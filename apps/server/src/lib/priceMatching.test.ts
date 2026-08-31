@@ -14,11 +14,11 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
-  bottleAliases,
   bottleBarcodes,
   bottleChecks,
   bottleGroups,
   bottleObservations,
+  bottleReferences,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -37,7 +37,7 @@ import {
 } from "@peated/server/lib/bottleReferenceCandidates";
 import { finalizeCreatedBottle } from "@peated/server/lib/createBottle";
 import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
   applyStorePriceBottleRepairFromProposal,
@@ -151,7 +151,7 @@ type MockBottleClassifierDecision = {
     | "match"
     | "match_existing"
     | "no_match";
-  aliasScope?: BottleClassificationDecision["aliasScope"];
+  referenceScope?: BottleClassificationDecision["referenceScope"];
   candidateBottleIds?: number[];
   confidence?: number | null;
   confidenceBasis?: BottleClassificationDecision["confidenceBasis"];
@@ -260,9 +260,9 @@ function normalizeMockBottleClassifierDecision(
     confidenceBasis: decision.confidenceBasis ?? null,
   };
   const base =
-    decision.aliasScope === undefined
+    decision.referenceScope === undefined
       ? commonDecision
-      : { ...commonDecision, aliasScope: decision.aliasScope };
+      : { ...commonDecision, referenceScope: decision.referenceScope };
 
   if (action === "match") {
     return {
@@ -342,7 +342,7 @@ describe("priceMatching", () => {
       proposalType: "match_existing",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
-      aliasScope: "none",
+      referenceScope: "none",
       model: null,
     });
     await expect(
@@ -351,8 +351,11 @@ describe("priceMatching", () => {
       }),
     ).resolves.toMatchObject({ bottleId: bottle.id });
     await expect(
-      db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+      db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(price.name),
+        ),
       }),
     ).resolves.toBeUndefined();
     expect(runScrapedBottleReference).not.toHaveBeenCalled();
@@ -614,7 +617,7 @@ describe("priceMatching", () => {
     getOpenAIEmbedding.mockRejectedValue(new Error("Embeddings unavailable"));
 
     const bottle = await fixtures.Bottle();
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Fallback Candidate",
     });
@@ -637,7 +640,7 @@ describe("priceMatching", () => {
     );
   });
 
-  test("resolves exact aliases through direct Bottle ownership", async ({
+  test("resolves exact references through direct Bottle ownership", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -646,7 +649,7 @@ describe("priceMatching", () => {
       name: "Authoritative Exact Candidate",
       edition: "Target edition",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: targetBottle.id,
       name: "Direct Bottle Alias ZXQ",
     });
@@ -660,7 +663,7 @@ describe("priceMatching", () => {
       expect.arrayContaining([
         expect.objectContaining({
           bottleId: targetBottle.id,
-          alias: "Direct Bottle Alias ZXQ",
+          reference: "Direct Bottle Alias ZXQ",
           fullName: targetBottle.fullName,
           edition: "Target edition",
           source: expect.arrayContaining(["exact"]),
@@ -675,16 +678,16 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const member = await fixtures.Bottle({ name: "Alias Scope Member" });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: member.id,
       name: "Assigned Alias Scope ZXQ",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: member.id,
       ignored: true,
       name: "Ignored Alias Scope ZXQ",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: null,
       name: "Unresolved Alias Scope ZXQ",
     });
@@ -705,7 +708,7 @@ describe("priceMatching", () => {
     expect(assignedCandidates).toEqual([
       expect.objectContaining({
         bottleId: member.id,
-        alias: "Assigned Alias Scope ZXQ",
+        reference: "Assigned Alias Scope ZXQ",
         source: expect.arrayContaining(["exact"]),
       }),
     ]);
@@ -904,7 +907,7 @@ describe("priceMatching", () => {
     );
   });
 
-  test("includes extracted cask flags in exact alias lookup", async ({
+  test("includes extracted cask flags in exact reference lookup", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -918,7 +921,7 @@ describe("priceMatching", () => {
       name: "Pure Malt",
       singleCask: true,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Shibui Pure Malt Single Cask",
     });
@@ -946,7 +949,7 @@ describe("priceMatching", () => {
       expect.arrayContaining([
         expect.objectContaining({
           bottleId: bottle.id,
-          alias: "Shibui Pure Malt Single Cask",
+          reference: "Shibui Pure Malt Single Cask",
           source: expect.arrayContaining(["exact"]),
           singleCask: true,
         }),
@@ -1057,7 +1060,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         extractedLabel: {
           brand: "SMWS",
           bottler: "SMWS",
@@ -1143,8 +1146,8 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -1262,7 +1265,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("prefers a literal exact alias over apostrophe-normalized fallback matches", async ({
+  test("prefers a literal exact reference over apostrophe-normalized fallback matches", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -1279,11 +1282,11 @@ describe("priceMatching", () => {
       brandId: brand.id,
       name: "Founders Cut Reserve",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: literalBottle.id,
       name: "Founder's Cut",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: normalizedBottle.id,
       name: "Founders Cut",
     });
@@ -1312,7 +1315,7 @@ describe("priceMatching", () => {
 
     expect(candidates[0]).toMatchObject({
       bottleId: literalBottle.id,
-      alias: "Founder's Cut",
+      reference: "Founder's Cut",
     });
     expect(candidates[0]?.source).toEqual(expect.arrayContaining(["exact"]));
   });
@@ -1326,7 +1329,7 @@ describe("priceMatching", () => {
     runQuery.mockResolvedValue([
       {
         bottleId: "123",
-        alias: "Synthetic Candidate",
+        reference: "Synthetic Candidate",
         fullName: "Synthetic Candidate",
         brand: "Synthetic Brand",
         score: "0.91",
@@ -1356,7 +1359,7 @@ describe("priceMatching", () => {
     expect(candidates).toEqual([
       expect.objectContaining({
         bottleId: 123,
-        alias: "Synthetic Candidate",
+        reference: "Synthetic Candidate",
       }),
     ]);
   });
@@ -1387,7 +1390,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: "Fractional Confidence Candidate",
+            reference: "Fractional Confidence Candidate",
             fullName: bottle.fullName,
             brand: null,
             bottler: null,
@@ -1479,7 +1482,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: generic12Bottle.id,
-            alias: "Tomatin Single Malt 12-year-old",
+            reference: "Tomatin Single Malt 12-year-old",
             fullName: generic12Bottle.fullName,
             brand: "Tomatin",
             bottler: null,
@@ -1501,7 +1504,7 @@ describe("priceMatching", () => {
           },
           {
             bottleId: bourbonAndSherryBottle.id,
-            alias: null,
+            reference: null,
             fullName: bourbonAndSherryBottle.fullName,
             brand: "Tomatin",
             bottler: null,
@@ -1523,7 +1526,7 @@ describe("priceMatching", () => {
           },
           {
             bottleId: caskStrengthBottle.id,
-            alias: null,
+            reference: null,
             fullName: caskStrengthBottle.fullName,
             brand: "Tomatin",
             bottler: null,
@@ -1612,7 +1615,7 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 80,
           rationale: "The current bottle identity already matches cleanly.",
-          aliasScope: "global_alias",
+          referenceScope: "global_alias",
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1621,7 +1624,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: "Example Distillery Port Cask 10 Year",
+            reference: "Example Distillery Port Cask 10 Year",
             fullName: "Example Distillery Port Cask 10 Year",
             brand: "Example Distillery",
             bottler: null,
@@ -1650,11 +1653,11 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
-    const rawListingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, price.name),
+    const rawListingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, price.name),
     });
     const observation = await db.query.bottleObservations.findFirst({
       where: (bottleObservations, { eq }) =>
@@ -1710,7 +1713,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: "Fractional Confidence Candidate",
+            reference: "Fractional Confidence Candidate",
             fullName: bottle.fullName,
             brand: null,
             bottler: null,
@@ -1808,7 +1811,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: null,
+            reference: null,
             fullName: "Jameson Cold Brew",
             brand: "Jameson",
             bottler: null,
@@ -1904,7 +1907,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: null,
+            reference: null,
             fullName: bottle.fullName,
             brand: "Wild Turkey",
             bottler: null,
@@ -2002,7 +2005,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: null,
+            reference: null,
             fullName: bottle.fullName,
             brand: "Wild Turkey",
             bottler: null,
@@ -2118,7 +2121,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: null,
+            reference: null,
             fullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
             brand: "Glenlivet",
             bottler: "Glenlivet",
@@ -2220,7 +2223,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: "Example Heritage Table Whiskey",
+            reference: "Example Heritage Table Whiskey",
             fullName: "Example Heritage Table Whiskey",
             brand: "Example Heritage",
             bottler: null,
@@ -2307,7 +2310,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: null,
+            reference: null,
             fullName: "Ardbeg Uigeadail",
             brand: "Ardbeg",
             bottler: null,
@@ -2499,7 +2502,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: currentBottle.id,
-            alias: "The Whistler Bodega Cask",
+            reference: "The Whistler Bodega Cask",
             fullName: currentBottle.fullName,
             brand: "The Whistler",
             bottler: null,
@@ -2625,7 +2628,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: currentBottle.id,
-            alias: "The Whistler Bodega Cask",
+            reference: "The Whistler Bodega Cask",
             fullName: currentBottle.fullName,
             brand: "The Whistler",
             bottler: null,
@@ -2787,8 +2790,11 @@ describe("priceMatching", () => {
         db.query.storePriceMatchProposals.findFirst({
           where: eq(storePriceMatchProposals.id, proposal.id),
         }),
-        db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+        db.query.bottleReferences.findFirst({
+          where: eq(
+            bottleReferences.name,
+            normalizeBottleReferenceKey(price.name),
+          ),
         }),
         db.query.bottleObservations.findFirst({
           where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
@@ -3254,7 +3260,7 @@ describe("priceMatching", () => {
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
-          aliasScope: "global_alias",
+          referenceScope: "global_alias",
           confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
@@ -3263,7 +3269,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: price.name,
+            reference: price.name,
             fullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
@@ -3291,8 +3297,8 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     expect(classifyBottleReference).toHaveBeenCalledOnce();
@@ -3369,7 +3375,7 @@ describe("priceMatching", () => {
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
-          aliasScope: "global_alias",
+          referenceScope: "global_alias",
           confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
@@ -3378,7 +3384,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: price.name,
+            reference: price.name,
             fullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
@@ -3406,8 +3412,8 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     expect(classifyBottleReference).toHaveBeenCalledOnce();
@@ -3475,7 +3481,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 95,
           rationale: "Classifier created the SMWS exact-cask bottle.",
-          aliasScope: "global_alias",
+          referenceScope: "global_alias",
           candidateBottleIds: [],
           proposedBottle: {
             name: "RW6.5 Sauna Smoke",
@@ -3536,8 +3542,8 @@ describe("priceMatching", () => {
     const createdBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, proposal.suggestedBottleId!),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
     const observation = await db.query.bottleObservations.findFirst({
       where: (bottleObservations, { eq }) =>
@@ -3662,7 +3668,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: price.name,
+            reference: price.name,
             fullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
@@ -3791,7 +3797,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: price.name,
+            reference: price.name,
             fullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
@@ -4004,7 +4010,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: mismatchedBottle.id,
-            alias: null,
+            reference: null,
             fullName: mismatchedBottle.fullName,
             brand: "SMWS",
             bottler: "SMWS",
@@ -4074,7 +4080,7 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 92,
           rationale: "Web evidence confirms a distinct release.",
-          aliasScope: "global_alias",
+          referenceScope: "global_alias",
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: null,
           candidateBottleIds: [],
@@ -4135,8 +4141,8 @@ describe("priceMatching", () => {
     const createdBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, proposal.suggestedBottleId!),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
     const creationChange = await db.query.changes.findFirst({
       where: and(
@@ -4355,7 +4361,7 @@ describe("priceMatching", () => {
       statedAge: 21,
       distillerIds: [distiller.id],
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: attemptedCanonicalName,
       assignmentSource: "legacy",
@@ -4516,7 +4522,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: currentBottle.id,
-            alias: null,
+            reference: null,
             fullName: currentBottle.fullName,
             brand: null,
             bottler: null,
@@ -4572,7 +4578,7 @@ describe("priceMatching", () => {
     config.AI_GATEWAY_API_KEY = undefined;
 
     const bottle = await fixtures.Bottle();
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Classifier Failure Candidate",
     });
@@ -4584,7 +4590,7 @@ describe("priceMatching", () => {
     const candidateBottles = [
       {
         bottleId: bottle.id,
-        alias: "Classifier Failure Candidate",
+        reference: "Classifier Failure Candidate",
         fullName: bottle.fullName,
         brand: null,
         bottler: null,
@@ -4862,12 +4868,12 @@ describe("priceMatching", () => {
       .update(bottles)
       .set({ fullName: "Age Ranking Mismatch Candidate" })
       .where(eq(bottles.id, mismatched.id));
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: mismatched.id,
       name: "Age Ranking Mismatch Alias",
       embedding: embeddingWithCosineSimilarity(0.9),
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: matching.id,
       name: "Age Ranking Matching Alias",
       embedding: embeddingWithCosineSimilarity(0.72),
@@ -4922,7 +4928,7 @@ describe("priceMatching", () => {
       caskNumber: "port_pipe",
       outturn: 240,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Independent Label Small Batch Reserve Batch 7",
     });
@@ -5109,7 +5115,7 @@ describe("priceMatching", () => {
       category: "single_malt",
       statedAge: 30,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: dirtyAgeBottle.id,
       name: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
     });
@@ -5172,7 +5178,7 @@ describe("priceMatching", () => {
       statedAge: null,
       edition: "Batch 11",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: legacyBatchBottle.id,
       name: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
     });
@@ -5393,7 +5399,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: suggestedBottle.id,
-            alias: "Attempt Candidate",
+            reference: "Attempt Candidate",
             fullName: suggestedBottle.fullName,
             brand: null,
             bottler: null,
@@ -5566,7 +5572,7 @@ describe("priceMatching", () => {
         decision: {
           action: "match_existing",
           confidence: 82,
-          rationale: "Local alias evidence is now sufficient.",
+          rationale: "Local reference evidence is now sufficient.",
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -5575,7 +5581,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: "Retry Candidate",
+            reference: "Retry Candidate",
             fullName: bottle.fullName,
             brand: null,
             bottler: null,
@@ -5878,7 +5884,7 @@ describe("priceMatching", () => {
         candidateBottles: [
           {
             bottleId: bottle.id,
-            alias: "Unknown Suggested Candidate",
+            reference: "Unknown Suggested Candidate",
             fullName: bottle.fullName,
             brand: null,
             bottler: null,
@@ -6840,8 +6846,8 @@ describe("priceMatching", () => {
       createdRelease: false,
     });
 
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
@@ -6893,7 +6899,7 @@ describe("priceMatching", () => {
         rationale: "The direct Bottle is the reviewed match.",
         candidateBottleIds: [directBottle.id],
         identityScope: "product",
-        aliasScope: "none",
+        referenceScope: "none",
         suggestedBottleId: directBottle.id,
         proposedBottle: null,
       },
@@ -6934,7 +6940,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: parent.id,
       })
       .returning();
@@ -6954,8 +6960,11 @@ describe("priceMatching", () => {
         db.query.storePriceMatchProposals.findFirst({
           where: eq(storePriceMatchProposals.id, proposal.id),
         }),
-        db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+        db.query.bottleReferences.findFirst({
+          where: eq(
+            bottleReferences.name,
+            normalizeBottleReferenceKey(price.name),
+          ),
         }),
         db.query.bottleObservations.findFirst({
           where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
@@ -6998,7 +7007,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: suggestedParent.id,
       })
       .returning();
@@ -7069,8 +7078,11 @@ describe("priceMatching", () => {
         db.query.storePriceMatchProposals.findFirst({
           where: eq(storePriceMatchProposals.id, proposal.id),
         }),
-        db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+        db.query.bottleReferences.findFirst({
+          where: eq(
+            bottleReferences.name,
+            normalizeBottleReferenceKey(price.name),
+          ),
         }),
         db.query.bottleObservations.findFirst({
           where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
@@ -7200,7 +7212,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -7215,8 +7227,8 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     expect(updatedPrice?.bottleId).toBe(bottle.id);
@@ -7249,7 +7261,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "none",
+        referenceScope: "none",
       })
       .returning();
 
@@ -7263,15 +7275,15 @@ describe("priceMatching", () => {
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     expect(updatedPrice?.bottleId).toBe(bottle.id);
     expect(listingAlias).toBeUndefined();
   });
 
-  test("does not create a BottleAlias when a match proposal has no suggested Bottle", async ({
+  test("does not create a BottleReference when a match proposal has no suggested Bottle", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -7286,7 +7298,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: null,
       })
       .returning();
@@ -7304,8 +7316,11 @@ describe("priceMatching", () => {
       }),
     ).toMatchObject({ bottleId: bottle.id });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(price.name),
+        ),
       }),
     ).toBeUndefined();
   });
@@ -7338,8 +7353,8 @@ describe("priceMatching", () => {
       actor: await getUserActor(reviewer),
     });
 
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     expect(listingAlias).toBeUndefined();
@@ -7350,7 +7365,7 @@ describe("priceMatching", () => {
   }) => {
     const reviewer = await fixtures.User();
     const bottle = await fixtures.Bottle();
-    const canonicalAlias = await fixtures.BottleAlias({
+    const canonicalAlias = await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Canonical Reusable Alias",
       assignmentSource: "canonical",
@@ -7368,7 +7383,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "none",
+        referenceScope: "none",
       })
       .returning();
 
@@ -7379,8 +7394,8 @@ describe("priceMatching", () => {
       actor: await getUserActor(reviewer),
     });
 
-    const reloadedCanonical = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, canonicalAlias.name),
+    const reloadedCanonical = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, canonicalAlias.name),
     });
     expect(reloadedCanonical?.ignored).toBe(false);
   });
@@ -7397,9 +7412,9 @@ describe("priceMatching", () => {
       name: "Existing Active Alias Listing",
       volume: 750,
     });
-    const existingAlias = await fixtures.BottleAlias({
+    const existingAlias = await fixtures.BottleReference({
       bottleId: bottle.id,
-      name: normalizeBottleAliasKey(price.name),
+      name: normalizeBottleReferenceKey(price.name),
       assignmentSource: "human_approved",
       ignored: false,
     });
@@ -7409,7 +7424,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "none",
+        referenceScope: "none",
       })
       .returning();
 
@@ -7420,8 +7435,8 @@ describe("priceMatching", () => {
       actor: await getUserActor(reviewer),
     });
 
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     // A none-scope decision must not deactivate an accepted alias that already
@@ -7446,9 +7461,9 @@ describe("priceMatching", () => {
       name: "Existing Ignored Alias Listing",
       volume: 750,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
-      name: normalizeBottleAliasKey(price.name),
+      name: normalizeBottleReferenceKey(price.name),
       assignmentSource: "human_approved",
       ignored: true,
     });
@@ -7458,7 +7473,7 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -7470,8 +7485,8 @@ describe("priceMatching", () => {
       actor: await getUserActor(reviewer),
     });
 
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
     // The classifier's alias scope cannot upgrade human state: a moderator
@@ -7497,7 +7512,7 @@ describe("priceMatching", () => {
           action: "match",
           rationale: "The source matches the inspected Bottle.",
           candidateBottleIds: [bottle.id],
-          aliasScope: "none",
+          referenceScope: "none",
           matchedBottleId: bottle.id,
           proposedBottle: null,
         },
@@ -7557,7 +7572,7 @@ describe("priceMatching", () => {
           action: "match",
           rationale: "The source matches the canonical destination.",
           candidateBottleIds: [sourceBottle.id, destinationBottle.id],
-          aliasScope: "none",
+          referenceScope: "none",
           matchedBottleId: destinationBottle.id,
           proposedBottle: null,
         },

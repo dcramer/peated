@@ -20,7 +20,7 @@ const GetBottleContextResultSchema = z
   .strict();
 
 const GET_BOTTLE_CONTEXT_DESCRIPTION =
-  "Load bounded read-only identity context for one existing Peated Bottle, including shared and exact state, aliases, siblings, observations, related Entity ids, and normalized public-image label evidence. Use before proposing an operation that targets or compares this Bottle.";
+  "Load bounded read-only identity context for one existing Peated Bottle, including shared and exact state, accepted references, siblings, observations, related Entity ids, and normalized public-image label evidence. Use before proposing an operation that targets or compares this Bottle.";
 
 export function createGetBottleContextTool({
   getBottleContext,

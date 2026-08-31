@@ -39,7 +39,7 @@ function buildCandidate(
 ): AssessmentInput["candidateBottles"][number] {
   return {
     bottleId: 1,
-    alias: null,
+    reference: null,
     fullName: "Example Distillery Port Cask 10 Year",
     brand: "Example Distillery",
     bottler: null,
@@ -488,7 +488,7 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 77,
           fullName: "Example Heritage Table Whiskey",
-          alias: "Example Heritage Table Whiskey",
+          reference: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
           category: "spirit",
@@ -568,7 +568,7 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 77,
           fullName: "Example Heritage Table Whiskey",
-          alias: "Example Heritage Table Whiskey",
+          reference: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
           category: "spirit",
@@ -638,7 +638,7 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 77,
           fullName: "Example Heritage Table Whiskey",
-          alias: "Example Heritage Table Whiskey",
+          reference: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
           category: "spirit",

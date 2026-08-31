@@ -8,7 +8,7 @@ import { ORPCError } from "@orpc/server";
 import {
   bottleNameDuplicatesBrand,
   normalizeBottleAge,
-  normalizeBottleAliasKey,
+  normalizeBottleReferenceKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
@@ -168,7 +168,7 @@ export type BottleUpdateResult = {
 export type BottleUpdateFinalizationManifest = BottleUpdateResult & {
   creationSource: CatalogVerificationCreationSource;
   changedBottleIds: number[];
-  changedAliasNames: string[];
+  changedReferenceNames: string[];
   changedEntityIds: number[];
   newEntityIds: number[];
   affectedSeriesIds: number[];
@@ -840,7 +840,7 @@ async function resolveStableState(
   let name = patch?.name ?? group.name;
   if (patch?.name !== undefined) {
     const normalized = normalizeBottleAge({
-      name: normalizeBottleAliasKey(patch.name),
+      name: normalizeBottleReferenceKey(patch.name),
       statedAge,
     });
     name = normalized.name;
@@ -1027,7 +1027,7 @@ function emptyResult(
     changed: false,
     creationSource,
     changedBottleIds: [],
-    changedAliasNames: [],
+    changedReferenceNames: [],
     changedEntityIds: [],
     newEntityIds: [],
     affectedSeriesIds: [],
@@ -1434,53 +1434,56 @@ export async function updateBottleInTransaction(
       : stable.bottlerId === group.bottlerId
         ? stable.bottler
         : await loadEntity(tx, group.bottlerId);
-  let changedAliasNames: string[];
+  let changedReferenceNames: string[];
   try {
-    ({ changedAliasNames } = await reserveBottleIdentitiesInTransaction(tx, {
-      candidates: affectedMembers.map((member) => {
-        const desired = desiredByBottleId.get(member.id)!;
-        return {
-          bottleId: member.id,
-          current: {
-            name: member.name,
-            fullName: member.fullName,
-            brandId: member.brandId,
-            brand: currentBrand,
-            bottler: currentBottler,
-            edition: member.edition,
-            statedAge: member.statedAge,
-            noAgeStatement: member.noAgeStatement,
-            vintageYear: member.vintageYear,
-            releaseYear: member.releaseYear,
-            releaseMonth: member.releaseMonth,
-            releaseDay: member.releaseDay,
-            abv: member.abv,
-            singleCask: member.singleCask,
-            caskStrength: member.caskStrength,
-            caskNumber: member.caskNumber,
-          },
-          desired: {
-            name: desired.name,
-            fullName: desired.fullName,
-            brandId: desired.brandId,
-            brand: stable.brand,
-            bottler: stable.bottler,
-            edition: desired.edition,
-            statedAge: desired.statedAge,
-            noAgeStatement: desired.noAgeStatement,
-            vintageYear: desired.vintageYear,
-            releaseYear: desired.releaseYear,
-            releaseMonth: desired.releaseMonth,
-            releaseDay: desired.releaseDay,
-            abv: desired.abv,
-            singleCask: desired.singleCask,
-            caskStrength: desired.caskStrength,
-            caskNumber: desired.caskNumber,
-          },
-        };
-      }),
-      assignedByActorId: actorId,
-    }));
+    ({ changedReferenceNames } = await reserveBottleIdentitiesInTransaction(
+      tx,
+      {
+        candidates: affectedMembers.map((member) => {
+          const desired = desiredByBottleId.get(member.id)!;
+          return {
+            bottleId: member.id,
+            current: {
+              name: member.name,
+              fullName: member.fullName,
+              brandId: member.brandId,
+              brand: currentBrand,
+              bottler: currentBottler,
+              edition: member.edition,
+              statedAge: member.statedAge,
+              noAgeStatement: member.noAgeStatement,
+              vintageYear: member.vintageYear,
+              releaseYear: member.releaseYear,
+              releaseMonth: member.releaseMonth,
+              releaseDay: member.releaseDay,
+              abv: member.abv,
+              singleCask: member.singleCask,
+              caskStrength: member.caskStrength,
+              caskNumber: member.caskNumber,
+            },
+            desired: {
+              name: desired.name,
+              fullName: desired.fullName,
+              brandId: desired.brandId,
+              brand: stable.brand,
+              bottler: stable.bottler,
+              edition: desired.edition,
+              statedAge: desired.statedAge,
+              noAgeStatement: desired.noAgeStatement,
+              vintageYear: desired.vintageYear,
+              releaseYear: desired.releaseYear,
+              releaseMonth: desired.releaseMonth,
+              releaseDay: desired.releaseDay,
+              abv: desired.abv,
+              singleCask: desired.singleCask,
+              caskStrength: desired.caskStrength,
+              caskNumber: desired.caskNumber,
+            },
+          };
+        }),
+        assignedByActorId: actorId,
+      },
+    ));
   } catch (error) {
     if (error instanceof BottleIdentityConflictError) {
       throw new BottleUpdateConflictError(error.conflictingBottleId);
@@ -1621,7 +1624,7 @@ export async function updateBottleInTransaction(
     changed: true,
     creationSource,
     changedBottleIds: affectedIds,
-    changedAliasNames,
+    changedReferenceNames,
     changedEntityIds: Array.from(changedEntityIds).sort(
       (left, right) => left - right,
     ),
@@ -1641,13 +1644,13 @@ export async function finalizeBottleUpdate(
       logError(error, { extra: { bottleId } });
     }
   }
-  for (const name of result.changedAliasNames) {
+  for (const name of result.changedReferenceNames) {
     try {
-      await pushUniqueJob("OnBottleAliasChange", { name });
+      await pushUniqueJob("OnBottleReferenceChange", { name });
     } catch (error) {
       logError(error, {
         bottle: { id: result.bottle.id },
-        alias: { name },
+        bottleReference: { name },
       });
     }
   }

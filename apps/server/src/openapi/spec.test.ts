@@ -273,21 +273,34 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<false>();
   });
 
-  it("publishes Bottle aliases with one direct Bottle identity", async () => {
+  it("publishes private Bottle references with one direct Bottle identity", async () => {
     const spec = await generateSpec();
-    const listItem = getJsonResponseSchema(spec.paths?.["/bottle-aliases"]?.get)
-      ?.properties?.results?.items;
+    const listItem = getJsonResponseSchema(
+      spec.paths?.["/bottle-references"]?.get,
+    )?.properties?.results?.items;
     const upsertRequest = getJsonRequestSchema(
-      spec.paths?.["/bottle-aliases"]?.put,
+      spec.paths?.["/bottle-references"]?.put,
     );
 
     expect(Object.keys(listItem?.properties ?? {})).toEqual([
+      "id",
       "name",
       "createdAt",
       "bottleId",
       "isCanonical",
+      "assignmentSource",
+      "reviewedAt",
+      "stateToken",
     ]);
-    expect(listItem?.required).toEqual(["name", "createdAt", "bottleId"]);
+    expect(listItem?.required).toEqual([
+      "id",
+      "name",
+      "createdAt",
+      "bottleId",
+      "assignmentSource",
+      "reviewedAt",
+      "stateToken",
+    ]);
     expect(JSON.stringify(listItem)).not.toContain("target");
     expect(Object.keys(upsertRequest?.properties ?? {})).toEqual([
       "bottle",
@@ -295,6 +308,20 @@ describe("OpenAPI generation ($ref reuse)", () => {
     ]);
     expect(upsertRequest?.required).toEqual(["bottle", "name"]);
     expect(JSON.stringify(upsertRequest)).not.toContain("target");
+  });
+
+  it("publishes Bottle aliases as display records owned by one Bottle", async () => {
+    const spec = await generateSpec();
+    const listItem = getJsonResponseSchema(
+      spec.paths?.["/bottles/{bottle}/aliases"]?.get,
+    )?.properties?.results?.items;
+
+    expect(Object.keys(listItem?.properties ?? {})).toEqual([
+      "id",
+      "name",
+      "createdAt",
+    ]);
+    expect(listItem?.required).toEqual(["id", "name", "createdAt"]);
   });
 
   it("publishes direct nullable Bottle identity for reviews and prices", async () => {

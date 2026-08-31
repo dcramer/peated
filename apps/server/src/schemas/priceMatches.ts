@@ -7,7 +7,7 @@ import { ExternalSiteSchema } from "./externalSites";
 import { CursorSchema } from "./shared";
 import { StorePriceSchema } from "./stores";
 
-const AliasScopeEnum = z.enum(["global_alias", "none"]);
+const ReferenceScopeEnum = z.enum(["global_alias", "none"]);
 
 export const ExtractedBottleDetailsSchema = z.object({
   brand: z.string().nullable().default(null),
@@ -198,7 +198,7 @@ const StorePriceMatchDecisionBaseSchema = z
     rationale: z.string().nullable().default(null),
     candidateBottleIds: z.array(z.number().int()).default([]),
     identityScope: BottleIdentityScopeEnum.default("product"),
-    aliasScope: AliasScopeEnum.optional(),
+    referenceScope: ReferenceScopeEnum.optional(),
   })
   .strict();
 

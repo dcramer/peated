@@ -22,7 +22,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Springbank",
         "bottler": null,
         "series": null,
@@ -47,7 +47,7 @@
       "when": ["springbank", "10"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Springbank",
           "bottler": null,
           "series": null,

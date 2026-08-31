@@ -24,7 +24,7 @@
     "initialCandidates": [
       {
         "bottleId": 469,
-        "alias": null,
+        "reference": null,
         "fullName": "Springbank 25-year-old",
         "brand": "Springbank",
         "bottler": "Springbank",
@@ -43,7 +43,7 @@
       },
       {
         "bottleId": 1563,
-        "alias": null,
+        "reference": null,
         "fullName": "Springbank 25-year-old Limited Edition",
         "brand": "Springbank",
         "bottler": "Springbank",
@@ -62,7 +62,7 @@
       },
       {
         "bottleId": 1230,
-        "alias": null,
+        "reference": null,
         "fullName": "Longrow 1974",
         "brand": "Longrow",
         "bottler": "Springbank",
@@ -87,7 +87,7 @@
       "results": [
         {
           "bottleId": 469,
-          "alias": null,
+          "reference": null,
           "fullName": "Springbank 25-year-old",
           "brand": "Springbank",
           "bottler": "Springbank",
@@ -106,7 +106,7 @@
         },
         {
           "bottleId": 1563,
-          "alias": null,
+          "reference": null,
           "fullName": "Springbank 25-year-old Limited Edition",
           "brand": "Springbank",
           "bottler": "Springbank",

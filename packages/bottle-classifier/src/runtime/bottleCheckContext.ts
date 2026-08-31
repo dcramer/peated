@@ -36,7 +36,7 @@ export function bottleContextToCandidate(
 ): BottleCandidate {
   return BottleCandidateSchema.parse({
     bottleId: context.bottleId,
-    alias: null,
+    reference: null,
     fullName: context.fullName,
     brand: context.shared.brand.name,
     bottler: context.shared.bottler?.name ?? null,

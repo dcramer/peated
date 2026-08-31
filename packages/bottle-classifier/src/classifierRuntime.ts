@@ -37,7 +37,7 @@ import {
   type AuditBottleResult,
   type BottleClassificationArtifacts,
   type BottleClassificationResult,
-  type BottleReference,
+  type BottleReferenceInput,
   type CandidateExpansionMode,
   type ClassifyBottleReferenceInput,
   type ProposedOperation,
@@ -203,7 +203,7 @@ export type BottleAuditAgentOutput = z.infer<
 
 export type RunBottleAuditAgentInput = {
   audit: AuditBottleInput;
-  reference?: BottleReference;
+  reference?: BottleReferenceInput;
   extractedIdentity?: BottleExtractedDetails | null;
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates?: BottleCandidate[];
@@ -222,7 +222,7 @@ type BottleClassifierAgentRun = {
 };
 
 export type RunBottleClassifierAgentInput = {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   conversationId?: string;
   extractedIdentity?: BottleExtractedDetails | null;
   imageEvidence?: ImageBottleEvidence | null;
@@ -300,7 +300,7 @@ export type BottleClassifier = {
     input: RunBottleClassifierAgentInput,
   ) => Promise<BottleClassifierAgentResult>;
   extractBottleReferenceIdentity: (
-    reference: Pick<BottleReference, "name" | "imageUrl">,
+    reference: Pick<BottleReferenceInput, "name" | "imageUrl">,
   ) => Promise<BottleExtractedDetails | null>;
   extractFromImage: (
     imageUrlOrBase64: string,
@@ -375,7 +375,7 @@ export type PreparedBottleClassifierAgentRun = {
 };
 
 function buildClassifierConversationId(
-  reference: BottleReference,
+  reference: BottleReferenceInput,
   conversationId?: string,
 ) {
   const explicitConversationId = conversationId?.trim();
@@ -517,7 +517,7 @@ export async function finalizeBottleClassifierAgentResult({
   reference,
   agentResult,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   agentResult: {
     decision: BottleClassifierAgentDecisionInput;
     artifacts: BottleClassificationArtifacts;
@@ -564,7 +564,7 @@ export async function prepareBottleClassifierAgentRun(
   };
   const normalizedExtractedIdentity = extractedIdentity ?? null;
   const normalizedImageEvidence = imageEvidence ?? null;
-  const hasExactAliasMatch = initialCandidates.some((candidate) =>
+  const hasExactReferenceMatch = initialCandidates.some((candidate) =>
     candidate.source.includes("exact"),
   );
 
@@ -657,7 +657,7 @@ export async function prepareBottleClassifierAgentRun(
     imageEvidence: normalizedImageEvidence,
     initialCandidates,
     currentBottle,
-    hasExactAliasMatch,
+    hasExactReferenceMatch,
     searchEvidence: state.searchEvidence,
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
     identityAnchor,
@@ -737,7 +737,7 @@ export function prepareBottleAuditAgentRun(
 ): PreparedBottleAuditAgentRun {
   const dataSource = getBottleClassifierDataSource(options);
   const currentBottle = bottleContextToCandidate(currentBottleContext);
-  const normalizedReference: BottleReference = reference ?? {
+  const normalizedReference: BottleReferenceInput = reference ?? {
     id: `audit:${audit.bottleId}`,
     name: currentBottleContext.fullName,
     url: null,
@@ -884,7 +884,7 @@ export function createBottleClassifier(
       : await extractor.extractFromText(label);
 
   const extractBottleReferenceIdentityWithSource = async (
-    reference: Pick<BottleReference, "name" | "imageUrl">,
+    reference: Pick<BottleReferenceInput, "name" | "imageUrl">,
   ): Promise<{
     identity: BottleExtractedDetails | null;
     source: "image" | "text";
@@ -917,7 +917,7 @@ export function createBottleClassifier(
   };
 
   const extractBottleReferenceIdentity = async (
-    reference: Pick<BottleReference, "name" | "imageUrl">,
+    reference: Pick<BottleReferenceInput, "name" | "imageUrl">,
   ): Promise<BottleExtractedDetails | null> =>
     (await extractBottleReferenceIdentityWithSource(reference)).identity;
 
@@ -1203,7 +1203,7 @@ export function createBottleClassifier(
           ({ labelEvidence }) => labelEvidence.extractedIdentity !== null,
         ) ??
         currentBottleContext.publicImages[0];
-      const reference: BottleReference = {
+      const reference: BottleReferenceInput = {
         id: `audit:${parsedInput.bottleId}`,
         name: currentBottleContext.fullName,
         url: null,

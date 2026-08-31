@@ -122,7 +122,7 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results[0]?.bottle).not.toHaveProperty("group");
   });
 
-  test("does not match an ignored Bottle alias in Library", async ({
+  test("does not match an ignored Bottle reference in Library", async ({
     defaults,
     fixtures,
   }) => {
@@ -136,7 +136,7 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
       collectionId: collection.id,
       bottleId: bottle.id,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Hidden Library Alias",
       ignored: true,

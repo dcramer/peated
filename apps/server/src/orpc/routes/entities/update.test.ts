@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroups,
+  bottleReferences,
   bottles,
   changes,
   entities,
@@ -365,7 +365,7 @@ describe("PATCH /entities/:entity", () => {
       new Set([first.groupId, otherGroup.groupId]),
     );
 
-    await db.insert(bottleAliases).values({
+    await db.insert(bottleReferences).values({
       name: "New Foo Reserve",
       bottleId: null,
       assignedByActorId: otherGroup.createdByActorId,
@@ -407,8 +407,8 @@ describe("PATCH /entities/:entity", () => {
 
       const aliases = await db
         .select()
-        .from(bottleAliases)
-        .where(eq(bottleAliases.bottleId, original.id));
+        .from(bottleReferences)
+        .where(eq(bottleReferences.bottleId, original.id));
       expect(aliases).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -484,10 +484,10 @@ describe("PATCH /entities/:entity", () => {
     expect(newBottle.name).toEqual(bottle.name);
     expect(newBottle.fullName).toEqual("F Bar");
 
-    const newAlias = await db.query.bottleAliases.findFirst({
+    const newAlias = await db.query.bottleReferences.findFirst({
       where: and(
-        eq(bottleAliases.bottleId, bottle.id),
-        eq(bottleAliases.name, newBottle.fullName),
+        eq(bottleReferences.bottleId, bottle.id),
+        eq(bottleReferences.name, newBottle.fullName),
       ),
     });
     expect(newAlias).toBeUndefined();
@@ -505,7 +505,7 @@ describe("PATCH /entities/:entity", () => {
     expect(shortNameAlias?.entityId).toEqual(entity.id);
   });
 
-  test("name change preserves brand bottle aliases when short name stays the same", async ({
+  test("name change preserves brand Bottle references when short name stays the same", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -534,8 +534,8 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.fullName).toEqual("FD Bar");
 
-    const preservedAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "FD Bar"),
+    const preservedAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "FD Bar"),
     });
     expect(preservedAlias?.bottleId).toEqual(bottle.id);
 
@@ -625,17 +625,17 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.fullName).toEqual("FC Bar");
 
-    const oldBottleAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "F Bar"),
+    const oldBottleReference = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "F Bar"),
     });
-    expect(oldBottleAlias).toMatchObject({
+    expect(oldBottleReference).toMatchObject({
       bottleId: bottle.id,
     });
 
-    const newBottleAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "FC Bar"),
+    const newBottleReference = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "FC Bar"),
     });
-    expect(newBottleAlias).toBeUndefined();
+    expect(newBottleReference).toBeUndefined();
 
     const oldEntityAlias = await db.query.entityAliases.findFirst({
       where: eq(entityAliases.name, "F"),
@@ -677,8 +677,8 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.fullName).toEqual("Foo Bar");
 
-    const oldShortNameAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "F Bar"),
+    const oldShortNameAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "F Bar"),
     });
     expect(oldShortNameAlias).toMatchObject({
       bottleId: bottle.id,
@@ -689,8 +689,8 @@ describe("PATCH /entities/:entity", () => {
     });
     expect(oldEntityAlias).toBeUndefined();
 
-    const revertedAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "Foo Bar"),
+    const revertedAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "Foo Bar"),
     });
     expect(revertedAlias).toBeUndefined();
 
@@ -712,7 +712,7 @@ describe("PATCH /entities/:entity", () => {
       name: "Core",
     });
     const conflictingBottle = await fixtures.Bottle();
-    const conflictingAlias = await fixtures.BottleAlias({
+    const conflictingAlias = await fixtures.BottleReference({
       bottleId: conflictingBottle.id,
       name: "Renamed Brand Core",
     });
@@ -729,8 +729,8 @@ describe("PATCH /entities/:entity", () => {
     const updatedBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
     });
-    const retainedConflict = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, conflictingAlias.name),
+    const retainedConflict = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, conflictingAlias.name),
     });
     expect(updatedEntity?.name).toBe("Renamed Brand");
     expect(updatedBottle?.fullName).toBe("Renamed Brand Core");
@@ -738,8 +738,8 @@ describe("PATCH /entities/:entity", () => {
       bottleId: conflictingBottle.id,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, "Renamed Brand Core"),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, "Renamed Brand Core"),
       }),
     ).toEqual(retainedConflict);
   });

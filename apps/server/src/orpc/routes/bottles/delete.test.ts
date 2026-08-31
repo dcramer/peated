@@ -1,10 +1,10 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
+  bottleReferences,
   bottleSeries,
   bottles,
   collectionBottles,
@@ -220,7 +220,7 @@ describe("DELETE /bottles/:bottle", () => {
     });
     const reviewer = await fixtures.User();
     const priorQueueEntryAt = new Date("2026-03-01T00:30:00.000Z");
-    const bottleAlias = await fixtures.BottleAlias({
+    const bottleReference = await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Deleted Bottle Alias",
     });
@@ -284,8 +284,8 @@ describe("DELETE /bottles/:bottle", () => {
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
       where: eq(storePriceMatchProposals.id, proposal.id),
     });
-    const updatedBottleAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, bottleAlias.name),
+    const updatedBottleReference = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, bottleReference.name),
     });
     const remainingFlavorProfiles = await db
       .select()
@@ -312,7 +312,7 @@ describe("DELETE /bottles/:bottle", () => {
       reviewedById: null,
       reviewedAt: null,
     });
-    expect(updatedBottleAlias).toMatchObject({
+    expect(updatedBottleReference).toMatchObject({
       bottleId: null,
     });
     expect(updatedProposal?.enteredQueueAt).not.toBeNull();

@@ -1,19 +1,19 @@
 import {
   normalizeBottle,
-  normalizeBottleAliasKey,
+  normalizeBottleReferenceKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
 import { storeExternalReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
-  assignBottleAliasInTransaction,
-  finalizeBottleAliasAssignment,
-} from "@peated/server/lib/bottleAliases";
-import {
   resolveBottleReferenceTarget,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  assignBottleReferenceInTransaction,
+  finalizeBottleReferenceAssignment,
+} from "@peated/server/lib/bottleReferences";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import {
@@ -93,7 +93,7 @@ export async function createExternalReview(
 
   const rawName = input.name;
   const { name: normalizedName } = normalizeBottle({ name: rawName });
-  const aliasKey = normalizeBottleAliasKey(rawName);
+  const referenceKey = normalizeBottleReferenceKey(rawName);
   const referenceInput = {
     reference: {
       externalSiteId: site.id,
@@ -102,7 +102,7 @@ export async function createExternalReview(
       imageUrl: null,
       currentBottleId: null,
     },
-    aliasLookupNames: [aliasKey, rawName],
+    referenceLookupNames: [referenceKey, rawName],
     extractedIdentity: { category: input.category },
     createdByActorId: systemActor.id,
   };
@@ -151,8 +151,8 @@ export async function createExternalReview(
         {
           origin: "manual",
           invalidBottleAction: "reject",
-          aliasLookupNames:
-            bottleId === null ? [] : [aliasKey, reviewName, rawName],
+          referenceLookupNames:
+            bottleId === null ? [] : [referenceKey, reviewName, rawName],
         },
       );
       const storedExternalReview = result.storedExternalReviews[0];
@@ -163,20 +163,20 @@ export async function createExternalReview(
 
       const appliedIncomingIdentity = externalReview.bottleId === bottleId;
       if (!bottleId || !appliedIncomingIdentity) {
-        return { externalReview, previousBottleId, aliasAssignment: null };
+        return { externalReview, previousBottleId, referenceAssignment: null };
       }
 
-      const aliasAssignment = await assignBottleAliasInTransaction(tx, {
+      const referenceAssignment = await assignBottleReferenceInTransaction(tx, {
         bottleId,
-        name: aliasKey,
+        name: referenceKey,
         backfillNames: [reviewName, rawName],
         externalSiteId: site.id,
         assignmentSource:
-          resolution.source === "exact_alias"
+          resolution.source === "exact_reference"
             ? undefined
             : "classifier_approved",
         assignedByActorId: systemActor.id,
-        sourceAliasIdentity: resolution.sourceAliasIdentity,
+        sourceReferenceIdentity: resolution.sourceReferenceIdentity,
       });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
@@ -218,7 +218,7 @@ export async function createExternalReview(
         });
       }
 
-      return { externalReview, previousBottleId, aliasAssignment };
+      return { externalReview, previousBottleId, referenceAssignment };
     });
   } catch (error) {
     if (error instanceof ActiveBottleSelectionError) {
@@ -227,8 +227,8 @@ export async function createExternalReview(
     throw error;
   }
 
-  if (stored.aliasAssignment) {
-    await finalizeBottleAliasAssignment(stored.aliasAssignment, {
+  if (stored.referenceAssignment) {
+    await finalizeBottleReferenceAssignment(stored.referenceAssignment, {
       review: { site: input.site, name: reviewName, url: input.url },
     });
   }

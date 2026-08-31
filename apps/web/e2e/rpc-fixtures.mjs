@@ -220,6 +220,7 @@ export function buildBottle({
     totalTastings,
     people,
     lastPrice: null,
+    aliases: [],
     barcodes: [],
     createdBy: null,
     createdAt: timestamp,
@@ -551,6 +552,7 @@ export const destinationBottleGroup = {
 
 export const existingBottleDetails = {
   ...existingBottle,
+  aliases: ["Lagavulin Destination Release"],
   groupId: destinationBottleGroup.id,
   group: destinationBottleGroup,
 };

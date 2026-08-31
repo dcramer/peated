@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleChecks,
   bottleGroupDistillers,
   bottleGroups,
   bottleObservations,
   bottleOperations,
+  bottleReferences,
   bottleSeries,
   bottleTombstones,
   bottles,
@@ -21,7 +21,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
@@ -141,7 +141,7 @@ describe("price match queue", () => {
           {
             bottleId: suggestedBottle.id,
             fullName: suggestedBottle.fullName,
-            alias: "Queue Candidate",
+            reference: "Queue Candidate",
             brand: suggestedBottle.brandId?.toString() || null,
             score: 0.91,
             source: ["vector"],
@@ -809,7 +809,7 @@ describe("price match queue", () => {
           {
             bottleId: currentBottle.id,
             fullName: currentBottle.fullName,
-            alias: "The Whistler Bodega Cask",
+            reference: "The Whistler Bodega Cask",
             brand: "The Whistler",
             bottler: "The Whistler",
             distillery: [],
@@ -954,7 +954,7 @@ describe("price match queue", () => {
           {
             bottleId: currentBottle.id,
             fullName: currentBottle.fullName,
-            alias: currentBottle.fullName,
+            reference: currentBottle.fullName,
             brand: "The Whistler",
             bottler: null,
             series: null,
@@ -1140,12 +1140,12 @@ describe("price match queue", () => {
         confidence: 92,
         currentBottleId: currentBottle.id,
         suggestedBottleId: currentBottle.id,
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         candidateBottles: [
           {
             bottleId: currentBottle.id,
             fullName: currentBottle.fullName,
-            alias: currentBottle.fullName,
+            reference: currentBottle.fullName,
             brand: "The Whistler",
             bottler: null,
             series: null,
@@ -1376,8 +1376,8 @@ describe("price match queue", () => {
       where: (bottleObservations, { eq }) =>
         eq(bottleObservations.sourceKey, `store_price:${price.id}`),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
     expect(observation).toMatchObject({
       bottleId: currentBottle.id,
@@ -1466,7 +1466,7 @@ describe("price match queue", () => {
       brandId: brand.id,
       name: "External Conflict Owner",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: conflicting.id,
       name: sibling.fullName.replace(
         "Repair Collision Source",
@@ -1510,8 +1510,8 @@ describe("price match queue", () => {
     const memberIds = [selected.id, sibling.id];
     const aliasesBefore = await db
       .select()
-      .from(bottleAliases)
-      .orderBy(asc(bottleAliases.name));
+      .from(bottleReferences)
+      .orderBy(asc(bottleReferences.name));
 
     await routerClient.prices.matchQueue.applyBottleRepair(
       { proposal: proposal.id },
@@ -1535,7 +1535,7 @@ describe("price match queue", () => {
         .from(bottles)
         .where(inArray(bottles.id, memberIds))
         .orderBy(asc(bottles.id)),
-      db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
+      db.select().from(bottleReferences).orderBy(asc(bottleReferences.name)),
       db.query.storePriceMatchProposals.findFirst({
         where: eq(storePriceMatchProposals.id, proposal.id),
       }),
@@ -2081,8 +2081,8 @@ describe("price match queue", () => {
       { context: { user } },
     );
 
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "Queue Approval"),
+    const alias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "Queue Approval"),
     });
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
@@ -2157,11 +2157,11 @@ describe("price match queue", () => {
       suggestedBottleId: null,
     });
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "IndexBottleAlias",
+      "IndexBottleReference",
       expect.anything(),
     );
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "OnBottleAliasChange",
+      "OnBottleReferenceChange",
       expect.anything(),
     );
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
@@ -2170,7 +2170,7 @@ describe("price match queue", () => {
     );
   });
 
-  test("approves one StorePrice when its title is a BottleAlias for another Bottle", async ({
+  test("approves one StorePrice when its title is a BottleReference for another Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2192,7 +2192,7 @@ describe("price match queue", () => {
       name: price.name,
       bottleId: null,
     });
-    const existingAlias = await fixtures.BottleAlias({
+    const existingAlias = await fixtures.BottleReference({
       bottleId: generalBottle.id,
       name: price.name,
       assignmentSource: "human_approved",
@@ -2204,7 +2204,7 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "none",
+        referenceScope: "none",
         suggestedBottleId: exactBottle.id,
       })
       .returning();
@@ -2234,8 +2234,8 @@ describe("price match queue", () => {
       db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
       }),
-      db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, price.name),
+      db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, price.name),
       }),
       db.query.storePriceMatchProposals.findFirst({
         where: eq(storePriceMatchProposals.id, proposal.id),
@@ -2267,13 +2267,13 @@ describe("price match queue", () => {
     });
     expect(observation).toMatchObject({
       bottleId: exactBottle.id,
-      facts: expect.objectContaining({ aliasScope: "none" }),
+      facts: expect.objectContaining({ referenceScope: "none" }),
     });
     expect(decisionLog).toMatchObject({
       proposalId: proposal.id,
       bottleId: exactBottle.id,
       decision: "match_existing",
-      metadata: expect.objectContaining({ aliasScope: "none" }),
+      metadata: expect.objectContaining({ referenceScope: "none" }),
     });
   });
 
@@ -2342,8 +2342,8 @@ describe("price match queue", () => {
       }),
     ).toMatchObject({ status: "approved", currentBottleId: bottle.id });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, "Removed Image Approval"),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, "Removed Image Approval"),
       }),
     ).toBeUndefined();
   });
@@ -2458,8 +2458,8 @@ describe("price match queue", () => {
         db.query.storePriceMatchAttempts.findFirst({
           where: eq(storePriceMatchAttempts.id, attempt.id),
         }),
-        db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, "Generic Group Listing"),
+        db.query.bottleReferences.findFirst({
+          where: eq(bottleReferences.name, "Generic Group Listing"),
         }),
         db.query.incomingBottleDecisionLogs.findFirst({
           where: and(
@@ -2504,7 +2504,7 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: suggestedBottle.id,
       })
       .returning();
@@ -2526,8 +2526,8 @@ describe("price match queue", () => {
       bottleId: otherBottle.id,
     });
     await expect(
-      db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, price.name),
+      db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, price.name),
       }),
     ).resolves.toBeUndefined();
   });
@@ -2550,7 +2550,7 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         proposedBottle: completeProposedBottle({
           name: "Single Cask",
           brand: { id: brand.id, name: brand.name },
@@ -2601,8 +2601,8 @@ describe("price match queue", () => {
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
       where: eq(storePriceMatchProposals.id, proposal.id),
     });
-    const listingAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "Queue Create Candidate"),
+    const listingAlias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, "Queue Create Candidate"),
     });
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -2750,7 +2750,7 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         currentBottleId: previousBottle.id,
         proposedBottle: completeProposedBottle({
           name: "Replacement Decision",
@@ -2814,8 +2814,8 @@ describe("price match queue", () => {
       db.query.storePriceMatchAttempts.findFirst({
         where: eq(storePriceMatchAttempts.id, attempt.id),
       }),
-      db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, price.name),
+      db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, price.name),
       }),
       db.query.bottleObservations.findFirst({
         where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
@@ -3439,7 +3439,7 @@ describe("price match queue", () => {
     expect(createdBottle).toBeUndefined();
   });
 
-  test("returns a conflict when approving a match would overwrite another alias", async ({
+  test("returns a conflict when approving a match would overwrite another reference", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -3450,7 +3450,7 @@ describe("price match queue", () => {
       bottleId: null,
     });
 
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: existingBottle.id,
       name: "Conflicting Alias",
     });
@@ -3461,7 +3461,7 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         suggestedBottleId: targetBottle.id,
       })
       .returning();
@@ -3478,11 +3478,11 @@ describe("price match queue", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot reserve exact Bottle alias "Conflicting Alias": another_bottle.]`,
+      `[Error: Cannot reserve exact Bottle reference "Conflicting Alias": another_bottle.]`,
     );
   });
 
-  test("returns a conflict when proposal-backed bottle creation hits an alias collision", async ({
+  test("returns a conflict when proposal-backed bottle creation hits a reference collision", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -3493,7 +3493,7 @@ describe("price match queue", () => {
       bottleId: null,
     });
 
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: existingBottle.id,
       name: "Create Alias Collision",
     });
@@ -3507,7 +3507,7 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         proposedBottle: completeProposedBottle({
           name: "Fresh Release",
           brand: { id: brand.id, name: brand.name },
@@ -3535,7 +3535,7 @@ describe("price match queue", () => {
       .from(bottleGroups);
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot reserve exact Bottle alias "Create Alias Collision": another_bottle.]`,
+      `[Error: Cannot reserve exact Bottle reference "Create Alias Collision": another_bottle.]`,
     );
     expect(createdBottle).toBeUndefined();
     expect(groupsAfter).toHaveLength(groupsBefore.length);

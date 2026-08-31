@@ -205,7 +205,7 @@
         "singleCask": true
       }
     ],
-    "aliases": [
+    "references": [
       {
         "name": "Willett Single Barrel Family Estate",
         "bottleId": 2

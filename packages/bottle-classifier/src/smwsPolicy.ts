@@ -5,7 +5,7 @@ import {
 } from "./classifierTypes";
 import type {
   BottleClassificationArtifacts,
-  BottleReference,
+  BottleReferenceInput,
 } from "./contract";
 import {
   candidateHasExactCaskCodeAnchor,
@@ -69,7 +69,7 @@ export function candidateLooksSmws(candidate: BottleCandidate): boolean {
   return (
     isSmwsIdentityAnchor(candidate.brand) ||
     isSmwsIdentityAnchor(candidate.bottler) ||
-    textLooksSmws(candidate.alias) ||
+    textLooksSmws(candidate.reference) ||
     textLooksSmws(candidate.fullName)
   );
 }
@@ -84,7 +84,7 @@ function getSmwsCompositionText({
   decision,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): string {
@@ -119,7 +119,7 @@ export function getSmwsCodeAnchor({
   decision,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): string | null {
@@ -159,7 +159,7 @@ export function getSmwsCodeAnchor({
 function getSmwsReferenceCodeAnchor({
   reference,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
 }): string | null {
   if (!textLooksSmws(reference.name)) {
     return null;
@@ -262,7 +262,7 @@ function getSmwsExactCaskDisplayName({
   code: string;
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
   proposedBottleName?: string | null;
-  reference: BottleReference;
+  reference: BottleReferenceInput;
 }): string {
   const title =
     extractSmwsTitleCandidate({
@@ -291,7 +291,7 @@ function buildSmwsExactCaskBottleDraft({
 }: {
   artifacts: BottleClassificationArtifacts;
   code: string;
-  reference: BottleReference;
+  reference: BottleReferenceInput;
 }): NonNullable<BottleClassificationDecision["proposedBottle"]> {
   const extractedIdentity = artifacts.extractedIdentity;
   const smwsDetails = parseSmwsDetailsFromName(code);
@@ -357,7 +357,7 @@ export function normalizeSmwsExactCaskProposedBottleDraft({
 }: {
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
   proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>;
-  reference: BottleReference;
+  reference: BottleReferenceInput;
 }): NonNullable<BottleClassificationDecision["proposedBottle"]> {
   const brandLooksSmws =
     isSmwsIdentityAnchor(proposedBottle.brand.name) ||
@@ -406,7 +406,7 @@ export function maybeResolveSmwsExactCaskCodeDecision({
   decision,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision | null {
@@ -480,7 +480,7 @@ export function resolveSmwsExactCaskReference({
   reference,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision | null {
   const smwsCode = getSmwsReferenceCodeAnchor({ reference });

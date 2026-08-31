@@ -71,7 +71,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Pappy Van Winkle's",
         "bottler": null,
         "series": null,
@@ -90,7 +90,7 @@
         "fullName": "Pappy Van Winkle's 15-year-old Family Reserve"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Pappy Van Winkle's",
         "bottler": null,
         "series": null,
@@ -115,7 +115,7 @@
       "when": ["pappy", "van", "winkle", "family", "reserve"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Pappy Van Winkle's",
           "bottler": null,
           "series": null,
@@ -134,7 +134,7 @@
           "fullName": "Pappy Van Winkle's 15-year-old Family Reserve"
         },
         {
-          "alias": null,
+          "reference": null,
           "brand": "Pappy Van Winkle's",
           "bottler": null,
           "series": null,
@@ -158,7 +158,7 @@
       "when": ["pappy", "15"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Pappy Van Winkle's",
           "bottler": null,
           "series": null,
@@ -177,7 +177,7 @@
           "fullName": "Pappy Van Winkle's 15-year-old Family Reserve"
         },
         {
-          "alias": null,
+          "reference": null,
           "brand": "Pappy Van Winkle's",
           "bottler": null,
           "series": null,

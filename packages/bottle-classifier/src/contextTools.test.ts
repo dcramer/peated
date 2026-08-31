@@ -62,7 +62,7 @@ function bottleContext(): BottleContext {
       outturn: null,
     },
     siblings: [],
-    aliases: [],
+    references: [],
     observations: [],
     publicImages: [],
   };

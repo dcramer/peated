@@ -8,7 +8,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Jura",
         "bottler": null,
         "series": null,
@@ -27,7 +27,7 @@
         "fullName": "Isle of Jura 12-year-old Single Malt Scotch Whisky"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Jura",
         "bottler": null,
         "series": null,
@@ -52,7 +52,7 @@
       "when": ["jura", "12"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Jura",
           "bottler": null,
           "series": null,
@@ -71,7 +71,7 @@
           "fullName": "Isle of Jura 12-year-old Single Malt Scotch Whisky"
         },
         {
-          "alias": null,
+          "reference": null,
           "brand": "Jura",
           "bottler": null,
           "series": null,

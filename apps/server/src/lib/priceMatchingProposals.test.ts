@@ -13,7 +13,7 @@ describe("toStorePriceMatchDecision", () => {
         rationale: "Exact source page identifies a generic listing title.",
         candidateBottleIds: [123],
         identityScope: "product",
-        aliasScope: "none",
+        referenceScope: "none",
         observation: null,
         matchedBottleId: 123,
         proposedBottle: null,
@@ -23,7 +23,7 @@ describe("toStorePriceMatchDecision", () => {
     expect(decision).toMatchObject({
       action: "match_existing",
       suggestedBottleId: 123,
-      aliasScope: "none",
+      referenceScope: "none",
     });
   });
 });
@@ -36,7 +36,7 @@ test("does not change create_bottle into a correction", () => {
       rationale: "The observed Bottle is not in the catalog.",
       candidateBottleIds: [1],
       identityScope: "product",
-      aliasScope: "none",
+      referenceScope: "none",
       observation: null,
       matchedBottleId: null,
       proposedBottle: {

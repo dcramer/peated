@@ -49,7 +49,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       createdByActorId: modActor.id,
       totalTastings: 9,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: reserveBottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged Batch Repair",
     });
@@ -57,7 +57,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       groupId: reserveBottle.groupId,
       edition: "Batch 2",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: reserveBatch.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged Batch 2 Repair",
     });
@@ -68,7 +68,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       createdByActorId: modActor.id,
       totalTastings: 5,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: premiumBottle.id,
       name: "Canadian Club Premium Batch Repair",
     });
@@ -79,7 +79,7 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       createdByActorId: modActor.id,
       totalTastings: 3,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: mistBottle.id,
       name: "Canadian Mist Black Diamond Batch Repair",
     });

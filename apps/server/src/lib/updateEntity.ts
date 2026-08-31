@@ -11,7 +11,7 @@ import {
   regions,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { ExactBottleAliasConflictError } from "@peated/server/lib/bottleAliases";
+import { ExactBottleReferenceConflictError } from "@peated/server/lib/bottleReferences";
 import {
   DuplicateEntityAliasError,
   upsertEntityAliases,
@@ -391,7 +391,7 @@ export async function updateEntityInTransaction(
       error instanceof BottleUpdateConflictError ||
       error instanceof BottleUpdateGraphError ||
       error instanceof BottleUpdateInputError ||
-      error instanceof ExactBottleAliasConflictError ||
+      error instanceof ExactBottleReferenceConflictError ||
       error instanceof BottleGroupRepresentativeMissingError
     ) {
       throw new EntityUpdateConflictError(error.message, { cause: error });

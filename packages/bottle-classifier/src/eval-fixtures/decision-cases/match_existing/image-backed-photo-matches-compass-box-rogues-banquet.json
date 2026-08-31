@@ -108,7 +108,7 @@
           "outturn": null
         },
         "siblings": [],
-        "aliases": [
+        "references": [
           {
             "name": "Compass Box Rogues' Banquet",
             "ignored": false
@@ -215,7 +215,7 @@
         "category": "blend"
       }
     ],
-    "aliases": [
+    "references": [
       {
         "name": "Compass Box Rogues' Banquet",
         "bottleId": 13364

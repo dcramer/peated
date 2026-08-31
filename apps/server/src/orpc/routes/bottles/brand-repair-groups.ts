@@ -4,7 +4,7 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
 
 const SupportingReferenceSchema = z.object({
-  source: z.enum(["full_name", "alias"]),
+  source: z.enum(["full_name", "reference"]),
   text: z.string(),
   targetMatchedName: z.string(),
   targetMatchedWordCount: z.number(),
@@ -27,7 +27,7 @@ export default procedure
     path: "/bottles/brand-repair-groups",
     summary: "List grouped bottle brand/entity repair candidates",
     description:
-      "Retrieve moderator-facing source-brand to target-brand repair clusters, grouped by deterministic bottle name and alias evidence.",
+      "Retrieve moderator-facing source-brand to target-brand repair clusters, grouped by deterministic bottle name and reference evidence.",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottleBrandRepairGroups",

@@ -320,7 +320,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
 
   if (user?.mod || user?.admin) {
     groups.push([
-      { href: `/bottles/${bottle.id}/aliases`, label: "View aliases" },
+      { href: `/bottles/${bottle.id}/aliases`, label: "Manage other names" },
       { href: `/bottles/${bottle.id}/edit`, label: "Edit bottle" },
       { href: `/bottles/${bottle.id}/merge`, label: "Merge bottle" },
       { href: `/bottles/${bottle.id}/audit`, label: "Audit bottle" },
@@ -443,6 +443,12 @@ export function BottlePageFrameClient({
           }
           specs={getBottleSpecs(bottle)}
         />
+        {bottle.aliases.length ? (
+          <p {...stylex.props(styles.aliases)}>
+            <span {...stylex.props(styles.aliasLabel)}>Also known as</span>{" "}
+            {bottle.aliases.join(" · ")}
+          </p>
+        ) : null}
         <div {...stylex.props(styles.tabs)}>
           <PageTabs
             ariaLabel="Bottle sections"
@@ -596,6 +602,18 @@ const styles = stylex.create({
   },
   tabs: {
     marginTop: space.x6,
+  },
+  aliases: {
+    marginTop: space.x4,
+    marginBottom: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "14px",
+    lineHeight: 1.5,
+  },
+  aliasLabel: {
+    color: colors.ink,
+    fontWeight: 600,
   },
   overview: {
     marginTop: space.x8,

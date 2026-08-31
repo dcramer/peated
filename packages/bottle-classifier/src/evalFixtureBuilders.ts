@@ -8,7 +8,7 @@ export function buildBottleCandidate(
     Partial<BottleCandidate>,
 ): BottleCandidate {
   return {
-    alias: null,
+    reference: null,
     brand: null,
     bottler: null,
     series: null,

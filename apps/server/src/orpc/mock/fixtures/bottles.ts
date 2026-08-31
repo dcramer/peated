@@ -342,6 +342,7 @@ export function mockRecommendationBottlesFor(user: User | null) {
 
 export const mockBottleDetails = {
   ...mockBottle,
+  aliases: ["Warehouse No. 1"],
   barcodes: [{ value: "5000281016290", volume: 700 }],
   people: 96,
   lastPrice: null,
@@ -351,6 +352,7 @@ export const mockBottleDetailsList = mockBottles.map(
   (bottle, index) =>
     ({
       ...bottle,
+      aliases: index === 0 ? mockBottleDetails.aliases : [],
       barcodes: index === 0 ? mockBottleDetails.barcodes : [],
       people: Math.max(24, Math.round(bottle.totalTastings * 0.8)),
       lastPrice: null,

@@ -4,13 +4,13 @@ import type {
 } from "../classifierTypes";
 import type {
   BottleClassificationArtifacts,
-  BottleReference,
+  BottleReferenceInput,
 } from "../contract";
 import { parseReferenceName as parseSmwsReferenceName } from "../smws";
 import { resolveSmwsExactCaskReference } from "../smwsPolicy";
 
 type DeterministicResolver = (input: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   artifacts: BottleClassificationArtifacts;
 }) => BottleClassificationDecision | null;
 
@@ -19,7 +19,7 @@ const DETERMINISTIC_RESOLVERS: DeterministicResolver[] = [
 ];
 
 export function getDeterministicIdentitySeed(
-  reference: Pick<BottleReference, "name">,
+  reference: Pick<BottleReferenceInput, "name">,
 ): BottleExtractedDetails | null {
   const smwsReference = parseSmwsReferenceName(reference.name);
   if (!smwsReference) {
@@ -52,7 +52,7 @@ export function applyDeterministicIdentitySeed({
   reference,
   extractedIdentity,
 }: {
-  reference: Pick<BottleReference, "name">;
+  reference: Pick<BottleReferenceInput, "name">;
   extractedIdentity: BottleExtractedDetails | null;
 }): BottleExtractedDetails | null {
   const seed = getDeterministicIdentitySeed(reference);
@@ -83,7 +83,7 @@ export function resolveDeterministicBottleReference({
   reference,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision | null {
   // Only add resolvers here when the result is true from closed syntax or

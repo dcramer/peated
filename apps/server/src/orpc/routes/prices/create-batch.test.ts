@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
-  bottleAliases,
   bottleBarcodes,
+  bottleReferences,
   bottleTombstones,
   externalReviews,
   storePriceHistories,
@@ -12,7 +12,7 @@ import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
 import {
   normalizeBottle,
-  normalizeBottleAliasKey,
+  normalizeBottleReferenceKey,
 } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -150,14 +150,14 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("uses a directly assigned Bottle alias", async ({ fixtures }) => {
+  test("uses a directly assigned Bottle reference", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
       name: "Direct Price Bottle",
     });
     const aliasName = "Direct Price Alias";
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: aliasName,
       bottleId: bottle.id,
     });
@@ -186,8 +186,11 @@ describe("POST /external-sites/:site/prices", () => {
       bottleId: bottle.id,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(aliasName),
+        ),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -199,7 +202,7 @@ describe("POST /external-sites/:site/prices", () => {
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle({ name: "System Price Bottle" });
-    const alias = await fixtures.BottleAlias({
+    const alias = await fixtures.BottleReference({
       name: "System Price Alias",
       bottleId: bottle.id,
     });
@@ -220,8 +223,8 @@ describe("POST /external-sites/:site/prices", () => {
     });
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, alias.name),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -668,10 +671,10 @@ describe("POST /external-sites/:site/prices", () => {
       { priceId: unresolved!.id },
     );
     expect(
-      await db.query.bottleAliases.findFirst({
+      await db.query.bottleReferences.findFirst({
         where: eq(
-          bottleAliases.name,
-          normalizeBottleAliasKey("Generic Retailer Title"),
+          bottleReferences.name,
+          normalizeBottleReferenceKey("Generic Retailer Title"),
         ),
       }),
     ).toBeUndefined();
@@ -688,7 +691,7 @@ describe("POST /external-sites/:site/prices", () => {
       brandId: brand.id,
     });
     const rawName = "Ardbeg 10 years old";
-    expect(normalizeBottleAliasKey(rawName)).toBe(bottle.fullName);
+    expect(normalizeBottleReferenceKey(rawName)).toBe(bottle.fullName);
 
     await routerClient.prices.createBatch(
       {
@@ -731,7 +734,7 @@ describe("POST /external-sites/:site/prices", () => {
       brandId: brand.id,
     });
     const rawName = "Lagavulin Distillers Edition 2011 Release";
-    expect(normalizeBottleAliasKey(rawName)).not.toBe(
+    expect(normalizeBottleReferenceKey(rawName)).not.toBe(
       normalizedAliasBottle.fullName,
     );
 
@@ -776,25 +779,25 @@ describe("POST /external-sites/:site/prices", () => {
       name: "Concurrent Committed Price Bottle",
     });
     const listingName = "Concurrent Price Listing® 2024 Release";
-    const aliasKey = normalizeBottleAliasKey(listingName);
+    const referenceKey = normalizeBottleReferenceKey(listingName);
     const normalizedListingName = normalizeBottle({ name: listingName }).name;
-    expect(aliasKey).not.toBe(listingName);
-    expect(normalizedListingName).not.toBe(aliasKey);
-    await fixtures.BottleAlias({
+    expect(referenceKey).not.toBe(listingName);
+    expect(normalizedListingName).not.toBe(referenceKey);
+    await fixtures.BottleReference({
       name: listingName,
       bottleId: incomingBottle.id,
     });
     const siblingPrice = await fixtures.StorePrice({
       bottleId: null,
       externalSiteId: site.id,
-      name: aliasKey,
+      name: referenceKey,
       volume: 750,
       url: "https://example.com/prices/concurrent-sibling",
     });
     const siblingReview = await fixtures.ExternalReview({
       bottleId: null,
       externalSiteId: site.id,
-      name: aliasKey,
+      name: referenceKey,
       url: "https://example.com/reviews/concurrent-sibling",
     });
     const client = new Client(getPostgresConnectionConfig());
@@ -879,8 +882,8 @@ describe("POST /external-sites/:site/prices", () => {
         }),
       ).toMatchObject({ bottleId: null });
       expect(
-        await db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, aliasKey),
+        await db.query.bottleReferences.findFirst({
+          where: eq(bottleReferences.name, referenceKey),
         }),
       ).toBeUndefined();
     } finally {

@@ -8,7 +8,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -33,7 +33,7 @@
       "when": ["elijah", "barrel proof"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Elijah Craig",
           "bottler": null,
           "series": null,

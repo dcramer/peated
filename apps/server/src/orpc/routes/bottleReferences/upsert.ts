@@ -1,33 +1,33 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  assignBottleAlias,
-  BottleAliasBottleInactiveError,
-  BottleAliasBottleNotFoundError,
-  BottleAliasBottleRetiredError,
-  ExactBottleAliasConflictError,
-  FailedToSaveBottleAliasError,
-} from "@peated/server/lib/bottleAliases";
+  assignBottleReference,
+  BottleReferenceBottleInactiveError,
+  BottleReferenceBottleNotFoundError,
+  BottleReferenceBottleRetiredError,
+  ExactBottleReferenceConflictError,
+  FailedToSaveBottleReferenceError,
+} from "@peated/server/lib/bottleReferences";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleAliasSchema } from "@peated/server/schemas";
+import { BottleReferenceSchema } from "@peated/server/schemas";
 import { z } from "zod";
 
 export default procedure
   .use(requireMod)
   .route({
     method: "PUT",
-    path: "/bottle-aliases",
-    summary: "Upsert bottle alias",
+    path: "/bottle-references",
+    summary: "Upsert bottle reference",
     description:
-      "Create or update a bottle alias and associate it with a bottle. Updates related prices and externalReviews. Requires moderator privileges",
-    operationId: "upsertBottleAlias",
+      "Create or update a bottle reference and associate it with a bottle. Updates related prices and externalReviews. Requires moderator privileges",
+    operationId: "upsertBottleReference",
   })
-  .input(BottleAliasSchema.strict())
+  .input(BottleReferenceSchema.strict())
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     try {
       const actor = await getUserActor(context.user);
-      await assignBottleAlias(
+      await assignBottleReference(
         {
           bottleId: input.bottle,
           name: input.name,
@@ -42,22 +42,22 @@ export default procedure
       );
     } catch (err) {
       if (
-        err instanceof ExactBottleAliasConflictError ||
-        err instanceof BottleAliasBottleInactiveError ||
-        err instanceof BottleAliasBottleRetiredError
+        err instanceof ExactBottleReferenceConflictError ||
+        err instanceof BottleReferenceBottleInactiveError ||
+        err instanceof BottleReferenceBottleRetiredError
       ) {
         throw errors.CONFLICT({ message: err.message });
       }
 
-      if (err instanceof BottleAliasBottleNotFoundError) {
+      if (err instanceof BottleReferenceBottleNotFoundError) {
         throw errors.NOT_FOUND({ message: "Bottle not found." });
       }
 
       throw errors.INTERNAL_SERVER_ERROR({
         message:
-          err instanceof FailedToSaveBottleAliasError
+          err instanceof FailedToSaveBottleReferenceError
             ? err.message
-            : "Failed to save alias.",
+            : "Failed to save reference.",
       });
     }
 

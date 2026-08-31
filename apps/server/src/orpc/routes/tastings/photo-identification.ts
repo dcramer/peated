@@ -7,7 +7,7 @@ import {
   deriveAutomationTier,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
 import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
-import { findExactAliasBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactAliasBottleCandidate";
+import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -115,7 +115,7 @@ function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
       decision.action === "match" && decision.matchedBottleId !== null,
     reaffirmsCurrentAssignment: false,
     replacesCurrentAssignment: false,
-    hasExactAliasAnchor: false,
+    hasExactReferenceAnchor: false,
     hasDeterministicAnchor: decision.identityScope === "exact_cask",
     hasPrimaryLabelOrImageEvidence: true,
   });
@@ -591,7 +591,7 @@ function logPhotoIdentificationFailure({
 
 /**
  * Runs label extraction and local candidate discovery for a pending scan. A
- * literal accepted alias resolves directly; all other references run the full
+ * literal accepted reference resolves directly; all other inputs run the full
  * classifier once.
  *
  * This is the shared Photo Identification workflow span boundary for all callers.
@@ -640,30 +640,30 @@ export async function identifyPendingImage(
         extractedIdentity,
         imageEvidence,
       };
-      const exactAliasCandidate = await findExactAliasBottleCandidate(
+      const exactReferenceCandidate = await findExactReferenceBottleCandidate(
         classificationInput.reference.name,
       );
-      const classificationRun = exactAliasCandidate
+      const classificationRun = exactReferenceCandidate
         ? {
             result: createDecidedBottleClassification({
               decision: {
                 action: "match",
                 rationale:
-                  "A literal stored Bottle alias identifies this Bottle.",
-                candidateBottleIds: [exactAliasCandidate.bottleId],
+                  "A literal stored Bottle reference identifies this Bottle.",
+                candidateBottleIds: [exactReferenceCandidate.bottleId],
                 identityScope: "product",
                 observation: null,
                 confidenceBasis: {
                   unresolvedRisks: [],
                   webEvidence: "not_needed",
                 },
-                matchedBottleId: exactAliasCandidate.bottleId,
+                matchedBottleId: exactReferenceCandidate.bottleId,
                 proposedBottle: null,
               },
               artifacts: {
                 extractedIdentity,
                 imageEvidence,
-                candidates: [exactAliasCandidate],
+                candidates: [exactReferenceCandidate],
               },
             }),
             modelMetadata: null,
@@ -684,7 +684,7 @@ export async function identifyPendingImage(
         "photo_identification.image_evidence_summary":
           diagnostics.extraction.summary ?? "none",
         "photo_identification.initial_candidate_count":
-          exactAliasCandidate === null ? 0 : 1,
+          exactReferenceCandidate === null ? 0 : 1,
         "photo_identification.final_candidate_count":
           classification.artifacts.candidates.length,
         "photo_identification.suggested_next_step": suggestedNextStep,

@@ -8,7 +8,7 @@ import { finalizeBottleReferenceClassification } from "./reviewPolicy";
 
 const existingPrivateCask: BottleCandidate = {
   bottleId: 100,
-  alias: null,
+  reference: null,
   fullName: "Example Private Cask",
   brand: "Example",
   bottler: null,
@@ -32,14 +32,14 @@ const existingPrivateCask: BottleCandidate = {
 const wrongFamilyExactCodeCandidate: BottleCandidate = {
   ...existingPrivateCask,
   bottleId: 101,
-  alias: "Other Private Cask No. 12.1",
+  reference: "Other Private Cask No. 12.1",
   fullName: "Other Private Cask No. 12.1",
   brand: "Other",
 };
 
 const ageBearingCandidate: BottleCandidate = {
   bottleId: 44175,
-  alias: "Shieldaig Speyside",
+  reference: "Shieldaig Speyside",
   fullName: "Shieldaig Speyside",
   brand: "Shieldaig",
   bottler: null,
@@ -63,7 +63,7 @@ const ageBearingCandidate: BottleCandidate = {
 const shieldaigSiblingAgeCandidate: BottleCandidate = {
   ...ageBearingCandidate,
   bottleId: 44176,
-  alias: "Shieldaig Speyside 25-year-old",
+  reference: "Shieldaig Speyside 25-year-old",
   fullName: "Shieldaig Speyside 25-year-old",
   statedAge: 25,
   familyContext: {
@@ -293,7 +293,7 @@ function buildAbvMatchInput({
       rationale: "The Bottle identity matches the candidate.",
       candidateBottleIds: [targetCandidate.bottleId],
       identityScope: "product" as const,
-      aliasScope: "none" as const,
+      referenceScope: "none" as const,
       observation: null,
       confidenceBasis: {
         unresolvedRisks: [],
@@ -447,7 +447,7 @@ describe("finalizeBottleReferenceClassification", () => {
   test("preserves a create draft when a candidate has an unsupported release field", () => {
     const candidate: BottleCandidate = {
       bottleId: 38004,
-      alias: "Trestle Spirit of Eclipse",
+      reference: "Trestle Spirit of Eclipse",
       fullName: "Trestle Spirit of Eclipse",
       brand: "Old Trestle",
       bottler: "Old Trestle",
@@ -550,7 +550,7 @@ describe("finalizeBottleReferenceClassification", () => {
   test("does not resolve a complete edition create draft to a partial-edition Bottle", () => {
     const candidate: BottleCandidate = {
       bottleId: 43397,
-      alias: null,
+      reference: null,
       fullName: "High West A Midwinter Night's Dram",
       brand: "High West",
       bottler: null,
@@ -636,7 +636,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("defaults missing alias metadata to no alias", () => {
+  test("defaults missing reference metadata to no reference", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
         name: "Example Private Cask",
@@ -657,11 +657,11 @@ describe("finalizeBottleReferenceClassification", () => {
 
     expect(result).toMatchObject({
       action: "match",
-      aliasScope: "none",
+      referenceScope: "none",
     });
   });
 
-  test("preserves alias metadata from the reviewed agent decision", () => {
+  test("preserves reference metadata from the reviewed agent decision", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
         name: "Example Known Bottle",
@@ -669,10 +669,10 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "match",
-        rationale: "The listing title is safe as a reusable alias.",
+        rationale: "The listing title is safe as a reusable reference.",
         candidateBottleIds: [existingPrivateCask.bottleId],
         identityScope: "product",
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
         observation: null,
         matchedBottleId: existingPrivateCask.bottleId,
         proposedBottle: null,
@@ -684,7 +684,7 @@ describe("finalizeBottleReferenceClassification", () => {
 
     expect(result).toMatchObject({
       action: "match",
-      aliasScope: "global_alias",
+      referenceScope: "global_alias",
     });
   });
 
@@ -1049,7 +1049,7 @@ describe("finalizeBottleReferenceClassification", () => {
     const containmentCandidate: BottleCandidate = {
       ...existingPrivateCask,
       bottleId: 102,
-      alias: "Example Private Cask No. 12.1 Reserve",
+      reference: "Example Private Cask No. 12.1 Reserve",
       fullName: "Example Private Cask No. 12.1 Reserve",
     };
     const result = finalizeBottleReferenceClassification({
@@ -1118,7 +1118,7 @@ describe("finalizeBottleReferenceClassification", () => {
     const exactCandidate: BottleCandidate = {
       ...existingPrivateCask,
       bottleId: 102,
-      alias: "Example Private Cask No. 12.1",
+      reference: "Example Private Cask No. 12.1",
       fullName: "Example Private Cask No. 12.1",
     };
     const unresolvedRisk = {
@@ -1204,7 +1204,7 @@ describe("finalizeBottleReferenceClassification", () => {
         "The readable label identifies an exact single-cask bottle with no safe local match.",
       candidateBottleIds: [],
       identityScope: "exact_cask",
-      aliasScope: "none",
+      referenceScope: "none",
       observation: {
         selector: null,
         caskNumber: "4779",
@@ -1318,7 +1318,7 @@ describe("finalizeBottleReferenceClassification", () => {
   test("does not suppress brand conflicts for non-SMWS targets with an SMWS-style code", () => {
     const targetCandidate: BottleCandidate = {
       bottleId: 11940,
-      alias: "Other Bottler 95.71 Winter Release",
+      reference: "Other Bottler 95.71 Winter Release",
       fullName: "Other Bottler 95.71 Winter Release",
       brand: "Other Bottler",
       bottler: "Other Bottler",
@@ -1348,7 +1348,7 @@ describe("finalizeBottleReferenceClassification", () => {
         rationale: "The source appears to match the coded candidate.",
         candidateBottleIds: [targetCandidate.bottleId],
         identityScope: "exact_cask",
-        aliasScope: "none",
+        referenceScope: "none",
         observation: {
           selector: null,
           caskNumber: "95.71",
@@ -1406,7 +1406,7 @@ describe("finalizeBottleReferenceClassification", () => {
       rationale: "The distinctive marketed product matches the malformed row.",
       candidateBottleIds: [9900],
       identityScope: "product",
-      aliasScope: "none",
+      referenceScope: "none",
       observation: null,
       matchedBottleId: 9900,
       proposedBottle: null,

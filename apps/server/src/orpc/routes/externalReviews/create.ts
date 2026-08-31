@@ -27,7 +27,7 @@ export function createExternalReviewProcedure(
       path: "/external-reviews",
       summary: "Create external review",
       description:
-        "Create an external review with automatic Bottle matching and alias creation. Requires admin privileges",
+        "Create an external review with automatic Bottle matching and reference creation. Requires admin privileges",
       operationId: "createExternalReview",
     })
     .input(ExternalReviewInputSchema)

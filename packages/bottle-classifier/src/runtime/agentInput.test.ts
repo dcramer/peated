@@ -10,7 +10,7 @@ import {
 function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
   return {
     bottleId: 100,
-    alias: "Example Parent",
+    reference: "Example Parent",
     fullName: "Example Parent",
     brand: "Example",
     bottler: null,
@@ -62,7 +62,7 @@ function buildBottleContext(): BottleContext {
       outturn: null,
     },
     siblings: [],
-    aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
+    references: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
     observations: [],
     publicImages: [],
   };
@@ -146,7 +146,7 @@ describe("buildAgentInput", () => {
           bottleId: 500,
           fullName: "Current Bottle",
         }),
-        hasExactAliasMatch: false,
+        hasExactReferenceMatch: false,
       }),
     );
 
@@ -228,7 +228,7 @@ describe("buildAgentInput", () => {
         },
         initialCandidates: [],
         currentBottle: null,
-        hasExactAliasMatch: false,
+        hasExactReferenceMatch: false,
       }),
     );
 
@@ -246,13 +246,13 @@ describe("buildAgentInput", () => {
         extractedIdentity: null,
         initialCandidates: [],
         currentBottle: null,
-        hasExactAliasMatch: false,
+        hasExactReferenceMatch: false,
         identityAnchor: {
           action: "match",
           rationale: "The SMWS code is a closed identity anchor.",
           candidateBottleIds: [95],
           identityScope: "exact_cask",
-          aliasScope: "none",
+          referenceScope: "none",
           observation: null,
           confidenceBasis: null,
           matchedBottleId: 95,
@@ -310,7 +310,7 @@ describe("buildAuditBottleAgentInput", () => {
         exact: {
           releaseYear: 2022,
         },
-        aliases: [
+        references: [
           {
             name: "Laphroaig Cairdeas 2022",
             ignored: false,

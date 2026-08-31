@@ -7,7 +7,7 @@ Authoritative policy lives in:
 
 - [Whisky Identity Model](../architecture/whisky-identity-model.md)
 - [Bottle Normalization Contract](../architecture/bottle-normalization-contract.md)
-- [Bottle Creation And Alias System](../architecture/bottle-creation-alias-system.md)
+- [Bottle Creation And Reference System](../architecture/bottle-creation-reference-system.md)
 - [Bottle Classifier](../architecture/bottle-classifier.md)
 
 Price matching is one consumer of the shared Reference Classification. It
@@ -26,7 +26,7 @@ that classifier boundary.
   state.
 - Preserve exact source facts as `bottle_observation` before promoting them into
   canonical Bottle identity, using the same Bottle selected by approval.
-- Assigned listing aliases propagate the same Bottle id to StorePrices with the
+- Assigned listing references propagate the same Bottle id to StorePrices with the
   same site, listing name, and volume. They do not retarget cross-volume
   proposals.
 
@@ -74,11 +74,11 @@ approved proposal's latest attempt without overwriting older attempts.
 `POST /external-sites/{site}/prices`:
 
 - normalizes the incoming listing name
-- builds the deterministic alias key from the listing name
-- does an exact alias lookup for that accepted key
-- if an assigned alias exists, writes its authoritative `bottleId`
-- allows a general alias to resolve only to the retained general Bottle
-- enqueues `ResolveStorePriceBottle` only when no accepted direct Bottle alias
+- builds the deterministic reference key from the listing name
+- does an exact reference lookup for that accepted key
+- if an assigned reference exists, writes its authoritative `bottleId`
+- allows a general reference to resolve only to the retained general Bottle
+- enqueues `ResolveStorePriceBottle` only when no accepted direct Bottle reference
   assignment exists
 - optionally enqueues `CapturePriceImage`
 
@@ -103,7 +103,7 @@ Evaluation order:
 Every full reference run creates a `resolve_reference` Bottle check from the
 same reviewed artifacts. This includes initial unresolved listings, ignored
 results, and individual or bulk retries. The check contains no Suggested Changes
-or findings. Deterministic accepted-alias matches do not create a check because
+or findings. Deterministic accepted-reference matches do not create a check because
 they do not run the classifier.
 
 The proposal, attempt, and linked check commit as one transaction before
@@ -150,21 +150,22 @@ version. Price, image, and URL changes do not affect this fingerprint.
 Time-based revalidation is deferred. Identity changes are the MVP invalidation
 boundary.
 
-## Approval And BottleAlias Safety
+## Approval And BottleReference Safety
 
 An approval always assigns the reviewed `store_price` to the selected Bottle.
-This exact assignment does not require a BottleAlias.
+This exact assignment does not require a BottleReference.
 
-A proposal can also allow the store title to become a reusable BottleAlias.
-The server creates that BottleAlias only when both conditions are true:
+A proposal can also allow the store title to become a reusable BottleReference.
+The server creates that BottleReference only when both conditions are true:
 
-- the stored proposal has `aliasScope = global_alias`
+- the stored proposal has `referenceScope = global_alias` (the retained
+  compatibility token for global BottleReference authority)
 - the moderator accepts the Bottle suggested by that proposal
 
-Missing scope and `aliasScope = none` create no BottleAlias. They also do not
-change an existing BottleAlias with the same name. The approval does not assign
+Missing scope and `referenceScope = none` create no BottleReference. They also do not
+change an existing BottleReference with the same name. The approval does not assign
 same-name StorePrices or reviews. A moderator override to a different Bottle
-also creates no BottleAlias, even if the proposal allowed one for its original
+also creates no BottleReference, even if the proposal allowed one for its original
 suggestion.
 
 The approved StorePrice image can still fill an empty Bottle image. The server
@@ -179,8 +180,8 @@ fill the empty image.
 ## Candidate Generation
 
 Candidate search presents independently complete Bottles, keyed by `bottleId`.
-Accepted aliases resolve directly to their Bottle; unassigned and ignored
-aliases do not produce Bottle candidates. Retained release ids and
+Accepted references resolve directly to their Bottle; unassigned and ignored
+references do not produce Bottle candidates. Retained release ids and
 BottleRelease rows are not classifier candidate inputs. The durable promotion
 mapping is retained only for migration, audit, merge, and cleanup internals.
 
@@ -194,7 +195,7 @@ Sources:
 
 Important behavior:
 
-- exact alias matches select a Bottle
+- exact reference matches select a Bottle
 - sibling Bottles can surface independently
 - exact Bottle metadata is used in scoring and automation, not just the
   candidate name
@@ -330,7 +331,7 @@ Automation is schema-first and code-derived:
 - every unresolved model risk forces `review`
 - an existing match requires a Bottle, must not replace a different
   current assignment, and needs an explicit anchor such as reaffirmed current
-  identity, deterministic exact identity, an accepted exact alias, primary
+  identity, deterministic exact identity, an accepted exact reference, primary
   label/image evidence, or supportive reviewed evidence
 - create actions require supportive reviewed evidence, a
   deterministic identity anchor, or primary label/image evidence
@@ -430,20 +431,20 @@ Bottle checks retain the application credentials, so scraper quota exhaustion
 or credential revocation does not take those flows offline when the scraper
 overrides are configured.
 
-## Alias Behavior
+## Reference Behavior
 
 Approving a price proposal does two separate things:
 
 1. assigns the authoritative Bottle id to matching `store_price` rows for the
    same site / listing name / volume
-2. stores a reusable Bottle alias for the accepted listing key
+2. stores a reusable Bottle reference for the accepted listing key
 
-Schema-first alias rule:
+Schema-first reference rule:
 
-- every assigned alias resolves directly to one Bottle id
-- a general expression alias resolves to the retained general Bottle and never
+- every assigned reference resolves directly to one Bottle id
+- a general expression reference resolves to the retained general Bottle and never
   selects the representative Bottle
-- no BottleGroup alias identity or second resolver remains
+- no BottleGroup reference identity or second resolver remains
 - matching propagation preserves the same site / listing name / volume scope
   and does not retarget cross-volume proposals
 
@@ -452,5 +453,5 @@ exact Bottle.
 
 ## Known Gaps
 
-- alias embeddings and canonical exact-Bottle alias maintenance should continue
+- reference embeddings and canonical exact-Bottle reference maintenance should continue
   to be audited when Bottle naming rules evolve

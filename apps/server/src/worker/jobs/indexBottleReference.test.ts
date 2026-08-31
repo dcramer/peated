@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottleTombstones,
   bottles,
   entities,
@@ -10,16 +10,16 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 import {
-  indexBottleAlias as indexBottleAliasWithServices,
-  type IndexBottleAliasServices,
-} from "./indexBottleAlias";
+  indexBottleReference as indexBottleReferenceWithServices,
+  type IndexBottleReferenceServices,
+} from "./indexBottleReference";
 
 let createEmbedding: ReturnType<
-  typeof vi.fn<IndexBottleAliasServices["createEmbedding"]>
+  typeof vi.fn<IndexBottleReferenceServices["createEmbedding"]>
 >;
 
-function indexBottleAlias(input: JobPayload) {
-  return indexBottleAliasWithServices(input, { createEmbedding });
+function indexBottleReference(input: JobPayload) {
+  return indexBottleReferenceWithServices(input, { createEmbedding });
 }
 
 const EMBEDDING = Array.from({ length: 3072 }, () => 0.125);
@@ -38,15 +38,15 @@ function firstEmbeddingValue(
 }
 
 async function getFirstStoredEmbeddingValue(name: string) {
-  const alias = await db.query.bottleAliases.findFirst({
-    where: eq(bottleAliases.name, name),
+  const reference = await db.query.bottleReferences.findFirst({
+    where: eq(bottleReferences.name, name),
     columns: { embedding: true },
   });
-  if (!alias) throw new Error("Bottle alias fixture not found.");
-  return firstEmbeddingValue(alias.embedding);
+  if (!reference) throw new Error("Bottle reference fixture not found.");
+  return firstEmbeddingValue(reference.embedding);
 }
 
-describe("indexBottleAlias", () => {
+describe("indexBottleReference", () => {
   beforeEach(() => {
     createEmbedding = vi.fn();
   });
@@ -71,55 +71,55 @@ describe("indexBottleAlias", () => {
       releaseYear: 2018,
       abv: 57.4,
     });
-    const alias = await fixtures.BottleAlias({
-      name: "Authoritative Alias Aurora",
+    const reference = await fixtures.BottleReference({
+      name: "Authoritative Reference Aurora",
       bottleId: bottle.id,
       ignored: false,
       embedding: EMBEDDING,
     });
     createEmbedding.mockImplementation(async () => {
-      expect(await getFirstStoredEmbeddingValue(alias.name)).toBeNull();
+      expect(await getFirstStoredEmbeddingValue(reference.name)).toBeNull();
       return FRESH_EMBEDDING;
     });
 
-    await indexBottleAlias({ name: alias.name.toUpperCase() });
+    await indexBottleReference({ name: reference.name.toUpperCase() });
 
     expect(createEmbedding).toHaveBeenCalledOnce();
     expect(createEmbedding).toHaveBeenCalledWith(
-      "Direct Bottle Brand Authoritative Alias Aurora Single Malt Solstice 19-year-old Oloroso hogshead cask strength barrel strength barrel proof full proof natural strength single cask single barrel 1998 vintage 2018 release 57.4% ABV",
+      "Direct Bottle Brand Authoritative Reference Aurora Single Malt Solstice 19-year-old Oloroso hogshead cask strength barrel strength barrel proof full proof natural strength single cask single barrel 1998 vintage 2018 release 57.4% ABV",
     );
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, reference.name),
       }),
     ).toMatchObject({ embedding: expect.anything() });
   });
 
-  test("clears ignored, unbound, and inactive alias embeddings", async ({
+  test("clears ignored, unbound, and inactive reference embeddings", async ({
     fixtures,
   }) => {
     const ignoredBottle = await fixtures.Bottle();
-    const ignoredAlias = await fixtures.BottleAlias({
-      name: "Ignored Alias",
+    const ignoredAlias = await fixtures.BottleReference({
+      name: "Ignored Reference",
       bottleId: ignoredBottle.id,
       ignored: true,
       embedding: EMBEDDING,
     });
-    const unboundAlias = await fixtures.BottleAlias({
-      name: "Unbound Alias",
+    const unboundAlias = await fixtures.BottleReference({
+      name: "Unbound Reference",
       bottleId: null,
       embedding: EMBEDDING,
     });
     const unassignedBottle = await fixtures.LegacyBottle();
-    const unassignedAlias = await fixtures.BottleAlias({
-      name: "Unassigned Bottle Alias",
+    const unassignedAlias = await fixtures.BottleReference({
+      name: "Unassigned Bottle Reference",
       bottleId: unassignedBottle.id,
       embedding: EMBEDDING,
     });
     const retiredBottle = await fixtures.Bottle();
     const replacementBottle = await fixtures.Bottle();
-    const retiredAlias = await fixtures.BottleAlias({
-      name: "Retired Bottle Alias",
+    const retiredAlias = await fixtures.BottleReference({
+      name: "Retired Bottle Reference",
       bottleId: retiredBottle.id,
       embedding: EMBEDDING,
     });
@@ -129,25 +129,25 @@ describe("indexBottleAlias", () => {
     });
     const aliases = [ignoredAlias, unboundAlias, unassignedAlias, retiredAlias];
 
-    for (const alias of aliases) {
-      await indexBottleAlias({ name: alias.name });
+    for (const reference of aliases) {
+      await indexBottleReference({ name: reference.name });
     }
 
     expect(createEmbedding).not.toHaveBeenCalled();
     expect(
       await db
         .select({
-          name: bottleAliases.name,
-          embedding: bottleAliases.embedding,
+          name: bottleReferences.name,
+          embedding: bottleReferences.embedding,
         })
-        .from(bottleAliases)
+        .from(bottleReferences)
         .where(
           inArray(
-            bottleAliases.name,
+            bottleReferences.name,
             aliases.map(({ name }) => name),
           ),
         )
-        .orderBy(asc(bottleAliases.name)),
+        .orderBy(asc(bottleReferences.name)),
     ).toEqual(
       aliases
         .map(({ name }) => ({ name, embedding: null }))
@@ -160,38 +160,38 @@ describe("indexBottleAlias", () => {
   }) => {
     const originalBottle = await fixtures.Bottle();
     const reassignedBottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Concurrently Reassigned Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Concurrently Reassigned Reference",
       bottleId: originalBottle.id,
       embedding: EMBEDDING,
     });
     createEmbedding
       .mockImplementationOnce(async () => {
         await db
-          .update(bottleAliases)
+          .update(bottleReferences)
           .set({ bottleId: reassignedBottle.id, embedding: null })
-          .where(eq(bottleAliases.name, alias.name));
+          .where(eq(bottleReferences.name, reference.name));
         return EMBEDDING;
       })
       .mockResolvedValue(FRESH_EMBEDDING);
 
-    await indexBottleAlias({ name: alias.name });
+    await indexBottleReference({ name: reference.name });
 
     expect(createEmbedding).toHaveBeenCalledTimes(2);
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, reference.name),
       }),
     ).toMatchObject({ bottleId: reassignedBottle.id });
-    expect(await getFirstStoredEmbeddingValue(alias.name)).toBe(0.5);
+    expect(await getFirstStoredEmbeddingValue(reference.name)).toBe(0.5);
   });
 
   test("retries when Bottle search fields drift during generation", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: "Original Edition" });
-    const alias = await fixtures.BottleAlias({
-      name: "Bottle Source Drift Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Bottle Source Drift Reference",
       bottleId: bottle.id,
       embedding: null,
     });
@@ -205,7 +205,7 @@ describe("indexBottleAlias", () => {
       })
       .mockResolvedValue(FRESH_EMBEDDING);
 
-    await indexBottleAlias({ name: alias.name });
+    await indexBottleReference({ name: reference.name });
 
     expect(createEmbedding).toHaveBeenCalledTimes(2);
     expect(createEmbedding).toHaveBeenNthCalledWith(
@@ -216,7 +216,7 @@ describe("indexBottleAlias", () => {
       2,
       expect.stringContaining("Revised Edition"),
     );
-    expect(await getFirstStoredEmbeddingValue(alias.name)).toBe(0.5);
+    expect(await getFirstStoredEmbeddingValue(reference.name)).toBe(0.5);
   });
 
   test("retries when brand search fields drift during generation", async ({
@@ -227,8 +227,8 @@ describe("indexBottleAlias", () => {
       shortName: "OSB",
     });
     const bottle = await fixtures.Bottle({ brandId: brand.id });
-    const alias = await fixtures.BottleAlias({
-      name: "Brand Source Drift Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Brand Source Drift Reference",
       bottleId: bottle.id,
       embedding: null,
     });
@@ -242,7 +242,7 @@ describe("indexBottleAlias", () => {
       })
       .mockResolvedValue(FRESH_EMBEDDING);
 
-    await indexBottleAlias({ name: alias.name });
+    await indexBottleReference({ name: reference.name });
 
     expect(createEmbedding).toHaveBeenCalledTimes(2);
     expect(createEmbedding).toHaveBeenNthCalledWith(
@@ -253,15 +253,15 @@ describe("indexBottleAlias", () => {
       2,
       expect.stringContaining("Revised Search Brand"),
     );
-    expect(await getFirstStoredEmbeddingValue(alias.name)).toBe(0.5);
+    expect(await getFirstStoredEmbeddingValue(reference.name)).toBe(0.5);
   });
 
   test("does not let an older job overwrite a newer source embedding", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: "Earlier Edition" });
-    const alias = await fixtures.BottleAlias({
-      name: "Out Of Order Source Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Out Of Order Source Reference",
       bottleId: bottle.id,
       embedding: null,
     });
@@ -281,13 +281,13 @@ describe("indexBottleAlias", () => {
       .mockResolvedValueOnce(FRESH_EMBEDDING)
       .mockRejectedValue(new Error("Redundant generation should not run"));
 
-    const olderJob = indexBottleAlias({ name: alias.name });
+    const olderJob = indexBottleReference({ name: reference.name });
     await firstStarted;
     await db
       .update(bottles)
       .set({ edition: "Newer Edition" })
       .where(eq(bottles.id, bottle.id));
-    await indexBottleAlias({ name: alias.name });
+    await indexBottleReference({ name: reference.name });
     resolveFirstEmbedding(EMBEDDING);
     await olderJob;
 
@@ -300,15 +300,15 @@ describe("indexBottleAlias", () => {
       2,
       expect.stringContaining("Newer Edition"),
     );
-    expect(await getFirstStoredEmbeddingValue(alias.name)).toBe(0.5);
+    expect(await getFirstStoredEmbeddingValue(reference.name)).toBe(0.5);
   });
 
   test("fails closed after two consecutive source drifts", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: "Initial Edition" });
-    const alias = await fixtures.BottleAlias({
-      name: "Repeated Source Drift Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Repeated Source Drift Reference",
       bottleId: bottle.id,
       embedding: EMBEDDING,
     });
@@ -322,24 +322,26 @@ describe("indexBottleAlias", () => {
       return EMBEDDING;
     });
 
-    await expect(indexBottleAlias({ name: alias.name })).rejects.toThrow(
-      `Bottle alias search source changed repeatedly while indexing: ${alias.name}`,
+    await expect(
+      indexBottleReference({ name: reference.name }),
+    ).rejects.toThrow(
+      `Bottle reference search source changed repeatedly while indexing: ${reference.name}`,
     );
 
     expect(createEmbedding).toHaveBeenCalledTimes(2);
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, reference.name),
       }),
     ).toMatchObject({ embedding: null });
   });
 
-  test("leaves an active alias unindexed when embedding generation fails", async ({
+  test("leaves an active reference unindexed when embedding generation fails", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Embedding Failure Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Embedding Failure Reference",
       bottleId: bottle.id,
       ignored: false,
       embedding: EMBEDDING,
@@ -348,14 +350,14 @@ describe("indexBottleAlias", () => {
       new Error("Embedding provider unavailable"),
     );
 
-    await expect(indexBottleAlias({ name: alias.name })).rejects.toThrow(
-      "Embedding provider unavailable",
-    );
+    await expect(
+      indexBottleReference({ name: reference.name }),
+    ).rejects.toThrow("Embedding provider unavailable");
 
     expect(createEmbedding).toHaveBeenCalledOnce();
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, reference.name),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -369,8 +371,8 @@ describe("indexBottleAlias", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Concurrently Retired Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Concurrently Retired Reference",
       bottleId: bottle.id,
       embedding: EMBEDDING,
     });
@@ -382,45 +384,45 @@ describe("indexBottleAlias", () => {
       return EMBEDDING;
     });
 
-    await indexBottleAlias({ name: alias.name });
+    await indexBottleReference({ name: reference.name });
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, reference.name),
       }),
     ).toMatchObject({ embedding: null });
   });
 
-  test("clears the embedding when the alias becomes ignored during generation", async ({
+  test("clears the embedding when the reference becomes ignored during generation", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Concurrently Ignored Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Concurrently Ignored Reference",
       bottleId: bottle.id,
       embedding: EMBEDDING,
     });
     createEmbedding.mockImplementationOnce(async () => {
       await db
-        .update(bottleAliases)
+        .update(bottleReferences)
         .set({ ignored: true })
-        .where(eq(bottleAliases.name, alias.name));
+        .where(eq(bottleReferences.name, reference.name));
       return EMBEDDING;
     });
 
-    await indexBottleAlias({ name: alias.name });
+    await indexBottleReference({ name: reference.name });
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, reference.name),
       }),
     ).toMatchObject({ ignored: true, embedding: null });
   });
 
-  test("rejects an unknown alias name", async () => {
+  test("rejects an unknown reference name", async () => {
     await expect(
-      indexBottleAlias({ name: "Unknown Alias Name" }),
-    ).rejects.toThrow("Unknown bottle alias: Unknown Alias Name");
+      indexBottleReference({ name: "Unknown Reference Name" }),
+    ).rejects.toThrow("Unknown bottle reference: Unknown Reference Name");
     expect(createEmbedding).not.toHaveBeenCalled();
   });
 });

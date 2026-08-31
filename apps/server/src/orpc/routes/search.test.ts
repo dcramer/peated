@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottleTombstones,
   entityAliases,
   entityTombstones,
@@ -8,9 +8,32 @@ import {
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import indexBottleSearchVectors from "@peated/server/worker/jobs/indexBottleSearchVectors";
 import { describe, expect, test } from "vitest";
 
 describe("GET /search", () => {
+  test("finds a Bottle by a display alias without exact-match authority", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Canonical Search Product" });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Marketed Moonneedle",
+    });
+    await indexBottleSearchVectors({ bottleId: bottle.id });
+
+    const data = await routerClient.search({
+      query: "marketed moonneedle",
+      scopes: ["bottles"],
+      limit: 5,
+    });
+
+    expect(data.groups[0]).toMatchObject({
+      type: "bottles",
+      results: [expect.objectContaining({ id: bottle.id })],
+    });
+  });
+
   test("returns independently capped groups with exact totals", async ({
     fixtures,
   }) => {
@@ -348,7 +371,7 @@ describe("GET /search", () => {
   }) => {
     const retainedBottle = await fixtures.Bottle({ name: "Retained Pair" });
     await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
-    await db.insert(bottleAliases).values({
+    await db.insert(bottleReferences).values({
       bottleId: retainedBottle.id,
       name: "Authoritative Search Alias",
       assignedByActorId: retainedBottle.createdByActorId,

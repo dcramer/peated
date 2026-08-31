@@ -5,11 +5,11 @@ import {
   BottleContextSchema,
   BottleContextSourceSchema,
   EntityContextSchema,
-  MAX_BOTTLE_CONTEXT_ALIASES,
   MAX_BOTTLE_CONTEXT_IMAGES,
   MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH,
   MAX_BOTTLE_CONTEXT_OBSERVATION_TEXT_LENGTH,
   MAX_BOTTLE_CONTEXT_OBSERVATIONS,
+  MAX_BOTTLE_CONTEXT_REFERENCES,
   MAX_BOTTLE_CONTEXT_SIBLINGS,
   MAX_ENTITY_CONTEXT_ALIASES,
   MAX_ENTITY_CONTEXT_BOTTLES,
@@ -47,7 +47,7 @@ function bottleSource(): BottleContextSource {
     },
     exact,
     siblings: [],
-    aliases: [],
+    references: [],
     observations: [],
     imageSources: [],
   };
@@ -64,9 +64,9 @@ describe("Bottle context contracts", () => {
         exact,
       }),
     );
-    source.aliases = Array.from(
-      { length: MAX_BOTTLE_CONTEXT_ALIASES },
-      (_, index) => ({ name: `Alias ${index}`, ignored: false }),
+    source.references = Array.from(
+      { length: MAX_BOTTLE_CONTEXT_REFERENCES },
+      (_, index) => ({ name: `Reference ${index}`, ignored: false }),
     );
     source.observations = Array.from(
       { length: MAX_BOTTLE_CONTEXT_OBSERVATIONS },
@@ -220,7 +220,7 @@ describe("Entity context contract", () => {
       yearEstablished: 1815,
       aliases: Array.from(
         { length: MAX_ENTITY_CONTEXT_ALIASES },
-        (_, index) => `Alias ${index}`,
+        (_, index) => `Reference ${index}`,
       ),
       relatedBottles: Array.from(
         { length: MAX_ENTITY_CONTEXT_BOTTLES },

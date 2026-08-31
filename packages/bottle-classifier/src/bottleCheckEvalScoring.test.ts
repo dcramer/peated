@@ -49,7 +49,7 @@ function inspectedBottleContext(
       outturn: null,
     },
     siblings: [],
-    aliases: [],
+    references: [],
     observations: [],
     publicImages: [],
   });

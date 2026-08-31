@@ -24,7 +24,7 @@
     "initialCandidates": [
       {
         "bottleId": 11904,
-        "alias": null,
+        "reference": null,
         "fullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
         "brand": "Hudson",
         "bottler": null,
@@ -43,7 +43,7 @@
       },
       {
         "bottleId": 17226,
-        "alias": "Hudson Manhattan Straight Rye (Batch 5)",
+        "reference": "Hudson Manhattan Straight Rye (Batch 5)",
         "fullName": "Hudson Manhattan Rye Whiskey",
         "brand": "Hudson",
         "bottler": null,
@@ -62,7 +62,7 @@
       },
       {
         "bottleId": -278,
-        "alias": "Hudson Manhattan Rye Whiskey - Batch 5",
+        "reference": "Hudson Manhattan Rye Whiskey - Batch 5",
         "fullName": "Hudson Manhattan Rye Whiskey - Batch 5",
         "brand": "Hudson",
         "bottler": null,
@@ -87,7 +87,7 @@
       "results": [
         {
           "bottleId": 11904,
-          "alias": null,
+          "reference": null,
           "fullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
           "brand": "Hudson",
           "bottler": null,

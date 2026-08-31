@@ -212,8 +212,8 @@ function candidateMatchesBrand(
     return false;
   }
 
-  return [candidate.brand, candidate.fullName, candidate.alias].some((value) =>
-    textsOverlap(value, brandName),
+  return [candidate.brand, candidate.fullName, candidate.reference].some(
+    (value) => textsOverlap(value, brandName),
   );
 }
 
@@ -227,7 +227,7 @@ function candidateMatchesName(
 
   return (
     textsOverlap(candidate.fullName, value) ||
-    textsOverlap(candidate.alias, value)
+    textsOverlap(candidate.reference, value)
   );
 }
 
@@ -1099,7 +1099,7 @@ export function shouldVerifyStorePriceMatch(params: {
       // A different current assignment means this is a correction, not a verify.
       replacesCurrentAssignment:
         currentBottleId != null && !reaffirmsCurrentAssignment,
-      hasExactAliasAnchor: false,
+      hasExactReferenceAnchor: false,
       // The exact-cask scope is the price-match deterministic anchor here; SMWS
       // exact-cask and the plain-age lane are handled above/upstream.
       hasDeterministicAnchor: identityScope === "exact_cask",

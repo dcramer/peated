@@ -36,7 +36,7 @@ describe("GET /entities/audit-candidates", () => {
       name: "Reserve 9-year-old Triple Aged",
       totalTastings: 9,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: reserveBottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged",
     });
@@ -46,7 +46,7 @@ describe("GET /entities/audit-candidates", () => {
       name: "Premium",
       totalTastings: 5,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: premiumBottle.id,
       name: "Canadian Club Premium",
     });

@@ -1,11 +1,11 @@
 import {
   BottleContextSourceSchema,
   EntityContextSchema,
-  MAX_BOTTLE_CONTEXT_ALIASES,
   MAX_BOTTLE_CONTEXT_IMAGES,
   MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH,
   MAX_BOTTLE_CONTEXT_OBSERVATION_TEXT_LENGTH,
   MAX_BOTTLE_CONTEXT_OBSERVATIONS,
+  MAX_BOTTLE_CONTEXT_REFERENCES,
   MAX_BOTTLE_CONTEXT_SIBLINGS,
   MAX_ENTITY_CONTEXT_ALIASES,
   MAX_ENTITY_CONTEXT_BOTTLES,
@@ -16,8 +16,8 @@ import {
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleObservations,
+  bottleReferences,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -149,17 +149,17 @@ export async function getBottleClassifierContext(
     return null;
   }
 
-  const [aliases, observations, tastingImages, siblingBottles] =
+  const [references, observations, tastingImages, siblingBottles] =
     await Promise.all([
       db
         .select({
-          name: bottleAliases.name,
-          ignored: bottleAliases.ignored,
+          name: bottleReferences.name,
+          ignored: bottleReferences.ignored,
         })
-        .from(bottleAliases)
-        .where(eq(bottleAliases.bottleId, bottleId))
-        .orderBy(asc(bottleAliases.name))
-        .limit(MAX_BOTTLE_CONTEXT_ALIASES),
+        .from(bottleReferences)
+        .where(eq(bottleReferences.bottleId, bottleId))
+        .orderBy(asc(bottleReferences.name))
+        .limit(MAX_BOTTLE_CONTEXT_REFERENCES),
       db
         .select({
           sourceType: bottleObservations.sourceType,
@@ -297,7 +297,10 @@ export async function getBottleClassifierContext(
     },
     exact: exactBottleContext(bottle, sharedStatedAge),
     siblings,
-    aliases: aliases.map(({ name, ignored }) => ({ name, ignored: !!ignored })),
+    references: references.map(({ name, ignored }) => ({
+      name,
+      ignored: !!ignored,
+    })),
     observations: observations.map((observation) => ({
       ...observation,
       sourceUrl: observation.sourceUrl

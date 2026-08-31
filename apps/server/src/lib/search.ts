@@ -1,11 +1,6 @@
 import { sql } from "drizzle-orm";
 import { TSVector } from "../db/columns";
-import type {
-  NewBottle,
-  NewBottleAlias,
-  NewBottleSeries,
-  NewEntity,
-} from "../db/schema";
+import type { NewBottle, NewBottleSeries, NewEntity } from "../db/schema";
 import { formatCategoryName } from "./format";
 
 const CASK_STRENGTH_SEARCH_TERMS =
@@ -62,7 +57,7 @@ export function buildEntitySearchVector(
 export function buildBottleSearchVector(
   bottle: NewBottle,
   brand: NewEntity,
-  aliasList?: Pick<NewBottleAlias, "name">[],
+  nameList?: { name: string }[],
   bottler?: NewEntity,
   distillerList?: NewEntity[],
   series?: NewBottleSeries,
@@ -92,7 +87,7 @@ export function buildBottleSearchVector(
   if (bottle.abv) values.push(new TSVector(formatSearchAbv(bottle.abv)!, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
   if (series) values.push(new TSVector(series.name, "A"));
-  aliasList
+  nameList
     ?.filter((a) => a.name !== bottle.fullName)
     .forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));

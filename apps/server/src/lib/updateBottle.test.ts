@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottleSeries,
   bottleTombstones,
   bottles,
@@ -114,9 +114,9 @@ async function loadGroupMembers(groupId: number) {
 async function loadAliases(bottleIds: number[]) {
   return await db
     .select()
-    .from(bottleAliases)
-    .where(inArray(bottleAliases.bottleId, bottleIds))
-    .orderBy(asc(bottleAliases.name));
+    .from(bottleReferences)
+    .where(inArray(bottleReferences.bottleId, bottleIds))
+    .orderBy(asc(bottleReferences.name));
 }
 
 async function loadUpdateAudits(bottleIds: number[]) {
@@ -1721,7 +1721,7 @@ describe("Bottle updates", () => {
     ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
   });
 
-  test("keeps marketed-title updates separate from exact aliases", async ({
+  test("keeps marketed-title updates separate from exact references", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -1756,7 +1756,7 @@ describe("Bottle updates", () => {
     });
     const conflictingAliasName = "Collision Brand Collision Label - Two";
     expect(aliasOwner.bottle.fullName).not.toBe(conflictingAliasName);
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: conflictingAliasName,
       bottleId: aliasOwner.bottle.id,
       assignmentSource: "human_approved",
@@ -2091,7 +2091,7 @@ describe("Bottle updates", () => {
         .map(([, payload]) => JSON.stringify(payload));
     for (const jobName of [
       "OnBottleChange",
-      "OnBottleAliasChange",
+      "OnBottleReferenceChange",
       "OnEntityChange",
       "VerifyEntityCreation",
       "IndexBottleSeriesSearchVectors",

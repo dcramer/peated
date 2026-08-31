@@ -17,7 +17,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("surfaces alias-supported repairs to a stronger target brand", async ({
+  test("surfaces reference-supported repairs to a stronger target brand", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -37,7 +37,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
       totalTastings: 9,
     });
 
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged",
     });
@@ -66,7 +66,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
         suggestedDistillery: null,
         supportingReferences: [
           {
-            source: "alias",
+            source: "reference",
             text: "Canadian Club Reserve 9-year-old Triple Aged",
             targetMatchedName: "Canadian Club",
           },
@@ -75,7 +75,9 @@ describe("GET /bottles/brand-repair-candidates", () => {
     ]);
   });
 
-  test("uses alias evidence from its direct Bottle", async ({ fixtures }) => {
+  test("uses reference evidence from its direct Bottle", async ({
+    fixtures,
+  }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
       kind: "brand",
@@ -87,15 +89,15 @@ describe("GET /bottles/brand-repair-candidates", () => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({
       brandId: currentBrand.id,
-      name: "Direct Alias Reserve",
+      name: "Direct Reference Reserve",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
-      name: "Canadian Club Direct Alias Reserve",
+      name: "Canadian Club Direct Reference Reserve",
     });
 
     const { results } = await routerClient.bottles.brandRepairCandidates(
-      { query: "Direct Alias Reserve" },
+      { query: "Direct Reference Reserve" },
       { context: { user } },
     );
 
@@ -105,15 +107,15 @@ describe("GET /bottles/brand-repair-candidates", () => {
         currentBrand: { id: currentBrand.id },
         supportingReferences: [
           {
-            source: "alias",
-            text: "Canadian Club Direct Alias Reserve",
+            source: "reference",
+            text: "Canadian Club Direct Reference Reserve",
           },
         ],
       },
     ]);
   });
 
-  test("does not move alias evidence away from its direct Bottle", async ({
+  test("does not move reference evidence away from its direct Bottle", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -133,7 +135,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
       brandId: currentBrand.id,
       name: "Unrelated Bottle",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: retainedBottle.id,
       name: "Canadian Club Direct Membership",
     });
@@ -150,7 +152,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
         targetBrand: { id: targetBrand.id },
         supportingReferences: [
           {
-            source: "alias",
+            source: "reference",
             text: "Canadian Club Direct Membership",
           },
         ],
@@ -161,7 +163,9 @@ describe("GET /bottles/brand-repair-candidates", () => {
     );
   });
 
-  test("filters alias evidence for retired Bottles", async ({ fixtures }) => {
+  test("filters reference evidence for retired Bottles", async ({
+    fixtures,
+  }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
       kind: "brand",
@@ -178,7 +182,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
     const destinationBottle = await fixtures.Bottle({
       name: "Active Destination",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: retiredBottle.id,
       name: "Canadian Club Retired Bottle Evidence",
     });
@@ -224,15 +228,15 @@ describe("GET /bottles/brand-repair-candidates", () => {
     const destinationBottle = await fixtures.Bottle({
       name: "Scan Destination",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: activeBottle.id,
       name: "Canadian Club Active Scan Evidence",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: secondActiveBottle.id,
       name: "Canadian Club Second Active Scan Evidence",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: retiredBottle.id,
       name: "Canadian Club Retired Bottle Scan Evidence",
     });
@@ -283,7 +287,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
       totalTastings: 2,
     });
 
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Acme Heritage 12-year-old",
     });
@@ -316,7 +320,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
       totalTastings: 15,
     });
 
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Jura 12-year-old Single Malt Scotch Whisky",
     });
@@ -349,7 +353,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
     ]);
   });
 
-  test("does not treat owner-prefixed aliases as stronger than the canonical bottle brand", async ({
+  test("does not treat owner-prefixed reference names as stronger than the canonical bottle brand", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -369,7 +373,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
       totalTastings: 3,
     });
 
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Suntory Yamazaki 12-year-old Whisky",
     });

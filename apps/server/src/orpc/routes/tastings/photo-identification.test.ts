@@ -9,9 +9,9 @@ import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleChecks,
   bottleGroups,
+  bottleReferences,
   bottles,
   pendingUploads,
   tastings,
@@ -73,7 +73,7 @@ type MockClassificationDecision = {
   rationale?: ClassificationDecisionInput["rationale"];
   candidateBottleIds?: ClassificationDecisionInput["candidateBottleIds"];
   identityScope?: ClassificationDecisionInput["identityScope"];
-  aliasScope?: ClassificationDecisionInput["aliasScope"];
+  referenceScope?: ClassificationDecisionInput["referenceScope"];
   observation?: ClassificationDecisionInput["observation"];
   confidenceBasis?: ClassificationDecisionInput["confidenceBasis"];
   matchedBottleId?: number | null;
@@ -324,7 +324,7 @@ async function countCatalogRows() {
   const [bottleRows, groupRows, aliasRows] = await Promise.all([
     db.select({ id: bottles.id }).from(bottles),
     db.select({ id: bottleGroups.id }).from(bottleGroups),
-    db.select({ name: bottleAliases.name }).from(bottleAliases),
+    db.select({ name: bottleReferences.name }).from(bottleReferences),
   ]);
 
   return {
@@ -588,7 +588,7 @@ describe("POST /tastings/photo-identification", () => {
     defaults,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Uigeadail" });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Ardbeg Uigeadail",
     });
@@ -618,7 +618,7 @@ describe("POST /tastings/photo-identification", () => {
     const response = await routerClient.tastings.photoIdentification(
       {
         file: await fixtures.SampleSquareImage(),
-        idempotencyKey: "photo-identification-exact-alias",
+        idempotencyKey: "photo-identification-exact-reference",
       },
       {
         context: { user: defaults.user },
@@ -1166,9 +1166,9 @@ describe("POST /tastings/photo-identification", () => {
       imageUrl: null,
     });
     const [canonicalAlias] = await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ assignmentSource: "canonical" })
-      .where(eq(bottleAliases.bottleId, existingBottle.id))
+      .where(eq(bottleReferences.bottleId, existingBottle.id))
       .returning();
     expect(canonicalAlias).toMatchObject({
       bottleId: existingBottle.id,

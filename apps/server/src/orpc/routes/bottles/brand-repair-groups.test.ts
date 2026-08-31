@@ -59,7 +59,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       name: "Reserve 9-year-old Triple Aged",
       totalTastings: 9,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: reserveBottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged Group Audit",
     });
@@ -69,7 +69,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       name: "Premium",
       totalTastings: 5,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: premiumBottle.id,
       name: "Canadian Club Premium Group Audit",
     });
@@ -79,7 +79,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       name: "Mist Black Diamond",
       totalTastings: 3,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: mistBottle.id,
       name: "Canadian Mist Black Diamond Group Audit",
     });
@@ -162,7 +162,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       name: "12-year-old",
       totalTastings: 2,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Acme Heritage 12-year-old",
     });
@@ -177,7 +177,7 @@ describe("GET /bottles/brand-repair-groups", () => {
     expect(results).toEqual([]);
   });
 
-  test("does not group branded bottles from producer-style aliases", async ({
+  test("does not group branded bottles from producer-style reference names", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -196,7 +196,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       brandId: currentBrand.id,
       name: "Four Grain Straight Bourbon",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: straightBourbonBottle.id,
       name: "Laws Whiskey House Four Grain Straight Bourbon Whiskey",
     });
@@ -205,7 +205,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       brandId: currentBrand.id,
       name: "Four Grain Straight Bourbon Cask Strength",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: caskStrengthBottle.id,
       name: "Laws Four Grain Straight Bourbon Cask Strength",
     });
@@ -240,7 +240,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       name: "Sour Mash Straight Whiskey",
       totalTastings: 1,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Belle Meade Bourbon Sour Mash Straight Whiskey",
     });
@@ -255,7 +255,7 @@ describe("GET /bottles/brand-repair-groups", () => {
     expect(results).toEqual([]);
   });
 
-  test("does not reverse a current brand from stale shorter aliases", async ({
+  test("does not reverse a current brand from stale shorter reference names", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -273,7 +273,7 @@ describe("GET /bottles/brand-repair-groups", () => {
       name: "Sour Mash Straight Whiskey",
       totalTastings: 1,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Belle Meade Sour Mash Straight Whiskey",
     });

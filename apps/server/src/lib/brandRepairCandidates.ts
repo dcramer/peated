@@ -1,7 +1,7 @@
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -136,7 +136,7 @@ type BrandNameEntry = {
 export type BrandRepairSupportingReference = {
   currentBrandMatchedName: null | string;
   currentBrandMatchedWordCount: number;
-  source: "alias" | "full_name";
+  source: "reference" | "full_name";
   targetMatchedName: string;
   targetMatchedWordCount: number;
   text: string;
@@ -193,7 +193,7 @@ type RankedTargetCandidate = {
   targetBrand: CandidateBrand;
 };
 
-const aliasBottles = alias(bottles, "brand_repair_alias_bottle");
+const referenceBottles = alias(bottles, "brand_repair_reference_bottle");
 
 function activeBottleConditions(bottle: {
   groupId: AnyPgColumn;
@@ -217,7 +217,7 @@ function activeBrandUseCondition() {
   )`;
 }
 
-async function getQueryAliasMembership({
+async function getQueryReferenceMembership({
   currentBrandId,
   query,
 }: {
@@ -226,43 +226,51 @@ async function getQueryAliasMembership({
 }): Promise<Array<{ bottleId: number; name: string }>> {
   const rows = await db
     .select({
-      bottleId: aliasBottles.id,
-      name: bottleAliases.name,
+      bottleId: referenceBottles.id,
+      name: bottleReferences.name,
     })
-    .from(bottleAliases)
-    .innerJoin(aliasBottles, eq(aliasBottles.id, bottleAliases.bottleId))
+    .from(bottleReferences)
+    .innerJoin(
+      referenceBottles,
+      eq(referenceBottles.id, bottleReferences.bottleId),
+    )
     .where(
       and(
-        eq(bottleAliases.ignored, false),
-        ilike(bottleAliases.name, `%${query}%`),
-        activeBottleConditions(aliasBottles),
-        currentBrandId ? eq(aliasBottles.brandId, currentBrandId) : undefined,
+        eq(bottleReferences.ignored, false),
+        ilike(bottleReferences.name, `%${query}%`),
+        activeBottleConditions(referenceBottles),
+        currentBrandId
+          ? eq(referenceBottles.brandId, currentBrandId)
+          : undefined,
       ),
     )
-    .orderBy(asc(bottleAliases.name))
+    .orderBy(asc(bottleReferences.name))
     .limit(MAX_SCAN_LIMIT);
 
   return rows;
 }
 
-async function getSupportingAliasMembership(
+async function getSupportingReferenceMembership(
   candidateBottleIds: number[],
 ): Promise<Array<{ bottleId: number; name: string }>> {
   const rows = await db
     .select({
-      bottleId: aliasBottles.id,
-      name: bottleAliases.name,
+      bottleId: referenceBottles.id,
+      name: bottleReferences.name,
     })
-    .from(bottleAliases)
-    .innerJoin(aliasBottles, eq(aliasBottles.id, bottleAliases.bottleId))
+    .from(bottleReferences)
+    .innerJoin(
+      referenceBottles,
+      eq(referenceBottles.id, bottleReferences.bottleId),
+    )
     .where(
       and(
-        eq(bottleAliases.ignored, false),
-        inArray(bottleAliases.bottleId, candidateBottleIds),
-        activeBottleConditions(aliasBottles),
+        eq(bottleReferences.ignored, false),
+        inArray(bottleReferences.bottleId, candidateBottleIds),
+        activeBottleConditions(referenceBottles),
       ),
     )
-    .orderBy(asc(bottleAliases.name));
+    .orderBy(asc(bottleReferences.name));
 
   return rows;
 }
@@ -345,8 +353,8 @@ function targetNameIsCurrentDistilleryBrandContraction({
   currentBrand: CandidateBrand;
   targetBrand: CandidateBrand;
 }): boolean {
-  // Alias-only contractions are safe only when Bottles also use the current
-  // Entity as a distiller; otherwise stale aliases can create bad repairs.
+  // Reference-only contractions are safe only when Bottles also use the current
+  // Entity as a distiller; otherwise stale references can create bad repairs.
   if (!currentBrand.usedAsDistiller) {
     return false;
   }
@@ -435,7 +443,7 @@ function hasDeterministicRepairScope({
   });
 }
 
-function hasSafeAliasOnlyBrandRepairSupport({
+function hasSafeReferenceOnlyBrandRepairSupport({
   currentBrand,
   hasCanonicalCurrentBrandMatch,
   supportingReferences,
@@ -459,14 +467,14 @@ function hasSafeAliasOnlyBrandRepairSupport({
   if (
     supportingReferences.some(
       (reference) =>
-        reference.source === "alias" &&
+        reference.source === "reference" &&
         reference.currentBrandMatchedWordCount > 0,
     )
   ) {
     return true;
   }
 
-  // Retail aliases often prepend an owner before the actual bottle brand; that
+  // Retail references often prepend an owner before the actual bottle brand; that
   // should not rewrite the bottle unless the current entity is a distillery.
   return targetNameIsCurrentDistilleryBrandContraction({
     currentBrand,
@@ -541,7 +549,7 @@ function compareSupportingReferenceQuality(
   }
 
   if (left.source !== right.source) {
-    return left.source === "alias" ? -1 : 1;
+    return left.source === "reference" ? -1 : 1;
   }
 
   return right.text.length - left.text.length;
@@ -618,7 +626,7 @@ async function getCandidateBottles({
         .limit(MAX_SCAN_LIMIT);
     }
 
-    const [matchingBottleRows, matchingAliasRows] = await Promise.all([
+    const [matchingBottleRows, matchingReferenceRows] = await Promise.all([
       db
         .select({ id: bottles.id })
         .from(bottles)
@@ -630,7 +638,7 @@ async function getCandidateBottles({
           ),
         )
         .limit(MAX_SCAN_LIMIT),
-      getQueryAliasMembership({ currentBrandId, query }),
+      getQueryReferenceMembership({ currentBrandId, query }),
     ]);
 
     const bottleIds = new Set<number>();
@@ -638,7 +646,7 @@ async function getCandidateBottles({
       bottleIds.add(id);
     }
 
-    for (const row of matchingAliasRows) {
+    for (const row of matchingReferenceRows) {
       bottleIds.add(row.bottleId);
     }
 
@@ -680,7 +688,7 @@ async function getCandidateBottles({
       .limit(MAX_SCAN_LIMIT);
   }
 
-  const [matchingBrandRows, matchingBottleRows, matchingAliasRows] =
+  const [matchingBrandRows, matchingBottleRows, matchingReferenceRows] =
     await Promise.all([
       db
         .select({ id: entities.id })
@@ -707,7 +715,7 @@ async function getCandidateBottles({
           ),
         )
         .limit(MAX_SCAN_LIMIT),
-      getQueryAliasMembership({ query }),
+      getQueryReferenceMembership({ query }),
     ]);
 
   const bottleIds = new Set<number>();
@@ -716,7 +724,7 @@ async function getCandidateBottles({
     bottleIds.add(id);
   }
 
-  for (const row of matchingAliasRows) {
+  for (const row of matchingReferenceRows) {
     bottleIds.add(row.bottleId);
   }
 
@@ -797,7 +805,7 @@ async function collectBrandRepairCandidates({
   const [currentBrands, aliasRows, brandRows, distillerUseRows] =
     await Promise.all([
       db.select().from(entities).where(inArray(entities.id, currentBrandIds)),
-      getSupportingAliasMembership(candidateBottleIds),
+      getSupportingReferenceMembership(candidateBottleIds),
       db
         .select({
           alias: entityAliases.name,
@@ -872,7 +880,7 @@ async function collectBrandRepairCandidates({
         text: bottle.fullName,
       },
       ...(aliasesByBottleId.get(bottle.id) ?? []).map((text) => ({
-        source: "alias" as const,
+        source: "reference" as const,
         text,
       })),
     ];
@@ -904,7 +912,8 @@ async function collectBrandRepairCandidates({
           if (
             entry.wordCount <= currentBrandMatchedWordCount &&
             !(
-              reference.source === "alias" && currentBrandMatchedWordCount === 0
+              reference.source === "reference" &&
+              currentBrandMatchedWordCount === 0
             )
           ) {
             continue;
@@ -980,7 +989,7 @@ async function collectBrandRepairCandidates({
       }
 
       if (
-        !hasSafeAliasOnlyBrandRepairSupport({
+        !hasSafeReferenceOnlyBrandRepairSupport({
           currentBrand,
           hasCanonicalCurrentBrandMatch,
           supportingReferences: sortedSupportingReferences,

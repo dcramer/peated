@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { db } from "../index";
 import {
-  bottleAliases,
   bottleBarcodes,
   bottleGroups,
+  bottleReferences,
   bottles,
 } from "./bottles";
 
@@ -95,7 +95,9 @@ describe("BottleGroup membership constraints", () => {
         .set({ groupId: otherBottle.groupId })
         .where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_group_representative_membership_fk/);
-    await db.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
+    await db
+      .delete(bottleReferences)
+      .where(eq(bottleReferences.bottleId, bottle.id));
     await expect(
       db.delete(bottles).where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_group_representative_membership_fk/);

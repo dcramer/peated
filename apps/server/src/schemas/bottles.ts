@@ -392,7 +392,9 @@ export const BottleMergeSchema = z.object({
     .describe("Direction of the merge operation"),
 });
 
-export const BottleAliasSchema = z.object({
-  bottle: z.number().describe("ID of the bottle this alias belongs to"),
-  name: z.string().describe("Alternative name for the bottle"),
+export const BottleReferenceSchema = z.object({
+  bottle: z
+    .number()
+    .describe("ID of the Bottle this exact reference resolves to"),
+  name: z.string().describe("Exact source reference for the Bottle"),
 });

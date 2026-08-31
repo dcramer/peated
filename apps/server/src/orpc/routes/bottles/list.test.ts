@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottleTombstones,
   entityFollows,
   flightBottles,
@@ -93,7 +93,7 @@ describe("GET /bottles", () => {
   }) => {
     const bottle = await fixtures.Bottle({ name: "Private Selection" });
 
-    await db.insert(bottleAliases).values({
+    await db.insert(bottleReferences).values({
       bottleId: bottle.id,
       name: "Direct Bottle Alias",
       assignedByActorId: bottle.createdByActorId,
@@ -112,7 +112,7 @@ describe("GET /bottles", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Alias Boundary" });
-    await db.insert(bottleAliases).values([
+    await db.insert(bottleReferences).values([
       {
         bottleId: bottle.id,
         name: "Assigned General Alias",
@@ -120,7 +120,7 @@ describe("GET /bottles", () => {
       },
       {
         bottleId: bottle.id,
-        name: "Ignored Exact Alias",
+        name: "Ignored Exact Reference",
         ignored: true,
         assignedByActorId: bottle.createdByActorId,
       },
@@ -134,7 +134,7 @@ describe("GET /bottles", () => {
     const [assignedResults, ignoredResults, unresolvedResults] =
       await Promise.all([
         routerClient.bottles.list({ query: "Assigned General Alias" }),
-        routerClient.bottles.list({ query: "Ignored Exact Alias" }),
+        routerClient.bottles.list({ query: "Ignored Exact Reference" }),
         routerClient.bottles.list({ query: "Unresolved Retained Alias" }),
       ]);
 

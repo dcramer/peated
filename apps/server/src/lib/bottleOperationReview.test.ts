@@ -2,8 +2,8 @@ import type { BottleContext } from "@peated/bottle-classifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroups,
+  bottleReferences,
   bottles,
   collectionBottles,
   entities,
@@ -67,7 +67,7 @@ function artifacts({
       outturn: null,
     },
     siblings: [],
-    aliases: [],
+    references: [],
     observations: [],
     publicImages: [],
   }));
@@ -540,25 +540,25 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
-  test("blocks only canonical alias owners outside both merge groups", async ({
+  test("blocks only canonical reference owners outside both merge groups", async ({
     fixtures,
   }) => {
     const sourceGroupBottle = await fixtures.Bottle({
-      name: "Alias Review Source Group",
+      name: "Reference Review Source Group",
     });
     const source = await fixtures.BottleGroupMember({
       groupId: sourceGroupBottle.groupId!,
       edition: "Duplicate Release",
     });
     const destinationGroupBottle = await fixtures.Bottle({
-      name: "Alias Review Destination Group",
+      name: "Reference Review Destination Group",
     });
     const destination = await fixtures.BottleGroupMember({
       groupId: destinationGroupBottle.groupId!,
       edition: "Canonical Release",
     });
     const foreignOwner = await fixtures.Bottle({
-      name: "Alias Review Foreign Owner",
+      name: "Reference Review Foreign Owner",
     });
     const operation = {
       id: 12,
@@ -582,9 +582,9 @@ describe("Bottle operation review preparation", () => {
     const allowedStateTokens: string[] = [];
     for (const allowedOwner of [sourceGroupBottle, destinationGroupBottle]) {
       await db
-        .update(bottleAliases)
+        .update(bottleReferences)
         .set({ bottleId: allowedOwner.id })
-        .where(eq(bottleAliases.name, source.fullName));
+        .where(eq(bottleReferences.name, source.fullName));
       const prepared = await prepareOperation({ operation, ...context });
       expect(prepared).toMatchObject({ status: "pending_review" });
       if (prepared.status !== "blocked" && prepared.type === "merge_bottles") {
@@ -594,9 +594,9 @@ describe("Bottle operation review preparation", () => {
     expect(allowedStateTokens[0]).not.toBe(allowedStateTokens[1]);
 
     await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ bottleId: foreignOwner.id })
-      .where(eq(bottleAliases.name, source.fullName));
+      .where(eq(bottleReferences.name, source.fullName));
     await expect(
       prepareOperation({ operation, ...context }),
     ).resolves.toMatchObject({
@@ -838,15 +838,15 @@ describe("Bottle operation review preparation", () => {
     expect(noOp).not.toHaveProperty("stateToken");
   });
 
-  test("allows a marketed title that matches an unassigned or assigned alias", async ({
+  test("allows a marketed title that matches an unassigned or assigned reference", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({
-      name: "Alias Claim Review",
+      name: "Reference Claim Review",
       edition: null,
     });
-    const aliasOwner = await fixtures.Bottle({
-      name: "Assigned Alias Owner",
+    const referenceOwner = await fixtures.Bottle({
+      name: "Assigned Reference Owner",
     });
     const operation = {
       id: 31,
@@ -870,7 +870,7 @@ describe("Bottle operation review preparation", () => {
       throw new Error("Expected the Bottle update to prepare.");
     }
     const desiredFullName = initial.preview.after.fullName;
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: null,
       name: desiredFullName,
     });
@@ -883,9 +883,9 @@ describe("Bottle operation review preparation", () => {
     );
 
     await db
-      .update(bottleAliases)
-      .set({ bottleId: aliasOwner.id })
-      .where(eq(bottleAliases.name, desiredFullName));
+      .update(bottleReferences)
+      .set({ bottleId: referenceOwner.id })
+      .where(eq(bottleReferences.name, desiredFullName));
 
     await expect(prepareOperation({ operation, ...context })).resolves.toEqual(
       expect.objectContaining({

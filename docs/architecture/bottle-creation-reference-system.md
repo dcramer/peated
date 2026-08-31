@@ -1,4 +1,4 @@
-# Bottle Creation And Alias System
+# Bottle Creation And Reference System
 
 This document defines the live architecture for creating and resolving Bottle
 identity across manual entry, scraped sources, reviews, prices, photos,
@@ -19,10 +19,10 @@ Related architecture:
 
 - Create, match, search, render, and edit one complete Bottle without hydrating
   its BottleGroup.
-- Reuse exact accepted aliases without paying for a classifier call.
+- Reuse exact accepted references without paying for a classifier call.
 - Use reviewed classifier evidence when no accepted prior decision exists.
 - Keep deterministic code limited to safe structural checks, exact accepted
-  aliases, and closed-form resolvers.
+  references, and closed-form resolvers.
 - Preserve observation-only source facts without silently promoting them into
   canonical Bottle identity.
 - Keep every assignment and automated create decision auditable.
@@ -37,9 +37,9 @@ Related architecture:
 - Do not infer semantic identity or grouping from brand prefixes, years, batch
   tokens, cask wording, retailer names, normalized strings, or fuzzy rank alone.
 - Do not store generated, normalized, scraped, or unresolved candidate strings
-  as aliases unless they have been accepted as assignments.
+  as references unless they have been accepted as assignments.
 - Do not make every write path synchronous on the classifier when an exact
-  accepted alias or closed-form identifier already proves Bottle identity.
+  accepted reference or closed-form identifier already proves Bottle identity.
 
 ## Canonical Model
 
@@ -54,7 +54,7 @@ Peated has three relevant identity layers:
 - `BottleObservation`: source facts useful as evidence but outside canonical
   catalog identity.
 
-Assigned aliases and other resolved consumers store one validated `bottleId`.
+Assigned references and other resolved consumers store one validated `bottleId`.
 They do not store BottleGroup identity or invoke a second resolver after
 selecting a Bottle. When a source identifies only a general expression, it may
 resolve to the retained general Bottle in that group; otherwise it remains
@@ -93,40 +93,47 @@ or shared series do not silently merge independently created groups. This
 release ships no automatic regrouping service; that capability requires a
 separate reviewed change.
 
-## Alias Model
+## Reference Model
 
-An alias is a durable assertion:
+A BottleReference is a durable assertion:
 
 > This accepted reference string resolves to this Bottle.
 
-An exact accepted alias can bypass the classifier because the system is reusing
+An exact accepted reference can bypass the classifier because the system is reusing
 a prior decision, not guessing from text. Candidate evidence, generated
-normalization output, and unresolved source text are not aliases.
+normalization output, and unresolved source text are not references.
 
-- Every assigned alias stores one Bottle id.
-- A general expression alias points to the retained general Bottle for that
+- Every assigned reference stores one Bottle id.
+- A general expression reference points to the retained general Bottle for that
   expression; it does not point to BottleGroup or select a representative.
-- An ignored alias does not participate in exact matching.
+- An ignored reference does not participate in exact matching.
 - Assignment provenance records whether the assertion came from canonical
   creation, an accepted source, classifier review, or human review.
 
-Alias lookup and alias writes use the same identity-preserving key for a
+Reference lookup and reference writes use the same identity-preserving key for a
 workflow. Lossy or semantic normalization may retrieve evidence but cannot
 assign a Bottle unless that exact key was already accepted.
 
-A marketed Bottle title is not automatically an exact alias. Several structured
+A marketed Bottle title is not automatically an exact reference. Several structured
 releases can use the same title, so creation, update, and review preflight check
-the complete structured identity and leave alias assignment to accepted source
-or human decisions. Alias conflicts do not block a Bottle title. Code does not
-overwrite or reinterpret another Bottle's accepted alias assertion.
+the complete structured identity and leave reference assignment to accepted
+source or human decisions. A reference conflict does not block a Bottle title.
+Code does not overwrite or reinterpret another Bottle's accepted reference.
+When an unchanged SMWS code proves that a subtitle was renamed, the previous
+title remains a reference for that Bottle.
+
+A BottleAlias is a moderator-verified alternate marketed name for display and
+customer search. It does not resolve ingestion or move existing consumers. The
+same alias text can belong to more than one Bottle. Bottle details show these
+names as “Also known as.”
 
 ## Resolution Pipeline
 
 All source-reference workflows follow the same conceptual pipeline:
 
 1. Preserve raw source facts.
-2. Build the workflow's identity-preserving alias key.
-3. Reuse an exact accepted alias when it resolves one valid Bottle.
+2. Build the workflow's identity-preserving reference key.
+3. Reuse an exact accepted reference when it resolves one valid Bottle.
 4. Apply a closed-form deterministic resolver when one exists, such as an exact
    SMWS code.
 5. Retrieve local Bottle and entity candidates.
@@ -136,7 +143,7 @@ All source-reference workflows follow the same conceptual pipeline:
 8. Derive the automation tier from action risk and structured evidence.
 9. Persist the Bottle id, queue review, or leave the source unresolved.
 
-Candidate retrieval is evidence, not a decision. Text rank, fuzzy aliases,
+Candidate retrieval is evidence, not a decision. Text rank, fuzzy references,
 similar names, sibling rows, and web results cannot independently select a
 Bottle or BottleGroup.
 
@@ -174,7 +181,7 @@ positive evidence, web-evidence status when applicable, and typed unresolved
 risks.
 
 An asserted unresolved risk forces review. No evidence field upgrades a decision
-that the derived tier routes to review. Exact accepted aliases and closed-form
+that the derived tier routes to review. Exact accepted references and closed-form
 identifiers may bypass classifier review because they prove identity directly;
 semantic normalized text cannot.
 
@@ -182,12 +189,12 @@ Automation may create or assign only when:
 
 - the raw source is retained;
 - the selected Bottle or create draft is independently complete;
-- duplicate Bottle and alias checks are safe;
+- duplicate Bottle and reference checks are safe;
 - required entities resolve or can be safely created;
 - observation-only detail remains outside canonical identity; and
 - the decision and evidence provenance are retained.
 
-Conflicting identity, unsafe alias collisions, unresolved canonical fields, or
+Conflicting identity, unsafe reference collisions, unresolved canonical fields, or
 an invalid Bottle leave the source unresolved or route it to review.
 
 ## Workflow Boundaries
@@ -203,13 +210,13 @@ a singleton group. It does not silently join the source group.
 ### Store Prices And Reviews
 
 Store-price and review ingestion preserve the raw reference first. An accepted
-alias supplies its validated Bottle id. Otherwise the row remains unresolved
+reference supplies its validated Bottle id. Otherwise the row remains unresolved
 until reviewed resolution succeeds.
 
 A successful classifier match or create supplies one Bottle id. When the
 workflow genuinely knows only the general expression, it may select the
 retained general Bottle; it never substitutes a group representative.
-Unresolved source text does not create an unbound alias as candidate storage.
+Unresolved source text does not create an unbound reference as candidate storage.
 
 ### Observations
 
@@ -238,13 +245,13 @@ release identity layer.
 
 Deterministic coverage should prove:
 
-- exact accepted aliases resolve one Bottle;
-- general aliases resolve the retained general Bottle without selecting a
+- exact accepted references resolve one Bottle;
+- general references resolve the retained general Bottle without selecting a
   representative;
-- ignored and ambiguous aliases do not resolve;
-- alias lookup and write keys are identical for each workflow;
+- ignored and ambiguous references do not resolve;
+- reference lookup and write keys are identical for each workflow;
 - semantic or lossy normalization does not auto-assign;
-- duplicate Bottle and alias conflicts roll back creation;
+- duplicate Bottle and reference conflicts roll back creation;
 - independent creation produces a singleton group and complete Bottle
   atomically;
 - direct Bottle identity cannot be downgraded by retained legacy fields; and

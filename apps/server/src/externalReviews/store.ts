@@ -61,11 +61,11 @@ export async function storeExternalReviewArticleInTransaction(
   {
     origin,
     invalidBottleAction,
-    aliasLookupNames = [],
+    referenceLookupNames = [],
   }: {
     origin: ExternalReviewOrigin;
     invalidBottleAction: InvalidBottleAction;
-    aliasLookupNames?: string[];
+    referenceLookupNames?: string[];
   },
 ) {
   const publicationApproved =
@@ -125,7 +125,7 @@ export async function storeExternalReviewArticleInTransaction(
     }
   }
 
-  if (aliasLookupNames.length) {
+  if (referenceLookupNames.length) {
     await tx
       .select({ id: storePrices.id })
       .from(storePrices)
@@ -133,7 +133,7 @@ export async function storeExternalReviewArticleInTransaction(
         and(
           eq(storePrices.externalSiteId, input.externalSiteId),
           or(
-            ...aliasLookupNames.map((name) =>
+            ...referenceLookupNames.map((name) =>
               eq(sql`LOWER(${storePrices.name})`, name.toLowerCase()),
             ),
           ),

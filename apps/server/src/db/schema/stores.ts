@@ -197,11 +197,9 @@ export const storePriceMatchProposals = pgTable(
     }).references(() => bottles.id),
     legacyCreationTarget:
       legacyStorePriceMatchCreationTargetEnum("creation_target"),
-    // Classifier-asserted alias safety. A generic listing title is only safe to
-    // reuse as a global bottle alias when the decision asserts `global_alias`;
-    // null/"none" mean the exact listing may match but its title must not become
-    // a reusable alias. Enforced at alias-write time in priceMatchingProposals.
-    aliasScope: text("alias_scope").$type<"global_alias" | "none">(),
+    // `global_alias` is the retained storage token for reusable BottleReference
+    // authority. New code exposes this decision as referenceScope.
+    referenceScope: text("reference_scope").$type<"global_alias" | "none">(),
     candidateBottles: jsonb("candidate_bottles")
       .$type<Array<BottleCandidate | PersistedJsonObject>>()
       .default(sql`'[]'::jsonb`)

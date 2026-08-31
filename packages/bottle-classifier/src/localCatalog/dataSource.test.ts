@@ -29,7 +29,7 @@ const shieldaigCatalog = LocalCatalogSchema.parse({
       outturn: 240,
     },
   ],
-  aliases: [{ name: "Shieldaig Speyside", bottleId: 44175 }],
+  references: [{ name: "Shieldaig Speyside", bottleId: 44175 }],
 });
 
 describe("local catalog data source", () => {
@@ -54,17 +54,17 @@ describe("local catalog data source", () => {
     expect(result.success).toBe(true);
   });
 
-  test("rejects aliases pointing at an unknown Bottle", () => {
+  test("rejects references pointing at an unknown Bottle", () => {
     const result = LocalCatalogSchema.safeParse({
       entities: [{ id: 1, name: "Shieldaig", kind: "brand" }],
       bottles: [{ id: 1, name: "Speyside", brandId: 1 }],
-      aliases: [{ name: "Shieldaig Highland", bottleId: 2 }],
+      references: [{ name: "Shieldaig Highland", bottleId: 2 }],
     });
 
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0]).toMatchObject({
-        path: ["aliases", 0, "bottleId"],
+        path: ["references", 0, "bottleId"],
         message: "Unknown bottle id 2.",
       });
     }
@@ -114,7 +114,7 @@ describe("local catalog data source", () => {
             outturn: 180,
           },
         ],
-        aliases: [],
+        references: [],
       }),
     );
 
@@ -207,7 +207,7 @@ describe("local catalog data source", () => {
           statedAge: 30,
         },
       ],
-      aliases: [],
+      references: [],
     });
     const dataSource = createLocalCatalogDataSource(catalog);
 
@@ -221,7 +221,7 @@ describe("local catalog data source", () => {
     );
   });
 
-  test("uses aliases for exact local search matches", async () => {
+  test("uses references for exact local search matches", async () => {
     const dataSource = createLocalCatalogDataSource(shieldaigCatalog);
 
     const candidates = await dataSource.searchBottles(
@@ -233,7 +233,7 @@ describe("local catalog data source", () => {
 
     expect(candidates[0]).toMatchObject({
       bottleId: 44175,
-      alias: "Shieldaig Speyside",
+      reference: "Shieldaig Speyside",
       source: expect.arrayContaining(["exact"]),
       score: 1,
     });

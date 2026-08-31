@@ -35,9 +35,12 @@ const prohibitedTerms = [
   /\bproposed[\s-]+operations?\b/giu,
   /\bbottle\s+groups?\b/gu,
   /\bBottle\s+groups?\b/gu,
-  /\bbottle[\s-]+references?\b/gu,
   /\breview[\s-]+operations?\b/gu,
   /\bsuggested[\s-]+changes?\b/gu,
+  /\bexact[\s-]+alias(?:es)?\b/giu,
+  /\bhasExactAlias\w*\b/gu,
+  /\bfindExactAlias\w*\b/gu,
+  /\baliasScope\b/gu,
 ];
 
 async function* files(path) {

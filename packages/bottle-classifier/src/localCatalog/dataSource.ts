@@ -8,7 +8,7 @@ import {
   type EntityResolution,
   type SearchEntitiesArgs,
 } from "../classifierTypes";
-import type { BottleReference } from "../contract";
+import type { BottleReferenceInput } from "../contract";
 import { buildDefaultBottleSearchInput } from "../runtime/agentInput";
 import { buildBottleCandidateFromCatalog } from "./candidates";
 import {
@@ -111,13 +111,14 @@ function getBottleFullName(catalog: LocalCatalog, bottle: LocalCatalogBottle) {
   );
 }
 
-function getAliasForCandidate(
+function getReferenceForCandidate(
   catalog: LocalCatalog,
   candidate: BottleCandidate,
 ) {
   return (
-    catalog.aliases.find(
-      (alias) => !alias.ignored && alias.bottleId === candidate.bottleId,
+    catalog.references.find(
+      (reference) =>
+        !reference.ignored && reference.bottleId === candidate.bottleId,
     )?.name ?? null
   );
 }
@@ -141,8 +142,8 @@ function mergeCandidates(candidates: BottleCandidate[]) {
     ) {
       existing.score = candidate.score;
     }
-    if (!existing.alias && candidate.alias) {
-      existing.alias = candidate.alias;
+    if (!existing.reference && candidate.reference) {
+      existing.reference = candidate.reference;
     }
   }
 
@@ -164,7 +165,7 @@ function scoreCandidate({
 }) {
   let score = 0;
   const searchableText = [
-    candidate.alias,
+    candidate.reference,
     candidate.fullName,
     candidate.brand,
     candidate.series,
@@ -175,7 +176,8 @@ function scoreCandidate({
     args.query &&
     (normalizeSearchText(candidate.fullName) ===
       normalizeSearchText(args.query) ||
-      normalizeSearchText(candidate.alias) === normalizeSearchText(args.query))
+      normalizeSearchText(candidate.reference) ===
+        normalizeSearchText(args.query))
   ) {
     score += 1;
   } else if (includesSearchText(searchableText, args.query)) {
@@ -232,20 +234,20 @@ function scoreCandidate({
 function buildBottleCandidate({
   catalog,
   bottle,
-  alias = null,
+  reference = null,
   score,
   source,
 }: {
   catalog: LocalCatalog;
   bottle: LocalCatalogBottle;
-  alias?: string | null;
+  reference?: string | null;
   score: number;
   source: Array<"exact" | "text" | "brand" | "vector" | "current">;
 }) {
   return buildBottleCandidateFromCatalog({
     catalog,
     bottle,
-    alias,
+    reference,
     score,
     source,
   });
@@ -258,20 +260,20 @@ function buildAllCandidates(catalog: LocalCatalog) {
     const candidate = buildBottleCandidate({
       catalog,
       bottle,
-      alias: null,
+      reference: null,
       score: 0,
       source: ["vector"],
     });
     candidates.push({
       ...candidate,
-      alias: getAliasForCandidate(catalog, candidate),
+      reference: getReferenceForCandidate(catalog, candidate),
     });
   }
 
   return candidates;
 }
 
-function findExactAliasCandidates({
+function findExactReferenceCandidates({
   catalog,
   query,
 }: {
@@ -284,12 +286,16 @@ function findExactAliasCandidates({
   }
 
   const candidates: BottleCandidate[] = [];
-  for (const alias of catalog.aliases.filter((entry) => !entry.ignored)) {
-    if (normalizeSearchText(alias.name) !== normalizedQuery) {
+  for (const reference of catalog.references.filter(
+    (entry) => !entry.ignored,
+  )) {
+    if (normalizeSearchText(reference.name) !== normalizedQuery) {
       continue;
     }
 
-    const bottle = catalog.bottles.find((entry) => entry.id === alias.bottleId);
+    const bottle = catalog.bottles.find(
+      (entry) => entry.id === reference.bottleId,
+    );
     if (!bottle) {
       continue;
     }
@@ -298,7 +304,7 @@ function findExactAliasCandidates({
       buildBottleCandidate({
         catalog,
         bottle,
-        alias: alias.name,
+        reference: reference.name,
         score: 1,
         source: ["exact"],
       }),
@@ -313,7 +319,7 @@ function searchCatalogCandidates(
   rawArgs: BottleCandidateSearchInput,
 ) {
   const args = BottleCandidateSearchInputSchema.parse(rawArgs);
-  const exactCandidates = findExactAliasCandidates({
+  const exactCandidates = findExactReferenceCandidates({
     catalog,
     query: args.query,
   });
@@ -419,7 +425,7 @@ export function createLocalCatalogDataSource(
       reference,
       extractedIdentity,
     }: {
-      reference: BottleReference;
+      reference: BottleReferenceInput;
       extractedIdentity: BottleExtractedDetails | null;
     }) =>
       searchCatalogCandidates(

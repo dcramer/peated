@@ -57,7 +57,6 @@ export type {
   UpdateEntityOperation,
 } from "./bottleCheckContract";
 export {
-  BottleContextAliasSchema,
   BottleContextEntityRefSchema,
   BottleContextExactFields,
   BottleContextExactSchema,
@@ -65,6 +64,7 @@ export {
   BottleContextLabelEvidenceSchema,
   BottleContextObservationSchema,
   BottleContextPublicImageSchema,
+  BottleContextReferenceSchema,
   BottleContextSchema,
   BottleContextSeriesRefSchema,
   BottleContextSharedFields,
@@ -74,24 +74,24 @@ export {
   EntityContextBottleSampleSchema,
   EntityContextFields,
   EntityContextSchema,
-  MAX_BOTTLE_CONTEXT_ALIASES,
   MAX_BOTTLE_CONTEXT_IMAGES,
   MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH,
   MAX_BOTTLE_CONTEXT_OBSERVATION_TEXT_LENGTH,
   MAX_BOTTLE_CONTEXT_OBSERVATIONS,
+  MAX_BOTTLE_CONTEXT_REFERENCES,
   MAX_BOTTLE_CONTEXT_SIBLINGS,
   MAX_ENTITY_CONTEXT_ALIASES,
   MAX_ENTITY_CONTEXT_BOTTLES,
 } from "./bottleContextContract";
 export type {
   BottleContext,
-  BottleContextAlias,
   BottleContextEntityRef,
   BottleContextExact,
   BottleContextImageSource,
   BottleContextLabelEvidence,
   BottleContextObservation,
   BottleContextPublicImage,
+  BottleContextReference,
   BottleContextSeriesRef,
   BottleContextShared,
   BottleContextSibling,
@@ -160,11 +160,11 @@ const RawReferenceUrlSchema = z
   .union([z.string(), z.null(), z.undefined()])
   .catch(null);
 
-const BottleReferenceUrlSchema = RawReferenceUrlSchema.transform(
+const BottleReferenceInputUrlSchema = RawReferenceUrlSchema.transform(
   normalizeHttpUrl,
 ).pipe(z.string().url().nullable().optional());
 
-const BottleReferenceImageUrlSchema = RawReferenceUrlSchema.transform(
+const BottleReferenceInputImageUrlSchema = RawReferenceUrlSchema.transform(
   (value) => {
     if (value === null || value === undefined) {
       return value;
@@ -179,13 +179,13 @@ const BottleReferenceImageUrlSchema = RawReferenceUrlSchema.transform(
   },
 ).pipe(z.union([z.string().url(), DataImageUrlSchema]).nullable().optional());
 
-export const BottleReferenceSchema = z
+export const BottleReferenceInputSchema = z
   .object({
     id: z.union([z.number(), z.string()]).nullable().optional(),
     externalSiteId: z.number().int().nullable().optional(),
     name: z.string().trim().min(1),
-    url: BottleReferenceUrlSchema,
-    imageUrl: BottleReferenceImageUrlSchema,
+    url: BottleReferenceInputUrlSchema,
+    imageUrl: BottleReferenceInputImageUrlSchema,
     currentBottleId: z.number().int().nullable().optional(),
   })
   .strict();
@@ -213,7 +213,7 @@ export const CandidateExpansionModeSchema = z.enum(["open", "initial_only"]);
 
 export const ClassifyBottleReferenceInputSchema = z
   .object({
-    reference: BottleReferenceSchema,
+    reference: BottleReferenceInputSchema,
     conversationId: z.string().trim().min(1).optional(),
     extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
     extractedIdentitySource: z
@@ -235,7 +235,7 @@ const BOTTLE_REFERENCE_EVIDENCE_FIELDS = [
   "url",
   "imageUrl",
   "currentBottleId",
-] as const satisfies readonly (keyof BottleReference)[];
+] as const satisfies readonly (keyof BottleReferenceInput)[];
 
 type BottleCheckEvidenceSource =
   | {
@@ -317,7 +317,7 @@ export const AuditBottleResultSchema = z
   })
   .strict();
 
-export type BottleReference = z.infer<typeof BottleReferenceSchema>;
+export type BottleReferenceInput = z.infer<typeof BottleReferenceInputSchema>;
 export type BottleClassificationArtifacts = z.infer<
   typeof BottleClassificationArtifactsSchema
 >;
@@ -325,7 +325,7 @@ export type CandidateExpansionMode = z.infer<
   typeof CandidateExpansionModeSchema
 >;
 export type ClassifyBottleReferenceInput = {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   conversationId?: string;
   extractedIdentity?: null | z.infer<typeof BottleExtractedDetailsSchema>;
   /** Known origin of a supplied extracted identity. Omit when unknown. */

@@ -1,7 +1,7 @@
 export {
   BottleClassificationArtifactsSchema,
   BottleClassificationResultSchema,
-  BottleReferenceSchema,
+  BottleReferenceInputSchema,
   CandidateExpansionModeSchema,
   ClassifyBottleReferenceInputSchema,
   DecidedBottleClassificationResultSchema,
@@ -23,7 +23,7 @@ export {
 export type {
   BottleClassificationArtifacts,
   BottleClassificationResult,
-  BottleReference,
+  BottleReferenceInput,
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
   DecidedBottleClassificationResult,

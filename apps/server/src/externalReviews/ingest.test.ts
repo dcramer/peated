@@ -49,7 +49,7 @@ test("rejects a missing source before Bottle resolution", async () => {
   expect(pushUniqueJobMock).not.toHaveBeenCalled();
 });
 
-test("stores exact aliases and queues model resolution after storage", async ({
+test("stores exact references and queues model resolution after storage", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });

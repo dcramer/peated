@@ -175,7 +175,7 @@ function getDerivedAutomationTier(
     reaffirmsCurrentAssignment,
     replacesCurrentAssignment:
       currentBottleId != null && !reaffirmsCurrentAssignment,
-    hasExactAliasAnchor: false,
+    hasExactReferenceAnchor: false,
     hasDeterministicAnchor: decision.identityScope === "exact_cask",
     // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
     // `reference.imageUrl` and rely on live extraction; both mean the run has
@@ -438,11 +438,11 @@ function evaluateDecisionContract(
   }
 
   if (
-    expected.aliasScope !== undefined &&
-    result.decision.aliasScope !== expected.aliasScope
+    expected.referenceScope !== undefined &&
+    result.decision.referenceScope !== expected.referenceScope
   ) {
     failures.push(
-      `aliasScope expected ${expected.aliasScope} but got ${result.decision.aliasScope}`,
+      `referenceScope expected ${expected.referenceScope} but got ${result.decision.referenceScope}`,
     );
   }
 
@@ -862,7 +862,7 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
       kind: entity.kind,
     })),
     bottles: [],
-    aliases: [],
+    references: [],
   }).searchEntities;
 
   return createEvalClassifierOptions({

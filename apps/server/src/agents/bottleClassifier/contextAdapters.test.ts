@@ -66,7 +66,7 @@ describe("Bottle classifier context adapters", () => {
       abv: 58.9,
       caskStrength: true,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Laphroaig Cairdeas 2022",
       ignored: false,
@@ -144,7 +144,7 @@ describe("Bottle classifier context adapters", () => {
         },
       ],
     });
-    expect(context?.aliases).toContainEqual({
+    expect(context?.references).toContainEqual({
       name: "Laphroaig Cairdeas 2022",
       ignored: false,
     });

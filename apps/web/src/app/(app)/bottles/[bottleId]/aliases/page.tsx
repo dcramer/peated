@@ -21,5 +21,5 @@ export default async function BottleAliasesPage(props: {
   const { client } = await getServerClient();
   const aliasList = await client.bottleAliases.list({ bottle: id });
 
-  return <AliasList initialAliasList={aliasList} />;
+  return <AliasList bottleId={id} initialAliasList={aliasList} />;
 }

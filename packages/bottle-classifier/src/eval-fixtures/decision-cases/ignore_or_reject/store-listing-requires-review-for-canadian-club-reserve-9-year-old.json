@@ -24,7 +24,7 @@
     "initialCandidates": [
       {
         "bottleId": 16913,
-        "alias": null,
+        "reference": null,
         "fullName": "Canadian Club Reserve 9-year-old Triple Aged Limited Edition",
         "brand": "Canadian",
         "bottler": null,
@@ -43,7 +43,7 @@
       },
       {
         "bottleId": 17346,
-        "alias": null,
+        "reference": null,
         "fullName": "Canadian Club Reserve, 40% ABV",
         "brand": "Canadian",
         "bottler": null,

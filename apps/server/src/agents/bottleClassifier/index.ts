@@ -1,7 +1,7 @@
 export {
   BottleClassificationArtifactsSchema,
   BottleClassificationResultSchema,
-  BottleReferenceSchema,
+  BottleReferenceInputSchema,
   CandidateExpansionModeSchema,
   ClassifyBottleReferenceInputSchema,
   DecidedBottleClassificationResultSchema,
@@ -23,7 +23,7 @@ export {
 export type {
   BottleClassificationArtifacts,
   BottleClassificationResult,
-  BottleReference,
+  BottleReferenceInput,
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
   DecidedBottleClassificationResult,
@@ -66,5 +66,5 @@ export {
   type PostUserCreationBottleAuditInput,
 } from "./auditBottle";
 export { classifyBottleReference } from "./classifyBottleReference";
-export { findExactAliasBottleCandidate } from "./findExactAliasBottleCandidate";
+export { findExactReferenceBottleCandidate } from "./findExactReferenceBottleCandidate";
 export { runBottleReference } from "./service";

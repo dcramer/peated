@@ -117,7 +117,7 @@ test.describe("unified Bottle workflows", () => {
     expect(details.audit).not.toHaveProperty("subjectKey");
     expect(details.audit).not.toHaveProperty("backgroundEventKey");
     expect(details.audit.output.decision).toMatchObject({
-      aliasScope: null,
+      referenceScope: null,
       confidenceBasis: null,
     });
     for (const operation of details.audit.operations) {

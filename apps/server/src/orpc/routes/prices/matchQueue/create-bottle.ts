@@ -1,8 +1,8 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  ExactBottleAliasConflictError,
-  FailedToSaveBottleAliasError,
-} from "@peated/server/lib/bottleAliases";
+  ExactBottleReferenceConflictError,
+  FailedToSaveBottleReferenceError,
+} from "@peated/server/lib/bottleReferences";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import {
   BottleAlreadyExistsError,
@@ -91,13 +91,13 @@ export default procedure
         });
       }
 
-      if (err instanceof ExactBottleAliasConflictError) {
+      if (err instanceof ExactBottleReferenceConflictError) {
         throw errors.CONFLICT({
           message: err.message,
         });
       }
 
-      if (err instanceof FailedToSaveBottleAliasError) {
+      if (err instanceof FailedToSaveBottleReferenceError) {
         throw errors.INTERNAL_SERVER_ERROR({
           message: err.message,
         });

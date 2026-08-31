@@ -35,7 +35,7 @@ export function candidateHasExactCaskCodeAnchor(
     return false;
   }
 
-  return [candidate.alias, candidate.fullName].some(
+  return [candidate.reference, candidate.fullName].some(
     (value) => getExactCaskCodeAnchor(value) === anchor,
   );
 }

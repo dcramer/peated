@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTombstones } from "@peated/server/db/schema";
-import { findBottleAliasAssignment, findBottleId } from "./bottleFinder";
+import { findBottleId, findBottleReferenceAssignment } from "./bottleFinder";
 
 describe("findBottleId", () => {
   test("matches exact", async ({ fixtures }) => {
@@ -31,7 +31,7 @@ describe("findBottleId", () => {
 
   test("matches alias", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Something Silly",
     });
@@ -43,15 +43,15 @@ describe("findBottleId", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
+    const alias = await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Direct Alias With Evidence",
     });
 
-    const result = await findBottleAliasAssignment(alias.name);
+    const result = await findBottleReferenceAssignment(alias.name);
 
     expect(result).toMatchObject({
-      alias: {
+      reference: {
         name: alias.name,
         bottleId: bottle.id,
         ignored: false,
@@ -60,20 +60,22 @@ describe("findBottleId", () => {
       },
       bottleId: bottle.id,
     });
-    expect(result?.alias).not.toHaveProperty("releaseId");
+    expect(result?.reference).not.toHaveProperty("releaseId");
   });
 
   test("resolves a general alias to its retained Bottle", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
+    const alias = await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "General Bottle Alias",
     });
 
-    await expect(findBottleAliasAssignment(alias.name)).resolves.toMatchObject({
-      alias: { bottleId: bottle.id },
+    await expect(
+      findBottleReferenceAssignment(alias.name),
+    ).resolves.toMatchObject({
+      reference: { bottleId: bottle.id },
       bottleId: bottle.id,
     });
   });
@@ -85,20 +87,20 @@ describe("findBottleId", () => {
     const unassigned = await fixtures.LegacyBottle();
     const retired = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Ignored Alias",
       bottleId: ignored.id,
       ignored: true,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Unbound Alias",
       bottleId: null,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Unassigned Alias",
       bottleId: unassigned.id,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Retired Alias",
       bottleId: retired.id,
     });

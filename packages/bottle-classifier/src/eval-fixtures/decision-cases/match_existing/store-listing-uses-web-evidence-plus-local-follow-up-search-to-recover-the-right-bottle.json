@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Wild Turkey",
         "bottler": null,
         "series": "Rare Breed",
@@ -48,7 +48,7 @@
       "when": ["wild turkey", "rare breed", "rye"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Wild Turkey",
           "bottler": null,
           "series": "Rare Breed",
@@ -72,7 +72,7 @@
       "when": ["rare breed", "rye", "barrel proof"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Wild Turkey",
           "bottler": null,
           "series": "Rare Breed",
@@ -96,7 +96,7 @@
       "when": ["rare breed", "rye", "cask_strength"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Wild Turkey",
           "bottler": null,
           "series": "Rare Breed",

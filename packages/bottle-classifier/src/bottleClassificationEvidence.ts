@@ -29,7 +29,7 @@ export function exactEditionMarkersMatch(
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(
-      [targetCandidate.alias, targetCandidate.fullName]
+      [targetCandidate.reference, targetCandidate.fullName]
         .filter((value): value is string => Boolean(value))
         .map((value) => value.trim())
         .filter((value) => value.length > 0),

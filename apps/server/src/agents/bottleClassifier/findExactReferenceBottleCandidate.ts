@@ -4,10 +4,10 @@ import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 
 /**
- * Returns one literal stored-alias candidate. A caller can accept its assigned
+ * Returns one literal stored-reference candidate. A caller can accept its assigned
  * Bottle as a deterministic Match without a classifier model call.
  */
-export async function findExactAliasBottleCandidate(
+export async function findExactReferenceBottleCandidate(
   referenceName: string,
 ): Promise<BottleCandidate | null> {
   const bottleId = await findBottleId(referenceName);

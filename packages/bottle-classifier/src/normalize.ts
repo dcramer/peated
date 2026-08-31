@@ -181,11 +181,11 @@ export function normalizeBottleBatchNumber(name: string) {
 }
 
 /**
- * Builds the deterministic key used for exact alias lookup and assignment.
+ * Builds the deterministic key used for exact reference lookup and assignment.
  * This is narrower than normalizeBottle: it keeps release-year and other
  * identity-bearing text in the string for classifier/moderator review.
  */
-export function normalizeBottleAliasKey(name: string): string {
+export function normalizeBottleReferenceKey(name: string): string {
   name = normalizeString(name);
   ({ name } = normalizeBottleAge({ name }));
 

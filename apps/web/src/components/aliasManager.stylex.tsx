@@ -12,7 +12,7 @@ import { Field, TextInput, ValidationMessage } from "./field.stylex";
 
 export type AliasManagerItem = {
   created: ReactNode;
-  isCanonical: boolean;
+  isPrimary: boolean;
   name: string;
 };
 
@@ -37,7 +37,7 @@ export function AliasManager({
       cell: (item) => (
         <span {...stylex.props(styles.name)}>
           <span>{item.name}</span>
-          {item.isCanonical ? <Chip variant="tinted">Primary</Chip> : null}
+          {item.isPrimary ? <Chip variant="tinted">Primary</Chip> : null}
         </span>
       ),
       header: "Name",
@@ -54,7 +54,7 @@ export function AliasManager({
           {
             align: "right",
             cell: (item: AliasManagerItem) =>
-              item.isCanonical ? null : (
+              item.isPrimary ? null : (
                 <Button
                   disabled={pending !== null}
                   loading={pending === item.name}
@@ -84,7 +84,7 @@ export function AliasManager({
       setName("");
     } catch (reason) {
       setError(
-        reason instanceof Error ? reason.message : "Unable to add alias.",
+        reason instanceof Error ? reason.message : "We couldn't add that name.",
       );
     } finally {
       setPending(null);
@@ -95,7 +95,7 @@ export function AliasManager({
     if (
       !onDelete ||
       pending ||
-      !window.confirm(`Delete the alias “${value}”?`)
+      !window.confirm(`Delete the name “${value}”?`)
     ) {
       return;
     }
@@ -106,7 +106,9 @@ export function AliasManager({
       await onDelete(value);
     } catch (reason) {
       setError(
-        reason instanceof Error ? reason.message : "Unable to delete alias.",
+        reason instanceof Error
+          ? reason.message
+          : "We couldn't delete that name.",
       );
     } finally {
       setPending(null);
@@ -118,7 +120,7 @@ export function AliasManager({
       {canEdit && onCreate ? (
         <form onSubmit={submit} {...stylex.props(styles.form)}>
           <div {...stylex.props(styles.field)}>
-            <Field htmlFor="alias-name" label="Alias">
+            <Field htmlFor="alias-name" label="Other name">
               <TextInput
                 id="alias-name"
                 onChange={(event) => setName(event.currentTarget.value)}
@@ -134,13 +136,13 @@ export function AliasManager({
             type="submit"
             variant="accent"
           >
-            Add alias
+            Add name
           </Button>
         </form>
       ) : null}
       {error ? <ValidationMessage>{error}</ValidationMessage> : null}
       <DataTable
-        caption="Record aliases"
+        caption="Other names"
         columns={columns}
         getKey={(item) => item.name}
         items={aliases}

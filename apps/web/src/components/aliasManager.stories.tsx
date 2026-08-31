@@ -8,10 +8,10 @@ const meta = {
   component: AliasManager,
   args: {
     aliases: [
-      { created: "Aug 12, 2026", isCanonical: true, name: "Lagavulin" },
+      { created: "Aug 12, 2026", isPrimary: true, name: "Lagavulin" },
       {
         created: "Aug 18, 2026",
-        isCanonical: false,
+        isPrimary: false,
         name: "Lagavulin Distillery",
       },
     ],

@@ -83,13 +83,13 @@ function getSiblingBottleContext({
 export function buildBottleCandidateFromCatalog({
   catalog,
   bottle,
-  alias = null,
+  reference = null,
   score = null,
   source,
 }: {
   catalog: LocalCatalog;
   bottle: LocalCatalogBottle;
-  alias?: string | null;
+  reference?: string | null;
   score?: number | null;
   source: CandidateSource[];
 }): BottleCandidate {
@@ -98,7 +98,7 @@ export function buildBottleCandidateFromCatalog({
 
   return BottleCandidateSchema.parse({
     bottleId: bottle.id,
-    alias,
+    reference,
     fullName: bottleFullName,
     brand: getEntityName(indexes, bottle.brandId),
     bottler: getEntityName(indexes, bottle.bottlerId),

@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottles,
   bottleTombstones,
   entities,
@@ -17,14 +17,14 @@ const CASK_STRENGTH_SEARCH_TERMS =
 const SINGLE_CASK_SEARCH_TERMS = "single cask single barrel";
 const MAX_SEARCH_SOURCE_ATTEMPTS = 2;
 
-export const IndexBottleAliasJobArgsSchema = z
+export const IndexBottleReferenceJobArgsSchema = z
   .object({
     name: z.string().min(1),
   })
   .strict();
 
-type BottleAliasSearchSource = {
-  alias: {
+type BottleReferenceSearchSource = {
+  reference: {
     name: string;
     bottleId: number;
     ignored: boolean | null;
@@ -57,19 +57,19 @@ function formatSearchAbv(abv: number | null | undefined) {
   return `${abv.toFixed(1)}% ABV`;
 }
 
-function aliasSnapshotWhere(alias: {
+function referenceSnapshotWhere(reference: {
   name: string;
   bottleId: number | null;
   ignored: boolean | null;
 }) {
   return and(
-    eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
-    sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
-    sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
+    eq(sql`LOWER(${bottleReferences.name})`, reference.name.toLowerCase()),
+    sql`${bottleReferences.bottleId} IS NOT DISTINCT FROM ${reference.bottleId}`,
+    sql`${bottleReferences.ignored} IS NOT DISTINCT FROM ${reference.ignored}`,
   );
 }
 
-function bottleSearchSourceWhere(source: BottleAliasSearchSource) {
+function bottleSearchSourceWhere(source: BottleReferenceSearchSource) {
   return sql`EXISTS (
     SELECT 1
     FROM ${bottles}
@@ -98,55 +98,55 @@ function bottleSearchSourceWhere(source: BottleAliasSearchSource) {
   )`;
 }
 
-async function clearAliasEmbedding(alias: {
+async function clearReferenceEmbedding(reference: {
   name: string;
   bottleId: number | null;
   ignored: boolean | null;
 }) {
   await db
-    .update(bottleAliases)
+    .update(bottleReferences)
     .set({ embedding: null })
-    .where(aliasSnapshotWhere(alias));
+    .where(referenceSnapshotWhere(reference));
 }
 
 async function clearActiveSourceEmbedding(
-  source: BottleAliasSearchSource,
+  source: BottleReferenceSearchSource,
   { requireEmptyEmbedding }: { requireEmptyEmbedding: boolean },
 ) {
   const cleared = await db
-    .update(bottleAliases)
+    .update(bottleReferences)
     .set({ embedding: null })
     .where(
       and(
-        aliasSnapshotWhere(source.alias),
+        referenceSnapshotWhere(source.reference),
         bottleSearchSourceWhere(source),
-        requireEmptyEmbedding ? isNull(bottleAliases.embedding) : undefined,
+        requireEmptyEmbedding ? isNull(bottleReferences.embedding) : undefined,
       ),
     )
-    .returning({ name: bottleAliases.name });
+    .returning({ name: bottleReferences.name });
 
   return cleared.length > 0;
 }
 
-async function loadActiveBottleAliasSearchSource(
+async function loadActiveBottleReferenceSearchSource(
   name: string,
-): Promise<BottleAliasSearchSource | null> {
-  const [alias] = await db
+): Promise<BottleReferenceSearchSource | null> {
+  const [reference] = await db
     .select({
-      name: bottleAliases.name,
-      bottleId: bottleAliases.bottleId,
-      ignored: bottleAliases.ignored,
-      hasEmbedding: sql<boolean>`${bottleAliases.embedding} IS NOT NULL`,
+      name: bottleReferences.name,
+      bottleId: bottleReferences.bottleId,
+      ignored: bottleReferences.ignored,
+      hasEmbedding: sql<boolean>`${bottleReferences.embedding} IS NOT NULL`,
     })
-    .from(bottleAliases)
-    .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
+    .from(bottleReferences)
+    .where(eq(sql`LOWER(${bottleReferences.name})`, name.toLowerCase()))
     .limit(1);
-  if (!alias) {
-    throw new Error(`Unknown bottle alias: ${name}`);
+  if (!reference) {
+    throw new Error(`Unknown bottle reference: ${name}`);
   }
 
-  if (alias.ignored || alias.bottleId === null) {
-    await clearAliasEmbedding(alias);
+  if (reference.ignored || reference.bottleId === null) {
+    await clearReferenceEmbedding(reference);
     return null;
   }
 
@@ -178,7 +178,7 @@ async function loadActiveBottleAliasSearchSource(
     .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
     .where(
       and(
-        eq(bottles.id, alias.bottleId),
+        eq(bottles.id, reference.bottleId),
         isNotNull(bottles.groupId),
         isNull(bottleTombstones.bottleId),
       ),
@@ -186,27 +186,27 @@ async function loadActiveBottleAliasSearchSource(
     .limit(1);
 
   if (!resolved) {
-    await clearAliasEmbedding(alias);
+    await clearReferenceEmbedding(reference);
     return null;
   }
 
   return {
-    alias: {
-      name: alias.name,
-      bottleId: alias.bottleId,
-      ignored: alias.ignored,
-      hasEmbedding: alias.hasEmbedding,
+    reference: {
+      name: reference.name,
+      bottleId: reference.bottleId,
+      ignored: reference.ignored,
+      hasEmbedding: reference.hasEmbedding,
     },
     ...resolved,
   };
 }
 
-function buildBottleAliasSearchText({
-  alias,
+function buildBottleReferenceSearchText({
+  reference,
   bottle,
   brand,
-}: BottleAliasSearchSource) {
-  const bits: string[] = [alias.name];
+}: BottleReferenceSearchSource) {
+  const bits: string[] = [reference.name];
   if (bottle.category) bits.push(formatCategoryName(bottle.category));
   if (bottle.edition) bits.push(bottle.edition);
   if (bottle.statedAge) bits.push(`${bottle.statedAge}-year-old`);
@@ -217,26 +217,26 @@ function buildBottleAliasSearchText({
   if (bottle.vintageYear) bits.push(`${bottle.vintageYear} vintage`);
   if (bottle.releaseYear) bits.push(`${bottle.releaseYear} release`);
   if (bottle.abv) bits.push(formatSearchAbv(bottle.abv)!);
-  // shortName is already present in alias.name
+  // shortName is already present in reference.name
   if (brand.name !== brand.shortName) bits.unshift(brand.name);
   return bits.join(" ");
 }
 
-export type IndexBottleAliasServices = {
+export type IndexBottleReferenceServices = {
   createEmbedding: (text: string) => Promise<number[]>;
 };
 
-const defaultServices: IndexBottleAliasServices = {
+const defaultServices: IndexBottleReferenceServices = {
   createEmbedding: getOpenAIEmbedding,
 };
 
-export async function indexBottleAlias(
+export async function indexBottleReference(
   input: JobPayload,
-  services: IndexBottleAliasServices = defaultServices,
+  services: IndexBottleReferenceServices = defaultServices,
 ) {
-  const { name } = IndexBottleAliasJobArgsSchema.parse(input);
+  const { name } = IndexBottleReferenceJobArgsSchema.parse(input);
 
-  logInfo("Updating index for bottle alias {name}", {
+  logInfo("Updating index for bottle reference {name}", {
     extra: {
       name,
     },
@@ -244,10 +244,10 @@ export async function indexBottleAlias(
 
   let clearedSource = false;
   for (let attempt = 0; attempt < MAX_SEARCH_SOURCE_ATTEMPTS; attempt += 1) {
-    const source = await loadActiveBottleAliasSearchSource(name);
+    const source = await loadActiveBottleReferenceSearchSource(name);
     if (!source) return;
 
-    if (clearedSource && source.alias.hasEmbedding) {
+    if (clearedSource && source.reference.hasEmbedding) {
       return;
     }
 
@@ -256,8 +256,9 @@ export async function indexBottleAlias(
     });
     if (!cleared) {
       if (clearedSource) {
-        const reloadedSource = await loadActiveBottleAliasSearchSource(name);
-        if (!reloadedSource || reloadedSource.alias.hasEmbedding) {
+        const reloadedSource =
+          await loadActiveBottleReferenceSearchSource(name);
+        if (!reloadedSource || reloadedSource.reference.hasEmbedding) {
           return;
         }
       }
@@ -266,23 +267,26 @@ export async function indexBottleAlias(
     clearedSource = true;
 
     const embedding = await services.createEmbedding(
-      buildBottleAliasSearchText(source),
+      buildBottleReferenceSearchText(source),
     );
     const updated = await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ embedding })
       .where(
-        and(aliasSnapshotWhere(source.alias), bottleSearchSourceWhere(source)),
+        and(
+          referenceSnapshotWhere(source.reference),
+          bottleSearchSourceWhere(source),
+        ),
       )
-      .returning({ name: bottleAliases.name });
+      .returning({ name: bottleReferences.name });
     if (updated.length) return;
   }
 
   throw new Error(
-    `Bottle alias search source changed repeatedly while indexing: ${name}`,
+    `Bottle reference search source changed repeatedly while indexing: ${name}`,
   );
 }
 
-export default async function indexBottleAliasJob(input: JobPayload) {
-  return await indexBottleAlias(input);
+export default async function indexBottleReferenceJob(input: JobPayload) {
+  return await indexBottleReference(input);
 }
