@@ -128,27 +128,36 @@ export async function findEntityByExactNameOrReference(
   }
 
   const lowerName = normalizedName.toLowerCase();
+  const nameMatch = eq(sql`LOWER(${entities.name})`, lowerName);
+  const shortNameMatch = eq(
+    sql`LOWER(COALESCE(${entities.shortName}, ''))`,
+    lowerName,
+  );
+  const trimmedNameMatch = eq(
+    sql`LOWER(
+      CASE
+        WHEN ${entities.name} ILIKE 'The %'
+          THEN SUBSTRING(${entities.name} FROM 5)
+        ELSE ''
+      END
+    )`,
+    lowerName,
+  );
+  const referenceMatch = eq(sql`LOWER(${entityReferences.name})`, lowerName);
 
   const [row] = await db
     .select({ entity: entities })
     .from(entities)
     .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
-    .where(
-      or(
-        eq(sql`LOWER(${entities.name})`, lowerName),
-        eq(sql`LOWER(COALESCE(${entities.shortName}, ''))`, lowerName),
-        eq(
-          sql`LOWER(
-            CASE
-              WHEN ${entities.name} ILIKE 'The %'
-                THEN SUBSTRING(${entities.name} FROM 5)
-              ELSE ''
-            END
-          )`,
-          lowerName,
-        ),
-        eq(sql`LOWER(${entityReferences.name})`, lowerName),
-      ),
+    .where(or(nameMatch, shortNameMatch, trimmedNameMatch, referenceMatch))
+    .orderBy(
+      sql`CASE
+        WHEN ${nameMatch} THEN 0
+        WHEN ${shortNameMatch} THEN 1
+        WHEN ${trimmedNameMatch} THEN 2
+        ELSE 3
+      END`,
+      entities.id,
     )
     .limit(1);
 

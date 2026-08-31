@@ -2,7 +2,26 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { entities } from "../db/schema";
 import { getUserActor } from "./actors";
-import { upsertEntity } from "./db";
+import { findEntityByExactNameOrReference, upsertEntity } from "./db";
+
+describe("findEntityByExactNameOrReference", () => {
+  test("prefers an Entity name over another Entity's short name", async ({
+    fixtures,
+  }) => {
+    await fixtures.Entity({
+      name: "Short Name Owner",
+      shortName: "Shared Entity Name",
+    });
+    const nameOwner = await fixtures.Entity({ name: "Shared Entity Name" });
+
+    const result = await findEntityByExactNameOrReference(
+      db,
+      "Shared Entity Name",
+    );
+
+    expect(result?.id).toBe(nameOwner.id);
+  });
+});
 
 describe("upsertEntity", () => {
   test("reuses an existing Entity without changing its kind", async ({
