@@ -23,7 +23,7 @@ import {
 import CountryMapIcon from "../countryMapIcon";
 
 const COMPACT = "@media (max-width: 639px)";
-const NARROW = "@media (max-width: 899px)";
+const NARROW = "@media (min-width: 640px) and (max-width: 899px)";
 
 function HomeModuleHeading({
   action,
@@ -245,7 +245,7 @@ function RegionCard({ region }: { region: HomeOrigin }) {
 
   return (
     <Card
-      appearance="surface"
+      appearance="outlined"
       linked
       padding="none"
       {...stylex.props(styles.region)}
@@ -303,7 +303,7 @@ export function HomeOrigins({
       <div {...stylex.props(styles.countryGrid)}>
         {countries.map((country) => (
           <CardLink
-            appearance="surface"
+            appearance="outlined"
             href={country.href}
             key={country.href}
             padding="none"
@@ -327,7 +327,7 @@ export function HomeOrigins({
         ))}
         {remainingCountries && remainingCountries.count > 0 ? (
           <CardLink
-            appearance="surface"
+            appearance="outlined"
             href="/locations"
             padding="none"
             {...stylex.props(styles.country)}

@@ -147,17 +147,14 @@ const styles = stylex.create({
     minWidth: 0,
     borderRadius: 0,
     backgroundColor: "transparent",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
   },
   outlined: {
-    borderTopColor: colors.sectionRule,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
   },
   surface: {
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
+    borderWidth: 0,
   },
   paddingSmall: {
     paddingTop: space.x4,
@@ -246,9 +243,6 @@ const styles = stylex.create({
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
-    gap: 0,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
+    gap: "6px",
   },
 });
