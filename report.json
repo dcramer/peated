@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "file": "bottler-detail__desktop.png",
+      "height": 1225,
+      "image": "images/bottler-detail__desktop.png",
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "bottler-detail__mobile.png",
+      "height": 1707,
+      "image": "images/bottler-detail__mobile.png",
+      "status": "changed",
+      "width": 390
+    },
+    {
+      "file": "brand-detail__desktop.png",
+      "height": 1181,
+      "image": "images/brand-detail__desktop.png",
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "brand-detail__mobile.png",
+      "height": 1557,
+      "image": "images/brand-detail__mobile.png",
+      "status": "changed",
+      "width": 390
+    },
+    {
+      "file": "distillery-detail__desktop.png",
+      "height": 1200,
+      "image": "images/distillery-detail__desktop.png",
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "distillery-detail__mobile.png",
+      "height": 1625,
+      "image": "images/distillery-detail__mobile.png",
+      "status": "changed",
+      "width": 390
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 6,
+    "removed": 0,
+    "unchanged": 0
+  },
+  "version": 1
+}
