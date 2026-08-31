@@ -50,9 +50,10 @@
 
 ## Catalog Operations
 
-- Before production catalog work, read the Catalog Enrichment guide and Whisky
-  Identity Model. Treat their identity, evidence, and verification rules as
-  required.
+- Before a catalog backfill, deduplication, or production Bottle edit, read the
+  Catalog Enrichment guide and Whisky Identity Model. Complete the inventory,
+  evidence manifest, approval, and verification gates before making production
+  writes.
 - Keep Bottle `name` to the stable marketed expression. Do not generate it from
   structured facts. Use exact producer wording only when it is part of the
   marketed expression, and verify each changed Bottle after the write.
