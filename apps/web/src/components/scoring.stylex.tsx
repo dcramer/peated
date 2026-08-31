@@ -120,15 +120,10 @@ export function Score({
 export type BandStackProps = {
   counts?: BandCounts;
   showCounts?: boolean;
-  showRanges?: boolean;
 };
 
 /** Shows aggregate tasting ratings as five fixed bins. */
-export function BandStack({
-  counts = {},
-  showCounts = false,
-  showRanges = false,
-}: BandStackProps) {
+export function BandStack({ counts = {}, showCounts = false }: BandStackProps) {
   const bins = getBandStackBins(counts);
   const total = bins.reduce((sum, bin) => sum + bin.count, 0);
   const shares = getBandStackShares(bins);
@@ -169,18 +164,6 @@ export function BandStack({
               {...stylex.props(styles.bandStackLabel(shares[index] ?? 0))}
             >
               {formatCount(bin.count)}
-            </span>
-          ))}
-        </div>
-      ) : null}
-      {showRanges && total > 0 ? (
-        <div {...stylex.props(styles.bandStackLabels, styles.bandStackRanges)}>
-          {bins.map((bin, index) => (
-            <span
-              key={bin.key}
-              {...stylex.props(styles.bandStackLabel(shares[index] ?? 0))}
-            >
-              {bin.range}
             </span>
           ))}
         </div>
@@ -482,11 +465,6 @@ const styles = stylex.create({
     fontSize: "10px",
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.35,
-  },
-  bandStackRanges: {
-    marginTop: "2px",
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
   },
   bandStackLabel: (share: number) => ({
     minWidth: 0,

@@ -14,7 +14,7 @@ const counts = {
 const meta = {
   title: "Components/Measures/Band Stack",
   component: BandStack,
-  args: { counts, showCounts: true, showRanges: true },
+  args: { counts, showCounts: true },
   decorators: [
     (Story) => (
       <StoryCanvas>
