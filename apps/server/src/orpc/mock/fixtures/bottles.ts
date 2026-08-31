@@ -65,6 +65,8 @@ export const mockBottle = {
   description: "A rich, smoky Islay single malt with a long finish.",
   descriptionSrc: "user",
   imageUrl: null,
+  imageSourceUrl: null,
+  imageLicense: null,
   flavorProfile: "peated",
   tastingNotes: {
     nose: "Smoke and dried fruit",
