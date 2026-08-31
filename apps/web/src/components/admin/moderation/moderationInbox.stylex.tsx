@@ -203,14 +203,23 @@ export function ModerationInboxContent({
                     <span>{task.category}</span>
                     <TimeSince date={task.attentionAt} />
                   </span>
-                  <strong {...stylex.props(styles.taskTitle)}>
+                  <strong
+                    title={task.title}
+                    {...stylex.props(styles.taskTitle)}
+                  >
                     {task.title}
                   </strong>
-                  <span {...stylex.props(styles.question)}>
+                  <span
+                    title={task.question}
+                    {...stylex.props(styles.question)}
+                  >
                     {task.question}
                   </span>
                   <span {...stylex.props(styles.taskMeta)}>
-                    <span {...stylex.props(styles.truncate)}>
+                    <span
+                      title={task.sourceLabel}
+                      {...stylex.props(styles.truncate)}
+                    >
                       {task.sourceLabel}
                     </span>
                     <span

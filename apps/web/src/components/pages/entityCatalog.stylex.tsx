@@ -159,13 +159,19 @@ function EntityCounts({ item }: { item: EntityCatalogItem }) {
       {...stylex.props(styles.counts)}
     >
       <span {...stylex.props(styles.count)}>
-        <strong {...stylex.props(styles.countValue)}>
+        <strong
+          title={item.totalBottles.toLocaleString("en-US")}
+          {...stylex.props(styles.countValue)}
+        >
           {item.totalBottles.toLocaleString("en-US")}
         </strong>
         <span {...stylex.props(styles.countLabel)}>{bottleNoun}</span>
       </span>
       <span {...stylex.props(styles.count, styles.tastingCount)}>
-        <strong {...stylex.props(styles.countValue)}>
+        <strong
+          title={item.totalTastings.toLocaleString("en-US")}
+          {...stylex.props(styles.countValue)}
+        >
           {item.totalTastings.toLocaleString("en-US")}
         </strong>
         <span {...stylex.props(styles.countLabel)}>{tastingNoun}</span>

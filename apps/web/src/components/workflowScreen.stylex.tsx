@@ -70,7 +70,9 @@ export function WorkflowScreen({
           <Link href="/" {...stylex.props(styles.brand)}>
             Peated
           </Link>
-          <h1 {...stylex.props(styles.title)}>{title}</h1>
+          <h1 title={title} {...stylex.props(styles.title)}>
+            {title}
+          </h1>
           {onSave ? (
             <span
               {...stylex.props(

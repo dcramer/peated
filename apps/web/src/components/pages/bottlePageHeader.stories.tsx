@@ -87,6 +87,23 @@ export const MissingImage: Story = {
   },
 };
 
+export const LongName: Story = {
+  args: {
+    brand: "The Scotch Malt Whisky Society",
+    brandHref: "/entities/3417",
+    detail: "Highland · single malt · independent bottling",
+    id: "B49748",
+    name: "SMWS Highland peaty potion",
+    notes: [],
+    specs: [
+      { label: "ABV", value: "50.0%" },
+      { label: "Age", value: "10 years" },
+      { label: "Cask", value: "1st fill barrels and oloroso sherry hogsheads" },
+      { label: "Release", value: "Batch 42" },
+    ],
+  },
+};
+
 export const ThinData: Story = {
   args: {
     actions: null,

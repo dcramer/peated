@@ -98,6 +98,7 @@ export function BottleIdentityRow({
           brandHref ? (
             <AppLink
               href={brandHref}
+              title={brand}
               {...stylex.props(
                 styles.brand,
                 styles.brandLink,
@@ -107,7 +108,9 @@ export function BottleIdentityRow({
               {brand}
             </AppLink>
           ) : (
-            <span {...stylex.props(styles.brand)}>{brand}</span>
+            <span title={brand} {...stylex.props(styles.brand)}>
+              {brand}
+            </span>
           )
         ) : null}
         <div {...stylex.props(styles.nameLine)}>
@@ -129,7 +132,7 @@ export function BottleIdentityRow({
           {hasTasted ? <MemberStatus kind="tasted" /> : null}
         </div>
         {metadata.length ? (
-          <div {...stylex.props(styles.metadata)}>
+          <div title={metadata.join(" · ")} {...stylex.props(styles.metadata)}>
             {metadata.map((item, index) => (
               <span key={`${item}-${index}`}>
                 {index ? <span aria-hidden="true"> · </span> : null}

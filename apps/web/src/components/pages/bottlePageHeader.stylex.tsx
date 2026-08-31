@@ -62,6 +62,7 @@ export function BottlePageHeader({
 }: BottlePageHeaderProps) {
   const hasActions = Boolean(actions || menu);
   const hasRatings = Boolean(score || bands);
+  const hasLongName = `${brand} ${name}`.length > 24;
 
   return (
     <header
@@ -83,13 +84,23 @@ export function BottlePageHeader({
             size="lg"
           />
           <div {...stylex.props(styles.identity)}>
-            <h1 {...stylex.props(foundationStyles.pageTitle, styles.name)}>
+            <h1
+              {...stylex.props(
+                foundationStyles.pageTitle,
+                styles.name,
+                hasLongName && styles.longName,
+              )}
+            >
               {brandHref ? (
-                <AppLink href={brandHref} {...stylex.props(styles.brand)}>
+                <AppLink
+                  href={brandHref}
+                  title={brand}
+                  {...stylex.props(styles.brand)}
+                >
                   {brand}
                 </AppLink>
               ) : (
-                <span>{brand}</span>
+                <span title={brand}>{brand}</span>
               )}{" "}
               {name}
             </h1>
@@ -215,6 +226,19 @@ const styles = stylex.create({
   },
   name: {
     overflowWrap: "anywhere",
+    fontSize: {
+      default: "clamp(30px, 4vw, 40px)",
+      [COMPACT]: "28px",
+      [PHONE]: "26px",
+    },
+    textWrap: "balance",
+  },
+  longName: {
+    fontSize: {
+      default: "clamp(28px, 3.5vw, 36px)",
+      [COMPACT]: "26px",
+      [PHONE]: "24px",
+    },
   },
   notes: {
     display: "flex",

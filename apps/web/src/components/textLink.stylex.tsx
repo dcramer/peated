@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { colors, effects, fonts } from "../styles/tokens.stylex";
 import { AppLink, type AppLinkProps } from "./appLink";
+import { getTextTitle } from "./textTitle";
 
 export type TextLinkProps = Omit<
   AppLinkProps,
@@ -31,7 +32,12 @@ export function TextLink({
       )}
     >
       {truncate ? (
-        <span {...stylex.props(styles.truncateContent)}>{children}</span>
+        <span
+          title={getTextTitle(children)}
+          {...stylex.props(styles.truncateContent)}
+        >
+          {children}
+        </span>
       ) : (
         children
       )}

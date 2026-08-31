@@ -83,7 +83,9 @@ export function FormSteps({ currentStep, steps }: FormStepsProps) {
             )}
           >
             <span aria-hidden="true">{index + 1}</span>
-            <span {...stylex.props(styles.stepLabel)}>{step}</span>
+            <span title={step} {...stylex.props(styles.stepLabel)}>
+              {step}
+            </span>
           </li>
         ))}
       </ol>

@@ -58,6 +58,7 @@ export function FacetRow({
       )}
     >
       <span
+        title={label}
         {...stylex.props(
           styles.label,
           !counted && styles.labelWide,

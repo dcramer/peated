@@ -171,7 +171,10 @@ export function NotePickerField({
                     index === activeIndex && styles.activeSuggestion,
                   )}
                 >
-                  <span {...stylex.props(styles.suggestionName)}>
+                  <span
+                    title={note.name}
+                    {...stylex.props(styles.suggestionName)}
+                  >
                     {note.name}
                   </span>
                   <span {...stylex.props(styles.suggestionCount)}>

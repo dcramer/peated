@@ -54,7 +54,9 @@ export function HomeMemberSummary({
               <dd {...stylex.props(styles.recordFactValue)}>
                 {fact.value.toLocaleString("en-US")}
               </dd>
-              <dt {...stylex.props(styles.recordFactLabel)}>{fact.label}</dt>
+              <dt title={fact.label} {...stylex.props(styles.recordFactLabel)}>
+                {fact.label}
+              </dt>
             </div>
           ))}
         </dl>

@@ -4,6 +4,7 @@ import { type ReactNode, useId } from "react";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
+import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -80,6 +81,7 @@ export function BottleComparisonTable({
                 {row.href ? (
                   <AppLink
                     href={row.href}
+                    title={row.name}
                     {...stylex.props(
                       styles.name,
                       styles.nameLink,
@@ -89,18 +91,30 @@ export function BottleComparisonTable({
                     {row.name}
                   </AppLink>
                 ) : (
-                  <span {...stylex.props(styles.name)}>{row.name}</span>
+                  <span title={row.name} {...stylex.props(styles.name)}>
+                    {row.name}
+                  </span>
                 )}
                 {row.metadata ? (
-                  <span {...stylex.props(styles.metadata)}>{row.metadata}</span>
+                  <span title={row.metadata} {...stylex.props(styles.metadata)}>
+                    {row.metadata}
+                  </span>
                 ) : null}
               </th>
               {row.values.map((value, index) => (
                 <td key={index} {...stylex.props(styles.valueCell)}>
-                  <span {...stylex.props(styles.mobileLabel)}>
+                  <span
+                    title={columns[index]}
+                    {...stylex.props(styles.mobileLabel)}
+                  >
                     {columns[index]}
                   </span>
-                  <span {...stylex.props(styles.value)}>{value ?? "–"}</span>
+                  <span
+                    title={getTextTitle(value ?? "–")}
+                    {...stylex.props(styles.value)}
+                  >
+                    {value ?? "–"}
+                  </span>
                 </td>
               ))}
             </tr>

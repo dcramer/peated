@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { colors, fonts, space } from "../styles/tokens.stylex";
+import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
 const PHONE = "@media (max-width: 480px)";
@@ -16,7 +17,11 @@ export function PeatedId({ detail, id }: PeatedIdProps) {
     <div {...stylex.props(styles.idStamp)}>
       <span {...stylex.props(styles.idLabel)}>Peated ID</span>
       <span {...stylex.props(styles.idValue)}>{id}</span>
-      {detail ? <span {...stylex.props(styles.idDetail)}>{detail}</span> : null}
+      {detail ? (
+        <span title={getTextTitle(detail)} {...stylex.props(styles.idDetail)}>
+          {detail}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -66,8 +71,12 @@ export function KeyFacts({ facts }: { facts: KeyFactList }) {
               styles.keyFactPhoneEven,
           )}
         >
-          <dt {...stylex.props(styles.keyFactLabel)}>{fact.label}</dt>
-          <dd {...stylex.props(styles.keyFactValue)}>{fact.value}</dd>
+          <dt title={fact.label} {...stylex.props(styles.keyFactLabel)}>
+            {fact.label}
+          </dt>
+          <dd title={String(fact.value)} {...stylex.props(styles.keyFactValue)}>
+            {fact.value}
+          </dd>
         </div>
       ))}
     </dl>

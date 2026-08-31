@@ -104,6 +104,7 @@ export function ScopedSearch({
               aria-expanded={scopeMenuOpen}
               aria-haspopup="listbox"
               aria-label={scopeLabel}
+              title={selectedScope?.label ?? "Search"}
               disabled={disabled}
               onClick={() => setScopeMenuOpen((open) => !open)}
               onKeyDown={(event) => {

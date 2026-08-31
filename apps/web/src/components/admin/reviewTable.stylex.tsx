@@ -58,7 +58,9 @@ export function ReviewRows({
                       {bottleName}
                     </AdminTextLink>
                   ) : (
-                    <span {...stylex.props(styles.match)}>{bottleName}</span>
+                    <span title={bottleName} {...stylex.props(styles.match)}>
+                      {bottleName}
+                    </span>
                   )}
                   <span {...stylex.props(styles.metadata)}>
                     {" · "}
