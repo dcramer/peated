@@ -183,7 +183,7 @@ const styles = stylex.create({
     },
   },
   ratingWidth: {
-    width: "152px",
+    width: "184px",
     [COMPACT]: {
       width: "104px",
     },

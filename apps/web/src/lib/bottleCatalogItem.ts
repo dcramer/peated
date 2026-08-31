@@ -1,3 +1,4 @@
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { BottleCatalogItem } from "@peated/web/components/pages/bottleCatalog.stylex";
@@ -9,7 +10,9 @@ import { getEntityUrl } from "./urls";
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
 export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
+  const releaseDate = formatReleaseDate(bottle);
   const metadata = [
+    releaseDate ? `${releaseDate} release` : null,
     bottle.category ? formatCategoryName(bottle.category) : null,
     bottle.statedAge !== null
       ? `${bottle.statedAge} years`
@@ -42,7 +45,6 @@ export function toBottleCatalogItem(bottle: Bottle): BottleCatalogItem {
     scoreHigh: bottle.maxScore,
     scoreLow: bottle.minScore,
     scoreCount: bottle.scoreCount,
-    totalTastings: bottle.totalTastings,
   };
 }
 
