@@ -45,8 +45,8 @@ export function mergeBottleCandidate(
     existing.score = candidate.score;
   }
 
-  if (!existing.alias && candidate.alias) {
-    existing.alias = candidate.alias;
+  if (!existing.reference && candidate.reference) {
+    existing.reference = candidate.reference;
   }
 
   if (!existing.series && candidate.series) {

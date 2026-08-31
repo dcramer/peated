@@ -26,7 +26,7 @@
     "initialCandidates": [
       {
         "bottleId": 41268,
-        "alias": "Caisteal Chamuis 12-year-old",
+        "reference": "Caisteal Chamuis 12-year-old",
         "fullName": "Caisteal Chamuis 12-year-old",
         "brand": "Caisteal Chamuis",
         "bottler": "Caisteal Chamuis",
@@ -45,7 +45,7 @@
       },
       {
         "bottleId": -218,
-        "alias": "Kilchoman 12-year-old Feis Ile 2020",
+        "reference": "Kilchoman 12-year-old Feis Ile 2020",
         "fullName": "Kilchoman Feis Ile - 2020 - 12-year-old",
         "brand": "Kilchoman",
         "bottler": null,
@@ -64,7 +64,7 @@
       },
       {
         "bottleId": 43911,
-        "alias": "Shieldaig The Classic 12-year-old",
+        "reference": "Shieldaig The Classic 12-year-old",
         "fullName": "Shieldaig The Classic 12-year-old",
         "brand": "Shieldaig",
         "bottler": null,
@@ -83,7 +83,7 @@
       },
       {
         "bottleId": 12810,
-        "alias": "Octomore 12.1",
+        "reference": "Octomore 12.1",
         "fullName": "Octomore 12.1",
         "brand": "Bruichladdich Octomore",
         "bottler": null,
@@ -102,7 +102,7 @@
       },
       {
         "bottleId": 13277,
-        "alias": "BenRiach The Smoky Twelve",
+        "reference": "BenRiach The Smoky Twelve",
         "fullName": "BenRiach The Smoky Twelve",
         "brand": "BenRiach",
         "bottler": "BenRiach",
@@ -121,7 +121,7 @@
       },
       {
         "bottleId": 1851,
-        "alias": "Octomore 12.2",
+        "reference": "Octomore 12.2",
         "fullName": "Octomore 12.2",
         "brand": "Bruichladdich Octomore",
         "bottler": "Bruichladdich",
@@ -140,7 +140,7 @@
       },
       {
         "bottleId": -395,
-        "alias": "The Balvenie Signature 12-year-old",
+        "reference": "The Balvenie Signature 12-year-old",
         "fullName": "The Balvenie Signature 12-year-old - Batch 1",
         "brand": "The Balvenie",
         "bottler": null,
@@ -159,7 +159,7 @@
       },
       {
         "bottleId": 44005,
-        "alias": "Laphroaig Cask Strength",
+        "reference": "Laphroaig Cask Strength",
         "fullName": "Laphroaig Cask Strength",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -178,7 +178,7 @@
       },
       {
         "bottleId": 12995,
-        "alias": "Bruichladdich Islay Barley (2012)",
+        "reference": "Bruichladdich Islay Barley (2012)",
         "fullName": "Bruichladdich Islay Barley",
         "brand": "Bruichladdich",
         "bottler": "Bruichladdich",
@@ -197,7 +197,7 @@
       },
       {
         "bottleId": 11838,
-        "alias": "Bushmills 12-year-old",
+        "reference": "Bushmills 12-year-old",
         "fullName": "Bushmills 12-year-old Marsala Cask",
         "brand": "Bushmills",
         "bottler": null,
@@ -216,7 +216,7 @@
       },
       {
         "bottleId": 44028,
-        "alias": "Kilchoman Feis Ile",
+        "reference": "Kilchoman Feis Ile",
         "fullName": "Kilchoman Feis Ile",
         "brand": "Kilchoman",
         "bottler": null,
@@ -235,7 +235,7 @@
       },
       {
         "bottleId": -329,
-        "alias": "Kilchoman Feis Ile - 9-year-old",
+        "reference": "Kilchoman Feis Ile - 9-year-old",
         "fullName": "Kilchoman Feis Ile - 9-year-old",
         "brand": "Kilchoman",
         "bottler": null,
@@ -254,7 +254,7 @@
       },
       {
         "bottleId": 13276,
-        "alias": "BenRiach The Original Twelve",
+        "reference": "BenRiach The Original Twelve",
         "fullName": "BenRiach The Original Twelve",
         "brand": "BenRiach",
         "bottler": "BenRiach",
@@ -273,7 +273,7 @@
       },
       {
         "bottleId": 44175,
-        "alias": "Shieldaig Speyside",
+        "reference": "Shieldaig Speyside",
         "fullName": "Shieldaig Speyside",
         "brand": "Shieldaig",
         "bottler": null,

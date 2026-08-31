@@ -4,7 +4,7 @@ import type { BottleClassificationDecision } from "@peated/server/agents/bottleC
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
-  bottleAliases,
+  bottleReferences,
   bottleTombstones,
   externalReviewArticles,
   externalReviews,
@@ -12,7 +12,7 @@ import {
 } from "@peated/server/db/schema";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import {
@@ -221,8 +221,8 @@ describe("POST /external-reviews", () => {
       fetchedAt: null,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, "Unresolved Review Bottle"),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, "Unresolved Review Bottle"),
       }),
     ).toBeUndefined();
   });
@@ -282,7 +282,7 @@ describe("POST /external-reviews", () => {
     });
   });
 
-  test("writes an exact alias match directly to externalReviews.bottleId", async ({
+  test("writes an exact reference match directly to externalReviews.bottleId", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -323,7 +323,7 @@ describe("POST /external-reviews", () => {
       brandId: brand.id,
     });
     const rawName = "Ardbeg 10 years old";
-    expect(normalizeBottleAliasKey(rawName)).toBe(bottle.fullName);
+    expect(normalizeBottleReferenceKey(rawName)).toBe(bottle.fullName);
     const url = "https://example.com/reviews/identity-preserving-alias";
 
     await routerClient.externalReviews.create(
@@ -345,7 +345,7 @@ describe("POST /external-reviews", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("does not use a lossy display-normalized name as an exact alias", async ({
+  test("does not use a lossy display-normalized name as an exact reference", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -385,7 +385,7 @@ describe("POST /external-reviews", () => {
     );
 
     expect(normalizedAliasBottle.fullName).not.toBe(
-      normalizeBottleAliasKey(rawName),
+      normalizeBottleReferenceKey(rawName),
     );
     expect(await findExternalReviewByUrl(url)).toMatchObject({
       bottleId: classifierBottle.id,
@@ -394,14 +394,14 @@ describe("POST /external-reviews", () => {
     expect(classifyBottleReferenceMock).toHaveBeenCalledOnce();
   });
 
-  test("uses a directly assigned Bottle alias", async ({ fixtures }) => {
+  test("uses a directly assigned Bottle reference", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
       name: "Direct Review Identity",
     });
     const aliasName = "Direct Review Alias";
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: aliasName,
       bottleId: bottle.id,
     });
@@ -423,8 +423,11 @@ describe("POST /external-reviews", () => {
       bottleId: bottle.id,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(aliasName),
+        ),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -471,8 +474,11 @@ describe("POST /external-reviews", () => {
       bottleId: bottle.id,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(reviewName),
+        ),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -651,8 +657,8 @@ describe("POST /external-reviews", () => {
     const reviewName = "Rollback Review Assignment";
     const retryUrl = "https://example.com/reviews/rollback-retry";
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
-      await fixtures.BottleAlias({
-        name: normalizeBottleAliasKey(reviewName),
+      await fixtures.BottleReference({
+        name: normalizeBottleReferenceKey(reviewName),
         bottleId: conflictingBottle.id,
       });
       return buildClassification(
@@ -681,8 +687,11 @@ describe("POST /external-reviews", () => {
 
     expect(await findExternalReviewByUrl(retryUrl)).toBeUndefined();
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(reviewName),
+        ),
       }),
     ).toMatchObject({
       bottleId: conflictingBottle.id,
@@ -762,8 +771,11 @@ describe("POST /external-reviews", () => {
         nativeScoreValue: 96,
       });
       expect(
-        await db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+        await db.query.bottleReferences.findFirst({
+          where: eq(
+            bottleReferences.name,
+            normalizeBottleReferenceKey(reviewName),
+          ),
         }),
       ).toBeUndefined();
       expect(
@@ -834,7 +846,7 @@ describe("POST /external-reviews", () => {
     const aliasName = "Conflicting Resolved Review";
     const issue = "Conflict issue";
     const url = "https://example.com/reviews/conflict";
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: aliasName,
       bottleId: incomingBottle.id,
     });

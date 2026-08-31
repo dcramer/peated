@@ -34,7 +34,7 @@ export function EntityAliasList({
       <AliasManager
         aliases={aliases.map((alias) => ({
           created: <TimeSince date={alias.createdAt} />,
-          isCanonical: alias.isCanonical,
+          isPrimary: alias.isCanonical,
           name: alias.name,
         }))}
         canEdit={user?.mod}

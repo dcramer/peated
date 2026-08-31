@@ -1,12 +1,8 @@
 import { base } from "@peated/server/orpc";
+import create from "./create";
 import delete_ from "./delete";
 import list from "./list";
-import update from "./update";
-import upsert from "./upsert";
 
-export default base.tag("bottleAliases").router({
-  list,
-  update,
-  delete: delete_,
-  upsert,
-});
+export default base
+  .tag("bottleAliases")
+  .router({ create, delete: delete_, list });

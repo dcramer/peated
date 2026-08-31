@@ -43,7 +43,7 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
       totalTastings: 10,
       createdByActorId: modActor.id,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Jura 12-year-old Single Malt Scotch Whisky",
     });
@@ -101,7 +101,7 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
       name: "12-year-old",
       createdByActorId: modActor.id,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Acme Heritage 12-year-old",
     });

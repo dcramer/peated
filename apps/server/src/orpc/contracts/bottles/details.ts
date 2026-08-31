@@ -10,6 +10,7 @@ import { contract } from "../base";
 const OutputSchema = z.intersection(
   BottleSchema,
   z.object({
+    aliases: z.array(z.string()).readonly(),
     barcodes: z
       .array(BottleBarcodeSchema.pick({ value: true, volume: true }))
       .readonly()

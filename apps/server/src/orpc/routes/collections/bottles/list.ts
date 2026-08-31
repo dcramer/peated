@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottles,
   bottlesToDistillers,
   collectionBottles,
@@ -93,10 +93,10 @@ export default implement(collectionBottleListContract).handler(async function ({
   if (input.query) {
     baseWhere.push(
       sql`EXISTS(
-          SELECT FROM ${bottleAliases}
-          WHERE ${bottleAliases.bottleId} = ${collectionBottles.bottleId}
-            AND LOWER(${bottleAliases.name}) = ${input.query.toLowerCase()}
-            AND ${bottleAliases.ignored} IS NOT TRUE
+          SELECT FROM ${bottleReferences}
+          WHERE ${bottleReferences.bottleId} = ${collectionBottles.bottleId}
+            AND LOWER(${bottleReferences.name}) = ${input.query.toLowerCase()}
+            AND ${bottleReferences.ignored} IS NOT TRUE
         ) OR ${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
     );
   }

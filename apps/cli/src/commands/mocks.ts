@@ -268,13 +268,13 @@ const loadDefaultBottles = async (
         externalSiteId: site.id,
         bottleId: null,
       });
-      await Fixtures.BottleAlias({
+      await Fixtures.BottleReference({
         bottleId: null,
       });
-      await Fixtures.BottleAlias({
+      await Fixtures.BottleReference({
         bottleId: null,
       });
-      await Fixtures.BottleAlias({
+      await Fixtures.BottleReference({
         bottleId: null,
       });
 

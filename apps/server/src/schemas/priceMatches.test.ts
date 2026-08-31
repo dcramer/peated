@@ -103,7 +103,7 @@ describe("StorePriceMatchDecisionSchema", () => {
       StorePriceMatchDecisionSchema.parse({
         action: "match_existing",
         suggestedBottleId: 123,
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
       }),
     ).toMatchObject({
       action: "match_existing",

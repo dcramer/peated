@@ -18,7 +18,7 @@ import {
 } from "./classifierTypes";
 import type {
   BottleClassificationArtifacts,
-  BottleReference,
+  BottleReferenceInput,
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import {
@@ -257,7 +257,7 @@ function maybeRejectExactCaskCreateDuplicate({
 function getBottleTargetNameCandidates(target: BottleCandidate): string[] {
   return Array.from(
     new Set(
-      [target.alias, target.fullName]
+      [target.reference, target.fullName]
         .filter(Boolean)
         .map((value) => value!.trim())
         .filter((value) => value.length > 0),
@@ -478,7 +478,7 @@ function createNoMatchDecision({
   identityScope,
 }: {
   decision: Pick<BottleClassifierAgentDecision, "rationale" | "identityScope"> &
-    Partial<Pick<BottleClassifierAgentDecision, "aliasScope">> &
+    Partial<Pick<BottleClassifierAgentDecision, "referenceScope">> &
     Partial<Pick<BottleClassifierAgentDecision, "confidenceBasis">>;
   candidateBottleIds: number[];
   rationale: string | null;
@@ -490,7 +490,7 @@ function createNoMatchDecision({
     rationale,
     candidateBottleIds,
     identityScope: identityScope ?? decision.identityScope ?? "product",
-    aliasScope: decision.aliasScope ?? "none",
+    referenceScope: decision.referenceScope ?? "none",
     observation,
     confidenceBasis: decision.confidenceBasis ?? null,
     matchedBottleId: null,
@@ -536,7 +536,7 @@ function rejectInvalidExistingMatch({
   decision,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision {
@@ -692,7 +692,7 @@ function sanitizeClassifierDecision({
   decision,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   decision: BottleClassifierAgentDecision;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision {
@@ -789,7 +789,7 @@ function sanitizeClassifierDecision({
       ...decision,
       action: "create_bottle",
       identityScope: decision.identityScope ?? "product",
-      aliasScope: decision.aliasScope ?? undefined,
+      referenceScope: decision.referenceScope ?? undefined,
       matchedBottleId: null,
       proposedBottle: proposedBottleDraft,
     };
@@ -884,7 +884,7 @@ export function finalizeBottleReferenceClassification({
   decision,
   artifacts,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   decision: BottleClassifierAgentDecisionInput;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision {
@@ -927,8 +927,10 @@ export function finalizeBottleReferenceClassification({
 
   return BottleClassificationDecisionSchema.parse({
     ...reviewedDecision,
-    aliasScope:
-      reviewedDecision.aliasScope ?? parsedDecision.aliasScope ?? "none",
+    referenceScope:
+      reviewedDecision.referenceScope ??
+      parsedDecision.referenceScope ??
+      "none",
     confidenceBasis:
       reviewedDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
   });

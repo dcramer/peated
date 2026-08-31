@@ -11,7 +11,7 @@ import {
 import type {
   AuditBottleInput,
   BottleContext,
-  BottleReference,
+  BottleReferenceInput,
 } from "../contract";
 import type { ImageBottleEvidence } from "../imageEvidence";
 
@@ -23,17 +23,17 @@ export function buildAgentInput({
   imageEvidence,
   initialCandidates,
   currentBottle,
-  hasExactAliasMatch,
+  hasExactReferenceMatch,
   searchEvidence = [],
   resolvedEntities = [],
   identityAnchor = null,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   extractedIdentity: BottleExtractedDetails | null;
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates: BottleCandidate[];
   currentBottle: BottleCandidate | null;
-  hasExactAliasMatch: boolean;
+  hasExactReferenceMatch: boolean;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
   identityAnchor?: BottleClassificationDecision | null;
@@ -57,7 +57,7 @@ export function buildAgentInput({
       extractedIdentity,
       imageEvidence: imageEvidence ?? null,
       localSearch: {
-        hasExactAliasMatch,
+        hasExactReferenceMatch,
         candidates: initialCandidates.map((candidate) =>
           AgentBottleCandidateSchema.parse(candidate),
         ),
@@ -88,7 +88,7 @@ export function buildAuditBottleAgentInput({
   availableSourceEvidenceFields,
 }: {
   audit: AuditBottleInput;
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   extractedIdentity: BottleExtractedDetails | null;
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates: BottleCandidate[];
@@ -138,7 +138,7 @@ export function buildDefaultBottleSearchInput({
   reference,
   extractedIdentity,
 }: {
-  reference: BottleReference;
+  reference: BottleReferenceInput;
   extractedIdentity: BottleExtractedDetails | null;
 }): BottleCandidateSearchInput {
   /**

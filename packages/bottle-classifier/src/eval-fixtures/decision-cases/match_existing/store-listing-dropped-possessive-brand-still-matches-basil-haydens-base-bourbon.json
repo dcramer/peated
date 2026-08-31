@@ -24,7 +24,7 @@
     "initialCandidates": [
       {
         "bottleId": 39686,
-        "alias": "Basil Hayden's 10-year-old Kentucky Bourbon",
+        "reference": "Basil Hayden's 10-year-old Kentucky Bourbon",
         "fullName": "Basil Hayden's 10-year-old Kentucky Bourbon",
         "brand": "Basil Hayden's",
         "bottler": "Basil Hayden's",
@@ -43,7 +43,7 @@
       },
       {
         "bottleId": 13378,
-        "alias": null,
+        "reference": null,
         "fullName": "Basil Hayden's 10-year-old Kentucky Straight Rye",
         "brand": "Basil Hayden's",
         "bottler": null,
@@ -62,7 +62,7 @@
       },
       {
         "bottleId": 39669,
-        "alias": "Basil Hayden's Kentucky Straight Bourbon",
+        "reference": "Basil Hayden's Kentucky Straight Bourbon",
         "fullName": "Basil Hayden's Kentucky Straight Bourbon",
         "brand": "Basil Hayden's",
         "bottler": null,
@@ -81,7 +81,7 @@
       },
       {
         "bottleId": 39668,
-        "alias": "Basil Hayden's Small Batch Bourbon",
+        "reference": "Basil Hayden's Small Batch Bourbon",
         "fullName": "Basil Hayden's Small Batch Bourbon",
         "brand": "Basil Hayden's",
         "bottler": null,
@@ -100,7 +100,7 @@
       },
       {
         "bottleId": 39671,
-        "alias": "Basil Hayden's Toast Bourbon",
+        "reference": "Basil Hayden's Toast Bourbon",
         "fullName": "Basil Hayden's Toasted Oak Bourbon",
         "brand": "Basil Hayden's",
         "bottler": null,
@@ -119,7 +119,7 @@
       },
       {
         "bottleId": 42426,
-        "alias": "Basil Hayden's Subtle Smoke",
+        "reference": "Basil Hayden's Subtle Smoke",
         "fullName": "Basil Hayden's Subtle Smoke",
         "brand": "Basil Hayden's",
         "bottler": null,

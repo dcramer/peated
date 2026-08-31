@@ -44,6 +44,11 @@ Before changing classifier behavior, read:
 
 - Every marketed release is one independently complete Bottle. The classifier
   never selects a Bottle Group or release-family owner.
+- A Bottle Reference is an accepted exact-match name. A Bottle Alias is a
+  verified other name for display and customer search. One never grants the
+  authority of the other.
+- A Bottle Reference Input is raw source text, an image, or a URL submitted for
+  classification. Do not call unaccepted source evidence a Bottle Reference.
 - Reference classification returns `match`, `create_bottle`, or `no_match`.
   A required catalog correction is a separate Suggested Change and forces
   `no_match` until the current Bottle is safe for assignment.

@@ -5,9 +5,9 @@ import {
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleChecks,
   bottleOperations,
+  bottleReferences,
   bottles,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -432,8 +432,8 @@ describe("server-owned Bottle audit workflows", () => {
     );
     await db.transaction(async (tx) => {
       await tx
-        .delete(bottleAliases)
-        .where(eq(bottleAliases.bottleId, bottle.id));
+        .delete(bottleReferences)
+        .where(eq(bottleReferences.bottleId, bottle.id));
       await tx.delete(bottles).where(eq(bottles.id, bottle.id));
     });
     deferred.resolve({

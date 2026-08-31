@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
+import { bottleReferences } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import {
   BottleGroupNotFoundError,
@@ -26,7 +26,7 @@ describe("BottleGroup reads", () => {
       edition: "Batch Two",
       releaseYear: 2024,
     });
-    await db.insert(bottleAliases).values({
+    await db.insert(bottleReferences).values({
       bottleId: related.id,
       name: "Alternate exact member",
       assignmentSource: "source_approved",
@@ -67,7 +67,9 @@ describe("BottleGroup reads", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const groupId = requireGroupId(bottle.groupId);
-    await db.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
+    await db
+      .delete(bottleReferences)
+      .where(eq(bottleReferences.bottleId, bottle.id));
 
     await expect(
       listBottleGroupBottles(groupId, {

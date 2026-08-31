@@ -1,7 +1,7 @@
 import { BOTTLE_AGE_BAND_LIST, CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -58,16 +58,16 @@ export default implement(bottleListContract).handler(async function ({
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
-  const exactAliasBottleIds = query
+  const exactReferenceBottleIds = query
     ? (
         await db
-          .selectDistinct({ bottleId: bottleAliases.bottleId })
-          .from(bottleAliases)
+          .selectDistinct({ bottleId: bottleReferences.bottleId })
+          .from(bottleReferences)
           .where(
             and(
-              eq(sql`LOWER(${bottleAliases.name})`, query.toLowerCase()),
-              sql`${bottleAliases.ignored} IS NOT TRUE`,
-              isNotNull(bottleAliases.bottleId),
+              eq(sql`LOWER(${bottleReferences.name})`, query.toLowerCase()),
+              sql`${bottleReferences.ignored} IS NOT TRUE`,
+              isNotNull(bottleReferences.bottleId),
             ),
           )
       )
@@ -137,8 +137,8 @@ export default implement(bottleListContract).handler(async function ({
       or(
         sql`${bottles.searchVector} @@ ${textQuery}`,
         sql`${bottles.searchVector} @@ ${prefixQuery}`,
-        exactAliasBottleIds.length
-          ? inArray(bottles.id, exactAliasBottleIds)
+        exactReferenceBottleIds.length
+          ? inArray(bottles.id, exactReferenceBottleIds)
           : undefined,
       ),
     );
@@ -277,10 +277,10 @@ export default implement(bottleListContract).handler(async function ({
         .limit(limit + 1)
         .offset(offset)
         .orderBy(
-          ...(exactAliasBottleIds.length
+          ...(exactReferenceBottleIds.length
             ? [
                 sql`CASE WHEN ${bottles.id} IN (${sql.join(
-                  exactAliasBottleIds.map((bottleId) => sql`${bottleId}`),
+                  exactReferenceBottleIds.map((bottleId) => sql`${bottleId}`),
                   sql`, `,
                 )}) THEN 0 ELSE 1 END`,
                 orderBy,

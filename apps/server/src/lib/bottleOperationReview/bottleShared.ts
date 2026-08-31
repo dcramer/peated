@@ -6,9 +6,9 @@ import type {
   Entity,
 } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottles,
   bottleSeries,
   bottleTombstones,
@@ -26,7 +26,7 @@ export type BottleResource = {
   series: BottleSeries | null;
   distillerIds: number[];
   distillers: Entity[];
-  aliases: string[];
+  references: string[];
   tombstoneDestinationBottleId: number | null;
 };
 
@@ -88,11 +88,11 @@ export async function loadBottle(
     .innerJoin(entities, eq(entities.id, bottleGroupDistillers.distillerId))
     .where(eq(bottleGroupDistillers.groupId, group.id))
     .orderBy(asc(entities.id));
-  const aliases = await database
-    .select({ name: bottleAliases.name })
-    .from(bottleAliases)
-    .where(eq(bottleAliases.bottleId, bottle.id))
-    .orderBy(asc(bottleAliases.name));
+  const references = await database
+    .select({ name: bottleReferences.name })
+    .from(bottleReferences)
+    .where(eq(bottleReferences.bottleId, bottle.id))
+    .orderBy(asc(bottleReferences.name));
   const [tombstone] = await database
     .select({ newBottleId: bottleTombstones.newBottleId })
     .from(bottleTombstones)
@@ -110,7 +110,7 @@ export async function loadBottle(
     series,
     distillerIds: distillerRows.map(({ entity }) => entity.id),
     distillers: distillerRows.map(({ entity }) => entity),
-    aliases: aliases.map(({ name }) => name),
+    references: references.map(({ name }) => name),
     tombstoneDestinationBottleId: null,
   };
 }

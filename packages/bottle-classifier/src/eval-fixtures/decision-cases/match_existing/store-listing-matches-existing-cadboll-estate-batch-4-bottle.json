@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -42,7 +42,7 @@
         "fullName": "Glenmorangie 15-year-old The Cadboll Estate"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -61,7 +61,7 @@
         "fullName": "Glenmorangie 15-year-old The Cadboll Estate - Batch 4"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,

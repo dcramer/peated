@@ -132,7 +132,7 @@ function directResolution(bottleId: number): BottleReferenceResolution {
       kind: "direct_bottle",
       bottleId,
     },
-    source: "exact_alias",
+    source: "exact_reference",
     error: null,
     confidence: null,
     model: null,
@@ -211,7 +211,7 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("uses exact aliases without calling the classifier", async ({
+  test("uses exact references without calling the classifier", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -227,7 +227,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: [bottle.fullName],
+      referenceLookupNames: [bottle.fullName],
       createdByActorId: actor.id,
     });
 
@@ -236,7 +236,7 @@ describe("resolveBottleReferenceTarget", () => {
         kind: "direct_bottle",
         bottleId: bottle.id,
       },
-      source: "exact_alias",
+      source: "exact_reference",
       createdBottle: false,
       classifierEvidence: null,
     });
@@ -244,13 +244,13 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("keeps an inactive exact alias visible until persistence rejects it", async ({
+  test("keeps an inactive exact reference visible until persistence rejects it", async ({
     fixtures,
   }) => {
     const retired = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Retired Exact Alias",
+    const alias = await fixtures.BottleReference({
+      name: "Retired Exact Reference",
       bottleId: retired.id,
     });
     await db.insert(bottleTombstones).values({
@@ -265,7 +265,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: [alias.name],
+      referenceLookupNames: [alias.name],
       createdByActorId: retired.createdByActorId,
     });
 
@@ -274,7 +274,7 @@ describe("resolveBottleReferenceTarget", () => {
         kind: "direct_bottle",
         bottleId: retired.id,
       },
-      source: "exact_alias",
+      source: "exact_reference",
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
     await expect(
@@ -293,7 +293,7 @@ describe("resolveBottleReferenceTarget", () => {
     const user = await fixtures.User({ admin: true });
     const actor = await getUserActor(user);
     const parent = await fixtures.Bottle({ name: "Grouped Alias Parent" });
-    const alias = await fixtures.BottleAlias({
+    const alias = await fixtures.BottleReference({
       bottleId: parent.id,
       name: "Grouped Parent Alias",
     });
@@ -304,7 +304,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: [alias.name],
+      referenceLookupNames: [alias.name],
       createdByActorId: actor.id,
     });
 
@@ -313,20 +313,20 @@ describe("resolveBottleReferenceTarget", () => {
         kind: "direct_bottle",
         bottleId: parent.id,
       },
-      source: "exact_alias",
+      source: "exact_reference",
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("resolves a direct Bottle alias", async ({ fixtures }) => {
+  test("resolves a direct Bottle reference", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const actor = await getUserActor(user);
     const bottle = await fixtures.LegacyBottle({
       name: "Staged Alias Bottle",
     });
-    const alias = await fixtures.BottleAlias({
+    const alias = await fixtures.BottleReference({
       bottleId: bottle.id,
-      name: "Staged Exact Alias",
+      name: "Staged Exact Reference",
     });
 
     const result = await resolveBottleReferenceTarget({
@@ -336,7 +336,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: [alias.name],
+      referenceLookupNames: [alias.name],
       createdByActorId: actor.id,
     });
 
@@ -345,7 +345,7 @@ describe("resolveBottleReferenceTarget", () => {
         kind: "direct_bottle",
         bottleId: bottle.id,
       },
-      source: "exact_alias",
+      source: "exact_reference",
       createdBottle: false,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
@@ -405,7 +405,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: ["Ardbeg 10 years old"],
+      referenceLookupNames: ["Ardbeg 10 years old"],
       createdByActorId: actor.id,
     });
 
@@ -434,7 +434,7 @@ describe("resolveBottleReferenceTarget", () => {
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: bottle.id,
       name: "Ardbeg Ten Years",
       ignored: true,
@@ -448,7 +448,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: ["Ardbeg Ten Years"],
+      referenceLookupNames: ["Ardbeg Ten Years"],
       createdByActorId: actor.id,
     });
 
@@ -497,7 +497,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: [],
+      referenceLookupNames: [],
       createdByActorId: actor.id,
     });
 
@@ -592,7 +592,7 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      aliasLookupNames: [],
+      referenceLookupNames: [],
       createdByActorId: actor.id,
     });
 

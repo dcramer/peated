@@ -106,7 +106,7 @@
           "outturn": null
         },
         "siblings": [],
-        "aliases": [],
+        "references": [],
         "observations": [],
         "imageSources": []
       }
@@ -272,6 +272,6 @@
         "statedAge": 3
       }
     ],
-    "aliases": []
+    "references": []
   }
 }

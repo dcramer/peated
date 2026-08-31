@@ -1,9 +1,9 @@
-import { normalizeBottleAliasKey } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
 import { ExternalReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
-import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
@@ -47,15 +47,15 @@ export async function ingestExternalReviewArticle(
 
   for (const externalReview of input.article.externalReviews) {
     const rawName = externalReview.name;
-    const aliasKey = normalizeBottleAliasKey(rawName);
-    let aliasMatch = null;
-    for (const aliasName of new Set([aliasKey, rawName])) {
-      aliasMatch = await findBottleAliasAssignment(aliasName);
-      if (aliasMatch) break;
+    const referenceKey = normalizeBottleReferenceKey(rawName);
+    let referenceMatch = null;
+    for (const referenceName of new Set([referenceKey, rawName])) {
+      referenceMatch = await findBottleReferenceAssignment(referenceName);
+      if (referenceMatch) break;
     }
     storedExternalReviews.push({
       ...externalReview,
-      bottleId: aliasMatch?.bottleId ?? null,
+      bottleId: referenceMatch?.bottleId ?? null,
     });
   }
 

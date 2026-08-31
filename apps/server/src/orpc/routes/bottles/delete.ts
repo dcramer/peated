@@ -4,6 +4,7 @@ import {
   bottleFlavorProfiles,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottleSeries,
   bottleTags,
   bottleTombstones,
@@ -142,7 +143,7 @@ export default procedure
       const actorId = (await getUserActorForDatabase(tx, context.user)).id;
       const distillerIds = distillerRows.map(({ distillerId }) => distillerId);
       const aliasFilters: SQL<unknown>[] = [
-        eq(bottleAliases.bottleId, bottle.id),
+        eq(bottleReferences.bottleId, bottle.id),
       ];
       const reviewFilters: SQL<unknown>[] = [
         eq(externalReviews.bottleId, bottle.id),
@@ -201,7 +202,7 @@ export default procedure
         .delete(bottlesToDistillers)
         .where(eq(bottlesToDistillers.bottleId, bottle.id));
       await tx
-        .update(bottleAliases)
+        .update(bottleReferences)
         .set({ bottleId: null })
         .where(or(...aliasFilters));
       await tx
@@ -258,6 +259,9 @@ export default procedure
         .set({ newBottleId: null })
         .where(eq(bottleTombstones.newBottleId, bottle.id));
       await tx.insert(bottleTombstones).values({ bottleId: bottle.id });
+      await tx
+        .delete(bottleAliases)
+        .where(eq(bottleAliases.bottleId, bottle.id));
       await tx.delete(bottles).where(eq(bottles.id, bottle.id));
 
       if (bottle.groupId !== null) {

@@ -8,12 +8,12 @@ import {
   publishResolvedReview,
 } from "@peated/server/externalReviews/publication";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import {
-  assignBottleAliasInTransaction,
-  finalizeBottleAliasAssignment,
-  StaleBottleAliasReviewIdentityError,
-} from "@peated/server/lib/bottleAliases";
 import { resolveScrapedBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  assignBottleReferenceInTransaction,
+  finalizeBottleReferenceAssignment,
+  StaleBottleReferenceReviewIdentityError,
+} from "@peated/server/lib/bottleReferences";
 import {
   getIncomingBottleDecisionFromResolutionSource,
   recordIncomingBottleDecisionInTransaction,
@@ -21,7 +21,7 @@ import {
   type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -74,7 +74,7 @@ export async function createMissingBottles(
 
     for (const { article, review } of missingInReviews) {
       cursor = review.id;
-      const aliasKey = normalizeBottleAliasKey(review.name);
+      const referenceKey = normalizeBottleReferenceKey(review.name);
 
       const resolution = await resolveScrapedBottleReferenceTarget(
         {
@@ -88,7 +88,7 @@ export async function createMissingBottles(
           },
           // Normalized fallback aliases can collapse exact identity detail before
           // the classifier reviews the full reference title.
-          aliasLookupNames: [aliasKey, review.name],
+          referenceLookupNames: [referenceKey, review.name],
           extractedIdentity:
             review.category === null ? null : { category: review.category },
           createdByActorId: systemActor.id,
@@ -128,9 +128,9 @@ export async function createMissingBottles(
         { createdBottle: resolution.createdBottle },
       );
 
-      let aliasAssignment;
+      let referenceAssignment;
       try {
-        aliasAssignment = await db.transaction(async (tx) => {
+        referenceAssignment = await db.transaction(async (tx) => {
           const publicationApproved =
             await isExternalReviewPublicationApprovedInTransaction(
               tx,
@@ -149,24 +149,27 @@ export async function createMissingBottles(
             );
           }
 
-          const aliasInput: Omit<
-            Parameters<typeof assignBottleAliasInTransaction>[1],
-            "bottleId" | "sourceAliasIdentity"
+          const referenceInput: Omit<
+            Parameters<typeof assignBottleReferenceInTransaction>[1],
+            "bottleId" | "sourceReferenceIdentity"
           > = {
-            name: aliasKey,
+            name: referenceKey,
             backfillNames: [review.name],
             externalSiteId: article.externalSiteId,
             assignedByActorId: systemActor.id,
             expectedReview: review,
           };
-          if (resolution.source !== "exact_alias") {
-            aliasInput.assignmentSource = "classifier_approved";
+          if (resolution.source !== "exact_reference") {
+            referenceInput.assignmentSource = "classifier_approved";
           }
-          const aliasAssignment = await assignBottleAliasInTransaction(tx, {
-            bottleId,
-            sourceAliasIdentity: resolution.sourceAliasIdentity,
-            ...aliasInput,
-          });
+          const referenceAssignment = await assignBottleReferenceInTransaction(
+            tx,
+            {
+              bottleId,
+              sourceReferenceIdentity: resolution.sourceReferenceIdentity,
+              ...referenceInput,
+            },
+          );
 
           if (
             decision !== null &&
@@ -204,10 +207,10 @@ export async function createMissingBottles(
             await publishResolvedReview(tx, article.externalSiteId, review.id);
           }
 
-          return aliasAssignment;
+          return referenceAssignment;
         });
       } catch (error) {
-        if (error instanceof StaleBottleAliasReviewIdentityError) {
+        if (error instanceof StaleBottleReferenceReviewIdentityError) {
           logInfo("Skipped stale bottle resolution for review {reviewId}", {
             extra: { reviewId: review.id },
           });
@@ -216,7 +219,7 @@ export async function createMissingBottles(
         throw error;
       }
 
-      await finalizeBottleAliasAssignment(aliasAssignment, {
+      await finalizeBottleReferenceAssignment(referenceAssignment, {
         review: {
           id: review.id,
           name: review.name,

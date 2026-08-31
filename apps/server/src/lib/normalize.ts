@@ -1,8 +1,8 @@
 export {
   normalizeBottle,
   normalizeBottleAge,
-  normalizeBottleAliasKey,
   normalizeBottleBatchNumber,
+  normalizeBottleReferenceKey,
   normalizeCategory,
   normalizeEntityName,
   normalizeString,

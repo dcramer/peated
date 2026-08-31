@@ -3,6 +3,7 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -125,7 +126,7 @@ describe("Bottle creation", () => {
     });
   });
 
-  test("does not turn a marketed title into an exact alias", async ({
+  test("does not turn a marketed title into an exact reference", async ({
     defaults,
     fixtures,
   }) => {
@@ -508,7 +509,7 @@ describe("Bottle creation", () => {
     }
   });
 
-  test("keeps accepted aliases separate from marketed titles", async ({
+  test("keeps accepted references separate from marketed titles", async ({
     defaults,
     fixtures,
   }) => {
@@ -516,7 +517,7 @@ describe("Bottle creation", () => {
     const owner = await fixtures.Bottle({ name: "Existing Alias Owner" });
     const attemptedCanonicalFullName =
       "Collision™ Test Brand Blocked Expression";
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: attemptedCanonicalFullName,
       bottleId: owner.id,
       assignmentSource: "human_approved",
@@ -531,8 +532,8 @@ describe("Bottle creation", () => {
     expect(created.bottle.fullName).toBe(attemptedCanonicalFullName);
     const [persistedCollision] = await db
       .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.name, attemptedCanonicalFullName));
+      .from(bottleReferences)
+      .where(eq(bottleReferences.name, attemptedCanonicalFullName));
     expect(persistedCollision).toMatchObject({
       bottleId: owner.id,
       assignmentSource: "human_approved",

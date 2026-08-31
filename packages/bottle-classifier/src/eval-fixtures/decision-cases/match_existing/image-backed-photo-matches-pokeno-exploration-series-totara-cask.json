@@ -24,7 +24,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Pōkeno",
         "bottler": null,
         "series": "Exploration Series",
@@ -49,7 +49,7 @@
       "when": ["pokeno", "totara"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Pōkeno",
           "bottler": null,
           "series": "Exploration Series",
@@ -73,7 +73,7 @@
       "when": ["pokeno", "exploration", "totara"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Pōkeno",
           "bottler": null,
           "series": "Exploration Series",

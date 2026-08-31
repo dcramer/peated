@@ -1,6 +1,6 @@
 import {
   normalizeBottle,
-  normalizeBottleAliasKey,
+  normalizeBottleReferenceKey,
 } from "@peated/bottle-classifier/normalize";
 import { db, type AnyTransaction } from "@peated/server/db";
 import {
@@ -11,12 +11,12 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
-  assignBottleAliasInTransaction,
-  BottleAliasBottleInactiveError,
-  BottleAliasBottleNotFoundError,
-  BottleAliasBottleRetiredError,
-  finalizeBottleAliasAssignment,
-} from "@peated/server/lib/bottleAliases";
+  assignBottleReferenceInTransaction,
+  BottleReferenceBottleInactiveError,
+  BottleReferenceBottleNotFoundError,
+  BottleReferenceBottleRetiredError,
+  finalizeBottleReferenceAssignment,
+} from "@peated/server/lib/bottleReferences";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { normalizeGtin, type NormalizedGtin } from "@peated/server/lib/gtin";
 import { ActiveBottleSelectionError } from "@peated/server/lib/resolveActiveBottleIds";
@@ -93,7 +93,7 @@ function getSourceFingerprint({
     : null;
   const evidence = JSON.stringify([
     sourceVersion,
-    normalizeBottleAliasKey(normalizedName),
+    normalizeBottleReferenceKey(normalizedName),
     volume,
     normalizedBarcode,
     identityEvidence,
@@ -361,97 +361,102 @@ export async function createStorePrices(
           sp.barcode === undefined || sp.barcode === null
             ? null
             : normalizeGtin(sp.barcode);
-        const { price, aliasAssignment } = await db.transaction(async (tx) => {
-          const { name } = normalizeBottle({ name: sp.name });
-          const aliasKey = normalizeBottleAliasKey(sp.name);
-          let bottleMatch;
-          try {
-            bottleMatch = await resolveStorePriceBottleMatchInTransaction(tx, {
-              name: sp.name,
-              normalizedBarcode,
-              sourceBottleIdentity: sp.sourceBottleIdentity ?? null,
-              volume: sp.volume,
-            });
-          } catch (error) {
-            if (!(error instanceof ActiveBottleSelectionError)) {
-              throw error;
-            }
-            switch (error.reason) {
-              case "missing":
-                throw new BottleAliasBottleNotFoundError(error.bottleId);
-              case "bottle_retired":
-                throw new BottleAliasBottleRetiredError(
-                  error.bottleId,
-                  error.replacementBottleId,
-                );
-              case "unassigned":
-                throw new BottleAliasBottleInactiveError(
-                  error.bottleId,
-                  error.reason,
-                );
-            }
-          }
-          const { aliasMatch: match, bottleId } = bottleMatch;
-
-          const persisted = await persistStorePriceInTransaction({
-            tx,
-            externalSiteId: site.id,
-            input: sp,
-            name,
-            normalizedBarcode,
-            bottleId,
-          });
-          const priceId = persisted.price.id;
-          const persistedBottleId = persisted.price.bottleId;
-          const hasDirectMatch =
-            persisted.sourceIdentityReused ||
-            (bottleId !== null && persistedBottleId === bottleId);
-          const hasAliasMatch =
-            !persisted.sourceIdentityReused &&
-            hasDirectMatch &&
-            bottleMatch.source === "alias";
-          const aliasAssignment =
-            bottleId !== null && hasAliasMatch
-              ? await assignBottleAliasInTransaction(tx, {
-                  name: aliasKey,
-                  backfillNames: [name, sp.name],
-                  externalSiteId: site.id,
+        const { price, referenceAssignment } = await db.transaction(
+          async (tx) => {
+            const { name } = normalizeBottle({ name: sp.name });
+            const referenceKey = normalizeBottleReferenceKey(sp.name);
+            let bottleMatch;
+            try {
+              bottleMatch = await resolveStorePriceBottleMatchInTransaction(
+                tx,
+                {
+                  name: sp.name,
+                  normalizedBarcode,
+                  sourceBottleIdentity: sp.sourceBottleIdentity ?? null,
                   volume: sp.volume,
-                  assignmentSource: "source_approved",
-                  assignedByActorId: actorId,
-                  bottleId,
-                  sourceAliasIdentity: match?.alias,
-                })
-              : null;
+                },
+              );
+            } catch (error) {
+              if (!(error instanceof ActiveBottleSelectionError)) {
+                throw error;
+              }
+              switch (error.reason) {
+                case "missing":
+                  throw new BottleReferenceBottleNotFoundError(error.bottleId);
+                case "bottle_retired":
+                  throw new BottleReferenceBottleRetiredError(
+                    error.bottleId,
+                    error.replacementBottleId,
+                  );
+                case "unassigned":
+                  throw new BottleReferenceBottleInactiveError(
+                    error.bottleId,
+                    error.reason,
+                  );
+              }
+            }
+            const { referenceMatch: match, bottleId } = bottleMatch;
 
-          await tx
-            .insert(storePriceHistories)
-            .values({
-              priceId,
-              price: sp.price,
-              currency: sp.currency,
-              volume: sp.volume,
-              date: sql`CURRENT_DATE`,
-            })
-            .onConflictDoNothing();
+            const persisted = await persistStorePriceInTransaction({
+              tx,
+              externalSiteId: site.id,
+              input: sp,
+              name,
+              normalizedBarcode,
+              bottleId,
+            });
+            const priceId = persisted.price.id;
+            const persistedBottleId = persisted.price.bottleId;
+            const hasDirectMatch =
+              persisted.sourceIdentityReused ||
+              (bottleId !== null && persistedBottleId === bottleId);
+            const hasReferenceMatch =
+              !persisted.sourceIdentityReused &&
+              hasDirectMatch &&
+              bottleMatch.source === "reference";
+            const referenceAssignment =
+              bottleId !== null && hasReferenceMatch
+                ? await assignBottleReferenceInTransaction(tx, {
+                    name: referenceKey,
+                    backfillNames: [name, sp.name],
+                    externalSiteId: site.id,
+                    volume: sp.volume,
+                    assignmentSource: "source_approved",
+                    assignedByActorId: actorId,
+                    bottleId,
+                    sourceReferenceIdentity: match?.reference,
+                  })
+                : null;
 
-          return {
-            price: {
-              id: priceId,
-              imageUrl: persisted.price.imageUrl,
-              hasDirectMatch,
-              directMatchSource: persisted.sourceIdentityReused
-                ? "source"
-                : hasDirectMatch
-                  ? bottleMatch.source
-                  : null,
-            },
-            aliasAssignment,
-          };
-        });
+            await tx
+              .insert(storePriceHistories)
+              .values({
+                priceId,
+                price: sp.price,
+                currency: sp.currency,
+                volume: sp.volume,
+                date: sql`CURRENT_DATE`,
+              })
+              .onConflictDoNothing();
 
-        if (aliasAssignment) {
-          await finalizeBottleAliasAssignment(aliasAssignment, {
+            return {
+              price: {
+                id: priceId,
+                imageUrl: persisted.price.imageUrl,
+                hasDirectMatch,
+                directMatchSource: persisted.sourceIdentityReused
+                  ? "source"
+                  : hasDirectMatch
+                    ? bottleMatch.source
+                    : null,
+              },
+              referenceAssignment,
+            };
+          },
+        );
+
+        if (referenceAssignment) {
+          await finalizeBottleReferenceAssignment(referenceAssignment, {
             price: { id: price.id, site: input.site, name: sp.name },
           });
         }

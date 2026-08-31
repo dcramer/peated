@@ -4,8 +4,8 @@ import {
   bottleNameDuplicatesBrand,
   normalizeBottle,
   normalizeBottleAge,
-  normalizeBottleAliasKey,
   normalizeBottleBatchNumber,
+  normalizeBottleReferenceKey,
   normalizeCategory,
   normalizeEntityName,
   normalizeString,
@@ -101,20 +101,20 @@ describe("normalize", () => {
   });
 
   test("builds alias keys without dropping identity-bearing tokens", () => {
-    expect(normalizeBottleAliasKey("Ardbeg   10 years old")).toBe(
+    expect(normalizeBottleReferenceKey("Ardbeg   10 years old")).toBe(
       "Ardbeg 10-year-old",
     );
-    expect(normalizeBottleAliasKey("The Last Drop 42")).toBe(
+    expect(normalizeBottleReferenceKey("The Last Drop 42")).toBe(
       "The Last Drop 42",
     );
     expect(
-      normalizeBottleAliasKey("Lagavulin Distillers Edition 2011 Release"),
+      normalizeBottleReferenceKey("Lagavulin Distillers Edition 2011 Release"),
     ).toBe("Lagavulin Distillers Edition 2011 Release");
     expect(
-      normalizeBottleAliasKey("Springbank 12 Cask Strength Batch No. 24"),
+      normalizeBottleReferenceKey("Springbank 12 Cask Strength Batch No. 24"),
     ).toBe("Springbank 12 Cask Strength Batch No. 24");
     expect(
-      normalizeBottleAliasKey(
+      normalizeBottleReferenceKey(
         "Four Roses Single Barrel Barrel Strength OESK Store Pick",
       ),
     ).toBe("Four Roses Single Barrel Barrel Strength OESK Store Pick");

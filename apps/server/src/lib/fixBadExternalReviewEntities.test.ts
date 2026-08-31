@@ -5,7 +5,7 @@ import type {
 } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -76,7 +76,7 @@ describe("fixBadExternalReviewEntities", () => {
     );
   });
 
-  test("reassigns a mismatched review to the exact alias target", async ({
+  test("reassigns a mismatched review to the exact reference target", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -126,7 +126,7 @@ describe("fixBadExternalReviewEntities", () => {
             {
               bottleId: correctBottle.id,
               fullName: correctBottle.fullName,
-              alias: correctBottle.fullName,
+              reference: correctBottle.fullName,
               brand: null,
               bottler: null,
               series: null,
@@ -163,8 +163,8 @@ describe("fixBadExternalReviewEntities", () => {
     });
     expect(updatedReview?.bottleId).toEqual(correctBottle.id);
 
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, review.name),
+    const alias = await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, review.name),
     });
     expect(alias).toMatchObject({
       bottleId: correctBottle.id,
@@ -187,7 +187,7 @@ describe("fixBadExternalReviewEntities", () => {
     );
   });
 
-  test("reassigns through an exact alias to an active Bottle", async ({
+  test("reassigns through an exact reference to an active Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -195,12 +195,12 @@ describe("fixBadExternalReviewEntities", () => {
       name: "Wrong Staged Alias Bottle",
     });
     const stagedBottle = await fixtures.Bottle({
-      name: "Staged Exact Alias Bottle",
+      name: "Staged Exact Reference Bottle",
     });
     const site = await fixtures.ExternalSiteOrExisting();
-    const alias = await fixtures.BottleAlias({
+    const alias = await fixtures.BottleReference({
       bottleId: stagedBottle.id,
-      name: "Staged Exact Alias Review",
+      name: "Staged Exact Reference Review",
     });
     const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
@@ -208,7 +208,7 @@ describe("fixBadExternalReviewEntities", () => {
       name: alias.name,
       issue: "Default",
       legacyNormalizedScore: 90,
-      url: "https://example.com/staged-exact-alias-review",
+      url: "https://example.com/staged-exact-reference-review",
     });
 
     const summary = await fixBadExternalReviewEntities({ user });
@@ -284,8 +284,8 @@ describe("fixBadExternalReviewEntities", () => {
       bottleId: stagedParent.id,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, review.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, review.name),
       }),
     ).toMatchObject({
       bottleId: stagedParent.id,
@@ -367,7 +367,7 @@ describe("fixBadExternalReviewEntities", () => {
     expect(unchangedReview?.bottleId).toEqual(bottle.id);
   });
 
-  test("propagates alias assignment failures and rolls back Review changes", async ({
+  test("propagates reference assignment failures and rolls back Review changes", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -392,9 +392,9 @@ describe("fixBadExternalReviewEntities", () => {
 
     classifyBottleReferenceMock.mockImplementationOnce(async () => {
       await db
-        .update(bottleAliases)
+        .update(bottleReferences)
         .set({ name: review.name })
-        .where(eq(bottleAliases.bottleId, conflictingBottle.id));
+        .where(eq(bottleReferences.bottleId, conflictingBottle.id));
       return buildClassification(
         {
           action: "match",
@@ -413,7 +413,7 @@ describe("fixBadExternalReviewEntities", () => {
     });
 
     await expect(fixBadExternalReviewEntities({ user })).rejects.toThrow(
-      /Cannot reserve exact Bottle alias/,
+      /Cannot reserve exact Bottle reference/,
     );
 
     expect(

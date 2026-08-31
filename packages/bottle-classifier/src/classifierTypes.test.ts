@@ -124,13 +124,13 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     ).toBe(false);
   });
 
-  test("accepts legacy decisions without alias metadata", () => {
+  test("accepts legacy decisions without reference metadata", () => {
     const decision = BottleClassificationDecisionSchema.parse({
       action: "no_match",
       candidateBottleIds: [],
     });
 
-    expect(decision.aliasScope).toBeUndefined();
+    expect(decision.referenceScope).toBeUndefined();
   });
 
   test("accepts explicit alias scope values", () => {
@@ -139,7 +139,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
         action: "match",
         candidateBottleIds: [123],
         matchedBottleId: 123,
-        aliasScope: "global_alias",
+        referenceScope: "global_alias",
       }).success,
     ).toBe(true);
 
@@ -148,7 +148,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
         action: "match",
         candidateBottleIds: [123],
         identityScope: "product",
-        aliasScope: "none",
+        referenceScope: "none",
         matchedBottleId: 123,
       }).success,
     ).toBe(true);
@@ -194,7 +194,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       rationale: "The source identifies a complete 1994 Vintage Bottle.",
       candidateBottleIds: [100],
       identityScope: "product",
-      aliasScope: "none",
+      referenceScope: "none",
       observation: null,
       confidenceBasis: {
         unresolvedRisks: [
@@ -303,7 +303,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       rationale: null,
       candidateBottleIds: [],
       identityScope: null,
-      aliasScope: null,
+      referenceScope: null,
       observation: null,
       confidenceBasis: null,
       matchedBottleId: null,
@@ -340,7 +340,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       rationale: null,
       candidateBottleIds: [],
       identityScope: null,
-      aliasScope: null,
+      referenceScope: null,
       observation: null,
       confidenceBasis: null,
       matchedBottleId: null,
@@ -349,7 +349,7 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     const otherwiseValidPersistedDecision = {
       ...otherwiseValidAgentDecision,
       identityScope: "product" as const,
-      aliasScope: undefined,
+      referenceScope: undefined,
     };
 
     expect(

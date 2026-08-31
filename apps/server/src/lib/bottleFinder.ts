@@ -1,49 +1,49 @@
 import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { db, type AnyDatabase } from "../db";
-import { bottleAliases } from "../db/schema";
-import type { BottleAliasIdentitySnapshot } from "./bottleAliases";
+import { bottleReferences } from "../db/schema";
+import type { BottleReferenceIdentitySnapshot } from "./bottleReferences";
 
-export type BottleAliasAssignmentMatch = {
-  alias: BottleAliasIdentitySnapshot;
+export type BottleReferenceAssignmentMatch = {
+  reference: BottleReferenceIdentitySnapshot;
   bottleId: number;
 };
 
-async function findBottleAliasIdentitySnapshot(
+async function findBottleReferenceIdentitySnapshot(
   name: string,
   database: AnyDatabase,
-): Promise<BottleAliasIdentitySnapshot | null> {
-  const [alias] = await database
+): Promise<BottleReferenceIdentitySnapshot | null> {
+  const [reference] = await database
     .select({
-      name: bottleAliases.name,
-      bottleId: bottleAliases.bottleId,
-      ignored: bottleAliases.ignored,
-      assignmentSource: bottleAliases.assignmentSource,
-      assignedByActorId: bottleAliases.assignedByActorId,
-      createdAt: bottleAliases.createdAt,
+      name: bottleReferences.name,
+      bottleId: bottleReferences.bottleId,
+      ignored: bottleReferences.ignored,
+      assignmentSource: bottleReferences.assignmentSource,
+      assignedByActorId: bottleReferences.assignedByActorId,
+      createdAt: bottleReferences.createdAt,
     })
-    .from(bottleAliases)
+    .from(bottleReferences)
     .where(
       and(
-        eq(sql`LOWER(${bottleAliases.name})`, sql`LOWER(${name})`),
-        sql`${bottleAliases.ignored} IS DISTINCT FROM true`,
-        isNotNull(bottleAliases.bottleId),
+        eq(sql`LOWER(${bottleReferences.name})`, sql`LOWER(${name})`),
+        sql`${bottleReferences.ignored} IS DISTINCT FROM true`,
+        isNotNull(bottleReferences.bottleId),
       ),
     )
     .limit(1);
-  return alias ?? null;
+  return reference ?? null;
 }
 
-/** Resolves a non-ignored alias to its directly assigned Bottle id. */
-export async function findBottleAliasAssignment(
+/** Resolves a non-ignored reference to its directly assigned Bottle id. */
+export async function findBottleReferenceAssignment(
   name: string,
   database: AnyDatabase = db,
-): Promise<BottleAliasAssignmentMatch | null> {
-  const alias = await findBottleAliasIdentitySnapshot(name, database);
-  if (!alias || alias.bottleId === null) return null;
+): Promise<BottleReferenceAssignmentMatch | null> {
+  const reference = await findBottleReferenceIdentitySnapshot(name, database);
+  if (!reference || reference.bottleId === null) return null;
 
   return {
-    alias,
-    bottleId: alias.bottleId,
+    reference,
+    bottleId: reference.bottleId,
   };
 }
 
@@ -51,6 +51,6 @@ export async function findBottleId(
   name: string,
   database: AnyDatabase = db,
 ): Promise<number | null> {
-  const match = await findBottleAliasAssignment(name, database);
+  const match = await findBottleReferenceAssignment(name, database);
   return match?.bottleId ?? null;
 }

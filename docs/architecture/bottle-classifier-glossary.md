@@ -10,10 +10,12 @@ concept.
 | ---------------------------- | ----------------------------------------------------------------------------- | ------------------------- |
 | **Bottle**                   | One complete product release.                                                 | `Bottle`                  |
 | **Bottle Group**             | An internal storage group for fields that multiple Bottles share.             | `BottleGroup`             |
-| **Bottle Reference**         | Source text, an image, or a URL that can identify one Bottle.                 | `BottleReference`         |
-| **Reference Classification** | The process that identifies a Bottle from a Bottle Reference.                 | `classifyBottleReference` |
-| **Match**                    | The Bottle Reference identifies an existing Bottle.                           | `match`                   |
-| **Create Bottle**            | The Bottle Reference identifies a Bottle that is not in the catalog.          | `create_bottle`           |
+| **Bottle Alias**             | A verified other name shown on a Bottle page and used in customer search.     | `BottleAlias`             |
+| **Bottle Reference**         | An accepted name that exact matching can resolve to one Bottle.               | `BottleReference`         |
+| **Bottle Reference Input**   | Source text, an image, or a URL submitted for Bottle identification.          | `BottleReferenceInput`    |
+| **Reference Classification** | The process that identifies a Bottle from a Bottle Reference Input.           | `classifyBottleReference` |
+| **Match**                    | The Bottle Reference Input identifies an existing Bottle.                     | `match`                   |
+| **Create Bottle**            | The Bottle Reference Input identifies a Bottle that is not in the catalog.    | `create_bottle`           |
 | **No Match**                 | The system cannot identify a Bottle safely.                                   | `no_match`                |
 | **Suggested Change**         | An untrusted catalog change from an agent.                                    | `SuggestedChange`         |
 | **Review Operation**         | A change that the server validated and checked for permission before it runs. | `ReviewOperation`         |

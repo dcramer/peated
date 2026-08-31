@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottles,
   entities,
   storePrices,
@@ -134,9 +134,12 @@ describe("handleBottle", () => {
     });
     expect(
       await db
-        .select({ bottleId: bottleAliases.bottleId, name: bottleAliases.name })
-        .from(bottleAliases)
-        .where(eq(bottleAliases.bottleId, original!.id)),
+        .select({
+          bottleId: bottleReferences.bottleId,
+          name: bottleReferences.name,
+        })
+        .from(bottleReferences)
+        .where(eq(bottleReferences.bottleId, original!.id)),
     ).toContainEqual({
       bottleId: original!.id,
       name: original!.fullName,

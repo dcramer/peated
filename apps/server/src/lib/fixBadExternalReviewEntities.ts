@@ -6,12 +6,12 @@ import {
   externalReviews,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import {
-  assignBottleAliasInTransaction,
-  finalizeBottleAliasAssignment,
-  StaleBottleAliasReviewIdentityError,
-} from "@peated/server/lib/bottleAliases";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  assignBottleReferenceInTransaction,
+  finalizeBottleReferenceAssignment,
+  StaleBottleReferenceReviewIdentityError,
+} from "@peated/server/lib/bottleReferences";
 import { and, eq, ne } from "drizzle-orm";
 
 export type FixBadExternalReviewEntitiesResult = {
@@ -26,7 +26,7 @@ export type FixBadExternalReviewEntitiesResult = {
  * Re-resolve external reviews whose linked Bottle no longer matches the title.
  *
  * This stays intentionally conservative: it never rewrites or deletes the
- * current Bottle record. It only reassigns the external review when an exact alias or
+ * current Bottle record. It only reassigns the external review when an exact reference or
  * reviewed classifier result returns a replacement Bottle.
  */
 export async function fixBadExternalReviewEntities(
@@ -82,9 +82,9 @@ export async function fixBadExternalReviewEntities(
           imageUrl: null,
           currentBottleId: review.bottleId,
         },
-        // Normalized fallback aliases can erase exact identity markers before the
+        // Normalized fallback references can erase exact identity markers before the
         // classifier sees the real reference title.
-        aliasLookupNames: [review.name],
+        referenceLookupNames: [review.name],
         createdByActorId: actor.id,
       },
       classify,
@@ -105,29 +105,29 @@ export async function fixBadExternalReviewEntities(
     const isSameTarget = targetBottleId === review.bottleId;
 
     try {
-      const aliasAssignment = await db.transaction(async (tx) => {
+      const referenceAssignment = await db.transaction(async (tx) => {
         const assignment = resolution.assignment;
         if (!assignment) {
           throw new Error("Bottle resolution returned no assignment.");
         }
-        const aliasInput = {
+        const referenceInput = {
           name: review.name,
           assignmentSource:
-            resolution.source === "exact_alias"
+            resolution.source === "exact_reference"
               ? undefined
               : ("classifier_approved" as const),
           assignedByActorId: actor.id,
           expectedReview: review,
         };
-        return assignBottleAliasInTransaction(tx, {
+        return assignBottleReferenceInTransaction(tx, {
           bottleId: targetBottleId,
-          sourceAliasIdentity: resolution.sourceAliasIdentity,
-          ...aliasInput,
+          sourceReferenceIdentity: resolution.sourceReferenceIdentity,
+          ...referenceInput,
         });
       });
-      await finalizeBottleAliasAssignment(aliasAssignment);
+      await finalizeBottleReferenceAssignment(referenceAssignment);
     } catch (error) {
-      if (error instanceof StaleBottleAliasReviewIdentityError) {
+      if (error instanceof StaleBottleReferenceReviewIdentityError) {
         summary.unchanged += 1;
         continue;
       }

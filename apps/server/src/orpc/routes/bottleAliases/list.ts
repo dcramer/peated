@@ -1,102 +1,53 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, bottles } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleTombstones,
+  bottles,
+} from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { listResponse } from "@peated/server/schemas";
-import { and, asc, eq, ilike, isNull, sql, type SQL } from "drizzle-orm";
+import { asc, eq, getTableColumns } from "drizzle-orm";
 import { z } from "zod";
-
-const OutputSchema = listResponse(
-  z.object({
-    name: z.string(),
-    createdAt: z.string(),
-    bottleId: z.number().nullable(),
-    isCanonical: z.boolean().optional(),
-  }),
-);
 
 export default procedure
   .route({
     method: "GET",
-    path: "/bottle-aliases",
-    summary: "List bottle aliases",
-    description:
-      "Retrieve bottle aliases with filtering by bottle, unknown status, and search support",
+    path: "/bottles/{bottle}/aliases",
+    summary: "List Bottle aliases",
+    description: "List verified alternate marketed names for a Bottle.",
     operationId: "listBottleAliases",
   })
-  .input(
-    z
-      .object({
-        bottle: z.coerce.number().optional(),
-        query: z.string().default(""),
-        onlyUnknown: z.coerce.boolean().optional(),
-        cursor: z.coerce.number().gte(1).default(1),
-        limit: z.coerce.number().gte(1).lte(100).default(100),
-      })
-      .strict()
-      .default({
-        query: "",
-        cursor: 1,
-        limit: 100,
-      }),
+  .input(z.object({ bottle: z.coerce.number().int().positive() }))
+  .output(
+    z.object({
+      results: z.array(
+        z.object({ id: z.number(), name: z.string(), createdAt: z.string() }),
+      ),
+    }),
   )
-  .output(OutputSchema)
-  .handler(async function ({
-    input: { cursor, query, limit, ...input },
-    errors,
-  }) {
-    const where: SQL<unknown>[] = [
-      sql`${bottleAliases.ignored} IS DISTINCT FROM TRUE`,
-    ];
-
-    let bottle: { id: number; fullName: string } | null = null;
-    if (input.bottle) {
+  .handler(async ({ input, errors }) => {
+    let [bottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, input.bottle));
+    if (!bottle) {
       [bottle] = await db
-        .select({
-          id: bottles.id,
-          fullName: bottles.fullName,
-        })
-        .from(bottles)
-        .where(eq(bottles.id, input.bottle));
-
-      if (!bottle) {
-        throw errors.NOT_FOUND({
-          message: "Bottle not found.",
-        });
-      }
-      where.push(eq(bottleAliases.bottleId, bottle.id));
+        .select({ ...getTableColumns(bottles) })
+        .from(bottleTombstones)
+        .innerJoin(bottles, eq(bottleTombstones.newBottleId, bottles.id))
+        .where(eq(bottleTombstones.bottleId, input.bottle));
     }
+    if (!bottle) throw errors.NOT_FOUND({ message: "Bottle not found." });
 
-    if (input.onlyUnknown) {
-      where.push(isNull(bottleAliases.bottleId));
-    }
-
-    if (query) {
-      where.push(ilike(bottleAliases.name, `%${query}%`));
-    }
-
-    const offset = (cursor - 1) * limit;
-    const results = await db
-      .select({
-        name: bottleAliases.name,
-        createdAt: bottleAliases.createdAt,
-        bottleId: bottleAliases.bottleId,
-      })
+    const aliases = await db
+      .select()
       .from(bottleAliases)
-      .where(and(...where))
-      .limit(limit + 1)
-      .offset(offset)
-      .orderBy(asc(bottleAliases.name));
-
+      .where(eq(bottleAliases.bottleId, bottle.id))
+      .orderBy(asc(bottleAliases.name), asc(bottleAliases.id));
     return {
-      results: results.slice(0, limit).map((alias) => ({
+      results: aliases.map((alias) => ({
+        id: alias.id,
         name: alias.name,
         createdAt: alias.createdAt.toISOString(),
-        bottleId: alias.bottleId,
-        isCanonical: bottle ? bottle.fullName === alias.name : undefined,
       })),
-      rel: {
-        nextCursor: results.length > limit ? cursor + 1 : null,
-        prevCursor: cursor > 1 ? cursor - 1 : null,
-      },
     };
   });

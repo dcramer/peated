@@ -1,10 +1,10 @@
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import type { AnyTransaction } from "@peated/server/db";
-import { bottleAliases, bottles, entities } from "@peated/server/db/schema";
+import { bottleReferences, bottles, entities } from "@peated/server/db/schema";
 import {
-  ExactBottleAliasConflictError,
-  reserveExactBottleAliasInTransaction,
-} from "@peated/server/lib/bottleAliases";
+  ExactBottleReferenceConflictError,
+  reserveExactBottleReferenceInTransaction,
+} from "@peated/server/lib/bottleReferences";
 import { and, asc, eq, notInArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -104,7 +104,7 @@ export function getSmwsCodeForBottleIdentity({
 
 function rowHasSmwsCode(
   row: {
-    aliasName: string | null;
+    referenceName: string | null;
     bottleName: string;
     fullName: string;
     brandName: string | null;
@@ -122,12 +122,12 @@ function rowHasSmwsCode(
 
   return valuesHaveSmwsCode(
     [
-      row.aliasName,
+      row.referenceName,
       row.fullName,
       ...entityNameVariants(brand, row.bottleName),
-      ...entityNameVariants(brand, row.aliasName),
+      ...entityNameVariants(brand, row.referenceName),
       ...entityNameVariants(bottler, row.bottleName),
-      ...entityNameVariants(bottler, row.aliasName),
+      ...entityNameVariants(bottler, row.referenceName),
     ],
     code,
   );
@@ -138,7 +138,7 @@ function rowHasSmwsCode(
  * The per-code transaction advisory lock serializes create/update decisions
  * until the caller's transaction completes. SMWS subtitles are mutable names:
  * the cask code owns the Bottle, and canonical updates preserve old names as
- * aliases rather than creating another Bottle for a renamed subtitle.
+ * references rather than creating another Bottle for a renamed subtitle.
  */
 export async function findConflictingSmwsBottleId(
   tx: AnyTransaction,
@@ -180,7 +180,7 @@ export async function findConflictingSmwsBottleId(
       bottleId: bottles.id,
       bottleName: bottles.name,
       fullName: bottles.fullName,
-      aliasName: bottleAliases.name,
+      referenceName: bottleReferences.name,
       brandName: brandEntity.name,
       brandShortName: brandEntity.shortName,
       bottlerName: bottlerEntity.name,
@@ -190,10 +190,10 @@ export async function findConflictingSmwsBottleId(
     .innerJoin(brandEntity, eq(brandEntity.id, bottles.brandId))
     .leftJoin(bottlerEntity, eq(bottlerEntity.id, bottles.bottlerId))
     .leftJoin(
-      bottleAliases,
+      bottleReferences,
       and(
-        eq(bottleAliases.bottleId, bottles.id),
-        sql`${bottleAliases.ignored} IS DISTINCT FROM true`,
+        eq(bottleReferences.bottleId, bottles.id),
+        sql`${bottleReferences.ignored} IS DISTINCT FROM true`,
       ),
     )
     .where(
@@ -201,7 +201,7 @@ export async function findConflictingSmwsBottleId(
         sql`(
           ${bottles.name} ILIKE ${codeSearch}
           OR ${bottles.fullName} ILIKE ${codeSearch}
-          OR ${bottleAliases.name} ILIKE ${codeSearch}
+          OR ${bottleReferences.name} ILIKE ${codeSearch}
         )`,
         sql`(
           LOWER(${brandEntity.name}) IN ('smws', 'the scotch malt whisky society', 'scotch malt whisky society')
@@ -210,8 +210,8 @@ export async function findConflictingSmwsBottleId(
           OR LOWER(COALESCE(${bottlerEntity.shortName}, '')) = 'smws'
           OR ${bottles.fullName} ILIKE ${smwsSearch}
           OR ${bottles.fullName} ILIKE ${societySearch}
-          OR ${bottleAliases.name} ILIKE ${smwsSearch}
-          OR ${bottleAliases.name} ILIKE ${societySearch}
+          OR ${bottleReferences.name} ILIKE ${smwsSearch}
+          OR ${bottleReferences.name} ILIKE ${societySearch}
         )`,
       ),
     )
@@ -224,7 +224,7 @@ export async function findConflictingSmwsBottleId(
   );
 }
 
-/** Preflights SMWS codes and preserves renamed subtitles as exact aliases. */
+/** Preflights Bottle identities and preserves renamed SMWS subtitles. */
 export async function reserveBottleIdentitiesInTransaction(
   tx: AnyTransaction,
   {
@@ -234,11 +234,12 @@ export async function reserveBottleIdentitiesInTransaction(
     candidates: BottleIdentityCandidate[];
     assignedByActorId: number;
   },
-): Promise<{ changedAliasNames: string[] }> {
+): Promise<{
+  changedReferenceNames: string[];
+}> {
   const sortedCandidates = [...candidates].sort(
     (left, right) => left.bottleId - right.bottleId,
   );
-
   const excludedBottleIds = sortedCandidates.map(({ bottleId }) => bottleId);
   const structuredIdentityOwners = new Map<string, number>();
   for (const { bottleId, desired } of sortedCandidates) {
@@ -348,7 +349,7 @@ export async function reserveBottleIdentitiesInTransaction(
     }
   }
 
-  const changedAliasNames = new Set<string>();
+  const changedReferenceNames = new Set<string>();
   for (const { candidate, currentCode, desiredCode } of smwsChanges) {
     if (
       currentCode === null ||
@@ -358,15 +359,15 @@ export async function reserveBottleIdentitiesInTransaction(
       continue;
     }
     try {
-      const result = await reserveExactBottleAliasInTransaction(tx, {
+      const result = await reserveExactBottleReferenceInTransaction(tx, {
         name: candidate.current.fullName,
         bottleId: candidate.bottleId,
         assignmentSource: "canonical",
         assignedByActorId,
       });
-      if (result.changed) changedAliasNames.add(result.name);
+      if (result.changed) changedReferenceNames.add(result.name);
     } catch (error) {
-      if (error instanceof ExactBottleAliasConflictError) {
+      if (error instanceof ExactBottleReferenceConflictError) {
         throw new BottleIdentityConflictError(
           error.conflictingBottleId,
           "smws_code",
@@ -377,5 +378,7 @@ export async function reserveBottleIdentitiesInTransaction(
     }
   }
 
-  return { changedAliasNames: Array.from(changedAliasNames).sort() };
+  return {
+    changedReferenceNames: Array.from(changedReferenceNames).sort(),
+  };
 }

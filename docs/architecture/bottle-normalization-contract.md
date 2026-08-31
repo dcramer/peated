@@ -1,7 +1,7 @@
 # Bottle Normalization Contract
 
 This document defines what deterministic bottle-name normalization may do before
-alias lookup, duplicate checks, search, or classifier input.
+reference lookup, duplicate checks, search, or classifier input.
 
 The short version: normalization may make the same reference string easier to
 compare. It must not decide how source facts become canonical Bottle identity,
@@ -10,14 +10,14 @@ consumer identity, or BottleGroup membership.
 Use this with:
 
 - [Whisky Identity Model](./whisky-identity-model.md)
-- [Bottle Creation And Alias System](./bottle-creation-alias-system.md)
+- [Bottle Creation And Reference System](./bottle-creation-reference-system.md)
 - [Bottle Classifier](./bottle-classifier.md)
 - [Bottle Normalization Examples](./bottle-normalization-examples.md)
 
 ## Goals
 
 - Produce stable comparison keys for deterministic checks.
-- Keep harmless formatting differences from creating duplicate aliases.
+- Keep harmless formatting differences from creating duplicate references.
 - Preserve identity-bearing tokens for classifier and moderator review.
 - Make unsafe semantic interpretation visible in tests instead of hiding it in
   string cleanup.
@@ -86,8 +86,8 @@ Deterministic normalization must not:
 - change brand, bottler, or distillery boundaries by prefix matching
 - treat an extracted metadata field as permission to rewrite the source name
 - derive or select BottleGroup membership from a normalized string
-- create or look up a deterministic alias from a lossy normalized string unless
-  that exact normalized string has already been accepted as an alias
+- create or look up a deterministic reference from a lossy normalized string unless
+  that exact normalized string has already been accepted as a reference
 
 ## Stories
 
@@ -134,16 +134,16 @@ Reliable product evidence may establish some details as structured exact-Bottle
 identity. Retailer-only selector wording or unit-specific facts may remain
 observations. They are not safe to remove before review.
 
-## Alias Keys
+## Reference Keys
 
-Alias lookup and alias writes must use the same accepted key for a workflow.
+Reference lookup and reference writes must use the same accepted key for a workflow.
 That key may be raw source text or an identity-preserving normalized form. Code
-should build that form through `normalizeBottleAliasKey`.
+should build that form through `normalizeBottleReferenceKey`.
 
-If normalization is lossy or semantic, it is not a safe deterministic alias key.
-Use it for search or classifier evidence instead. An exact accepted alias maps
-directly to its authoritative Bottle. A general expression alias may map to the
-retained general Bottle; no alias maps to BottleGroup or reconstructs a legacy
+If normalization is lossy or semantic, it is not a safe deterministic reference key.
+Use it for search or classifier evidence instead. An exact accepted reference maps
+directly to its authoritative Bottle. A general expression reference may map to the
+retained general Bottle; no reference maps to BottleGroup or reconstructs a legacy
 paired identity.
 
 ## Test Requirements
@@ -155,7 +155,7 @@ Deterministic normalization tests should cover:
 - bare years that are not automatically distillation, bottling, or release years
 - batch and cask tokens that remain present
 - store-pick and exclusive wording that remains present
-- alias lookup/write consistency for whichever key a workflow accepts
+- reference lookup/write consistency for whichever key a workflow accepts
 - no deterministic BottleGroup selection from normalized identity
 
 Classifier and eval coverage should cover semantic cases where stable-expression

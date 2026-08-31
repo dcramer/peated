@@ -76,7 +76,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "The Exclusive Malts",
         "bottler": null,
         "series": null,
@@ -95,7 +95,7 @@
         "fullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Pōkeno",
         "bottler": null,
         "series": null,
@@ -114,7 +114,7 @@
         "fullName": "Pōkeno Totara Cask - 01 - Other"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Pōkeno",
         "bottler": null,
         "series": null,
@@ -139,7 +139,7 @@
       "when": ["exclusive", "malts", "islay", "2007"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "The Exclusive Malts",
           "bottler": null,
           "series": null,

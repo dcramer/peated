@@ -40,9 +40,9 @@ does not create another catalog identity layer.
   vintage, or single-cask product.
 - Every Bottle is independently complete and belongs to exactly one
   BottleGroup.
-- Every assigned alias and activity-bearing record references one Bottle id.
+- Every assigned reference and activity-bearing record references one Bottle id.
   BottleGroup is never a fallback consumer identity.
-- A general expression alias points to the retained general Bottle, not the
+- A general expression reference points to the retained general Bottle, not the
   group's representative Bottle.
 - Ordinary creation atomically creates a complete Bottle and a singleton
   BottleGroup. “Add a similar bottle” only prefills a new Bottle draft; it does
@@ -87,7 +87,13 @@ exact identity and additionally owns:
 - natural-color and non-chill-filtered facts;
 - the producer-stated phenol level of the malted barley, in PPM;
 - optional cask size, type, and fill when explicitly supplied;
-- exact aliases, content, images, activity, and statistics.
+- exact references, content, images, activity, and statistics.
+
+BottleReference and BottleAlias have separate authority. A BottleReference is
+an internal accepted string that can resolve exact ingestion. A quarantined
+reference cannot match new input. A BottleAlias is a moderator-verified
+alternate marketed name for display and customer search only. It never grants
+exact-match authority. Both records belong to one Bottle, not a BottleGroup.
 
 This duplication is intentional. BottleGroup is the authority for shared
 edits, while Bottle remains the authority for exact reads.
@@ -129,8 +135,9 @@ identity while preserving each member's exact fields.
 
 A shared edit that changes a name or prefix regenerates every member's marketed
 name while preserving that member's explicit edition. A title change does not
-create an exact alias because the same marketed title can identify several
-structured releases. SMWS code collisions, incomplete member updates, or audit
+create an exact reference because the same marketed title can identify several
+structured releases. An unchanged SMWS code can preserve the previous subtitle
+as a reference. SMWS code collisions, incomplete member updates, or audit
 failures roll back the entire shared edit.
 
 `Bottle.statedAge` stores the effective age. A non-null value that differs from
@@ -150,14 +157,14 @@ reviewed Laphroaig Càirdeas 2022 case, malformed Bottle `39096` merges into
 Warehouse 1 Bottle `45146` while generic Bottle `44288` remains unchanged.
 That case does not authorize a grouping operation. A separate follow-up may
 define the smallest regroup or group-merge operation only after real reviewed
-findings demonstrate the need. It must also preserve aliases, representatives,
+findings demonstrate the need. It must also preserve references, representatives,
 and auditable history in addition to the invariants above.
 
 ## Exact Bottle Merge
 
 Exact Bottle merge is the only operation that retires a duplicate Bottle and
 repoints consumer Bottle ids. A moderator selects an explicit surviving Bottle;
-consumer rows, assigned aliases, release-promotion mappings, and tombstones
+consumer rows, assigned references, release-promotion mappings, and tombstones
 converge on that Bottle in one canonical operation. BottleGroup is never the
 merge destination and a representative Bottle is never selected implicitly.
 
@@ -225,7 +232,7 @@ release descriptor.
 
 Brand identity is not a longest-prefix match. Distillery, bottler, owner,
 importer, and parent-company names may appear in source text without becoming
-the brand. Canonical names and aliases are evidence, but stale or
+the brand. Canonical names and references are evidence, but stale or
 source-specific strings cannot prove an entity repair by themselves.
 
 Entity selection is also not a shortest-name match. When existing Bottle data
@@ -241,7 +248,7 @@ evidence.
 ## Matching And Canonicalization
 
 Resolve the exact marketed Bottle first. Use exact label facts, authoritative
-sources, aliases, and nearby catalog entries as evidence. Missing optional
+sources, references, and nearby catalog entries as evidence. Missing optional
 attributes do not make a clear exact identity unresolved, while conflicting
 age, edition, year, marketed finish or exact cask code, single-cask, or
 cask-strength facts are strong evidence of distinct Bottles. Cask type, size,
@@ -271,17 +278,18 @@ composed from an SMWS distillery number and single-cask number visible on the
 label. A code must not invent a missing component or subtitle. SMWS may rename
 the subtitle marketed for a cask, but that does not create a new Bottle: the
 code continues to identify the same Bottle, the new subtitle becomes its
-canonical name, and the previous canonical name remains an alias. Its canonical
-Bottle name is `<distillery number>.<cask number> <subtitle>`. Exact traits stay
-in structured fields and are not appended to that name.
+canonical name, and the previous canonical name remains a reference. Its
+canonical Bottle name is `<distillery number>.<cask number> <subtitle>`. Exact
+traits stay in structured fields and are not appended to that name.
 
 ## Activity Identity
 
-Tastings, reviews, collection entries, flights, prices, aliases, observations,
-and similar consumers reference one Bottle id. Assigned aliases resolve
-directly to that Bottle with no BottleGroup alias identity and no second
-resolver. A general expression alias may reference the retained general Bottle;
-otherwise an uncertain source remains unresolved.
+Tastings, reviews, collection entries, flights, prices, references,
+observations, and similar consumers reference one Bottle id. Assigned
+references resolve directly to that Bottle with no BottleGroup reference
+identity and no second resolver. A general expression reference may reference
+the retained general Bottle. Otherwise, an uncertain source remains
+unresolved.
 
 Bottle statistics include only activity assigned to that Bottle. BottleGroup
 statistics derive from raw activity on current member Bottle ids, counted once;

@@ -1,6 +1,6 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottles,
   bottleTombstones,
   entities,
@@ -152,13 +152,13 @@ function visibleMemberWhere(context: Context) {
   );
 }
 
-function exactBottleAliasMatch(query: string) {
+function exactBottleReferenceMatch(query: string) {
   return sql`${bottles.id} IN (
-    SELECT ${bottleAliases.bottleId}
-    FROM ${bottleAliases}
-    WHERE LOWER(${bottleAliases.name}) = ${query.toLowerCase().trim()}
-      AND ${bottleAliases.ignored} IS NOT TRUE
-      AND ${bottleAliases.bottleId} IS NOT NULL
+    SELECT ${bottleReferences.bottleId}
+    FROM ${bottleReferences}
+    WHERE LOWER(${bottleReferences.name}) = ${query.toLowerCase().trim()}
+      AND ${bottleReferences.ignored} IS NOT TRUE
+      AND ${bottleReferences.bottleId} IS NOT NULL
   )`;
 }
 
@@ -214,7 +214,7 @@ async function searchBottles(
   if (!query) return { total: 0, results: [] };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
-  const aliasMatch = exactBottleAliasMatch(query);
+  const aliasMatch = exactBottleReferenceMatch(query);
   const where = and(
     activeBottleWhere(),
     or(

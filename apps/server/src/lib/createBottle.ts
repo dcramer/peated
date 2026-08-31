@@ -6,7 +6,7 @@
 import {
   bottleNameDuplicatesBrand,
   normalizeBottleAge,
-  normalizeBottleAliasKey,
+  normalizeBottleReferenceKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
@@ -563,7 +563,7 @@ export async function createBottleInTransaction(
   const { group: storageGroup, exact } = splitBottleCreateInput(input);
   // Exact age is name-normalization context only; it cannot become group-owned state.
   const normalizedGroup = normalizeBottleAge({
-    name: normalizeBottleAliasKey(storageGroup.name),
+    name: normalizeBottleReferenceKey(storageGroup.name),
     statedAge: exact.statedAge,
   });
   const groupFields = {

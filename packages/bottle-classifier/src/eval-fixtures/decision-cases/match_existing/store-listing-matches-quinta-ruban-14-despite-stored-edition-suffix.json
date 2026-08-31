@@ -8,7 +8,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glenmorangie",
         "bottler": "Glenmorangie",
         "series": null,
@@ -33,7 +33,7 @@
       "when": ["quinta", "ruban"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Glenmorangie",
           "bottler": "Glenmorangie",
           "series": null,

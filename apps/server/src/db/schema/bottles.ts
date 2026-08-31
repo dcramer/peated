@@ -88,18 +88,18 @@ const DEFAULT_RATING_STATS: RatingStats = {
 };
 
 const OBSERVATION_SOURCE_TYPES = ["store_price"] as const;
-export const BOTTLE_ALIAS_ASSIGNMENT_SOURCES = [
+export const BOTTLE_REFERENCE_ASSIGNMENT_SOURCES = [
   "legacy",
   "canonical",
   "source_approved",
   "classifier_approved",
   "human_approved",
 ] as const;
-export type BottleAliasAssignmentSource =
-  (typeof BOTTLE_ALIAS_ASSIGNMENT_SOURCES)[number];
-export const bottleAliasAssignmentSourceEnum = pgEnum(
-  "bottle_alias_assignment_source",
-  BOTTLE_ALIAS_ASSIGNMENT_SOURCES,
+export type BottleReferenceAssignmentSource =
+  (typeof BOTTLE_REFERENCE_ASSIGNMENT_SOURCES)[number];
+export const bottleReferenceAssignmentSourceEnum = pgEnum(
+  "bottle_reference_assignment_source",
+  BOTTLE_REFERENCE_ASSIGNMENT_SOURCES,
 );
 /**
  * Represents a series of bottles from a brand.
@@ -687,9 +687,10 @@ export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
 export type BottleTag = typeof bottleTags.$inferSelect;
 export type NewBottleTag = typeof bottleTags.$inferInsert;
 
-export const bottleAliases = pgTable(
-  "bottle_alias",
+export const bottleReferences = pgTable(
+  "bottle_reference",
   {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
@@ -697,9 +698,9 @@ export const bottleAliases = pgTable(
     legacyReleaseId: bigint("release_id", { mode: "number" }),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
-    // Ignored aliases are retained for audit/history but excluded from exact matching.
+    // Ignored references are retained for audit/history but excluded from exact matching.
     ignored: boolean("ignored").default(false),
-    assignmentSource: bottleAliasAssignmentSourceEnum("assignment_source")
+    assignmentSource: bottleReferenceAssignmentSourceEnum("assignment_source")
       .default("legacy")
       .notNull(),
     assignedByActorId: bigint("assigned_by_actor_id", {
@@ -707,16 +708,70 @@ export const bottleAliases = pgTable(
     })
       .references(() => actors.id)
       .notNull(),
+    reviewedByActorId: bigint("reviewed_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id),
+    reviewedAt: timestamp("reviewed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("bottle_alias_name_idx").using(
+    uniqueIndex("bottle_reference_name_idx").using(
       "btree",
       sql`LOWER(${table.name})`,
     ),
+    index("bottle_reference_bottle_idx").on(table.bottleId),
+    index("bottle_reference_release_idx").on(table.legacyReleaseId),
+    index("bottle_reference_assigned_by_actor_idx").on(table.assignedByActorId),
+    index("bottle_reference_reviewed_by_actor_idx").on(table.reviewedByActorId),
+  ],
+);
+
+export const bottleReferencesRelations = relations(
+  bottleReferences,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottleReferences.bottleId],
+      references: [bottles.id],
+    }),
+    assignedByActor: one(actors, {
+      fields: [bottleReferences.assignedByActorId],
+      references: [actors.id],
+    }),
+    reviewedByActor: one(actors, {
+      fields: [bottleReferences.reviewedByActorId],
+      references: [actors.id],
+    }),
+  }),
+);
+
+export type BottleReference = typeof bottleReferences.$inferSelect;
+export type NewBottleReference = typeof bottleReferences.$inferInsert;
+
+export const bottleAliases = pgTable(
+  "bottle_alias",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    // Keeps display punctuation while enforcing the accepted comparison key.
+    normalizedName: varchar("normalized_name", { length: 255 }).notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    })
+      .references(() => actors.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("bottle_alias_bottle_normalized_name_idx").on(
+      table.bottleId,
+      table.normalizedName,
+    ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
-    index("bottle_alias_release_idx").on(table.legacyReleaseId),
-    index("bottle_alias_assigned_by_actor_idx").on(table.assignedByActorId),
+    index("bottle_alias_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
 
@@ -725,8 +780,8 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
     fields: [bottleAliases.bottleId],
     references: [bottles.id],
   }),
-  assignedByActor: one(actors, {
-    fields: [bottleAliases.assignedByActorId],
+  createdByActor: one(actors, {
+    fields: [bottleAliases.createdByActorId],
     references: [actors.id],
   }),
 }));

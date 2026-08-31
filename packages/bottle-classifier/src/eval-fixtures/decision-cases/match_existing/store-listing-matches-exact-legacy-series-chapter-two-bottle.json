@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glengoyne",
         "bottler": null,
         "series": null,
@@ -42,7 +42,7 @@
         "fullName": "Glengoyne The Legacy Series Chapter Two"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glengoyne",
         "bottler": null,
         "series": null,

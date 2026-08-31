@@ -6,12 +6,12 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroupDistillers,
   bottleGroups,
   bottleObservations,
+  bottleReferences,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -30,6 +30,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { moveBottleAliasesForMergeInTransaction } from "@peated/server/lib/bottleAliases";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
@@ -93,7 +94,7 @@ export type BottleMergeResult = {
 };
 
 export type BottleMergeFinalizationManifest = BottleMergeResult & {
-  aliasNames: string[];
+  referenceNames: string[];
   entityIds: number[];
   seriesIds: number[];
 };
@@ -107,7 +108,7 @@ function inertManifest(
     destinationBottleId: destinationBottle.id,
     destinationBottle,
     changed: false,
-    aliasNames: [],
+    referenceNames: [],
     entityIds: [],
     seriesIds: [],
   };
@@ -506,9 +507,9 @@ export async function lockBottleMergeDependencies(
   }
   await tx
     .select()
-    .from(bottleAliases)
-    .where(inArray(bottleAliases.bottleId, bottleIds))
-    .orderBy(asc(bottleAliases.name))
+    .from(bottleReferences)
+    .where(inArray(bottleReferences.bottleId, bottleIds))
+    .orderBy(asc(bottleReferences.name))
     .for("update");
   await tx
     .select()
@@ -782,23 +783,23 @@ export async function mergeBottlesInTransaction(
     .where(eq(bottlesToDistillers.bottleId, destinationBottleId))
     .orderBy(asc(bottlesToDistillers.distillerId))
     .for("share");
-  const sourceAliases = await tx
+  const sourceReferences = await tx
     .select()
-    .from(bottleAliases)
-    .where(eq(bottleAliases.bottleId, sourceBottleId))
-    .orderBy(asc(bottleAliases.name))
+    .from(bottleReferences)
+    .where(eq(bottleReferences.bottleId, sourceBottleId))
+    .orderBy(asc(bottleReferences.name))
     .for("update");
-  const [canonicalAlias] = await tx
+  const [canonicalReference] = await tx
     .select()
-    .from(bottleAliases)
-    .where(sql`LOWER(${bottleAliases.name}) = LOWER(${source.fullName})`)
+    .from(bottleReferences)
+    .where(sql`LOWER(${bottleReferences.name}) = LOWER(${source.fullName})`)
     .limit(1)
     .for("update");
-  const canonicalAliasOwnerId = canonicalAlias?.bottleId;
+  const canonicalReferenceOwnerId = canonicalReference?.bottleId;
   if (
-    canonicalAliasOwnerId !== undefined &&
-    canonicalAliasOwnerId !== null &&
-    !bottleById.has(canonicalAliasOwnerId)
+    canonicalReferenceOwnerId !== undefined &&
+    canonicalReferenceOwnerId !== null &&
+    !bottleById.has(canonicalReferenceOwnerId)
   ) {
     throw new BottleMergeConflictError("identity_conflict");
   }
@@ -824,19 +825,19 @@ export async function mergeBottlesInTransaction(
   }
 
   await tx
-    .update(bottleAliases)
+    .update(bottleReferences)
     .set({ bottleId: destinationBottleId })
-    .where(eq(bottleAliases.bottleId, sourceBottleId));
-  if (!canonicalAlias) {
-    await tx.insert(bottleAliases).values({
+    .where(eq(bottleReferences.bottleId, sourceBottleId));
+  if (!canonicalReference) {
+    await tx.insert(bottleReferences).values({
       name: source.fullName,
       bottleId: destinationBottleId,
       assignmentSource: "human_approved",
       assignedByActorId: actorId,
     });
-  } else if (canonicalAlias.bottleId === null) {
+  } else if (canonicalReference.bottleId === null) {
     await tx
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({
         name: source.fullName,
         bottleId: destinationBottleId,
@@ -845,8 +846,15 @@ export async function mergeBottlesInTransaction(
         assignmentSource: "human_approved",
         assignedByActorId: actorId,
       })
-      .where(eq(bottleAliases.name, canonicalAlias.name));
+      .where(eq(bottleReferences.name, canonicalReference.name));
   }
+
+  await moveBottleAliasesForMergeInTransaction(
+    tx,
+    sourceBottleId,
+    destinationBottleId,
+    destination.fullName,
+  );
 
   const sourceTags = await tx
     .select()
@@ -969,7 +977,7 @@ export async function mergeBottlesInTransaction(
     destinationGroupId,
     sourceBefore: source,
     destinationBefore: destination,
-    sourceAliasNames: sourceAliases.map(({ name }) => name),
+    sourceReferenceNames: sourceReferences.map(({ name }) => name),
     consumerCounts,
   };
   for (const before of groups) {
@@ -1040,8 +1048,8 @@ export async function mergeBottlesInTransaction(
     destinationBottleId,
     destinationBottle,
     changed: true,
-    aliasNames: Array.from(
-      new Set([source.fullName, ...sourceAliases.map(({ name }) => name)]),
+    referenceNames: Array.from(
+      new Set([source.fullName, ...sourceReferences.map(({ name }) => name)]),
     ).sort(),
     entityIds: uniqueSorted([
       source.brandId,
@@ -1064,7 +1072,7 @@ export async function finalizeBottleMerge(
     readonly [
       (
         | "OnBottleChange"
-        | "OnBottleAliasChange"
+        | "OnBottleReferenceChange"
         | "OnEntityChange"
         | "IndexBottleSeriesSearchVectors"
       ),
@@ -1072,8 +1080,8 @@ export async function finalizeBottleMerge(
     ]
   > = [
     ["OnBottleChange", { bottleId: manifest.destinationBottleId }],
-    ...manifest.aliasNames.map(
-      (name) => ["OnBottleAliasChange", { name }] as const,
+    ...manifest.referenceNames.map(
+      (name) => ["OnBottleReferenceChange", { name }] as const,
     ),
     ...manifest.entityIds.map(
       (entityId) => ["OnEntityChange", { entityId }] as const,

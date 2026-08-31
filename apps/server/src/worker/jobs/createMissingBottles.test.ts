@@ -2,13 +2,13 @@ import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
 import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   externalReviews,
   incomingBottleDecisionLogs,
   storePrices,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import {
   createMissingBottles as createMissingBottlesWithServices,
@@ -139,8 +139,11 @@ describe("createMissingBottles", () => {
     });
     expect(bottle?.fullName).toEqual("Springbank Bottle Name");
 
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
+    const alias = await db.query.bottleReferences.findFirst({
+      where: eq(
+        bottleReferences.name,
+        normalizeBottleReferenceKey(review.name),
+      ),
     });
     expect(alias).toMatchObject({
       bottleId: updatedReview?.bottleId,
@@ -203,12 +206,12 @@ describe("createMissingBottles", () => {
       name: "Worker Existing Bottle",
     });
     await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ assignmentSource: "canonical" })
       .where(
         and(
-          eq(bottleAliases.bottleId, bottle.id),
-          eq(bottleAliases.name, bottle.fullName),
+          eq(bottleReferences.bottleId, bottle.id),
+          eq(bottleReferences.name, bottle.fullName),
         ),
       );
     const review = await fixtures.ExternalReview({
@@ -364,8 +367,11 @@ describe("createMissingBottles", () => {
       bottleId: bottle.id,
     });
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(review.name),
+        ),
       }),
     ).toMatchObject({
       bottleId: bottle.id,

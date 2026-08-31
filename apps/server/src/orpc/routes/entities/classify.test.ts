@@ -64,7 +64,7 @@ describe("POST /entities/{entity}/classify", () => {
       name: "Reserve 9-year-old Triple Aged",
       totalTastings: 9,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       bottleId: reserveBottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged",
     });

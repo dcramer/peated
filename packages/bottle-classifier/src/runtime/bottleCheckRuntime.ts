@@ -21,7 +21,7 @@ import {
 import {
   buildBottleClassificationArtifacts,
   type BottleClassificationArtifacts,
-  type BottleReference,
+  type BottleReferenceInput,
   type Finding,
 } from "../contract";
 import type { ImageBottleEvidence } from "../imageEvidence";
@@ -51,7 +51,7 @@ import { mergeBottleCandidate, mergeResolvedEntity } from "./candidates";
 
 export type BottleClassifierDataSource = {
   findInitialCandidates?: (args: {
-    reference: BottleReference;
+    reference: BottleReferenceInput;
     extractedIdentity: BottleExtractedDetails | null;
   }) => Promise<BottleCandidate[]>;
   searchBottles: (

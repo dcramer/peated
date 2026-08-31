@@ -14,26 +14,42 @@ import { BottleSection } from "../bottleSection.stylex";
 type AliasList = Outputs["bottleAliases"]["list"];
 
 export function AliasList({
+  bottleId,
   initialAliasList,
 }: {
+  bottleId: number;
   initialAliasList: AliasList;
 }) {
   const { user } = useAuth();
   const orpc = useORPC();
   const [aliases, setAliases] = useState(initialAliasList.results);
+  const createAlias = useMutation(orpc.bottleAliases.create.mutationOptions());
   const deleteAlias = useMutation(orpc.bottleAliases.delete.mutationOptions());
 
   return (
-    <BottleSection count={aliases.length} heading="Aliases">
+    <BottleSection count={aliases.length} heading="Also known as">
       <AliasManager
         aliases={aliases.map((alias) => ({
           created: <TimeSince date={alias.createdAt} />,
-          isCanonical: Boolean(alias.isCanonical),
+          isPrimary: false,
           name: alias.name,
         }))}
         canEdit={user?.mod}
+        onCreate={async (name) => {
+          const alias = await createAlias.mutateAsync({
+            bottle: bottleId,
+            name,
+          });
+          setAliases((values) =>
+            [...values, alias].sort((left, right) =>
+              left.name.localeCompare(right.name),
+            ),
+          );
+        }}
         onDelete={async (name) => {
-          await deleteAlias.mutateAsync({ alias: name });
+          const alias = aliases.find((value) => value.name === name);
+          if (!alias) return;
+          await deleteAlias.mutateAsync({ bottle: bottleId, alias: alias.id });
           setAliases((values) => values.filter((value) => value.name !== name));
         }}
       />

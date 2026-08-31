@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": "Tomatin Single Malt 12-year-old",
+        "reference": "Tomatin Single Malt 12-year-old",
         "brand": "Tomatin",
         "bottler": null,
         "series": null,
@@ -42,7 +42,7 @@
         "fullName": "Tomatin 12-year-old"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Tomatin",
         "bottler": null,
         "series": null,
@@ -61,7 +61,7 @@
         "fullName": "Tomatin 12-year-old Bourbon & Sherry Casks"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Tomatin",
         "bottler": null,
         "series": null,

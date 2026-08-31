@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   actors,
-  bottleAliases,
+  bottleReferences,
   bottles,
   bottlesToDistillers,
   changes,
@@ -59,8 +59,8 @@ describe("updateEntity", () => {
 
       const aliases = await db
         .select()
-        .from(bottleAliases)
-        .where(eq(bottleAliases.bottleId, original.id));
+        .from(bottleReferences)
+        .where(eq(bottleReferences.bottleId, original.id));
       expect(aliases).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ name: original.fullName }),

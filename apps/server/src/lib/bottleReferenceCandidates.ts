@@ -16,7 +16,7 @@ import {
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottleSeries,
   bottleTombstones,
   bottles,
@@ -45,7 +45,7 @@ const BRAND_CANDIDATE_LIMIT = 5;
 type BottleReferenceIdentity = BottleExtractedDetails;
 export type BottleCandidateQueryRow = {
   bottleId: number | string;
-  alias?: string | null;
+  reference?: string | null;
   fullName: string;
   brand?: string | null;
   bottler?: string | null;
@@ -264,8 +264,8 @@ export function mergeBottleCandidate(
     existing.score = candidate.score;
   }
 
-  if (!existing.alias && candidate.alias) {
-    existing.alias = candidate.alias;
+  if (!existing.reference && candidate.reference) {
+    existing.reference = candidate.reference;
   }
 
   if (!existing.series && candidate.series) {
@@ -316,7 +316,7 @@ function buildBottleCandidate(
 ): BottleCandidate {
   return BottleCandidateSchema.parse({
     bottleId: Number(row.bottleId),
-    alias: row.alias ?? null,
+    reference: row.reference ?? null,
     fullName: row.fullName,
     brand: row.brand ?? null,
     bottler: row.bottler ?? null,
@@ -572,8 +572,8 @@ function candidateMatchesKnownBrand(
     return false;
   }
 
-  return [candidate.brand, candidate.fullName, candidate.alias].some((value) =>
-    normalizeIdentityText(value).includes(normalizedBrand),
+  return [candidate.brand, candidate.fullName, candidate.reference].some(
+    (value) => normalizeIdentityText(value).includes(normalizedBrand),
   );
 }
 
@@ -913,8 +913,8 @@ async function getVectorCandidates(
 
   const rows = await runQuery(sql`
     SELECT
-      ${bottleAliases.bottleId} AS "bottleId",
-      ${bottleAliases.name} AS alias,
+      ${bottleReferences.bottleId} AS "bottleId",
+      ${bottleReferences.name} AS reference,
       ${bottles.fullName} AS "fullName",
       ${entities.name} AS brand,
       ${bottles.category} AS category,
@@ -929,18 +929,18 @@ async function getVectorCandidates(
       ${bottles.maturation} AS "maturation",
       ${bottles.caskNumber} AS "caskNumber",
       ${bottles.outturn} AS "outturn",
-      1 - (${bottleAliases.embedding} <=> ${vector}) AS score
-    FROM ${bottleAliases}
+      1 - (${bottleReferences.embedding} <=> ${vector}) AS score
+    FROM ${bottleReferences}
     INNER JOIN ${bottles}
-      ON ${bottles.id} = ${bottleAliases.bottleId}
+      ON ${bottles.id} = ${bottleReferences.bottleId}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
-    WHERE ${bottleAliases.embedding} IS NOT NULL
-      AND ${bottleAliases.ignored} = false
+    WHERE ${bottleReferences.embedding} IS NOT NULL
+      AND ${bottleReferences.ignored} IS DISTINCT FROM TRUE
       AND NOT EXISTS(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}
       )
-    ORDER BY ${bottleAliases.embedding} <=> ${vector}
+    ORDER BY ${bottleReferences.embedding} <=> ${vector}
     LIMIT ${VECTOR_CANDIDATE_LIMIT}
   `);
 
@@ -1134,7 +1134,7 @@ async function getExactBottleCandidate(
   const exactMatches = await db
     .select({
       bottleId: bottles.id,
-      alias: bottleAliases.name,
+      reference: bottleReferences.name,
       fullName: bottles.fullName,
       brand: entities.name,
       category: bottles.category,
@@ -1149,13 +1149,13 @@ async function getExactBottleCandidate(
       caskNumber: bottles.caskNumber,
       outturn: bottles.outturn,
     })
-    .from(bottleAliases)
-    .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
+    .from(bottleReferences)
+    .innerJoin(bottles, eq(bottles.id, bottleReferences.bottleId))
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(
       and(
-        sql`LOWER(${bottleAliases.name}) = ${normalizedLowerName}`,
-        eq(bottleAliases.ignored, false),
+        sql`LOWER(${bottleReferences.name}) = ${normalizedLowerName}`,
+        sql`${bottleReferences.ignored} IS DISTINCT FROM TRUE`,
         sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
       ),
     )
@@ -1166,7 +1166,7 @@ async function getExactBottleCandidate(
     return buildBottleCandidate(
       {
         bottleId: exactMatch.bottleId,
-        alias: exactMatch.alias,
+        reference: exactMatch.reference,
         fullName: exactMatch.fullName,
         brand: exactMatch.brand || null,
         category: exactMatch.category,
@@ -1193,7 +1193,7 @@ async function getExactBottleCandidate(
   const comparableMatches = await db
     .select({
       bottleId: bottles.id,
-      alias: bottleAliases.name,
+      reference: bottleReferences.name,
       fullName: bottles.fullName,
       brand: entities.name,
       category: bottles.category,
@@ -1208,13 +1208,13 @@ async function getExactBottleCandidate(
       caskNumber: bottles.caskNumber,
       outturn: bottles.outturn,
     })
-    .from(bottleAliases)
-    .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
+    .from(bottleReferences)
+    .innerJoin(bottles, eq(bottles.id, bottleReferences.bottleId))
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(
       and(
-        sql`LOWER(REPLACE(${bottleAliases.name}, ${"'"}, '')) = ${comparableName}`,
-        eq(bottleAliases.ignored, false),
+        sql`LOWER(REPLACE(${bottleReferences.name}, ${"'"}, '')) = ${comparableName}`,
+        sql`${bottleReferences.ignored} IS DISTINCT FROM TRUE`,
         sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
       ),
     )
@@ -1229,7 +1229,7 @@ async function getExactBottleCandidate(
   return buildBottleCandidate(
     {
       bottleId: comparableMatch.bottleId,
-      alias: comparableMatch.alias,
+      reference: comparableMatch.reference,
       fullName: comparableMatch.fullName,
       brand: comparableMatch.brand || null,
       category: comparableMatch.category,

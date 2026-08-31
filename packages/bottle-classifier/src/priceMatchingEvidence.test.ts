@@ -46,7 +46,7 @@ function buildBottleCandidate(
     Partial<BottleCandidate>,
 ): BottleCandidate {
   return {
-    alias: null,
+    reference: null,
     brand: null,
     bottler: null,
     series: null,
@@ -425,7 +425,7 @@ function buildTierInput(
     hasMatchTarget: true,
     reaffirmsCurrentAssignment: false,
     replacesCurrentAssignment: false,
-    hasExactAliasAnchor: false,
+    hasExactReferenceAnchor: false,
     hasDeterministicAnchor: false,
     hasPrimaryLabelOrImageEvidence: false,
     ...overrides,
@@ -451,7 +451,7 @@ describe("deriveAutomationTier", () => {
             hasUnresolvedRisks: true,
             reaffirmsCurrentAssignment: true,
             hasDeterministicAnchor: true,
-            hasExactAliasAnchor: true,
+            hasExactReferenceAnchor: true,
             hasPrimaryLabelOrImageEvidence: true,
             webEvidence: "supportive",
           }),
@@ -510,9 +510,9 @@ describe("deriveAutomationTier", () => {
       ).toBe("auto");
     });
 
-    test("exact alias anchor autos", () => {
+    test("exact reference anchor autos", () => {
       expect(
-        deriveAutomationTier(buildTierInput({ hasExactAliasAnchor: true })),
+        deriveAutomationTier(buildTierInput({ hasExactReferenceAnchor: true })),
       ).toBe("auto");
     });
 
@@ -610,7 +610,7 @@ describe("deriveAutomationTier", () => {
           buildTierInput({
             actionRiskClass: "create",
             reaffirmsCurrentAssignment: true,
-            hasExactAliasAnchor: true,
+            hasExactReferenceAnchor: true,
             webEvidence: "weak",
           }),
         ),

@@ -11,15 +11,15 @@ import {
   BottleContextSourceSchema,
 } from "./bottleContextContract";
 import {
-  AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
   CategoryEnum,
   EntityResolutionSchema,
+  ReferenceScopeEnum,
 } from "./classifierTypes";
 import {
   AuditBottleResultSchema,
-  BottleReferenceSchema,
+  BottleReferenceInputSchema,
   CandidateExpansionModeSchema,
 } from "./contract";
 import { ImageBottleEvidenceSchema } from "./imageEvidence";
@@ -104,7 +104,7 @@ export const classifierEvalExpectationSchema = z
     status: z.enum(["ignored", "classified"]),
     action: z.enum(["match", "create_bottle", "no_match"]).optional(),
     identityScope: z.enum(["product", "exact_cask"]).optional(),
-    aliasScope: AliasScopeEnum.optional(),
+    referenceScope: ReferenceScopeEnum.optional(),
     matchedBottleId: z.number().int().nullable().optional(),
     proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
     proposedBottleNameOneOf: z.array(z.string().min(1)).min(1).optional(),
@@ -228,7 +228,7 @@ export const classifierEvalFixtureSchema = z
     name: z.string().min(1),
     input: z
       .object({
-        reference: BottleReferenceSchema,
+        reference: BottleReferenceInputSchema,
         extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
         imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
         initialCandidates: z.array(BottleCandidateSchema).optional(),

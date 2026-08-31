@@ -40,7 +40,7 @@ const LocalCatalogBottleSchema = z
   })
   .strict();
 
-const LocalCatalogAliasSchema = z
+const LocalCatalogReferenceSchema = z
   .object({
     name: z.string().trim().min(1),
     bottleId: z.number().int(),
@@ -52,7 +52,7 @@ export const LocalCatalogSchema = z
   .object({
     entities: z.array(LocalCatalogEntitySchema).default([]),
     bottles: z.array(LocalCatalogBottleSchema).default([]),
-    aliases: z.array(LocalCatalogAliasSchema).default([]),
+    references: z.array(LocalCatalogReferenceSchema).default([]),
   })
   .strict()
   .superRefine((catalog, ctx) => {
@@ -115,12 +115,12 @@ export const LocalCatalogSchema = z
       }
     }
 
-    for (const [index, alias] of catalog.aliases.entries()) {
-      if (!bottleIds.has(alias.bottleId)) {
+    for (const [index, reference] of catalog.references.entries()) {
+      if (!bottleIds.has(reference.bottleId)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Unknown bottle id ${alias.bottleId}.`,
-          path: ["aliases", index, "bottleId"],
+          message: `Unknown bottle id ${reference.bottleId}.`,
+          path: ["references", index, "bottleId"],
         });
       }
     }
@@ -129,4 +129,4 @@ export const LocalCatalogSchema = z
 export type LocalCatalog = z.infer<typeof LocalCatalogSchema>;
 export type LocalCatalogEntity = LocalCatalog["entities"][number];
 export type LocalCatalogBottle = LocalCatalog["bottles"][number];
-export type LocalCatalogAlias = LocalCatalog["aliases"][number];
+export type LocalCatalogReference = LocalCatalog["references"][number];

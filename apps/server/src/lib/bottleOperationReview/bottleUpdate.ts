@@ -5,7 +5,7 @@ import {
 import {
   bottleNameDuplicatesBrand,
   normalizeBottleAge,
-  normalizeBottleAliasKey,
+  normalizeBottleReferenceKey,
   normalizeEntityName,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
@@ -609,7 +609,7 @@ export async function prepareBottleUpdate(
       : storage.shared.statedAge;
   if (storage.shared?.name !== undefined) {
     const normalized = normalizeBottleAge({
-      name: normalizeBottleAliasKey(storage.shared.name),
+      name: normalizeBottleReferenceKey(storage.shared.name),
       statedAge: sharedStatedAge,
     });
     sharedName = normalized.name;

@@ -2,11 +2,11 @@ import type {
   BottleCandidate,
   BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
-import { normalizeBottleAliasKey } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { getExistingMatchIdentityConflicts } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { AnyTransaction } from "@peated/server/db";
 import { bottleBarcodes } from "@peated/server/db/schema";
-import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import type { NormalizedGtin } from "@peated/server/lib/gtin";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
@@ -15,14 +15,14 @@ import { eq } from "drizzle-orm";
 export type StorePriceBottleMatch = {
   bottleId: number | null;
   candidate: BottleCandidate | null;
-  source: "alias" | "barcode" | null;
-  aliasMatch: Awaited<ReturnType<typeof findBottleAliasAssignment>>;
+  source: "reference" | "barcode" | null;
+  referenceMatch: Awaited<ReturnType<typeof findBottleReferenceAssignment>>;
 };
 
 /**
  * Matches a listing only from an exact saved name or an approved barcode.
  * A barcode sent by a store is evidence only: this code never approves it or
- * turns the store's title into an alias.
+ * turns the store's title into a reference.
  */
 export async function resolveStorePriceBottleMatchInTransaction(
   tx: AnyTransaction,
@@ -38,10 +38,10 @@ export async function resolveStorePriceBottleMatchInTransaction(
     volume: number;
   },
 ): Promise<StorePriceBottleMatch> {
-  const aliasKey = normalizeBottleAliasKey(name);
-  let aliasMatch = await findBottleAliasAssignment(aliasKey, tx);
-  if (!aliasMatch && aliasKey !== name) {
-    aliasMatch = await findBottleAliasAssignment(name, tx);
+  const referenceKey = normalizeBottleReferenceKey(name);
+  let referenceMatch = await findBottleReferenceAssignment(referenceKey, tx);
+  if (!referenceMatch && referenceKey !== name) {
+    referenceMatch = await findBottleReferenceAssignment(name, tx);
   }
 
   const barcodeBeforeLock = normalizedBarcode
@@ -51,15 +51,17 @@ export async function resolveStorePriceBottleMatchInTransaction(
     : null;
 
   if (!barcodeBeforeLock) {
-    if (!aliasMatch) {
-      return { bottleId: null, candidate: null, source: null, aliasMatch };
+    if (!referenceMatch) {
+      return { bottleId: null, candidate: null, source: null, referenceMatch };
     }
-    await resolveActiveBottleIds(tx, [aliasMatch.bottleId], { lock: "update" });
+    await resolveActiveBottleIds(tx, [referenceMatch.bottleId], {
+      lock: "update",
+    });
     return {
-      bottleId: aliasMatch.bottleId,
+      bottleId: referenceMatch.bottleId,
       candidate: null,
-      source: "alias",
-      aliasMatch,
+      source: "reference",
+      referenceMatch,
     };
   }
 
@@ -82,7 +84,8 @@ export async function resolveStorePriceBottleMatchInTransaction(
     barcodeAfterLock?.bottleId === barcodeBeforeLock.bottleId &&
     (barcodeAfterLock.volume === null || barcodeAfterLock.volume === volume) &&
     conflicts.length === 0 &&
-    (aliasMatch === null || aliasMatch.bottleId === barcodeAfterLock.bottleId)
+    (referenceMatch === null ||
+      referenceMatch.bottleId === barcodeAfterLock.bottleId)
       ? barcodeAfterLock.bottleId
       : null;
 
@@ -93,6 +96,6 @@ export async function resolveStorePriceBottleMatchInTransaction(
         ? { ...candidate, source: [...candidate.source, "barcode"] }
         : null,
     source: bottleId !== null ? "barcode" : null,
-    aliasMatch,
+    referenceMatch,
   };
 }

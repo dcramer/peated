@@ -1,7 +1,7 @@
 import {
   isIgnoredBottleClassification,
   type BottleClassificationResult,
-  type BottleReference,
+  type BottleReferenceInput,
 } from "@peated/bottle-classifier";
 import type {
   BottleClassificationDecision,
@@ -13,8 +13,8 @@ import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/
 import { classifyScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
-import type { BottleAliasIdentitySnapshot } from "@peated/server/lib/bottleAliases";
-import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
+import type { BottleReferenceIdentitySnapshot } from "@peated/server/lib/bottleReferences";
 import {
   createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
@@ -26,7 +26,7 @@ import {
 } from "./resolveActiveBottleIds";
 
 export type BottleReferenceResolutionSource =
-  | "exact_alias"
+  | "exact_reference"
   | "classifier_match"
   | "classifier_create_bottle"
   | "unresolved";
@@ -52,10 +52,10 @@ export type BottleReferenceResolution = {
   rationale: string | null;
   classifierEvidence: BottleReferenceClassifierEvidence | null;
   createdBottle: boolean;
-  sourceAliasIdentity?: BottleAliasIdentitySnapshot;
+  sourceReferenceIdentity?: BottleReferenceIdentitySnapshot;
 };
 
-/** Locks the resolved Bottle before any alias or consumer row is locked. */
+/** Locks the resolved Bottle before any reference or consumer row is locked. */
 export async function lockBottleReferenceResolutionAssignmentInTransaction(
   tx: AnyTransaction,
   resolution: BottleReferenceResolution,
@@ -163,7 +163,7 @@ export async function applyClassifierCreateDecision({
 }
 
 /**
- * Resolve a raw external Bottle Reference into Bottle identity. Exact aliases
+ * Resolve a raw external Bottle Reference into Bottle identity. Exact references
  * retain their accepted fast path; ambiguous references use the reviewed
  * classifier. `create_bottle` returns the created or reused Bottle.
  *
@@ -171,8 +171,8 @@ export async function applyClassifierCreateDecision({
  * preserve its raw source record.
  */
 type ResolveBottleReferenceTargetInput = {
-  reference: BottleReference;
-  aliasLookupNames?: string[];
+  reference: BottleReferenceInput;
+  referenceLookupNames?: string[];
   extractedIdentity?: Partial<BottleExtractedDetails> | null;
   createdByActorId: number;
 };
@@ -180,32 +180,32 @@ type ResolveBottleReferenceTargetInput = {
 async function resolveBottleReferenceTargetWithClassifier(
   {
     reference,
-    aliasLookupNames = [],
+    referenceLookupNames = [],
     extractedIdentity = null,
     createdByActorId,
   }: ResolveBottleReferenceTargetInput,
   classify: typeof classifyBottleReference,
 ): Promise<BottleReferenceResolution> {
-  const uniqueAliasLookupNames = Array.from(
-    new Set(aliasLookupNames.map((name) => name.trim()).filter(Boolean)),
+  const uniqueReferenceLookupNames = Array.from(
+    new Set(referenceLookupNames.map((name) => name.trim()).filter(Boolean)),
   );
 
-  for (const aliasName of uniqueAliasLookupNames) {
-    const match = await findBottleAliasAssignment(aliasName);
+  for (const referenceName of uniqueReferenceLookupNames) {
+    const match = await findBottleReferenceAssignment(referenceName);
     if (match) {
       return {
         assignment: {
           kind: "direct_bottle",
           bottleId: match.bottleId,
         },
-        source: "exact_alias",
+        source: "exact_reference",
         error: null,
         confidence: null,
         model: null,
         rationale: null,
         classifierEvidence: null,
         createdBottle: false,
-        sourceAliasIdentity: match.alias,
+        sourceReferenceIdentity: match.reference,
       };
     }
   }

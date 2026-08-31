@@ -64,7 +64,7 @@ function buildAuditedBottleContext(): BottleContextSource {
         },
       },
     ],
-    aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
+    references: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
     observations: [
       {
         sourceType: "store_price",
@@ -143,7 +143,7 @@ describe("auditBottle", () => {
         expect(currentBottleContext).toMatchObject({
           bottleId: 45146,
           groupId: 320,
-          aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
+          references: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
           observations: [{ sourceKey: "warehouse-1" }],
         });
         expect(currentBottleContext.publicImages).toHaveLength(2);
@@ -371,7 +371,7 @@ describe("auditBottle", () => {
       shared: relatedBottleSource.shared,
       exact: relatedBottleSource.exact,
       siblings: relatedBottleSource.siblings,
-      aliases: relatedBottleSource.aliases,
+      references: relatedBottleSource.references,
       observations: relatedBottleSource.observations,
       publicImages: [],
     };

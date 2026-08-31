@@ -18,7 +18,7 @@ the [Catalog Enrichment](../operations/catalog-enrichment.md) workflow.
   by evidence. The server rejects invalid combinations.
 - Creation atomically creates a singleton BottleGroup. Users do not select,
   name, or submit authority for a group.
-- Deterministic alias duplicate checks remain in the request path. Slow catalog
+- Deterministic reference duplicate checks remain in the request path. Slow catalog
   verification, review, indexing, and similar work run after persistence.
 - “Add a similar bottle” only prefills the same independent creation form from
   the selected Bottle. It does not reuse or join the source BottleGroup.
@@ -36,9 +36,9 @@ manual creation with supported label fields and the pending photo. The
   storage and shared fan-out.
 - A stated-age edit changes the selected Bottle. The client does not select an
   age storage scope.
-- An exact edit changes only the selected Bottle and its exact aliases.
+- An exact edit changes only the selected Bottle and its exact references.
 - A shared edit updates the BottleGroup and atomically rematerializes every
-  member Bottle while preserving exact fields and aliases.
+  member Bottle while preserving exact fields and references.
 - Independently created Bottles stay in singleton groups. Similar names, brand,
   or series do not merge them automatically.
 - No manual or automatic regrouping operation ships in the current workflow.

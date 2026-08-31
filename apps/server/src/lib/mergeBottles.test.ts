@@ -6,6 +6,7 @@ import {
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
+  bottleReferences,
   bottles,
   bottleTags,
   bottleTombstones,
@@ -71,11 +72,23 @@ describe("exact Bottle merges", () => {
     const collectionWithCollision = await fixtures.Collection();
     const collectionToMove = await fixtures.Collection();
     const flightWithCollision = await fixtures.Flight();
-    const sourceAlias = await fixtures.BottleAlias({
+    const sourceAlias = await fixtures.BottleReference({
       bottleId: source.id,
-      name: "Retired exact alias",
+      name: "Retired exact reference",
       assignmentSource: "human_approved",
       assignedByActorId: actor.id,
+    });
+    await fixtures.BottleAlias({
+      bottleId: source.id,
+      name: "Source Market Name",
+    });
+    await fixtures.BottleAlias({
+      bottleId: source.id,
+      name: "Shared Market Name",
+    });
+    await fixtures.BottleAlias({
+      bottleId: destination.id,
+      name: "Shared   Market Name",
     });
 
     const sourceTasting = await fixtures.Tasting({
@@ -308,10 +321,21 @@ describe("exact Bottle merges", () => {
     ).toEqual([expect.objectContaining({ bottleId: destination.id })]);
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, sourceAlias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, sourceAlias.name),
       }),
     ).toMatchObject({ bottleId: destination.id });
+    expect(
+      await db
+        .select({ name: bottleAliases.name })
+        .from(bottleAliases)
+        .where(eq(bottleAliases.bottleId, destination.id)),
+    ).toEqual(
+      expect.arrayContaining([
+        { name: "Source Market Name" },
+        { name: "Shared   Market Name" },
+      ]),
+    );
     expect(
       await db.query.bottleTags.findFirst({
         where: and(
@@ -659,9 +683,9 @@ describe("exact Bottle merges", () => {
       name: "Canonical Release",
     });
     const [canonicalAlias] = await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ bottleId: sourceGroupBottle.id })
-      .where(eq(bottleAliases.name, source.fullName))
+      .where(eq(bottleReferences.name, source.fullName))
       .returning();
     if (!canonicalAlias) throw new Error("Expected the canonical alias.");
 
@@ -674,8 +698,8 @@ describe("exact Bottle merges", () => {
     );
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, canonicalAlias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, canonicalAlias.name),
       }),
     ).toMatchObject({ bottleId: sourceGroupBottle.id });
     expect(
@@ -700,9 +724,9 @@ describe("exact Bottle merges", () => {
       edition: "Canonical Release",
     });
     const [canonicalAlias] = await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ bottleId: destinationGroupBottle.id })
-      .where(eq(bottleAliases.name, source.fullName))
+      .where(eq(bottleReferences.name, source.fullName))
       .returning();
     if (!canonicalAlias) throw new Error("Expected the canonical alias.");
 
@@ -715,8 +739,8 @@ describe("exact Bottle merges", () => {
     );
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, canonicalAlias.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, canonicalAlias.name),
       }),
     ).toMatchObject({ bottleId: destinationGroupBottle.id });
     expect(
@@ -735,9 +759,9 @@ describe("exact Bottle merges", () => {
       name: "Unassigned Alias Destination",
     });
     await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ bottleId: null, ignored: true })
-      .where(eq(bottleAliases.name, source.fullName));
+      .where(eq(bottleReferences.name, source.fullName));
 
     await db.transaction((tx) =>
       mergeBottlesInTransaction(tx, {
@@ -748,8 +772,8 @@ describe("exact Bottle merges", () => {
     );
 
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, source.fullName),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, source.fullName),
       }),
     ).toMatchObject({
       bottleId: destination.id,
@@ -771,9 +795,9 @@ describe("exact Bottle merges", () => {
       name: "Reserved Alias Owner",
     });
     await db
-      .update(bottleAliases)
+      .update(bottleReferences)
       .set({ bottleId: conflictingBottle.id })
-      .where(eq(bottleAliases.name, source.fullName));
+      .where(eq(bottleReferences.name, source.fullName));
 
     await expect(
       db.transaction((tx) =>

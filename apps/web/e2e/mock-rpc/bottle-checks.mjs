@@ -341,7 +341,7 @@ export function createBottleCheckMock({
               "The store listing is matched; one duplicate Bottle still needs moderator disposition.",
             candidateBottleIds: [existingBottleId],
             identityScope: "product",
-            aliasScope: null,
+            referenceScope: null,
             observation: null,
             confidenceBasis: null,
             matchedBottleId: existingBottleId,

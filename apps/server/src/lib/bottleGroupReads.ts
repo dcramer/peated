@@ -1,8 +1,8 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottles,
   bottleTombstones,
   type User,
@@ -137,7 +137,7 @@ export async function listBottleGroupBottles(
       or(
         ilike(bottles.name, pattern),
         ilike(bottles.fullName, pattern),
-        sql`EXISTS(SELECT FROM ${bottleAliases} WHERE ${bottleAliases.bottleId} = ${bottles.id} AND ${bottleAliases.ignored} IS NOT TRUE AND ${bottleAliases.name} ILIKE ${pattern})`,
+        sql`EXISTS(SELECT FROM ${bottleReferences} WHERE ${bottleReferences.bottleId} = ${bottles.id} AND ${bottleReferences.ignored} IS NOT TRUE AND ${bottleReferences.name} ILIKE ${pattern})`,
       )!,
     );
   }

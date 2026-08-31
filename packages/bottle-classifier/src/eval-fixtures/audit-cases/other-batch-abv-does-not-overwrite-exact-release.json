@@ -73,7 +73,7 @@
               }
             }
           ],
-          "aliases": [],
+          "references": [],
           "observations": [
             {
               "sourceType": "review",

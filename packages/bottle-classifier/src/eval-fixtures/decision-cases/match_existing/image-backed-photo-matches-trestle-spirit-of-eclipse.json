@@ -105,7 +105,7 @@
           "outturn": null
         },
         "siblings": [],
-        "aliases": [],
+        "references": [],
         "observations": [],
         "imageSources": []
       }
@@ -180,7 +180,7 @@
         "releaseYear": 2011
       }
     ],
-    "aliases": [
+    "references": [
       {
         "name": "Trestle Spirit of Eclipse",
         "bottleId": 38004

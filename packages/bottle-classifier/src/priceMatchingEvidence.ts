@@ -118,8 +118,8 @@ export type AutomationTierInput = {
   // The match replaces a *different* current assignment (a correction, not a
   // verification candidate).
   replacesCurrentAssignment: boolean;
-  // An exact accepted local alias resolved the reference.
-  hasExactAliasAnchor: boolean;
+  // An exact accepted local reference resolved the reference.
+  hasExactReferenceAnchor: boolean;
   // A closed-form deterministic identity anchor (SMWS exact cask, exact_cask
   // scope, or a unique plain-age structured match).
   hasDeterministicAnchor: boolean;
@@ -142,7 +142,7 @@ function deriveMatchTier(input: AutomationTierInput): AutomationTier {
 
   // An unmatched existing match auto-verifies only with an explicit typed
   // anchor: a reaffirmed current assignment, a closed-form deterministic anchor
-  // (exact_cask/SMWS), an exact accepted alias, primary label/image evidence,
+  // (exact_cask/SMWS), an exact accepted reference, primary label/image evidence,
   // agent-reviewed supportive web evidence, or the agent's affirmative
   // `webEvidence = not_needed` judgment. `not_needed` anchors a match because
   // the spec's evidence requirement explicitly allows a clear existing match to
@@ -155,7 +155,7 @@ function deriveMatchTier(input: AutomationTierInput): AutomationTier {
   const hasMatchAnchor =
     input.reaffirmsCurrentAssignment ||
     input.hasDeterministicAnchor ||
-    input.hasExactAliasAnchor ||
+    input.hasExactReferenceAnchor ||
     input.hasPrimaryLabelOrImageEvidence ||
     input.webEvidence === "supportive" ||
     input.webEvidence === "not_needed";
@@ -219,7 +219,7 @@ export function agentActionRiskClass(
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(
-      [targetCandidate.alias, targetCandidate.fullName]
+      [targetCandidate.reference, targetCandidate.fullName]
         .filter((value): value is string => Boolean(value))
         .map((value) => value.trim())
         .filter((value) => value.length > 0),
@@ -571,8 +571,8 @@ function candidateMatchesBrand(
     return false;
   }
 
-  return [candidate.brand, candidate.fullName, candidate.alias].some((value) =>
-    textsOverlap(value, brandName),
+  return [candidate.brand, candidate.fullName, candidate.reference].some(
+    (value) => textsOverlap(value, brandName),
   );
 }
 
@@ -586,7 +586,7 @@ function candidateMatchesName(
 
   return (
     textsOverlap(candidate.fullName, value) ||
-    textsOverlap(candidate.alias, value)
+    textsOverlap(candidate.reference, value)
   );
 }
 

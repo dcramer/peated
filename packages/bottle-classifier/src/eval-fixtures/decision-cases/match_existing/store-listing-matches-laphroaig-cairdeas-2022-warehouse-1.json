@@ -12,7 +12,7 @@
     "initialCandidates": [
       {
         "bottleId": 39096,
-        "alias": "Laphroaig Cairdeas (2022)",
+        "reference": "Laphroaig Cairdeas (2022)",
         "fullName": "Laphroaig Cairdeas",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -34,7 +34,7 @@
       },
       {
         "bottleId": 44288,
-        "alias": "Laphroaig Càirdeas",
+        "reference": "Laphroaig Càirdeas",
         "fullName": "Laphroaig Càirdeas",
         "brand": "Laphroaig",
         "bottler": null,
@@ -56,7 +56,7 @@
       },
       {
         "bottleId": 45146,
-        "alias": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
+        "reference": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
         "fullName": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
         "brand": "Laphroaig",
         "bottler": null,
@@ -78,7 +78,7 @@
       },
       {
         "bottleId": 39097,
-        "alias": "Laphroaig Cairdeas White Port and Madeira (2023)",
+        "reference": "Laphroaig Cairdeas White Port and Madeira (2023)",
         "fullName": "Laphroaig Cairdeas White Port and Madeira",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -100,7 +100,7 @@
       },
       {
         "bottleId": 44880,
-        "alias": "Lagavulin Distillers Edition 2022 Release",
+        "reference": "Lagavulin Distillers Edition 2022 Release",
         "fullName": "Lagavulin Distillers Edition - 2022 Release - 2022 Release - 2006 Vintage",
         "brand": "Lagavulin",
         "bottler": null,
@@ -122,7 +122,7 @@
       },
       {
         "bottleId": 44035,
-        "alias": "Laphroaig Single Cask Collection Cask Collectors Edition 2",
+        "reference": "Laphroaig Single Cask Collection Cask Collectors Edition 2",
         "fullName": "Laphroaig Single Cask Selection",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -144,7 +144,7 @@
       },
       {
         "bottleId": 44879,
-        "alias": "Lagavulin Distillers Edition 2021 Release",
+        "reference": "Lagavulin Distillers Edition 2021 Release",
         "fullName": "Lagavulin Distillers Edition - 2021 Release - 2021 Release - 2005 Vintage",
         "brand": "Lagavulin",
         "bottler": null,
@@ -166,7 +166,7 @@
       },
       {
         "bottleId": 44865,
-        "alias": "Lagavulin Distillers Edition 2023 Release",
+        "reference": "Lagavulin Distillers Edition 2023 Release",
         "fullName": "Lagavulin Distillers Edition - 2023 Release - 2023 Release",
         "brand": "Lagavulin",
         "bottler": null,
@@ -188,7 +188,7 @@
       },
       {
         "bottleId": 44028,
-        "alias": "Kilchoman Feis Ile 2020",
+        "reference": "Kilchoman Feis Ile 2020",
         "fullName": "Kilchoman Feis Ile",
         "brand": "Kilchoman",
         "bottler": null,
@@ -210,7 +210,7 @@
       },
       {
         "bottleId": 44006,
-        "alias": "Lagavulin The Distillers Edition 2023 Release",
+        "reference": "Lagavulin The Distillers Edition 2023 Release",
         "fullName": "Lagavulin Distillers Edition",
         "brand": "Lagavulin",
         "bottler": null,
@@ -232,7 +232,7 @@
       },
       {
         "bottleId": 45013,
-        "alias": "Kilchoman 12-year-old Feis Ile 2020",
+        "reference": "Kilchoman 12-year-old Feis Ile 2020",
         "fullName": "Kilchoman Feis Ile - 2020 - 12-year-old",
         "brand": "Kilchoman",
         "bottler": null,
@@ -254,7 +254,7 @@
       },
       {
         "bottleId": 44286,
-        "alias": "Laphroaig Elements",
+        "reference": "Laphroaig Elements",
         "fullName": "Laphroaig Elements",
         "brand": "Laphroaig",
         "bottler": null,
@@ -276,7 +276,7 @@
       },
       {
         "bottleId": 45034,
-        "alias": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - Single Cask - Oak",
+        "reference": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - Single Cask - Oak",
         "fullName": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - 58.3% ABV - Single Cask - Cask Strength",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -298,7 +298,7 @@
       },
       {
         "bottleId": 44849,
-        "alias": "Laphroaig Cask Strength (Batch 002)",
+        "reference": "Laphroaig Cask Strength (Batch 002)",
         "fullName": "Laphroaig Cask Strength - Batch 002 - Cask Strength",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -320,7 +320,7 @@
       },
       {
         "bottleId": 45033,
-        "alias": "Laphroaig Single Cask Selection - Cask Collectors Edition 2 - Single Cask - Pedro Ximenez - Hogshead",
+        "reference": "Laphroaig Single Cask Selection - Cask Collectors Edition 2 - Single Cask - Pedro Ximenez - Hogshead",
         "fullName": "Laphroaig Single Cask Selection - Cask Collectors Edition 2 - 60.4% ABV - Single Cask",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
@@ -399,7 +399,7 @@
             }
           }
         ],
-        "aliases": [],
+        "references": [],
         "observations": [],
         "imageSources": [
           {
@@ -462,7 +462,7 @@
             }
           }
         ],
-        "aliases": [],
+        "references": [],
         "observations": [],
         "imageSources": [
           {
@@ -524,7 +524,7 @@
             }
           }
         ],
-        "aliases": [],
+        "references": [],
         "observations": [],
         "imageSources": []
       }

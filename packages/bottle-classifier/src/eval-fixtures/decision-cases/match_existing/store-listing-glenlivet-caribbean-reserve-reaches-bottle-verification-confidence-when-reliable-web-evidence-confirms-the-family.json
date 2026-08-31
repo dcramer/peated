@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Glenlivet",
         "bottler": "Glenlivet",
         "series": null,
@@ -48,7 +48,7 @@
       "when": ["glenlivet", "caribbean reserve"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Glenlivet",
           "bottler": "Glenlivet",
           "series": null,

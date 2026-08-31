@@ -32,7 +32,7 @@ const BrandRepairCandidateSchema = z.object({
     .nullable(),
   supportingReferences: z.array(
     z.object({
-      source: z.enum(["full_name", "alias"]),
+      source: z.enum(["full_name", "reference"]),
       text: z.string(),
       targetMatchedName: z.string(),
       targetMatchedWordCount: z.number(),
@@ -49,7 +49,7 @@ export default procedure
     path: "/bottles/brand-repair-candidates",
     summary: "List bottle brand/entity repair candidates",
     description:
-      "Retrieve moderator-facing audit candidates for bottles whose stored brand entity appears wrong but whose names or aliases point at a different existing brand entity.",
+      "Retrieve moderator-facing audit candidates for bottles whose stored brand entity appears wrong but whose names or references point at a different existing brand entity.",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottleBrandRepairCandidates",

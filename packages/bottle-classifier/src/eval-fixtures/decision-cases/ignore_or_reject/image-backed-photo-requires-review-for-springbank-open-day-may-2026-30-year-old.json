@@ -142,7 +142,7 @@
           "outturn": null
         },
         "siblings": [],
-        "aliases": [
+        "references": [
           {
             "name": "Springbank Open Day",
             "ignored": false
@@ -200,7 +200,7 @@
         "statedAge": 30
       }
     ],
-    "aliases": [
+    "references": [
       {
         "name": "Springbank Open Day",
         "bottleId": 44256

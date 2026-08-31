@@ -15,7 +15,7 @@ export default procedure
     path: "/external-sites/{site}/prices",
     summary: "Create batch prices",
     description:
-      "Bulk create or update store prices for an external site with automatic bottle matching and alias creation. Requires admin privileges",
+      "Bulk create or update store prices for an external site with automatic bottle matching and reference creation. Requires admin privileges",
     operationId: "createPricesBatch",
   })
   .input(CreateStorePricesInputSchema)

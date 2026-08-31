@@ -10,6 +10,7 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -33,6 +34,7 @@ import {
   toasts,
   users,
 } from "@peated/server/db/schema";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { generateOAuthClientId } from "@peated/server/lib/oauth";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import slugify from "@sindresorhus/slugify";
@@ -695,7 +697,7 @@ async function createBottleFixture(
     }
 
     await tx
-      .insert(bottleAliases)
+      .insert(bottleReferences)
       .values({
         bottleId: bottle.id,
         name: bottle.fullName,
@@ -772,10 +774,10 @@ async function resolveFixtureBottleId(
   return (await Bottle({}, _db)).id;
 }
 
-export const BottleAlias = async (
-  { ...data }: Partial<dbSchema.NewBottleAlias> = {},
+export const BottleReference = async (
+  { ...data }: Partial<dbSchema.NewBottleReference> = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.BottleAlias> => {
+): Promise<dbSchema.BottleReference> => {
   const [result] = await db.transaction(async (tx) => {
     const assignedByActorId =
       data.assignedByActorId ??
@@ -784,7 +786,7 @@ export const BottleAlias = async (
     const bottleId = await resolveFixtureBottleId(data, tx);
 
     return await tx
-      .insert(bottleAliases)
+      .insert(bottleReferences)
       .values({
         ...data,
         bottleId,
@@ -797,6 +799,32 @@ export const BottleAlias = async (
       })
       .returning();
   });
+  if (!result) throw new Error("Unable to create BottleReference fixture");
+  return result;
+};
+
+export const BottleAlias = async (
+  { ...data }: Partial<dbSchema.NewBottleAlias> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.BottleAlias> => {
+  const bottleId = await resolveFixtureBottleId(data, db);
+  if (bottleId === null)
+    throw new Error("BottleAlias fixture requires a Bottle");
+  const createdByActorId =
+    data.createdByActorId ??
+    (await getUserActorByIdForDatabase(db, (await User({}, db)).id)).id;
+  const name = data.name ?? `${toTitleCase(faker.word.adjective())} Oak`;
+  const [result] = await db
+    .insert(bottleAliases)
+    .values({
+      ...data,
+      bottleId,
+      name,
+      normalizedName:
+        data.normalizedName ?? normalizeBottleReferenceKey(name).toLowerCase(),
+      createdByActorId,
+    })
+    .returning();
   if (!result) throw new Error("Unable to create BottleAlias fixture");
   return result;
 };

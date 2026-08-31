@@ -33,12 +33,12 @@ import {
   type User,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import {
-  assignBottleAliasInTransaction,
-  fillMissingBottleImage,
-  finalizeBottleAliasAssignment,
-} from "@peated/server/lib/bottleAliases";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import {
+  assignBottleReferenceInTransaction,
+  fillMissingBottleImage,
+  finalizeBottleReferenceAssignment,
+} from "@peated/server/lib/bottleReferences";
 import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
 import {
   buildBottleInputFromProposedBottle,
@@ -56,7 +56,7 @@ import {
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError, logInfo } from "@peated/server/lib/log";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import {
   getStorePriceMatchAutomationAssessment,
   shouldVerifyStorePriceMatch,
@@ -288,7 +288,7 @@ export function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
-      aliasScope: decision.aliasScope ?? "none",
+      referenceScope: decision.referenceScope ?? "none",
       suggestedBottleId: decision.matchedBottleId,
       proposedBottle: null,
     };
@@ -301,7 +301,7 @@ export function toStorePriceMatchDecision({
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
-      aliasScope: decision.aliasScope ?? "none",
+      referenceScope: decision.referenceScope ?? "none",
       suggestedBottleId: null,
       proposedBottle: parseClassifierProposedBottle(decision.proposedBottle),
     };
@@ -313,7 +313,7 @@ export function toStorePriceMatchDecision({
     rationale: decision.rationale,
     candidateBottleIds: decision.candidateBottleIds,
     identityScope: decision.identityScope,
-    aliasScope: decision.aliasScope ?? "none",
+    referenceScope: decision.referenceScope ?? "none",
     suggestedBottleId: null,
     proposedBottle: null,
   };
@@ -706,11 +706,11 @@ function getStorePriceBottleRepairDraft(
 function buildStorePriceObservationFacts(
   proposal: Pick<
     StorePriceMatchProposalForReview,
-    "aliasScope" | "proposalType" | "proposedBottle"
+    "referenceScope" | "proposalType" | "proposedBottle"
   >,
 ) {
   return {
-    aliasScope: proposal.aliasScope ?? "none",
+    referenceScope: proposal.referenceScope ?? "none",
     proposalType: proposal.proposalType,
     proposedBottle: proposal.proposedBottle ?? null,
   };
@@ -728,7 +728,7 @@ async function upsertStorePriceObservationInTransaction(
     createdById: number;
   },
 ) {
-  // Preserve the exact store listing as evidence even when the canonical alias
+  // Preserve the exact store listing as evidence even when the canonical reference
   // stays bottle-level. Approval should capture facts without forcing a split.
   const [observation] = await tx
     .insert(bottleObservations)
@@ -817,7 +817,7 @@ export async function upsertStorePriceMatchProposal({
     confidence: parsedDecision?.confidence ?? null,
     currentBottleId: price.bottleId,
     suggestedBottleId: parsedDecision?.suggestedBottleId ?? null,
-    aliasScope: parsedDecision?.aliasScope ?? null,
+    referenceScope: parsedDecision?.referenceScope ?? null,
     candidateBottles: candidates,
     extractedLabel,
     proposedBottle: parsedDecision?.proposedBottle ?? null,
@@ -1034,7 +1034,7 @@ function hasStorePriceMatchInputChanged(
   );
 }
 
-/** Applies an approved barcode match without saving the store title as an alias. */
+/** Applies an approved barcode match without saving the store title as a reference. */
 async function resolveApprovedBarcodeStorePriceMatch({
   price,
   existingProposal,
@@ -1101,7 +1101,7 @@ async function resolveApprovedBarcodeStorePriceMatch({
       rationale: `Matched approved barcode ${normalizedBarcode.value}. Bottle size and known bottle details agree.`,
       candidateBottleIds: [match.bottleId],
       identityScope: "product",
-      aliasScope: "none",
+      referenceScope: "none",
       suggestedBottleId: match.bottleId,
       proposedBottle: null,
     };
@@ -1712,7 +1712,7 @@ async function persistApprovedStorePriceMatchInTransaction(
   const metadata: IncomingBottleDecisionMetadata = {
     ...decisionLog.metadata,
     proposalType: proposal.proposalType,
-    aliasScope: proposal.aliasScope ?? "none",
+    referenceScope: proposal.referenceScope ?? "none",
   };
   if (decisionLog.actor.type === "system") {
     metadata.initiatedByUserId = reviewedById;
@@ -1768,18 +1768,18 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     },
   );
 
-  // A BottleAlias affects other listings and external reviews. Create it only when the
+  // A BottleReference affects other listings and external reviews. Create it only when the
   // proposal explicitly allows that reuse and the moderator accepted the
   // suggested Bottle. The exact StorePrice assignment below is independent.
-  const shouldAssignAlias =
-    proposal.aliasScope === "global_alias" &&
+  const shouldAssignReference =
+    proposal.referenceScope === "global_alias" &&
     (proposal.proposalType === "create_new" ||
       proposal.suggestedBottleId === bottleId);
-  const aliasResult = shouldAssignAlias
-    ? await assignBottleAliasInTransaction(tx, {
+  const referenceResult = shouldAssignReference
+    ? await assignBottleReferenceInTransaction(tx, {
         bottleId,
         externalSiteId: proposal.price.externalSiteId,
-        name: normalizeBottleAliasKey(proposal.price.name),
+        name: normalizeBottleReferenceKey(proposal.price.name),
         backfillNames: [proposal.price.name],
         volume: proposal.price.volume,
         ignored: false,
@@ -1799,9 +1799,9 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
   });
 
   return {
-    aliasResult,
+    referenceResult,
     bottleImageCandidate:
-      aliasResult === null && proposal.price.imageUrl
+      referenceResult === null && proposal.price.imageUrl
         ? { bottleId, imageUrl: proposal.price.imageUrl }
         : null,
   };
@@ -1813,8 +1813,8 @@ async function finalizeStorePriceApproval(
   >,
   bottleId: number,
 ) {
-  if (approval.aliasResult) {
-    await finalizeBottleAliasAssignment(approval.aliasResult, {
+  if (approval.referenceResult) {
+    await finalizeBottleReferenceAssignment(approval.referenceResult, {
       bottle: { id: bottleId },
     });
     return;

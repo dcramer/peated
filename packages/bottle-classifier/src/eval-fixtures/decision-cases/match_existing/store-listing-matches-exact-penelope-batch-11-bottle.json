@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
+        "reference": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
         "brand": "Penelope",
         "bottler": null,
         "series": null,
@@ -42,7 +42,7 @@
         "fullName": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Penelope",
         "bottler": null,
         "series": null,

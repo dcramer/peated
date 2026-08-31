@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Lagavulin",
         "bottler": null,
         "series": null,
@@ -42,7 +42,7 @@
         "fullName": "Lagavulin Distillers Edition"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "Lagavulin",
         "bottler": null,
         "series": null,

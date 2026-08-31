@@ -9,7 +9,7 @@ import {
 
 const candidate: BottleCandidate = {
   bottleId: 45146,
-  alias: "Laphroaig Cairdeas 2022",
+  reference: "Laphroaig Cairdeas 2022",
   fullName: "Laphroaig Càirdeas 2022 Warehouse 1",
   brand: "Laphroaig",
   bottler: null,

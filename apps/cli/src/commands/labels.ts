@@ -1,5 +1,5 @@
 import program from "@peated/cli/program";
-import { listUnmatchedBottleAliasNames } from "@peated/server/lib/bottleAliases";
+import { listUnmatchedBottleReferenceNames } from "@peated/server/lib/bottleReferences";
 
 const subcommand = program.command("labels");
 
@@ -10,7 +10,10 @@ subcommand.command("dump-unmatched").action(async () => {
   let offset = 0;
   while (hasResults) {
     hasResults = false;
-    const names = await listUnmatchedBottleAliasNames({ limit: step, offset });
+    const names = await listUnmatchedBottleReferenceNames({
+      limit: step,
+      offset,
+    });
     for (const name of names) {
       process.stdout.write(`${name}\n`);
       hasResults = true;

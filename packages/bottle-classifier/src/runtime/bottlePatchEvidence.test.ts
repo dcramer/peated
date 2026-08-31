@@ -40,7 +40,7 @@ function bottleContext({
       outturn: 180,
     },
     siblings: [],
-    aliases: [],
+    references: [],
     observations:
       observationAbv === undefined
         ? []

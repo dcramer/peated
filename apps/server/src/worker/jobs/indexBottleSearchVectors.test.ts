@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, bottles } from "@peated/server/db/schema";
+import { bottleReferences, bottles } from "@peated/server/db/schema";
+import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
@@ -51,22 +52,26 @@ describe("indexBottleSearchVectors", () => {
     const unrelatedBottle = await fixtures.Bottle({
       name: "Unrelated Expression",
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Authoritative Alias Aurora",
       bottleId: bottle.id,
       ignored: false,
     });
     await fixtures.BottleAlias({
+      name: "Displayed Market Comet",
+      bottleId: bottle.id,
+    });
+    await fixtures.BottleReference({
       name: "Direct Alias Quasar",
       bottleId: bottle.id,
       ignored: false,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Ignored Exact Nebula",
       bottleId: bottle.id,
       ignored: true,
     });
-    await fixtures.BottleAlias({
+    await fixtures.BottleReference({
       name: "Foreign Direct Pulsar",
       bottleId: unrelatedBottle.id,
       ignored: false,
@@ -97,6 +102,12 @@ describe("indexBottleSearchVectors", () => {
     expect(await searchVectorMatches(bottle.id, "Direct Alias Quasar")).toBe(
       true,
     );
+    expect(await searchVectorMatches(bottle.id, "Displayed Market Comet")).toBe(
+      true,
+    );
+    await expect(
+      findBottleReferenceAssignment("Displayed Market Comet"),
+    ).resolves.toBeNull();
     expect(await searchVectorMatches(bottle.id, "Ignored Exact Nebula")).toBe(
       false,
     );
@@ -105,9 +116,9 @@ describe("indexBottleSearchVectors", () => {
     );
     expect(
       await db
-        .select({ name: bottleAliases.name })
-        .from(bottleAliases)
-        .where(eq(bottleAliases.bottleId, bottle.id)),
+        .select({ name: bottleReferences.name })
+        .from(bottleReferences)
+        .where(eq(bottleReferences.bottleId, bottle.id)),
     ).toEqual(
       expect.arrayContaining([
         { name: "Authoritative Alias Aurora" },

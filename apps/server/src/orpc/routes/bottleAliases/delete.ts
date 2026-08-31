@@ -1,144 +1,45 @@
-import { db } from "@peated/server/db";
 import {
-  bottleAliases,
-  bottles,
-  externalReviews,
-  storePrices,
-} from "@peated/server/db/schema";
+  BottleAliasBottleNotFoundError,
+  deleteBottleAlias,
+} from "@peated/server/lib/bottleAliases";
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushJob } from "@peated/server/worker/client";
-import { and, eq, sql } from "drizzle-orm";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { z } from "zod";
 
 export default procedure
   .use(requireMod)
   .route({
     method: "DELETE",
-    path: "/bottle-aliases/{alias}",
-    summary: "Delete bottle alias",
+    path: "/bottles/{bottle}/aliases/{alias}",
+    summary: "Delete a Bottle alias",
     description:
-      "Unassign one Bottle alias and clear matching direct Bottle references. Cannot delete canonical names. Requires moderator privileges",
+      "Delete one displayed Bottle alias. Requires moderator privileges.",
     operationId: "deleteBottleAlias",
   })
-  .input(z.object({ alias: z.string() }).strict())
+  .input(
+    z.object({
+      bottle: z.coerce.number().int().positive(),
+      alias: z.coerce.number().int().positive(),
+    }),
+  )
   .output(z.object({}))
-  .handler(async function ({ input, errors }) {
-    const { aliasName, bottleId } = await db.transaction(async (tx) => {
-      const [alias] = await tx
-        .select({
-          name: bottleAliases.name,
-          bottleId: bottleAliases.bottleId,
-          ignored: bottleAliases.ignored,
-          assignmentSource: bottleAliases.assignmentSource,
-          assignedByActorId: bottleAliases.assignedByActorId,
-        })
-        .from(bottleAliases)
-        .where(eq(sql`LOWER(${bottleAliases.name})`, input.alias.toLowerCase()))
-        .limit(1);
-
-      if (!alias) {
-        throw errors.NOT_FOUND({
-          message: "Bottle Alias not found.",
-        });
-      }
-      if (alias.bottleId === null) {
-        throw errors.CONFLICT({
-          message: "Bottle Alias is not assigned to a Bottle.",
-        });
-      }
-      const aliasBottleId = alias.bottleId;
-
-      const [bottle] = await tx
-        .select()
-        .from(bottles)
-        .where(eq(bottles.id, aliasBottleId))
-        .limit(1)
-        .for("update");
-      if (!bottle) {
-        throw errors.CONFLICT({
-          message: "Bottle Alias points to a missing Bottle.",
-        });
-      }
-      if (alias.name.toLowerCase() === bottle.fullName.toLowerCase()) {
-        throw errors.BAD_REQUEST({
-          message: "Cannot delete canonical name",
-        });
-      }
-
-      await tx
-        .update(storePrices)
-        .set({ bottleId: null })
-        .where(
-          and(
-            eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()),
-            eq(storePrices.bottleId, bottle.id),
-          ),
-        );
-      await tx
-        .update(externalReviews)
-        .set({ bottleId: null })
-        .where(
-          and(
-            eq(sql`LOWER(${externalReviews.name})`, alias.name.toLowerCase()),
-            eq(externalReviews.bottleId, bottle.id),
-          ),
-        );
-
-      // A concurrent alias retarget must roll back the earlier consumer clears.
-      const [clearedAlias] = await tx
-        .update(bottleAliases)
-        .set({ bottleId: null, embedding: null })
-        .where(
-          and(
-            eq(bottleAliases.name, alias.name),
-            sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
-            sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
-            sql`${bottleAliases.assignmentSource} IS NOT DISTINCT FROM ${alias.assignmentSource}`,
-            sql`${bottleAliases.assignedByActorId} IS NOT DISTINCT FROM ${alias.assignedByActorId}`,
-          ),
-        )
-        .returning({ name: bottleAliases.name });
-      if (!clearedAlias) {
-        throw errors.CONFLICT({
-          message:
-            "Bottle Alias changed while it was being unassigned. Retry the operation.",
-        });
-      }
-
-      return { aliasName: alias.name, bottleId: bottle.id };
-    });
-
+  .handler(async ({ input, errors }) => {
     try {
-      await pushJob("IndexBottleAlias", { name: aliasName });
+      await deleteBottleAlias({ bottleId: input.bottle, aliasId: input.alias });
+      try {
+        await pushUniqueJob("IndexBottleSearchVectors", {
+          bottleId: input.bottle,
+        });
+      } catch (error) {
+        logError(error, { bottle: { id: input.bottle } });
+      }
+      return {};
     } catch (error) {
-      logError(error, {
-        contexts: {
-          bottle: { id: bottleId },
-          bottleAlias: { name: input.alias },
-        },
-        extra: {
-          operation: "deleteBottleAlias",
-          job: "IndexBottleAlias",
-        },
-      });
+      if (error instanceof BottleAliasBottleNotFoundError) {
+        throw errors.NOT_FOUND({ message: "Bottle name not found." });
+      }
+      throw error;
     }
-
-    try {
-      await pushJob("IndexBottleSearchVectors", { bottleId });
-    } catch (error) {
-      logError(error, {
-        contexts: {
-          bottle: { id: bottleId },
-          bottleAlias: { name: input.alias },
-        },
-        extra: {
-          operation: "deleteBottleAlias",
-          job: "IndexBottleSearchVectors",
-        },
-      });
-    }
-
-    return {};
   });

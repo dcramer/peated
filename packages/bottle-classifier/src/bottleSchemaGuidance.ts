@@ -7,6 +7,6 @@ export const BOTTLE_SCHEMA_RULES = {
     "The year fields mean different things. `vintageYear` is the distillation year. `bottlingYear` is the year the whisky was bottled. `releaseYear` is the year the release became available. Set `releaseMonth` and `releaseDay` only when the source gives them. A different bottling year alone does not prove that it is a different Bottle. If a source gives a year without explaining it, use the label wording and related Bottles to decide. If the meaning is still unclear, leave the year fields empty. Never calculate `statedAge` from year fields. Set it only when the product states the age.",
   observationPolicy:
     "Use `observation` for a source cask number, barrel number, or selector name when it does not identify the marketed Bottle. A source bottle number is evidence only. Do not put it in `edition` unless evidence identifies it as a marketed release descriptor.",
-  aliasPolicy:
-    "Retailer listing aliases are evidence for the exact Bottle only when they safely identify that marketed product. Removing retailer, package, condition, or other source noise does not make the original label a reusable global alias.",
+  referencePolicy:
+    "Retailer listing references are evidence for the exact Bottle only when they safely identify that marketed product. Removing retailer, package, condition, or other source noise does not make the original label a reusable global reference.",
 } as const;

@@ -7,7 +7,7 @@ import {
   ProposedBottleFields,
 } from "./classifierTypes";
 
-export const MAX_BOTTLE_CONTEXT_ALIASES = 12;
+export const MAX_BOTTLE_CONTEXT_REFERENCES = 12;
 export const MAX_BOTTLE_CONTEXT_SIBLINGS = 12;
 export const MAX_BOTTLE_CONTEXT_OBSERVATIONS = 8;
 export const MAX_BOTTLE_CONTEXT_IMAGES = 3;
@@ -122,7 +122,7 @@ export const BottleContextObservationSchema = z
   })
   .strict();
 
-export const BottleContextAliasSchema = z
+export const BottleContextReferenceSchema = z
   .object({
     name: NonEmptyTextSchema,
     ignored: z.boolean(),
@@ -168,7 +168,9 @@ const BottleContextBaseSchema = z
     siblings: z
       .array(BottleContextSiblingSchema)
       .max(MAX_BOTTLE_CONTEXT_SIBLINGS),
-    aliases: z.array(BottleContextAliasSchema).max(MAX_BOTTLE_CONTEXT_ALIASES),
+    references: z
+      .array(BottleContextReferenceSchema)
+      .max(MAX_BOTTLE_CONTEXT_REFERENCES),
     observations: z
       .array(BottleContextObservationSchema)
       .max(MAX_BOTTLE_CONTEXT_OBSERVATIONS),
@@ -224,7 +226,9 @@ export type BottleContextSibling = z.infer<typeof BottleContextSiblingSchema>;
 export type BottleContextObservation = z.infer<
   typeof BottleContextObservationSchema
 >;
-export type BottleContextAlias = z.infer<typeof BottleContextAliasSchema>;
+export type BottleContextReference = z.infer<
+  typeof BottleContextReferenceSchema
+>;
 export type BottleContextImageSource = z.infer<
   typeof BottleContextImageSourceSchema
 >;

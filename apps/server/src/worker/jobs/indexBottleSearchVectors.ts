@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReferences,
   bottleSeries,
   bottles,
   bottlesToDistillers,
@@ -26,17 +27,22 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
   });
   if (!bottle) return;
 
-  const aliasList = await db
+  const referenceList = await db
     .select({
-      name: bottleAliases.name,
+      name: bottleReferences.name,
     })
-    .from(bottleAliases)
+    .from(bottleReferences)
     .where(
       and(
-        eq(bottleAliases.bottleId, bottle.id),
-        sql`${bottleAliases.ignored} IS NOT TRUE`,
+        eq(bottleReferences.bottleId, bottle.id),
+        sql`${bottleReferences.ignored} IS NOT TRUE`,
       ),
     );
+
+  const aliasList = await db
+    .select({ name: bottleAliases.name })
+    .from(bottleAliases)
+    .where(eq(bottleAliases.bottleId, bottle.id));
 
   const distillerList = await db
     .select({
@@ -70,7 +76,7 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
     buildBottleSearchVector(
       bottle,
       brand,
-      aliasList,
+      [...referenceList, ...aliasList],
       bottler,
       distillerList,
       series,

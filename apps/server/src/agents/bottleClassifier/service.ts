@@ -1,6 +1,6 @@
 import type {
   AuditBottleInput,
-  BottleReference,
+  BottleReferenceInput,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
 import { AuditBottleInputSchema } from "@peated/bottle-classifier/contract";
@@ -43,8 +43,8 @@ async function searchBottleClassifierEntities(args: SearchEntitiesArgs) {
 }
 
 function normalizeReferenceForClassifier(
-  reference: BottleReference,
-): BottleReference {
+  reference: BottleReferenceInput,
+): BottleReferenceInput {
   if (!reference.imageUrl) {
     return reference;
   }
@@ -57,7 +57,7 @@ function normalizeReferenceForClassifier(
 
 function buildReferenceConversationId(
   prefix: string,
-  reference: BottleReference,
+  reference: BottleReferenceInput,
   conversationId?: string,
 ) {
   const explicitConversationId = conversationId?.trim();

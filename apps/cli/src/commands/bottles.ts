@@ -1,8 +1,8 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroups,
+  bottleReferences,
   bottles,
   bottleTombstones,
   entities,
@@ -10,6 +10,11 @@ import {
   externalReviewPublications,
   externalReviews,
 } from "@peated/server/db/schema";
+import {
+  assertBottleReferenceMigrationReportsMatch,
+  getBottleReferenceMigrationReport,
+  parseBottleReferenceMigrationReport,
+} from "@peated/server/lib/bottleReferenceMigrationAudit";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
 import { fixBadExternalReviewEntities } from "@peated/server/lib/fixBadExternalReviewEntities";
@@ -18,6 +23,7 @@ import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
 import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
+import { readFile } from "node:fs/promises";
 
 const subcommand = program.command("bottles");
 
@@ -217,16 +223,20 @@ subcommand
   });
 
 subcommand
-  .command("index-aliases")
-  .description("Rebuild exact alias embeddings and clear ineligible aliases")
+  .command("index-references")
+  .description(
+    "Rebuild exact reference embeddings and clear ineligible references",
+  )
   .option("--only-missing")
   .action(async (options) => {
     const step = 1000;
     const baseQuery = db
-      .select({ name: bottleAliases.name })
-      .from(bottleAliases)
-      .where(options.onlyMissing ? isNull(bottleAliases.embedding) : undefined)
-      .orderBy(asc(bottleAliases.createdAt));
+      .select({ name: bottleReferences.name })
+      .from(bottleReferences)
+      .where(
+        options.onlyMissing ? isNull(bottleReferences.embedding) : undefined,
+      )
+      .orderBy(asc(bottleReferences.createdAt));
 
     let hasResults = true;
     let offset = 0;
@@ -234,12 +244,35 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { name } of query) {
-        console.log(`Indexing embeddings for alias ${name}.`);
-        await runJob("IndexBottleAlias", { name });
+        console.log(`Indexing embeddings for reference ${name}.`);
+        await runJob("IndexBottleReference", { name });
         hasResults = true;
       }
       offset += step;
     }
+  });
+
+subcommand
+  .command("reference-migration-report")
+  .description(
+    "Report BottleReference identity before or after the table cutover",
+  )
+  .requiredOption("--phase <phase>", "preflight or postflight")
+  .option("--expected <path>", "Preflight JSON to verify during postflight")
+  .action(async (options: { phase: string; expected?: string }) => {
+    if (options.phase !== "preflight" && options.phase !== "postflight") {
+      throw new Error("Phase must be preflight or postflight.");
+    }
+    const report = await getBottleReferenceMigrationReport({
+      storage: options.phase === "preflight" ? "legacy_alias" : "reference",
+    });
+    if (options.expected) {
+      const expected = parseBottleReferenceMigrationReport(
+        await readFile(options.expected, "utf8"),
+      );
+      assertBottleReferenceMigrationReportsMatch(expected, report);
+    }
+    console.log(JSON.stringify(report, null, 2));
   });
 
 subcommand

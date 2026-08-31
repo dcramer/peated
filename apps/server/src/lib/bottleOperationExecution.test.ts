@@ -83,7 +83,7 @@ function artifacts({
         outturn: null,
       },
       siblings: [],
-      aliases: [],
+      references: [],
       observations: [],
       publicImages: [],
     })),

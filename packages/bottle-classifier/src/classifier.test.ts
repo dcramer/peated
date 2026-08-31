@@ -248,7 +248,7 @@ const blantonsOriginalIdentity: BottleExtractedDetails = {
 
 const rareBreedNearMatch: BottleCandidate = {
   bottleId: 7,
-  alias: null,
+  reference: null,
   fullName: "Wild Turkey Rare Breed Barrel Proof",
   brand: "Wild Turkey",
   bottler: null,
@@ -271,7 +271,7 @@ const rareBreedNearMatch: BottleCandidate = {
 
 const elijahCraigBarrelProofCandidate: BottleCandidate = {
   bottleId: 620,
-  alias: null,
+  reference: null,
   fullName: "Elijah Craig Barrel Proof",
   brand: "Elijah Craig",
   bottler: null,
@@ -294,7 +294,7 @@ const elijahCraigBarrelProofCandidate: BottleCandidate = {
 
 const glenglassaughRareCaskCandidate: BottleCandidate = {
   bottleId: 2457,
-  alias: null,
+  reference: null,
   fullName: "Glenglassaugh 1978 Rare Cask Release",
   brand: "Glenglassaugh",
   bottler: null,
@@ -317,7 +317,7 @@ const glenglassaughRareCaskCandidate: BottleCandidate = {
 
 const macallanSherryOakCandidate: BottleCandidate = {
   bottleId: 54082,
-  alias: null,
+  reference: null,
   fullName: "The Macallan Sherry Oak",
   brand: "The Macallan",
   bottler: null,
@@ -340,7 +340,7 @@ const macallanSherryOakCandidate: BottleCandidate = {
 
 const macallanSherryOakLegacy30Candidate: BottleCandidate = {
   bottleId: 54083,
-  alias: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+  reference: "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
   fullName: "The Macallan Sherry Oak 30-year-old",
   brand: "The Macallan",
   bottler: null,
@@ -363,7 +363,7 @@ const macallanSherryOakLegacy30Candidate: BottleCandidate = {
 
 const tomatinLegacy12Candidate: BottleCandidate = {
   bottleId: 65001,
-  alias: "Tomatin Single Malt 12-year-old",
+  reference: "Tomatin Single Malt 12-year-old",
   fullName: "Tomatin 12-year-old",
   brand: "Tomatin",
   bottler: null,
@@ -386,7 +386,7 @@ const tomatinLegacy12Candidate: BottleCandidate = {
 
 const tomatinCaskStrengthCandidate: BottleCandidate = {
   bottleId: 65002,
-  alias: null,
+  reference: null,
   fullName: "Tomatin Cask Strength",
   brand: "Tomatin",
   bottler: null,
@@ -409,7 +409,7 @@ const tomatinCaskStrengthCandidate: BottleCandidate = {
 
 const tomatinBourbonAndSherryCasksCandidate: BottleCandidate = {
   bottleId: 65003,
-  alias: null,
+  reference: null,
   fullName: "Tomatin 12-year-old Bourbon & Sherry Casks",
   brand: "Tomatin",
   bottler: null,
@@ -432,7 +432,7 @@ const tomatinBourbonAndSherryCasksCandidate: BottleCandidate = {
 
 const penelopeBarrelStrengthCandidate: BottleCandidate = {
   bottleId: 54068,
-  alias: null,
+  reference: null,
   fullName: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey",
   brand: "Penelope",
   bottler: null,
@@ -455,7 +455,8 @@ const penelopeBarrelStrengthCandidate: BottleCandidate = {
 
 const penelopeLegacyBatch11Candidate: BottleCandidate = {
   bottleId: 54069,
-  alias: "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
+  reference:
+    "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
   fullName:
     "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
   brand: "Penelope",
@@ -479,7 +480,7 @@ const penelopeLegacyBatch11Candidate: BottleCandidate = {
 
 const taleOfIceCreamCandidate: BottleCandidate = {
   bottleId: 43236,
-  alias: null,
+  reference: null,
   fullName: "Glenmorangie A Tale of Ice Cream",
   brand: "Glenmorangie",
   bottler: null,
@@ -502,7 +503,7 @@ const taleOfIceCreamCandidate: BottleCandidate = {
 
 const ledaigStiuireadairCandidate: BottleCandidate = {
   bottleId: 41258,
-  alias: "Ledaig Stiuireadair",
+  reference: "Ledaig Stiuireadair",
   fullName: "Ledaig Stiuireadair",
   brand: "Ledaig",
   bottler: null,
@@ -525,7 +526,7 @@ const ledaigStiuireadairCandidate: BottleCandidate = {
 
 const ledaigStiuiredairNearDuplicateCandidate: BottleCandidate = {
   bottleId: 41259,
-  alias: "Ledaig Stiuiredair",
+  reference: "Ledaig Stiuiredair",
   fullName: "Ledaig Stiuiredair",
   brand: "Ledaig",
   bottler: null,
@@ -548,7 +549,7 @@ const ledaigStiuiredairNearDuplicateCandidate: BottleCandidate = {
 
 const jura12YearOldCandidate: BottleCandidate = {
   bottleId: 3233,
-  alias: null,
+  reference: null,
   fullName: "Isle of Jura 12-year-old Single Malt Scotch Whisky",
   brand: "Jura",
   bottler: null,
@@ -571,7 +572,7 @@ const jura12YearOldCandidate: BottleCandidate = {
 
 const juraElixirCandidate: BottleCandidate = {
   bottleId: 4306,
-  alias: null,
+  reference: null,
   fullName: "Jura Elixir",
   brand: "Jura",
   bottler: null,
@@ -594,7 +595,7 @@ const juraElixirCandidate: BottleCandidate = {
 
 const juraSherryCaskCandidate: BottleCandidate = {
   bottleId: 3234,
-  alias: null,
+  reference: null,
   fullName: "Jura 12-year-old Sherry Cask Single Malt Scotch Whisky",
   brand: "Jura",
   bottler: null,
@@ -617,7 +618,7 @@ const juraSherryCaskCandidate: BottleCandidate = {
 
 const canadianClubReserve9YearOldCandidate: BottleCandidate = {
   bottleId: 16913,
-  alias: null,
+  reference: null,
   fullName: "Canadian Club Reserve 9-year-old Triple Aged",
   brand: "Canadian",
   bottler: null,
@@ -640,7 +641,7 @@ const canadianClubReserve9YearOldCandidate: BottleCandidate = {
 
 const canadianClubReserve40Candidate: BottleCandidate = {
   bottleId: 17346,
-  alias: null,
+  reference: null,
   fullName: "Canadian Club Reserve, 40% ABV",
   brand: "Canadian",
   bottler: null,
@@ -663,7 +664,7 @@ const canadianClubReserve40Candidate: BottleCandidate = {
 
 const redbreastBatchACandidate: BottleCandidate = {
   bottleId: 9101,
-  alias: null,
+  reference: null,
   fullName: "Redbreast Small Batch Cask Strength Batch A",
   brand: "Redbreast",
   bottler: null,
@@ -686,7 +687,7 @@ const redbreastBatchACandidate: BottleCandidate = {
 
 const springbank10YearOldCandidate: BottleCandidate = {
   bottleId: 11,
-  alias: "Springbank 10-year-old",
+  reference: "Springbank 10-year-old",
   fullName: "Springbank 10-year-old",
   brand: "Springbank",
   bottler: null,
@@ -728,7 +729,7 @@ const springbank10YearOldIdentity: BottleExtractedDetails = {
 
 const cadbollEstateBaseCandidate: BottleCandidate = {
   bottleId: 13442,
-  alias: null,
+  reference: null,
   fullName: "Glenmorangie 15-year-old The Cadboll Estate",
   brand: "Glenmorangie",
   bottler: null,
@@ -751,7 +752,7 @@ const cadbollEstateBaseCandidate: BottleCandidate = {
 
 const cadbollEstateLegacyBatch4Candidate: BottleCandidate = {
   bottleId: 43034,
-  alias: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+  reference: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
   fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
   brand: "Glenmorangie",
   bottler: null,
@@ -774,7 +775,7 @@ const cadbollEstateLegacyBatch4Candidate: BottleCandidate = {
 
 const cadbollEstateLegacyBatch2Candidate: BottleCandidate = {
   bottleId: 12900,
-  alias: null,
+  reference: null,
   fullName: "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)",
   brand: "Glenmorangie",
   bottler: null,
@@ -797,7 +798,7 @@ const cadbollEstateLegacyBatch2Candidate: BottleCandidate = {
 
 const glengoyneLegacySeriesChapterTwoCandidate: BottleCandidate = {
   bottleId: 2083,
-  alias: null,
+  reference: null,
   fullName: "Glengoyne The Legacy Series Chapter Two",
   brand: "Glengoyne",
   bottler: null,
@@ -820,7 +821,7 @@ const glengoyneLegacySeriesChapterTwoCandidate: BottleCandidate = {
 
 const glengoyneLegacySeriesChapterOneCandidate: BottleCandidate = {
   bottleId: 2460,
-  alias: null,
+  reference: null,
   fullName: "Glengoyne The Legacy Series Chapter One",
   brand: "Glengoyne",
   bottler: null,
@@ -843,7 +844,7 @@ const glengoyneLegacySeriesChapterOneCandidate: BottleCandidate = {
 
 const cadbollEstateBatch4Candidate: BottleCandidate = {
   bottleId: 13442,
-  alias: null,
+  reference: null,
   fullName: "Glenmorangie 15-year-old The Cadboll Estate - Batch 4",
   brand: "Glenmorangie",
   bottler: null,
@@ -866,7 +867,7 @@ const cadbollEstateBatch4Candidate: BottleCandidate = {
 
 const lagavulinDistillersEditionBaseCandidate: BottleCandidate = {
   bottleId: 44006,
-  alias: null,
+  reference: null,
   fullName: "Lagavulin Distillers Edition",
   brand: "Lagavulin",
   bottler: null,
@@ -889,7 +890,7 @@ const lagavulinDistillersEditionBaseCandidate: BottleCandidate = {
 
 const lagavulinDistillersEdition2023Candidate: BottleCandidate = {
   bottleId: 44006,
-  alias: null,
+  reference: null,
   fullName: "Lagavulin Distillers Edition 2023 Release",
   brand: "Lagavulin",
   bottler: null,
@@ -912,7 +913,7 @@ const lagavulinDistillersEdition2023Candidate: BottleCandidate = {
 
 const lagavulinDistillersEdition2023SpringCandidate: BottleCandidate = {
   bottleId: 44006,
-  alias: null,
+  reference: null,
   fullName: "Lagavulin Distillers Edition 2023 Spring Release",
   brand: "Lagavulin",
   bottler: null,
@@ -935,7 +936,7 @@ const lagavulinDistillersEdition2023SpringCandidate: BottleCandidate = {
 
 const lagavulinDistillersEdition2023AutumnCandidate: BottleCandidate = {
   bottleId: 44006,
-  alias: null,
+  reference: null,
   fullName: "Lagavulin Distillers Edition 2023 Autumn Release",
   brand: "Lagavulin",
   bottler: null,
@@ -2472,7 +2473,7 @@ describe("createBottleClassifier", () => {
   test("keeps a matched bottle when the only name difference is a canonical proof suffix", async () => {
     const rareBreedRyeMatch: BottleCandidate = {
       bottleId: 501,
-      alias: null,
+      reference: null,
       fullName: "Wild Turkey Rare Breed Rye Barrel Proof",
       brand: "Wild Turkey",
       bottler: null,
@@ -2539,7 +2540,7 @@ describe("createBottleClassifier", () => {
   test("moves an auto-verification match to review when the decision reports unresolved risks", async () => {
     const rareBreedRyeMatch: BottleCandidate = {
       bottleId: 501,
-      alias: null,
+      reference: null,
       fullName: "Wild Turkey Rare Breed Rye Barrel Proof",
       brand: "Wild Turkey",
       bottler: null,
@@ -2614,7 +2615,7 @@ describe("createBottleClassifier", () => {
   test("moves an auto-verification match to review when replacing a current assignment", async () => {
     const rareBreedRyeMatch: BottleCandidate = {
       bottleId: 501,
-      alias: null,
+      reference: null,
       fullName: "Wild Turkey Rare Breed Rye Barrel Proof",
       brand: "Wild Turkey",
       bottler: null,
@@ -2777,7 +2778,7 @@ describe("createBottleClassifier", () => {
       async (): Promise<ReasoningResult> => ({
         decision: {
           action: "match",
-          rationale: "The local alias is an exact wording match.",
+          rationale: "The local reference is an exact wording match.",
           identityScope: "product",
           observation: null,
           matchedBottleId: 11,
@@ -4690,7 +4691,7 @@ describe("createBottleClassifier", () => {
   test("passes a deterministic SMWS match through the agent as an identity anchor", async () => {
     const existingSmwsBottle: BottleCandidate = {
       bottleId: 6505,
-      alias: "SMWS RW6.5 Appley ever after",
+      reference: "SMWS RW6.5 Appley ever after",
       fullName: "SMWS RW6.5 Appley ever after",
       brand: "SMWS",
       bottler: "The Scotch Malt Whisky Society",
@@ -4882,7 +4883,7 @@ describe("createBottleClassifier", () => {
     };
     const shibuiGrainSelectCandidate: BottleCandidate = {
       bottleId: 13025,
-      alias: "Shibui Grain Select",
+      reference: "Shibui Grain Select",
       fullName: "Shibui Grain Select",
       brand: "Shibui",
       bottler: null,
@@ -4970,7 +4971,7 @@ describe("createBottleClassifier", () => {
     };
     const currentBottleCandidate: BottleCandidate = {
       bottleId: 1201,
-      alias: "The Whistler Bodega Cask",
+      reference: "The Whistler Bodega Cask",
       fullName: "The Whistler Bodega Cask",
       brand: "The Whistler",
       bottler: null,

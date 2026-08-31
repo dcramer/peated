@@ -529,7 +529,7 @@ function renderSchemaRules() {
     BOTTLE_SCHEMA_RULES.bottleIdentity,
     BOTTLE_SCHEMA_RULES.exactBottleIdentity,
     BOTTLE_SCHEMA_RULES.observationPolicy,
-    BOTTLE_SCHEMA_RULES.aliasPolicy,
+    BOTTLE_SCHEMA_RULES.referencePolicy,
   ]);
 }
 

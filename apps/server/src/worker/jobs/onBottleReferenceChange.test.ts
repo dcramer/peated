@@ -8,21 +8,21 @@ import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { JobPayload } from "../types";
 import {
-  onBottleAliasChange as onBottleAliasChangeWithServices,
-  type OnBottleAliasChangeServices,
-} from "./onBottleAliasChange";
+  onBottleReferenceChange as onBottleReferenceChangeWithServices,
+  type OnBottleReferenceChangeServices,
+} from "./onBottleReferenceChange";
 
-let runAliasIndex: ReturnType<
-  typeof vi.fn<OnBottleAliasChangeServices["runAliasIndex"]>
+let runReferenceIndex: ReturnType<
+  typeof vi.fn<OnBottleReferenceChangeServices["runReferenceIndex"]>
 >;
 
-function onBottleAliasChange(input: JobPayload) {
-  return onBottleAliasChangeWithServices(input, { runAliasIndex });
+function onBottleReferenceChange(input: JobPayload) {
+  return onBottleReferenceChangeWithServices(input, { runReferenceIndex });
 }
 
-describe("onBottleAliasChange", () => {
+describe("onBottleReferenceChange", () => {
   beforeEach(() => {
-    runAliasIndex = vi.fn();
+    runReferenceIndex = vi.fn();
   });
 
   test("replays one active Bottle assignment without overwriting direct consumers", async ({
@@ -30,31 +30,31 @@ describe("onBottleAliasChange", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
+    const reference = await fixtures.BottleReference({
       bottleId: bottle.id,
-      name: "Direct Bottle Worker Alias",
+      name: "Direct Bottle Worker Reference",
     });
     const unresolvedReview = await fixtures.ExternalReview({
       bottleId: null,
-      name: alias.name,
+      name: reference.name,
     });
     const unresolvedPrice = await fixtures.StorePrice({
       bottleId: null,
-      name: alias.name,
+      name: reference.name,
     });
     const assignedReview = await fixtures.ExternalReview({
       bottleId: otherBottle.id,
-      name: alias.name,
+      name: reference.name,
       issue: "Independent assignment",
     });
     const assignedPrice = await fixtures.StorePrice({
       bottleId: otherBottle.id,
-      name: alias.name,
+      name: reference.name,
       volume: 1_000,
     });
 
-    await onBottleAliasChange({ name: alias.name.toUpperCase() });
-    await onBottleAliasChange({ name: alias.name });
+    await onBottleReferenceChange({ name: reference.name.toUpperCase() });
+    await onBottleReferenceChange({ name: reference.name });
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -76,22 +76,22 @@ describe("onBottleAliasChange", () => {
         where: eq(storePrices.id, assignedPrice.id),
       }),
     ).toMatchObject({ bottleId: otherBottle.id });
-    expect(runAliasIndex).toHaveBeenCalledTimes(2);
-    expect(runAliasIndex).toHaveBeenLastCalledWith(alias.name);
+    expect(runReferenceIndex).toHaveBeenCalledTimes(2);
+    expect(runReferenceIndex).toHaveBeenLastCalledWith(reference.name);
   });
 
   test("does not propagate ignored or unbound aliases", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const ignoredAlias = await fixtures.BottleAlias({
+    const ignoredAlias = await fixtures.BottleReference({
       bottleId: bottle.id,
       ignored: true,
-      name: "Ignored Worker Alias",
+      name: "Ignored Worker Reference",
     });
-    const unboundAlias = await fixtures.BottleAlias({
+    const unboundAlias = await fixtures.BottleReference({
       bottleId: null,
-      name: "Unbound Worker Alias",
+      name: "Unbound Worker Reference",
     });
     const ignoredReview = await fixtures.ExternalReview({
       bottleId: null,
@@ -102,8 +102,8 @@ describe("onBottleAliasChange", () => {
       name: unboundAlias.name,
     });
 
-    await onBottleAliasChange({ name: ignoredAlias.name });
-    await onBottleAliasChange({ name: unboundAlias.name });
+    await onBottleReferenceChange({ name: ignoredAlias.name });
+    await onBottleReferenceChange({ name: unboundAlias.name });
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -115,8 +115,8 @@ describe("onBottleAliasChange", () => {
         where: eq(storePrices.id, unboundPrice.id),
       }),
     ).toMatchObject({ bottleId: null });
-    expect(runAliasIndex).toHaveBeenNthCalledWith(1, ignoredAlias.name);
-    expect(runAliasIndex).toHaveBeenNthCalledWith(2, unboundAlias.name);
+    expect(runReferenceIndex).toHaveBeenNthCalledWith(1, ignoredAlias.name);
+    expect(runReferenceIndex).toHaveBeenNthCalledWith(2, unboundAlias.name);
   });
 
   test("does not propagate a retired Bottle assignment", async ({
@@ -124,33 +124,33 @@ describe("onBottleAliasChange", () => {
   }) => {
     const retiredBottle = await fixtures.Bottle();
     const replacementBottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
+    const reference = await fixtures.BottleReference({
       bottleId: retiredBottle.id,
-      name: "Retired Bottle Worker Alias",
+      name: "Retired Bottle Worker Reference",
     });
     const review = await fixtures.ExternalReview({
       bottleId: null,
-      name: alias.name,
+      name: reference.name,
     });
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: replacementBottle.id,
     });
 
-    await onBottleAliasChange({ name: alias.name });
+    await onBottleReferenceChange({ name: reference.name });
 
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({ bottleId: null });
-    expect(runAliasIndex).toHaveBeenCalledWith(alias.name);
+    expect(runReferenceIndex).toHaveBeenCalledWith(reference.name);
   });
 
-  test("rejects an unknown alias before scheduling indexing", async () => {
+  test("rejects an unknown reference before scheduling indexing", async () => {
     await expect(
-      onBottleAliasChange({ name: "Unknown Bottle Alias" }),
-    ).rejects.toThrow("Unknown bottle alias: Unknown Bottle Alias");
-    expect(runAliasIndex).not.toHaveBeenCalled();
+      onBottleReferenceChange({ name: "Unknown Bottle Reference" }),
+    ).rejects.toThrow("Unknown bottle reference: Unknown Bottle Reference");
+    expect(runReferenceIndex).not.toHaveBeenCalled();
   });
 });

@@ -85,7 +85,7 @@ const suggestedBottle = {
 
 const localCandidate = {
   bottleId: 19,
-  alias: "Springbank Batch 24",
+  reference: "Springbank Batch 24",
   fullName: "Springbank 12 Cask Strength Batch 24",
   brand: "Springbank",
   bottler: null,

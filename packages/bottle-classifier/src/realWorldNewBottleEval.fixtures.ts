@@ -94,7 +94,7 @@ const singleBarrel1792 = buildBottleCandidate({
 
 const elijahCraigBarrelProof = buildBottleCandidate({
   bottleId: 44014,
-  alias: "Elijah Craig Barrel Proof",
+  reference: "Elijah Craig Barrel Proof",
   fullName: "Elijah Craig Barrel Proof",
   brand: "Elijah Craig",
   category: "bourbon",

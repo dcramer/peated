@@ -1,9 +1,9 @@
 import type { ProposedOperation } from "@peated/bottle-classifier";
 import type { AnyDatabase } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleFlavorProfiles,
   bottleObservations,
+  bottleReferences,
   bottleTags,
   bottleTombstones,
   bottles,
@@ -61,7 +61,7 @@ function bottleMergeIdentityState(resource: BottleResource) {
       bottlerId: resource.group.bottlerId,
     },
     exact: bottleExact(resource),
-    aliasDigest: relationshipDigest(resource.aliases),
+    aliasDigest: relationshipDigest(resource.references),
     tombstoneDestinationBottleId: resource.tombstoneDestinationBottleId,
   };
 }
@@ -101,10 +101,10 @@ async function bottleMergeConsumerPreview(
     .from(flightBottles)
     .where(eq(flightBottles.bottleId, sourceBottleId))
     .then(([row]) => row?.total ?? 0);
-  const aliasCount = await database
+  const referenceCount = await database
     .select({ total: count() })
-    .from(bottleAliases)
-    .where(eq(bottleAliases.bottleId, sourceBottleId))
+    .from(bottleReferences)
+    .where(eq(bottleReferences.bottleId, sourceBottleId))
     .then(([row]) => row?.total ?? 0);
   const collectionCollisions = await database
     .select({
@@ -168,7 +168,7 @@ async function bottleMergeConsumerPreview(
       observations: observationCount,
       collectionMemberships: collectionCount,
       flightMemberships: flightCount,
-      aliases: aliasCount,
+      aliases: referenceCount,
     },
     membershipCollisions: {
       collections: collectionCollisions,
@@ -292,12 +292,12 @@ async function bottleMergeRelationshipState(
     .from(bottleTombstones)
     .where(inArray(bottleTombstones.newBottleId, bottleIds))
     .orderBy(asc(bottleTombstones.bottleId));
-  const [canonicalAlias] = await database
-    .select({ bottleId: bottleAliases.bottleId })
-    .from(bottleAliases)
+  const [canonicalReference] = await database
+    .select({ bottleId: bottleReferences.bottleId })
+    .from(bottleReferences)
     .where(
       eq(
-        sql`LOWER(${bottleAliases.name})`,
+        sql`LOWER(${bottleReferences.name})`,
         source.bottle.fullName.toLowerCase(),
       ),
     )
@@ -316,7 +316,7 @@ async function bottleMergeRelationshipState(
     matchAttempts: matchAttemptRows,
     tags: tagRows,
     flavorProfiles: flavorRows,
-    canonicalAliasBottleId: canonicalAlias?.bottleId ?? null,
+    canonicalAliasBottleId: canonicalReference?.bottleId ?? null,
     incomingTombstones: tombstoneRows.filter(
       (
         row,
@@ -353,16 +353,16 @@ export async function prepareBottleMerge(
     source,
     destination,
   );
-  const canonicalAliasOwnerId = relationships.canonicalAliasBottleId;
+  const canonicalReferenceOwnerId = relationships.canonicalAliasBottleId;
   if (
-    canonicalAliasOwnerId !== null &&
+    canonicalReferenceOwnerId !== null &&
     !relationships.bottles.some(
-      ({ bottleId }) => bottleId === canonicalAliasOwnerId,
+      ({ bottleId }) => bottleId === canonicalReferenceOwnerId,
     )
   ) {
     fail(
       "identity_collision",
-      `Bottle identity "${source.bottle.fullName}" conflicts with an alias assigned to Bottle ${canonicalAliasOwnerId}.`,
+      `Bottle identity "${source.bottle.fullName}" conflicts with a reference assigned to Bottle ${canonicalReferenceOwnerId}.`,
     );
   }
   const collisionTotal =

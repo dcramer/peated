@@ -24,7 +24,7 @@
     "initialCandidates": [
       {
         "bottleId": 13025,
-        "alias": "Shibui Grain Select",
+        "reference": "Shibui Grain Select",
         "fullName": "Shibui Grain Select",
         "brand": "Shibui",
         "bottler": null,
@@ -43,7 +43,7 @@
       },
       {
         "bottleId": 44140,
-        "alias": "Shibui 10-year-old White Oak Cask",
+        "reference": "Shibui 10-year-old White Oak Cask",
         "fullName": "Shibui 10-year-old White Oak Cask",
         "brand": "Shibui",
         "bottler": null,

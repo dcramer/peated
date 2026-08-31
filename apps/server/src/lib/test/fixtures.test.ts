@@ -1,9 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
+  bottleReferences,
   bottlesToDistillers,
   changes,
   externalReviewArticles,
@@ -28,16 +28,16 @@ describe("catalog identity fixtures", () => {
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
     const review = await fixtures.ExternalReview({ bottleId: bottle.id });
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
-    const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
+    const alias = await fixtures.BottleReference({ bottleId: bottle.id });
     const flight = await fixtures.Flight({ bottles: [bottle.id] });
     const [flightBottle, canonicalAlias, reviewArticle] = await Promise.all([
       db.query.flightBottles.findFirst({
         where: eq(flightBottles.flightId, flight.id),
       }),
-      db.query.bottleAliases.findFirst({
+      db.query.bottleReferences.findFirst({
         where: and(
-          eq(bottleAliases.bottleId, bottle.id),
-          eq(bottleAliases.name, bottle.fullName),
+          eq(bottleReferences.bottleId, bottle.id),
+          eq(bottleReferences.name, bottle.fullName),
         ),
       }),
       db.query.externalReviewArticles.findFirst({
@@ -69,8 +69,8 @@ describe("catalog identity fixtures", () => {
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
     const aliases = await db
       .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.bottleId, bottle.id));
+      .from(bottleReferences)
+      .where(eq(bottleReferences.bottleId, bottle.id));
 
     expect(bottle.groupId).toBeNull();
     expect(aliases).toEqual([
@@ -114,8 +114,8 @@ describe("catalog identity fixtures", () => {
         db.query.bottleGroups.findFirst({
           where: eq(bottleGroups.id, groupId),
         }),
-        db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.bottleId, member.id),
+        db.query.bottleReferences.findFirst({
+          where: eq(bottleReferences.bottleId, member.id),
         }),
         db.query.changes.findFirst({
           where: and(

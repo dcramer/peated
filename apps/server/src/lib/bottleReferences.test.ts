@@ -1,23 +1,23 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
+  bottleReferences,
   bottleTombstones,
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
 import {
-  assignBottleAliasInTransaction,
-  BottleAliasBottleNotFoundError,
-  BottleAliasBottleRetiredError,
-  BottleAliasIdentityChangedError,
-  ExactBottleAliasConflictError,
-  finalizeBottleAliasAssignment,
-  listUnmatchedBottleAliasNames,
-  reserveExactBottleAliasInTransaction,
-  StaleBottleAliasReviewIdentityError,
-  syncBottleAliasConsumersForAliasChange,
-} from "@peated/server/lib/bottleAliases";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+  assignBottleReferenceInTransaction,
+  BottleReferenceBottleNotFoundError,
+  BottleReferenceBottleRetiredError,
+  BottleReferenceIdentityChangedError,
+  ExactBottleReferenceConflictError,
+  finalizeBottleReferenceAssignment,
+  listUnmatchedBottleReferenceNames,
+  reserveExactBottleReferenceInTransaction,
+  StaleBottleReferenceReviewIdentityError,
+  syncBottleReferenceConsumersForReferenceChange,
+} from "@peated/server/lib/bottleReferences";
+import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
@@ -28,35 +28,35 @@ beforeEach(() => {
 });
 
 async function getAlias(name: string) {
-  const alias = await db.query.bottleAliases.findFirst({
-    where: eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()),
+  const reference = await db.query.bottleReferences.findFirst({
+    where: eq(sql`LOWER(${bottleReferences.name})`, name.toLowerCase()),
   });
-  if (!alias) throw new Error("Bottle alias fixture not found.");
-  return alias;
+  if (!reference) throw new Error("Bottle reference fixture not found.");
+  return reference;
 }
 
-describe("listUnmatchedBottleAliasNames", () => {
+describe("listUnmatchedBottleReferenceNames", () => {
   test("uses nullable Bottle identity", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    await db.insert(bottleAliases).values([
+    await db.insert(bottleReferences).values([
       {
-        name: "Unresolved Alias",
+        name: "Unresolved Reference",
         bottleId: null,
         assignedByActorId: bottle.createdByActorId,
       },
       {
-        name: "Resolved Alias",
+        name: "Resolved Reference",
         bottleId: bottle.id,
         assignedByActorId: bottle.createdByActorId,
       },
       {
-        name: "Ignored Unresolved Alias",
+        name: "Ignored Unresolved Reference",
         bottleId: null,
         ignored: true,
         assignedByActorId: bottle.createdByActorId,
       },
       {
-        name: "Nullable Ignored Unresolved Alias",
+        name: "Nullable Ignored Unresolved Reference",
         bottleId: null,
         ignored: null,
         assignedByActorId: bottle.createdByActorId,
@@ -64,25 +64,25 @@ describe("listUnmatchedBottleAliasNames", () => {
     ]);
 
     await expect(
-      listUnmatchedBottleAliasNames({ limit: 100, offset: 0 }),
+      listUnmatchedBottleReferenceNames({ limit: 100, offset: 0 }),
     ).resolves.toEqual([
-      "Nullable Ignored Unresolved Alias",
-      "Unresolved Alias",
+      "Nullable Ignored Unresolved Reference",
+      "Unresolved Reference",
     ]);
   });
 });
 
-describe("exact Bottle alias reservation", () => {
+describe("exact Bottle reference reservation", () => {
   test("normalizes the name", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    const original = await fixtures.BottleAlias({
-      name: normalizeBottleAliasKey("Reserved   12-year-old"),
+    const original = await fixtures.BottleReference({
+      name: normalizeBottleReferenceKey("Reserved   12-year-old"),
       bottleId: bottle.id,
       assignmentSource: "legacy",
     });
 
     const result = await db.transaction((tx) =>
-      reserveExactBottleAliasInTransaction(tx, {
+      reserveExactBottleReferenceInTransaction(tx, {
         name: "Reserved   12-year-old",
         bottleId: bottle.id,
         assignmentSource: "canonical",
@@ -102,22 +102,22 @@ describe("exact Bottle alias reservation", () => {
   }) => {
     const existingBottle = await fixtures.Bottle();
     const selectedBottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
+    const reference = await fixtures.BottleReference({
       name: "Bottle Identity Collision",
       bottleId: existingBottle.id,
     });
 
     await expect(
       db.transaction((tx) =>
-        reserveExactBottleAliasInTransaction(tx, {
-          name: alias.name,
+        reserveExactBottleReferenceInTransaction(tx, {
+          name: reference.name,
           bottleId: selectedBottle.id,
           assignmentSource: "canonical",
           assignedByActorId: selectedBottle.createdByActorId,
         }),
       ),
     ).rejects.toMatchObject({
-      name: "ExactBottleAliasConflictError",
+      name: "ExactBottleReferenceConflictError",
       code: "another_bottle",
       conflictingBottleId: existingBottle.id,
     });
@@ -134,53 +134,53 @@ describe("exact Bottle alias reservation", () => {
 
     await expect(
       db.transaction((tx) =>
-        reserveExactBottleAliasInTransaction(tx, {
-          name: "Retired Bottle Alias",
+        reserveExactBottleReferenceInTransaction(tx, {
+          name: "Retired Bottle Reference",
           bottleId: retired.id,
           assignmentSource: "canonical",
           assignedByActorId: retired.createdByActorId,
         }),
       ),
-    ).rejects.toBeInstanceOf(BottleAliasBottleRetiredError);
+    ).rejects.toBeInstanceOf(BottleReferenceBottleRetiredError);
 
     await expect(
       db.transaction((tx) =>
-        reserveExactBottleAliasInTransaction(tx, {
-          name: "Unassigned Bottle Alias",
+        reserveExactBottleReferenceInTransaction(tx, {
+          name: "Unassigned Bottle Reference",
           bottleId: unassigned.id,
           assignmentSource: "canonical",
           assignedByActorId: unassigned.createdByActorId,
         }),
       ),
     ).rejects.toMatchObject({
-      name: "BottleAliasBottleInactiveError",
+      name: "BottleReferenceBottleInactiveError",
       reason: "unassigned",
       message: `Bottle ${unassigned.id} is not assigned to a BottleGroup.`,
     });
 
     await expect(
       db.transaction((tx) =>
-        reserveExactBottleAliasInTransaction(tx, {
-          name: "Missing Bottle Alias",
+        reserveExactBottleReferenceInTransaction(tx, {
+          name: "Missing Bottle Reference",
           bottleId: 2_147_483_647,
           assignmentSource: "canonical",
           assignedByActorId: retired.createdByActorId,
         }),
       ),
-    ).rejects.toBeInstanceOf(BottleAliasBottleNotFoundError);
+    ).rejects.toBeInstanceOf(BottleReferenceBottleNotFoundError);
 
     await expect(
       db
-        .select({ name: bottleAliases.name })
-        .from(bottleAliases)
+        .select({ name: bottleReferences.name })
+        .from(bottleReferences)
         .where(
-          sql`${bottleAliases.name} IN ('Retired Bottle Alias', 'Unassigned Bottle Alias', 'Missing Bottle Alias')`,
+          sql`${bottleReferences.name} IN ('Retired Bottle Reference', 'Unassigned Bottle Reference', 'Missing Bottle Reference')`,
         ),
     ).resolves.toEqual([]);
   });
 });
 
-describe("assignBottleAliasInTransaction", () => {
+describe("assignBottleReferenceInTransaction", () => {
   test("writes one Bottle id and clears its stale vector", async ({
     fixtures,
   }) => {
@@ -188,7 +188,7 @@ describe("assignBottleAliasInTransaction", () => {
     const legacy = await fixtures.Bottle();
     const alreadyAssigned = await fixtures.Bottle();
     const name = "Shared Retailer Bottle Name";
-    await db.insert(bottleAliases).values({
+    await db.insert(bottleReferences).values({
       name,
       bottleId: null,
       embedding: Array.from({ length: 3072 }, () => 0.125),
@@ -215,7 +215,7 @@ describe("assignBottleAliasInTransaction", () => {
     });
 
     const result = await db.transaction((tx) =>
-      assignBottleAliasInTransaction(tx, {
+      assignBottleReferenceInTransaction(tx, {
         bottleId: selected.id,
         name,
         assignmentSource: "human_approved",
@@ -225,10 +225,10 @@ describe("assignBottleAliasInTransaction", () => {
 
     expect(result).toMatchObject({
       bottleId: selected.id,
-      aliasChanged: true,
+      referenceChanged: true,
       isNew: false,
     });
-    expect(result.alias).not.toHaveProperty("releaseId");
+    expect(result.reference).not.toHaveProperty("releaseId");
     expect(await getAlias(name)).toMatchObject({
       bottleId: selected.id,
       assignmentSource: "human_approved",
@@ -263,7 +263,7 @@ describe("assignBottleAliasInTransaction", () => {
     });
 
     await db.transaction((tx) =>
-      assignBottleAliasInTransaction(tx, {
+      assignBottleReferenceInTransaction(tx, {
         bottleId: selected.id,
         name,
         assignedByActorId: selected.createdByActorId,
@@ -290,7 +290,7 @@ describe("assignBottleAliasInTransaction", () => {
     const concurrent = await fixtures.Bottle();
     const selected = await fixtures.Bottle();
     const review = await fixtures.ExternalReview({
-      name: "Concurrent Review Alias",
+      name: "Concurrent Review Reference",
       bottleId: previous.id,
     });
     await db
@@ -300,22 +300,22 @@ describe("assignBottleAliasInTransaction", () => {
 
     await expect(
       db.transaction((tx) =>
-        assignBottleAliasInTransaction(tx, {
+        assignBottleReferenceInTransaction(tx, {
           bottleId: selected.id,
           name: review.name,
           assignedByActorId: selected.createdByActorId,
           expectedReview: review,
         }),
       ),
-    ).rejects.toBeInstanceOf(StaleBottleAliasReviewIdentityError);
+    ).rejects.toBeInstanceOf(StaleBottleReferenceReviewIdentityError);
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, review.name),
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, review.name),
       }),
     ).toBeUndefined();
   });
 
-  test("rolls back when a distinct source alias identity changes", async ({
+  test("rolls back when a distinct source reference identity changes", async ({
     fixtures,
   }) => {
     for (const field of [
@@ -327,62 +327,62 @@ describe("assignBottleAliasInTransaction", () => {
     ] as const) {
       const bottle = await fixtures.Bottle();
       const concurrent = await fixtures.Bottle();
-      const source = await fixtures.BottleAlias({
-        name: `Raw Source Alias ${field}`,
+      const source = await fixtures.BottleReference({
+        name: `Raw Source Reference ${field}`,
         bottleId: null,
       });
       if (field === "bottleId") {
         await db
-          .update(bottleAliases)
+          .update(bottleReferences)
           .set({ bottleId: concurrent.id })
-          .where(eq(bottleAliases.name, source.name));
+          .where(eq(bottleReferences.name, source.name));
       } else if (field === "name") {
         await db
-          .update(bottleAliases)
+          .update(bottleReferences)
           .set({ name: `${source.name} changed` })
-          .where(eq(bottleAliases.name, source.name));
+          .where(eq(bottleReferences.name, source.name));
       } else if (field === "ignored") {
         await db
-          .update(bottleAliases)
+          .update(bottleReferences)
           .set({ ignored: !source.ignored })
-          .where(eq(bottleAliases.name, source.name));
+          .where(eq(bottleReferences.name, source.name));
       } else if (field === "assignmentSource") {
         await db
-          .update(bottleAliases)
+          .update(bottleReferences)
           .set({ assignmentSource: "human_approved" })
-          .where(eq(bottleAliases.name, source.name));
+          .where(eq(bottleReferences.name, source.name));
       } else {
         await db
-          .update(bottleAliases)
+          .update(bottleReferences)
           .set({ assignedByActorId: concurrent.createdByActorId })
-          .where(eq(bottleAliases.name, source.name));
+          .where(eq(bottleReferences.name, source.name));
       }
 
-      const assignedName = `Normalized Source Alias ${field}`;
+      const assignedName = `Normalized Source Reference ${field}`;
       await expect(
         db.transaction((tx) =>
-          assignBottleAliasInTransaction(tx, {
+          assignBottleReferenceInTransaction(tx, {
             bottleId: bottle.id,
             name: assignedName,
             assignedByActorId: bottle.createdByActorId,
-            sourceAliasIdentity: source,
+            sourceReferenceIdentity: source,
           }),
         ),
-      ).rejects.toBeInstanceOf(BottleAliasIdentityChangedError);
+      ).rejects.toBeInstanceOf(BottleReferenceIdentityChangedError);
       expect(
-        await db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, assignedName),
+        await db.query.bottleReferences.findFirst({
+          where: eq(bottleReferences.name, assignedName),
         }),
       ).toBeUndefined();
     }
   });
 
-  test("allows concurrent assignments that converge on the same alias identity", async ({
+  test("allows concurrent assignments that converge on the same reference identity", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const source = await fixtures.BottleAlias({
-      name: "Concurrent Source Alias",
+    const source = await fixtures.BottleReference({
+      name: "Concurrent Source Reference",
       bottleId: bottle.id,
       assignmentSource: "source_approved",
     });
@@ -391,12 +391,12 @@ describe("assignBottleAliasInTransaction", () => {
     const results = await Promise.all(
       [1, 2].map(() =>
         db.transaction((tx) =>
-          assignBottleAliasInTransaction(tx, {
+          assignBottleReferenceInTransaction(tx, {
             bottleId: bottle.id,
             name: source.name,
             assignmentSource: "source_approved",
             assignedByActorId: bottle.createdByActorId,
-            sourceAliasIdentity: source,
+            sourceReferenceIdentity: source,
           }),
         ),
       ),
@@ -410,18 +410,18 @@ describe("assignBottleAliasInTransaction", () => {
     });
   });
 
-  test("allows one winner when Bottles race to claim the same alias", async ({
+  test("allows one winner when Bottles race to claim the same reference", async ({
     fixtures,
   }) => {
     const first = await fixtures.Bottle();
     const second = await fixtures.Bottle();
-    const name = "Concurrent Direct Alias";
+    const name = "Concurrent Direct Reference";
     const price = await fixtures.StorePrice({ name, bottleId: null });
 
     const outcomes = await Promise.allSettled(
       [first, second].map((bottle) =>
         db.transaction((tx) =>
-          assignBottleAliasInTransaction(tx, {
+          assignBottleReferenceInTransaction(tx, {
             bottleId: bottle.id,
             name,
             assignedByActorId: bottle.createdByActorId,
@@ -438,7 +438,9 @@ describe("assignBottleAliasInTransaction", () => {
     );
     expect(fulfilled).toHaveLength(1);
     expect(rejected).toHaveLength(1);
-    expect(rejected[0]!.reason).toBeInstanceOf(ExactBottleAliasConflictError);
+    expect(rejected[0]!.reason).toBeInstanceOf(
+      ExactBottleReferenceConflictError,
+    );
 
     const winnerBottleId = fulfilled[0]!.value.bottleId;
     expect(await getAlias(name)).toMatchObject({ bottleId: winnerBottleId });
@@ -455,7 +457,7 @@ describe("assignBottleAliasInTransaction", () => {
     const otherSite = await fixtures.ExternalSiteOrExisting({
       type: "astorwines",
     });
-    const name = "Scoped Retailer Alias";
+    const name = "Scoped Retailer Reference";
     const matchingPrice = await fixtures.StorePrice({
       name,
       bottleId: null,
@@ -480,7 +482,7 @@ describe("assignBottleAliasInTransaction", () => {
     });
 
     await db.transaction((tx) =>
-      assignBottleAliasInTransaction(tx, {
+      assignBottleReferenceInTransaction(tx, {
         bottleId: bottle.id,
         name,
         externalSiteId: site.id,
@@ -519,13 +521,13 @@ describe("assignBottleAliasInTransaction", () => {
 
     await expect(
       db.transaction((tx) =>
-        assignBottleAliasInTransaction(tx, {
+        assignBottleReferenceInTransaction(tx, {
           bottleId: bottle.id,
           name: "   ",
           assignedByActorId: bottle.createdByActorId,
         }),
       ),
-    ).rejects.toMatchObject({ name: "FailedToSaveBottleAliasError" });
+    ).rejects.toMatchObject({ name: "FailedToSaveBottleReferenceError" });
     expect(
       await db.query.storePrices.findFirst({
         where: eq(storePrices.id, price.id),
@@ -534,26 +536,26 @@ describe("assignBottleAliasInTransaction", () => {
   });
 });
 
-describe("alias replay", () => {
+describe("reference replay", () => {
   test("replays direct Bottle identity without overwriting assigned consumers", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Replay Direct Bottle Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Replay Direct Bottle Reference",
       bottleId: bottle.id,
     });
     const price = await fixtures.StorePrice({
-      name: alias.name,
+      name: reference.name,
       bottleId: null,
     });
     const assignedReview = await fixtures.ExternalReview({
-      name: alias.name,
+      name: reference.name,
       bottleId: otherBottle.id,
     });
 
-    await syncBottleAliasConsumersForAliasChange(alias.name);
+    await syncBottleReferenceConsumersForReferenceChange(reference.name);
 
     expect(
       await db.query.storePrices.findFirst({
@@ -567,21 +569,21 @@ describe("alias replay", () => {
     ).toMatchObject({ bottleId: otherBottle.id });
   });
 
-  test("replays an active alias with nullable snapshot state", async ({
+  test("replays an active reference with nullable snapshot state", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      name: "Nullable Snapshot Replay Alias",
+    const reference = await fixtures.BottleReference({
+      name: "Nullable Snapshot Replay Reference",
       bottleId: bottle.id,
       ignored: null,
     });
     const review = await fixtures.ExternalReview({
-      name: alias.name,
+      name: reference.name,
       bottleId: null,
     });
 
-    await syncBottleAliasConsumersForAliasChange(alias.name);
+    await syncBottleReferenceConsumersForReferenceChange(reference.name);
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -595,17 +597,17 @@ describe("alias replay", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const ignoredAlias = await fixtures.BottleAlias({
-      name: "Ignored Replay Alias",
+    const ignoredAlias = await fixtures.BottleReference({
+      name: "Ignored Replay Reference",
       bottleId: bottle.id,
       ignored: true,
     });
-    const unboundAlias = await fixtures.BottleAlias({
-      name: "Unbound Replay Alias",
+    const unboundAlias = await fixtures.BottleReference({
+      name: "Unbound Replay Reference",
       bottleId: null,
     });
-    const retiredAlias = await fixtures.BottleAlias({
-      name: "Retired Replay Alias",
+    const retiredAlias = await fixtures.BottleReference({
+      name: "Retired Replay Reference",
       bottleId: bottle.id,
     });
     await db.insert(bottleTombstones).values({
@@ -613,16 +615,16 @@ describe("alias replay", () => {
       newBottleId: replacement.id,
     });
     const prices = await Promise.all(
-      [ignoredAlias, unboundAlias, retiredAlias].map((alias) =>
+      [ignoredAlias, unboundAlias, retiredAlias].map((reference) =>
         fixtures.StorePrice({
-          name: alias.name,
+          name: reference.name,
           bottleId: null,
         }),
       ),
     );
 
-    for (const alias of [ignoredAlias, unboundAlias, retiredAlias]) {
-      await syncBottleAliasConsumersForAliasChange(alias.name);
+    for (const reference of [ignoredAlias, unboundAlias, retiredAlias]) {
+      await syncBottleReferenceConsumersForReferenceChange(reference.name);
     }
 
     for (const price of prices) {
@@ -635,7 +637,7 @@ describe("alias replay", () => {
   });
 });
 
-describe("finalizeBottleAliasAssignment", () => {
+describe("finalizeBottleReferenceAssignment", () => {
   test("applies a price image and indexes the direct Bottle", async ({
     fixtures,
   }) => {
@@ -647,7 +649,7 @@ describe("finalizeBottleAliasAssignment", () => {
       imageUrl,
     });
     const result = await db.transaction((tx) =>
-      assignBottleAliasInTransaction(tx, {
+      assignBottleReferenceInTransaction(tx, {
         bottleId: bottle.id,
         name: price.name,
         externalSiteId: price.externalSiteId,
@@ -656,15 +658,15 @@ describe("finalizeBottleAliasAssignment", () => {
       }),
     );
 
-    await finalizeBottleAliasAssignment(result);
+    await finalizeBottleReferenceAssignment(result);
 
     expect(
       await db.query.bottles.findFirst({
         where: (bottles, { eq }) => eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
-    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
-      name: result.alias.name,
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleReference", {
+      name: result.reference.name,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
@@ -677,9 +679,9 @@ describe("finalizeBottleAliasAssignment", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const result = await db.transaction((tx) =>
-      assignBottleAliasInTransaction(tx, {
+      assignBottleReferenceInTransaction(tx, {
         bottleId: bottle.id,
-        name: "Queue Failure Alias",
+        name: "Queue Failure Reference",
         assignedByActorId: bottle.createdByActorId,
       }),
     );
@@ -691,9 +693,9 @@ describe("finalizeBottleAliasAssignment", () => {
     );
 
     await expect(
-      finalizeBottleAliasAssignment(result),
+      finalizeBottleReferenceAssignment(result),
     ).resolves.toBeUndefined();
-    expect(await getAlias(result.alias.name)).toMatchObject({
+    expect(await getAlias(result.reference.name)).toMatchObject({
       bottleId: bottle.id,
     });
   });

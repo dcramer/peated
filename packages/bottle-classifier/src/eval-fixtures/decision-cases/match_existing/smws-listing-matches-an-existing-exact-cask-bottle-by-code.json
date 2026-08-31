@@ -26,7 +26,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "The Scotch Malt Whisky Society",
         "bottler": "The Scotch Malt Whisky Society",
         "series": null,
@@ -54,7 +54,7 @@
       "when": ["rw6.5"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "The Scotch Malt Whisky Society",
           "bottler": "The Scotch Malt Whisky Society",
           "series": null,

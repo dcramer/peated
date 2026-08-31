@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottleBarcodes,
   bottleTombstones,
   bottles,
@@ -41,7 +42,7 @@ export default implement(bottleDetailsContract).handler(async function ({
     }
   }
 
-  const [[lastPrice], [{ count: totalPeople }], barcodeList] =
+  const [[lastPrice], [{ count: totalPeople }], barcodeList, aliasList] =
     await Promise.all([
       db
         .select()
@@ -65,12 +66,18 @@ export default implement(bottleDetailsContract).handler(async function ({
         .from(bottleBarcodes)
         .where(eq(bottleBarcodes.bottleId, bottle.id))
         .orderBy(asc(bottleBarcodes.value), asc(bottleBarcodes.id)),
+      db
+        .select({ name: bottleAliases.name })
+        .from(bottleAliases)
+        .where(eq(bottleAliases.bottleId, bottle.id))
+        .orderBy(asc(bottleAliases.name), asc(bottleAliases.id)),
     ]);
 
   return {
     ...(await serialize(BottleSerializer, bottle, context.user, [], {
       includeGroupSummary: true,
     })),
+    aliases: aliasList.map(({ name }) => name),
     barcodes: barcodeList.map(({ value, volume }) => ({ value, volume })),
     people: Number(totalPeople),
     lastPrice: lastPrice

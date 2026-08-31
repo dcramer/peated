@@ -8,7 +8,7 @@
     },
     "initialCandidates": [
       {
-        "alias": null,
+        "reference": null,
         "brand": "Jameson",
         "bottler": null,
         "series": null,
@@ -33,7 +33,7 @@
       "when": ["jameson", "cold brew"],
       "results": [
         {
-          "alias": null,
+          "reference": null,
           "brand": "Jameson",
           "bottler": null,
           "series": null,

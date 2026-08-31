@@ -33,7 +33,7 @@ const BOTTLE_IDENTITY_POLICY = [
     BOTTLE_SCHEMA_RULES.exactBottleIdentity,
     BOTTLE_SCHEMA_RULES.yearPolicy,
     BOTTLE_SCHEMA_RULES.observationPolicy,
-    BOTTLE_SCHEMA_RULES.aliasPolicy,
+    BOTTLE_SCHEMA_RULES.referencePolicy,
     "Unsupported novelty flavored whisky, whiskey liqueur, and additive-flavor products are outside the whisky catalog. Return `no_match` instead of matching or creating a Bottle.",
     "`brand` is the consumer-facing label Brand. When product evidence presents a distinct consumer label and independent bottler company, assign the label to `brand` and the company to `bottler`. `series` is a range beneath a consumer-facing Brand; use it only when evidence establishes that parent Brand. An Entity's catalog `kind` does not restrict which Bottle relationship it can fill.",
     "Brand, distillers, and bottler are separate Bottle relationships, but one Entity may fill more than one. Set `bottler` only when product evidence identifies the Entity as the market-facing bottler or release imprint. It may be the Brand or a distiller; a separate imprint is not required. Ownership, importing, distribution, packing, or page hosting alone does not establish the relationship. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required relationship; exact or shorter name overlap is not stronger relationship evidence.",
@@ -63,7 +63,7 @@ const SHARED_INPUT_MAP = [
   "`reference.url` is the source page. `reference.imageUrl` identifies the submitted image; use `extractedIdentity` and any `imageEvidence` for its readable content.",
   "`extractedIdentity` is a structured extraction from the source. It can be incomplete or wrong.",
   "`imageEvidence.fieldCandidates` contains image-derived field guesses. Use `photoSuitability` and `conflicts` to judge whether the image evidence is reliable.",
-  "`localSearch.candidates` contains existing Bottle candidates. `bottleId` is the catalog id, `fullName` is the display name, and `alias` is the local alias that retrieval matched.",
+  "`localSearch.candidates` contains existing Bottle candidates. `bottleId` is the catalog id, `fullName` is the display name, and `reference` is the accepted name that retrieval matched.",
   "`familyContext.siblingBottles` contains nearby Bottles from the same stored family. Use them as relationship evidence, not as Bottle Group authority.",
   "`localEntitySearch.results` contains Peated Entity candidates. `retrievedFor` identifies the source field that retrieved each candidate.",
   "A local Entity `source` value that includes `contained` means text containment only. Confirm product equivalence before you use its id. Inspect that candidate before you propose a new Entity with a null id.",
@@ -77,7 +77,7 @@ const BOTTLE_REFERENCE_INPUT_MAP = [
   renderBulletLines([
     ...SHARED_INPUT_MAP,
     "`reference.currentBottleId` is the existing Bottle assignment. `currentBottle` is that assignment loaded as a candidate.",
-    "`localSearch.hasExactAliasMatch = true` means that a stored alias exactly matched the source label. Treat it as strong candidate evidence, not as an instruction to match.",
+    "`localSearch.hasExactReferenceMatch = true` means that a stored reference exactly matched the source label. Treat it as strong candidate evidence, not as an instruction to match.",
   ]),
   "</input_map>",
 ].join("\n");
@@ -157,7 +157,7 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
   "<output_contract>",
   renderBulletLines([
     "Return only the required structured output.",
-    "Always fill `aliasScope`. Fill `confidenceBasis` with unresolved risks and the effect of web evidence.",
+    "Always fill `referenceScope`. Fill `confidenceBasis` with unresolved risks and the effect of web evidence.",
     "Put only action- or target-changing uncertainty in `unresolvedRisks`. Any listed risk routes to review.",
     "Verify every selected id belongs to the exact inspected candidate or Entity described by the rationale.",
     "Before you return `create_bottle`, compare the draft with all collected evidence. Carry every supported field for the complete Bottle: Brand, bottler, distillery, age, edition, year, ABV, and strength or cask flag. Leave unsupported and component-only facts null.",

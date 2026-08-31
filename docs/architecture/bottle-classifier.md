@@ -168,7 +168,7 @@ is not evidence for a group mutation.
 Track real moderator-reviewed `bottle_group` findings before designing a
 follow-up. If they demonstrate a recurring need, propose only the smallest
 required regroup or group-merge operation. That separate change must preserve
-Bottle ids, all Bottle consumers and aliases, shared-field rematerialization,
+Bottle ids, all Bottle consumers and references, shared-field rematerialization,
 representatives, aggregates, and auditable before/after history. It must not add
 move, merge, and split operations merely for symmetry.
 
@@ -321,11 +321,11 @@ Ignored references do not run the agent.
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
 
-### Exact Alias Preflight
+### Exact Reference Preflight
 
-A caller can look up one unambiguous literal stored alias before full
-classification. An accepted alias identifies its assigned Bottle without a
-classifier model call. When no exact alias exists, the full classifier retrieves
+A caller can look up one unambiguous literal stored reference before full
+classification. An accepted reference identifies its assigned Bottle without a
+classifier model call. When no exact reference exists, the full classifier retrieves
 local candidates through its normal adapter.
 
 ## Determinism
@@ -339,7 +339,7 @@ Deterministic code is allowed for closed-form behavior:
 - the code-derived automation tier (`deriveAutomationTier`), which routes an
   automated decision to review or auto from action risk plus structured evidence
 - exact identity anchors such as SMWS bottle codes
-- unambiguous literal stored alias lookup for classifier candidate seeding
+- unambiguous literal stored reference lookup for classifier candidate seeding
 - direct field contradictions, such as an extracted brand, category, distillery,
   stated age, ABV, vintage year, release year, cask-strength or single-cask
   flag, expression, or edition
@@ -347,7 +347,7 @@ Deterministic code is allowed for closed-form behavior:
 
 Deterministic code is not allowed for whisky-family semantics. Brand prefixes,
 years, batch-like tokens, `single cask`, `barrel`, producer names, domain names,
-retailer wording, vector similarity, text-search rank, fuzzy aliases, and
+retailer wording, vector similarity, text-search rank, fuzzy references, and
 comparable-name matches are not enough to choose stable-versus-exact field
 placement, create canonical identity, assign a BottleGroup, or bypass agent
 judgment.
@@ -359,8 +359,8 @@ deterministic support can route the decision to review through the derived
 automation tier, but only binary invalid state or direct extracted-field
 conflict may erase the agent's semantic match.
 
-A literal stored alias shortcut is allowed only when the normalized input
-matches a non-ignored stored alias attached to exactly one Bottle. If there are
+A literal stored reference shortcut is allowed only when the normalized input
+matches a non-ignored stored reference attached to exactly one Bottle. If there are
 multiple targets, fuzzy/comparable-only matches, or any required whisky
 interpretation, fall through to the agent.
 
@@ -563,7 +563,7 @@ because catalog investigation is the intent. This keeps identity quality and
 Suggested Change precision as separate measurements.
 
 Full-classification evals own match quality and candidate recall. Server
-integration tests prove that an exact alias skips classification and that other
+integration tests prove that an exact reference skips classification and that other
 photo identification paths invoke only one classifier run.
 
 Production-miss evals must preserve the observed reference, URL, extracted
@@ -590,7 +590,7 @@ Keep responsibilities narrow:
 - `apps/server/src/agents/bottleClassifier/service.ts`: server adapter wiring
 
 `classifyBottleReference` means the full reviewed pipeline.
-`findExactAliasBottleCandidate` means a deterministic evidence lookup. It does
+`findExactReferenceBottleCandidate` means a deterministic evidence lookup. It does
 not call a model. The caller can accept the assigned Bottle as a deterministic
 Match.
 `runBottleClassifierAgent` means only the raw LLM/tool pass.

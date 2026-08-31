@@ -23,7 +23,7 @@
     },
     "initialCandidates": [
       {
-        "alias": "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
+        "reference": "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
         "brand": "The Macallan",
         "bottler": null,
         "series": null,
@@ -42,7 +42,7 @@
         "fullName": "The Macallan Sherry Oak 30-year-old"
       },
       {
-        "alias": null,
+        "reference": null,
         "brand": "The Macallan",
         "bottler": null,
         "series": null,
