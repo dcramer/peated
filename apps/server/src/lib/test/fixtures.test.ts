@@ -135,9 +135,8 @@ describe("catalog identity fixtures", () => {
 
     expect(member).toMatchObject({
       groupId: first.groupId,
-      name: "Fixture Expression - Batch Two - 2025 Release",
-      fullName:
-        "Fixture Group Brand Fixture Expression - Batch Two - 2025 Release",
+      name: "Fixture Expression - Batch Two",
+      fullName: "Fixture Group Brand Fixture Expression - Batch Two",
       statedAge: 12,
       seriesId: series.id,
       category: "single_malt",

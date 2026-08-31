@@ -115,9 +115,9 @@ workflow. Lossy or semantic normalization may retrieve evidence but cannot
 assign a Bottle unless that exact key was already accepted.
 
 A marketed Bottle title is not automatically an exact alias. Several structured
-releases can use the same title, so creation checks the complete structured
-identity for retry safety and leaves alias assignment to accepted source or
-human decisions. Alias conflicts do not block a Bottle title. Code does not
+releases can use the same title, so creation, update, and review preflight check
+the complete structured identity and leave alias assignment to accepted source
+or human decisions. Alias conflicts do not block a Bottle title. Code does not
 overwrite or reinterpret another Bottle's accepted alias assertion.
 
 ## Resolution Pipeline

@@ -1742,6 +1742,7 @@ describe("Bottle updates", () => {
         name: "Collision Label",
         brand: brand.id,
         edition: "Two",
+        releaseYear: 2024,
       },
     });
     const memberIds = members.map(({ bottle }) => bottle.id);

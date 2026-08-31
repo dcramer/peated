@@ -392,7 +392,7 @@ async function findExactBottleIdentityInTransaction(
   // Names are marketed titles, not unique ids. Serialize same-title creates and
   // compare the structured identity that can safely prove an exact duplicate.
   await tx.execute(
-    sql`SELECT pg_advisory_xact_lock(hashtext(${`bottle:create:${bottle.fullName.toLowerCase()}`}))`,
+    sql`SELECT pg_advisory_xact_lock(hashtext(${`bottle:identity:${bottle.fullName.toLowerCase()}`}))`,
   );
   const [existing] = await tx
     .select({ id: bottles.id })

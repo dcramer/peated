@@ -527,7 +527,7 @@ describe("resolveBottleReferenceTarget", () => {
     });
     expect(created).toMatchObject({
       groupId: expect.any(Number),
-      name: "Independent Expression - First Edition - 12-year-old - 2020 Release - 2008 Vintage - 46.0% ABV",
+      name: "Independent Expression - First Edition",
       edition: "First Edition",
       statedAge: 12,
       abv: 46,

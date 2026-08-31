@@ -414,9 +414,11 @@ describe("PATCH /entities/:entity", () => {
           expect.objectContaining({
             name: original.fullName,
           }),
-          expect.objectContaining({
-            name: updated?.fullName,
-          }),
+        ]),
+      );
+      expect(aliases).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ name: updated?.fullName }),
         ]),
       );
     }
@@ -488,10 +490,7 @@ describe("PATCH /entities/:entity", () => {
         eq(bottleAliases.name, newBottle.fullName),
       ),
     });
-    expect(newAlias).toMatchObject({
-      name: newBottle.fullName,
-      bottleId: bottle.id,
-    });
+    expect(newAlias).toBeUndefined();
 
     const [newOtherBottle] = await db
       .select()
@@ -636,7 +635,7 @@ describe("PATCH /entities/:entity", () => {
     const newBottleAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "FC Bar"),
     });
-    expect(newBottleAlias?.bottleId).toEqual(bottle.id);
+    expect(newBottleAlias).toBeUndefined();
 
     const oldEntityAlias = await db.query.entityAliases.findFirst({
       where: eq(entityAliases.name, "F"),
@@ -693,7 +692,7 @@ describe("PATCH /entities/:entity", () => {
     const revertedAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "Foo Bar"),
     });
-    expect(revertedAlias?.bottleId).toEqual(bottle.id);
+    expect(revertedAlias).toBeUndefined();
 
     const canonicalEntityAlias = await db.query.entityAliases.findFirst({
       where: eq(entityAliases.name, "Foo"),
@@ -701,7 +700,7 @@ describe("PATCH /entities/:entity", () => {
     expect(canonicalEntityAlias?.entityId).toEqual(entity.id);
   });
 
-  test("grouped alias collision rolls back the entity and every Bottle identity", async ({
+  test("brand rename does not overwrite an accepted Bottle alias", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -719,27 +718,22 @@ describe("PATCH /entities/:entity", () => {
     });
     const modUser = await fixtures.User({ mod: true });
 
-    const error = await waitError(
-      routerClient.entities.update(
-        { entity: entity.id, name: "Renamed Brand" },
-        { context: { user: modUser } },
-      ),
-    );
-    expect(error.message).toBe(
-      "Bottle identity conflicts with an existing Bottle.",
+    await routerClient.entities.update(
+      { entity: entity.id, name: "Renamed Brand" },
+      { context: { user: modUser } },
     );
 
-    const unchangedEntity = await db.query.entities.findFirst({
+    const updatedEntity = await db.query.entities.findFirst({
       where: eq(entities.id, entity.id),
     });
-    const unchangedBottle = await db.query.bottles.findFirst({
+    const updatedBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
     });
     const retainedConflict = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, conflictingAlias.name),
     });
-    expect(unchangedEntity?.name).toBe("Original Brand");
-    expect(unchangedBottle?.fullName).toBe("Original Brand Core");
+    expect(updatedEntity?.name).toBe("Renamed Brand");
+    expect(updatedBottle?.fullName).toBe("Renamed Brand Core");
     expect(retainedConflict).toMatchObject({
       bottleId: conflictingBottle.id,
     });

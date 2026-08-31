@@ -5,7 +5,7 @@ import {
   ExactBottleAliasConflictError,
   reserveExactBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, notInArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 export type BottleIdentityEntity = {
@@ -16,8 +16,20 @@ export type BottleIdentityEntity = {
 export type BottleIdentityState = {
   name: string;
   fullName: string;
+  brandId: number;
   brand: BottleIdentityEntity;
   bottler: BottleIdentityEntity | null;
+  edition: string | null;
+  statedAge: number | null;
+  noAgeStatement: boolean | null;
+  vintageYear: number | null;
+  releaseYear: number | null;
+  releaseMonth: number | null;
+  releaseDay: number | null;
+  abv: number | null;
+  singleCask: boolean | null;
+  caskStrength: boolean | null;
+  caskNumber: string | null;
 };
 
 export type BottleIdentityCandidate = {
@@ -26,7 +38,7 @@ export type BottleIdentityCandidate = {
   desired: BottleIdentityState;
 };
 
-export type BottleIdentityConflictCause = "smws_code";
+export type BottleIdentityConflictCause = "smws_code" | "structured_identity";
 
 export class BottleIdentityConflictError extends Error {
   constructor(
@@ -226,6 +238,74 @@ export async function reserveBottleIdentitiesInTransaction(
   const sortedCandidates = [...candidates].sort(
     (left, right) => left.bottleId - right.bottleId,
   );
+
+  const excludedBottleIds = sortedCandidates.map(({ bottleId }) => bottleId);
+  const structuredIdentityOwners = new Map<string, number>();
+  for (const { bottleId, desired } of sortedCandidates) {
+    const key = JSON.stringify([
+      desired.brandId,
+      desired.fullName.toLowerCase(),
+      desired.edition,
+      desired.statedAge,
+      desired.noAgeStatement,
+      desired.vintageYear,
+      desired.releaseYear,
+      desired.releaseMonth,
+      desired.releaseDay,
+      desired.abv,
+      desired.singleCask,
+      desired.caskStrength,
+      desired.caskNumber,
+    ]);
+    const owner = structuredIdentityOwners.get(key);
+    if (owner !== undefined && owner !== bottleId) {
+      throw new BottleIdentityConflictError(owner, "structured_identity");
+    }
+    structuredIdentityOwners.set(key, bottleId);
+  }
+
+  const desiredNames = Array.from(
+    new Set(
+      sortedCandidates.map(({ desired }) => desired.fullName.toLowerCase()),
+    ),
+  ).sort();
+  for (const desiredName of desiredNames) {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtext(${`bottle:identity:${desiredName}`}))`,
+    );
+  }
+
+  for (const { desired } of sortedCandidates) {
+    const [conflictingBottle] = await tx
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(
+        and(
+          notInArray(bottles.id, excludedBottleIds),
+          eq(bottles.brandId, desired.brandId),
+          eq(sql`LOWER(${bottles.fullName})`, desired.fullName.toLowerCase()),
+          sql`${bottles.edition} IS NOT DISTINCT FROM ${desired.edition}`,
+          sql`${bottles.statedAge} IS NOT DISTINCT FROM ${desired.statedAge}`,
+          sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${desired.noAgeStatement}`,
+          sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${desired.vintageYear}`,
+          sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${desired.releaseYear}`,
+          sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${desired.releaseMonth}`,
+          sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${desired.releaseDay}`,
+          sql`${bottles.abv} IS NOT DISTINCT FROM ${desired.abv}`,
+          sql`${bottles.singleCask} IS NOT DISTINCT FROM ${desired.singleCask}`,
+          sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${desired.caskStrength}`,
+          sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${desired.caskNumber}`,
+        ),
+      )
+      .orderBy(asc(bottles.id))
+      .limit(1);
+    if (conflictingBottle) {
+      throw new BottleIdentityConflictError(
+        conflictingBottle.id,
+        "structured_identity",
+      );
+    }
+  }
 
   const smwsChanges = sortedCandidates
     .map((candidate) => {

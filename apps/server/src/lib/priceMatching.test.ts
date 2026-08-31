@@ -601,7 +601,7 @@ describe("priceMatching", () => {
     });
     expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
     expect(createdBottle).toMatchObject({
-      name: "Eclipse – Finished in Orange Wine Casks - 52.9% ABV",
+      name: "Eclipse – Finished in Orange Wine Casks",
       category: "blend",
       abv: 52.9,
     });
@@ -1181,7 +1181,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("create_new approval only reuses an active nonignored exact canonical Bottle", async ({
+  test("create_new approval reuses an exact structured Bottle identity", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User({ mod: true });
@@ -1260,40 +1260,6 @@ describe("priceMatching", () => {
       currentBottleId: first.bottle.id,
       suggestedBottleId: first.bottle.id,
     });
-
-    await db
-      .update(bottleAliases)
-      .set({ ignored: true })
-      .where(eq(bottleAliases.name, first.bottle.fullName));
-    const ignoredPrice = await fixtures.StorePrice({
-      externalSiteId: site.id,
-      name: "Canonical Reuse Ignored Listing",
-    });
-    const [ignoredProposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: ignoredPrice.id,
-        status: "pending_review",
-        proposalType: "create_new",
-      })
-      .returning();
-
-    await expect(
-      createBottleFromStorePriceMatchProposal({
-        proposalId: ignoredProposal.id,
-        bottleInput,
-        user: reviewer,
-        actor: await getUserActor(reviewer),
-      }),
-    ).rejects.toMatchObject({
-      bottleId: first.bottle.id,
-      collision: { kind: "alias" },
-    });
-    expect(
-      await db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, ignoredProposal.id),
-      }),
-    ).toMatchObject({ status: "pending_review" });
   });
 
   test("prefers a literal exact alias over apostrophe-normalized fallback matches", async ({
@@ -3592,8 +3558,8 @@ describe("priceMatching", () => {
     });
     expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
     expect(createdBottle).toMatchObject({
-      name: "RW6.5 Sauna Smoke - Single Cask",
-      fullName: "SMWS RW6.5 Sauna Smoke - Single Cask",
+      name: "RW6.5 Sauna Smoke",
+      fullName: "SMWS RW6.5 Sauna Smoke",
       brandId: brand.id,
       bottlerId: brand.id,
       category: "rye",
@@ -4078,8 +4044,8 @@ describe("priceMatching", () => {
     });
     expect(proposal.suggestedBottleId).not.toBe(mismatchedBottle.id);
     expect(createdBottle).toMatchObject({
-      name: "RW6.5 Sauna Smoke - Single Cask",
-      fullName: "SMWS RW6.5 Sauna Smoke - Single Cask",
+      name: "RW6.5 Sauna Smoke",
+      fullName: "SMWS RW6.5 Sauna Smoke",
       brandId: brand.id,
     });
     expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
@@ -4195,8 +4161,8 @@ describe("priceMatching", () => {
       bottleId: proposal.suggestedBottleId,
     });
     expect(createdBottle).toMatchObject({
-      name: "Web Reserve - 12-year-old",
-      fullName: "Auto Brand Web Reserve - 12-year-old",
+      name: "Web Reserve",
+      fullName: "Auto Brand Web Reserve",
       statedAge: 12,
       createdByActorId: systemActor.id,
     });
@@ -4357,12 +4323,12 @@ describe("priceMatching", () => {
       bottleId: proposal.suggestedBottleId,
     });
     expect(createdBottle).toMatchObject({
-      name: "Lease Reserve - 12-year-old",
-      fullName: "Retry Auto Brand Lease Reserve - 12-year-old",
+      name: "Lease Reserve",
+      fullName: "Retry Auto Brand Lease Reserve",
     });
   });
 
-  test("does not auto-reuse an existing Bottle through a noncanonical alias collision", async ({
+  test("creates a Bottle when its marketed title matches another Bottle alias", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -4464,13 +4430,16 @@ describe("priceMatching", () => {
     });
 
     expect(proposal).toMatchObject({
-      status: "errored",
+      status: "approved",
       proposalType: "create_new",
-      currentBottleId: null,
-      suggestedBottleId: null,
-      error: "Bottle already exists.",
+      currentBottleId: expect.any(Number),
+      suggestedBottleId: expect.any(Number),
+      error: null,
     });
-    expect(updatedPrice).toMatchObject({ bottleId: null });
+    expect(proposal.suggestedBottleId).not.toBe(bottle.id);
+    expect(updatedPrice).toMatchObject({
+      bottleId: proposal.suggestedBottleId,
+    });
   });
 
   test("auto creates new bottles even when replacing an existing assignment", async ({
@@ -4592,8 +4561,8 @@ describe("priceMatching", () => {
       bottleId: proposal.suggestedBottleId,
     });
     expect(createdBottle).toMatchObject({
-      name: "Fresh Release - 12-year-old",
-      fullName: "Replacement Brand Fresh Release - 12-year-old",
+      name: "Fresh Release",
+      fullName: "Replacement Brand Fresh Release",
     });
   });
 
