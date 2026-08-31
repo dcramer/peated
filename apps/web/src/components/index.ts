@@ -139,6 +139,8 @@ export type {
 } from "./historyTimeline.stylex";
 export { ImageAttribution } from "./imageAttribution.stylex";
 export type { ImageAttributionProps } from "./imageAttribution.stylex";
+export { ImageViewer } from "./imageViewer.stylex";
+export type { ImageViewerProps } from "./imageViewer.stylex";
 export { ItemList, ItemListItem, ItemRow } from "./itemList.stylex";
 export type {
   ItemListItemProps,

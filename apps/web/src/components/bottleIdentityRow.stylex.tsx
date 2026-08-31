@@ -9,6 +9,7 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
+import { ImageViewer } from "./imageViewer.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MemberStatus } from "./memberStatus.stylex";
 
@@ -18,6 +19,7 @@ const bottleIconUrl = "/assets/bottle.svg";
 export type BottleVisualSize = "sm" | "md" | "lg";
 
 export type BottleVisualProps = {
+  expandable?: boolean;
   imageUrl?: string | null;
   label?: string;
   size?: BottleVisualSize;
@@ -25,6 +27,7 @@ export type BottleVisualProps = {
 
 /** Shows a supplied bottle image and uses Peated's bottle glyph when no image exists. */
 export function BottleVisual({
+  expandable = false,
   imageUrl,
   label,
   size = "md",
@@ -40,7 +43,15 @@ export function BottleVisual({
         visualSizeStyles[size],
       )}
     >
-      {imageUrl ? (
+      {imageUrl && expandable && label ? (
+        <ImageViewer
+          alt=""
+          fill
+          imageProps={stylex.props(styles.image)}
+          label={label}
+          src={imageUrl}
+        />
+      ) : imageUrl ? (
         <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
       ) : (
         <span

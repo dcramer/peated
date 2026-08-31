@@ -9,6 +9,7 @@ import {
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
+import { ImageViewer } from "../../imageViewer.stylex";
 
 export function ModerationDetailFrame({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.frame)}>{children}</div>;
@@ -97,7 +98,15 @@ export function ModerationMedia({
   return (
     <div {...stylex.props(styles.media)}>
       {imageUrl ? (
-        <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
+        <div {...stylex.props(styles.imageFrame)}>
+          <ImageViewer
+            alt=""
+            fill
+            imageProps={stylex.props(styles.image)}
+            label="submitted image"
+            src={imageUrl}
+          />
+        </div>
       ) : null}
       <div {...stylex.props(styles.mediaCopy)}>{children}</div>
     </div>
@@ -197,15 +206,19 @@ const styles = stylex.create({
   },
   image: {
     boxSizing: "border-box",
-    width: "80px",
-    height: "96px",
-    flexShrink: 0,
+    width: "100%",
+    height: "100%",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
     borderRadius: controlMetrics.radiusSmall,
     objectFit: "contain",
     backgroundColor: colors.imageBackground,
+  },
+  imageFrame: {
+    width: "80px",
+    height: "96px",
+    flexShrink: 0,
   },
   mediaCopy: {
     minWidth: 0,

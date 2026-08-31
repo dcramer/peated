@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { ImageAttribution } from "@peated/web/components";
+import { ImageAttribution, ImageViewer } from "@peated/web/components";
 import { colors, space } from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
@@ -17,10 +17,12 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
       {...stylex.props(styles.gallery)}
     >
       <figure {...stylex.props(styles.primaryFigure)}>
-        <img
+        <ImageViewer
           alt={primary.caption || `${entity.name} primary image`}
+          caption={primary.caption}
+          imageProps={stylex.props(styles.primaryImage)}
+          label={primary.caption || `${entity.name} primary image`}
           src={primary.imageUrl}
-          {...stylex.props(styles.primaryImage)}
         />
         {primary.caption || primary.sourceUrl || primary.license ? (
           <figcaption {...stylex.props(styles.caption)}>
@@ -36,10 +38,12 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
         <div {...stylex.props(styles.secondaryGrid)}>
           {otherImages.map((image) => (
             <figure key={image.id} {...stylex.props(styles.secondaryFigure)}>
-              <img
+              <ImageViewer
                 alt={image.caption || `${entity.name} image`}
+                caption={image.caption}
+                imageProps={stylex.props(styles.secondaryImage)}
+                label={image.caption || `${entity.name} image`}
                 src={image.imageUrl}
-                {...stylex.props(styles.secondaryImage)}
               />
               {image.caption || image.sourceUrl || image.license ? (
                 <figcaption {...stylex.props(styles.caption)}>

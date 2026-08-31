@@ -6,6 +6,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
+import { ImageViewer } from "../imageViewer.stylex";
 
 export type PhotoPreviewProps = {
   loading?: boolean;
@@ -34,10 +35,15 @@ export function PhotoPreview({
           loading && styles.loadingImageFrame,
         )}
       >
-        <img
+        <ImageViewer
           alt="Uploaded bottle label"
+          fill
+          imageProps={stylex.props(
+            styles.image,
+            loading && styles.loadingImage,
+          )}
+          label="uploaded bottle label"
           src={src}
-          {...stylex.props(styles.image, loading && styles.loadingImage)}
         />
         {loading ? (
           <span aria-hidden="true" {...stylex.props(styles.progress)}>
