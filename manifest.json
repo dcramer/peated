@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/cli/src/commands/bottles.ts",
+    "apps/cli/src/commands/mocks.ts",
+    "apps/server/migrations/0257_gigantic_kat_farrell.sql",
+    "apps/server/migrations/0258_silky_warstar.sql",
+    "apps/server/migrations/meta/0257_snapshot.json",
+    "apps/server/migrations/meta/0258_snapshot.json",
+    "apps/server/migrations/meta/_journal.json",
+    "apps/server/src/agents/bottleClassifier/contextAdapters.test.ts",
+    "apps/server/src/agents/bottleClassifier/contextAdapters.ts",
+    "apps/server/src/agents/entityClassifier/service.ts",
+    "apps/server/src/db/schema/entities.ts",
+    "apps/server/src/lib/bottleOperationReview/entity.ts",
+    "apps/server/src/lib/bottleOperationReview/shared.ts",
+    "apps/server/src/lib/bottleOperationReviewSchemas.ts",
+    "apps/server/src/lib/brandRepairCandidates.ts",
+    "apps/server/src/lib/catalogVerificationFindings.ts",
+    "apps/server/src/lib/classifierEntitySearch.test.ts",
+    "apps/server/src/lib/classifierEntitySearch.ts",
+    "apps/server/src/lib/db.test.ts",
+    "apps/server/src/lib/db.ts"
+  ],
+  "commitSha": "e6b6de26af04aa54a8a61a9552a95a74fb17b09c",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
