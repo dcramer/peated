@@ -49,8 +49,11 @@ Then apply these rules:
 
 - Set `brand`, `distillers`, `bottler`, and `series` from product evidence. Do
   not infer a bottler from the Brand owner or distributor.
-- Keep Bottle names free of package facts such as `70cl release`, gift box, or
-  export carton. Use `edition` only for a marketed release descriptor.
+- Keep `name` to the stable marketed expression. Do not append age, vintage
+  year, release year, ABV, cask strength, cask number, outturn, package size, or
+  package text to make it unique. Store those facts in their fields. Preserve
+  wording only when the producer markets it as part of the expression. Use
+  `edition` only for an explicit marketed release descriptor.
 - Store only known date parts. Use `releaseYear`, then `releaseMonth`, then
   `releaseDay`. A month needs a year, and a day needs a month. Do not invent the
   first day of a month. Do not copy a distillation or bottling date into release
@@ -72,9 +75,11 @@ shows that it is wrong.
 
 Review these as separate records with separate authority:
 
-- The Bottle name is the current stable marketed expression. Keep an edition,
-  batch, vintage, or other release selector in its structured field when the
-  data model supports it.
+- Review `name` and `edition` apart from the exact fields. Reject a proposed
+  display name that repeats structured facts without evidence that the producer
+  markets that wording as part of the expression. For a uniform label that
+  features a different distillery on each release, use the featured distillery
+  as `name` when there is no separate expression name.
 - A BottleAlias is a verified alternate marketed name that customers can see
   and search. Add one only when producer material, a label, or another strong
   source proves that the release was marketed under that name. Remove one when
@@ -107,6 +112,7 @@ The CLI uses `https://api.peated.com` by default. It adds `/v1` to API paths.
 pnpm cli auth status
 pnpm cli api get '/entities?query=Rare%20Malts%20Selection&limit=25'
 pnpm cli api get '/bottles?brand=366603&limit=100&sort=name'
+pnpm cli api get /bottles/123/edit-context
 pnpm cli api get '/bottles/123/aliases'
 pnpm cli api get '/bottle-references?bottle=123&limit=100'
 pnpm cli api get '/admin/bottle-reference-audit?reviewState=unreviewed&limit=50'
@@ -176,6 +182,9 @@ pnpm cli api post /bottle-references/456/review --input /tmp/reference-review.js
 
 - Read every target immediately before the batch. Stop if an ID, identity, or
   current value differs from the manifest.
+- Before a name patch, read the Bottle edit context. Confirm the shared `name`,
+  exact fields, and number of affected Bottles. A name patch is a shared edit
+  and can rematerialize every Bottle in the group.
 - Get explicit authorization for the write scope. Use `--yes` only after that
   authorization.
 - Patch explicit IDs in small batches. Do not derive write targets from result
@@ -184,6 +193,9 @@ pnpm cli api post /bottle-references/456/review --input /tmp/reference-review.js
   before retrying.
 - Re-fetch every changed Bottle. Compare the stored values with the manifest
   and confirm that unrelated fields did not change.
+- After a name patch, re-fetch the Bottle edit context and the Bottle. Confirm
+  the shared name is the stable expression, the Bottle `name` and `fullName`
+  are concise, and every exact field is unchanged.
 - Re-fetch each uploaded `imageUrl` and inspect the stored image. Confirm that
   it still shows the expected release after server processing.
 - After a merge, fetch both IDs. Confirm that the old ID resolves to the chosen

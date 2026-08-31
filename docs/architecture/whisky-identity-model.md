@@ -232,9 +232,15 @@ Entity.
   `2024 Release`, or `S2B13`. Preserve its descriptor words. A printed batch or
   lot code is not an edition when the producer sells one ongoing product
   without batch-specific marketing.
-- Bottle names combine the stable expression with an explicit edition. Age,
-  year, ABV, and production flags remain structured facts and are not generated
-  as name suffixes. Wording already marketed in the expression remains there.
+- Bottle names combine the stable expression with an explicit marketed
+  edition. Age, vintage year, release year, ABV, cask strength, cask number, and
+  outturn remain structured facts. Do not generate name suffixes from those
+  fields to make a Bottle look unique. Wording already marketed in the
+  expression remains there.
+- For a uniform multi-distillery label with no separate expression name, use
+  the featured distillery as the Bottle name. For example, use `Glenury Royal`
+  as the Rare Series Bottle name. Store its 55-year age, 1970 vintage, 2026
+  release year, and 62.4% ABV in their fields, not in the name.
 - `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
   was bottled. `releaseYear` is the known year the marketed release became
   available. Store `releaseMonth` and `releaseDay` only when the source gives
