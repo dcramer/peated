@@ -1,7 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
 
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../styles/tokens.stylex";
 
 export type PageTabItem = {
   count?: number;
@@ -91,10 +97,19 @@ const styles = stylex.create({
     },
   },
   count: {
+    minWidth: "20px",
+    borderRadius: controlMetrics.radiusSmall,
+    paddingTop: "2px",
+    paddingRight: "6px",
+    paddingBottom: "2px",
+    paddingLeft: "6px",
+    backgroundColor: colors.surface,
     color: colors.inkMuted,
     fontFamily: fonts.data,
-    fontSize: "13px",
+    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    fontWeight: 400,
+    fontWeight: 600,
+    lineHeight: 1.2,
+    textAlign: "center",
   },
 });

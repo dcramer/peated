@@ -91,7 +91,6 @@ export function EntityBottleOverview({
 
   return (
     <PageSection
-      count={bottleList.results.length}
       heading={presentation.bottleSectionLabel}
       intro={
         <TextLink href={`${entityHref}/bottles?sort=-tastings`}>

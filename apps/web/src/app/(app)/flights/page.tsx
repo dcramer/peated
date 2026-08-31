@@ -45,7 +45,7 @@ export default async function FlightsPage(props: {
         eyebrow="Your record"
         title="Flights"
       />
-      <PageSection count={flightList.results.length} heading="Your flights">
+      <PageSection heading="Your flights">
         {flightList.results.length ? (
           <ItemList ariaLabel="Tasting flights">
             {flightList.results.map((flight) => (

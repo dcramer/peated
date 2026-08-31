@@ -48,7 +48,6 @@ export function EntityCodes({
 
       {groups.map((group) => (
         <PageSection
-          count={group.rows.length}
           heading={
             group.code ? `${group.heading} (${group.code})` : group.heading
           }

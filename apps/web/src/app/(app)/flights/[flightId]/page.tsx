@@ -60,7 +60,7 @@ export default async function FlightPage(props: {
         menu={<FlightActions flight={flight} />}
         title={flight.name}
       />
-      <PageSection count={flight.bottles.length} heading="Bottles">
+      <PageSection heading="Bottles">
         {flight.bottles.length ? (
           <ItemList ariaLabel="Flight bottles">
             {flight.bottles.map(({ bottle, hasTasted, isLibrary }) => (

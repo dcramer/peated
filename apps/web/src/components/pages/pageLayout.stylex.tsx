@@ -127,19 +127,17 @@ export function TabbedPage({
 
 export function PageSection({
   children,
-  count,
   heading,
   intro,
 }: {
   children: ReactNode;
-  count?: number;
   heading: ReactNode;
   intro?: ReactNode;
 }) {
   return (
     <section {...stylex.props(styles.section)}>
       <div {...stylex.props(styles.sectionHeader)}>
-        <SectionHeading count={count}>{heading}</SectionHeading>
+        <SectionHeading>{heading}</SectionHeading>
         {intro ? (
           <div {...stylex.props(styles.sectionIntro)}>{intro}</div>
         ) : null}

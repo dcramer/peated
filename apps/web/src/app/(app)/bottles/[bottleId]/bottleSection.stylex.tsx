@@ -6,16 +6,14 @@ import { space } from "../../../../styles/tokens.stylex";
 
 export function BottleSection({
   children,
-  count,
   heading,
 }: {
   children: ReactNode;
-  count?: number;
   heading: ReactNode;
 }) {
   return (
     <section {...stylex.props(styles.section)}>
-      <SectionHeading count={count}>{heading}</SectionHeading>
+      <SectionHeading>{heading}</SectionHeading>
       {children}
     </section>
   );

@@ -24,7 +24,7 @@ export const Overview: Story = {
   render: () => (
     <StoryStack>
       <Card>
-        <SectionHeading count={312}>Distilleries</SectionHeading>
+        <SectionHeading>Distilleries</SectionHeading>
       </Card>
       <CardLink href="#lagavulin">
         <SectionHeading>Lagavulin</SectionHeading>

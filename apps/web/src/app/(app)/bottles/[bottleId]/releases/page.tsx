@@ -54,7 +54,7 @@ export default async function BottleReleasesPage(props: {
   const pathname = `/bottles/${anchorId}/releases`;
 
   return (
-    <BottleSection count={bottleList.results.length} heading="Releases">
+    <BottleSection heading="Releases">
       {bottleList.results.length ? (
         <ItemList ariaLabel="Bottle releases">
           {bottleList.results.map((bottle) => (
