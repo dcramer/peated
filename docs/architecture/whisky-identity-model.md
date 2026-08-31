@@ -200,6 +200,29 @@ authority.
   bottling as a separate release.
 - Do not infer `statedAge` from year fields unless the source states the age.
 
+When one uniform consumer label markets whiskies from multiple named
+distilleries, use that uniform label as the Brand when the distillery names
+identify provenance rather than separate consumer brands. Keep each producer
+in `distillers`. Do not assign the distillery as Brand only because a common
+product title puts the distillery name first. Display order does not change
+identity.
+
+For example, model Rare Malts Selection as Brand for its Brora release. Use
+Brora as the Bottle name and distiller. Do not model Rare Malts Selection as a
+series beneath the Brora Brand.
+
+BottleSeries belongs to one Brand. Do not use BottleSeries to demote an
+evidenced uniform Brand into several distillery Brands. A real marketing
+program that relates independently branded products needs a separately
+designed cross-brand collection concept; it is not a BottleSeries in the
+current model.
+
+Package volume, export carton, gift box, and miniature presentation are not
+Bottle editions by themselves. Variants that differ only by those package
+facts identify the same Bottle. Store a market or package phrase in `edition`
+only when product evidence shows that the producer markets it as a distinct
+release descriptor.
+
 Brand identity is not a longest-prefix match. Distillery, bottler, owner,
 importer, and parent-company names may appear in source text without becoming
 the brand. Canonical names and aliases are evidence, but stale or

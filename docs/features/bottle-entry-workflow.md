@@ -4,6 +4,9 @@ This document describes the current manual Bottle create and edit workflow. The
 [Whisky Identity Model](../architecture/whisky-identity-model.md) owns identity,
 field ownership, grouping, and merge semantics.
 
+For researched catalog backfills, deduplication, and production API edits, use
+the [Catalog Enrichment](../operations/catalog-enrichment.md) workflow.
+
 ## Creation
 
 - The Add a bottle form accepts one flat Bottle input. The server owns field storage and
@@ -11,8 +14,8 @@ field ownership, grouping, and merge semantics.
 - A submitted stated age belongs to the new Bottle. The singleton BottleGroup
   starts without a shared age. A reviewed shared edit can establish one later.
 - A release can have only a year, a year and month, or a full date. A month
-  requires a year, and a day requires a month. The server rejects invalid
-  combinations.
+  requires a year, and a day requires a month. Store only the parts supported
+  by evidence. The server rejects invalid combinations.
 - Creation atomically creates a singleton BottleGroup. Users do not select,
   name, or submit authority for a group.
 - Deterministic alias duplicate checks remain in the request path. Slow catalog

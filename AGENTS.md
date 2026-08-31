@@ -99,11 +99,12 @@ in that area.
 | Catalog classifier behavior               | `docs/architecture/whisky-identity-model.md`, `docs/architecture/bottle-classifier.md`, `docs/architecture/entity-classifier.md`, `packages/bottle-classifier/AGENTS.md` |
 | oRPC routes and clients                   | `docs/development/orpc-routes.md`, `docs/development/orpc-client.md`                                                                                                     |
 | Bottle entry and photo resolution         | `docs/features/bottle-entry-workflow.md`, `docs/features/photo-tasting-entry.md`                                                                                         |
+| Catalog enrichment                        | `docs/operations/catalog-enrichment.md`                                                                                                                                  |
 | Public catalog identifiers                | `docs/architecture/peated-ids.md`                                                                                                                                        |
 | Ratings and aggregates                    | `docs/architecture/rating-systems.md`                                                                                                                                    |
 | Web components, layouts, and caching      | `docs/policies/frontend-components.md`, `docs/policies/web-route-layouts.md`, `docs/development/web-caching.md`                                                          |
 | Local UI verification                     | `docs/development/local-ui-verification.md`                                                                                                                              |
-| Production debugging                      | `docs/development/production-debugging.md`                                                                                                                               |
+| Production debugging                      | `docs/operations/production-debugging.md`                                                                                                                                |
 
 Policy documents contain repo-wide defaults. Feature architecture and
 non-obvious invariants belong in the owning package, module, or feature
