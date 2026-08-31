@@ -1,6 +1,7 @@
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
-import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
 
@@ -8,19 +9,10 @@ import { EntityPageFrameClient } from "./entityPageFrameClient.stylex";
 
 export async function generateMetadata(props: {
   params: Promise<{ entityId: string }>;
-}) {
+}): Promise<Metadata> {
   const { entityId } = await props.params;
   const entity = await getEntityPage(Number(entityId));
-  const description = summarize(entity.description || "", 200);
-  const primaryImage = entity.images?.[0];
-  const images = primaryImage ? [primaryImage.imageUrl] : [];
-
-  return {
-    title: entity.name,
-    description,
-    openGraph: { title: entity.name, description, images },
-    twitter: { card: "summary", images },
-  };
+  return getEntitySeoMetadata(entity);
 }
 
 export default async function EntityLayout(props: {

@@ -210,17 +210,11 @@ async function handleRpcRequest({ request, response, url }) {
       }
       return false;
     case "entities/details":
-      if (
-        [testBrand, testBottler, testOwnedEntity, testOwner].some(
-          (entity) => entity.id === Number(input?.entity),
-        )
-      ) {
-        sendRpcResponse(
-          response,
-          [testBrand, testBottler, testOwnedEntity, testOwner].find(
-            (entity) => entity.id === Number(input?.entity),
-          ),
-        );
+      const entity = [testBrand, testBottler, testOwnedEntity, testOwner].find(
+        (candidate) => candidate.id === Number(input?.entity),
+      );
+      if (entity) {
+        sendRpcResponse(response, { ...entity, images: [] });
         return true;
       }
       sendRpcError(response, "Unexpected entity details payload");
