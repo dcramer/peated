@@ -12,12 +12,15 @@ export const MAJOR_COUNTRIES = [
 
 export const CATEGORY_LIST = [
   "blend",
+  "blended_grain",
+  "blended_malt",
   "bourbon",
+  "corn",
   "rye",
   "single_grain",
   "single_malt",
   "single_pot_still",
-  "spirit",
+  "wheat",
 ] as const;
 
 export const BOTTLE_AGE_BAND_LIST = [

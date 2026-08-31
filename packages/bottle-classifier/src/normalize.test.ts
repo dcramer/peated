@@ -144,6 +144,18 @@ describe("normalize", () => {
     expect(normalizeCategory("Redbreast Single Pot Still Irish Whiskey")).toBe(
       "single_pot_still",
     );
+    expect(normalizeCategory("Compass Box Blended Malt Scotch Whisky")).toBe(
+      "blended_malt",
+    );
+    expect(normalizeCategory("Blended Grain Scotch Whisky")).toBe(
+      "blended_grain",
+    );
+    expect(normalizeCategory("Blended Straight Rye Whiskeys")).toBe("rye");
+    expect(normalizeCategory("Blended Corn Whiskey")).toBe("corn");
+    expect(normalizeCategory("Blended Wheat Whiskey")).toBe("wheat");
+    expect(normalizeCategory("American Corn Whiskey")).toBe("corn");
+    expect(normalizeCategory("Malt Whisky")).toBeNull();
+    expect(normalizeCategory("Spirit")).toBeNull();
     expect(normalizeEntityName("Maker's Mark Distillery")).toBe(
       "Maker's Mark Distillery",
     );

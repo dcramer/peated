@@ -170,7 +170,7 @@ describe("GET /countries/categories", () => {
       distillerIds: [countryDistiller.id],
     });
     const destinationBottle = await fixtures.Bottle({
-      category: "spirit",
+      category: null,
       distillerIds: [otherDistiller.id],
     });
 

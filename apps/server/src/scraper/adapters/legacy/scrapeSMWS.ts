@@ -154,7 +154,7 @@ function categoryFromSmwsFacts({
   const details = caskNumber
     ? parseDetailsFromName(`${caskNumber} Society bottle`)
     : null;
-  if (details?.distiller) return details.category ?? "spirit";
+  if (details?.distiller) return details.category;
 
   const normalizedSpirit = spirit?.toLowerCase() ?? "";
   const normalizedRegion = region?.toLowerCase() ?? "";
@@ -162,18 +162,26 @@ function categoryFromSmwsFacts({
     normalizedRegion.includes("blended malt") ||
     normalizedSpirit.includes("blended malt")
   ) {
-    return "blend";
+    return "blended_malt";
   }
   if (
-    normalizedSpirit.includes("grain whisky") ||
+    normalizedRegion.includes("blended grain") ||
+    normalizedSpirit.includes("blended grain")
+  ) {
+    return "blended_grain";
+  }
+  if (
+    normalizedSpirit.includes("single grain whisky") ||
     normalizedSpirit.includes("single grain")
   ) {
     return "single_grain";
   }
   if (normalizedSpirit.includes("bourbon")) return "bourbon";
+  if (normalizedSpirit.includes("corn whisky")) return "corn";
   if (normalizedSpirit.includes("rye")) return "rye";
-  if (normalizedSpirit.includes("malt whisky")) return "single_malt";
-  return "spirit";
+  if (normalizedSpirit.includes("wheat whisky")) return "wheat";
+  if (normalizedSpirit.includes("single malt whisky")) return "single_malt";
+  return null;
 }
 
 function isSingleCask(

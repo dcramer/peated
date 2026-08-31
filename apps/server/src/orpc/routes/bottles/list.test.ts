@@ -374,7 +374,7 @@ describe("GET /bottles", () => {
       category: "blend",
       noAgeStatement: true,
     });
-    await fixtures.Bottle({ name: "Unknown Age", category: "spirit" });
+    await fixtures.Bottle({ name: "Unknown Age", category: null });
 
     const response = await routerClient.bottles.list({ limit: 2 });
 
@@ -386,7 +386,6 @@ describe("GET /bottles", () => {
         { value: "bourbon", count: 1 },
         { value: "rye", count: 1 },
         { value: "single_malt", count: 2 },
-        { value: "spirit", count: 1 },
       ],
       ageBand: [
         { value: "nas", count: 1 },

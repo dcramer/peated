@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-legacy-spirit-category-does-not-block-shibui-grain-select",
-  "name": "store listing: legacy spirit category does not block Shibui Grain Select",
+  "id": "store-listing-unknown-category-does-not-block-shibui-grain-select",
+  "name": "store listing: unknown category does not block Shibui Grain Select",
   "input": {
     "reference": {
       "name": "Shibui Grain Select Whisky 750ml",
@@ -30,7 +30,7 @@
         "bottler": null,
         "series": null,
         "distillery": [],
-        "category": "spirit",
+        "category": null,
         "statedAge": null,
         "edition": null,
         "caskStrength": null,
@@ -68,13 +68,13 @@
       "https://www.shibuiwhisky.com/grain-select",
       "https://api.peated.com/v1/bottles/13025"
     ],
-    "notes": "Shibui describes Grain Select as a grain-led world whisky made from wheat and malt. Peated Bottle 13025 has the exact marketed identity; its legacy generic spirit category is catalog debt rather than evidence of a different product."
+    "notes": "Shibui describes Grain Select as a grain-led world whisky made from wheat and malt. Peated Bottle 13025 has the exact marketed identity; its missing category is incomplete catalog data rather than evidence of a different product."
   },
   "expected": {
     "status": "classified",
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 13025,
-    "summary": "Ignore the legacy generic `spirit` bucket on the stored bottle, then keep the exact-name existing match to Shibui Grain Select."
+    "summary": "Keep the exact-name existing match to Shibui Grain Select even though the stored bottle has no category."
   }
 }

@@ -23,6 +23,7 @@ export function formatCategoryName(
   value: Category | string | undefined | null,
 ) {
   if (!value) return "";
+  if (value === "blend") return "Blended Whisky";
   return toTitleCase(`${value}`.replace(/_/g, " "));
 }
 

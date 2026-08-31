@@ -225,7 +225,6 @@ function maybeRejectExactCaskCreateDuplicate({
           !proposedBottleHasKnownTargetConflict({
             target: candidate,
             proposedBottle,
-            extractedIdentity: artifacts.extractedIdentity,
           }),
       )
       .sort((left, right) => {
@@ -327,30 +326,12 @@ function stringListsOverlap(
   );
 }
 
-function proposedBottleChangesOnlyLegacyGenericCategory({
-  target,
-  proposedBottle,
-  extractedIdentity,
-}: {
-  target: BottleCandidate;
-  proposedBottle: ProposedBottle;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-}) {
-  return (
-    target.category === "spirit" &&
-    proposedBottle.category !== null &&
-    proposedBottle.category === extractedIdentity?.category
-  );
-}
-
 function proposedBottleNeedsMaterialTargetRepair({
   target,
   proposedBottle,
-  extractedIdentity,
 }: {
   target: BottleCandidate;
   proposedBottle: ProposedBottle;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
 }): boolean {
   if (
     target.brand &&
@@ -364,12 +345,8 @@ function proposedBottleNeedsMaterialTargetRepair({
 
   if (
     proposedBottle.category !== null &&
-    target.category !== proposedBottle.category &&
-    !proposedBottleChangesOnlyLegacyGenericCategory({
-      target,
-      proposedBottle,
-      extractedIdentity,
-    })
+    target.category !== null &&
+    target.category !== proposedBottle.category
   ) {
     return true;
   }
@@ -451,11 +428,9 @@ function proposedBottleNeedsMaterialTargetRepair({
 function proposedBottleHasKnownTargetConflict({
   target,
   proposedBottle,
-  extractedIdentity,
 }: {
   target: BottleCandidate;
   proposedBottle: ProposedBottle;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
 }): boolean {
   return proposedBottleNeedsMaterialTargetRepair({
     target,
@@ -466,7 +441,6 @@ function proposedBottleHasKnownTargetConflict({
         target.caskStrength === null ? null : proposedBottle.caskStrength,
       singleCask: target.singleCask === null ? null : proposedBottle.singleCask,
     },
-    extractedIdentity,
   });
 }
 
@@ -666,8 +640,6 @@ function sanitizeProposedBottleDraft(
 
   return {
     ...proposedBottle,
-    category:
-      proposedBottle.category === "spirit" ? null : proposedBottle.category,
     series,
     brand,
     distillers: proposedBottle.distillers.map((distiller) =>

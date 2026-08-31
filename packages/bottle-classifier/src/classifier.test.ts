@@ -4889,7 +4889,7 @@ describe("createBottleClassifier", () => {
       bottler: null,
       series: null,
       distillery: [],
-      category: "spirit",
+      category: null,
       statedAge: null,
       edition: null,
       caskStrength: null,

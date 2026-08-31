@@ -288,8 +288,7 @@ export function getCategoryFromCask(caskNumber: string): Category | null {
   } else if (caskNumber.startsWith("RW")) {
     return "rye";
   } else if (caskNumber.startsWith("CW1")) {
-    // SMWS corn whisky has no current house category, so keep it unknown.
-    return null;
+    return "corn";
   } else if (caskNumber.startsWith("B")) {
     return "bourbon";
   } else if (caskNumber.startsWith("R")) {

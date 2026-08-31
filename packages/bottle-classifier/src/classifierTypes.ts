@@ -2,12 +2,15 @@ import { z } from "zod";
 
 export const CATEGORY_LIST = [
   "blend",
+  "blended_grain",
+  "blended_malt",
   "bourbon",
+  "corn",
   "rye",
   "single_grain",
   "single_malt",
   "single_pot_still",
-  "spirit",
+  "wheat",
 ] as const;
 
 export const BOTTLE_ENTITY_ROLE_LIST = [

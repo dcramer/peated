@@ -21,11 +21,15 @@ type ExtractionExample = {
 
 const CATEGORY_VALUES = [
   "`blend`",
+  "`blended_grain`",
+  "`blended_malt`",
   "`bourbon`",
+  "`corn`",
   "`rye`",
   "`single_grain`",
   "`single_malt`",
   "`single_pot_still`",
+  "`wheat`",
 ].join(", ");
 
 export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
@@ -96,8 +100,12 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     outputField: "`category`",
     guidance: [
       `Normalize into one of ${CATEGORY_VALUES}.`,
+      "Use the most specific recognized whisky style. Treat the country and region as separate facts. Follow the local legal style when the source states one.",
+      "Use `blend` for a general blended-whisky designation. Use `blended_malt` for single malts from more than one distillery. Use `blended_grain` for grain whiskies from more than one distillery.",
+      "A specific grain style takes precedence over blend construction. Classify blended rye as `rye`, blended corn whisky as `corn`, and blended wheat whisky as `wheat`. Classify bourbon as `bourbon`, not `corn`.",
+      "Use `corn`, `rye`, or `wheat` when the source states that recognized style. Do not infer a majority grain from tasting notes, location, or an unstated mash bill.",
       "Only return `single_malt` when the source explicitly says single malt. Do not collapse `malt whiskey` or `straight malt whiskey` into `single_malt`; leave `category` as `null` if no house value fits.",
-      "If the whisky category is unclear, return `null` instead of using a broader fallback bucket.",
+      "If the whisky category is unclear, return `null`. Do not use `spirit`, `grain`, `malt`, `whisky`, or a regional name as a fallback category.",
     ],
   },
   {

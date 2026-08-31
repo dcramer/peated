@@ -104,7 +104,7 @@ test("parses all-time archive bottle cards and skips non-bottle products", () =>
   expect(result.bottles[1]?.bottle).toMatchObject({
     name: "BAT.13 Tabanco Time",
     abv: 50,
-    category: "blend",
+    category: "blended_malt",
     caskNumber: "BAT.13",
     singleCask: false,
     distillers: [],
@@ -566,7 +566,7 @@ test("categorizes current small batches without distillery codes", async ({
       expect.objectContaining({
         name: "Highland peaty potion",
         edition: "Batch 42",
-        category: "single_malt",
+        category: null,
         caskNumber: null,
         singleCask: false,
         distillers: [],

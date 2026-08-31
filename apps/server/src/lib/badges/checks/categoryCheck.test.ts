@@ -50,18 +50,21 @@ describe("config schema", () => {
           "code": "invalid_value",
           "values": [
             "blend",
+            "blended_grain",
+            "blended_malt",
             "bourbon",
+            "corn",
             "rye",
             "single_grain",
             "single_malt",
             "single_pot_still",
-            "spirit"
+            "wheat"
           ],
           "path": [
             "category",
             0
           ],
-          "message": "Invalid option: expected one of \\"blend\\"|\\"bourbon\\"|\\"rye\\"|\\"single_grain\\"|\\"single_malt\\"|\\"single_pot_still\\"|\\"spirit\\""
+          "message": "Invalid option: expected one of \\"blend\\"|\\"blended_grain\\"|\\"blended_malt\\"|\\"bourbon\\"|\\"corn\\"|\\"rye\\"|\\"single_grain\\"|\\"single_malt\\"|\\"single_pot_still\\"|\\"wheat\\""
         }
       ]]
     `);

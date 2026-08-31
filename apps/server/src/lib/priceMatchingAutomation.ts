@@ -117,12 +117,20 @@ function clampScore(score: number) {
 
 function getCategoryKeywords(value: string) {
   switch (value) {
+    case "blend":
+      return ["blended whisky", "blended whiskey"];
+    case "corn":
+      return ["corn whisky", "corn whiskey"];
+    case "rye":
+      return ["rye whisky", "rye whiskey"];
     case "single_malt":
       return ["single malt"];
     case "single_grain":
       return ["single grain"];
     case "single_pot_still":
       return ["single pot still"];
+    case "wheat":
+      return ["wheat whisky", "wheat whiskey"];
     default:
       return [value.replace(/_/g, " ")];
   }
@@ -425,8 +433,7 @@ function hasUsableStructuredSourceIdentity(
   return Boolean(
     sourceIdentity?.brand?.trim() &&
     sourceIdentity.expression?.trim() &&
-    sourceIdentity.category &&
-    sourceIdentity.category !== "spirit",
+    sourceIdentity.category,
   );
 }
 
