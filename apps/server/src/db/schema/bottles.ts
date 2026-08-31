@@ -265,7 +265,7 @@ export const bottles = pgTable(
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
     index("bottle_release_sort_idx").using(
       "btree",
-      table.releaseYear.desc(),
+      table.releaseYear.desc().nullsLast(),
       table.releaseMonth.desc().nullsLast(),
       table.releaseDay.desc().nullsLast(),
       table.createdAt.desc(),
