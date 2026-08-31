@@ -1,20 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { buildBody } from "./post-pr-comment.mjs";
+import { buildBody, shouldPostComment } from "./post-pr-comment.mjs";
 
-describe("buildBody", () => {
+describe("post PR comment", () => {
   it("describes selected pages and changed files", () => {
-    const body = buildBody(
-      {
-        changedFiles: ["apps/web/src/components/loginForm.tsx"],
-        scenarioIds: ["login"],
-        screenshots: [{ file: "login__desktop.png", label: "Login · desktop" }],
-        selection: "changed-files",
-        skipped: false,
-      },
-      "https://example.com/screenshots",
-    );
+    const manifest = {
+      changedFiles: ["apps/web/src/components/loginForm.tsx"],
+      scenarioIds: ["login"],
+      screenshots: [{ file: "login__desktop.png", label: "Login · desktop" }],
+      selection: "changed-files",
+      skipped: false,
+    };
+    const body = buildBody(manifest, "https://example.com/screenshots");
 
+    expect(shouldPostComment(manifest)).toBe(true);
     expect(body).toContain("## Web screenshots");
     expect(body).toContain("Run: pages matched to changed files");
     expect(body).toContain("Pages: `login`");
@@ -24,20 +23,15 @@ describe("buildBody", () => {
     );
   });
 
-  it("explains when no page matches", () => {
-    const body = buildBody(
-      {
+  it("skips the comment when no page matches", () => {
+    expect(
+      shouldPostComment({
         changedFiles: ["apps/web/e2e/activity-feed.spec.ts"],
         scenarioIds: [],
         screenshots: [],
         selection: "changed-files",
         skipped: true,
-      },
-      "https://example.com/screenshots",
-    );
-
-    expect(body).toContain(
-      "No screenshot scenarios match these changed files.",
-    );
+      }),
+    ).toBe(false);
   });
 });
