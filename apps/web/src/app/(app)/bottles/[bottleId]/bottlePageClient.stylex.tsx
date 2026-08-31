@@ -511,6 +511,7 @@ export function BottleOverviewClient({
         />
       ),
       href: `/bottles/${recommendation.id}`,
+      imageUrl: recommendation.imageUrl,
       metadata: [
         formatCategoryName(recommendation.category),
         recommendation.abv === null

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { CriticReviewProps, FactListItem, TastingEntryProps } from "..";
 import {
   AppLink,
+  BottleVisual,
   CriticReview,
   FactList,
   hasVisibleFacts,
@@ -23,6 +24,7 @@ const RAIL_STACKS = "@media (max-width: 680px)";
 export type BottleRecommendation = {
   end?: ReactNode;
   href: string;
+  imageUrl?: string | null;
   metadata?: string;
   name: string;
 };
@@ -140,6 +142,12 @@ export function BottleOverview({
                     end={recommendation.end}
                     href={recommendation.href}
                     key={recommendation.href}
+                    leading={
+                      <BottleVisual
+                        imageUrl={recommendation.imageUrl}
+                        size="sm"
+                      />
+                    }
                     metadata={recommendation.metadata}
                     title={recommendation.name}
                   />
