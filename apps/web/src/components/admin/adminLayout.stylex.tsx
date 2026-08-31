@@ -30,7 +30,7 @@ export type AdminNavigationGroup = {
   label: string;
 };
 
-export type AdminWorkspaceProps = {
+export type AdminLayoutProps = {
   children: ReactNode;
   currentHref?: string;
   groups: readonly AdminNavigationGroup[];
@@ -80,17 +80,17 @@ function AdminNavigation({
   );
 }
 
-/** Owns the common responsive frame for every administrator route. */
-export function AdminWorkspace({
+/** Owns the common responsive layout for every administrator route. */
+export function AdminLayout({
   children,
   currentHref,
   groups,
-}: AdminWorkspaceProps) {
+}: AdminLayoutProps) {
   const pathname = usePathname();
   const activeHref = currentHref ?? pathname;
 
   return (
-    <div {...stylex.props(foundationStyles.document, styles.workspace)}>
+    <div {...stylex.props(foundationStyles.document, styles.layout)}>
       <SkipLink href="#admin-content">Skip to admin content</SkipLink>
 
       <header {...stylex.props(styles.mobileHeader)}>
@@ -133,7 +133,7 @@ export function AdminWorkspace({
 }
 
 const styles = stylex.create({
-  workspace: {
+  layout: {
     minHeight: "100dvh",
     backgroundColor: colors.ground,
     color: colors.ink,

@@ -1,7 +1,7 @@
 import {
-  AdminWorkspace,
+  AdminLayout,
   type AdminNavigationGroup,
-} from "@peated/web/components/admin/adminWorkspace.stylex";
+} from "@peated/web/components/admin/adminLayout.stylex";
 import React from "react";
 
 const navigationGroups = [
@@ -27,10 +27,10 @@ const navigationGroups = [
   },
 ] satisfies readonly AdminNavigationGroup[];
 
-export default async function AdminLayout({
+export default async function AdminRouteLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <AdminWorkspace groups={navigationGroups}>{children}</AdminWorkspace>;
+  return <AdminLayout groups={navigationGroups}>{children}</AdminLayout>;
 }
