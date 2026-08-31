@@ -16,6 +16,10 @@ const SORT_OPTIONS = [
   "-bottles",
 ] as const;
 
+export const EntityKindListOutputSchema = listResponse(EntitySchema).extend({
+  total: z.number().int().nonnegative(),
+});
+
 export const EntityKindListInputSchema = z
   .object({
     query: z
@@ -88,5 +92,5 @@ export function createEntityKindListContract({
       operationId,
     })
     .input(EntityKindListInputSchema)
-    .output(listResponse(EntitySchema));
+    .output(EntityKindListOutputSchema);
 }

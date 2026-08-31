@@ -67,5 +67,8 @@ export function listEntities(
     })
     .map((entity) => mockEntityFor(signedIn, entity));
 
-  return mockPage(entities, input.cursor, input.limit);
+  return {
+    ...mockPage(entities, input.cursor, input.limit),
+    total: entities.length,
+  };
 }

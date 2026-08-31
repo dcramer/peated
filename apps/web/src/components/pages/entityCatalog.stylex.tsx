@@ -48,9 +48,10 @@ export type EntityCatalogListProps = {
   showFollowingMarks?: boolean;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
+  total: number;
 };
 
-/** Presents one API-owned cursor page without inventing a total. */
+/** Presents one API-owned cursor page and its full-result total. */
 export function EntityCatalogList({
   addHref,
   emptyAction,
@@ -68,24 +69,28 @@ export function EntityCatalogList({
   showFollowingMarks = true,
   sort,
   sortOptions,
+  total,
 }: EntityCatalogListProps) {
   return (
     <section aria-label={`${noun} catalog`} {...stylex.props(styles.catalog)}>
-      <ListToolbar
-        count={items.length}
-        noun={noun}
-        onSortChange={onSortChange}
-        sort={sort}
-        sortOptions={sortOptions}
-      />
       {items.length ? (
-        <EntityCatalogTable
-          items={items}
-          noun={noun}
-          onToggleFollowing={onToggleFollowing}
-          pendingId={pendingId}
-          showFollowingMarks={showFollowingMarks}
-        />
+        <>
+          <ListToolbar
+            count={items.length}
+            noun={noun}
+            onSortChange={onSortChange}
+            sort={sort}
+            sortOptions={sortOptions}
+            total={total}
+          />
+          <EntityCatalogTable
+            items={items}
+            noun={noun}
+            onToggleFollowing={onToggleFollowing}
+            pendingId={pendingId}
+            showFollowingMarks={showFollowingMarks}
+          />
+        </>
       ) : (
         <EmptyState
           action={

@@ -42,9 +42,26 @@ describe("Entity kind collections", () => {
       kind: "distillery",
     });
 
-    const { results } = await routerClient.brands.list({ query: "Highland" });
+    const { results, total } = await routerClient.brands.list({
+      query: "Highland",
+    });
 
     expect(results.map(({ id }) => id)).toEqual([expected.id]);
+    expect(total).toBe(1);
+  });
+
+  test("returns the full filtered total for a page", async ({ fixtures }) => {
+    await fixtures.Entity({ name: "First Distillery", kind: "distillery" });
+    await fixtures.Entity({ name: "Second Distillery", kind: "distillery" });
+    await fixtures.Entity({ name: "Other Brand", kind: "brand" });
+
+    const { results, total } = await routerClient.distilleries.list({
+      limit: 1,
+      sort: "name",
+    });
+
+    expect(results).toHaveLength(1);
+    expect(total).toBe(2);
   });
 
   test("filters a kind collection by location", async ({ fixtures }) => {

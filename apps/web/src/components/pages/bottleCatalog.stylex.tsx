@@ -80,16 +80,18 @@ export function BottleCatalogList({
 }: BottleCatalogListProps) {
   return (
     <section aria-label="Bottle catalog" {...stylex.props(styles.catalog)}>
-      <ListToolbar
-        count={items.length}
-        noun="bottle"
-        onSortChange={onSortChange}
-        sort={sort}
-        sortOptions={sortOptions}
-        total={total}
-      />
       {items.length ? (
-        <BottleCatalogTable items={items} />
+        <>
+          <ListToolbar
+            count={items.length}
+            noun="bottle"
+            onSortChange={onSortChange}
+            sort={sort}
+            sortOptions={sortOptions}
+            total={total}
+          />
+          <BottleCatalogTable items={items} />
+        </>
       ) : (
         <EmptyState
           action={
