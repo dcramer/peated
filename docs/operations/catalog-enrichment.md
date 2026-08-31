@@ -24,8 +24,8 @@ stay null. A catalog is not complete only because every release has a row.
    Classify each expected release as create, update, merge, no change, or
    unresolved.
 5. Keep a manifest with the expected identity, Peated IDs, proposed changes,
-   image source, and source URL for each changed fact. Mark uncertain rows for
-   review instead of guessing.
+   image source, source URL for each changed fact, and any alias or reference
+   decision. Mark uncertain rows for review instead of guessing.
 
 Prefer producer material, label images, and contemporary announcements. A
 specialist archive or auction catalog can fill historical gaps when it shows
@@ -68,6 +68,37 @@ Then apply these rules:
 Use `null` for unknown facts. Preserve a current value unless stronger evidence
 shows that it is wrong.
 
+## Review Names, Aliases, And References
+
+Review these as separate records with separate authority:
+
+- The Bottle name is the current stable marketed expression. Keep an edition,
+  batch, vintage, or other release selector in its structured field when the
+  data model supports it.
+- A BottleAlias is a verified alternate marketed name that customers can see
+  and search. Add one only when producer material, a label, or another strong
+  source proves that the release was marketed under that name. Remove one when
+  evidence shows that it is generated text, an error, or a name for another
+  release.
+- A BottleReference is an accepted input string that can match new ingestion
+  directly to one Bottle. Verify it only when the complete string identifies
+  that exact release. Quarantine it when it is wrong, ambiguous, generated
+  noise, or belongs to another release. Quarantine does not move consumers that
+  are already assigned.
+
+Do not add old generated full names, package text, spelling mistakes, or search
+phrases as display aliases. Do not use a display alias to grant matching
+authority. A useful alternate marketed name can be both an alias and a
+reference, but each decision needs its own evidence.
+
+After a rename, review the Bottle's aliases and noncanonical references. For an
+SMWS single-cask Bottle, an unchanged Society code proves that an old subtitle
+belongs to the same Bottle, so the old canonical name can remain a reference.
+Add the old subtitle as a display alias only when evidence shows that SMWS
+marketed the Bottle under both titles. For a numbered batch, keep the stable
+expression in the name and the complete `Batch N` value in `edition`; do not
+add the old generated combined name as an alias.
+
 ## Use The Production API
 
 The CLI uses `https://api.peated.com` by default. It adds `/v1` to API paths.
@@ -76,6 +107,9 @@ The CLI uses `https://api.peated.com` by default. It adds `/v1` to API paths.
 pnpm cli auth status
 pnpm cli api get '/entities?query=Rare%20Malts%20Selection&limit=25'
 pnpm cli api get '/bottles?brand=366603&limit=100&sort=name'
+pnpm cli api get '/bottles/123/aliases'
+pnpm cli api get '/bottle-references?bottle=123&limit=100'
+pnpm cli api get '/admin/bottle-reference-audit?reviewState=unreviewed&limit=50'
 ```
 
 Follow `rel.nextCursor` until every page is loaded. Before a write, check the
@@ -110,6 +144,34 @@ For a reviewed merge, this example merges Bottle `111` into survivor `222`:
 pnpm cli api post /bottles/111/merge --input /tmp/bottle-merge.json
 ```
 
+To add a verified display alias, send only the marketed name:
+
+```json
+{
+  "name": "Verified alternate marketed name"
+}
+```
+
+```bash
+pnpm cli api post /bottles/123/aliases --input /tmp/bottle-alias.json
+pnpm cli api delete /bottles/123/aliases/789
+```
+
+Reference review uses the current `stateToken` returned by the list or audit
+endpoint. Choose `verify` to keep exact matching or `quarantine` to stop future
+matching:
+
+```json
+{
+  "action": "quarantine",
+  "stateToken": "current-state-token"
+}
+```
+
+```bash
+pnpm cli api post /bottle-references/456/review --input /tmp/reference-review.json
+```
+
 ## Batch Safety
 
 - Read every target immediately before the batch. Stop if an ID, identity, or
@@ -126,6 +188,11 @@ pnpm cli api post /bottles/111/merge --input /tmp/bottle-merge.json
   it still shows the expected release after server processing.
 - After a merge, fetch both IDs. Confirm that the old ID resolves to the chosen
   survivor and that references, facts, and the best image were preserved.
+- After a name change or merge, re-fetch aliases and references. Confirm that
+  verified display names remain visible and quarantined references no longer
+  appear in the active reference list.
+- Treat a stale reference `stateToken` as changed state. Re-fetch and review it
+  again instead of retrying the old decision.
 - Report the target environment, changed count, verified count, sources, and
   rows skipped for missing or conflicting evidence.
 
@@ -135,6 +202,9 @@ The operation is complete only when:
 
 - every inventory row has a final status;
 - every writable field was reviewed, including image, dates, and outturn;
+- every in-scope alias has evidence for its marketed name, and every in-scope
+  reference other than the current full Bottle name was verified, quarantined,
+  or marked unresolved;
 - every stored fact has adequate source evidence;
 - every create, update, image, and merge was read back and verified;
 - expected, stored, merged, and unresolved counts reconcile; and
