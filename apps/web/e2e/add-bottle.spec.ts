@@ -424,7 +424,7 @@ test.describe("create bottle", () => {
     );
     await expect(
       page.getByText(
-        "There was an error uploading your image, but the bottle was saved.",
+        "We couldn't upload the image, but the bottle was saved. Try the image again.",
       ),
     ).toBeVisible();
   });
