@@ -429,9 +429,13 @@ describe("POST /external-sites/:site/prices", () => {
       externalProductId: listing.externalProductId,
     });
     expect(updated!.sourceFingerprint).not.toBe(initial!.sourceFingerprint);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      { priceId: initial!.id },
+      { priceId: initial!.id, force: true },
+    );
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
     );
   });
 

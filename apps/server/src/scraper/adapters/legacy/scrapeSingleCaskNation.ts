@@ -83,87 +83,81 @@ export function parseReleaseMonth(input: string) {
   };
 }
 
-async function parseSingleCaskNationProducts(
+async function scrapeSingleCaskNationProducts(
   input: JsonValue,
   sourceUrl: string,
+  onListing: ScrapePricesCallback,
   loadReleases: LoadReleases,
-): Promise<StorePrice[]> {
+) {
   const payload = SingleCaskNationProductsSchema.parse(input);
   const savedReleases = await loadReleases(
     payload.products.flatMap((product) =>
       product.id === undefined ? [] : [String(product.id)],
     ),
   );
-  const products = await Promise.all(
-    payload.products.map(async (product): Promise<StorePrice | null> => {
-      const category = CATEGORY_BY_PRODUCT_TYPE.get(product.product_type);
-      if (!category) return null;
+  for (const product of payload.products) {
+    const category = CATEGORY_BY_PRODUCT_TYPE.get(product.product_type);
+    if (!category) continue;
 
-      const pricedVariant = product.variants
-        .map((variant) => ({
-          ...variant,
-          parsedPrice: parseShopifyPrice(variant.price),
-        }))
-        .find((variant) => variant.available && variant.parsedPrice !== null);
-      if (!pricedVariant || pricedVariant.parsedPrice === null) return null;
+    const pricedVariant = product.variants
+      .map((variant) => ({
+        ...variant,
+        parsedPrice: parseShopifyPrice(variant.price),
+      }))
+      .find((variant) => variant.available && variant.parsedPrice !== null);
+    if (!pricedVariant || pricedVariant.parsedPrice === null) continue;
 
-      const { name } = normalizeBottle({
-        name: `Single Cask Nation ${product.title}`,
-      });
-      const productUrl = absoluteUrl(
-        sourceUrl,
-        `/products/${encodeURIComponent(product.handle)}`,
-      );
-      const shopifyIdentity = getShopifyStorePriceIdentity(
-        product,
-        pricedVariant,
-      );
-      let release: Release | null | undefined =
-        shopifyIdentity.externalProductId
-          ? savedReleases.get(shopifyIdentity.externalProductId)
-          : undefined;
-      // A saved release date does not change. Fetch the page until we have one.
-      if (!release) release = parseReleaseMonth(await getUrl(productUrl));
-      const listing: StorePrice = {
-        ...shopifyIdentity,
-        name,
-        price: pricedVariant.parsedPrice,
-        currency: "usd",
-        volume: DEFAULT_VOLUME,
-        url: productUrl,
-        imageUrl: product.images[0]?.src ?? null,
-        sourceBottleIdentity: BottleExtractedDetailsSchema.parse({
-          brand: "Single Cask Nation",
-          bottler: "Single Cask Nation",
-          expression: product.title,
-          category,
-          single_cask: true,
-          release_year: release?.releaseYear ?? null,
-          release_month: release?.releaseMonth ?? null,
-        }),
-      };
+    const { name } = normalizeBottle({
+      name: `Single Cask Nation ${product.title}`,
+    });
+    const productUrl = absoluteUrl(
+      sourceUrl,
+      `/products/${encodeURIComponent(product.handle)}`,
+    );
+    const shopifyIdentity = getShopifyStorePriceIdentity(
+      product,
+      pricedVariant,
+    );
+    let release: Release | null | undefined = shopifyIdentity.externalProductId
+      ? savedReleases.get(shopifyIdentity.externalProductId)
+      : undefined;
+    // A saved release date does not change. Fetch the page until we have one.
+    if (!release) {
+      release = parseReleaseMonth(await getUrl(productUrl));
+    }
+    const listing: StorePrice = {
+      ...shopifyIdentity,
+      sourceFingerprint: "release-month-v1",
+      name,
+      price: pricedVariant.parsedPrice,
+      currency: "usd",
+      volume: DEFAULT_VOLUME,
+      url: productUrl,
+      imageUrl: product.images[0]?.src ?? null,
+      sourceBottleIdentity: BottleExtractedDetailsSchema.parse({
+        brand: "Single Cask Nation",
+        bottler: "Single Cask Nation",
+        expression: product.title,
+        category,
+        single_cask: true,
+        release_year: release?.releaseYear ?? null,
+        release_month: release?.releaseMonth ?? null,
+      }),
+    };
 
-      logScrapedProduct(SITE, listing);
-      return listing;
-    }),
-  );
-
-  return products.filter((product): product is StorePrice => product !== null);
+    logScrapedProduct(SITE, listing);
+    await onListing(listing);
+  }
 }
 
 export async function scrapeProducts(
   url: string,
-  cb: ScrapePricesCallback,
+  onListing: ScrapePricesCallback,
   loadReleases: LoadReleases = noSavedReleases,
 ) {
   const data = await getUrl(url);
   const catalog = ShopifyCatalogSchema.parse(JSON.parse(data));
-  const products = await parseSingleCaskNationProducts(
-    catalog,
-    url,
-    loadReleases,
-  );
-  await Promise.all(products.map(cb));
+  await scrapeSingleCaskNationProducts(catalog, url, onListing, loadReleases);
   return { hasSourceProducts: catalog.products.length > 0 };
 }
 
@@ -175,7 +169,7 @@ export default async function scrapeSingleCaskNation(
     SITE,
     (page) =>
       `${STORE_ORIGIN}/collections/frontpage/products.json?limit=250&page=${page}&country=US`,
-    (url, cb) => scrapeProducts(url, cb, loadReleases),
+    (url, onListing) => scrapeProducts(url, onListing, loadReleases),
     { dryRun },
   );
 }
