@@ -141,6 +141,70 @@ test("marks an explicitly multi-cask Society release as a small batch", () => {
   });
 });
 
+test("keeps reused Society labels out of bottle names and cask numbers", () => {
+  const result = parseArchivePage(`
+    <p class="productCount">3 Products</p>
+    <ul class="productGrid">
+      <li class="product"><article class="itemSmall"
+        data-item-name="Bazaar Berries"
+        data-item-sku="SM0123GB0700609">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">Small Batch</span></li>
+          <li><span class="name">ABV</span><span class="value">50.0%</span></li>
+          <li><span class="name">SPIRIT</span><span class="value">Malt Whisky</span></li>
+        </ul></div>
+      </article></li>
+      <li class="product"><article class="itemSmall"
+        data-item-name="Viking toothpaste"
+        data-item-sku="SM0124GB0700610">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">Distillery 93 Rare Release</span></li>
+          <li><span class="name">REGION</span><span class="value">Campbeltown</span></li>
+          <li><span class="name">ABV</span><span class="value">60.0%</span></li>
+          <li><span class="name">SPIRIT</span><span class="value">Malt Whisky</span></li>
+        </ul></div>
+      </article></li>
+      <li class="product"><article class="itemSmall"
+        data-item-name="Lime and thyme"
+        data-item-sku="SM0125GB0700611">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">5 Lowland Batch 2022</span></li>
+          <li><span class="name">REGION</span><span class="value">Lowland</span></li>
+          <li><span class="name">ABV</span><span class="value">55.8%</span></li>
+          <li><span class="name">SPIRIT</span><span class="value">Malt Whisky</span></li>
+        </ul></div>
+      </article></li>
+    </ul>
+  `);
+
+  expect(result.bottles.map(({ bottle }) => bottle)).toEqual([
+    expect.objectContaining({
+      name: "Bazaar Berries",
+      category: null,
+      caskNumber: null,
+      singleCask: false,
+      distillers: [],
+    }),
+    expect.objectContaining({
+      name: "Viking toothpaste",
+      category: "single_malt",
+      caskNumber: null,
+      singleCask: false,
+      distillers: [{ name: "Glen Scotia" }],
+    }),
+    expect.objectContaining({
+      name: "Lime and thyme",
+      category: "single_malt",
+      caskNumber: null,
+      singleCask: false,
+      distillers: [{ name: "Auchentoshan" }],
+    }),
+  ]);
+  for (const { bottle } of result.bottles) {
+    expect(bottle).not.toHaveProperty("edition");
+  }
+});
+
 test("reads the public storefront token from plain or escaped page context", () => {
   expect(
     parseStorefrontToken('{"storefront_api":{"token":"plain-token"}}'),
@@ -514,7 +578,7 @@ test("prefers a known cask code encoded in the official SKU", async ({
   });
 });
 
-test("categorizes current small batches without distillery codes", async ({
+test("keeps current batch and rare-release titles clean", async ({
   axiosMock,
 }) => {
   const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
@@ -528,13 +592,14 @@ test("categorizes current small batches without distillery codes", async ({
             cask_no: z.string().nullable(),
             region: z.string().nullish(),
             spirit_type: z.string().nullish(),
+            list_description: z.string().nullish(),
           })
           .passthrough(),
       ),
     })
     .passthrough()
     .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
-  payload.items = payload.items.slice(0, 2);
+  payload.items = payload.items.slice(0, 4);
   payload.items[0].sku = "SM0123GB0700609";
   payload.items[0].name = "Incognito";
   payload.items[0].cask_no = "Batch 41";
@@ -545,6 +610,18 @@ test("categorizes current small batches without distillery codes", async ({
   payload.items[1].cask_no = "Batch 42";
   payload.items[1].region = "Highland";
   payload.items[1].spirit_type = "Malt Whisky";
+  payload.items[2].sku = "SM0125GB0700611";
+  payload.items[2].name = "Bazaar Berries";
+  payload.items[2].cask_no = "Small Batch";
+  payload.items[2].region = null;
+  payload.items[2].spirit_type = "Malt Whisky";
+  payload.items[2].list_description =
+    "A delightful small batch sherried single malt.";
+  payload.items[3].sku = "SM0126GB0700612";
+  payload.items[3].name = "Dark 'n' stormy crème brûlée";
+  payload.items[3].cask_no = "Distillery G16 Rare Release";
+  payload.items[3].region = "Lowland";
+  payload.items[3].spirit_type = "Grain Whisky";
   axiosMock.onGet(url).reply(200, payload);
 
   const items: any[] = [];
@@ -552,7 +629,7 @@ test("categorizes current small batches without distillery codes", async ({
     items.push(item);
   });
 
-  expect(items).toHaveLength(2);
+  expect(items).toHaveLength(4);
   expect(items.map(([bottle]) => bottle)).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
@@ -571,6 +648,22 @@ test("categorizes current small batches without distillery codes", async ({
         singleCask: false,
         distillers: [],
       }),
+      expect.objectContaining({
+        name: "Bazaar Berries",
+        category: "single_malt",
+        caskNumber: null,
+        singleCask: false,
+        distillers: [],
+      }),
+      expect.objectContaining({
+        name: "Dark 'n' stormy crème brûlée",
+        category: "single_grain",
+        caskNumber: null,
+        singleCask: false,
+        distillers: [{ name: "Glasgow Distillery" }],
+      }),
     ]),
   );
+  expect(items[2][0]).not.toHaveProperty("edition");
+  expect(items[3][0]).not.toHaveProperty("edition");
 });
