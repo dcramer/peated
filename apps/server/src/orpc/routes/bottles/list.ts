@@ -250,9 +250,9 @@ export default implement(bottleListContract).handler(async function ({
       break;
     case "-release":
       orderBy = sql`
-          COALESCE(${bottles.releaseYear}, EXTRACT(YEAR FROM ${bottles.createdAt})) DESC,
-          ${bottles.releaseYear} IS NULL ASC,
-          ${bottles.releaseDate} DESC NULLS LAST,
+          ${bottles.releaseYear} DESC NULLS LAST,
+          ${bottles.releaseMonth} DESC NULLS LAST,
+          ${bottles.releaseDay} DESC NULLS LAST,
           ${bottles.createdAt} DESC NULLS LAST
         `;
       break;

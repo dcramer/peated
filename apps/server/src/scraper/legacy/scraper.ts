@@ -178,10 +178,18 @@ export async function persistBottleObservation(
     // An SMWS cask code outlives its mutable subtitle. Reuse its Bottle id;
     // the update boundary makes the new title canonical and retains the old
     // canonical title as an alias.
+    const updateInput = { ...createInput };
+    for (const field of [
+      "releaseYear",
+      "releaseMonth",
+      "releaseDay",
+    ] as const) {
+      if (!(field in bottle)) delete updateInput[field];
+    }
     resultBottle = (
       await updateBottleAsPeated({
         bottleId: error.bottleId,
-        input: createInput,
+        input: updateInput,
       })
     ).bottle;
   }

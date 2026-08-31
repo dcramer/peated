@@ -4,7 +4,7 @@
  */
 import { BottleInputFields } from "@peated/server/schemas";
 import { z } from "zod";
-import { releaseYearFromDate } from "./bottleRelease";
+import { isValidReleaseDate } from "./bottleRelease";
 
 export const MAX_BOTTLE_SUGGESTED_TAGS = 5;
 
@@ -86,7 +86,8 @@ const ExactBottleInputFields = {
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
-  releaseDate: BottleInputFields.releaseDate,
+  releaseMonth: BottleInputFields.releaseMonth,
+  releaseDay: BottleInputFields.releaseDay,
   maturation: BottleInputFields.maturation,
   caskNumber: BottleInputFields.caskNumber,
   outturn: BottleInputFields.outturn,
@@ -118,17 +119,22 @@ function validateBottleInput(
       path: ["noAgeStatement"],
     });
   }
-  if (
-    input.releaseDate !== null &&
-    input.releaseDate !== undefined &&
-    input.releaseYear !== null &&
-    input.releaseYear !== undefined &&
-    input.releaseYear !== releaseYearFromDate(input.releaseDate)
-  ) {
+}
+
+function validateBottleCreateInput(
+  input: z.infer<typeof BottleCreateFieldsSchema>,
+  ctx: z.RefinementCtx,
+) {
+  validateBottleInput(input, ctx);
+  const releaseYear = input.releaseYear ?? null;
+  const releaseMonth = input.releaseMonth ?? null;
+  const releaseDay = input.releaseDay ?? null;
+  if (!isValidReleaseDate({ releaseYear, releaseMonth, releaseDay })) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Release year must match release date.",
-      path: ["releaseYear"],
+      message:
+        "Enter a valid release date. A month needs a year, and a day needs a month.",
+      path: [releaseDay == null ? "releaseMonth" : "releaseDay"],
     });
   }
 }
@@ -137,8 +143,9 @@ function validateBottleInput(
  * Flat Bottle creation is the only creation contract. The service owns which
  * fields are stored as BottleGroup authority and which fields stay exact.
  */
-export const BottleCreateInputSchema =
-  BottleCreateFieldsSchema.superRefine(validateBottleInput);
+export const BottleCreateInputSchema = BottleCreateFieldsSchema.superRefine(
+  validateBottleCreateInput,
+);
 
 export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;
 
@@ -194,7 +201,10 @@ const BottlePatchFieldsSchema = z
       .lte(new Date().getFullYear())
       .nullable()
       .optional(),
-    releaseDate: ExactBottleInputFields.releaseDate.removeDefault().optional(),
+    releaseMonth: ExactBottleInputFields.releaseMonth
+      .removeDefault()
+      .optional(),
+    releaseDay: ExactBottleInputFields.releaseDay.removeDefault().optional(),
     maturation: ExactBottleInputFields.maturation.removeDefault().optional(),
     caskNumber: ExactBottleInputFields.caskNumber.removeDefault().optional(),
     outturn: ExactBottleInputFields.outturn.removeDefault().optional(),

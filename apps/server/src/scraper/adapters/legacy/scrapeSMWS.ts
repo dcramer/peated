@@ -1,6 +1,7 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
+import { parseExactReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   type BottleInputSchema,
   type StorePriceInputSchema,
@@ -47,11 +48,11 @@ function parseVintageYear(value: string | null | undefined): number | null {
     : null;
 }
 
-function parseReleaseDate(value: string | null | undefined): string | null {
+function parseReleaseDate(value: string | null | undefined) {
   if (!value) return null;
 
   const date = value.trim().slice(0, 10);
-  return z.string().date().safeParse(date).success ? date : null;
+  return parseExactReleaseDate(date);
 }
 
 function parseVolume(sku: string): number | null {
@@ -136,13 +137,13 @@ export async function scrapeBottles(
           return;
         }
 
-        const releaseDate = parseReleaseDate(item.release_date);
+        const release = parseReleaseDate(item.release_date);
 
         const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
           name: details.name,
           statedAge: item.age,
           vintageYear: parseVintageYear(item.distilleddate),
-          releaseYear: releaseDate ? Number(releaseDate.slice(0, 4)) : null,
+          releaseYear: release?.releaseYear ?? null,
           isFullName: false,
         });
 
@@ -155,31 +156,36 @@ export async function scrapeBottles(
           });
         }
 
-        await cb(
-          {
-            name,
-            vintageYear,
-            releaseYear,
-            releaseDate,
-            category: details.category,
-            statedAge,
-            abv,
-            brand: {
-              name: "The Scotch Malt Whisky Society",
-            },
-            bottler: {
-              name: "The Scotch Malt Whisky Society",
-            },
-            distillers: [
-              {
-                name: details.distiller,
-              },
-            ],
-            maturation: item.cask_type?.trim() || null,
-            caskNumber,
-            singleCask: true,
-            description: item.list_description?.trim() || null,
+        const bottle: z.input<typeof BottleInputSchema> = {
+          name,
+          vintageYear,
+          category: details.category,
+          statedAge,
+          abv,
+          brand: {
+            name: "The Scotch Malt Whisky Society",
           },
+          bottler: {
+            name: "The Scotch Malt Whisky Society",
+          },
+          distillers: [
+            {
+              name: details.distiller,
+            },
+          ],
+          maturation: item.cask_type?.trim() || null,
+          caskNumber,
+          singleCask: true,
+          description: item.list_description?.trim() || null,
+        };
+        if (release && releaseYear !== null) {
+          bottle.releaseYear = releaseYear;
+          bottle.releaseMonth = release.releaseMonth;
+          bottle.releaseDay = release.releaseDay;
+        }
+
+        await cb(
+          bottle,
           volume
             ? {
                 name: `SMWS ${details.name}`,

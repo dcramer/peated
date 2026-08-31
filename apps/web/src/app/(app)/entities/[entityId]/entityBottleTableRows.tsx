@@ -1,4 +1,5 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 
@@ -8,13 +9,6 @@ import {
 } from "@peated/web/components/designSystem/components";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
-
-const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
 
 function formatAbv(abv: number) {
   return abv.toFixed(1).replace(/\.0$/, "");
@@ -49,13 +43,8 @@ function formatBottleMetadata(bottle: Bottle) {
 }
 
 function formatReleaseMetadata(bottle: Bottle) {
-  const release = bottle.releaseDate
-    ? `Released ${releaseDateFormatter.format(
-        new Date(`${bottle.releaseDate}T00:00:00Z`),
-      )}`
-    : bottle.releaseYear
-      ? `Released ${bottle.releaseYear}`
-      : null;
+  const formattedRelease = formatReleaseDate(bottle);
+  const release = formattedRelease ? `Released ${formattedRelease}` : null;
 
   return [release, formatBottleMetadata(bottle)]
     .filter((value): value is string => Boolean(value))

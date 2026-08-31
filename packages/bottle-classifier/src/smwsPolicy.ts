@@ -336,6 +336,8 @@ function buildSmwsExactCaskBottleDraft({
     vintageYear: extractedIdentity?.vintage_year ?? null,
     bottlingYear: extractedIdentity?.bottling_year ?? null,
     releaseYear: extractedIdentity?.release_year ?? null,
+    releaseMonth: extractedIdentity?.release_month ?? null,
+    releaseDay: extractedIdentity?.release_day ?? null,
     brand: {
       id: null,
       name: brandName,

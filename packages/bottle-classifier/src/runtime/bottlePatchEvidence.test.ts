@@ -33,6 +33,8 @@ function bottleContext({
       caskStrength: true,
       vintageYear: 2007,
       releaseYear: 2024,
+      releaseMonth: null,
+      releaseDay: null,
       caskNumber: "#3456",
       maturation: "Other cask",
       outturn: 180,

@@ -77,6 +77,21 @@ const filtrationChoices: BooleanChoice[] = [
   { id: "no", name: "Chill-filtered" },
 ];
 
+const releaseMonths = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
 function booleanChoiceValue(value: string) {
   if (value === "yes") return true;
   if (value === "no") return false;
@@ -144,7 +159,8 @@ const moreDetailFields = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
-  "releaseDate",
+  "releaseMonth",
+  "releaseDay",
   "series",
   "singleCask",
   "caskStrength",
@@ -775,19 +791,53 @@ export default function BottleForm({
                 })}
               />
               <Field
-                error={errors.releaseDate?.message}
-                htmlFor="bottle-release-date"
-                label="Exact release date"
+                error={errors.releaseMonth?.message}
+                htmlFor="bottle-release-month"
+                label="Release month"
+                optional
+              >
+                <Controller
+                  control={control}
+                  name="releaseMonth"
+                  render={({ field }) => (
+                    <Select
+                      id="bottle-release-month"
+                      invalid={Boolean(errors.releaseMonth)}
+                      onChange={(event) =>
+                        field.onChange(
+                          event.currentTarget.value
+                            ? Number(event.currentTarget.value)
+                            : null,
+                        )
+                      }
+                      value={field.value ?? ""}
+                    >
+                      <option value="">Not set</option>
+                      {releaseMonths.map((month, index) => (
+                        <option key={month} value={index + 1}>
+                          {month}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </Field>
+              <Field
+                error={errors.releaseDay?.message}
+                htmlFor="bottle-release-day"
+                label="Release day"
                 optional
               >
                 <TextInput
-                  {...register("releaseDate", {
-                    setValueAs: (value) => value || null,
+                  {...register("releaseDay", {
+                    setValueAs: (value) => numberOrNull(value),
                   })}
                   format="data"
-                  id="bottle-release-date"
-                  invalid={Boolean(errors.releaseDate)}
-                  type="date"
+                  id="bottle-release-day"
+                  invalid={Boolean(errors.releaseDay)}
+                  max={31}
+                  min={1}
+                  type="number"
                 />
               </Field>
             </FormGrid>

@@ -1,3 +1,4 @@
+import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -10,6 +11,51 @@ const SITE = "decadentdrinks";
 const PRODUCT_CARD_SELECTOR =
   ".catalog-results .view-content > .col > .product-card";
 const DEFAULT_VOLUME = 700;
+const SITEMAP_URL = "https://decadent-drinks.com/sitemap.xml";
+
+function productUrlKey(value: string) {
+  const url = new URL(value);
+  url.hash = "";
+  url.search = "";
+  url.pathname = url.pathname.replace(/\/$/u, "") || "/";
+  return url.toString();
+}
+
+export function parseSitemapUpdatedYears(input: string) {
+  const $ = cheerio(input, { xmlMode: true });
+  const years = new Map<string, number>();
+  $("url").each((_, element) => {
+    const url = $("loc", element).text().trim();
+    const lastModified = $("lastmod", element).text().trim();
+    const match = /^(?<year>\d{4})-/u.exec(lastModified);
+    if (!url || !match?.groups) return;
+
+    const year = Number(match.groups.year);
+    if (year >= 1800 && year <= new Date().getFullYear()) {
+      years.set(productUrlKey(url), year);
+    }
+  });
+  return years;
+}
+
+export function parseExplicitReleaseYear(name: string): number | null {
+  const match =
+    /\b(?:spring|summer|autumn|fall|winter)(?:\s+edition)?\s+(20\d{2})\b/iu.exec(
+      name,
+    ) ?? /\b(20\d{2})\s+(?:edition|release)\b/iu.exec(name);
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  return year <= new Date().getFullYear() ? year : null;
+}
+
+export function parseSkuReleaseYear(input: string): number | null {
+  const match = /"SKU":"(?:BDS)?(?<year>\d{2})\d+"/u.exec(input);
+  if (!match?.groups) return null;
+
+  const year = 2000 + Number(match.groups.year);
+  return year <= new Date().getFullYear() ? year : null;
+}
 
 function extractVolume(name: string): [string, number] {
   const match = name.match(/^(.+?)\s+(\d+(?:\.\d+)?)\s*(cl|ml|l)$/i);
@@ -36,7 +82,11 @@ function parsePrice(value: string): number | null {
   return pounds * 100 + pence;
 }
 
-export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
+export async function scrapeProducts(
+  url: string,
+  cb: ScrapePricesCallback,
+  sitemapUpdatedYears: ReadonlyMap<string, number> = new Map(),
+) {
   const data = await getUrl(url);
   const $ = cheerio(data);
 
@@ -73,15 +123,32 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 
     logScrapedProduct(SITE, { name, price });
 
+    const productPageUrl = absoluteUrl(url, productUrl);
     promises.push(
-      cb({
-        name,
-        price,
-        currency: "gbp",
-        volume,
-        url: absoluteUrl(url, productUrl),
-        imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
-      }),
+      (async () => {
+        let releaseYear = parseExplicitReleaseYear(nameWithoutVolume);
+        const updatedYear = sitemapUpdatedYears.get(
+          productUrlKey(productPageUrl),
+        );
+        if (releaseYear === null && updatedYear !== undefined) {
+          const skuYear = parseSkuReleaseYear(await getUrl(productPageUrl));
+          if (skuYear === updatedYear) releaseYear = skuYear;
+        }
+
+        await cb({
+          name,
+          price,
+          currency: "gbp",
+          volume,
+          url: productPageUrl,
+          imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
+          sourceBottleIdentity: BottleExtractedDetailsSchema.parse({
+            bottler: "Decadent Drinks",
+            expression: name,
+            release_year: releaseYear,
+          }),
+        });
+      })(),
     );
   });
 
@@ -92,10 +159,13 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
 export default async function scrapeDecadentDrinks({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
+  const sitemapUpdatedYears = parseSitemapUpdatedYears(
+    await getUrl(SITEMAP_URL),
+  );
   return scrapePrices(
     SITE,
     (page) => `https://decadent-drinks.com/shop?category=5&page=${page - 1}`,
-    scrapeProducts,
+    (url, cb) => scrapeProducts(url, cb, sitemapUpdatedYears),
     { dryRun },
   );
 }

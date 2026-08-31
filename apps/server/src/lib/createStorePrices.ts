@@ -80,6 +80,8 @@ function getSourceFingerprint({
         sourceBottleIdentity.stated_age,
         sourceBottleIdentity.abv,
         sourceBottleIdentity.release_year,
+        sourceBottleIdentity.release_month,
+        sourceBottleIdentity.release_day,
         sourceBottleIdentity.vintage_year,
         sourceBottleIdentity.cask_strength,
         sourceBottleIdentity.single_cask,

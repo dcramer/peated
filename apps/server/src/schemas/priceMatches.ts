@@ -19,6 +19,8 @@ export const ExtractedBottleDetailsSchema = z.object({
   stated_age: z.number().nullable().default(null),
   abv: z.number().nullable().default(null),
   release_year: z.number().nullable().default(null),
+  release_month: z.number().int().min(1).max(12).nullable().optional(),
+  release_day: z.number().int().min(1).max(31).nullable().optional(),
   vintage_year: z.number().nullable().default(null),
   maturation: z.string().trim().nullable().default(null),
   cask_number: z.string().trim().nullable().default(null),
@@ -176,6 +178,8 @@ export const ProposedBottleSchema = z.object({
     .lte(new Date().getFullYear())
     .nullable()
     .default(null),
+  releaseMonth: z.number().int().min(1).max(12).nullable().default(null),
+  releaseDay: z.number().int().min(1).max(31).nullable().default(null),
   maturation: z.string().trim().nullable().default(null),
   caskNumber: z.string().trim().nullable().default(null),
   outturn: z.number().int().positive().nullable().default(null),

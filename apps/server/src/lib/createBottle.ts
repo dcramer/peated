@@ -56,7 +56,6 @@ import {
   getSmwsCodeForBottleIdentity,
 } from "./bottleConflicts";
 import { materializeBottleIdentity } from "./bottleIdentity";
-import { releaseYearFromDate } from "./bottleRelease";
 import {
   BottleCreateInputSchema,
   type BottleCreateInput,
@@ -111,6 +110,8 @@ type BottleIdentityPreparation = {
     | "vintageYear"
     | "bottlingYear"
     | "releaseYear"
+    | "releaseMonth"
+    | "releaseDay"
     | "singleCask"
     | "caskStrength"
   >;
@@ -143,7 +144,8 @@ type ExactBottleCreateInput = Pick<
   | "vintageYear"
   | "bottlingYear"
   | "releaseYear"
-  | "releaseDate"
+  | "releaseMonth"
+  | "releaseDay"
   | "maturation"
   | "caskNumber"
   | "outturn"
@@ -212,10 +214,6 @@ async function prepareBottleCreateInTransaction(
     // Explicit exact input overrides traits inferred from the group name.
     Object.assign(bottleData, bottleIdentity.exactNormalizedFields);
   }
-  if (bottleData.releaseDate) {
-    bottleData.releaseYear = releaseYearFromDate(bottleData.releaseDate);
-  }
-
   if (input.description !== undefined) {
     bottleData.description = input.description;
     bottleData.descriptionSrc =
@@ -347,6 +345,8 @@ async function prepareBottleCreateInTransaction(
           noAgeStatement: bottleData.noAgeStatement ?? null,
           bottlingYear: bottleData.bottlingYear ?? null,
           releaseYear: bottleData.releaseYear ?? null,
+          releaseMonth: bottleData.releaseMonth ?? null,
+          releaseDay: bottleData.releaseDay ?? null,
           vintageYear: bottleData.vintageYear ?? null,
           abv: bottleData.abv ?? null,
           singleCask: bottleData.singleCask ?? null,
@@ -608,6 +608,8 @@ export async function createBottleInTransaction(
         vintageYear: exact.vintageYear,
         bottlingYear: exact.bottlingYear,
         releaseYear: exact.releaseYear,
+        releaseMonth: exact.releaseMonth,
+        releaseDay: exact.releaseDay,
         singleCask: exact.singleCask,
         caskStrength: exact.caskStrength,
       },

@@ -69,6 +69,8 @@ const BOTTLE_FIELD_LABELS: BottleFieldLabels = {
   "exact.abv": "ABV",
   "exact.bottlingYear": "Bottling year",
   "exact.releaseYear": "Release year",
+  "exact.releaseMonth": "Release month",
+  "exact.releaseDay": "Release day",
 };
 
 const DisplayValueSchema = z.json();

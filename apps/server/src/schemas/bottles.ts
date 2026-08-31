@@ -1,4 +1,3 @@
-import { releaseYearFromDate } from "@peated/server/lib/bottleRelease";
 import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
@@ -95,19 +94,22 @@ const BottleReleaseYearSchema = z
   .nullable()
   .default(null)
   .describe("Year this release became available");
-const BottleReleaseDateSchema = z
-  .string()
-  .date()
-  .refine(
-    (value) => {
-      const year = releaseYearFromDate(value);
-      return year >= 1800 && year <= new Date().getFullYear();
-    },
-    { message: "Release date year must be between 1800 and the current year" },
-  )
+const BottleReleaseMonthSchema = z
+  .number()
+  .int()
+  .min(1)
+  .max(12)
   .nullable()
   .default(null)
-  .describe("Exact date this release became available, when known");
+  .describe("Month this release became available, when known");
+const BottleReleaseDaySchema = z
+  .number()
+  .int()
+  .min(1)
+  .max(31)
+  .nullable()
+  .default(null)
+  .describe("Day of the month this release became available, when known");
 const BottleMaturationSchema = z
   .string()
   .trim()
@@ -195,7 +197,8 @@ export const BottleSchema = z.object({
   vintageYear: BottleVintageYearSchema,
   bottlingYear: BottleBottlingYearSchema,
   releaseYear: BottleReleaseYearSchema,
-  releaseDate: BottleReleaseDateSchema,
+  releaseMonth: BottleReleaseMonthSchema,
+  releaseDay: BottleReleaseDaySchema,
 
   maturation: BottleMaturationSchema,
   caskNumber: BottleCaskNumberSchema,
@@ -363,7 +366,8 @@ export const BottleInputFields = {
   vintageYear: BottleVintageYearSchema,
   bottlingYear: BottleBottlingYearSchema,
   releaseYear: BottleReleaseYearSchema,
-  releaseDate: BottleReleaseDateSchema,
+  releaseMonth: BottleReleaseMonthSchema,
+  releaseDay: BottleReleaseDaySchema,
   maturation: BottleMaturationSchema,
   caskNumber: BottleCaskNumberSchema,
   outturn: BottleOutturnSchema,

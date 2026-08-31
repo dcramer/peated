@@ -16,6 +16,8 @@ export const BottleOperationFieldPathSchema = z.enum([
   "exact.vintageYear",
   "exact.bottlingYear",
   "exact.releaseYear",
+  "exact.releaseMonth",
+  "exact.releaseDay",
   "exact.maturation",
   "exact.caskNumber",
   "exact.outturn",

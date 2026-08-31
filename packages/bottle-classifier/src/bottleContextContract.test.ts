@@ -24,6 +24,8 @@ const exact = {
   caskStrength: null,
   vintageYear: null,
   releaseYear: null,
+  releaseMonth: null,
+  releaseDay: null,
   caskNumber: null,
   maturation: null,
   outturn: null,

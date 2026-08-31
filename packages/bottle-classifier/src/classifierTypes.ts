@@ -47,6 +47,71 @@ const CaskNumberSchema = z
   .default(null);
 const OutturnSchema = z.number().int().positive().nullable().default(null);
 
+function hasValidReleaseDate(
+  year: number | null | undefined,
+  month: number | null | undefined,
+  day: number | null | undefined,
+) {
+  if (month == null) return day == null;
+  if (year == null || month < 1 || month > 12) return false;
+  if (day == null) return true;
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+function validateReleaseDate(
+  value: {
+    releaseYear: number | null | undefined;
+    releaseMonth?: number | null | undefined;
+    releaseDay?: number | null | undefined;
+  },
+  ctx: z.RefinementCtx,
+) {
+  if (
+    !hasValidReleaseDate(
+      value.releaseYear,
+      value.releaseMonth,
+      value.releaseDay,
+    )
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Enter a valid release date. A month needs a year, and a day needs a month.",
+      path: [value.releaseDay == null ? "releaseMonth" : "releaseDay"],
+    });
+  }
+}
+
+function validateExtractedReleaseDate(
+  value: {
+    release_year: number | null | undefined;
+    release_month?: number | null | undefined;
+    release_day?: number | null | undefined;
+  },
+  ctx: z.RefinementCtx,
+) {
+  if (
+    !hasValidReleaseDate(
+      value.release_year,
+      value.release_month,
+      value.release_day,
+    )
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Enter a valid release date. A month needs a year, and a day needs a month.",
+      path: [value.release_day == null ? "release_month" : "release_day"],
+    });
+  }
+}
+
 export const BOTTLE_EXACT_TRAIT_FIELDS = [
   "edition",
   "statedAge",
@@ -88,6 +153,8 @@ const BottleCandidateSiblingSchema = z
       .lte(CURRENT_YEAR)
       .nullable()
       .default(null),
+    releaseMonth: z.number().int().min(1).max(12).nullable().optional(),
+    releaseDay: z.number().int().min(1).max(31).nullable().optional(),
     vintageYear: z
       .number()
       .int()
@@ -133,6 +200,8 @@ export const BottleExtractedDetailsSchema = z
     stated_age: z.number().nullable().default(null),
     abv: z.number().nullable().default(null),
     release_year: z.number().nullable().default(null),
+    release_month: z.number().int().min(1).max(12).nullable().optional(),
+    release_day: z.number().int().min(1).max(31).nullable().optional(),
     vintage_year: z.number().nullable().default(null),
     // Model and replay data can omit fields added later. Omission and null both
     // mean that the value is unknown; server inputs store unknown values as null.
@@ -144,9 +213,10 @@ export const BottleExtractedDetailsSchema = z
     outturn: OutturnSchema,
     edition: z.string().nullable().default(null),
   })
-  .strict();
+  .strict()
+  .superRefine(validateExtractedReleaseDate);
 
-export const BottleCandidateSchema = z
+const BottleCandidateObjectSchema = z
   .object({
     bottleId: z.number().int(),
     alias: z.string().nullable().default(null),
@@ -185,18 +255,24 @@ export const BottleCandidateSchema = z
       .lte(CURRENT_YEAR)
       .nullable()
       .default(null),
+    releaseMonth: z.number().int().min(1).max(12).nullable().optional(),
+    releaseDay: z.number().int().min(1).max(31).nullable().optional(),
     score: z.number().nullable().default(null),
     source: z.array(z.string()).default([]),
     familyContext: BottleCandidateFamilyContextSchema.nullable().optional(),
   })
   .strict();
 
+export const BottleCandidateSchema = BottleCandidateObjectSchema;
+
 // Score orders runtime retrieval, and source tracks retrieval provenance.
 // Neither is Bottle identity evidence, so neither reaches the agent.
-export const AgentBottleCandidateSchema = BottleCandidateSchema.omit({
+export const AgentBottleCandidateSchema = BottleCandidateObjectSchema.omit({
   score: true,
   source: true,
-}).strip();
+})
+  .strip()
+  .superRefine(validateReleaseDate);
 
 export const BottleSearchResultSchema = z.object({
   title: z.string(),
@@ -311,12 +387,17 @@ export const ProposedBottleFields = {
     .lte(CURRENT_YEAR)
     .nullable()
     .default(null),
+  releaseMonth: z.number().int().min(1).max(12).nullable().optional(),
+  releaseDay: z.number().int().min(1).max(31).nullable().optional(),
   brand: ProposedEntityChoiceSchema,
   distillers: z.array(ProposedEntityChoiceSchema).default([]),
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 } as const;
 
-export const ProposedBottleSchema = z.object(ProposedBottleFields).strict();
+export const ProposedBottleSchema = z
+  .object(ProposedBottleFields)
+  .strict()
+  .superRefine(validateReleaseDate);
 
 export const MAX_BOTTLE_CANDIDATES = 25;
 

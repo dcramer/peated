@@ -40,7 +40,7 @@ import {
   getBottleExactStatedAge,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
-import { releaseYearFromDate } from "@peated/server/lib/bottleRelease";
+import { isValidReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   BottlePatchSchema,
   type BottlePatch,
@@ -87,7 +87,8 @@ type ExactPatch = Partial<
     | "vintageYear"
     | "bottlingYear"
     | "releaseYear"
-    | "releaseDate"
+    | "releaseMonth"
+    | "releaseDay"
     | "maturation"
     | "caskNumber"
     | "outturn"
@@ -194,7 +195,8 @@ type DesiredBottle = Pick<
   | "vintageYear"
   | "bottlingYear"
   | "releaseYear"
-  | "releaseDate"
+  | "releaseMonth"
+  | "releaseDay"
   | "maturation"
   | "caskNumber"
   | "outturn"
@@ -412,7 +414,8 @@ export function bottleStoragePatch(
   if ("vintageYear" in input) exact.vintageYear = input.vintageYear;
   if ("bottlingYear" in input) exact.bottlingYear = input.bottlingYear;
   if ("releaseYear" in input) exact.releaseYear = input.releaseYear;
-  if ("releaseDate" in input) exact.releaseDate = input.releaseDate;
+  if ("releaseMonth" in input) exact.releaseMonth = input.releaseMonth;
+  if ("releaseDay" in input) exact.releaseDay = input.releaseDay;
   if ("maturation" in input) exact.maturation = input.maturation;
   if ("caskNumber" in input) exact.caskNumber = input.caskNumber;
   if ("outturn" in input) exact.outturn = input.outturn;
@@ -539,38 +542,22 @@ function valueOrCurrent<T>(value: T | undefined, current: T): T {
 function desiredReleaseFields(
   bottle: Bottle,
   exactPatch: ExactPatch | undefined,
-): Pick<Bottle, "releaseYear" | "releaseDate"> {
-  const releaseDate = valueOrCurrent(
-    exactPatch?.releaseDate,
-    bottle.releaseDate,
-  );
-  const requestedReleaseYear = valueOrCurrent(
+): Pick<Bottle, "releaseYear" | "releaseMonth" | "releaseDay"> {
+  const releaseYear = valueOrCurrent(
     exactPatch?.releaseYear,
     bottle.releaseYear,
   );
-
-  if (exactPatch?.releaseDate) {
-    const releaseYear = releaseYearFromDate(exactPatch.releaseDate);
-    if (
-      exactPatch.releaseYear !== undefined &&
-      exactPatch.releaseYear !== null &&
-      exactPatch.releaseYear !== releaseYear
-    ) {
-      throw new BottleUpdateInputError("Release year must match release date.");
-    }
-    return { releaseDate, releaseYear };
-  }
-
-  if (
-    releaseDate !== null &&
-    requestedReleaseYear !== releaseYearFromDate(releaseDate)
-  ) {
+  const releaseMonth = valueOrCurrent(
+    exactPatch?.releaseMonth,
+    bottle.releaseMonth,
+  );
+  const releaseDay = valueOrCurrent(exactPatch?.releaseDay, bottle.releaseDay);
+  if (!isValidReleaseDate({ releaseYear, releaseMonth, releaseDay })) {
     throw new BottleUpdateInputError(
-      "Release year must match release date. Update or clear release date.",
+      "Enter a valid release date. A month needs a year, and a day needs a month.",
     );
   }
-
-  return { releaseDate, releaseYear: requestedReleaseYear };
+  return { releaseYear, releaseMonth, releaseDay };
 }
 
 function desiredBottleFor({
@@ -661,7 +648,8 @@ function desiredBottleFor({
     vintageYear: exact.vintageYear,
     bottlingYear: exact.bottlingYear ?? null,
     releaseYear: release.releaseYear,
-    releaseDate: release.releaseDate,
+    releaseMonth: release.releaseMonth,
+    releaseDay: release.releaseDay,
     maturation: exact.maturation,
     caskNumber: exact.caskNumber,
     outturn: exact.outturn,
@@ -697,7 +685,8 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
-  "releaseDate",
+  "releaseMonth",
+  "releaseDay",
   "maturation",
   "caskNumber",
   "outturn",

@@ -193,7 +193,11 @@ export const bottles = pgTable(
     vintageYear: smallint("vintage_year"),
     bottlingYear: smallint("bottling_year"),
     releaseYear: smallint("release_year"),
-    releaseDate: date("release_date"),
+    releaseMonth: smallint("release_month"),
+    releaseDay: smallint("release_day"),
+    // Keep this until the CLI backfill copies its year, month, and day.
+    // TODO(catalog): Drop this column after the backfill.
+    legacyReleaseDate: date("release_date"),
     maturation: text("maturation"),
     caskNumber: varchar("cask_number", { length: 255 }),
     outturn: integer("outturn"),
@@ -261,9 +265,9 @@ export const bottles = pgTable(
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
     index("bottle_release_sort_idx").using(
       "btree",
-      sql`COALESCE(${table.releaseYear}, EXTRACT(YEAR FROM ${table.createdAt})) DESC`,
-      sql`(${table.releaseYear} IS NULL) ASC`,
-      table.releaseDate.desc().nullsLast(),
+      table.releaseYear.desc().nullsLast(),
+      table.releaseMonth.desc().nullsLast(),
+      table.releaseDay.desc().nullsLast(),
       table.createdAt.desc(),
       table.id.asc(),
     ),
@@ -296,8 +300,16 @@ export const bottles = pgTable(
       sql`${table.releaseYear} IS NULL OR ${table.releaseYear} >= 1800`,
     ),
     check(
-      "bottle_release_date_year_check",
-      sql`${table.releaseDate} IS NULL OR (${table.releaseYear} IS NOT NULL AND ${table.releaseDate} >= DATE '1800-01-01' AND ${table.releaseYear} = EXTRACT(YEAR FROM ${table.releaseDate}))`,
+      "bottle_release_month_check",
+      sql`${table.releaseMonth} IS NULL OR (${table.releaseYear} IS NOT NULL AND ${table.releaseMonth} BETWEEN 1 AND 12)`,
+    ),
+    check(
+      "bottle_release_day_check",
+      sql`CASE
+        WHEN ${table.releaseDay} IS NULL THEN TRUE
+        WHEN ${table.releaseYear} IS NULL OR ${table.releaseMonth} IS NULL OR ${table.releaseMonth} NOT BETWEEN 1 AND 12 THEN FALSE
+        ELSE ${table.releaseDay} BETWEEN 1 AND EXTRACT(DAY FROM (MAKE_DATE(${table.releaseYear}, ${table.releaseMonth}, 1) + INTERVAL '1 month - 1 day'))
+      END`,
     ),
   ],
 );
