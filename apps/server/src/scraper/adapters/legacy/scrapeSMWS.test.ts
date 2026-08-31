@@ -143,7 +143,7 @@ test("marks an explicitly multi-cask Society release as a small batch", () => {
 
 test("keeps reused Society labels out of bottle names and cask numbers", () => {
   const result = parseArchivePage(`
-    <p class="productCount">3 Products</p>
+    <p class="productCount">4 Products</p>
     <ul class="productGrid">
       <li class="product"><article class="itemSmall"
         data-item-name="Bazaar Berries"
@@ -174,6 +174,15 @@ test("keeps reused Society labels out of bottle names and cask numbers", () => {
           <li><span class="name">SPIRIT</span><span class="value">Malt Whisky</span></li>
         </ul></div>
       </article></li>
+      <li class="product"><article class="itemSmall"
+        data-item-name="Shades of green"
+        data-item-sku="SM0126GB0700612">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">G17.1</span></li>
+          <li><span class="name">ABV</span><span class="value">60.9%</span></li>
+          <li><span class="name">SPIRIT</span><span class="value">Single Grain Whisky</span></li>
+        </ul></div>
+      </article></li>
     </ul>
   `);
 
@@ -198,6 +207,13 @@ test("keeps reused Society labels out of bottle names and cask numbers", () => {
       caskNumber: null,
       singleCask: false,
       distillers: [{ name: "Auchentoshan" }],
+    }),
+    expect.objectContaining({
+      name: "G17.1 Shades of green",
+      category: "single_grain",
+      caskNumber: "G17.1",
+      singleCask: true,
+      distillers: [],
     }),
   ]);
   for (const { bottle } of result.bottles) {

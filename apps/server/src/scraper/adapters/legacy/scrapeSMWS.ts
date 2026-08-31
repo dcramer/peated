@@ -231,10 +231,18 @@ function categoryFromSmwsDescription(
 }
 
 function isSingleCask(
-  hasKnownDistiller: boolean,
+  caskNumber: string | null,
+  category: z.input<typeof BottleInputSchema>["category"],
   maturation: string | null,
 ): boolean {
-  if (!hasKnownDistiller) return false;
+  if (
+    !caskNumber ||
+    category === "blend" ||
+    category === "blended_malt" ||
+    category === "blended_grain"
+  ) {
+    return false;
+  }
   return !/^(?:two|three|four|five|six|seven|eight|nine|ten)\b/iu.test(
     maturation?.trim() ?? "",
   );
@@ -314,6 +322,12 @@ export function parseArchivePage(body: string): ArchivePage {
       vintageYear,
       isFullName: false,
     });
+    const category = categoryFromSmwsFacts({
+      caskNumber,
+      distilleryCode,
+      region,
+      spirit,
+    });
 
     const bottle: z.input<typeof BottleInputSchema> = {
       name: normalized.name,
@@ -321,12 +335,7 @@ export function parseArchivePage(body: string): ArchivePage {
       vintageYear: normalized.vintageYear,
       releaseYear: normalized.releaseYear,
       abv,
-      category: categoryFromSmwsFacts({
-        caskNumber,
-        distilleryCode,
-        region,
-        spirit,
-      }),
+      category,
       brand: { name: "The Scotch Malt Whisky Society" },
       bottler: { name: "The Scotch Malt Whisky Society" },
       distillers: distiller ? [{ name: distiller }] : [],
@@ -335,7 +344,7 @@ export function parseArchivePage(body: string): ArchivePage {
       outturn: parsePositiveInteger(
         facts.get("OUTTURN") ?? facts.get("BOTTLES PRODUCED"),
       ),
-      singleCask: isSingleCask(Boolean(caskNumber && distiller), maturation),
+      singleCask: isSingleCask(caskNumber, category, maturation),
     };
     if (edition) bottle.edition = edition;
 
@@ -713,7 +722,8 @@ export async function scrapeBottles(
           maturation: item.cask_type?.trim() || null,
           caskNumber,
           singleCask: isSingleCask(
-            Boolean(caskNumber && distiller),
+            caskNumber,
+            category,
             item.cask_type?.trim() || null,
           ),
           description: item.list_description?.trim() || null,
