@@ -1,17 +1,33 @@
+import { db } from "@peated/server/db";
+import { entityAliases } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 describe("GET /smws/distillers", () => {
-  test("lists distillers", async ({ fixtures }) => {
-    const nikka = await fixtures.Entity({
-      name: "Nikka",
+  test("lists distilleries by canonical name or alias", async ({
+    fixtures,
+  }) => {
+    const cascadeHollow = await fixtures.Entity({
+      name: "Cascade Hollow",
+      kind: "distillery",
+    });
+    await db
+      .delete(entityAliases)
+      .where(eq(entityAliases.entityId, cascadeHollow.id));
+
+    const theGlenlivet = await fixtures.Entity({
+      name: "The Glenlivet",
+      kind: "distillery",
     });
     await fixtures.EntityAlias({
-      entityId: nikka.id,
-      name: "Nikka Coffey Grain",
+      entityId: theGlenlivet.id,
+      name: "Glenlivet",
     });
 
-    const macallan = await fixtures.Entity({
-      name: "Macallan",
+    await fixtures.Entity({ name: "Bowmore", kind: "company" });
+    await fixtures.Entity({
+      name: "Not an SMWS distillery",
+      kind: "distillery",
     });
 
     const user = await fixtures.User({ mod: true });
@@ -20,6 +36,8 @@ describe("GET /smws/distillers", () => {
       { context: { user } },
     );
 
-    expect(results.length).toBe(2);
+    expect(new Set(results.map((result) => result.id))).toEqual(
+      new Set([cascadeHollow.id, theGlenlivet.id]),
+    );
   });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  SMWS_DISTILLERY_CODES,
   composeExactCaskCodeFromComponents,
   getCategoryFromCask,
   parseDetailsFromName,
@@ -25,6 +26,27 @@ describe("smws", () => {
     expect(getCategoryFromCask("R2.19")).toBeNull();
     expect(getCategoryFromCask("A5.6")).toBeNull();
     expect(getCategoryFromCask("GN1.1")).toBeNull();
+  });
+
+  test("maps producer labels to canonical distillery entities", () => {
+    expect(SMWS_DISTILLERY_CODES).toMatchObject({
+      52: "Pulteney Distillery",
+      121: "Lochranza",
+      134: "Paul John Distillery",
+      140: "Balcones Distilling",
+      146: "Cotswolds Distillery",
+      153: "Thy Whisky Distillery",
+      157: "Distillerie Warenghem",
+      G11: "Miyagikyo",
+      G12: "Miyagikyo",
+      B1: "Heaven Hill Distillery",
+      B2: "Heaven Hill Bernheim Distillery",
+      B3: "Rock Town Distillery",
+      RW4: "Kentucky Peerless Distilling Co.",
+      CW1: "Heaven Hill Distillery",
+      CW2: "Balcones Distilling",
+      GN7: "Cotswolds Distillery",
+    });
   });
 
   test("parses SMWS reference titles into code identity and selector", () => {
