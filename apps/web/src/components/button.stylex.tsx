@@ -16,16 +16,19 @@ const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
 export type ButtonVariant = "default" | "tonal" | "accent" | "danger" | "text";
 export type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonProps = Omit<
+type SharedButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   "className" | "style"
 > & {
-  align?: "center" | "start";
-  fullWidth?: boolean;
   loading?: boolean;
-  loadingLabel?: ReactNode;
   size?: ButtonSize;
   variant?: ButtonVariant;
+};
+
+export type ButtonProps = SharedButtonProps & {
+  align?: "center" | "start";
+  fullWidth?: boolean;
+  loadingLabel?: ReactNode;
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -45,33 +48,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) {
     return (
-      <button
+      <ButtonBase
         {...props}
-        aria-busy={loading || undefined}
-        data-size={size}
-        data-variant={variant}
-        disabled={disabled || loading}
+        align={align}
+        disabled={disabled}
+        fullWidth={fullWidth}
+        layout="label"
+        loading={loading}
         ref={ref}
+        size={size}
         type={type}
-        {...stylex.props(
-          styles.control,
-          styles.button,
-          fullWidth && styles.fullWidth,
-          align === "start" && styles.alignStart,
-          controlSizeStyles[size],
-          buttonSizeStyles[size],
-          variantStyles[variant],
-          loading && styles.loading,
-          loading && variant === "accent" && styles.loadingAccent,
-        )}
+        variant={variant}
       >
         {loading && loadingLabel !== undefined ? loadingLabel : children}
-        {loading ? (
-          <span aria-hidden {...stylex.props(styles.loadingTrack)}>
-            <span {...stylex.props(styles.loadingSweep)} />
-          </span>
-        ) : null}
-      </button>
+      </ButtonBase>
     );
   },
 );
@@ -114,48 +104,85 @@ export function ButtonLink({
 }
 
 export type IconButtonProps = Omit<
-  ButtonProps,
-  "aria-label" | "children" | "loadingLabel"
+  SharedButtonProps,
+  "aria-label" | "children"
 > & {
   icon: ReactNode;
   label: string;
 };
 
-export function IconButton({
-  icon,
-  label,
-  loading = false,
-  size = "md",
-  variant = "tonal",
-  ...props
-}: IconButtonProps) {
-  return (
-    <button
-      {...props}
-      aria-busy={loading || undefined}
-      aria-label={label}
-      data-size={size}
-      data-variant={variant}
-      disabled={props.disabled || loading}
-      type={props.type ?? "button"}
-      {...stylex.props(
-        styles.control,
-        styles.iconButton,
-        controlSizeStyles[size],
-        iconButtonSizeStyles[size],
-        variantStyles[variant],
-        loading && styles.loading,
-      )}
-    >
-      {icon}
-      {loading ? (
-        <span aria-hidden {...stylex.props(styles.loadingTrack)}>
-          <span {...stylex.props(styles.loadingSweep)} />
-        </span>
-      ) : null}
-    </button>
-  );
-}
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  function IconButton({ icon, label, variant = "tonal", ...props }, ref) {
+    return (
+      <ButtonBase
+        {...props}
+        aria-label={label}
+        layout="icon"
+        ref={ref}
+        variant={variant}
+      >
+        {icon}
+      </ButtonBase>
+    );
+  },
+);
+
+type ButtonBaseProps = SharedButtonProps & {
+  align?: "center" | "start";
+  children: ReactNode;
+  fullWidth?: boolean;
+  layout: "icon" | "label";
+};
+
+const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
+  function ButtonBase(
+    {
+      align = "center",
+      children,
+      disabled = false,
+      fullWidth = false,
+      layout,
+      loading = false,
+      size = "md",
+      type = "button",
+      variant = "default",
+      ...props
+    },
+    ref,
+  ) {
+    return (
+      <button
+        {...props}
+        aria-busy={loading || undefined}
+        data-size={size}
+        data-variant={variant}
+        disabled={disabled || loading}
+        ref={ref}
+        type={type}
+        {...stylex.props(
+          styles.control,
+          layout === "label" && styles.button,
+          layout === "icon" && styles.iconButton,
+          fullWidth && styles.fullWidth,
+          align === "start" && styles.alignStart,
+          controlSizeStyles[size],
+          layout === "label" && buttonSizeStyles[size],
+          layout === "icon" && iconButtonSizeStyles[size],
+          variantStyles[variant],
+          loading && styles.loading,
+          loading && variant === "accent" && styles.loadingAccent,
+        )}
+      >
+        {children}
+        {loading ? (
+          <span aria-hidden {...stylex.props(styles.loadingTrack)}>
+            <span {...stylex.props(styles.loadingSweep)} />
+          </span>
+        ) : null}
+      </button>
+    );
+  },
+);
 
 const sweep = stylex.keyframes({
   "0%": { transform: "translateX(-100%)" },

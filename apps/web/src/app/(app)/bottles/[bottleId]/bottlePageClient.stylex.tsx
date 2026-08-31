@@ -80,7 +80,7 @@ function getBottleNotes(bottle: Bottle) {
     bottle.caskStrength ? "Cask strength" : null,
     bottle.singleCask ? "Single cask" : null,
     bottle.nonChillFiltered ? "Non-chill filtered" : null,
-    bottle.naturalColor ? "Natural colour" : null,
+    bottle.naturalColor ? "Natural color" : null,
   ].filter((value): value is string => value !== null);
 }
 
@@ -122,8 +122,8 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
         bottle.naturalColor === null
           ? null
           : bottle.naturalColor
-            ? "Natural colour"
-            : "Colour added",
+            ? "Natural color"
+            : "Color added",
     },
     {
       label: "Filtration",

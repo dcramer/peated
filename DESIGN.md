@@ -286,7 +286,7 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 - Use a switch for an independent setting that takes effect immediately. Put its label and consequence beside the control.
 - Use the five-band rating input for a tasting. Do not offer an exact point in the tasting workflow.
 - Use a whole-number 0–100 input only when a member writes or edits a review.
-- Use the colour input for Peated's fixed 0–20 whisky colour scale. Draw all 21 reference steps as one continuous strip, support keyboard changes through a native range input, and let the member state that they are unsure.
+- Use the color input for Peated's fixed 0–20 whisky color scale. Draw all 21 reference steps as one continuous strip, support keyboard changes through a native range input, and let the member state that they are unsure.
 - Use the picture input to open the native file picker. Start with one tonal action. When a picture exists, make the preview the change action and show explicit change and remove controls.
 - Use a fieldset and legend for grouped controls. Use a label only for a single field.
 - Keep selects, segmented controls, text fields, and buttons on the 40px `md` control rhythm when they share a form.

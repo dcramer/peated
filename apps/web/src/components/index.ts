@@ -269,12 +269,12 @@ export type {
   TastingEntryProps,
 } from "./tastingEntry.stylex";
 export {
-  ColourInput,
+  ColorInput,
   PictureInput,
   RatingBandInput,
 } from "./tastingInputs.stylex";
 export type {
-  ColourInputProps,
+  ColorInputProps,
   PictureInputProps,
   RatingBandInputProps,
 } from "./tastingInputs.stylex";

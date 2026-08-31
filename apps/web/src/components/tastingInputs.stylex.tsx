@@ -97,7 +97,7 @@ export function RatingBandInput({
   );
 }
 
-export type ColourInputProps = {
+export type ColorInputProps = {
   disabled?: boolean;
   id: string;
   name: string;
@@ -105,23 +105,23 @@ export type ColourInputProps = {
   value: number | null;
 };
 
-/** Records the observed whisky colour on Peated's fixed 0–20 reference scale. */
-export function ColourInput({
+/** Records the observed whisky color on Peated's fixed 0–20 reference scale. */
+export function ColorInput({
   disabled = false,
   id,
   name,
   onChange,
   value,
-}: ColourInputProps) {
+}: ColorInputProps) {
   const selected =
     value === null
       ? null
       : (COLOR_SCALE.find(([number]) => number === value) ?? null);
 
   return (
-    <div {...stylex.props(styles.colourRoot, disabled && styles.disabled)}>
-      <div {...stylex.props(styles.colourHeading)}>
-        <strong {...stylex.props(styles.colourName)}>
+    <div {...stylex.props(styles.colorRoot, disabled && styles.disabled)}>
+      <div {...stylex.props(styles.colorHeading)}>
+        <strong {...stylex.props(styles.colorName)}>
           {selected?.[1] ?? "Unsure"}
         </strong>
         {value !== null ? (
@@ -135,21 +135,21 @@ export function ColourInput({
           </Button>
         ) : null}
       </div>
-      <div {...stylex.props(styles.colourScale)}>
-        <div aria-hidden="true" {...stylex.props(styles.colourSwatches)}>
+      <div {...stylex.props(styles.colorScale)}>
+        <div aria-hidden="true" {...stylex.props(styles.colorSwatches)}>
           {COLOR_SCALE.map(([number, , hex]) => (
             <span
               key={number}
               style={{ backgroundColor: hex }}
               {...stylex.props(
-                styles.colourSwatch,
-                number === value && styles.colourSwatchSelected,
+                styles.colorSwatch,
+                number === value && styles.colorSwatchSelected,
               )}
             />
           ))}
         </div>
         <input
-          aria-label="Colour of the pour"
+          aria-label="Color of the pour"
           aria-valuetext={selected?.[1] ?? "Unsure"}
           disabled={disabled}
           id={id}
@@ -160,10 +160,10 @@ export function ColourInput({
           step={1}
           type="range"
           value={selected?.[0] ?? 0}
-          {...stylex.props(styles.colourRange)}
+          {...stylex.props(styles.colorRange)}
         />
       </div>
-      <div aria-hidden="true" {...stylex.props(styles.colourAnchors)}>
+      <div aria-hidden="true" {...stylex.props(styles.colorAnchors)}>
         <span>clear</span>
         <span>gold</span>
         <span>amber</span>
@@ -378,17 +378,18 @@ const styles = stylex.create({
     clipPath: "inset(50%)",
     whiteSpace: "nowrap",
   },
-  colourRoot: {
+  colorRoot: {
     width: "100%",
   },
-  colourHeading: {
+  colorHeading: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     columnGap: space.x3,
+    minHeight: controlMetrics.controlHeightSmall,
     marginBottom: space.x3,
   },
-  colourName: {
+  colorName: {
     minWidth: 0,
     overflow: "hidden",
     color: colors.ink,
@@ -400,7 +401,7 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
-  colourScale: {
+  colorScale: {
     position: "relative",
     height: "44px",
     borderRadius: controlMetrics.radiusSmall,
@@ -409,7 +410,7 @@ const styles = stylex.create({
       ":focus-within": effects.focusRing,
     },
   },
-  colourSwatches: {
+  colorSwatches: {
     position: "absolute",
     inset: 0,
     display: "grid",
@@ -420,15 +421,15 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.inset,
   },
-  colourSwatch: {
+  colorSwatch: {
     height: "32px",
     transitionProperty: "height",
     transitionDuration: "120ms",
   },
-  colourSwatchSelected: {
+  colorSwatchSelected: {
     height: "44px",
   },
-  colourRange: {
+  colorRange: {
     position: "absolute",
     inset: 0,
     width: "100%",
@@ -437,7 +438,7 @@ const styles = stylex.create({
     opacity: 0,
     cursor: "ew-resize",
   },
-  colourAnchors: {
+  colorAnchors: {
     display: "flex",
     justifyContent: "space-between",
     marginTop: "6px",

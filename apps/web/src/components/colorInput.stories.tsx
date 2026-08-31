@@ -4,11 +4,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
-import { ColourInput } from "./tastingInputs.stylex";
+import { ColorInput } from "./tastingInputs.stylex";
 
 const meta = {
-  title: "Components/Forms/Colour Input",
-  component: ColourInput,
+  title: "Components/Forms/Color Input",
+  component: ColorInput,
   decorators: [
     (Story) => (
       <StoryCanvas>
@@ -17,12 +17,12 @@ const meta = {
     ),
   ],
   args: {
-    id: "colour",
-    name: "colour",
+    id: "color",
+    name: "color",
     onChange: () => undefined,
     value: 10,
   },
-} satisfies Meta<typeof ColourInput>;
+} satisfies Meta<typeof ColorInput>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -30,32 +30,30 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <ControlledColourInput {...args} />
-      <ControlledColourInput
+      <ControlledColorInput {...args} />
+      <ControlledColorInput
         {...args}
-        id="unsure-colour"
-        name="unsure-colour"
+        id="unsure-color"
+        name="unsure-color"
         value={null}
       />
-      <ControlledColourInput
+      <ControlledColorInput
         {...args}
-        id="dark-colour"
-        name="dark-colour"
+        id="dark-color"
+        name="dark-color"
         value={19}
       />
-      <ColourInput
+      <ColorInput
         {...args}
         disabled
-        id="disabled-colour"
-        name="disabled-colour"
+        id="disabled-color"
+        name="disabled-color"
       />
     </StoryStack>
   ),
 };
 
-function ControlledColourInput(
-  props: React.ComponentProps<typeof ColourInput>,
-) {
+function ControlledColorInput(props: React.ComponentProps<typeof ColorInput>) {
   const [value, setValue] = useState<number | null>(props.value);
-  return <ColourInput {...props} onChange={setValue} value={value} />;
+  return <ColorInput {...props} onChange={setValue} value={value} />;
 }
