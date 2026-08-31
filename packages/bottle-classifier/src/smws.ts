@@ -64,7 +64,7 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   49: "St. Magdalene",
   50: "Bladnoch",
   51: "Bushmills",
-  52: "Old Pulteney",
+  52: "Pulteney Distillery", // Old Pulteney
   53: "Caol Ila",
   54: "Aberlour",
   55: "Royal Brackla",
@@ -133,7 +133,7 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   118: "Cooley", // Connemara (Peated)
   119: "Yamazaki",
   120: "Hakushu",
-  121: "Isle of Arran",
+  121: "Lochranza", // Isle of Arran
   122: "Loch Lomond", // Croftengea
   123: "Glengoyne",
   124: "Miyagikyo",
@@ -146,30 +146,30 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   131: "Hanyu",
   132: "Karuizawa",
   133: "Westland",
-  134: "Paul John",
+  134: "Paul John Distillery",
   135: "Loch Lomond", // Inchmoan
   136: "Eden Mill",
   137: "St. George's",
   138: "Nantou",
   139: "Kavalan",
-  140: "Balcones",
+  140: "Balcones Distilling", // Balcones
   141: "Fary Lochan",
   142: "Breuckelen Distilling",
   143: "Copperworks Distilling Co.",
   144: "High Coast Distillery",
   145: "Smögen Whisky",
-  146: "Cotswolds",
+  146: "Cotswolds Distillery",
   147: "Archie Rose",
   148: "Starward",
   149: "Ardnamurchan",
   150: "West Cork Distillers",
   151: "Mackmyra",
   152: "Shelter Point",
-  153: "Thy Whisky",
+  153: "Thy Whisky Distillery",
   154: "Mosgaard Whisky",
   155: "Milk & Honey Distillery",
   156: "Glasgow Distillery",
-  157: "Armorik",
+  157: "Distillerie Warenghem", // Armorik
   158: "Yuza",
   159: "Mars Shinshu",
   160: "Mars Tsunuki",
@@ -193,17 +193,17 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   G8: "Cambus",
   G9: "Loch Lomond",
   G10: "Strathclyde",
-  G11: "Nikka Coffey Grain",
-  G12: "Nikka Coffey Malt",
+  G11: "Miyagikyo", // Nikka Coffey Grain
+  G12: "Miyagikyo", // Nikka Coffey Malt
   G13: "Chita",
   G14: "Dumbarton",
   G15: "Loch Lomond", // Rhosdhu
   G16: "Glasgow Distillery",
 
   // Bourbon
-  B1: "Heaven Hill",
-  B2: "Bernheim",
-  B3: "Rock Town",
+  B1: "Heaven Hill Distillery",
+  B2: "Heaven Hill Bernheim Distillery",
+  B3: "Rock Town Distillery",
   B4: "FEW Spirits",
   B5: "Cascade Hollow",
   B6: "Finger Lakes Distilling",
@@ -214,14 +214,14 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   RW1: "FEW Spirits",
   RW2: "Finger Lakes Distilling",
   RW3: "New York Distilling Co.",
-  RW4: "Peerless",
+  RW4: "Kentucky Peerless Distilling Co.",
   RW5: "Lux Row Distillers",
   RW6: "Kyrö",
   RW7: "Journeyman",
 
   // Corn
-  CW1: "Heaven Hill",
-  CW2: "Baclones",
+  CW1: "Heaven Hill Distillery",
+  CW2: "Balcones Distilling", // Balcones
 
   // Rum
   R1: "Monymusk",
@@ -267,7 +267,7 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   GN4: "Boatyard Distillery",
   GN5: "Scottish Gin",
   GN6: "Holyrood Distillery",
-  GN7: "Cotswolds",
+  GN7: "Cotswolds Distillery",
 };
 
 export const SMWS_CATEGORY_LIST = [

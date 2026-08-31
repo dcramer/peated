@@ -5,7 +5,7 @@ import { implement } from "@peated/server/orpc";
 import smwsDistillerListContract from "@peated/server/orpc/contracts/smws/distiller-list";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 export default implement(smwsDistillerListContract).handler(async function ({
   context,
@@ -17,11 +17,14 @@ export default implement(smwsDistillerListContract).handler(async function ({
     .select()
     .from(entities)
     .where(
-      sql`LOWER(${entities.name}) IN ${distilleryNames}
-        OR ${entities.id} IN (
-          SELECT ${entityAliases.entityId} FROM ${entityAliases}
-          WHERE LOWER(${entityAliases.name}) IN ${distilleryNames}
-        )`,
+      and(
+        eq(entities.kind, "distillery"),
+        sql`(LOWER(${entities.name}) IN ${distilleryNames}
+          OR ${entities.id} IN (
+            SELECT ${entityAliases.entityId} FROM ${entityAliases}
+            WHERE LOWER(${entityAliases.name}) IN ${distilleryNames}
+          ))`,
+      ),
     );
 
   return {
