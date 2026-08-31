@@ -1,5 +1,4 @@
-import { ButtonLink } from "@peated/web/components";
-import Markdown from "@peated/web/components/markdown";
+import { ButtonLink, ExpandableDescription } from "@peated/web/components";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
@@ -53,7 +52,7 @@ export default async function CountryLayout(props: {
       country={undefined}
       description={
         country.description ? (
-          <Markdown content={country.description} noLinks />
+          <ExpandableDescription content={country.description} noLinks />
         ) : undefined
       }
       name={country.name}

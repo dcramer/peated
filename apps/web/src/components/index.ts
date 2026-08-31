@@ -65,6 +65,7 @@ export { CriticReview } from "./criticReview.stylex";
 export type { CriticReviewProps } from "./criticReview.stylex";
 export { DataTable } from "./dataTable.stylex";
 export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
+export { ExpandableDescription } from "./expandableDescription.stylex";
 export { FacetRow } from "./facetRow.stylex";
 export type { FacetRowProps } from "./facetRow.stylex";
 export { FactList, hasVisibleFacts } from "./factList.stylex";
