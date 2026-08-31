@@ -45,7 +45,6 @@ export type BottleCatalogItem = {
   scoreHigh: number | null;
   scoreLow: number | null;
   scoreCount: number;
-  totalTastings: number;
 };
 
 export type BottleCatalogListProps = {
@@ -151,14 +150,7 @@ function BottleCatalogTable({
       padding: "flush",
     },
     {
-      align: "right",
-      cell: (item) => item.totalTastings.toLocaleString("en-US"),
-      header: "Tastings",
-      key: "tastings",
-      width: "count",
-    },
-    {
-      align: "right",
+      align: "center",
       cell: (item) => (
         <BottleRatings
           counts={item.bandCounts}
