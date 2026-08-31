@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/server/src/lib/createStorePrices.ts",
+    "apps/server/src/orpc/routes/prices/create-batch.test.ts",
+    "apps/server/src/scraper/adapters/legacy/scrapeSingleCaskNation.test.ts",
+    "apps/server/src/scraper/adapters/legacy/scrapeSingleCaskNation.ts",
+    "apps/web/e2e/mock-rpc-server.mjs",
+    "apps/web/e2e/rpc-fixtures.mjs",
+    "apps/web/src/app/(app)/badges/[badgeId]/badgePage.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/aliases/aliasList.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/bottlePageClient.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/bottleSection.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/prices/page.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/releases/page.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/tastings/page.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/aliases/entityAliasList.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/codes/entityCodes.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityBottleOverview.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityDetails.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityPageData.test.ts",
+    "apps/web/src/app/(app)/entities/[entityId]/entityPageData.ts",
+    "apps/web/src/app/(app)/entities/[entityId]/entityPageFrameClient.stylex.tsx"
+  ],
+  "commitSha": "169b6885ef33525ccf56fee059c27ec557af434f",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "region-detail"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "region-detail__desktop.png",
+      "label": "Region detail · desktop"
+    },
+    {
+      "file": "region-detail__mobile.png",
+      "label": "Region detail · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
