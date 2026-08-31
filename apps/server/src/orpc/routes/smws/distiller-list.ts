@@ -10,13 +10,17 @@ import { sql } from "drizzle-orm";
 export default implement(smwsDistillerListContract).handler(async function ({
   context,
 }) {
+  const distilleryNames = Object.values(SMWS_DISTILLERY_CODES).map((name) =>
+    name.toLowerCase(),
+  );
   const results = await db
     .select()
     .from(entities)
     .where(
-      sql`${entities.id} IN (
+      sql`LOWER(${entities.name}) IN ${distilleryNames}
+        OR ${entities.id} IN (
           SELECT ${entityAliases.entityId} FROM ${entityAliases}
-          WHERE LOWER(${entityAliases.name}) IN ${Object.values(SMWS_DISTILLERY_CODES).map((s) => s.toLowerCase())}
+          WHERE LOWER(${entityAliases.name}) IN ${distilleryNames}
         )`,
     );
 

@@ -1,7 +1,17 @@
+import { db } from "@peated/server/db";
+import { entityAliases } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 describe("GET /smws/distillers", () => {
-  test("lists distillers", async ({ fixtures }) => {
+  test("lists distillers by canonical name or alias", async ({ fixtures }) => {
+    const cascadeHollow = await fixtures.Entity({
+      name: "Cascade Hollow",
+    });
+    await db
+      .delete(entityAliases)
+      .where(eq(entityAliases.entityId, cascadeHollow.id));
+
     const nikka = await fixtures.Entity({
       name: "Nikka",
     });
@@ -10,9 +20,7 @@ describe("GET /smws/distillers", () => {
       name: "Nikka Coffey Grain",
     });
 
-    const macallan = await fixtures.Entity({
-      name: "Macallan",
-    });
+    await fixtures.Entity({ name: "Not an SMWS distiller" });
 
     const user = await fixtures.User({ mod: true });
     const { results } = await routerClient.smws.distillerList(
@@ -20,6 +28,8 @@ describe("GET /smws/distillers", () => {
       { context: { user } },
     );
 
-    expect(results.length).toBe(2);
+    expect(new Set(results.map((result) => result.id))).toEqual(
+      new Set([cascadeHollow.id, nikka.id]),
+    );
   });
 });
