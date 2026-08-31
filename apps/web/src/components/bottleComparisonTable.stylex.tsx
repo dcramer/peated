@@ -1,20 +1,31 @@
 import * as stylex from "@stylexjs/stylex";
 import { type ReactNode, useId } from "react";
 
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
-import { AppLink } from "./appLink";
-import { BottleVisual } from "./bottleIdentityRow.stylex";
+import { colors, fonts, space } from "../styles/tokens.stylex";
+import {
+  BottleIdentityRow,
+  type BottleIdentityRowProps,
+} from "./bottleIdentityRow.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
 
-export type BottleComparisonRow = {
-  href?: string;
+export type BottleComparisonRow = Pick<
+  BottleIdentityRowProps,
+  | "align"
+  | "brand"
+  | "brandHref"
+  | "hasTasted"
+  | "href"
+  | "imageUrl"
+  | "isLibrary"
+  | "metadata"
+  | "name"
+  | "relatedReleases"
+  | "subtitle"
+> & {
   id: string;
-  imageUrl?: string | null;
-  metadata?: string;
-  name: string;
   values: readonly [ReactNode, ...ReactNode[]];
 };
 
@@ -80,36 +91,20 @@ export function BottleComparisonTable({
               )}
             >
               <th scope="row" {...stylex.props(styles.nameCell)}>
-                <div {...stylex.props(styles.identity)}>
-                  <BottleVisual imageUrl={row.imageUrl} />
-                  <div {...stylex.props(styles.copy)}>
-                    {row.href ? (
-                      <AppLink
-                        href={row.href}
-                        title={row.name}
-                        {...stylex.props(
-                          styles.name,
-                          styles.nameLink,
-                          linkedRowStyles.primaryLink,
-                        )}
-                      >
-                        {row.name}
-                      </AppLink>
-                    ) : (
-                      <span title={row.name} {...stylex.props(styles.name)}>
-                        {row.name}
-                      </span>
-                    )}
-                    {row.metadata ? (
-                      <span
-                        title={row.metadata}
-                        {...stylex.props(styles.metadata)}
-                      >
-                        {row.metadata}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
+                <BottleIdentityRow
+                  align={row.align}
+                  brand={row.brand}
+                  brandHref={row.brandHref}
+                  hasTasted={row.hasTasted}
+                  href={row.href}
+                  imageUrl={row.imageUrl}
+                  isLibrary={row.isLibrary}
+                  layout="cell"
+                  metadata={row.metadata}
+                  name={row.name}
+                  relatedReleases={row.relatedReleases}
+                  subtitle={row.subtitle}
+                />
               </th>
               {row.values.map((value, index) => (
                 <td key={index} {...stylex.props(styles.valueCell)}>
@@ -230,59 +225,6 @@ const styles = stylex.create({
       paddingRight: 0,
       paddingBottom: space.x3,
     },
-  },
-  identity: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "center",
-    gap: space.x3,
-  },
-  copy: {
-    minWidth: 0,
-    flex: 1,
-  },
-  name: {
-    display: "block",
-    overflow: "hidden",
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-    textDecoration: "none",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  nameLink: {
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
-  },
-  metadata: {
-    display: "block",
-    marginTop: space.x1,
-    overflow: "hidden",
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 400,
-    lineHeight: 1.35,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
   valueCell: {
     paddingTop: "14px",

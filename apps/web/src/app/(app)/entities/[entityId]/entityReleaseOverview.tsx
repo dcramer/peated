@@ -9,7 +9,7 @@ import {
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
-import { toReleaseTableRow } from "./entityBottleTableRows";
+import { toBottleTableRow } from "./entityBottleTableRows";
 import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 
 type BottleList = Outputs["bottles"]["list"];
@@ -64,8 +64,8 @@ export function EntityReleaseOverview({
         ariaLabel={`${entity.name} latest releases`}
         columns={["Rating"]}
         rows={[
-          toReleaseTableRow(firstRelease),
-          ...remainingReleases.map((bottle) => toReleaseTableRow(bottle)),
+          toBottleTableRow(firstRelease),
+          ...remainingReleases.map((bottle) => toBottleTableRow(bottle)),
         ]}
       />
     </PageSection>

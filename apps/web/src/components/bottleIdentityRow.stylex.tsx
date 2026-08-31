@@ -12,6 +12,7 @@ import { AppLink } from "./appLink";
 import { ImageViewer } from "./imageViewer.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MemberStatus } from "./memberStatus.stylex";
+import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
 const bottleIconUrl = "/assets/bottle.svg";
@@ -67,6 +68,7 @@ export function BottleVisual({
 }
 
 export type BottleIdentityRowProps = {
+  align?: "center" | "start";
   brand?: string;
   brandHref?: string;
   end?: ReactNode;
@@ -81,10 +83,12 @@ export type BottleIdentityRowProps = {
     count: number;
     href: string;
   };
+  subtitle?: ReactNode;
 };
 
 /** Presents one catalog bottle using Peated's existing identity and member-status meanings. */
 export function BottleIdentityRow({
+  align = "center",
   brand,
   brandHref,
   end,
@@ -96,11 +100,13 @@ export function BottleIdentityRow({
   metadata = [],
   name,
   relatedReleases,
+  subtitle,
 }: BottleIdentityRowProps) {
   return (
     <div
       {...stylex.props(
         styles.row,
+        align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
         Boolean(href) && layout === "row" && linkedRowStyles.container,
         Boolean(href) && layout === "row" && linkedRowStyles.onGround,
@@ -145,6 +151,14 @@ export function BottleIdentityRow({
           {isLibrary ? <MemberStatus kind="library" /> : null}
           {hasTasted ? <MemberStatus kind="tasted" /> : null}
         </div>
+        {subtitle ? (
+          <div
+            title={getTextTitle(subtitle)}
+            {...stylex.props(styles.subtitle)}
+          >
+            {subtitle}
+          </div>
+        ) : null}
         {metadata.length ? (
           <div title={metadata.join(" · ")} {...stylex.props(styles.metadata)}>
             {metadata.map((item, index) => (
@@ -235,6 +249,9 @@ const styles = stylex.create({
     paddingBottom: space.x3,
     paddingLeft: "12px",
   },
+  startAlignedRow: {
+    alignItems: "flex-start",
+  },
   cellLayout: {
     width: "100%",
     marginRight: 0,
@@ -324,6 +341,17 @@ const styles = stylex.create({
     fontFamily: fonts.data,
     fontSize: "11px",
     lineHeight: 1.4,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  subtitle: {
+    maxWidth: "100%",
+    overflow: "hidden",
+    marginTop: "3px",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.3,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },

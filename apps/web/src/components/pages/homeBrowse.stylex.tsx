@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import {
   AppLink,
+  BottleIdentityRow,
   BottleRatings,
   BottleVisual,
   Card,
@@ -11,6 +12,7 @@ import {
   CardLink,
   CardPrimaryLink,
   ItemList,
+  ItemListItem,
   ItemRow,
   TextLink,
   type TastingRatingCounts,
@@ -84,22 +86,23 @@ export function HomeHighestRated({
       <div {...stylex.props(styles.rows)}>
         <ItemList ariaLabel="Highest rated bottles">
           {bottles.map((bottle) => (
-            <ItemRow
-              end={
-                <BottleRatings
-                  counts={bottle.bandCounts}
-                  high={bottle.scoreHigh}
-                  low={bottle.scoreLow}
-                  median={bottle.score}
-                  scoreCount={bottle.scoreCount}
-                />
-              }
-              href={bottle.href}
-              key={bottle.href}
-              leading={<BottleVisual imageUrl={bottle.imageUrl} />}
-              metadata={bottle.metadata.join(" · ")}
-              title={bottle.name}
-            />
+            <ItemListItem key={bottle.href}>
+              <BottleIdentityRow
+                end={
+                  <BottleRatings
+                    counts={bottle.bandCounts}
+                    high={bottle.scoreHigh}
+                    low={bottle.scoreLow}
+                    median={bottle.score}
+                    scoreCount={bottle.scoreCount}
+                  />
+                }
+                href={bottle.href}
+                imageUrl={bottle.imageUrl}
+                metadata={bottle.metadata}
+                name={bottle.name}
+              />
+            </ItemListItem>
           ))}
         </ItemList>
       </div>
@@ -138,15 +141,16 @@ export function HomeLatestReleases({
       <div {...stylex.props(styles.rows)}>
         <ItemList ariaLabel={title}>
           {bottles.map((bottle) => (
-            <ItemRow
-              align="start"
-              href={bottle.href}
-              key={bottle.href}
-              leading={<BottleVisual imageUrl={bottle.imageUrl} />}
-              metadata={bottle.metadata.join(" · ")}
-              subtitle={bottle.subtitle}
-              title={bottle.name}
-            />
+            <ItemListItem key={bottle.href}>
+              <BottleIdentityRow
+                align="start"
+                href={bottle.href}
+                imageUrl={bottle.imageUrl}
+                metadata={bottle.metadata}
+                name={bottle.name}
+                subtitle={bottle.subtitle}
+              />
+            </ItemListItem>
           ))}
         </ItemList>
       </div>
