@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getBottleMetadata, getBottleReviewMetadata } from "./bottleMetadata";
+import {
+  getBottleMetadata,
+  getBottleReleasePlacement,
+  getBottleReviewMetadata,
+} from "./bottleMetadata";
 
 describe("bottle metadata", () => {
   it("spells out a missing age statement", () => {
@@ -51,6 +55,26 @@ describe("bottle metadata", () => {
         vintageYear: null,
       }),
     ).toBe("Batch C923 · Bourbon · 12 years · 68.3% ABV");
+  });
+
+  it("places a release date once on the bottle page", () => {
+    expect(
+      getBottleReleasePlacement({
+        edition: null,
+        releaseYear: 2026,
+        releaseMonth: 8,
+        releaseDay: 30,
+      }),
+    ).toEqual({ header: "Aug 30, 2026", details: null });
+
+    expect(
+      getBottleReleasePlacement({
+        edition: "Batch 24",
+        releaseYear: 2026,
+        releaseMonth: null,
+        releaseDay: null,
+      }),
+    ).toEqual({ header: "Batch 24", details: "2026" });
   });
 
   it("omits missing facts and unnecessary ABV decimals", () => {

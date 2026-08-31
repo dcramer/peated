@@ -8,10 +8,7 @@
  * syntax can own identity when its exact fields agree. New hardcoded phrase
  * rules need verified whisky research and focused tests before being added here.
  */
-import { z } from "zod";
-import { getExactCaskCodeAnchor } from "./exactCask";
 import { normalizeBottle } from "./normalize";
-import { parseReferenceName } from "./smws";
 
 export type BottleExactIdentityInput = {
   edition: string | null;
@@ -27,78 +24,11 @@ export type BottleExactIdentityInput = {
   outturn?: number | null;
 };
 
-type BottleNameTraitsInput = Omit<BottleExactIdentityInput, "statedAge">;
-
-type BottleNameIdentityInput = BottleNameInput & Partial<BottleNameTraitsInput>;
-
 type BottleNameInput = {
   fullName: string | null | undefined;
   name: string | null | undefined;
   statedAge: number | null | undefined;
 };
-
-const BOTTLE_EXACT_IDENTITY_FIELDS = [
-  "edition",
-  "statedAge",
-  "releaseYear",
-  "vintageYear",
-  "abv",
-  "singleCask",
-  "caskStrength",
-] as const satisfies ReadonlyArray<keyof BottleExactIdentityInput>;
-
-const BOTTLE_NAME_TRAIT_FIELDS = [
-  "singleCask",
-  "caskStrength",
-] as const satisfies ReadonlyArray<keyof BottleNameTraitsInput>;
-
-function bottleNameMarketsPattern(
-  bottle: BottleNameInput,
-  pattern: RegExp,
-): boolean {
-  return [bottle.name, bottle.fullName].some((name) => {
-    const parsedName = z.string().safeParse(name);
-    if (!parsedName.success) {
-      return false;
-    }
-
-    return pattern.test(parsedName.data);
-  });
-}
-
-function bottleNameMarketsTrait(
-  bottle: BottleNameInput,
-  field: (typeof BOTTLE_NAME_TRAIT_FIELDS)[number],
-): boolean {
-  switch (field) {
-    case "singleCask":
-      return bottleNameMarketsPattern(
-        bottle,
-        /\b(single[-\s]+cask|single[-\s]+barrel)\b/i,
-      );
-    case "caskStrength":
-      return bottleNameMarketsPattern(
-        bottle,
-        /\b(cask[-\s]+strength|barrel[-\s]+strength|barrel[-\s]+proof|full[-\s]+proof|natural[-\s]+strength|original[-\s]+strength|undiluted|cask[-\s]+bottling)\b/i,
-      );
-  }
-}
-
-function isTraitAlreadyInBottleName({
-  bottle,
-  field,
-  exact,
-}: {
-  bottle: BottleNameIdentityInput;
-  field: (typeof BOTTLE_NAME_TRAIT_FIELDS)[number];
-  exact: Partial<BottleExactIdentityInput>;
-}) {
-  return (
-    bottle[field] === true &&
-    exact[field] === true &&
-    bottleNameMarketsTrait(bottle, field)
-  );
-}
 
 function nameMarketsStatedAge({
   name,
@@ -151,49 +81,6 @@ export function hasBottleStatedAgeConflict({
   );
 }
 
-function formatExactIdentityLabel(
-  field: (typeof BOTTLE_EXACT_IDENTITY_FIELDS)[number],
-  value: NonNullable<
-    BottleExactIdentityInput[(typeof BOTTLE_EXACT_IDENTITY_FIELDS)[number]]
-  >,
-): string | null {
-  switch (field) {
-    case "edition":
-      return `${value}`;
-    case "statedAge":
-      return `${value}-year-old`;
-    case "releaseYear":
-      return `${value} Release`;
-    case "vintageYear":
-      return `${value} Vintage`;
-    case "abv":
-      return `${Number(value).toFixed(1)}% ABV`;
-    case "singleCask":
-      return value ? "Single Cask" : null;
-    case "caskStrength":
-      return value ? "Cask Strength" : null;
-    default:
-      return null;
-  }
-}
-
-function editionIncludesReleaseYearEditionPhrase({
-  edition,
-  releaseYear,
-}: {
-  edition: string | null;
-  releaseYear: number | null;
-}) {
-  if (!edition || releaseYear === null) {
-    return false;
-  }
-
-  return new RegExp(
-    `(?:^|[^A-Za-z0-9])${releaseYear}\\s+Edition(?:[^A-Za-z0-9]|$)`,
-    "i",
-  ).test(edition);
-}
-
 /**
  * Produces the canonical exact identity after accounting for bottle-level
  * stated-age carryover and shared-age conflicts.
@@ -232,121 +119,33 @@ export interface CanonicalBottleName {
   name: string;
 }
 
-function smwsCaskCodeOwnsName({
-  bottleName,
-  bottleFullName,
-  caskNumber,
-}: {
-  bottleName: string;
-  bottleFullName: string;
-  caskNumber: string | null | undefined;
-}) {
-  const caskCode = getExactCaskCodeAnchor(caskNumber);
-  const reference = parseReferenceName(bottleFullName);
-  if (!caskCode || reference?.code !== caskCode) {
-    return false;
-  }
-
-  const normalizedName = bottleName.trim().toUpperCase();
-  return (
-    normalizedName === caskCode || normalizedName.startsWith(`${caskCode} `)
-  );
+function nameIncludesEdition(name: string, edition: string) {
+  const escapedEdition = edition.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `(?:^|[^A-Za-z0-9])${escapedEdition}(?:[^A-Za-z0-9]|$)`,
+    "i",
+  ).test(name);
 }
 
 export function formatCanonicalBottleName({
   bottleName,
   bottleFullName,
-  bottleNameTraits,
-  bottleStatedAge,
-  exact,
+  edition,
 }: {
   bottleName: string;
   bottleFullName: string;
-  bottleNameTraits?: Partial<BottleNameTraitsInput>;
-  bottleStatedAge: number | null;
-  exact: BottleExactIdentityInput;
+  edition: string | null;
 }): CanonicalBottleName {
-  const resolvedIdentity = getResolvedBottleIdentity({
-    bottle: {
-      name: bottleName,
-      fullName: bottleFullName,
-      statedAge: bottleStatedAge,
-    },
-    exact,
-  });
-
-  // The SMWS cask code is the complete marketed Bottle identity. Keep exact
-  // traits in structured fields instead of duplicating them in the name.
-  if (
-    smwsCaskCodeOwnsName({
-      bottleName,
-      bottleFullName,
-      caskNumber: resolvedIdentity.caskNumber,
-    })
-  ) {
+  const releaseName = edition?.trim();
+  if (!releaseName || nameIncludesEdition(bottleName, releaseName)) {
     return {
       name: bottleName,
       fullName: bottleFullName,
     };
   }
 
-  const nameBits = [bottleName];
-  const fullNameBits = [bottleFullName];
-
-  for (const field of BOTTLE_EXACT_IDENTITY_FIELDS) {
-    if (
-      field === "releaseYear" &&
-      editionIncludesReleaseYearEditionPhrase(resolvedIdentity)
-    ) {
-      continue;
-    }
-
-    if (
-      field === "statedAge" &&
-      resolvedIdentity.statedAge !== null &&
-      ((bottleStatedAge !== null &&
-        resolvedIdentity.statedAge === bottleStatedAge) ||
-        bottleMarketsStatedAge({
-          name: bottleName,
-          fullName: bottleFullName,
-          statedAge: resolvedIdentity.statedAge,
-        }))
-    ) {
-      continue;
-    }
-
-    if (
-      (field === "singleCask" || field === "caskStrength") &&
-      isTraitAlreadyInBottleName({
-        bottle: {
-          name: bottleName,
-          fullName: bottleFullName,
-          statedAge: bottleStatedAge,
-          ...bottleNameTraits,
-        },
-        field,
-        exact: resolvedIdentity,
-      })
-    ) {
-      continue;
-    }
-
-    const value = resolvedIdentity[field];
-    if (value === null || value === undefined) {
-      continue;
-    }
-
-    const label = formatExactIdentityLabel(field, value);
-    if (!label) {
-      continue;
-    }
-
-    nameBits.push(label);
-    fullNameBits.push(label);
-  }
-
   return {
-    name: nameBits.join(" - "),
-    fullName: fullNameBits.join(" - "),
+    name: `${bottleName} - ${releaseName}`,
+    fullName: `${bottleFullName} - ${releaseName}`,
   };
 }

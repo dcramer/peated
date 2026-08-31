@@ -28,11 +28,6 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
-import {
-  ExactBottleAliasConflictError,
-  reserveExactBottleAliasInTransaction,
-  reserveLiteralCanonicalBottleAliasInTransaction,
-} from "@peated/server/lib/bottleAliases";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   getCatalogVerificationCreationMetadata,
@@ -49,7 +44,7 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
   findConflictingSmwsBottleId,
@@ -75,7 +70,7 @@ export class BottleAlreadyExistsError extends Error {
   constructor(
     readonly bottleId: number,
     readonly collision: {
-      kind: "alias" | "canonical_name" | "smws_code";
+      kind: "canonical_identity" | "smws_code";
       attemptedCanonicalFullName: string | null;
       attemptedSmwsCode?: string | null;
     } | null = null,
@@ -87,7 +82,6 @@ export class BottleAlreadyExistsError extends Error {
 
 type PersistedBottleResult = {
   bottle: Bottle;
-  newAliases: string[];
   newEntityIds: number[];
   seriesCreated: boolean;
 };
@@ -391,59 +385,41 @@ async function prepareBottleCreateInTransaction(
   };
 }
 
-function mapExactBottleAliasConflict(
-  error: ExactBottleAliasConflictError,
-  attemptedCanonicalFullName: string,
-) {
-  if (error.conflictingBottleId === null) return error;
-
-  return new BottleAlreadyExistsError(error.conflictingBottleId, {
-    kind:
-      error.alias.assignmentSource === "canonical" &&
-      error.alias.ignored !== true
-        ? "canonical_name"
-        : "alias",
-    attemptedCanonicalFullName,
-  });
-}
-
-async function reserveCanonicalBottleAliasesInTransaction(
+async function findExactBottleIdentityInTransaction(
   tx: AnyTransaction,
-  {
-    bottle,
-    assignedByActorId,
-  }: {
-    bottle: Bottle;
-    assignedByActorId: number;
-  },
+  bottle: NewBottle,
 ) {
-  const changedAliasNames = new Set<string>();
-  const reserveAlias = async (
-    reserve: typeof reserveExactBottleAliasInTransaction,
-  ) => {
-    try {
-      const result = await reserve(tx, {
-        name: bottle.fullName,
-        bottleId: bottle.id,
-        assignmentSource: "canonical",
-        assignedByActorId,
-      });
-      if (result.changed) changedAliasNames.add(result.name);
-    } catch (error) {
-      if (error instanceof ExactBottleAliasConflictError) {
-        throw mapExactBottleAliasConflict(error, bottle.fullName);
-      }
-      throw error;
-    }
-  };
-
-  await reserveAlias(reserveExactBottleAliasInTransaction);
-  await reserveAlias(reserveLiteralCanonicalBottleAliasInTransaction);
-
-  return Array.from(changedAliasNames).sort();
+  // Names are marketed titles, not unique ids. Serialize same-title creates and
+  // compare the structured identity that can safely prove an exact duplicate.
+  await tx.execute(
+    sql`SELECT pg_advisory_xact_lock(hashtext(${`bottle:create:${bottle.fullName.toLowerCase()}`}))`,
+  );
+  const [existing] = await tx
+    .select({ id: bottles.id })
+    .from(bottles)
+    .where(
+      and(
+        eq(bottles.brandId, bottle.brandId),
+        eq(sql`LOWER(${bottles.fullName})`, bottle.fullName.toLowerCase()),
+        sql`${bottles.edition} IS NOT DISTINCT FROM ${bottle.edition ?? null}`,
+        sql`${bottles.statedAge} IS NOT DISTINCT FROM ${bottle.statedAge ?? null}`,
+        sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${bottle.noAgeStatement ?? null}`,
+        sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${bottle.vintageYear ?? null}`,
+        sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${bottle.releaseYear ?? null}`,
+        sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${bottle.releaseMonth ?? null}`,
+        sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${bottle.releaseDay ?? null}`,
+        sql`${bottles.abv} IS NOT DISTINCT FROM ${bottle.abv ?? null}`,
+        sql`${bottles.singleCask} IS NOT DISTINCT FROM ${bottle.singleCask ?? null}`,
+        sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${bottle.caskStrength ?? null}`,
+        sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${bottle.caskNumber ?? null}`,
+      ),
+    )
+    .orderBy(bottles.id)
+    .limit(1);
+  return existing?.id ?? null;
 }
 
-/** Persists the Bottle, its durable distiller joins, alias, and audit rows. */
+/** Persists the Bottle, its durable distiller joins, and audit rows. */
 async function insertPreparedBottleInTransaction(
   tx: AnyTransaction,
   prepared: PreparedBottleCreate,
@@ -462,11 +438,6 @@ async function insertPreparedBottleInTransaction(
     .insert(bottles)
     .values({ ...bottleInsertData, groupId })
     .returning();
-
-  const newAliases = await reserveCanonicalBottleAliasesInTransaction(tx, {
-    bottle,
-    assignedByActorId: createdByActorId,
-  });
 
   const promises: Promise<any>[] = [
     tx.insert(changes).values({
@@ -498,7 +469,6 @@ async function insertPreparedBottleInTransaction(
 
   return {
     bottle,
-    newAliases,
     newEntityIds,
     seriesCreated,
   };
@@ -620,6 +590,17 @@ export async function createBottleInTransaction(
     input: buildBottleInput(groupFields, exact),
   });
 
+  const existingBottleId = await findExactBottleIdentityInTransaction(
+    tx,
+    prepared.bottleInsertData,
+  );
+  if (existingBottleId !== null) {
+    throw new BottleAlreadyExistsError(existingBottleId, {
+      kind: "canonical_identity",
+      attemptedCanonicalFullName: prepared.bottleInsertData.fullName,
+    });
+  }
+
   const group = await createIndependentGroupPrefix(tx, {
     actorId: createdByActorId,
     fields: groupFields,
@@ -659,7 +640,7 @@ function isSafeBottleReuse(
   existingBottle: Bottle,
 ) {
   if (
-    error.collision?.kind === "canonical_name" &&
+    error.collision?.kind === "canonical_identity" &&
     error.collision.attemptedCanonicalFullName !== null
   ) {
     return (
@@ -682,7 +663,7 @@ function isSafeBottleReuse(
 
 /**
  * Owns the savepoint-backed create-or-safe-reuse decision. Reuse is
- * limited to an exact canonical-name collision or the structurally verified
+ * limited to an exact structured-identity collision or the structurally verified
  * SMWS code that caused creation to conflict.
  */
 export async function createOrReuseBottleInTransaction(
@@ -730,7 +711,7 @@ export async function createOrReuseBottleInTransaction(
 
 /** Dispatches unique, best-effort work only after the Bottle transaction commits. */
 export async function finalizeCreatedBottle(
-  { bottle, seriesCreated, newAliases, newEntityIds }: BottleCreateResult,
+  { bottle, seriesCreated, newEntityIds }: BottleCreateResult,
   {
     creationSource = "manual_entry",
   }: {
@@ -775,18 +756,6 @@ export async function finalizeCreatedBottle(
         },
         series: {
           id: bottle.seriesId,
-        },
-      });
-    }
-  }
-
-  for (const aliasName of newAliases) {
-    try {
-      await pushUniqueJob("OnBottleAliasChange", { name: aliasName });
-    } catch (err) {
-      logError(err, {
-        bottle: {
-          id: bottle.id,
         },
       });
     }

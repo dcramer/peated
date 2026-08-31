@@ -25,8 +25,9 @@ Bottle and returns its concise marketed identity. A caller can suppress brand
 context only when the surrounding layout already supplies it.
 
 React components still own truncation, links, line breaks, and supporting
-metadata. Canonical `fullName` remains available for matching, sorting,
-verification, and stored identity.
+metadata. Canonical `fullName` remains available for search, sorting,
+verification, and stored marketed identity. Exact matching also uses the
+structured Bottle fields or an accepted alias.
 
 ## Identity Layers
 

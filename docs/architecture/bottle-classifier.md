@@ -45,9 +45,10 @@ belong to a separate Bottle audit and never accompany the reference result.
 `create_bottle` proposes one complete Bottle. It stores the stable
 expression in `proposedBottle.name` and supplies supported Bottle fields such as
 edition, distillation year, bottling year, release year, stated age, and ABV.
-The server uses those values to build the complete Bottle name without repeats,
-create the Bottle, and manage grouping. The classifier never selects a
-BottleGroup.
+The server appends an explicit edition to the stable expression without
+repeating it. Other exact facts remain structured instead of becoming generated
+name suffixes. The server creates the Bottle and manages grouping. The
+classifier never selects a BottleGroup.
 
 `maturation` stores the producer's wording without splitting it into cask type,
 size, or fill. `caskNumber` stores a marketed cask or barrel identifier.

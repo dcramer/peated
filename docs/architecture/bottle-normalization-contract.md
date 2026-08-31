@@ -31,10 +31,12 @@ identity combines:
 - Bottle fields such as edition, distillation year, bottling year, release year,
   effective stated age, ABV, single-cask/cask-strength flags, and cask details.
 
-Bottle creation uses those values in the complete Bottle name. Facts that
-describe only the source listing or physical bottle, such as a retailer
-selector, bottle number, or outturn, remain observations until reviewed evidence
-shows that they identify the marketed Bottle.
+Bottle creation combines the stable expression with an explicit marketed
+edition. It keeps age, year, ABV, and production flags in structured fields
+instead of generating name suffixes from them. Facts that describe only the
+source listing or physical bottle, such as a retailer selector, bottle number,
+or outturn, remain observations until reviewed evidence shows that they identify
+the marketed Bottle.
 
 Independent creation starts in a singleton BottleGroup. Deterministic legacy
 migration groups retained parents with their promoted release Bottles.

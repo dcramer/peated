@@ -31,7 +31,7 @@ test.each([
   {
     label: "preserves a differing exact age",
     exactStatedAge: 13,
-    expectedName: "Old Malt - 13-year-old",
+    expectedName: "Old Malt",
     expectedStatedAge: 13,
   },
   {
@@ -100,6 +100,32 @@ test("keeps an SMWS cask name stable when exact details change", () => {
   });
 });
 
+test("keeps exact facts in fields instead of serializing them into the name", () => {
+  expect(
+    materializeBottleIdentity({
+      stable: {
+        name: "Cask Strength",
+        fullName: "Example Brand Cask Strength",
+        statedAge: null,
+      },
+      exact: {
+        ...exactIdentity,
+        edition: "Batch 24",
+        statedAge: 13,
+        releaseYear: 2026,
+        vintageYear: 2013,
+        abv: 55.4,
+        singleCask: true,
+        caskStrength: true,
+      },
+    }),
+  ).toEqual({
+    name: "Cask Strength - Batch 24",
+    fullName: "Example Brand Cask Strength - Batch 24",
+    statedAge: 13,
+  });
+});
+
 test("classifies patched exact identity against the source group age", () => {
   expect(
     getBottleExactIdentity({
@@ -138,8 +164,8 @@ test("materializes only durable shared Bottle fields", () => {
       exact: { ...exactIdentity, edition: "Batch 2", statedAge: 13 },
     }),
   ).toEqual({
-    name: "Old Malt - Batch 2 - 13-year-old",
-    fullName: "Example Brand Old Malt - Batch 2 - 13-year-old",
+    name: "Old Malt - Batch 2",
+    fullName: "Example Brand Old Malt - Batch 2",
     statedAge: 13,
     brandId: 1,
     bottlerId: 2,

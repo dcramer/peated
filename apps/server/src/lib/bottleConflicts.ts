@@ -4,10 +4,8 @@ import { bottleAliases, bottles, entities } from "@peated/server/db/schema";
 import {
   ExactBottleAliasConflictError,
   reserveExactBottleAliasInTransaction,
-  reserveLiteralCanonicalBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
-import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { and, asc, eq, notInArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 export type BottleIdentityEntity = {
@@ -28,10 +26,7 @@ export type BottleIdentityCandidate = {
   desired: BottleIdentityState;
 };
 
-export type BottleIdentityConflictCause =
-  | "full_name"
-  | "smws_code"
-  | "exact_alias";
+export type BottleIdentityConflictCause = "smws_code";
 
 export class BottleIdentityConflictError extends Error {
   constructor(
@@ -217,10 +212,7 @@ export async function findConflictingSmwsBottleId(
   );
 }
 
-/**
- * Preflights Bottle identities and reserves their old/new exact aliases.
- * Callers explicitly choose which current Bottle rows are replaced atomically.
- */
+/** Preflights SMWS codes and preserves renamed subtitles as exact aliases. */
 export async function reserveBottleIdentitiesInTransaction(
   tx: AnyTransaction,
   {
@@ -230,50 +222,10 @@ export async function reserveBottleIdentitiesInTransaction(
     candidates: BottleIdentityCandidate[];
     assignedByActorId: number;
   },
-): Promise<{
-  changedAliasNames: string[];
-}> {
+): Promise<{ changedAliasNames: string[] }> {
   const sortedCandidates = [...candidates].sort(
     (left, right) => left.bottleId - right.bottleId,
   );
-  const identityChanges = sortedCandidates.filter(
-    ({ current, desired }) => current.fullName !== desired.fullName,
-  );
-
-  const fullNameOwners = new Map<string, number>();
-  for (const candidate of sortedCandidates) {
-    const key = candidate.desired.fullName.toLowerCase();
-    const owner = fullNameOwners.get(key);
-    if (owner !== undefined && owner !== candidate.bottleId) {
-      throw new BottleIdentityConflictError(owner, "full_name");
-    }
-    fullNameOwners.set(key, candidate.bottleId);
-  }
-
-  if (identityChanges.length) {
-    const names = Array.from(
-      new Set(
-        identityChanges.map(({ desired }) => desired.fullName.toLowerCase()),
-      ),
-    ).sort();
-    const excluded = Array.from(
-      new Set(sortedCandidates.map(({ bottleId }) => bottleId)),
-    ).sort((left, right) => left - right);
-    const [conflictingBottle] = await tx
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(
-        and(
-          excluded.length ? notInArray(bottles.id, excluded) : undefined,
-          or(...names.map((name) => eq(sql`LOWER(${bottles.fullName})`, name))),
-        ),
-      )
-      .orderBy(asc(bottles.id))
-      .limit(1);
-    if (conflictingBottle) {
-      throw new BottleIdentityConflictError(conflictingBottle.id, "full_name");
-    }
-  }
 
   const smwsChanges = sortedCandidates
     .map((candidate) => {
@@ -316,89 +268,34 @@ export async function reserveBottleIdentitiesInTransaction(
     }
   }
 
-  const reservations = new Map<string, { name: string; bottleId: number }>();
-  const literalReservations = new Map<
-    string,
-    { name: string; bottleId: number }
-  >();
-  for (const candidate of identityChanges) {
-    for (const name of [
-      candidate.current.fullName,
-      candidate.desired.fullName,
-    ]) {
-      const key = normalizeBottleAliasKey(name).toLowerCase();
-      const existing = reservations.get(key);
-      if (existing && existing.bottleId !== candidate.bottleId) {
-        throw new BottleIdentityConflictError(existing.bottleId, "exact_alias");
-      }
-      reservations.set(key, {
-        name,
-        bottleId: candidate.bottleId,
-      });
-    }
-
-    const literalName = candidate.current.fullName.trim();
-    const literalKey = literalName.toLowerCase();
-    const existingLiteral = literalReservations.get(literalKey);
-    if (existingLiteral && existingLiteral.bottleId !== candidate.bottleId) {
-      throw new BottleIdentityConflictError(
-        existingLiteral.bottleId,
-        "exact_alias",
-      );
-    }
-    literalReservations.set(literalKey, {
-      name: literalName,
-      bottleId: candidate.bottleId,
-    });
-  }
-
   const changedAliasNames = new Set<string>();
-  const reserveAlias = async (
-    reservation: { name: string; bottleId: number },
-    reserve: typeof reserveExactBottleAliasInTransaction,
-  ) => {
+  for (const { candidate, currentCode, desiredCode } of smwsChanges) {
+    if (
+      currentCode === null ||
+      currentCode !== desiredCode ||
+      candidate.current.fullName === candidate.desired.fullName
+    ) {
+      continue;
+    }
     try {
-      const result = await reserve(tx, {
-        name: reservation.name,
-        bottleId: reservation.bottleId,
+      const result = await reserveExactBottleAliasInTransaction(tx, {
+        name: candidate.current.fullName,
+        bottleId: candidate.bottleId,
         assignmentSource: "canonical",
         assignedByActorId,
       });
-      if (result.changed) {
-        changedAliasNames.add(result.name);
-      }
+      if (result.changed) changedAliasNames.add(result.name);
     } catch (error) {
       if (error instanceof ExactBottleAliasConflictError) {
         throw new BottleIdentityConflictError(
           error.conflictingBottleId,
-          "exact_alias",
+          "smws_code",
           { cause: error },
         );
       }
       throw error;
     }
-  };
-
-  for (const reservation of Array.from(reservations.values()).sort(
-    (left, right) =>
-      normalizeBottleAliasKey(left.name)
-        .toLowerCase()
-        .localeCompare(normalizeBottleAliasKey(right.name).toLowerCase()),
-  )) {
-    await reserveAlias(reservation, reserveExactBottleAliasInTransaction);
   }
 
-  for (const reservation of Array.from(literalReservations.values()).sort(
-    (left, right) =>
-      left.name.toLowerCase().localeCompare(right.name.toLowerCase()),
-  )) {
-    await reserveAlias(
-      reservation,
-      reserveLiteralCanonicalBottleAliasInTransaction,
-    );
-  }
-
-  return {
-    changedAliasNames: Array.from(changedAliasNames).sort(),
-  };
+  return { changedAliasNames: Array.from(changedAliasNames).sort() };
 }

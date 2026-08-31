@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  formatBottleDisplayName,
-  isBatchEdition,
-} from "@peated/server/lib/bottleDisplayName";
-import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   formatCategoryName,
   formatServingStyle,
@@ -41,6 +37,7 @@ import {
   getAddBottleHref,
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
+import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
@@ -105,9 +102,7 @@ function getBottleSpecs(bottle: Bottle) {
     { label: "Cask", value: bottle.maturation },
     {
       label: "Release",
-      value:
-        (isBatchEdition(bottle.edition) ? bottle.edition : null) ??
-        formatReleaseDate(bottle),
+      value: getBottleReleasePlacement(bottle).header,
     },
   ] as const;
 }
@@ -124,7 +119,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     },
     {
       label: "Released",
-      value: formatReleaseDate(bottle),
+      value: getBottleReleasePlacement(bottle).details,
     },
     {
       label: "Phenols",

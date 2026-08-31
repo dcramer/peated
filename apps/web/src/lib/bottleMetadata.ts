@@ -1,4 +1,8 @@
-import { getBottleReleaseMetadata } from "@peated/server/lib/bottleDisplayName";
+import {
+  getBottleReleaseMetadata,
+  isBatchEdition,
+} from "@peated/server/lib/bottleDisplayName";
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 
@@ -12,6 +16,19 @@ export type BottleReviewMetadata = Pick<
   Bottle,
   "abv" | "edition" | "releaseYear" | "statedAge" | "vintageYear"
 >;
+
+type BottleReleasePlacement = Pick<
+  Bottle,
+  "edition" | "releaseDay" | "releaseMonth" | "releaseYear"
+>;
+
+/** Keeps one release date on the page while retaining batch and date context. */
+export function getBottleReleasePlacement(bottle: BottleReleasePlacement) {
+  const releaseDate = formatReleaseDate(bottle);
+  return isBatchEdition(bottle.edition)
+    ? { header: bottle.edition, details: releaseDate }
+    : { header: releaseDate, details: null };
+}
 
 export function getBottleMetadata(bottle: BottleMetadata) {
   return [

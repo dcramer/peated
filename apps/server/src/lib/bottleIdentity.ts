@@ -143,15 +143,7 @@ export function materializeBottleIdentity({
   const identity = formatCanonicalBottleName({
     bottleName: stable.name,
     bottleFullName: stable.fullName,
-    bottleNameTraits: {
-      caskStrength: exact.caskStrength,
-      singleCask: exact.singleCask,
-    },
-    bottleStatedAge: hasNoAgeStatement ? null : stable.statedAge,
-    exact: {
-      ...exact,
-      statedAge: exactStatedAge,
-    },
+    edition: exact.edition,
   });
 
   return {
