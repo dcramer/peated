@@ -80,7 +80,7 @@ export default async function RegionPage(props: {
       visual={
         countrySlug === "united-states"
           ? { kind: "state", slug: region.slug }
-          : undefined
+          : { kind: "country", slug: region.country.slug }
       }
     >
       <LocationDistillerList

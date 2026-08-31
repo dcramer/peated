@@ -26,7 +26,7 @@ export function LocationsIndexFrame({ children }: { children: ReactNode }) {
           ]}
         />
       </div>
-      <div {...stylex.props(styles.content)}>{children}</div>
+      <div {...stylex.props(styles.indexContent)}>{children}</div>
     </div>
   );
 }
@@ -63,7 +63,6 @@ export function LocationPageFrame({
         actions={actions}
         description={description}
         eyebrow={country ? "Whisky region" : "Whisky country"}
-        identity={visual ? <LocationVisual visual={visual} /> : undefined}
         parent={
           country ? (
             <TextLink href={country.href} size="inherit">
@@ -88,7 +87,14 @@ export function LocationPageFrame({
           items={tabs}
         />
       </div>
-      <div {...stylex.props(styles.content)}>{children}</div>
+      <div {...stylex.props(styles.overviewGrid)}>
+        <div {...stylex.props(styles.content)}>{children}</div>
+        {visual ? (
+          <aside {...stylex.props(styles.details)}>
+            <LocationVisual visual={visual} />
+          </aside>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -100,24 +106,66 @@ function LocationVisual({
 }) {
   const props = {
     "aria-hidden": true,
-    ...stylex.props(styles.visual),
+    ...stylex.props(styles.visualIcon),
   } as const;
 
-  return visual.kind === "state" ? (
-    <UsStateMapIcon slug={visual.slug} {...props} />
-  ) : (
-    <CountryMapIcon slug={visual.slug} {...props} />
+  return (
+    <div {...stylex.props(styles.visual)}>
+      {visual.kind === "state" ? (
+        <UsStateMapIcon slug={visual.slug} {...props} />
+      ) : (
+        <CountryMapIcon slug={visual.slug} {...props} />
+      )}
+    </div>
   );
 }
+
+const NARROW = "@media (max-width: 759px)";
 
 const styles = stylex.create({
   specs: { marginTop: space.x4 },
   tabs: { marginTop: space.x6 },
-  content: { minWidth: 0, marginTop: space.x6 },
+  overviewGrid: {
+    display: "grid",
+    gridTemplateAreas: {
+      default: '"content details"',
+      [NARROW]: '"details" "content"',
+    },
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr) 336px",
+      [NARROW]: "minmax(0, 1fr)",
+    },
+    columnGap: space.x12,
+  },
+  content: {
+    gridArea: "content",
+    minWidth: 0,
+    paddingTop: space.x4,
+  },
+  indexContent: {
+    minWidth: 0,
+    marginTop: space.x6,
+  },
+  details: {
+    gridArea: "details",
+    minWidth: 0,
+  },
   visual: {
+    display: "flex",
+    height: "220px",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    marginTop: space.x4,
+    padding: space.x6,
+    borderRadius: "3px",
+    backgroundColor: colors.inset,
+  },
+  visualIcon: {
     display: "block",
-    width: "96px",
-    maxHeight: "72px",
-    color: colors.inkMuted,
+    width: "100%",
+    maxWidth: "240px",
+    height: "100%",
+    color: colors.ink,
   },
 });
