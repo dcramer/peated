@@ -536,6 +536,7 @@ const styles = stylex.create({
   },
   activeResult: {
     backgroundColor: colors.surface,
+    boxShadow: effects.focusRing,
   },
   visual: {
     display: "inline-flex",

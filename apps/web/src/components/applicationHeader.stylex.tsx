@@ -507,6 +507,10 @@ const styles = stylex.create({
     lineHeight: 1.2,
     textDecoration: "none",
     outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   accountMenuAction: {
     width: "100%",
@@ -526,6 +530,7 @@ const styles = stylex.create({
   },
   focusedAccountMenuItem: {
     backgroundColor: colors.surface,
+    boxShadow: effects.focusRing,
   },
   currentMenuLink: {
     color: colors.ink,

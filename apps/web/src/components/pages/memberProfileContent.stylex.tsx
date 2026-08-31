@@ -20,7 +20,7 @@ import {
   type RowMenuGroup,
   type TastingEntryProps,
 } from "..";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 
@@ -305,6 +305,11 @@ const styles = stylex.create({
     fontSize: "13px",
     fontWeight: 600,
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   collectionActivity: {
     paddingTop: space.x4,

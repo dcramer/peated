@@ -485,6 +485,11 @@ const styles = stylex.create({
     fontWeight: 700,
     listStyle: "none",
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     "::-webkit-details-marker": { display: "none" },
   },
   detailsBody: {

@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 
 export type ErrorPageProps = {
   actions?: ReactNode;
@@ -235,6 +235,11 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: 1.45,
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   technicalBody: {
     marginTop: space.x2,

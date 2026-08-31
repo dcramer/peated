@@ -85,7 +85,10 @@ const styles = stylex.create({
     fontFamily: fonts.display,
     fontSize: "15px",
     fontWeight: 700,
-    boxShadow: `inset 0 -2px 0 ${colors.ink}`,
+    boxShadow: {
+      default: `inset 0 -2px 0 ${colors.ink}`,
+      ":focus-visible": effects.focusRing,
+    },
   },
   count: {
     color: colors.inkMuted,

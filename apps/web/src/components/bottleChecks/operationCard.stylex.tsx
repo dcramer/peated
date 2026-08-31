@@ -1185,6 +1185,11 @@ const styles = stylex.create({
     color: { default: colors.inkMuted, ":hover": colors.accentDeep },
     textDecoration: "underline",
     overflowWrap: "anywhere",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   evidenceList: {
     display: "grid",
@@ -1232,6 +1237,11 @@ const styles = stylex.create({
     fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   rejectionPanel: {
     marginTop: space.x3,

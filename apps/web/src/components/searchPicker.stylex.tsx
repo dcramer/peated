@@ -464,12 +464,20 @@ const styles = stylex.create({
     rowGap: space.x1,
     padding: space.x3,
     borderWidth: 0,
+    outline: "none",
     backgroundColor: { default: "transparent", ":hover": colors.inset },
     color: colors.ink,
     textAlign: "left",
     cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
-  activeResult: { backgroundColor: colors.inset },
+  activeResult: {
+    backgroundColor: colors.inset,
+    boxShadow: effects.focusRing,
+  },
   resultLabel: {
     fontFamily: fonts.display,
     fontSize: "14px",
@@ -502,6 +510,7 @@ const styles = stylex.create({
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
+    outline: "none",
     backgroundColor: { default: colors.surface, ":hover": colors.inset },
     color: colors.accentDeep,
     fontFamily: fonts.reading,
@@ -509,6 +518,10 @@ const styles = stylex.create({
     fontWeight: 700,
     textAlign: "left",
     cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   createHint: {
     flexShrink: 0,

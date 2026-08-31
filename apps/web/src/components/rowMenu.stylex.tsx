@@ -238,9 +238,14 @@ const styles = stylex.create({
     textAlign: "left",
     textDecoration: "none",
     cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   focusedItem: {
     backgroundColor: colors.surface,
+    boxShadow: effects.focusRing,
   },
   disabledItem: {
     opacity: 0.45,

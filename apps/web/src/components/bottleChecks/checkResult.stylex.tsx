@@ -1,6 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 import {
   getBottleCheckFindings,
   getBottleCheckState,
@@ -207,6 +207,11 @@ const styles = stylex.create({
   },
   summary: {
     cursor: "pointer",
+    outline: "none",
     color: { default: colors.inkMuted, ":hover": colors.ink },
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
 });

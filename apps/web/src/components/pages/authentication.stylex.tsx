@@ -7,6 +7,7 @@ import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
+  effects,
   fonts,
   space,
 } from "../../styles/tokens.stylex";
@@ -228,6 +229,11 @@ const styles = stylex.create({
     letterSpacing: "-0.04em",
     lineHeight: 1,
     textDecoration: "none",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     [NARROW]: {
       fontSize: "24px",
     },
@@ -446,6 +452,10 @@ const styles = stylex.create({
     lineHeight: 1.4,
     cursor: "pointer",
     textAlign: "left",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     ":hover": {
       color: colors.accent,
     },

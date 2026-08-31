@@ -161,6 +161,10 @@ const styles = stylex.create({
     outline: "none",
     color: colors.ink,
     textDecoration: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   mobileMenu: { position: "relative" },
   mobileMenuTrigger: {

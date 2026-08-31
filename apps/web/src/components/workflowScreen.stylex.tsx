@@ -8,7 +8,13 @@ import type { FormEvent, ReactNode } from "react";
 
 import { Button, IconButton, LoadingList } from "@peated/web/components";
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../styles/tokens.stylex";
 
 export type WorkflowScreenProps = {
   children: ReactNode;
@@ -207,6 +213,10 @@ const styles = stylex.create({
     textDecoration: "none",
     outline: "none",
     borderRadius: controlMetrics.radiusSmall,
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     "@media (max-width: 559px)": { display: "none" },
   },
   title: {

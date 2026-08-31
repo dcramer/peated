@@ -1,6 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 import issueText from "./scraperIssueText";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
@@ -123,6 +123,11 @@ const styles = stylex.create({
   moreSummary: {
     color: colors.accentDeep,
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   moreList: {
     display: "flex",
@@ -143,6 +148,11 @@ const styles = stylex.create({
   link: {
     color: colors.accentDeep,
     overflowWrap: "anywhere",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   body: {
     display: "flex",

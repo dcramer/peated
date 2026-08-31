@@ -284,7 +284,10 @@ const styles = stylex.create({
       default: "transparent",
       ":hover": colors.surface,
     },
-    boxShadow: `inset 0 0 0 1px ${colors.sectionRule}`,
+    boxShadow: {
+      default: `inset 0 0 0 1px ${colors.sectionRule}`,
+      ":focus-visible": effects.focusRing,
+    },
     color: colors.ink,
   },
   accent: {
@@ -296,7 +299,10 @@ const styles = stylex.create({
       default: "transparent",
       ":hover": colors.criticalQuiet,
     },
-    boxShadow: `inset 0 0 0 1px ${colors.critical}`,
+    boxShadow: {
+      default: `inset 0 0 0 1px ${colors.critical}`,
+      ":focus-visible": effects.focusRing,
+    },
     color: colors.critical,
   },
   text: {

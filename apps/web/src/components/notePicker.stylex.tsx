@@ -460,9 +460,14 @@ const styles = stylex.create({
     color: colors.ink,
     textAlign: "left",
     cursor: "pointer",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   activeSuggestion: {
     backgroundColor: colors.inset,
+    boxShadow: effects.focusRing,
   },
   suggestionName: {
     overflow: "hidden",
@@ -611,7 +616,10 @@ const styles = stylex.create({
       ":hover": colors.ink,
       ":active": colors.ink,
     },
-    boxShadow: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     color: colors.ground,
   },
   noteArea: {
@@ -654,12 +662,18 @@ const styles = stylex.create({
   selectedNote: {
     backgroundColor: colors.accent,
     color: colors.ground,
-    boxShadow: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
   },
   commonNote: {
     backgroundColor: "transparent",
     color: colors.accentDeep,
-    boxShadow: `inset 0 0 0 1px ${colors.accent}`,
+    boxShadow: {
+      default: `inset 0 0 0 1px ${colors.accent}`,
+      ":focus-visible": effects.focusRing,
+    },
   },
   availableNote: {
     backgroundColor: "transparent",

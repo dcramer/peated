@@ -314,6 +314,11 @@ const styles = stylex.create({
     paddingLeft: 0,
     listStyle: "none",
     cursor: "pointer",
+    outline: "none",
+    boxShadow: {
+      default: "none",
+      ":focus-visible": effects.focusRing,
+    },
     "::-webkit-details-marker": { display: "none" },
   },
   detailsIcon: { flexShrink: 0, color: colors.inkMuted },

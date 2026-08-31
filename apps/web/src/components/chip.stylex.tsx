@@ -105,12 +105,18 @@ const styles = stylex.create({
   },
   neutral: {
     backgroundColor: "transparent",
-    boxShadow: `inset 0 0 0 1px ${colors.sectionRule}`,
+    boxShadow: {
+      default: `inset 0 0 0 1px ${colors.sectionRule}`,
+      ":focus-visible": effects.focusRing,
+    },
     color: colors.inkMuted,
   },
   tinted: {
     backgroundColor: "transparent",
-    boxShadow: `inset 0 0 0 1px ${colors.accent}`,
+    boxShadow: {
+      default: `inset 0 0 0 1px ${colors.accent}`,
+      ":focus-visible": effects.focusRing,
+    },
     color: colors.accentDeep,
   },
   solid: {
