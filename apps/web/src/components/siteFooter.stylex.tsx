@@ -11,15 +11,10 @@ export type FooterLink = {
   label: string;
 };
 
-export type FooterGroup = {
-  label: string;
-  links: readonly [FooterLink, ...FooterLink[]];
-};
-
 export type SiteFooterProps = {
   brand?: string;
   coverage?: ReactNode;
-  groups: readonly [FooterGroup, FooterGroup, FooterGroup, FooterGroup];
+  links: readonly [FooterLink, ...FooterLink[]];
   provenance: ReactNode;
   referenceLinks: readonly FooterLink[];
   responsibility?: ReactNode;
@@ -30,7 +25,7 @@ export type SiteFooterProps = {
 export function SiteFooter({
   brand = "Peated",
   coverage,
-  groups,
+  links,
   provenance,
   referenceLinks,
   responsibility = "Drink responsibly.",
@@ -43,20 +38,15 @@ export function SiteFooter({
           <div {...stylex.props(styles.footerBrand)}>{brand}</div>
           <p {...stylex.props(styles.statement)}>{statement}</p>
         </div>
-        <div {...stylex.props(styles.footerGroups)}>
-          {groups.map((group) => (
-            <nav aria-label={group.label} key={group.label}>
-              <h2 {...stylex.props(styles.footerHeading)}>{group.label}</h2>
-              <ul {...stylex.props(styles.footerLinks)}>
-                {group.links.map((link) => (
-                  <li key={link.href}>
-                    <FooterAnchor link={link} />
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
-        </div>
+        <nav aria-label="Footer">
+          <ul {...stylex.props(styles.footerLinks)}>
+            {links.map((link) => (
+              <li key={link.href}>
+                <FooterAnchor link={link} />
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
       {referenceLinks.length ? (
         <div {...stylex.props(styles.referenceSection)}>
@@ -121,15 +111,6 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: 1.55,
   },
-  footerGroups: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: space.x6,
-    [COMPACT]: {
-      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-      rowGap: space.x8,
-    },
-  },
   footerHeading: {
     margin: 0,
     color: colors.inkMuted,
@@ -142,12 +123,17 @@ const styles = stylex.create({
   },
   footerLinks: {
     display: "flex",
-    flexDirection: "column",
-    gap: space.x2,
+    alignItems: "baseline",
+    justifyContent: "flex-end",
+    columnGap: space.x6,
+    rowGap: space.x3,
+    flexWrap: "wrap",
     margin: 0,
-    marginTop: space.x3,
     padding: 0,
     listStyle: "none",
+    [COMPACT]: {
+      justifyContent: "flex-start",
+    },
   },
   footerLink: {
     color: {

@@ -2,46 +2,12 @@ import type { Outputs } from "@peated/server/orpc/router";
 
 import { SiteFooter, type SiteFooterProps } from "@peated/web/components";
 
-const groups = [
-  {
-    label: "Database",
-    links: [
-      { href: "/bottles", label: "Bottles" },
-      { href: "/distillers", label: "Distillers" },
-      { href: "/brands", label: "Brands" },
-      { href: "/bottlers", label: "Bottlers" },
-      { href: "/locations", label: "Locations" },
-    ],
-  },
-  {
-    label: "You",
-    links: [
-      { href: "/library", label: "Library" },
-      { href: "/tastings", label: "Tastings" },
-      { href: "/following", label: "Following" },
-      { href: "/friends", label: "Friends" },
-      { href: "/settings", label: "Settings" },
-    ],
-  },
-  {
-    label: "Contribute",
-    links: [
-      { href: "/addBottle?intent=catalog", label: "Add a bottle" },
-      { href: "/addEntity", label: "Add a distiller" },
-      { href: "/updates", label: "Recent changes" },
-    ],
-  },
-  {
-    label: "Peated",
-    links: [
-      { href: "/about", label: "About" },
-      { href: "/about/brand", label: "Brand voice" },
-      { href: "/about/ratings", label: "Rating systems" },
-      { href: "https://github.com/peated/peated", label: "Source" },
-      { href: "/terms", label: "Terms" },
-    ],
-  },
-] as const satisfies SiteFooterProps["groups"];
+const links = [
+  { href: "/about", label: "About" },
+  { href: "/updates", label: "Recent changes" },
+  { href: "https://github.com/peated/peated", label: "Source" },
+  { href: "/terms", label: "Terms" },
+] as const satisfies SiteFooterProps["links"];
 
 function formatCount(value: number, noun: string) {
   return `${value.toLocaleString("en-US")} ${noun}`;
@@ -62,7 +28,7 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
   return (
     <SiteFooter
       coverage={coverage}
-      groups={groups}
+      links={links}
       provenance="Edited by members · corrections welcome"
       referenceLinks={[
         {

@@ -3,43 +3,11 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SiteFooter, type SiteFooterProps } from "./siteFooter.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
-const groups: SiteFooterProps["groups"] = [
-  {
-    label: "Database",
-    links: [
-      { href: "/bottles", label: "Bottles" },
-      { href: "/distillers", label: "Distillers" },
-      { href: "/brands", label: "Brands" },
-      { href: "/bottlers", label: "Bottlers" },
-      { href: "/locations", label: "Locations" },
-    ],
-  },
-  {
-    label: "You",
-    links: [
-      { href: "/library", label: "Library" },
-      { href: "/tastings", label: "Tastings" },
-      { href: "/friends", label: "Friends" },
-      { href: "/settings", label: "Settings" },
-    ],
-  },
-  {
-    label: "Contribute",
-    links: [
-      { href: "/addBottle?intent=catalog", label: "Add a bottle" },
-      { href: "/addEntity", label: "Add a distiller" },
-      { href: "/updates", label: "Recent changes" },
-    ],
-  },
-  {
-    label: "Peated",
-    links: [
-      { href: "/about", label: "About" },
-      { href: "/about/ratings", label: "Rating systems" },
-      { href: "https://github.com/peated/peated", label: "Source" },
-      { href: "/terms", label: "Terms" },
-    ],
-  },
+const links: SiteFooterProps["links"] = [
+  { href: "/about", label: "About" },
+  { href: "/updates", label: "Recent changes" },
+  { href: "https://github.com/peated/peated", label: "Source" },
+  { href: "/terms", label: "Terms" },
 ];
 
 const meta = {
@@ -48,7 +16,7 @@ const meta = {
   args: {
     coverage:
       "47,402 bottles · 3,102 distilleries · 1,891 brands · 431 bottlers · 312,000 tastings",
-    groups,
+    links,
     provenance: "Community-edited · corrections welcome",
     referenceLinks: [
       { href: "/bottlers/4263/codes", label: "SMWS distillery codes" },
@@ -57,7 +25,7 @@ const meta = {
       "A record of every whisky bottling, what the critics said, and what the people who drank it said.",
   },
   argTypes: {
-    groups: { control: false },
+    links: { control: false },
     referenceLinks: { control: false },
   },
   decorators: [
