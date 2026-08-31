@@ -58,11 +58,13 @@ export default async function CountryLayout(props: {
       }
       name={country.name}
       tabs={[
-        { href: rootHref, label: "Distillers" },
+        {
+          count: country.totalDistillers,
+          href: rootHref,
+          label: "Distillers",
+        },
         { href: `${rootHref}/regions`, label: "Regions" },
       ]}
-      totalBottles={country.totalBottles}
-      totalDistillers={country.totalDistillers}
       visual={{ kind: "country", slug: country.slug }}
     >
       {props.children}

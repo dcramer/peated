@@ -46,6 +46,22 @@ describe("selectScenarioIds", () => {
     ).toEqual(["search"]);
   });
 
+  it("selects region detail for location page changes", () => {
+    expect(
+      selectScenarioIds([
+        "apps/web/src/app/(app)/locations/locationPageFrame.stylex.tsx",
+      ]),
+    ).toEqual(["region-detail"]);
+  });
+
+  it("does not select region detail for unrelated page changes", () => {
+    expect(
+      selectScenarioIds([
+        "apps/web/src/app/(app)/notifications/notificationList.stylex.tsx",
+      ]),
+    ).toEqual([]);
+  });
+
   it("selects search for shared search result changes", () => {
     expect(
       selectScenarioIds(["apps/web/src/components/searchResults.stylex.tsx"]),
@@ -91,6 +107,7 @@ describe("selectScenarioIds", () => {
       "home",
       "search",
       "bottle-detail",
+      "region-detail",
       "member-profile",
       "add-tasting",
       "brand-detail",

@@ -54,6 +54,7 @@ import {
   testBrand,
   testOwnedEntity,
   testOwner,
+  testRegion,
   testUser,
   unifiedBottleEditContext,
 } from "./rpc-fixtures.mjs";
@@ -261,6 +262,16 @@ async function handleRpcRequest({ request, response, url }) {
         results:
           input?.owner && input.owner !== testOwner.id ? [] : [testOwnedEntity],
       });
+      return true;
+    case "regions/details":
+      if (
+        input?.country !== testRegion.country.slug ||
+        input?.region !== testRegion.slug
+      ) {
+        sendRpcError(response, "Unexpected region details payload");
+        return true;
+      }
+      sendRpcResponse(response, testRegion);
       return true;
     case "bottlers/list":
     case "companies/list":

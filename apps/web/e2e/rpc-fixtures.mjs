@@ -89,6 +89,28 @@ export const libraryInsightsStats = {
 
 export const testAccessToken = "peated-playwright-access-token";
 
+export const testCountry = {
+  id: 9151,
+  name: "Scotland",
+  slug: "scotland",
+  description: "A major whisky-producing country.",
+  summary: "Home to distinct whisky regions and styles.",
+  location: [-4.2, 56.5],
+  totalBottles: 8_200,
+  totalDistillers: 150,
+};
+
+export const testRegion = {
+  id: 9152,
+  name: "Islay",
+  slug: "islay",
+  country: testCountry,
+  description: "An island region known for smoky single malt whisky.",
+  location: [-6.2, 55.8],
+  totalBottles: 680,
+  totalDistillers: 10,
+};
+
 export const testBrand = {
   id: 9201,
   peatedId: "E9201",
