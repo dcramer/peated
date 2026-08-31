@@ -87,9 +87,14 @@ export function SearchBox({
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [activeId, setActiveId] = useState<string>();
+  const [selectedId, setSelectedId] = useState<string>();
   const [open, setOpen] = useState(defaultOpen);
   const items = useMemo(() => groups.flatMap((group) => group.items), [groups]);
+  const activeId =
+    items.find((item) => item.id === selectedId)?.id ??
+    (query.trim() && resultQuery.trim() === query.trim()
+      ? items[0]?.id
+      : undefined);
   const hasPanelContent =
     groups.length > 0 ||
     Boolean(emptyText) ||
@@ -152,7 +157,7 @@ export function SearchBox({
           ? 0
           : items.length - 1
         : (currentIndex + offset + items.length) % items.length;
-    setActiveId(items[nextIndex]?.id);
+    setSelectedId(items[nextIndex]?.id);
     setOpen(true);
   }
 
@@ -178,7 +183,7 @@ export function SearchBox({
       event.preventDefault();
       if (query) {
         onQueryChange("");
-        setActiveId(undefined);
+        setSelectedId(undefined);
       } else {
         setOpen(false);
         onClose?.();
@@ -208,19 +213,19 @@ export function SearchBox({
       inputRef={inputRef}
       onChange={(event) => {
         onQueryChange(event.currentTarget.value);
-        setActiveId(query.trim() ? items[0]?.id : undefined);
+        setSelectedId(undefined);
         setOpen(true);
       }}
       onClear={() => {
         onQueryChange("");
-        setActiveId(undefined);
+        setSelectedId(undefined);
         inputRef.current?.focus();
       }}
       onFocus={() => setOpen(true)}
       onKeyDown={handleKeyDown}
       onScopeChange={(nextScope) => {
         onScopeChange(nextScope);
-        setActiveId(undefined);
+        setSelectedId(undefined);
         inputRef.current?.focus();
         setOpen(true);
       }}
