@@ -67,7 +67,7 @@ function validateImagePath(value, prefix = "") {
 }
 
 export function validateReport(report) {
-  if (report?.version !== 2 || !Array.isArray(report.files)) {
+  if (report?.version !== 1 || !Array.isArray(report.files)) {
     throw new Error("Invalid visual diff report");
   }
   const statuses = new Set(["added", "changed", "removed", "unchanged"]);
@@ -90,7 +90,8 @@ export function validateReport(report) {
           )
         : [];
     if (
-      (expectedKeys.length === 0 && file.images !== undefined) ||
+      (expectedKeys.length === 0 &&
+        (file.image !== undefined || file.images !== undefined)) ||
       actualKeys.length !== expectedKeys.length ||
       actualKeys.some((key, index) => key !== expectedKeys[index])
     ) {
@@ -98,6 +99,13 @@ export function validateReport(report) {
     }
     for (const key of expectedKeys) {
       validateImagePath(file.images[key], `images/${key}/`);
+    }
+    if (expectedKeys.length > 0) {
+      const primaryKey = file.status === "changed" ? "diff" : expectedKeys[0];
+      validateImagePath(file.image, "images/");
+      if (file.image !== file.images[primaryKey]) {
+        throw new Error(`Invalid visual diff image for ${file.status}`);
+      }
     }
   }
   return report;

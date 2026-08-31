@@ -36,6 +36,11 @@ only the baseline image. The tool records these paths in `report.json`. The
 Peated comment script uses this report instead of importing comparison code.
 It shows before and after first, with the pixel diff in a collapsed section.
 
+The report keeps its version 1 `image` field. It points to the pixel diff for a
+changed pair and to the available image for an added or removed file. This lets
+the trusted comment job on `main` read a report made by pull request code during
+the rollout. The extra `images` field supplies the before and after paths.
+
 ### Capture both revisions in the pull request job
 
 Peated captures the selected scenarios from the pull request base revision and

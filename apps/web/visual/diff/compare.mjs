@@ -5,7 +5,7 @@ import path from "node:path";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 
-const REPORT_VERSION = 2;
+const REPORT_VERSION = 1;
 
 async function listPngs(root) {
   const files = new Map();
@@ -106,6 +106,7 @@ async function comparePair(baselinePath, candidatePath, output, relative) {
   return {
     file: relative,
     height,
+    image: `images/diff/${relative}`,
     images: {
       baseline: baselineImage,
       candidate: candidateImage,
@@ -148,28 +149,32 @@ export async function compareDirectories({ baseline, candidate, output }) {
     const baselinePath = baselineFiles.get(file);
     const candidatePath = candidateFiles.get(file);
     if (!baselinePath) {
+      const candidateImage = await copyReportImage(
+        candidatePath,
+        output,
+        "candidate",
+        file,
+      );
       files.push({
         file,
+        image: candidateImage,
         images: {
-          candidate: await copyReportImage(
-            candidatePath,
-            output,
-            "candidate",
-            file,
-          ),
+          candidate: candidateImage,
         },
         status: "added",
       });
     } else if (!candidatePath) {
+      const baselineImage = await copyReportImage(
+        baselinePath,
+        output,
+        "baseline",
+        file,
+      );
       files.push({
         file,
+        image: baselineImage,
         images: {
-          baseline: await copyReportImage(
-            baselinePath,
-            output,
-            "baseline",
-            file,
-          ),
+          baseline: baselineImage,
         },
         status: "removed",
       });

@@ -55,6 +55,12 @@ showing unchanged screenshots.
 - **THEN** the pull request comment shows its before and after images first
 - **AND** provides its pixel diff in a collapsed section
 
+#### Scenario: The trusted comment job reads a new report before merge
+
+- **WHEN** pull request code adds before and after paths to a report
+- **THEN** the report keeps the version 1 primary image path
+- **AND** the comment job on the default branch can still read the report
+
 ### Requirement: Compare revisions from the same test merge
 
 The screenshot workflow SHALL capture the candidate test merge and its first

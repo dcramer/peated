@@ -86,9 +86,11 @@ describe("compareDirectories", () => {
       await fs.readFile(path.join(paths.output, "images/diff/home.png")),
     );
 
+    expect(report.version).toBe(1);
     expect(report.summary.changed).toBe(1);
     expect(report.files[0]).toMatchObject({
       file: "home.png",
+      image: "images/diff/home.png",
       images: {
         baseline: "images/baseline/home.png",
         candidate: "images/candidate/home.png",
@@ -121,6 +123,7 @@ describe("compareDirectories", () => {
     expect(report.files[0]).toMatchObject({
       file: "nested/home.png",
       height: 2,
+      image: "images/diff/nested/home.png",
       images: {
         baseline: "images/baseline/nested/home.png",
         candidate: "images/candidate/nested/home.png",
@@ -154,11 +157,13 @@ describe("compareDirectories", () => {
     expect(report.files).toEqual([
       {
         file: "added.png",
+        image: "images/candidate/added.png",
         images: { candidate: "images/candidate/added.png" },
         status: "added",
       },
       {
         file: "removed.png",
+        image: "images/baseline/removed.png",
         images: { baseline: "images/baseline/removed.png" },
         status: "removed",
       },
