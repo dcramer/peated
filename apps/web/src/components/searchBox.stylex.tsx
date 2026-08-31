@@ -208,7 +208,7 @@ export function SearchBox({
       inputRef={inputRef}
       onChange={(event) => {
         onQueryChange(event.currentTarget.value);
-        setActiveId(items[0]?.id);
+        setActiveId(query.trim() ? items[0]?.id : undefined);
         setOpen(true);
       }}
       onClear={() => {
@@ -274,6 +274,21 @@ export function SearchBox({
             {browseHeader}
             <div {...stylex.props(styles.databaseBrowseSearch)}>
               {searchRow}
+              {expanded ? (
+                <SearchResults
+                  activeId={activeId}
+                  embedded
+                  groups={groups}
+                  label="Recent searches"
+                  onItemSelect={selectResult}
+                  optionIdPrefix={panelId}
+                  panelId={panelId}
+                  query=""
+                  scroll={false}
+                  status={status}
+                  variant="database"
+                />
+              ) : null}
             </div>
           </>
         ) : (
@@ -364,6 +379,7 @@ export function SearchBox({
               embedded
               emptyText={emptyText}
               groups={groups}
+              label={query.trim() ? "Search results" : "Recent searches"}
               onItemSelect={selectResult}
               onRetry={onRetry}
               optionIdPrefix={panelId}
