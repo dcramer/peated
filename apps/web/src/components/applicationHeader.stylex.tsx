@@ -507,6 +507,10 @@ const styles = stylex.create({
     lineHeight: 1.2,
     textDecoration: "none",
     outline: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.surface,
+    },
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
@@ -517,7 +521,6 @@ const styles = stylex.create({
     paddingTop: 0,
     paddingBottom: 0,
     borderWidth: 0,
-    backgroundColor: "transparent",
     textAlign: "left",
     cursor: {
       default: "pointer",
