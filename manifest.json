@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/server/src/lib/bottleConflicts.ts",
+    "apps/server/src/lib/bottleDisplayName.test.ts",
+    "apps/server/src/lib/bottleDisplayName.ts",
+    "apps/server/src/lib/bottleIdentity.test.ts",
+    "apps/server/src/lib/bottleIdentity.ts",
+    "apps/server/src/lib/bottleOperationReview.test.ts",
+    "apps/server/src/lib/bottleOperationReview/bottleUpdate.ts",
+    "apps/server/src/lib/bottleReferenceResolution.test.ts",
+    "apps/server/src/lib/classifierDecisionCreateInputs.test.ts",
+    "apps/server/src/lib/createBottle.test.ts",
+    "apps/server/src/lib/createBottle.ts",
+    "apps/server/src/lib/priceMatching.test.ts",
+    "apps/server/src/lib/test/fixtures.test.ts",
+    "apps/server/src/lib/test/fixtures.ts",
+    "apps/server/src/lib/updateBottle.test.ts",
+    "apps/server/src/lib/updateBottle.ts",
+    "apps/server/src/lib/updateEntity.test.ts",
+    "apps/server/src/orpc/routes/bottles/create.test.ts",
+    "apps/server/src/orpc/routes/entities/update.test.ts",
+    "apps/server/src/orpc/routes/prices/matchQueue/index.test.ts"
+  ],
+  "commitSha": "fad235f75660c447b54cca7286ea648373f76776",
+  "scenarioIds": [
+    "search",
+    "bottle-detail",
+    "brand-detail",
+    "distillery-detail"
+  ],
+  "screenshots": [
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "brand-detail__desktop.png",
+      "label": "Brand detail · desktop"
+    },
+    {
+      "file": "brand-detail__mobile.png",
+      "label": "Brand detail · mobile"
+    },
+    {
+      "file": "distillery-detail__desktop.png",
+      "label": "Distillery detail · desktop"
+    },
+    {
+      "file": "distillery-detail__mobile.png",
+      "label": "Distillery detail · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
