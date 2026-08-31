@@ -263,6 +263,7 @@ The spacing scale uses 4px steps: 4, 8, 12, 16, 24, 32, and 48px. Prefer these v
 ## Elevation & Depth
 
 - Floating overlays use `0 18px 40px` with 16% light ink or 55% black in dark mode.
+- Keep internal stacking local to the component. A trigger can sit above its own menu, but it must not escape that component and cover an unrelated search overlay. Search overlays cover ordinary page controls. Dialogs cover non-dialog overlays.
 - Other elements do not use elevation.
 
 ## Shapes

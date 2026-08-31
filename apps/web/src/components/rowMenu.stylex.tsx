@@ -35,7 +35,7 @@ export type RowMenuProps = {
   variant?: "page" | "row";
 };
 
-/** Collects a record's secondary actions behind one vertical-dots control. */
+/** Collects an item's secondary actions behind one vertical-dots control. */
 export function RowMenu({
   groups,
   label,
@@ -142,10 +142,12 @@ const styles = stylex.create({
     position: "relative",
     display: "inline-flex",
     flexShrink: 0,
+    // Keep the trigger above its own menu without escaping this component.
+    isolation: "isolate",
   },
   triggerLayer: {
     position: "relative",
-    zIndex: 30,
+    zIndex: 2,
     display: "inline-flex",
   },
   dots: {
@@ -164,7 +166,7 @@ const styles = stylex.create({
     position: "absolute",
     top: 0,
     right: 0,
-    zIndex: 20,
+    zIndex: 1,
     width: "216px",
     overflow: "hidden",
     borderRadius: controlMetrics.radius,
