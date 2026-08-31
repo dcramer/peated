@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { KeyFacts, PageTabs, TextLink } from "@peated/web/components";
+import { PageTabs, TextLink, type PageTabItem } from "@peated/web/components";
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
@@ -16,7 +16,7 @@ export function LocationsIndexFrame({ children }: { children: ReactNode }) {
   return (
     <div>
       <PageHeader eyebrow="Whisky database" title="Locations" />
-      <div {...stylex.props(styles.tabs)}>
+      <div {...stylex.props(styles.indexTabs)}>
         <PageTabs
           ariaLabel="Location sections"
           currentHref={pathname}
@@ -38,8 +38,6 @@ export function LocationPageFrame({
   description,
   name,
   tabs,
-  totalBottles,
-  totalDistillers,
   visual,
 }: {
   actions?: ReactNode;
@@ -47,12 +45,7 @@ export function LocationPageFrame({
   country?: { href: string; name: string };
   description?: ReactNode;
   name: string;
-  tabs: readonly [
-    { href: string; label: string },
-    ...{ href: string; label: string }[],
-  ];
-  totalBottles: number;
-  totalDistillers: number;
+  tabs: readonly [PageTabItem, ...PageTabItem[]];
   visual?: { kind: "country" | "state"; slug: string };
 }) {
   const pathname = usePathname();
@@ -72,14 +65,6 @@ export function LocationPageFrame({
         }
         title={name}
       />
-      <div {...stylex.props(styles.specs)}>
-        <KeyFacts
-          facts={[
-            { label: "Distillers", value: totalDistillers.toLocaleString() },
-            { label: "Bottles", value: totalBottles.toLocaleString() },
-          ]}
-        />
-      </div>
       <div {...stylex.props(styles.tabs)}>
         <PageTabs
           ariaLabel={`${name} sections`}
@@ -123,8 +108,8 @@ function LocationVisual({
 const NARROW = "@media (max-width: 759px)";
 
 const styles = stylex.create({
-  specs: { marginTop: space.x4 },
-  tabs: { marginTop: space.x6 },
+  indexTabs: { marginTop: space.x6 },
+  tabs: { marginTop: 0 },
   overviewGrid: {
     display: "grid",
     gridTemplateAreas: {

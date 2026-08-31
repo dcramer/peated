@@ -74,9 +74,13 @@ export default async function RegionPage(props: {
         ) : undefined
       }
       name={region.name}
-      tabs={[{ href: pathname, label: "Distillers" }]}
-      totalBottles={region.totalBottles}
-      totalDistillers={region.totalDistillers}
+      tabs={[
+        {
+          count: region.totalDistillers,
+          href: pathname,
+          label: "Distillers",
+        },
+      ]}
       visual={
         countrySlug === "united-states"
           ? { kind: "state", slug: region.slug }
