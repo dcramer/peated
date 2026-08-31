@@ -67,6 +67,7 @@ export function RatingBandInput({
               key={band.key}
               {...stylex.props(
                 styles.bandInputCell,
+                checked && styles.bandInputCellSelected,
                 checked && bandInputSelectedStyles[band.key],
               )}
             >
@@ -84,14 +85,18 @@ export function RatingBandInput({
               <span {...stylex.props(styles.visuallyHiddenText)}>
                 {band.label}, {band.range}
               </span>
+              <span
+                aria-hidden="true"
+                {...stylex.props(
+                  styles.bandInputBracket,
+                  checked && bandInputBracketSelectedStyles[band.key],
+                )}
+              >
+                {band.shortRange}
+              </span>
             </label>
           );
         })}
-      </div>
-      <div aria-hidden="true" {...stylex.props(styles.bandInputRanges)}>
-        {RATING_BANDS.map((band) => (
-          <span key={band.key}>{band.shortRange}</span>
-        ))}
       </div>
     </div>
   );
@@ -318,7 +323,7 @@ const styles = stylex.create({
   bandInputTrack: {
     display: "grid",
     width: "100%",
-    height: "44px",
+    height: "52px",
     gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
     gap: "2px",
     marginTop: space.x3,
@@ -330,16 +335,25 @@ const styles = stylex.create({
     height: "52px",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: "transparent",
     cursor: "pointer",
     boxShadow: {
       default: `inset 0 0 0 2px ${colors.fieldRule}`,
+      ":hover": `inset 0 0 0 2px ${colors.inkMuted}`,
       ":focus-within": effects.focusRing,
     },
     opacity: {
       default: 1,
       ":hover": 0.86,
+    },
+  },
+  bandInputCellSelected: {
+    boxShadow: {
+      default: "none",
+      ":hover": "none",
+      ":focus-within": effects.focusRing,
     },
   },
   band1Selected: {
@@ -357,18 +371,28 @@ const styles = stylex.create({
   band5Selected: {
     backgroundColor: colors.band5,
   },
-  bandInputRanges: {
-    display: "grid",
-    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-    gap: "2px",
-    marginTop: "6px",
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "9px",
+  bandInputBracket: {
+    position: "relative",
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "19px",
     fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.02em",
-    lineHeight: 1.35,
-    textTransform: "uppercase",
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    lineHeight: 1,
+    opacity: 0.26,
+    pointerEvents: "none",
+  },
+  bandInputBracketSelectedLight: {
+    opacity: 0.5,
+  },
+  bandInputBracketSelectedDark: {
+    color: colors.ground,
+    opacity: 0.5,
+  },
+  bandInputBracketSelectedDarkest: {
+    color: colors.ground,
+    opacity: 0.62,
   },
   visuallyHiddenText: {
     position: "absolute",
@@ -505,4 +529,12 @@ const bandInputSelectedStyles = {
   very_good: styles.band3Selected,
   outstanding: styles.band4Selected,
   unicorn: styles.band5Selected,
+} satisfies Record<RatingBand, stylex.StyleXStyles>;
+
+const bandInputBracketSelectedStyles = {
+  mediocre: styles.bandInputBracketSelectedLight,
+  good: styles.bandInputBracketSelectedLight,
+  very_good: styles.bandInputBracketSelectedDark,
+  outstanding: styles.bandInputBracketSelectedDark,
+  unicorn: styles.bandInputBracketSelectedDarkest,
 } satisfies Record<RatingBand, stylex.StyleXStyles>;
