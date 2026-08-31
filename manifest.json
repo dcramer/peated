@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/cli/src/commands/bottles.ts",
+    "apps/cli/src/commands/labels.ts",
+    "apps/cli/src/commands/mocks.ts",
+    "apps/server/migrations/0254_cold_maelstrom.sql",
+    "apps/server/migrations/0255_smart_newton_destine.sql",
+    "apps/server/migrations/meta/0254_snapshot.json",
+    "apps/server/migrations/meta/0255_snapshot.json",
+    "apps/server/migrations/meta/_journal.json",
+    "apps/server/src/agents/bottleClassifier/auditBottle.test.ts",
+    "apps/server/src/agents/bottleClassifier/contextAdapters.test.ts",
+    "apps/server/src/agents/bottleClassifier/contextAdapters.ts",
+    "apps/server/src/agents/bottleClassifier/contract.ts",
+    "apps/server/src/agents/bottleClassifier/findExactAliasBottleCandidate.test.ts",
+    "apps/server/src/agents/bottleClassifier/findExactReferenceBottleCandidate.test.ts",
+    "apps/server/src/agents/bottleClassifier/findExactReferenceBottleCandidate.ts",
+    "apps/server/src/agents/bottleClassifier/index.ts",
+    "apps/server/src/agents/bottleClassifier/service.ts",
+    "apps/server/src/db/schema/bottles.test.ts",
+    "apps/server/src/db/schema/bottles.ts",
+    "apps/server/src/db/schema/stores.ts"
+  ],
+  "commitSha": "59b2a4e2cd1e6461d3b0bfbcb260b33050634af3",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
