@@ -128,7 +128,21 @@ export function parseCaskNumberFromSku(sku: string): string | null {
   return `${distilleryCode}.${caskSequence}`;
 }
 
-function categoryFromArchiveFacts({
+function getSmwsCodeIdentity(societyCode: string) {
+  // SMWS puts numbered Heresy releases in its cask-number API field, but the
+  // product presents them as batch editions rather than single-cask codes.
+  const batchMatch = /^Batch (?<number>\d+)$/iu.exec(societyCode);
+  if (batchMatch?.groups) {
+    return {
+      caskNumber: null,
+      edition: `Batch ${batchMatch.groups.number}`,
+    };
+  }
+
+  return { caskNumber: societyCode, edition: null };
+}
+
+function categoryFromSmwsFacts({
   caskNumber,
   region,
   spirit,
@@ -144,8 +158,18 @@ function categoryFromArchiveFacts({
 
   const normalizedSpirit = spirit?.toLowerCase() ?? "";
   const normalizedRegion = region?.toLowerCase() ?? "";
-  if (normalizedRegion.includes("blended malt")) return "blend";
-  if (normalizedSpirit.includes("grain whisky")) return "single_grain";
+  if (
+    normalizedRegion.includes("blended malt") ||
+    normalizedSpirit.includes("blended malt")
+  ) {
+    return "blend";
+  }
+  if (
+    normalizedSpirit.includes("grain whisky") ||
+    normalizedSpirit.includes("single grain")
+  ) {
+    return "single_grain";
+  }
   if (normalizedSpirit.includes("bourbon")) return "bourbon";
   if (normalizedSpirit.includes("rye")) return "rye";
   if (normalizedSpirit.includes("malt whisky")) return "single_malt";
@@ -209,13 +233,14 @@ export function parseArchivePage(body: string): ArchivePage {
     const abv = parseAbv(facts.get("ABV"));
     if (!title || abv === null) continue;
 
-    const displayedCaskNumber = facts.get("CASK NO.") ?? null;
-    const caskNumber = parseCaskNumberFromSku(sku) ?? displayedCaskNumber;
-    if (!caskNumber) continue;
-    const standardCaskNumber = /^[A-Z0-9]+\.\d+$/iu.test(caskNumber);
+    const displayedSocietyCode = facts.get("CASK NO.") ?? null;
+    const societyCode = parseCaskNumberFromSku(sku) ?? displayedSocietyCode;
+    if (!societyCode) continue;
+    const standardCaskNumber = /^[A-Z0-9]+\.\d+$/iu.test(societyCode);
     const bundleTitle = /\b(?:case|collection|duo|pack|trio)\b/iu.test(title);
     if (!standardCaskNumber && bundleTitle) continue;
-    const details = parseDetailsFromName(`${caskNumber} ${title}`);
+    const { caskNumber, edition } = getSmwsCodeIdentity(societyCode);
+    const details = parseDetailsFromName(`${societyCode} ${title}`);
     const age = Number.parseInt(facts.get("AGE") ?? "", 10);
     const statedAge = Number.isSafeInteger(age) && age > 0 ? age : null;
     const vintageYear = parseVintageYear(card.attr("data-item-distilleddate"));
@@ -224,7 +249,7 @@ export function parseArchivePage(body: string): ArchivePage {
     const region = facts.get("REGION") ?? null;
     const spirit = facts.get("SPIRIT") ?? null;
     const rawName =
-      details?.name ?? (caskNumber ? `${caskNumber} ${title}` : title);
+      details?.name ?? (edition ? title : `${societyCode} ${title}`);
     const normalized = normalizeBottle({
       name: rawName,
       statedAge,
@@ -232,27 +257,30 @@ export function parseArchivePage(body: string): ArchivePage {
       isFullName: false,
     });
 
+    const bottle: z.input<typeof BottleInputSchema> = {
+      name: normalized.name,
+      statedAge: normalized.statedAge,
+      vintageYear: normalized.vintageYear,
+      releaseYear: normalized.releaseYear,
+      abv,
+      category: categoryFromSmwsFacts({ caskNumber, region, spirit }),
+      brand: { name: "The Scotch Malt Whisky Society" },
+      bottler: { name: "The Scotch Malt Whisky Society" },
+      distillers: details?.distiller ? [{ name: details.distiller }] : [],
+      maturation,
+      caskNumber,
+      outturn: parsePositiveInteger(
+        facts.get("OUTTURN") ?? facts.get("BOTTLES PRODUCED"),
+      ),
+      singleCask: isSingleCask(Boolean(details?.distiller), maturation),
+    };
+    if (edition) bottle.edition = edition;
+
     bottles.push({
       imageUrl: imageUrl ?? null,
       productId:
         Number.isSafeInteger(productId) && productId > 0 ? productId : null,
-      bottle: {
-        name: normalized.name,
-        statedAge: normalized.statedAge,
-        vintageYear: normalized.vintageYear,
-        releaseYear: normalized.releaseYear,
-        abv,
-        category: categoryFromArchiveFacts({ caskNumber, region, spirit }),
-        brand: { name: "The Scotch Malt Whisky Society" },
-        bottler: { name: "The Scotch Malt Whisky Society" },
-        distillers: details?.distiller ? [{ name: details.distiller }] : [],
-        maturation,
-        caskNumber,
-        outturn: parsePositiveInteger(
-          facts.get("OUTTURN") ?? facts.get("BOTTLES PRODUCED"),
-        ),
-        singleCask: isSingleCask(Boolean(details?.distiller), maturation),
-      },
+      bottle,
     });
   }
 
@@ -529,6 +557,8 @@ const SMWSPayloadSchema = z.object({
       abv: z.union([z.string(), z.number()]).nullish(),
       cask_no: z.string().nullish(),
       cask_type: z.string().nullish(),
+      region: z.string().nullish(),
+      spirit_type: z.string().nullish(),
       distilleddate: z.string().nullish(),
       list_description: z.string().nullish(),
       price: z.number(),
@@ -557,22 +587,29 @@ export async function scrapeBottles(
           logScrapeWarning(SITE, "Cannot find cask name for product");
           return;
         }
-        const caskNumber =
+        const societyCode =
           parseCaskNumberFromSku(item.sku) ?? item.cask_no?.trim() ?? null;
-        if (!caskNumber) {
-          logScrapeWarning(SITE, "Cannot find cask number for product", {
+        if (!societyCode) {
+          logScrapeWarning(SITE, "Cannot find Society code for product", {
             caskName,
           });
           return;
         }
 
-        const details = parseDetailsFromName(`${caskNumber} ${caskName}`);
-        const category = details?.category ?? "spirit";
+        const { caskNumber, edition } = getSmwsCodeIdentity(societyCode);
+        const details = parseDetailsFromName(`${societyCode} ${caskName}`);
+        const category = categoryFromSmwsFacts({
+          caskNumber,
+          region: item.region ?? null,
+          spirit: item.spirit_type ?? null,
+        });
 
         const release = parseReleaseDate(item.release_date);
 
         const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
-          name: details?.name ?? `${caskNumber} ${caskName}`,
+          name:
+            details?.name ??
+            (edition ? caskName : `${societyCode} ${caskName}`),
           statedAge: item.age,
           vintageYear: parseVintageYear(item.distilleddate),
           releaseYear: release?.releaseYear ?? null,
@@ -583,7 +620,7 @@ export async function scrapeBottles(
         const volume = parseVolume(item.sku);
         if (!volume) {
           logScrapeWarning(SITE, "Cannot find supported bottle volume", {
-            caskNumber,
+            societyCode,
             sku: item.sku,
           });
         }
@@ -615,6 +652,7 @@ export async function scrapeBottles(
           ),
           description: item.list_description?.trim() || null,
         };
+        if (edition) bottle.edition = edition;
         if (release && releaseYear !== null) {
           bottle.releaseYear = releaseYear;
           bottle.releaseMonth = release.releaseMonth;
