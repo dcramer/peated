@@ -11,6 +11,7 @@ import {
   fonts,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
+import { IconButton } from "./button.stylex";
 
 const PHONE = "@media (max-width: 480px)";
 
@@ -45,22 +46,23 @@ export function RowMenu({
 
   return (
     <Menu as="div" {...stylex.props(styles.root)}>
-      {({ open }) => (
+      {() => (
         <>
-          <MenuButton
-            aria-label={triggerLabel}
-            {...stylex.props(
-              styles.trigger,
-              variant === "page" && styles.pageTrigger,
-              open && styles.openTrigger,
-            )}
-          >
-            <span aria-hidden="true" {...stylex.props(styles.dots)}>
-              <span {...stylex.props(styles.dot)} />
-              <span {...stylex.props(styles.dot)} />
-              <span {...stylex.props(styles.dot)} />
-            </span>
-          </MenuButton>
+          <span {...stylex.props(styles.triggerLayer)}>
+            <MenuButton
+              as={IconButton}
+              icon={
+                <span aria-hidden="true" {...stylex.props(styles.dots)}>
+                  <span {...stylex.props(styles.dot)} />
+                  <span {...stylex.props(styles.dot)} />
+                  <span {...stylex.props(styles.dot)} />
+                </span>
+              }
+              label={triggerLabel}
+              size={variant === "page" ? "lg" : "sm"}
+              variant="tonal"
+            />
+          </span>
           <MenuItems
             aria-label={`${label} actions`}
             portal={false}
@@ -141,36 +143,10 @@ const styles = stylex.create({
     display: "inline-flex",
     flexShrink: 0,
   },
-  trigger: {
+  triggerLayer: {
     position: "relative",
     zIndex: 30,
     display: "inline-flex",
-    width: "34px",
-    height: "34px",
-    flexShrink: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 0,
-    borderWidth: 0,
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: {
-      default: colors.inset,
-      ":hover": colors.surface,
-    },
-    color: colors.accentDeep,
-    cursor: "pointer",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  openTrigger: {
-    backgroundColor: colors.ground,
-  },
-  pageTrigger: {
-    width: controlMetrics.controlHeightLarge,
-    height: controlMetrics.controlHeightLarge,
   },
   dots: {
     display: "flex",
