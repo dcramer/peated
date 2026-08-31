@@ -1175,8 +1175,18 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
   link: {
-    color: { default: colors.inkMuted, ":hover": colors.accentDeep },
-    textDecoration: "underline",
+    color: {
+      default: colors.accentDeep,
+      ":hover": colors.accent,
+      ":active": colors.ink,
+    },
+    fontWeight: 600,
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     outline: "none",
     boxShadow: {
       default: "none",
@@ -1184,8 +1194,18 @@ const styles = stylex.create({
     },
   },
   externalLink: {
-    color: { default: colors.inkMuted, ":hover": colors.accentDeep },
-    textDecoration: "underline",
+    color: {
+      default: colors.accentDeep,
+      ":hover": colors.accent,
+      ":active": colors.ink,
+    },
+    fontWeight: 600,
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     overflowWrap: "anywhere",
     outline: "none",
     boxShadow: {

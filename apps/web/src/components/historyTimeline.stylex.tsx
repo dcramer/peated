@@ -1,13 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import {
-  colors,
-  controlMetrics,
-  effects,
-  fonts,
-  space,
-} from "../styles/tokens.stylex";
+import { colors, fonts, space } from "../styles/tokens.stylex";
+import { TextLink } from "./textLink.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -66,14 +61,16 @@ export function HistoryTimeline({ events, summary }: HistoryTimelineProps) {
                 </span>
               ) : null}
               {event.source ? (
-                <a
-                  href={event.source.href}
-                  rel="noreferrer"
-                  target="_blank"
-                  {...stylex.props(styles.source)}
-                >
-                  {event.source.label ?? "Source"}
-                </a>
+                <span {...stylex.props(styles.source)}>
+                  <TextLink
+                    href={event.source.href}
+                    rel="noreferrer"
+                    size="inherit"
+                    target="_blank"
+                  >
+                    {event.source.label ?? "Source"}
+                  </TextLink>
+                </span>
               ) : null}
             </div>
           </li>
@@ -140,18 +137,9 @@ const styles = stylex.create({
     color: colors.inkMuted,
   },
   source: {
-    color: { default: colors.accentDeep, ":hover": colors.accent },
     fontFamily: fonts.data,
     fontSize: "11px",
     lineHeight: 1.45,
-    textDecorationLine: "underline",
-    textUnderlineOffset: "2px",
-    outline: "none",
-    borderRadius: controlMetrics.radiusSmall,
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
   summary: {
     marginTop: space.x3,

@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import { colors, fonts, space } from "../styles/tokens.stylex";
+import { TextLink } from "./textLink.stylex";
 
 export type CriticReviewProps = {
   href?: string;
@@ -46,9 +47,11 @@ export function CriticReview({
       {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
 
       {href ? (
-        <a href={href} {...stylex.props(styles.reviewLink)}>
-          Read the full review on {publication} →
-        </a>
+        <div {...stylex.props(styles.reviewLink)}>
+          <TextLink href={href} size="inherit">
+            Read the full review on {publication} →
+          </TextLink>
+        </div>
       ) : null}
     </article>
   );
@@ -115,23 +118,9 @@ const styles = stylex.create({
     textWrap: "pretty",
   },
   reviewLink: {
-    display: "inline-block",
     marginTop: space.x3,
-    borderRadius: "2px",
-    outline: "none",
-    color: {
-      default: colors.accentDeep,
-      ":hover": colors.accent,
-      ":active": colors.ink,
-    },
     fontFamily: fonts.reading,
     fontSize: "13px",
-    fontWeight: 700,
     lineHeight: 1.35,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
 });

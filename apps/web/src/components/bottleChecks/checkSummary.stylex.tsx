@@ -1,8 +1,8 @@
 import type { Finding } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
-import { AppLink as Link } from "@peated/web/components";
+import { TextLink } from "@peated/web/components";
 import * as stylex from "@stylexjs/stylex";
-import { colors, effects } from "../../styles/tokens.stylex";
+import { colors } from "../../styles/tokens.stylex";
 
 export type BottleCheck = Outputs["audits"]["list"]["results"][number];
 
@@ -68,12 +68,9 @@ export function BottleCheckSubject({
 }) {
   if (check.bottleId) {
     return (
-      <Link
-        href={`/bottles/${check.bottleId}`}
-        {...stylex.props(styles.subjectLink)}
-      >
+      <TextLink href={`/bottles/${check.bottleId}`} size="inherit">
         Bottle #{check.bottleId}
-      </Link>
+      </TextLink>
     );
   }
   if (check.intent === "resolve_reference") {
@@ -91,16 +88,6 @@ export function BottleCheckSubject({
 
 const styles = stylex.create({
   subject: { color: colors.inkMuted },
-  subjectLink: {
-    color: { default: colors.ink, ":hover": colors.accentDeep },
-    fontWeight: 600,
-    textDecoration: "underline",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
 });
 
 export function BottleCheckOrigin({

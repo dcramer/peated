@@ -8,13 +8,13 @@ import { useState } from "react";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
-  AppLink,
   Button,
   CursorPager,
   EmptyState,
   IconButton,
   ItemList,
   ItemListItem,
+  TextLink,
 } from "@peated/web/components";
 import { Avatar } from "@peated/web/components/avatar.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
@@ -25,7 +25,6 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   colors,
   controlMetrics,
-  effects,
   fonts,
   space,
 } from "../../../styles/tokens.stylex";
@@ -147,21 +146,18 @@ export function NotificationList({
                 <div {...stylex.props(styles.copy)}>
                   <div {...stylex.props(styles.message)}>
                     {from ? (
-                      <AppLink
-                        href={`/users/${from.username}`}
-                        {...stylex.props(styles.author)}
-                      >
+                      <TextLink href={`/users/${from.username}`} size="inherit">
                         {from.username}
-                      </AppLink>
+                      </TextLink>
                     ) : null}{" "}
                     {href ? (
-                      <AppLink
+                      <TextLink
                         href={href}
                         onClick={() => markRead(notification.id)}
-                        {...stylex.props(styles.target)}
+                        size="inherit"
                       >
                         {getNotificationMessage(notification)}
-                      </AppLink>
+                      </TextLink>
                     ) : (
                       getNotificationMessage(notification)
                     )}
@@ -267,22 +263,6 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "13px",
     lineHeight: 1.45,
-  },
-  author: {
-    color: { default: colors.ink, ":hover": colors.accentDeep },
-    fontWeight: 700,
-    textDecorationLine: { default: "none", ":hover": "underline" },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
-    outline: "none",
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-  },
-  target: {
-    color: "inherit",
-    textDecoration: "none",
-    outline: "none",
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-    ":hover": { color: colors.ink, textDecoration: "underline" },
   },
   date: {
     display: "block",
