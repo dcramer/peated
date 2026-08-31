@@ -27,6 +27,30 @@ function includesIdentityText(value: string, candidate: string) {
   return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
 }
 
+export function isBatchEdition(edition: string | null | undefined) {
+  return edition
+    ? /^batch(?:\s+(?:no\.?|number))?\s+\S/iu.test(edition)
+    : false;
+}
+
+/** Returns an exact release fact that belongs beside, rather than inside, the title. */
+export function getBottleReleaseMetadata(
+  bottle: Pick<
+    BottleDisplayNameSource,
+    "edition" | "releaseYear" | "vintageYear"
+  >,
+) {
+  if (bottle.edition && isBatchEdition(bottle.edition)) return bottle.edition;
+  if (bottle.edition) return null;
+  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
+    return `${bottle.vintageYear} vintage`;
+  }
+  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
+    return `${bottle.releaseYear} release`;
+  }
+  return null;
+}
+
 function getExpressionName(bottle: BottleDisplayNameSource) {
   if (bottle.group) return bottle.group.name;
 
@@ -67,23 +91,10 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
 function getReleaseName(bottle: BottleDisplayNameSource) {
   const expressionName = getExpressionName(bottle);
 
-  if (bottle.edition) {
+  if (bottle.edition && !isBatchEdition(bottle.edition)) {
     return includesIdentityText(expressionName, bottle.edition)
       ? expressionName
       : `${expressionName} - ${bottle.edition}`;
-  }
-  if (!bottle.group) return expressionName;
-  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
-    const vintage = `${bottle.vintageYear} Vintage`;
-    return includesIdentityText(expressionName, vintage)
-      ? expressionName
-      : `${expressionName} - ${vintage}`;
-  }
-  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
-    const release = `${bottle.releaseYear} Release`;
-    return includesIdentityText(expressionName, release)
-      ? expressionName
-      : `${expressionName} - ${release}`;
   }
 
   return expressionName;

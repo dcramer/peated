@@ -1,18 +1,21 @@
+import { getBottleReleaseMetadata } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 
 export type BottleMetadata = Pick<
   Bottle,
   "abv" | "category" | "noAgeStatement" | "statedAge"
->;
+> &
+  Partial<Pick<Bottle, "edition" | "releaseYear" | "vintageYear">>;
 
 export type BottleReviewMetadata = Pick<
   Bottle,
-  "abv" | "releaseYear" | "statedAge" | "vintageYear"
+  "abv" | "edition" | "releaseYear" | "statedAge" | "vintageYear"
 >;
 
 export function getBottleMetadata(bottle: BottleMetadata) {
   return [
+    getBottleReleaseMetadata(bottle),
     bottle.category ? formatCategoryName(bottle.category) : null,
     bottle.statedAge !== null
       ? `${bottle.statedAge} years`
@@ -34,7 +37,6 @@ export function getBottleReviewMetadata(bottle: BottleReviewMetadata) {
     bottle.abv === null
       ? null
       : `${bottle.abv.toFixed(1).replace(/\.0$/, "")}% ABV`,
-    bottle.vintageYear === null ? null : `${bottle.vintageYear} vintage`,
-    bottle.releaseYear === null ? null : `${bottle.releaseYear} release`,
+    getBottleReleaseMetadata(bottle),
   ].filter((value): value is string => Boolean(value));
 }

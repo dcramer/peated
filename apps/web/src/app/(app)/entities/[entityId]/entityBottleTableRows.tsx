@@ -1,4 +1,7 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import {
+  formatBottleDisplayName,
+  getBottleReleaseMetadata,
+} from "@peated/server/lib/bottleDisplayName";
 import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
@@ -30,6 +33,7 @@ function formatBottleMetadata(bottle: Bottle) {
         : null;
 
   return [
+    getBottleReleaseMetadata(bottle),
     origin,
     bottle.statedAge !== null
       ? `${bottle.statedAge} years`
