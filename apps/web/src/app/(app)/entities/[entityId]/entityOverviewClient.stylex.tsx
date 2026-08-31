@@ -113,53 +113,64 @@ export function EntityOverviewClient({
   return (
     <div {...stylex.props(styles.overviewGrid)}>
       <div {...stylex.props(styles.catalog)}>
-        {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
-        <EntityBottleOverview
-          bottleList={bottleListQuery.data}
-          createBottleHref={getEntityBottleCreateHref(entity)}
-          entity={entity}
-          error={Boolean(bottleListQuery.error)}
-          pending={bottleListQuery.isPending}
-          retry={() => void bottleListQuery.refetch()}
-          totalBottles={entity.totalBottles}
-        />
-        <EntityReleaseOverview
-          entity={entity}
-          error={Boolean(releaseListQuery.error)}
-          pending={releaseListQuery.isPending}
-          releaseList={releaseListQuery.data}
-          retry={() => void releaseListQuery.refetch()}
-        />
-        <EntityHistoryOverview
-          entityName={entity.name}
-          error={Boolean(eventListQuery.error)}
-          eventList={eventListQuery.data}
-          pending={eventListQuery.isPending}
-          retry={() => void eventListQuery.refetch()}
-        />
+        <div {...stylex.props(styles.facts)}>
+          {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
+        </div>
+        <div {...stylex.props(styles.catalogSections)}>
+          <EntityBottleOverview
+            bottleList={bottleListQuery.data}
+            createBottleHref={getEntityBottleCreateHref(entity)}
+            entity={entity}
+            error={Boolean(bottleListQuery.error)}
+            pending={bottleListQuery.isPending}
+            retry={() => void bottleListQuery.refetch()}
+            totalBottles={entity.totalBottles}
+          />
+          <EntityReleaseOverview
+            entity={entity}
+            error={Boolean(releaseListQuery.error)}
+            pending={releaseListQuery.isPending}
+            releaseList={releaseListQuery.data}
+            retry={() => void releaseListQuery.refetch()}
+          />
+          <EntityHistoryOverview
+            entityName={entity.name}
+            error={Boolean(eventListQuery.error)}
+            eventList={eventListQuery.data}
+            pending={eventListQuery.isPending}
+            retry={() => void eventListQuery.refetch()}
+          />
+        </div>
       </div>
 
       <aside {...stylex.props(styles.details)}>
-        {entity.images?.length ? (
-          <EntityImageGallery entity={entity} />
-        ) : (
-          <EntityImagePlaceholder entityName={entity.name} kind={entity.kind} />
-        )}
-        <EntityMap entity={entity} />
-        <EntityCatalogRelationships
-          catalog={catalogQuery.data}
-          entity={entity}
-          error={Boolean(catalogQuery.error)}
-          pending={catalogQuery.isPending}
-          retry={() => void catalogQuery.refetch()}
-        />
-        <EntitySiblingOverview
-          entity={entity}
-          error={Boolean(siblingListQuery.error)}
-          pending={siblingListQuery.isPending}
-          retry={() => void siblingListQuery.refetch()}
-          siblingList={siblingListQuery.data}
-        />
+        <div {...stylex.props(styles.media)}>
+          {entity.images?.length ? (
+            <EntityImageGallery entity={entity} />
+          ) : (
+            <EntityImagePlaceholder
+              entityName={entity.name}
+              kind={entity.kind}
+            />
+          )}
+        </div>
+        <div {...stylex.props(styles.relationships)}>
+          <EntityMap entity={entity} />
+          <EntityCatalogRelationships
+            catalog={catalogQuery.data}
+            entity={entity}
+            error={Boolean(catalogQuery.error)}
+            pending={catalogQuery.isPending}
+            retry={() => void catalogQuery.refetch()}
+          />
+          <EntitySiblingOverview
+            entity={entity}
+            error={Boolean(siblingListQuery.error)}
+            pending={siblingListQuery.isPending}
+            retry={() => void siblingListQuery.refetch()}
+            siblingList={siblingListQuery.data}
+          />
+        </div>
       </aside>
     </div>
   );
@@ -170,7 +181,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateAreas: {
       default: '"catalog details"',
-      [NARROW]: '"catalog" "details"',
+      [NARROW]: '"facts" "media" "catalogSections" "relationships"',
     },
     gridTemplateColumns: {
       default: "minmax(0, 1fr) 336px",
@@ -182,9 +193,31 @@ const styles = stylex.create({
     gridArea: "catalog",
     minWidth: 0,
     paddingTop: space.x4,
+    display: {
+      [NARROW]: "contents",
+    },
   },
   details: {
     gridArea: "details",
+    minWidth: 0,
+    display: {
+      [NARROW]: "contents",
+    },
+  },
+  facts: {
+    gridArea: "facts",
+    minWidth: 0,
+  },
+  catalogSections: {
+    gridArea: "catalogSections",
+    minWidth: 0,
+  },
+  media: {
+    gridArea: "media",
+    minWidth: 0,
+  },
+  relationships: {
+    gridArea: "relationships",
     minWidth: 0,
   },
 });
