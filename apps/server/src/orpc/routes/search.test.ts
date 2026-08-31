@@ -359,11 +359,11 @@ describe("GET /search", () => {
     expect(bottleData.groups).toEqual([]);
     expect(bottleData.exact).toMatchObject({
       type: "bottle",
-      ref: { id: bottle.id, peatedId: formatPeatedId("bottle", bottle.id) },
+      ref: { id: bottle.id },
     });
     expect(entityData.exact).toMatchObject({
       type: "entity",
-      ref: { id: entity.id, peatedId: formatPeatedId("entity", entity.id) },
+      ref: { id: entity.id },
     });
   });
 

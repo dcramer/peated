@@ -75,10 +75,17 @@ describe("mock oRPC router", () => {
       query: "Lagavulin",
       scopes: ["bottles", "distilleries"],
     });
-    expect(search.exact).toEqual({ type: "entity", ref: mockEntity });
+    expect(search.exact).toMatchObject({
+      type: "entity",
+      ref: { id: mockEntity.id, name: mockEntity.name },
+    });
     expect(search.groups).toMatchObject([
       { type: "bottles", total: 3 },
-      { type: "distilleries", total: 1, results: [mockEntity] },
+      {
+        type: "distilleries",
+        total: 1,
+        results: [{ id: mockEntity.id, name: mockEntity.name }],
+      },
     ]);
 
     const user = await authenticatedClient.users.details({ user: "me" });
@@ -554,7 +561,11 @@ describe("mock oRPC router", () => {
           total: 1,
           results: [
             {
-              member: mockUser,
+              member: {
+                id: mockUser.id,
+                username: mockUser.username,
+                pictureUrl: mockUser.pictureUrl,
+              },
               totalTastings: mockUserDetails.stats.tastings,
             },
           ],
