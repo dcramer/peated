@@ -147,6 +147,44 @@ test("continues when optional SMWS catalog fields are absent", async ({
   expect(items[1][0]).not.toHaveProperty("releaseDay");
 });
 
+test("omits the release date when it conflicts with age and vintage", async ({
+  axiosMock,
+}) => {
+  const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
+  const payload = z
+    .object({
+      items: z.array(
+        z
+          .object({
+            age: z.number(),
+            distilleddate: z.string().nullable(),
+            release_date: z.string().nullable(),
+          })
+          .passthrough(),
+      ),
+    })
+    .passthrough()
+    .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
+
+  payload.items = [payload.items[0]];
+  payload.items[0].age = 8;
+  axiosMock.onGet(url).reply(200, payload);
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items).toHaveLength(1);
+  expect(items[0][0]).toMatchObject({
+    statedAge: 8,
+    vintageYear: 2016,
+  });
+  expect(items[0][0]).not.toHaveProperty("releaseYear");
+  expect(items[0][0]).not.toHaveProperty("releaseMonth");
+  expect(items[0][0]).not.toHaveProperty("releaseDay");
+});
+
 test("uses the SKU volume and positive sale price", async ({ axiosMock }) => {
   const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
   const payload = z

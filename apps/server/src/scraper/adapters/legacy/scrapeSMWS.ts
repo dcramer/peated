@@ -178,7 +178,7 @@ export async function scrapeBottles(
           singleCask: true,
           description: item.list_description?.trim() || null,
         };
-        if (release) {
+        if (release && releaseYear !== null) {
           bottle.releaseYear = releaseYear;
           bottle.releaseMonth = release.releaseMonth;
           bottle.releaseDay = release.releaseDay;
