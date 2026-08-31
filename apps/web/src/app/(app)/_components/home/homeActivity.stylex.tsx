@@ -44,6 +44,7 @@ function TastingActivity({ session }: { session: TastingSession }) {
     <TastingEntry
       author={session.createdBy.username}
       authorHref={`/users/${session.createdBy.username}`}
+      authorId={session.createdBy.id}
       context={
         members.length > 1
           ? `${members.length.toLocaleString()} tastings`

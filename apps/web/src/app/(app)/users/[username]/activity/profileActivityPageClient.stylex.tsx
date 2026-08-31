@@ -183,6 +183,7 @@ function toActivityItem(activity: Activity): MemberActivityItem {
     tasting: {
       author: activity.createdBy.username,
       authorHref: `/users/${activity.createdBy.username}`,
+      authorId: activity.createdBy.id,
       date: <TimeSince date={activity.lastActivityAt} />,
       leading: (
         <MemberAvatar

@@ -232,10 +232,11 @@ export type {
   SummaryStripCell,
   SummaryStripCells,
 } from "./summaryStrip.stylex";
-export { TastingEntry } from "./tastingEntry.stylex";
+export { TastingEntry, TastingMedia } from "./tastingEntry.stylex";
 export type {
   TastingEntryMember,
   TastingEntryProps,
+  TastingMediaKind,
 } from "./tastingEntry.stylex";
 export {
   ColorInput,
@@ -247,6 +248,7 @@ export type {
   PictureInputProps,
   RatingBandInputProps,
 } from "./tastingInputs.stylex";
+export { TastingToastSummary } from "./tastingToastButton.stylex";
 export { TextLink } from "./textLink.stylex";
 export type { TextLinkProps } from "./textLink.stylex";
 export { UnitInput } from "./unitInput.stylex";

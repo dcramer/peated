@@ -3,6 +3,7 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   formatCategoryName,
+  formatColor,
   formatServingStyle,
 } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
@@ -164,19 +165,27 @@ function getCriticReview(
 
 function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
   const member = {
+    color: tasting.color === null ? undefined : formatColor(tasting.color),
+    comments: tasting.comments,
     description: tasting.notes ?? undefined,
     descriptionHref: `/tastings/${tasting.id}`,
+    hasToasted: tasting.hasToasted,
+    imageKind: tasting.imageUrl ? ("photo" as const) : ("bottle" as const),
+    imageUrl: tasting.imageUrl ?? bottle.imageUrl,
     name: formatBottleDisplayName(bottle, { includeBrand: false }),
     notes: tasting.tags,
     ratingBand: tasting.ratingBand ?? undefined,
+    servingStyle: tasting.servingStyle
+      ? formatServingStyle(tasting.servingStyle)
+      : undefined,
+    tastingId: tasting.id,
+    toasts: tasting.toasts,
   };
 
   return {
     author: tasting.createdBy.username,
     authorHref: `/users/${tasting.createdBy.username}`,
-    context: tasting.servingStyle
-      ? formatServingStyle(tasting.servingStyle)
-      : undefined,
+    authorId: tasting.createdBy.id,
     date: <TimeSince date={tasting.createdAt} />,
     members: [member],
   };
