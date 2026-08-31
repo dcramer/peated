@@ -10,6 +10,7 @@ import {
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
+import { getTextTitle } from "./textTitle";
 
 const MOBILE = "@media (max-width: 559px)";
 
@@ -101,6 +102,7 @@ export function ItemRow({
           {href ? (
             <AppLink
               href={href}
+              title={getTextTitle(title)}
               {...stylex.props(
                 styles.title,
                 size === "sm" && styles.smallTitle,
@@ -111,6 +113,7 @@ export function ItemRow({
             </AppLink>
           ) : (
             <span
+              title={getTextTitle(title)}
               {...stylex.props(
                 styles.title,
                 size === "sm" && styles.smallTitle,
@@ -121,6 +124,7 @@ export function ItemRow({
           )}
           {metadata ? (
             <div
+              title={getTextTitle(metadata)}
               {...stylex.props(
                 styles.metadata,
                 size === "sm" && styles.smallMetadata,

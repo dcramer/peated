@@ -74,15 +74,21 @@ export function TastingEntry({
               {member.href ? (
                 <AppLink
                   href={member.href}
+                  title={member.name}
                   {...stylex.props(styles.name, styles.nameLink)}
                 >
                   {member.name}
                 </AppLink>
               ) : (
-                <span {...stylex.props(styles.name)}>{member.name}</span>
+                <span title={member.name} {...stylex.props(styles.name)}>
+                  {member.name}
+                </span>
               )}
               {member.metadata ? (
-                <span {...stylex.props(styles.metadata)}>
+                <span
+                  title={member.metadata}
+                  {...stylex.props(styles.metadata)}
+                >
                   {member.metadata}
                 </span>
               ) : null}

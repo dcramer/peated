@@ -195,9 +195,14 @@ function PickerControl({
           )}
         >
           <span {...stylex.props(styles.selectedCopy)}>
-            <span {...stylex.props(styles.selectedName)}>{value[0].label}</span>
+            <span title={value[0].label} {...stylex.props(styles.selectedName)}>
+              {value[0].label}
+            </span>
             {(value[0].selectedDetail ?? value[0].detail) ? (
-              <span {...stylex.props(styles.selectedDetail)}>
+              <span
+                title={value[0].selectedDetail ?? value[0].detail}
+                {...stylex.props(styles.selectedDetail)}
+              >
                 {value[0].selectedDetail ?? value[0].detail}
               </span>
             ) : null}

@@ -273,12 +273,15 @@ function SearchResultsGroup({
             >
               {item.visual ? <ResultVisual visual={item.visual} /> : null}
               <span {...stylex.props(styles.copy)}>
-                <strong {...stylex.props(styles.title)}>
+                <strong title={item.title} {...stylex.props(styles.title)}>
                   <MatchedText query={query} text={item.title} />
                   {item.isFollowing ? <MemberStatus kind="following" /> : null}
                 </strong>
                 {item.metadata ? (
-                  <span {...stylex.props(styles.metadata)}>
+                  <span
+                    title={item.metadata}
+                    {...stylex.props(styles.metadata)}
+                  >
                     {item.metadata}
                   </span>
                 ) : null}

@@ -164,6 +164,7 @@ export function TastingRatingDistribution({
           {bins.map((bin, index) => (
             <span
               key={bin.key}
+              title={formatCount(bin.count)}
               {...stylex.props(styles.tastingRatingLabel(shares[index] ?? 0))}
             >
               {formatCount(bin.count)}

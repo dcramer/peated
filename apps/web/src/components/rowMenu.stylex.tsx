@@ -72,6 +72,7 @@ export function RowMenu({
             )}
           >
             <div
+              title={label}
               {...stylex.props(
                 styles.header,
                 variant === "page" && styles.pageHeader,

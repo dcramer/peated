@@ -126,7 +126,10 @@ export function ColorInput({
   return (
     <div {...stylex.props(styles.colorRoot, disabled && styles.disabled)}>
       <div {...stylex.props(styles.colorHeading)}>
-        <strong {...stylex.props(styles.colorName)}>
+        <strong
+          title={selected?.[1] ?? "Unsure"}
+          {...stylex.props(styles.colorName)}
+        >
           {selected?.[1] ?? "Unsure"}
         </strong>
         {value !== null ? (

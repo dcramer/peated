@@ -51,6 +51,7 @@ export function AdminBreadcrumbs({
             <Link
               aria-current={item.current ? "page" : undefined}
               href={item.href}
+              title={item.label}
               {...stylex.props(
                 styles.breadcrumbLink,
                 item.current && styles.currentBreadcrumb,

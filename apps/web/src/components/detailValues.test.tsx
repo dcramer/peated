@@ -45,5 +45,7 @@ describe("detail values", () => {
     expect(html).not.toContain("Country");
     expect(html).toContain("Bottles");
     expect(html).toContain(">0<");
+    expect(html).toContain('title="Bottles"');
+    expect(html).toContain('title="0"');
   });
 });

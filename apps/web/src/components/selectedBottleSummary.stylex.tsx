@@ -25,8 +25,13 @@ export function SelectedBottleSummary({
     <section aria-label="Selected bottle" {...stylex.props(styles.summary)}>
       <BottleVisual imageUrl={imageUrl} label={`${name} bottle`} size="sm" />
       <div {...stylex.props(styles.copy)}>
-        <strong {...stylex.props(styles.name)}>{name}</strong>
-        <span {...stylex.props(styles.metadata)}>
+        <strong title={name} {...stylex.props(styles.name)}>
+          {name}
+        </strong>
+        <span
+          title={`${bottleId} · ${metadata}`}
+          {...stylex.props(styles.metadata)}
+        >
           {bottleId} · {metadata}
         </span>
       </div>

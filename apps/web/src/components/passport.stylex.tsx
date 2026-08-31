@@ -98,7 +98,9 @@ function PassportCount({ count, detail }: { count: number; detail: string }) {
       <strong {...stylex.props(styles.count)}>
         {count.toLocaleString("en-US")}
       </strong>
-      <span {...stylex.props(styles.countDetail)}>{detail}</span>
+      <span title={detail} {...stylex.props(styles.countDetail)}>
+        {detail}
+      </span>
     </div>
   );
 }

@@ -34,11 +34,15 @@ export function SummaryStrip({ cells }: { cells: SummaryStripCells }) {
           key={`${cell.label}-${index}`}
           {...stylex.props(styles.cell)}
         >
-          <dt {...stylex.props(styles.label)}>{cell.label}</dt>
+          <dt title={cell.label} {...stylex.props(styles.label)}>
+            {cell.label}
+          </dt>
           <dd {...stylex.props(styles.valueRow)}>
             <strong {...stylex.props(styles.value)}>{cell.value}</strong>
             {cell.detail ? (
-              <span {...stylex.props(styles.detail)}>{cell.detail}</span>
+              <span title={cell.detail} {...stylex.props(styles.detail)}>
+                {cell.detail}
+              </span>
             ) : null}
           </dd>
         </div>

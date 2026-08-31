@@ -320,7 +320,10 @@ export function HomeOrigins({
               />
             </span>
             <span {...stylex.props(styles.countryHeading)}>
-              <strong {...stylex.props(styles.countryName)}>
+              <strong
+                title={country.name}
+                {...stylex.props(styles.countryName)}
+              >
                 {country.name}
               </strong>
             </span>
@@ -343,7 +346,10 @@ export function HomeOrigins({
               +{remainingCountries.count}
             </span>
             <span {...stylex.props(styles.countryHeading)}>
-              <strong {...stylex.props(styles.countryName)}>
+              <strong
+                title="Everywhere else"
+                {...stylex.props(styles.countryName)}
+              >
                 Everywhere else
               </strong>
             </span>

@@ -178,15 +178,20 @@ export function RailListItem({
           {href ? (
             <AppLink
               href={href}
+              title={title}
               {...stylex.props(styles.railTitle, styles.railTitleLink)}
             >
               {title}
             </AppLink>
           ) : (
-            <span {...stylex.props(styles.railTitle)}>{title}</span>
+            <span title={title} {...stylex.props(styles.railTitle)}>
+              {title}
+            </span>
           )}
           {metadata ? (
-            <span {...stylex.props(styles.railMetadata)}>{metadata}</span>
+            <span title={metadata} {...stylex.props(styles.railMetadata)}>
+              {metadata}
+            </span>
           ) : null}
         </div>
         {end ? <span {...stylex.props(styles.railEnd)}>{end}</span> : null}
