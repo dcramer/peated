@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/web/src/app/(app)/badges/[badgeId]/badgePage.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/aliases/aliasList.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/bottleSection.stylex.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/prices/page.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/releases/page.tsx",
+    "apps/web/src/app/(app)/bottles/[bottleId]/tastings/page.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/aliases/entityAliasList.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/codes/entityCodes.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityBottleOverview.tsx",
+    "apps/web/src/app/(app)/flights/[flightId]/page.tsx",
+    "apps/web/src/app/(app)/flights/page.tsx",
+    "apps/web/src/app/(app)/tastings/[tastingId]/page.tsx",
+    "apps/web/src/app/(app)/updates/page.tsx",
+    "apps/web/src/components/card.stories.tsx",
+    "apps/web/src/components/historyTimeline.stories.tsx",
+    "apps/web/src/components/pageTabs.stylex.tsx",
+    "apps/web/src/components/pages/bottleOverview.stylex.tsx",
+    "apps/web/src/components/pages/pageLayout.stylex.tsx",
+    "apps/web/src/components/sectionHeading.stories.tsx",
+    "apps/web/src/components/sectionHeading.stylex.tsx"
+  ],
+  "commitSha": "d77cdd953ac3cc8243674f2b3b1ac55681be037e",
+  "scenarioIds": [
+    "home",
+    "bottle-detail",
+    "member-profile",
+    "add-tasting"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    },
+    {
+      "file": "add-tasting__desktop.png",
+      "label": "Log a tasting · desktop"
+    },
+    {
+      "file": "add-tasting__mobile.png",
+      "label": "Log a tasting · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
