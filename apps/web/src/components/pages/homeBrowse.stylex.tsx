@@ -12,6 +12,7 @@ import {
   CardPrimaryLink,
   ItemList,
   ItemRow,
+  TextLink,
   type TastingRatingCounts,
 } from "..";
 import {
@@ -189,14 +190,14 @@ export function HomeRecentReviews({
               key={review.id}
               metadata={
                 <>
-                  <a
+                  <TextLink
                     href={review.sourceHref}
                     rel="noreferrer"
+                    size="inherit"
                     target="_blank"
-                    {...stylex.props(styles.sourceLink)}
                   >
                     {review.source}
-                  </a>
+                  </TextLink>
                   {review.metadata.map((item) => (
                     <span key={item}>
                       <span aria-hidden="true"> · </span>
@@ -532,29 +533,6 @@ const styles = stylex.create({
   },
   rows: {
     marginTop: space.x2,
-  },
-  sourceLink: {
-    position: "relative",
-    zIndex: 2,
-    width: "fit-content",
-    maxWidth: "100%",
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    color: {
-      default: colors.inkMuted,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": "none",
-    },
   },
   reviewFacts: {
     display: "flex",

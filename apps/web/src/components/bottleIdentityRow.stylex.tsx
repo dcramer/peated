@@ -328,7 +328,11 @@ const styles = stylex.create({
     fontSize: "12px",
     fontWeight: 600,
     lineHeight: 1.3,
-    textDecorationLine: "underline",
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
     textUnderlineOffset: "2px",
     boxShadow: {
       default: "none",
