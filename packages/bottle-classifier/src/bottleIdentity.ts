@@ -4,11 +4,14 @@
  *
  * Keep this module structurally safe and brand-agnostic. If a decision depends
  * on marketed family meaning or producer-specific semantics, it belongs in the
- * reviewed classifier, not in these helpers. New hardcoded phrase rules need
- * verified whisky research and focused tests before being added here.
+ * reviewed classifier, not in these helpers. A documented closed identifier
+ * syntax can own identity when its exact fields agree. New hardcoded phrase
+ * rules need verified whisky research and focused tests before being added here.
  */
 import { z } from "zod";
+import { getExactCaskCodeAnchor } from "./exactCask";
 import { normalizeBottle } from "./normalize";
+import { parseReferenceName } from "./smws";
 
 export type BottleExactIdentityInput = {
   edition: string | null;
@@ -229,6 +232,27 @@ export interface CanonicalBottleName {
   name: string;
 }
 
+function smwsCaskCodeOwnsName({
+  bottleName,
+  bottleFullName,
+  caskNumber,
+}: {
+  bottleName: string;
+  bottleFullName: string;
+  caskNumber: string | null | undefined;
+}) {
+  const caskCode = getExactCaskCodeAnchor(caskNumber);
+  const reference = parseReferenceName(bottleFullName);
+  if (!caskCode || reference?.code !== caskCode) {
+    return false;
+  }
+
+  const normalizedName = bottleName.trim().toUpperCase();
+  return (
+    normalizedName === caskCode || normalizedName.startsWith(`${caskCode} `)
+  );
+}
+
 export function formatCanonicalBottleName({
   bottleName,
   bottleFullName,
@@ -250,6 +274,21 @@ export function formatCanonicalBottleName({
     },
     exact,
   });
+
+  // The SMWS cask code is the complete marketed Bottle identity. Keep exact
+  // traits in structured fields instead of duplicating them in the name.
+  if (
+    smwsCaskCodeOwnsName({
+      bottleName,
+      bottleFullName,
+      caskNumber: resolvedIdentity.caskNumber,
+    })
+  ) {
+    return {
+      name: bottleName,
+      fullName: bottleFullName,
+    };
+  }
 
   const nameBits = [bottleName];
   const fullNameBits = [bottleFullName];

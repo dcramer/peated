@@ -238,4 +238,65 @@ describe("bottleIdentity", () => {
       fullName: "Glendronach 1972 Single Cask - Batch 1",
     });
   });
+
+  test.each([
+    {
+      bottleName: "64.149 A cake walk in the Black Forest",
+      bottleFullName: "SMWS 64.149 A cake walk in the Black Forest",
+      caskNumber: "64.149",
+    },
+    {
+      bottleName: "G15.12 Summer orchard",
+      bottleFullName: "The Scotch Malt Whisky Society G15.12 Summer orchard",
+      caskNumber: "G15.12",
+    },
+  ])(
+    "keeps SMWS exact traits out of $bottleName",
+    ({ bottleName, bottleFullName, caskNumber }) => {
+      expect(
+        formatCanonicalBottleName({
+          bottleName,
+          bottleFullName,
+          bottleStatedAge: null,
+          exact: {
+            edition: null,
+            statedAge: 17,
+            releaseYear: 2023,
+            vintageYear: 2006,
+            abv: 56.6,
+            singleCask: false,
+            caskStrength: true,
+            caskNumber,
+          },
+        }),
+      ).toEqual({
+        name: bottleName,
+        fullName: bottleFullName,
+      });
+    },
+  );
+
+  test("keeps exact traits in a non-SMWS dotted-cask name", () => {
+    expect(
+      formatCanonicalBottleName({
+        bottleName: "64.149 Private Selection",
+        bottleFullName: "Example Brand 64.149 Private Selection",
+        bottleStatedAge: null,
+        exact: {
+          edition: null,
+          statedAge: null,
+          releaseYear: 2023,
+          vintageYear: null,
+          abv: 56.6,
+          singleCask: true,
+          caskStrength: null,
+          caskNumber: "64.149",
+        },
+      }),
+    ).toEqual({
+      name: "64.149 Private Selection - 2023 Release - 56.6% ABV - Single Cask",
+      fullName:
+        "Example Brand 64.149 Private Selection - 2023 Release - 56.6% ABV - Single Cask",
+    });
+  });
 });

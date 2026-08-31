@@ -243,7 +243,9 @@ composed from an SMWS distillery number and single-cask number visible on the
 label. A code must not invent a missing component or subtitle. SMWS may rename
 the subtitle marketed for a cask, but that does not create a new Bottle: the
 code continues to identify the same Bottle, the new subtitle becomes its
-canonical name, and the previous canonical name remains an alias.
+canonical name, and the previous canonical name remains an alias. Its canonical
+Bottle name is `<distillery number>.<cask number> <subtitle>`. Exact traits stay
+in structured fields and are not appended to that name.
 
 ## Activity Identity
 

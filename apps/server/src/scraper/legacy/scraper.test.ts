@@ -88,6 +88,25 @@ describe("handleBottle", () => {
     });
   });
 
+  it("does not erase known facts when a later scrape omits them", async () => {
+    await handleBottle({
+      ...bottleInput,
+      description: "Known description",
+      maturation: "First-fill bourbon barrel",
+    });
+    await handleBottle({
+      ...bottleInput,
+      description: null,
+      maturation: null,
+    });
+
+    const [matchingBottle] = await db.select().from(bottles);
+    expect(matchingBottle).toMatchObject({
+      description: "Known description",
+      maturation: "First-fill bourbon barrel",
+    });
+  });
+
   it("treats an SMWS subtitle rename as an alias for the same cask", async () => {
     const society = "The Scotch Malt Whisky Society";
     const originalName = "35.331 Ultra hoggie";

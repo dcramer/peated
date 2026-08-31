@@ -92,6 +92,14 @@ test("registers every scraper source with explicit target ownership", () => {
   expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBeNull();
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
+  expect(
+    scraperRegistry.targets.get("smws")?.origins.map(({ origin }) => origin),
+  ).toEqual(["https://api.smws.com", "https://smws.com"]);
+  expect(scraperRegistry.targets.get("smws")).toMatchObject({
+    allowedRequestHeaders: ["authorization", "content-type"],
+    minimumSpacingMs: 2_000,
+    requestsPerWindow: 80,
+  });
   expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("bourbonculture")).toMatchObject({
     minimumSpacingMs: 5_000,

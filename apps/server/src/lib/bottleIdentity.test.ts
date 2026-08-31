@@ -74,6 +74,32 @@ test("keeps a confirmed NAS Bottle separate from an inherited group age", () => 
   });
 });
 
+test("keeps an SMWS cask name stable when exact details change", () => {
+  expect(
+    materializeBottleIdentity({
+      stable: {
+        name: "64.149 A cake walk in the Black Forest",
+        fullName: "SMWS 64.149 A cake walk in the Black Forest",
+        statedAge: null,
+      },
+      exact: {
+        ...exactIdentity,
+        statedAge: 17,
+        releaseYear: 2023,
+        vintageYear: 2006,
+        abv: 56.6,
+        singleCask: false,
+        caskStrength: true,
+        caskNumber: "64.149",
+      },
+    }),
+  ).toEqual({
+    name: "64.149 A cake walk in the Black Forest",
+    fullName: "SMWS 64.149 A cake walk in the Black Forest",
+    statedAge: 17,
+  });
+});
+
 test("classifies patched exact identity against the source group age", () => {
   expect(
     getBottleExactIdentity({

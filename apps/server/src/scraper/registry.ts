@@ -226,12 +226,20 @@ const legacyPriceSources = [
 const legacyBottleSources = [
   {
     type: "smws",
-    origin: "https://api.smws.com",
+    origins: [
+      { origin: "https://api.smws.com", robots: { mode: "enforce" } },
+      { origin: "https://smws.com", robots: { mode: "enforce" } },
+    ],
     scrape: scrapeSMWS,
   },
   {
     type: "smwsa",
-    origin: "https://newmake.smwsa.com",
+    origins: [
+      {
+        origin: "https://newmake.smwsa.com",
+        robots: { mode: "enforce" },
+      },
+    ],
     scrape: scrapeSMWSA,
   },
 ] as const;
@@ -252,7 +260,17 @@ export const scraperRegistry = createScraperRegistry({
     ...legacyBottleSources.map((source) =>
       defineScrapeTarget({
         key: source.type,
-        origins: [{ origin: source.origin, robots: { mode: "enforce" } }],
+        allowedRequestHeaders:
+          source.type === "smws" ? ["authorization", "content-type"] : [],
+        requestsPerWindow: source.type === "smws" ? 80 : undefined,
+        policyException:
+          source.type === "smws"
+            ? {
+                rationale:
+                  "The official weekly SMWS archive sync uses public batch APIs and about 74 requests with two-second spacing.",
+              }
+            : undefined,
+        origins: source.origins,
       }),
     ),
     defineScrapeTarget({

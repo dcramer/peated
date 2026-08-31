@@ -27,7 +27,7 @@ estimate of current live inventory.
 | North Star Spirits | `https://northstarspirits.com`             | GET Shopify JSON pages                                                     | 2 items                                                             |
 | ReserveBar         | `https://api.liquidcommerce.cloud`         | POST token query then read-only POST catalog pages with code-owned headers | 2 items                                                             |
 | Single Cask Nation | `https://singlecasknation.com`             | GET Shopify JSON pages                                                     | 6 items                                                             |
-| SMWS               | `https://api.smws.com`                     | One GET JSON catalog partition                                             | 127 emitted bottles from 128 records                                |
+| SMWS               | `https://smws.com`, `https://api.smws.com` | Paginated archive, batch storefront details, and current-catalog audit     | 2,425 bottle identities after bundle exclusion on 2026-08-30        |
 | SMWSA              | `https://newmake.smwsa.com`                | One GET HTML collection                                                    | 35 bottles                                                          |
 | Thompson Bros.     | `https://www.thompsonbrosdistillers.com`   | GET WooCommerce JSON pages                                                 | 2 items                                                             |
 | Total Wine         | `https://www.totalwine.com`                | GET HTML, two paginated categories                                         | 112 items on listing fixture; target disabled pending policy review |
@@ -42,6 +42,9 @@ estimate of current live inventory.
 All scheduled and manual external-site runs now dispatch only `RunScraper` with
 a durable run id. Retailer GETs use the runtime-backed legacy request bridge;
 Healthy Spirits, Master of Malt, and ReserveBar use its governed POST support.
+SMWS reads the official paginated bottle archive for all-time coverage. It
+uses the public batch storefront API for descriptions, custom fields, and
+original images. It then reads the current API catalog for live prices.
 SMWS and SMWSA emit bottle observations through runtime sinks. Whisky Advocate
 and Whiskyfun use the shared external-review sink. The runtime enforces robots
 rules before remote requests.
