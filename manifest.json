@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/web/src/components/admin/adminContent.stylex.tsx",
+    "apps/web/src/components/admin/moderation/moderationInbox.stylex.tsx",
+    "apps/web/src/components/admin/reviewTable.stylex.tsx",
+    "apps/web/src/components/bottleComparisonTable.stylex.tsx",
+    "apps/web/src/components/bottleIdentityRow.stylex.tsx",
+    "apps/web/src/components/catalogDetails.stylex.tsx",
+    "apps/web/src/components/detailValues.test.tsx",
+    "apps/web/src/components/facetRow.stylex.tsx",
+    "apps/web/src/components/formLayout.stylex.tsx",
+    "apps/web/src/components/itemList.stylex.tsx",
+    "apps/web/src/components/lists.stylex.tsx",
+    "apps/web/src/components/notePicker.stylex.tsx",
+    "apps/web/src/components/pages/bottlePageHeader.stories.tsx",
+    "apps/web/src/components/pages/bottlePageHeader.stylex.tsx",
+    "apps/web/src/components/pages/entityCatalog.stylex.tsx",
+    "apps/web/src/components/pages/homeBrowse.stylex.tsx",
+    "apps/web/src/components/pages/homeSummary.stylex.tsx",
+    "apps/web/src/components/passport.stylex.tsx",
+    "apps/web/src/components/rowMenu.stylex.tsx",
+    "apps/web/src/components/scopedSearch.stylex.tsx"
+  ],
+  "commitSha": "87a0d090e43a417e04c40d15d66fdb55e59030b3",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "member-profile"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "label": "Member profile · desktop"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "label": "Member profile · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
