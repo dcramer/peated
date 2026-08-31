@@ -15,14 +15,14 @@ import {
 } from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import Markdown from "@peated/web/components/markdown";
+import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import { foundationStyles } from "@peated/web/styles/foundations.stylex";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { space } from "../../../../styles/tokens.stylex";
 
 import {
   getEntityClassification,
@@ -178,23 +178,9 @@ export function EntityPageFrameClient({
 
   return (
     <div {...stylex.props(styles.page)}>
-      <header>
-        <div {...stylex.props(styles.masthead)}>
-          <div {...stylex.props(styles.classification)}>
-            {getEntityClassification(entity)}
-          </div>
-          <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
-            {entity.name}
-          </h1>
-        </div>
-
-        <div {...stylex.props(styles.summary)}>
-          {entity.description ? (
-            <div {...stylex.props(styles.description)}>
-              <Markdown content={entity.description} />
-            </div>
-          ) : null}
-          <div {...stylex.props(styles.headerActions)}>
+      <PageHeader
+        actions={
+          <>
             {canFollow ? (
               <EntityFollowAction key={entity.id} entity={entity} />
             ) : null}
@@ -207,10 +193,15 @@ export function EntityPageFrameClient({
                 {bottleActionLabel}
               </ButtonLink>
             ) : null}
-            <EntityActions entity={entity} />
-          </div>
-        </div>
-      </header>
+          </>
+        }
+        description={
+          entity.description ? <Markdown content={entity.description} /> : null
+        }
+        eyebrow={getEntityClassification(entity)}
+        menu={<EntityActions entity={entity} />}
+        title={entity.name}
+      />
 
       <div {...stylex.props(styles.tabs)}>
         <PageTabs
@@ -230,46 +221,6 @@ const styles = stylex.create({
     minWidth: 0,
   },
   tabs: {
-    marginTop: 0,
-  },
-  masthead: {
-    paddingTop: space.x3,
-    paddingBottom: space.x4,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
-  },
-  classification: {
-    marginBottom: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
-  },
-  title: {
-    fontSize: "clamp(44px, 6vw, 72px)",
-    letterSpacing: "-0.05em",
-    lineHeight: 0.95,
-  },
-  summary: {
-    display: "flex",
-    maxWidth: "66ch",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: space.x3,
-    paddingTop: space.x6,
-    paddingBottom: space.x6,
-  },
-  description: {
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
-  },
-  headerActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: space.x2,
-    flexWrap: "wrap",
+    marginTop: space.x6,
   },
 });
