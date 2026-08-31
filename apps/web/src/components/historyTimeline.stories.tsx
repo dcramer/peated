@@ -47,12 +47,10 @@ const meta = {
   title: "Components/History/History Timeline",
   component: HistoryTimeline,
   decorators: [
-    (Story, context) => (
+    (Story) => (
       <StoryCanvas width="wide">
         <StoryStack>
-          <SectionHeading count={context.args.events.length}>
-            History
-          </SectionHeading>
+          <SectionHeading>History</SectionHeading>
           <Story />
         </StoryStack>
       </StoryCanvas>

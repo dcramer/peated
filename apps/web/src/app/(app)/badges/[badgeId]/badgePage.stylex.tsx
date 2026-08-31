@@ -34,7 +34,7 @@ export function BadgePage({
         identity={<BadgeImage badge={badge} size={72} />}
         title={badge.name}
       />
-      <PageSection count={awardList.results.length} heading="Leaderboard">
+      <PageSection heading="Leaderboard">
         <ItemList ariaLabel={`${badge.name} leaderboard`}>
           {awardList.results.map((award, index) => (
             <ItemRow

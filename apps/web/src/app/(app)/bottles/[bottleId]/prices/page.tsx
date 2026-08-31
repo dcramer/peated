@@ -54,7 +54,7 @@ export default async function BottlePricesPage(props: {
   const priceList = await client.bottles.prices.list({ bottle: bottle.id });
 
   return (
-    <BottleSection count={priceList.results.length} heading="Sellers">
+    <BottleSection heading="Sellers">
       {priceList.results.length ? (
         <DataTable
           caption="Bottle sellers"

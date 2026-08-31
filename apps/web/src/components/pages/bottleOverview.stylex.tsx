@@ -30,7 +30,6 @@ export type BottleRecommendation = {
 };
 
 export type BottleOverviewProps = {
-  criticReviewCount?: number;
   criticReviewDetail?: string;
   criticReviews?: readonly CriticReviewProps[];
   declaredFacts: readonly [FactListItem, ...FactListItem[]];
@@ -45,7 +44,6 @@ export type BottleOverviewProps = {
 
 /** Composes the bounded content section beneath a bottle's page header. */
 export function BottleOverview({
-  criticReviewCount,
   criticReviewDetail,
   criticReviews = [],
   declaredFacts,
@@ -66,9 +64,7 @@ export function BottleOverview({
         {criticReviews.length ? (
           <section {...stylex.props(styles.section)}>
             <div {...stylex.props(styles.sectionHeader)}>
-              <SectionHeading count={criticReviewCount}>
-                Critic reviews
-              </SectionHeading>
+              <SectionHeading>Critic reviews</SectionHeading>
               {criticReviewDetail ? (
                 <span {...stylex.props(styles.sectionDetail)}>
                   {criticReviewDetail}
@@ -89,9 +85,7 @@ export function BottleOverview({
 
         {tastings.length ? (
           <section {...stylex.props(styles.section)}>
-            <SectionHeading count={tastingCount ?? tastings.length}>
-              Tastings
-            </SectionHeading>
+            <SectionHeading>Tastings</SectionHeading>
             <ItemList ariaLabel="Bottle tastings">
               {tastings.map((tasting, index) => (
                 <ItemListItem key={`${tasting.author}-${index}`}>

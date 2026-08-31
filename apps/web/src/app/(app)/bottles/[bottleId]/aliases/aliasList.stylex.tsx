@@ -27,7 +27,7 @@ export function AliasList({
   const deleteAlias = useMutation(orpc.bottleAliases.delete.mutationOptions());
 
   return (
-    <BottleSection count={aliases.length} heading="Also known as">
+    <BottleSection heading="Also known as">
       <AliasManager
         aliases={aliases.map((alias) => ({
           created: <TimeSince date={alias.createdAt} />,

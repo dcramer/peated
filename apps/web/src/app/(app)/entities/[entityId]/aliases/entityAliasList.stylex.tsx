@@ -30,7 +30,7 @@ export function EntityAliasList({
   );
 
   return (
-    <PageSection count={aliases.length} heading="Aliases">
+    <PageSection heading="Aliases">
       <AliasManager
         aliases={aliases.map((alias) => ({
           created: <TimeSince date={alias.createdAt} />,

@@ -64,7 +64,7 @@ export default async function TastingPage(props: {
       <PageSection heading="Tasting">
         <TastingRecordEntry showFullNotes tasting={tasting} />
       </PageSection>
-      <PageSection count={commentList.results.length} heading="Comments">
+      <PageSection heading="Comments">
         <TastingComments
           initialCommentList={commentList}
           tastingId={tasting.id}

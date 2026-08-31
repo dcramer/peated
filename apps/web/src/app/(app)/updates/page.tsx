@@ -25,7 +25,7 @@ export default async function UpdatesPage(props: {
   return (
     <div>
       <PageHeader eyebrow="Whisky database" title="Updates" />
-      <PageSection count={changeList.results.length} heading="Recent changes">
+      <PageSection heading="Recent changes">
         {changeList.results.length ? (
           <UpdateList
             changes={changeList.results}
