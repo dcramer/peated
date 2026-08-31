@@ -110,8 +110,9 @@ export function HomeHighestRated({
 export type HomeRelease = {
   href: string;
   imageUrl?: string | null;
-  metadata: ReactNode;
+  metadata: readonly string[];
   name: string;
+  subtitle?: ReactNode;
 };
 
 /** Shows bottles with known release years in API release order. */
@@ -138,11 +139,12 @@ export function HomeLatestReleases({
         <ItemList ariaLabel={title}>
           {bottles.map((bottle) => (
             <ItemRow
+              align="start"
               href={bottle.href}
               key={bottle.href}
               leading={<BottleVisual imageUrl={bottle.imageUrl} />}
-              metadata={bottle.metadata}
-              metadataWrap
+              metadata={bottle.metadata.join(" · ")}
+              subtitle={bottle.subtitle}
               title={bottle.name}
             />
           ))}

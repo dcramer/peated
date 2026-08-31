@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import * as stylex from "@stylexjs/stylex";
 
 import { colors, fonts } from "../styles/tokens.stylex";
+import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { ItemList, ItemRow } from "./itemList.stylex";
 import { BottleRatings } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
@@ -103,8 +104,11 @@ export const Overview: Story = {
               scoreCount={28}
             />
           }
+          align="start"
           href="#yamazaki"
+          leading={<BottleVisual />}
           metadata="Japan · 12 years · 43.0% ABV"
+          subtitle="Japanese single malt"
           title="Yamazaki 12-year-old"
         />
         <ItemRow
