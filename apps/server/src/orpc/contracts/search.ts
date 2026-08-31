@@ -35,8 +35,57 @@ export const SEARCH_SCOPE_LIST = [
 
 export type SearchScope = (typeof SEARCH_SCOPE_LIST)[number];
 
+const BottleResultSchema = BottleSchema.pick({
+  id: true,
+  name: true,
+  category: true,
+  edition: true,
+  statedAge: true,
+  noAgeStatement: true,
+  caskStrength: true,
+  singleCask: true,
+  abv: true,
+  vintageYear: true,
+  releaseYear: true,
+  imageUrl: true,
+  medianScore: true,
+  scoreCount: true,
+  tastingBandCounts: true,
+}).extend({
+  brand: EntitySchema.pick({ name: true, shortName: true }),
+  series: z.object({ name: z.string() }).nullable(),
+  group: z.object({ name: z.string() }).optional(),
+});
+
+const EntityResultSchema = EntitySchema.pick({
+  id: true,
+  name: true,
+  kind: true,
+  isFollowing: true,
+}).extend({
+  region: z.object({ name: z.string() }).nullable(),
+});
+
+const RegionResultSchema = RegionSchema.pick({
+  id: true,
+  name: true,
+  slug: true,
+  totalDistillers: true,
+}).extend({
+  country: z.object({
+    name: z.string(),
+    slug: z.string(),
+  }),
+});
+
+const UserResultSchema = UserSchema.pick({
+  id: true,
+  username: true,
+  pictureUrl: true,
+});
+
 const MemberResultSchema = z.object({
-  member: UserSchema,
+  member: UserResultSchema,
   totalTastings: z.number().int().nonnegative(),
 });
 
@@ -44,32 +93,32 @@ const GroupSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("bottles"),
     total: z.number().int().nonnegative(),
-    results: z.array(BottleSchema),
+    results: z.array(BottleResultSchema),
   }),
   z.object({
     type: z.literal("distilleries"),
     total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
+    results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("brands"),
     total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
+    results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("bottlers"),
     total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
+    results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("companies"),
     total: z.number().int().nonnegative(),
-    results: z.array(EntitySchema),
+    results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("regions"),
     total: z.number().int().nonnegative(),
-    results: z.array(RegionSchema),
+    results: z.array(RegionResultSchema),
   }),
   z.object({
     type: z.literal("members"),
@@ -80,18 +129,18 @@ const GroupSchema = z.discriminatedUnion("type", [
 
 export const ExactSchema = z
   .discriminatedUnion("type", [
-    z.object({ type: z.literal("bottle"), ref: BottleSchema }),
-    z.object({ type: z.literal("entity"), ref: EntitySchema }),
+    z.object({ type: z.literal("bottle"), ref: BottleResultSchema }),
+    z.object({ type: z.literal("entity"), ref: EntityResultSchema }),
   ])
   .nullable();
 
 const NearestSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("bottles"), result: BottleSchema }),
-  z.object({ type: z.literal("distilleries"), result: EntitySchema }),
-  z.object({ type: z.literal("brands"), result: EntitySchema }),
-  z.object({ type: z.literal("bottlers"), result: EntitySchema }),
-  z.object({ type: z.literal("companies"), result: EntitySchema }),
-  z.object({ type: z.literal("regions"), result: RegionSchema }),
+  z.object({ type: z.literal("bottles"), result: BottleResultSchema }),
+  z.object({ type: z.literal("distilleries"), result: EntityResultSchema }),
+  z.object({ type: z.literal("brands"), result: EntityResultSchema }),
+  z.object({ type: z.literal("bottlers"), result: EntityResultSchema }),
+  z.object({ type: z.literal("companies"), result: EntityResultSchema }),
+  z.object({ type: z.literal("regions"), result: RegionResultSchema }),
   z.object({ type: z.literal("members"), result: MemberResultSchema }),
 ]);
 

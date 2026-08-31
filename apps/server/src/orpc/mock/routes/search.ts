@@ -1,3 +1,4 @@
+import { SearchOutputSchema } from "@peated/server/orpc/contracts/search";
 import type { MockOutputs } from "@peated/server/orpc/mock/contract";
 import {
   includesQuery,
@@ -141,16 +142,16 @@ export default mockOS.search.handler(async ({ input, context }) => {
   };
   if (context.user) scopeTotals.members = 3;
 
-  return {
+  return SearchOutputSchema.parse({
     query: input.query,
     exact:
       input.scopes.includes("bottles") && exactBottle
-        ? { type: "bottle", ref: exactBottle }
+        ? { type: "bottle", ref: { ...exactBottle, group: undefined } }
         : exactEntity
           ? { type: "entity", ref: exactEntity }
           : null,
     groups,
     scopeTotals,
     nearest: [],
-  };
+  });
 });
