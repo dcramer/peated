@@ -109,4 +109,18 @@ describe("SEO metadata", () => {
       twitter: { card: "summary" },
     });
   });
+
+  it("supports Entity metadata without images", () => {
+    const metadata = getEntitySeoMetadata({
+      id: 12,
+      kind: "distillery",
+      name: "Lagavulin",
+      description: null,
+    });
+
+    expect(metadata).toMatchObject({
+      title: "Lagavulin — Whisky distillery",
+      twitter: { card: "summary" },
+    });
+  });
 });

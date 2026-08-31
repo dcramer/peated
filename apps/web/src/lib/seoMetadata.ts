@@ -39,7 +39,7 @@ type EntitySeoMetadataSource = {
   kind: EntityKind;
   name: string;
   description: string | null;
-  images: readonly { imageUrl: string }[];
+  images?: readonly { imageUrl: string }[];
 };
 
 type MetadataOptions = {
@@ -97,7 +97,7 @@ export function getEntitySeoMetadata(
   const description =
     summarize(entity.description || "", 160) ||
     `See details for ${entity.name}, a ${kindLabel.toLowerCase()}, in the Peated whisky database.`;
-  const primaryImage = entity.images[0];
+  const primaryImage = entity.images?.[0];
   const images = primaryImage
     ? [{ url: primaryImage.imageUrl, alt: entity.name }]
     : undefined;
