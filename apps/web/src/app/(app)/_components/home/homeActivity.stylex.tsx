@@ -8,9 +8,11 @@ import { useEventListener } from "usehooks-ts";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
+  BottleIdentityRow,
   ButtonLink,
   EmptyState,
   ItemList,
+  ItemListItem,
   ItemRow,
   LoadingList,
   MemberAvatar,
@@ -24,6 +26,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { memberHomeQueries } from "@peated/web/lib/orpc/homeQueries";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { colors } from "../../../../styles/tokens.stylex";
 
 type ActivityList = Outputs["activity"]["list"];
@@ -103,12 +106,21 @@ function CollectionActivityItem({
       {visibleItems.length ? (
         <ItemList ariaLabel={`${activity.collection.name} additions`}>
           {visibleItems.map((item) => (
-            <ItemRow
-              href={`/bottles/${item.bottle.id}`}
-              key={item.id}
-              metadata={getBottleMetadata(item.bottle)}
-              title={formatBottleDisplayName(item.bottle)}
-            />
+            <ItemListItem key={item.id}>
+              <BottleIdentityRow
+                brand={item.bottle.brand.shortName || item.bottle.brand.name}
+                brandHref={getEntityUrl({
+                  id: item.bottle.brand.id,
+                  kind: "brand",
+                })}
+                href={`/bottles/${item.bottle.id}`}
+                imageUrl={item.bottle.imageUrl}
+                metadata={getBottleMetadata(item.bottle).split(" · ")}
+                name={formatBottleDisplayName(item.bottle, {
+                  includeBrand: false,
+                })}
+              />
+            </ItemListItem>
           ))}
           {remaining > 0 ? (
             <ItemRow

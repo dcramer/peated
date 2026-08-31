@@ -45,12 +45,22 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
+          align="start"
+          href="/bottles/19936"
+          imageUrl={BottleImage.src}
+          metadata={["2026 release", "10 years", "50% ABV"]}
+          name="SMWS Highland peaty potion"
+          subtitle="Highland · Single Malt"
+        />
+      </ItemListItem>
+      <ItemListItem>
+        <BottleIdentityRow
           brand="Lagavulin"
           brandHref="/entities/245"
           href="/bottles/42"
           imageUrl={null}
           metadata={["16 years", "43.0% ABV", "Distillers Edition"]}
-          name="Lagavulin 16-year-old"
+          name="16-year-old"
           relatedReleases={{ count: 3, href: "/bottles/42/releases" }}
         />
       </ItemListItem>

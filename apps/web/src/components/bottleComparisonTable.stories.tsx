@@ -10,11 +10,12 @@ import { StoryCanvas } from "./storyFixtures.stylex";
 
 const rows: BottleComparisonTableProps["rows"] = [
   {
+    brand: "Port Charlotte",
     href: "/bottles/1",
     id: "1",
     imageUrl: BottleImage.src,
-    metadata: "Islay · 10 years · 46% ABV",
-    name: "Port Charlotte 10 Year Old",
+    metadata: ["Single Malt", "10 years", "46% ABV"],
+    name: "10 Year Old",
     values: [
       <BottleRatings
         counts={{
@@ -33,10 +34,11 @@ const rows: BottleComparisonTableProps["rows"] = [
     ],
   },
   {
+    brand: "Ardbeg",
     href: "/bottles/2",
     id: "2",
-    metadata: "Islay · No age statement · 54.2% ABV",
-    name: "Ardbeg Uigeadail",
+    metadata: ["Single Malt", "No age statement", "54.2% ABV"],
+    name: "Uigeadail",
     values: [
       <BottleRatings
         counts={{
@@ -55,16 +57,18 @@ const rows: BottleComparisonTableProps["rows"] = [
     ],
   },
   {
+    brand: "Caol Ila",
     href: "/bottles/3",
     id: "3",
-    metadata: "Islay · 12 years · 43% ABV",
-    name: "Caol Ila 12 Year Old",
+    metadata: ["Single Malt", "12 years", "43% ABV"],
+    name: "12 Year Old",
     values: [<BottleRatings counts={{}} key="rating" />],
   },
   {
+    brand: "Independent Bottler",
     href: "/bottles/4",
     id: "4",
-    metadata: "Campbeltown · 15 years · 51.4% ABV",
+    metadata: ["Single Malt", "15 years", "51.4% ABV"],
     name: "A deliberately long independent bottle name that tests the aligned row",
     values: [
       <BottleRatings
