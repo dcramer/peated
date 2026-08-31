@@ -23,4 +23,4 @@
 ## 5. Revision pairing
 
 - [x] 5.1 Derive selection and baseline capture from the test merge's first parent
-- [ ] 5.2 Validate the workflow and confirm the pull request reports no false changes
+- [x] 5.2 Validate the workflow and confirm the pull request reports no false changes
