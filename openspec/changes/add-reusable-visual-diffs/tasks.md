@@ -19,3 +19,8 @@
 - [x] 4.1 Upload only the manifests, report JSON, and changed report images
 - [x] 4.2 Add third-party licenses and a bundle freshness test
 - [x] 4.3 Verify the exact artifact layout and rerun focused checks
+
+## 5. Revision pairing
+
+- [x] 5.1 Derive selection and baseline capture from the test merge's first parent
+- [ ] 5.2 Validate the workflow and confirm the pull request reports no false changes

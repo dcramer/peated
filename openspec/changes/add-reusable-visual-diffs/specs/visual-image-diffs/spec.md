@@ -46,6 +46,17 @@ showing unchanged screenshots.
 - **WHEN** one or more images changed
 - **THEN** the pull request comment includes only those visual changes
 
+### Requirement: Compare revisions from the same test merge
+
+The screenshot workflow SHALL capture the candidate test merge and its first
+parent as the baseline.
+
+#### Scenario: The pull request event has an older base SHA
+
+- **WHEN** the base branch moves while GitHub prepares the test merge
+- **THEN** changed-file selection uses the test merge's first parent
+- **AND** baseline capture checks out that same parent
+
 ### Requirement: Visual changes remain informational
 
 The screenshot workflow SHALL NOT fail only because image pixels changed.

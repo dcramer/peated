@@ -42,6 +42,12 @@ races. The job uploads only the two capture manifests, `report.json`, and the
 changed report images. It does not upload the full baseline or candidate image
 sets. The trusted comment workflow only reads and publishes that artifact.
 
+The candidate is GitHub's test merge. Its first parent is the exact base used
+to create that merge. The workflow derives the baseline from that parent for
+both changed-file selection and baseline capture. It does not use the base SHA
+recorded earlier in the pull request event because `main` can move while
+GitHub prepares the test merge.
+
 ### Expose a plain Node module, command, and action
 
 The source lives under `apps/web/visual/diff/` because Peated is its first

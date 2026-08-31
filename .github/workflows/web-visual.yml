@@ -35,8 +35,7 @@ jobs:
       - name: Choose pages
         id: mode
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.sha }}
+          MERGE_SHA: ${{ github.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
           set -euo pipefail
@@ -45,7 +44,9 @@ jobs:
           else
             echo "all=false" >> "$GITHUB_OUTPUT"
           fi
-          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > /tmp/peated-screenshot-changes.txt
+          base_sha="$(git rev-parse "${MERGE_SHA}^1")"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          git diff --name-only "$base_sha" "$MERGE_SHA" > /tmp/peated-screenshot-changes.txt
           cat /tmp/peated-screenshot-changes.txt
 
       - name: Checkout base revision
@@ -54,7 +55,7 @@ jobs:
           fetch-depth: 1
           path: base-source
           persist-credentials: false
-          ref: ${{ github.event.pull_request.base.sha }}
+          ref: ${{ steps.mode.outputs.base_sha }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
