@@ -5,7 +5,7 @@ error does not identify the failing runtime.
 
 ## Production Surfaces
 
-- frontend: `https://peated.com`, Vercel project `peated-web-next`
+- frontend: `https://peated.com`, Vercel project `peated-web`
 - API: `https://api.peated.com`, Render service `api`
 - worker: Render service `worker`
 - Sentry org/project: `peated` / `peated`
@@ -60,7 +60,7 @@ Query a tight UTC window and route:
 ```bash
 pnpm dlx vercel logs \
   --scope peated \
-  --project peated-web-next \
+  --project peated-web \
   --environment production \
   --since <start-utc> \
   --until <end-utc> \
@@ -72,10 +72,10 @@ pnpm dlx vercel logs \
 Broad error checks are useful only after narrowing the time:
 
 ```bash
-pnpm dlx vercel logs --scope peated --project peated-web-next \
+pnpm dlx vercel logs --scope peated --project peated-web \
   --environment production --level error --since 30m --json
 
-pnpm dlx vercel logs --scope peated --project peated-web-next \
+pnpm dlx vercel logs --scope peated --project peated-web \
   --environment production --status-code 500 --since 30m --json
 ```
 

@@ -87,5 +87,9 @@
   },
   "volta": {
     "extends": "../../package.json"
-  }
+  },
+  "engines": {
+    "node": ">=24.18.0 <25.0.0"
+  },
+  "packageManager": "pnpm@11.20.0"
 }

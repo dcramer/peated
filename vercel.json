@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm storybook:build",
+  "framework": null,
+  "outputDirectory": "apps/web/storybook-static",
+  "git": {
+    "deploymentEnabled": {
+      "web-screenshots/**": false
+    }
+  }
+}
