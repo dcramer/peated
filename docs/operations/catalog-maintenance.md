@@ -1,35 +1,39 @@
 # Catalog Maintenance
 
-Use this workflow to fill gaps for a brand, series, distillery, or other bounded
-set of Bottles. The [Whisky Identity Model](../architecture/whisky-identity-model.md)
-owns Bottle identity and field meaning.
+Use this workflow to fill gaps for one brand, series, distillery, or other
+clearly defined set of Bottles. The
+[Whisky Identity Model](../architecture/whisky-identity-model.md) defines what
+makes a Bottle unique and what each field means.
 
 ## Goal
 
-Finish with one verified record for every marketed release in scope. Review
-every writable Bottle field, fill every fact supported by evidence, attach the
-best usable image, and remove confirmed duplicates. Unknown or disputed facts
-stay null. A catalog is not complete only because every release has a row.
+Finish with one checked record for every marketed release in the selected set.
+Review every Bottle field that the API can update. Fill every fact supported by
+evidence, attach the best usable image, and remove confirmed duplicates. Leave
+unknown or disputed facts as `null`. A catalog is not complete only because
+every release has a record.
 
-## Build The Inventory
+## Build The Work List
 
-1. Define the catalog boundary. Resolve its Brand, series, distillery, and
+1. Define the exact set to review. Find its Brand, series, distillery, and
    Bottle IDs before making changes.
-2. Find an independent source that lists the complete set. Use it to detect
-   missing and extra records. Do not treat the current Peated list as complete.
+2. Find a source independent of Peated that lists the complete set. Use it to
+   detect missing and extra records. Do not treat the current Peated list as
+   complete.
 3. Match each release by stable facts such as distillery, vintage, stated age,
    ABV, edition, and cask number. Search alternate spellings and old distillery
    names.
-4. Fetch all Peated pages and compare them with the independent inventory.
+4. Fetch all Peated pages and compare them with the independent list.
    Classify each expected release as create, update, merge, no change, or
    unresolved.
-5. Keep a manifest with the expected identity, Peated IDs, proposed changes,
-   image source, source URL for each changed fact, and any alias or reference
-   decision. Mark uncertain rows for review instead of guessing.
+5. Keep one work list. For each release, record its expected identity, Peated
+   IDs, planned changes, image source, source URL for each changed fact, and any
+   decision about another public name or an import match. Mark uncertain
+   records for review instead of guessing.
 
-Prefer producer material, label images, and contemporary announcements. A
-specialist archive or auction catalog can fill historical gaps when it shows
-the exact expression. A readable label can verify facts printed on that label.
+Prefer producer material, label images, and announcements from the time of the
+release. A specialist archive or auction catalog can fill historical gaps when
+it shows the exact Bottle. A readable label can verify facts printed on it.
 Use a second source when a fact is not printed, a source is weak, or sources
 conflict. An auction date, retailer publication date, or image filename is not
 a release date.
@@ -38,10 +42,11 @@ a release date.
 
 Use the live OpenAPI Bottle schema as the complete checklist. Review at least:
 
-- identity: `brand`, `distillers`, `bottler`, `series`, `name`, `edition`, and
-  `category`;
-- product facts: stated age or NAS, ABV, vintage and bottling year, cask facts,
-  maturation, natural color, chill filtration, and phenol level;
+- who made and named it: `brand`, `distillers`, `bottler`, `series`, `name`,
+  `edition`, and `category`;
+- Bottle facts: stated age or no age statement (NAS), ABV, vintage and bottling
+  year, cask facts, maturation, natural color, chill filtration, and phenol
+  level;
 - release facts: release year, month, day, and outturn;
 - content: description, description source, and image.
 
@@ -49,7 +54,7 @@ Then apply these rules:
 
 - Set `brand`, `distillers`, `bottler`, and `series` from product evidence. Do
   not infer a bottler from the Brand owner or distributor.
-- Keep `name` to the stable marketed expression. Do not append age, vintage
+- Keep `name` to the stable release name used by the producer. Do not append age, vintage
   year, release year, ABV, cask strength, cask number, outturn, package size, or
   package text to make it unique. Store those facts in their fields. Preserve
   wording only when the producer markets it as part of the expression. Use
@@ -64,7 +69,7 @@ Then apply these rules:
 - Store `outturn` only when a source gives the exact bottle count. A maximum
   case count does not prove an exact bottle outturn.
 - Use an image only when age, vintage, ABV, edition, and other visible facts
-  match the Bottle. Prefer the highest-resolution clear front label from a
+  match the Bottle. Prefer the clearest, highest-resolution front label from a
   source Peated may store. Do not use a thumbnail, watermark, or similar-looking
   release when an exact image is available.
 - Merge records only when they describe the same marketed release. Package
@@ -76,36 +81,35 @@ shows that it is wrong.
 
 ## Review Names, Aliases, And References
 
-Review these as separate records with separate authority:
+Review the Bottle name, other public names, and saved import matches separately:
 
-- Review `name` and `edition` apart from the exact fields. Reject a proposed
-  display name that repeats structured facts without evidence that the producer
-  markets that wording as part of the expression. For a uniform label that
-  features a different distillery on each release, use the featured distillery
-  as `name` when there is no separate expression name.
-- A BottleAlias is a verified alternate marketed name that customers can see
-  and search. Add one only when producer material, a label, or another strong
-  source proves that the release was marketed under that name. Remove one when
-  evidence shows that it is generated text, an error, or a name for another
-  release.
-- A BottleReference is an accepted input string that can match new ingestion
-  directly to one Bottle. Verify it only when the complete string identifies
-  that exact release. Quarantine it when it is wrong, ambiguous, generated
-  noise, or belongs to another release. Quarantine does not move consumers that
-  are already assigned.
+- Review `name` and `edition` separately from age, vintage, ABV, and other
+  release facts. Do not accept a suggested public name that repeats these facts
+  unless a source shows that the producer used that wording. When every release
+  in a series uses the same label but features a different distillery, use the
+  featured distillery as `name` if there is no other release name.
+- `BottleAlias` stores another proven public name. Customers can see and search
+  it. Add one only when producer material, a label, or another strong source
+  shows that the producer used that name. Remove one when it is an automatic
+  name, an error, or a name for another release.
+- `BottleReference` stores accepted import text that can match one Bottle. Assign
+  it only when the complete text identifies that exact release. Leave it
+  unresolved when the text is wrong, unclear, automatic noise, or belongs to
+  another release. Assigning it does not change imports that are already linked
+  to a Bottle.
 
-Do not add old generated full names, package text, spelling mistakes, or search
-phrases as display aliases. Do not use a display alias to grant matching
-authority. A useful alternate marketed name can be both an alias and a
-reference, but each decision needs its own evidence.
+Do not add old automatic full names, package text, spelling mistakes, or search
+phrases as public aliases. A public alias does not prove that import text is
+safe to match. A proven public name can be both an alias and an import match,
+but check each use separately.
 
-After a rename, review the Bottle's aliases and noncanonical references. For an
-SMWS single-cask Bottle, an unchanged Society code proves that an old subtitle
-belongs to the same Bottle, so the old canonical name can remain a reference.
-Add the old subtitle as a display alias only when evidence shows that SMWS
-marketed the Bottle under both titles. For a numbered batch, keep the stable
-expression in the name and the complete `Batch N` value in `edition`; do not
-add the old generated combined name as an alias.
+After a rename, review the Bottle's aliases and references that differ from its
+current full name. For an SMWS single-cask Bottle, an unchanged Society code
+shows that an old subtitle belongs to the same Bottle. The old full name can
+remain as an import match. Add the old subtitle as a public alias only when a
+source shows that SMWS used both titles. For a numbered batch, keep the release
+title in `name` and the complete `Batch N` value in `edition`. Do not add the old
+automatic combined name as an alias.
 
 ## Use The Production API
 
@@ -164,7 +168,8 @@ pnpm cli api patch /bottles/123 --input /tmp/bottle-123.json
 pnpm cli api get /bottles/123
 ```
 
-For a reviewed merge, this example merges Bottle `111` into survivor `222`:
+For a merge you have checked, this example merges Bottle `111` into the Bottle
+that will remain, `222`:
 
 ```json
 {
@@ -177,11 +182,11 @@ For a reviewed merge, this example merges Bottle `111` into survivor `222`:
 pnpm cli api post /bottles/111/merge --input /tmp/bottle-merge.json
 ```
 
-To add a verified display alias, send only the marketed name:
+To add a verified public alias, send only the name:
 
 ```json
 {
-  "name": "Verified alternate marketed name"
+  "name": "Verified public name"
 }
 ```
 
@@ -190,44 +195,46 @@ pnpm cli api post /bottles/123/aliases --input /tmp/bottle-alias.json
 pnpm cli api delete /bottles/123/aliases/789
 ```
 
-## Batch Safety
+## Make Changes Safely
 
-- Read every target immediately before the batch. Stop if an ID, identity, or
-  current value differs from the manifest.
-- Before a name patch, read the Bottle edit context. Confirm the shared `name`,
-  exact fields, and number of affected Bottles. A name patch is a shared edit
-  and can update every Bottle in the group.
-- Get explicit authorization for the write scope. Use `--yes` only after that
+- Read every Bottle immediately before changing it. Stop if an ID, identifying
+  fact, or current value differs from the work list.
+- Before changing a name, read the Bottle edit context. Confirm the shared
+  `name`, the release facts, and the number of Bottles that will change. A name
+  change is shared and can update every Bottle in the group.
+- Get explicit authorization for the set of changes. Use `--yes` only after that
   authorization.
-- Patch explicit IDs in small batches. Do not derive write targets from result
-  order or an unverified search result.
-- Stop on validation errors, conflicts, or changed identity. Re-read the record
-  before retrying.
-- Re-fetch every changed Bottle. Compare the stored values with the manifest
+- Update known IDs in small groups. Do not choose IDs from result order or an
+  unchecked search result.
+- Stop on validation errors, conflicts, or changed identifying facts. Read the
+  record again before retrying.
+- Fetch every changed Bottle again. Compare the stored values with the work list
   and confirm that unrelated fields did not change.
-- After a name patch, re-fetch the Bottle edit context and the Bottle. Confirm
-  the shared name is the stable expression, the Bottle `name` and `fullName`
-  are concise, and every exact field is unchanged.
-- Re-fetch each uploaded `imageUrl` and inspect the stored image. Confirm that
+- After a name change, fetch the Bottle edit context and Bottle again. Confirm
+  that the shared name is the producer's name, `name` and `fullName` are short,
+  and all release facts are unchanged.
+- Fetch each uploaded `imageUrl` again and inspect the stored image. Confirm that
   it still shows the expected release after server processing.
 - After a merge, fetch both IDs. Confirm that the old ID resolves to the chosen
   survivor and that references, facts, and the best image were preserved.
-- After a name change or merge, re-fetch aliases and references. Confirm that
-  verified display names remain visible and active references point to the
+- After a name change or merge, fetch aliases and references again. Confirm that
+  verified public names remain visible and active references point to the
   expected Bottle.
-- Report the target environment, changed count, verified count, sources, and
-  rows skipped for missing or conflicting evidence.
+- Report whether the changes were local or in production. Include the number
+  changed, the number checked, the sources, and any records skipped because
+  evidence was missing or conflicting.
 
-## Completion Gate
+## When The Work Is Complete
 
 The operation is complete only when:
 
-- every inventory row has a final status;
-- every writable field was reviewed, including image, dates, and outturn;
-- every in-scope alias has evidence for its marketed name, and every in-scope
-  reference other than the current full Bottle name points to an evidence-backed
-  exact Bottle or remains unresolved;
-- every stored fact has adequate source evidence;
-- every create, update, image, and merge was read back and verified;
-- expected, stored, merged, and unresolved counts reconcile; and
+- every release on the work list has a final status;
+- every field that can be changed was reviewed, including image, dates, and
+  outturn;
+- every alias in the selected set has a source for its public name;
+- every import match in the selected set, other than the current full Bottle
+  name, points to an evidence-backed exact Bottle or remains unresolved;
+- every stored fact has a good source;
+- every new record, update, image, and merge was fetched and checked;
+- the counts for expected, stored, merged, and unresolved releases agree; and
 - unresolved facts and releases are listed explicitly for later work.
