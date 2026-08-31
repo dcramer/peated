@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { AppLink, KeyFacts, PageTabs } from "@peated/web/components";
+import { KeyFacts, PageTabs, TextLink } from "@peated/web/components";
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
@@ -66,7 +66,9 @@ export function LocationPageFrame({
         identity={visual ? <LocationVisual visual={visual} /> : undefined}
         parent={
           country ? (
-            <AppLink href={country.href}>{country.name}</AppLink>
+            <TextLink href={country.href} size="inherit">
+              {country.name}
+            </TextLink>
           ) : undefined
         }
         title={name}

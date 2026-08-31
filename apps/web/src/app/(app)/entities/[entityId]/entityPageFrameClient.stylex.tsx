@@ -6,13 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode } from "react";
 
 import {
-  AppLink,
   Button,
   ButtonLink,
   KeyFacts,
   PageTabs,
   RowMenu,
   SectionError,
+  TextLink,
   type RowMenuItem,
 } from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
@@ -24,12 +24,7 @@ import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "@peated/web/styles/foundations.stylex";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-} from "../../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 import {
   getEntityClassification,
@@ -201,12 +196,9 @@ export function EntityPageFrameClient({
 
         <div {...stylex.props(styles.summary)}>
           {owner ? (
-            <AppLink
-              href={getEntityUrl(owner)}
-              {...stylex.props(styles.ownerLink)}
-            >
+            <TextLink href={getEntityUrl(owner)} size="inherit">
               {getEntityOwnerLabel(entity, owner)}
-            </AppLink>
+            </TextLink>
           ) : null}
           {entity.description ? (
             <div {...stylex.props(styles.description)}>
@@ -312,14 +304,5 @@ const styles = stylex.create({
   },
   specs: {
     marginBottom: space.x4,
-  },
-  ownerLink: {
-    color: "inherit",
-    outline: "none",
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
 });

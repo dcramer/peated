@@ -28,7 +28,7 @@ const styles = stylex.create({
     paddingBottom: space.x2,
     paddingLeft: space.x3,
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.ink,
+    backgroundColor: { default: colors.ink, ":hover": colors.accentDeep },
     color: colors.ground,
     fontFamily: fonts.reading,
     fontSize: "13px",

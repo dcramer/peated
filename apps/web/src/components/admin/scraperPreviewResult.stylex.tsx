@@ -149,8 +149,10 @@ const styles = stylex.create({
     borderTopColor: colors.hairline,
   },
   link: {
-    color: colors.accentDeep,
+    color: { default: colors.accentDeep, ":hover": colors.accent },
     overflowWrap: "anywhere",
+    textDecorationLine: { default: "none", ":hover": "underline" },
+    textUnderlineOffset: "2px",
     outline: "none",
     boxShadow: {
       default: "none",

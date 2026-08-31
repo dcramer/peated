@@ -140,7 +140,7 @@ const styles = stylex.create({
     color: colors.inkMuted,
   },
   source: {
-    color: colors.accentDeep,
+    color: { default: colors.accentDeep, ":hover": colors.accent },
     fontFamily: fonts.data,
     fontSize: "11px",
     lineHeight: 1.45,

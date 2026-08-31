@@ -1,5 +1,5 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { AppLink } from "@peated/web/components";
+import { TextLink } from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
@@ -52,9 +52,12 @@ export default async function TastingPage(props: {
       <PageHeader
         eyebrow="Tasting record"
         parent={
-          <AppLink href={`/users/${tasting.createdBy.username}`}>
+          <TextLink
+            href={`/users/${tasting.createdBy.username}`}
+            size="inherit"
+          >
             {tasting.createdBy.username}
-          </AppLink>
+          </TextLink>
         }
         title={formatBottleDisplayName(tasting.bottle)}
       />

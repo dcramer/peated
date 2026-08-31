@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, effects, fonts } from "../styles/tokens.stylex";
 import { AppLink, type AppLinkProps } from "./appLink";
+import { textLinkStyles } from "./textLinkStyles.stylex";
 import { getTextTitle } from "./textTitle";
 
 export type TextLinkProps = Omit<
@@ -26,15 +26,15 @@ export function TextLink({
       href={href}
       {...props}
       {...stylex.props(
-        styles.link,
-        size === "sm" && styles.small,
-        truncate && styles.truncate,
+        textLinkStyles.link,
+        size === "sm" && textLinkStyles.small,
+        truncate && textLinkStyles.truncate,
       )}
     >
       {truncate ? (
         <span
           title={getTextTitle(children)}
-          {...stylex.props(styles.truncateContent)}
+          {...stylex.props(textLinkStyles.truncateContent)}
         >
           {children}
         </span>
@@ -44,45 +44,3 @@ export function TextLink({
     </AppLink>
   );
 }
-
-const styles = stylex.create({
-  link: {
-    position: "relative",
-    zIndex: 2,
-    display: "inline-flex",
-    width: "fit-content",
-    color: {
-      default: colors.accentDeep,
-      ":hover": colors.accent,
-      ":active": colors.ink,
-    },
-    fontWeight: 600,
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  small: {
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
-  },
-  truncate: {
-    minWidth: 0,
-    maxWidth: "100%",
-  },
-  truncateContent: {
-    minWidth: 0,
-    maxWidth: "100%",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-});

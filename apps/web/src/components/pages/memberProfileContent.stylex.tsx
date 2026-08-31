@@ -4,7 +4,6 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import {
-  AppLink,
   BottleIdentityRow,
   Button,
   Chip,
@@ -16,6 +15,7 @@ import {
   ItemListItem,
   RowMenu,
   TastingEntry,
+  TextLink,
   type BottleIdentityRowProps,
   type RowMenuGroup,
   type TastingEntryProps,
@@ -225,12 +225,14 @@ function CollectionActivity({
       <header {...stylex.props(styles.activityHeader)}>
         <div {...stylex.props(styles.activityCopy)}>
           <div {...stylex.props(styles.activitySentence)}>
-            <AppLink href={activity.authorHref}>{activity.author}</AppLink>
+            <TextLink href={activity.authorHref} size="inherit">
+              {activity.author}
+            </TextLink>
             <span> added {formatBottleCount(activity.totalItems)} to </span>
             {activity.collectionHref ? (
-              <AppLink href={activity.collectionHref}>
+              <TextLink href={activity.collectionHref} size="inherit">
                 {activity.collectionName}
-              </AppLink>
+              </TextLink>
             ) : (
               <strong>{activity.collectionName}</strong>
             )}
