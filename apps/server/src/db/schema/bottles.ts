@@ -166,7 +166,7 @@ export const bottles = pgTable(
     // True only when the label was confirmed to have no age statement.
     noAgeStatement: boolean("no_age_statement"),
 
-    // a NULL series represents a "core bottling"
+    // A NULL series means that no named product range has been assigned.
     seriesId: bigint("series_id", { mode: "number" }).references(
       () => bottleSeries.id,
     ),
@@ -183,6 +183,8 @@ export const bottles = pgTable(
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
     // Exact marketed-release identity.
+    // TODO(catalog): Add a Bottle-owned core-range flag after Peated has a
+    // reliable sourcing and moderation workflow for the designation.
     edition: varchar("edition", { length: 255 }),
     abv: doublePrecision("abv"),
     singleCask: boolean("single_cask"),

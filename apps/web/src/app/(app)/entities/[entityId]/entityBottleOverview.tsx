@@ -44,20 +44,18 @@ export function EntityBottleOverview({
 
   if (pending) {
     return (
-      <PageSection heading={presentation.bottleSectionLabel}>
-        <LoadingList label="Loading associated bottles" rows={4} />
+      <PageSection heading="Popular bottles">
+        <LoadingList label="Loading popular bottles" rows={4} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading={presentation.bottleSectionLabel}>
-        <SectionError
-          heading="Associated bottles are unavailable"
-          onRetry={retry}
-        >
-          The rest of this page still works. Try loading its bottles again.
+      <PageSection heading="Popular bottles">
+        <SectionError heading="Popular bottles are unavailable" onRetry={retry}>
+          The rest of this page still works. Try loading its popular bottles
+          again.
         </SectionError>
       </PageSection>
     );
@@ -71,7 +69,7 @@ export function EntityBottleOverview({
       }).toString()}`;
 
     return (
-      <PageSection heading={presentation.bottleSectionLabel}>
+      <PageSection heading="Popular bottles">
         <EmptyState
           action={
             <ButtonLink href={addBottleHref} size="sm" variant="accent">
@@ -91,7 +89,7 @@ export function EntityBottleOverview({
 
   return (
     <PageSection
-      heading={presentation.bottleSectionLabel}
+      heading="Popular bottles"
       intro={
         <TextLink href={`${entityHref}/bottles?sort=-tastings`}>
           View all {totalBottles.toLocaleString("en-US")} bottles
@@ -99,7 +97,7 @@ export function EntityBottleOverview({
       }
     >
       <BottleComparisonTable
-        ariaLabel={`${entity.name} ${presentation.bottleSectionLabel.toLowerCase()}`}
+        ariaLabel={`${entity.name} popular bottles`}
         columns={["Rating"]}
         rows={[
           toBottleTableRow(firstBottle),
