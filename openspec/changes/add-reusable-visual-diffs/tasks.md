@@ -24,3 +24,10 @@
 
 - [x] 5.1 Derive selection and baseline capture from the test merge's first parent
 - [x] 5.2 Validate the workflow and confirm the pull request reports no false changes
+
+## 6. Review context
+
+- [x] 6.1 Emit before, after, and pixel diff images only for changed files
+- [x] 6.2 Render before and after first, with the pixel diff collapsed
+- [x] 6.3 Rebuild the action and run focused validation
+- [x] 6.4 Keep reports compatible with the trusted comment job during rollout

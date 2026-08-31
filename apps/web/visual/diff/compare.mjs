@@ -46,11 +46,11 @@ function fit(image, width, height) {
   return result;
 }
 
-async function copyReportImage(source, output, relative) {
-  const destination = path.join(output, "images", ...relative.split("/"));
+async function copyReportImage(source, output, kind, relative) {
+  const destination = path.join(output, "images", kind, ...relative.split("/"));
   await fs.mkdir(path.dirname(destination), { recursive: true });
   await fs.copyFile(source, destination);
-  return `images/${relative}`;
+  return `images/${kind}/${relative}`;
 }
 
 async function comparePair(baselinePath, candidatePath, output, relative) {
@@ -96,13 +96,22 @@ async function comparePair(baselinePath, candidatePath, output, relative) {
     return { file: relative, status: "unchanged" };
   }
 
-  const image = path.join(output, "images", ...relative.split("/"));
-  await fs.mkdir(path.dirname(image), { recursive: true });
-  await fs.writeFile(image, PNG.sync.write(diff));
+  const diffImage = path.join(output, "images", "diff", ...relative.split("/"));
+  await fs.mkdir(path.dirname(diffImage), { recursive: true });
+  await fs.writeFile(diffImage, PNG.sync.write(diff));
+  const [baselineImage, candidateImage] = await Promise.all([
+    copyReportImage(baselinePath, output, "baseline", relative),
+    copyReportImage(candidatePath, output, "candidate", relative),
+  ]);
   return {
     file: relative,
     height,
-    image: `images/${relative}`,
+    image: `images/diff/${relative}`,
+    images: {
+      baseline: baselineImage,
+      candidate: candidateImage,
+      diff: `images/diff/${relative}`,
+    },
     status: "changed",
     width,
   };
@@ -140,15 +149,33 @@ export async function compareDirectories({ baseline, candidate, output }) {
     const baselinePath = baselineFiles.get(file);
     const candidatePath = candidateFiles.get(file);
     if (!baselinePath) {
+      const candidateImage = await copyReportImage(
+        candidatePath,
+        output,
+        "candidate",
+        file,
+      );
       files.push({
         file,
-        image: await copyReportImage(candidatePath, output, file),
+        image: candidateImage,
+        images: {
+          candidate: candidateImage,
+        },
         status: "added",
       });
     } else if (!candidatePath) {
+      const baselineImage = await copyReportImage(
+        baselinePath,
+        output,
+        "baseline",
+        file,
+      );
       files.push({
         file,
-        image: await copyReportImage(baselinePath, output, file),
+        image: baselineImage,
+        images: {
+          baseline: baselineImage,
+        },
         status: "removed",
       });
     } else {

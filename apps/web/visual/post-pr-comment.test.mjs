@@ -29,7 +29,12 @@ describe("post PR comment", () => {
       files: [
         {
           file: "login__desktop.png",
-          image: "images/login__desktop.png",
+          image: "images/diff/login__desktop.png",
+          images: {
+            baseline: "images/baseline/login__desktop.png",
+            candidate: "images/candidate/login__desktop.png",
+            diff: "images/diff/login__desktop.png",
+          },
           status: "changed",
         },
         { file: "login__mobile.png", status: "unchanged" },
@@ -50,7 +55,14 @@ describe("post PR comment", () => {
     expect(body).toContain("`apps/web/src/components/loginForm.tsx`");
     expect(body).toContain("### Login · desktop — Changed");
     expect(body).toContain(
-      "![Login · desktop changed](https://example.com/screenshots/images/login__desktop.png)",
+      "![Login · desktop before](https://example.com/screenshots/images/baseline/login__desktop.png)",
+    );
+    expect(body).toContain(
+      "![Login · desktop after](https://example.com/screenshots/images/candidate/login__desktop.png)",
+    );
+    expect(body).toContain("<summary>Pixel diff</summary>");
+    expect(body).toContain(
+      "![Login · desktop pixel diff](https://example.com/screenshots/images/diff/login__desktop.png)",
     );
     expect(body).not.toContain("Login · mobile");
   });
@@ -74,6 +86,43 @@ describe("post PR comment", () => {
     expect(body).not.toContain("https://example.com/screenshots/images");
   });
 
+  it("shows only the available side for added and removed screenshots", () => {
+    const body = buildBody(
+      {
+        baseline: manifest(),
+        candidate: manifest(),
+        report: {
+          files: [
+            {
+              file: "added.png",
+              image: "images/candidate/added.png",
+              images: { candidate: "images/candidate/added.png" },
+              status: "added",
+            },
+            {
+              file: "removed.png",
+              image: "images/baseline/removed.png",
+              images: { baseline: "images/baseline/removed.png" },
+              status: "removed",
+            },
+          ],
+          summary: { added: 1, changed: 0, removed: 1, unchanged: 0 },
+          version: 1,
+        },
+      },
+      "https://example.com/screenshots",
+    );
+
+    expect(body).toContain("### added.png — Added\n\n#### After");
+    expect(body).toContain(
+      "![added.png after](https://example.com/screenshots/images/candidate/added.png)",
+    );
+    expect(body).toContain("### removed.png — Removed\n\n#### Before");
+    expect(body).toContain(
+      "![removed.png before](https://example.com/screenshots/images/baseline/removed.png)",
+    );
+  });
+
   it("skips the comment when no page matches", () => {
     expect(
       shouldPostComment(
@@ -89,11 +138,52 @@ describe("post PR comment", () => {
           {
             file: "login.png",
             image: "../login.png",
+            images: {
+              baseline: "images/baseline/login.png",
+              candidate: "images/candidate/login.png",
+              diff: "../login.png",
+            },
             status: "changed",
           },
         ],
         version: 1,
       }),
     ).toThrow("Invalid report image path");
+  });
+
+  it("rejects incomplete image sets", () => {
+    expect(() =>
+      validateReport({
+        files: [
+          {
+            file: "login.png",
+            image: "images/candidate/login.png",
+            images: { candidate: "images/candidate/login.png" },
+            status: "changed",
+          },
+        ],
+        version: 1,
+      }),
+    ).toThrow("Invalid visual diff images for changed");
+  });
+
+  it("keeps the version 1 image aligned with the pixel diff", () => {
+    expect(() =>
+      validateReport({
+        files: [
+          {
+            file: "login.png",
+            image: "images/candidate/login.png",
+            images: {
+              baseline: "images/baseline/login.png",
+              candidate: "images/candidate/login.png",
+              diff: "images/diff/login.png",
+            },
+            status: "changed",
+          },
+        ],
+        version: 1,
+      }),
+    ).toThrow("Invalid visual diff image for changed");
   });
 });

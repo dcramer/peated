@@ -71,16 +71,85 @@ export function validateReport(report) {
     throw new Error("Invalid visual diff report");
   }
   const statuses = new Set(["added", "changed", "removed", "unchanged"]);
+  const imageKeys = {
+    added: ["candidate"],
+    changed: ["baseline", "candidate", "diff"],
+    removed: ["baseline"],
+    unchanged: [],
+  };
   for (const file of report.files) {
     validateImagePath(file.file);
     if (!statuses.has(file.status)) {
       throw new Error(`Invalid visual diff status: ${file.status}`);
     }
-    if (file.status !== "unchanged") {
+    const expectedKeys = imageKeys[file.status];
+    const actualKeys =
+      file.images?.constructor === Object
+        ? Object.keys(file.images).sort((left, right) =>
+            left.localeCompare(right),
+          )
+        : [];
+    if (
+      (expectedKeys.length === 0 &&
+        (file.image !== undefined || file.images !== undefined)) ||
+      actualKeys.length !== expectedKeys.length ||
+      actualKeys.some((key, index) => key !== expectedKeys[index])
+    ) {
+      throw new Error(`Invalid visual diff images for ${file.status}`);
+    }
+    for (const key of expectedKeys) {
+      validateImagePath(file.images[key], `images/${key}/`);
+    }
+    if (expectedKeys.length > 0) {
+      const primaryKey = file.status === "changed" ? "diff" : expectedKeys[0];
       validateImagePath(file.image, "images/");
+      if (file.image !== file.images[primaryKey]) {
+        throw new Error(`Invalid visual diff image for ${file.status}`);
+      }
     }
   }
   return report;
+}
+
+function imageUrl(imageBaseUrl, imagePath) {
+  const encodedPath = imagePath.split("/").map(encodeURIComponent).join("/");
+  return `${imageBaseUrl}/${encodedPath}`;
+}
+
+function renderChange(screenshot, label, imageBaseUrl) {
+  const status =
+    screenshot.status[0].toUpperCase() + screenshot.status.slice(1);
+  const lines = [`### ${label} — ${status}`, ""];
+
+  if (screenshot.status === "changed") {
+    const before = imageUrl(imageBaseUrl, screenshot.images.baseline);
+    const after = imageUrl(imageBaseUrl, screenshot.images.candidate);
+    const diff = imageUrl(imageBaseUrl, screenshot.images.diff);
+    lines.push(
+      "| Before | After |",
+      "| --- | --- |",
+      `| ![${label} before](${before}) | ![${label} after](${after}) |`,
+      "",
+      "<details>",
+      "<summary>Pixel diff</summary>",
+      "",
+      `![${label} pixel diff](${diff})`,
+      "",
+      "</details>",
+      "",
+    );
+  } else {
+    const kind = screenshot.status === "added" ? "candidate" : "baseline";
+    const heading = screenshot.status === "added" ? "After" : "Before";
+    lines.push(
+      `#### ${heading}`,
+      "",
+      `![${label} ${heading.toLowerCase()}](${imageUrl(imageBaseUrl, screenshot.images[kind])})`,
+      "",
+    );
+  }
+
+  return lines.join("\n");
 }
 
 export function buildBody({ baseline, candidate, report }, imageBaseUrl) {
@@ -96,19 +165,7 @@ export function buildBody({ baseline, candidate, report }, imageBaseUrl) {
   const screenshots = changes
     .map((screenshot) => {
       const label = labels.get(screenshot.file) ?? screenshot.file;
-      const status =
-        screenshot.status[0].toUpperCase() + screenshot.status.slice(1);
-      const imagePath = screenshot.image
-        .split("/")
-        .map(encodeURIComponent)
-        .join("/");
-      const url = `${imageBaseUrl}/${imagePath}`;
-      return [
-        `### ${label} — ${status}`,
-        "",
-        `![${label} ${screenshot.status}](${url})`,
-        "",
-      ].join("\n");
+      return renderChange(screenshot, label, imageBaseUrl);
     })
     .join("\n");
   const run =
@@ -147,14 +204,15 @@ function publishImages(reportDir, report, branch, commitSha) {
     `${JSON.stringify(report, null, 2)}\n`,
   );
   for (const file of report.files) {
-    if (file.status === "unchanged") continue;
-    const source = path.join(reportDir, ...file.image.split("/"));
-    if (!fs.existsSync(source) || !fs.lstatSync(source).isFile()) {
-      throw new Error(`Missing report image: ${file.image}`);
+    for (const image of Object.values(file.images ?? {})) {
+      const source = path.join(reportDir, ...image.split("/"));
+      if (!fs.existsSync(source) || !fs.lstatSync(source).isFile()) {
+        throw new Error(`Missing report image: ${image}`);
+      }
+      const destination = path.join(tempDir, ...image.split("/"));
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.copyFileSync(source, destination);
     }
-    const destination = path.join(tempDir, ...file.image.split("/"));
-    fs.mkdirSync(path.dirname(destination), { recursive: true });
-    fs.copyFileSync(source, destination);
   }
 
   git(["init", "-q"], { cwd: tempDir });

@@ -60,8 +60,9 @@ pnpm --dir apps/web visual:diff -- \
   --output /tmp/visual-report
 ```
 
-The report contains `report.json` and one review image for each changed, added,
-or removed PNG. It does not copy unchanged images.
+The report contains `report.json`. Changed PNGs include before, after, and
+pixel diff images. Added PNGs include only after. Removed PNGs include only
+before. It does not copy unchanged images.
 
 CI uploads only the baseline and candidate manifests, `report.json`, and these
 review images. The full baseline and candidate screenshots stay on the runner.
