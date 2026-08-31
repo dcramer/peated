@@ -83,14 +83,14 @@ export function BottlePageHeader({
             size="lg"
           />
           <div {...stylex.props(styles.identity)}>
-            {brandHref ? (
-              <AppLink href={brandHref} {...stylex.props(styles.brand)}>
-                {brand}
-              </AppLink>
-            ) : (
-              <span {...stylex.props(styles.brand)}>{brand}</span>
-            )}
             <h1 {...stylex.props(foundationStyles.pageTitle, styles.name)}>
+              {brandHref ? (
+                <AppLink href={brandHref} {...stylex.props(styles.brand)}>
+                  {brand}
+                </AppLink>
+              ) : (
+                <span>{brand}</span>
+              )}{" "}
               {name}
             </h1>
             {notes.length ? (
@@ -193,33 +193,24 @@ const styles = stylex.create({
     minWidth: 0,
   },
   brand: {
-    display: "inline-block",
-    maxWidth: "100%",
-    overflow: "hidden",
     outline: "none",
-    color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textDecoration: "none",
-    textOverflow: "ellipsis",
-    textTransform: "uppercase",
-    whiteSpace: "nowrap",
+    color: {
+      default: "inherit",
+      ":hover": colors.accentDeep,
+    },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "3px",
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
     },
   },
   name: {
-    marginTop: space.x1,
     overflowWrap: "anywhere",
-    fontSize: {
-      default: "clamp(32px, 5vw, 44px)",
-      [COMPACT]: "28px",
-      [PHONE]: "26px",
-    },
   },
   notes: {
     display: "flex",
