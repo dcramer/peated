@@ -9,6 +9,7 @@ import {
   AppLink,
   Button,
   ButtonLink,
+  KeyFacts,
   PageTabs,
   RowMenu,
   SectionError,
@@ -229,30 +230,24 @@ export function EntityPageFrameClient({
           </div>
         </div>
 
-        <dl {...stylex.props(styles.figures)}>
-          {entity.yearEstablished ? (
-            <div {...stylex.props(styles.figure)}>
-              <dd {...stylex.props(styles.figureValue)}>
-                {entity.yearEstablished}
-              </dd>
-              <dt {...stylex.props(styles.figureLabel)}>
-                {presentation.establishmentLabel.toLowerCase()}
-              </dt>
-            </div>
-          ) : null}
-          <div {...stylex.props(styles.figure)}>
-            <dd {...stylex.props(styles.figureValue)}>
-              {entity.totalBottles.toLocaleString("en-US")}
-            </dd>
-            <dt {...stylex.props(styles.figureLabel)}>bottles recorded</dt>
-          </div>
-          <div {...stylex.props(styles.figure)}>
-            <dd {...stylex.props(styles.figureValue)}>
-              {entity.totalTastings.toLocaleString("en-US")}
-            </dd>
-            <dt {...stylex.props(styles.figureLabel)}>member tastings</dt>
-          </div>
-        </dl>
+        <div {...stylex.props(styles.specs)}>
+          <KeyFacts
+            facts={[
+              {
+                label: presentation.establishmentLabel,
+                value: entity.yearEstablished,
+              },
+              {
+                label: "Bottles recorded",
+                value: entity.totalBottles.toLocaleString("en-US"),
+              },
+              {
+                label: "Member tastings",
+                value: entity.totalTastings.toLocaleString("en-US"),
+              },
+            ]}
+          />
+        </div>
       </header>
 
       <div {...stylex.props(styles.tabs)}>
@@ -315,61 +310,8 @@ const styles = stylex.create({
     gap: space.x2,
     flexWrap: "wrap",
   },
-  figures: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "repeat(3, minmax(0, 1fr))",
-      "@media (max-width: 559px)": "minmax(0, 1fr)",
-    },
-    margin: 0,
-    paddingTop: space.x4,
-    paddingBottom: space.x4,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
-  },
-  figure: {
-    minWidth: 0,
-    paddingRight: space.x6,
-    paddingLeft: {
-      default: space.x6,
-      "@media (max-width: 559px)": 0,
-    },
-    paddingTop: {
-      default: 0,
-      "@media (max-width: 559px)": space.x3,
-    },
-    paddingBottom: {
-      default: 0,
-      "@media (max-width: 559px)": space.x3,
-    },
-    borderLeftWidth: {
-      default: "1px",
-      "@media (max-width: 559px)": 0,
-    },
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.hairline,
-    ":first-child": {
-      paddingLeft: 0,
-      borderLeftWidth: 0,
-    },
-  },
-  figureValue: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "32px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.04em",
-    lineHeight: 1,
-  },
-  figureLabel: {
-    marginTop: space.x1,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
-    lineHeight: 1.35,
+  specs: {
+    marginBottom: space.x4,
   },
   ownerLink: {
     color: "inherit",
