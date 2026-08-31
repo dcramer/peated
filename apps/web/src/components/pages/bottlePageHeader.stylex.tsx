@@ -312,9 +312,6 @@ const styles = stylex.create({
     paddingRight: 0,
     paddingBottom: { default: space.x6, [NARROW]: space.x4 },
     paddingLeft: { default: space.x6, [NARROW]: 0 },
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
     backgroundColor: "transparent",
   },
   rating: {

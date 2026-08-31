@@ -62,9 +62,6 @@ const styles = stylex.create({
     width: "100%",
     paddingTop: "14px",
     paddingBottom: "14px",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
   },
   heading: {
     display: "flex",

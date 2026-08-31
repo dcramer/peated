@@ -58,7 +58,6 @@ export function PageColumns({
 export function PageHeader({
   actions,
   description,
-  divider = true,
   eyebrow,
   identity,
   menu,
@@ -67,7 +66,6 @@ export function PageHeader({
 }: {
   actions?: ReactNode;
   description?: ReactNode;
-  divider?: boolean;
   eyebrow?: ReactNode;
   identity?: ReactNode;
   menu?: ReactNode;
@@ -75,12 +73,7 @@ export function PageHeader({
   title: ReactNode;
 }) {
   return (
-    <header
-      {...stylex.props(
-        styles.pageHeader,
-        !divider && styles.pageHeaderNoDivider,
-      )}
-    >
+    <header {...stylex.props(styles.pageHeader)}>
       {identity}
       <div {...stylex.props(styles.pageHeaderBody)}>
         <div {...stylex.props(styles.pageHeaderCopy)}>
@@ -242,13 +235,7 @@ const styles = stylex.create({
     paddingRight: 0,
     paddingBottom: "18px",
     paddingLeft: 0,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
     backgroundColor: "transparent",
-  },
-  pageHeaderNoDivider: {
-    borderBottomWidth: 0,
   },
   pageHeaderBody: {
     display: "flex",
