@@ -1,0 +1,67 @@
+{
+  "changedFiles": [
+    "apps/server/src/orpc/contracts/entities/catalog.ts",
+    "apps/server/src/orpc/mock/fixtures/catalog.ts",
+    "apps/server/src/orpc/routes/entities/catalog.test.ts",
+    "apps/server/src/orpc/routes/entities/catalog.ts",
+    "apps/web/e2e/mock-rpc-server.mjs",
+    "apps/web/e2e/rpc-fixtures.mjs",
+    "apps/web/src/app/(app)/entities/[entityId]/entityCatalogRelationships.test.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityCatalogRelationships.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entityOverviewClient.stylex.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/entitySiblingData.test.ts",
+    "apps/web/src/app/(app)/entities/[entityId]/entitySiblingData.ts",
+    "apps/web/src/app/(app)/entities/[entityId]/entitySiblingOverview.tsx",
+    "apps/web/src/app/(app)/entities/[entityId]/page.tsx",
+    "apps/web/src/app/(app)/locations/[countrySlug]/(country)/layout.tsx",
+    "apps/web/src/app/(app)/locations/[countrySlug]/regions/[regionSlug]/page.tsx",
+    "apps/web/src/app/(app)/locations/locationPageFrame.stylex.tsx",
+    "apps/web/src/components/search/search.stylex.tsx",
+    "apps/web/src/components/searchBox.stylex.tsx",
+    "apps/web/src/components/searchBox.test.tsx",
+    "apps/web/src/lib/recentSearches.test.ts"
+  ],
+  "commitSha": "156c5bed0e2100baf18b8a7dc3c800ada8ede3dd",
+  "scenarioIds": [
+    "home",
+    "search",
+    "bottle-detail",
+    "region-detail"
+  ],
+  "screenshots": [
+    {
+      "file": "home__desktop.png",
+      "label": "Home · desktop"
+    },
+    {
+      "file": "home__mobile.png",
+      "label": "Home · mobile"
+    },
+    {
+      "file": "search__desktop.png",
+      "label": "Search · desktop"
+    },
+    {
+      "file": "search__mobile.png",
+      "label": "Search · mobile"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "label": "Bottle detail · desktop"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "label": "Bottle detail · mobile"
+    },
+    {
+      "file": "region-detail__desktop.png",
+      "label": "Region detail · desktop"
+    },
+    {
+      "file": "region-detail__mobile.png",
+      "label": "Region detail · mobile"
+    }
+  ],
+  "selection": "changed-files",
+  "skipped": false
+}
