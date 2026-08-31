@@ -1,6 +1,11 @@
 "use client";
 
 import {
+  formatBottleDisplayName,
+  isBatchEdition,
+} from "@peated/server/lib/bottleDisplayName";
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
+import {
   formatCategoryName,
   formatServingStyle,
 } from "@peated/server/lib/format";
@@ -10,8 +15,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   Button,
   ButtonLink,
@@ -102,13 +105,27 @@ function getBottleSpecs(bottle: Bottle) {
     { label: "Cask", value: bottle.maturation },
     {
       label: "Release",
-      value: formatReleaseDate(bottle),
+      value:
+        (isBatchEdition(bottle.edition) ? bottle.edition : null) ??
+        formatReleaseDate(bottle),
     },
   ] as const;
 }
 
 function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
+    {
+      label: "Vintage",
+      value: bottle.vintageYear === null ? null : String(bottle.vintageYear),
+    },
+    {
+      label: "Bottled",
+      value: bottle.bottlingYear === null ? null : String(bottle.bottlingYear),
+    },
+    {
+      label: "Released",
+      value: formatReleaseDate(bottle),
+    },
     {
       label: "Phenols",
       value:

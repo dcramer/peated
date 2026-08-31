@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { formatBottleDisplayName } from "./bottleDisplayName";
+import {
+  formatBottleDisplayName,
+  getBottleReleaseMetadata,
+} from "./bottleDisplayName";
 
 const bottle = {
   name: "Glenburgie 38-year-old",
@@ -38,13 +41,38 @@ describe("formatBottleDisplayName", () => {
     );
   });
 
-  it("uses at most one year when no marketed release marker exists", () => {
+  it("keeps inferred years out of the bottle name", () => {
     expect(
       formatBottleDisplayName({
         ...bottle,
         edition: null,
       }),
-    ).toBe("Decadent Drinks Whiskyland Glenburgie 38-year-old - 1988 Vintage");
+    ).toBe("Decadent Drinks Whiskyland Glenburgie 38-year-old");
+  });
+
+  it("keeps a numbered batch beside the bottle name", () => {
+    const batchedBottle = {
+      ...bottle,
+      edition: "Batch C923",
+      vintageYear: null,
+    };
+
+    expect(formatBottleDisplayName(batchedBottle)).toBe(
+      "Decadent Drinks Whiskyland Glenburgie 38-year-old",
+    );
+    expect(getBottleReleaseMetadata(batchedBottle)).toBe("Batch C923");
+  });
+
+  it("preserves stable batch wording in the expression", () => {
+    expect(
+      formatBottleDisplayName({
+        ...bottle,
+        name: "Small Batch",
+        group: { name: "Small Batch" },
+        edition: null,
+        series: null,
+      }),
+    ).toBe("Decadent Drinks Small Batch");
   });
 
   it("does not add a release year already used as the edition", () => {
@@ -67,5 +95,22 @@ describe("formatBottleDisplayName", () => {
         series: { name: "Exploration Series" },
       }),
     ).toBe("Pōkeno Exploration Series No. 1 - Chapter Thirty Two");
+  });
+
+  it("returns at most one supporting release fact", () => {
+    expect(
+      getBottleReleaseMetadata({
+        edition: null,
+        releaseYear: 2026,
+        vintageYear: 1988,
+      }),
+    ).toBe("1988 vintage");
+    expect(
+      getBottleReleaseMetadata({
+        edition: "Chapter Thirty Two",
+        releaseYear: 2026,
+        vintageYear: 1988,
+      }),
+    ).toBeNull();
   });
 });

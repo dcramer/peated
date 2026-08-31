@@ -74,11 +74,15 @@ that present bottle identity should display it when present unless:
 
 Series must remain searchable even on surfaces that do not render it.
 
-### Prefer a release name or code over years
+### Separate release names from supporting release facts
 
-A meaningful `edition` is normally more recognizable than a year. When a
-chapter, batch, volume, scene, edition, or exact marketed code is present,
-compact views should not also append years by default.
+A meaningful named edition is normally more recognizable than a year. Keep a
+chapter, volume, scene, or other marketed release name in the title. Put a
+numbered or coded batch beside the title as supporting metadata. Do not also
+append years by default.
+
+Stable wording such as `Small Batch` or `Batch Proof` remains part of the title.
+Only an exact batch marker such as `Batch 24` or `Batch C923` moves to metadata.
 
 An exact cask or barrel code is useful when it identifies the marketed release.
 The generic fact that the bottle is single-cask is not a substitute for that
@@ -167,6 +171,7 @@ subject.
 - Show producer context and nonduplicative series.
 - Make the expression the primary title.
 - Show a meaningful release marker prominently.
+- Show an exact batch marker in the supporting release facts.
 - Show stated age once and show ABV when known.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
@@ -183,7 +188,8 @@ similar repeated items that support a title plus secondary metadata.
 
 - Show enough producer, series, and expression context to recognize the Bottle
   outside its detail page.
-- Include the release marker before an optional year.
+- Include a named release marker in the title.
+- Put an exact batch marker or optional year in secondary metadata.
 - Include age or ABV when the component's density makes them useful.
 - Do not let a year crowd out a more meaningful release marker or ABV.
 - Do not add single-cask or cask-strength labels.
@@ -197,7 +203,8 @@ Use inside prose, notifications, narrow activity items, controls, or other
 places that cannot support a metadata row.
 
 - Produce a recognizable marketed label, not a field inventory.
-- Prefer expression plus release marker.
+- Prefer the expression plus a named release marker.
+- Omit exact batch markers when the surface has no supporting metadata.
 - Include series when it is essential to recognizing the product and is not
   already represented; secondary context may otherwise be omitted.
 - Omit ABV, general production details, and years that are not needed.
@@ -207,9 +214,10 @@ places that cannot support a metadata row.
 Use when a BottleGroup heading or surrounding view already establishes the
 producer and shared expression.
 
-- Show the smallest exact release marker that identifies the member within the
+- Show the smallest exact release fact that identifies the member within the
   family.
-- Prefer an explicit edition, batch, chapter, volume, scene, or marketed code.
+- Prefer an explicit chapter, volume, scene, or other named edition in the
+  title. Put an exact batch marker in supporting metadata.
 - If no explicit release marker exists, use a marketed distillation, bottling,
   or release year that distinguishes the member.
 - Use an exact age override when it differs from the group and is the useful
@@ -242,6 +250,8 @@ Open Graph metadata, share text, accessible labels, and some exports.
   field.
 - Include producer, nonduplicative series, expression, and a meaningful release
   marker.
+- Omit an exact batch marker unless the text must distinguish releases that
+  otherwise have the same name.
 - Include a year only when it is a necessary part of that marketed identity.
 - Omit generic single-cask and cask-strength flags and normally omit ABV.
 - Do not assume the stored `fullName` is the ideal text for every consumer.
@@ -276,7 +286,8 @@ particular result component omits some of them visually.
 | Bottler                   | When distinct and useful | Optional          | Rarely             | Context supplies | When needed       | Yes          |
 | Series                    | If nonduplicative        | If nonduplicative | When essential     | Context supplies | If nonduplicative | Yes          |
 | Expression                | Primary                  | Primary           | Primary            | Context supplies | Primary           | Yes          |
-| Edition/release marker    | Prominent                | Yes               | Yes                | Primary          | Yes               | Yes          |
+| Named edition             | Prominent                | In title          | In title           | Primary          | Yes               | Yes          |
+| Exact batch marker        | Supporting fact          | Metadata          | Rarely             | Metadata         | Conditional       | Yes          |
 | Stated age                | Once                     | Optional          | Only when integral | Exact override   | If integral       | Yes          |
 | ABV                       | Yes when known           | Optional          | No                 | Optional support | Normally no       | Yes          |
 | Distillation year         | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
@@ -300,7 +311,7 @@ the implementation.
 | ----------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | Whiskyland Glenburgie 38-year-old, Chapter Thirty Two | `Whiskyland` is the Brand; `Chapter Thirty Two` is the release marker           | Show both; omit 1988 vintage and 2026 release from the ordinary header |
 | High West A Midwinter Night's Dram, Act 12 Scene 9    | Act and scene identify the release                                              | Prefer the edition; do not also require its release year               |
-| Elijah Craig Barrel Proof, Batch C923                 | `Barrel Proof` is marketed expression wording; the batch identifies the release | Preserve the expression and batch; do not add a cask-strength flag     |
+| Elijah Craig Barrel Proof, Batch C923                 | `Barrel Proof` is marketed expression wording; the batch identifies the release | Keep the expression as the title and show the batch beside it          |
 | Four Roses Limited Edition Small Batch 2017           | The year is the annual release identity when no stronger marker exists          | Show the release year                                                  |
 | Macallan Sherry Oak 18-year-old, 1994 Vintage         | Vintage is how the producer distinguishes the release                           | Show the vintage and do not add another year label                     |
 | Willett Family Estate, Barrel 4769                    | The exact barrel code identifies the marketed release                           | Show the code; do not add `Single cask` merely from the boolean        |
@@ -313,7 +324,8 @@ the implementation.
 The contract is applied at the presentation site that owns each branch:
 
 - Bottle headers, result rows, previews, and tasting identities compose their
-  own structured layouts from the shared Bottle fields.
+  own structured layouts from the shared Bottle fields. Numbered batches and
+  inferred years use supporting metadata when the layout provides it.
 - Relative release-family labels show the most useful difference without adding
   general cask labels.
 - SEO, sharing, notifications, and other unstructured consumers use concise
