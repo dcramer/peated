@@ -7,38 +7,27 @@ type EntityTabSource = Pick<
   Entity,
   "id" | "kind" | "shortName" | "totalBottles" | "totalTastings"
 >;
-type EntityLocation = Pick<NonNullable<Entity["country"]>, "name">;
-type EntityClassificationSource = Pick<Entity, "kind" | "yearEstablished"> & {
-  country?: EntityLocation | null;
-  region?: EntityLocation | null;
-};
-
 const entityKindPresentation = {
   bottler: {
     bottleSectionLabel: "Bottles",
-    establishmentLabel: "Founded",
     label: "Bottler",
   },
   brand: {
     bottleSectionLabel: "Bottles",
-    establishmentLabel: "Established",
     label: "Brand",
   },
   company: {
     bottleSectionLabel: "Bottles",
-    establishmentLabel: "Founded",
     label: "Company",
   },
   distillery: {
     bottleSectionLabel: "Bottles",
-    establishmentLabel: "Founded",
     label: "Distillery",
   },
 } as const;
 
 const fallbackPresentation = {
   bottleSectionLabel: "Bottles",
-  establishmentLabel: "Established",
   label: "Brand or producer",
 } as const;
 
@@ -48,30 +37,8 @@ export function getEntityPresentation(entity: Pick<Entity, "kind">) {
     : fallbackPresentation;
 }
 
-export function getEntityClassification(entity: EntityClassificationSource) {
-  const presentation = getEntityPresentation(entity);
-  const location = entity.region?.name ?? entity.country?.name;
-
-  return [
-    presentation.label,
-    entity.yearEstablished
-      ? `${presentation.establishmentLabel.toLowerCase()} ${entity.yearEstablished}`
-      : null,
-    location,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
-}
-
-export function getEntityOwnerLabel(
-  entity: Pick<Entity, "kind">,
-  owner: Pick<Entity, "name" | "shortName">,
-) {
-  const ownerName = owner.shortName || owner.name;
-
-  return entity.kind === "brand"
-    ? `A ${ownerName} brand`
-    : `Part of ${ownerName}`;
+export function getEntityClassification(entity: Pick<Entity, "kind">) {
+  return getEntityPresentation(entity).label;
 }
 
 export function entityHasBottleCatalog(entity: Pick<Entity, "kind">) {
