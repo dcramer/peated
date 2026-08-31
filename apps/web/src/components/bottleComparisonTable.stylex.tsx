@@ -3,6 +3,7 @@ import { type ReactNode, useId } from "react";
 
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
+import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { getTextTitle } from "./textTitle";
 
@@ -11,6 +12,7 @@ const COMPACT = "@media (max-width: 639px)";
 export type BottleComparisonRow = {
   href?: string;
   id: string;
+  imageUrl?: string | null;
   metadata?: string;
   name: string;
   values: readonly [ReactNode, ...ReactNode[]];
@@ -78,28 +80,36 @@ export function BottleComparisonTable({
               )}
             >
               <th scope="row" {...stylex.props(styles.nameCell)}>
-                {row.href ? (
-                  <AppLink
-                    href={row.href}
-                    title={row.name}
-                    {...stylex.props(
-                      styles.name,
-                      styles.nameLink,
-                      linkedRowStyles.primaryLink,
+                <div {...stylex.props(styles.identity)}>
+                  <BottleVisual imageUrl={row.imageUrl} />
+                  <div {...stylex.props(styles.copy)}>
+                    {row.href ? (
+                      <AppLink
+                        href={row.href}
+                        title={row.name}
+                        {...stylex.props(
+                          styles.name,
+                          styles.nameLink,
+                          linkedRowStyles.primaryLink,
+                        )}
+                      >
+                        {row.name}
+                      </AppLink>
+                    ) : (
+                      <span title={row.name} {...stylex.props(styles.name)}>
+                        {row.name}
+                      </span>
                     )}
-                  >
-                    {row.name}
-                  </AppLink>
-                ) : (
-                  <span title={row.name} {...stylex.props(styles.name)}>
-                    {row.name}
-                  </span>
-                )}
-                {row.metadata ? (
-                  <span title={row.metadata} {...stylex.props(styles.metadata)}>
-                    {row.metadata}
-                  </span>
-                ) : null}
+                    {row.metadata ? (
+                      <span
+                        title={row.metadata}
+                        {...stylex.props(styles.metadata)}
+                      >
+                        {row.metadata}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </th>
               {row.values.map((value, index) => (
                 <td key={index} {...stylex.props(styles.valueCell)}>
@@ -220,6 +230,16 @@ const styles = stylex.create({
       paddingRight: 0,
       paddingBottom: space.x3,
     },
+  },
+  identity: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x3,
+  },
+  copy: {
+    minWidth: 0,
+    flex: 1,
   },
   name: {
     display: "block",

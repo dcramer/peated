@@ -62,6 +62,7 @@ export function toBottleTableRow(
   return {
     href: `/bottles/${bottle.id}`,
     id: bottle.peatedId,
+    imageUrl: bottle.imageUrl,
     metadata,
     name: formatBottleDisplayName(bottle),
     values: [

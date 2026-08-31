@@ -161,6 +161,7 @@ export function RailList({
 export type RailListItemProps = {
   end?: ReactNode;
   href?: string;
+  leading?: ReactNode;
   metadata?: string;
   title: string;
 };
@@ -168,12 +169,14 @@ export type RailListItemProps = {
 export function RailListItem({
   end,
   href,
+  leading,
   metadata,
   title,
 }: RailListItemProps) {
   return (
     <ItemListItem>
       <div {...stylex.props(styles.railRow)}>
+        {leading}
         <div {...stylex.props(styles.railCopy)}>
           {href ? (
             <AppLink

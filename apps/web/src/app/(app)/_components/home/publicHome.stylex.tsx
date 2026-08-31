@@ -152,6 +152,7 @@ function LatestReleases() {
       : [
           {
             href: `/bottles/${bottle.id}`,
+            imageUrl: bottle.imageUrl,
             metadata: getReleaseMetadata(bottle),
             name: formatBottleDisplayName(bottle),
           },
@@ -383,6 +384,7 @@ function RecentBottles({ totalBottles }: { totalBottles?: number }) {
     <HomeRecentBottles
       bottles={bottles.data.results.map((bottle) => ({
         href: `/bottles/${bottle.id}`,
+        imageUrl: bottle.imageUrl,
         metadata: getBottleMetadata(bottle),
         name: formatBottleDisplayName(bottle),
       }))}

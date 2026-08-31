@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import {
   AppLink,
   BottleRatings,
+  BottleVisual,
   Card,
   CardActionLink,
   CardLink,
@@ -48,6 +49,7 @@ function HomeModuleHeading({
 export type HomeRatedBottle = {
   bandCounts: TastingRatingCounts;
   href: string;
+  imageUrl?: string | null;
   metadata: readonly string[];
   name: string;
   scoreCount: number;
@@ -93,6 +95,7 @@ export function HomeHighestRated({
               }
               href={bottle.href}
               key={bottle.href}
+              leading={<BottleVisual imageUrl={bottle.imageUrl} />}
               metadata={bottle.metadata.join(" · ")}
               title={bottle.name}
             />
@@ -105,6 +108,7 @@ export function HomeHighestRated({
 
 export type HomeRelease = {
   href: string;
+  imageUrl?: string | null;
   metadata: ReactNode;
   name: string;
 };
@@ -135,6 +139,7 @@ export function HomeLatestReleases({
             <ItemRow
               href={bottle.href}
               key={bottle.href}
+              leading={<BottleVisual imageUrl={bottle.imageUrl} />}
               metadata={bottle.metadata}
               metadataWrap
               title={bottle.name}
@@ -427,6 +432,7 @@ export function HomeDistilleries({
 
 export type HomeRecentBottle = {
   href: string;
+  imageUrl?: string | null;
   metadata: readonly string[];
   name: string;
 };
@@ -454,6 +460,7 @@ export function HomeRecentBottles({
             <ItemRow
               href={bottle.href}
               key={bottle.href}
+              leading={<BottleVisual imageUrl={bottle.imageUrl} size="sm" />}
               metadata={bottle.metadata.join(" · ")}
               size="sm"
               title={bottle.name}

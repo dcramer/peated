@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import {
   BottleComparisonTable,
   type BottleComparisonTableProps,
@@ -11,6 +12,7 @@ const rows: BottleComparisonTableProps["rows"] = [
   {
     href: "/bottles/1",
     id: "1",
+    imageUrl: BottleImage.src,
     metadata: "Islay · 10 years · 46% ABV",
     name: "Port Charlotte 10 Year Old",
     values: [
