@@ -1,4 +1,4 @@
-type EntitySiblingCandidate = { id: number };
+type EntitySiblingCandidate = { id: number; kind: string };
 type EntitySiblingList<T extends EntitySiblingCandidate> = {
   results: readonly T[];
 };
@@ -9,7 +9,11 @@ export function getEntitySiblings<T extends EntitySiblingCandidate>(
 ) {
   return (
     siblingList?.results
-      .filter((sibling) => sibling.id !== entityId)
+      .filter(
+        (sibling) =>
+          sibling.id !== entityId &&
+          (sibling.kind === "distillery" || sibling.kind === "bottler"),
+      )
       .slice(0, 4) ?? []
   );
 }

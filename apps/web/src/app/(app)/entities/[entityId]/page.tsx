@@ -26,6 +26,7 @@ export default async function EntityPage(props: {
       entity.ownerId
         ? client.entities
             .list({
+              kinds: ["distillery", "bottler"],
               limit: 5,
               owner: entity.ownerId,
               sort: "-bottles",

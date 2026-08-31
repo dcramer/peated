@@ -12,23 +12,48 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 import type { Entity } from "./entityPageData";
 
 type EntityCatalog = Outputs["entities"]["catalog"];
-type RelatedEntity = EntityCatalog["related"]["brands"][number];
+type RelatedEntity =
+  | EntityCatalog["related"]["bottlers"][number]
+  | EntityCatalog["related"]["distillers"][number];
 
 function getRelationshipGroup(entity: Entity, catalog?: EntityCatalog) {
   if (!catalog) return null;
 
-  const candidates: Array<{
+  const groups: {
     heading: string;
+    itemLabel: string;
     items: RelatedEntity[];
-  }> =
-    entity.kind === "brand"
+  }[] =
+    entity.kind === "distillery"
       ? [
-          { heading: "Distillers", items: catalog.related.distillers },
-          { heading: "Bottlers", items: catalog.related.bottlers },
+          {
+            heading: "Bottled by",
+            itemLabel: "bottlers",
+            items: catalog.related.bottlers,
+          },
         ]
-      : [{ heading: "Brands", items: catalog.related.brands }];
+      : entity.kind === "brand"
+        ? [
+            {
+              heading: "Distilled at",
+              itemLabel: "distilleries",
+              items: catalog.related.distillers,
+            },
+            {
+              heading: "Bottled by",
+              itemLabel: "bottlers",
+              items: catalog.related.bottlers,
+            },
+          ]
+        : [
+            {
+              heading: "Distilled at",
+              itemLabel: "distilleries",
+              items: catalog.related.distillers,
+            },
+          ];
 
-  return candidates.find((candidate) => candidate.items.length > 0) ?? null;
+  return groups.find((group) => group.items.length) ?? null;
 }
 
 export function EntityCatalogRelationships({
@@ -46,28 +71,39 @@ export function EntityCatalogRelationships({
 }) {
   if (entity.kind === "company") return null;
 
+  const group = getRelationshipGroup(entity, catalog);
+  const state =
+    group ??
+    (entity.kind === "brand"
+      ? {
+          heading: "Distilleries and bottlers",
+          itemLabel: "distilleries and bottlers",
+        }
+      : entity.kind === "distillery"
+        ? { heading: "Bottled by", itemLabel: "bottlers" }
+        : { heading: "Distilled at", itemLabel: "distilleries" });
+
   if (pending) {
     return (
-      <PageSection heading="Related brands and producers">
-        <LoadingList label="Loading related brands and producers" rows={3} />
+      <PageSection heading={state.heading}>
+        <LoadingList label={`Loading ${state.itemLabel}`} rows={3} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading="Related brands and producers">
+      <PageSection heading={state.heading}>
         <SectionError
-          heading="Related brands and producers are unavailable"
+          heading={`Could not load ${state.itemLabel}`}
           onRetry={retry}
         >
-          Try loading the related brands and producers again.
+          Try again.
         </SectionError>
       </PageSection>
     );
   }
 
-  const group = getRelationshipGroup(entity, catalog);
   if (!group) return null;
 
   return (
@@ -78,7 +114,6 @@ export function EntityCatalogRelationships({
             end={related.count.toLocaleString("en-US")}
             href={getEntityUrl(related)}
             key={related.id}
-            metadata={related.kind === "brand" ? "Bottle brand" : undefined}
             title={related.shortName || related.name}
           />
         ))}

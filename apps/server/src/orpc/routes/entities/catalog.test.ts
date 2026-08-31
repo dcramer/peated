@@ -10,11 +10,26 @@ describe("GET /entities/:entity/catalog", () => {
       name: "Summary Entity",
       kind: "distillery",
     });
-    const alphaBrand = await fixtures.Entity({ name: "Alpha Brand" });
-    const betaBrand = await fixtures.Entity({ name: "Beta Brand" });
-    const outsideBottler = await fixtures.Entity({ name: "Outside Bottler" });
-    const sourceA = await fixtures.Entity({ name: "Source A" });
-    const sourceB = await fixtures.Entity({ name: "Source B" });
+    const alphaBrand = await fixtures.Entity({
+      name: "Alpha Brand",
+      kind: "brand",
+    });
+    const betaBrand = await fixtures.Entity({
+      name: "Beta Brand",
+      kind: "brand",
+    });
+    const outsideBottler = await fixtures.Entity({
+      name: "Outside Bottler",
+      kind: "bottler",
+    });
+    const sourceA = await fixtures.Entity({
+      name: "Source A",
+      kind: "distillery",
+    });
+    const sourceB = await fixtures.Entity({
+      name: "Source B",
+      kind: "distillery",
+    });
 
     await fixtures.Bottle({
       name: "Overlapping Roles",
@@ -82,7 +97,7 @@ describe("GET /entities/:entity/catalog", () => {
             id: outsideBottler.id,
             name: "Outside Bottler",
             shortName: null,
-            kind: "brand",
+            kind: "bottler",
             count: 1,
           },
         ],
@@ -91,14 +106,14 @@ describe("GET /entities/:entity/catalog", () => {
             id: sourceA.id,
             name: "Source A",
             shortName: null,
-            kind: "brand",
+            kind: "distillery",
             count: 1,
           },
           {
             id: sourceB.id,
             name: "Source B",
             shortName: null,
-            kind: "brand",
+            kind: "distillery",
             count: 1,
           },
         ],
@@ -123,6 +138,38 @@ describe("GET /entities/:entity/catalog", () => {
           medianScore: null,
         },
       ],
+    });
+  });
+
+  test("excludes related Entities whose kind does not match their Bottle relationship", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const brandUsedAsBottler = await fixtures.Entity({
+      name: "Brand Used as Bottler",
+      kind: "brand",
+    });
+    const bottlerUsedAsBrand = await fixtures.Entity({
+      name: "Bottler Used as Brand",
+      kind: "bottler",
+    });
+    const brandUsedAsDistiller = await fixtures.Entity({
+      name: "Brand Used as Distiller",
+      kind: "brand",
+    });
+
+    await fixtures.Bottle({
+      brandId: bottlerUsedAsBrand.id,
+      bottlerId: brandUsedAsBottler.id,
+      distillerIds: [entity.id, brandUsedAsDistiller.id],
+    });
+
+    const data = await routerClient.entities.catalog({ entity: entity.id });
+
+    expect(data.related).toEqual({
+      brands: [],
+      bottlers: [],
+      distillers: [],
     });
   });
 
