@@ -80,7 +80,9 @@ const styles = stylex.create({
     position: "relative",
     display: "block",
     borderRadius: controlMetrics.radius,
-    objectFit: "cover",
+    backgroundColor: colors.imageBackground,
+    objectFit: "contain",
+    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
   },
   maxLevelImage: {
     boxShadow: `inset 0 0 0 1px ${colors.accent}`,

@@ -317,7 +317,14 @@ function ResultVisual({
   visual: NonNullable<SearchResultItem["visual"]>;
 }) {
   return (
-    <span aria-label={visual.label} role="img" {...stylex.props(styles.visual)}>
+    <span
+      aria-label={visual.label}
+      role="img"
+      {...stylex.props(
+        styles.visual,
+        Boolean(visual.imageUrl) && styles.visualWithImage,
+      )}
+    >
       {visual.imageUrl ? (
         <img
           alt=""
@@ -552,6 +559,10 @@ const styles = stylex.create({
     fontFamily: fonts.display,
     fontSize: "11px",
     fontWeight: 700,
+  },
+  visualWithImage: {
+    backgroundColor: colors.imageBackground,
+    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
   },
   visualImage: {
     display: "block",

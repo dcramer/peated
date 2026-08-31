@@ -483,7 +483,10 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: space.x3,
     padding: space.x3,
-    backgroundColor: colors.inset,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    backgroundColor: "transparent",
   },
   setupStepName: {
     color: colors.ink,

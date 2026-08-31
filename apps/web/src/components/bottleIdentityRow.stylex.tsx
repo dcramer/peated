@@ -35,7 +35,11 @@ export function BottleVisual({
       aria-hidden={label ? undefined : "true"}
       aria-label={label}
       role={label ? "img" : undefined}
-      {...stylex.props(styles.visual, visualSizeStyles[size])}
+      {...stylex.props(
+        styles.visual,
+        Boolean(imageUrl) && styles.imageVisual,
+        visualSizeStyles[size],
+      )}
     >
       {imageUrl ? (
         <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
@@ -169,6 +173,10 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: "transparent",
     color: colors.inkMuted,
+  },
+  imageVisual: {
+    backgroundColor: colors.imageBackground,
+    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
   },
   visualSmall: {
     width: "32px",

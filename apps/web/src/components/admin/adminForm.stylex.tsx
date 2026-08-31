@@ -352,9 +352,9 @@ const styles = stylex.create({
   },
   error: {
     padding: space.x4,
-    borderLeftWidth: "3px",
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.accentDeep,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.criticalQuiet,
     backgroundColor: colors.accentTint,
     color: colors.ink,
     fontFamily: fonts.reading,

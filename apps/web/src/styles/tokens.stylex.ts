@@ -80,6 +80,7 @@ export const colors = stylex.defineVars({
     default: "rgb(255 255 255 / 0.55)",
     [DARK]: "rgb(255 255 255 / 0.04)",
   },
+  imageBackground: "#ffffff",
   critical: { default: "#a3231a", [DARK]: "#f0776b" },
   criticalQuiet: {
     default: "rgb(163 35 26 / 0.42)",
@@ -121,6 +122,7 @@ export const lightColorTheme = stylex.createTheme(colors, {
   dividerOnPanel: "rgb(22 25 20 / 0.14)",
   fieldRule: "rgb(22 25 20 / 0.28)",
   fieldBackground: "rgb(255 255 255 / 0.55)",
+  imageBackground: "#ffffff",
   critical: "#a3231a",
   criticalQuiet: "rgb(163 35 26 / 0.42)",
   dataRange: "rgb(22 25 20 / 0.45)",
@@ -156,6 +158,7 @@ export const darkColorTheme = stylex.createTheme(colors, {
   dividerOnPanel: "rgb(232 234 227 / 0.15)",
   fieldRule: "rgb(232 234 227 / 0.32)",
   fieldBackground: "rgb(255 255 255 / 0.04)",
+  imageBackground: "#ffffff",
   critical: "#f0776b",
   criticalQuiet: "rgb(240 119 107 / 0.42)",
   dataRange: "rgb(232 234 227 / 0.45)",

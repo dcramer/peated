@@ -60,10 +60,14 @@ const styles = stylex.create({
   },
   primaryImage: {
     aspectRatio: "16 / 10",
-    backgroundColor: colors.inset,
+    boxSizing: "border-box",
+    backgroundColor: colors.imageBackground,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
     borderRadius: "3px",
     display: "block",
-    objectFit: "cover",
+    objectFit: "contain",
     width: "100%",
   },
   secondaryGrid: {
@@ -77,10 +81,14 @@ const styles = stylex.create({
   },
   secondaryImage: {
     aspectRatio: "4 / 3",
-    backgroundColor: colors.inset,
+    boxSizing: "border-box",
+    backgroundColor: colors.imageBackground,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
     borderRadius: "3px",
     display: "block",
-    objectFit: "cover",
+    objectFit: "contain",
     width: "100%",
   },
   caption: {

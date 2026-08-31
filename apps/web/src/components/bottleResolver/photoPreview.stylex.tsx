@@ -95,7 +95,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: colors.hairline,
     borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.inset,
+    backgroundColor: colors.imageBackground,
     "@media (max-width: 559px)": {
       width: "64px",
       height: "80px",
@@ -105,9 +105,8 @@ const styles = stylex.create({
     width: "100%",
     height: "min(52vw, 360px)",
     minHeight: "260px",
-    borderWidth: 0,
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.inset,
+    backgroundColor: colors.imageBackground,
     "@media (max-width: 559px)": {
       width: "100%",
       height: "260px",

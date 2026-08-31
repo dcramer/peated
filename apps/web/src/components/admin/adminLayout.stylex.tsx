@@ -148,10 +148,7 @@ const styles = stylex.create({
     justifyContent: "space-between",
     paddingRight: space.x3,
     paddingLeft: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.ground,
     [WIDE]: { display: "none" },
   },
   mobileBrand: {
@@ -220,10 +217,7 @@ const styles = stylex.create({
     paddingBottom: space.x6,
     paddingLeft: space.x4,
     overflowY: "auto",
-    borderRightWidth: "1px",
-    borderRightStyle: "solid",
-    borderRightColor: colors.hairline,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.ground,
     [COMPACT]: { display: "none" },
   },
   brand: {

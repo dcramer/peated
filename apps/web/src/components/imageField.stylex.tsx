@@ -130,7 +130,9 @@ const ImageField = forwardRef<HTMLInputElement, Props>(function ImageField(
       optional={!required}
       required={required}
     >
-      <div {...stylex.props(styles.frame)}>
+      <div
+        {...stylex.props(styles.frame, Boolean(preview) && styles.previewFrame)}
+      >
         {preview ? (
           <img
             alt="Image preview"
@@ -289,6 +291,10 @@ const styles = stylex.create({
     borderStyle: "dashed",
     borderColor: colors.hairline,
     backgroundColor: colors.inset,
+  },
+  previewFrame: {
+    borderStyle: "solid",
+    backgroundColor: colors.imageBackground,
   },
   preview: {
     display: "block",
