@@ -781,7 +781,7 @@ describe("GET /bottles", () => {
     expect(results[1].id).toBe(bottle1.id);
   });
 
-  test("requires a release year and orders year-only releases by creation time", async ({
+  test("sorts known releases first and undated bottles last", async ({
     fixtures,
   }) => {
     const earlierAddition = await fixtures.Bottle({
@@ -794,7 +794,7 @@ describe("GET /bottles", () => {
       releaseYear: 2026,
       createdAt: new Date("2026-06-01T00:00:00.000Z"),
     });
-    await fixtures.Bottle({
+    const undated = await fixtures.Bottle({
       name: "Recently Added",
       createdAt: new Date("2027-01-01T00:00:00.000Z"),
     });
@@ -806,8 +806,9 @@ describe("GET /bottles", () => {
     expect(results.map(({ id }) => id)).toEqual([
       laterAddition.id,
       earlierAddition.id,
+      undated.id,
     ]);
-    expect(total).toBe(2);
+    expect(total).toBe(3);
   });
 
   test("requires authentication for followed entity releases", async () => {
@@ -878,7 +879,7 @@ describe("GET /bottles", () => {
       releaseYear: 2026,
       createdAt: new Date("2026-07-01T00:00:00.000Z"),
     });
-    await fixtures.Bottle({
+    const addedThisYear = await fixtures.Bottle({
       name: "Added This Year",
       distillerIds: [distiller.id],
       createdAt: new Date("2026-09-01T00:00:00.000Z"),
@@ -889,7 +890,7 @@ describe("GET /bottles", () => {
       releaseYear: 2025,
       createdAt: new Date("2026-08-15T00:00:00.000Z"),
     });
-    await fixtures.Bottle({
+    const addedLastYear = await fixtures.Bottle({
       name: "Added Last Year",
       distillerIds: [distiller.id],
       createdAt: new Date("2025-12-01T00:00:00.000Z"),
@@ -921,6 +922,8 @@ describe("GET /bottles", () => {
       exactEarlierThisYear.id,
       yearOnlyThisYear.id,
       knownLastYear.id,
+      addedThisYear.id,
+      addedLastYear.id,
     ]);
     expect(followedEntityCount).toBe(3);
   });

@@ -27,7 +27,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 
 import { BottleCatalogNavigation } from "./bottleCatalogNavigation.stylex";
 
-const DEFAULT_SORT = "-tastings";
+const DEFAULT_SORT = "-release";
 
 type BottleList = Outputs["bottles"]["list"];
 
@@ -85,6 +85,7 @@ export function BottleCatalogPageClient({
   const searchParams = useSearchParams();
   const queryParams = normalizeBottleCatalogQueryParams(
     useApiQueryParams({
+      defaults: { sort: DEFAULT_SORT },
       allowedValues: BOTTLE_CATALOG_ALLOWED_VALUES,
       fields: BOTTLE_CATALOG_QUERY_FIELDS,
       numericFields: [
