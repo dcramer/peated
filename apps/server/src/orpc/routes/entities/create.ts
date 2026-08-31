@@ -11,8 +11,8 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import {
-  DuplicateEntityAliasError,
-  upsertEntityAliases,
+  EntityReferenceConflictError,
+  upsertEntityReferences,
 } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
@@ -101,9 +101,9 @@ export default implement(contract)
       }
 
       try {
-        await upsertEntityAliases({ db: tx, entity });
+        await upsertEntityReferences({ db: tx, entity });
       } catch (err) {
-        if (err instanceof DuplicateEntityAliasError) {
+        if (err instanceof EntityReferenceConflictError) {
           throw errors.CONFLICT({ message: err.message, cause: err });
         }
         throw err;

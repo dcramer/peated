@@ -604,7 +604,7 @@ function sanitizeResolvedEntityChoice(
   const matchedNames = [
     resolvedEntity.name,
     resolvedEntity.shortName,
-    resolvedEntity.alias,
+    resolvedEntity.reference,
   ]
     .filter((name): name is string => Boolean(name))
     .map(normalizeEntityChoiceName);

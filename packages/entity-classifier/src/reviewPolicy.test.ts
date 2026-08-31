@@ -1,14 +1,14 @@
 import { describe, expect, test } from "vitest";
-import type { EntityClassificationReference } from "./classifierTypes";
+import type { EntityClassificationContext } from "./classifierTypes";
 import { buildEntityClassificationArtifacts } from "./contract";
 import { finalizeEntityClassification } from "./reviewPolicy";
 
-const reference: EntityClassificationReference = {
+const context: EntityClassificationContext = {
   entity: {
     id: 1,
     name: "Canadian",
     shortName: null,
-    aliases: [],
+    otherNames: [],
     kind: "brand",
     website: null,
     countryName: null,
@@ -31,7 +31,7 @@ const reference: EntityClassificationReference = {
       entityId: 2,
       name: "Canadian Club",
       shortName: null,
-      aliases: [],
+      otherNames: [],
       kind: "brand",
       website: "https://www.canadianclub.com/",
       score: null,
@@ -47,7 +47,7 @@ const reference: EntityClassificationReference = {
 describe("finalizeEntityClassification", () => {
   test("uses the known name for a brand-assignment target", () => {
     const result = finalizeEntityClassification({
-      reference,
+      context,
       artifacts: buildEntityClassificationArtifacts({}),
       advice: {
         kind: "brand_assignment_issue",
@@ -65,7 +65,7 @@ describe("finalizeEntityClassification", () => {
 
   test("uses insufficient evidence for an unknown target id", () => {
     const result = finalizeEntityClassification({
-      reference,
+      context,
       artifacts: buildEntityClassificationArtifacts({}),
       advice: {
         kind: "possible_duplicate",
@@ -84,7 +84,7 @@ describe("finalizeEntityClassification", () => {
 
   test("requires an evidence URL for metadata advice", () => {
     const result = finalizeEntityClassification({
-      reference,
+      context,
       artifacts: buildEntityClassificationArtifacts({}),
       advice: {
         kind: "metadata_issue",
@@ -102,7 +102,7 @@ describe("finalizeEntityClassification", () => {
 
   test("removes a target from advice that does not use one", () => {
     const result = finalizeEntityClassification({
-      reference,
+      context,
       artifacts: buildEntityClassificationArtifacts({}),
       advice: {
         kind: "no_issue",
@@ -120,7 +120,7 @@ describe("finalizeEntityClassification", () => {
 
   test("removes evidence URLs that the server did not collect", () => {
     const result = finalizeEntityClassification({
-      reference,
+      context,
       artifacts: buildEntityClassificationArtifacts({}),
       advice: {
         kind: "possible_duplicate",

@@ -15,7 +15,7 @@ import {
   getBottleReferenceMigrationReport,
   parseBottleReferenceMigrationReport,
 } from "@peated/server/lib/bottleReferenceMigrationAudit";
-import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
+import { findEntityByExactNameOrReference } from "@peated/server/lib/db";
 import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
 import { fixBadExternalReviewEntities } from "@peated/server/lib/fixBadExternalReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
@@ -35,7 +35,7 @@ async function resolveEntityReference(
     ? await db.query.entities.findFirst({
         where: eq(entities.id, Number.parseInt(value, 10)),
       })
-    : await findEntityByExactNameOrAlias(db, value);
+    : await findEntityByExactNameOrReference(db, value);
 
   if (!entity) {
     throw new Error(`${label} not found: ${value}`);

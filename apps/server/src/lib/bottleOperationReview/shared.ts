@@ -7,7 +7,7 @@ import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { countries, entities, regions } from "@peated/server/db/schema";
 import type { BottlePatch } from "@peated/server/lib/bottleSchemas";
-import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
+import { findEntityByExactNameOrReference } from "@peated/server/lib/db";
 import type {
   BottleUpdateExpectedSelectedBottleState,
   BottleUpdateExpectedSharedState,
@@ -420,7 +420,7 @@ export async function requireNoEntityIdentityCollision({
 }) {
   for (const rawName of names) {
     if (!rawName?.trim()) continue;
-    const found = await findEntityByExactNameOrAlias(database, rawName);
+    const found = await findEntityByExactNameOrReference(database, rawName);
     if (found && found.id !== entityId) {
       fail(
         "identity_collision",

@@ -20,15 +20,15 @@ describe("entity classifier contract", () => {
     ).toEqual({ query: "Compass Box", kind: "bottler", limit: 5 });
   });
 
-  test("parses a suspect entity reference", () => {
+  test("parses Entity classifier context", () => {
     expect(
       ClassifyEntityInputSchema.parse({
-        reference: {
+        context: {
           entity: {
             id: 1,
             name: "Canadian",
             shortName: null,
-            aliases: ["Canadian"],
+            otherNames: ["Canadian"],
             kind: "brand",
             website: "https://www.canadianwhisky.org/",
             countryName: "Canada",
@@ -57,7 +57,7 @@ describe("entity classifier contract", () => {
               entityId: 2,
               name: "Canadian Club",
               shortName: null,
-              aliases: ["Canadian Club"],
+              otherNames: ["Canadian Club"],
               kind: "brand",
               website: "https://www.canadianclub.com/",
               score: null,

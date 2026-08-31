@@ -42,15 +42,15 @@ function formatSearchAbv(abv: number | null | undefined) {
 
 export function buildEntitySearchVector(
   entity: NewEntity,
-  aliasList?: { name: string }[],
+  alternateNames?: { name: string }[],
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(entity.name, "A"),
     ...(entity.shortName ? [new TSVector(entity.shortName, "A")] : []),
   ];
-  aliasList
-    ?.filter((a) => a.name !== entity.name)
-    .forEach((a) => values.push(new TSVector(a.name, "B")));
+  alternateNames
+    ?.filter(({ name }) => name !== entity.name)
+    .forEach(({ name }) => values.push(new TSVector(name, "B")));
   return values;
 }
 

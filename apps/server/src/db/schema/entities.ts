@@ -179,8 +179,8 @@ export type NewEntity = typeof entities.$inferInsert;
 export type EntityImage = typeof entityImages.$inferSelect;
 export type NewEntityImage = typeof entityImages.$inferInsert;
 
-export const entityAliases = pgTable(
-  "entity_alias",
+export const entityReferences = pgTable(
+  "entity_reference",
   {
     entityId: bigint("entity_id", { mode: "number" }).references(
       () => entities.id,
@@ -189,11 +189,52 @@ export const entityAliases = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    index("entity_alias_entity_idx").on(table.entityId),
-    uniqueIndex("entity_alias_name_idx").using(
+    index("entity_reference_entity_idx").on(table.entityId),
+    uniqueIndex("entity_reference_name_idx").using(
       "btree",
       sql`LOWER(${table.name})`,
     ),
+  ],
+);
+
+export const entityReferencesRelations = relations(
+  entityReferences,
+  ({ one }) => ({
+    entity: one(entities, {
+      fields: [entityReferences.entityId],
+      references: [entities.id],
+    }),
+  }),
+);
+
+export type EntityReference = typeof entityReferences.$inferSelect;
+export type NewEntityReference = typeof entityReferences.$inferInsert;
+
+export const entityAliases = pgTable(
+  "entity_alias",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: bigint("entity_id", { mode: "number" })
+      .references(() => entities.id, { onDelete: "cascade" })
+      .notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    // Keep the displayed spelling and use this value to reject duplicates.
+    normalizedName: varchar("normalized_name", { length: 255 }).notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    })
+      .references(() => actors.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("entity_alias_entity_normalized_name_idx").on(
+      table.entityId,
+      table.normalizedName,
+    ),
+    index("entity_alias_entity_idx").on(table.entityId),
+    index("entity_alias_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
 
@@ -201,6 +242,10 @@ export const entityAliasesRelations = relations(entityAliases, ({ one }) => ({
   entity: one(entities, {
     fields: [entityAliases.entityId],
     references: [entities.id],
+  }),
+  createdByActor: one(actors, {
+    fields: [entityAliases.createdByActorId],
+    references: [actors.id],
   }),
 }));
 

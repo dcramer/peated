@@ -6,7 +6,7 @@ import {
   bottlesToDistillers,
   bottleTombstones,
   entities,
-  entityAliases,
+  entityReferences,
 } from "@peated/server/db/schema";
 import {
   and,
@@ -19,7 +19,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import { type AnyPgColumn, alias } from "drizzle-orm/pg-core";
+import { alias as tableAlias, type AnyPgColumn } from "drizzle-orm/pg-core";
 
 const MAX_PREFIX_WORDS = 8;
 const MAX_SCAN_LIMIT = 2000;
@@ -193,7 +193,7 @@ type RankedTargetCandidate = {
   targetBrand: CandidateBrand;
 };
 
-const referenceBottles = alias(bottles, "brand_repair_reference_bottle");
+const referenceBottles = tableAlias(bottles, "brand_repair_reference_bottle");
 
 function activeBottleConditions(bottle: {
   groupId: AnyPgColumn;
@@ -693,14 +693,14 @@ async function getCandidateBottles({
       db
         .select({ id: entities.id })
         .from(entities)
-        .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+        .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
         .where(
           and(
             activeBrandUseCondition(),
             or(
               ilike(entities.name, `%${query}%`),
               ilike(sql`COALESCE(${entities.shortName}, '')`, `%${query}%`),
-              ilike(sql`COALESCE(${entityAliases.name}, '')`, `%${query}%`),
+              ilike(sql`COALESCE(${entityReferences.name}, '')`, `%${query}%`),
             ),
           ),
         )
@@ -808,11 +808,11 @@ async function collectBrandRepairCandidates({
       getSupportingReferenceMembership(candidateBottleIds),
       db
         .select({
-          alias: entityAliases.name,
+          reference: entityReferences.name,
           brand: entities,
         })
         .from(entities)
-        .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+        .leftJoin(entityReferences, eq(entityReferences.entityId, entities.id))
         .where(or(eq(entities.kind, "brand"), activeBrandUseCondition())),
       db
         .selectDistinct({ entityId: bottlesToDistillers.distillerId })
@@ -850,11 +850,11 @@ async function collectBrandRepairCandidates({
   const allBrandsById = new Map<number, CandidateBrand>();
   const brandNameIndex = new Map<string, BrandNameEntry[]>();
   const brandNamesById = new Map<number, BrandNameEntry[]>();
-  for (const { alias, brand } of brandRows) {
+  for (const { reference, brand } of brandRows) {
     allBrandsById.set(brand.id, brand);
     registerBrandName(brandNameIndex, brandNamesById, brand, brand.name);
     registerBrandName(brandNameIndex, brandNamesById, brand, brand.shortName);
-    registerBrandName(brandNameIndex, brandNamesById, brand, alias);
+    registerBrandName(brandNameIndex, brandNamesById, brand, reference);
   }
 
   const results: BrandRepairCandidateInternal[] = [];

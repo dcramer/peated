@@ -1,6 +1,6 @@
 import type {
   EntityClassificationAdvice,
-  EntityClassificationReference,
+  EntityClassificationContext,
 } from "./classifierTypes";
 import type { EntityClassificationArtifacts } from "./contract";
 
@@ -21,11 +21,11 @@ function insufficientEvidenceAdvice({
 
 function isKnownTarget({
   targetEntityId,
-  reference,
+  context,
   artifacts,
 }: {
   targetEntityId: number | null;
-  reference: EntityClassificationReference;
+  context: EntityClassificationContext;
   artifacts: EntityClassificationArtifacts;
 }) {
   if (targetEntityId === null) {
@@ -33,7 +33,7 @@ function isKnownTarget({
   }
 
   return (
-    reference.candidateTargets.some(
+    context.candidateTargets.some(
       (target) => target.entityId === targetEntityId,
     ) ||
     artifacts.resolvedEntities.some(
@@ -43,13 +43,13 @@ function isKnownTarget({
 }
 
 function getKnownEvidenceUrls(
-  reference: EntityClassificationReference,
+  context: EntityClassificationContext,
   artifacts: EntityClassificationArtifacts,
 ) {
   return new Set(
     [
-      reference.entity.website,
-      ...reference.candidateTargets.map((target) => target.website),
+      context.entity.website,
+      ...context.candidateTargets.map((target) => target.website),
       ...artifacts.searchEvidence.flatMap((evidence) =>
         evidence.results.map((result) => result.url),
       ),
@@ -58,15 +58,15 @@ function getKnownEvidenceUrls(
 }
 
 export function finalizeEntityClassification({
-  reference,
+  context,
   advice,
   artifacts,
 }: {
-  reference: EntityClassificationReference;
+  context: EntityClassificationContext;
   advice: EntityClassificationAdvice;
   artifacts: EntityClassificationArtifacts;
 }): EntityClassificationAdvice {
-  const knownEvidenceUrls = getKnownEvidenceUrls(reference, artifacts);
+  const knownEvidenceUrls = getKnownEvidenceUrls(context, artifacts);
   const reviewedAdvice = {
     ...advice,
     evidenceUrls: advice.evidenceUrls.filter((url) =>
@@ -88,7 +88,7 @@ export function finalizeEntityClassification({
     if (
       !isKnownTarget({
         targetEntityId: reviewedAdvice.targetEntityId,
-        reference,
+        context,
         artifacts,
       })
     ) {

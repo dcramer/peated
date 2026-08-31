@@ -45,7 +45,7 @@ describe("POST /entities/{entity}/classify", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Entity not found.]`);
   });
 
-  test("runs the classifier against the reconstructed entity reference", async ({
+  test("runs the classifier with server-built context", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -91,11 +91,11 @@ describe("POST /entities/{entity}/classify", () => {
       targetEntityId: canadianClub.id,
     });
     expect(classifyEntity).toHaveBeenCalledWith({
-      reference: expect.objectContaining({
+      context: expect.objectContaining({
         entity: expect.objectContaining({
           id: currentBrand.id,
           name: "Canadian",
-          aliases: expect.arrayContaining(["Canadian"]),
+          otherNames: expect.arrayContaining(["Canadian"]),
         }),
         reasons: expect.arrayContaining([
           expect.objectContaining({

@@ -4,6 +4,6 @@ import list from "./list";
 
 export default {
   create,
-  list,
   delete: delete_,
+  list,
 };

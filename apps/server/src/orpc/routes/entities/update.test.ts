@@ -5,7 +5,7 @@ import {
   bottles,
   changes,
   entities,
-  entityAliases,
+  entityReferences,
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
@@ -499,10 +499,10 @@ describe("PATCH /entities/:entity", () => {
 
     expect(newOtherBottle.fullName).toEqual(otherBottle.fullName);
 
-    const shortNameAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "F"),
+    const shortNameReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "F"),
     });
-    expect(shortNameAlias?.entityId).toEqual(entity.id);
+    expect(shortNameReference?.entityId).toEqual(entity.id);
   });
 
   test("name change preserves brand Bottle references when short name stays the same", async ({
@@ -539,20 +539,21 @@ describe("PATCH /entities/:entity", () => {
     });
     expect(preservedAlias?.bottleId).toEqual(bottle.id);
 
-    const oldEntityAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "Foo Distillery"),
+    const oldEntityReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "Foo Distillery"),
     });
-    expect(oldEntityAlias).toBeUndefined();
+    expect(oldEntityReference).toBeUndefined();
 
-    const currentEntityAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "Foo Co"),
+    const currentEntityReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "Foo Co"),
     });
-    expect(currentEntityAlias?.entityId).toEqual(entity.id);
+    expect(currentEntityReference?.entityId).toEqual(entity.id);
 
-    const preservedShortNameAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "FD"),
-    });
-    expect(preservedShortNameAlias?.entityId).toEqual(entity.id);
+    const preservedShortNameReference =
+      await db.query.entityReferences.findFirst({
+        where: eq(entityReferences.name, "FD"),
+      });
+    expect(preservedShortNameReference?.entityId).toEqual(entity.id);
   });
 
   test("rejects a rename that would claim another entity alias", async ({
@@ -564,7 +565,7 @@ describe("PATCH /entities/:entity", () => {
     const aliasOwner = await fixtures.Entity({
       name: "Alias Owner",
     });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: aliasOwner.id,
       name: "Mars Shinshu",
     });
@@ -581,7 +582,7 @@ describe("PATCH /entities/:entity", () => {
     );
 
     expect(err.message).toBe(
-      `Duplicate entity alias found (${aliasOwner.id}) for "Mars Shinshu".`,
+      `The name "Mars Shinshu" belongs to Entity ${aliasOwner.id}.`,
     );
 
     const [unchangedEntity] = await db
@@ -590,10 +591,10 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, entity.id));
     expect(unchangedEntity.name).toBe("Original Distillery");
 
-    const conflictingAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "Mars Shinshu"),
+    const conflictingReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "Mars Shinshu"),
     });
-    expect(conflictingAlias?.entityId).toBe(aliasOwner.id);
+    expect(conflictingReference?.entityId).toBe(aliasOwner.id);
   });
 
   test("changing short name retires the old entity alias", async ({
@@ -637,18 +638,18 @@ describe("PATCH /entities/:entity", () => {
     });
     expect(newBottleReference).toBeUndefined();
 
-    const oldEntityAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "F"),
+    const oldEntityReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "F"),
     });
-    expect(oldEntityAlias).toBeUndefined();
+    expect(oldEntityReference).toBeUndefined();
 
-    const newEntityAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "FC"),
+    const newEntityReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "FC"),
     });
-    expect(newEntityAlias?.entityId).toEqual(entity.id);
+    expect(newEntityReference?.entityId).toEqual(entity.id);
   });
 
-  test("clearing short name reverts brand bottle names and removes the old display alias", async ({
+  test("clearing the short name updates Bottle names and Entity references", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -677,27 +678,27 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(bottles.id, bottle.id));
     expect(updatedBottle.fullName).toEqual("Foo Bar");
 
-    const oldShortNameAlias = await db.query.bottleReferences.findFirst({
+    const oldBottleReference = await db.query.bottleReferences.findFirst({
       where: eq(bottleReferences.name, "F Bar"),
     });
-    expect(oldShortNameAlias).toMatchObject({
+    expect(oldBottleReference).toMatchObject({
       bottleId: bottle.id,
     });
 
-    const oldEntityAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "F"),
+    const oldEntityReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "F"),
     });
-    expect(oldEntityAlias).toBeUndefined();
+    expect(oldEntityReference).toBeUndefined();
 
-    const revertedAlias = await db.query.bottleReferences.findFirst({
+    const newBottleReference = await db.query.bottleReferences.findFirst({
       where: eq(bottleReferences.name, "Foo Bar"),
     });
-    expect(revertedAlias).toBeUndefined();
+    expect(newBottleReference).toBeUndefined();
 
-    const canonicalEntityAlias = await db.query.entityAliases.findFirst({
-      where: eq(entityAliases.name, "Foo"),
+    const entityReference = await db.query.entityReferences.findFirst({
+      where: eq(entityReferences.name, "Foo"),
     });
-    expect(canonicalEntityAlias?.entityId).toEqual(entity.id);
+    expect(entityReference?.entityId).toEqual(entity.id);
   });
 
   test("brand rename does not overwrite an accepted Bottle alias", async ({

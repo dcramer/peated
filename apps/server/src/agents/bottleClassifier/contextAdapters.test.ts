@@ -213,7 +213,7 @@ describe("Bottle classifier context adapters", () => {
       totalBottles: 111,
       totalTastings: 222,
     });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: entity.id,
       name: "Context Entity Alias",
     });

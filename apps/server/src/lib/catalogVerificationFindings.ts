@@ -2,7 +2,7 @@ import type { CatalogVerificationFinding } from "@peated/catalog-verifier";
 import { db } from "@peated/server/db";
 import { bottles, entities } from "@peated/server/db/schema";
 import { findBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
-import { getEntityClassificationReference } from "@peated/server/lib/entityAuditCandidates";
+import { getEntityClassificationContext } from "@peated/server/lib/entityAuditCandidates";
 import { eq } from "drizzle-orm";
 
 export async function getBottleCatalogVerificationFindings({
@@ -54,16 +54,16 @@ export async function getEntityCatalogVerificationFindings({
 }: {
   entityId: number;
 }): Promise<CatalogVerificationFinding[]> {
-  const reference = await getEntityClassificationReference({
+  const context = await getEntityClassificationContext({
     entity: entityId,
     includeManualFallback: false,
   });
 
-  if (!reference) {
+  if (!context) {
     return [];
   }
 
-  const candidateTargets = reference.candidateTargets
+  const candidateTargets = context.candidateTargets
     .map((target) => target.name)
     .slice(0, 3);
   const targetSummary =
@@ -74,9 +74,8 @@ export async function getEntityCatalogVerificationFindings({
   return [
     {
       kind: "entity_audit_candidate",
-      summary:
-        reference.reasons[0]?.summary ?? "Entity triggered audit signals.",
-      details: [reference.reasons[0]?.details ?? null, targetSummary]
+      summary: context.reasons[0]?.summary ?? "Entity triggered audit signals.",
+      details: [context.reasons[0]?.details ?? null, targetSummary]
         .filter(Boolean)
         .join(" "),
       workstream: "entity-audits",

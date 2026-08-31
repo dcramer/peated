@@ -41,7 +41,7 @@ export function getEntityClassifier() {
 
 export async function classifyEntity(input: ClassifyEntityInput) {
   return await withSentryConversation(
-    `entity:${input.reference.entity.id}`,
+    `entity:${input.context.entity.id}`,
     async () => await getEntityClassifier().classifyEntity(input),
   );
 }
@@ -50,7 +50,7 @@ export async function runEntityClassifierAgent(
   input: RunEntityClassifierAgentInput,
 ) {
   return await withSentryConversation(
-    `entity:${input.reference.entity.id}`,
+    `entity:${input.context.entity.id}`,
     async () => await getEntityClassifier().runEntityClassifierAgent(input),
   );
 }

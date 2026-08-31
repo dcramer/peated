@@ -651,11 +651,11 @@ describe("priceMatching", () => {
     });
     await fixtures.BottleReference({
       bottleId: targetBottle.id,
-      name: "Direct Bottle Alias ZXQ",
+      name: "Direct Bottle Reference ZXQ",
     });
 
     const candidates = await searchBottleCandidates({
-      query: "Direct Bottle Alias ZXQ",
+      query: "Direct Bottle Reference ZXQ",
       limit: 15,
     });
 
@@ -663,7 +663,7 @@ describe("priceMatching", () => {
       expect.arrayContaining([
         expect.objectContaining({
           bottleId: targetBottle.id,
-          reference: "Direct Bottle Alias ZXQ",
+          reference: "Direct Bottle Reference ZXQ",
           fullName: targetBottle.fullName,
           edition: "Target edition",
           source: expect.arrayContaining(["exact"]),
@@ -677,38 +677,38 @@ describe("priceMatching", () => {
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
 
-    const member = await fixtures.Bottle({ name: "Alias Scope Member" });
+    const member = await fixtures.Bottle({ name: "Reference Scope Member" });
     await fixtures.BottleReference({
       bottleId: member.id,
-      name: "Assigned Alias Scope ZXQ",
+      name: "Assigned Reference Scope ZXQ",
     });
     await fixtures.BottleReference({
       bottleId: member.id,
       ignored: true,
-      name: "Ignored Alias Scope ZXQ",
+      name: "Ignored Reference Scope ZXQ",
     });
     await fixtures.BottleReference({
       bottleId: null,
-      name: "Unresolved Alias Scope ZXQ",
+      name: "Unresolved Reference Scope ZXQ",
     });
 
     const assignedCandidates = await searchBottleCandidates({
-      query: "Assigned Alias Scope ZXQ",
+      query: "Assigned Reference Scope ZXQ",
       limit: 15,
     });
     const ignoredCandidates = await searchBottleCandidates({
-      query: "Ignored Alias Scope ZXQ",
+      query: "Ignored Reference Scope ZXQ",
       limit: 15,
     });
     const unresolvedCandidates = await searchBottleCandidates({
-      query: "Unresolved Alias Scope ZXQ",
+      query: "Unresolved Reference Scope ZXQ",
       limit: 15,
     });
 
     expect(assignedCandidates).toEqual([
       expect.objectContaining({
         bottleId: member.id,
-        reference: "Assigned Alias Scope ZXQ",
+        reference: "Assigned Reference Scope ZXQ",
         source: expect.arrayContaining(["exact"]),
       }),
     ]);
@@ -1272,7 +1272,7 @@ describe("priceMatching", () => {
 
     const brand = await fixtures.Entity({
       kind: "brand",
-      name: "Alias Preference Brand",
+      name: "Reference Preference Brand",
     });
     const literalBottle = await fixtures.Bottle({
       brandId: brand.id,
@@ -1381,7 +1381,7 @@ describe("priceMatching", () => {
         decision: {
           action: "match_existing",
           confidence: 0.88,
-          rationale: "Alias and listing details strongly match.",
+          rationale: "Reference and listing details strongly match.",
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1703,7 +1703,7 @@ describe("priceMatching", () => {
         decision: {
           action: "match_existing",
           confidence: 97,
-          rationale: "The listing exactly matches a canonical alias.",
+          rationale: "The listing exactly matches a canonical reference.",
           confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
@@ -2781,25 +2781,30 @@ describe("priceMatching", () => {
       await observer.end();
     }
 
-    const [updatedBottle, updatedPrice, updatedProposal, alias, observation] =
-      await Promise.all([
-        db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
-        db.query.storePrices.findFirst({
-          where: eq(storePrices.id, price.id),
-        }),
-        db.query.storePriceMatchProposals.findFirst({
-          where: eq(storePriceMatchProposals.id, proposal.id),
-        }),
-        db.query.bottleReferences.findFirst({
-          where: eq(
-            bottleReferences.name,
-            normalizeBottleReferenceKey(price.name),
-          ),
-        }),
-        db.query.bottleObservations.findFirst({
-          where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
-        }),
-      ]);
+    const [
+      updatedBottle,
+      updatedPrice,
+      updatedProposal,
+      reference,
+      observation,
+    ] = await Promise.all([
+      db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+      db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(price.name),
+        ),
+      }),
+      db.query.bottleObservations.findFirst({
+        where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+      }),
+    ]);
 
     expect(updatedBottle).toMatchObject({
       id: bottle.id,
@@ -2819,7 +2824,7 @@ describe("priceMatching", () => {
       reviewedById: null,
       reviewedAt: null,
     });
-    expect(alias).toBeUndefined();
+    expect(reference).toBeUndefined();
     expect(observation).toBeUndefined();
   });
 
@@ -4334,7 +4339,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("creates a Bottle when its marketed title matches another Bottle alias", async ({
+  test("creates a Bottle when its marketed title matches another Bottle reference", async ({
     fixtures,
   }) => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -4870,12 +4875,12 @@ describe("priceMatching", () => {
       .where(eq(bottles.id, mismatched.id));
     await fixtures.BottleReference({
       bottleId: mismatched.id,
-      name: "Age Ranking Mismatch Alias",
+      name: "Age Ranking Mismatch Reference",
       embedding: embeddingWithCosineSimilarity(0.9),
     });
     await fixtures.BottleReference({
       bottleId: matching.id,
-      name: "Age Ranking Matching Alias",
+      name: "Age Ranking Matching Reference",
       embedding: embeddingWithCosineSimilarity(0.72),
     });
 
@@ -5743,13 +5748,13 @@ describe("priceMatching", () => {
       name: "Canonical Bottler",
       kind: "bottler",
     });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: brand.id,
-      name: "Brand Alias",
+      name: "Brand Reference",
     });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: bottler.id,
-      name: "Bottler Alias",
+      name: "Bottler Reference",
     });
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -5806,7 +5811,7 @@ describe("priceMatching", () => {
             name: brand.name,
             shortName: brand.shortName,
             kind: brand.kind!,
-            alias: "Brand Alias",
+            reference: "Brand Reference",
             score: 1,
             source: ["exact"],
           },
@@ -5815,7 +5820,7 @@ describe("priceMatching", () => {
             name: distiller.name,
             shortName: distiller.shortName,
             kind: distiller.kind!,
-            alias: null,
+            reference: null,
             score: 1,
             source: ["exact"],
           },
@@ -5824,7 +5829,7 @@ describe("priceMatching", () => {
             name: bottler.name,
             shortName: bottler.shortName,
             kind: bottler.kind!,
-            alias: "Bottler Alias",
+            reference: "Bottler Reference",
             score: 1,
             source: ["exact"],
           },
@@ -7070,7 +7075,7 @@ describe("priceMatching", () => {
       await observer.end();
     }
 
-    const [updatedPrice, updatedProposal, alias, observation] =
+    const [updatedPrice, updatedProposal, reference, observation] =
       await Promise.all([
         db.query.storePrices.findFirst({
           where: eq(storePrices.id, price.id),
@@ -7099,7 +7104,7 @@ describe("priceMatching", () => {
       suggestedBottleId: suggestedParent.id,
       reviewedById: reviewer.id,
     });
-    expect(alias).toBeUndefined();
+    expect(reference).toBeUndefined();
     expect(observation).toMatchObject({
       bottleId: suggestedParent.id,
     });
@@ -7194,7 +7199,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("writes a reusable global alias when the decision asserts global_alias scope", async ({
+  test("writes a reusable global reference when the decision asserts global_alias scope", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -7203,7 +7208,7 @@ describe("priceMatching", () => {
     const price = await fixtures.StorePrice({
       bottleId: null,
       externalSiteId: site.id,
-      name: "Global Alias Candidate",
+      name: "Global Reference Candidate",
       volume: 750,
     });
     const [proposal] = await db
@@ -7243,7 +7248,7 @@ describe("priceMatching", () => {
     expect(observation?.bottleId).toBe(bottle.id);
   });
 
-  test("does not globalize the listing title when alias scope is none", async ({
+  test("does not globalize the listing title when reference scope is none", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -7325,7 +7330,7 @@ describe("priceMatching", () => {
     ).toBeUndefined();
   });
 
-  test("treats missing alias scope conservatively and keeps the listing title source-scoped", async ({
+  test("treats missing reference scope conservatively and keeps the listing title source-scoped", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -7367,7 +7372,7 @@ describe("priceMatching", () => {
     const bottle = await fixtures.Bottle();
     const canonicalAlias = await fixtures.BottleReference({
       bottleId: bottle.id,
-      name: "Canonical Reusable Alias",
+      name: "Canonical Reusable Reference",
       assignmentSource: "canonical",
     });
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -7400,7 +7405,7 @@ describe("priceMatching", () => {
     expect(reloadedCanonical?.ignored).toBe(false);
   });
 
-  test("keeps an existing active alias reusable when a none-scope proposal is approved", async ({
+  test("keeps an existing active reference reusable when a none-scope proposal is approved", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -7409,7 +7414,7 @@ describe("priceMatching", () => {
     const price = await fixtures.StorePrice({
       bottleId: null,
       externalSiteId: site.id,
-      name: "Existing Active Alias Listing",
+      name: "Existing Active Reference Listing",
       volume: 750,
     });
     const existingAlias = await fixtures.BottleReference({
@@ -7439,7 +7444,7 @@ describe("priceMatching", () => {
       where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
-    // A none-scope decision must not deactivate an accepted alias that already
+    // A none-scope decision must not deactivate an accepted reference that already
     // assigns this target for future exact matches.
     expect(listingAlias).toMatchObject({
       bottleId: bottle.id,
@@ -7449,7 +7454,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("does not resurrect a moderator-ignored alias when a global_alias proposal is approved", async ({
+  test("does not resurrect a moderator-ignored reference when a global_alias proposal is approved", async ({
     fixtures,
   }) => {
     const reviewer = await fixtures.User();
@@ -7458,7 +7463,7 @@ describe("priceMatching", () => {
     const price = await fixtures.StorePrice({
       bottleId: null,
       externalSiteId: site.id,
-      name: "Existing Ignored Alias Listing",
+      name: "Existing Ignored Reference Listing",
       volume: 750,
     });
     await fixtures.BottleReference({
@@ -7489,8 +7494,8 @@ describe("priceMatching", () => {
       where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
     });
 
-    // The classifier's alias scope cannot upgrade human state: a moderator
-    // deliberately ignored this alias, so approval keeps it ignored.
+    // The classifier's reference scope cannot upgrade human state: a moderator
+    // deliberately ignored this reference, so approval keeps it ignored.
     expect(listingAlias).toMatchObject({
       bottleId: bottle.id,
       ignored: true,

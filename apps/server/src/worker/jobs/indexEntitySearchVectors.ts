@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { entities, entityAliases } from "@peated/server/db/schema";
+import {
+  entities,
+  entityAliases,
+  entityReferences,
+} from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
 import { buildEntitySearchVector } from "@peated/server/lib/search";
 import { eq } from "drizzle-orm";
@@ -10,12 +14,21 @@ export default async ({ entityId }: { entityId: number }) => {
   });
   if (!entity) return;
 
-  const aliasList = await db
-    .select()
-    .from(entityAliases)
-    .where(eq(entityAliases.entityId, entity.id));
+  const [references, aliases] = await Promise.all([
+    db
+      .select({ name: entityReferences.name })
+      .from(entityReferences)
+      .where(eq(entityReferences.entityId, entity.id)),
+    db
+      .select({ name: entityAliases.name })
+      .from(entityAliases)
+      .where(eq(entityAliases.entityId, entity.id)),
+  ]);
 
-  const searchVector = buildEntitySearchVector(entity, aliasList) || null;
+  const searchVector = buildEntitySearchVector(entity, [
+    ...references,
+    ...aliases,
+  ]);
 
   logInfo("Updating search vector for entity {entityId}", {
     extra: {

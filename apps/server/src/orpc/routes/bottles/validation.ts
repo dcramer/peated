@@ -7,7 +7,7 @@ import {
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { entities, entityTombstones } from "@peated/server/db/schema";
-import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
+import { findEntityByExactNameOrReference } from "@peated/server/lib/db";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
@@ -81,7 +81,7 @@ async function getEntity(
   }
   const draft = EntityChoiceInputSchema.parse(input);
   const parsedInput = { ...draft, kind: draft.kind ?? defaultKind };
-  const existingEntity = await findEntityByExactNameOrAlias(
+  const existingEntity = await findEntityByExactNameOrReference(
     entityDb,
     parsedInput.name,
   );

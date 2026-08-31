@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { entityAliases } from "@peated/server/db/schema";
+import { entityReferences } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
@@ -12,14 +12,14 @@ describe("GET /smws/distillers", () => {
       kind: "distillery",
     });
     await db
-      .delete(entityAliases)
-      .where(eq(entityAliases.entityId, cascadeHollow.id));
+      .delete(entityReferences)
+      .where(eq(entityReferences.entityId, cascadeHollow.id));
 
     const theGlenlivet = await fixtures.Entity({
       name: "The Glenlivet",
       kind: "distillery",
     });
-    await fixtures.EntityAlias({
+    await fixtures.EntityReference({
       entityId: theGlenlivet.id,
       name: "Glenlivet",
     });

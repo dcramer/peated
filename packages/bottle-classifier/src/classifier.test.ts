@@ -1313,7 +1313,7 @@ describe("createBottleClassifier", () => {
           name: args.query,
           shortName: null,
           kind: "brand",
-          alias: null,
+          reference: null,
           score: 0.98,
           source: ["entity_text"],
         },

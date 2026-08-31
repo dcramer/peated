@@ -5,7 +5,7 @@ import {
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
   type EntityClassificationAdvice,
-  type EntityClassificationReference,
+  type EntityClassificationContext,
   type EntityResolution,
   type SearchEntitiesArgs,
 } from "./classifierTypes";
@@ -27,7 +27,7 @@ import { createOpenAIWebSearchTool, createSearchEntitiesTool } from "./tools";
 const ENTITY_CLASSIFIER_MAX_TURNS = 8;
 
 export type RunEntityClassifierAgentInput = {
-  reference: EntityClassificationReference;
+  context: EntityClassificationContext;
 };
 
 export type EntityClassifierAdapters = {
@@ -76,18 +76,18 @@ function mergeResolvedEntity(
     existing.score = candidate.score;
   }
 
-  if (!existing.alias && candidate.alias) {
-    existing.alias = candidate.alias;
+  if (!existing.reference && candidate.reference) {
+    existing.reference = candidate.reference;
   }
 }
 
-function buildAgentInput(reference: EntityClassificationReference): string {
+function buildAgentInput(context: EntityClassificationContext): string {
   return [
     "Classify this suspect whisky entity row and decide the safest corrective action.",
     "Treat the JSON below as the authoritative local context.",
-    "Reference JSON:",
+    "Context JSON:",
     "```json",
-    JSON.stringify(reference, null, 2),
+    JSON.stringify(context, null, 2),
     "```",
   ].join("\n");
 }
@@ -96,10 +96,10 @@ export function createEntityClassifier(
   options: CreateEntityClassifierOptions,
 ): EntityClassifier {
   const runEntityClassifierAgent = async ({
-    reference,
+    context,
   }: RunEntityClassifierAgentInput): Promise<EntityClassificationResult> => {
     if (options.overrides?.runEntityClassifierAgent) {
-      return await options.overrides.runEntityClassifierAgent({ reference });
+      return await options.overrides.runEntityClassifierAgent({ context });
     }
 
     const resolvedEntities = new Map<number, EntityResolution>();
@@ -151,7 +151,7 @@ export function createEntityClassifier(
       outputType: EntityClassificationAdviceSchema,
       tools,
     });
-    const conversationId = `entity:${reference.entity.id}`;
+    const conversationId = `entity:${context.entity.id}`;
     const runner = new Runner({
       tracingDisabled: true,
       modelProvider: new OpenAIProvider({
@@ -162,7 +162,7 @@ export function createEntityClassifier(
       groupId: conversationId,
       traceMetadata: {
         "gen_ai.conversation.id": conversationId,
-        entity_id: `${reference.entity.id}`,
+        entity_id: `${context.entity.id}`,
       },
     });
 
@@ -172,11 +172,11 @@ export function createEntityClassifier(
         conversationId,
         attributes: {
           "gen_ai.request.model": options.model,
-          "entity_classifier.entity_id": `${reference.entity.id}`,
-          "entity_classifier.entity_name": reference.entity.name,
+          "entity_classifier.entity_id": `${context.entity.id}`,
+          "entity_classifier.entity_name": context.entity.name,
         },
         callback: async () =>
-          await runner.run(agent, buildAgentInput(reference), {
+          await runner.run(agent, buildAgentInput(context), {
             maxTurns: ENTITY_CLASSIFIER_MAX_TURNS,
           }),
       });
@@ -191,7 +191,7 @@ export function createEntityClassifier(
         searchEvidence,
       });
       const advice = finalizeEntityClassification({
-        reference,
+        context,
         advice: EntityClassificationAdviceSchema.parse(result.finalOutput),
         artifacts,
       });
@@ -223,7 +223,7 @@ export function createEntityClassifier(
   ): Promise<EntityClassificationResult> {
     const parsedInput = ClassifyEntityInputSchema.parse(input);
     return await runEntityClassifierAgent({
-      reference: parsedInput.reference,
+      context: parsedInput.context,
     });
   }
 

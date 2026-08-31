@@ -57,14 +57,18 @@ identity advice, not only a suspicion score.
 
 The classifier entrypoint is:
 
-- `classifyEntity({ reference })`
+- `classifyEntity({ context })`
 
-`reference` is a server-assembled snapshot containing:
+`context` is a server-assembled snapshot containing:
 
 - current Entity record
 - suspicion reasons
 - sample Bottles
 - candidate target Entities
+
+The snapshot uses `otherNames` for the Entity's aliases and references. The
+classifier uses these names as clues. They do not prove that two Entities are
+the same.
 
 The classifier returns:
 
@@ -97,7 +101,8 @@ reassignments, Entity patches, Suggested Changes, or Review Operations.
 - Advice must not select Bottle ids or catalog fields to change.
 - Metadata advice requires authoritative support.
 - Brand and Entity advice must distinguish Brand from distillery, owner, bottler, importer, and product or category text.
-- `fullName` and aliases are weak evidence for a Brand assignment issue. They can contain stale Brand text or source-specific prefixes.
+- `fullName` and other names are weak evidence for a Brand assignment issue.
+  They can contain old Brand text or source-specific prefixes.
 - Deterministic grouped repairs should only surface zero-ambiguity moves whose after-state is valid; product-suffix expansions and reversible brand moves belong in classifier or manual review.
 
 ## Admin Flow
