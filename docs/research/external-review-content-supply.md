@@ -275,7 +275,7 @@ The pilot started with these limits:
 
 Relevant implementation:
 
-- [`reviews` schema](../../apps/server/src/db/schema/reviews.ts)
+- [external reviews schema](../../apps/server/src/db/schema/externalReviews.ts)
 - [review publication](../../apps/server/src/db/schema/externalReviewPublications.ts)
 - [article observation contract](../../apps/server/src/externalReviews/observation.ts)
 - [external review ingestion](../../apps/server/src/externalReviews/ingest.ts)

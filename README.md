@@ -6,6 +6,9 @@ For more details, take a look at <https://peated.com/about>
 
 A Discord is available if you want to contribute: <https://discord.gg/d7GFPfy88Z>
 
+See the [documentation index](./docs/README.md) for architecture, feature,
+development, operations, policy, and research documents.
+
 ## Features
 
 ### Rating Systems
@@ -101,7 +104,7 @@ checks, use `pnpm dev:server:api`.
 ## Operations
 
 The web app runs on Vercel and the API and worker run on Render. Use the
-[Production Debugging](./docs/development/production-debugging.md) playbook for
+[Production Debugging](./docs/operations/production-debugging.md) playbook for
 current hosts, logs, traces, and diagnostic commands.
 
 ### Authenticated API maintenance
@@ -130,3 +133,6 @@ pnpm cli api get /bottles/123
 pnpm cli api patch /bottles/123 --input ./change.json --yes
 pnpm cli auth logout
 ```
+
+Use the [Catalog Enrichment](./docs/operations/catalog-enrichment.md) workflow
+for researched Bottle backfills, deduplication, and verified batch edits.
