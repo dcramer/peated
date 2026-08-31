@@ -63,6 +63,7 @@ export type BottleIdentityRowProps = {
   href?: string;
   imageUrl?: string | null;
   isLibrary?: boolean;
+  layout?: "cell" | "row";
   metadata?: readonly string[];
   name: string;
   relatedReleases?: {
@@ -80,6 +81,7 @@ export function BottleIdentityRow({
   href,
   imageUrl,
   isLibrary = false,
+  layout = "row",
   metadata = [],
   name,
   relatedReleases,
@@ -88,8 +90,9 @@ export function BottleIdentityRow({
     <div
       {...stylex.props(
         styles.row,
-        Boolean(href) && linkedRowStyles.container,
-        Boolean(href) && linkedRowStyles.onGround,
+        layout === "cell" && styles.cellLayout,
+        Boolean(href) && layout === "row" && linkedRowStyles.container,
+        Boolean(href) && layout === "row" && linkedRowStyles.onGround,
       )}
     >
       <BottleVisual imageUrl={imageUrl} />
@@ -220,6 +223,13 @@ const styles = stylex.create({
     paddingRight: "12px",
     paddingBottom: space.x3,
     paddingLeft: "12px",
+  },
+  cellLayout: {
+    width: "100%",
+    marginRight: 0,
+    marginLeft: 0,
+    paddingRight: space.x3,
+    paddingLeft: 0,
   },
   copy: {
     display: "flex",

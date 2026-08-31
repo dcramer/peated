@@ -14,8 +14,6 @@ import {
   FacetGroup,
   FilterPanel,
   FilterQuery,
-  ItemList,
-  ItemListItem,
   ListToolbar,
   Select,
   TextInput,
@@ -24,8 +22,8 @@ import {
 } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
+import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 
-const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (max-width: 759px)";
 
 export type BottleCatalogItem = {
@@ -47,6 +45,7 @@ export type BottleCatalogItem = {
   scoreHigh: number | null;
   scoreLow: number | null;
   scoreCount: number;
+  totalTastings: number;
 };
 
 export type BottleCatalogListProps = {
@@ -90,24 +89,7 @@ export function BottleCatalogList({
         total={total}
       />
       {items.length ? (
-        <ItemList ariaLabel="Bottles" showTopDivider={false}>
-          {items.map((item) => (
-            <ItemListItem key={item.id}>
-              <BottleIdentityRow
-                brand={item.brand}
-                brandHref={item.brandHref}
-                end={<BottleCatalogRatings item={item} />}
-                hasTasted={item.hasTasted}
-                href={item.href}
-                imageUrl={item.imageUrl}
-                isLibrary={item.isLibrary}
-                metadata={item.metadata}
-                name={item.name}
-                relatedReleases={item.relatedReleases}
-              />
-            </ItemListItem>
-          ))}
-        </ItemList>
+        <BottleCatalogTable items={items} />
       ) : (
         <EmptyState
           action={
@@ -141,17 +123,64 @@ export function BottleCatalogList({
   );
 }
 
-function BottleCatalogRatings({ item }: { item: BottleCatalogItem }) {
+function BottleCatalogTable({
+  items,
+}: {
+  items: readonly BottleCatalogItem[];
+}) {
+  const columns: CatalogTableColumn<BottleCatalogItem>[] = [
+    {
+      cell: (item) => (
+        <BottleIdentityRow
+          brand={item.brand}
+          brandHref={item.brandHref}
+          hasTasted={item.hasTasted}
+          href={item.href}
+          imageUrl={item.imageUrl}
+          isLibrary={item.isLibrary}
+          layout="cell"
+          metadata={item.metadata}
+          name={item.name}
+          relatedReleases={item.relatedReleases}
+        />
+      ),
+      header: "Bottle",
+      key: "bottle",
+      padding: "flush",
+    },
+    {
+      align: "right",
+      cell: (item) => item.totalTastings.toLocaleString("en-US"),
+      header: "Tastings",
+      key: "tastings",
+      width: "count",
+    },
+    {
+      align: "right",
+      cell: (item) => (
+        <BottleRatings
+          counts={item.bandCounts}
+          high={item.scoreHigh}
+          low={item.scoreLow}
+          median={item.medianScore}
+          scoreCount={item.scoreCount}
+        />
+      ),
+      header: "Rating",
+      key: "rating",
+      padding: "flush",
+      width: "rating",
+    },
+  ];
+
   return (
-    <div {...stylex.props(styles.ratings)}>
-      <BottleRatings
-        counts={item.bandCounts}
-        high={item.scoreHigh}
-        low={item.scoreLow}
-        median={item.medianScore}
-        scoreCount={item.scoreCount}
-      />
-    </div>
+    <CatalogTable
+      caption="Bottle records"
+      columns={columns}
+      getKey={(item) => item.id}
+      items={items}
+      linked
+    />
   );
 }
 
@@ -305,14 +334,6 @@ export function BottleCatalogLoading() {
 const styles = stylex.create({
   catalog: {
     minWidth: 0,
-  },
-  ratings: {
-    display: "flex",
-    width: "152px",
-    justifyContent: "flex-end",
-    [COMPACT]: {
-      width: "104px",
-    },
   },
   field: {
     display: "flex",

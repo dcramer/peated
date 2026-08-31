@@ -11,16 +11,15 @@ import {
   FacetGroup,
   FilterPanel,
   FilterQuery,
-  ItemList,
-  ItemRow,
   ListToolbar,
   MemberStatus,
   type ListSortOption,
 } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { AppLink } from "../appLink";
+import { linkedRowStyles } from "../linkedRow.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
-
-const COMPACT = "@media (max-width: 639px)";
+import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 
 export type EntityCatalogItem = {
   href: string;
@@ -80,45 +79,13 @@ export function EntityCatalogList({
         sortOptions={sortOptions}
       />
       {items.length ? (
-        <ItemList ariaLabel={`${noun} records`} showTopDivider={false}>
-          {items.map((item) => (
-            <ItemRow
-              action={
-                onToggleFollowing ? (
-                  <Button
-                    aria-label={
-                      item.isFollowing
-                        ? `Unfollow ${item.name}`
-                        : `Follow ${item.name}`
-                    }
-                    aria-pressed={item.isFollowing}
-                    loading={pendingId === item.id}
-                    loadingLabel={
-                      item.isFollowing ? "Unfollowing…" : "Following…"
-                    }
-                    onClick={() => onToggleFollowing(item)}
-                    size="sm"
-                    variant={item.isFollowing ? "text" : "tonal"}
-                  >
-                    {item.isFollowing ? "Following" : "Follow"}
-                  </Button>
-                ) : undefined
-              }
-              end={<EntityCounts item={item} />}
-              href={item.href}
-              key={item.id}
-              metadata={item.metadata.join(" · ")}
-              title={
-                <>
-                  {item.name}
-                  {item.isFollowing && showFollowingMarks ? (
-                    <MemberStatus kind="following" />
-                  ) : null}
-                </>
-              }
-            />
-          ))}
-        </ItemList>
+        <EntityCatalogTable
+          items={items}
+          noun={noun}
+          onToggleFollowing={onToggleFollowing}
+          pendingId={pendingId}
+          showFollowingMarks={showFollowingMarks}
+        />
       ) : (
         <EmptyState
           action={
@@ -148,35 +115,90 @@ export function EntityCatalogList({
   );
 }
 
-function EntityCounts({ item }: { item: EntityCatalogItem }) {
-  const bottleNoun = item.totalBottles === 1 ? "bottle" : "bottles";
-  const tastingNoun = item.totalTastings === 1 ? "tasting" : "tastings";
+function EntityCatalogTable({
+  items,
+  noun,
+  onToggleFollowing,
+  pendingId,
+  showFollowingMarks,
+}: {
+  items: readonly EntityCatalogItem[];
+  noun: string;
+  onToggleFollowing?: (item: EntityCatalogItem) => void;
+  pendingId?: number;
+  showFollowingMarks: boolean;
+}) {
+  const columns: CatalogTableColumn<EntityCatalogItem>[] = [
+    {
+      cell: (item) => (
+        <>
+          <AppLink
+            href={item.href}
+            {...stylex.props(styles.title, linkedRowStyles.primaryLink)}
+          >
+            {item.name}
+            {item.isFollowing && showFollowingMarks ? (
+              <MemberStatus kind="following" />
+            ) : null}
+          </AppLink>
+          <div {...stylex.props(styles.metadata)}>
+            {item.metadata.join(" · ")}
+          </div>
+        </>
+      ),
+      header: "Name",
+      key: "name",
+    },
+    {
+      align: "right",
+      cell: (item) => item.totalBottles.toLocaleString("en-US"),
+      header: "Bottles",
+      key: "bottles",
+      width: "count",
+    },
+    {
+      align: "right",
+      cell: (item) => item.totalTastings.toLocaleString("en-US"),
+      header: "Tastings",
+      key: "tastings",
+      priority: "secondary",
+      width: "count",
+    },
+  ];
+
+  if (onToggleFollowing) {
+    columns.push({
+      align: "right",
+      cell: (item) => (
+        <Button
+          aria-label={
+            item.isFollowing ? `Unfollow ${item.name}` : `Follow ${item.name}`
+          }
+          aria-pressed={item.isFollowing}
+          loading={pendingId === item.id}
+          loadingLabel={item.isFollowing ? "Unfollowing…" : "Following…"}
+          onClick={() => onToggleFollowing(item)}
+          size="sm"
+          variant={item.isFollowing ? "text" : "tonal"}
+        >
+          {item.isFollowing ? "Following" : "Follow"}
+        </Button>
+      ),
+      header: "Follow",
+      interactive: true,
+      key: "follow",
+      width: "action",
+    });
+  }
 
   return (
-    <span
-      aria-label={`${item.totalBottles.toLocaleString("en-US")} ${bottleNoun} and ${item.totalTastings.toLocaleString("en-US")} ${tastingNoun}`}
-      role="group"
-      {...stylex.props(styles.counts)}
-    >
-      <span {...stylex.props(styles.count)}>
-        <strong
-          title={item.totalBottles.toLocaleString("en-US")}
-          {...stylex.props(styles.countValue)}
-        >
-          {item.totalBottles.toLocaleString("en-US")}
-        </strong>
-        <span {...stylex.props(styles.countLabel)}>{bottleNoun}</span>
-      </span>
-      <span {...stylex.props(styles.count, styles.tastingCount)}>
-        <strong
-          title={item.totalTastings.toLocaleString("en-US")}
-          {...stylex.props(styles.countValue)}
-        >
-          {item.totalTastings.toLocaleString("en-US")}
-        </strong>
-        <span {...stylex.props(styles.countLabel)}>{tastingNoun}</span>
-      </span>
-    </span>
+    <CatalogTable
+      caption={`${noun} records`}
+      columns={columns}
+      getKey={(item) => item.id}
+      items={items}
+      linked
+    />
   );
 }
 
@@ -246,49 +268,27 @@ const styles = stylex.create({
   catalog: {
     minWidth: 0,
   },
-  counts: {
-    display: "grid",
-    width: "156px",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: space.x4,
-    [COMPACT]: {
-      width: "52px",
-      gridTemplateColumns: "52px",
-    },
-  },
-  count: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: space.x1,
-  },
-  countValue: {
+  title: {
+    display: "block",
     overflow: "hidden",
-    maxWidth: "100%",
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "15px",
-    fontVariantNumeric: "tabular-nums",
+    fontSize: "18px",
     fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1,
+    letterSpacing: "-0.025em",
+    lineHeight: 1.25,
+    textDecoration: "none",
     textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
-  countLabel: {
+  metadata: {
+    marginTop: "3px",
+    overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "9px",
-    letterSpacing: "0.07em",
-    lineHeight: 1.2,
-    textTransform: "uppercase",
-    [COMPACT]: {
-      fontSize: "8px",
-    },
-  },
-  tastingCount: {
-    [COMPACT]: {
-      display: "none",
-    },
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.4,
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
 });
