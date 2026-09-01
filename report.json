@@ -1,0 +1,259 @@
+{
+  "files": [
+    {
+      "file": "add-tasting__desktop.png",
+      "image": "images/baseline/add-tasting__desktop.png",
+      "images": {
+        "baseline": "images/baseline/add-tasting__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "add-tasting__mobile.png",
+      "image": "images/baseline/add-tasting__mobile.png",
+      "images": {
+        "baseline": "images/baseline/add-tasting__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "image": "images/baseline/bottle-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/bottle-detail__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "image": "images/baseline/bottle-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/bottle-detail__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "bottler-detail__desktop.png",
+      "image": "images/baseline/bottler-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/bottler-detail__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "bottler-detail__mobile.png",
+      "image": "images/baseline/bottler-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/bottler-detail__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "brand-detail__desktop.png",
+      "image": "images/baseline/brand-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/brand-detail__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "brand-detail__mobile.png",
+      "image": "images/baseline/brand-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/brand-detail__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "distillery-detail__desktop.png",
+      "image": "images/baseline/distillery-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/distillery-detail__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "distillery-detail__mobile.png",
+      "image": "images/baseline/distillery-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/distillery-detail__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "home__desktop.png",
+      "image": "images/baseline/home__desktop.png",
+      "images": {
+        "baseline": "images/baseline/home__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "home__mobile.png",
+      "image": "images/baseline/home__mobile.png",
+      "images": {
+        "baseline": "images/baseline/home__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "login__desktop.png",
+      "image": "images/baseline/login__desktop.png",
+      "images": {
+        "baseline": "images/baseline/login__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "login__mobile.png",
+      "image": "images/baseline/login__mobile.png",
+      "images": {
+        "baseline": "images/baseline/login__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "image": "images/baseline/member-profile__desktop.png",
+      "images": {
+        "baseline": "images/baseline/member-profile__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "image": "images/baseline/member-profile__mobile.png",
+      "images": {
+        "baseline": "images/baseline/member-profile__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "record-tasting/log-tasting/logs-a-tasting-from-a-matched-bottle-photo/start__chromium-desktop.png",
+      "image": "images/candidate/record-tasting/log-tasting/logs-a-tasting-from-a-matched-bottle-photo/start__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/record-tasting/log-tasting/logs-a-tasting-from-a-matched-bottle-photo/start__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "region-detail__desktop.png",
+      "image": "images/baseline/region-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/region-detail__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "region-detail__mobile.png",
+      "image": "images/baseline/region-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/region-detail__mobile.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "routes/mobile-navigation-opens-and-reaches-the-bottle-catalog/navigation-open__chromium-mobile.png",
+      "image": "images/candidate/routes/mobile-navigation-opens-and-reaches-the-bottle-catalog/navigation-open__chromium-mobile.png",
+      "images": {
+        "candidate": "images/candidate/routes/mobile-navigation-opens-and-reaches-the-bottle-catalog/navigation-open__chromium-mobile.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/bottle-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/bottle-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/bottle-detail__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/bottler-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/bottler-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/bottler-detail__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/brand-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/brand-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/brand-detail__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/distillery-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/distillery-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/distillery-detail__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/home__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/home__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/home__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/login__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/login__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/login__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/member-profile__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/member-profile__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/member-profile__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/region-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/region-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/region-detail__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "routes/public-routes-load/search__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/search__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/search__chromium-desktop.png"
+      },
+      "status": "added"
+    },
+    {
+      "file": "search__desktop.png",
+      "image": "images/baseline/search__desktop.png",
+      "images": {
+        "baseline": "images/baseline/search__desktop.png"
+      },
+      "status": "removed"
+    },
+    {
+      "file": "search__mobile.png",
+      "image": "images/baseline/search__mobile.png",
+      "images": {
+        "baseline": "images/baseline/search__mobile.png"
+      },
+      "status": "removed"
+    }
+  ],
+  "summary": {
+    "added": 11,
+    "changed": 0,
+    "removed": 20,
+    "unchanged": 0
+  },
+  "version": 2
+}
