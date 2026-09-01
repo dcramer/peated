@@ -1,28 +1,76 @@
-import { SummaryStrip } from "@peated/web/components";
 import {
-  ContentLink,
-  ContentPage,
-  ContentSection,
-  ContentText,
-} from "@peated/web/components/pages/contentPage.stylex";
+  FactList,
+  RailList,
+  RailListItem,
+  SummaryStrip,
+} from "@peated/web/components";
+import {
+  PageSection,
+  RailSection,
+} from "@peated/web/components/pages/pageLayout.stylex";
 import config from "@peated/web/config";
 import { getPublicStats } from "@peated/web/lib/publicStats.server";
 import type { Metadata } from "next";
+import {
+  AboutLink,
+  AboutPage,
+  AboutText,
+  AboutTextStack,
+} from "./aboutPage.stylex";
 
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "About",
+  description:
+    "How Peated records whisky bottles, the people who make them, and what drinkers thought.",
 };
 
-export default async function AboutPage() {
+export default async function AboutRoute() {
   const stats = await getPublicStats().catch(() => undefined);
 
   return (
-    <ContentPage
-      eyebrow="About Peated"
-      intro="A community-maintained record of whisky bottles and the people who make them."
-      title="The mission"
+    <AboutPage
+      currentHref="/about"
+      description="A community-maintained record of whisky bottles, the people who make them, and what the people who drank them thought."
+      eyebrow="Reference · edited by members"
+      rail={
+        <>
+          <RailSection heading="Contribute">
+            <RailList ariaLabel="Contribute to Peated">
+              <RailListItem
+                href="/addBottle?intent=catalog"
+                metadata="Anything the catalog is missing"
+                title="Record a bottle"
+              />
+              <RailListItem
+                href="/bottles"
+                metadata="Open any bottle record"
+                title="Suggest a correction"
+              />
+              <RailListItem
+                href={config.DISCORD_LINK}
+                title="Peated on Discord"
+              />
+              <RailListItem
+                href={config.GITHUB_REPO}
+                title="Source on GitHub"
+              />
+            </RailList>
+          </RailSection>
+          <RailSection heading="Reference">
+            <RailList ariaLabel="Peated reference pages">
+              <RailListItem
+                href="/bottlers/4263/codes"
+                title="SMWS distillery codes"
+              />
+              <RailListItem href="/updates" title="Recent changes" />
+              <RailListItem href="/terms" title="Terms" />
+            </RailList>
+          </RailSection>
+        </>
+      }
+      title="About Peated"
     >
       {stats ? (
         <SummaryStrip
@@ -40,39 +88,46 @@ export default async function AboutPage() {
           ]}
         />
       ) : null}
-      <ContentSection title="Why Peated exists">
-        <ContentText>
-          Peated is a social record for tasting and collecting whisky. It gives
-          the community one place to identify bottles, record what they drank,
-          and share useful notes.
-        </ContentText>
-        <ContentText>
-          The catalog is central to that work. It combines public sources and
-          community corrections, and the same modern API powers the product.
-        </ContentText>
-      </ContentSection>
-      <ContentSection title="Built in the open">
-        <ContentText>
-          Peated was started by David Cramer and is{" "}
-          <ContentLink href={config.GITHUB_REPO}>
-            open source on GitHub
-          </ContentLink>
-          . Join the{" "}
-          <ContentLink href={config.DISCORD_LINK}>Peated Discord</ContentLink>{" "}
-          to help improve it.
-        </ContentText>
+      <PageSection heading="Why Peated exists">
+        <AboutTextStack>
+          <AboutText>
+            Peated is a social record for tasting and collecting whisky. It
+            gives you one place to identify a bottle, record what you drank, and
+            leave useful notes.
+          </AboutText>
+          <AboutText>
+            The catalog is central to that work. It combines public sources with
+            corrections from members. The same API that serves the site is open
+            to anyone building on top of it.
+          </AboutText>
+        </AboutTextStack>
+      </PageSection>
+      <PageSection heading="Built in the open">
+        <AboutText>
+          Peated was started by David Cramer. The source is on GitHub, and the
+          Discord is where members discuss corrections and contributions.
+        </AboutText>
         {config.VERSION ? (
-          <ContentText>
+          <AboutText>
             This site runs version{" "}
-            <ContentLink
-              href={`${config.GITHUB_REPO}/commit/${config.VERSION}`}
-            >
+            <AboutLink href={`${config.GITHUB_REPO}/commit/${config.VERSION}`}>
               {config.VERSION}
-            </ContentLink>
+            </AboutLink>
             .
-          </ContentText>
+          </AboutText>
         ) : null}
-      </ContentSection>
-    </ContentPage>
+      </PageSection>
+      <PageSection heading="What Peated holds">
+        <FactList
+          facts={[
+            { label: "Started", value: "2023" },
+            { label: "Maintained by", value: "Members" },
+            { label: "License", value: "Apache 2.0" },
+            { label: "API", value: "Public" },
+          ]}
+          layout="grid"
+        />
+      </PageSection>
+    </AboutPage>
   );
 }

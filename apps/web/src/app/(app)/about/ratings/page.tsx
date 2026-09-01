@@ -1,17 +1,23 @@
 import {
-  Card,
-  CardGrid,
   DataTable,
-  type DataTableColumn,
+  RailList,
+  RailListItem,
   RATING_BANDS,
+  TastingRating,
+  type DataTableColumn,
 } from "@peated/web/components";
 import {
-  ContentPage,
-  ContentSection,
-  ContentSubsection,
-  ContentText,
-} from "@peated/web/components/pages/contentPage.stylex";
+  PageSection,
+  RailSection,
+} from "@peated/web/components/pages/pageLayout.stylex";
 import type { Metadata } from "next";
+import {
+  AboutPage,
+  AboutText,
+  AboutTextStack,
+  ReviewDirections,
+  ReviewSteps,
+} from "../aboutPage.stylex";
 
 export const dynamic = "force-static";
 
@@ -28,90 +34,97 @@ const bandColumns: DataTableColumn<(typeof RATING_BANDS)[number]>[] = [
     key: "label",
   },
   {
-    align: "right",
     cell: (band) => band.range,
     header: "Range",
     key: "range",
+  },
+  {
+    align: "right",
+    cell: (band) => <TastingRating band={band.key} />,
+    header: "Marker",
+    key: "marker",
+    priority: "secondary",
   },
 ];
 
 export default function RatingsPage() {
   return (
-    <ContentPage
-      eyebrow="Rating guide"
-      intro="Choose one of five ratings for a tasting. Use a 100-point score for a written review."
-      title="Tastings and reviews"
+    <AboutPage
+      currentHref="/about/ratings"
+      description="A tasting takes one of five ratings. A written review takes a whole number out of 100. Neither is ever converted into the other."
+      eyebrow="Reference · two measures"
+      rail={
+        <RailSection heading="Where these appear">
+          <RailList ariaLabel="Rating examples">
+            <RailListItem
+              href="/addBottle?intent=tasting"
+              metadata="Where the five ratings are used"
+              title="Log a tasting"
+            />
+            <RailListItem
+              href="/bottles?sort=-score"
+              metadata="Ordered by median review score"
+              title="Scored bottles"
+            />
+            <RailListItem href="/tastings" title="Recent reviews" />
+          </RailList>
+        </RailSection>
+      }
+      title="Rating guide"
     >
-      <CardGrid>
-        <Card>
-          <ContentSubsection title="Choose a tasting rating">
-            <ContentText>
-              Pick the label that best describes the whole whisky. The fixed
-              vocabulary keeps quick tasting records easy to compare.
-            </ContentText>
-          </ContentSubsection>
-        </Card>
-        <Card>
-          <ContentSubsection title="Score a review out of 100">
-            <ContentText>
-              Pick a whole number from 0 to 100. Add notes when the number needs
-              context.
-            </ContentText>
-          </ContentSubsection>
-        </Card>
-      </CardGrid>
-
-      <ContentSection title="How to write a review">
-        <CardGrid>
-          <Card>
-            <ContentSubsection title="Taste first">
-              <ContentText>
-                Notice what stands out before thinking about a number.
-              </ContentText>
-            </ContentSubsection>
-          </Card>
-          <Card>
-            <ContentSubsection title="Start at 80">
-              <ContentText>
-                An 80 is good: enjoyable, well made, and without a major
-                problem.
-              </ContentText>
-            </ContentSubsection>
-          </Card>
-          <Card>
-            <ContentSubsection title="Move the score">
-              <ContentText>
-                Judge the whisky as a whole. There are no points to add up.
-              </ContentText>
-            </ContentSubsection>
-          </Card>
-        </CardGrid>
-        <ContentText>
-          Move up when flavors are clear, the parts work well together, the
-          texture has depth, and the finish lasts. Move down for off flavors,
-          rough alcohol, thin texture, poor balance, or a short finish.
-        </ContentText>
-        <ContentText>
-          Keep price, rarity, packaging, and reputation out of the score.
-        </ContentText>
-      </ContentSection>
-
-      <ContentSection title="The score at a glance">
+      <PageSection heading="The five ratings">
         <DataTable
-          caption="Peated rating ranges"
+          caption="Peated tasting ratings"
           columns={bandColumns}
           getKey={(band) => band.key}
           items={RATING_BANDS}
         />
-      </ContentSection>
+        <AboutText>
+          Pick the label that describes the whole whisky. The vocabulary is
+          fixed on purpose. Five labels stay comparable across many tastings in
+          a way that free-form numbers do not.
+        </AboutText>
+      </PageSection>
 
-      <ContentSection title="How bottle scores work">
-        <ContentText>
-          Peated shows a median after the first eligible member or external
-          review score. External scores count only when the publication permits
-          their use and uses a whole-number 100-point scale.
-        </ContentText>
-      </ContentSection>
-    </ContentPage>
+      <PageSection heading="Writing a review">
+        <ReviewSteps
+          steps={[
+            {
+              body: "Notice what stands out before you think about a number.",
+              title: "Taste first",
+            },
+            {
+              body: "An 80 is good: enjoyable, well made, and without a major problem.",
+              title: "Start at 80",
+            },
+            {
+              body: "Judge the whisky as a whole. There are no points to add up.",
+              title: "Move the score",
+            },
+          ]}
+        />
+        <ReviewDirections
+          down="Off flavors, rough alcohol, thin texture, poor balance, or a finish that stops short."
+          up="Clear flavors, parts that work together, texture with depth, or a finish that lasts."
+        />
+        <AboutText>
+          Keep price, rarity, packaging, and reputation out of it.
+        </AboutText>
+      </PageSection>
+
+      <PageSection heading="How a bottle score is worked out">
+        <AboutTextStack>
+          <AboutText>
+            A bottle shows a median from the first eligible score onward. It
+            never shows an average or a number converted from tasting ratings.
+          </AboutText>
+          <AboutText>
+            An external score counts only when the publication permits its use
+            and scores on a whole-number 100-point scale. A publication on its
+            own scale gets an en dash beside its quote.
+          </AboutText>
+        </AboutTextStack>
+      </PageSection>
+    </AboutPage>
   );
 }
