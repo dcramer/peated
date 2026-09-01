@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-import { bottlePath } from "./assertions";
 import {
   exactMatchedBottleId,
   missingBottleId,
@@ -14,7 +13,9 @@ test.describe("Bottle page redirects", () => {
     page,
   }) => {
     const sourcePath = `/bottles/${replacementSourceBottleId}/tastings?source=legacy&tag=one&tag=two`;
-    const replacementPath = `/bottles/${exactMatchedBottleId}/tastings?source=legacy&tag=one&tag=two`;
+    const replacementPath = new RegExp(
+      `/bottles/${exactMatchedBottleId}-[^/?#]+/tastings\\?source=legacy&tag=one&tag=two$`,
+    );
 
     await page.goto(sourcePath, { waitUntil: "commit" });
     await expect(page).toHaveURL(replacementPath);
@@ -39,7 +40,7 @@ test.describe("Bottle page redirects", () => {
     page,
   }) => {
     await page.goto(`/bottles/${missingBottleId}`);
-    await expect(page).toHaveURL(bottlePath(missingBottleId));
+    await expect(page).toHaveURL(`/bottles/${missingBottleId}`);
     await expect(
       page.getByRole("heading", { name: "Nothing lives here" }),
     ).toBeVisible();

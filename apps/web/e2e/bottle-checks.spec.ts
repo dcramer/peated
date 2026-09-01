@@ -1,6 +1,6 @@
 import { expect, test, type TestInfo } from "@playwright/test";
 
-import { bottlePath } from "./assertions";
+import { bottlePathPattern } from "./assertions";
 import {
   existingBottleId,
   moderatorUser,
@@ -106,7 +106,7 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Return to bottle" }).click();
-  await expect(page).toHaveURL(bottlePath(existingBottleId));
+  await expect(page).toHaveURL(bottlePathPattern(existingBottleId));
 });
 
 test("opens an actionable admin audit in its focused Moderation task", async ({

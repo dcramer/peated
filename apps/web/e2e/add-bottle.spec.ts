@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-import { bottlePath } from "./assertions";
+import { bottleHrefSelector, bottlePathPattern } from "./assertions";
 import {
   addAnotherReleaseSourceBottle,
   createdBottleId,
@@ -179,7 +179,7 @@ test.describe("create bottle", () => {
       expect(createInput).not.toHaveProperty(authorityField);
     }
 
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("continues to tasting from explicit tasting intent", async ({
@@ -211,7 +211,7 @@ test.describe("create bottle", () => {
     );
     await submitCreateBottle(page);
 
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("returns to the catalog outcome from catalog intent", async ({
@@ -235,7 +235,7 @@ test.describe("create bottle", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View bottle" }),
-    ).toHaveAttribute("href", bottlePath(createdBottleId));
+    ).toHaveAttribute("href", bottlePathPattern(createdBottleId));
   });
 
   test("returns to the created bottle from choose intent", async ({
@@ -487,7 +487,7 @@ test.describe("create bottle", () => {
     expect(createInput).not.toHaveProperty("sourceBottleId");
     expect(createInput).not.toHaveProperty("release");
     expect(createInput).not.toHaveProperty("releaseId");
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("shows validation when saving without a brand", async ({
@@ -572,7 +572,7 @@ test.describe("add bottle flow", () => {
     expect(addBottleUrl.searchParams.get("release")).toBeNull();
     await expect(
       page.getByRole("link", { name: "View bottle" }),
-    ).toHaveAttribute("href", `/bottles/${exactSearchBottle.id}`);
+    ).toHaveAttribute("href", bottlePathPattern(exactSearchBottle.id));
     await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
@@ -726,7 +726,7 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
+    ).toHaveAttribute("href", bottlePathPattern(existingBottle.id));
     await expectFooterBelowAction(
       page.getByRole("link", { name: "View Bottle" }),
       traceFooter,
@@ -755,7 +755,7 @@ test.describe("add bottle flow", () => {
     await page.getByRole("link", { name: "View Library" }).click();
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
     await expect(
-      page.locator(`a[href="/bottles/${existingBottle.id}"]`).first(),
+      page.locator(bottleHrefSelector(existingBottle.id)).first(),
     ).toBeVisible();
 
     await page.goto("/addBottle");
@@ -878,7 +878,7 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("creates a complete bottle from a scan when Add a bottle is clicked", async ({
@@ -902,7 +902,7 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("prefills exact bottle fields from a scan before creating it", async ({
@@ -932,7 +932,7 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("creates from an unsuitable scan without requesting image approval", async ({
@@ -956,7 +956,7 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:unsuitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("shows catalog image warning without blocking created Bottle resolution", async ({
@@ -979,7 +979,7 @@ test.describe("add bottle flow", () => {
         "The bottle was added, but the public image was not saved.",
       ),
     ).toBeVisible();
-    await expect(page).toHaveURL(bottlePath(createdBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(createdBottleId));
   });
 
   test("creates a scan proposal as part of Add to Library", async ({
@@ -1112,7 +1112,7 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    await expect(page).toHaveURL(bottlePath(existingBottle.id));
+    await expect(page).toHaveURL(bottlePathPattern(existingBottle.id));
   });
 
   test("adds an existing reused create proposal to Library", async ({
