@@ -1,6 +1,14 @@
 import { EntitySchema, listResponse } from "@peated/server/schemas";
+import { z } from "zod";
 
 import { contract } from "../base";
+
+const SmwsDistillerSchema = EntitySchema.extend({
+  smwsCodes: z
+    .array(z.string())
+    .readonly()
+    .describe("SMWS codes that resolve to this distillery"),
+});
 
 export default contract
   .route({
@@ -11,4 +19,4 @@ export default contract
       "Retrieve distillers that are part of the Scotch Malt Whisky Society (SMWS) system",
     spec: (spec) => ({ ...spec, operationId: "listSmwsDistillers" }),
   })
-  .output(listResponse(EntitySchema));
+  .output(listResponse(SmwsDistillerSchema));

@@ -11,6 +11,8 @@ interface SmwsDistilleryCodes {
 // backed by a cited source and tests until this moves into an editable database.
 // SMWS code format: https://unfiltered.smws.com/uk/welcome-magazine/smws-101.html
 // Source: https://www.whiskysaga.com/smws-codes
+// Current inventory: Cask Code, 2026-08-28, CC BY 4.0
+// https://caskcode.co.uk/data/smws-codes.json
 export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   // Single Malt
   1: "Glenfarclas",
@@ -180,7 +182,12 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   165: "Wolfburn", // peated
   166: "Torabhaig",
   167: "The Clydeside Distillery",
-  168: "InchDairnie Distillery", // KinGlassie
+  168: "InchDairnie Distillery",
+  // Peated InchDairnie spirit. Corroborated by two current code indexes:
+  // https://www.whiskygoodness.com/smws/169
+  // https://whisky-taru-blog.com/%e3%80%90smws%e3%80%91%e3%82%b9%e3%82%b3%e3%83%83%e3%83%81%e3%83%a2%e3%83%ab%e3%83%88%e3%82%a6%e3%82%b9%e3%82%ad%e3%83%bc%e3%82%bd%e3%82%b5%e3%82%a8%e3%83%86%e3%82%a3%ef%bd%9c%e8%92%b8/
+  // InchDairnie's peated malt: https://www.inchdairniedistillery.com/product/kinglassie/
+  169: "InchDairnie Distillery",
 
   // Single Grain
   G1: "North British",
@@ -199,6 +206,7 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   G14: "Dumbarton",
   G15: "Loch Lomond", // Rhosdhu
   G16: "Glasgow Distillery",
+  G17: "Starlaw",
 
   // Bourbon
   B1: "Heaven Hill Distillery",
@@ -209,6 +217,7 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   B6: "Finger Lakes Distilling",
   B7: "Ross & Squibb",
   B8: "Woodinville Whiskey Co.",
+  B9: "Wilderness Trail Distillery",
 
   // Rye
   RW1: "FEW Spirits",
@@ -218,6 +227,8 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   RW5: "Lux Row Distillers",
   RW6: "Kyrö",
   RW7: "Journeyman",
+  RW8: "Catoctin Creek",
+  RW9: "Wilderness Trail Distillery",
 
   // Corn
   CW1: "Heaven Hill Distillery",
@@ -248,6 +259,7 @@ export const SMWS_DISTILLERY_CODES: SmwsDistilleryCodes = {
   A6: "Domaine Lasalle",
   A7: "Domaine Lasalle",
   A8: "Domaine de Cavaillon",
+  A9: "Domaine de Saurine",
 
   // Cognac
   C1: "Camus",
@@ -275,7 +287,7 @@ export const SMWS_CATEGORY_LIST = [
   ["G", "Single Grain Whisky"],
   ["B", "Bourbon"],
   ["RW", "Rye"],
-  ["CW1", "Corn Whisky"],
+  ["CW", "Corn Whisky"],
   ["R", "Rum"],
   ["GN", "Gin"],
   ["C", "Cognac"],
