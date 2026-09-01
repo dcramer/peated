@@ -12,7 +12,6 @@ import {
   EmptyState,
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   ListToolbar,
   Select,
   TextInput,
@@ -174,13 +173,15 @@ export function BottleCatalogFilters({
   const facetNames = new Set(facets?.groups.map((group) => group.name));
 
   return (
-    <FilterPanel ariaLabel="Bottle filters">
-      <FilterQuery
-        label="Find a bottle"
-        onSubmit={onQuerySubmit}
-        placeholder="Name, brand, or release"
-        query={query}
-      />
+    <FilterPanel
+      ariaLabel="Bottle filters"
+      query={{
+        label: "Find a bottle",
+        onSubmit: onQuerySubmit,
+        placeholder: "Name, brand, or release",
+        query,
+      }}
+    >
       {facetNames.has("category") ? null : (
         <FilterSelect
           label="Category"

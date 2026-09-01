@@ -9,7 +9,6 @@ import {
   ButtonLink,
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   PageTabs,
 } from "@peated/web/components";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
@@ -86,14 +85,15 @@ export function FollowingPageClient({
     <CatalogPage
       eyebrow="Your record"
       filters={
-        <FilterPanel ariaLabel="Following filters">
-          <FilterQuery
-            key={state.query}
-            label="Name"
-            onSubmit={(value) => updateParams({ query: value })}
-            placeholder="Distiller, brand, or bottler"
-            query={state.query}
-          />
+        <FilterPanel
+          ariaLabel="Following filters"
+          query={{
+            label: "Name",
+            onSubmit: (value) => updateParams({ query: value }),
+            placeholder: "Distiller, brand, or bottler",
+            query: state.query,
+          }}
+        >
           <FacetGroup
             label="Type"
             onChange={(value) => updateParams({ type: value })}

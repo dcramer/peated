@@ -1,7 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { ListFilter } from "lucide-react";
+import { ListFilter, Search } from "lucide-react";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 
 import {
@@ -11,7 +11,7 @@ import {
   fonts,
   space,
 } from "../styles/tokens.stylex";
-import { Button } from "./button.stylex";
+import { Button, IconButton } from "./button.stylex";
 import { FacetRow } from "./facetRow.stylex";
 import { TextInput } from "./field.stylex";
 
@@ -21,24 +21,48 @@ const NARROW = "@media (max-width: 759px)";
 export type FilterPanelProps = {
   ariaLabel: string;
   children: ReactNode;
+  query?: FilterQueryProps;
 };
 
 /** Keeps a page's filters visible on wide screens and disclosed on narrow ones. */
-export function FilterPanel({ ariaLabel, children }: FilterPanelProps) {
+export function FilterPanel({ ariaLabel, children, query }: FilterPanelProps) {
+  const contentId = useId();
   const [open, setOpen] = useState(false);
+  const toggle = (
+    <IconButton
+      aria-controls={contentId}
+      aria-expanded={open}
+      icon={<ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />}
+      label={open ? "Hide filters" : "Show filters"}
+      onClick={() => setOpen((current) => !current)}
+      size="sm"
+    />
+  );
 
   return (
     <section aria-label={ariaLabel} {...stylex.props(styles.root)}>
-      <button
-        aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
-        type="button"
-        {...stylex.props(styles.toggle)}
+      {query ? (
+        <FilterQueryForm filterToggle={toggle} {...query} />
+      ) : (
+        <button
+          aria-controls={contentId}
+          aria-expanded={open}
+          onClick={() => setOpen((current) => !current)}
+          type="button"
+          {...stylex.props(styles.toggle)}
+        >
+          <ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />
+          Filters
+        </button>
+      )}
+      <div
+        id={contentId}
+        {...stylex.props(
+          styles.content,
+          query && styles.contentAfterQuery,
+          open && styles.contentOpen,
+        )}
       >
-        <ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />
-        Filters
-      </button>
-      <div {...stylex.props(styles.content, open && styles.contentOpen)}>
         {children}
       </div>
     </section>
@@ -61,7 +85,27 @@ export function FilterQuery({
   query,
   submitLabel = "Search",
 }: FilterQueryProps) {
+  return (
+    <FilterQueryForm
+      label={label}
+      onSubmit={onSubmit}
+      placeholder={placeholder}
+      query={query}
+      submitLabel={submitLabel}
+    />
+  );
+}
+
+function FilterQueryForm({
+  filterToggle,
+  label,
+  onSubmit,
+  placeholder,
+  query,
+  submitLabel = "Search",
+}: FilterQueryProps & { filterToggle?: ReactNode }) {
   const id = useId();
+  const hasFilterToggle = filterToggle !== undefined;
   const [draft, setDraft] = useState({ source: query, value: query });
   const draftValue = draft.source === query ? draft.value : query;
 
@@ -71,7 +115,14 @@ export function FilterQuery({
   }
 
   return (
-    <form onSubmit={submit} role="search" {...stylex.props(styles.queryForm)}>
+    <form
+      onSubmit={submit}
+      role="search"
+      {...stylex.props(
+        styles.queryForm,
+        hasFilterToggle && styles.panelQueryForm,
+      )}
+    >
       <label htmlFor={id} {...stylex.props(styles.field)}>
         <span {...stylex.props(styles.heading)}>{label}</span>
         <TextInput
@@ -86,9 +137,29 @@ export function FilterQuery({
           value={draftValue}
         />
       </label>
-      <Button size="sm" type="submit" variant="tonal">
-        {submitLabel}
-      </Button>
+      {hasFilterToggle ? (
+        <span {...stylex.props(styles.mobileFilterToggle)}>{filterToggle}</span>
+      ) : null}
+      <span
+        {...stylex.props(
+          styles.desktopSubmit,
+          hasFilterToggle && styles.panelDesktopSubmit,
+        )}
+      >
+        <Button size="sm" type="submit" variant="tonal">
+          {submitLabel}
+        </Button>
+      </span>
+      {hasFilterToggle ? (
+        <span {...stylex.props(styles.mobileSubmit)}>
+          <IconButton
+            icon={<Search aria-hidden="true" size={16} />}
+            label={submitLabel}
+            size="sm"
+            type="submit"
+          />
+        </span>
+      ) : null}
     </form>
   );
 }
@@ -192,8 +263,10 @@ const styles = stylex.create({
     gap: space.x4,
     [NARROW]: {
       display: "none",
-      paddingTop: space.x4,
     },
+  },
+  contentAfterQuery: {
+    marginTop: space.x4,
   },
   contentOpen: {
     [NARROW]: {
@@ -210,6 +283,32 @@ const styles = stylex.create({
     gap: space.x2,
     [NARROW]: {
       gridColumn: "1 / -1",
+    },
+  },
+  panelQueryForm: {
+    [NARROW]: {
+      display: "grid",
+      gridTemplateColumns: "minmax(0, 1fr) auto auto",
+    },
+  },
+  desktopSubmit: {
+    display: "inline-flex",
+  },
+  panelDesktopSubmit: {
+    [NARROW]: {
+      display: "none",
+    },
+  },
+  mobileFilterToggle: {
+    display: "none",
+    [NARROW]: {
+      display: "inline-flex",
+    },
+  },
+  mobileSubmit: {
+    display: "none",
+    [NARROW]: {
+      display: "inline-flex",
     },
   },
   field: {

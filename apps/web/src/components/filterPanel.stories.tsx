@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   type FilterPanelProps,
 } from "./filterPanel.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
@@ -56,13 +55,15 @@ function ControlledFilters({ ariaLabel }: FilterPanelProps) {
   const [query, setQuery] = useState("");
 
   return (
-    <FilterPanel ariaLabel={ariaLabel}>
-      <FilterQuery
-        label="Find a bottle"
-        onSubmit={setQuery}
-        placeholder="Name"
-        query={query}
-      />
+    <FilterPanel
+      ariaLabel={ariaLabel}
+      query={{
+        label: "Find a bottle",
+        onSubmit: setQuery,
+        placeholder: "Name",
+        query,
+      }}
+    >
       <FacetGroup
         label="Country"
         onChange={setCountry}
