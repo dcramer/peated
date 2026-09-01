@@ -17,7 +17,7 @@ import {
   Textarea,
   TextInput,
 } from "..";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, fonts, space, zIndices } from "../../styles/tokens.stylex";
 import { WorkflowScreen } from "../workflowScreen.stylex";
 
 type FieldError = { message?: string } | undefined;
@@ -324,7 +324,7 @@ const styles = stylex.create({
   fieldset: { minWidth: 0, margin: 0, padding: 0, borderWidth: 0 },
   saving: {
     position: "fixed",
-    zIndex: 80,
+    zIndex: zIndices.dialog,
     inset: 0,
     display: "flex",
     alignItems: "center",

@@ -11,6 +11,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { Chip } from "./chip.stylex";
@@ -436,7 +437,7 @@ const styles = stylex.create({
   },
   suggestionOverlay: {
     position: "absolute",
-    zIndex: 21,
+    zIndex: zIndices.menuControl,
     top: "calc(100% + 4px)",
     right: 0,
     left: 0,
@@ -499,7 +500,7 @@ const styles = stylex.create({
   },
   fieldOverlay: {
     position: "absolute",
-    zIndex: 20,
+    zIndex: zIndices.menu,
     top: "calc(100% + 4px)",
     left: 0,
     width: "min(640px, calc(100vw - 48px))",

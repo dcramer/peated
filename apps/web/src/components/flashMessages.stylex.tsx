@@ -15,7 +15,7 @@ import {
   FlashMessage,
   type FlashMessageTone,
 } from "@peated/web/components/feedback.stylex";
-import { space } from "../styles/tokens.stylex";
+import { space, zIndices } from "../styles/tokens.stylex";
 
 const MESSAGE_LIFETIME = 8000;
 
@@ -88,7 +88,7 @@ export function FlashMessages({ children }: { children: ReactNode }) {
 const styles = stylex.create({
   messages: {
     position: "fixed",
-    zIndex: 80,
+    zIndex: zIndices.notification,
     top: `max(${space.x4}, env(safe-area-inset-top))`,
     right: `max(${space.x4}, env(safe-area-inset-right))`,
     left: {

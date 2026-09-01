@@ -14,6 +14,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 
 export type WorkflowScreenProps = {
@@ -179,7 +180,7 @@ const styles = stylex.create({
   },
   header: {
     position: "sticky",
-    zIndex: 20,
+    zIndex: zIndices.sticky,
     top: 0,
     paddingTop: "env(safe-area-inset-top)",
     borderBottomWidth: "1px",
@@ -269,7 +270,7 @@ const styles = stylex.create({
     display: "none",
     "@media (max-width: 559px)": {
       position: "fixed",
-      zIndex: 20,
+      zIndex: zIndices.sticky,
       right: 0,
       bottom: 0,
       left: 0,

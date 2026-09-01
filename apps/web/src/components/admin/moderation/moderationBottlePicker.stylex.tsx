@@ -24,6 +24,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../../../styles/tokens.stylex";
 
 export default function ModerationBottlePicker({
@@ -225,7 +226,7 @@ export default function ModerationBottlePicker({
 }
 
 const styles = stylex.create({
-  dialog: { position: "relative", zIndex: 60 },
+  dialog: { position: "relative", zIndex: zIndices.dialog },
   backdrop: {
     position: "fixed",
     inset: 0,
@@ -253,7 +254,7 @@ const styles = stylex.create({
   },
   header: {
     position: "sticky",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     top: 0,
     display: "flex",
     alignItems: "center",

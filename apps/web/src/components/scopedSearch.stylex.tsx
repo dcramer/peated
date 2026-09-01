@@ -11,6 +11,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { Chip } from "./chip.stylex";
 
@@ -324,10 +325,10 @@ const styles = stylex.create({
   },
   openScope: {
     position: "relative",
-    zIndex: 21,
+    zIndex: zIndices.menuControl,
   },
   openScopeIcon: {
-    zIndex: 21,
+    zIndex: zIndices.menuControl,
   },
   appliedScope: {
     backgroundColor: colors.accent,
@@ -338,7 +339,7 @@ const styles = stylex.create({
   },
   scopeMenu: {
     position: "absolute",
-    zIndex: 20,
+    zIndex: zIndices.menu,
     top: "-8px",
     left: "-8px",
     width: "232px",

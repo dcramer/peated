@@ -7,6 +7,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { ImageViewer } from "./imageViewer.stylex";
@@ -407,7 +408,7 @@ const styles = stylex.create({
   },
   end: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     display: "flex",
     flexShrink: 0,
     alignItems: "center",

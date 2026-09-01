@@ -1,0 +1,7 @@
+id: web-z-index-requires-token
+valid:
+  - "const styles = stylex.create({ menu: { zIndex: zIndices.menu } });"
+  - "const styles = stylex.create({ control: { zIndex: zIndices.localControl } });"
+invalid:
+  - "const styles = stylex.create({ menu: { zIndex: 300 } });"
+  - 'const styles = stylex.create({ menu: { zIndex: "auto" } });'

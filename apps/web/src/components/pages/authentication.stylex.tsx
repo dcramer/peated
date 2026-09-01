@@ -10,6 +10,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
@@ -222,7 +223,7 @@ const styles = stylex.create({
   },
   brand: {
     position: "relative",
-    zIndex: 1,
+    zIndex: zIndices.localContent,
     alignSelf: "flex-start",
     color: colors.ink,
     fontFamily: fonts.display,
@@ -242,7 +243,7 @@ const styles = stylex.create({
   },
   introBody: {
     position: "relative",
-    zIndex: 1,
+    zIndex: zIndices.localContent,
     display: "flex",
     maxWidth: "440px",
     flex: 1,
@@ -331,7 +332,7 @@ const styles = stylex.create({
   },
   introFooter: {
     position: "relative",
-    zIndex: 1,
+    zIndex: zIndices.localContent,
     color: colors.inkMuted,
     fontFamily: fonts.data,
     fontSize: "11px",

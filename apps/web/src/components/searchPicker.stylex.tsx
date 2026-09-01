@@ -11,6 +11,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { Chip } from "./chip.stylex";
 import { FloatingPanel } from "./feedback.stylex";
@@ -457,7 +458,7 @@ const styles = stylex.create({
   invalid: { boxShadow: effects.errorRing },
   overlay: {
     position: "absolute",
-    zIndex: 10,
+    zIndex: zIndices.menu,
     top: "calc(100% + 4px)",
     right: 0,
     left: 0,

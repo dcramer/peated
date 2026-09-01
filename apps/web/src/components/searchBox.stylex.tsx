@@ -17,6 +17,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { FacetGroup, FilterPanel } from "./filterPanel.stylex";
@@ -508,7 +509,7 @@ const styles = stylex.create({
   },
   expandedSurface: {
     position: "absolute",
-    zIndex: 10,
+    zIndex: zIndices.menu,
     top: 0,
     right: 0,
     left: 0,
@@ -518,7 +519,7 @@ const styles = stylex.create({
   },
   pageSurface: {
     position: "relative",
-    zIndex: 0,
+    zIndex: zIndices.base,
     top: "auto",
     right: "auto",
     left: "auto",

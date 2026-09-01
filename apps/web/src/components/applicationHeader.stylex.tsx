@@ -16,6 +16,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { IconButton } from "./button.stylex";
@@ -483,7 +484,7 @@ const styles = stylex.create({
     position: "absolute",
     top: "calc(100% + 4px)",
     right: 0,
-    zIndex: 40,
+    zIndex: zIndices.menu,
     width: "220px",
     paddingTop: space.x1,
     paddingBottom: space.x1,
