@@ -67,10 +67,12 @@ export function WorkflowScreen({
     <main {...stylex.props(foundationStyles.document, styles.screen)}>
       <header {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.headerInner)}>
-          {onClose ? <BackButton onClick={onClose} /> : <RouterBackButton />}
-          <Link href="/" {...stylex.props(styles.brand)}>
-            Peated
-          </Link>
+          <div {...stylex.props(styles.headerLeading)}>
+            {onClose ? <BackButton onClick={onClose} /> : <RouterBackButton />}
+            <Link href="/" {...stylex.props(styles.brand)}>
+              Peated
+            </Link>
+          </div>
           <h1 title={title} {...stylex.props(styles.title)}>
             {title}
           </h1>
@@ -194,7 +196,7 @@ const styles = stylex.create({
     width: "100%",
     maxWidth: "960px",
     minHeight: "56px",
-    gridTemplateColumns: "34px auto minmax(0, 1fr) auto",
+    gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
     alignItems: "center",
     columnGap: space.x3,
     marginRight: "auto",
@@ -202,10 +204,16 @@ const styles = stylex.create({
     paddingRight: `max(${space.x6}, env(safe-area-inset-right))`,
     paddingLeft: `max(${space.x6}, env(safe-area-inset-left))`,
     "@media (max-width: 559px)": {
-      gridTemplateColumns: `${controlMetrics.controlHeightSmall} minmax(0, 1fr) auto`,
       paddingRight: `max(${space.x3}, env(safe-area-inset-right))`,
       paddingLeft: `max(${space.x3}, env(safe-area-inset-left))`,
     },
+  },
+  headerLeading: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    justifySelf: "start",
+    gap: space.x3,
   },
   brand: {
     color: { default: colors.ink, ":hover": colors.accentDeep },
@@ -235,10 +243,12 @@ const styles = stylex.create({
     lineHeight: 1.2,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+    textAlign: "center",
   },
   headerActions: {
     display: "flex",
     alignItems: "center",
+    justifySelf: "end",
     gap: space.x2,
   },
   content: {

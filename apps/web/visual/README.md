@@ -39,6 +39,11 @@ Use a short title that says what the image shows, such as "Home," "Bottle," or
 "Menu." This title appears in Frameshift and sets the file name. Each title must
 be unique.
 
+Use `/` to group related states in Frameshift. For example,
+`snapshot("Tasting form / Review / 1 Score")` writes
+`tasting-form/review/1-score.png`. Keep the final segment specific to the visible
+state. Use a number when workflow order matters.
+
 ## Run locally
 
 Run the normal E2E suite:

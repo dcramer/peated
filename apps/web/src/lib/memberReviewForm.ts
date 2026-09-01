@@ -1,16 +1,17 @@
-import { MemberReviewNotesSchema } from "@peated/server/schemas";
+import { MemberReviewInputSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import type { ImageUploadValue } from "./imageUpload";
 
-export const MemberReviewFormFieldsSchema = z
-  .object({
+export const MemberReviewFormFieldsSchema = MemberReviewInputSchema.omit({
+  score: true,
+})
+  .extend({
     score: z
       .number()
       .int("Use a whole number.")
       .min(0, "Score must be 0 or higher.")
       .max(100, "Score must be 100 or lower.")
       .nullable(),
-    notes: MemberReviewNotesSchema,
   })
   .strict()
   .refine(({ score }) => score !== null, {
@@ -24,10 +25,8 @@ export type MemberReviewFormFields = z.infer<
 
 export type MemberReviewFormSubmitData = {
   bottle: number;
-  score: number;
-  notes: string | null;
   image: ImageUploadValue;
-};
+} & Omit<MemberReviewFormFields, "score"> & { score: number };
 
 export function buildMemberReviewFormSubmission({
   bottleId,
@@ -43,9 +42,9 @@ export function buildMemberReviewFormSubmission({
   }
 
   return {
-    bottle: bottleId,
+    ...fields,
     score: fields.score,
-    notes: fields.notes,
+    bottle: bottleId,
     image,
   };
 }

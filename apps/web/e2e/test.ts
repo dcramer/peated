@@ -22,9 +22,8 @@ export const test = base.extend<{ snapshot: Snapshot }>({
     const titles = new Set<string>();
 
     await use(async (title, { fullPage = true, ready }) => {
-      const snapshotName = slug(title);
-      if (!snapshotName)
-        throw new Error("Snapshot titles must contain a letter or number.");
+      const file = snapshotFile(title);
+      const snapshotName = file.slice(0, -".png".length);
       if (titles.has(snapshotName)) {
         throw new Error(`Duplicate snapshot title in one test: ${title}`);
       }
@@ -38,7 +37,6 @@ export const test = base.extend<{ snapshot: Snapshot }>({
       });
 
       const outputRoot = visualOutputRoot();
-      const file = snapshotFile(snapshotName);
       const imagePath = path.join(outputRoot, file);
       const metadataFile = snapshotMetadataFile(testInfo, snapshotName);
       const metadataPath = path.join(outputRoot, ".metadata", metadataFile);
@@ -90,8 +88,14 @@ function visualOutputRoot() {
     : path.resolve(process.cwd(), ".playwright/visual");
 }
 
-export function snapshotFile(snapshotName: string) {
-  return `${snapshotName}.png`;
+export function snapshotFile(title: string) {
+  const segments = title.split("/").map(slug);
+  if (segments.some((segment) => !segment)) {
+    throw new Error(
+      "Snapshot titles and category segments must contain a letter or number.",
+    );
+  }
+  return `${segments.join("/")}.png`;
 }
 
 export function snapshotMetadataFile(testInfo: TestInfo, snapshotName: string) {

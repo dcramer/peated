@@ -44,7 +44,7 @@ export function MemberPicker({
   return (
     <SearchPicker
       emptyText="No matching friends."
-      help="The people enjoying this tasting with you."
+      help="The people sharing this pour with you."
       label={label}
       loading={loading}
       onChange={(nextValue) =>

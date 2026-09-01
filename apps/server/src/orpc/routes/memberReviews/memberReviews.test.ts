@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { memberReviews } from "@peated/server/db/schema";
+import { follows, memberReviews } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import waitError from "@peated/server/lib/test/waitError";
@@ -18,23 +18,64 @@ describe("member reviews", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
+    const friend = await fixtures.User();
+    await Promise.all(
+      ["apple", "wax", "smoke"].map((name) => fixtures.Tag({ name })),
+    );
+    await db.insert(follows).values({
+      fromUserId: defaults.user.id,
+      toUserId: friend.id,
+      status: "following",
+    });
 
     const created = await routerClient.memberReviews.save(
-      { bottle: bottle.id, score: 88, notes: "Bright fruit." },
+      {
+        bottle: bottle.id,
+        score: 88,
+        tags: ["apple", "wax"],
+        color: 7,
+        notes: "Bright fruit.",
+        servingStyle: "neat",
+        friends: [friend.id],
+      },
       { context: { user: defaults.user } },
     );
     const updated = await routerClient.memberReviews.save(
-      { bottle: bottle.id, score: 90, notes: null },
+      {
+        bottle: bottle.id,
+        score: 90,
+        tags: ["smoke"],
+        color: 9,
+        notes: null,
+        servingStyle: "splash",
+        friends: [friend.id],
+      },
       { context: { user: defaults.user } },
     );
 
-    expect(updated).toMatchObject({ id: created.id, score: 90, notes: null });
+    expect(updated).toMatchObject({
+      id: created.id,
+      score: 90,
+      tags: ["smoke"],
+      color: 9,
+      notes: null,
+      servingStyle: "splash",
+      friends: [{ id: friend.id }],
+    });
     await expect(
       routerClient.memberReviews.getMy(
         { bottle: bottle.id },
         { context: { user: defaults.user } },
       ),
-    ).resolves.toMatchObject({ id: created.id, score: 90, notes: null });
+    ).resolves.toMatchObject({
+      id: created.id,
+      score: 90,
+      tags: ["smoke"],
+      color: 9,
+      notes: null,
+      servingStyle: "splash",
+      friends: [{ id: friend.id }],
+    });
     await expect(
       db.query.memberReviews.findMany({
         where: and(
@@ -48,6 +89,21 @@ describe("member reviews", () => {
       { bottleId: bottle.id },
       { delay: 5000, removeOnComplete: true, removeOnFail: false },
     );
+  });
+
+  test("rejects friends who are not active relationships", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const other = await fixtures.User();
+
+    await expect(
+      routerClient.memberReviews.save(
+        { bottle: bottle.id, score: 88, friends: [other.id] },
+        { context: { user: defaults.user } },
+      ),
+    ).rejects.toThrow("Friends must all be active relationships.");
   });
 
   test("rejects invalid scores", async ({ defaults, fixtures }) => {

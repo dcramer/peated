@@ -1,5 +1,6 @@
 "use client";
 
+import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import * as stylex from "@stylexjs/stylex";
 import type { FocusEvent } from "react";
 import { useId, useMemo, useState } from "react";
@@ -193,15 +194,25 @@ export function NotePickerField({
       ) : null}
 
       {isBrowserOpen ? (
-        <div {...stylex.props(styles.fieldOverlay)}>
-          <NotePicker
-            notes={notes}
-            onChange={onChange}
-            onClose={() => setIsBrowserOpen(false)}
-            onConfirm={() => setIsBrowserOpen(false)}
-            value={value}
-          />
-        </div>
+        <Dialog
+          aria-label="Browse tasting notes"
+          onClose={() => setIsBrowserOpen(false)}
+          open
+          {...stylex.props(styles.browserDialog)}
+        >
+          <DialogBackdrop {...stylex.props(styles.browserBackdrop)} />
+          <div {...stylex.props(styles.browserPosition)}>
+            <DialogPanel {...stylex.props(styles.browserPanel)}>
+              <NotePicker
+                notes={notes}
+                onChange={onChange}
+                onClose={() => setIsBrowserOpen(false)}
+                onConfirm={() => setIsBrowserOpen(false)}
+                value={value}
+              />
+            </DialogPanel>
+          </div>
+        </Dialog>
       ) : null}
 
       {value.length ? (
@@ -259,12 +270,7 @@ export function NotePicker({
     : "none";
 
   return (
-    <FloatingPanel
-      aria-labelledby={titleId}
-      data-state="open"
-      role="dialog"
-      {...stylex.props(styles.picker)}
-    >
+    <div data-state="open" {...stylex.props(styles.picker)}>
       <div {...stylex.props(styles.header)}>
         <h3
           id={titleId}
@@ -379,7 +385,7 @@ export function NotePicker({
           </Button>
         ) : null}
       </footer>
-    </FloatingPanel>
+    </div>
   );
 }
 
@@ -498,12 +504,52 @@ const styles = stylex.create({
     fontSize: "13px",
     lineHeight: 1.4,
   },
-  fieldOverlay: {
-    position: "absolute",
-    zIndex: zIndices.menu,
-    top: "calc(100% + 4px)",
-    left: 0,
-    width: "min(640px, calc(100vw - 48px))",
+  browserDialog: {
+    position: "relative",
+    zIndex: zIndices.dialog,
+  },
+  browserBackdrop: {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: "rgb(16 18 16 / 0.48)",
+  },
+  browserPosition: {
+    boxSizing: "border-box",
+    position: "fixed",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: {
+      default: `max(${space.x6}, env(safe-area-inset-top))`,
+      [COMPACT]: 0,
+    },
+    paddingRight: {
+      default: `max(${space.x6}, env(safe-area-inset-right))`,
+      [COMPACT]: 0,
+    },
+    paddingBottom: {
+      default: `max(${space.x6}, env(safe-area-inset-bottom))`,
+      [COMPACT]: 0,
+    },
+    paddingLeft: {
+      default: `max(${space.x6}, env(safe-area-inset-left))`,
+      [COMPACT]: 0,
+    },
+    pointerEvents: "none",
+  },
+  browserPanel: {
+    width: "100%",
+    maxWidth: "640px",
+    maxHeight: "min(720px, calc(100dvh - 48px))",
+    overflow: "hidden",
+    outline: "none",
+    pointerEvents: "auto",
+    [COMPACT]: {
+      maxWidth: "none",
+      height: "100dvh",
+      maxHeight: "none",
+    },
   },
   fieldSummary: {
     margin: 0,
@@ -514,9 +560,23 @@ const styles = stylex.create({
     lineHeight: 1.3,
   },
   picker: {
+    boxSizing: "border-box",
+    display: "flex",
     width: "100%",
     maxWidth: "640px",
+    maxHeight: "inherit",
+    flexDirection: "column",
     overflow: "hidden",
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.ground,
+    color: colors.ink,
+    boxShadow: effects.overlayShadow,
+    [COMPACT]: {
+      height: "100%",
+      maxWidth: "none",
+      borderRadius: 0,
+      boxShadow: "none",
+    },
   },
   header: {
     display: "grid",
@@ -627,6 +687,9 @@ const styles = stylex.create({
     color: colors.ground,
   },
   noteArea: {
+    minHeight: 0,
+    flex: 1,
+    overflowY: "auto",
     paddingRight: { default: space.x4, [COMPACT]: space.x3 },
     paddingBottom: space.x6,
     paddingLeft: { default: space.x4, [COMPACT]: space.x3 },

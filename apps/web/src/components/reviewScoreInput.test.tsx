@@ -53,8 +53,12 @@ describe("ReviewScoreInput", () => {
     expect(container.textContent).toContain("90–94");
   });
 
-  it("starts an empty score at 85 and stays within the 0–100 range", () => {
+  it("suggests 80 for an empty score and stays within the 0–100 range", () => {
     act(() => root.render(<ReviewScoreHarness initialValue={null} />));
+
+    expect(
+      container.querySelector<HTMLInputElement>("#score")?.placeholder,
+    ).toBe("80");
 
     const increase = container.querySelector<HTMLButtonElement>(
       'button[aria-label="One point higher"]',
@@ -62,7 +66,7 @@ describe("ReviewScoreInput", () => {
     act(() => increase?.click());
 
     expect(container.querySelector<HTMLInputElement>("#score")?.value).toBe(
-      "85",
+      "80",
     );
 
     act(() =>
