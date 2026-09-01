@@ -135,12 +135,13 @@ const ImageField = forwardRef<HTMLInputElement, Props>(function ImageField(
         {...stylex.props(styles.frame, Boolean(preview) && styles.previewFrame)}
       >
         {preview ? (
-          <ImageViewer
-            alt="Image preview"
-            imageProps={stylex.props(styles.preview)}
-            label="image preview"
-            src={preview}
-          />
+          <ImageViewer alt="Image preview" label="image preview" src={preview}>
+            <img
+              alt="Image preview"
+              src={preview}
+              {...stylex.props(styles.preview)}
+            />
+          </ImageViewer>
         ) : (
           <ImagePlus
             aria-hidden="true"

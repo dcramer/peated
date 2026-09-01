@@ -45,13 +45,9 @@ export function BottleVisual({
       )}
     >
       {imageUrl && expandable && label ? (
-        <ImageViewer
-          alt=""
-          fill
-          imageProps={stylex.props(styles.image)}
-          label={label}
-          src={imageUrl}
-        />
+        <ImageViewer alt="" fill label={label} src={imageUrl}>
+          <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
+        </ImageViewer>
       ) : imageUrl ? (
         <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
       ) : (

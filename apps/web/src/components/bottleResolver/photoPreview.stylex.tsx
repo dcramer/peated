@@ -38,13 +38,15 @@ export function PhotoPreview({
         <ImageViewer
           alt="Uploaded bottle label"
           fill
-          imageProps={stylex.props(
-            styles.image,
-            loading && styles.loadingImage,
-          )}
           label="uploaded bottle label"
           src={src}
-        />
+        >
+          <img
+            alt="Uploaded bottle label"
+            src={src}
+            {...stylex.props(styles.image, loading && styles.loadingImage)}
+          />
+        </ImageViewer>
         {loading ? (
           <span aria-hidden="true" {...stylex.props(styles.progress)}>
             <span {...stylex.props(styles.progressSweep)} />

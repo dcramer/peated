@@ -25,7 +25,13 @@ const meta = {
     alt: "A whisky bottle on a white background",
     label: "Whisky bottle",
     src: "/assets/auth-discovery-illustration.webp",
-    imageProps: stylex.props(styles.image),
+    children: (
+      <img
+        alt="A whisky bottle on a white background"
+        src="/assets/auth-discovery-illustration.webp"
+        {...stylex.props(styles.image)}
+      />
+    ),
   },
   decorators: [
     (Story) => (
