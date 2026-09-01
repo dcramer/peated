@@ -25,6 +25,8 @@ export const test = base.extend<{ snapshot: Snapshot }>({
       }
       titles.add(snapshotName);
 
+      await page.waitForLoadState("domcontentloaded");
+      await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
       await page.evaluate(async () => document.fonts.ready);
       await page.addStyleTag({
         content: "nextjs-portal { display: none !important; }",
