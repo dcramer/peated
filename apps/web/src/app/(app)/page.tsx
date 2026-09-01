@@ -20,7 +20,10 @@ export const metadata = homeMetadata;
 
 export default async function Page() {
   const session = await getSession();
-  const searchPlaceholder = getHomeSearchPlaceholder();
+  // Playwright screenshots require stable copy. Production keeps rotating hints.
+  const searchPlaceholder = getHomeSearchPlaceholder(
+    process.env.PLAYWRIGHT_TEST ? () => 0 : undefined,
+  );
   const queryClient = getQueryClient();
   const { client } = session.user
     ? await getServerClient()
