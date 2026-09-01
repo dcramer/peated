@@ -74,7 +74,7 @@ function visualOutputRoot() {
     : path.resolve(process.cwd(), ".playwright/visual");
 }
 
-function snapshotFile(testInfo: TestInfo, snapshotName: string) {
+export function snapshotFile(testInfo: TestInfo, snapshotName: string) {
   const specPath = path
     .relative(testInfo.project.testDir, testInfo.file)
     .replaceAll(path.sep, "/")
@@ -91,7 +91,7 @@ function snapshotFile(testInfo: TestInfo, snapshotName: string) {
 }
 
 function snapshotTitles(testInfo: Pick<TestInfo, "title" | "titlePath">) {
-  const titles = testInfo.titlePath.slice(2);
+  const titles = testInfo.titlePath.slice(1);
   return titles.length > 0 ? titles : [testInfo.title];
 }
 
