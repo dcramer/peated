@@ -1,4 +1,4 @@
-import { BOTTLE_AGE_BAND_LIST, CATEGORY_LIST } from "@peated/server/constants";
+import type { BOTTLE_AGE_BAND_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -54,16 +54,7 @@ export default implement(bottleListContract).handler(async function ({
   context,
   errors,
 }) {
-  const {
-    query,
-    cursor,
-    limit,
-    includeFacets,
-    filter,
-    category,
-    ageBand,
-    ...rest
-  } = input;
+  const { query, cursor, limit, filter, category, ageBand, ...rest } = input;
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
@@ -271,32 +262,7 @@ export default implement(bottleListContract).handler(async function ({
       orderBy = desc(bottles.totalTastings);
   }
 
-  // Facets are an explicit catalog capability because each bucket set scans
-  // the complete filtered result set.
-  const facetQueries = includeFacets
-    ? Promise.all([
-        db
-          .select({
-            value: bottles.category,
-            count: sql<string>`COUNT(*)`,
-          })
-          .from(bottles)
-          .where(and(...where, ageBandWhere, isNotNull(bottles.category)))
-          .groupBy(bottles.category),
-        db
-          .select({
-            nas: sql<string>`COUNT(*) FILTER (WHERE ${bottles.noAgeStatement} IS TRUE)`,
-            under_12: sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} < 12)`,
-            "12_17": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 12 AND ${bottles.statedAge} < 18)`,
-            "18_24": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 18 AND ${bottles.statedAge} < 25)`,
-            "25_plus": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 25)`,
-          })
-          .from(bottles)
-          .where(and(...where, categoryWhere)),
-      ])
-    : Promise.resolve(null);
-
-  const [results, [totalRow], facetRows] = await Promise.all([
+  const [results, [totalRow]] = await Promise.all([
     db
       .select({ ...getTableColumns(bottles) })
       .from(bottles)
@@ -320,13 +286,7 @@ export default implement(bottleListContract).handler(async function ({
       .select({ count: sql<string>`COUNT(*)` })
       .from(bottles)
       .where(and(...resultWhere)),
-    facetQueries,
   ]);
-
-  const categoryCounts = new Map(
-    (facetRows?.[0] ?? []).map(({ value, count }) => [value, Number(count)]),
-  );
-  const ageBandCounts = facetRows?.[1][0];
 
   return {
     results: await serialize(
@@ -337,18 +297,6 @@ export default implement(bottleListContract).handler(async function ({
       { includeGroupSummary: true },
     ),
     total: Number(totalRow?.count ?? 0),
-    facets: facetRows
-      ? {
-          category: CATEGORY_LIST.flatMap((value) => {
-            const count = categoryCounts.get(value) ?? 0;
-            return count > 0 ? [{ value, count }] : [];
-          }),
-          ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
-            const count = Number(ageBandCounts?.[value] ?? 0);
-            return count > 0 ? [{ value, count }] : [];
-          }),
-        }
-      : null,
     followedEntityCount: followedEntityIds?.length ?? null,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,

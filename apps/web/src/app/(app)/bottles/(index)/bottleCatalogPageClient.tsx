@@ -10,7 +10,6 @@ import { ButtonLink } from "@peated/web/components";
 import {
   BottleCatalogFilters,
   BottleCatalogList,
-  type BottleCatalogFacetGroup,
   type BottleCatalogFilterOption,
 } from "@peated/web/components/pages/bottleCatalog.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
@@ -41,7 +40,6 @@ const sortOptions = [
 ] as const;
 
 const categoryOptions = [
-  { label: "All categories", value: "" },
   ...CATEGORY_LIST.map((value) => ({
     label: formatCategoryName(value),
     value,
@@ -56,24 +54,10 @@ const ageBandLabels = {
   "25_plus": "25+ years",
 } as const;
 
-const filterGroups = [
-  {
-    label: "Category",
-    name: "category",
-    options: CATEGORY_LIST.map((value) => ({
-      label: formatCategoryName(value),
-      value,
-    })),
-  },
-  {
-    label: "Age statement",
-    name: "ageBand",
-    options: BOTTLE_AGE_BAND_LIST.map((value) => ({
-      label: ageBandLabels[value],
-      value,
-    })),
-  },
-] satisfies readonly BottleCatalogFacetGroup[];
+const ageBandOptions = BOTTLE_AGE_BAND_LIST.map((value) => ({
+  label: ageBandLabels[value],
+  value,
+})) satisfies readonly BottleCatalogFilterOption[];
 
 const clearedFilterKeys = [
   "age",
@@ -168,16 +152,10 @@ export function BottleCatalogPageClient({
       filters={
         <BottleCatalogFilters
           age={searchParams.get("age") ?? ""}
+          ageBand={searchParams.get("ageBand") ?? ""}
+          ageBandOptions={ageBandOptions}
           category={searchParams.get("category") ?? ""}
           categoryOptions={categoryOptions}
-          facets={{
-            groups: filterGroups,
-            onChange: (name, value) => updateParams({ [name]: value }),
-            selected: {
-              ageBand: searchParams.get("ageBand") ?? "",
-              category: searchParams.get("category") ?? "",
-            },
-          }}
           key={searchParams.get("query") ?? ""}
           onChange={(name, value) => updateParams({ [name]: value })}
           onClear={clearFilters}

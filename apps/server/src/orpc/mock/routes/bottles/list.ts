@@ -1,4 +1,4 @@
-import { BOTTLE_AGE_BAND_LIST, CATEGORY_LIST } from "@peated/server/constants";
+import type { BOTTLE_AGE_BAND_LIST } from "@peated/server/constants";
 import {
   includesQuery,
   mockBottleFor,
@@ -43,10 +43,7 @@ export default mockOS.bottles.list.handler(
     const flightBottleIds = input.flight
       ? mockFlightBottleIds.get(input.flight)
       : undefined;
-    const matchesBottle = (
-      bottle: MockBottle,
-      omittedFacet?: "category" | "ageBand",
-    ) =>
+    const matchesBottle = (bottle: MockBottle) =>
       includesQuery(
         input.query,
         bottle.fullName,
@@ -65,13 +62,9 @@ export default mockOS.bottles.list.handler(
       (input.tag == null || bottle.suggestedTags?.includes(input.tag)) &&
       (input.flavorProfile == null ||
         bottle.flavorProfile === input.flavorProfile) &&
-      (omittedFacet === "category" ||
-        input.category == null ||
-        bottle.category === input.category) &&
+      (input.category == null || bottle.category === input.category) &&
       (input.age == null || bottle.statedAge === input.age) &&
-      (omittedFacet === "ageBand" ||
-        input.ageBand == null ||
-        matchesAgeBand(bottle, input.ageBand)) &&
+      (input.ageBand == null || matchesAgeBand(bottle, input.ageBand)) &&
       (input.minScore == null || (bottle.medianScore ?? 0) >= input.minScore) &&
       (input.flight == null || flightBottleIds?.includes(bottle.id) === true) &&
       (input.filter !== "following" ||
@@ -80,25 +73,6 @@ export default mockOS.bottles.list.handler(
 
     let bottles = mockBottles.filter((bottle) => matchesBottle(bottle));
     const total = bottles.length;
-    const facets = input.includeFacets
-      ? {
-          category: CATEGORY_LIST.flatMap((value) => {
-            const count = mockBottles.filter(
-              (bottle) =>
-                matchesBottle(bottle, "category") && bottle.category === value,
-            ).length;
-            return count > 0 ? [{ value, count }] : [];
-          }),
-          ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
-            const count = mockBottles.filter(
-              (bottle) =>
-                matchesBottle(bottle, "ageBand") &&
-                matchesAgeBand(bottle, value),
-            ).length;
-            return count > 0 ? [{ value, count }] : [];
-          }),
-        }
-      : null;
 
     const direction = input.sort.startsWith("-") ? -1 : 1;
     const sort = input.sort.replace(/^-/, "");
@@ -133,7 +107,6 @@ export default mockOS.bottles.list.handler(
         input.limit,
       ),
       total,
-      facets,
       followedEntityCount: input.filter === "following" ? 3 : null,
     };
   },
