@@ -151,10 +151,12 @@ export const BottleSerializer = serializer({
     const seriesIds = Array.from(
       new Set(itemList.map((i) => i.seriesId).filter(notEmpty)),
     );
-    const seriesList = await db
-      .select()
-      .from(bottleSeries)
-      .where(inArray(bottleSeries.id, seriesIds));
+    const seriesList = seriesIds.length
+      ? await db
+          .select()
+          .from(bottleSeries)
+          .where(inArray(bottleSeries.id, seriesIds))
+      : [];
     const seriesById = Object.fromEntries(
       (await serialize(BottleSeriesSerializer, seriesList, currentUser)).map(
         (data, index) => [seriesList[index].id, data],
