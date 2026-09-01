@@ -25,8 +25,10 @@ test("opens the account menu", async ({ page, snapshot }) => {
 });
 ```
 
-The fixture waits for fonts, disables animation and caret differences, and
-hides the Next.js development portal. It uses a full-page screenshot by
+The fixture waits for visible elements with `aria-busy="true"` to finish and
+for fonts to load. It also disables animation and caret differences and hides
+the Next.js development portal. Use `aria-busy="true"` on loading states that
+must finish before a snapshot. The fixture uses a full-page screenshot by
 default. Pass `{ fullPage: false }` when the viewport itself is part of the
 workflow state, such as an open mobile menu.
 
