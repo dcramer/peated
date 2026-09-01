@@ -54,6 +54,7 @@ export type SearchBoxProps = Pick<
   scopeFacets?: readonly ScopedSearchOption[];
   scopes: readonly ScopedSearchOption[];
   submitLabel?: string;
+  typeaheadNavigation?: boolean;
 };
 
 /** Owns the keyboard and disclosure behavior for Peated's scoped search UI. */
@@ -83,6 +84,7 @@ export function SearchBox({
   status = "ready",
   statusText,
   submitLabel = "Search",
+  typeaheadNavigation = true,
 }: SearchBoxProps) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -90,11 +92,12 @@ export function SearchBox({
   const [selectedId, setSelectedId] = useState<string>();
   const [open, setOpen] = useState(defaultOpen);
   const items = useMemo(() => groups.flatMap((group) => group.items), [groups]);
-  const activeId =
-    items.find((item) => item.id === selectedId)?.id ??
-    (query.trim() && resultQuery.trim() === query.trim()
-      ? items[0]?.id
-      : undefined);
+  const activeId = typeaheadNavigation
+    ? (items.find((item) => item.id === selectedId)?.id ??
+      (query.trim() && resultQuery.trim() === query.trim()
+        ? items[0]?.id
+        : undefined))
+    : undefined;
   const hasPanelContent =
     groups.length > 0 ||
     Boolean(emptyText) ||
@@ -162,6 +165,14 @@ export function SearchBox({
   }
 
   function handleKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
+    if (!typeaheadNavigation) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        onSubmit?.(query);
+      }
+      return;
+    }
+
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       moveActive(event.key === "ArrowDown" ? 1 : -1);
@@ -203,9 +214,11 @@ export function SearchBox({
   const searchControl = (
     <ScopedSearch
       aria-activedescendant={
-        activeId ? `${panelId}-${encodeURIComponent(activeId)}` : undefined
+        typeaheadNavigation && activeId
+          ? `${panelId}-${encodeURIComponent(activeId)}`
+          : undefined
       }
-      aria-autocomplete="list"
+      aria-autocomplete={typeaheadNavigation ? "list" : undefined}
       aria-controls={expanded ? panelId : undefined}
       autoFocus={autoFocus}
       disabled={disabled}
@@ -281,12 +294,12 @@ export function SearchBox({
               {searchRow}
               {expanded ? (
                 <SearchResults
-                  activeId={activeId}
+                  activeId={typeaheadNavigation ? activeId : undefined}
                   embedded
                   groups={groups}
                   label="Recent searches"
-                  onItemSelect={selectResult}
-                  optionIdPrefix={panelId}
+                  onItemSelect={typeaheadNavigation ? selectResult : undefined}
+                  optionIdPrefix={typeaheadNavigation ? panelId : undefined}
                   panelId={panelId}
                   query=""
                   scroll={false}
@@ -325,14 +338,14 @@ export function SearchBox({
               ) : null}
               {expanded ? (
                 <SearchResults
-                  activeId={activeId}
+                  activeId={typeaheadNavigation ? activeId : undefined}
                   contribution={contribution}
                   embedded
                   emptyText={emptyText}
                   groups={groups}
-                  onItemSelect={selectResult}
+                  onItemSelect={typeaheadNavigation ? selectResult : undefined}
                   onRetry={onRetry}
-                  optionIdPrefix={panelId}
+                  optionIdPrefix={typeaheadNavigation ? panelId : undefined}
                   panelId={panelId}
                   query={resultQuery}
                   scroll={false}
@@ -379,15 +392,15 @@ export function SearchBox({
               />
             </div>
             <SearchResults
-              activeId={activeId}
+              activeId={typeaheadNavigation ? activeId : undefined}
               contribution={contribution}
               embedded
               emptyText={emptyText}
               groups={groups}
               label={query.trim() ? "Search results" : "Recent searches"}
-              onItemSelect={selectResult}
+              onItemSelect={typeaheadNavigation ? selectResult : undefined}
               onRetry={onRetry}
-              optionIdPrefix={panelId}
+              optionIdPrefix={typeaheadNavigation ? panelId : undefined}
               panelId={panelId}
               query={resultQuery}
               scroll={placement === "overlay"}

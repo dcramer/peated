@@ -259,6 +259,27 @@ describe("GET /search", () => {
     ]);
   });
 
+  test("puts a case-insensitive exact Entity group before Bottle matches", async ({
+    fixtures,
+  }) => {
+    await fixtures.Bottle({ name: "Exactgroupneedle Bottle" });
+    const brand = await fixtures.Entity({
+      name: "Exactgroupneedle",
+      kind: "brand",
+    });
+
+    const data = await routerClient.search({
+      query: "EXACTGROUPNEEDLE",
+      scopes: ["bottles", "brands"],
+      limit: 10,
+    });
+
+    expect(data.groups).toMatchObject([
+      { type: "brands", results: [{ id: brand.id }] },
+      { type: "bottles" },
+    ]);
+  });
+
   test("uses community rating count only to break equal text matches", async ({
     fixtures,
   }) => {
