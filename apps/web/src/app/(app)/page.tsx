@@ -35,7 +35,6 @@ export default async function Page() {
       ...publicHomeQueries.stats(orpc),
       queryFn: getPublicStats,
     }),
-    queryClient.prefetchQuery(publicHomeQueries.events(orpc)),
     queryClient.prefetchQuery(publicHomeQueries.recentReviews(orpc)),
     queryClient.prefetchQuery(publicHomeQueries.releases(orpc)),
     ...(session.user

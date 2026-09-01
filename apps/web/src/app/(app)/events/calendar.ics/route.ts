@@ -1,7 +1,7 @@
 import { buildEventsCalendar } from "@peated/web/lib/eventsCalendar";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const { client } = await getAnonymousServerClient();
