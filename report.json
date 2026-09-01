@@ -1,0 +1,123 @@
+{
+  "files": [
+    {
+      "file": "record-tasting/log-tasting/logs-a-tasting-from-a-matched-bottle-photo/start__chromium-desktop.png",
+      "image": "images/candidate/record-tasting/log-tasting/logs-a-tasting-from-a-matched-bottle-photo/start__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/record-tasting/log-tasting/logs-a-tasting-from-a-matched-bottle-photo/start__chromium-desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "routes/mobile-navigation-opens-and-reaches-the-bottle-catalog/navigation-open__chromium-mobile.png",
+      "image": "images/candidate/routes/mobile-navigation-opens-and-reaches-the-bottle-catalog/navigation-open__chromium-mobile.png",
+      "images": {
+        "candidate": "images/candidate/routes/mobile-navigation-opens-and-reaches-the-bottle-catalog/navigation-open__chromium-mobile.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "routes/public-routes-load/bottle-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/bottle-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/bottle-detail__chromium-desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "routes/public-routes-load/bottler-detail__chromium-desktop.png",
+      "height": 1211,
+      "image": "images/diff/routes/public-routes-load/bottler-detail__chromium-desktop.png",
+      "images": {
+        "baseline": "images/baseline/routes/public-routes-load/bottler-detail__chromium-desktop.png",
+        "candidate": "images/candidate/routes/public-routes-load/bottler-detail__chromium-desktop.png",
+        "diff": "images/diff/routes/public-routes-load/bottler-detail__chromium-desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "routes/public-routes-load/brand-detail__chromium-desktop.png",
+      "height": 1180,
+      "image": "images/diff/routes/public-routes-load/brand-detail__chromium-desktop.png",
+      "images": {
+        "baseline": "images/baseline/routes/public-routes-load/brand-detail__chromium-desktop.png",
+        "candidate": "images/candidate/routes/public-routes-load/brand-detail__chromium-desktop.png",
+        "diff": "images/diff/routes/public-routes-load/brand-detail__chromium-desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "routes/public-routes-load/distillery-detail__chromium-desktop.png",
+      "height": 1191,
+      "image": "images/diff/routes/public-routes-load/distillery-detail__chromium-desktop.png",
+      "images": {
+        "baseline": "images/baseline/routes/public-routes-load/distillery-detail__chromium-desktop.png",
+        "candidate": "images/candidate/routes/public-routes-load/distillery-detail__chromium-desktop.png",
+        "diff": "images/diff/routes/public-routes-load/distillery-detail__chromium-desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "routes/public-routes-load/home__chromium-desktop.png",
+      "height": 1603,
+      "image": "images/diff/routes/public-routes-load/home__chromium-desktop.png",
+      "images": {
+        "baseline": "images/baseline/routes/public-routes-load/home__chromium-desktop.png",
+        "candidate": "images/candidate/routes/public-routes-load/home__chromium-desktop.png",
+        "diff": "images/diff/routes/public-routes-load/home__chromium-desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "routes/public-routes-load/login__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/login__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/login__chromium-desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "routes/public-routes-load/member-profile__chromium-desktop.png",
+      "height": 1180,
+      "image": "images/diff/routes/public-routes-load/member-profile__chromium-desktop.png",
+      "images": {
+        "baseline": "images/baseline/routes/public-routes-load/member-profile__chromium-desktop.png",
+        "candidate": "images/candidate/routes/public-routes-load/member-profile__chromium-desktop.png",
+        "diff": "images/diff/routes/public-routes-load/member-profile__chromium-desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "routes/public-routes-load/region-detail__chromium-desktop.png",
+      "image": "images/candidate/routes/public-routes-load/region-detail__chromium-desktop.png",
+      "images": {
+        "candidate": "images/candidate/routes/public-routes-load/region-detail__chromium-desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "routes/public-routes-load/search__chromium-desktop.png",
+      "height": 1132,
+      "image": "images/diff/routes/public-routes-load/search__chromium-desktop.png",
+      "images": {
+        "baseline": "images/baseline/routes/public-routes-load/search__chromium-desktop.png",
+        "candidate": "images/candidate/routes/public-routes-load/search__chromium-desktop.png",
+        "diff": "images/diff/routes/public-routes-load/search__chromium-desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 6,
+    "removed": 0,
+    "unchanged": 5
+  },
+  "version": 2
+}
