@@ -16,7 +16,12 @@ import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
 import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
-import { entityHasBottleCatalog, type Entity } from "./entityPageData";
+import { EntityOperatedOverview } from "./entityOperatedOverview";
+import {
+  entityHasBottleCatalog,
+  getEntityRelationshipOwnerIds,
+  type Entity,
+} from "./entityPageData";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
@@ -44,6 +49,8 @@ export function EntityOverviewClient({
 }) {
   const orpc = useORPC();
   const ownsBottleSections = entityHasBottleCatalog(initialEntity);
+  const { operatedOwnerId, siblingOwnerId } =
+    getEntityRelationshipOwnerIds(initialEntity);
   const entityQuery = useQuery({
     ...orpc.entities.details.queryOptions({
       input: { entity: initialEntity.id },
@@ -85,16 +92,29 @@ export function EntityOverviewClient({
     enabled: ownsBottleSections,
     initialData: initialReleaseList,
   });
-  const siblingListQuery = useQuery({
+  const operatedListQuery = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
-        kinds: ["distillery", "bottler"],
         limit: 5,
-        owner: initialEntity.ownerId ?? undefined,
+        owner: operatedOwnerId ?? undefined,
         sort: "-bottles",
       },
     }),
-    enabled: Boolean(initialEntity.ownerId),
+    enabled: Boolean(operatedOwnerId),
+  });
+  const siblingListQuery = useQuery({
+    ...orpc.entities.list.queryOptions({
+      input: {
+        kinds:
+          initialEntity.kind === "company"
+            ? undefined
+            : ["distillery", "bottler"],
+        limit: 5,
+        owner: siblingOwnerId ?? undefined,
+        sort: "-bottles",
+      },
+    }),
+    enabled: Boolean(siblingOwnerId),
     initialData: initialSiblingList,
   });
 
@@ -117,6 +137,13 @@ export function EntityOverviewClient({
           {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
         </div>
         <div {...stylex.props(styles.catalogSections)}>
+          <EntityOperatedOverview
+            entity={entity}
+            error={Boolean(operatedListQuery.error)}
+            operatedList={operatedListQuery.data}
+            pending={operatedListQuery.isPending}
+            retry={() => void operatedListQuery.refetch()}
+          />
           <EntityReleaseOverview
             entity={entity}
             error={Boolean(releaseListQuery.error)}

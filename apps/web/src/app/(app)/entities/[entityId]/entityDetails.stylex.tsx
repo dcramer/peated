@@ -5,7 +5,7 @@ import {
   hasVisibleFacts,
   type FactListItem,
 } from "@peated/web/components";
-import { parseDomain } from "@peated/web/lib/urls";
+import { getEntityUrl, parseDomain } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
@@ -36,7 +36,7 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     {
       label: "Part of",
       value: entity.owner ? (
-        <TextLink href={`/entities/${entity.owner.id}`} size="inherit">
+        <TextLink href={getEntityUrl(entity.owner)} size="inherit">
           {entity.owner.name}
         </TextLink>
       ) : null,

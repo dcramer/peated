@@ -227,7 +227,12 @@ export const mockEntities: Entity[] = [
     name: "Caol Ila",
     shortName: null,
     ownerId: 9210,
-    owner: { id: 9210, peatedId: "E9210", name: "Diageo" },
+    owner: {
+      id: 9210,
+      kind: "company",
+      peatedId: "E9210",
+      name: "Diageo",
+    },
     description:
       "An Islay distillery known for a lighter, maritime style of peated single malt.",
     yearEstablished: 1846,
@@ -244,7 +249,12 @@ export const mockEntities: Entity[] = [
     name: "Talisker",
     shortName: null,
     ownerId: 9210,
-    owner: { id: 9210, peatedId: "E9210", name: "Diageo" },
+    owner: {
+      id: 9210,
+      kind: "company",
+      peatedId: "E9210",
+      name: "Diageo",
+    },
     description:
       "An island distillery known for peppery, maritime single malt.",
     yearEstablished: 1830,
