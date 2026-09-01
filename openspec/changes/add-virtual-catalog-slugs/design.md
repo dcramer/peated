@@ -2,9 +2,9 @@
 
 Public Bottle pages use `/bottles/{id}`. Public Entity pages use the primary
 kind collection and ID, such as `/distillers/{id}`. Shared URL helpers already
-own most public links. Page loaders already redirect merged IDs and wrong
-Entity collections. Bottle display names are already centralized in
-`formatBottleDisplayName`.
+own most public links. The web route boundary redirects Entity routes before
+rendering, and Bottle pages redirect merged IDs. Bottle display names are
+already centralized in `formatBottleDisplayName`.
 
 The slug is part of the displayed URL. It can change when a Bottle or Entity
 name changes. The numeric database ID remains stable and handles all lookups.
