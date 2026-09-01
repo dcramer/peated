@@ -1,0 +1,1 @@
+ALTER TABLE "member_review" ADD COLUMN "image_url" text;

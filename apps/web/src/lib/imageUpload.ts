@@ -1,9 +1,11 @@
-const TASTING_IMAGE_UPLOAD_TIMEOUT_MS = 90_000;
+export type ImageUploadValue = HTMLCanvasElement | File | null | undefined;
 
-export async function uploadTastingImageAfterSave<TResult>({
+const IMAGE_UPLOAD_TIMEOUT_MS = 90_000;
+
+export async function uploadImageAfterSave<TResult>({
   prepare,
   upload,
-  timeoutMs = TASTING_IMAGE_UPLOAD_TIMEOUT_MS,
+  timeoutMs = IMAGE_UPLOAD_TIMEOUT_MS,
 }: {
   prepare: () => Promise<Blob>;
   upload: (file: Blob) => Promise<TResult>;
@@ -21,7 +23,7 @@ export async function uploadTastingImageAfterSave<TResult>({
       })(),
       new Promise<never>((_, reject) => {
         timeout = setTimeout(
-          () => reject(new Error(`Tasting image ${stage} timed out.`)),
+          () => reject(new Error(`Image ${stage} timed out.`)),
           timeoutMs,
         );
       }),

@@ -28,6 +28,7 @@ import type { CreateBottlePrefill } from "@peated/web/components/search/createBo
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
 import TastingForm, {
+  type MemberReviewFormSubmitData,
   type TastingCreateFormSubmitData,
 } from "@peated/web/components/tastingForm";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
@@ -40,10 +41,10 @@ import {
 import { toBlob } from "@peated/web/lib/blobs";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { TastingTagSuggestion } from "@peated/web/lib/tastingForm";
-import { uploadTastingImageAfterSave } from "@peated/web/lib/tastingImageUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -646,6 +647,15 @@ function AddBottleFlowContent() {
   const tastingCreateMutation = useMutation(
     orpc.tastings.create.mutationOptions(),
   );
+  const memberReviewSaveMutation = useMutation(
+    orpc.memberReviews.save.mutationOptions(),
+  );
+  const memberReviewImageUpdateMutation = useMutation(
+    orpc.memberReviews.imageUpdate.mutationOptions(),
+  );
+  const memberReviewImageDeleteMutation = useMutation(
+    orpc.memberReviews.imageDelete.mutationOptions(),
+  );
   const tastingImageUpdateMutation = useMutation(
     orpc.tastings.imageUpdate.mutationOptions(),
   );
@@ -932,7 +942,7 @@ function AddBottleFlowContent() {
 
     if (image) {
       try {
-        await uploadTastingImageAfterSave({
+        await uploadImageAfterSave({
           prepare: async () =>
             image instanceof File ? image : await toBlob(image),
           upload: async (imageFile) => {
@@ -948,7 +958,7 @@ function AddBottleFlowContent() {
           extra: { tastingId: tasting.id },
         });
         flash(
-          "There was an error uploading your image, but the tasting was saved.",
+          "We couldn't upload the picture, but your tasting was saved.",
           "error",
         );
       }
@@ -968,6 +978,64 @@ function AddBottleFlowContent() {
         ? `/flights/${requestedFlightId}`
         : `/tastings/${tasting.id}`,
     );
+  }
+
+  async function submitMemberReview({
+    image,
+    ...data
+  }: MemberReviewFormSubmitData) {
+    if (!tastingDraft) return;
+
+    let review = await memberReviewSaveMutation.mutateAsync({
+      ...data,
+      pendingImageId:
+        image === undefined ? tastingDraft.pendingImage?.id : undefined,
+    });
+
+    try {
+      if (image) {
+        await uploadImageAfterSave({
+          prepare: async () =>
+            image instanceof File ? image : await toBlob(image),
+          upload: async (imageFile) => {
+            review = await memberReviewImageUpdateMutation.mutateAsync({
+              bottle: review.bottleId,
+              file: imageFile,
+            });
+          },
+        });
+      } else if (image === null && review.imageUrl) {
+        review = await memberReviewImageDeleteMutation.mutateAsync({
+          bottle: review.bottleId,
+        });
+      }
+    } catch (err) {
+      logError(err, {
+        context: "member_review_image_update_after_save",
+        extra: { memberReviewId: review.id },
+      });
+      flash(
+        "We couldn't update the picture, but your review was saved.",
+        "error",
+      );
+    }
+
+    queryClient.setQueryData(
+      orpc.memberReviews.getMy.key({
+        input: { bottle: review.bottleId },
+        type: "query",
+      }),
+      review,
+    );
+    await queryClient.invalidateQueries({
+      queryKey: orpc.bottles.details.key({
+        input: { bottle: review.bottleId },
+        type: "query",
+      }),
+    });
+
+    flash("Review saved.", "info");
+    router.push(`/bottles/${review.bottleId}`);
   }
 
   if (loadingBottle) {
@@ -1007,6 +1075,7 @@ function AddBottleFlowContent() {
           imageUrl: tastingDraft.pendingImage?.imageUrl,
         }}
         suggestedTags={tastingDraft.suggestedTags}
+        onReviewSubmit={submitMemberReview}
         onSubmit={submitTasting}
       />
     );

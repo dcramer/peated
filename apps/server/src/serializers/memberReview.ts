@@ -4,7 +4,9 @@ import type { MemberReviewSchema } from "@peated/server/schemas";
 import { inArray } from "drizzle-orm";
 import type { z } from "zod";
 import { serialize, serializer } from ".";
+import config from "../config";
 import { db } from "../db";
+import { absoluteUrl } from "../lib/urls";
 import { UserSerializer } from "./user";
 
 type Attrs = {
@@ -48,6 +50,9 @@ export const MemberReviewSerializer = serializer({
     bottleId: item.bottleId,
     score: item.score,
     notes: item.notes,
+    imageUrl: item.imageUrl
+      ? absoluteUrl(config.API_SERVER, item.imageUrl)
+      : null,
     createdBy: attrs.createdBy,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),

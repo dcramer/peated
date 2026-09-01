@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { memberReviews } from "@peated/server/db/schema";
+import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -59,6 +60,93 @@ describe("member reviews", () => {
         ),
       ).rejects.toThrow("Input validation failed");
     }
+  });
+
+  test("attaches an owned photo-entry image when saving", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+    });
+
+    const review = await routerClient.memberReviews.save(
+      {
+        bottle: bottle.id,
+        score: 91,
+        notes: null,
+        pendingImageId: pendingUpload.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(review.imageUrl).toContain(
+      `/uploads/member-reviews/member_review-${review.id}-`,
+    );
+  });
+
+  test("uploads and removes my review image", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await routerClient.memberReviews.save(
+      { bottle: bottle.id, score: 87, notes: null },
+      { context: { user: defaults.user } },
+    );
+    const oldUpdatedAt = new Date("2020-01-01T00:00:00.000Z");
+    await db
+      .update(memberReviews)
+      .set({ updatedAt: oldUpdatedAt })
+      .where(eq(memberReviews.bottleId, bottle.id));
+
+    const withImage = await routerClient.memberReviews.imageUpdate(
+      { bottle: bottle.id, file: await fixtures.SampleSquareImage() },
+      { context: { user: defaults.user } },
+    );
+    expect(withImage.imageUrl).toMatch(/\.webp$/);
+    expect(withImage.updatedAt).not.toBe(oldUpdatedAt.toISOString());
+    await expect(
+      db.query.memberReviews.findFirst({
+        where: eq(memberReviews.id, withImage.id),
+      }),
+    ).resolves.toMatchObject({ imageUrl: expect.stringMatching(/\.webp$/) });
+
+    await db
+      .update(memberReviews)
+      .set({ updatedAt: oldUpdatedAt })
+      .where(eq(memberReviews.id, withImage.id));
+
+    const withoutImage = await routerClient.memberReviews.imageDelete(
+      { bottle: bottle.id },
+      { context: { user: defaults.user } },
+    );
+    expect(withoutImage.imageUrl).toBeNull();
+    expect(withoutImage.updatedAt).not.toBe(oldUpdatedAt.toISOString());
+  });
+
+  test("cannot update another member's review image", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const other = await fixtures.User();
+    await routerClient.memberReviews.save(
+      { bottle: bottle.id, score: 87, notes: null },
+      { context: { user: other } },
+    );
+
+    expect(
+      await waitError(() =>
+        routerClient.memberReviews.imageUpdate(
+          { bottle: bottle.id, file: new Blob(["not read"]) },
+          { context: { user: defaults.user } },
+        ),
+      ),
+    ).toMatchObject({ code: "NOT_FOUND" });
   });
 
   test("only the owner can delete a review", async ({ defaults, fixtures }) => {

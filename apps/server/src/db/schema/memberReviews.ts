@@ -25,6 +25,7 @@ export const memberReviews = pgTable(
       .notNull(),
     score: smallint("score").notNull(),
     notes: text("notes"),
+    imageUrl: text("image_url"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

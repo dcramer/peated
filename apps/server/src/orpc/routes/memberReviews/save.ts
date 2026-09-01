@@ -1,6 +1,12 @@
 import { db } from "@peated/server/db";
 import { memberReviews } from "@peated/server/db/schema";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
+import { logError } from "@peated/server/lib/log";
+import {
+  copyPendingImageToMemberReview,
+  getUsablePendingUpload,
+  PendingUploadError,
+} from "@peated/server/lib/pendingUploads";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -16,7 +22,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -31,11 +37,31 @@ export default procedure
   .input(
     MemberReviewInputSchema.extend({
       bottle: z.coerce.number().int().positive(),
+      pendingImageId: z.string().trim().min(1).optional(),
     }),
   )
   .output(MemberReviewSchema)
   .handler(async ({ input, context, errors }) => {
-    const review = await db.transaction(async (tx) => {
+    if (input.pendingImageId) {
+      try {
+        const pendingUpload = await getUsablePendingUpload({
+          id: input.pendingImageId,
+          userId: context.user.id,
+        });
+        if (pendingUpload.purpose !== "photo_tasting_entry") {
+          throw new PendingUploadError("Pending upload purpose mismatch.");
+        }
+      } catch (err) {
+        if (err instanceof PendingUploadError) {
+          throw errors.BAD_REQUEST({
+            message: err.message || "Pending photo is no longer available.",
+          });
+        }
+        throw err;
+      }
+    }
+
+    let review = await db.transaction(async (tx) => {
       try {
         await resolveActiveBottleIds(tx, [input.bottle], { lock: "update" });
       } catch (error) {
@@ -70,6 +96,28 @@ export default procedure
       }
       return stored;
     });
+
+    if (input.pendingImageId) {
+      try {
+        const imageUrl = await copyPendingImageToMemberReview({
+          id: input.pendingImageId,
+          userId: context.user.id,
+          purpose: "photo_tasting_entry",
+          memberReviewId: review.id,
+        });
+        const [updated] = await db
+          .update(memberReviews)
+          .set({ imageUrl })
+          .where(eq(memberReviews.id, review.id))
+          .returning();
+        if (updated) review = updated;
+      } catch (err) {
+        logError(err, {
+          memberReview: { id: review.id },
+          pendingUpload: { id: input.pendingImageId },
+        });
+      }
+    }
 
     await dispatchBottleStatsRecompute(
       "memberReview",

@@ -35,14 +35,7 @@ export function FormSection({
     <section {...props} {...stylex.props(styles.section)}>
       <div {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.copy)}>
-          <h2
-            {...stylex.props(
-              foundationStyles.sectionHeading,
-              styles.numberedHeading,
-            )}
-          >
-            {title}
-          </h2>
+          <h2 {...stylex.props(foundationStyles.sectionHeading)}>{title}</h2>
           {description ? (
             <div {...stylex.props(foundationStyles.body, styles.description)}>
               {description}
@@ -159,7 +152,6 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     rowGap: space.x4,
-    counterReset: "form-section",
   },
   grid: {
     display: "grid",
@@ -181,7 +173,6 @@ const styles = stylex.create({
     paddingBottom: space.x8,
     paddingLeft: 0,
     backgroundColor: "transparent",
-    counterIncrement: "form-section",
   },
   header: {
     display: "flex",
@@ -195,14 +186,6 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     rowGap: space.x2,
-  },
-  numberedHeading: {
-    "::before": {
-      content: "counter(form-section, decimal-leading-zero)",
-      marginRight: space.x3,
-      color: colors.accent,
-      fontVariantNumeric: "tabular-nums",
-    },
   },
   description: {
     maxWidth: "62ch",

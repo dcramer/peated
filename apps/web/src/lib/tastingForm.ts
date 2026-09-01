@@ -1,6 +1,7 @@
 import { TastingContentInputSchema } from "@peated/server/schemas";
 import type { SuggestedTag, Tag } from "@peated/server/types";
 import { z } from "zod";
+import type { ImageUploadValue } from "./imageUpload";
 
 export const TastingFormFieldsSchema = TastingContentInputSchema.pick({
   ratingBand: true,
@@ -20,9 +21,8 @@ export const TastingCreateFormFieldsSchema = TastingFormFieldsSchema.refine(
 );
 
 export type TastingFormFields = z.infer<typeof TastingFormFieldsSchema>;
-export type TastingFormImage = HTMLCanvasElement | File | null | undefined;
 export type TastingEditFormSubmitData = TastingFormFields & {
-  image: TastingFormImage;
+  image: ImageUploadValue;
 };
 export type TastingCreateFormSubmitData = TastingEditFormSubmitData & {
   bottle: number;
@@ -34,7 +34,7 @@ export function buildTastingCreateFormSubmission({
   bottleId,
 }: {
   fields: TastingFormFields;
-  image: TastingFormImage;
+  image: ImageUploadValue;
   bottleId: number;
 }): TastingCreateFormSubmitData {
   return {
@@ -49,7 +49,7 @@ export function buildTastingEditFormSubmission({
   image,
 }: {
   fields: TastingFormFields;
-  image: TastingFormImage;
+  image: ImageUploadValue;
 }): TastingEditFormSubmitData {
   return { ...fields, image };
 }

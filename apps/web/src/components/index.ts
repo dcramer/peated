@@ -239,11 +239,13 @@ export {
   ColorInput,
   PictureInput,
   RatingBandInput,
+  ReviewScoreInput,
 } from "./tastingInputs.stylex";
 export type {
   ColorInputProps,
   PictureInputProps,
   RatingBandInputProps,
+  ReviewScoreInputProps,
 } from "./tastingInputs.stylex";
 export { TastingToastSummary } from "./tastingToastButton.stylex";
 export { TextLink } from "./textLink.stylex";

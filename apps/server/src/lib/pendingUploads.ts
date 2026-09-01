@@ -14,6 +14,7 @@ import { Readable } from "node:stream";
 export const PENDING_UPLOAD_NAMESPACE = "pending-uploads";
 export const PERMANENT_UPLOAD_NAMESPACES = [
   "tastings",
+  "member-reviews",
   "collection-bottles",
   "bottles",
   "bottle-releases",
@@ -258,6 +259,23 @@ export async function copyPendingImageToTasting({
     destinationNamespace: "tastings",
     destinationType: "tasting",
     destinationId: tastingId,
+  });
+}
+
+/** Copies an approved pending image to a member review image slot. */
+export async function copyPendingImageToMemberReview({
+  id,
+  userId,
+  purpose,
+  memberReviewId,
+}: PendingImageCopyInput & { memberReviewId: number }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "member-reviews",
+    destinationType: "member_review",
+    destinationId: memberReviewId,
   });
 }
 
