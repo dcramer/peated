@@ -163,7 +163,7 @@ function LatestReleases() {
 
     return [
       {
-        ...toBottleListItem(bottle),
+        ...toBottleListItem(bottle, { includeBrandRow: false }),
         align: "start" as const,
         metadata: getReleaseMetadata(bottle),
         subtitle: subtitle.length ? (
