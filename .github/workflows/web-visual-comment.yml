@@ -66,7 +66,7 @@ jobs:
         if: >-
           steps.pr.outputs.found == 'true' &&
           steps.download.outcome == 'success'
-        uses: dcramer/frameshift/publish@86923f029b13159b2f36c6c4f4c3cfe61a514122 # main
+        uses: dcramer/frameshift/publish@4d72fa3bbd01d9f49cc65a9244f89420c0e5bdf0 # main
         with:
           report: apps/web/.playwright/visual/report
           github-token: ${{ secrets.GITHUB_TOKEN }}
