@@ -7,6 +7,7 @@ on:
       - "apps/web/**"
       - "packages/design/**"
       - "packages/orpc/**"
+      - ".github/workflows/web-visual-baseline.yml"
       - ".github/workflows/web-visual.yml"
       - ".github/workflows/web-visual-comment.yml"
       - "package.json"
@@ -23,6 +24,7 @@ jobs:
     timeout-minutes: 20
     if: github.event.pull_request.head.repo.full_name == github.repository
     permissions:
+      actions: read
       contents: read
       pull-requests: read
     steps:
@@ -34,6 +36,7 @@ jobs:
       - name: Choose pages
         id: mode
         env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
           MERGE_SHA: ${{ github.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
@@ -43,18 +46,9 @@ jobs:
           else
             echo "all=false" >> "$GITHUB_OUTPUT"
           fi
-          base_sha="$(git rev-parse "${MERGE_SHA}^1")"
-          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
-          git diff --name-only "$base_sha" "$MERGE_SHA" > /tmp/peated-screenshot-changes.txt
+          echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          git diff --name-only "$BASE_SHA" "$MERGE_SHA" > /tmp/peated-screenshot-changes.txt
           cat /tmp/peated-screenshot-changes.txt
-
-      - name: Checkout base revision
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 1
-          path: base-source
-          persist-credentials: false
-          ref: ${{ steps.mode.outputs.base_sha }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -66,12 +60,8 @@ jobs:
           node-version: 24.18.0
       - name: Install candidate dependencies
         run: pnpm install --frozen-lockfile
-      - name: Install base dependencies
-        run: pnpm --dir base-source install --frozen-lockfile
       - name: Install candidate Playwright
         run: pnpm --dir apps/web exec playwright install --with-deps chromium
-      - name: Install base Playwright
-        run: pnpm --dir base-source/apps/web exec playwright install chromium
       - name: Capture candidate screenshots
         env:
           ALL: ${{ steps.mode.outputs.all }}
@@ -87,23 +77,22 @@ jobs:
             args+=(--all)
           fi
           pnpm visual:web -- "${args[@]}"
-      - name: Capture base screenshots
-        env:
-          ALL: ${{ steps.mode.outputs.all }}
-          VISUAL_SOURCE_SHA: ${{ steps.mode.outputs.base_sha }}
-          VISUAL_ROOT: ${{ github.workspace }}/visual-output
-        run: |
-          set -euo pipefail
-          args=(
-            --changed-file /tmp/peated-screenshot-changes.txt
-            --out-dir "$VISUAL_ROOT/baseline"
-          )
-          if [[ "$ALL" == "true" ]]; then
-            args+=(--all)
-          fi
-          pnpm --dir base-source visual:web -- "${args[@]}"
+      - name: Restore exact baseline artifact
+        uses: dcramer/frameshift/baseline@b0bd168f717b9d7e865dc3aff252950519a58e40 # main
+        with:
+          name: peated-web-screenshots
+          sha: ${{ steps.mode.outputs.base_sha }}
+          path: ${{ github.workspace }}/visual-output/baseline-artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Select matching baseline screenshots
+        run: >-
+          node apps/web/visual/select-baseline.mjs
+          --source visual-output/baseline-artifact
+          --candidate visual-output/candidate/manifest.json
+          --output visual-output/baseline
+          --sha "${{ steps.mode.outputs.base_sha }}"
       - name: Compare screenshots
-        uses: dcramer/frameshift@c44e38d936f9ba9048795438c4204e3480500a98 # main
+        uses: dcramer/frameshift@b0bd168f717b9d7e865dc3aff252950519a58e40 # main
         with:
           baseline: ${{ github.workspace }}/visual-output/baseline
           candidate: ${{ github.workspace }}/visual-output/candidate

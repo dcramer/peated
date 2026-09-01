@@ -29,28 +29,30 @@ Add the `run-all-screenshots` label to capture every scenario.
 
 ## Where the baseline comes from
 
-The workflow generates both screenshot sets during each pull request run. It
-does not download the baseline from an older workflow artifact.
+The default-branch workflow captures every scenario once for each `main`
+commit. It stores the complete screenshot directory in a GitHub Actions
+artifact named with that commit's full SHA.
 
-GitHub's `pull_request` event checks out a temporary merge commit. That commit
-represents the pull request applied to its current base branch. CI uses it as
-the candidate revision. It resolves the merge commit's first parent and checks
-that exact Git commit out into `base-source`. It uses that checkout as the
-baseline revision.
-
-CI then installs each revision from its own lockfile and runs the same capture
-command in both directories:
+GitHub's `pull_request` event identifies the exact base SHA and a temporary
+candidate merge commit. The pull request workflow restores the artifact for
+that base SHA, captures only the selected candidate scenarios, and selects the
+matching files from the complete baseline:
 
 ```text
-merge commit checkout ──capture──> visual-output/candidate
-       first parent ────capture──> visual-output/baseline
+main commit ──capture once──> GitHub artifact keyed by base SHA
+                                      │
+pull request ──capture candidate──────┴──> Frameshift comparison
 ```
 
-Both captures run on the same GitHub runner with the same Chromium version.
-The capture tool also fixes the mock API data, color scheme, device scale,
-locale, timezone, reduced-motion setting, and viewport sizes. This keeps the
-comparison tied to source revisions without keeping a permanent screenshot
-archive.
+The restore Action checks both the artifact name and its source SHA. The
+selection step also checks the SHA recorded in `manifest.json`. A missing or
+expired artifact fails with instructions to run the baseline workflow; CI does
+not silently repeat the baseline capture in the pull request job.
+
+Artifacts are retained for 30 days. Active pull requests normally use a recent
+`main` commit. An older branch can regenerate its exact base artifact by
+running the baseline workflow for that revision before retrying the pull
+request job.
 
 ## Run locally
 
