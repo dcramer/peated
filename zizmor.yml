@@ -1,0 +1,7 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # Frameshift uses v0 as its rolling release tag.
+        # Keep other actions hash-pinned.
+        "dcramer/frameshift/*": ref-pin
