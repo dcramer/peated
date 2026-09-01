@@ -101,7 +101,7 @@ jobs:
           fi
           pnpm --dir base-source visual:web -- "${args[@]}"
       - name: Compare screenshots
-        uses: dcramer/frameshift@1b2f66e91274b535a91fe5cfde6ec9ad0ab17ace # main
+        uses: dcramer/frameshift@c44e38d936f9ba9048795438c4204e3480500a98 # main
         with:
           baseline: ${{ github.workspace }}/visual-output/baseline
           candidate: ${{ github.workspace }}/visual-output/candidate
