@@ -27,7 +27,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { useProfile } from "../profileContext";
 
 type Activity = Outputs["users"]["activity"]["list"]["results"][number];
@@ -154,8 +154,9 @@ function toActivityItem(activity: Activity): MemberActivityItem {
           brandHref: getEntityUrl({
             id: entry.bottle.brand.id,
             kind: "brand",
+            name: entry.bottle.brand.name,
           }),
-          href: `/bottles/${entry.bottle.id}`,
+          href: getBottleUrl(entry.bottle),
           id: String(entry.id),
           imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,
           metadata: getBottleMetadata(entry.bottle).split(" · "),

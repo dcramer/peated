@@ -1,3 +1,4 @@
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
@@ -11,7 +12,7 @@ export async function generateMetadata(props: {
   params: Promise<{ entityId: string }>;
 }): Promise<Metadata> {
   const { entityId } = await props.params;
-  const entity = await getEntityPage(Number(entityId));
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
   return getEntitySeoMetadata(entity);
 }
 
@@ -20,7 +21,7 @@ export default async function EntityLayout(props: {
   params: Promise<{ entityId: string }>;
 }) {
   const { entityId } = await props.params;
-  const canonicalEntity = await getEntityPage(Number(entityId));
+  const canonicalEntity = await getEntityPage(parseCatalogRouteId(entityId));
   const { client } = await getServerClient();
   const entity = await client.entities.details({ entity: canonicalEntity.id });
 

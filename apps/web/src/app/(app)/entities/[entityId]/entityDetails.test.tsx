@@ -6,7 +6,7 @@ import { EntityDetails } from "./entityDetails.stylex";
 import type { Entity } from "./entityPageData";
 
 describe("EntityDetails", () => {
-  test("links an owner to its canonical public route", () => {
+  test("links an owner to its current public route", () => {
     const entity = {
       ...mockEntity,
       images: [],
@@ -21,7 +21,7 @@ describe("EntityDetails", () => {
 
     const html = renderToStaticMarkup(<EntityDetails entity={entity} />);
 
-    expect(html).toContain('href="/companies/2"');
+    expect(html).toContain('href="/companies/2-example-company"');
     expect(html).not.toContain('href="/entities/2"');
   });
 });

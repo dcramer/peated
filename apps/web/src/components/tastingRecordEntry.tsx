@@ -15,6 +15,7 @@ import {
   getBottleMetadata,
   type BottleMetadata,
 } from "@peated/web/lib/bottleMetadata";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
@@ -45,7 +46,7 @@ export function getTastingEntryMember(
     description: tasting.notes ?? undefined,
     descriptionHref: `/tastings/${tasting.id}`,
     hasToasted: tasting.hasToasted,
-    href: `/bottles/${tasting.bottle.id}`,
+    href: getBottleUrl(tasting.bottle),
     imageKind: tasting.imageUrl ? "photo" : "bottle",
     imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
     metadata: getBottleMetadata(tasting.bottle),

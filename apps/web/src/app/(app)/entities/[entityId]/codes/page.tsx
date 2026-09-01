@@ -2,6 +2,7 @@ import {
   SMWS_CATEGORY_LIST,
   SMWS_DISTILLERY_CODES,
 } from "@peated/bottle-classifier/smws";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { logError } from "@peated/web/lib/log";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
@@ -15,7 +16,7 @@ export default async function EntityCodesPage(props: {
 }) {
   const { entityId } = await props.params;
   const { client } = await getAnonymousServerClient();
-  const entity = await getEntityPage(Number(entityId));
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
 
   if (entity.shortName !== "SMWS") notFound();
 
@@ -53,7 +54,11 @@ export default async function EntityCodesPage(props: {
         code,
         country: distiller?.country?.name ?? null,
         href: distiller
-          ? getEntityUrl({ id: distiller.id, kind: "distillery" })
+          ? getEntityUrl({
+              id: distiller.id,
+              kind: "distillery",
+              name: distiller.name,
+            })
           : undefined,
         name: distiller?.name ?? distillerName ?? "Unknown",
       });
@@ -68,7 +73,11 @@ export default async function EntityCodesPage(props: {
     <EntityCodes
       entityName={entity.name}
       example={{
-        href: getEntityUrl({ id: exampleDistiller.id, kind: "distillery" }),
+        href: getEntityUrl({
+          id: exampleDistiller.id,
+          kind: "distillery",
+          name: exampleDistiller.name,
+        }),
         name: exampleDistiller.name,
       }}
       groups={groups}

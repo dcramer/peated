@@ -31,7 +31,7 @@ import {
   memberHomeQueries,
   publicHomeQueries,
 } from "@peated/web/lib/orpc/homeQueries";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
@@ -214,7 +214,7 @@ function RecentReviews() {
     review.bottle
       ? [
           {
-            bottleHref: `/bottles/${review.bottle.id}`,
+            bottleHref: getBottleUrl(review.bottle),
             bottleImageUrl: review.bottle.imageUrl,
             bottleName: formatBottleDisplayName(review.bottle),
             date: (

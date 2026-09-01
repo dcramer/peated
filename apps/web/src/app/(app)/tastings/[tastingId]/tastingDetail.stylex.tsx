@@ -15,6 +15,7 @@ import {
 } from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 type Tasting = Outputs["tastings"]["details"];
@@ -66,7 +67,7 @@ export function TastingDetail({ tasting }: { tasting: Tasting }) {
       </header>
 
       <AppLink
-        href={`/bottles/${tasting.bottle.id}`}
+        href={getBottleUrl(tasting.bottle)}
         {...stylex.props(styles.bottleName)}
       >
         {bottleName}

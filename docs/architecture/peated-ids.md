@@ -4,10 +4,10 @@ Peated IDs are short, permanent references for public catalog objects. They are 
 
 ## Supported Objects
 
-| Object | Format                | Example | Canonical URL                       |
-| ------ | --------------------- | ------- | ----------------------------------- |
-| Bottle | `B` plus four+ digits | `B0123` | `https://peated.com/bottles/123`    |
-| Entity | `E` plus four+ digits | `E0123` | `https://peated.com/distillers/123` |
+| Object | Format                | Example | Canonical URL                                          |
+| ------ | --------------------- | ------- | ------------------------------------------------------ |
+| Bottle | `B` plus four+ digits | `B0123` | `https://peated.com/bottles/123-lagavulin-16-year-old` |
+| Entity | `E` plus four+ digits | `E0123` | `https://peated.com/distillers/123-lagavulin`          |
 
 The number is the object's existing positive database ID. Numbers shorter than four digits use leading zeroes. The prefix identifies the type, so `B0123` and `E0123` are different Peated IDs.
 
@@ -15,9 +15,13 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 
 ## Public Behavior
 
-- Bottle URLs use `/bottles/{numeric ID}`.
+- Bottle URLs use `/bottles/{numeric ID}-{current display-name slug}`.
 - Entity URLs use the collection for their primary kind: `/brands`,
-  `/distillers`, `/bottlers`, or `/companies`.
+  `/distillers`, `/bottlers`, or `/companies`, followed by the numeric ID and
+  current name slug.
+- The numeric ID identifies the object. The web app creates the slug when it
+  builds a URL. It does not store slugs. Numeric-only and old slug URLs redirect
+  permanently to the current URL.
 - Root ID URLs such as `/B0123`, `/B123`, and `/E0123` redirect permanently to
   the canonical collection URL.
 - Legacy `/entities/{numeric ID}` URLs redirect permanently to the Entity's
@@ -26,7 +30,7 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 - Global search recognizes an exact Peated ID and returns that object when its type is included in the search.
 - Bottle and entity pages display the compact label `ID` and provide a way to
   copy the canonical URL.
-- IDs for merged bottles and entities continue to resolve through the existing tombstones to the surviving object.
+- IDs for merged bottles and entities redirect to the remaining object.
 
 ## Scope
 

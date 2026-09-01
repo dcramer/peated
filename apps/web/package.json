@@ -40,6 +40,7 @@
     "@sentry/core": "catalog:",
     "@sentry/nextjs": "catalog:",
     "@simplewebauthn/browser": "^13.2.2",
+    "@sindresorhus/slugify": "^2.2.1",
     "@stylexjs/stylex": "0.19.0",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-next-experimental": "catalog:",

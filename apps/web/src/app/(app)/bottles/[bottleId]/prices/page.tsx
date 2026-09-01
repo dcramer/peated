@@ -7,8 +7,8 @@ import {
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -49,7 +49,7 @@ export default async function BottlePricesPage(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = await props.params;
-  const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
+  const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
   const { client } = await getAnonymousServerClient();
   const priceList = await client.bottles.prices.list({ bottle: bottle.id });
 

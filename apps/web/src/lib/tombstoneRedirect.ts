@@ -1,15 +1,15 @@
 import { headers } from "next/headers";
-import { getReleaseFamilyHref } from "./releaseFamily";
-
-type CanonicalRouteRedirectOptions = {
-  canonicalId: number | string;
-  collectionPath: `/${string}`;
-  currentId: number | string;
-};
 
 type RequestedRoute = {
   pathname: string;
   search: string;
+};
+
+type CanonicalPublicRouteOptions = {
+  canonicalId: number;
+  canonicalPath: `/${string}`;
+  currentId: number;
+  currentPathPrefixes: `/${string}`[];
 };
 
 export type LoadRequestHeaders = () => Promise<Pick<Headers, "get">>;
@@ -23,7 +23,7 @@ function parseRequestedRoute(value: string): RequestedRoute {
     }
 
     const url = new URL(value, "http://n");
-    return { pathname: url.pathname, search: url.search };
+    return { pathname: decodeURI(url.pathname), search: url.search };
   } catch (error) {
     throw new Error("Invalid proxy-owned request path", { cause: error });
   }
@@ -40,37 +40,38 @@ async function getRequestedRoute(loadHeaders: LoadRequestHeaders) {
   return parseRequestedRoute(requestPath);
 }
 
-export async function getCanonicalRouteRedirectPath(
-  { canonicalId, collectionPath, currentId }: CanonicalRouteRedirectOptions,
+function getNestedRouteSuffix(pathname: string, prefix: string) {
+  if (pathname === prefix) return "";
+  if (pathname.startsWith(`${prefix}/`)) return pathname.slice(prefix.length);
+  if (!pathname.startsWith(`${prefix}-`)) return null;
+
+  const nestedRouteIndex = pathname.indexOf("/", prefix.length + 1);
+  return nestedRouteIndex === -1 ? "" : pathname.slice(nestedRouteIndex);
+}
+
+export async function getCanonicalPublicRouteRedirectPath(
+  {
+    canonicalId,
+    canonicalPath,
+    currentId,
+    currentPathPrefixes,
+  }: CanonicalPublicRouteOptions,
   loadHeaders: LoadRequestHeaders = loadRequestHeaders,
 ) {
-  const currentPrefix = `${collectionPath}/${currentId}`;
-  const canonicalPrefix = `${collectionPath}/${canonicalId}`;
   const requestedRoute = await getRequestedRoute(loadHeaders);
 
   if (!requestedRoute) {
-    return canonicalPrefix;
+    return canonicalId === currentId ? null : canonicalPath;
   }
 
-  const { pathname: requestedPathname, search } = requestedRoute;
-  const suffix = requestedPathname.slice(currentPrefix.length);
-  if (
-    !requestedPathname.startsWith(currentPrefix) ||
-    (suffix && !suffix.startsWith("/"))
-  ) {
-    return `${canonicalPrefix}${search}`;
+  const { pathname, search } = requestedRoute;
+  if (pathname === canonicalPath || pathname.startsWith(`${canonicalPath}/`)) {
+    return null;
   }
 
-  return `${canonicalPrefix}${suffix}${search}`;
-}
-
-export async function getReleaseFamilyRouteRedirectPath(
-  representativeBottleId: number,
-  loadHeaders: LoadRequestHeaders = loadRequestHeaders,
-) {
-  const requestedRoute = await getRequestedRoute(loadHeaders);
-  return getReleaseFamilyHref(
-    representativeBottleId,
-    requestedRoute?.search ?? "",
-  );
+  const suffix =
+    currentPathPrefixes
+      .map((prefix) => getNestedRouteSuffix(pathname, prefix))
+      .find((candidate) => candidate !== null) ?? "";
+  return `${canonicalPath}${suffix}${search}`;
 }

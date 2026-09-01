@@ -1,4 +1,7 @@
+import type { BottleDisplayNameSource } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { EntityKind } from "@peated/server/types";
+import slugify from "@sindresorhus/slugify";
 
 const ENTITY_COLLECTION_BY_KIND = {
   brand: "/brands",
@@ -8,17 +11,34 @@ const ENTITY_COLLECTION_BY_KIND = {
 } as const satisfies Record<EntityKind, `/${string}`>;
 
 export function getBottleUrl(
-  bottle: Pick<{ id: number }, "id">,
-): `/bottles/${number}` {
-  return `/bottles/${bottle.id}`;
+  bottle: BottleDisplayNameSource & { id: number },
+): `/bottles/${number}-${string}` {
+  const slug = createUrlSlug(formatBottleDisplayName(bottle), "bottle");
+  return `/bottles/${bottle.id}-${slug}`;
 }
 
 export function getEntityUrl(entity: {
   id: number;
   kind: EntityKind | null;
+  name: string;
 }): `/${string}` {
-  if (!entity.kind) return `/entities/${entity.id}`;
-  return `${ENTITY_COLLECTION_BY_KIND[entity.kind]}/${entity.id}`;
+  const collection = entity.kind
+    ? ENTITY_COLLECTION_BY_KIND[entity.kind]
+    : "/entities";
+  return `${collection}/${entity.id}-${createUrlSlug(entity.name, "entity")}`;
+}
+
+function createUrlSlug(value: string, fallback: "bottle" | "entity"): string {
+  const asciiSlug = slugify(value);
+  if (asciiSlug) return asciiSlug;
+
+  const unicodeSlug = value
+    .normalize("NFKC")
+    .toLowerCase()
+    .match(/[\p{Letter}\p{Mark}\p{Number}]+/gu)
+    ?.join("-")
+    .normalize("NFC");
+  return unicodeSlug || fallback;
 }
 
 export function getEntityKindSearchUrl(kind: EntityKind) {

@@ -2,6 +2,7 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { PagingRel, StorePrice } from "@peated/server/types";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 import { AdminTextLink } from "./adminContent.stylex";
 import { AdminTable } from "./adminTable.stylex";
@@ -24,7 +25,7 @@ export default function StorePriceTable({
               {price.bottle ? (
                 <>
                   {" · "}
-                  <AdminTextLink href={`/bottles/${price.bottle.id}`}>
+                  <AdminTextLink href={getBottleUrl(price.bottle)}>
                     {formatBottleDisplayName(price.bottle)}
                   </AdminTextLink>
                 </>

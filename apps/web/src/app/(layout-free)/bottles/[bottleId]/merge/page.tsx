@@ -19,6 +19,7 @@ import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
   useMutation,
@@ -115,7 +116,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
         other: data.bottleId,
       });
       flash(<div>Bottles merged successfully.</div>);
-      router.push(`/bottles/${nextBottle.id}`);
+      router.push(getBottleUrl(nextBottle));
     } catch (error) {
       setSubmitError(
         getFormErrorMessage(error, { allowAnyErrorMessage: true }),

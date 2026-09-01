@@ -13,12 +13,15 @@ test.describe("Entity page routes", () => {
     request,
   }) => {
     for (const [source, destination] of [
-      [`/entities/${testOwner.id}`, `/companies/${testOwner.id}`],
-      [`/E${testOwner.id}`, `/companies/${testOwner.id}`],
-      [`/brands/${testOwnedEntity.id}`, `/distillers/${testOwnedEntity.id}`],
+      [`/entities/${testOwner.id}`, `/companies/${testOwner.id}-diageo`],
+      [`/E${testOwner.id}`, `/companies/${testOwner.id}-diageo`],
+      [
+        `/brands/${testOwnedEntity.id}`,
+        `/distillers/${testOwnedEntity.id}-lagavulin-distillery`,
+      ],
       [
         `/entities/${replacementSourceEntityId}/edit?source=legacy`,
-        `/distillers/${testOwnedEntity.id}/edit?source=legacy`,
+        `/distillers/${testOwnedEntity.id}-lagavulin-distillery/edit?source=legacy`,
       ],
     ]) {
       const response = await request.get(source, { maxRedirects: 0 });
@@ -36,12 +39,12 @@ test.describe("Entity page routes", () => {
     const companyLink = page.getByRole("link", { name: "View company" });
     await expect(companyLink).toHaveAttribute(
       "href",
-      `/companies/${testOwner.id}`,
+      `/companies/${testOwner.id}-diageo`,
     );
 
     await companyLink.click();
 
-    await expect(page).toHaveURL(`/companies/${testOwner.id}`);
+    await expect(page).toHaveURL(`/companies/${testOwner.id}-diageo`);
     await expect(
       page.getByRole("heading", { name: testOwner.name, exact: true }),
     ).toBeVisible();

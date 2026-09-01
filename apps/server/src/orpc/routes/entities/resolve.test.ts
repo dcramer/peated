@@ -4,12 +4,16 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /entities/:entity/resolve", () => {
-  test("returns the Entity ID and primary kind", async ({ fixtures }) => {
+  test("returns the Entity route fields", async ({ fixtures }) => {
     const entity = await fixtures.Entity({ kind: "company" });
 
     await expect(
       routerClient.entities.resolve({ entity: entity.id }),
-    ).resolves.toEqual({ id: entity.id, kind: "company" });
+    ).resolves.toEqual({
+      id: entity.id,
+      kind: "company",
+      name: entity.name,
+    });
   });
 
   test("resolves an Entity tombstone", async ({ fixtures }) => {
@@ -21,7 +25,11 @@ describe("GET /entities/:entity/resolve", () => {
 
     await expect(
       routerClient.entities.resolve({ entity: 999 }),
-    ).resolves.toEqual({ id: entity.id, kind: "distillery" });
+    ).resolves.toEqual({
+      id: entity.id,
+      kind: "distillery",
+      name: entity.name,
+    });
   });
 
   test("rejects a missing Entity", async () => {

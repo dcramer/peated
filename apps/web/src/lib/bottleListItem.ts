@@ -5,6 +5,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import type { BottleListItem } from "@peated/web/components";
 
 import { getReleaseFamilyHref } from "./releaseFamily";
+import { getBottleUrl } from "./urls";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
@@ -26,7 +27,7 @@ export function toBottleListItem(
 
   return {
     hasTasted: bottle.hasTasted,
-    href: `/bottles/${bottle.id}`,
+    href: getBottleUrl(bottle),
     id: bottle.peatedId,
     imageUrl: bottle.imageUrl,
     isLibrary: bottle.isLibrary,
@@ -54,7 +55,7 @@ export function toBottleListItem(
       includeRelatedReleases && relatedReleaseCount > 1
         ? {
             count: relatedReleaseCount,
-            href: getReleaseFamilyHref(bottle.id),
+            href: getReleaseFamilyHref(bottle),
           }
         : undefined,
   };

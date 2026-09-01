@@ -1,5 +1,6 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { ExternalReview, PagingRel } from "@peated/server/types";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 
 import { colors, fonts, space } from "../../styles/tokens.stylex";
@@ -51,7 +52,7 @@ export function ReviewRows({
                   </span>
                   {review.bottle ? (
                     <AdminTextLink
-                      href={`/bottles/${review.bottle.id}`}
+                      href={getBottleUrl(review.bottle)}
                       title={bottleName}
                       truncate
                     >

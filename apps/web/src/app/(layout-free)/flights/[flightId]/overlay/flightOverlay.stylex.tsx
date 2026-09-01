@@ -54,6 +54,7 @@ export function FlightOverlay({
                     brandHref={getEntityUrl({
                       id: bottle.brand.id,
                       kind: "brand",
+                      name: bottle.brand.name,
                     })}
                     href={getBottleUrl(bottle)}
                     imageUrl={bottle.imageUrl}

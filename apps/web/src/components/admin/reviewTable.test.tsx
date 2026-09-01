@@ -102,7 +102,9 @@ describe("ReviewTable", () => {
       <ReviewRows reviews={[makeReview(1, bottle)]} />,
     );
 
-    expect(html).toContain('href="/bottles/19"');
+    expect(html).toContain(
+      'href="/bottles/19-springbank-12-cask-strength-batch-24"',
+    );
     expect(html).toContain('title="Springbank review"');
     expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");

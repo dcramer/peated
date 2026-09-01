@@ -231,6 +231,7 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(response, {
           id: testOwnedEntity.id,
           kind: testOwnedEntity.kind,
+          name: testOwnedEntity.name,
         });
         return true;
       }
@@ -241,7 +242,11 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcError(response, "Unexpected entity resolve payload");
         return true;
       }
-      sendRpcResponse(response, { id: entity.id, kind: entity.kind });
+      sendRpcResponse(response, {
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+      });
       return true;
     }
     case "entities/catalog":

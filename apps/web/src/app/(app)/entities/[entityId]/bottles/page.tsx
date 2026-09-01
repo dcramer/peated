@@ -5,6 +5,7 @@ import {
   BOTTLE_CATALOG_QUERY_FIELDS,
   normalizeBottleCatalogQueryParams,
 } from "@peated/web/lib/bottleCatalogQueryParams";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
@@ -18,7 +19,7 @@ export default async function EntityBottlesPage(props: {
 }) {
   const { entityId } = await props.params;
   const { client } = await getPublicPageServerClient();
-  const entity = await getEntityPage(Number(entityId));
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
   const createBottleHref = getEntityBottleCreateHref(entity);
   const queryParams = normalizeBottleCatalogQueryParams(
     getApiQueryParams(await props.searchParams, {

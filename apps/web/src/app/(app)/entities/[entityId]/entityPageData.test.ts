@@ -44,15 +44,30 @@ describe("getEntityTabs", () => {
       getEntityTabs({
         id: 4263,
         kind: "bottler",
+        name: "Scotch Malt Whisky Society",
         shortName: "SMWS",
         totalBottles: 1_301,
         totalTastings: 29,
       }),
     ).toEqual([
-      { href: "/bottlers/4263", label: "Overview" },
-      { count: 1_301, href: "/bottlers/4263/bottles", label: "Bottles" },
-      { count: 29, href: "/bottlers/4263/tastings", label: "Tastings" },
-      { href: "/bottlers/4263/codes", label: "Distillery codes" },
+      {
+        href: "/bottlers/4263-scotch-malt-whisky-society",
+        label: "Overview",
+      },
+      {
+        count: 1_301,
+        href: "/bottlers/4263-scotch-malt-whisky-society/bottles",
+        label: "Bottles",
+      },
+      {
+        count: 29,
+        href: "/bottlers/4263-scotch-malt-whisky-society/tastings",
+        label: "Tastings",
+      },
+      {
+        href: "/bottlers/4263-scotch-malt-whisky-society/codes",
+        label: "Distillery codes",
+      },
     ]);
   });
 });
@@ -61,9 +76,14 @@ describe("getEntityCurrentHref", () => {
   it("maps a Peated ID route to the canonical public route", () => {
     expect(
       getEntityCurrentHref(
-        { id: 4263, kind: "bottler", peatedId: "E4263" },
+        {
+          id: 4263,
+          kind: "bottler",
+          name: "Scotch Malt Whisky Society",
+          peatedId: "E4263",
+        },
         "/E4263",
       ),
-    ).toBe("/bottlers/4263");
+    ).toBe("/bottlers/4263-scotch-malt-whisky-society");
   });
 });

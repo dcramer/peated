@@ -7,6 +7,7 @@ import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import {
   useMutation,
   useQueryClient,
@@ -50,7 +51,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
     <BottleForm
       onSubmit={async (value, meta) => {
         const { image } = value;
-        await bottleUpdateMutation.mutateAsync({
+        const updatedBottle = await bottleUpdateMutation.mutateAsync({
           bottle: context.bottleId,
           ...buildBottlePatch(value, meta),
         });
@@ -84,7 +85,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
           }),
           refetchType: "all",
         });
-        router.push(`/bottles/${bottleId}`);
+        router.push(getBottleUrl(updatedBottle));
       }}
       initialData={{
         ...context.shared,

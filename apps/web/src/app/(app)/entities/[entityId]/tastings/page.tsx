@@ -1,4 +1,5 @@
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 
@@ -10,7 +11,7 @@ export default async function EntityTastingsPage(props: {
 }) {
   const { entityId } = await props.params;
   const { client } = await getAnonymousServerClient();
-  const entity = await getEntityPage(Number(entityId));
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
   const queryParams = getApiQueryParams(await props.searchParams, {
     numericFields: ["cursor"],
     overrides: { entity: entity.id, limit: 25 },

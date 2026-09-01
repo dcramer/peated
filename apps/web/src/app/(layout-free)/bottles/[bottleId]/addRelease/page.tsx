@@ -10,6 +10,7 @@ import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { buildBottleProposalDraft } from "@peated/web/lib/bottleProposalDraft";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 
@@ -114,7 +115,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
         }
 
         if (returnTo) router.push(returnTo);
-        else router.replace(`/bottles/${createdBottle.id}`);
+        else router.replace(getBottleUrl(createdBottle));
       }}
     />
   );

@@ -15,9 +15,9 @@ describe("EntityLinks", () => {
       />,
     );
 
-    expect(html).toContain('href="/distillers/129"');
-    expect(html).toContain('href="/distillers/366"');
-    expect(html).toContain('href="/distillers/142"');
+    expect(html).toContain('href="/distillers/129-glen-moray"');
+    expect(html).toContain('href="/distillers/366-caol-ila"');
+    expect(html).toContain('href="/distillers/142-glen-spey"');
     expect(html).toContain("Glen Moray");
     expect(html).toContain("Caol Ila");
     expect(html).toContain("Glen Spey");
@@ -30,6 +30,6 @@ describe("EntityLinks", () => {
       <EntityLinks entities={[{ id: 5, kind: null, name: "Unknown" }]} />,
     );
 
-    expect(html).toContain('href="/entities/5"');
+    expect(html).toContain('href="/entities/5-unknown"');
   });
 });

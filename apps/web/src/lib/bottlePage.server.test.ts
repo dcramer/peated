@@ -4,7 +4,17 @@ import {
   type BottlePageServices,
 } from "./bottlePage.server";
 
-type TestBottle = { id: number; fullName?: string };
+type TestBottle = {
+  id: number;
+  name: string;
+  brand: { name: string };
+};
+
+const bottle = {
+  id: 11,
+  name: "16-year-old",
+  brand: { name: "Lagavulin" },
+};
 
 const loadBottle = vi.fn<BottlePageServices<TestBottle>["loadBottle"]>();
 const getRedirectPath =
@@ -28,16 +38,17 @@ describe("getBottlePage", () => {
   });
 
   it("returns an active independently complete Bottle", async () => {
-    const bottle = { id: 11, fullName: "Lagavulin 16-year-old" };
     loadBottle.mockResolvedValue(bottle);
+    getRedirectPath.mockResolvedValue(null);
 
     await expect(getBottlePage(11)).resolves.toBe(bottle);
 
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it("permanently redirects an exact replacement with its suffix and query", async () => {
-    loadBottle.mockResolvedValue({ id: 22 });
+  it("redirects a merged Bottle with its suffix and query", async () => {
+    const replacement = { ...bottle, id: 22 };
+    loadBottle.mockResolvedValue(replacement);
     getRedirectPath.mockResolvedValue(
       "/bottles/22/tastings?source=legacy&tag=one&tag=two",
     );
@@ -45,7 +56,7 @@ describe("getBottlePage", () => {
     await expect(getBottlePage(11)).rejects.toBe(redirectSignal);
 
     expect(getRedirectPath).toHaveBeenCalledWith({
-      canonicalId: 22,
+      canonicalBottle: replacement,
       currentId: 11,
     });
     expect(redirect).toHaveBeenCalledOnce();

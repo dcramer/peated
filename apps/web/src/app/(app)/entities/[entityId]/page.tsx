@@ -1,3 +1,4 @@
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
@@ -10,7 +11,7 @@ export async function generateMetadata(props: {
   params: Promise<{ entityId: string }>;
 }): Promise<Metadata> {
   const { entityId } = await props.params;
-  const entity = await getEntityPage(Number(entityId));
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
   return getEntitySeoMetadata(entity, { canonical: true });
 }
 
@@ -19,7 +20,7 @@ export default async function EntityPage(props: {
 }) {
   const { entityId } = await props.params;
   const { client } = await getAnonymousServerClient();
-  const entity = await getEntityPage(Number(entityId));
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
   const bottleList = entityHasBottleCatalog(entity)
     ? await client.bottles
         .list({ entity: entity.id, limit: 4, sort: "-tastings" })
