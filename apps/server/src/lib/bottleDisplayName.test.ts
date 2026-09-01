@@ -63,6 +63,27 @@ describe("formatBottleDisplayName", () => {
     expect(getBottleReleaseMetadata(batchedBottle)).toBe("Batch C923");
   });
 
+  it.each(["9.3", "S2B13"])(
+    "renders compact edition code %s inline with the expression",
+    (edition) => {
+      expect(
+        formatBottleDisplayName({
+          ...bottle,
+          edition,
+        }),
+      ).toBe(`Decadent Drinks Whiskyland Glenburgie 38-year-old ${edition}`);
+    },
+  );
+
+  it("keeps a separator before a worded edition", () => {
+    expect(
+      formatBottleDisplayName({
+        ...bottle,
+        edition: "2026 Release",
+      }),
+    ).toBe("Decadent Drinks Whiskyland Glenburgie 38-year-old - 2026 Release");
+  });
+
   it("preserves stable batch wording in the expression", () => {
     expect(
       formatBottleDisplayName({
