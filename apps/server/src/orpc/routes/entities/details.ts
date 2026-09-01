@@ -1,16 +1,12 @@
 import { db } from "@peated/server/db";
-import {
-  entities,
-  entityFollows,
-  entityImages,
-  entityTombstones,
-} from "@peated/server/db/schema";
+import { entityFollows, entityImages } from "@peated/server/db/schema";
+import { resolveEntity } from "@peated/server/lib/resolveEntity";
 import { implement } from "@peated/server/orpc";
 import entityDetailsContract from "@peated/server/orpc/contracts/entities/details";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
-import { and, asc, desc, eq, getTableColumns } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 
 export default implement(entityDetailsContract).handler(async function ({
   input,
@@ -19,24 +15,11 @@ export default implement(entityDetailsContract).handler(async function ({
 }) {
   const { entity: entityId } = input;
 
-  let [entity] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, entityId));
+  const entity = await resolveEntity(entityId);
   if (!entity) {
-    // check for a tombstone
-    [entity] = await db
-      .select({
-        ...getTableColumns(entities),
-      })
-      .from(entityTombstones)
-      .innerJoin(entities, eq(entityTombstones.newEntityId, entities.id))
-      .where(eq(entityTombstones.entityId, entityId));
-    if (!entity) {
-      throw errors.NOT_FOUND({
-        message: "Entity not found.",
-      });
-    }
+    throw errors.NOT_FOUND({
+      message: "Entity not found.",
+    });
   }
 
   let isFollowing = false;

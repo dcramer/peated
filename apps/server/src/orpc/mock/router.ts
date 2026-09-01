@@ -28,6 +28,7 @@ import entityCreate from "./routes/entities/create";
 import entityDetails from "./routes/entities/details";
 import entityEventList from "./routes/entities/events/list";
 import entityList from "./routes/entities/list";
+import entityResolve from "./routes/entities/resolve";
 import eventList from "./routes/events/list";
 import externalReviewList from "./routes/externalReviews/list";
 import flightDetails from "./routes/flights/details";
@@ -115,6 +116,7 @@ export const mockRouter = mockOS.router({
       list: entityEventList,
     },
     list: entityList,
+    resolve: entityResolve,
   },
   events: {
     list: eventList,

@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import { proxy } from "./proxy";
 
 describe("web proxy", () => {
-  test("protects the OAuth authorization response", () => {
-    const response = proxy(
+  test("protects the OAuth authorization response", async () => {
+    const response = await proxy(
       new NextRequest(
         "https://peated.com/oauth/authorize?client_id=peated-cli",
       ),

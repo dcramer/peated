@@ -76,6 +76,7 @@ function EntityActions({ entity }: { entity: Entity }) {
   const { flash } = useFlashMessages();
   const deleteMutation = useMutation(orpc.entities.delete.mutationOptions());
   const noun = getEntityPresentation(entity).label.toLocaleLowerCase();
+  const entityUrl = getEntityUrl(entity);
   const groups: RowMenuItem[][] = [
     [
       {
@@ -99,9 +100,9 @@ function EntityActions({ entity }: { entity: Entity }) {
 
   if (user?.mod || user?.admin) {
     groups.push([
-      { href: `/entities/${entity.id}/aliases`, label: "View aliases" },
-      { href: `/entities/${entity.id}/edit`, label: `Edit ${noun}` },
-      { href: `/entities/${entity.id}/merge`, label: `Merge ${noun}` },
+      { href: `${entityUrl}/aliases`, label: "View aliases" },
+      { href: `${entityUrl}/edit`, label: `Edit ${noun}` },
+      { href: `${entityUrl}/merge`, label: `Merge ${noun}` },
     ]);
   }
 

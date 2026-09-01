@@ -47,6 +47,7 @@ import {
   priceSite,
   priceSiteRuns,
   replacementSourceBottleId,
+  replacementSourceEntityId,
   storePriceList,
   suggestedTags,
   tastingNotes,
@@ -225,6 +226,24 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcError(response, "Unexpected entity details payload");
       return true;
+    case "entities/resolve": {
+      if (Number(input?.entity) === replacementSourceEntityId) {
+        sendRpcResponse(response, {
+          id: testOwnedEntity.id,
+          kind: testOwnedEntity.kind,
+        });
+        return true;
+      }
+      const entity = [testBrand, testBottler, testOwnedEntity, testOwner].find(
+        (candidate) => candidate.id === Number(input?.entity),
+      );
+      if (!entity) {
+        sendRpcError(response, "Unexpected entity resolve payload");
+        return true;
+      }
+      sendRpcResponse(response, { id: entity.id, kind: entity.kind });
+      return true;
+    }
     case "entities/catalog":
       if (
         ![
