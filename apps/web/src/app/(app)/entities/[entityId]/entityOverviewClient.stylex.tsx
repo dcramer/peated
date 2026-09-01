@@ -117,6 +117,13 @@ export function EntityOverviewClient({
           {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
         </div>
         <div {...stylex.props(styles.catalogSections)}>
+          <EntityReleaseOverview
+            entity={entity}
+            error={Boolean(releaseListQuery.error)}
+            pending={releaseListQuery.isPending}
+            releaseList={releaseListQuery.data}
+            retry={() => void releaseListQuery.refetch()}
+          />
           <EntityBottleOverview
             bottleList={bottleListQuery.data}
             createBottleHref={getEntityBottleCreateHref(entity)}
@@ -125,13 +132,6 @@ export function EntityOverviewClient({
             pending={bottleListQuery.isPending}
             retry={() => void bottleListQuery.refetch()}
             totalBottles={entity.totalBottles}
-          />
-          <EntityReleaseOverview
-            entity={entity}
-            error={Boolean(releaseListQuery.error)}
-            pending={releaseListQuery.isPending}
-            releaseList={releaseListQuery.data}
-            retry={() => void releaseListQuery.refetch()}
           />
           <EntityHistoryOverview
             entityName={entity.name}
