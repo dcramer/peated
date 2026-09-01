@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getBottleUrl, getEntityUrl } from "./urls";
+import { getBottleSeriesUrl, getBottleUrl, getEntityUrl } from "./urls";
 
 const bottle = {
   id: 123,
@@ -10,6 +10,15 @@ const bottle = {
 describe("public catalog URLs", () => {
   it("uses the Bottle collection, ID, and display name", () => {
     expect(getBottleUrl(bottle)).toBe("/bottles/123-lagavulin-16-year-old");
+  });
+
+  it("uses the Series collection, ID, and full name", () => {
+    expect(
+      getBottleSeriesUrl({
+        id: 421,
+        fullName: "Dramfool Jim McEwan Signature Collection",
+      }),
+    ).toBe("/series/421-dramfool-jim-mc-ewan-signature-collection");
   });
 
   it.each([

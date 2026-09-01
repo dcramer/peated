@@ -1,4 +1,6 @@
+import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
+import { EntitySchema } from "./entities";
 
 const BottleSeriesNameSchema = z
   .string()
@@ -12,6 +14,12 @@ const BottleSeriesDescriptionSchema = z
 
 export const BottleSeriesSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the bottle series"),
+  peatedId: z
+    .string()
+    .regex(/^S\d{4,}$/)
+    .refine((value) => isCanonicalPeatedId(value, "series"))
+    .readonly()
+    .describe("Permanent Peated ID for the bottle series"),
   name: BottleSeriesNameSchema,
   fullName: z
     .string()
@@ -33,6 +41,16 @@ export const BottleSeriesSchema = z.object({
     .datetime()
     .readonly()
     .describe("Timestamp when the series was last updated"),
+});
+
+export const BottleSeriesDetailsSchema = BottleSeriesSchema.extend({
+  brand: EntitySchema.pick({
+    id: true,
+    peatedId: true,
+    name: true,
+    shortName: true,
+    kind: true,
+  }).describe("Brand that owns this bottle series"),
 });
 
 export const BottleSeriesInputFields = {

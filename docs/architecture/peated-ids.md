@@ -8,8 +8,9 @@ Peated IDs are short, permanent references for public catalog objects. They are 
 | ------ | --------------------- | ------- | ------------------------------------------------------ |
 | Bottle | `B` plus four+ digits | `B0123` | `https://peated.com/bottles/123-lagavulin-16-year-old` |
 | Entity | `E` plus four+ digits | `E0123` | `https://peated.com/distillers/123-lagavulin`          |
+| Series | `S` plus four+ digits | `S0123` | `https://peated.com/series/123-ardbeg-supernova`       |
 
-The number is the object's existing positive database ID. Numbers shorter than four digits use leading zeroes. The prefix identifies the type, so `B0123` and `E0123` are different Peated IDs.
+The number is the object's existing positive database ID. Numbers shorter than four digits use leading zeroes. The prefix identifies the type, so `B0123`, `E0123`, and `S0123` are different Peated IDs.
 
 Peated IDs are serialized in uppercase with at least four digits. Input and search are case-insensitive and accept omitted leading zeroes, so `b123` is normalized to `B0123`.
 
@@ -19,18 +20,23 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 - Entity URLs use the collection for their primary kind: `/brands`,
   `/distillers`, `/bottlers`, or `/companies`, followed by the numeric ID and
   current name slug.
+- Series URLs use `/series/{numeric ID}-{current full-name slug}`. The full name
+  includes the Brand.
 - The numeric ID identifies the object. The web app creates the slug when it
   builds a URL. It does not store slugs. Numeric-only and old slug URLs redirect
   permanently to the current URL.
-- Root ID URLs such as `/B0123`, `/B123`, and `/E0123` redirect permanently to
-  the canonical collection URL.
+- Root ID URLs such as `/B0123`, `/B123`, `/E0123`, and `/S0123` redirect
+  permanently to the canonical collection URL.
 - Legacy `/entities/{numeric ID}` URLs redirect permanently to the Entity's
   primary-kind collection. Nested routes keep their suffix and query string.
-- Bottle and entity API responses include `peatedId` alongside the existing numeric `id`.
+- Bottle, Entity, and Series API responses include `peatedId` alongside the
+  existing numeric `id`.
 - Global search recognizes an exact Peated ID and returns that object when its type is included in the search.
-- Bottle and entity pages display the compact label `ID` and provide a way to
+- Bottle, Entity, and Series pages display the compact label `ID` and provide a way to
   copy the canonical URL.
-- IDs for merged bottles and entities redirect to the remaining object.
+- IDs for merged Bottles, Entities, and Series redirect to the remaining object.
+- A populated Series must be merged instead of deleted. Deleting an empty
+  Series preserves its ID as a tombstone without a destination.
 
 ## Scope
 

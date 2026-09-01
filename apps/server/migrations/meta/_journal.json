@@ -1849,6 +1849,13 @@
       "when": 1788298555632,
       "tag": "0263_slow_mordo",
       "breakpoints": false
+    },
+    {
+      "idx": 264,
+      "version": "7",
+      "when": 1788304399017,
+      "tag": "0264_right_demogoblin",
+      "breakpoints": false
     }
   ]
 }

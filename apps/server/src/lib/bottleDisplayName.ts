@@ -21,6 +21,7 @@ export type BottleDisplayNameSource = {
 
 export type BottleDisplayNameOptions = {
   includeBrand?: boolean;
+  includeSeries?: boolean;
 };
 
 function includesIdentityText(value: string, candidate: string) {
@@ -112,7 +113,7 @@ function getReleaseName(bottle: BottleDisplayNameSource) {
 /** Formats the concise marketed identity used for human-facing bottle names. */
 export function formatBottleDisplayName(
   bottle: BottleDisplayNameSource,
-  { includeBrand = true }: BottleDisplayNameOptions = {},
+  { includeBrand = true, includeSeries = true }: BottleDisplayNameOptions = {},
 ) {
   const expressionName = getReleaseName(bottle);
   const brandName = bottle.brand.shortName || bottle.brand.name;
@@ -121,7 +122,11 @@ export function formatBottleDisplayName(
       ? bottle.series.name
       : null;
 
-  return [includeBrand ? brandName : null, seriesName, expressionName]
+  return [
+    includeBrand ? brandName : null,
+    includeSeries ? seriesName : null,
+    expressionName,
+  ]
     .filter(Boolean)
     .join(" ");
 }

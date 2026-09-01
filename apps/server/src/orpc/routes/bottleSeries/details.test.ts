@@ -17,12 +17,16 @@ describe("GET /bottle-series/:series", () => {
 
     expect(result).toMatchObject({
       id: series.id,
+      peatedId: `S${String(series.id).padStart(4, "0")}`,
       name: series.name,
       fullName: series.fullName,
       description: series.description,
       numReleases: series.numReleases,
+      brand: {
+        id: brand.id,
+        name: brand.name,
+      },
     });
-    expect(result).not.toHaveProperty("brand");
   });
 
   it("returns 404 for non-existent series", async function () {

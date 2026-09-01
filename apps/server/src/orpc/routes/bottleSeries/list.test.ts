@@ -82,4 +82,25 @@ describe("GET /bottle-series", () => {
 
     expect(results).toHaveLength(0);
   });
+
+  it("lists all series with working cursor pagination", async function ({
+    fixtures,
+  }) {
+    const firstBrand = await fixtures.Entity({ name: "A Series Brand" });
+    const secondBrand = await fixtures.Entity({ name: "B Series Brand" });
+    await fixtures.BottleSeries({ name: "Alpha", brandId: firstBrand.id });
+    await fixtures.BottleSeries({ name: "Beta", brandId: secondBrand.id });
+
+    const firstPage = await routerClient.bottleSeries.list({ limit: 1 });
+    const secondPage = await routerClient.bottleSeries.list({
+      cursor: firstPage.rel.nextCursor!,
+      limit: 1,
+    });
+
+    expect(firstPage.total).toBeGreaterThanOrEqual(2);
+    expect(firstPage.results).toHaveLength(1);
+    expect(firstPage.rel.nextCursor).toBe(2);
+    expect(secondPage.results).toHaveLength(1);
+    expect(secondPage.results[0]?.id).not.toBe(firstPage.results[0]?.id);
+  });
 });

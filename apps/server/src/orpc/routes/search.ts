@@ -5,6 +5,7 @@ import {
   bottleReferences,
   bottles,
   bottleSeries,
+  bottleSeriesTombstones,
   bottleTombstones,
   countries,
   entities,
@@ -16,7 +17,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
-import { parsePeatedId } from "@peated/server/lib/peatedId";
+import { formatPeatedId, parsePeatedId } from "@peated/server/lib/peatedId";
 import {
   plainTextSearchQuery,
   prefixTextSearchQuery,
@@ -43,6 +44,7 @@ type BottleResult = Extract<
   { type: "bottles" }
 >["results"][number];
 type EntityResult = Extract<OutputGroup, { type: "brands" }>["results"][number];
+type SeriesResult = Extract<OutputGroup, { type: "series" }>["results"][number];
 type RegionResult = Extract<
   OutputGroup,
   { type: "regions" }
@@ -60,6 +62,9 @@ type EntityRow = EntityResult & {
   shortName: string | null;
   totalTastings: number;
 };
+type SeriesRow = Omit<SeriesResult, "peatedId" | "brand"> & {
+  brand: Omit<SeriesResult["brand"], "peatedId">;
+};
 type RegionRow = RegionResult & { totalBottles: number };
 type ScopeTotals = NonNullable<SearchOutput["scopeTotals"]>;
 type GroupRows =
@@ -67,6 +72,12 @@ type GroupRows =
       type: "bottles";
       total: number;
       results: BottleRow[];
+      exactMatch: boolean;
+    }
+  | {
+      type: "series";
+      total: number;
+      results: SeriesRow[];
       exactMatch: boolean;
     }
   | {
@@ -91,10 +102,12 @@ type GroupRows =
 type ExactRow =
   | { type: "bottle"; ref: BottleRow }
   | { type: "entity"; ref: EntityRow }
+  | { type: "series"; ref: SeriesRow }
   | null;
 
 type NearestRow =
   | { type: "bottles"; result: BottleRow; distance: number; tie: number }
+  | { type: "series"; result: SeriesRow; distance: number; tie: number }
   | {
       type: EntitySearchScope;
       result: EntityRow;
@@ -270,6 +283,21 @@ function entityColumns(context: Context) {
   };
 }
 
+function seriesColumns() {
+  return {
+    id: bottleSeries.id,
+    name: bottleSeries.name,
+    fullName: bottleSeries.fullName,
+    numReleases: bottleSeries.numReleases,
+    brand: {
+      id: entities.id,
+      name: entities.name,
+      shortName: entities.shortName,
+      kind: entities.kind,
+    },
+  };
+}
+
 function regionColumns() {
   return {
     id: regions.id,
@@ -290,13 +318,20 @@ function entityScopeWhere(scope: EntitySearchScope) {
 
 async function countRows(
   database: AnyDatabase,
-  table: typeof bottles | typeof entities | typeof regions | typeof users,
+  table:
+    | typeof bottles
+    | typeof bottleSeries
+    | typeof entities
+    | typeof regions
+    | typeof users,
   where: SQL<unknown> | undefined,
 ) {
   const query = database.select({ total: sql<string>`COUNT(*)` });
   let row: { total: string } | undefined;
   if (table === bottles) {
     [row] = await query.from(bottles).where(where);
+  } else if (table === bottleSeries) {
+    [row] = await query.from(bottleSeries).where(where);
   } else if (table === entities) {
     [row] = await query.from(entities).where(where);
   } else if (table === regions) {
@@ -305,6 +340,42 @@ async function countRows(
     [row] = await query.from(users).where(where);
   }
   return Number(row?.total ?? 0);
+}
+
+async function searchSeries(
+  database: AnyDatabase,
+  query: string,
+  limit: number,
+): Promise<{ total: number; results: SeriesRow[]; exactMatch: boolean }> {
+  if (!query) return { total: 0, results: [], exactMatch: false };
+  const textQuery = plainTextSearchQuery(query);
+  const prefixQuery = prefixTextSearchQuery(query);
+  const where = or(
+    sql`${bottleSeries.searchVector} @@ ${textQuery}`,
+    sql`${bottleSeries.searchVector} @@ ${prefixQuery}`,
+  );
+  const rank = nameRank(
+    [sql`${bottleSeries.fullName}`, sql`${bottleSeries.name}`],
+    query,
+  );
+  const rows = await database
+    .select({
+      ...seriesColumns(),
+      searchRank: rank,
+      searchTotal: sql<number>`COUNT(*) OVER()`,
+    })
+    .from(bottleSeries)
+    .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
+    .where(where)
+    .limit(limit)
+    .orderBy(rank, sql`${bottleSeries.numReleases} DESC`, asc(bottleSeries.id));
+  return {
+    total: Number(rows[0]?.searchTotal ?? 0),
+    results: rows.map(
+      ({ searchRank: _, searchTotal: __, ...result }) => result,
+    ),
+    exactMatch: Number(rows[0]?.searchRank) === 0,
+  };
 }
 
 async function searchBottles(
@@ -477,6 +548,7 @@ async function getScopeTotals(
 ): Promise<ScopeTotals> {
   const totals: ScopeTotals = {
     bottles: await countRows(database, bottles, activeBottleWhere()),
+    series: await countRows(database, bottleSeries, undefined),
     distilleries: await countRows(
       database,
       entities,
@@ -541,6 +613,26 @@ async function findExact(
     return bottle ? { type: "bottle", ref: bottle } : null;
   }
 
+  if (peatedId.type === "series" && scopes.includes("series")) {
+    let [series] = await database
+      .select(seriesColumns())
+      .from(bottleSeries)
+      .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
+      .where(eq(bottleSeries.id, peatedId.id));
+    if (!series) {
+      [series] = await database
+        .select(seriesColumns())
+        .from(bottleSeriesTombstones)
+        .innerJoin(
+          bottleSeries,
+          eq(bottleSeriesTombstones.newSeriesId, bottleSeries.id),
+        )
+        .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
+        .where(eq(bottleSeriesTombstones.seriesId, peatedId.id));
+    }
+    return series ? { type: "series", ref: series } : null;
+  }
+
   if (peatedId.type === "entity") {
     let [entity] = await database
       .select(entityColumns(context))
@@ -573,6 +665,8 @@ async function searchGroup(
   switch (scope) {
     case "bottles":
       return { type: scope, ...(await searchBottles(database, query, limit)) };
+    case "series":
+      return { type: scope, ...(await searchSeries(database, query, limit)) };
     case "distilleries":
     case "brands":
     case "bottlers":
@@ -675,6 +769,22 @@ async function findNearest(
                 (total, count) => total + count,
                 0,
               ),
+          });
+        }
+        break;
+      case "series":
+        for (const result of group.results) {
+          const key = `series:${result.id}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          nearest.push({
+            type: "series",
+            result,
+            distance: nearestDistance(normalizedQuery, [
+              result.fullName,
+              result.name,
+            ]),
+            tie: result.numReleases,
           });
         }
         break;
@@ -838,6 +948,17 @@ function memberResult(row: MemberResult): MemberResult {
   };
 }
 
+function seriesResult(row: SeriesRow): SeriesResult {
+  return {
+    ...row,
+    peatedId: formatPeatedId("series", row.id),
+    brand: {
+      ...row.brand,
+      peatedId: formatPeatedId("entity", row.brand.id),
+    },
+  };
+}
+
 function serializeGroup(group: GroupRows) {
   switch (group.type) {
     case "bottles":
@@ -845,6 +966,12 @@ function serializeGroup(group: GroupRows) {
         type: group.type,
         total: group.total,
         results: group.results.map((row) => bottleResult(row, true)),
+      };
+    case "series":
+      return {
+        type: group.type,
+        total: group.total,
+        results: group.results.map(seriesResult),
       };
     case "distilleries":
     case "brands":
@@ -872,6 +999,11 @@ function serializeNearest(row: NearestRow) {
         type: row.type,
         result: bottleResult(row.result),
       };
+    case "series":
+      return {
+        type: row.type,
+        result: seriesResult(row.result),
+      };
     case "distilleries":
     case "brands":
     case "bottlers":
@@ -894,7 +1026,9 @@ function serializeSearch(rows: SearchRows) {
   const exact =
     rows.exact?.type === "bottle"
       ? { type: "bottle", ref: bottleResult(rows.exact.ref) }
-      : rows.exact;
+      : rows.exact?.type === "series"
+        ? { type: "series", ref: seriesResult(rows.exact.ref) }
+        : rows.exact;
   const nearest = rows.nearest.map(serializeNearest);
   return SearchOutputSchema.parse({
     query: rows.query,

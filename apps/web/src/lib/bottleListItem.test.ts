@@ -22,6 +22,19 @@ describe("toBottleListItem", () => {
     });
   });
 
+  test("can omit the brand from a list owned by that brand", () => {
+    expect(
+      toBottleListItem(mockBottle, {
+        includeBrandInName: false,
+        includeBrandRow: false,
+      }),
+    ).toMatchObject({
+      brand: undefined,
+      brandHref: undefined,
+      name: "16-year-old",
+    });
+  });
+
   test("identifies a distinct bottler when the surrounding view needs it", () => {
     const bottler = {
       ...mockBottle.brand,
