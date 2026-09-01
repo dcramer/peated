@@ -5,11 +5,13 @@ import {
   AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
+  AdminSection,
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import DateRange from "@peated/web/components/dateRange";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
+import { getEventsNeedingNextDate } from "@peated/web/lib/eventDates";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -28,6 +30,7 @@ export default function Page() {
       input: queryParams,
     }),
   );
+  const needsNextDate = getEventsNeedingNextDate(eventList.results);
 
   return (
     <AdminPage>
@@ -52,6 +55,30 @@ export default function Page() {
         }
         title="Events"
       />
+
+      {needsNextDate.length ? (
+        <AdminSection
+          description="The latest date has passed. Add the next confirmed edition."
+          title="Needs next date"
+          tone="warning"
+        >
+          <Table
+            items={needsNextDate}
+            noHeaders
+            url={(item) => `/admin/events/${item.id}/next`}
+            columns={[
+              { name: "name" },
+              {
+                name: "dateStart",
+                title: "Last dates",
+                value: (event) => (
+                  <DateRange start={event.dateStart} end={event.dateEnd} />
+                ),
+              },
+            ]}
+          />
+        </AdminSection>
+      ) : null}
 
       {eventList.results.length > 0 ? (
         <Table

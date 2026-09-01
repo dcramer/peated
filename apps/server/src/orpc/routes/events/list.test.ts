@@ -22,19 +22,24 @@ describe("GET /events", () => {
       dateStart: futureData.toISOString(),
       dateEnd: futureData.toISOString(),
     });
+    const farFutureEvent = await fixtures.Event({
+      dateStart: "2090-01-01",
+      dateEnd: "2090-01-02",
+    });
 
     const { results } = await routerClient.events.list({
       onlyUpcoming: true,
     });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(futureEvent.id);
+    expect(results.map(({ id }) => id)).toEqual(
+      expect.arrayContaining([futureEvent.id, farFutureEvent.id]),
+    );
 
     const allEvents = await routerClient.events.list({
       onlyUpcoming: false,
     });
     expect(allEvents.results.map(({ id }) => id)).toEqual(
-      expect.arrayContaining([pastEvent.id, futureEvent.id]),
+      expect.arrayContaining([pastEvent.id, futureEvent.id, farFutureEvent.id]),
     );
   });
 

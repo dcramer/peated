@@ -12,6 +12,10 @@ type ActivityList = Outputs["activity"]["list"];
 
 export const publicHomeQueries = {
   stats: (orpc: ORPCQueryUtils) => orpc.stats.queryOptions(),
+  events: (orpc: ORPCQueryUtils) =>
+    orpc.events.list.queryOptions({
+      input: { limit: 1, onlyUpcoming: true, sort: "date" },
+    }),
   releases: (orpc: ORPCQueryUtils) =>
     orpc.bottles.list.queryOptions({
       input: { limit: 5, sort: "-release" },
