@@ -1,6 +1,5 @@
 "use client";
 
-import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
@@ -9,6 +8,7 @@ import {
   Button,
   ColorInput,
   Field,
+  FieldGroup,
   FormNotice,
   FormSection,
   FormStack,
@@ -19,8 +19,8 @@ import {
   PictureInput,
   RatingBandInput,
   ReviewScoreInput,
-  Select,
   SelectedBottleSummary,
+  ServingStyleInput,
   Textarea,
   ValidationMessage,
   type MemberPickerOption,
@@ -449,8 +449,13 @@ export default function TastingForm(
                 ) : null}
               </FormSection>
             ) : currentStep === 1 ? (
-              <FormSection title="What you noticed">
-                <Field htmlFor="review-notes" label="Notes" optional>
+              <FormSection title="What you tasted">
+                <Field
+                  hint="Suggested from this bottle's own tastings."
+                  htmlFor="review-notes"
+                  label="Notes"
+                  optional
+                >
                   <Controller
                     control={reviewControl}
                     name="tags"
@@ -502,34 +507,33 @@ export default function TastingForm(
                     aria-label="Comments"
                     id="review-comments"
                     invalid={Boolean(reviewErrors.notes)}
-                    placeholder="What stood out?"
+                    placeholder="What do you want to remember about this pour?"
                     rows={6}
                   />
                 </Field>
               </FormSection>
             ) : (
-              <FormSection title="Picture and company">
-                <Field
+              <FormSection title="The sitting">
+                <FieldGroup
                   error={reviewErrors.servingStyle?.message}
-                  htmlFor="review-serving-style"
-                  label="Served"
+                  hint="How you took it, not how the bottle ships."
+                  label="Serving"
                   optional
                 >
-                  <Select
-                    {...registerReview("servingStyle", {
-                      setValueAs: (value) => value || null,
-                    })}
-                    id="review-serving-style"
-                    invalid={Boolean(reviewErrors.servingStyle)}
-                  >
-                    <option value="">Not set</option>
-                    {SERVING_STYLE_LIST.map((style) => (
-                      <option key={style} value={style}>
-                        {toTitleCase(style)}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
+                  <Controller
+                    control={reviewControl}
+                    name="servingStyle"
+                    render={({ field }) => (
+                      <ServingStyleInput
+                        disabled={isReviewSubmitting}
+                        id="review-serving-style"
+                        name={field.name}
+                        onChange={field.onChange}
+                        value={field.value ?? null}
+                      />
+                    )}
+                  />
+                </FieldGroup>
                 <Field htmlFor="review-picture" label="Picture" optional>
                   <PictureInput
                     disabled={isReviewSubmitting}
@@ -564,7 +568,7 @@ export default function TastingForm(
                   name="friends"
                   render={({ field }) => (
                     <MemberPicker
-                      label="Drinking with"
+                      label="Friends"
                       loading={friendResults.isFetching}
                       onChange={(nextFriends) => {
                         field.onChange(nextFriends.map((friend) => friend.id));
@@ -605,8 +609,13 @@ export default function TastingForm(
             </FormSection>
           ) : null}
           {recordType === "tasting" && currentStep === 1 ? (
-            <FormSection title="What you noticed">
-              <Field htmlFor="tasting-notes" label="Notes" optional>
+            <FormSection title="What you tasted">
+              <Field
+                hint="Suggested from this bottle's own tastings."
+                htmlFor="tasting-notes"
+                label="Notes"
+                optional
+              >
                 <Controller
                   control={control}
                   name="tags"
@@ -654,35 +663,34 @@ export default function TastingForm(
                   aria-label="Comments"
                   id="tasting-comments"
                   invalid={Boolean(errors.notes)}
-                  placeholder="What stood out?"
+                  placeholder="What do you want to remember about this pour?"
                   rows={6}
                 />
               </Field>
             </FormSection>
           ) : null}
           {recordType === "tasting" && currentStep === 2 ? (
-            <FormSection title="Picture and company">
-              <Field
+            <FormSection title="The sitting">
+              <FieldGroup
                 error={errors.servingStyle?.message}
-                htmlFor="tasting-serving-style"
-                label="Served"
+                hint="How you took it, not how the bottle ships."
+                label="Serving"
                 optional
               >
-                <Select
-                  {...register("servingStyle", {
-                    setValueAs: (value) => value || null,
-                  })}
-                  id="tasting-serving-style"
-                  invalid={Boolean(errors.servingStyle)}
-                >
-                  <option value="">Not set</option>
-                  {SERVING_STYLE_LIST.map((style) => (
-                    <option key={style} value={style}>
-                      {toTitleCase(style)}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
+                <Controller
+                  control={control}
+                  name="servingStyle"
+                  render={({ field }) => (
+                    <ServingStyleInput
+                      disabled={isSubmitting}
+                      id="tasting-serving-style"
+                      name={field.name}
+                      onChange={field.onChange}
+                      value={field.value ?? null}
+                    />
+                  )}
+                />
+              </FieldGroup>
               <Field htmlFor="tasting-picture" label="Picture" optional>
                 <PictureInput
                   disabled={isSubmitting}
@@ -714,7 +722,7 @@ export default function TastingForm(
                 name="friends"
                 render={({ field }) => (
                   <MemberPicker
-                    label="Drinking with"
+                    label="Friends"
                     loading={friendResults.isFetching}
                     onChange={(nextFriends) => {
                       setFriends(nextFriends);

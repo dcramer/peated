@@ -1,8 +1,8 @@
 "use client";
 
-import { COLOR_SCALE } from "@peated/server/constants";
+import { COLOR_SCALE, type SERVING_STYLE_LIST } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
-import { Minus, Plus, Upload } from "lucide-react";
+import { Box, Droplets, GlassWater, Minus, Plus, Upload } from "lucide-react";
 import { useRef } from "react";
 
 import {
@@ -16,6 +16,8 @@ import { Button, IconButton } from "./button.stylex";
 import { RATING_BANDS, type RatingBand } from "./scoring.stylex";
 
 const REVIEW_SCORE_TRACK_MIN = 60;
+
+export type ServingStyle = (typeof SERVING_STYLE_LIST)[number];
 
 export type ReviewScoreInputProps = {
   disabled?: boolean;
@@ -241,6 +243,58 @@ export function RatingBandInput({
   );
 }
 
+export type ServingStyleInputProps = {
+  disabled?: boolean;
+  id: string;
+  name: string;
+  onChange: (value: ServingStyle) => void;
+  value: ServingStyle | null;
+};
+
+/** Records how the whisky was served with the three canonical choices. */
+export function ServingStyleInput({
+  disabled = false,
+  id,
+  name,
+  onChange,
+  value,
+}: ServingStyleInputProps) {
+  return (
+    <div
+      aria-label="Serving"
+      role="radiogroup"
+      {...stylex.props(styles.servingStyleTrack, disabled && styles.disabled)}
+    >
+      {SERVING_STYLE_OPTIONS.map(({ icon: Icon, label, value: option }) => {
+        const checked = value === option;
+
+        return (
+          <label
+            key={option}
+            {...stylex.props(
+              styles.servingStyleCell,
+              checked && styles.servingStyleCellSelected,
+            )}
+          >
+            <input
+              checked={checked}
+              disabled={disabled}
+              id={`${id}-${option}`}
+              name={name}
+              onChange={() => onChange(option)}
+              type="radio"
+              value={option}
+              {...stylex.props(styles.visuallyHiddenInput)}
+            />
+            <Icon aria-hidden="true" size={16} strokeWidth={1.75} />
+            <span>{label}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
 export type ColorInputProps = {
   disabled?: boolean;
   id: string;
@@ -316,6 +370,11 @@ export function ColorInput({
         <span>amber</span>
         <span>dark</span>
       </div>
+      <p aria-live="polite" {...stylex.props(styles.colorHint)}>
+        {selected
+          ? `${selected[1]} · ${selected[0]} of 20`
+          : "Bar light can lie. Unsure is a real answer."}
+      </p>
     </div>
   );
 }
@@ -671,6 +730,43 @@ const styles = stylex.create({
     color: colors.ground,
     opacity: 0.62,
   },
+  servingStyleTrack: {
+    display: "grid",
+    width: "100%",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: space.x2,
+  },
+  servingStyleCell: {
+    position: "relative",
+    display: "flex",
+    minWidth: 0,
+    height: "44px",
+    alignItems: "center",
+    justifyContent: "center",
+    columnGap: space.x2,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.fieldBackground,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "15px",
+    fontWeight: 600,
+    lineHeight: 1,
+    cursor: "pointer",
+    boxShadow: {
+      default: `inset 0 0 0 1px ${colors.fieldRule}`,
+      ":hover": `inset 0 0 0 1px ${colors.inkMuted}`,
+      ":focus-within": effects.focusRing,
+    },
+  },
+  servingStyleCellSelected: {
+    backgroundColor: colors.ground,
+    color: colors.ink,
+    boxShadow: {
+      default: `inset 0 0 0 2px ${colors.ink}`,
+      ":hover": `inset 0 0 0 2px ${colors.ink}`,
+      ":focus-within": effects.focusRing,
+    },
+  },
   visuallyHiddenText: {
     position: "absolute",
     width: "1px",
@@ -748,6 +844,16 @@ const styles = stylex.create({
     fontSize: "10px",
     lineHeight: 1.3,
   },
+  colorHint: {
+    marginTop: space.x2,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.45,
+  },
   pictureRoot: {
     width: "100%",
   },
@@ -817,3 +923,13 @@ const bandInputBracketSelectedStyles = {
   outstanding: styles.bandInputBracketSelectedDark,
   unicorn: styles.bandInputBracketSelectedDarkest,
 } satisfies Record<RatingBand, stylex.StyleXStyles>;
+
+const SERVING_STYLE_OPTIONS = [
+  { icon: GlassWater, label: "Neat", value: "neat" },
+  { icon: Box, label: "Rocks", value: "rocks" },
+  { icon: Droplets, label: "Splash", value: "splash" },
+] as const satisfies ReadonlyArray<{
+  icon: typeof GlassWater;
+  label: string;
+  value: ServingStyle;
+}>;
