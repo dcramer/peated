@@ -13,7 +13,18 @@ import {
 import { AppLink } from "./appLink";
 import { IconButton } from "./button.stylex";
 
-const PHONE = "@media (max-width: 480px)";
+const MENU_ANCHORS = {
+  page: {
+    gap: `calc(${controlMetrics.controlHeightLarge} * -1)`,
+    padding: 8,
+    to: "bottom end",
+  },
+  row: {
+    gap: `calc(${controlMetrics.controlHeightSmall} * -1)`,
+    padding: 8,
+    to: "bottom end",
+  },
+} as const;
 
 type RowMenuItemBase = {
   disabled?: boolean;
@@ -45,9 +56,9 @@ export function RowMenu({
   const normalizedGroups = groups.map(normalizeGroup);
 
   return (
-    <Menu as="div" {...stylex.props(styles.root)}>
-      {() => (
-        <>
+    <Menu>
+      {({ open }) => (
+        <div {...stylex.props(styles.root, open && styles.openRoot)}>
           <span {...stylex.props(styles.triggerLayer)}>
             <MenuButton
               as={IconButton}
@@ -64,12 +75,9 @@ export function RowMenu({
             />
           </span>
           <MenuItems
+            anchor={MENU_ANCHORS[variant]}
             aria-label={`${label} actions`}
-            portal={false}
-            {...stylex.props(
-              styles.menu,
-              variant === "page" && styles.pageMenu,
-            )}
+            {...stylex.props(styles.menu)}
           >
             <div
               title={label}
@@ -126,7 +134,7 @@ export function RowMenu({
               </div>
             ))}
           </MenuItems>
-        </>
+        </div>
       )}
     </Menu>
   );
@@ -143,8 +151,12 @@ const styles = stylex.create({
     position: "relative",
     display: "inline-flex",
     flexShrink: 0,
-    // Keep the trigger above its own menu without escaping this component.
+    // Keep the trigger inside this component's stacking context.
     isolation: "isolate",
+  },
+  openRoot: {
+    // The anchored menu uses a portal, so its open trigger must sit above it.
+    zIndex: 2,
   },
   triggerLayer: {
     position: "relative",
@@ -164,9 +176,6 @@ const styles = stylex.create({
     backgroundColor: "currentColor",
   },
   menu: {
-    position: "absolute",
-    top: 0,
-    right: 0,
     zIndex: 1,
     width: "216px",
     overflow: "hidden",
@@ -175,10 +184,6 @@ const styles = stylex.create({
     backgroundColor: colors.ground,
     color: colors.ink,
     boxShadow: effects.overlayShadow,
-  },
-  pageMenu: {
-    top: { default: 0, [PHONE]: "auto" },
-    bottom: { default: "auto", [PHONE]: 0 },
   },
   header: {
     boxSizing: "border-box",
