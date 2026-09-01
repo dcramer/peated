@@ -24,6 +24,7 @@ import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottleReviewMetadata } from "@peated/web/lib/bottleMetadata";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -162,10 +163,9 @@ function LatestReleases() {
 
     return [
       {
-        href: `/bottles/${bottle.id}`,
-        imageUrl: bottle.imageUrl,
+        ...toBottleListItem(bottle),
+        align: "start" as const,
         metadata: getReleaseMetadata(bottle),
-        name: formatBottleDisplayName(bottle),
         subtitle: subtitle.length ? (
           <Join divider=" · ">{subtitle}</Join>
         ) : undefined,
@@ -398,10 +398,9 @@ function RecentBottles({ totalBottles }: { totalBottles?: number }) {
   return bottles.data.results.length ? (
     <HomeRecentBottles
       bottles={bottles.data.results.map((bottle) => ({
-        href: `/bottles/${bottle.id}`,
-        imageUrl: bottle.imageUrl,
+        ...toBottleListItem(bottle),
         metadata: getBottleMetadata(bottle),
-        name: formatBottleDisplayName(bottle),
+        size: "sm",
       }))}
       totalBottles={totalBottles}
     />

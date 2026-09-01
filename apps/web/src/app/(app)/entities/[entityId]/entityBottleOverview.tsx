@@ -1,7 +1,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
-  BottleTable,
+  BottleList,
   ButtonLink,
   EmptyState,
   LoadingList,
@@ -9,9 +9,9 @@ import {
   TextLink,
 } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
-import { toBottleTableRow } from "./entityBottleTableRows";
 import {
   entityHasBottleCatalog,
   getEntityPresentation,
@@ -85,8 +85,6 @@ export function EntityBottleOverview({
     );
   }
 
-  const [firstBottle, ...remainingBottles] = bottleList.results;
-
   return (
     <PageSection
       heading="Popular bottles"
@@ -96,13 +94,14 @@ export function EntityBottleOverview({
         </TextLink>
       }
     >
-      <BottleTable
+      <BottleList
         ariaLabel={`${entity.name} popular bottles`}
-        columns={["Rating"]}
-        rows={[
-          toBottleTableRow(firstBottle),
-          ...remainingBottles.map((bottle) => toBottleTableRow(bottle)),
-        ]}
+        items={bottleList.results.map((bottle) =>
+          toBottleListItem(bottle, {
+            includeRatings: true,
+            includeRelatedReleases: true,
+          }),
+        )}
       />
     </PageSection>
   );

@@ -8,12 +8,12 @@ import type { ReactNode } from "react";
 
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
 import {
   BOTTLE_CATALOG_ALLOWED_VALUES,
   BOTTLE_CATALOG_QUERY_FIELDS,
   normalizeBottleCatalogQueryParams,
 } from "@peated/web/lib/bottleCatalogQueryParams";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
@@ -87,7 +87,12 @@ export function EntityBottleListClient({
         emptyAction={emptyAction}
         emptyDescription={`No bottles have been added for ${entityName} yet.`}
         emptyHeading="No bottles yet"
-        items={bottleList.results.map(toBottleCatalogItem)}
+        items={bottleList.results.map((bottle) =>
+          toBottleListItem(bottle, {
+            includeRatings: true,
+            includeRelatedReleases: true,
+          }),
+        )}
         nextHref={getCursorHref(
           pathname,
           searchParams,

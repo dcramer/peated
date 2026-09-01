@@ -19,11 +19,12 @@ export type { BadgeImageProps } from "./badgeImage.stylex";
 export { BottleIdentityRow, BottleVisual } from "./bottleIdentityRow.stylex";
 export type {
   BottleIdentityRowProps,
+  BottleIdentityRowSize,
   BottleVisualProps,
   BottleVisualSize,
 } from "./bottleIdentityRow.stylex";
-export { BottleTable } from "./bottleTable.stylex";
-export type { BottleTableProps, BottleTableRow } from "./bottleTable.stylex";
+export { BottleList } from "./bottleList.stylex";
+export type { BottleListItem, BottleListProps } from "./bottleList.stylex";
 export { Button, ButtonLink, IconButton } from "./button.stylex";
 export type {
   ButtonLinkProps,

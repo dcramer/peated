@@ -112,14 +112,11 @@ export function BottleOverview({
       {hasRail ? (
         <aside aria-label="Bottle details" {...stylex.props(styles.rail)}>
           {hasDeclaredFacts ? (
-            <section {...stylex.props(styles.railSection)}>
-              <h2 {...stylex.props(styles.railHeading)}>
-                Declared on the label
-              </h2>
+            <div {...stylex.props(styles.railSection)}>
               <div {...stylex.props(styles.panel)}>
                 <FactList facts={declaredFacts} />
               </div>
-            </section>
+            </div>
           ) : null}
 
           {recommendations.length ? (

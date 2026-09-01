@@ -4,18 +4,15 @@ import type { ReactNode } from "react";
 
 import {
   AppLink,
-  BottleIdentityRow,
-  BottleRatings,
-  BottleVisual,
+  BottleList,
+  type BottleListItem,
   Card,
   CardActionLink,
   CardLink,
   CardPrimaryLink,
   ItemList,
-  ItemListItem,
   ItemRow,
   TextLink,
-  type TastingRatingCounts,
 } from "..";
 import {
   colors,
@@ -49,24 +46,12 @@ function HomeModuleHeading({
   );
 }
 
-export type HomeRatedBottle = {
-  bandCounts: TastingRatingCounts;
-  href: string;
-  imageUrl?: string | null;
-  metadata: readonly string[];
-  name: string;
-  scoreCount: number;
-  scoreHigh?: number | null;
-  scoreLow?: number | null;
-  score: number;
-};
-
 /** Shows bottles with published median scores in API rank order. */
 export function HomeHighestRated({
   bottles,
   totalRated,
 }: {
-  bottles: readonly HomeRatedBottle[];
+  bottles: readonly BottleListItem[];
   totalRated: number;
 }) {
   return (
@@ -84,39 +69,11 @@ export function HomeHighestRated({
         title="Highest rated"
       />
       <div {...stylex.props(styles.rows)}>
-        <ItemList ariaLabel="Highest rated bottles">
-          {bottles.map((bottle) => (
-            <ItemListItem key={bottle.href}>
-              <BottleIdentityRow
-                end={
-                  <BottleRatings
-                    counts={bottle.bandCounts}
-                    high={bottle.scoreHigh}
-                    low={bottle.scoreLow}
-                    median={bottle.score}
-                    scoreCount={bottle.scoreCount}
-                  />
-                }
-                href={bottle.href}
-                imageUrl={bottle.imageUrl}
-                metadata={bottle.metadata}
-                name={bottle.name}
-              />
-            </ItemListItem>
-          ))}
-        </ItemList>
+        <BottleList ariaLabel="Highest rated bottles" items={bottles} />
       </div>
     </section>
   );
 }
-
-export type HomeRelease = {
-  href: string;
-  imageUrl?: string | null;
-  metadata: readonly string[];
-  name: string;
-  subtitle?: ReactNode;
-};
 
 /** Shows bottles with known release years in API release order. */
 export function HomeLatestReleases({
@@ -124,7 +81,7 @@ export function HomeLatestReleases({
   seeAllHref,
   title,
 }: {
-  bottles: readonly HomeRelease[];
+  bottles: readonly BottleListItem[];
   seeAllHref: string;
   title: string;
 }) {
@@ -139,20 +96,7 @@ export function HomeLatestReleases({
         title={title}
       />
       <div {...stylex.props(styles.rows)}>
-        <ItemList ariaLabel={title}>
-          {bottles.map((bottle) => (
-            <ItemListItem key={bottle.href}>
-              <BottleIdentityRow
-                align="start"
-                href={bottle.href}
-                imageUrl={bottle.imageUrl}
-                metadata={bottle.metadata}
-                name={bottle.name}
-                subtitle={bottle.subtitle}
-              />
-            </ItemListItem>
-          ))}
-        </ItemList>
+        <BottleList ariaLabel={title} items={bottles} />
       </div>
     </section>
   );
@@ -180,39 +124,37 @@ export function HomeRecentReviews({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading title="From the critics" />
       <div {...stylex.props(styles.rows)}>
-        <ItemList ariaLabel="From the critics">
-          {reviews.map((review) => (
-            <ItemListItem key={review.id}>
-              <BottleIdentityRow
-                align="start"
-                end={
-                  <span {...stylex.props(styles.reviewFacts)}>
-                    {review.rating !== null && review.rating !== undefined ? (
-                      <strong {...stylex.props(styles.reviewRating)}>
-                        {review.rating}
-                      </strong>
-                    ) : null}
-                    <span {...stylex.props(styles.rowDate)}>{review.date}</span>
-                  </span>
-                }
-                href={review.bottleHref}
-                imageUrl={review.bottleImageUrl}
-                metadata={review.metadata}
-                name={review.bottleName}
-                subtitle={
-                  <TextLink
-                    href={review.sourceHref}
-                    rel="noreferrer"
-                    size="inherit"
-                    target="_blank"
-                  >
-                    {review.source}
-                  </TextLink>
-                }
-              />
-            </ItemListItem>
-          ))}
-        </ItemList>
+        <BottleList
+          ariaLabel="From the critics"
+          items={reviews.map((review) => ({
+            align: "start",
+            end: (
+              <span {...stylex.props(styles.reviewFacts)}>
+                {review.rating !== null && review.rating !== undefined ? (
+                  <strong {...stylex.props(styles.reviewRating)}>
+                    {review.rating}
+                  </strong>
+                ) : null}
+                <span {...stylex.props(styles.rowDate)}>{review.date}</span>
+              </span>
+            ),
+            href: review.bottleHref,
+            id: review.id,
+            imageUrl: review.bottleImageUrl,
+            metadata: review.metadata,
+            name: review.bottleName,
+            subtitle: (
+              <TextLink
+                href={review.sourceHref}
+                rel="noreferrer"
+                size="inherit"
+                target="_blank"
+              >
+                {review.source}
+              </TextLink>
+            ),
+          }))}
+        />
       </div>
     </section>
   );
@@ -434,18 +376,11 @@ export function HomeDistilleries({
   );
 }
 
-export type HomeRecentBottle = {
-  href: string;
-  imageUrl?: string | null;
-  metadata: readonly string[];
-  name: string;
-};
-
 export function HomeRecentBottles({
   bottles,
   totalBottles,
 }: {
-  bottles: readonly HomeRecentBottle[];
+  bottles: readonly BottleListItem[];
   totalBottles?: number;
 }) {
   return (
@@ -459,18 +394,7 @@ export function HomeRecentBottles({
         title="Added this week"
       />
       <div {...stylex.props(styles.recentBottles)}>
-        <ItemList ariaLabel="Bottles added this week">
-          {bottles.map((bottle) => (
-            <ItemRow
-              href={bottle.href}
-              key={bottle.href}
-              leading={<BottleVisual imageUrl={bottle.imageUrl} size="sm" />}
-              metadata={bottle.metadata.join(" · ")}
-              size="sm"
-              title={bottle.name}
-            />
-          ))}
-        </ItemList>
+        <BottleList ariaLabel="Bottles added this week" items={bottles} />
       </div>
     </section>
   );

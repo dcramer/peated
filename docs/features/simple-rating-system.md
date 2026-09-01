@@ -36,6 +36,6 @@ not remove the score from the Bottle summary.
 ## Read a Bottle summary
 
 The Bottle page shows tasting bands as named counts in fixed order. It shows a
-review median and range only after 20 counted member and permitted external
-scores exist. It also shows external reviews with the score text supplied by
-the publication.
+review median after the first counted member or permitted external score. It
+shows a range when more than one score exists. It also shows external reviews
+with the score text supplied by the publication.

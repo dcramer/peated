@@ -195,6 +195,7 @@ export function EntityPageFrameClient({
             ) : null}
           </>
         }
+        actionsPosition="start"
         description={
           entity.description ? (
             <ExpandableDescription content={entity.description} />

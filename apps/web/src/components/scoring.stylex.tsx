@@ -60,8 +60,6 @@ export type ReviewScoreProps = {
   low?: number | null;
   /** Whole-number median of eligible review scores. */
   median?: number | null;
-  /** Minimum score count before the median is shown. */
-  minimumCount?: number;
   /** Optional caller-owned action when the median is withheld. */
   contributionAction?: ReactNode;
 };
@@ -73,9 +71,9 @@ export function ReviewScore({
   high = null,
   low = null,
   median = null,
-  minimumCount = 20,
 }: ReviewScoreProps) {
-  const hasScore = median !== null && count >= minimumCount;
+  const hasScore = median !== null && count > 0;
+  const hasRange = count > 1 && low !== null && high !== null;
 
   return (
     <div
@@ -88,16 +86,16 @@ export function ReviewScore({
           <div {...stylex.props(styles.scoreHeading)}>
             <strong {...stylex.props(styles.scoreValue)}>{median}</strong>
             <span {...stylex.props(styles.scoreMetadata)}>
-              / 100 · median of {formatCount(count)} scores
+              / 100 · median of {formatCount(count)} {countNoun(count)}
             </span>
           </div>
           <div aria-hidden="true" {...stylex.props(styles.scoreTrack)}>
-            {low !== null && high !== null ? (
+            {hasRange ? (
               <span {...stylex.props(styles.scoreRange(low, high))} />
             ) : null}
             <span {...stylex.props(styles.scoreTick(median))} />
           </div>
-          {low !== null && high !== null ? (
+          {hasRange ? (
             <div {...stylex.props(styles.scoreCaption)}>
               low {low} · median {median} · high {high}
             </div>
@@ -108,7 +106,7 @@ export function ReviewScore({
           <span>
             {count === 0
               ? "No review scores yet."
-              : `Only ${formatCount(count)} ${count === 1 ? "score" : "scores"} so far.`}
+              : `${formatCount(count)} ${countNoun(count)} so far.`}
           </span>
           {contributionAction}
         </div>
@@ -239,7 +237,7 @@ export function BottleRatings({
   const label = [
     median === null
       ? "No published score"
-      : `Median score ${median} from ${formatCount(scoreCount)} ${scoreCount === 1 ? "score" : "scores"}`,
+      : `Median score ${median} from ${formatCount(scoreCount)} ${countNoun(scoreCount)}`,
     `Tasting ratings: ${RATING_BANDS.map((band, index) => `${band.label} ${formatCount(bandCounts[index] ?? 0)}`).join(", ")}`,
     hasRange ? `Score range ${low} to ${high}` : null,
   ]
@@ -345,6 +343,10 @@ function getRatingBarHeight(count: number, maxCount: number, sample: number) {
 
 function formatCount(count: number) {
   return count.toLocaleString("en-US");
+}
+
+function countNoun(count: number) {
+  return count === 1 ? "score" : "scores";
 }
 
 const styles = stylex.create({

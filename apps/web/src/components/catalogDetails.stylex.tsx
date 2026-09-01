@@ -106,7 +106,7 @@ const styles = stylex.create({
   idDetail: {
     minWidth: 0,
     width: { default: "auto", [COMPACT]: "100%" },
-    marginLeft: { default: "auto", [COMPACT]: 0 },
+    marginLeft: 0,
     overflow: { default: "hidden", [COMPACT]: "visible" },
     textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },

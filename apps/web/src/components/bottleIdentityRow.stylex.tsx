@@ -18,6 +18,7 @@ const COMPACT = "@media (max-width: 639px)";
 const bottleIconUrl = "/assets/bottle.svg";
 
 export type BottleVisualSize = "sm" | "md" | "lg";
+export type BottleIdentityRowSize = Extract<BottleVisualSize, "sm" | "md">;
 
 export type BottleVisualProps = {
   expandable?: boolean;
@@ -79,6 +80,7 @@ export type BottleIdentityRowProps = {
     count: number;
     href: string;
   };
+  size?: BottleIdentityRowSize;
   subtitle?: ReactNode;
 };
 
@@ -96,19 +98,21 @@ export function BottleIdentityRow({
   metadata = [],
   name,
   relatedReleases,
+  size = "md",
   subtitle,
 }: BottleIdentityRowProps) {
   return (
     <div
       {...stylex.props(
         styles.row,
+        size === "sm" && styles.smallRow,
         align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
         Boolean(href) && layout === "row" && linkedRowStyles.container,
         Boolean(href) && layout === "row" && linkedRowStyles.onGround,
       )}
     >
-      <BottleVisual imageUrl={imageUrl} />
+      <BottleVisual imageUrl={imageUrl} size={size} />
       <div {...stylex.props(styles.copy)}>
         {brand ? (
           brandHref ? (
@@ -135,6 +139,7 @@ export function BottleIdentityRow({
               href={href}
               {...stylex.props(
                 styles.name,
+                size === "sm" && styles.smallName,
                 styles.nameLink,
                 linkedRowStyles.primaryLink,
               )}
@@ -142,7 +147,11 @@ export function BottleIdentityRow({
               {name}
             </AppLink>
           ) : (
-            <span {...stylex.props(styles.name)}>{name}</span>
+            <span
+              {...stylex.props(styles.name, size === "sm" && styles.smallName)}
+            >
+              {name}
+            </span>
           )}
           {isLibrary ? <MemberStatus kind="library" /> : null}
           {hasTasted ? <MemberStatus kind="tasted" /> : null}
@@ -156,7 +165,13 @@ export function BottleIdentityRow({
           </div>
         ) : null}
         {metadata.length ? (
-          <div title={metadata.join(" · ")} {...stylex.props(styles.metadata)}>
+          <div
+            title={metadata.join(" · ")}
+            {...stylex.props(
+              styles.metadata,
+              size === "sm" && styles.smallMetadata,
+            )}
+          >
             {metadata.map((item, index) => (
               <span key={`${item}-${index}`}>
                 {index ? <span aria-hidden="true"> · </span> : null}
@@ -248,6 +263,11 @@ const styles = stylex.create({
   startAlignedRow: {
     alignItems: "flex-start",
   },
+  smallRow: {
+    gap: space.x2,
+    paddingTop: "11px",
+    paddingBottom: "11px",
+  },
   cellLayout: {
     width: "100%",
     marginRight: 0,
@@ -329,6 +349,9 @@ const styles = stylex.create({
     textDecorationThickness: "1px",
     textUnderlineOffset: "2px",
   },
+  smallName: {
+    fontSize: "14px",
+  },
   metadata: {
     maxWidth: "100%",
     overflow: "hidden",
@@ -339,6 +362,9 @@ const styles = stylex.create({
     lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  smallMetadata: {
+    fontSize: "10px",
   },
   subtitle: {
     maxWidth: "100%",
