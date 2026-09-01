@@ -45,9 +45,16 @@ pull request ──capture candidate──────┴──> Frameshift comp
 ```
 
 The restore Action checks both the artifact name and its source SHA. The
-selection step also checks the SHA recorded in `manifest.json`. A missing or
-expired artifact fails with instructions to run the baseline workflow; CI does
-not silently repeat the baseline capture in the pull request job.
+selection step also checks the SHA recorded in `manifest.json`, the capture
+contract version, the runner platform, and the exact Chromium version. An
+incompatible artifact fails before pixel comparison instead of producing
+false visual changes.
+
+The stable artifact ID includes the capture-contract version. Increment it
+with the contract in `capture.mjs` when an intentional capture change makes old
+artifacts incompatible. A missing or expired artifact fails with instructions
+to run the baseline workflow; CI does not silently repeat the baseline capture
+in the pull request job.
 
 Artifacts are retained for 30 days. Active pull requests normally use a recent
 `main` commit. An older branch can regenerate its exact base artifact by

@@ -39,7 +39,7 @@ jobs:
       - name: Store baseline by source revision
         uses: dcramer/frameshift/baseline/upload@b0bd168f717b9d7e865dc3aff252950519a58e40 # main
         with:
-          name: peated-web-screenshots
+          name: peated-web-screenshots-v1
           sha: ${{ github.sha }}
           path: visual-output/baseline
           retention-days: 30

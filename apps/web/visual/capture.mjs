@@ -17,6 +17,17 @@ const WEB_ROOT = path.resolve(
 const DEFAULT_OUT_DIR = path.join(WEB_ROOT, ".playwright/visual");
 const SESSION_SECRET =
   "peated-playwright-session-secret-for-local-browser-tests";
+// Bump this when old baseline artifacts become incompatible.
+const CAPTURE_CONTRACT = 1;
+
+function captureEnvironment(browserVersion) {
+  return {
+    browserVersion,
+    contract: CAPTURE_CONTRACT,
+    platform: `${process.platform}-${process.arch}`,
+    runner: process.env.ImageOS ?? process.platform,
+  };
+}
 
 function requireFlagValue(flag, value) {
   if (!value || value.startsWith("-")) {
@@ -230,6 +241,7 @@ async function main() {
 
   if (scenarioIds.length === 0) {
     await writeManifest(outDir, {
+      capture: captureEnvironment(null),
       changedFiles: changedFiles.slice(0, 20),
       commitSha: sourceSha,
       scenarioIds,
@@ -244,9 +256,11 @@ async function main() {
   const scenarios = getScenarios(scenarioIds);
   const servers = await startServers();
   let browser;
+  let browserVersion;
   const screenshots = [];
   try {
     browser = await chromium.launch({ headless: true });
+    browserVersion = browser.version();
     for (const scenario of scenarios) {
       screenshots.push(
         ...(await captureScenario({
@@ -263,6 +277,7 @@ async function main() {
   }
 
   await writeManifest(outDir, {
+    capture: captureEnvironment(browserVersion),
     changedFiles: changedFiles.slice(0, 20),
     commitSha: sourceSha,
     scenarioIds,

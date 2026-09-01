@@ -7,6 +7,12 @@ import { afterEach, describe, expect, test } from "vitest";
 import { selectBaseline } from "./select-baseline.mjs";
 
 const SHA = "0123456789abcdef0123456789abcdef01234567";
+const CAPTURE = {
+  browserVersion: "Chromium 140",
+  contract: 1,
+  platform: "linux-x64",
+  runner: "ubuntu24",
+};
 const roots = [];
 
 async function fixture() {
@@ -22,6 +28,7 @@ async function fixture() {
     fs.writeFile(
       path.join(source, "manifest.json"),
       JSON.stringify({
+        capture: CAPTURE,
         changedFiles: [],
         commitSha: SHA,
         scenarioIds: ["home", "search"],
@@ -34,6 +41,7 @@ async function fixture() {
     fs.writeFile(
       candidate,
       JSON.stringify({
+        capture: CAPTURE,
         changedFiles: ["apps/web/src/app/page.tsx"],
         commitSha: "ffffffffffffffffffffffffffffffffffffffff",
         scenarioIds: ["home", "new-page"],
@@ -86,5 +94,16 @@ describe("baseline selection", () => {
         sha: "ffffffffffffffffffffffffffffffffffffffff",
       }),
     ).rejects.toThrow("Baseline manifest is for");
+  });
+
+  test("rejects an incompatible capture environment", async () => {
+    const paths = await fixture();
+    const candidate = JSON.parse(await fs.readFile(paths.candidate, "utf8"));
+    candidate.capture.browserVersion = "Chromium 141";
+    await fs.writeFile(paths.candidate, JSON.stringify(candidate));
+
+    await expect(selectBaseline({ ...paths, sha: SHA })).rejects.toThrow(
+      "capture environments differ",
+    );
   });
 });

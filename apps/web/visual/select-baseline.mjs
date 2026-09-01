@@ -17,6 +17,12 @@ const screenshotFileSchema = z
 
 const manifestSchema = z
   .object({
+    capture: z.object({
+      browserVersion: z.string().nullable(),
+      contract: z.literal(1),
+      platform: z.string(),
+      runner: z.string(),
+    }),
     changedFiles: z.array(z.string()),
     commitSha: z
       .string()
@@ -79,6 +85,15 @@ export async function selectBaseline({ candidate, output, sha, source }) {
   if (baselineManifest.commitSha?.toLowerCase() !== sha.toLowerCase()) {
     throw new Error(
       `Baseline manifest is for ${baselineManifest.commitSha ?? "an unknown revision"}, not ${sha}`,
+    );
+  }
+  if (
+    candidateManifest.screenshots.length > 0 &&
+    JSON.stringify(baselineManifest.capture) !==
+      JSON.stringify(candidateManifest.capture)
+  ) {
+    throw new Error(
+      "Baseline and candidate capture environments differ; generate a compatible baseline instead of comparing pixels",
     );
   }
 
