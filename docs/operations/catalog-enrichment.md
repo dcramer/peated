@@ -122,6 +122,19 @@ Follow `rel.nextCursor` until every page is loaded. Before a write, check the
 live [OpenAPI specification](https://api.peated.com/spec.json). Do not rely on a
 stale checkout or an old request shape.
 
+Use the administrator-only reviewed import route for a Bottle that the reviewed
+source list already verifies. It records the create as repair work. It updates
+search and counts, but it does not generate details or start a second AI audit.
+The request body uses the normal Bottle create schema.
+
+```bash
+pnpm cli api post /admin/catalog/bottles --input /tmp/reviewed-bottle.json
+pnpm cli api get /bottles/123
+```
+
+Use the normal `POST /bottles` route for manual entry. Do not use the reviewed
+import route to avoid review when the source facts or identity are uncertain.
+
 Put each patch in a temporary JSON file. Send only the fields supported by the
 evidence.
 

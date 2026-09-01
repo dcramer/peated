@@ -383,6 +383,7 @@ describe("POST /bottles", () => {
       maturation: bottle.maturation,
       outturn: bottle.outturn,
       description: bottle.description,
+      descriptionSrc: bottle.descriptionSrc,
     });
     expect(bottle.createdByActorId).toBe(
       (await getUserActor(defaults.user)).id,
