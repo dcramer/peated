@@ -1,0 +1,1 @@
+ALTER TABLE "event" ADD CONSTRAINT "event_date_range_check" CHECK ("event"."date_end" IS NULL OR "event"."date_end" >= "event"."date_start");

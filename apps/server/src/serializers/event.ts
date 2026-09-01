@@ -49,6 +49,7 @@ export const EventSerializer = serializer({
       description: item.description,
       website: item.website,
       country: attrs.country,
+      address: item.address,
       location: item.location,
     };
   },

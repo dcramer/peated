@@ -11,6 +11,7 @@ export const mockEvents = [
     website: "https://example.com/events/autumn-whisky-festival",
     description: "Independent bottlers and distillers gather for two days.",
     country: mockCountries[0]!,
+    address: "Assembly Rooms, Edinburgh",
     location: [-3.19, 55.95],
   },
   {
@@ -22,6 +23,7 @@ export const mockEvents = [
     website: "https://example.com/events/kentucky-bourbon-weekend",
     description: "Distillery tastings and talks from Kentucky producers.",
     country: mockCountries[2]!,
+    address: null,
     location: [-84.5, 38.05],
   },
   {
@@ -33,6 +35,7 @@ export const mockEvents = [
     website: null,
     description: "A small gathering focused on Japanese single malt.",
     country: mockCountries[3]!,
+    address: null,
     location: [139.69, 35.68],
   },
   {
@@ -44,6 +47,7 @@ export const mockEvents = [
     website: null,
     description: null,
     country: mockCountries[1]!,
+    address: null,
     location: null,
   },
 ] satisfies MockOutputs["events"]["list"]["results"];
