@@ -7,7 +7,6 @@ on:
       - "apps/web/**"
       - "packages/design/**"
       - "packages/orpc/**"
-      - ".github/actions/visual-diff/**"
       - ".github/workflows/web-visual.yml"
       - ".github/workflows/web-visual-comment.yml"
       - "package.json"
@@ -102,7 +101,7 @@ jobs:
           fi
           pnpm --dir base-source visual:web -- "${args[@]}"
       - name: Compare screenshots
-        uses: ./.github/actions/visual-diff
+        uses: dcramer/frameshift@6e478275a27bb557599a4c3ba94af5ab70f34f85 # main
         with:
           baseline: ${{ github.workspace }}/visual-output/baseline
           candidate: ${{ github.workspace }}/visual-output/candidate

@@ -51,46 +51,30 @@ pnpm visual:web -- --changed-file /tmp/peated-screenshot-changes.txt
 
 Images and `manifest.json` go to `apps/web/.playwright/visual/`.
 
-Compare two capture directories:
-
-```sh
-pnpm --dir apps/web visual:diff -- \
-  --baseline /tmp/visual-base \
-  --candidate /tmp/visual-candidate \
-  --output /tmp/visual-report
-```
-
-The report contains `report.json`. Changed PNGs include before, after, and
-pixel diff images. Added PNGs include only after. Removed PNGs include only
-before. It does not copy unchanged images.
+CI uses the pinned Frameshift Action to compare the base and candidate
+directories. The report contains `report.json` plus only the images needed for
+review. The PR comment and native `Frameshift` commit status link to the same
+immutable report on [frameshift.pub](https://frameshift.pub).
 
 CI uploads only the baseline and candidate manifests, `report.json`, and these
 review images. The full baseline and candidate screenshots stay on the runner.
 
-## Reuse the comparison action
+## Frameshift setup
 
-The comparison accepts any two directories of PNG files. Matching relative
-paths identify the same screenshot. Another public repository can use the
-bundled action without installing Peated dependencies:
+Peated's integration is one pinned comparison step. Matching relative paths
+identify the same screenshot:
 
 ```yaml
-- uses: dcramer/peated/.github/actions/visual-diff@<commit-sha>
+- uses: dcramer/frameshift@<full-commit-sha>
   with:
     baseline: path/to/baseline
     candidate: path/to/candidate
     output: path/to/report
 ```
 
-The action writes the report directory and returns the number of visual changes
-as the `changes` output. Screenshot capture and report publication remain the
-calling repository's responsibility.
-
-After changing the comparison source, rebuild the committed action. Focused
-tests fail if the bundle or its license file is out of date.
-
-```sh
-pnpm --dir apps/web visual:diff:build-action
-```
+The Action writes the report directory and returns the number of visual changes
+as the `changes` output. Peated keeps capture and privileged publication in
+separate workflows so pull request code cannot receive write permissions.
 
 ## Add a scenario
 

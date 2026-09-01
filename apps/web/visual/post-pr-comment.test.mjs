@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildBody,
+  frameshiftStatus,
+  frameshiftViewerUrl,
   shouldPostComment,
   validateReport,
 } from "./post-pr-comment.mjs";
@@ -18,6 +20,24 @@ function manifest(overrides = {}) {
 }
 
 describe("post PR comment", () => {
+  it("builds the native Frameshift status", () => {
+    const viewerUrl = frameshiftViewerUrl(
+      "dcramer/peated",
+      "0123456789abcdef0123456789abcdef01234567",
+    );
+
+    expect(viewerUrl).toBe(
+      "https://frameshift.pub/?ref=0123456789abcdef0123456789abcdef01234567&repo=dcramer%2Fpeated",
+    );
+    expect(frameshiftStatus(viewerUrl, 1)).toEqual({
+      context: "Frameshift",
+      description: "1 visual change",
+      state: "success",
+      target_url: viewerUrl,
+    });
+    expect(frameshiftStatus(viewerUrl, 2).description).toBe("2 visual changes");
+  });
+
   it("shows only changed screenshots", () => {
     const candidate = manifest({
       screenshots: [
@@ -46,10 +66,14 @@ describe("post PR comment", () => {
     const body = buildBody(
       { baseline: manifest(), candidate, report },
       "https://example.com/screenshots",
+      "https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc",
     );
 
     expect(shouldPostComment(candidate)).toBe(true);
     expect(body).toContain("## Web screenshots");
+    expect(body).toContain(
+      "[Open the full report in Frameshift](https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc)",
+    );
     expect(body).toContain("Run: pages matched to changed files");
     expect(body).toContain("Pages: `login`");
     expect(body).toContain("`apps/web/src/components/loginForm.tsx`");
@@ -80,6 +104,7 @@ describe("post PR comment", () => {
         },
       },
       "https://example.com/screenshots",
+      "https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc",
     );
 
     expect(body).toContain("No visual changes in the selected pages.");
@@ -111,6 +136,7 @@ describe("post PR comment", () => {
         },
       },
       "https://example.com/screenshots",
+      "https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc",
     );
 
     expect(body).toContain("### added.png — Added\n\n#### After");
