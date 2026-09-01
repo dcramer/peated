@@ -50,6 +50,7 @@ function DatabaseIntro() {
           value: reviewCount?.toLocaleString("en-US") ?? "–",
         },
       ]}
+      loading={stats.isPending}
       footer={
         <AuthenticationLink href="/bottles">
           Browse without an account →

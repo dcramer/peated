@@ -19,18 +19,21 @@ import { expect, test } from "./test";
 test("opens the account menu", async ({ page, snapshot }) => {
   await page.goto("/settings");
   await page.getByRole("button", { name: "Account" }).click();
-  await expect(page.getByRole("menu")).toBeVisible();
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
 
-  await snapshot("Account menu open");
+  await snapshot("Account menu open", { ready: menu });
 });
 ```
 
-The fixture waits for visible elements with `aria-busy="true"` to finish and
-for fonts to load. It also disables animation and caret differences and hides
-the Next.js development portal. Use `aria-busy="true"` on loading states that
-must finish before a snapshot. The fixture uses a full-page screenshot by
-default. Pass `{ fullPage: false }` when the viewport itself is part of the
-workflow state, such as an open mobile menu.
+Pass the page element that proves the page is ready as `ready`. The fixture
+checks that this element stays visible while it takes the screenshot. It also
+waits for visible elements with `aria-busy="true"` to finish and for fonts to
+load. Use `aria-busy="true"` on loading states that must block a screenshot. The
+fixture disables animation and caret differences and hides the Next.js
+development portal. It uses a full-page screenshot by default. Pass
+`fullPage: false` when the screen size is part of the test, such as an open
+mobile menu.
 
 Use a short title that says what the image shows, such as "Home," "Bottle," or
 "Menu." This title appears in Frameshift and sets the file name. Each title must

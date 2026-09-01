@@ -53,9 +53,11 @@ pnpm test:e2e:install
 - Check spacing, color, artwork, copy, and responsive layouts manually or with
   browser screenshots.
 - E2E tests can call the shared `snapshot` fixture after they prove a useful
-  workflow state. Frameshift reviews the image change, but the image is not a
-  test assertion. The fixture waits for visible `aria-busy="true"` loading
-  states to finish before capture. Do not add screenshot-only E2E tests.
+  workflow state. Pass the page element that proves the page is ready as the
+  snapshot's `ready` option. Frameshift reviews the image change, but the image
+  is not a test assertion. The fixture also waits for visible
+  `aria-busy="true"` loading states to finish before it takes the screenshot.
+  Do not add screenshot-only E2E tests.
 - Prefer the fewest assertions that prove the material outcome. Avoid repeating
   lower-level component or API contracts inside an end-to-end workflow.
 - Test a loading fallback only when it changes what a user can do. Check how it

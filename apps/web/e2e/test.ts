@@ -1,4 +1,9 @@
-import { test as base, expect, type TestInfo } from "@playwright/test";
+import {
+  test as base,
+  expect,
+  type Locator,
+  type TestInfo,
+} from "@playwright/test";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -8,7 +13,7 @@ export type { TestInfo };
 
 type Snapshot = (
   title: string,
-  options?: { fullPage?: boolean },
+  options: { fullPage?: boolean; ready: Locator },
 ) => Promise<void>;
 
 /** Snapshot paths are durable Frameshift identities. Keep retries and workers out of them. */
@@ -16,7 +21,7 @@ export const test = base.extend<{ snapshot: Snapshot }>({
   snapshot: async ({ page }, use, testInfo) => {
     const titles = new Set<string>();
 
-    await use(async (title, { fullPage = true } = {}) => {
+    await use(async (title, { fullPage = true, ready }) => {
       const snapshotName = slug(title);
       if (!snapshotName)
         throw new Error("Snapshot titles must contain a letter or number.");
@@ -26,7 +31,7 @@ export const test = base.extend<{ snapshot: Snapshot }>({
       titles.add(snapshotName);
 
       await page.waitForLoadState("domcontentloaded");
-      await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
+      const loadingStates = page.locator('[aria-busy="true"]:visible');
       await page.evaluate(async () => document.fonts.ready);
       await page.addStyleTag({
         content: "nextjs-portal { display: none !important; }",
@@ -39,13 +44,27 @@ export const test = base.extend<{ snapshot: Snapshot }>({
       const metadataPath = path.join(outputRoot, ".metadata", metadataFile);
       await fs.mkdir(path.dirname(imagePath), { recursive: true });
       await reserveSnapshot(outputRoot, file, testInfo, snapshotName);
-      await page.screenshot({
-        animations: "disabled",
-        caret: "hide",
-        fullPage,
-        path: imagePath,
-        type: "png",
-      });
+      let captured = false;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        await expect(ready).toBeVisible();
+        await expect(loadingStates).toHaveCount(0);
+        await page.screenshot({
+          animations: "disabled",
+          caret: "hide",
+          fullPage,
+          path: imagePath,
+          type: "png",
+        });
+        if ((await ready.isVisible()) && (await loadingStates.count()) === 0) {
+          captured = true;
+          break;
+        }
+      }
+      if (!captured) {
+        throw new Error(
+          "The expected page state changed during visual snapshot capture.",
+        );
+      }
 
       await fs.mkdir(path.dirname(metadataPath), { recursive: true });
       await fs.writeFile(
