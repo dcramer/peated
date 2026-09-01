@@ -80,22 +80,25 @@ export default mockOS.bottles.list.handler(
 
     let bottles = mockBottles.filter((bottle) => matchesBottle(bottle));
     const total = bottles.length;
-    const facets = {
-      category: CATEGORY_LIST.flatMap((value) => {
-        const count = mockBottles.filter(
-          (bottle) =>
-            matchesBottle(bottle, "category") && bottle.category === value,
-        ).length;
-        return count > 0 ? [{ value, count }] : [];
-      }),
-      ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
-        const count = mockBottles.filter(
-          (bottle) =>
-            matchesBottle(bottle, "ageBand") && matchesAgeBand(bottle, value),
-        ).length;
-        return count > 0 ? [{ value, count }] : [];
-      }),
-    };
+    const facets = input.includeFacets
+      ? {
+          category: CATEGORY_LIST.flatMap((value) => {
+            const count = mockBottles.filter(
+              (bottle) =>
+                matchesBottle(bottle, "category") && bottle.category === value,
+            ).length;
+            return count > 0 ? [{ value, count }] : [];
+          }),
+          ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
+            const count = mockBottles.filter(
+              (bottle) =>
+                matchesBottle(bottle, "ageBand") &&
+                matchesAgeBand(bottle, value),
+            ).length;
+            return count > 0 ? [{ value, count }] : [];
+          }),
+        }
+      : null;
 
     const direction = input.sort.startsWith("-") ? -1 : 1;
     const sort = input.sort.replace(/^-/, "");

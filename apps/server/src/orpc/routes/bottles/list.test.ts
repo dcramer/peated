@@ -346,7 +346,19 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
-  test("returns the unfiltered total and non-empty facet buckets", async ({
+  test("does not include facets by default", async ({ fixtures }) => {
+    await fixtures.Bottle({
+      name: "Default Facet Bottle",
+      category: "single_malt",
+      statedAge: 12,
+    });
+
+    const response = await routerClient.bottles.list({});
+
+    expect(response.facets).toBeNull();
+  });
+
+  test("returns the unfiltered total and requested facet buckets", async ({
     fixtures,
   }) => {
     await fixtures.Bottle({
@@ -376,7 +388,10 @@ describe("GET /bottles", () => {
     });
     await fixtures.Bottle({ name: "Unknown Age", category: null });
 
-    const response = await routerClient.bottles.list({ limit: 2 });
+    const response = await routerClient.bottles.list({
+      includeFacets: true,
+      limit: 2,
+    });
 
     expect(response.results).toHaveLength(2);
     expect(response.total).toBe(6);
@@ -415,6 +430,7 @@ describe("GET /bottles", () => {
     });
 
     const response = await routerClient.bottles.list({
+      includeFacets: true,
       query: "Catalog Match",
     });
 
@@ -470,6 +486,7 @@ describe("GET /bottles", () => {
       category: "single_malt",
       ageBand: "12_17",
       cursor: 1,
+      includeFacets: true,
       limit: 1,
       sort: "name",
     });
@@ -477,6 +494,7 @@ describe("GET /bottles", () => {
       category: "single_malt",
       ageBand: "12_17",
       cursor: 2,
+      includeFacets: true,
       limit: 1,
       sort: "name",
     });
@@ -506,6 +524,7 @@ describe("GET /bottles", () => {
     await fixtures.Bottle({ name: "Available Bottle", statedAge: 12 });
 
     const response = await routerClient.bottles.list({
+      includeFacets: true,
       query: "No Such Catalog Bottle",
     });
 
@@ -571,10 +590,7 @@ describe("GET /bottles", () => {
     expect(result).toEqual({
       results: [],
       total: 0,
-      facets: {
-        category: [],
-        ageBand: [],
-      },
+      facets: null,
       followedEntityCount: null,
       rel: {
         nextCursor: null,

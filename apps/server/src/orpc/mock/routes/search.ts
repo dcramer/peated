@@ -130,17 +130,21 @@ export default mockOS.search.handler(async ({ input, context }) => {
       ),
   );
 
-  const scopeTotals: MockOutputs["search"]["scopeTotals"] = {
-    bottles: mockBottles.length,
-    distilleries: mockEntities.filter((entity) => entity.kind === "distillery")
-      .length,
-    brands: mockEntities.filter((entity) => entity.kind === "brand").length,
-    bottlers: mockEntities.filter((entity) => entity.kind === "bottler").length,
-    companies: mockEntities.filter((entity) => entity.kind === "company")
-      .length,
-    regions: mockRegions.length,
-  };
-  if (context.user) scopeTotals.members = 3;
+  const scopeTotals: MockOutputs["search"]["scopeTotals"] = input.includeFacets
+    ? {
+        bottles: mockBottles.length,
+        distilleries: mockEntities.filter(
+          (entity) => entity.kind === "distillery",
+        ).length,
+        brands: mockEntities.filter((entity) => entity.kind === "brand").length,
+        bottlers: mockEntities.filter((entity) => entity.kind === "bottler")
+          .length,
+        companies: mockEntities.filter((entity) => entity.kind === "company")
+          .length,
+        regions: mockRegions.length,
+      }
+    : null;
+  if (context.user && scopeTotals) scopeTotals.members = 3;
 
   return SearchOutputSchema.parse({
     query: input.query,

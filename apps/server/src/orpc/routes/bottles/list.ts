@@ -54,7 +54,16 @@ export default implement(bottleListContract).handler(async function ({
   context,
   errors,
 }) {
-  const { query, cursor, limit, filter, category, ageBand, ...rest } = input;
+  const {
+    query,
+    cursor,
+    limit,
+    includeFacets,
+    filter,
+    category,
+    ageBand,
+    ...rest
+  } = input;
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
@@ -262,54 +271,62 @@ export default implement(bottleListContract).handler(async function ({
       orderBy = desc(bottles.totalTastings);
   }
 
-  const [results, [totalRow], categoryRows, [ageBandCounts]] =
-    await Promise.all([
-      db
-        .select({ ...getTableColumns(bottles) })
-        .from(bottles)
-        .innerJoin(entities, eq(entities.id, bottles.brandId))
-        .where(and(...resultWhere))
-        .limit(limit + 1)
-        .offset(offset)
-        .orderBy(
-          ...(exactReferenceBottleIds.length
-            ? [
-                sql`CASE WHEN ${bottles.id} IN (${sql.join(
-                  exactReferenceBottleIds.map((bottleId) => sql`${bottleId}`),
-                  sql`, `,
-                )}) THEN 0 ELSE 1 END`,
-                orderBy,
-                asc(bottles.id),
-              ]
-            : [orderBy, asc(bottles.id)]),
-        ),
-      db
-        .select({ count: sql<string>`COUNT(*)` })
-        .from(bottles)
-        .where(and(...resultWhere)),
-      db
-        .select({
-          value: bottles.category,
-          count: sql<string>`COUNT(*)`,
-        })
-        .from(bottles)
-        .where(and(...where, ageBandWhere, isNotNull(bottles.category)))
-        .groupBy(bottles.category),
-      db
-        .select({
-          nas: sql<string>`COUNT(*) FILTER (WHERE ${bottles.noAgeStatement} IS TRUE)`,
-          under_12: sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} < 12)`,
-          "12_17": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 12 AND ${bottles.statedAge} < 18)`,
-          "18_24": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 18 AND ${bottles.statedAge} < 25)`,
-          "25_plus": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 25)`,
-        })
-        .from(bottles)
-        .where(and(...where, categoryWhere)),
-    ]);
+  // Facets are an explicit catalog capability because each bucket set scans
+  // the complete filtered result set.
+  const facetQueries = includeFacets
+    ? Promise.all([
+        db
+          .select({
+            value: bottles.category,
+            count: sql<string>`COUNT(*)`,
+          })
+          .from(bottles)
+          .where(and(...where, ageBandWhere, isNotNull(bottles.category)))
+          .groupBy(bottles.category),
+        db
+          .select({
+            nas: sql<string>`COUNT(*) FILTER (WHERE ${bottles.noAgeStatement} IS TRUE)`,
+            under_12: sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} < 12)`,
+            "12_17": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 12 AND ${bottles.statedAge} < 18)`,
+            "18_24": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 18 AND ${bottles.statedAge} < 25)`,
+            "25_plus": sql<string>`COUNT(*) FILTER (WHERE ${bottles.statedAge} >= 25)`,
+          })
+          .from(bottles)
+          .where(and(...where, categoryWhere)),
+      ])
+    : Promise.resolve(null);
+
+  const [results, [totalRow], facetRows] = await Promise.all([
+    db
+      .select({ ...getTableColumns(bottles) })
+      .from(bottles)
+      .innerJoin(entities, eq(entities.id, bottles.brandId))
+      .where(and(...resultWhere))
+      .limit(limit + 1)
+      .offset(offset)
+      .orderBy(
+        ...(exactReferenceBottleIds.length
+          ? [
+              sql`CASE WHEN ${bottles.id} IN (${sql.join(
+                exactReferenceBottleIds.map((bottleId) => sql`${bottleId}`),
+                sql`, `,
+              )}) THEN 0 ELSE 1 END`,
+              orderBy,
+              asc(bottles.id),
+            ]
+          : [orderBy, asc(bottles.id)]),
+      ),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(bottles)
+      .where(and(...resultWhere)),
+    facetQueries,
+  ]);
 
   const categoryCounts = new Map(
-    categoryRows.map(({ value, count }) => [value, Number(count)]),
+    (facetRows?.[0] ?? []).map(({ value, count }) => [value, Number(count)]),
   );
+  const ageBandCounts = facetRows?.[1][0];
 
   return {
     results: await serialize(
@@ -320,16 +337,18 @@ export default implement(bottleListContract).handler(async function ({
       { includeGroupSummary: true },
     ),
     total: Number(totalRow?.count ?? 0),
-    facets: {
-      category: CATEGORY_LIST.flatMap((value) => {
-        const count = categoryCounts.get(value) ?? 0;
-        return count > 0 ? [{ value, count }] : [];
-      }),
-      ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
-        const count = Number(ageBandCounts?.[value] ?? 0);
-        return count > 0 ? [{ value, count }] : [];
-      }),
-    },
+    facets: facetRows
+      ? {
+          category: CATEGORY_LIST.flatMap((value) => {
+            const count = categoryCounts.get(value) ?? 0;
+            return count > 0 ? [{ value, count }] : [];
+          }),
+          ageBand: BOTTLE_AGE_BAND_LIST.flatMap((value) => {
+            const count = Number(ageBandCounts?.[value] ?? 0);
+            return count > 0 ? [{ value, count }] : [];
+          }),
+        }
+      : null,
     followedEntityCount: followedEntityIds?.length ?? null,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,

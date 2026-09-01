@@ -34,6 +34,23 @@ export const Overview: Story = {
   render: (args) => <ControlledFilters {...args} />,
 };
 
+export const WithoutCounts: Story = {
+  render: ({ ariaLabel }) => (
+    <FilterPanel ariaLabel={ariaLabel}>
+      <FacetGroup
+        label="Category"
+        onChange={() => undefined}
+        options={[
+          { label: "Single malt", value: "single_malt" },
+          { label: "Blended malt", value: "blended_malt" },
+          { label: "Bourbon", value: "bourbon" },
+        ]}
+        selected="single_malt"
+      />
+    </FilterPanel>
+  ),
+};
+
 function ControlledFilters({ ariaLabel }: FilterPanelProps) {
   const [country, setCountry] = useState("scotland");
   const [query, setQuery] = useState("");

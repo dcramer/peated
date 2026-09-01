@@ -12,20 +12,22 @@ const DEFAULT_SORT = "-tastings";
 
 const OutputSchema = listResponse(BottleSchema).extend({
   total: z.number().int().nonnegative(),
-  facets: z.object({
-    category: z.array(
-      z.object({
-        value: z.enum(CATEGORY_LIST),
-        count: z.number().int().positive(),
-      }),
-    ),
-    ageBand: z.array(
-      z.object({
-        value: z.enum(BOTTLE_AGE_BAND_LIST),
-        count: z.number().int().positive(),
-      }),
-    ),
-  }),
+  facets: z
+    .object({
+      category: z.array(
+        z.object({
+          value: z.enum(CATEGORY_LIST),
+          count: z.number().int().positive(),
+        }),
+      ),
+      ageBand: z.array(
+        z.object({
+          value: z.enum(BOTTLE_AGE_BAND_LIST),
+          count: z.number().int().positive(),
+        }),
+      ),
+    })
+    .nullable(),
   followedEntityCount: z.number().int().nonnegative().nullable(),
 });
 
@@ -61,6 +63,10 @@ export default contract
       minScore: z.coerce.number().int().min(0).max(100).nullish(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
+      includeFacets: z.coerce
+        .boolean()
+        .default(false)
+        .describe("Compute category and age-band facet counts"),
       filter: z.enum(["all", "following"]).default("all"),
       sort: z.enum(BOTTLE_LIST_SORT_OPTIONS).default(DEFAULT_SORT),
     }),

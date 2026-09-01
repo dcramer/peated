@@ -17,24 +17,14 @@ export async function EntityCatalogPage({
     numericFields: ["cursor", "limit"],
   });
   const { client } = await getPublicPageServerClient();
-  const entityListPromise =
+  const entityList =
     kind === "distillery"
-      ? client.distilleries.list(queryParams)
+      ? await client.distilleries.list(queryParams)
       : kind === "brand"
-        ? client.brands.list(queryParams)
+        ? await client.brands.list(queryParams)
         : kind === "bottler"
-          ? client.bottlers.list(queryParams)
-          : client.companies.list(queryParams);
-  const [entityList, countryList] = await Promise.all([
-    entityListPromise,
-    client.countries.list({ onlyMajor: true, sort: "-bottles" }),
-  ]);
+          ? await client.bottlers.list(queryParams)
+          : await client.companies.list(queryParams);
 
-  return (
-    <EntityCatalogPageClient
-      initialCountryList={countryList}
-      initialEntityList={entityList}
-      kind={kind}
-    />
-  );
+  return <EntityCatalogPageClient initialEntityList={entityList} kind={kind} />;
 }
