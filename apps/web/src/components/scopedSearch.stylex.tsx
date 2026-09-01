@@ -260,7 +260,7 @@ const styles = stylex.create({
     borderTopRightRadius: controlMetrics.radius,
     borderBottomRightRadius: 0,
     borderBottomLeftRadius: 0,
-    outlineWidth: "2px",
+    outlineWidth: 0,
     backgroundColor: colors.ground,
   },
   scopeMenuRoot: {
