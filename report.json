@@ -1,0 +1,43 @@
+{
+  "files": [
+    {
+      "file": "add-tasting__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "add-tasting__mobile.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "bottle-detail__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "home__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "home__mobile.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "status": "unchanged"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 0,
+    "removed": 0,
+    "unchanged": 8
+  },
+  "version": 1
+}
