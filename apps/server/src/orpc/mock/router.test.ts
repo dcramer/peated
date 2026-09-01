@@ -528,6 +528,7 @@ describe("mock oRPC router", () => {
       ],
       scopeTotals: {
         bottles: mockBottles.length,
+        series: 0,
         distilleries: mockEntities.filter(
           (entity) => entity.kind === "distillery",
         ).length,
