@@ -17,43 +17,43 @@ import { signIn } from "./session";
 const publicRoutes = [
   {
     heading: "A record of whisky, bottle by bottle.",
-    name: "home",
+    name: "Home",
     path: "/",
   },
   {
     heading: "Search the database",
-    name: "search",
+    name: "Search",
     path: "/search",
   },
   {
     heading: existingBottleDetails.group.fullName,
-    name: "bottle detail",
+    name: "Bottle",
     path: `/bottles/${existingBottle.id}`,
   },
   {
     heading: testRegion.name,
-    name: "region detail",
+    name: "Region",
     path: `/locations/${testRegion.country.slug}/regions/${testRegion.slug}`,
   },
   {
     heading: testUser.username,
-    name: "member profile",
+    name: "Profile",
     path: `/users/${testUser.username}`,
   },
-  { heading: "Sign in", name: "login", path: "/login" },
+  { heading: "Sign in", name: "Sign in", path: "/login" },
   {
     heading: testBrand.name,
-    name: "brand detail",
+    name: "Brand",
     path: `/brands/${testBrand.id}`,
   },
   {
     heading: testOwnedEntity.name,
-    name: "distillery detail",
+    name: "Distillery",
     path: `/distillers/${testOwnedEntity.id}`,
   },
   {
     heading: testBottler.name,
-    name: "bottler detail",
+    name: "Bottler",
     path: `/bottlers/${testBottler.id}`,
   },
 ] as const;
@@ -115,7 +115,7 @@ test(
     });
 
     await expect(navigation).toBeVisible();
-    await snapshot("navigation open", { fullPage: false });
+    await snapshot("Menu", { fullPage: false });
     await navigation.getByRole("link", { name: "Bottles" }).click();
     await expect(page).toHaveURL(/\/bottles$/);
   },

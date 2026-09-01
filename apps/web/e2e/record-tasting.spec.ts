@@ -82,7 +82,7 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { exact: true, name: "Log a tasting" }).first(),
     ).toBeVisible();
-    await snapshot("start");
+    await snapshot("Start a tasting");
 
     await uploadLabel(page);
 

@@ -7,23 +7,23 @@ export { expect };
 export type { TestInfo };
 
 type Snapshot = (
-  name: string,
+  title: string,
   options?: { fullPage?: boolean },
 ) => Promise<void>;
 
 /** Snapshot paths are durable Frameshift identities. Keep retries and workers out of them. */
 export const test = base.extend<{ snapshot: Snapshot }>({
   snapshot: async ({ page }, use, testInfo) => {
-    const names = new Set<string>();
+    const titles = new Set<string>();
 
-    await use(async (name, { fullPage = true } = {}) => {
-      const snapshotName = slug(name);
+    await use(async (title, { fullPage = true } = {}) => {
+      const snapshotName = slug(title);
       if (!snapshotName)
-        throw new Error("Snapshot names must contain a letter or number.");
-      if (names.has(snapshotName)) {
-        throw new Error(`Duplicate snapshot name in one test: ${name}`);
+        throw new Error("Snapshot titles must contain a letter or number.");
+      if (titles.has(snapshotName)) {
+        throw new Error(`Duplicate snapshot title in one test: ${title}`);
       }
-      names.add(snapshotName);
+      titles.add(snapshotName);
 
       await page.evaluate(async () => document.fonts.ready);
       await page.addStyleTag({
@@ -31,9 +31,12 @@ export const test = base.extend<{ snapshot: Snapshot }>({
       });
 
       const outputRoot = visualOutputRoot();
-      const file = snapshotFile(testInfo, snapshotName);
+      const file = snapshotFile(snapshotName);
       const imagePath = path.join(outputRoot, file);
+      const metadataFile = snapshotMetadataFile(testInfo, snapshotName);
+      const metadataPath = path.join(outputRoot, ".metadata", metadataFile);
       await fs.mkdir(path.dirname(imagePath), { recursive: true });
+      await reserveSnapshot(outputRoot, file, testInfo, snapshotName);
       await page.screenshot({
         animations: "disabled",
         caret: "hide",
@@ -42,7 +45,6 @@ export const test = base.extend<{ snapshot: Snapshot }>({
         type: "png",
       });
 
-      const metadataPath = path.join(outputRoot, ".metadata", `${file}.json`);
       await fs.mkdir(path.dirname(metadataPath), { recursive: true });
       await fs.writeFile(
         metadataPath,
@@ -50,14 +52,7 @@ export const test = base.extend<{ snapshot: Snapshot }>({
           {
             browserVersion: page.context().browser()?.version() ?? null,
             file,
-            label: [
-              ...snapshotTitles(testInfo),
-              name,
-              projectLabel(testInfo.project.name),
-            ].join(" · "),
-            project: testInfo.project.name,
-            snapshot: name,
-            test: snapshotTitles(testInfo).join(" › "),
+            label: title,
           },
           null,
           2,
@@ -74,7 +69,11 @@ function visualOutputRoot() {
     : path.resolve(process.cwd(), ".playwright/visual");
 }
 
-export function snapshotFile(testInfo: TestInfo, snapshotName: string) {
+export function snapshotFile(snapshotName: string) {
+  return `${snapshotName}.png`;
+}
+
+export function snapshotMetadataFile(testInfo: TestInfo, snapshotName: string) {
   const specPath = path
     .relative(testInfo.project.testDir, testInfo.file)
     .replaceAll(path.sep, "/")
@@ -86,21 +85,43 @@ export function snapshotFile(testInfo: TestInfo, snapshotName: string) {
   return path.posix.join(
     ...(specPath.length > 0 ? specPath : ["test"]),
     ...testPath,
-    `${snapshotName}__${slug(testInfo.project.name) || "project"}.png`,
+    `${snapshotName}__${slug(testInfo.project.name) || "project"}.json`,
   );
+}
+
+async function reserveSnapshot(
+  outputRoot: string,
+  file: string,
+  testInfo: TestInfo,
+  snapshotName: string,
+) {
+  const lockPath = path.join(outputRoot, ".metadata", ".locks", `${file}.lock`);
+  const owner = JSON.stringify({
+    file: path.relative(testInfo.project.testDir, testInfo.file),
+    project: testInfo.project.name,
+    snapshot: snapshotName,
+    titlePath: testInfo.titlePath,
+  });
+  await fs.mkdir(path.dirname(lockPath), { recursive: true });
+  try {
+    await fs.writeFile(lockPath, owner, { flag: "wx" });
+  } catch (error) {
+    if (
+      !(error instanceof Error && "code" in error && error.code === "EEXIST")
+    ) {
+      throw error;
+    }
+    if ((await fs.readFile(lockPath, "utf8")) !== owner) {
+      throw new Error(`Duplicate visual snapshot file: ${file}`, {
+        cause: error,
+      });
+    }
+  }
 }
 
 function snapshotTitles(testInfo: Pick<TestInfo, "title" | "titlePath">) {
   const titles = testInfo.titlePath.slice(1);
   return titles.length > 0 ? titles : [testInfo.title];
-}
-
-function projectLabel(project: string) {
-  return project
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map((part) => part[0]?.toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function slug(value: string) {
