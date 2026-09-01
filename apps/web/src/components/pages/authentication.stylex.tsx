@@ -29,6 +29,7 @@ export type AuthenticationIntroProps = {
   description?: ReactNode;
   facts?: readonly AuthenticationFact[];
   footer?: ReactNode;
+  loading?: boolean;
   points?: readonly ReactNode[];
   title: ReactNode;
 };
@@ -38,11 +39,12 @@ export function AuthenticationIntro({
   description,
   facts,
   footer,
+  loading = false,
   points,
   title,
 }: AuthenticationIntroProps) {
   return (
-    <aside {...stylex.props(styles.intro)}>
+    <aside aria-busy={loading || undefined} {...stylex.props(styles.intro)}>
       {artwork ? (
         <img
           alt={artwork.alt}

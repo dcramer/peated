@@ -79,10 +79,11 @@ test.describe("log tasting", () => {
     await page.goto("/addTasting");
 
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
-    await expect(
-      page.getByRole("heading", { exact: true, name: "Log a tasting" }).first(),
-    ).toBeVisible();
-    await snapshot("Start a tasting");
+    const heading = page
+      .getByRole("heading", { exact: true, name: "Log a tasting" })
+      .first();
+    await expect(heading).toBeVisible();
+    await snapshot("Start a tasting", { ready: heading });
 
     await uploadLabel(page);
 

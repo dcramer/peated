@@ -71,12 +71,11 @@ test("public routes load", async ({ page, snapshot }) => {
 
       expect(response?.status()).toBeLessThan(400);
       if ("heading" in route) {
-        await expect(
-          page
-            .getByRole("heading", { exact: true, name: route.heading })
-            .first(),
-        ).toBeVisible();
-        await snapshot(route.name);
+        const heading = page
+          .getByRole("heading", { exact: true, name: route.heading })
+          .first();
+        await expect(heading).toBeVisible();
+        await snapshot(route.name, { ready: heading });
       }
     });
   }
@@ -115,7 +114,7 @@ test(
     });
 
     await expect(navigation).toBeVisible();
-    await snapshot("Menu", { fullPage: false });
+    await snapshot("Menu", { fullPage: false, ready: navigation });
     await navigation.getByRole("link", { name: "Bottles" }).click();
     await expect(page).toHaveURL(/\/bottles$/);
   },
