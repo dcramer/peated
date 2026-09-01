@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 const DARK = "@media (prefers-color-scheme: dark)";
+const COARSE_POINTER = "@media (pointer: coarse)";
+const NARROW = "@media (max-width: 759px)";
 
 export const colors = stylex.defineVars({
   ground: { default: "#f7f8f5", [DARK]: "#101210" },
@@ -177,8 +179,16 @@ export const space = stylex.defineVars({
 export const controlMetrics = stylex.defineVars({
   radius: "3px",
   radiusSmall: "2px",
-  controlHeightSmall: "34px",
-  controlHeight: "40px",
+  controlHeightSmall: {
+    default: "34px",
+    [COARSE_POINTER]: "44px",
+    [NARROW]: "44px",
+  },
+  controlHeight: {
+    default: "40px",
+    [COARSE_POINTER]: "44px",
+    [NARROW]: "44px",
+  },
   controlHeightLarge: "44px",
 });
 

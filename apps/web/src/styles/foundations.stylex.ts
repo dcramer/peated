@@ -12,6 +12,8 @@ export const foundationStyles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "15px",
     lineHeight: 1.6,
+    textSizeAdjust: "100%",
+    touchAction: "manipulation",
   },
   pageTitle: {
     margin: 0,

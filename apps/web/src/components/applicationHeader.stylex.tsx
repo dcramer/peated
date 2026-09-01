@@ -10,7 +10,13 @@ import * as stylex from "@stylexjs/stylex";
 import { Menu as MenuIcon, Search, X } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+} from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { IconButton } from "./button.stylex";
 import {
@@ -353,6 +359,7 @@ function HeaderDrawerGroup({
 const styles = stylex.create({
   header: {
     width: "100%",
+    paddingTop: "env(safe-area-inset-top)",
     backgroundColor: "transparent",
   },
   headerOnPage: {
@@ -364,15 +371,15 @@ const styles = stylex.create({
     maxWidth: "1320px",
     marginRight: "auto",
     marginLeft: "auto",
-    paddingRight: space.x8,
-    paddingLeft: space.x8,
+    paddingRight: `max(${space.x8}, env(safe-area-inset-right))`,
+    paddingLeft: `max(${space.x8}, env(safe-area-inset-left))`,
     [PAGE_INSET_TIGHTENS]: {
-      paddingRight: space.x6,
-      paddingLeft: space.x6,
+      paddingRight: `max(${space.x6}, env(safe-area-inset-right))`,
+      paddingLeft: `max(${space.x6}, env(safe-area-inset-left))`,
     },
     [MOBILE]: {
-      paddingRight: space.x3,
-      paddingLeft: space.x3,
+      paddingRight: `max(${space.x3}, env(safe-area-inset-right))`,
+      paddingLeft: `max(${space.x3}, env(safe-area-inset-left))`,
     },
   },
   primaryRow: {
@@ -456,8 +463,8 @@ const styles = stylex.create({
   },
   accountButton: {
     display: "inline-flex",
-    width: "34px",
-    height: "34px",
+    width: controlMetrics.controlHeightSmall,
+    height: controlMetrics.controlHeightSmall,
     alignItems: "center",
     justifyContent: "center",
     padding: 0,
@@ -548,7 +555,7 @@ const styles = stylex.create({
   },
   mobileSearchCancel: {
     display: "none",
-    minHeight: "34px",
+    minHeight: controlMetrics.controlHeightSmall,
     padding: 0,
     borderWidth: 0,
     outline: "none",

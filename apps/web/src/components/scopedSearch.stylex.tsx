@@ -412,7 +412,7 @@ const styles = stylex.create({
     },
     color: colors.ink,
     fontFamily: fonts.data,
-    fontSize: "13px",
+    fontSize: { default: "13px", [COMPACT]: "16px" },
     lineHeight: 1.4,
     "::placeholder": {
       color: colors.inkMuted,
