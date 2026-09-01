@@ -2,6 +2,7 @@ import {
   BOTTLE_AGE_BAND_LIST,
   BOTTLE_LIST_SORT_OPTIONS,
   CATEGORY_LIST,
+  DISTILLERY_BOTTLE_VIEW_LIST,
   FLAVOR_PROFILES,
 } from "@peated/server/constants";
 import { BottleSchema, listResponse } from "@peated/server/schemas";
@@ -37,6 +38,12 @@ export default contract
       distiller: z.coerce.number().nullish(),
       bottler: z.coerce.number().nullish(),
       entity: z.coerce.number().nullish(),
+      distilleryView: z
+        .enum(DISTILLERY_BOTTLE_VIEW_LIST)
+        .nullish()
+        .describe(
+          "Filter a distillery to its own releases or releases from other brands and bottlers.",
+        ),
       series: z.coerce.number().nullish(),
       tag: z.string().nullish(),
       flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),

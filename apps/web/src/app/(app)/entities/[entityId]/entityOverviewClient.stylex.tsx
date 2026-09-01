@@ -73,6 +73,8 @@ export function EntityOverviewClient({
   const bottleListQuery = useQuery({
     ...orpc.bottles.list.queryOptions({
       input: {
+        distilleryView:
+          initialEntity.kind === "distillery" ? "other" : undefined,
         entity: initialEntity.id,
         limit: 4,
         sort: "-tastings",
@@ -84,6 +86,8 @@ export function EntityOverviewClient({
   const releaseListQuery = useQuery({
     ...orpc.bottles.list.queryOptions({
       input: {
+        distilleryView:
+          initialEntity.kind === "distillery" ? "releases" : undefined,
         entity: initialEntity.id,
         limit: 4,
         sort: "-release",

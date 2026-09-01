@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   entityHasBottleCatalog,
+  getDistilleryBottleView,
   getEntityClassification,
   getEntityCurrentHref,
   getEntityRelationshipOwnerIds,
@@ -14,6 +15,27 @@ describe("entityHasBottleCatalog", () => {
     expect(entityHasBottleCatalog({ kind: "bottler" })).toBe(true);
     expect(entityHasBottleCatalog({ kind: "distillery" })).toBe(true);
     expect(entityHasBottleCatalog({ kind: "company" })).toBe(false);
+  });
+});
+
+describe("getDistilleryBottleView", () => {
+  it("defaults distillery pages to their releases", () => {
+    expect(getDistilleryBottleView({ kind: "distillery" }, undefined)).toBe(
+      "releases",
+    );
+    expect(getDistilleryBottleView({ kind: "distillery" }, "other")).toBe(
+      "other",
+    );
+    expect(getDistilleryBottleView({ kind: "distillery" }, "unknown")).toBe(
+      "releases",
+    );
+    expect(
+      getDistilleryBottleView({ kind: "distillery" }, undefined, "other"),
+    ).toBe("other");
+  });
+
+  it("does not add a view for other kinds", () => {
+    expect(getDistilleryBottleView({ kind: "brand" }, "other")).toBe(undefined);
   });
 });
 

@@ -10,6 +10,7 @@ import { getBottleUrl, getEntityUrl } from "./urls";
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
 export type BottleListItemOptions = {
+  includeBottler?: boolean;
   includeBrandRow?: boolean;
   includeRatings?: boolean;
   includeRelatedReleases?: boolean;
@@ -19,6 +20,7 @@ export type BottleListItemOptions = {
 export function toBottleListItem(
   bottle: Bottle,
   {
+    includeBottler = false,
     includeBrandRow = true,
     includeRatings = false,
     includeRelatedReleases = false,
@@ -71,6 +73,10 @@ export function toBottleListItem(
             count: relatedReleaseCount,
             href: getReleaseFamilyHref(bottle),
           }
+        : undefined,
+    subtitle:
+      includeBottler && bottle.bottler && bottle.bottler.id !== bottle.brand.id
+        ? `Bottled by ${bottle.bottler.shortName || bottle.bottler.name}`
         : undefined,
   };
 }

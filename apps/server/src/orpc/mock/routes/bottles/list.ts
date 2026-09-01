@@ -11,6 +11,27 @@ import { mockOS } from "@peated/server/orpc/mock/implementer";
 type MockBottle = (typeof mockBottles)[number];
 type BottleAgeBand = (typeof BOTTLE_AGE_BAND_LIST)[number];
 
+function matchesDistilleryView(
+  bottle: MockBottle,
+  entityId: number,
+  view: "releases" | "other",
+) {
+  const ownBrand =
+    bottle.brand.id === entityId || bottle.brand.ownerId === entityId;
+  const ownBottler =
+    bottle.bottler === null ||
+    bottle.bottler.id === entityId ||
+    bottle.bottler.ownerId === entityId;
+  const madeByDistillery = bottle.distillers.some(
+    (distiller) => distiller.id === entityId,
+  );
+  const ownRelease = ownBrand && ownBottler;
+
+  return view === "releases"
+    ? ownRelease
+    : (ownBrand || madeByDistillery) && !ownRelease;
+}
+
 function matchesAgeBand(bottle: MockBottle, ageBand: BottleAgeBand) {
   switch (ageBand) {
     case "nas":
@@ -55,9 +76,11 @@ export default mockOS.bottles.list.handler(
         bottle.distillers.some((entity) => entity.id === input.distiller)) &&
       (input.bottler == null || bottle.bottler?.id === input.bottler) &&
       (input.entity == null ||
-        bottle.brand.id === input.entity ||
-        bottle.bottler?.id === input.entity ||
-        bottle.distillers.some((entity) => entity.id === input.entity)) &&
+        (input.distilleryView
+          ? matchesDistilleryView(bottle, input.entity, input.distilleryView)
+          : bottle.brand.id === input.entity ||
+            bottle.bottler?.id === input.entity ||
+            bottle.distillers.some((entity) => entity.id === input.entity))) &&
       (input.series == null || bottle.series?.id === input.series) &&
       (input.tag == null || bottle.suggestedTags?.includes(input.tag)) &&
       (input.flavorProfile == null ||

@@ -11,6 +11,7 @@ import {
   flights,
   tastings,
 } from "@peated/server/db/schema";
+import { bottlesForDistilleryView } from "@peated/server/lib/distilleryBottleView";
 import {
   plainTextSearchQuery,
   prefixTextSearchQuery,
@@ -154,7 +155,23 @@ export default implement(bottleListContract).handler(async function ({
   if (rest.bottler) {
     where.push(eq(bottles.bottlerId, rest.bottler));
   }
-  if (rest.entity) {
+  if (rest.distilleryView) {
+    if (!rest.entity) {
+      throw errors.BAD_REQUEST({
+        message: "Choose a distillery for this view.",
+      });
+    }
+    const [entity] = await db
+      .select({ kind: entities.kind })
+      .from(entities)
+      .where(eq(entities.id, rest.entity));
+    if (entity?.kind !== "distillery") {
+      throw errors.BAD_REQUEST({
+        message: "Choose a distillery for this view.",
+      });
+    }
+    where.push(bottlesForDistilleryView(rest.entity, rest.distilleryView));
+  } else if (rest.entity) {
     where.push(
       or(
         eq(bottles.brandId, rest.entity),

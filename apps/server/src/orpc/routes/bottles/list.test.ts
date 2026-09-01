@@ -289,6 +289,106 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
+  test("separates distillery releases from other bottlings", async ({
+    fixtures,
+  }) => {
+    const distillery = await fixtures.Entity({
+      name: "Bottle View Distillery",
+      kind: "distillery",
+    });
+    const ownedBrand = await fixtures.Entity({
+      name: "Owned Distillery Brand",
+      kind: "brand",
+      ownerId: distillery.id,
+    });
+    const ownedBottler = await fixtures.Entity({
+      name: "Owned Release Imprint",
+      kind: "bottler",
+      ownerId: distillery.id,
+    });
+    const outsideBrand = await fixtures.Entity({
+      name: "Outside Distillery Brand",
+      kind: "brand",
+    });
+    const outsideBottler = await fixtures.Entity({
+      name: "Outside Distillery Bottler",
+      kind: "bottler",
+    });
+    const otherDistillery = await fixtures.Entity({
+      name: "Second Bottle View Distillery",
+      kind: "distillery",
+    });
+
+    const directRelease = await fixtures.Bottle({
+      name: "Direct Release",
+      brandId: distillery.id,
+      bottlerId: null,
+      distillerIds: [],
+    });
+    const ownedBrandRelease = await fixtures.Bottle({
+      name: "Owned Brand Release",
+      brandId: ownedBrand.id,
+      bottlerId: ownedBottler.id,
+      distillerIds: [distillery.id],
+    });
+    const outsideBottling = await fixtures.Bottle({
+      name: "Outside Bottling",
+      brandId: outsideBrand.id,
+      bottlerId: outsideBottler.id,
+      distillerIds: [distillery.id],
+    });
+    const outsideBottlerOnOfficialBrand = await fixtures.Bottle({
+      name: "Outside Bottler Official Brand",
+      brandId: distillery.id,
+      bottlerId: outsideBottler.id,
+      distillerIds: [],
+    });
+    await fixtures.Bottle({
+      name: "Bottler Role Only",
+      brandId: outsideBrand.id,
+      bottlerId: distillery.id,
+      distillerIds: [otherDistillery.id],
+    });
+
+    const [releases, other] = await Promise.all([
+      routerClient.bottles.list({
+        entity: distillery.id,
+        distilleryView: "releases",
+        sort: "name",
+      }),
+      routerClient.bottles.list({
+        entity: distillery.id,
+        distilleryView: "other",
+        sort: "name",
+      }),
+    ]);
+
+    expect(new Set(releases.results.map(({ id }) => id))).toEqual(
+      new Set([directRelease.id, ownedBrandRelease.id]),
+    );
+    expect(releases.total).toBe(2);
+    expect(new Set(other.results.map(({ id }) => id))).toEqual(
+      new Set([outsideBottling.id, outsideBottlerOnOfficialBrand.id]),
+    );
+    expect(other.total).toBe(2);
+  });
+
+  test("rejects a distillery view without a distillery", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ kind: "brand" });
+
+    await expect(
+      routerClient.bottles.list({ distilleryView: "releases" }),
+    ).rejects.toThrow("Choose a distillery for this view.");
+    await expect(
+      routerClient.bottles.list({
+        entity: brand.id,
+        distilleryView: "releases",
+      }),
+    ).rejects.toThrow("Choose a distillery for this view.");
+  });
+
   test("lists bottles with flavor profile filter", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({
       name: "Peated Whisky",
