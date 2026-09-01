@@ -1,14 +1,11 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import {
-  BottleRatings,
-  type BottleComparisonRow,
-} from "@peated/web/components";
+import { BottleRatings, type BottleTableRow } from "@peated/web/components";
 import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
-export function toBottleTableRow(bottle: Bottle): BottleComparisonRow {
+export function toBottleTableRow(bottle: Bottle): BottleTableRow {
   const item = toBottleCatalogItem(bottle);
 
   return {

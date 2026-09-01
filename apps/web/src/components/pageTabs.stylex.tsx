@@ -57,6 +57,9 @@ const styles = stylex.create({
     columnGap: space.x6,
     paddingRight: space.x1,
     paddingLeft: space.x1,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.sectionRule,
     scrollbarWidth: "none",
     "::-webkit-scrollbar": {
       display: "none",

@@ -1,7 +1,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
-  BottleComparisonTable,
+  BottleTable,
   ButtonLink,
   EmptyState,
   LoadingList,
@@ -96,7 +96,7 @@ export function EntityBottleOverview({
         </TextLink>
       }
     >
-      <BottleComparisonTable
+      <BottleTable
         ariaLabel={`${entity.name} popular bottles`}
         columns={["Rating"]}
         rows={[
