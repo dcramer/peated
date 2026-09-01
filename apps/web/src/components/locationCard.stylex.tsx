@@ -25,7 +25,7 @@ export function LocationCard({
   const distillerNoun = totalDistillers === 1 ? "distiller" : "distillers";
 
   return (
-    <CardLink href={href}>
+    <CardLink href={href} padding="none" {...stylex.props(styles.card)}>
       <div {...stylex.props(styles.map)}>
         <CountryMapIcon
           aria-hidden="true"
@@ -44,6 +44,9 @@ export function LocationCard({
 }
 
 const styles = stylex.create({
+  card: {
+    padding: space.x4,
+  },
   map: {
     display: "flex",
     height: "132px",
