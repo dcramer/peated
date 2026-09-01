@@ -13,7 +13,7 @@ export const linkedRowStyles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
-      ":active": colors.inset,
+      ":active": colors.surface,
     },
     boxShadow: {
       default: "none",
@@ -25,7 +25,7 @@ export const linkedRowStyles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.inset,
-      ":active": colors.sunken,
+      ":active": colors.inset,
     },
     boxShadow: {
       default: "none",

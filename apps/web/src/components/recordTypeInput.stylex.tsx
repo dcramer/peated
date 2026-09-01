@@ -83,7 +83,7 @@ const styles = stylex.create({
     fontWeight: 700,
     boxShadow: {
       default: `inset 0 -2px 0 ${colors.ink}`,
-      ":focus-within": effects.focusRing,
+      ":focus-within": `inset 0 -2px 0 ${colors.ink}`,
     },
   },
   disabledTab: { cursor: "not-allowed", opacity: 0.45 },

@@ -351,7 +351,7 @@ const styles = stylex.create({
     color: {
       default: colors.ink,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
   },
   date: {
@@ -390,7 +390,7 @@ const styles = stylex.create({
     color: {
       default: colors.ink,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
   },
   metadata: {

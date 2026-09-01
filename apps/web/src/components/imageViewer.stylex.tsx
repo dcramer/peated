@@ -226,7 +226,7 @@ const styles = stylex.create({
     },
     boxShadow: {
       default: "none",
-      ":focus-visible": "inset 0 0 0 2px white",
+      ":focus-visible": "none",
     },
   },
   close: {
@@ -249,7 +249,7 @@ const styles = stylex.create({
     cursor: "pointer",
     boxShadow: {
       default: "0 0 0 1px rgb(255 255 255 / 0.24)",
-      ":focus-visible": "inset 0 0 0 2px white",
+      ":focus-visible": "0 0 0 1px rgb(255 255 255 / 0.24)",
     },
   },
 });

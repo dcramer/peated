@@ -171,7 +171,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
-      ":active": colors.inset,
+      ":active": colors.surface,
     },
     boxShadow: {
       default: "none",
@@ -193,7 +193,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
-      ":active": colors.inset,
+      ":active": colors.surface,
     },
     boxShadow: {
       default: "none",
@@ -227,7 +227,7 @@ const styles = stylex.create({
     color: {
       default: colors.inkMuted,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
     textDecorationLine: {
       default: "none",

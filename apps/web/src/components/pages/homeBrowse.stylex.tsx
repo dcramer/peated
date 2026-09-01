@@ -651,7 +651,7 @@ const styles = stylex.create({
     color: {
       default: colors.accent,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
     fontFamily: fonts.display,
     fontSize: "13px",

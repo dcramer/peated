@@ -305,7 +305,7 @@ const styles = stylex.create({
     color: {
       default: colors.inkMuted,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
     textDecorationLine: {
       default: "none",
@@ -340,7 +340,7 @@ const styles = stylex.create({
     color: {
       default: colors.ink,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
     textDecorationLine: {
       default: "none",
@@ -383,7 +383,7 @@ const styles = stylex.create({
     color: {
       default: colors.accentDeep,
       ":hover": colors.accent,
-      ":active": colors.ink,
+      ":active": colors.accent,
     },
     fontFamily: fonts.reading,
     fontSize: "12px",
