@@ -275,12 +275,18 @@ const styles = stylex.create({
     alignItems: "center",
     flexWrap: "wrap",
     paddingTop: { default: 0, [PHONE]: "10px" },
-    paddingRight: { default: 0, [PHONE]: space.x4 },
+    paddingRight: {
+      default: 0,
+      [PHONE]: `max(${space.x4}, env(safe-area-inset-right))`,
+    },
     paddingBottom: {
       default: 0,
       [PHONE]: "calc(10px + env(safe-area-inset-bottom))",
     },
-    paddingLeft: { default: 0, [PHONE]: space.x4 },
+    paddingLeft: {
+      default: 0,
+      [PHONE]: `max(${space.x4}, env(safe-area-inset-left))`,
+    },
     borderTopWidth: { default: 0, [PHONE]: "1px" },
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,

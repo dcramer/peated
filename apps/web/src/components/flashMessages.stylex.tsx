@@ -89,9 +89,12 @@ const styles = stylex.create({
   messages: {
     position: "fixed",
     zIndex: 80,
-    top: space.x4,
-    right: space.x4,
-    left: { default: "auto", "@media (max-width: 559px)": space.x4 },
+    top: `max(${space.x4}, env(safe-area-inset-top))`,
+    right: `max(${space.x4}, env(safe-area-inset-right))`,
+    left: {
+      default: "auto",
+      "@media (max-width: 559px)": `max(${space.x4}, env(safe-area-inset-left))`,
+    },
     display: "flex",
     width: {
       default: "min(480px, calc(100vw - 32px))",

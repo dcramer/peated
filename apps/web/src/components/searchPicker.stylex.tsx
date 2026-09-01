@@ -442,7 +442,10 @@ const styles = stylex.create({
     backgroundColor: colors.inset,
     color: colors.ink,
     fontFamily: fonts.reading,
-    fontSize: "14px",
+    fontSize: {
+      default: "14px",
+      "@media (max-width: 639px)": "16px",
+    },
     lineHeight: 1.4,
     boxShadow: {
       default: "none",

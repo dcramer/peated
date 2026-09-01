@@ -38,6 +38,23 @@ test("Add Entity route loads for a signed-in member", async ({
   expect(response?.status()).toBeLessThan(400);
 });
 
+test(
+  "mobile navigation opens and reaches the bottle catalog",
+  { tag: "@mobile" },
+  async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("button", { name: "Open navigation" }).click();
+    const navigation = page.getByRole("navigation", {
+      name: "Mobile navigation",
+    });
+
+    await expect(navigation).toBeVisible();
+    await navigation.getByRole("link", { name: "Bottles" }).click();
+    await expect(page).toHaveURL(/\/bottles$/);
+  },
+);
+
 test("site administration route loads for an administrator", async ({
   context,
   page,

@@ -20,13 +20,27 @@ export const fetchCache = "default-no-store";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: config.THEME_COLOR,
+  viewportFit: "cover",
+  themeColor: [
+    {
+      color: config.THEME_COLOR_LIGHT,
+      media: "(prefers-color-scheme: light)",
+    },
+    {
+      color: config.THEME_COLOR_DARK,
+      media: "(prefers-color-scheme: dark)",
+    },
+  ],
 };
 
 export function generateMetadata(): Metadata {
   return {
     metadataBase: new URL(config.URL_PREFIX),
     applicationName: "Peated",
+    appleWebApp: {
+      capable: true,
+      title: "Peated",
+    },
     title: {
       template: "%s | Peated",
       default: "Peated",
@@ -40,6 +54,15 @@ export function generateMetadata(): Metadata {
       card: "summary",
     },
     description: config.DESCRIPTION,
+    icons: {
+      apple: [
+        {
+          url: "/assets/glyph-black.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+      ],
+    },
     other: {
       ...Sentry.getTraceData(),
     },

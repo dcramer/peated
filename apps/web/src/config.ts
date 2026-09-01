@@ -13,7 +13,8 @@ const config = {
 
   DESCRIPTION:
     "A record of whisky bottles, critic scores, and tasting notes. Log tastings and keep track of your whisky library.",
-  THEME_COLOR: "#fbbf24",
+  THEME_COLOR_LIGHT: "#f7f8f5",
+  THEME_COLOR_DARK: "#101210",
 };
 
 export const SharedSentryConfig = {

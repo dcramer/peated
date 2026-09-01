@@ -424,7 +424,7 @@ const styles = stylex.create({
     backgroundColor: "transparent",
     color: colors.ink,
     fontFamily: fonts.data,
-    fontSize: "12px",
+    fontSize: { default: "12px", [COMPACT]: "16px" },
     lineHeight: 1.4,
     "::placeholder": {
       color: colors.inkMuted,
@@ -549,7 +549,7 @@ const styles = stylex.create({
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
     fontFamily: fonts.data,
-    fontSize: "12px",
+    fontSize: { default: "12px", [COMPACT]: "16px" },
     lineHeight: 1.4,
     boxShadow: {
       default: "none",
