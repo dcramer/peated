@@ -1,0 +1,103 @@
+{
+  "files": [
+    {
+      "file": "bottle.png",
+      "image": "images/candidate/bottle.png",
+      "images": {
+        "candidate": "images/candidate/bottle.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "bottler.png",
+      "image": "images/candidate/bottler.png",
+      "images": {
+        "candidate": "images/candidate/bottler.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "brand.png",
+      "image": "images/candidate/brand.png",
+      "images": {
+        "candidate": "images/candidate/brand.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "distillery.png",
+      "image": "images/candidate/distillery.png",
+      "images": {
+        "candidate": "images/candidate/distillery.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "home.png",
+      "image": "images/candidate/home.png",
+      "images": {
+        "candidate": "images/candidate/home.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "menu.png",
+      "height": 2321,
+      "image": "images/diff/menu.png",
+      "images": {
+        "baseline": "images/baseline/menu.png",
+        "candidate": "images/candidate/menu.png",
+        "diff": "images/diff/menu.png"
+      },
+      "status": "changed",
+      "width": 1073
+    },
+    {
+      "file": "profile.png",
+      "image": "images/candidate/profile.png",
+      "images": {
+        "candidate": "images/candidate/profile.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "region.png",
+      "image": "images/candidate/region.png",
+      "images": {
+        "candidate": "images/candidate/region.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "search.png",
+      "image": "images/candidate/search.png",
+      "images": {
+        "candidate": "images/candidate/search.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "sign-in.png",
+      "image": "images/candidate/sign-in.png",
+      "images": {
+        "candidate": "images/candidate/sign-in.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "start-a-tasting.png",
+      "image": "images/candidate/start-a-tasting.png",
+      "images": {
+        "candidate": "images/candidate/start-a-tasting.png"
+      },
+      "status": "unchanged"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 1,
+    "removed": 0,
+    "unchanged": 10
+  },
+  "version": 2
+}
