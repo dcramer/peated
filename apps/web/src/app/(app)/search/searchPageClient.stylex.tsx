@@ -1,5 +1,6 @@
 "use client";
 
+import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
@@ -92,7 +93,13 @@ function getTitle({
   return "Search";
 }
 
-export function SearchPageClient({ bottleTotal }: { bottleTotal: number }) {
+export function SearchPageClient({
+  bottleTotal,
+  initialResponse,
+}: {
+  bottleTotal: number;
+  initialResponse?: Outputs["search"];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") ?? "";
@@ -182,7 +189,9 @@ export function SearchPageClient({ bottleTotal }: { bottleTotal: number }) {
           getBottleHref={getBottleHref}
           getContributionHref={getContributionHref}
           initialQuery={query}
+          initialResponse={initialResponse}
           initialScope={initialScope}
+          key={`${query}:${initialScope}`}
           limit={databaseSearch ? 5 : 50}
           onScopeChange={databaseSearch ? updateScope : undefined}
           onSubmit={submitSearch}
