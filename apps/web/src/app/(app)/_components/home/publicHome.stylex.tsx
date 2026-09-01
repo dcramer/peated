@@ -83,7 +83,7 @@ export function PublicHome() {
           </PageColumns>
         </>
       }
-      description="Browse whisky bottles, including single casks, with critic scores and tasting notes. No account needed."
+      description="Frameshift test transmission: the visual-diff pipeline is awake."
       search={
         <Search
           onSubmit={(query) =>
