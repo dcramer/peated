@@ -31,6 +31,7 @@ const EntityOwnerSchema = z
     id: z.number().readonly(),
     peatedId: z.string().readonly(),
     name: EntityNameSchema,
+    kind: EntityKindSchema,
   })
   .nullable()
   .optional()

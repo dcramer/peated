@@ -58,7 +58,11 @@ export const EntitySerializer = serializer({
           : [],
         ownerIds.length
           ? db
-              .select({ id: entities.id, name: entities.name })
+              .select({
+                id: entities.id,
+                kind: entities.kind,
+                name: entities.name,
+              })
               .from(entities)
               .where(inArray(entities.id, ownerIds))
           : [],
@@ -89,6 +93,7 @@ export const EntitySerializer = serializer({
         owner.id,
         {
           id: owner.id,
+          kind: owner.kind,
           peatedId: formatPeatedId("entity", owner.id),
           name: owner.name,
         },

@@ -76,6 +76,7 @@ describe("GET /entities/:entity", () => {
 
     expect(data.owner).toEqual({
       id: owner.id,
+      kind: "company",
       peatedId: formatPeatedId("entity", owner.id),
       name: owner.name,
     });

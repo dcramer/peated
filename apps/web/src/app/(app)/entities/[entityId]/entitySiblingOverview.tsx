@@ -34,9 +34,7 @@ export function EntitySiblingOverview({
     ? `Also part of ${entity.owner.name}`
     : "Other distilleries and bottlers";
   const companyLink = entity.owner ? (
-    <TextLink href={getEntityUrl({ id: entity.owner.id, kind: null })}>
-      View company
-    </TextLink>
+    <TextLink href={getEntityUrl(entity.owner)}>View company</TextLink>
   ) : null;
 
   if (pending) {

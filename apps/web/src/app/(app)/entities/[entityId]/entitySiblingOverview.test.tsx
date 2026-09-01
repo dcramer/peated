@@ -13,6 +13,7 @@ describe("EntitySiblingOverview", () => {
       ownerId: 42,
       owner: {
         id: 42,
+        kind: "company",
         name: "Suntory Global Spirits",
         peatedId: "E0042",
       },
@@ -34,7 +35,7 @@ describe("EntitySiblingOverview", () => {
     );
 
     expect(html).toContain("Also part of Suntory Global Spirits");
-    expect(html).toContain('href="/entities/42"');
+    expect(html).toContain('href="/companies/42"');
     expect(html).toContain("View company");
   });
 });

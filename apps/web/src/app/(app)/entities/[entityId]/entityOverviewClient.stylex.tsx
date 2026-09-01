@@ -16,6 +16,7 @@ import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
 import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
+import { EntityOperatedOverview } from "./entityOperatedOverview";
 import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
@@ -44,6 +45,8 @@ export function EntityOverviewClient({
 }) {
   const orpc = useORPC();
   const ownsBottleSections = entityHasBottleCatalog(initialEntity);
+  const relationshipOwnerId =
+    initialEntity.kind === "company" ? initialEntity.id : initialEntity.ownerId;
   const entityQuery = useQuery({
     ...orpc.entities.details.queryOptions({
       input: { entity: initialEntity.id },
@@ -88,13 +91,16 @@ export function EntityOverviewClient({
   const siblingListQuery = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
-        kinds: ["distillery", "bottler"],
+        kinds:
+          initialEntity.kind === "company"
+            ? undefined
+            : ["distillery", "bottler"],
         limit: 5,
-        owner: initialEntity.ownerId ?? undefined,
+        owner: relationshipOwnerId ?? undefined,
         sort: "-bottles",
       },
     }),
-    enabled: Boolean(initialEntity.ownerId),
+    enabled: Boolean(relationshipOwnerId),
     initialData: initialSiblingList,
   });
 
@@ -117,6 +123,13 @@ export function EntityOverviewClient({
           {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
         </div>
         <div {...stylex.props(styles.catalogSections)}>
+          <EntityOperatedOverview
+            entity={entity}
+            error={Boolean(siblingListQuery.error)}
+            operatedList={siblingListQuery.data}
+            pending={siblingListQuery.isPending}
+            retry={() => void siblingListQuery.refetch()}
+          />
           <EntityReleaseOverview
             entity={entity}
             error={Boolean(releaseListQuery.error)}
