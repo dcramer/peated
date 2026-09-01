@@ -215,6 +215,7 @@ function RecentReviews() {
       ? [
           {
             bottleHref: `/bottles/${review.bottle.id}`,
+            bottleImageUrl: review.bottle.imageUrl,
             bottleName: formatBottleDisplayName(review.bottle),
             date: (
               <TimeSince
