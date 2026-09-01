@@ -107,7 +107,7 @@ const styles = stylex.create({
     backgroundColor: "transparent",
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.sectionRule}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.sectionRule}`,
     },
     color: colors.inkMuted,
   },
@@ -115,7 +115,7 @@ const styles = stylex.create({
     backgroundColor: "transparent",
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.accent}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.accent}`,
     },
     color: colors.accentDeep,
   },

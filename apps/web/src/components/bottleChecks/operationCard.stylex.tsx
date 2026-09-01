@@ -1178,7 +1178,7 @@ const styles = stylex.create({
     color: {
       default: colors.accentDeep,
       ":hover": colors.accent,
-      ":active": colors.ink,
+      ":active": colors.accent,
     },
     fontWeight: 600,
     textDecorationLine: {
@@ -1197,7 +1197,7 @@ const styles = stylex.create({
     color: {
       default: colors.accentDeep,
       ":hover": colors.accent,
-      ":active": colors.ink,
+      ":active": colors.accent,
     },
     fontWeight: 600,
     textDecorationLine: {

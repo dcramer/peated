@@ -144,7 +144,7 @@ const styles = stylex.create({
     color: {
       default: colors.inkMuted,
       ":hover": colors.accentDeep,
-      ":active": colors.accent,
+      ":active": colors.accentDeep,
     },
     fontFamily: fonts.data,
     fontSize: "11px",

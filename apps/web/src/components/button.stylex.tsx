@@ -211,18 +211,14 @@ const styles = stylex.create({
     opacity: {
       default: 1,
       ":hover": 0.86,
+      ":active": 0.86,
       ":disabled": 0.45,
     },
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
     },
-    transform: {
-      default: "none",
-      ":active": "translateY(1px)",
-      ":disabled": "none",
-    },
-    transitionProperty: "background-color, color, opacity, transform",
+    transitionProperty: "background-color, color, opacity",
     transitionDuration: "120ms",
   },
   button: {
@@ -283,10 +279,11 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
+      ":active": colors.surface,
     },
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.sectionRule}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.sectionRule}`,
     },
     color: colors.ink,
   },
@@ -298,10 +295,11 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.criticalQuiet,
+      ":active": colors.criticalQuiet,
     },
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.critical}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.critical}`,
     },
     color: colors.critical,
   },
@@ -309,6 +307,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.accentTint,
+      ":active": colors.accentTint,
     },
     color: colors.accentDeep,
   },

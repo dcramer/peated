@@ -94,7 +94,7 @@ const styles = stylex.create({
     fontWeight: 700,
     boxShadow: {
       default: `inset 0 -2px 0 ${colors.ink}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 -2px 0 ${colors.ink}`,
     },
   },
   count: {

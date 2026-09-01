@@ -610,7 +610,7 @@ const styles = stylex.create({
     cursor: "pointer",
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.sectionRule}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.sectionRule}`,
     },
   },
   activeCategory: {
@@ -659,7 +659,7 @@ const styles = stylex.create({
     },
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.sectionRule}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.sectionRule}`,
     },
   },
   selectedNote: {
@@ -675,7 +675,7 @@ const styles = stylex.create({
     color: colors.accentDeep,
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.accent}`,
-      ":focus-visible": effects.focusRing,
+      ":focus-visible": `inset 0 0 0 1px ${colors.accent}`,
     },
   },
   availableNote: {

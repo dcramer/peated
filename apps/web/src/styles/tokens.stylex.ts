@@ -193,10 +193,9 @@ export const controlMetrics = stylex.defineVars({
 });
 
 export const effects = stylex.defineVars({
-  focusRing: {
-    default: "inset 0 0 0 2px #9a5b12",
-    [DARK]: "inset 0 0 0 2px #d9922f",
-  },
+  // Interactive controls use their local hover and pressed treatments.
+  // Do not add a separate focus outline around the control.
+  focusRing: "none",
   errorRing: {
     default: "inset 0 0 0 2px #a3231a",
     [DARK]: "inset 0 0 0 2px #f0776b",
@@ -208,13 +207,13 @@ export const effects = stylex.defineVars({
 });
 
 export const lightEffectTheme = stylex.createTheme(effects, {
-  focusRing: "inset 0 0 0 2px #9a5b12",
+  focusRing: "none",
   errorRing: "inset 0 0 0 2px #a3231a",
   overlayShadow: "0 18px 40px rgb(22 25 20 / 0.16)",
 });
 
 export const darkEffectTheme = stylex.createTheme(effects, {
-  focusRing: "inset 0 0 0 2px #d9922f",
+  focusRing: "none",
   errorRing: "inset 0 0 0 2px #f0776b",
   overlayShadow: "0 18px 40px rgb(0 0 0 / 0.55)",
 });

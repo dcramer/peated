@@ -86,7 +86,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
-      ":active": colors.inset,
+      ":active": colors.surface,
     },
     color: colors.ink,
     fontFamily: fonts.reading,

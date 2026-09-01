@@ -267,7 +267,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: colors.ground,
       ":hover": colors.inset,
-      ":active": colors.accentTint,
+      ":active": colors.inset,
     },
     color: colors.ink,
     fontFamily: fonts.reading,
@@ -320,7 +320,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.inset,
-      ":active": colors.accentTint,
+      ":active": colors.inset,
     },
     color: colors.inkMuted,
     fontFamily: fonts.reading,
