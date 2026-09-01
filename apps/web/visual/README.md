@@ -21,7 +21,7 @@ test("opens the account menu", async ({ page, snapshot }) => {
   await page.getByRole("button", { name: "Account" }).click();
   await expect(page.getByRole("menu")).toBeVisible();
 
-  await snapshot("account menu open");
+  await snapshot("Account menu open");
 });
 ```
 
@@ -30,9 +30,9 @@ hides the Next.js development portal. It uses a full-page screenshot by
 default. Pass `{ fullPage: false }` when the viewport itself is part of the
 workflow state, such as an open mobile menu.
 
-Use a short checkpoint name that describes the visible state. The stable path
-also includes the spec, test titles, and Playwright project. A test cannot use
-the same checkpoint name twice.
+Use a short title that says what the image shows, such as "Home," "Bottle," or
+"Menu." This title appears in Frameshift and sets the file name. Each title must
+be unique.
 
 ## Run locally
 
@@ -68,5 +68,5 @@ report for pull requests. A dependent job does not check out pull request code;
 it publishes the validated report and adds the pull request link. Published
 reports and baseline artifacts expire after 30 days.
 
-Snapshot paths identify the same state across revisions. Renaming a spec, test,
-or checkpoint intentionally removes the old path and adds a new one.
+Snapshot paths identify the same state across revisions. Renaming a snapshot
+title intentionally removes the old path and adds a new one.
