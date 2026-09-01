@@ -167,7 +167,7 @@ describe("POST /bottle-series/:series/merge", () => {
     );
   });
 
-  test("rolls back when a bottle group cannot be moved", async ({
+  test("rolls back when a BottleGroup cannot be moved", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -213,7 +213,7 @@ describe("POST /bottle-series/:series/merge", () => {
     );
 
     expect(err.message).toBe(
-      `Bottle group ${incompleteGroup.group.id} is incomplete and cannot be moved.`,
+      `BottleGroup ${incompleteGroup.group.id} is incomplete and cannot be moved.`,
     );
     expect(
       await db.query.bottleSeries.findFirst({

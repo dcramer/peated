@@ -86,7 +86,7 @@ export default procedure
       for (const group of groups) {
         if (group.representativeBottleId === null) {
           throw errors.CONFLICT({
-            message: `Bottle group ${group.id} is incomplete and cannot be moved.`,
+            message: `BottleGroup ${group.id} is incomplete and cannot be moved.`,
           });
         }
         manifests.push(
