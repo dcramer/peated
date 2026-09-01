@@ -12,6 +12,7 @@ import {
   Field,
   ItemList,
   ItemRow,
+  LoadingList,
   MemberAvatar,
   RowMenu,
   SectionError,
@@ -29,7 +30,7 @@ export function TastingComments({
   initialCommentList,
   tastingId,
 }: {
-  initialCommentList: CommentList;
+  initialCommentList?: CommentList;
   tastingId: number;
 }) {
   const orpc = useORPC();
@@ -117,7 +118,9 @@ export function TastingComments({
         </ButtonLink>
       )}
 
-      {comments.length ? (
+      {commentList.isPending ? (
+        <LoadingList label="Loading tasting comments" rows={3} />
+      ) : comments.length ? (
         <ItemList ariaLabel="Tasting comments">
           {comments.map((item) => {
             const canDelete = Boolean(

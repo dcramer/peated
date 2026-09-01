@@ -40,18 +40,13 @@ export default async function TastingPage(props: {
   params: Promise<{ tastingId: string }>;
 }) {
   const { tastingId } = await props.params;
-  const { client } = await getPublicPageServerClient();
   const tasting = await getTasting(Number(tastingId));
-  const commentList = await client.comments.list({ tasting: tasting.id });
   return (
     <div>
       <TastingDetail tasting={tasting} />
       <div id="comments">
         <PageSection heading="Conversation">
-          <TastingComments
-            initialCommentList={commentList}
-            tastingId={tasting.id}
-          />
+          <TastingComments tastingId={tasting.id} />
         </PageSection>
       </div>
     </div>

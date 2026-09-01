@@ -1,9 +1,9 @@
 "use client";
 
-import type { Outputs } from "@peated/server/orpc/router";
+import { useQuery } from "@tanstack/react-query";
 import { CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useTransition, type ReactNode } from "react";
 
 import {
   ApplicationHeader,
@@ -14,7 +14,8 @@ import { PageFrame } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { logout } from "@peated/web/lib/auth.actions";
-import { useTransition } from "react";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { publicHomeQueries } from "@peated/web/lib/orpc/homeQueries";
 import { ApplicationFooter } from "./applicationFooter.stylex";
 
 const databaseItems = [
@@ -41,15 +42,11 @@ function AccountVisual({
   return <CircleUserRound aria-hidden="true" size={19} />;
 }
 
-export function ApplicationLayout({
-  children,
-  initialStats,
-}: {
-  children: ReactNode;
-  initialStats?: Outputs["stats"];
-}) {
+export function ApplicationLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const orpc = useORPC();
+  const stats = useQuery(publicHomeQueries.stats(orpc));
   const [logoutPending, startLogout] = useTransition();
   const isHome = pathname === "/";
   const usesInlineNavigation = isHome || pathname === "/search";
@@ -78,7 +75,7 @@ export function ApplicationLayout({
 
   return (
     <PageFrame
-      footer={<ApplicationFooter stats={initialStats} />}
+      footer={<ApplicationFooter stats={stats.data} />}
       header={
         <ApplicationHeader
           account={

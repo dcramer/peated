@@ -90,6 +90,7 @@ export type SearchProps = {
   getBottleHref?: (bottleId: number) => string;
   getContributionHref?: (query: string) => string;
   initialQuery?: string;
+  initialResponse?: SearchResponse;
   initialScope?: SearchScope;
   limit?: number;
   onScopeChange?: (scope: SearchScope, query: string) => void;
@@ -357,6 +358,33 @@ function getResultScopeTotals(response: SearchResponse) {
   } satisfies Record<SearchScope, number>;
 }
 
+function getSearchSnapshot(
+  response: SearchResponse,
+  query: string,
+  scope: SearchScope,
+  bottleOptions: BottleItemOptions,
+  showMoreLinks: boolean,
+): SearchSnapshot {
+  const count = getResultCount(response, scope);
+  return {
+    count,
+    emptyText:
+      count > 0
+        ? undefined
+        : response.nearest.length
+          ? `No exact matches for “${query}”.`
+          : `Nothing matches “${query}”.`,
+    groups: resultGroups(response, query, bottleOptions, showMoreLinks, scope),
+    hasExact: Boolean(
+      response.exact && exactMatchesScope(response.exact, scope),
+    ),
+    query,
+    scope,
+    scopeCounts: getResultScopeTotals(response),
+    scopeTotals: response.scopeTotals,
+  };
+}
+
 function exactItem(exact: SearchExact, bottleOptions: BottleItemOptions) {
   return exact.type === "bottle"
     ? bottleItem(exact.ref, bottleOptions)
@@ -399,6 +427,7 @@ export function Search({
   getBottleHref = getDefaultBottleHref,
   getContributionHref = getDefaultContributionHref,
   initialQuery = "",
+  initialResponse,
   initialScope = "all",
   limit = 3,
   onScopeChange,
@@ -412,22 +441,39 @@ export function Search({
   const { user } = useAuth();
   const orpc = useORPC();
   const router = useRouter();
-  const [query, setQuery] = useState(initialQuery);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [scope, setScope] = useState<SearchScope>(initialScope);
-  const [snapshot, setSnapshot] = useState<SearchSnapshot>();
-  const [status, setStatus] = useState<"error" | "ready" | "searching">(
-    initialQuery.trim() ? "searching" : "ready",
-  );
-  const latestRequest = useRef(0);
-  const initialSearchStarted = useRef(false);
-  const previousInitialQuery = useRef(initialQuery);
-  const previousInitialScope = useRef(initialScope);
   const availableScopeDefinitions = scopeValues
     ? searchScopes.filter((option) => scopeValues.includes(option.value))
     : user
       ? searchScopes
       : searchScopes.filter((option) => option.value !== "members");
+  const resolvedInitialScope = availableScopeDefinitions.some(
+    (option) => option.value === initialScope,
+  )
+    ? initialScope
+    : (availableScopeDefinitions[0]?.value ?? "all");
+  const initialSnapshot =
+    initialResponse && initialResponse.query === initialQuery.trim()
+      ? getSearchSnapshot(
+          initialResponse,
+          initialQuery.trim(),
+          resolvedInitialScope,
+          { getBottleHref, showRatings: showBottleRatings },
+          placement === "database" || placement === "overlay",
+        )
+      : undefined;
+  const [query, setQuery] = useState(initialQuery);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [scope, setScope] = useState<SearchScope>(initialScope);
+  const [snapshot, setSnapshot] = useState<SearchSnapshot | undefined>(
+    initialSnapshot,
+  );
+  const [status, setStatus] = useState<"error" | "ready" | "searching">(
+    initialQuery.trim() && !initialSnapshot ? "searching" : "ready",
+  );
+  const latestRequest = useRef(0);
+  const initialSearchStarted = useRef(Boolean(initialSnapshot));
+  const previousInitialQuery = useRef(initialQuery);
+  const previousInitialScope = useRef(initialScope);
   const effectiveScope = availableScopeDefinitions.some(
     (option) => option.value === scope,
   )
@@ -477,31 +523,15 @@ export function Search({
           indicatorFloor,
         ]);
         if (latestRequest.current !== requestId) return;
-        const nextGroups = resultGroups(
-          response,
-          trimmedQuery,
-          { getBottleHref, showRatings: showBottleRatings },
-          placement === "database" || placement === "overlay",
-          nextScope,
-        );
-        const nextResultCount = getResultCount(response, nextScope);
-        const hasMatches = nextResultCount > 0;
-        setSnapshot({
-          count: nextResultCount,
-          emptyText: hasMatches
-            ? undefined
-            : response.nearest.length
-              ? `No exact matches for “${trimmedQuery}”.`
-              : `Nothing matches “${trimmedQuery}”.`,
-          groups: nextGroups,
-          hasExact: Boolean(
-            response.exact && exactMatchesScope(response.exact, nextScope),
+        setSnapshot(
+          getSearchSnapshot(
+            response,
+            trimmedQuery,
+            nextScope,
+            { getBottleHref, showRatings: showBottleRatings },
+            placement === "database" || placement === "overlay",
           ),
-          query: trimmedQuery,
-          scope: nextScope,
-          scopeCounts: getResultScopeTotals(response),
-          scopeTotals: response.scopeTotals,
-        });
+        );
         setStatus("ready");
       } catch {
         await indicatorFloor;

@@ -15,7 +15,7 @@ function formatCount(value: number, noun: string) {
   return `${value.toLocaleString("en-US")} ${noun}`;
 }
 
-/** Renders the server-supplied platform snapshot without owning data access. */
+/** Renders platform coverage when the secondary stats query is available. */
 export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
   const coverage = stats
     ? [
