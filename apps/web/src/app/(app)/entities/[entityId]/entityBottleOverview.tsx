@@ -27,6 +27,7 @@ export function EntityBottleOverview({
   error,
   pending,
   retry,
+  totalBottles,
 }: {
   bottleList?: BottleList;
   createBottleHref?: string;
@@ -34,6 +35,7 @@ export function EntityBottleOverview({
   error: boolean;
   pending: boolean;
   retry: () => void;
+  totalBottles: number;
 }) {
   const presentation = getEntityPresentation(entity);
   const entityHref = getEntityUrl(entity);
@@ -88,10 +90,11 @@ export function EntityBottleOverview({
     );
   }
 
+  const total = isDistillery ? bottleList.total : totalBottles;
   const viewAllLabel =
-    bottleList.total === 1
+    total === 1
       ? "View 1 bottle"
-      : `View all ${bottleList.total.toLocaleString("en-US")} bottles`;
+      : `View all ${total.toLocaleString("en-US")} bottles`;
 
   return (
     <PageSection

@@ -162,6 +162,7 @@ export function EntityOverviewClient({
             error={Boolean(bottleListQuery.error)}
             pending={bottleListQuery.isPending}
             retry={() => void bottleListQuery.refetch()}
+            totalBottles={entity.totalBottles}
           />
           <EntityHistoryOverview
             entityName={entity.name}
