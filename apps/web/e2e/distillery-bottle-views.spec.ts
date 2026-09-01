@@ -13,14 +13,14 @@ test("switches between distillery releases and other bottlings", async ({
   await page.goto(`/distillers/${testOwnedEntity.id}/bottles`);
 
   await expect(
-    page.getByRole("link", { name: bottleGroupRepresentative.fullName }),
+    page.getByRole("link", { name: bottleGroupRepresentative.name }),
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Other bottlings" }).click();
 
   await expect(page).toHaveURL(/\/bottles\?view=other$/);
   await expect(
-    page.getByRole("link", { name: homeBottle.group.fullName }),
+    page.getByRole("link", { name: homeBottle.group.name }),
   ).toBeVisible();
   await expect(page.getByText(`Bottled by ${testBottler.name}`)).toBeVisible();
 });
