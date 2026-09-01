@@ -339,7 +339,8 @@ function main() {
 
   const prNumber = requiredEnv("PR_NUMBER");
   const repo = requiredEnv("GITHUB_REPOSITORY");
-  const commitSha = process.env.GITHUB_SHA ?? "unknown";
+  // GitHub does not let workflows override reserved GITHUB_* variables.
+  const commitSha = requiredEnv("PR_HEAD_SHA");
   const branch = `web-screenshots/pr-${prNumber}`;
   const imageRef = publishImages(reportDir, result.report, branch, commitSha);
   const viewerUrl = frameshiftViewerUrl(repo, imageRef);
