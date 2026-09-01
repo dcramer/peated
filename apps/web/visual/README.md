@@ -29,9 +29,9 @@ Add the `run-all-screenshots` label to capture every scenario.
 
 ## Where the baseline comes from
 
-The default-branch workflow captures every scenario once for each `main`
-commit. It stores the complete screenshot directory in a GitHub Actions
-artifact named with that commit's full SHA.
+The default-branch job captures every scenario once for each `main` commit. It
+stores the complete screenshot directory in a GitHub Actions artifact named
+with that commit's full SHA.
 
 GitHub's `pull_request` event identifies the exact base SHA and a temporary
 candidate merge commit. The pull request workflow restores the artifact for
@@ -89,8 +89,9 @@ directories. The report contains `report.json` plus only the images needed for
 review. The PR comment and native `Frameshift` commit status link to the same
 immutable report on [frameshift.pub](https://frameshift.pub).
 
-CI uploads only the baseline and candidate manifests, `report.json`, and these
-review images. The full baseline and candidate screenshots stay on the runner.
+The pull request job uploads only `report.json` and its review images. The full
+candidate screenshots stay on the runner. Complete default-branch baselines
+use the separate revision-keyed artifact.
 
 ## Frameshift setup
 
@@ -106,11 +107,13 @@ relative paths identify the same screenshot:
 ```
 
 The Action writes the report directory and returns the number of visual changes
-as the `changes` output. A trusted `workflow_run` job passes that directory to
-`dcramer/frameshift/publish`. The publisher validates the Zod contract, creates
-the immutable report tag, and posts only a compact change summary plus the
-Frameshift link. Peated keeps capture and privileged publication in separate
-workflows so pull request code cannot receive write permissions.
+as the `changes` output. The capture job uploads that directory once. A small
+dependent job downloads it through `dcramer/frameshift/publish/workflow`. The
+publisher validates the Zod contract, creates the immutable report tag, and
+posts only a compact change summary plus the Frameshift link. This dependent
+job has write permission, but it never checks out or runs pull request code.
+Published reports expire after 30 days. Baseline retention is configured
+separately.
 
 ## Add a scenario
 
