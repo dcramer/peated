@@ -21,11 +21,17 @@ const NARROW = "@media (max-width: 759px)";
 export type FilterPanelProps = {
   ariaLabel: string;
   children: ReactNode;
+  onClear?: () => void;
   query?: FilterQueryProps;
 };
 
 /** Keeps a page's filters visible on wide screens and disclosed on narrow ones. */
-export function FilterPanel({ ariaLabel, children, query }: FilterPanelProps) {
+export function FilterPanel({
+  ariaLabel,
+  children,
+  onClear,
+  query,
+}: FilterPanelProps) {
   const contentId = useId();
   const [open, setOpen] = useState(false);
   const toggle = (
@@ -63,6 +69,16 @@ export function FilterPanel({ ariaLabel, children, query }: FilterPanelProps) {
           open && styles.contentOpen,
         )}
       >
+        {query ? (
+          <div {...stylex.props(styles.panelHeader)}>
+            <span {...stylex.props(styles.heading)}>Filters</span>
+            {onClear ? (
+              <Button onClick={onClear} size="sm" variant="text">
+                Clear all
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
         {children}
       </div>
     </section>
@@ -275,6 +291,19 @@ const styles = stylex.create({
     },
     [COMPACT]: {
       gridTemplateColumns: "minmax(0, 1fr)",
+    },
+  },
+  panelHeader: {
+    display: "flex",
+    minHeight: controlMetrics.controlHeight,
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x2,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.sectionRule,
+    [NARROW]: {
+      gridColumn: "1 / -1",
     },
   },
   queryForm: {

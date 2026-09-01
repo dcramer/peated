@@ -57,6 +57,14 @@ function ControlledFilters({ ariaLabel }: FilterPanelProps) {
   return (
     <FilterPanel
       ariaLabel={ariaLabel}
+      onClear={
+        country || query
+          ? () => {
+              setCountry("");
+              setQuery("");
+            }
+          : undefined
+      }
       query={{
         label: "Find a bottle",
         onSubmit: setQuery,

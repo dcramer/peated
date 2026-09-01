@@ -171,10 +171,17 @@ export function BottleCatalogFilters({
 }: BottleCatalogFiltersProps) {
   const id = useId();
   const facetNames = new Set(facets?.groups.map((group) => group.name));
+  const hasFilters = Boolean(
+    age ||
+    category ||
+    query ||
+    (facets && Object.values(facets.selected).some(Boolean)),
+  );
 
   return (
     <FilterPanel
       ariaLabel="Bottle filters"
+      onClear={hasFilters ? onClear : undefined}
       query={{
         label: "Find a bottle",
         onSubmit: onQuerySubmit,
@@ -206,9 +213,6 @@ export function BottleCatalogFilters({
           />
         </label>
       )}
-      <Button align="start" onClick={onClear} size="sm" variant="text">
-        Clear filters
-      </Button>
     </FilterPanel>
   );
 }

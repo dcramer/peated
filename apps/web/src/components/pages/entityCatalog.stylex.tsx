@@ -238,6 +238,7 @@ export function EntityCatalogFilters({
   return (
     <FilterPanel
       ariaLabel={ariaLabel}
+      onClear={query || country || region ? onClear : undefined}
       query={{
         label: "Find a record",
         onSubmit: onQuerySubmit,
@@ -259,9 +260,6 @@ export function EntityCatalogFilters({
           selected={region}
         />
       ) : null}
-      <Button align="start" onClick={onClear} size="sm" variant="text">
-        Clear filters
-      </Button>
     </FilterPanel>
   );
 }
