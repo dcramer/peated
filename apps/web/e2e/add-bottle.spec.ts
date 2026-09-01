@@ -1078,6 +1078,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
     ).toBeVisible();
+    await page.getByRole("button", { name: /^Log a tasting/ }).click();
     await page
       .getByRole("radio", { name: /^Very good/ })
       .check({ force: true });

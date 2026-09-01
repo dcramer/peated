@@ -89,8 +89,10 @@ export default function TastingForm(
   const { errorMessage, initialData, suggestedTags, title } = props;
   const orpc = useORPC();
   const canRecordReview = props.mode !== "edit";
-  const [recordType, setRecordType] = useState<RecordType>("tasting");
-  const isReview = canRecordReview && recordType === "review";
+  const [recordType, setRecordType] = useState<RecordType | null>(
+    canRecordReview ? null : "tasting",
+  );
+  const isReview = recordType === "review";
   const [submitError, setSubmitError] = useState<string>();
   const [image, setImage] = useState<ImageUploadValue>();
   const [imagePreview, setImagePreview] = useState(
@@ -136,8 +138,9 @@ export default function TastingForm(
     register: registerReview,
     reset: resetReview,
     control: reviewControl,
+    trigger: triggerReview,
   } = useForm<MemberReviewFormFields>({
-    defaultValues: { score: null, notes: null },
+    defaultValues: { score: 80, notes: null },
     resolver: zodResolver(MemberReviewFormFieldsSchema),
   });
   const ratingBand = useWatch({ control, name: "ratingBand" });
@@ -150,7 +153,9 @@ export default function TastingForm(
     staleTime: Infinity,
   });
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = ["Rating", "Notes", "Details"] as const;
+  const steps = isReview
+    ? (["Score", "Notes", "Details"] as const)
+    : (["Rating", "Notes", "Details"] as const);
   const isLastStep = currentStep === steps.length - 1;
   const needsRating = props.mode !== "edit" && !ratingBand;
   const noteOptions: NotePickerOption[] = buildTastingTagOptions(
@@ -180,7 +185,7 @@ export default function TastingForm(
   useEffect(() => {
     if (reviewQuery.data === undefined) return;
     resetReview({
-      score: reviewQuery.data?.score ?? null,
+      score: reviewQuery.data?.score ?? 80,
       notes: reviewQuery.data?.notes ?? null,
     });
   }, [resetReview, reviewQuery.data]);
@@ -241,15 +246,20 @@ export default function TastingForm(
   };
 
   async function continueForm() {
-    const stepIsValid = await trigger(
-      currentStep === 0
-        ? ["ratingBand"]
-        : currentStep === 1
-          ? ["tags", "color", "notes"]
-          : ["servingStyle", "friends"],
-    );
+    const stepIsValid = isReview
+      ? await triggerReview(
+          currentStep === 0 ? ["score"] : currentStep === 1 ? ["notes"] : [],
+        )
+      : await trigger(
+          currentStep === 0
+            ? ["ratingBand"]
+            : currentStep === 1
+              ? ["tags", "color", "notes"]
+              : ["servingStyle", "friends"],
+        );
     if (!stepIsValid) return;
     setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
+    scrollToFormTop();
   }
 
   const tastingFormAction = isLastStep
@@ -258,9 +268,13 @@ export default function TastingForm(
         event.preventDefault();
         void continueForm();
       };
-  const formAction = isReview
+  const reviewFormAction = isLastStep
     ? handleReviewSubmit(submitReview)
-    : tastingFormAction;
+    : (event: React.FormEvent) => {
+        event.preventDefault();
+        void continueForm();
+      };
+  const formAction = isReview ? reviewFormAction : tastingFormAction;
   const saving = isReview ? isReviewSubmitting : isSubmitting;
   const reviewIsLoading = isReview && reviewQuery.isPending;
   const reviewLoadFailed = isReview && Boolean(reviewQuery.error);
@@ -274,29 +288,52 @@ export default function TastingForm(
         ? "Your review could not be loaded."
         : reviewScore === null
           ? "Enter a score to save."
-          : reviewQuery.data
-            ? "Saving updates your existing review."
-            : "Score this bottle from 0 to 100."
+          : `Step ${currentStep + 1} of ${steps.length}`
     : needsRating
       ? "Pick a rating to continue."
       : `Step ${currentStep + 1} of ${steps.length}`;
   const saveLabel = isReview
-    ? reviewQuery.data
-      ? "Update review"
-      : "Save review"
+    ? isLastStep
+      ? reviewQuery.data
+        ? "Update review"
+        : "Save review"
+      : "Continue"
     : isLastStep
       ? "Save tasting"
       : "Continue";
+
+  function selectRecordType(nextType: RecordType) {
+    setSubmitError(undefined);
+    setCurrentStep(0);
+    setRecordType(nextType);
+    scrollToFormTop();
+  }
+
+  function previousStep() {
+    if (currentStep > 0) {
+      setCurrentStep((step) => Math.max(0, step - 1));
+      scrollToFormTop();
+      return;
+    }
+    if (canRecordReview) {
+      setRecordType(null);
+      scrollToFormTop();
+    }
+  }
+
+  function scrollToFormTop() {
+    requestAnimationFrame(() => window.scrollTo({ top: 0 }));
+  }
 
   return (
     <WorkflowScreen
       mobileSaveBar
       onPrevious={
-        !isReview && currentStep > 0
-          ? () => setCurrentStep((step) => Math.max(0, step - 1))
+        recordType && (currentStep > 0 || canRecordReview)
+          ? previousStep
           : undefined
       }
-      onSave={formAction}
+      onSave={recordType ? formAction : undefined}
       saveDisabled={saveDisabled}
       saveHint={saveHint}
       saveLabel={saveLabel}
@@ -323,17 +360,19 @@ export default function TastingForm(
           {submitError || errorMessage ? (
             <FormNotice>{submitError ?? errorMessage}</FormNotice>
           ) : null}
-          {canRecordReview ? (
-            <RecordTypeInput
-              disabled={saving}
-              onChange={(nextType) => {
-                setSubmitError(undefined);
-                setRecordType(nextType);
-              }}
-              value={recordType}
-            />
+          {recordType === null ? (
+            <FormSection
+              description="A tasting records one pour. A review is your overall opinion of the bottle."
+              title="What do you want to log?"
+            >
+              <RecordTypeInput
+                disabled={saving}
+                onChange={selectRecordType}
+                value={recordType}
+              />
+            </FormSection>
           ) : null}
-          {!isReview ? (
+          {recordType !== null ? (
             <FormSteps currentStep={currentStep} steps={steps} />
           ) : null}
           {isReview && reviewIsLoading ? (
@@ -342,7 +381,7 @@ export default function TastingForm(
           {isReview && reviewLoadFailed ? (
             <>
               <FormNotice role="alert">
-                We couldn't load your review. Try again or switch back to your
+                We couldn't load your review. Try again or go back and choose a
                 tasting.
               </FormNotice>
               <Button
@@ -356,7 +395,7 @@ export default function TastingForm(
             </>
           ) : null}
           {isReview && !reviewIsLoading && !reviewLoadFailed ? (
-            <>
+            currentStep === 0 ? (
               <FormSection title="Your score">
                 <Controller
                   control={reviewControl}
@@ -379,14 +418,15 @@ export default function TastingForm(
                   </ValidationMessage>
                 ) : null}
               </FormSection>
+            ) : currentStep === 1 ? (
               <FormSection
                 description="Review the bottle as a whole, not only this pour."
-                title="Your review"
+                title="Your notes"
               >
                 <Field
                   error={reviewErrors.notes?.message}
                   htmlFor="review-notes"
-                  label="Review"
+                  label="Notes"
                   optional
                 >
                   <Textarea
@@ -395,10 +435,13 @@ export default function TastingForm(
                     })}
                     id="review-notes"
                     invalid={Boolean(reviewErrors.notes)}
-                    placeholder="Make your case."
+                    placeholder="What stands out across the bottle?"
                     rows={10}
                   />
                 </Field>
+              </FormSection>
+            ) : (
+              <FormSection title="Picture">
                 <Field htmlFor="review-picture" label="Picture" optional>
                   <PictureInput
                     disabled={isReviewSubmitting}
@@ -429,9 +472,9 @@ export default function TastingForm(
                   />
                 </Field>
               </FormSection>
-            </>
+            )
           ) : null}
-          {!isReview && currentStep === 0 ? (
+          {recordType === "tasting" && currentStep === 0 ? (
             <FormSection title="Your rating">
               <Controller
                 control={control}
@@ -455,7 +498,7 @@ export default function TastingForm(
               ) : null}
             </FormSection>
           ) : null}
-          {!isReview && currentStep === 1 ? (
+          {recordType === "tasting" && currentStep === 1 ? (
             <FormSection title="What you noticed">
               <Field htmlFor="tasting-notes" label="Notes" optional>
                 <Controller
@@ -511,7 +554,7 @@ export default function TastingForm(
               </Field>
             </FormSection>
           ) : null}
-          {!isReview && currentStep === 2 ? (
+          {recordType === "tasting" && currentStep === 2 ? (
             <FormSection title="Picture and company">
               {props.mode === "edit" ? (
                 <Field

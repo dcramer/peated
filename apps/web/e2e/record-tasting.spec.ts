@@ -18,6 +18,47 @@ const testImage = Buffer.from(
 );
 
 test.describe("log tasting", () => {
+  test("chooses the record type once and steps through a review", async ({
+    context,
+    page,
+    snapshot,
+  }) => {
+    await signIn(context);
+
+    await page.goto(`/bottles/${existingBottle.id}/addTasting`);
+
+    await expect(
+      page.getByRole("heading", { name: "What do you want to log?" }),
+    ).toBeVisible();
+    await snapshot("Choose tasting or review");
+    await page.getByRole("button", { name: /^Write a review/ }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Write a review" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Score out of 100")).toHaveValue("80");
+    await snapshot("Review score step");
+    const progress = page.getByRole("navigation", { name: "Form progress" });
+    await expect(progress).toContainText("Score");
+    await expect(progress).toContainText("Notes");
+    await expect(progress).toContainText("Details");
+
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Your notes" }),
+    ).toBeVisible();
+    await page.getByLabel("Notes").fill("Coastal and waxy.");
+
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByRole("heading", { name: "Picture" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Save review" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /^Write a review/ }),
+    ).toHaveCount(0);
+  });
+
   test("logs a tasting for a fixture bottle", async ({ context, page }) => {
     await signIn(context);
 
@@ -176,6 +217,7 @@ async function fillComments(page: Page, value: string) {
 }
 
 async function chooseVeryGood(page: Page) {
+  await page.getByRole("button", { name: /^Log a tasting/ }).click();
   await page.getByRole("radio", { name: /^Very good/ }).check({ force: true });
 }
 

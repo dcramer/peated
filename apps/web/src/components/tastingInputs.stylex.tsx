@@ -24,6 +24,7 @@ export type ReviewScoreInputProps = {
   label?: string;
   name: string;
   onChange: (value: number | null) => void;
+  placeholder?: string;
   required?: boolean;
   value: number | null;
 };
@@ -36,6 +37,7 @@ export function ReviewScoreInput({
   label = "Score out of 100",
   name,
   onChange,
+  placeholder = "80",
   required = false,
   value,
 }: ReviewScoreInputProps) {
@@ -44,7 +46,7 @@ export function ReviewScoreInput({
   );
 
   function stepScore(direction: -1 | 1) {
-    const nextValue = value === null ? 85 : value + direction;
+    const nextValue = value === null ? 80 : value + direction;
     onChange(Math.max(0, Math.min(100, nextValue)));
   }
 
@@ -88,6 +90,7 @@ export function ReviewScoreInput({
                 .slice(0, 3);
               onChange(digits === "" ? null : Math.min(100, Number(digits)));
             }}
+            placeholder={placeholder}
             type="text"
             value={value ?? ""}
             {...stylex.props(
