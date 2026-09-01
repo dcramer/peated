@@ -36,11 +36,13 @@ jobs:
       - name: Choose pages
         id: mode
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
           MERGE_SHA: ${{ github.sha }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
           set -euo pipefail
+          # The merge commit is immutable for this run. Its first parent is the
+          # exact base GitHub tested; pull_request.base.sha can be stale.
+          BASE_SHA=$(git rev-parse "$MERGE_SHA^1")
           if [[ ",$PR_LABELS," == *",run-all-screenshots,"* ]]; then
             echo "all=true" >> "$GITHUB_OUTPUT"
           else
