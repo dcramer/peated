@@ -6,16 +6,19 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
 import {
+  Button,
   ColorInput,
   Field,
   FormNotice,
   FormSection,
   FormStack,
   FormSteps,
+  LoadingList,
   MemberPicker,
   NotePickerField,
   PictureInput,
   RatingBandInput,
+  ReviewScoreInput,
   Select,
   SelectedBottleSummary,
   Textarea,
@@ -23,9 +26,20 @@ import {
   type MemberPickerOption,
   type NotePickerOption,
 } from "@peated/web/components";
+import {
+  RecordTypeInput,
+  type RecordType,
+} from "@peated/web/components/recordTypeInput.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
+import type { ImageUploadValue } from "@peated/web/lib/imageUpload";
+import {
+  buildMemberReviewFormSubmission,
+  MemberReviewFormFieldsSchema,
+  type MemberReviewFormFields,
+  type MemberReviewFormSubmitData,
+} from "@peated/web/lib/memberReviewForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   buildTastingCreateFormSubmission,
@@ -36,7 +50,6 @@ import {
   type TastingCreateFormSubmitData,
   type TastingEditFormSubmitData,
   type TastingFormFields,
-  type TastingFormImage,
   type TastingTagSuggestion,
 } from "@peated/web/lib/tastingForm";
 import { zodResolver } from "@peated/web/lib/zodResolver";
@@ -46,6 +59,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { z } from "zod";
 
+export type { MemberReviewFormSubmitData } from "@peated/web/lib/memberReviewForm";
 export type {
   TastingCreateFormSubmitData,
   TastingEditFormSubmitData,
@@ -55,6 +69,7 @@ type TastingCreateFormProps = {
   initialData: Partial<z.infer<typeof TastingSchema>> &
     Pick<z.infer<typeof TastingSchema>, "bottle">;
   mode?: "create";
+  onReviewSubmit: SubmitHandler<MemberReviewFormSubmitData>;
   onSubmit: SubmitHandler<TastingCreateFormSubmitData>;
 };
 
@@ -73,9 +88,16 @@ export default function TastingForm(
 ) {
   const { errorMessage, initialData, suggestedTags, title } = props;
   const orpc = useORPC();
+  const canRecordReview = props.mode !== "edit";
+  const [recordType, setRecordType] = useState<RecordType>("tasting");
+  const isReview = canRecordReview && recordType === "review";
   const [submitError, setSubmitError] = useState<string>();
-  const [image, setImage] = useState<TastingFormImage>();
+  const [image, setImage] = useState<ImageUploadValue>();
   const [imagePreview, setImagePreview] = useState(
+    initialData.imageUrl ?? undefined,
+  );
+  const [reviewImage, setReviewImage] = useState<ImageUploadValue>();
+  const [reviewImagePreview, setReviewImagePreview] = useState(
     initialData.imageUrl ?? undefined,
   );
   const [friendQuery, setFriendQuery] = useState("");
@@ -108,7 +130,25 @@ export default function TastingForm(
         : TastingCreateFormFieldsSchema,
     ),
   });
+  const {
+    formState: { errors: reviewErrors, isSubmitting: isReviewSubmitting },
+    handleSubmit: handleReviewSubmit,
+    register: registerReview,
+    reset: resetReview,
+    control: reviewControl,
+  } = useForm<MemberReviewFormFields>({
+    defaultValues: { score: null, notes: null },
+    resolver: zodResolver(MemberReviewFormFieldsSchema),
+  });
   const ratingBand = useWatch({ control, name: "ratingBand" });
+  const reviewScore = useWatch({ control: reviewControl, name: "score" });
+  const reviewQuery = useQuery({
+    ...orpc.memberReviews.getMy.queryOptions({
+      input: { bottle: initialData.bottle.id },
+    }),
+    enabled: isReview,
+    staleTime: Infinity,
+  });
   const [currentStep, setCurrentStep] = useState(0);
   const steps = ["Rating", "Notes", "Details"] as const;
   const isLastStep = currentStep === steps.length - 1;
@@ -129,6 +169,27 @@ export default function TastingForm(
     };
   }, [imagePreview]);
 
+  useEffect(() => {
+    return () => {
+      if (reviewImagePreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(reviewImagePreview);
+      }
+    };
+  }, [reviewImagePreview]);
+
+  useEffect(() => {
+    if (reviewQuery.data === undefined) return;
+    resetReview({
+      score: reviewQuery.data?.score ?? null,
+      notes: reviewQuery.data?.notes ?? null,
+    });
+  }, [resetReview, reviewQuery.data]);
+
+  const effectiveReviewImagePreview =
+    reviewImage === undefined
+      ? (reviewQuery.data?.imageUrl ?? initialData.imageUrl ?? undefined)
+      : reviewImagePreview;
+
   const submit: SubmitHandler<TastingFormFields> = async (fields) => {
     setSubmitError(undefined);
     try {
@@ -147,6 +208,33 @@ export default function TastingForm(
       setSubmitError(
         getFormErrorMessage(error, {
           expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
+          fallbackMessage:
+            "We couldn't save that tasting. Your notes are still here — try again.",
+        }),
+      );
+    }
+  };
+
+  const submitReview: SubmitHandler<MemberReviewFormFields> = async (
+    fields,
+  ) => {
+    if (props.mode === "edit") return;
+
+    setSubmitError(undefined);
+    try {
+      await props.onReviewSubmit(
+        buildMemberReviewFormSubmission({
+          bottleId: props.initialData.bottle.id,
+          fields,
+          image: reviewImage,
+        }),
+      );
+    } catch (error) {
+      setSubmitError(
+        getFormErrorMessage(error, {
+          expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
+          fallbackMessage:
+            "We couldn't save that review. Your review is still here — try again.",
         }),
       );
     }
@@ -164,45 +252,186 @@ export default function TastingForm(
     setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
   }
 
-  const formAction = isLastStep
+  const tastingFormAction = isLastStep
     ? handleSubmit(submit)
     : (event: React.FormEvent) => {
         event.preventDefault();
         void continueForm();
       };
+  const formAction = isReview
+    ? handleReviewSubmit(submitReview)
+    : tastingFormAction;
+  const saving = isReview ? isReviewSubmitting : isSubmitting;
+  const reviewIsLoading = isReview && reviewQuery.isPending;
+  const reviewLoadFailed = isReview && Boolean(reviewQuery.error);
+  const saveDisabled = isReview
+    ? reviewIsLoading || reviewLoadFailed || reviewScore === null
+    : needsRating;
+  const saveHint = isReview
+    ? reviewIsLoading
+      ? "Loading your review…"
+      : reviewLoadFailed
+        ? "Your review could not be loaded."
+        : reviewScore === null
+          ? "Enter a score to save."
+          : reviewQuery.data
+            ? "Saving updates your existing review."
+            : "Score this bottle from 0 to 100."
+    : needsRating
+      ? "Pick a rating to continue."
+      : `Step ${currentStep + 1} of ${steps.length}`;
+  const saveLabel = isReview
+    ? reviewQuery.data
+      ? "Update review"
+      : "Save review"
+    : isLastStep
+      ? "Save tasting"
+      : "Continue";
 
   return (
     <WorkflowScreen
       mobileSaveBar
       onPrevious={
-        currentStep > 0
+        !isReview && currentStep > 0
           ? () => setCurrentStep((step) => Math.max(0, step - 1))
           : undefined
       }
       onSave={formAction}
-      saveDisabled={needsRating}
-      saveHint={
-        needsRating
-          ? "Pick a rating to continue."
-          : `Step ${currentStep + 1} of ${steps.length}`
+      saveDisabled={saveDisabled}
+      saveHint={saveHint}
+      saveLabel={saveLabel}
+      saving={saving}
+      title={
+        isReview
+          ? reviewQuery.data
+            ? "Edit your review"
+            : "Write a review"
+          : title
       }
-      saveLabel={isLastStep ? "Save tasting" : "Continue"}
-      saving={isSubmitting}
-      title={title}
     >
       <form onSubmit={formAction}>
         <FormStack>
           <SelectedBottleSummary
             bottleId={initialData.bottle.peatedId}
-            imageUrl={imagePreview ?? initialData.bottle.imageUrl}
+            imageUrl={
+              (isReview ? effectiveReviewImagePreview : imagePreview) ??
+              initialData.bottle.imageUrl
+            }
             metadata={getBottleMetadata(initialData.bottle)}
             name={formatBottleDisplayName(initialData.bottle)}
           />
           {submitError || errorMessage ? (
             <FormNotice>{submitError ?? errorMessage}</FormNotice>
           ) : null}
-          <FormSteps currentStep={currentStep} steps={steps} />
-          {currentStep === 0 ? (
+          {canRecordReview ? (
+            <RecordTypeInput
+              disabled={saving}
+              onChange={(nextType) => {
+                setSubmitError(undefined);
+                setRecordType(nextType);
+              }}
+              value={recordType}
+            />
+          ) : null}
+          {!isReview ? (
+            <FormSteps currentStep={currentStep} steps={steps} />
+          ) : null}
+          {isReview && reviewIsLoading ? (
+            <LoadingList label="Loading your review" rows={2} />
+          ) : null}
+          {isReview && reviewLoadFailed ? (
+            <>
+              <FormNotice role="alert">
+                We couldn't load your review. Try again or switch back to your
+                tasting.
+              </FormNotice>
+              <Button
+                onClick={() => void reviewQuery.refetch()}
+                size="sm"
+                type="button"
+                variant="tonal"
+              >
+                Try again
+              </Button>
+            </>
+          ) : null}
+          {isReview && !reviewIsLoading && !reviewLoadFailed ? (
+            <>
+              <FormSection title="Your score">
+                <Controller
+                  control={reviewControl}
+                  name="score"
+                  render={({ field }) => (
+                    <ReviewScoreInput
+                      disabled={isReviewSubmitting}
+                      id="review-score"
+                      invalid={Boolean(reviewErrors.score)}
+                      name={field.name}
+                      onChange={field.onChange}
+                      required
+                      value={field.value}
+                    />
+                  )}
+                />
+                {reviewErrors.score?.message ? (
+                  <ValidationMessage>
+                    {reviewErrors.score.message}
+                  </ValidationMessage>
+                ) : null}
+              </FormSection>
+              <FormSection
+                description="Review the bottle as a whole, not only this pour."
+                title="Your review"
+              >
+                <Field
+                  error={reviewErrors.notes?.message}
+                  htmlFor="review-notes"
+                  label="Review"
+                  optional
+                >
+                  <Textarea
+                    {...registerReview("notes", {
+                      setValueAs: (value) => value || null,
+                    })}
+                    id="review-notes"
+                    invalid={Boolean(reviewErrors.notes)}
+                    placeholder="Make your case."
+                    rows={10}
+                  />
+                </Field>
+                <Field htmlFor="review-picture" label="Picture" optional>
+                  <PictureInput
+                    disabled={isReviewSubmitting}
+                    id="review-picture"
+                    name="reviewImage"
+                    onFilesSelected={(files) => {
+                      const file = files.item(0);
+                      if (!file) return;
+                      setReviewImage(file);
+                      setReviewImagePreview(URL.createObjectURL(file));
+                    }}
+                    onRemove={
+                      effectiveReviewImagePreview
+                        ? () => {
+                            setReviewImage(null);
+                            setReviewImagePreview(undefined);
+                          }
+                        : undefined
+                    }
+                    preview={
+                      effectiveReviewImagePreview
+                        ? {
+                            alt: "Review picture",
+                            src: effectiveReviewImagePreview,
+                          }
+                        : undefined
+                    }
+                  />
+                </Field>
+              </FormSection>
+            </>
+          ) : null}
+          {!isReview && currentStep === 0 ? (
             <FormSection title="Your rating">
               <Controller
                 control={control}
@@ -226,7 +455,7 @@ export default function TastingForm(
               ) : null}
             </FormSection>
           ) : null}
-          {currentStep === 1 ? (
+          {!isReview && currentStep === 1 ? (
             <FormSection title="What you noticed">
               <Field htmlFor="tasting-notes" label="Notes" optional>
                 <Controller
@@ -282,7 +511,7 @@ export default function TastingForm(
               </Field>
             </FormSection>
           ) : null}
-          {currentStep === 2 ? (
+          {!isReview && currentStep === 2 ? (
             <FormSection title="Picture and company">
               {props.mode === "edit" ? (
                 <Field

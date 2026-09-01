@@ -20,6 +20,7 @@ export const MemberReviewSchema = z.object({
   bottleId: z.number().int().positive(),
   score: MemberReviewScoreSchema,
   notes: MemberReviewNotesSchema,
+  imageUrl: z.string().nullable(),
   createdBy: UserSchema.readonly(),
   createdAt: z.string().datetime().readonly(),
   updatedAt: z.string().datetime().readonly(),

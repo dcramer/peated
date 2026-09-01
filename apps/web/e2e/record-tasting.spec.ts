@@ -61,7 +61,7 @@ test.describe("log tasting", () => {
 
     await expect(
       page.getByText(
-        "There was an error uploading your image, but the tasting was saved.",
+        "We couldn't upload the picture, but your tasting was saved.",
       ),
     ).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
@@ -118,7 +118,11 @@ test.describe("log tasting", () => {
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Save tasting" }).click();
 
-    await expect(page.getByText("Internal error")).toBeVisible();
+    await expect(
+      page.getByText(
+        "We couldn't save that tasting. Your notes are still here — try again.",
+      ),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Back", exact: true }).click();
     await expect(page.getByLabel("Comments")).toHaveValue(failingTastingNotes);
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);

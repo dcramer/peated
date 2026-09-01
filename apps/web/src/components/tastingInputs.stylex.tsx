@@ -2,7 +2,7 @@
 
 import { COLOR_SCALE } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
-import { Upload } from "lucide-react";
+import { Minus, Plus, Upload } from "lucide-react";
 import { useRef } from "react";
 
 import {
@@ -12,8 +12,144 @@ import {
   fonts,
   space,
 } from "../styles/tokens.stylex";
-import { Button } from "./button.stylex";
+import { Button, IconButton } from "./button.stylex";
 import { RATING_BANDS, type RatingBand } from "./scoring.stylex";
+
+const REVIEW_SCORE_TRACK_MIN = 60;
+
+export type ReviewScoreInputProps = {
+  disabled?: boolean;
+  id: string;
+  invalid?: boolean;
+  label?: string;
+  name: string;
+  onChange: (value: number | null) => void;
+  required?: boolean;
+  value: number | null;
+};
+
+/** Records one whole-number review score while showing its rating range. */
+export function ReviewScoreInput({
+  disabled = false,
+  id,
+  invalid = false,
+  label = "Score out of 100",
+  name,
+  onChange,
+  required = false,
+  value,
+}: ReviewScoreInputProps) {
+  const selectedBand = RATING_BANDS.find(
+    (band) => value !== null && value >= band.min && value <= band.max,
+  );
+
+  function stepScore(direction: -1 | 1) {
+    const nextValue = value === null ? 85 : value + direction;
+    onChange(Math.max(0, Math.min(100, nextValue)));
+  }
+
+  return (
+    <div {...stylex.props(styles.reviewScoreRoot, disabled && styles.disabled)}>
+      <div {...stylex.props(styles.ratingHeading)}>
+        <label htmlFor={id} {...stylex.props(styles.ratingLabel)}>
+          {label}
+        </label>
+        {required ? (
+          <span {...stylex.props(styles.requiredLabel)}>Required</span>
+        ) : null}
+      </div>
+      <div {...stylex.props(styles.reviewScoreHeading)}>
+        <div {...stylex.props(styles.reviewScoreControls)}>
+          <IconButton
+            disabled={disabled || value === 0}
+            icon={<Minus aria-hidden="true" size={18} />}
+            label="One point lower"
+            onClick={() => stepScore(-1)}
+            size="lg"
+            variant="tonal"
+          />
+          <input
+            aria-invalid={invalid || undefined}
+            aria-label={label}
+            disabled={disabled}
+            id={id}
+            inputMode="numeric"
+            max={100}
+            min={0}
+            name={name}
+            onBlur={() => {
+              if (value !== null) {
+                onChange(Math.max(0, Math.min(100, Math.round(value))));
+              }
+            }}
+            onChange={(event) => {
+              const digits = event.currentTarget.value
+                .replace(/[^0-9]/g, "")
+                .slice(0, 3);
+              onChange(digits === "" ? null : Math.min(100, Number(digits)));
+            }}
+            type="text"
+            value={value ?? ""}
+            {...stylex.props(
+              styles.reviewScoreValue,
+              invalid && styles.reviewScoreValueInvalid,
+            )}
+          />
+          <IconButton
+            disabled={disabled || value === 100}
+            icon={<Plus aria-hidden="true" size={18} />}
+            label="One point higher"
+            onClick={() => stepScore(1)}
+            size="lg"
+            variant="tonal"
+          />
+        </div>
+        <div aria-live="polite" {...stylex.props(styles.reviewScoreBand)}>
+          <strong {...stylex.props(styles.reviewScoreBandLabel)}>
+            {selectedBand?.label ?? "Choose a score"}
+          </strong>
+          <span {...stylex.props(styles.reviewScoreBandRange)}>
+            {selectedBand?.range ?? "0–100"}
+          </span>
+        </div>
+      </div>
+      <div {...stylex.props(styles.reviewScoreScale)}>
+        <div aria-hidden="true" {...stylex.props(styles.reviewScoreTrack)}>
+          {RATING_BANDS.map((band) => (
+            <span
+              key={band.key}
+              {...stylex.props(
+                styles.reviewScoreSegment,
+                selectedBand?.key === band.key &&
+                  bandInputSelectedStyles[band.key],
+              )}
+            />
+          ))}
+          {value !== null ? (
+            <span
+              {...stylex.props(
+                styles.reviewScoreMarker,
+                styles.reviewScoreMarkerPosition(value),
+              )}
+            />
+          ) : null}
+        </div>
+        <div aria-hidden="true" {...stylex.props(styles.reviewScoreAnchors)}>
+          <span>60</span>
+          <span {...stylex.props(styles.reviewScoreAnchor80)}>80 good</span>
+          <span {...stylex.props(styles.reviewScoreAnchor90)}>
+            90 outstanding
+          </span>
+          <span>100</span>
+        </div>
+      </div>
+      <p {...stylex.props(styles.reviewScoreHint)}>
+        Whole numbers. Your score counts toward this bottle's review score and
+        appears with your review.
+      </p>
+    </div>
+  );
+}
 
 export type RatingBandInputProps = {
   disabled?: boolean;
@@ -195,7 +331,7 @@ export type PictureInputProps = {
   };
 };
 
-/** Opens a native file picker and presents the current tasting image as the control. */
+/** Opens a native file picker and presents the current picture as the control. */
 export function PictureInput({
   accept = "image/*",
   disabled = false,
@@ -267,6 +403,9 @@ export function PictureInput({
 }
 
 const styles = stylex.create({
+  reviewScoreRoot: {
+    width: "100%",
+  },
   ratingHeading: {
     display: "flex",
     alignItems: "baseline",
@@ -287,6 +426,138 @@ const styles = stylex.create({
     fontStyle: "italic",
     letterSpacing: 0,
     lineHeight: 1.4,
+  },
+  reviewScoreHeading: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    columnGap: space.x6,
+    rowGap: space.x3,
+    paddingTop: space.x3,
+    "@media (max-width: 559px)": {
+      alignItems: "flex-start",
+      flexDirection: "column",
+    },
+  },
+  reviewScoreControls: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    columnGap: space.x2,
+  },
+  reviewScoreValue: {
+    boxSizing: "border-box",
+    width: "116px",
+    height: controlMetrics.controlHeightLarge,
+    padding: 0,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "transparent",
+      ":hover": colors.fieldRule,
+      ":focus": colors.accent,
+    },
+    borderRadius: controlMetrics.radius,
+    outline: "none",
+    backgroundColor: "transparent",
+    color: colors.ink,
+    fontFamily: fonts.data,
+    fontSize: "42px",
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "-0.04em",
+    lineHeight: 1,
+    textAlign: "center",
+    boxShadow: {
+      default: "none",
+      ":focus": `inset 0 0 0 1px ${colors.accent}`,
+    },
+  },
+  reviewScoreValueInvalid: {
+    borderColor: colors.critical,
+    boxShadow: effects.errorRing,
+  },
+  reviewScoreBand: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    rowGap: space.x1,
+  },
+  reviewScoreBandLabel: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "20px",
+    fontWeight: 700,
+    letterSpacing: "-0.025em",
+    lineHeight: 1.2,
+  },
+  reviewScoreBandRange: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "13px",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1.3,
+  },
+  reviewScoreScale: {
+    paddingTop: space.x6,
+  },
+  reviewScoreTrack: {
+    position: "relative",
+    display: "grid",
+    width: "100%",
+    height: "10px",
+    gridTemplateColumns: "20fr 5fr 5fr 5fr 6fr",
+    columnGap: "2px",
+  },
+  reviewScoreSegment: {
+    display: "block",
+    minWidth: 0,
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.hairline,
+  },
+  reviewScoreMarker: {
+    position: "absolute",
+    top: "-4px",
+    bottom: "-4px",
+    width: "2px",
+    backgroundColor: colors.ink,
+    transform: "translateX(-50%)",
+  },
+  reviewScoreMarkerPosition: (score: number) => ({
+    left: `${((Math.max(REVIEW_SCORE_TRACK_MIN, Math.min(100, score)) - REVIEW_SCORE_TRACK_MIN) / (100 - REVIEW_SCORE_TRACK_MIN)) * 100}%`,
+  }),
+  reviewScoreAnchors: {
+    position: "relative",
+    display: "flex",
+    height: "20px",
+    justifyContent: "space-between",
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "12px",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1.4,
+    paddingTop: space.x1,
+  },
+  reviewScoreAnchor80: {
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-50%)",
+  },
+  reviewScoreAnchor90: {
+    position: "absolute",
+    left: "75%",
+    transform: "translateX(-50%)",
+    "@media (max-width: 559px)": { display: "none" },
+  },
+  reviewScoreHint: {
+    maxWidth: "62ch",
+    marginTop: space.x3,
+    marginRight: 0,
+    marginBottom: 0,
+    marginLeft: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.45,
   },
   visuallyHiddenInput: {
     position: "absolute",
