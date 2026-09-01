@@ -27,6 +27,12 @@ function includesIdentityText(value: string, candidate: string) {
   return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
 }
 
+function isCompactEditionCode(edition: string) {
+  return (
+    /\d/u.test(edition) && /^[A-Za-z0-9]+(?:[./-][A-Za-z0-9]+)*$/u.test(edition)
+  );
+}
+
 export function isBatchEdition(edition: string | null | undefined) {
   return edition
     ? /^batch(?:\s+(?:no\.?|number))?\s+\S/iu.test(edition)
@@ -92,9 +98,12 @@ function getReleaseName(bottle: BottleDisplayNameSource) {
   const expressionName = getExpressionName(bottle);
 
   if (bottle.edition && !isBatchEdition(bottle.edition)) {
-    return includesIdentityText(expressionName, bottle.edition)
-      ? expressionName
-      : `${expressionName} - ${bottle.edition}`;
+    if (includesIdentityText(expressionName, bottle.edition)) {
+      return expressionName;
+    }
+
+    const separator = isCompactEditionCode(bottle.edition) ? " " : " - ";
+    return `${expressionName}${separator}${bottle.edition}`;
   }
 
   return expressionName;
