@@ -8,15 +8,15 @@ import {
 } from "@headlessui/react";
 import * as stylex from "@stylexjs/stylex";
 import { ExternalLink, Maximize2, X } from "lucide-react";
-import { useState, type ImgHTMLAttributes, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { controlMetrics, effects, fonts, space } from "../styles/tokens.stylex";
 
 export type ImageViewerProps = {
   alt: string;
   caption?: ReactNode;
+  children: ReactNode;
   fill?: boolean;
-  imageProps?: Omit<ImgHTMLAttributes<HTMLImageElement>, "alt" | "src">;
   label: string;
   src: string;
 };
@@ -25,8 +25,8 @@ export type ImageViewerProps = {
 export function ImageViewer({
   alt,
   caption,
+  children,
   fill = false,
-  imageProps,
   label,
   src,
 }: ImageViewerProps) {
@@ -40,7 +40,7 @@ export function ImageViewer({
         type="button"
         {...stylex.props(styles.trigger, fill && styles.fillTrigger)}
       >
-        <img {...imageProps} alt={alt} src={src} />
+        {children}
         <span aria-hidden="true" {...stylex.props(styles.expandCue)}>
           <Maximize2 size={15} strokeWidth={1.75} />
         </span>
@@ -104,6 +104,8 @@ const styles = stylex.create({
   },
   fillTrigger: {
     height: "100%",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gridTemplateRows: "minmax(0, 1fr)",
   },
   expandCue: {
     position: "absolute",

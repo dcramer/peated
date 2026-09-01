@@ -99,13 +99,9 @@ export function ModerationMedia({
     <div {...stylex.props(styles.media)}>
       {imageUrl ? (
         <div {...stylex.props(styles.imageFrame)}>
-          <ImageViewer
-            alt=""
-            fill
-            imageProps={stylex.props(styles.image)}
-            label="submitted image"
-            src={imageUrl}
-          />
+          <ImageViewer alt="" fill label="submitted image" src={imageUrl}>
+            <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
+          </ImageViewer>
         </div>
       ) : null}
       <div {...stylex.props(styles.mediaCopy)}>{children}</div>

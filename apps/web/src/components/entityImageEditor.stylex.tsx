@@ -70,10 +70,15 @@ export function EntityImageEditor({
           <div key={image.key} {...stylex.props(styles.row)}>
             <ImageViewer
               alt={image.caption || "Image preview"}
-              imageProps={stylex.props(styles.preview)}
               label={image.caption || "image preview"}
               src={image.imageUrl}
-            />
+            >
+              <img
+                alt={image.caption || "Image preview"}
+                src={image.imageUrl}
+                {...stylex.props(styles.preview)}
+              />
+            </ImageViewer>
             <div {...stylex.props(styles.fields)}>
               <Field
                 htmlFor={`entity-image-caption-${image.key}`}

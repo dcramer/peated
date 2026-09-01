@@ -24,11 +24,9 @@ describe("ImageViewer", () => {
   it("opens the full image and closes it again", () => {
     act(() =>
       root.render(
-        <ImageViewer
-          alt="Bottle label"
-          label="bottle label"
-          src="/label.jpg"
-        />,
+        <ImageViewer alt="Bottle label" label="bottle label" src="/label.jpg">
+          <img alt="Bottle label" className="thumbnail" src="/label.jpg" />
+        </ImageViewer>,
       ),
     );
 
@@ -36,6 +34,7 @@ describe("ImageViewer", () => {
     expect(trigger?.getAttribute("aria-label")).toBe(
       "View bottle label at full size",
     );
+    expect(trigger?.querySelector("img")?.className).toBe("thumbnail");
 
     act(() => trigger?.click());
 

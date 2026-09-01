@@ -20,10 +20,15 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
         <ImageViewer
           alt={primary.caption || `${entity.name} primary image`}
           caption={primary.caption}
-          imageProps={stylex.props(styles.primaryImage)}
           label={primary.caption || `${entity.name} primary image`}
           src={primary.imageUrl}
-        />
+        >
+          <img
+            alt={primary.caption || `${entity.name} primary image`}
+            src={primary.imageUrl}
+            {...stylex.props(styles.primaryImage)}
+          />
+        </ImageViewer>
         {primary.caption || primary.sourceUrl || primary.license ? (
           <figcaption {...stylex.props(styles.caption)}>
             {primary.caption ? <span>{primary.caption}</span> : null}
@@ -41,10 +46,15 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
               <ImageViewer
                 alt={image.caption || `${entity.name} image`}
                 caption={image.caption}
-                imageProps={stylex.props(styles.secondaryImage)}
                 label={image.caption || `${entity.name} image`}
                 src={image.imageUrl}
-              />
+              >
+                <img
+                  alt={image.caption || `${entity.name} image`}
+                  src={image.imageUrl}
+                  {...stylex.props(styles.secondaryImage)}
+                />
+              </ImageViewer>
               {image.caption || image.sourceUrl || image.license ? (
                 <figcaption {...stylex.props(styles.caption)}>
                   {image.caption ? <span>{image.caption}</span> : null}
