@@ -1,0 +1,51 @@
+{
+  "files": [
+    {
+      "file": "bottle-detail__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "home__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "home__mobile.png",
+      "height": 1689,
+      "image": "images/diff/home__mobile.png",
+      "images": {
+        "baseline": "images/baseline/home__mobile.png",
+        "candidate": "images/candidate/home__mobile.png",
+        "diff": "images/diff/home__mobile.png"
+      },
+      "status": "changed",
+      "width": 390
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "search__desktop.png",
+      "status": "unchanged"
+    },
+    {
+      "file": "search__mobile.png",
+      "status": "unchanged"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 1,
+    "removed": 0,
+    "unchanged": 7
+  },
+  "version": 1
+}
