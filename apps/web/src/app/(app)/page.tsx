@@ -1,4 +1,5 @@
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
+import { getHomeSearchPlaceholder } from "@peated/web/app/(app)/_components/home/homeSearchPlaceholder";
 import {
   getAnonymousServerClient,
   getServerClient,
@@ -19,6 +20,7 @@ export const metadata = homeMetadata;
 
 export default async function Page() {
   const session = await getSession();
+  const searchPlaceholder = getHomeSearchPlaceholder();
   const queryClient = getQueryClient();
   const { client } = session.user
     ? await getServerClient()
@@ -39,7 +41,7 @@ export default async function Page() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <HomePageClient />
+      <HomePageClient searchPlaceholder={searchPlaceholder} />
     </HydrationBoundary>
   );
 }

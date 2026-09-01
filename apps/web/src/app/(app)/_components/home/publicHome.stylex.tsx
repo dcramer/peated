@@ -36,7 +36,11 @@ import { space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
-export function PublicHome() {
+export function PublicHome({
+  searchPlaceholder,
+}: {
+  searchPlaceholder: string;
+}) {
   const orpc = useORPC();
   const router = useRouter();
   const { user } = useAuth();
@@ -92,11 +96,7 @@ export function PublicHome() {
               query ? `/search?q=${encodeURIComponent(query)}` : "/search",
             )
           }
-          placeholder={
-            totalBottles === undefined
-              ? "Search bottles…"
-              : `Search ${totalBottles.toLocaleString("en-US")} bottles…`
-          }
+          placeholder={searchPlaceholder}
           scopeValues={["all"]}
           showBottleRatings={false}
           submitLabel="Search"
