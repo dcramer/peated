@@ -17,7 +17,11 @@ import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
 import { EntityOperatedOverview } from "./entityOperatedOverview";
-import { entityHasBottleCatalog, type Entity } from "./entityPageData";
+import {
+  entityHasBottleCatalog,
+  getEntityRelationshipOwnerIds,
+  type Entity,
+} from "./entityPageData";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
@@ -45,8 +49,8 @@ export function EntityOverviewClient({
 }) {
   const orpc = useORPC();
   const ownsBottleSections = entityHasBottleCatalog(initialEntity);
-  const relationshipOwnerId =
-    initialEntity.kind === "company" ? initialEntity.id : initialEntity.ownerId;
+  const { operatedOwnerId, siblingOwnerId } =
+    getEntityRelationshipOwnerIds(initialEntity);
   const entityQuery = useQuery({
     ...orpc.entities.details.queryOptions({
       input: { entity: initialEntity.id },
@@ -88,6 +92,16 @@ export function EntityOverviewClient({
     enabled: ownsBottleSections,
     initialData: initialReleaseList,
   });
+  const operatedListQuery = useQuery({
+    ...orpc.entities.list.queryOptions({
+      input: {
+        limit: 5,
+        owner: operatedOwnerId ?? undefined,
+        sort: "-bottles",
+      },
+    }),
+    enabled: Boolean(operatedOwnerId),
+  });
   const siblingListQuery = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
@@ -96,11 +110,11 @@ export function EntityOverviewClient({
             ? undefined
             : ["distillery", "bottler"],
         limit: 5,
-        owner: relationshipOwnerId ?? undefined,
+        owner: siblingOwnerId ?? undefined,
         sort: "-bottles",
       },
     }),
-    enabled: Boolean(relationshipOwnerId),
+    enabled: Boolean(siblingOwnerId),
     initialData: initialSiblingList,
   });
 
@@ -125,10 +139,10 @@ export function EntityOverviewClient({
         <div {...stylex.props(styles.catalogSections)}>
           <EntityOperatedOverview
             entity={entity}
-            error={Boolean(siblingListQuery.error)}
-            operatedList={siblingListQuery.data}
-            pending={siblingListQuery.isPending}
-            retry={() => void siblingListQuery.refetch()}
+            error={Boolean(operatedListQuery.error)}
+            operatedList={operatedListQuery.data}
+            pending={operatedListQuery.isPending}
+            retry={() => void operatedListQuery.refetch()}
           />
           <EntityReleaseOverview
             entity={entity}
