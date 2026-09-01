@@ -1,0 +1,83 @@
+{
+  "files": [
+    {
+      "file": "bottle-detail__desktop.png",
+      "image": "images/candidate/bottle-detail__desktop.png",
+      "images": {
+        "candidate": "images/candidate/bottle-detail__desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "bottle-detail__mobile.png",
+      "image": "images/candidate/bottle-detail__mobile.png",
+      "images": {
+        "candidate": "images/candidate/bottle-detail__mobile.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "home__desktop.png",
+      "height": 1270,
+      "image": "images/diff/home__desktop.png",
+      "images": {
+        "baseline": "images/baseline/home__desktop.png",
+        "candidate": "images/candidate/home__desktop.png",
+        "diff": "images/diff/home__desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "home__mobile.png",
+      "height": 1689,
+      "image": "images/diff/home__mobile.png",
+      "images": {
+        "baseline": "images/baseline/home__mobile.png",
+        "candidate": "images/candidate/home__mobile.png",
+        "diff": "images/diff/home__mobile.png"
+      },
+      "status": "changed",
+      "width": 390
+    },
+    {
+      "file": "member-profile__desktop.png",
+      "image": "images/candidate/member-profile__desktop.png",
+      "images": {
+        "candidate": "images/candidate/member-profile__desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "member-profile__mobile.png",
+      "image": "images/candidate/member-profile__mobile.png",
+      "images": {
+        "candidate": "images/candidate/member-profile__mobile.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "search__desktop.png",
+      "image": "images/candidate/search__desktop.png",
+      "images": {
+        "candidate": "images/candidate/search__desktop.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "search__mobile.png",
+      "image": "images/candidate/search__mobile.png",
+      "images": {
+        "candidate": "images/candidate/search__mobile.png"
+      },
+      "status": "unchanged"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 2,
+    "removed": 0,
+    "unchanged": 6
+  },
+  "version": 2
+}
