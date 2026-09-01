@@ -48,9 +48,11 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Your notes" }),
     ).toBeVisible();
     await page.getByLabel("Notes").fill("Coastal and waxy.");
+    await snapshot("Review notes step");
 
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("heading", { name: "Picture" })).toBeVisible();
+    await snapshot("Review details step");
     await expect(
       page.getByRole("button", { name: "Save review" }),
     ).toBeVisible();
@@ -59,7 +61,11 @@ test.describe("log tasting", () => {
     ).toHaveCount(0);
   });
 
-  test("logs a tasting for a fixture bottle", async ({ context, page }) => {
+  test("logs a tasting for a fixture bottle", async ({
+    context,
+    page,
+    snapshot,
+  }) => {
     await signIn(context);
 
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
@@ -68,8 +74,15 @@ test.describe("log tasting", () => {
       new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=tasting$`),
     );
     await chooseVeryGood(page);
+    await snapshot("Tasting rating step");
     await fillComments(page, tastingNotes);
+    await snapshot("Tasting notes step");
+    await page.getByRole("button", { name: "Browse" }).click();
+    await expect(page.getByRole("heading", { name: "Notes" })).toBeVisible();
+    await snapshot("Tasting note browser");
+    await page.getByRole("button", { name: "Close note picker" }).click();
     await uploadTastingImage(page);
+    await snapshot("Tasting details step");
     const createRequestPromise = waitForTastingCreate(page);
     const imageRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/tastings/imageUpdate"),
