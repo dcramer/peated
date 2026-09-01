@@ -63,6 +63,10 @@ export default function Page({
           <DefinitionList.Details>
             {event.country?.name ?? "Not set"}
           </DefinitionList.Details>
+          <DefinitionList.Term>Venue or area</DefinitionList.Term>
+          <DefinitionList.Details>
+            {event.address ?? "Not set"}
+          </DefinitionList.Details>
           <DefinitionList.Term>Website</DefinitionList.Term>
           <DefinitionList.Details>
             {event.website ? (

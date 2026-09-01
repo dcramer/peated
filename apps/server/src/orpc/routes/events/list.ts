@@ -12,15 +12,16 @@ export default implement(eventListContract).handler(async function ({
 }) {
   const offset = (cursor - 1) * limit;
 
-  const where: (SQL<unknown> | undefined)[] = [
-    or(
-      and(isNull(events.dateEnd), gte(events.dateStart, sql`CURRENT_DATE`)),
-      gte(events.dateEnd, sql`CURRENT_DATE`),
-    ),
-  ];
+  const where: (SQL<unknown> | undefined)[] = [];
 
   if (input.onlyUpcoming) {
-    where.push(lte(events.dateStart, sql`CURRENT_DATE + INTERVAL '45' DAY`));
+    where.push(
+      or(
+        and(isNull(events.dateEnd), gte(events.dateStart, sql`CURRENT_DATE`)),
+        gte(events.dateEnd, sql`CURRENT_DATE`),
+      ),
+      lte(events.dateStart, sql`CURRENT_DATE + INTERVAL '45' DAY`),
+    );
   }
 
   if (query) {

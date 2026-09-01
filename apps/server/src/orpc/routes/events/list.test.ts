@@ -29,6 +29,13 @@ describe("GET /events", () => {
 
     expect(results.length).toBe(1);
     expect(results[0].id).toBe(futureEvent.id);
+
+    const allEvents = await routerClient.events.list({
+      onlyUpcoming: false,
+    });
+    expect(allEvents.results.map(({ id }) => id)).toEqual(
+      expect.arrayContaining([pastEvent.id, futureEvent.id]),
+    );
   });
 
   test("sorts events by date", async ({ fixtures }) => {

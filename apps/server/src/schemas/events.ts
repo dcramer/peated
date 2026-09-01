@@ -30,15 +30,35 @@ export const EventSchema = z.object({
   country: CountrySchema.nullable()
     .default(null)
     .describe("Country where the event takes place"),
+  address: z
+    .string()
+    .trim()
+    .nullable()
+    .default(null)
+    .describe("Venue or address for the event"),
   location: PointSchema.nullable()
     .default(null)
     .describe("Geographic coordinates of the event"),
 });
 
-export const EventInputSchema = EventSchema.omit({ id: true }).extend({
+const EventInputObjectSchema = EventSchema.omit({ id: true }).extend({
   country: z
     .number()
     .nullable()
     .default(null)
     .describe("ID of the country where the event takes place"),
 });
+
+export const EventInputSchema = EventInputObjectSchema.superRefine(
+  (event, context) => {
+    if (event.dateEnd && event.dateEnd < event.dateStart) {
+      context.addIssue({
+        code: "custom",
+        path: ["dateEnd"],
+        message: "End date must be on or after start date.",
+      });
+    }
+  },
+);
+
+export const EventPatchSchema = EventInputObjectSchema.partial();

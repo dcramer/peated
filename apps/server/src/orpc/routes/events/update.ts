@@ -3,7 +3,11 @@ import type { Event } from "@peated/server/db/schema";
 import { countries, events } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { EventInputSchema, EventSchema } from "@peated/server/schemas";
+import {
+  EventInputSchema,
+  EventPatchSchema,
+  EventSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
 import { eq } from "drizzle-orm";
@@ -19,7 +23,7 @@ export default procedure
       "Update event information including dates, location, and details. Requires admin privileges",
     operationId: "updateEvent",
   })
-  .input(EventInputSchema.partial().extend({ event: z.coerce.number() }))
+  .input(EventPatchSchema.extend({ event: z.coerce.number() }))
   .output(EventSchema)
   .handler(async function ({ input, context, errors }) {
     const { event: eventId } = input;
@@ -34,11 +38,29 @@ export default procedure
       });
     }
 
-    if (input.country) {
+    const nextInput = EventInputSchema.safeParse({
+      name: input.name ?? event.name,
+      dateStart: input.dateStart ?? event.dateStart,
+      dateEnd: input.dateEnd !== undefined ? input.dateEnd : event.dateEnd,
+      repeats: input.repeats ?? event.repeats,
+      website: input.website !== undefined ? input.website : event.website,
+      description:
+        input.description !== undefined ? input.description : event.description,
+      country: input.country !== undefined ? input.country : event.countryId,
+      address: input.address !== undefined ? input.address : event.address,
+      location: input.location !== undefined ? input.location : event.location,
+    });
+    if (!nextInput.success) {
+      throw errors.BAD_REQUEST({
+        message: nextInput.error.issues[0]?.message ?? "Invalid event.",
+      });
+    }
+
+    if (nextInput.data.country) {
       const [country] = await db
         .select()
         .from(countries)
-        .where(eq(countries.id, input.country));
+        .where(eq(countries.id, nextInput.data.country));
       if (!country) {
         throw errors.NOT_FOUND({
           message: "Country not found.",
@@ -64,6 +86,8 @@ export default procedure
       data.description = input.description;
     if (input.country !== undefined && input.country !== event.countryId)
       data.countryId = input.country;
+    if (input.address !== undefined && input.address !== event.address)
+      data.address = input.address;
     if (input.location !== undefined && input.location !== event.location)
       data.location = input.location;
 

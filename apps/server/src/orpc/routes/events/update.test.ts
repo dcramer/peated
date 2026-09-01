@@ -33,4 +33,25 @@ describe("PATCH /events/:event", () => {
     expect(newEvent).toBeDefined();
     expect(newEvent.name).toEqual("Foobar");
   });
+
+  test("rejects an end date before the stored start date", async ({
+    fixtures,
+  }) => {
+    const event = await fixtures.Event({ dateStart: "2027-05-10" });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const err = await waitError(
+      routerClient.events.update(
+        {
+          event: event.id,
+          dateEnd: "2027-05-09",
+        },
+        { context: { user: adminUser } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: End date must be on or after start date.]`,
+    );
+  });
 });

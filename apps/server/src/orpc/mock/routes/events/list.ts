@@ -12,8 +12,9 @@ export default mockOS.events.list.handler(async ({ input }) => {
   const events = mockEvents
     .filter(
       (event) =>
-        (event.dateEnd ?? event.dateStart) >= today &&
-        (!input.onlyUpcoming || event.dateStart <= upcomingCutoff) &&
+        (!input.onlyUpcoming ||
+          ((event.dateEnd ?? event.dateStart) >= today &&
+            event.dateStart <= upcomingCutoff)) &&
         includesQuery(input.query, event.name),
     )
     .toSorted((left, right) => {

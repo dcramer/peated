@@ -67,6 +67,7 @@ export default function EventForm({
           label="Name"
           placeholder="e.g. Fèis Ìle"
           error={errors.name}
+          required
         />
 
         <TextField
@@ -74,6 +75,7 @@ export default function EventForm({
           label="Start Date"
           type="date"
           error={errors.dateStart}
+          required
         />
 
         <TextField
@@ -103,7 +105,7 @@ export default function EventForm({
 
         <TextAreaField
           {...register("description")}
-          label="description"
+          label="Description"
           error={errors.description}
           rows={6}
         />
@@ -124,6 +126,15 @@ export default function EventForm({
               value={countryValue}
             />
           )}
+        />
+
+        <TextField
+          {...register("address", {
+            setValueAs: (v) => (v === "" || !v ? null : v),
+          })}
+          label="Venue or area"
+          placeholder="e.g. Across Speyside"
+          error={errors.address}
         />
       </Fieldset>
     </FormPage>

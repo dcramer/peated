@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  check,
   date,
   index,
   pgTable,
@@ -43,6 +44,10 @@ export const events = pgTable(
       sql`LOWER(${table.name})`,
     ),
     index("event_country_id").on(table.countryId),
+    check(
+      "event_date_range_check",
+      sql`${table.dateEnd} IS NULL OR ${table.dateEnd} >= ${table.dateStart}`,
+    ),
   ],
 );
 
