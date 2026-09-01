@@ -741,6 +741,26 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
       if (
+        input?.entity === testOwnedEntity.id &&
+        input?.distilleryView === "releases"
+      ) {
+        sendRpcResponse(
+          response,
+          buildBottleListResponse([bottleGroupRepresentative]),
+        );
+        return true;
+      }
+      if (
+        input?.entity === testOwnedEntity.id &&
+        input?.distilleryView === "other"
+      ) {
+        sendRpcResponse(
+          response,
+          buildBottleListResponse([{ ...homeBottle, bottler: testBottler }]),
+        );
+        return true;
+      }
+      if (
         !getAccessToken(request).includes("flight-bottles") &&
         [testBrand.id, testBottler.id, testOwnedEntity.id].includes(
           input?.entity,
@@ -1259,6 +1279,16 @@ async function handleRpcRequest({ request, response, url }) {
     default:
       return false;
   }
+}
+
+function buildBottleListResponse(results) {
+  return {
+    results,
+    rel: { nextCursor: null, prevCursor: null },
+    total: results.length,
+    facets: { ageBand: [], category: [] },
+    followedEntityCount: null,
+  };
 }
 
 /**

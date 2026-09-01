@@ -47,6 +47,8 @@ export const BOTTLE_LIST_SORT_OPTIONS = [
   "-tastings",
 ] as const;
 
+export const DISTILLERY_BOTTLE_VIEW_LIST = ["releases", "other"] as const;
+
 export const REGION_LIST_SORT_OPTIONS = [
   "name",
   "bottles",

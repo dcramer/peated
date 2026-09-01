@@ -11,6 +11,7 @@ import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
+import { getDistilleryBottleView } from "../entityPageData";
 import { EntityBottleListClient } from "./entityBottleListClient.stylex";
 
 export default async function EntityBottlesPage(props: {
@@ -18,11 +19,13 @@ export default async function EntityBottlesPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { entityId } = await props.params;
+  const searchParams = await props.searchParams;
   const { client } = await getPublicPageServerClient();
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
   const createBottleHref = getEntityBottleCreateHref(entity);
-  const queryParams = normalizeBottleCatalogQueryParams(
-    getApiQueryParams(await props.searchParams, {
+  let distilleryView = getDistilleryBottleView(entity, searchParams.view);
+  let queryParams = normalizeBottleCatalogQueryParams(
+    getApiQueryParams(searchParams, {
       defaults: { sort: "-release" },
       allowedValues: BOTTLE_CATALOG_ALLOWED_VALUES,
       fields: BOTTLE_CATALOG_QUERY_FIELDS,
@@ -37,12 +40,24 @@ export default async function EntityBottlesPage(props: {
         "series",
       ],
       overrides: {
+        distilleryView,
         entity: entity.id,
         limit: 25,
       },
     }),
   );
-  const bottleList = await client.bottles.list(queryParams);
+  let bottleList = await client.bottles.list(queryParams);
+
+  if (
+    entity.kind === "distillery" &&
+    searchParams.view === undefined &&
+    distilleryView === "releases" &&
+    bottleList.total === 0
+  ) {
+    distilleryView = "other";
+    queryParams = { ...queryParams, distilleryView };
+    bottleList = await client.bottles.list(queryParams);
+  }
 
   return (
     <EntityBottleListClient
@@ -61,7 +76,9 @@ export default async function EntityBottlesPage(props: {
         </ButtonLink>
       }
       entityId={entity.id}
+      entityKind={entity.kind}
       entityName={entity.name}
+      initialDistilleryView={distilleryView}
       initialBottleList={bottleList}
     />
   );

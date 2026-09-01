@@ -49,6 +49,15 @@ export function entityHasBottleCatalog(entity: Pick<Entity, "kind">) {
   );
 }
 
+export function getDistilleryBottleView(
+  entity: Pick<Entity, "kind">,
+  view: string | string[] | undefined,
+  fallback: "other" | "releases" = "releases",
+) {
+  if (entity.kind !== "distillery") return undefined;
+  return view === "other" || view === "releases" ? view : fallback;
+}
+
 export function getEntityRelationshipOwnerIds(
   entity: Pick<Entity, "id" | "kind" | "ownerId">,
 ) {

@@ -28,20 +28,26 @@ export function EntityReleaseOverview({
   retry: () => void;
 }) {
   if (!entityHasBottleCatalog(entity)) return null;
+  const isDistillery = entity.kind === "distillery";
+  const heading = isDistillery
+    ? "Latest distillery releases"
+    : "Latest releases";
+  const viewAllParams = new URLSearchParams({ sort: "-release" });
+  if (isDistillery) viewAllParams.set("view", "releases");
 
   if (pending) {
     return (
-      <PageSection heading="Latest releases">
-        <LoadingList label="Loading latest releases" rows={4} />
+      <PageSection heading={heading}>
+        <LoadingList label={`Loading ${heading.toLowerCase()}`} rows={4} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading="Latest releases">
-        <SectionError heading="Latest releases are unavailable" onRetry={retry}>
-          Try loading the latest releases again.
+      <PageSection heading={heading}>
+        <SectionError heading={`${heading} are unavailable`} onRetry={retry}>
+          Try loading this list again.
         </SectionError>
       </PageSection>
     );
@@ -51,15 +57,21 @@ export function EntityReleaseOverview({
 
   return (
     <PageSection
-      heading="Latest releases"
+      heading={heading}
       intro={
-        <TextLink href={`${getEntityUrl(entity)}/bottles?sort=-release`}>
+        <TextLink
+          href={`${getEntityUrl(entity)}/bottles?${viewAllParams.toString()}`}
+        >
           View all releases
         </TextLink>
       }
     >
       <BottleList
-        ariaLabel={`${entity.name} latest releases`}
+        ariaLabel={
+          isDistillery
+            ? `${entity.name} latest distillery releases`
+            : `${entity.name} latest releases`
+        }
         items={releaseList.results.map((bottle) =>
           toBottleListItem(bottle, {
             includeRatings: true,

@@ -27,7 +27,6 @@ export function EntityBottleOverview({
   error,
   pending,
   retry,
-  totalBottles,
 }: {
   bottleList?: BottleList;
   createBottleHref?: string;
@@ -35,33 +34,37 @@ export function EntityBottleOverview({
   error: boolean;
   pending: boolean;
   retry: () => void;
-  totalBottles: number;
 }) {
   const presentation = getEntityPresentation(entity);
   const entityHref = getEntityUrl(entity);
+  const isDistillery = entity.kind === "distillery";
+  const heading = isDistillery ? "Popular other bottlings" : "Popular bottles";
+  const viewAllParams = new URLSearchParams({ sort: "-tastings" });
+  if (isDistillery) viewAllParams.set("view", "other");
 
   if (!entityHasBottleCatalog(entity)) return null;
 
   if (pending) {
     return (
-      <PageSection heading="Popular bottles">
-        <LoadingList label="Loading popular bottles" rows={4} />
+      <PageSection heading={heading}>
+        <LoadingList label={`Loading ${heading.toLowerCase()}`} rows={4} />
       </PageSection>
     );
   }
 
   if (error) {
     return (
-      <PageSection heading="Popular bottles">
-        <SectionError heading="Popular bottles are unavailable" onRetry={retry}>
-          The rest of this page still works. Try loading its popular bottles
-          again.
+      <PageSection heading={heading}>
+        <SectionError heading={`${heading} are unavailable`} onRetry={retry}>
+          The rest of this page still works. Try loading this list again.
         </SectionError>
       </PageSection>
     );
   }
 
   if (!bottleList?.results.length) {
+    if (isDistillery) return null;
+
     const addBottleHref =
       createBottleHref ??
       `/bottles/new?${new URLSearchParams({
@@ -69,7 +72,7 @@ export function EntityBottleOverview({
       }).toString()}`;
 
     return (
-      <PageSection heading="Popular bottles">
+      <PageSection heading={heading}>
         <EmptyState
           action={
             <ButtonLink href={addBottleHref} size="sm" variant="accent">
@@ -85,19 +88,29 @@ export function EntityBottleOverview({
     );
   }
 
+  const viewAllLabel =
+    bottleList.total === 1
+      ? "View 1 bottle"
+      : `View all ${bottleList.total.toLocaleString("en-US")} bottles`;
+
   return (
     <PageSection
-      heading="Popular bottles"
+      heading={heading}
       intro={
-        <TextLink href={`${entityHref}/bottles?sort=-tastings`}>
-          View all {totalBottles.toLocaleString("en-US")} bottles
+        <TextLink href={`${entityHref}/bottles?${viewAllParams.toString()}`}>
+          {viewAllLabel}
         </TextLink>
       }
     >
       <BottleList
-        ariaLabel={`${entity.name} popular bottles`}
+        ariaLabel={
+          isDistillery
+            ? `${entity.name} popular other bottlings`
+            : `${entity.name} popular bottles`
+        }
         items={bottleList.results.map((bottle) =>
           toBottleListItem(bottle, {
+            includeBottler: isDistillery,
             includeRatings: true,
             includeRelatedReleases: true,
           }),

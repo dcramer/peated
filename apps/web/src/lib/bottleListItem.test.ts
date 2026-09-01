@@ -21,4 +21,29 @@ describe("toBottleListItem", () => {
       name: "Lagavulin 16-year-old",
     });
   });
+
+  test("identifies a distinct bottler when the surrounding view needs it", () => {
+    const bottler = {
+      ...mockBottle.brand,
+      id: 4263,
+      peatedId: "E4263",
+      name: "The Scotch Malt Whisky Society",
+      shortName: "SMWS",
+      kind: "bottler" as const,
+    };
+
+    expect(
+      toBottleListItem({ ...mockBottle, bottler }, { includeBottler: true })
+        .subtitle,
+    ).toBe("Bottled by SMWS");
+  });
+
+  test("does not repeat the brand when it also fills the bottler role", () => {
+    expect(
+      toBottleListItem(
+        { ...mockBottle, bottler: mockBottle.brand },
+        { includeBottler: true },
+      ).subtitle,
+    ).toBeUndefined();
+  });
 });

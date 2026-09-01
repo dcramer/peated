@@ -23,7 +23,12 @@ export default async function EntityPage(props: {
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
   const bottleList = entityHasBottleCatalog(entity)
     ? await client.bottles
-        .list({ entity: entity.id, limit: 4, sort: "-tastings" })
+        .list({
+          distilleryView: entity.kind === "distillery" ? "other" : undefined,
+          entity: entity.id,
+          limit: 4,
+          sort: "-tastings",
+        })
         .catch(() => undefined)
     : undefined;
 
