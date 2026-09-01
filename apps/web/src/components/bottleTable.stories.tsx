@@ -1,14 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
-import {
-  BottleComparisonTable,
-  type BottleComparisonTableProps,
-} from "./bottleComparisonTable.stylex";
+import { BottleTable, type BottleTableProps } from "./bottleTable.stylex";
 import { BottleRatings } from "./scoring.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
-const rows: BottleComparisonTableProps["rows"] = [
+const rows: BottleTableProps["rows"] = [
   {
     brand: "Port Charlotte",
     href: "/bottles/1",
@@ -90,12 +87,11 @@ const rows: BottleComparisonTableProps["rows"] = [
 ];
 
 const meta = {
-  title: "Components/Bottles/Bottle Comparison Table",
-  component: BottleComparisonTable,
+  title: "Components/Bottles/Bottle Table",
+  component: BottleTable,
   args: {
+    ariaLabel: "Islay single malts",
     columns: ["Rating"],
-    detail: "3 bottles in this set",
-    heading: "Islay single malts",
     rows,
   },
   argTypes: { rows: { control: false } },
@@ -106,17 +102,17 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<BottleComparisonTableProps>;
+} satisfies Meta<BottleTableProps>;
 
 export default meta;
-type Story = StoryObj<BottleComparisonTableProps>;
+type Story = StoryObj<BottleTableProps>;
 
 export const Overview: Story = {
-  render: (args) => <BottleComparisonTable {...args} />,
+  render: (args) => <BottleTable {...args} />,
 };
 
 export const InteractionStates: Story = {
-  render: (args) => <BottleComparisonTable {...args} />,
+  render: (args) => <BottleTable {...args} />,
   parameters: {
     pseudo: {
       active: ['tr[data-record-key="4"]'],
