@@ -52,6 +52,9 @@ pnpm test:e2e:install
   layout, element counts, or exact sizes and positions.
 - Check spacing, color, artwork, copy, and responsive layouts manually or with
   browser screenshots.
+- E2E tests can call the shared `snapshot` fixture after they prove a useful
+  workflow state. Frameshift reviews the image change, but the image is not a
+  test assertion. Do not add screenshot-only E2E tests.
 - Prefer the fewest assertions that prove the material outcome. Avoid repeating
   lower-level component or API contracts inside an end-to-end workflow.
 - Test a loading fallback only when it changes what a user can do. Check how it
@@ -76,6 +79,11 @@ The suite starts two local servers:
 This keeps browser tests independent from a local database and API server.
 Browser workflow tests should reuse the shared e2e fixtures and add narrow mock
 RPC responses for the routes they exercise.
+
+Import `test` and `expect` from `e2e/test.ts`, not directly from Playwright.
+This makes the optional `snapshot` fixture available to every browser test.
+Snapshot paths include the spec, test, checkpoint, and browser project, so keep
+these names stable unless the visual identity should change.
 
 CI runs all browser workflows once with desktop Chromium. The mobile project
 runs only tests tagged `@mobile`. Use the tag only when a touch interaction,

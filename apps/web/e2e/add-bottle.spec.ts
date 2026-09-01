@@ -1,4 +1,6 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { Buffer } from "node:buffer";
+import { z } from "zod";
 import {
   expect,
   type Locator,
@@ -6,9 +8,7 @@ import {
   type Request,
   test,
   type TestInfo,
-} from "@playwright/test";
-import { Buffer } from "node:buffer";
-import { z } from "zod";
+} from "./test";
 
 declare global {
   interface Window {

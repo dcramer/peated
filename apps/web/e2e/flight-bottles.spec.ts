@@ -1,5 +1,5 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 import {
   createdFlightBottleFixtureId,

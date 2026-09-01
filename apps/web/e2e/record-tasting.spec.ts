@@ -1,6 +1,6 @@
-import { expect, type Page, type Request, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
 import { z } from "zod";
+import { expect, type Page, type Request, test } from "./test";
 
 import {
   createdTastingId,
@@ -70,6 +70,7 @@ test.describe("log tasting", () => {
   test("logs a tasting from a matched bottle photo", async ({
     context,
     page,
+    snapshot,
   }, testInfo) => {
     await signIn(context, {
       accessToken: `${testAccessToken}-photo-tasting-${testInfo.project.name}`,
@@ -78,6 +79,10 @@ test.describe("log tasting", () => {
     await page.goto("/addTasting");
 
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
+    await expect(
+      page.getByRole("heading", { exact: true, name: "Log a tasting" }).first(),
+    ).toBeVisible();
+    await snapshot("start");
 
     await uploadLabel(page);
 

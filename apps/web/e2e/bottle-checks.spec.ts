@@ -1,4 +1,4 @@
-import { expect, test, type TestInfo } from "@playwright/test";
+import { expect, test, type TestInfo } from "./test";
 
 import { bottlePathPattern } from "./assertions";
 import {

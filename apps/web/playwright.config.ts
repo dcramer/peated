@@ -10,6 +10,8 @@ const apiServer =
 export default defineConfig({
   testDir: "./e2e",
   outputDir: ".playwright/test-results",
+  globalSetup: "./visual/global-setup.mjs",
+  globalTeardown: "./visual/global-teardown.mjs",
   timeout: 45_000,
   globalTimeout: process.env.CI ? 7 * 60_000 : undefined,
   maxFailures: process.env.CI ? 2 : 0,
@@ -26,7 +28,11 @@ export default defineConfig({
   },
   use: {
     baseURL,
+    colorScheme: "light",
+    contextOptions: { reducedMotion: "reduce" },
+    locale: "en-US",
     screenshot: "only-on-failure",
+    timezoneId: "America/Los_Angeles",
     trace: "retain-on-failure",
   },
   projects: [

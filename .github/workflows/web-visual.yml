@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    types: [opened, synchronize, reopened]
     paths:
       - "apps/web/**"
       - "packages/design/**"
@@ -36,25 +36,17 @@ jobs:
           fetch-depth: 2
           persist-credentials: false
 
-      - name: Choose pages
+      - name: Resolve base revision
         if: github.event_name == 'pull_request'
-        id: mode
+        id: revision
         env:
           MERGE_SHA: ${{ github.sha }}
-          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
           set -euo pipefail
           # The merge commit is immutable for this run. Its first parent is the
           # exact base GitHub tested; pull_request.base.sha can be stale.
           BASE_SHA=$(git rev-parse "$MERGE_SHA^1")
-          if [[ ",$PR_LABELS," == *",run-all-screenshots,"* ]]; then
-            echo "all=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "all=false" >> "$GITHUB_OUTPUT"
-          fi
           echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
-          git diff --name-only "$BASE_SHA" "$MERGE_SHA" > /tmp/peated-screenshot-changes.txt
-          cat /tmp/peated-screenshot-changes.txt
 
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -68,13 +60,11 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install Playwright
         run: pnpm --dir apps/web exec playwright install --with-deps chromium
-      - name: Capture all baseline screenshots
-        if: github.event_name != 'pull_request'
+      - name: Run end-to-end tests and capture snapshots
         env:
           VISUAL_SOURCE_SHA: ${{ github.sha }}
-        run: >-
-          pnpm visual:web -- --all
-          --out-dir "$GITHUB_WORKSPACE/visual-output/baseline-artifact"
+          VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate
+        run: pnpm test:e2e
       # Every main commit can become a pull request base, so each gets an exact artifact.
       - name: Store baseline by source revision
         if: github.event_name != 'pull_request'
@@ -82,40 +72,23 @@ jobs:
         with:
           name: peated-web-screenshots-v1
           sha: ${{ github.sha }}
-          path: visual-output/baseline-artifact
+          path: visual-output/candidate
           retention-days: 30
-      - name: Capture candidate screenshots
-        if: github.event_name == 'pull_request'
-        env:
-          ALL: ${{ steps.mode.outputs.all }}
-          VISUAL_SOURCE_SHA: ${{ github.sha }}
-          VISUAL_ROOT: ${{ github.workspace }}/visual-output
-        run: |
-          set -euo pipefail
-          args=(
-            --changed-file /tmp/peated-screenshot-changes.txt
-            --out-dir "$VISUAL_ROOT/candidate"
-          )
-          if [[ "$ALL" == "true" ]]; then
-            args+=(--all)
-          fi
-          pnpm visual:web -- "${args[@]}"
       - name: Restore exact baseline artifact
         if: github.event_name == 'pull_request'
         uses: dcramer/frameshift/baseline@68a8b5e8bbd439088ef9a044e693c5de9efe7ecd
         with:
           name: peated-web-screenshots-v1
-          sha: ${{ steps.mode.outputs.base_sha }}
-          path: ${{ github.workspace }}/visual-output/baseline-artifact
+          sha: ${{ steps.revision.outputs.base_sha }}
+          path: ${{ github.workspace }}/visual-output/baseline
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Select matching baseline screenshots
+      - name: Validate baseline snapshots
         if: github.event_name == 'pull_request'
         run: >-
-          node apps/web/visual/select-baseline.mjs
-          --source visual-output/baseline-artifact
+          node apps/web/visual/validate-baseline.mjs
+          --baseline visual-output/baseline/manifest.json
           --candidate visual-output/candidate/manifest.json
-          --output visual-output/baseline
-          --sha "${{ steps.mode.outputs.base_sha }}"
+          --sha "${{ steps.revision.outputs.base_sha }}"
       - name: Compare screenshots
         if: github.event_name == 'pull_request'
         uses: dcramer/frameshift@68a8b5e8bbd439088ef9a044e693c5de9efe7ecd
