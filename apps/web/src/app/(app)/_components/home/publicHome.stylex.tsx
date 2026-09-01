@@ -26,6 +26,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottleReviewMetadata } from "@peated/web/lib/bottleMetadata";
+import { isEventWithinDays } from "@peated/web/lib/eventDates";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   memberHomeQueries,
@@ -33,6 +34,7 @@ import {
 } from "@peated/web/lib/orpc/homeQueries";
 import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
+import { HomeEventCallout } from "./homeEventCallout.stylex";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
@@ -45,12 +47,17 @@ export function PublicHome({
   const router = useRouter();
   const { user } = useAuth();
   const stats = useQuery(publicHomeQueries.stats(orpc));
+  const events = useQuery(publicHomeQueries.events(orpc));
   const totalBottles = stats.data?.bottles;
+  const nextEvent = events.data?.results[0];
+  const upcomingEvent =
+    nextEvent && isEventWithinDays(nextEvent, 30) ? nextEvent : null;
 
   return (
     <HomePage
       content={
         <>
+          {upcomingEvent ? <HomeEventCallout event={upcomingEvent} /> : null}
           <div {...stylex.props(styles.ratingsGrid)}>
             <LatestReleases />
             <RecentReviews />

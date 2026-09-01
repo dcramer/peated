@@ -6,15 +6,12 @@ import {
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 const today = "2026-08-26";
-const upcomingCutoff = "2026-10-10";
 
 export default mockOS.events.list.handler(async ({ input }) => {
   const events = mockEvents
     .filter(
       (event) =>
-        (!input.onlyUpcoming ||
-          ((event.dateEnd ?? event.dateStart) >= today &&
-            event.dateStart <= upcomingCutoff)) &&
+        (!input.onlyUpcoming || (event.dateEnd ?? event.dateStart) >= today) &&
         includesQuery(input.query, event.name),
     )
     .toSorted((left, right) => {

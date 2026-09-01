@@ -9,6 +9,7 @@ import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo, logTelemetryError } from "../lib/log";
 import { initializeScraperRuntime } from "../scraper";
 import "./jobs";
+import createNextRepeatingEvents from "./jobs/createNextRepeatingEvents";
 import scheduleScrapers from "./jobs/scheduleScrapers";
 import {
   buildJobContext,
@@ -174,6 +175,9 @@ export async function runWorker() {
   // dont run the scraper in dev
   if (config.ENV === "production") {
     scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
+    scheduledJob("15 4 * * *", "create-next-repeating-events", async () => {
+      await createNextRepeatingEvents();
+    });
     scheduledJob(
       "17 * * * *",
       "reconcile-store-price-match-proposals",

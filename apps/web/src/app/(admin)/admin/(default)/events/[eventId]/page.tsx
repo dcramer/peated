@@ -4,6 +4,7 @@ import { use } from "react";
 
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
+  AdminActions,
   AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
@@ -44,7 +45,12 @@ export default function Page({
       <AdminPageHeader
         title={event.name}
         actions={
-          <Button href={`/admin/events/${event.id}/edit`}>Edit event</Button>
+          <AdminActions>
+            <Button href={`/admin/events/${event.id}/next`} variant="default">
+              Add next edition
+            </Button>
+            <Button href={`/admin/events/${event.id}/edit`}>Edit event</Button>
+          </AdminActions>
         }
       />
       {event.description ? (

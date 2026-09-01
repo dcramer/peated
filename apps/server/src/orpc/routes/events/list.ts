@@ -5,7 +5,7 @@ import eventListContract from "@peated/server/orpc/contracts/events/list";
 import { serialize } from "@peated/server/serializers";
 import { EventSerializer } from "@peated/server/serializers/event";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, gte, ilike, isNull, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, gte, ilike, isNull, or, sql } from "drizzle-orm";
 export default implement(eventListContract).handler(async function ({
   input: { cursor, sort, limit, query, ...input },
   context,
@@ -20,7 +20,6 @@ export default implement(eventListContract).handler(async function ({
         and(isNull(events.dateEnd), gte(events.dateStart, sql`CURRENT_DATE`)),
         gte(events.dateEnd, sql`CURRENT_DATE`),
       ),
-      lte(events.dateStart, sql`CURRENT_DATE + INTERVAL '45' DAY`),
     );
   }
 
