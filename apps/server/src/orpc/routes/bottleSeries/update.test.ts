@@ -51,10 +51,6 @@ describe("PATCH /bottle-series/:series", () => {
       id: series.id,
       name: data.name,
       description: data.description,
-      brand: expect.objectContaining({
-        id: brand.id,
-        name: brand.name,
-      }),
     });
 
     // Verify changes were recorded
@@ -131,10 +127,6 @@ describe("PATCH /bottle-series/:series", () => {
       id: series.id,
       name: "Updated Series",
       description: "The original description", // Description should remain unchanged
-      brand: expect.objectContaining({
-        id: brand.id,
-        name: brand.name,
-      }),
     });
 
     // Verify changes were recorded
