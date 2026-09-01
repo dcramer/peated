@@ -16,6 +16,7 @@ export async function GET() {
       ({ collection }) => `/sitemaps/${collection}/sitemap.xml`,
     ),
     "/sitemaps/bottles/sitemap.xml",
+    "/sitemaps/series/sitemap.xml",
     "/sitemaps/static.xml",
   ]);
 

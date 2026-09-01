@@ -41,6 +41,15 @@ describe("formatBottleDisplayName", () => {
     );
   });
 
+  it("omits Brand and Series context inside a Series-owned list", () => {
+    expect(
+      formatBottleDisplayName(bottle, {
+        includeBrand: false,
+        includeSeries: false,
+      }),
+    ).toBe("Glenburgie 38-year-old - Chapter Thirty Two");
+  });
+
   it("keeps inferred years out of the bottle name", () => {
     expect(
       formatBottleDisplayName({

@@ -32,6 +32,7 @@ const addBottleIntents = [
 const databaseScopes = [
   "all",
   "bottles",
+  "series",
   "distilleries",
   "brands",
   "bottlers",
@@ -50,7 +51,7 @@ function BrowseHeader({ bottleTotal }: { bottleTotal: number }) {
       </h1>
       <p {...stylex.props(styles.browseDescription)}>
         {bottleTotal.toLocaleString("en-US")} bottles, and someone has probably
-        logged yours. Search bottles, distillers, brands, and bottlers.
+        logged yours. Search bottles, series, distillers, brands, and bottlers.
       </p>
     </header>
   );
@@ -201,7 +202,7 @@ export function SearchPageClient({
           onSubmit={submitSearch}
           placement={databaseSearch ? "database" : "page"}
           placeholder={
-            databaseSearch ? "Ardbeg 10, Lagavulin, Cadenhead's…" : undefined
+            databaseSearch ? "Ardbeg 10, Supernova, Lagavulin…" : undefined
           }
           scopeValues={scopeValues}
           showBottleRatings={false}

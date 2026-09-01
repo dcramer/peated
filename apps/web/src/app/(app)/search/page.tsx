@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 
 const apiScopes = [
   "bottles",
+  "series",
   "distilleries",
   "brands",
   "bottlers",
@@ -22,6 +23,7 @@ const apiScopes = [
 const databasePageScopes = [
   "all",
   "bottles",
+  "series",
   "distilleries",
   "brands",
   "bottlers",

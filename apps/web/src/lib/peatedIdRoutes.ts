@@ -7,7 +7,7 @@ export type PeatedIdRouteResolution = {
   pathname: string;
 };
 
-const ROOT_PEATED_ID_PATTERN = /^\/([BE]\d+)\/?$/i;
+const ROOT_PEATED_ID_PATTERN = /^\/([BES]\d+)\/?$/i;
 const PUBLIC_ENTITY_PATTERN =
   /^\/(brands|distillers|bottlers|companies)\/([1-9]\d*)(?:-[^/]+)?(\/.*)?$/;
 const LEGACY_ENTITY_PATTERN = /^\/entities\/([1-9]\d*)(?:-[^/]+)?(\/.*)?$/;
@@ -44,7 +44,7 @@ function getEntityKind(collection: string): EntityKind | null {
   }
 }
 
-export function resolveBottlePeatedIdRoute(
+export function resolveCatalogPeatedIdRoute(
   pathname: string,
 ): PeatedIdRouteResolution | null {
   const rootMatch = ROOT_PEATED_ID_PATTERN.exec(pathname);
@@ -52,9 +52,13 @@ export function resolveBottlePeatedIdRoute(
     const parsed = parsePeatedId(rootMatch[1]);
     if (!parsed) return null;
 
-    return parsed.type === "bottle"
-      ? { action: "redirect", pathname: `/bottles/${parsed.id}` }
-      : null;
+    if (parsed.type === "bottle") {
+      return { action: "redirect", pathname: `/bottles/${parsed.id}` };
+    }
+    if (parsed.type === "series") {
+      return { action: "redirect", pathname: `/series/${parsed.id}` };
+    }
+    return null;
   }
 
   return null;

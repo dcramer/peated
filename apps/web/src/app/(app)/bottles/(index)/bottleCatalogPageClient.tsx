@@ -142,6 +142,10 @@ export function BottleCatalogPageClient({
       includeRelatedReleases: true,
     }),
   );
+  const title =
+    queryParams.series && bottleList.results[0]?.series
+      ? bottleList.results[0].series.name
+      : "Bottles";
   return (
     <CatalogPage
       action={
@@ -172,7 +176,7 @@ export function BottleCatalogPageClient({
           />
         ) : undefined
       }
-      title="Bottles"
+      title={title}
     >
       <BottleCatalogList
         emptyAction={

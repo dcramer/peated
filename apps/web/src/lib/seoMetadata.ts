@@ -5,7 +5,7 @@ import config from "@peated/web/config";
 import type { Metadata } from "next";
 
 import { summarize } from "./markdown";
-import { getBottleUrl, getEntityUrl } from "./urls";
+import { getBottleSeriesUrl, getBottleUrl, getEntityUrl } from "./urls";
 
 const HOME_TITLE = "Peated: Whisky bottles, reviews, and tasting notes";
 
@@ -40,6 +40,13 @@ type EntitySeoMetadataSource = {
   name: string;
   description: string | null;
   images?: readonly { imageUrl: string }[];
+};
+
+type SeriesSeoMetadataSource = {
+  id: number;
+  fullName: string;
+  description: string | null;
+  numReleases: number;
 };
 
 type MetadataOptions = {
@@ -121,6 +128,37 @@ export function getEntitySeoMetadata(
       title,
       description,
       images,
+    },
+  };
+}
+
+export function getSeriesSeoMetadata(
+  series: SeriesSeoMetadataSource,
+  { canonical = false }: MetadataOptions = {},
+): Metadata {
+  const title = `${series.fullName} — Whisky series`;
+  const bottleCount = series.numReleases.toLocaleString("en-US");
+  const description =
+    summarize(series.description || "", 160) ||
+    `See ${bottleCount} ${series.numReleases === 1 ? "bottle" : "bottles"} in the ${series.fullName} series.`;
+  const url = getBottleSeriesUrl(series);
+
+  return {
+    title,
+    description,
+    alternates: canonical ? { canonical: url } : undefined,
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      siteName: "Peated",
+      title,
+      description,
+      url: canonical ? url : undefined,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
     },
   };
 }

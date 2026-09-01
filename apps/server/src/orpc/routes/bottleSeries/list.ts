@@ -15,8 +15,8 @@ export default procedure
     path: "/bottle-series",
     summary: "List bottle series",
     description:
-      "Retrieve bottle series for a specific brand with search and pagination support",
-    operationId: "listBottleSeries",
+      "List bottle series, with optional brand filtering, search, and pagination.",
+    spec: (spec) => ({ ...spec, operationId: "listBottleSeries" }),
   })
   .input(
     z.object({
@@ -24,7 +24,7 @@ export default procedure
         .string()
         .default("")
         .describe("Search text only. Search operators are not supported."),
-      brand: z.coerce.number(),
+      brand: z.coerce.number().optional().describe("Filter by brand ID."),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
@@ -40,9 +40,9 @@ export default procedure
     const { query, brand, cursor, limit } = input;
     const offset = (cursor - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [
-      eq(bottleSeries.brandId, brand),
-    ];
+    const where: (SQL<unknown> | undefined)[] = [];
+
+    if (brand) where.push(eq(bottleSeries.brandId, brand));
 
     if (query) {
       where.push(
@@ -56,7 +56,7 @@ export default procedure
         .from(bottleSeries)
         .where(where ? and(...where) : undefined)
         .orderBy(asc(bottleSeries.name))
-        .limit(limit)
+        .limit(limit + 1)
         .offset(offset),
       db
         .select({ count: sql<string>`count(*)` })
@@ -65,7 +65,11 @@ export default procedure
     ]);
 
     return {
-      results: await serialize(BottleSeriesSerializer, results, context.user),
+      results: await serialize(
+        BottleSeriesSerializer,
+        results.slice(0, limit),
+        context.user,
+      ),
       total: Number(total[0].count),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -1,5 +1,6 @@
 import {
   BottleSchema,
+  BottleSeriesSchema,
   EntitySchema,
   RegionSchema,
   UserSchema,
@@ -28,6 +29,7 @@ export const ENTITY_KIND_BY_SEARCH_SCOPE = {
 
 export const SEARCH_SCOPE_LIST = [
   "bottles",
+  "series",
   ...ENTITY_SEARCH_SCOPE_LIST,
   "regions",
   "members",
@@ -66,6 +68,22 @@ const EntityResultSchema = EntitySchema.pick({
   region: z.object({ name: z.string() }).nullable(),
 });
 
+const SeriesResultSchema = BottleSeriesSchema.pick({
+  id: true,
+  peatedId: true,
+  name: true,
+  fullName: true,
+  numReleases: true,
+}).extend({
+  brand: EntitySchema.pick({
+    id: true,
+    peatedId: true,
+    name: true,
+    shortName: true,
+    kind: true,
+  }),
+});
+
 const RegionResultSchema = RegionSchema.pick({
   id: true,
   name: true,
@@ -94,6 +112,11 @@ const GroupSchema = z.discriminatedUnion("type", [
     type: z.literal("bottles"),
     total: z.number().int().nonnegative(),
     results: z.array(BottleResultSchema),
+  }),
+  z.object({
+    type: z.literal("series"),
+    total: z.number().int().nonnegative(),
+    results: z.array(SeriesResultSchema),
   }),
   z.object({
     type: z.literal("distilleries"),
@@ -131,11 +154,13 @@ export const ExactSchema = z
   .discriminatedUnion("type", [
     z.object({ type: z.literal("bottle"), ref: BottleResultSchema }),
     z.object({ type: z.literal("entity"), ref: EntityResultSchema }),
+    z.object({ type: z.literal("series"), ref: SeriesResultSchema }),
   ])
   .nullable();
 
 const NearestSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("bottles"), result: BottleResultSchema }),
+  z.object({ type: z.literal("series"), result: SeriesResultSchema }),
   z.object({ type: z.literal("distilleries"), result: EntityResultSchema }),
   z.object({ type: z.literal("brands"), result: EntityResultSchema }),
   z.object({ type: z.literal("bottlers"), result: EntityResultSchema }),
@@ -146,6 +171,7 @@ const NearestSchema = z.discriminatedUnion("type", [
 
 export const ScopeTotalsSchema = z.object({
   bottles: z.number().int().nonnegative(),
+  series: z.number().int().nonnegative(),
   distilleries: z.number().int().nonnegative(),
   brands: z.number().int().nonnegative(),
   bottlers: z.number().int().nonnegative(),
@@ -168,7 +194,7 @@ export default contract
     path: "/search",
     summary: "Global search",
     description:
-      "Search bottles, brands, distilleries, bottlers, companies, regions, and members",
+      "Search bottles, series, brands, distilleries, bottlers, companies, regions, and members",
     spec: (spec) => ({ ...spec, operationId: "search" }),
   })
   .input(

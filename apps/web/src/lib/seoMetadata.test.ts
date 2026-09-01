@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getBottleSeoMetadata,
   getEntitySeoMetadata,
+  getSeriesSeoMetadata,
   homeMetadata,
 } from "./seoMetadata";
 
@@ -120,6 +121,33 @@ describe("SEO metadata", () => {
 
     expect(metadata).toMatchObject({
       title: "Lagavulin — Whisky distillery",
+      twitter: { card: "summary" },
+    });
+  });
+
+  it("builds canonical Series metadata with its bottle count", () => {
+    const metadata = getSeriesSeoMetadata(
+      {
+        id: 421,
+        fullName: "Dramfool Jim McEwan Signature Collection",
+        description: null,
+        numReleases: 12,
+      },
+      { canonical: true },
+    );
+
+    expect(metadata).toMatchObject({
+      title: "Dramfool Jim McEwan Signature Collection — Whisky series",
+      description:
+        "See 12 bottles in the Dramfool Jim McEwan Signature Collection series.",
+      alternates: {
+        canonical: "/series/421-dramfool-jim-mc-ewan-signature-collection",
+      },
+      openGraph: {
+        locale: "en_US",
+        siteName: "Peated",
+        url: "/series/421-dramfool-jim-mc-ewan-signature-collection",
+      },
       twitter: { card: "summary" },
     });
   });

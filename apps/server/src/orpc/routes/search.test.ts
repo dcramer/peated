@@ -1,6 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
+  bottleSeries,
+  bottleSeriesTombstones,
   bottleTombstones,
   entityReferences,
   entityTombstones,
@@ -9,6 +11,7 @@ import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import indexBottleSearchVectors from "@peated/server/worker/jobs/indexBottleSearchVectors";
+import indexBottleSeriesSearchVectors from "@peated/server/worker/jobs/indexBottleSeriesSearchVectors";
 import indexEntitySearchVectors from "@peated/server/worker/jobs/indexEntitySearchVectors";
 import { describe, expect, test } from "vitest";
 
@@ -97,6 +100,46 @@ describe("GET /search", () => {
       { type: "bottlers", total: 1, results: [{ id: bottler.id }] },
       { type: "companies", total: 1, results: [{ id: company.id }] },
       { type: "regions", total: 1, results: [{ id: region.id }] },
+    ]);
+  });
+
+  test("finds Series with Brand context and exact totals", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Dramfool" });
+    const first = await fixtures.BottleSeries({
+      name: "Jim McEwan Signature Collection",
+      brandId: brand.id,
+      numReleases: 12,
+    });
+    const second = await fixtures.BottleSeries({
+      name: "Jim McEwan Signature Archive",
+      brandId: brand.id,
+      numReleases: 4,
+    });
+    await Promise.all([
+      indexBottleSeriesSearchVectors({ seriesId: first.id }),
+      indexBottleSeriesSearchVectors({ seriesId: second.id }),
+    ]);
+
+    const data = await routerClient.search({
+      query: "Jim McEwan Signature",
+      scopes: ["series"],
+      limit: 1,
+    });
+
+    expect(data.groups).toMatchObject([
+      {
+        type: "series",
+        total: 2,
+        results: [
+          {
+            id: first.id,
+            peatedId: formatPeatedId("series", first.id),
+            brand: { id: brand.id, name: brand.name },
+          },
+        ],
+      },
     ]);
   });
 
@@ -366,11 +409,16 @@ describe("GET /search", () => {
     ]);
   });
 
-  test("resolves Bottle and Entity Peated ID tombstones directly", async ({
+  test("resolves Bottle, Entity, and Series Peated ID tombstones directly", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const entity = await fixtures.Entity({ type: [], kind: "company" });
+    const brand = await fixtures.Entity({ name: "Redirect Brand" });
+    const series = await fixtures.BottleSeries({
+      name: "Redirect Destination",
+      brandId: brand.id,
+    });
     await db.insert(bottleTombstones).values({
       bottleId: 9001,
       newBottleId: bottle.id,
@@ -379,8 +427,12 @@ describe("GET /search", () => {
       entityId: 9002,
       newEntityId: entity.id,
     });
+    await db.insert(bottleSeriesTombstones).values({
+      seriesId: 9003,
+      newSeriesId: series.id,
+    });
 
-    const [bottleData, entityData] = await Promise.all([
+    const [bottleData, entityData, seriesData] = await Promise.all([
       routerClient.search({
         query: formatPeatedId("bottle", 9001),
         scopes: ["bottles"],
@@ -388,6 +440,10 @@ describe("GET /search", () => {
       routerClient.search({
         query: formatPeatedId("entity", 9002),
         scopes: ["companies"],
+      }),
+      routerClient.search({
+        query: formatPeatedId("series", 9003),
+        scopes: ["series"],
       }),
     ]);
 
@@ -399,6 +455,10 @@ describe("GET /search", () => {
     expect(entityData.exact).toMatchObject({
       type: "entity",
       ref: { id: entity.id },
+    });
+    expect(seriesData.exact).toMatchObject({
+      type: "series",
+      ref: { id: series.id, brand: { id: brand.id } },
     });
   });
 

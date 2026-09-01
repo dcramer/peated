@@ -11,9 +11,11 @@ type Bottle = Outputs["bottles"]["list"]["results"][number];
 
 export type BottleListItemOptions = {
   includeBottler?: boolean;
+  includeBrandInName?: boolean;
   includeBrandRow?: boolean;
   includeRatings?: boolean;
   includeRelatedReleases?: boolean;
+  includeSeriesInName?: boolean;
 };
 
 /** Maps one API Bottle to the shared standard list presentation. */
@@ -21,9 +23,11 @@ export function toBottleListItem(
   bottle: Bottle,
   {
     includeBottler = false,
+    includeBrandInName,
     includeBrandRow = true,
     includeRatings = false,
     includeRelatedReleases = false,
+    includeSeriesInName = true,
   }: BottleListItemOptions = {},
 ): BottleListItem {
   const releaseDate = formatReleaseDate(bottle);
@@ -56,7 +60,8 @@ export function toBottleListItem(
       bottle.abv !== null ? `${formatAbv(bottle.abv)}% ABV` : null,
     ].filter((value): value is string => value !== null),
     name: formatBottleDisplayName(bottle, {
-      includeBrand: !includeBrandRow,
+      includeBrand: includeBrandInName ?? !includeBrandRow,
+      includeSeries: includeSeriesInName,
     }),
     ratings: includeRatings
       ? {

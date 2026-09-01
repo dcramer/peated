@@ -16,7 +16,11 @@ import {
   readRecentSearches,
   writeRecentSearches,
 } from "@peated/web/lib/recentSearches";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import {
+  getBottleSeriesUrl,
+  getBottleUrl,
+  getEntityUrl,
+} from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
 import {
@@ -33,6 +37,7 @@ import { space } from "../../styles/tokens.stylex";
 const searchScopes = [
   { label: "Everything", value: "all" },
   { label: "Bottles", value: "bottles" },
+  { label: "Series", value: "series" },
   { label: "Distillers", value: "distilleries" },
   { label: "Brands", value: "brands" },
   { label: "Bottlers", value: "bottlers" },
@@ -41,6 +46,7 @@ const searchScopes = [
 
 const allApiScopes = [
   "bottles",
+  "series",
   "distilleries",
   "brands",
   "bottlers",
@@ -60,6 +66,10 @@ type BottleSearchResult = Extract<
 type EntitySearchResult = Extract<
   SearchGroup,
   { type: "distilleries" }
+>["results"][number];
+type SeriesSearchResult = Extract<
+  SearchGroup,
+  { type: "series" }
 >["results"][number];
 type RegionSearchResult = Extract<
   SearchGroup,
@@ -143,8 +153,8 @@ function getApiScopes(scope: SearchScope, signedIn: boolean) {
 function getSearchingText(scope: SearchScope, signedIn: boolean) {
   if (scope === "all") {
     return signedIn
-      ? "Searching bottles, distillers, brands, bottlers, and members…"
-      : "Searching bottles, distillers, brands, and bottlers…";
+      ? "Searching bottles, series, distillers, brands, bottlers, and members…"
+      : "Searching bottles, series, distillers, brands, and bottlers…";
   }
   const label = searchScopes.find((option) => option.value === scope)?.label;
   return label ? `Searching ${label.toLocaleLowerCase()}…` : "Searching…";
@@ -196,6 +206,19 @@ function entityItem(entity: EntitySearchResult) {
   } satisfies SearchResultItem;
 }
 
+function seriesItem(series: SeriesSearchResult) {
+  return {
+    href: getBottleSeriesUrl(series),
+    id: `series-${series.id}`,
+    metadata: `${series.brand.name} · ${series.numReleases.toLocaleString("en-US")} ${series.numReleases === 1 ? "bottle" : "bottles"}`,
+    title: series.name,
+    visual: {
+      fallback: "S",
+      label: series.fullName,
+    },
+  } satisfies SearchResultItem;
+}
+
 function memberItem({ member, totalTastings }: MemberSearchResult) {
   return {
     href: `/users/${member.username}`,
@@ -227,6 +250,8 @@ function getGroupLabel(type: SearchGroup["type"]) {
   switch (type) {
     case "bottles":
       return "Bottles";
+    case "series":
+      return "Series";
     case "distilleries":
       return "Distillers";
     case "brands":
@@ -261,6 +286,8 @@ function groupItems(
   switch (group.type) {
     case "bottles":
       return group.results.map((bottle) => bottleItem(bottle, bottleOptions));
+    case "series":
+      return group.results.map(seriesItem);
     case "distilleries":
     case "brands":
     case "bottlers":
@@ -328,6 +355,7 @@ function groupMatchesScope(type: SearchGroup["type"], scope: SearchScope) {
 function exactMatchesScope(exact: SearchExact, scope: SearchScope) {
   if (scope === "all") return true;
   if (exact.type === "bottle") return scope === "bottles";
+  if (exact.type === "series") return scope === "series";
   return (
     (exact.ref.kind === "distillery" && scope === "distilleries") ||
     (exact.ref.kind === "brand" && scope === "brands") ||
@@ -348,6 +376,7 @@ function getResultScopeTotals(response: SearchResponse) {
   return {
     all: getResultCount(response, "all"),
     bottles: getResultCount(response, "bottles"),
+    series: getResultCount(response, "series"),
     distilleries: getResultCount(response, "distilleries"),
     brands: getResultCount(response, "brands"),
     bottlers: getResultCount(response, "bottlers"),
@@ -383,15 +412,17 @@ function getSearchSnapshot(
 }
 
 function exactItem(exact: SearchExact, bottleOptions: BottleItemOptions) {
-  return exact.type === "bottle"
-    ? bottleItem(exact.ref, bottleOptions)
-    : entityItem(exact.ref);
+  if (exact.type === "bottle") return bottleItem(exact.ref, bottleOptions);
+  if (exact.type === "series") return seriesItem(exact.ref);
+  return entityItem(exact.ref);
 }
 
 function nearestItem(nearest: SearchNearest, bottleOptions: BottleItemOptions) {
   switch (nearest.type) {
     case "bottles":
       return bottleItem(nearest.result, bottleOptions);
+    case "series":
+      return seriesItem(nearest.result);
     case "distilleries":
     case "brands":
     case "bottlers":
@@ -430,7 +461,7 @@ export function Search({
   onScopeChange,
   onSubmit,
   placement = "overlay",
-  placeholder = "bottles, distillers, brands…",
+  placeholder = "bottles, series, distillers, brands…",
   scopeValues,
   showBottleRatings = true,
   submitLabel,

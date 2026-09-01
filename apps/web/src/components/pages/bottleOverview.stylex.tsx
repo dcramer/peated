@@ -11,22 +11,18 @@ import {
   ImageAttribution,
   ItemList,
   ItemListItem,
-  RailList,
-  RailListItem,
   SectionHeading,
   TastingEntry,
 } from "..";
 import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import {
+  BottleRailSection,
+  type BottleRailItem,
+} from "./bottleRailSection.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 
-export type BottleRecommendation = {
-  end?: ReactNode;
-  href: string;
-  imageUrl?: string | null;
-  metadata?: string;
-  name: string;
-};
+export type BottleRecommendation = BottleRailItem;
 
 export type BottleOverviewImage = {
   label: string;
@@ -45,6 +41,7 @@ export type BottleOverviewProps = {
   recommendationHeading?: string;
   recommendationIntro?: string;
   recommendations?: readonly BottleRecommendation[];
+  railSections?: ReactNode;
   tastingCount?: number;
   tastings?: readonly TastingEntryProps[];
 };
@@ -60,6 +57,7 @@ export function BottleOverview({
   recommendationHeading = "If you liked this",
   recommendationIntro,
   recommendations = [],
+  railSections,
   tastingCount,
   tastings = [],
 }: BottleOverviewProps) {
@@ -145,32 +143,17 @@ export function BottleOverview({
           ) : null}
         </figure>
 
-        {recommendations.length ? (
-          <section {...stylex.props(styles.recommendations)}>
-            <h2 {...stylex.props(styles.railHeading)}>
-              {recommendationHeading}
-            </h2>
-            {recommendationIntro ? (
-              <p {...stylex.props(styles.railIntro)}>{recommendationIntro}</p>
+        {recommendations.length || railSections ? (
+          <div {...stylex.props(styles.railSections)}>
+            {recommendations.length ? (
+              <BottleRailSection
+                heading={recommendationHeading}
+                intro={recommendationIntro}
+                items={recommendations}
+              />
             ) : null}
-            <RailList ariaLabel={recommendationHeading}>
-              {recommendations.map((recommendation) => (
-                <RailListItem
-                  end={recommendation.end}
-                  href={recommendation.href}
-                  key={recommendation.href}
-                  leading={
-                    <BottleVisual
-                      imageUrl={recommendation.imageUrl}
-                      size="sm"
-                    />
-                  }
-                  metadata={recommendation.metadata}
-                  title={recommendation.name}
-                />
-              ))}
-            </RailList>
-          </section>
+            {railSections}
+          </div>
         ) : null}
       </aside>
     </div>
@@ -182,7 +165,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateAreas: {
       default: '"main rail"',
-      [NARROW]: '"facts" "media" "content" "recommendations"',
+      [NARROW]: '"facts" "media" "content" "railSections"',
     },
     gridTemplateColumns: {
       default: "minmax(0, 1fr) 336px",
@@ -227,12 +210,12 @@ const styles = stylex.create({
     marginTop: space.x2,
     color: colors.inkMuted,
   },
-  recommendations: {
-    gridArea: "recommendations",
+  railSections: {
+    gridArea: "railSections",
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
-    gap: space.x2,
+    gap: space.x8,
   },
   section: {
     minWidth: 0,
@@ -278,20 +261,5 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
-  },
-  railHeading: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
-  railIntro: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
   },
 });

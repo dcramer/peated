@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
+  AppLink,
   BottleRatings,
   Button,
   ButtonLink,
@@ -32,6 +33,7 @@ import { EntityLinks } from "@peated/web/components/entityLinks";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
+import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -41,11 +43,17 @@ import {
 import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import { selectOtherSeriesBottles } from "@peated/web/lib/seriesBottleRail";
+import {
+  getBottleSeriesUrl,
+  getBottleUrl,
+  getEntityUrl,
+} from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["details"];
 type RecommendationList = Outputs["bottles"]["recommendations"];
+type BottleList = Outputs["bottles"]["list"];
 type ExternalReviewList = Outputs["externalReviews"]["list"];
 type TastingList = Outputs["tastings"]["list"];
 type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
@@ -68,6 +76,14 @@ function getBottleEyebrow(bottle: Bottle) {
 
 function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
+    {
+      label: "Series",
+      value: bottle.series ? (
+        <AppLink href={getBottleSeriesUrl(bottle.series)}>
+          {bottle.series.name}
+        </AppLink>
+      ) : null,
+    },
     {
       label: "Category",
       value: bottle.category ? formatCategoryName(bottle.category) : null,
@@ -466,10 +482,12 @@ export function BottlePageFrameClient({
 export function BottleOverviewClient({
   initialRecommendations,
   initialReviews,
+  initialSeriesBottles,
   initialTastings,
 }: {
   initialRecommendations?: RecommendationList;
   initialReviews?: ExternalReviewList;
+  initialSeriesBottles?: BottleList;
   initialTastings?: TastingList;
 }) {
   const orpc = useORPC();
@@ -491,6 +509,17 @@ export function BottleOverviewClient({
       input: { bottle: bottle.id, limit: 3 },
     }),
     initialData: initialRecommendations,
+  });
+  const seriesBottlesQuery = useQuery({
+    ...orpc.bottles.list.queryOptions({
+      input: {
+        limit: 4,
+        series: bottle.series?.id,
+        sort: "-release",
+      },
+    }),
+    enabled: Boolean(bottle.series),
+    initialData: initialSeriesBottles,
   });
 
   const criticReviews =
@@ -523,6 +552,43 @@ export function BottleOverviewClient({
         .join(" · "),
       name: formatBottleDisplayName(recommendation),
     })) ?? [];
+  const otherSeriesBottles = seriesBottlesQuery.data
+    ? selectOtherSeriesBottles(seriesBottlesQuery.data.results, bottle.id).map(
+        (seriesBottle) => ({
+          href: getBottleUrl(seriesBottle),
+          imageUrl: seriesBottle.imageUrl,
+          metadata: [
+            formatCategoryName(seriesBottle.category),
+            getBottleReleasePlacement(seriesBottle).header,
+          ]
+            .filter((value): value is string => Boolean(value))
+            .join(" · "),
+          name: formatBottleDisplayName(seriesBottle, {
+            includeBrand: false,
+            includeSeries: false,
+          }),
+        }),
+      )
+    : [];
+  const seriesRail = !bottle.series ? null : seriesBottlesQuery.isPending ? (
+    <BottleRailSection heading="Other bottles in this series">
+      <LoadingList label="Loading other bottles in this series" rows={3} />
+    </BottleRailSection>
+  ) : seriesBottlesQuery.error ? (
+    <SectionError
+      heading="Other bottles in this series are unavailable"
+      onRetry={() => void seriesBottlesQuery.refetch()}
+    >
+      Try loading this list again.
+    </SectionError>
+  ) : otherSeriesBottles.length ? (
+    <BottleRailSection
+      heading="Other bottles in this series"
+      items={otherSeriesBottles}
+      moreHref={getBottleSeriesUrl(bottle.series)}
+      moreLabel={`See all ${(seriesBottlesQuery.data?.total ?? otherSeriesBottles.length + 1).toLocaleString("en-US")} bottles`}
+    />
+  ) : null;
   const mainPending =
     !criticReviews.length &&
     !tastings.length &&
@@ -582,6 +648,7 @@ export function BottleOverviewClient({
         moreTastingsHref={`${getBottleUrl(bottle)}/tastings`}
         recommendationIntro={recommendationsQuery.data?.reason}
         recommendations={recommendations}
+        railSections={seriesRail}
         tastingCount={bottle.totalTastings}
         tastings={tastings}
       />

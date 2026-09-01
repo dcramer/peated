@@ -1,19 +1,30 @@
 import { describe, expect, it } from "vitest";
 import {
   matchEntityRoute,
-  resolveBottlePeatedIdRoute,
+  resolveCatalogPeatedIdRoute,
   resolveEntityRoute,
 } from "./peatedIdRoutes";
 
 describe("Peated ID routes", () => {
   it("redirects Bottle IDs to the Bottle collection route", () => {
-    expect(resolveBottlePeatedIdRoute("/B0123")).toEqual({
+    expect(resolveCatalogPeatedIdRoute("/B0123")).toEqual({
       action: "redirect",
       pathname: "/bottles/123",
     });
-    expect(resolveBottlePeatedIdRoute("/b123")).toEqual({
+    expect(resolveCatalogPeatedIdRoute("/b123")).toEqual({
       action: "redirect",
       pathname: "/bottles/123",
+    });
+  });
+
+  it("redirects Series IDs to the Series collection route", () => {
+    expect(resolveCatalogPeatedIdRoute("/S0421")).toEqual({
+      action: "redirect",
+      pathname: "/series/421",
+    });
+    expect(resolveCatalogPeatedIdRoute("/s421")).toEqual({
+      action: "redirect",
+      pathname: "/series/421",
     });
   });
 
@@ -94,7 +105,7 @@ describe("Peated ID routes", () => {
   );
 
   it("does not claim unrelated or malformed routes", () => {
-    expect(resolveBottlePeatedIdRoute("/bottles/123")).toBeNull();
+    expect(resolveCatalogPeatedIdRoute("/bottles/123")).toBeNull();
     expect(matchEntityRoute("/bottles/123")).toBeNull();
     expect(matchEntityRoute("/distillers")).toBeNull();
     expect(matchEntityRoute("/entities/0")).toBeNull();

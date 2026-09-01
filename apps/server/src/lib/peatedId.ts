@@ -1,6 +1,7 @@
 export const PEATED_ID_PREFIXES = {
   bottle: "B",
   entity: "E",
+  series: "S",
 } as const;
 
 export type PeatedIdType = keyof typeof PEATED_ID_PREFIXES;
@@ -11,7 +12,7 @@ export type ParsedPeatedId = {
   peatedId: string;
 };
 
-const PEATED_ID_PATTERN = /^([BE])(\d+)$/i;
+const PEATED_ID_PATTERN = /^([BES])(\d+)$/i;
 const MINIMUM_DIGITS = 4;
 
 export function formatPeatedId(type: PeatedIdType, id: number): string {
@@ -26,7 +27,11 @@ export function parsePeatedId(value: string): ParsedPeatedId | null {
   const match = PEATED_ID_PATTERN.exec(value.trim());
   if (!match) return null;
 
-  const type = match[1].toUpperCase() === "B" ? "bottle" : "entity";
+  const prefix = match[1].toUpperCase();
+  let type: PeatedIdType;
+  if (prefix === "B") type = "bottle";
+  else if (prefix === "E") type = "entity";
+  else type = "series";
   const id = Number(match[2]);
   if (!Number.isSafeInteger(id) || id < 1) return null;
 

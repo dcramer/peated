@@ -54,6 +54,9 @@ export default mockOS.search.handler(async ({ input, context }) => {
       results: bottles.slice(0, input.limit),
     });
   }
+  if (input.scopes.includes("series")) {
+    groups.push({ type: "series", total: 0, results: [] });
+  }
   for (const scope of [
     "distilleries",
     "brands",
@@ -117,6 +120,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
         case "companies":
           return entity.kind === "company";
         case "bottles":
+        case "series":
         case "members":
         case "regions":
           return false;
@@ -133,6 +137,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
   const scopeTotals: MockOutputs["search"]["scopeTotals"] = input.includeFacets
     ? {
         bottles: mockBottles.length,
+        series: 0,
         distilleries: mockEntities.filter(
           (entity) => entity.kind === "distillery",
         ).length,

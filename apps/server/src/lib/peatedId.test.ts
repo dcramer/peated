@@ -1,9 +1,10 @@
 import { formatPeatedId, isCanonicalPeatedId, parsePeatedId } from "./peatedId";
 
 describe("Peated IDs", () => {
-  test("formats bottle and entity IDs", () => {
+  test("formats public catalog IDs", () => {
     expect(formatPeatedId("bottle", 123)).toBe("B0123");
     expect(formatPeatedId("entity", 123)).toBe("E0123");
+    expect(formatPeatedId("series", 123)).toBe("S0123");
     expect(formatPeatedId("bottle", 1234567)).toBe("B1234567");
   });
 
@@ -18,6 +19,11 @@ describe("Peated IDs", () => {
       id: 456,
       peatedId: "E0456",
     });
+    expect(parsePeatedId("s789")).toEqual({
+      type: "series",
+      id: 789,
+      peatedId: "S0789",
+    });
   });
 
   test("recognizes only canonical output", () => {
@@ -25,6 +31,7 @@ describe("Peated IDs", () => {
     expect(isCanonicalPeatedId("B123", "bottle")).toBe(false);
     expect(isCanonicalPeatedId("B000123", "bottle")).toBe(false);
     expect(isCanonicalPeatedId("b0123", "bottle")).toBe(false);
+    expect(isCanonicalPeatedId("S0123", "series")).toBe(true);
   });
 
   test.each(["", "B0", "B0000", "B-1", "B1.5", "X123", "BB123", "123"])(

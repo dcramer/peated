@@ -17,6 +17,13 @@ export function getBottleUrl(
   return `/bottles/${bottle.id}-${slug}`;
 }
 
+export function getBottleSeriesUrl(series: {
+  id: number;
+  fullName: string;
+}): `/series/${number}-${string}` {
+  return `/series/${series.id}-${createUrlSlug(series.fullName, "series")}`;
+}
+
 export function getEntityUrl(entity: {
   id: number;
   kind: EntityKind | null;
@@ -28,7 +35,10 @@ export function getEntityUrl(entity: {
   return `${collection}/${entity.id}-${createUrlSlug(entity.name, "entity")}`;
 }
 
-function createUrlSlug(value: string, fallback: "bottle" | "entity"): string {
+function createUrlSlug(
+  value: string,
+  fallback: "bottle" | "entity" | "series",
+): string {
   const asciiSlug = slugify(value);
   if (asciiSlug) return asciiSlug;
 

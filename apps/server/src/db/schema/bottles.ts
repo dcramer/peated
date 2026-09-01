@@ -142,6 +142,26 @@ export const bottleSeries = pgTable(
 export type BottleSeries = typeof bottleSeries.$inferSelect;
 export type NewBottleSeries = typeof bottleSeries.$inferInsert;
 
+/** Preserves public Series references after a merge or deletion. */
+export const bottleSeriesTombstones = pgTable("bottle_series_tombstone", {
+  seriesId: bigint("series_id", { mode: "number" }).primaryKey(),
+  newSeriesId: bigint("new_series_id", { mode: "number" }),
+});
+
+export const bottleSeriesTombstonesRelations = relations(
+  bottleSeriesTombstones,
+  ({ one }) => ({
+    newSeries: one(bottleSeries, {
+      fields: [bottleSeriesTombstones.newSeriesId],
+      references: [bottleSeries.id],
+    }),
+  }),
+);
+
+export type BottleSeriesTombstone = typeof bottleSeriesTombstones.$inferSelect;
+export type NewBottleSeriesTombstone =
+  typeof bottleSeriesTombstones.$inferInsert;
+
 /**
  * Represents one independently complete marketed release.
  *

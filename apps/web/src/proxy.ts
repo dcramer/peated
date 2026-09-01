@@ -2,7 +2,7 @@ import { isORPCNotFoundError } from "@peated/orpc/client/errors";
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import {
   matchEntityRoute,
-  resolveBottlePeatedIdRoute,
+  resolveCatalogPeatedIdRoute,
   resolveEntityRoute,
 } from "@peated/web/lib/peatedIdRoutes";
 import { type NextRequest, NextResponse } from "next/server";
@@ -18,7 +18,7 @@ export async function proxy(request: NextRequest) {
     `${request.nextUrl.pathname}${request.nextUrl.search}`,
   );
   const entityMatch = matchEntityRoute(request.nextUrl.pathname);
-  let resolution = resolveBottlePeatedIdRoute(request.nextUrl.pathname);
+  let resolution = resolveCatalogPeatedIdRoute(request.nextUrl.pathname);
 
   if (entityMatch) {
     try {
