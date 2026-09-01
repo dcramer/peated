@@ -26,11 +26,21 @@ interface EntityAttrs {
 export const EntitySerializer = serializer({
   name: "entity",
   attrs: async (itemList: Entity[], currentUser?: User) => {
-    const itemIds = itemList.map((item) => item.id);
-    const followedEntityIds = new Set(
-      currentUser && itemIds.length
-        ? (
-            await db
+    const itemIds = [...new Set(itemList.map((item) => item.id))];
+    const countryIds = [
+      ...new Set(itemList.map((item) => item.countryId).filter(notEmpty)),
+    ];
+    const regionIds = [
+      ...new Set(itemList.map((item) => item.regionId).filter(notEmpty)),
+    ];
+    const ownerIds = [
+      ...new Set(itemList.map((item) => item.ownerId).filter(notEmpty)),
+    ];
+
+    const [followedEntityList, countryList, regionList, ownerList] =
+      await Promise.all([
+        currentUser && itemIds.length
+          ? db
               .select({ entityId: entityFollows.entityId })
               .from(entityFollows)
               .where(
@@ -39,16 +49,24 @@ export const EntitySerializer = serializer({
                   inArray(entityFollows.entityId, itemIds),
                 ),
               )
-          ).map(({ entityId }) => entityId)
-        : [],
+          : [],
+        countryIds.length
+          ? db.select().from(countries).where(inArray(countries.id, countryIds))
+          : [],
+        regionIds.length
+          ? db.select().from(regions).where(inArray(regions.id, regionIds))
+          : [],
+        ownerIds.length
+          ? db
+              .select({ id: entities.id, name: entities.name })
+              .from(entities)
+              .where(inArray(entities.id, ownerIds))
+          : [],
+      ]);
+
+    const followedEntityIds = new Set(
+      followedEntityList.map(({ entityId }) => entityId),
     );
-    const countryIds = itemList.map((i) => i.countryId).filter(notEmpty);
-    const countryList = countryIds.length
-      ? await db
-          .select()
-          .from(countries)
-          .where(inArray(countries.id, countryIds))
-      : [];
 
     const countriesById = countryList.length
       ? Object.fromEntries(
@@ -58,11 +76,6 @@ export const EntitySerializer = serializer({
         )
       : {};
 
-    const regionIds = itemList.map((i) => i.regionId).filter(notEmpty);
-    const regionList = regionIds.length
-      ? await db.select().from(regions).where(inArray(regions.id, regionIds))
-      : [];
-
     const regionsById = regionList.length
       ? Object.fromEntries(
           (await serialize(RegionSerializer, regionList, currentUser)).map(
@@ -71,13 +84,6 @@ export const EntitySerializer = serializer({
         )
       : {};
 
-    const ownerIds = itemList.map((item) => item.ownerId).filter(notEmpty);
-    const ownerList = ownerIds.length
-      ? await db
-          .select({ id: entities.id, name: entities.name })
-          .from(entities)
-          .where(inArray(entities.id, ownerIds))
-      : [];
     const ownersById = Object.fromEntries(
       ownerList.map((owner) => [
         owner.id,
