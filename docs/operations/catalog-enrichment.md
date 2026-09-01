@@ -122,6 +122,29 @@ Follow `rel.nextCursor` until every page is loaded. Before a write, check the
 live [OpenAPI specification](https://api.peated.com/spec.json). Do not rely on a
 stale checkout or an old request shape.
 
+For a Bottle whose facts a moderator already checked, use the normal create
+route and set `reviewed` to `true`. Only moderators and administrators can use
+this option. The server updates search and counts, but it does not generate
+details or start another automated check.
+
+Include the option with the reviewed Bottle fields:
+
+```json
+{
+  "name": "Reviewed release",
+  "brand": 123,
+  "reviewed": true
+}
+```
+
+```bash
+pnpm cli api post /bottles --input /tmp/reviewed-bottle.json
+pnpm cli api get /bottles/123
+```
+
+Leave out `reviewed` for manual entry. Do not set it when the source facts or
+Bottle identity are uncertain.
+
 Put each patch in a temporary JSON file. Send only the fields supported by the
 evidence.
 

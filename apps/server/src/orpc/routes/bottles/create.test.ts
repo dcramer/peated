@@ -55,6 +55,64 @@ describe("POST /bottles", () => {
     expect(await db.select().from(bottleGroups)).toEqual(graphBefore.groups);
   });
 
+  test("lets a moderator create a bottle whose facts are already checked", async ({
+    fixtures,
+  }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity();
+    const result = await routerClient.bottles.create(
+      {
+        name: "Reviewed release",
+        brand: brand.id,
+        description: "Text copied from the official product page.",
+        descriptionSrc: "user",
+        reviewed: true,
+      },
+      { context: { user: moderator } },
+    );
+
+    expect(result).toMatchObject({
+      name: "Reviewed release",
+      description: "Text copied from the official product page.",
+      descriptionSrc: "user",
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: result.id,
+      generateDetails: false,
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "VerifyBottleCreation",
+      {
+        bottleId: result.id,
+        creationSource: "repair_workflow",
+      },
+      { delay: 5000 },
+    );
+  });
+
+  test("rejects the reviewed option from other users without writing", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity();
+    const error = await waitError(
+      routerClient.bottles.create(
+        {
+          name: "Denied reviewed release",
+          brand: brand.id,
+          reviewed: true,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      status: 403,
+      message: "Only moderators can mark a bottle as reviewed.",
+    });
+    expect(await db.select().from(bottles)).toHaveLength(0);
+  });
+
   test("rejects invalid numeric fields at the route boundary", async ({
     fixtures,
     defaults,
@@ -383,6 +441,7 @@ describe("POST /bottles", () => {
       maturation: bottle.maturation,
       outturn: bottle.outturn,
       description: bottle.description,
+      descriptionSrc: bottle.descriptionSrc,
     });
     expect(bottle.createdByActorId).toBe(
       (await getUserActor(defaults.user)).id,

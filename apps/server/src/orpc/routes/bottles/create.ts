@@ -1,4 +1,4 @@
-import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
+import { BottleCreateRequestSchema } from "@peated/server/lib/bottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
@@ -27,13 +27,22 @@ export default procedure
       operationId: "createBottle",
     }),
   })
-  .input(BottleCreateInputSchema)
+  .input(BottleCreateRequestSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
+    const { reviewed, ...bottleInput } = input;
+    if (reviewed && !context.user.admin && !context.user.mod) {
+      throw errors.FORBIDDEN({
+        message: "Only moderators can mark a bottle as reviewed.",
+      });
+    }
+
     try {
       const result = await createBottle({
         context,
-        input,
+        input: bottleInput,
+        creationSource: reviewed ? "repair_workflow" : "manual_entry",
+        generateDetails: !reviewed,
       });
       return await serialize(
         BottleSerializer,

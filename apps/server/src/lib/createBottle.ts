@@ -713,14 +713,16 @@ export async function finalizeCreatedBottle(
   { bottle, seriesCreated, newEntityIds }: BottleCreateResult,
   {
     creationSource = "manual_entry",
+    generateDetails = true,
   }: {
     creationSource?: CatalogVerificationCreationSource;
+    generateDetails?: boolean;
   } = {},
 ) {
   try {
     await pushUniqueJob("OnBottleChange", {
       bottleId: bottle.id,
-      generateDetails: true,
+      generateDetails,
     });
   } catch (err) {
     logError(err, {
@@ -795,10 +797,12 @@ type BottleCreateInputCandidate = Partial<
 async function createBottleForActor({
   actorId,
   creationSource,
+  generateDetails = true,
   input: rawInput,
 }: {
   actorId: number;
   creationSource: CatalogVerificationCreationSource;
+  generateDetails?: boolean;
   input: BottleCreateInputCandidate;
 }): Promise<CreateBottleResult> {
   const input = BottleCreateInputSchema.parse(rawInput);
@@ -810,7 +814,7 @@ async function createBottleForActor({
     }),
   );
 
-  await finalizeCreatedBottle(result, { creationSource });
+  await finalizeCreatedBottle(result, { creationSource, generateDetails });
   return {
     bottle: result.bottle,
     group: result.group,
@@ -820,15 +824,22 @@ async function createBottleForActor({
 /** Parses untrusted input once and owns transaction plus post-commit dispatch. */
 export async function createBottle({
   creationSource = "manual_entry",
+  generateDetails = true,
   input,
   context,
 }: {
   creationSource?: CatalogVerificationCreationSource;
+  generateDetails?: boolean;
   input: BottleCreateInputCandidate;
   context: Context & { user: User };
 }): Promise<CreateBottleResult> {
   const actor = await getUserActor(context.user);
-  return createBottleForActor({ actorId: actor.id, creationSource, input });
+  return createBottleForActor({
+    actorId: actor.id,
+    creationSource,
+    generateDetails,
+    input,
+  });
 }
 
 /** Trusted scraper capability; automated creation is always Peated-owned. */

@@ -258,6 +258,7 @@ export const BottleSerializer = serializer({
 
       category: item.category,
       description: item.description,
+      descriptionSrc: item.descriptionSrc,
       flavorProfile: item.flavorProfile,
       tastingNotes: item.tastingNotes,
 

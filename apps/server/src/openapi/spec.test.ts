@@ -184,6 +184,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(getOperationIds(spec)).not.toContain("deleteBottleRelease");
 
     expect(spec.paths?.["/bottles"]?.post?.operationId).toBe("createBottle");
+    expect(spec.paths?.["/admin/catalog/bottles"]).toBeUndefined();
     expect(spec.paths?.["/bottles/{bottle}"]?.patch?.operationId).toBe(
       "updateBottle",
     );
@@ -192,6 +193,14 @@ describe("OpenAPI generation ($ref reuse)", () => {
     ).toBe("getBottleEditContext");
 
     expectBottleResponse(getJsonResponseSchema(spec.paths?.["/bottles"]?.post));
+    const createBottleRequest = getJsonRequestSchema(
+      spec.paths?.["/bottles"]?.post,
+    );
+    expect(createBottleRequest?.properties?.reviewed).toMatchObject({
+      type: "boolean",
+      default: false,
+      description: "Mark facts that a moderator already checked.",
+    });
     expectBottleResponse(
       getJsonResponseSchema(spec.paths?.["/bottles/{bottle}"]?.patch),
     );

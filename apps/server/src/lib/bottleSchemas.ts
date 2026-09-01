@@ -149,6 +149,13 @@ export const BottleCreateInputSchema = BottleCreateFieldsSchema.superRefine(
 
 export type BottleCreateInput = z.infer<typeof BottleCreateInputSchema>;
 
+export const BottleCreateRequestSchema = BottleCreateFieldsSchema.extend({
+  reviewed: z
+    .boolean()
+    .default(false)
+    .describe("Mark facts that a moderator already checked."),
+}).superRefine(validateBottleCreateInput);
+
 const BottlePatchFieldsSchema = z
   .object({
     name: BottleGroupFields.name.optional(),
