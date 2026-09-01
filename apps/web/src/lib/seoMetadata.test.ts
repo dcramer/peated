@@ -42,12 +42,12 @@ describe("SEO metadata", () => {
     expect(metadata).toMatchObject({
       title: "Lagavulin 16-year-old",
       description: "A smoky Islay single malt.",
-      alternates: { canonical: "/bottles/42" },
+      alternates: { canonical: "/bottles/42-lagavulin-16-year-old" },
       openGraph: {
         locale: "en_US",
         siteName: "Peated",
         title: "Lagavulin 16-year-old",
-        url: "/bottles/42",
+        url: "/bottles/42-lagavulin-16-year-old",
         images: [
           {
             url: "https://images.peated.com/lagavulin.jpg",
@@ -94,11 +94,11 @@ describe("SEO metadata", () => {
       title: "Lagavulin — Whisky distillery",
       description:
         "See details for Lagavulin, a whisky distillery, in the Peated whisky database.",
-      alternates: { canonical: "/distillers/12" },
+      alternates: { canonical: "/distillers/12-lagavulin" },
       openGraph: {
         locale: "en_US",
         siteName: "Peated",
-        url: "/distillers/12",
+        url: "/distillers/12-lagavulin",
         images: [
           {
             url: "https://images.peated.com/lagavulin-distillery.jpg",

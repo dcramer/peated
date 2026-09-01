@@ -1,21 +1,10 @@
-import { notFound } from "next/navigation";
+import type { BottleDisplayNameSource } from "@peated/server/lib/bottleDisplayName";
+import { getBottleUrl } from "./urls";
 
 type ReleaseFamilyGroup = {
   id: number;
   representativeBottleId: number | null;
 };
-
-export function parseReleaseFamilyRouteId(value: string): number {
-  if (!/^[1-9]\d*$/.test(value)) {
-    notFound();
-  }
-
-  const bottleId = Number(value);
-  if (!Number.isSafeInteger(bottleId)) {
-    notFound();
-  }
-  return bottleId;
-}
 
 export function requireReleaseFamilyGroup<
   Group extends ReleaseFamilyGroup,
@@ -44,11 +33,11 @@ export function requireReleaseFamilyAnchor(group: ReleaseFamilyGroup): number {
 }
 
 export function getReleaseFamilyHref(
-  anchorBottleId: number,
+  anchorBottle: BottleDisplayNameSource & { id: number },
   search = "",
 ): string {
-  if (!Number.isSafeInteger(anchorBottleId) || anchorBottleId < 1) {
+  if (!Number.isSafeInteger(anchorBottle.id) || anchorBottle.id < 1) {
     throw new Error("A valid Bottle anchor is required for a release family.");
   }
-  return `/bottles/${anchorBottleId}/releases${search}`;
+  return `${getBottleUrl(anchorBottle)}/releases${search}`;
 }

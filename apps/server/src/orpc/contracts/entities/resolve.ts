@@ -15,5 +15,6 @@ export default contract
     z.object({
       id: z.number().readonly(),
       kind: EntityKindEnum,
+      name: z.string(),
     }),
   );

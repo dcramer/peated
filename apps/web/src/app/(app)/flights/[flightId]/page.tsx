@@ -15,7 +15,7 @@ import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { cache } from "react";
 
 import { FlightActions } from "./flightActions";
@@ -70,6 +70,7 @@ export default async function FlightPage(props: {
                   brandHref={getEntityUrl({
                     id: bottle.brand.id,
                     kind: "brand",
+                    name: bottle.brand.name,
                   })}
                   end={
                     <ButtonLink
@@ -85,7 +86,7 @@ export default async function FlightPage(props: {
                     </ButtonLink>
                   }
                   hasTasted={hasTasted}
-                  href={`/bottles/${bottle.id}`}
+                  href={getBottleUrl(bottle)}
                   imageUrl={bottle.imageUrl}
                   isLibrary={isLibrary}
                   metadata={getBottleMetadata(bottle).split(" · ")}

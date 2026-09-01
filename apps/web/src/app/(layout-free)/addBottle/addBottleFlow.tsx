@@ -45,6 +45,7 @@ import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { TastingTagSuggestion } from "@peated/web/lib/tastingForm";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -113,7 +114,7 @@ function getSearchHref(
 }
 
 function getViewBottleHref(bottle: Bottle) {
-  return `/bottles/${bottle.id}`;
+  return getBottleUrl(bottle);
 }
 
 function canSaveBottleToLibrary(selection: FlowBottle) {
@@ -622,9 +623,9 @@ function AddBottleFlowContent() {
   const [loadingTastingDraft, setLoadingTastingDraft] = useState(false);
   const userLibraryHref = user ? `/users/${user.username}/library` : "/library";
   const inlineBottleHref = useCallback(
-    (bottleId: number) =>
+    (bottle: { id: number }) =>
       getAddBottleHref({
-        bottleId,
+        bottleId: bottle.id,
         intent: getCreateReturnAction(intent),
       }),
     [intent],
@@ -1035,7 +1036,7 @@ function AddBottleFlowContent() {
     });
 
     flash("Review saved.", "info");
-    router.push(`/bottles/${review.bottleId}`);
+    router.push(getBottleUrl(tastingDraft.bottle));
   }
 
   if (loadingBottle) {

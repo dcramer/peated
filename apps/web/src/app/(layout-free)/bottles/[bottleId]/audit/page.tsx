@@ -15,6 +15,7 @@ import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { use, useState, type FormEvent } from "react";
@@ -46,7 +47,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
   ) {
     event.preventDefault();
     if (summary) {
-      router.push(`/bottles/${bottle.id}`);
+      router.push(getBottleUrl(bottle));
       return;
     }
 

@@ -12,6 +12,7 @@ import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -298,7 +299,7 @@ function CreateBottleForm() {
             }),
           );
         } else if (returnAction === "view") {
-          router.replace(`/bottles/${createdBottle.id}`);
+          router.replace(getBottleUrl(createdBottle));
         } else if (returnAction === "catalog" || returnAction === "choose") {
           router.replace(
             getAddBottleHref({
@@ -322,7 +323,7 @@ function CreateBottleForm() {
         } else if (returnTo) {
           router.push(returnTo);
         } else {
-          router.replace(`/bottles/${createdBottle.id}`);
+          router.replace(getBottleUrl(createdBottle));
         }
       }}
       initialData={initialData}

@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
+import { bottleHrefSelector } from "./assertions";
 import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
@@ -171,14 +172,14 @@ test.describe("profile library", () => {
 });
 
 function libraryBottleLink(page: Page, bottleId: number) {
-  return page.locator(`a[href="/bottles/${bottleId}"]`).first();
+  return page.locator(bottleHrefSelector(bottleId)).first();
 }
 
 function libraryBottleRow(page: Page, bottleId: number) {
   return page
     .locator("li")
     .filter({
-      has: page.locator(`a[href="/bottles/${bottleId}"]`),
+      has: page.locator(bottleHrefSelector(bottleId)),
     })
     .filter({ visible: true });
 }

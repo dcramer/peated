@@ -8,15 +8,15 @@ import {
 } from "@peated/web/components";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import {
-  parseReleaseFamilyRouteId,
   requireReleaseFamilyAnchor,
   requireReleaseFamilyGroup,
 } from "@peated/web/lib/releaseFamily";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -24,7 +24,7 @@ export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = await props.params;
-  const { group } = await getReleaseGroup(parseReleaseFamilyRouteId(bottleId));
+  const { group } = await getReleaseGroup(parseCatalogRouteId(bottleId));
   return {
     title: `${group.fullName} releases`,
     description: `Explore releases of ${group.fullName}.`,
@@ -39,9 +39,9 @@ export default async function BottleReleasesPage(props: {
     props.params,
     props.searchParams,
   ]);
-  const anchorId = parseReleaseFamilyRouteId(bottleId);
+  const anchorId = parseCatalogRouteId(bottleId);
   const cursor = Number(searchParams.cursor ?? 1) || 1;
-  const { client, group } = await getReleaseGroup(anchorId);
+  const { anchorBottle, client, group } = await getReleaseGroup(anchorId);
   const bottleList = await resolveOrNotFound(
     client.bottleGroups.bottles({
       cursor,
@@ -51,7 +51,7 @@ export default async function BottleReleasesPage(props: {
       sort: "-tastings",
     }),
   );
-  const pathname = `/bottles/${anchorId}/releases`;
+  const pathname = `${getBottleUrl(anchorBottle)}/releases`;
 
   return (
     <BottleSection heading="Releases">
@@ -64,13 +64,14 @@ export default async function BottleReleasesPage(props: {
                 brandHref={getEntityUrl({
                   id: bottle.brand.id,
                   kind: "brand",
+                  name: bottle.brand.name,
                 })}
                 end={
                   bottle.medianScore !== null && bottle.scoreCount >= 20
                     ? `${bottle.medianScore} / 100`
                     : undefined
                 }
-                href={`/bottles/${bottle.id}`}
+                href={getBottleUrl(bottle)}
                 imageUrl={bottle.imageUrl}
                 metadata={getBottleMetadata(bottle).split(" · ")}
                 name={formatBottleDisplayName(bottle, {
@@ -113,5 +114,5 @@ async function getReleaseGroup(anchorId: number) {
     client.bottleGroups.details({ group: summary.id }),
   );
   requireReleaseFamilyAnchor(group);
-  return { client, group };
+  return { anchorBottle, client, group };
 }

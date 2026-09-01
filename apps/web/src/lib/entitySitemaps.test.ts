@@ -53,6 +53,7 @@ describe("Entity sitemaps", () => {
           {
             id: 1001,
             kind: "brand",
+            name: "Lagavulin",
             updatedAt: "2026-08-27T12:00:00.000Z",
           },
         ],
@@ -63,6 +64,7 @@ describe("Entity sitemaps", () => {
           {
             id: 1002,
             kind: "brand",
+            name: "Ardbeg",
             updatedAt: "2026-08-28T12:00:00.000Z",
           },
         ],
@@ -72,11 +74,11 @@ describe("Entity sitemaps", () => {
     await expect(loadEntitySitemapPage(2, listEntities)).resolves.toEqual({
       pages: [
         {
-          url: "/brands/1001",
+          url: "/brands/1001-lagavulin",
           lastModified: "2026-08-27T12:00:00.000Z",
         },
         {
-          url: "/brands/1002",
+          url: "/brands/1002-ardbeg",
           lastModified: "2026-08-28T12:00:00.000Z",
         },
       ],

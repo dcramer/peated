@@ -5,7 +5,7 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 export type Entity = Outputs["entities"]["details"];
 type EntityTabSource = Pick<
   Entity,
-  "id" | "kind" | "shortName" | "totalBottles" | "totalTastings"
+  "id" | "kind" | "name" | "shortName" | "totalBottles" | "totalTastings"
 >;
 const entityKindPresentation = {
   bottler: {
@@ -90,7 +90,7 @@ export function getEntityTabs(
 }
 
 export function getEntityCurrentHref(
-  entity: Pick<Entity, "id" | "kind" | "peatedId">,
+  entity: Pick<Entity, "id" | "kind" | "name" | "peatedId">,
   pathname: string,
 ) {
   return pathname === `/${entity.peatedId}` ? getEntityUrl(entity) : pathname;

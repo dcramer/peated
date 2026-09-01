@@ -24,6 +24,7 @@ import type { ExcludedOperationField } from "@peated/web/components/bottleChecks
 import OperationCard from "@peated/web/components/bottleChecks/operationCard.stylex";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import {
   useMutation,
   useQuery,
@@ -282,7 +283,7 @@ function ListingTask({
         <AdminSection title="Recommended bottle" tone="accent">
           <strong>{formatBottleDisplayName(item.suggestedBottle)}</strong>
           {" · "}
-          <AdminTextLink href={`/bottles/${item.suggestedBottle.id}`}>
+          <AdminTextLink href={getBottleUrl(item.suggestedBottle)}>
             View bottle #{item.suggestedBottle.id}
           </AdminTextLink>
         </AdminSection>

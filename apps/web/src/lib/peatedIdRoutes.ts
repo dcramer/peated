@@ -9,12 +9,13 @@ export type PeatedIdRouteResolution = {
 
 const ROOT_PEATED_ID_PATTERN = /^\/([BE]\d+)\/?$/i;
 const PUBLIC_ENTITY_PATTERN =
-  /^\/(brands|distillers|bottlers|companies)\/([1-9]\d*)(\/.*)?$/;
-const LEGACY_ENTITY_PATTERN = /^\/entities\/([1-9]\d*)(\/.*)?$/;
+  /^\/(brands|distillers|bottlers|companies)\/([1-9]\d*)(?:-[^/]+)?(\/.*)?$/;
+const LEGACY_ENTITY_PATTERN = /^\/entities\/([1-9]\d*)(?:-[^/]+)?(\/.*)?$/;
 
 export type EntityRouteMatch = {
   entityId: number;
   kind: EntityKind | null;
+  pathname: string;
   source: "collection" | "legacy" | "peated-id";
   suffix: string;
 };
@@ -68,6 +69,7 @@ export function matchEntityRoute(pathname: string): EntityRouteMatch | null {
     return {
       entityId: parsed.id,
       kind: null,
+      pathname,
       source: "peated-id",
       suffix: "",
     };
@@ -78,12 +80,14 @@ export function matchEntityRoute(pathname: string): EntityRouteMatch | null {
     const entityId = parseEntityId(entityMatch[2]);
     const kind = getEntityKind(entityMatch[1]);
     if (!entityId || !kind) return null;
+    const suffix = normalizeSuffix(entityMatch[3]);
 
     return {
       entityId,
       kind,
+      pathname: suffix ? pathname.slice(0, -suffix.length) : pathname,
       source: "collection",
-      suffix: normalizeSuffix(entityMatch[3]),
+      suffix,
     };
   }
 
@@ -91,12 +95,14 @@ export function matchEntityRoute(pathname: string): EntityRouteMatch | null {
   if (legacyMatch) {
     const entityId = parseEntityId(legacyMatch[1]);
     if (!entityId) return null;
+    const suffix = normalizeSuffix(legacyMatch[2]);
 
     return {
       entityId,
       kind: null,
+      pathname: suffix ? pathname.slice(0, -suffix.length) : pathname,
       source: "legacy",
-      suffix: normalizeSuffix(legacyMatch[2]),
+      suffix,
     };
   }
 
@@ -105,19 +111,20 @@ export function matchEntityRoute(pathname: string): EntityRouteMatch | null {
 
 export function resolveEntityRoute(
   match: EntityRouteMatch,
-  entity: { id: number; kind: EntityKind },
+  entity: { id: number; kind: EntityKind; name: string },
 ): PeatedIdRouteResolution {
   const suffix = match.suffix;
-  const canonicalPath = `${getEntityUrl(entity)}${suffix}`;
+  const canonicalPath = getEntityUrl(entity);
   const canonicalRequest =
     match.source === "collection" &&
     match.entityId === entity.id &&
-    match.kind === entity.kind;
+    match.kind === entity.kind &&
+    match.pathname === canonicalPath;
 
   return canonicalRequest
     ? {
         action: "rewrite",
         pathname: `/entities/${entity.id}${suffix}`,
       }
-    : { action: "redirect", pathname: canonicalPath };
+    : { action: "redirect", pathname: `${canonicalPath}${suffix}` };
 }

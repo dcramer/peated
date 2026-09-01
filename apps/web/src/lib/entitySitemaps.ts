@@ -46,7 +46,7 @@ export const ENTITY_SITEMAP_COLLECTIONS = [
 export type EntitySitemapCollection =
   (typeof ENTITY_SITEMAP_COLLECTIONS)[number];
 
-type SitemapEntity = Pick<Entity, "id" | "kind" | "updatedAt">;
+type SitemapEntity = Pick<Entity, "id" | "kind" | "name" | "updatedAt">;
 
 export type ListSitemapEntities = (input: {
   cursor: number;

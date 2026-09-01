@@ -41,7 +41,7 @@ import {
 import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 type Bottle = Outputs["bottles"]["details"];
@@ -192,7 +192,7 @@ function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
 }
 
 function getTabs(bottle: Bottle): [PageTabItem, ...PageTabItem[]] {
-  const baseUrl = `/bottles/${bottle.id}`;
+  const baseUrl = getBottleUrl(bottle);
   const tabs: [PageTabItem, ...PageTabItem[]] = [
     { href: baseUrl, label: "Overview" },
     {
@@ -385,7 +385,7 @@ export function BottlePageFrameClient({
 
   const bottle = bottleQuery.data;
   const currentHref =
-    pathname === `/${bottle.peatedId}` ? `/bottles/${bottle.id}` : pathname;
+    pathname === `/${bottle.peatedId}` ? getBottleUrl(bottle) : pathname;
 
   return (
     <BottlePageContext.Provider value={bottle}>
@@ -412,7 +412,11 @@ export function BottlePageFrameClient({
               : null
           }
           brand={bottle.brand.shortName || bottle.brand.name}
-          brandHref={getEntityUrl({ id: bottle.brand.id, kind: "brand" })}
+          brandHref={getEntityUrl({
+            id: bottle.brand.id,
+            kind: "brand",
+            name: bottle.brand.name,
+          })}
           eyebrow={getBottleEyebrow(bottle)}
           menu={<BottleActions bottle={bottle} />}
           name={formatBottleDisplayName(bottle, { includeBrand: false })}
@@ -499,7 +503,7 @@ export function BottleOverviewClient({
           scoreCount={recommendation.scoreCount}
         />
       ),
-      href: `/bottles/${recommendation.id}`,
+      href: getBottleUrl(recommendation),
       imageUrl: recommendation.imageUrl,
       metadata: [
         formatCategoryName(recommendation.category),
@@ -567,7 +571,7 @@ export function BottleOverviewClient({
           url: bottle.imageUrl,
         }}
         mainState={mainState}
-        moreTastingsHref={`/bottles/${bottle.id}/tastings`}
+        moreTastingsHref={`${getBottleUrl(bottle)}/tastings`}
         recommendationIntro={recommendationsQuery.data?.reason}
         recommendations={recommendations}
         tastingCount={bottle.totalTastings}

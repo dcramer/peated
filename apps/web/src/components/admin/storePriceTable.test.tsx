@@ -116,7 +116,9 @@ describe("StorePriceTable", () => {
       <StorePriceTable priceList={[makePrice({ bottle })]} />,
     );
 
-    expect(html).toContain('href="/bottles/19"');
+    expect(html).toContain(
+      'href="/bottles/19-springbank-12-cask-strength-batch-24"',
+    );
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
   });
 

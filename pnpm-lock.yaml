@@ -487,6 +487,9 @@ importers:
       '@simplewebauthn/browser':
         specifier: ^13.2.2
         version: 13.2.2
+      '@sindresorhus/slugify':
+        specifier: ^2.2.1
+        version: 2.2.1
       '@stylexjs/stylex':
         specifier: 0.19.0
         version: 0.19.0

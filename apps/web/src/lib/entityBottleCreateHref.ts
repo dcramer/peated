@@ -5,11 +5,15 @@ import { getEntityUrl } from "./urls";
 export function getEntityBottleCreateHref({
   id,
   kind,
+  name,
 }: {
   id: number;
   kind: EntityKind | null;
+  name: string;
 }) {
-  const params = new URLSearchParams({ returnTo: getEntityUrl({ id, kind }) });
+  const params = new URLSearchParams({
+    returnTo: getEntityUrl({ id, kind, name }),
+  });
 
   switch (kind) {
     case "brand":

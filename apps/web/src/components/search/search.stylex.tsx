@@ -16,7 +16,7 @@ import {
   readRecentSearches,
   writeRecentSearches,
 } from "@peated/web/lib/recentSearches";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
 import {
@@ -87,7 +87,7 @@ export type SearchProps = {
   browseHeader?: ReactNode;
   contributionLabel?: string;
   defaultOpen?: boolean;
-  getBottleHref?: (bottleId: number) => string;
+  getBottleHref?: (bottle: BottleSearchResult) => string;
   getContributionHref?: (query: string) => string;
   initialQuery?: string;
   initialResponse?: SearchResponse;
@@ -105,10 +105,6 @@ export type SearchProps = {
 
 const SEARCH_DEBOUNCE_MS = 140;
 const SEARCH_INDICATOR_FLOOR_MS = 250;
-
-function getDefaultBottleHref(bottleId: number) {
-  return `/bottles/${bottleId}`;
-}
 
 function getDefaultContributionHref(query: string) {
   return getCreateBottleHref({ query });
@@ -160,12 +156,12 @@ function bottleItem(
     getBottleHref,
     showRatings,
   }: {
-    getBottleHref: (bottleId: number) => string;
+    getBottleHref: (bottle: BottleSearchResult) => string;
     showRatings: boolean;
   },
 ) {
   return {
-    href: getBottleHref(bottle.id),
+    href: getBottleHref(bottle),
     id: `bottle-${bottle.id}`,
     ratings: showRatings
       ? {
@@ -425,7 +421,7 @@ export function Search({
   browseHeader,
   contributionLabel = "Add a new bottle",
   defaultOpen = false,
-  getBottleHref = getDefaultBottleHref,
+  getBottleHref = getBottleUrl,
   getContributionHref = getDefaultContributionHref,
   initialQuery = "",
   initialResponse,

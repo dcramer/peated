@@ -9,5 +9,5 @@ export default mockOS.entities.resolve.handler(async ({ input, errors }) => {
     throw errors.NOT_FOUND({ message: "Mock entity not found." });
   }
 
-  return { id: entity.id, kind: entity.kind };
+  return { id: entity.id, kind: entity.kind, name: entity.name };
 });

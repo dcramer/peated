@@ -3,9 +3,9 @@ import type { Product, WithContext } from "schema-dts";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
-import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
 import { getBottleSeoMetadata } from "@peated/web/lib/seoMetadata";
 import type { Metadata } from "next";
 
@@ -15,7 +15,7 @@ export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
 }): Promise<Metadata> {
   const { bottleId } = await props.params;
-  const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
+  const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
   return getBottleSeoMetadata(bottle);
 }
 
@@ -24,9 +24,7 @@ export default async function BottleLayout(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = await props.params;
-  const canonicalBottle = await getBottlePage(
-    parseReleaseFamilyRouteId(bottleId),
-  );
+  const canonicalBottle = await getBottlePage(parseCatalogRouteId(bottleId));
   const { client } = await getServerClient();
   const bottle = await client.bottles.details({ bottle: canonicalBottle.id });
   const title = formatBottleDisplayName(bottle);

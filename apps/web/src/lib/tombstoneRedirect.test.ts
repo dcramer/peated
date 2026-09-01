@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-  getCanonicalRouteRedirectPath,
-  getReleaseFamilyRouteRedirectPath,
+  getCanonicalPublicRouteRedirectPath,
   type LoadRequestHeaders,
 } from "./tombstoneRedirect";
 
@@ -14,7 +13,7 @@ describe("tombstone redirects", () => {
     loadHeaders.mockResolvedValue(new Headers());
   });
 
-  it("preserves a compatible Bottle suffix and query parameters", async () => {
+  it("preserves a Bottle suffix and query parameters", async () => {
     loadHeaders.mockResolvedValue(
       new Headers({
         "x-peated-request-path":
@@ -23,15 +22,38 @@ describe("tombstone redirects", () => {
     );
 
     await expect(
-      getCanonicalRouteRedirectPath(
+      getCanonicalPublicRouteRedirectPath(
         {
           canonicalId: 34,
-          collectionPath: "/bottles",
+          canonicalPath: "/bottles/34-lagavulin-16-year-old",
           currentId: 12,
+          currentPathPrefixes: ["/bottles/12"],
         },
         loadHeaders,
       ),
-    ).resolves.toBe("/bottles/34/tastings?source=legacy&tag=one&tag=two");
+    ).resolves.toBe(
+      "/bottles/34-lagavulin-16-year-old/tastings?source=legacy&tag=one&tag=two",
+    );
+  });
+
+  it("replaces a stale Bottle slug while preserving its nested route", async () => {
+    loadHeaders.mockResolvedValue(
+      new Headers({
+        "x-peated-request-path": "/bottles/12-old-name/prices?currency=USD",
+      }),
+    );
+
+    await expect(
+      getCanonicalPublicRouteRedirectPath(
+        {
+          canonicalId: 12,
+          canonicalPath: "/bottles/12-current-name",
+          currentId: 12,
+          currentPathPrefixes: ["/bottles/12"],
+        },
+        loadHeaders,
+      ),
+    ).resolves.toBe("/bottles/12-current-name/prices?currency=USD");
   });
 
   it("rejects a malformed proxy-owned request path", async () => {
@@ -42,43 +64,29 @@ describe("tombstone redirects", () => {
     );
 
     await expect(
-      getCanonicalRouteRedirectPath(
+      getCanonicalPublicRouteRedirectPath(
         {
           canonicalId: 34,
-          collectionPath: "/bottles",
+          canonicalPath: "/bottles/34-lagavulin-16-year-old",
           currentId: 12,
+          currentPathPrefixes: ["/bottles/12"],
         },
         loadHeaders,
       ),
     ).rejects.toThrow("Invalid proxy-owned request path");
   });
 
-  it("drops Bottle suffixes while preserving query for a release family", async () => {
-    loadHeaders.mockResolvedValue(
-      new Headers({
-        "x-peated-request-path":
-          "/bottles/12/tastings?source=legacy&tag=one&tag=two",
-      }),
-    );
-
-    await expect(
-      getReleaseFamilyRouteRedirectPath(56, loadHeaders),
-    ).resolves.toBe("/bottles/56/releases?source=legacy&tag=one&tag=two");
-  });
-
   it("returns a stable root path without request headers", async () => {
     await expect(
-      getCanonicalRouteRedirectPath(
+      getCanonicalPublicRouteRedirectPath(
         {
           canonicalId: 34,
-          collectionPath: "/bottles",
+          canonicalPath: "/bottles/34-lagavulin-16-year-old",
           currentId: 12,
+          currentPathPrefixes: ["/bottles/12"],
         },
         loadHeaders,
       ),
-    ).resolves.toBe("/bottles/34");
-    await expect(
-      getReleaseFamilyRouteRedirectPath(56, loadHeaders),
-    ).resolves.toBe("/bottles/56/releases");
+    ).resolves.toBe("/bottles/34-lagavulin-16-year-old");
   });
 });

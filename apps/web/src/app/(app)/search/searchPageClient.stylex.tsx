@@ -15,8 +15,11 @@ import {
   getPendingImageFromParams,
   type AddBottleRouteIntent,
 } from "@peated/web/lib/addBottle";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
+
+type BottleUrlSource = Parameters<typeof getBottleUrl>[0];
 
 const addBottleIntents = [
   "catalog",
@@ -122,7 +125,8 @@ export function SearchPageClient({
   const createReturnAction = getCreateReturnAction(intent, directToTasting);
 
   const getBottleHref = useCallback(
-    (bottleId: number) => {
+    (bottle: BottleUrlSource) => {
+      const bottleId = bottle.id;
       if (intent) {
         return getAddBottleHref({
           bottleId,
@@ -134,7 +138,7 @@ export function SearchPageClient({
       if (directToTasting) {
         return getAddBottleHref({ bottleId, intent: "tasting" });
       }
-      return `/bottles/${bottleId}`;
+      return getBottleUrl(bottle);
     },
     [directToTasting, intent, pendingImage?.id, pendingImage?.imageUrl],
   );

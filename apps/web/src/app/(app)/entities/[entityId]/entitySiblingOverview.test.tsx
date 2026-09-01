@@ -35,7 +35,7 @@ describe("EntitySiblingOverview", () => {
     );
 
     expect(html).toContain("Also part of Suntory Global Spirits");
-    expect(html).toContain('href="/companies/42"');
+    expect(html).toContain('href="/companies/42-suntory-global-spirits"');
     expect(html).toContain("View company");
   });
 });

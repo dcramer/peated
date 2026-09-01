@@ -7,9 +7,11 @@ import {
 } from "@peated/web/components";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
+import { getBottlePage } from "@peated/web/lib/bottlePage.server";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -21,15 +23,18 @@ export default async function BottleTastingsPage(props: {
     props.params,
     props.searchParams,
   ]);
-  const id = parseReleaseFamilyRouteId(bottleId);
+  const id = parseCatalogRouteId(bottleId);
   const cursor = Number(searchParams.cursor ?? 1) || 1;
-  const { client } = await getAnonymousServerClient();
+  const [bottle, { client }] = await Promise.all([
+    getBottlePage(id),
+    getAnonymousServerClient(),
+  ]);
   const tastingList = await client.tastings.list({
     bottle: id,
     cursor,
     limit: 25,
   });
-  const pathname = `/bottles/${id}/tastings`;
+  const pathname = `${getBottleUrl(bottle)}/tastings`;
 
   return (
     <BottleSection heading="Tastings">

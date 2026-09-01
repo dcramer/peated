@@ -2,7 +2,7 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { expect, type Request, test, type TestInfo } from "@playwright/test";
 import { z } from "zod";
 
-import { bottlePath } from "./assertions";
+import { bottlePathPattern } from "./assertions";
 import {
   anotherReleaseSourceBottle,
   createdBottleName,
@@ -212,7 +212,7 @@ test.describe("unified Bottle workflows", () => {
       expect(input).not.toHaveProperty(legacyField);
       expect(independentBottle).not.toHaveProperty(legacyField);
     }
-    await expect(page).toHaveURL(bottlePath(existingBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(existingBottleId));
   });
 
   test("keeps exact age ownership behind the unified Bottle form", async ({
@@ -320,7 +320,7 @@ test.describe("unified Bottle workflows", () => {
       other: exactMergeOtherBottleId,
       direction: "mergeInto",
     });
-    await expect(page).toHaveURL(bottlePath(exactMergeOtherBottleId));
+    await expect(page).toHaveURL(bottlePathPattern(exactMergeOtherBottleId));
   });
 });
 
