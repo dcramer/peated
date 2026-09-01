@@ -9,6 +9,7 @@ import {
   controlMetrics,
   effects,
   fonts,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { IconButton } from "./button.stylex";
@@ -156,11 +157,11 @@ const styles = stylex.create({
   },
   openRoot: {
     // The anchored menu uses a portal, so its open trigger must sit above it.
-    zIndex: 2,
+    zIndex: zIndices.menuControl,
   },
   triggerLayer: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     display: "inline-flex",
   },
   dots: {
@@ -176,7 +177,7 @@ const styles = stylex.create({
     backgroundColor: "currentColor",
   },
   menu: {
-    zIndex: 1,
+    zIndex: zIndices.menu,
     width: "216px",
     overflow: "hidden",
     borderRadius: controlMetrics.radius,

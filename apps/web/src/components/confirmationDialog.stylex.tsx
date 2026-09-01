@@ -10,7 +10,13 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { Button } from ".";
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  effects,
+  fonts,
+  space,
+  zIndices,
+} from "../styles/tokens.stylex";
 
 export default function ConfirmationDialog({
   continueLabel = "Continue",
@@ -49,7 +55,7 @@ export default function ConfirmationDialog({
 }
 
 const styles = stylex.create({
-  dialog: { position: "relative", zIndex: 70 },
+  dialog: { position: "relative", zIndex: zIndices.dialog },
   backdrop: {
     position: "fixed",
     inset: 0,

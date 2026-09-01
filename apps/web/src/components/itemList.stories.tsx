@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts } from "../styles/tokens.stylex";
+import { colors, fonts, zIndices } from "../styles/tokens.stylex";
 import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { ItemList, ItemRow } from "./itemList.stylex";
 import { BottleRatings } from "./scoring.stylex";
@@ -140,7 +140,7 @@ export const InteractionStates: Story = {
 const styles = stylex.create({
   secondaryLink: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     color: {
       default: colors.inkMuted,
       ":hover": colors.accentDeep,

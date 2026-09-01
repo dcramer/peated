@@ -10,7 +10,13 @@ import * as stylex from "@stylexjs/stylex";
 import { ExternalLink, Maximize2, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
-import { controlMetrics, effects, fonts, space } from "../styles/tokens.stylex";
+import {
+  controlMetrics,
+  effects,
+  fonts,
+  space,
+  zIndices,
+} from "../styles/tokens.stylex";
 
 export type ImageViewerProps = {
   alt: string;
@@ -122,7 +128,7 @@ const styles = stylex.create({
   },
   dialog: {
     position: "relative",
-    zIndex: 100,
+    zIndex: zIndices.fullscreen,
   },
   backdrop: {
     position: "fixed",

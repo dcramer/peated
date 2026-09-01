@@ -14,6 +14,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 759px)";
@@ -140,7 +141,7 @@ const styles = stylex.create({
   },
   mobileHeader: {
     position: "sticky",
-    zIndex: 40,
+    zIndex: zIndices.navigation,
     top: 0,
     display: "flex",
     minHeight: "56px",
@@ -203,7 +204,7 @@ const styles = stylex.create({
   },
   sidebar: {
     position: "fixed",
-    zIndex: 30,
+    zIndex: zIndices.navigation,
     top: 0,
     bottom: 0,
     left: 0,

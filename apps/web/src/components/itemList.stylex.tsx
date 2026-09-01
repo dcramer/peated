@@ -7,6 +7,7 @@ import {
   effects,
   fonts,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
@@ -270,7 +271,7 @@ const styles = stylex.create({
   },
   action: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     display: "flex",
     flexShrink: 0,
   },

@@ -21,7 +21,13 @@ import { z } from "zod";
 
 import { Button, Field } from ".";
 import setRef from "../lib/setRef";
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  effects,
+  fonts,
+  space,
+  zIndices,
+} from "../styles/tokens.stylex";
 import { ImageViewer } from "./imageViewer.stylex";
 
 type Props = {
@@ -314,7 +320,7 @@ const styles = stylex.create({
     overflow: "hidden",
     clip: "rect(0, 0, 0, 0)",
   },
-  dialog: { position: "relative", zIndex: 80 },
+  dialog: { position: "relative", zIndex: zIndices.dialog },
   backdrop: {
     position: "fixed",
     inset: 0,

@@ -1,6 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, controlMetrics, effects } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  zIndices,
+} from "../styles/tokens.stylex";
 
 /** Shared interaction geometry for rows with one primary destination. */
 export const linkedRowStyles = stylex.create({
@@ -41,13 +46,13 @@ export const linkedRowStyles = stylex.create({
     "::after": {
       content: "''",
       position: "absolute",
-      zIndex: 1,
+      zIndex: zIndices.localContent,
       inset: 0,
       borderRadius: controlMetrics.radiusSmall,
     },
   },
   nestedAction: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
   },
 });

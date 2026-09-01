@@ -1,7 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  fonts,
+  space,
+  zIndices,
+} from "../styles/tokens.stylex";
 
 export function SkipLink({
   children,
@@ -20,7 +26,7 @@ export function SkipLink({
 const styles = stylex.create({
   link: {
     position: "fixed",
-    zIndex: 100,
+    zIndex: zIndices.accessibility,
     top: space.x2,
     left: space.x2,
     paddingTop: space.x2,

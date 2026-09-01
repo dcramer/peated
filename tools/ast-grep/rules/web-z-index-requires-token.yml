@@ -1,0 +1,17 @@
+id: web-z-index-requires-token
+language: TypeScript
+severity: error
+message: Use a named zIndices token for StyleX stacking.
+note: Select the layer by runtime role from apps/web/src/styles/tokens.stylex.ts.
+files:
+  - apps/web/src/**/*.ts
+  - apps/web/src/**/*.tsx
+rule:
+  all:
+    - pattern:
+        context: "{ zIndex: $VALUE }"
+        selector: pair
+    - not:
+        pattern:
+          context: "{ zIndex: zIndices.$LAYER }"
+          selector: pair

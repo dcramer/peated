@@ -1,12 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, effects, fonts } from "../styles/tokens.stylex";
+import { colors, effects, fonts, zIndices } from "../styles/tokens.stylex";
 
 /** Shared text-link interaction styles for TextLink and bare AppLink fallback. */
 export const textLinkStyles = stylex.create({
   link: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     display: "inline-flex",
     width: "fit-content",
     color: {

@@ -176,6 +176,23 @@ export const space = stylex.defineVars({
   x12: "48px",
 });
 
+// These tokens own cross-component stacking. Local stacking contexts can use
+// localContent and localControl. Page-level surfaces must use the semantic
+// layer that matches their runtime role.
+export const zIndices = stylex.defineVars({
+  base: "0",
+  localContent: "1",
+  localControl: "2",
+  sticky: "100",
+  navigation: "200",
+  menu: "300",
+  menuControl: "301",
+  dialog: "400",
+  notification: "500",
+  fullscreen: "600",
+  accessibility: "700",
+});
+
 export const controlMetrics = stylex.defineVars({
   radius: "3px",
   radiusSmall: "2px",

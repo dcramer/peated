@@ -6,6 +6,7 @@ import {
   controlMetrics,
   effects,
   space,
+  zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink, type AppLinkProps } from "./appLink";
 
@@ -214,14 +215,14 @@ const styles = stylex.create({
     "::after": {
       content: "''",
       position: "absolute",
-      zIndex: 1,
+      zIndex: zIndices.localContent,
       inset: 0,
       borderRadius: controlMetrics.radius,
     },
   },
   nestedAction: {
     position: "relative",
-    zIndex: 2,
+    zIndex: zIndices.localControl,
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",
     color: {
