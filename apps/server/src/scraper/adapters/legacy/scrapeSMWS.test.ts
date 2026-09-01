@@ -213,7 +213,7 @@ test("keeps reused Society labels out of bottle names and cask numbers", () => {
       category: "single_grain",
       caskNumber: "G17.1",
       singleCask: true,
-      distillers: [],
+      distillers: [{ name: "Starlaw" }],
     }),
   ]);
   for (const { bottle } of result.bottles) {

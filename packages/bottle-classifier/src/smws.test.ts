@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  SMWS_CATEGORY_LIST,
   SMWS_DISTILLERY_CODES,
   composeExactCaskCodeFromComponents,
   getCategoryFromCask,
@@ -43,11 +44,35 @@ describe("smws", () => {
       B1: "Heaven Hill Distillery",
       B2: "Heaven Hill Bernheim Distillery",
       B3: "Rock Town Distillery",
+      B9: "Wilderness Trail Distillery",
+      G17: "Starlaw",
+      169: "InchDairnie Distillery",
       RW4: "Kentucky Peerless Distilling Co.",
+      RW8: "Catoctin Creek",
+      RW9: "Wilderness Trail Distillery",
       CW1: "Heaven Hill Distillery",
       CW2: "Balcones Distilling",
+      A9: "Domaine de Saurine",
       GN7: "Cotswolds Distillery",
     });
+  });
+
+  test("lists every code in a renderable category sequence", () => {
+    const listedCodes = SMWS_CATEGORY_LIST.flatMap(([prefix]) => {
+      const codes = [];
+
+      for (let index = 1; index < 1000; index += 1) {
+        const code = `${prefix}${index}`;
+        if (SMWS_DISTILLERY_CODES[code] === undefined) break;
+        codes.push(code);
+      }
+
+      return codes;
+    });
+
+    expect(listedCodes.sort()).toEqual(
+      Object.keys(SMWS_DISTILLERY_CODES).sort(),
+    );
   });
 
   test("parses SMWS reference titles into code identity and selector", () => {

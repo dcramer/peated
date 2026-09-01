@@ -20,10 +20,12 @@ export default async function EntityCodesPage(props: {
   if (entity.shortName !== "SMWS") notFound();
 
   const { results: distillerList } = await client.smws.distillerList();
-  const exampleDistiller = distillerList.find(
-    (distiller) =>
-      distiller.name.toLowerCase() === SMWS_DISTILLERY_CODES[4].toLowerCase(),
+  const distillersByCode = Object.fromEntries(
+    distillerList.flatMap((distiller) =>
+      distiller.smwsCodes.map((code) => [code, distiller]),
+    ),
   );
+  const exampleDistiller = distillersByCode["4"];
 
   if (!exampleDistiller) {
     const error = new Error("Unable to find example distiller for SMWS codes.");
@@ -38,15 +40,6 @@ export default async function EntityCodesPage(props: {
     throw error;
   }
 
-  const distillersByName = Object.fromEntries([
-    ...distillerList.map((distiller) => [
-      distiller.name.toLowerCase(),
-      distiller,
-    ]),
-    ...distillerList
-      .filter((distiller) => Boolean(distiller.shortName))
-      .map((distiller) => [distiller.shortName!.toLowerCase(), distiller]),
-  ]);
   const groups = SMWS_CATEGORY_LIST.flatMap(([categoryCode, categoryTitle]) => {
     const rows = [];
 
@@ -54,9 +47,7 @@ export default async function EntityCodesPage(props: {
       const code = `${categoryCode}${index}`;
       const distillerName = SMWS_DISTILLERY_CODES[code];
       if (distillerName === undefined) break;
-      const distiller = distillerName
-        ? distillersByName[distillerName.toLowerCase()]
-        : null;
+      const distiller = distillersByCode[code] ?? null;
 
       rows.push({
         code,

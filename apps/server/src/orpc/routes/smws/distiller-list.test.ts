@@ -24,6 +24,11 @@ describe("GET /smws/distillers", () => {
       name: "Glenlivet",
     });
 
+    const inchDairnie = await fixtures.Entity({
+      name: "InchDairnie Distillery",
+      kind: "distillery",
+    });
+
     await fixtures.Entity({ name: "Bowmore", kind: "company" });
     await fixtures.Entity({
       name: "Not an SMWS distillery",
@@ -37,7 +42,16 @@ describe("GET /smws/distillers", () => {
     );
 
     expect(new Set(results.map((result) => result.id))).toEqual(
-      new Set([cascadeHollow.id, theGlenlivet.id]),
+      new Set([cascadeHollow.id, theGlenlivet.id, inchDairnie.id]),
     );
+    expect(
+      results.find((result) => result.id === cascadeHollow.id)?.smwsCodes,
+    ).toContain("B5");
+    expect(
+      results.find((result) => result.id === theGlenlivet.id)?.smwsCodes,
+    ).toContain("2");
+    expect(
+      results.find((result) => result.id === inchDairnie.id)?.smwsCodes,
+    ).toEqual(["168", "169"]);
   });
 });
