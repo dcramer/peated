@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import BottleImage from "../../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { HomeRecentReviews } from "./homeBrowse.stylex";
 
@@ -23,6 +24,7 @@ export const RecentReviews: Story = {
     reviews: [
       {
         bottleHref: "/bottles/47529",
+        bottleImageUrl: BottleImage.src,
         bottleName: "Milroy's of Soho Tun 89 Teaspooned Malt",
         date: "2 days ago",
         id: "47529",

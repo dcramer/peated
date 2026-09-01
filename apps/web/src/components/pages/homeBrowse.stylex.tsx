@@ -160,6 +160,7 @@ export function HomeLatestReleases({
 
 export type HomeReview = {
   bottleHref: string;
+  bottleImageUrl?: string | null;
   bottleName: string;
   date: ReactNode;
   id: string;
@@ -181,21 +182,24 @@ export function HomeRecentReviews({
       <div {...stylex.props(styles.rows)}>
         <ItemList ariaLabel="From the critics">
           {reviews.map((review) => (
-            <ItemRow
-              end={
-                <span {...stylex.props(styles.reviewFacts)}>
-                  {review.rating !== null && review.rating !== undefined ? (
-                    <strong {...stylex.props(styles.reviewRating)}>
-                      {review.rating}
-                    </strong>
-                  ) : null}
-                  <span {...stylex.props(styles.rowDate)}>{review.date}</span>
-                </span>
-              }
-              href={review.bottleHref}
-              key={review.id}
-              metadata={
-                <>
+            <ItemListItem key={review.id}>
+              <BottleIdentityRow
+                align="start"
+                end={
+                  <span {...stylex.props(styles.reviewFacts)}>
+                    {review.rating !== null && review.rating !== undefined ? (
+                      <strong {...stylex.props(styles.reviewRating)}>
+                        {review.rating}
+                      </strong>
+                    ) : null}
+                    <span {...stylex.props(styles.rowDate)}>{review.date}</span>
+                  </span>
+                }
+                href={review.bottleHref}
+                imageUrl={review.bottleImageUrl}
+                metadata={review.metadata}
+                name={review.bottleName}
+                subtitle={
                   <TextLink
                     href={review.sourceHref}
                     rel="noreferrer"
@@ -204,16 +208,9 @@ export function HomeRecentReviews({
                   >
                     {review.source}
                   </TextLink>
-                  {review.metadata.map((item) => (
-                    <span key={item}>
-                      <span aria-hidden="true"> · </span>
-                      {item}
-                    </span>
-                  ))}
-                </>
-              }
-              title={review.bottleName}
-            />
+                }
+              />
+            </ItemListItem>
           ))}
         </ItemList>
       </div>
