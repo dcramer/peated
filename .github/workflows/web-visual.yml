@@ -75,6 +75,7 @@ jobs:
       - name: Capture candidate screenshots
         env:
           ALL: ${{ steps.mode.outputs.all }}
+          VISUAL_SOURCE_SHA: ${{ github.sha }}
           VISUAL_ROOT: ${{ github.workspace }}/visual-output
         run: |
           set -euo pipefail
@@ -89,6 +90,7 @@ jobs:
       - name: Capture base screenshots
         env:
           ALL: ${{ steps.mode.outputs.all }}
+          VISUAL_SOURCE_SHA: ${{ steps.mode.outputs.base_sha }}
           VISUAL_ROOT: ${{ github.workspace }}/visual-output
         run: |
           set -euo pipefail

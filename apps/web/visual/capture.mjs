@@ -213,6 +213,8 @@ async function main() {
     process.argv.slice(2),
   );
   const changedFiles = await readChangedPaths(changedFile);
+  const sourceSha =
+    process.env.VISUAL_SOURCE_SHA ?? process.env.GITHUB_SHA ?? null;
   const selection = all ? "all" : scenarioList ? "named" : "changed-files";
   const scenarioIds = all
     ? selectScenarioIds(changedFiles, { all: true })
@@ -229,7 +231,7 @@ async function main() {
   if (scenarioIds.length === 0) {
     await writeManifest(outDir, {
       changedFiles: changedFiles.slice(0, 20),
-      commitSha: process.env.GITHUB_SHA ?? null,
+      commitSha: sourceSha,
       scenarioIds,
       screenshots: [],
       selection,
@@ -262,7 +264,7 @@ async function main() {
 
   await writeManifest(outDir, {
     changedFiles: changedFiles.slice(0, 20),
-    commitSha: process.env.GITHUB_SHA ?? null,
+    commitSha: sourceSha,
     scenarioIds,
     screenshots,
     selection,
