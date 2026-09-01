@@ -78,7 +78,7 @@ jobs:
       # Every main commit can become a pull request base, so each gets an exact artifact.
       - name: Store baseline by source revision
         if: github.event_name != 'pull_request'
-        uses: dcramer/frameshift/baseline/upload@e964f36af42dfb2594f308ebbf1a9ea51e666c17
+        uses: dcramer/frameshift/baseline/upload@68a8b5e8bbd439088ef9a044e693c5de9efe7ecd
         with:
           name: peated-web-screenshots-v1
           sha: ${{ github.sha }}
@@ -102,7 +102,7 @@ jobs:
           pnpm visual:web -- "${args[@]}"
       - name: Restore exact baseline artifact
         if: github.event_name == 'pull_request'
-        uses: dcramer/frameshift/baseline@e964f36af42dfb2594f308ebbf1a9ea51e666c17
+        uses: dcramer/frameshift/baseline@68a8b5e8bbd439088ef9a044e693c5de9efe7ecd
         with:
           name: peated-web-screenshots-v1
           sha: ${{ steps.mode.outputs.base_sha }}
@@ -118,7 +118,7 @@ jobs:
           --sha "${{ steps.mode.outputs.base_sha }}"
       - name: Compare screenshots
         if: github.event_name == 'pull_request'
-        uses: dcramer/frameshift@e964f36af42dfb2594f308ebbf1a9ea51e666c17
+        uses: dcramer/frameshift@68a8b5e8bbd439088ef9a044e693c5de9efe7ecd
         with:
           baseline: ${{ github.workspace }}/visual-output/baseline
           candidate: ${{ github.workspace }}/visual-output/candidate
@@ -154,6 +154,6 @@ jobs:
       statuses: write
     steps:
       # This job never checks out or runs pull request code.
-      - uses: dcramer/frameshift/publish/workflow@e964f36af42dfb2594f308ebbf1a9ea51e666c17
+      - uses: dcramer/frameshift/publish/workflow@68a8b5e8bbd439088ef9a044e693c5de9efe7ecd
         with:
           retention-days: 30
