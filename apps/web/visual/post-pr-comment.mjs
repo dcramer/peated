@@ -116,6 +116,21 @@ function imageUrl(imageBaseUrl, imagePath) {
   return `${imageBaseUrl}/${encodedPath}`;
 }
 
+export function frameshiftViewerUrl(repo, ref) {
+  const viewerUrl = new URL("https://frameshift.pub/");
+  viewerUrl.search = new URLSearchParams({ ref, repo }).toString();
+  return viewerUrl.href;
+}
+
+export function frameshiftStatus(viewerUrl, changes) {
+  return {
+    context: "Frameshift",
+    description: `${changes} visual change${changes === 1 ? "" : "s"}`,
+    state: "success",
+    target_url: viewerUrl,
+  };
+}
+
 function renderChange(screenshot, label, imageBaseUrl) {
   const status =
     screenshot.status[0].toUpperCase() + screenshot.status.slice(1);
@@ -152,7 +167,11 @@ function renderChange(screenshot, label, imageBaseUrl) {
   return lines.join("\n");
 }
 
-export function buildBody({ baseline, candidate, report }, imageBaseUrl) {
+export function buildBody(
+  { baseline, candidate, report },
+  imageBaseUrl,
+  viewerUrl,
+) {
   const manifest = candidate;
   const changedFiles = manifest.changedFiles.length
     ? manifest.changedFiles
@@ -178,6 +197,8 @@ export function buildBody({ baseline, candidate, report }, imageBaseUrl) {
   return [
     MARKER,
     "## Web screenshots",
+    "",
+    `[Open the full report in Frameshift](${viewerUrl})`,
     "",
     run,
     `Pages: \`${manifest.scenarioIds.join("`, `")}\``,
@@ -236,9 +257,26 @@ function publishImages(reportDir, report, branch, commitSha) {
   }).trim();
   const remote = `https://x-access-token:${requiredEnv("GITHUB_TOKEN")}@github.com/${requiredEnv("GITHUB_REPOSITORY")}.git`;
   git(["remote", "add", "origin", remote], { cwd: tempDir });
+  const reportTag = `frameshift-report/${commitSha}/${requiredEnv("GITHUB_RUN_ID")}-${requiredEnv("GITHUB_RUN_ATTEMPT")}`;
+  git(["tag", reportTag], { cwd: tempDir });
+  git(["push", "origin", `refs/tags/${reportTag}`], { cwd: tempDir });
   git(["push", "-f", "origin", `HEAD:${branch}`], { cwd: tempDir });
   fs.rmSync(tempDir, { force: true, recursive: true });
   return publishedSha;
+}
+
+function updateFrameshiftStatus(repo, commitSha, viewerUrl, changes) {
+  ghInput(
+    [
+      "api",
+      "--method",
+      "POST",
+      `repos/${repo}/statuses/${commitSha}`,
+      "--input",
+      "-",
+    ],
+    JSON.stringify(frameshiftStatus(viewerUrl, changes)),
+  );
 }
 
 function upsertComment(repo, prNumber, body) {
@@ -304,11 +342,17 @@ function main() {
   const commitSha = process.env.GITHUB_SHA ?? "unknown";
   const branch = `web-screenshots/pr-${prNumber}`;
   const imageRef = publishImages(reportDir, result.report, branch, commitSha);
+  const viewerUrl = frameshiftViewerUrl(repo, imageRef);
   const body = buildBody(
     result,
     `https://raw.githubusercontent.com/${repo}/${imageRef}`,
+    viewerUrl,
   );
   upsertComment(repo, prNumber, body);
+  const changes = result.report.files.filter(
+    (file) => file.status !== "unchanged",
+  ).length;
+  updateFrameshiftStatus(repo, commitSha, viewerUrl, changes);
   console.log(`updated screenshot comment on PR #${prNumber}`);
 }
 

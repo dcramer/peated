@@ -14,11 +14,7 @@
       "ignoreDependencies": ["dotenv-cli"],
     },
     "apps/web": {
-      "entry": [
-        "e2e/mock-rpc-server.mjs",
-        // The action build command bundles this source into the committed action.
-        "visual/diff/action.mjs",
-      ],
+      "entry": ["e2e/mock-rpc-server.mjs"],
       "ignoreDependencies": [
         // Next.js consumes this loader name from webpack/turbopack configuration.
         "@svgr/webpack",
