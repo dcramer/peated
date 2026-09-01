@@ -12,20 +12,6 @@ const DEFAULT_SORT = "-tastings";
 
 const OutputSchema = listResponse(BottleSchema).extend({
   total: z.number().int().nonnegative(),
-  facets: z.object({
-    category: z.array(
-      z.object({
-        value: z.enum(CATEGORY_LIST),
-        count: z.number().int().positive(),
-      }),
-    ),
-    ageBand: z.array(
-      z.object({
-        value: z.enum(BOTTLE_AGE_BAND_LIST),
-        count: z.number().int().positive(),
-      }),
-    ),
-  }),
   followedEntityCount: z.number().int().nonnegative().nullable(),
 });
 

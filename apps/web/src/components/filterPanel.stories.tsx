@@ -6,7 +6,6 @@ import { useState } from "react";
 import {
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   type FilterPanelProps,
 } from "./filterPanel.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
@@ -34,18 +33,45 @@ export const Overview: Story = {
   render: (args) => <ControlledFilters {...args} />,
 };
 
+export const WithoutCounts: Story = {
+  render: ({ ariaLabel }) => (
+    <FilterPanel ariaLabel={ariaLabel}>
+      <FacetGroup
+        label="Category"
+        onChange={() => undefined}
+        options={[
+          { label: "Single malt", value: "single_malt" },
+          { label: "Blended malt", value: "blended_malt" },
+          { label: "Bourbon", value: "bourbon" },
+        ]}
+        selected="single_malt"
+      />
+    </FilterPanel>
+  ),
+};
+
 function ControlledFilters({ ariaLabel }: FilterPanelProps) {
   const [country, setCountry] = useState("scotland");
   const [query, setQuery] = useState("");
 
   return (
-    <FilterPanel ariaLabel={ariaLabel}>
-      <FilterQuery
-        label="Find a bottle"
-        onSubmit={setQuery}
-        placeholder="Name"
-        query={query}
-      />
+    <FilterPanel
+      ariaLabel={ariaLabel}
+      onClear={
+        country || query
+          ? () => {
+              setCountry("");
+              setQuery("");
+            }
+          : undefined
+      }
+      query={{
+        label: "Find a bottle",
+        onSubmit: setQuery,
+        placeholder: "Name",
+        query,
+      }}
+    >
       <FacetGroup
         label="Country"
         onChange={setCountry}

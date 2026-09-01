@@ -61,7 +61,7 @@ type EntityRow = EntityResult & {
   totalTastings: number;
 };
 type RegionRow = RegionResult & { totalBottles: number };
-type ScopeTotals = SearchOutput["scopeTotals"];
+type ScopeTotals = NonNullable<SearchOutput["scopeTotals"]>;
 type GroupRows =
   | {
       type: "bottles";
@@ -108,11 +108,16 @@ type SearchRows = {
   query: string;
   exact: ExactRow;
   groups: GroupRows[];
-  scopeTotals: ScopeTotals;
+  scopeTotals: ScopeTotals | null;
   nearest: NearestRow[];
 };
 
-type SearchInput = { query: string; scopes: SearchScope[]; limit: number };
+type SearchInput = {
+  query: string;
+  scopes: SearchScope[];
+  limit: number;
+  includeFacets: boolean;
+};
 
 function normalizeText(value: string) {
   return value
@@ -743,14 +748,18 @@ async function readSearchRows(
   );
   return db.transaction(
     async (tx) => {
-      const scopeTotals = await Sentry.startSpan(
-        {
-          name: "search.scope_totals",
-          op: "function",
-          attributes: { "search.authenticated": !!context.user },
-        },
-        () => getScopeTotals(tx, context),
-      );
+      // Scope totals are search facets. Each total scans one complete scope,
+      // so callers must request them explicitly.
+      const scopeTotals = input.includeFacets
+        ? await Sentry.startSpan(
+            {
+              name: "search.scope_totals",
+              op: "function",
+              attributes: { "search.authenticated": !!context.user },
+            },
+            () => getScopeTotals(tx, context),
+          )
+        : null;
       const exact = await Sentry.startSpan(
         { name: "search.resolve_exact", op: "function" },
         () => findExact(tx, context, input.query, scopes),

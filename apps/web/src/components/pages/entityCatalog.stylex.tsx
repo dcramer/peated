@@ -10,7 +10,6 @@ import {
   EmptyState,
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   ListToolbar,
   MemberStatus,
   type ListSortOption,
@@ -237,13 +236,16 @@ export function EntityCatalogFilters({
   region,
 }: EntityCatalogFiltersProps) {
   return (
-    <FilterPanel ariaLabel={ariaLabel}>
-      <FilterQuery
-        label="Find a record"
-        onSubmit={onQuerySubmit}
-        placeholder="Name"
-        query={query}
-      />
+    <FilterPanel
+      ariaLabel={ariaLabel}
+      onClear={query || country || region ? onClear : undefined}
+      query={{
+        label: "Find a record",
+        onSubmit: onQuerySubmit,
+        placeholder: "Name",
+        query,
+      }}
+    >
       <FacetGroup
         label="Country"
         onChange={onCountryChange}
@@ -258,9 +260,6 @@ export function EntityCatalogFilters({
           selected={region}
         />
       ) : null}
-      <Button align="start" onClick={onClear} size="sm" variant="text">
-        Clear filters
-      </Button>
     </FilterPanel>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { MAJOR_COUNTRIES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { EntityKind } from "@peated/server/types";
@@ -30,7 +31,6 @@ const sortOptions = [
 ] as const;
 
 type EntityList = Outputs["distilleries"]["list"];
-type CountryList = Outputs["countries"]["list"];
 export type EntityCatalogKind = Extract<
   EntityKind,
   "bottler" | "brand" | "company" | "distillery"
@@ -43,12 +43,15 @@ const catalogConfig = {
   distillery: { noun: "distiller", title: "Distillers" },
 } satisfies Record<EntityCatalogKind, { noun: string; title: string }>;
 
+const countryOptions = MAJOR_COUNTRIES.map(([label, value]) => ({
+  label,
+  value,
+}));
+
 export function EntityCatalogPageClient({
-  initialCountryList,
   initialEntityList,
   kind,
 }: {
-  initialCountryList: CountryList;
   initialEntityList: EntityList;
   kind: EntityCatalogKind;
 }) {
@@ -73,12 +76,6 @@ export function EntityCatalogPageClient({
   const { data: entityList } = useSuspenseQuery({
     ...listQueryOptions,
     initialData: initialEntityList,
-  });
-  const { data: countryList } = useSuspenseQuery({
-    ...orpc.countries.list.queryOptions({
-      input: { onlyMajor: true, sort: "-bottles" },
-    }),
-    initialData: initialCountryList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
   const sort = searchParams.get("sort") ?? DEFAULT_SORT;
@@ -131,10 +128,7 @@ export function EntityCatalogPageClient({
       filters={
         <EntityCatalogFilters
           ariaLabel={`${config.title} filters`}
-          countries={countryList.results.map((item) => ({
-            label: item.name,
-            value: String(item.id),
-          }))}
+          countries={countryOptions}
           country={country}
           key={query}
           onClear={clearFilters}

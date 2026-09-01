@@ -163,14 +163,24 @@ describe("GET /search", () => {
     });
 
     const data = await routerClient.search({
+      includeFacets: true,
       query: "no-population-match",
       scopes: ["bottles", "bottlers", "companies"],
     });
 
-    expect(data.scopeTotals.bottles).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals.bottlers).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals.companies).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals.members).toBeUndefined();
+    expect(data.scopeTotals?.bottles).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals?.bottlers).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals?.companies).toBeGreaterThanOrEqual(1);
+    expect(data.scopeTotals?.members).toBeUndefined();
+  });
+
+  test("does not include scope facets by default", async () => {
+    const data = await routerClient.search({
+      query: "no-facet-match",
+      scopes: ["brands"],
+    });
+
+    expect(data.scopeTotals).toBeNull();
   });
 
   test("keeps member search authenticated and hides unsearchable profiles", async ({
@@ -191,13 +201,17 @@ describe("GET /search", () => {
     const [anonymous, authenticated] = await Promise.all([
       routerClient.search({ query: "memberneedle", scopes: ["members"] }),
       routerClient.search(
-        { query: "memberneedle", scopes: ["members"] },
+        {
+          includeFacets: true,
+          query: "memberneedle",
+          scopes: ["members"],
+        },
         { context: { user: defaults.user } },
       ),
     ]);
 
     expect(anonymous.groups).toEqual([]);
-    expect(anonymous.scopeTotals.members).toBeUndefined();
+    expect(anonymous.scopeTotals).toBeNull();
     expect(authenticated.groups).toMatchObject([
       {
         type: "members",

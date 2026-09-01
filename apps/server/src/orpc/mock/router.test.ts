@@ -514,6 +514,7 @@ describe("mock oRPC router", () => {
 
   it("returns no results when the fixed data does not match", async () => {
     const results = await anonymousClient.search({
+      includeFacets: true,
       query: "Ardbeg",
       scopes: ["bottles", "distilleries", "members"],
     });
@@ -543,14 +544,16 @@ describe("mock oRPC router", () => {
 
   it("shows member search results only after sign-in", async () => {
     const anonymousResults = await anonymousClient.search({
+      includeFacets: true,
       query: mockUser.username,
       scopes: ["members"],
     });
     expect(anonymousResults.groups).toEqual([]);
-    expect(anonymousResults.scopeTotals.members).toBeUndefined();
+    expect(anonymousResults.scopeTotals?.members).toBeUndefined();
 
     await expect(
       authenticatedClient.search({
+        includeFacets: true,
         query: mockUser.username,
         scopes: ["members"],
       }),

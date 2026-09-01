@@ -102,7 +102,7 @@ const styles = stylex.create({
     paddingTop: "7px",
     paddingRight: "10px",
     paddingBottom: "7px",
-    paddingLeft: "10px",
+    paddingLeft: 0,
     borderWidth: 0,
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",

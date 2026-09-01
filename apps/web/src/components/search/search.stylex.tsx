@@ -509,6 +509,7 @@ export function Search({
       try {
         const [response] = await Promise.all([
           orpc.search.call({
+            includeFacets: placement === "database",
             limit: placement === "database" && nextScope !== "all" ? 50 : limit,
             query: trimmedQuery,
             scopes: [

@@ -2,7 +2,6 @@
 
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
-import { useId } from "react";
 
 import {
   BottleList,
@@ -12,17 +11,11 @@ import {
   EmptyState,
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   ListToolbar,
-  Select,
-  TextInput,
   type BottleListItem,
   type ListSortOption,
 } from "..";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
-
-const NARROW = "@media (max-width: 759px)";
 
 export type BottleCatalogListProps = {
   emptyAction?: ReactNode;
@@ -106,54 +99,13 @@ export type BottleCatalogFilterOption = {
   value: string;
 };
 
-export type BottleCatalogFacetName = "ageBand" | "category";
-
-export type BottleCatalogFacetGroup = {
-  label: string;
-  name: BottleCatalogFacetName;
-  options: readonly {
-    count?: number;
-    label: string;
-    value: string;
-  }[];
-};
-
-export type BottleCatalogFacetsProps = {
-  groups: readonly BottleCatalogFacetGroup[];
-  onChange: (name: BottleCatalogFacetName, value: string) => void;
-  selected: Partial<Record<BottleCatalogFacetName, string>>;
-  total?: number;
-};
-
-/** Renders API-owned catalog facets without deriving counts from a cursor page. */
-export function BottleCatalogFacets({
-  groups,
-  onChange,
-  selected,
-  total,
-}: BottleCatalogFacetsProps) {
-  return (
-    <div {...stylex.props(styles.facetGroups)}>
-      {groups.map((group) => (
-        <FacetGroup
-          key={group.name}
-          label={group.label}
-          onChange={(value) => onChange(group.name, value)}
-          options={group.options}
-          selected={selected[group.name]}
-          total={total}
-        />
-      ))}
-    </div>
-  );
-}
-
 export type BottleCatalogFiltersProps = {
   age: string;
+  ageBand: string;
+  ageBandOptions: readonly BottleCatalogFilterOption[];
   category: string;
   categoryOptions: readonly BottleCatalogFilterOption[];
-  facets?: BottleCatalogFacetsProps;
-  onChange: (name: "age" | "category", value: string) => void;
+  onChange: (name: "ageBand" | "category", value: string) => void;
   onClear: () => void;
   onQuerySubmit: (value: string) => void;
   query: string;
@@ -162,85 +114,41 @@ export type BottleCatalogFiltersProps = {
 /** Keeps catalog filters reachable while the product route owns URL state. */
 export function BottleCatalogFilters({
   age,
+  ageBand,
+  ageBandOptions,
   category,
   categoryOptions,
-  facets,
   onChange,
   onClear,
   onQuerySubmit,
   query,
 }: BottleCatalogFiltersProps) {
-  const id = useId();
-  const facetNames = new Set(facets?.groups.map((group) => group.name));
+  const hasFilters = Boolean(age || ageBand || category || query);
 
   return (
-    <FilterPanel ariaLabel="Bottle filters">
-      <FilterQuery
-        label="Find a bottle"
-        onSubmit={onQuerySubmit}
-        placeholder="Name, brand, or release"
-        query={query}
+    <FilterPanel
+      ariaLabel="Bottle filters"
+      onClear={hasFilters ? onClear : undefined}
+      query={{
+        label: "Find a bottle",
+        onSubmit: onQuerySubmit,
+        placeholder: "Name, brand, or release",
+        query,
+      }}
+    >
+      <FacetGroup
+        label="Category"
+        onChange={(value) => onChange("category", value)}
+        options={categoryOptions}
+        selected={category}
       />
-      {facetNames.has("category") ? null : (
-        <FilterSelect
-          label="Category"
-          onChange={(value) => onChange("category", value)}
-          options={categoryOptions}
-          value={category}
-        />
-      )}
-      {facets ? <BottleCatalogFacets {...facets} /> : null}
-      {facetNames.has("ageBand") ? null : (
-        <label htmlFor={`${id}-age`} {...stylex.props(styles.field)}>
-          <span {...stylex.props(styles.filterHeading)}>Age statement</span>
-          <TextInput
-            aria-label="Age statement in years"
-            id={`${id}-age`}
-            inputMode="numeric"
-            min={0}
-            onChange={(event) => onChange("age", event.currentTarget.value)}
-            placeholder="Any age"
-            type="number"
-            value={age}
-          />
-        </label>
-      )}
-      <Button align="start" onClick={onClear} size="sm" variant="text">
-        Clear filters
-      </Button>
+      <FacetGroup
+        label="Age statement"
+        onChange={(value) => onChange("ageBand", value)}
+        options={ageBandOptions}
+        selected={ageBand}
+      />
     </FilterPanel>
-  );
-}
-
-function FilterSelect({
-  label,
-  onChange,
-  options,
-  value,
-}: {
-  label: string;
-  onChange: (value: string) => void;
-  options: readonly BottleCatalogFilterOption[];
-  value: string;
-}) {
-  const id = useId();
-
-  return (
-    <label htmlFor={id} {...stylex.props(styles.field)}>
-      <span {...stylex.props(styles.filterHeading)}>{label}</span>
-      <Select
-        aria-label={label}
-        id={id}
-        onChange={(event) => onChange(event.currentTarget.value)}
-        value={value}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </Select>
-    </label>
   );
 }
 
@@ -251,30 +159,5 @@ export function BottleCatalogLoading() {
 const styles = stylex.create({
   catalog: {
     minWidth: 0,
-  },
-  field: {
-    display: "flex",
-    minWidth: 0,
-    flex: 1,
-    flexDirection: "column",
-    gap: space.x2,
-  },
-  filterHeading: {
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
-  facetGroups: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x6,
-    [NARROW]: {
-      gridColumn: "1 / -1",
-    },
   },
 });

@@ -158,7 +158,7 @@ export const SearchOutputSchema = z.object({
   query: z.string(),
   exact: ExactSchema,
   groups: z.array(GroupSchema),
-  scopeTotals: ScopeTotalsSchema,
+  scopeTotals: ScopeTotalsSchema.nullable(),
   nearest: z.array(NearestSchema).max(3),
 });
 
@@ -181,6 +181,10 @@ export default contract
           .array(z.enum(SEARCH_SCOPE_LIST))
           .default([...SEARCH_SCOPE_LIST]),
         limit: z.coerce.number().gte(1).lte(50).default(3),
+        includeFacets: z.coerce
+          .boolean()
+          .default(false)
+          .describe("Compute totals for each searchable scope"),
       })
       .strict(),
   )

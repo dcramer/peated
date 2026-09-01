@@ -76,7 +76,12 @@ export default async function SearchPage(props: {
     client.stats(),
     query
       ? client
-          .search({ limit: searchLimit, query, scopes: [...searchScopes] })
+          .search({
+            includeFacets: databaseSearch,
+            limit: searchLimit,
+            query,
+            scopes: [...searchScopes],
+          })
           .catch(() => undefined)
       : undefined,
   ]);

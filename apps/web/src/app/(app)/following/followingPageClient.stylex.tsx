@@ -5,11 +5,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
-  Button,
   ButtonLink,
   FacetGroup,
   FilterPanel,
-  FilterQuery,
   PageTabs,
 } from "@peated/web/components";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
@@ -86,23 +84,22 @@ export function FollowingPageClient({
     <CatalogPage
       eyebrow="Your record"
       filters={
-        <FilterPanel ariaLabel="Following filters">
-          <FilterQuery
-            key={state.query}
-            label="Name"
-            onSubmit={(value) => updateParams({ query: value })}
-            placeholder="Distiller, brand, or bottler"
-            query={state.query}
-          />
+        <FilterPanel
+          ariaLabel="Following filters"
+          onClear={state.hasFilters ? clearFilters : undefined}
+          query={{
+            label: "Name",
+            onSubmit: (value) => updateParams({ query: value }),
+            placeholder: "Distiller, brand, or bottler",
+            query: state.query,
+          }}
+        >
           <FacetGroup
             label="Type"
             onChange={(value) => updateParams({ type: value })}
             options={typeOptions}
             selected={state.type === "all" ? "" : state.type}
           />
-          <Button align="start" onClick={clearFilters} size="sm" variant="text">
-            Clear filters
-          </Button>
         </FilterPanel>
       }
       navigation={
