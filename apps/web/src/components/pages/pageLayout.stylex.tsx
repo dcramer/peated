@@ -57,6 +57,7 @@ export function PageColumns({
 
 export function PageHeader({
   actions,
+  actionsPosition = "end",
   description,
   eyebrow,
   identity,
@@ -65,6 +66,7 @@ export function PageHeader({
   title,
 }: {
   actions?: ReactNode;
+  actionsPosition?: "end" | "start";
   description?: ReactNode;
   eyebrow?: ReactNode;
   identity?: ReactNode;
@@ -75,7 +77,12 @@ export function PageHeader({
   return (
     <header {...stylex.props(styles.pageHeader)}>
       {identity}
-      <div {...stylex.props(styles.pageHeaderBody)}>
+      <div
+        {...stylex.props(
+          styles.pageHeaderBody,
+          actionsPosition === "start" && styles.startHeaderActions,
+        )}
+      >
         <div {...stylex.props(styles.pageHeaderCopy)}>
           {eyebrow ? (
             <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
@@ -250,6 +257,11 @@ const styles = stylex.create({
   },
   pageHeaderCopy: {
     minWidth: 0,
+  },
+  startHeaderActions: {
+    alignItems: "flex-start",
+    flexDirection: "column",
+    gap: space.x4,
   },
   eyebrow: {
     marginBottom: space.x2,

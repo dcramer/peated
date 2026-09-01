@@ -107,9 +107,9 @@ export default function RatingsPage() {
 
       <ContentSection title="How bottle scores work">
         <ContentText>
-          Peated shows a median after at least 20 eligible member and external
-          review scores exist. External scores count only when the publication
-          permits their use and uses a whole-number 100-point scale.
+          Peated shows a median after the first eligible member or external
+          review score. External scores count only when the publication permits
+          their use and uses a whole-number 100-point scale.
         </ContentText>
       </ContentSection>
     </ContentPage>

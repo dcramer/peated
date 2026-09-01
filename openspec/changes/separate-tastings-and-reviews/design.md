@@ -176,19 +176,18 @@ query. BottleGroup summaries use the same records from active member Bottles.
 ### Use the median and keep the three sources visible
 
 The score is the median of member review scores and permitted external review
-scores. For an even count, use the lower of the two middle scores. The median is
-null until the combined score count reaches 20. The minimum and maximum are
-also null below that limit. Bottles below the limit sort after Bottles with a
-visible score.
+scores. For an even count, use the lower of the two middle scores. The median,
+minimum, and maximum are null only when no scores count. Bottles without a
+score sort after Bottles with a visible score.
 
 The API returns the member and external counts separately. Band counts include
 new tasting bands only. Point scores never increase a band count.
 
 ### Keep the display plain
 
-When fewer than 20 scores count, hide the score area completely. Do not show a
-dash, zero, or estimated score. The empty state can link to the Bottle review
-form.
+When no scores count, hide the score area completely. Do not show a dash, zero,
+or estimated score. The empty state can link to the Bottle review form. Show
+the median after the first score counts.
 
 Show band counts from Mediocre through Unicorn in that fixed order. Whenever a
 band name appears, show its range. Do not print the distribution as a

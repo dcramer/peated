@@ -1,15 +1,15 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
-  BottleTable,
+  BottleList,
   LoadingList,
   SectionError,
   TextLink,
 } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
-import { toBottleTableRow } from "./entityBottleTableRows";
 import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 
 type BottleList = Outputs["bottles"]["list"];
@@ -49,8 +49,6 @@ export function EntityReleaseOverview({
 
   if (!releaseList?.results.length) return null;
 
-  const [firstRelease, ...remainingReleases] = releaseList.results;
-
   return (
     <PageSection
       heading="Latest releases"
@@ -60,13 +58,14 @@ export function EntityReleaseOverview({
         </TextLink>
       }
     >
-      <BottleTable
+      <BottleList
         ariaLabel={`${entity.name} latest releases`}
-        columns={["Rating"]}
-        rows={[
-          toBottleTableRow(firstRelease),
-          ...remainingReleases.map((bottle) => toBottleTableRow(bottle)),
-        ]}
+        items={releaseList.results.map((bottle) =>
+          toBottleListItem(bottle, {
+            includeRatings: true,
+            includeRelatedReleases: true,
+          }),
+        )}
       />
     </PageSection>
   );

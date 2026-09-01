@@ -16,8 +16,8 @@ many tastings of a Bottle, but their review should be one current opinion.
   reviews.
 - Use `externalReview` for publication reviews in application and API names;
   reserve `memberReview` for reviews written by Peated members.
-- Calculate the Bottle score as a median. Hide it until at least 20 counted
-  member and external scores exist.
+- Calculate the Bottle score as a median. Show it after the first counted
+  member or external score.
 - Apply member privacy only when an individual review is shown. Every valid
   member score still counts in Bottle summaries without public attribution.
 - Keep tasting band counts separate from review scores. Never turn a band into

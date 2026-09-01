@@ -284,7 +284,6 @@ export const BOT_USER_AGENT = "PeatedBot/1.0 (+https://peated.com/bot)";
 export const ALLOWED_VOLUMES = [350, 500, 700, 750, 1000, 1500, 1750];
 
 export const SCRAPER_PRICE_BATCH_SIZE = 5;
-export const MIN_BOTTLE_SCORE_COUNT = 20;
 
 export const SIMPLE_RATING_VALUES = {
   PASS: -1,

@@ -137,19 +137,18 @@ cannot be confused with member reviews.
 
 The system SHALL calculate the Bottle score as the median of member review
 scores and permitted external review scores. For an even count, it SHALL use
-the lower middle score. The score SHALL be null until the
-combined count reaches 20.
+the lower middle score. The score SHALL be null only when no scores count.
 
-#### Scenario: Fewer than 20 scores
+#### Scenario: No scores
 
-- **WHEN** a Bottle has fewer than 20 counted member and external scores
+- **WHEN** a Bottle has no counted member or external scores
 - **THEN** its median score is null
 - **AND** its minimum and maximum scores are null
 - **AND** score sorting places it after Bottles with a visible median
 
-#### Scenario: Twenty scores
+#### Scenario: One score
 
-- **WHEN** a Bottle reaches 20 counted scores
+- **WHEN** a Bottle has one counted score
 - **THEN** the system publishes its median, minimum, maximum, total count,
   member count, and external count
 
@@ -160,7 +159,7 @@ combined count reaches 20.
 
 #### Scenario: Band-only Bottle
 
-- **WHEN** a Bottle has tasting bands but fewer than 20 counted review scores
+- **WHEN** a Bottle has tasting bands but no counted review scores
 - **THEN** its band counts are available
 - **AND** its median score remains null
 
@@ -188,11 +187,16 @@ present the band distribution as a percentage, stars, or a five-point score.
 - **THEN** the system shows their counts in the fixed band order
 - **AND** it does not print a percentage or star rating
 
-#### Scenario: Score is below the minimum count
+#### Scenario: Bottle has no score
 
-- **WHEN** fewer than 20 review scores count for a Bottle
+- **WHEN** no review scores count for a Bottle
 - **THEN** the score area shows no dash, zero, or estimated score
 - **AND** the page may link to the Bottle review form
+
+#### Scenario: Bottle has one score
+
+- **WHEN** one review score counts for a Bottle
+- **THEN** the score area shows that score and its count
 
 ### Requirement: BottleGroup summaries
 

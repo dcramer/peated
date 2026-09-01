@@ -215,7 +215,7 @@ describe("member reviews", () => {
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       memberScoreCount: 1,
       externalScoreCount: 0,
-      medianScore: null,
+      medianScore: 93,
     });
   });
 });

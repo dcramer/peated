@@ -208,7 +208,7 @@ page composition and its live product adapter are ready to replace it together.
 
 - **WHEN** the bottle list supplies published median scores in descending score order
 - **THEN** the homepage renders those bottles as Highest rated and hydrates the matching client query
-- **AND** the interface does not derive the ranking or expose a median below the publication floor
+- **AND** the interface does not derive the ranking
 
 #### Scenario: The homepage shell renders
 
@@ -603,6 +603,11 @@ The web application SHALL compose an entity overview from reusable StyleX compon
 - **WHEN** a brand, bottler, distillery, or blender has no supplied bottle rows
 - **THEN** the page keeps its Bottles or Bottlings module visible and offers an Add a bottle button instead of removing the section
 
+#### Scenario: Entity header actions align with the identity
+
+- **WHEN** an entity page supplies header actions
+- **THEN** the page places them below the entity copy and aligns them with its left edge
+
 #### Scenario: Entity detail data is not owned
 
 - **WHEN** the API does not supply operating status, still count, capacity, entity-level community measures, or sourced history
@@ -617,6 +622,7 @@ The web application SHALL compose an entity overview from reusable StyleX compon
 
 - **WHEN** the bottle-list endpoint supplies an entity page, sort order, total, and cursor links
 - **THEN** the Bottles tab renders the shared bottle rows, writes sorting and cursor state to the URL, and does not duplicate the complete route in Storybook
+- **AND** entity overviews, entity bottle tabs, the bottle catalog, and homepage bottle modules use the same bottle list and row components
 
 #### Scenario: Member browses entity tastings
 

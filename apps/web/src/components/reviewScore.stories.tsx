@@ -29,18 +29,15 @@ export const Overview: Story = {
   render: (args) => (
     <StoryStack>
       <ReviewScore {...args} />
+      <ReviewScore count={1} high={89} low={89} median={89} />
       <ReviewScore
         contributionAction={
           <Button size="sm" variant="text">
             Write a review
           </Button>
         }
-        count={12}
-        high={94}
-        low={79}
-        median={89}
+        count={0}
       />
-      <ReviewScore count={0} />
     </StoryStack>
   ),
 };

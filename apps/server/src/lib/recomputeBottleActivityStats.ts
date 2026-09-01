@@ -1,7 +1,4 @@
-import {
-  EMPTY_TASTING_BAND_COUNTS,
-  MIN_BOTTLE_SCORE_COUNT,
-} from "@peated/server/constants";
+import { EMPTY_TASTING_BAND_COUNTS } from "@peated/server/constants";
 import type { AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import {
@@ -116,18 +113,12 @@ export async function aggregateBottleActivityStatsInTransaction(
 
   const memberScoreCount = requiredCount(raw.memberScoreCount);
   const externalScoreCount = requiredCount(raw.externalScoreCount);
-  const scoreCount = memberScoreCount + externalScoreCount;
 
   return {
     totalTastings: requiredCount(raw.totalTastings),
-    medianScore:
-      scoreCount >= MIN_BOTTLE_SCORE_COUNT
-        ? requiredScore(raw.medianScore)
-        : null,
-    minScore:
-      scoreCount >= MIN_BOTTLE_SCORE_COUNT ? requiredScore(raw.minScore) : null,
-    maxScore:
-      scoreCount >= MIN_BOTTLE_SCORE_COUNT ? requiredScore(raw.maxScore) : null,
+    medianScore: requiredScore(raw.medianScore),
+    minScore: requiredScore(raw.minScore),
+    maxScore: requiredScore(raw.maxScore),
     memberScoreCount,
     externalScoreCount,
     tastingBandCounts: {

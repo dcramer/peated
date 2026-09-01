@@ -92,8 +92,8 @@ data. Application code calls them `legacySimpleRatingAverage` and
 `legacySimpleRatingStats`. Current summaries do not read or update them.
 
 `scoreCount` is the sum of the two score counts in the API. The score and range
-stay `null` until at least 20 counted scores exist. The median uses the lower
-middle value when the count is even.
+stay `null` when no counted scores exist. The median uses the lower middle value
+when the count is even.
 
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
 active members. They exclude retired Bottles.

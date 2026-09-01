@@ -5,8 +5,7 @@ import type { ReactNode } from "react";
 import { useId } from "react";
 
 import {
-  BottleIdentityRow,
-  BottleRatings,
+  BottleList,
   Button,
   ButtonLink,
   CursorPager,
@@ -17,41 +16,19 @@ import {
   ListToolbar,
   Select,
   TextInput,
+  type BottleListItem,
   type ListSortOption,
-  type TastingRatingCounts,
 } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
-import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 
 const NARROW = "@media (max-width: 759px)";
-
-export type BottleCatalogItem = {
-  bandCounts: TastingRatingCounts;
-  brand: string;
-  brandHref?: string;
-  hasTasted?: boolean;
-  href: string;
-  id: string;
-  imageUrl?: string | null;
-  isLibrary?: boolean;
-  metadata: readonly string[];
-  name: string;
-  relatedReleases?: {
-    count: number;
-    href: string;
-  };
-  medianScore: number | null;
-  scoreHigh: number | null;
-  scoreLow: number | null;
-  scoreCount: number;
-};
 
 export type BottleCatalogListProps = {
   emptyAction?: ReactNode;
   emptyDescription?: ReactNode;
   emptyHeading?: string;
-  items: readonly BottleCatalogItem[];
+  items: readonly BottleListItem[];
   nextHref?: string;
   onClear?: () => void;
   onSortChange: (value: string) => void;
@@ -89,7 +66,7 @@ export function BottleCatalogList({
             sortOptions={sortOptions}
             total={total}
           />
-          <BottleCatalogTable items={items} />
+          <BottleList ariaLabel="Bottle records" items={items} />
         </>
       ) : (
         <EmptyState
@@ -121,60 +98,6 @@ export function BottleCatalogList({
         previousHref={previousHref}
       />
     </section>
-  );
-}
-
-function BottleCatalogTable({
-  items,
-}: {
-  items: readonly BottleCatalogItem[];
-}) {
-  const columns: CatalogTableColumn<BottleCatalogItem>[] = [
-    {
-      cell: (item) => (
-        <BottleIdentityRow
-          brand={item.brand}
-          brandHref={item.brandHref}
-          hasTasted={item.hasTasted}
-          href={item.href}
-          imageUrl={item.imageUrl}
-          isLibrary={item.isLibrary}
-          layout="cell"
-          metadata={item.metadata}
-          name={item.name}
-          relatedReleases={item.relatedReleases}
-        />
-      ),
-      header: "Bottle",
-      key: "bottle",
-      padding: "flush",
-    },
-    {
-      align: "center",
-      cell: (item) => (
-        <BottleRatings
-          counts={item.bandCounts}
-          high={item.scoreHigh}
-          low={item.scoreLow}
-          median={item.medianScore}
-          scoreCount={item.scoreCount}
-        />
-      ),
-      header: "Rating",
-      key: "rating",
-      padding: "flush",
-      width: "rating",
-    },
-  ];
-
-  return (
-    <CatalogTable
-      caption="Bottle records"
-      columns={columns}
-      getKey={(item) => item.id}
-      items={items}
-      linked
-    />
   );
 }
 

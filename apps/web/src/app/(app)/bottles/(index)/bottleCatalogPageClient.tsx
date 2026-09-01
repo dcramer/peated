@@ -16,12 +16,12 @@ import {
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
-import { toBottleCatalogItem } from "@peated/web/lib/bottleCatalogItem";
 import {
   BOTTLE_CATALOG_ALLOWED_VALUES,
   BOTTLE_CATALOG_QUERY_FIELDS,
   normalizeBottleCatalogQueryParams,
 } from "@peated/web/lib/bottleCatalogQueryParams";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
@@ -133,7 +133,12 @@ export function BottleCatalogPageClient({
     router.push(buildSearchHref(pathname, nextParams));
   }
 
-  const items = bottleList.results.map(toBottleCatalogItem);
+  const items = bottleList.results.map((bottle) =>
+    toBottleListItem(bottle, {
+      includeRatings: true,
+      includeRelatedReleases: true,
+    }),
+  );
   const facetGroups = [
     {
       label: "Category",

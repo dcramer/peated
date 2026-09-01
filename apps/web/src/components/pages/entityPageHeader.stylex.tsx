@@ -33,6 +33,7 @@ export function EntityPageHeader({
     <div>
       <PageHeader
         actions={actions}
+        actionsPosition="start"
         description={description}
         eyebrow={eyebrow}
         identity={<PeatedId detail={detail} id={id} />}

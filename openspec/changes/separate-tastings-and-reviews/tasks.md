@@ -50,12 +50,12 @@
 - [x] 3.3 Apply the same calculation to BottleGroups and keep retired
       Bottles excluded
 - [x] 3.4 Update Bottle schemas, serializers, sorting, filtering, search, and
-      structured data to use the new summary and the 20-score floor
+      structured data to use the new summary and show the first counted score
 - [x] 3.5 Recalculate affected Bottle summaries after external reviews are
       imported, reassigned, hidden, or affected by a score-display policy change;
       queue large policy changes in small batches
 - [x] 3.6 Add integration tests for which scores count, member and external
-      counts, median boundaries, the 20-score floor, repeat tasting bands, and
+      counts, median boundaries, empty scores, repeat tasting bands, and
       BottleGroup results
 - [x] 3.7 Recalculate active Bottle and BottleGroup summaries and verify external
       score counts against public reviews that meet the score rules
@@ -75,8 +75,8 @@
 - [x] 4.2 Add the Bottle review form for one 100-point score and optional notes,
       including edit and delete behavior
 - [x] 4.3 Update tasting rows, review lists, Bottle summaries, release-family
-      summaries, and Bottle tables to show the new bands and median score; hide the
-      score area below 20 counted scores
+      summaries, and Bottle lists to show the new bands and median score; show
+      the score after the first counted review
 - [x] 4.4 Keep old simple and star ratings readable on historical tasting rows
       without including them in new summaries
 - [x] 4.5 Show named bands with their ranges in fixed order and do not present

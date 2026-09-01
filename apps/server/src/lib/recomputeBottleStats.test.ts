@@ -98,7 +98,7 @@ describe("Bottle statistics recomputation", () => {
     ).toEqual(groupBefore);
   });
 
-  test("hides the range and median below 20 scores", async ({
+  test("publishes the range and median for one score", async ({
     defaults,
     fixtures,
   }) => {
@@ -112,9 +112,9 @@ describe("Bottle statistics recomputation", () => {
 
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       totalTastings: 1,
-      medianScore: null,
-      minScore: null,
-      maxScore: null,
+      medianScore: 92,
+      minScore: 92,
+      maxScore: 92,
       memberScoreCount: 1,
       externalScoreCount: 0,
     });
@@ -165,11 +165,13 @@ describe("Bottle statistics recomputation", () => {
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       memberScoreCount: 0,
       externalScoreCount: 1,
-      medianScore: null,
+      medianScore: 90,
+      minScore: 90,
+      maxScore: 90,
     });
   });
 
-  test("uses member and external scores together at the publication floor", async ({
+  test("uses member and external scores together", async ({
     defaults,
     fixtures,
   }) => {
