@@ -694,7 +694,13 @@ export const bottlesToDistillers = pgTable(
       .references(() => entities.id)
       .notNull(),
   },
-  (table) => [primaryKey({ columns: [table.bottleId, table.distillerId] })],
+  (table) => [
+    primaryKey({ columns: [table.bottleId, table.distillerId] }),
+    index("bottle_distiller_distiller_bottle_idx").on(
+      table.distillerId,
+      table.bottleId,
+    ),
+  ],
 );
 
 export const bottlesToDistillersRelations = relations(

@@ -33,6 +33,7 @@ export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
             aria-current={current ? "page" : undefined}
             href={item.href}
             key={item.href}
+            prefetch={false}
             {...stylex.props(styles.tab, current && styles.currentTab)}
           >
             <span>{item.label}</span>

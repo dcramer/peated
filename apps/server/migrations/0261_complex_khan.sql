@@ -1,0 +1,1 @@
+CREATE INDEX "bottle_distiller_distiller_bottle_idx" ON "bottle_distiller" USING btree ("distiller_id","bottle_id");
