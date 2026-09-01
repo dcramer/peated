@@ -1,23 +1,88 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 import {
   bottleGroupRepresentative,
+  existingBottle,
+  existingBottleDetails,
   priceSite,
+  testBottler,
+  testBrand,
   testOwnedEntity,
   testOwner,
+  testRegion,
   testUser,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 const publicRoutes = [
-  ["home", "/"],
+  {
+    heading: "A record of whisky, bottle by bottle.",
+    name: "home",
+    path: "/",
+  },
+  {
+    heading: "Search the database",
+    name: "search",
+    path: "/search",
+  },
+  {
+    heading: existingBottleDetails.group.fullName,
+    name: "bottle detail",
+    path: `/bottles/${existingBottle.id}`,
+  },
+  {
+    heading: testRegion.name,
+    name: "region detail",
+    path: `/locations/${testRegion.country.slug}/regions/${testRegion.slug}`,
+  },
+  {
+    heading: testUser.username,
+    name: "member profile",
+    path: `/users/${testUser.username}`,
+  },
+  { heading: "Sign in", name: "login", path: "/login" },
+  {
+    heading: testBrand.name,
+    name: "brand detail",
+    path: `/brands/${testBrand.id}`,
+  },
+  {
+    heading: testOwnedEntity.name,
+    name: "distillery detail",
+    path: `/distillers/${testOwnedEntity.id}`,
+  },
+  {
+    heading: testBottler.name,
+    name: "bottler detail",
+    path: `/bottlers/${testBottler.id}`,
+  },
+] as const;
+
+const otherPublicRoutes = [
   ["Bottle releases", `/bottles/${bottleGroupRepresentative.id}/releases`],
   ["distillers", "/distillers"],
-  ["distillery", `/distillers/${testOwnedEntity.id}`],
   ["company", `/companies/${testOwner.id}`],
 ] as const;
 
-for (const [name, path] of publicRoutes) {
+test("public routes load", async ({ page, snapshot }) => {
+  for (const route of publicRoutes) {
+    await test.step(route.name, async () => {
+      const response = await page.goto(route.path, { waitUntil: "commit" });
+
+      expect(response?.status()).toBeLessThan(400);
+      if ("heading" in route) {
+        await expect(
+          page
+            .getByRole("heading", { exact: true, name: route.heading })
+            .first(),
+        ).toBeVisible();
+        await snapshot(route.name);
+      }
+    });
+  }
+});
+
+for (const [name, path] of otherPublicRoutes) {
   test(`${name} route loads`, async ({ page }) => {
     const response = await page.goto(path, { waitUntil: "commit" });
 
@@ -41,7 +106,7 @@ test("Add Entity route loads for a signed-in member", async ({
 test(
   "mobile navigation opens and reaches the bottle catalog",
   { tag: "@mobile" },
-  async ({ page }) => {
+  async ({ page, snapshot }) => {
     await page.goto("/");
 
     await page.getByRole("button", { name: "Open navigation" }).click();
@@ -50,6 +115,7 @@ test(
     });
 
     await expect(navigation).toBeVisible();
+    await snapshot("navigation open", { fullPage: false });
     await navigation.getByRole("link", { name: "Bottles" }).click();
     await expect(page).toHaveURL(/\/bottles$/);
   },

@@ -1,6 +1,6 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { expect, type Request, test, type TestInfo } from "@playwright/test";
 import { z } from "zod";
+import { expect, type Request, test, type TestInfo } from "./test";
 
 import { bottlePathPattern } from "./assertions";
 import {

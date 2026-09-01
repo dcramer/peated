@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, test } from "./test";
 
 import { bottleHrefSelector } from "./assertions";
 import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";

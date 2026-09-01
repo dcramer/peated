@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./test";
 
 import { adminUser, testAccessToken, testUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";

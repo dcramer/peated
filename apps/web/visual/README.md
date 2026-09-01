@@ -1,128 +1,72 @@
-# Web screenshots in pull requests
+# E2E snapshots in pull requests
 
-This tool takes repeatable screenshots for web changes. CI captures the pull
-request base and candidate revisions, compares matching PNG files, and links to
-a focused Frameshift report. A page change does not fail CI.
+Playwright E2E tests can capture stable screenshots at useful workflow states.
+CI compares these snapshots with the exact pull request base through
+[Frameshift](https://frameshift.pub). Pixel changes do not fail the E2E test or
+the screenshot workflow.
 
-Each page has its own file in `visual/scenarios/`. That file contains:
+Snapshots are checkpoints inside behavioral E2E tests. There is no separate
+visual scenario registry or visual test suite. Do not add a test whose only
+outcome is a screenshot.
 
-- The URL to open.
-- The heading that proves the page loaded.
-- Whether the page needs a signed-in user.
-- The desktop and mobile browser sizes.
-- `shouldRunFor`, which lists the source changes that affect the page.
+## Capture a snapshot
 
-The ordered scenario list is in `visual/scenarios/index.mjs`. The four-page
-limit is in `visual/select-scenarios.mjs`.
+Import `test` and `expect` from the shared E2E fixture:
 
-## How CI chooses pages
+```ts
+import { expect, test } from "./test";
 
-CI checks each changed file against each scenario's `shouldRunFor` function.
-It captures the first four matching scenarios. This keeps each report focused.
+test("opens the account menu", async ({ page, snapshot }) => {
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "Account" }).click();
+  await expect(page.getByRole("menu")).toBeVisible();
 
-Shared UI and web setup changes match four representative pages: home, bottle
-detail, member profile, and log a tasting. Changes to fixed test data match
-each page that reads that data. The four-page limit still applies. Test-only
-changes do not capture a page.
-
-Add the `run-all-screenshots` label to capture every scenario.
-
-## Where the baseline comes from
-
-The default-branch job captures every scenario once for each `main` commit. It
-stores the complete screenshot directory in a GitHub Actions artifact named
-with that commit's full SHA.
-
-GitHub's `pull_request` event identifies the exact base SHA and a temporary
-candidate merge commit. The pull request workflow restores the artifact for
-that base SHA, captures only the selected candidate scenarios, and selects the
-matching files from the complete baseline:
-
-```text
-main commit ──capture once──> GitHub artifact keyed by base SHA
-                                      │
-pull request ──capture candidate──────┴──> Frameshift comparison
+  await snapshot("account menu open");
+});
 ```
 
-The restore Action checks both the artifact name and its source SHA. The
-selection step also checks the SHA recorded in `manifest.json`, the capture
-contract version, the runner platform, and the exact Chromium version. An
-incompatible artifact fails before pixel comparison instead of producing
-false visual changes.
+The fixture waits for fonts, disables animation and caret differences, and
+hides the Next.js development portal. It uses a full-page screenshot by
+default. Pass `{ fullPage: false }` when the viewport itself is part of the
+workflow state, such as an open mobile menu.
 
-The stable artifact ID includes the capture-contract version. Increment it
-with the contract in `capture.mjs` when an intentional capture change makes old
-artifacts incompatible. A missing or expired artifact fails with instructions
-to run the baseline workflow; CI does not silently repeat the baseline capture
-in the pull request job.
-
-Artifacts are retained for 30 days. Active pull requests normally use a recent
-`main` commit. An older branch can regenerate its exact base artifact by
-running the baseline workflow for that revision before retrying the pull
-request job.
+Use a short checkpoint name that describes the visible state. The stable path
+also includes the spec, test titles, and Playwright project. A test cannot use
+the same checkpoint name twice.
 
 ## Run locally
 
-Capture named scenarios:
+Run the normal E2E suite:
 
 ```sh
-pnpm visual:web -- --scenarios home,bottle-detail
+pnpm test:e2e
 ```
 
-Capture all scenarios:
+Images and `manifest.json` go to `apps/web/.playwright/visual/`. The directory
+is reset at the start of each Playwright run.
 
-```sh
-pnpm visual:web -- --all
+## Frameshift flow
+
+The web screenshot workflow runs the normal E2E suite for both `main` and pull
+request revisions. Each `main` run uploads all E2E snapshots in an artifact
+keyed by the full commit SHA. A pull request run restores the artifact for the
+merge commit's first parent and compares it with the candidate snapshots:
+
+```text
+main commit --run E2E--> revision-keyed baseline artifact
+                                      |
+pull request --run E2E----------------+--> Frameshift report
 ```
 
-Choose scenarios from changed files:
+Before comparison, CI checks the source SHA, capture contract, platform,
+runner image, and exact Chromium version. An incompatible or missing baseline
+fails with an instruction to generate the exact baseline. CI does not silently
+capture the base with pull request code.
 
-```sh
-git diff --name-only origin/main...HEAD > /tmp/peated-screenshot-changes.txt
-pnpm visual:web -- --changed-file /tmp/peated-screenshot-changes.txt
-```
+The capture job has read-only permissions. It uploads only the Frameshift
+report for pull requests. A dependent job does not check out pull request code;
+it publishes the validated report and adds the pull request link. Published
+reports and baseline artifacts expire after 30 days.
 
-Images and `manifest.json` go to `apps/web/.playwright/visual/`.
-
-CI uses the pinned Frameshift Action to compare the base and candidate
-directories. The report contains `report.json` plus only the images needed for
-review. The PR comment and native `Frameshift` commit status link to the same
-immutable report on [frameshift.pub](https://frameshift.pub).
-
-The pull request job uploads only `report.json` and its review images. The full
-candidate screenshots stay on the runner. Complete default-branch baselines
-use the separate revision-keyed artifact.
-
-## Frameshift setup
-
-Peated uses pinned Frameshift comparison and publisher Actions. Matching
-relative paths identify the same screenshot:
-
-```yaml
-- uses: dcramer/frameshift@<full-commit-sha>
-  with:
-    baseline: path/to/baseline
-    candidate: path/to/candidate
-    output: path/to/report
-```
-
-The Action writes the report directory and returns the number of visual changes
-as the `changes` output. The capture job uploads that directory once. A small
-dependent job downloads it through `dcramer/frameshift/publish/workflow`. The
-publisher validates the Zod contract, creates the immutable report tag, and
-posts only a compact change summary plus the Frameshift link. This dependent
-job has write permission, but it never checks out or runs pull request code.
-Published reports expire after 30 days. Baseline retention is configured
-separately.
-
-## Add a scenario
-
-1. Copy the nearest scenario file in `visual/scenarios/`.
-2. Set its `id`, `label`, `path`, `heading`, and viewports.
-3. Write `shouldRunFor` so the file states when it runs.
-4. Add it to `visual/scenarios/index.mjs` in review order.
-5. Add selection tests for files that should and should not select it.
-6. Use fixed test data. Do not use production data or credentials.
-
-The tests check the filename, ID, required fields, browser sizes, and ordered
-list. A new scenario cannot pass `pnpm test` until these are complete.
+Snapshot paths identify the same state across revisions. Renaming a spec, test,
+or checkpoint intentionally removes the old path and adds a new one.
