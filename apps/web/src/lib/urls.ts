@@ -7,15 +7,6 @@ const ENTITY_COLLECTION_BY_KIND = {
   company: "/companies",
 } as const satisfies Record<EntityKind, `/${string}`>;
 
-export function getEntityRoutePrefixes(entityId: number): `/${string}`[] {
-  return [
-    ...Object.values(ENTITY_COLLECTION_BY_KIND).map(
-      (collection): `/${string}` => `${collection}/${entityId}`,
-    ),
-    `/entities/${entityId}`,
-  ];
-}
-
 export function getBottleUrl(
   bottle: Pick<{ id: number }, "id">,
 ): `/bottles/${number}` {

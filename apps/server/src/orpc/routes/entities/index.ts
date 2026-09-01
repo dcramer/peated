@@ -13,6 +13,7 @@ import images from "./images";
 import list from "./list";
 import merge from "./merge";
 import references from "./references";
+import resolve from "./resolve";
 import unfollow from "./unfollow";
 import update from "./update";
 
@@ -27,6 +28,7 @@ export default base.tag("entities").router({
   merge,
   aliases,
   references,
+  resolve,
   categories,
   events,
   follow,

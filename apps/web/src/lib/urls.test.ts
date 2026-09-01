@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getBottleUrl, getEntityRoutePrefixes, getEntityUrl } from "./urls";
+import { getBottleUrl, getEntityUrl } from "./urls";
 
 describe("public catalog URLs", () => {
   it("uses the Bottle collection and numeric ID", () => {
@@ -17,15 +17,5 @@ describe("public catalog URLs", () => {
 
   it("uses the generic Entity route when kind is unavailable", () => {
     expect(getEntityUrl({ id: 123, kind: null })).toBe("/entities/123");
-  });
-
-  it("lists every route prefix that can resolve an Entity", () => {
-    expect(getEntityRoutePrefixes(123)).toEqual([
-      "/brands/123",
-      "/distillers/123",
-      "/bottlers/123",
-      "/companies/123",
-      "/entities/123",
-    ]);
   });
 });

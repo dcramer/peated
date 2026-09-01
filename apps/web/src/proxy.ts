@@ -1,22 +1,45 @@
-import { resolvePeatedIdRoute } from "@peated/web/lib/peatedIdRoutes";
+import { isORPCNotFoundError } from "@peated/orpc/client/errors";
+import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import {
+  matchEntityRoute,
+  resolveBottlePeatedIdRoute,
+  resolveEntityRoute,
+} from "@peated/web/lib/peatedIdRoutes";
 import { type NextRequest, NextResponse } from "next/server";
 
 const PRIVATE_CACHE_CONTROL =
   "private, no-cache, no-store, max-age=0, must-revalidate";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   // Overwrite client input with the trusted route, including its exact query string.
   requestHeaders.set(
     "x-peated-request-path",
     `${request.nextUrl.pathname}${request.nextUrl.search}`,
   );
-  const resolution = resolvePeatedIdRoute(request.nextUrl.pathname);
+  const entityMatch = matchEntityRoute(request.nextUrl.pathname);
+  let resolution = resolveBottlePeatedIdRoute(request.nextUrl.pathname);
+
+  if (entityMatch) {
+    try {
+      const { client } = await createAnonymousServerClient();
+      const entity = await client.entities.resolve({
+        entity: entityMatch.entityId,
+      });
+      resolution = resolveEntityRoute(entityMatch, entity);
+    } catch (error) {
+      if (!isORPCNotFoundError(error)) throw error;
+      resolution = null;
+    }
+  }
   let response: NextResponse;
 
   if (resolution) {
     const destination = request.nextUrl.clone();
     destination.pathname = resolution.pathname;
+    if (resolution.action === "redirect") {
+      destination.searchParams.delete("_rsc");
+    }
     response =
       resolution.action === "redirect"
         ? NextResponse.redirect(destination, 308)

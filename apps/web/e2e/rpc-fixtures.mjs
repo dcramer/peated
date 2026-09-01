@@ -150,10 +150,13 @@ export const testOwnedEntity = {
   ownerId: testOwner.id,
   owner: {
     id: testOwner.id,
+    kind: testOwner.kind,
     peatedId: testOwner.peatedId,
     name: testOwner.name,
   },
 };
+
+export const replacementSourceEntityId = 9205;
 
 export const testBottler = {
   ...testBrand,
