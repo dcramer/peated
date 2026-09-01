@@ -41,17 +41,6 @@ function git(args, options = {}) {
   });
 }
 
-function imageLabels(...manifests) {
-  return new Map(
-    manifests.flatMap((manifest) =>
-      (manifest?.screenshots ?? []).map((screenshot) => [
-        screenshot.file,
-        String(screenshot.label).replace(/[\r\n[\]()]/g, " "),
-      ]),
-    ),
-  );
-}
-
 function validateImagePath(value, prefix = "") {
   if (
     value?.constructor !== String ||
@@ -111,11 +100,6 @@ export function validateReport(report) {
   return report;
 }
 
-function imageUrl(imageBaseUrl, imagePath) {
-  const encodedPath = imagePath.split("/").map(encodeURIComponent).join("/");
-  return `${imageBaseUrl}/${encodedPath}`;
-}
-
 export function frameshiftViewerUrl(repo, ref) {
   const viewerUrl = new URL("https://frameshift.pub/");
   viewerUrl.search = new URLSearchParams({ ref, repo }).toString();
@@ -131,85 +115,21 @@ export function frameshiftStatus(viewerUrl, changes) {
   };
 }
 
-function renderChange(screenshot, label, imageBaseUrl) {
-  const status =
-    screenshot.status[0].toUpperCase() + screenshot.status.slice(1);
-  const lines = [`### ${label} — ${status}`, ""];
-
-  if (screenshot.status === "changed") {
-    const before = imageUrl(imageBaseUrl, screenshot.images.baseline);
-    const after = imageUrl(imageBaseUrl, screenshot.images.candidate);
-    const diff = imageUrl(imageBaseUrl, screenshot.images.diff);
-    lines.push(
-      "| Before | After |",
-      "| --- | --- |",
-      `| ![${label} before](${before}) | ![${label} after](${after}) |`,
-      "",
-      "<details>",
-      "<summary>Pixel diff</summary>",
-      "",
-      `![${label} pixel diff](${diff})`,
-      "",
-      "</details>",
-      "",
-    );
-  } else {
-    const kind = screenshot.status === "added" ? "candidate" : "baseline";
-    const heading = screenshot.status === "added" ? "After" : "Before";
-    lines.push(
-      `#### ${heading}`,
-      "",
-      `![${label} ${heading.toLowerCase()}](${imageUrl(imageBaseUrl, screenshot.images[kind])})`,
-      "",
-    );
-  }
-
-  return lines.join("\n");
-}
-
-export function buildBody(
-  { baseline, candidate, report },
-  imageBaseUrl,
-  viewerUrl,
-) {
-  const manifest = candidate;
-  const changedFiles = manifest.changedFiles.length
-    ? manifest.changedFiles
-        .slice(0, 8)
-        .map((file) => `- \`${file}\``)
-        .join("\n")
-    : "- None provided";
-  const labels = imageLabels(baseline, candidate);
+export function buildBody({ report }, viewerUrl) {
   const changes = report.files.filter((file) => file.status !== "unchanged");
-  const screenshots = changes
-    .map((screenshot) => {
-      const label = labels.get(screenshot.file) ?? screenshot.file;
-      return renderChange(screenshot, label, imageBaseUrl);
-    })
-    .join("\n");
-  const run =
-    manifest.selection === "all"
-      ? "Run: all pages (`run-all-screenshots` or `--all`)"
-      : manifest.selection === "named"
-        ? "Run: pages named by the command"
-        : "Run: pages matched to changed files";
+  const count = (status) =>
+    report.files.filter((file) => file.status === status).length;
+  const headline = changes.length
+    ? `**${changes.length} visual change${changes.length === 1 ? "" : "s"}** — ${count("changed")} changed · ${count("added")} added · ${count("removed")} removed`
+    : "**No visual changes**";
 
   return [
     MARKER,
-    "## Web screenshots",
+    "## Frameshift",
     "",
-    `[Open the full report in Frameshift](${viewerUrl})`,
+    headline,
     "",
-    run,
-    `Pages: \`${manifest.scenarioIds.join("`, `")}\``,
-    "",
-    "Changed files:",
-    changedFiles,
-    "",
-    changes.length === 0
-      ? "No visual changes in the selected pages."
-      : screenshots,
-    "_Compared from local Peated with fixed test data. Visual changes do not block the pull request._",
+    `[Review the visual report in Frameshift](${viewerUrl})`,
     "",
   ].join("\n");
 }
@@ -344,11 +264,7 @@ function main() {
   const branch = `web-screenshots/pr-${prNumber}`;
   const imageRef = publishImages(reportDir, result.report, branch, commitSha);
   const viewerUrl = frameshiftViewerUrl(repo, imageRef);
-  const body = buildBody(
-    result,
-    `https://raw.githubusercontent.com/${repo}/${imageRef}`,
-    viewerUrl,
-  );
+  const body = buildBody(result, viewerUrl);
   upsertComment(repo, prNumber, body);
   const changes = result.report.files.filter(
     (file) => file.status !== "unchanged",

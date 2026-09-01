@@ -38,7 +38,7 @@ describe("post PR comment", () => {
     expect(frameshiftStatus(viewerUrl, 2).description).toBe("2 visual changes");
   });
 
-  it("shows only changed screenshots", () => {
+  it("links to Frameshift with a text summary", () => {
     const candidate = manifest({
       screenshots: [
         { file: "login__desktop.png", label: "Login · desktop" },
@@ -65,30 +65,19 @@ describe("post PR comment", () => {
 
     const body = buildBody(
       { baseline: manifest(), candidate, report },
-      "https://example.com/screenshots",
       "https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc",
     );
 
     expect(shouldPostComment(candidate)).toBe(true);
-    expect(body).toContain("## Web screenshots");
+    expect(body).toContain("## Frameshift");
     expect(body).toContain(
-      "[Open the full report in Frameshift](https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc)",
-    );
-    expect(body).toContain("Run: pages matched to changed files");
-    expect(body).toContain("Pages: `login`");
-    expect(body).toContain("`apps/web/src/components/loginForm.tsx`");
-    expect(body).toContain("### Login · desktop — Changed");
-    expect(body).toContain(
-      "![Login · desktop before](https://example.com/screenshots/images/baseline/login__desktop.png)",
+      "**1 visual change** — 1 changed · 0 added · 0 removed",
     );
     expect(body).toContain(
-      "![Login · desktop after](https://example.com/screenshots/images/candidate/login__desktop.png)",
+      "[Review the visual report in Frameshift](https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc)",
     );
-    expect(body).toContain("<summary>Pixel diff</summary>");
-    expect(body).toContain(
-      "![Login · desktop pixel diff](https://example.com/screenshots/images/diff/login__desktop.png)",
-    );
-    expect(body).not.toContain("Login · mobile");
+    expect(body).not.toContain("![");
+    expect(body).not.toContain("apps/web/src/components/loginForm.tsx");
   });
 
   it("reports when selected pages have no visual changes", () => {
@@ -103,15 +92,13 @@ describe("post PR comment", () => {
           version: 1,
         },
       },
-      "https://example.com/screenshots",
       "https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc",
     );
 
-    expect(body).toContain("No visual changes in the selected pages.");
-    expect(body).not.toContain("https://example.com/screenshots/images");
+    expect(body).toContain("**No visual changes**");
   });
 
-  it("shows only the available side for added and removed screenshots", () => {
+  it("summarizes added and removed screenshots", () => {
     const body = buildBody(
       {
         baseline: manifest(),
@@ -135,18 +122,14 @@ describe("post PR comment", () => {
           version: 1,
         },
       },
-      "https://example.com/screenshots",
       "https://frameshift.pub/?repo=dcramer%2Fpeated&ref=abc",
     );
 
-    expect(body).toContain("### added.png — Added\n\n#### After");
     expect(body).toContain(
-      "![added.png after](https://example.com/screenshots/images/candidate/added.png)",
+      "**2 visual changes** — 0 changed · 1 added · 1 removed",
     );
-    expect(body).toContain("### removed.png — Removed\n\n#### Before");
-    expect(body).toContain(
-      "![removed.png before](https://example.com/screenshots/images/baseline/removed.png)",
-    );
+    expect(body).not.toContain("added.png");
+    expect(body).not.toContain("removed.png");
   });
 
   it("skips the comment when no page matches", () => {
