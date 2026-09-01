@@ -463,20 +463,20 @@ const styles = stylex.create({
   },
   reviewFacts: {
     display: "flex",
-    alignItems: "center",
-    gap: space.x3,
+    alignItems: "flex-end",
+    flexDirection: "column",
+    gap: space.x1,
   },
   reviewRating: {
     flexShrink: 0,
     color: colors.ink,
     fontFamily: fonts.data,
-    fontSize: "13px",
+    fontSize: "24px",
     fontVariantNumeric: "tabular-nums",
-    fontWeight: 500,
-    lineHeight: 1.2,
+    fontWeight: 600,
+    lineHeight: 1,
   },
   rowDate: {
-    width: "72px",
     flexShrink: 0,
     color: colors.inkMuted,
     fontFamily: fonts.data,
@@ -484,9 +484,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     textAlign: "right",
     whiteSpace: "nowrap",
-    [COMPACT]: {
-      display: "none",
-    },
   },
   originIntro: {
     maxWidth: "640px",
