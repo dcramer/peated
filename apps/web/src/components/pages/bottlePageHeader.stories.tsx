@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button, ButtonLink, RowMenu } from "..";
-import BottleImage from "../../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { BottlePageHeader } from "./bottlePageHeader.stylex";
 
@@ -21,10 +20,7 @@ const meta = {
     ),
     brand: "Laphroaig",
     brandHref: "/entities/809",
-    detail: "Islay · single malt · official bottling",
-    id: "B19936",
-    imageUrl: BottleImage.src,
-    memberStatus: { hasTasted: true, isLibrary: false },
+    eyebrow: "Laphroaig Distillery",
     menu: (
       <RowMenu
         groups={[
@@ -38,7 +34,6 @@ const meta = {
       />
     ),
     name: "Elements L 2.0",
-    notes: ["Cask strength", "Non-chill filtered"],
     bands: {
       counts: {
         good: 8,
@@ -69,26 +64,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const MissingImage: Story = {
-  args: {
-    brand: "Lagavulin",
-    brandHref: "/entities/245",
-    detail: "Islay · single malt · official bottling",
-    id: "B00042",
-    imageUrl: null,
-    name: "16-year-old",
-    notes: ["Sherry cask finish"],
-  },
-};
-
 export const LongName: Story = {
   args: {
     brand: "The Scotch Malt Whisky Society",
     brandHref: "/entities/3417",
-    detail: "Highland · single malt · independent bottling",
-    id: "B49748",
+    eyebrow: "Caol Ila Distillery",
     name: "SMWS Highland peaty potion",
-    notes: [],
   },
 };
 
@@ -97,13 +78,9 @@ export const ThinData: Story = {
     actions: null,
     brand: "Port Ellen",
     brandHref: "/entities/214",
-    detail: "Islay · single malt",
-    id: "B08172",
-    imageUrl: null,
-    memberStatus: undefined,
+    eyebrow: "Port Ellen Distillery",
     menu: null,
     name: "Independent bottling",
-    notes: [],
     bands: null,
     score: null,
   },

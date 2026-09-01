@@ -30,7 +30,6 @@ import {
 } from "@peated/web/components";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
-import Join from "@peated/web/components/join";
 import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
 import TimeSince from "@peated/web/components/timeSince";
@@ -61,31 +60,32 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-function getBottleDetail(bottle: Bottle) {
-  return (
-    <Join divider=" · ">
-      {[
-        bottle.category ? formatCategoryName(bottle.category) : null,
-        bottle.distillers.length ? (
-          <EntityLinks entities={bottle.distillers} key="distillers" />
-        ) : null,
-        bottle.bottler ? (
-          <EntityLinks entities={[bottle.bottler]} key="bottler" />
-        ) : null,
-      ].filter((value) => value !== null)}
-    </Join>
-  );
-}
-
-function getBottleNotes(bottle: Bottle) {
-  return [
-    bottle.caskStrength ? "Cask strength" : null,
-    bottle.singleCask ? "Single cask" : null,
-  ].filter((value): value is string => value !== null);
+function getBottleEyebrow(bottle: Bottle) {
+  return bottle.distillers.length ? (
+    <EntityLinks entities={bottle.distillers} />
+  ) : null;
 }
 
 function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
+    {
+      label: "Category",
+      value: bottle.category ? formatCategoryName(bottle.category) : null,
+    },
+    {
+      label: "Bottled by",
+      value: bottle.bottler ? (
+        <EntityLinks entities={[bottle.bottler]} />
+      ) : null,
+    },
+    {
+      label: "Strength",
+      value: bottle.caskStrength ? "Cask strength" : null,
+    },
+    {
+      label: "Cask selection",
+      value: bottle.singleCask ? "Single cask" : null,
+    },
     {
       label: "ABV",
       value: bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
@@ -363,7 +363,6 @@ export function BottlePageFrameClient({
   children: ReactNode;
   initialBottle: Bottle;
 }) {
-  const { user } = useAuth();
   const orpc = useORPC();
   const pathname = usePathname();
   const bottleQuery = useQuery({
@@ -414,22 +413,9 @@ export function BottlePageFrameClient({
           }
           brand={bottle.brand.shortName || bottle.brand.name}
           brandHref={getEntityUrl({ id: bottle.brand.id, kind: "brand" })}
-          detail={getBottleDetail(bottle)}
-          id={bottle.peatedId}
-          imageUrl={bottle.imageUrl}
-          imageSourceUrl={bottle.imageSourceUrl}
-          imageLicense={bottle.imageLicense}
-          memberStatus={
-            user
-              ? {
-                  hasTasted: bottle.hasTasted,
-                  isLibrary: bottle.isLibrary,
-                }
-              : undefined
-          }
+          eyebrow={getBottleEyebrow(bottle)}
           menu={<BottleActions bottle={bottle} />}
           name={formatBottleDisplayName(bottle, { includeBrand: false })}
-          notes={getBottleNotes(bottle)}
           score={
             bottle.scoreCount === 0
               ? null
@@ -574,6 +560,12 @@ export function BottleOverviewClient({
         }
         criticReviews={criticReviews}
         declaredFacts={getDeclaredFacts(bottle)}
+        image={{
+          label: formatBottleDisplayName(bottle),
+          license: bottle.imageLicense,
+          sourceUrl: bottle.imageSourceUrl,
+          url: bottle.imageUrl,
+        }}
         mainState={mainState}
         moreTastingsHref={`/bottles/${bottle.id}/tastings`}
         recommendationIntro={recommendationsQuery.data?.reason}
@@ -628,7 +620,7 @@ const styles = stylex.create({
     lineHeight: 1.55,
   },
   overview: {
-    marginTop: space.x8,
+    minWidth: 0,
   },
   partialError: {
     margin: 0,

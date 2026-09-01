@@ -40,6 +40,15 @@ export const Overview: Story = {
           },
         ]}
       />
+      <FactList
+        facts={[
+          { label: "Category", value: "Single malt" },
+          { label: "ABV", value: "58.8%" },
+          { label: "Age", value: "11 years" },
+          { label: "Cask", value: "First-fill ex-bourbon barrel" },
+        ]}
+        layout="grid"
+      />
     </StoryStack>
   ),
 };

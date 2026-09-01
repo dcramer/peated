@@ -8,6 +8,7 @@ import {
   CriticReview,
   FactList,
   hasVisibleFacts,
+  ImageAttribution,
   ItemList,
   ItemListItem,
   RailList,
@@ -17,9 +18,7 @@ import {
 } from "..";
 import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 
-const RAIL_SHRINKS = "@media (max-width: 1040px)";
-const RAIL_FOLDS = "@media (max-width: 900px)";
-const RAIL_STACKS = "@media (max-width: 680px)";
+const NARROW = "@media (max-width: 759px)";
 
 export type BottleRecommendation = {
   end?: ReactNode;
@@ -29,10 +28,18 @@ export type BottleRecommendation = {
   name: string;
 };
 
+export type BottleOverviewImage = {
+  label: string;
+  license?: string | null;
+  sourceUrl?: string | null;
+  url?: string | null;
+};
+
 export type BottleOverviewProps = {
   criticReviewDetail?: string;
   criticReviews?: readonly CriticReviewProps[];
   declaredFacts: readonly [FactListItem, ...FactListItem[]];
+  image: BottleOverviewImage;
   mainState?: ReactNode;
   moreTastingsHref?: string;
   recommendationHeading?: string;
@@ -42,11 +49,12 @@ export type BottleOverviewProps = {
   tastings?: readonly TastingEntryProps[];
 };
 
-/** Composes the bounded content section beneath a bottle's page header. */
+/** Composes the bottle facts, image, reviews, tastings, and recommendations. */
 export function BottleOverview({
   criticReviewDetail,
   criticReviews = [],
   declaredFacts,
+  image,
   mainState,
   moreTastingsHref,
   recommendationHeading = "If you liked this",
@@ -56,98 +64,115 @@ export function BottleOverview({
   tastings = [],
 }: BottleOverviewProps) {
   const hasDeclaredFacts = hasVisibleFacts(declaredFacts);
-  const hasRail = hasDeclaredFacts || recommendations.length > 0;
 
   return (
-    <div {...stylex.props(styles.layout, !hasRail && styles.layoutWithoutRail)}>
+    <div {...stylex.props(styles.layout)}>
       <div {...stylex.props(styles.main)}>
-        {criticReviews.length ? (
-          <section {...stylex.props(styles.section)}>
-            <div {...stylex.props(styles.sectionHeader)}>
-              <SectionHeading>Critic reviews</SectionHeading>
-              {criticReviewDetail ? (
-                <span {...stylex.props(styles.sectionDetail)}>
-                  {criticReviewDetail}
-                </span>
-              ) : null}
-            </div>
-            <ItemList ariaLabel="Critic reviews">
-              {criticReviews.map((review, index) => (
-                <ItemListItem
-                  key={`${review.publication}-${review.publishedAt ?? index}`}
-                >
-                  <CriticReview {...review} />
-                </ItemListItem>
-              ))}
-            </ItemList>
-          </section>
+        {hasDeclaredFacts ? (
+          <div {...stylex.props(styles.facts)}>
+            <FactList facts={declaredFacts} layout="grid" />
+          </div>
         ) : null}
 
-        {tastings.length ? (
-          <section {...stylex.props(styles.section)}>
-            <SectionHeading>Tastings</SectionHeading>
-            <ItemList ariaLabel="Bottle tastings">
-              {tastings.map((tasting, index) => (
-                <ItemListItem key={`${tasting.author}-${index}`}>
-                  <TastingEntry {...tasting} />
-                </ItemListItem>
-              ))}
-            </ItemList>
-            {moreTastingsHref &&
-            tastingCount !== undefined &&
-            tastingCount > tastings.length ? (
-              <AppLink
-                href={moreTastingsHref}
-                {...stylex.props(styles.moreLink)}
-              >
-                Show all {tastingCount.toLocaleString("en-US")} tastings →
-              </AppLink>
-            ) : null}
-          </section>
-        ) : null}
-
-        {!criticReviews.length && !tastings.length ? mainState : null}
-      </div>
-
-      {hasRail ? (
-        <aside aria-label="Bottle details" {...stylex.props(styles.rail)}>
-          {hasDeclaredFacts ? (
-            <div {...stylex.props(styles.railSection)}>
-              <div {...stylex.props(styles.panel)}>
-                <FactList facts={declaredFacts} />
+        <div {...stylex.props(styles.content)}>
+          {criticReviews.length ? (
+            <section {...stylex.props(styles.section)}>
+              <div {...stylex.props(styles.sectionHeader)}>
+                <SectionHeading>Critic reviews</SectionHeading>
+                {criticReviewDetail ? (
+                  <span {...stylex.props(styles.sectionDetail)}>
+                    {criticReviewDetail}
+                  </span>
+                ) : null}
               </div>
-            </div>
-          ) : null}
-
-          {recommendations.length ? (
-            <section {...stylex.props(styles.railSection)}>
-              <h2 {...stylex.props(styles.railHeading)}>
-                {recommendationHeading}
-              </h2>
-              {recommendationIntro ? (
-                <p {...stylex.props(styles.railIntro)}>{recommendationIntro}</p>
-              ) : null}
-              <RailList ariaLabel={recommendationHeading}>
-                {recommendations.map((recommendation) => (
-                  <RailListItem
-                    end={recommendation.end}
-                    href={recommendation.href}
-                    key={recommendation.href}
-                    leading={
-                      <BottleVisual
-                        imageUrl={recommendation.imageUrl}
-                        size="sm"
-                      />
-                    }
-                    metadata={recommendation.metadata}
-                    title={recommendation.name}
-                  />
+              <ItemList ariaLabel="Critic reviews">
+                {criticReviews.map((review, index) => (
+                  <ItemListItem
+                    key={`${review.publication}-${review.publishedAt ?? index}`}
+                  >
+                    <CriticReview {...review} />
+                  </ItemListItem>
                 ))}
-              </RailList>
+              </ItemList>
             </section>
           ) : null}
-        </aside>
-      ) : null}
+
+          {tastings.length ? (
+            <section {...stylex.props(styles.section)}>
+              <SectionHeading>Tastings</SectionHeading>
+              <ItemList ariaLabel="Bottle tastings">
+                {tastings.map((tasting, index) => (
+                  <ItemListItem key={`${tasting.author}-${index}`}>
+                    <TastingEntry {...tasting} />
+                  </ItemListItem>
+                ))}
+              </ItemList>
+              {moreTastingsHref &&
+              tastingCount !== undefined &&
+              tastingCount > tastings.length ? (
+                <AppLink
+                  href={moreTastingsHref}
+                  {...stylex.props(styles.moreLink)}
+                >
+                  Show all {tastingCount.toLocaleString("en-US")} tastings →
+                </AppLink>
+              ) : null}
+            </section>
+          ) : null}
+
+          {!criticReviews.length && !tastings.length ? mainState : null}
+        </div>
+      </div>
+
+      <aside
+        aria-label="Bottle media and recommendations"
+        {...stylex.props(styles.rail)}
+      >
+        <figure {...stylex.props(styles.media)}>
+          <BottleVisual
+            expandable
+            imageUrl={image.url}
+            label={image.label}
+            size="xl"
+          />
+          {image.url && (image.sourceUrl || image.license) ? (
+            <figcaption {...stylex.props(styles.caption)}>
+              <ImageAttribution
+                license={image.license}
+                sourceUrl={image.sourceUrl}
+              />
+            </figcaption>
+          ) : null}
+        </figure>
+
+        {recommendations.length ? (
+          <section {...stylex.props(styles.recommendations)}>
+            <h2 {...stylex.props(styles.railHeading)}>
+              {recommendationHeading}
+            </h2>
+            {recommendationIntro ? (
+              <p {...stylex.props(styles.railIntro)}>{recommendationIntro}</p>
+            ) : null}
+            <RailList ariaLabel={recommendationHeading}>
+              {recommendations.map((recommendation) => (
+                <RailListItem
+                  end={recommendation.end}
+                  href={recommendation.href}
+                  key={recommendation.href}
+                  leading={
+                    <BottleVisual
+                      imageUrl={recommendation.imageUrl}
+                      size="sm"
+                    />
+                  }
+                  metadata={recommendation.metadata}
+                  title={recommendation.name}
+                />
+              ))}
+            </RailList>
+          </section>
+        ) : null}
+      </aside>
     </div>
   );
 }
@@ -155,24 +180,59 @@ export function BottleOverview({
 const styles = stylex.create({
   layout: {
     display: "grid",
+    gridTemplateAreas: {
+      default: '"main rail"',
+      [NARROW]: '"facts" "media" "content" "recommendations"',
+    },
     gridTemplateColumns: {
       default: "minmax(0, 1fr) 336px",
-      [RAIL_SHRINKS]: "minmax(0, 1fr) 300px",
-      [RAIL_FOLDS]: "minmax(0, 1fr)",
+      [NARROW]: "minmax(0, 1fr)",
     },
     minWidth: 0,
     alignItems: "start",
-    columnGap: space.x8,
-    rowGap: space.x8,
-  },
-  layoutWithoutRail: {
-    gridTemplateColumns: "minmax(0, 1fr)",
+    columnGap: space.x12,
   },
   main: {
+    gridArea: "main",
+    display: { default: "flex", [NARROW]: "contents" },
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x8,
+  },
+  facts: {
+    gridArea: "facts",
+    minWidth: 0,
+  },
+  content: {
+    gridArea: "content",
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
     gap: space.x8,
+  },
+  rail: {
+    gridArea: "rail",
+    display: { default: "flex", [NARROW]: "contents" },
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x8,
+  },
+  media: {
+    gridArea: "media",
+    minWidth: 0,
+    margin: 0,
+    marginTop: space.x4,
+  },
+  caption: {
+    marginTop: space.x2,
+    color: colors.inkMuted,
+  },
+  recommendations: {
+    gridArea: "recommendations",
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x2,
   },
   section: {
     minWidth: 0,
@@ -219,23 +279,6 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
-  rail: {
-    display: { default: "flex", [RAIL_FOLDS]: "grid" },
-    minWidth: 0,
-    flexDirection: "column",
-    gridTemplateColumns: {
-      default: "none",
-      [RAIL_FOLDS]: "repeat(2, minmax(0, 1fr))",
-      [RAIL_STACKS]: "minmax(0, 1fr)",
-    },
-    gap: { default: space.x6, [RAIL_FOLDS]: "6px", [RAIL_STACKS]: space.x6 },
-  },
-  railSection: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x2,
-  },
   railHeading: {
     margin: 0,
     fontFamily: fonts.display,
@@ -250,12 +293,5 @@ const styles = stylex.create({
     fontFamily: fonts.data,
     fontSize: "10px",
     lineHeight: 1.4,
-  },
-  panel: {
-    paddingTop: space.x1,
-    paddingRight: 0,
-    paddingBottom: space.x1,
-    paddingLeft: 0,
-    backgroundColor: "transparent",
   },
 });

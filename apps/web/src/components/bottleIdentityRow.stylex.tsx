@@ -17,7 +17,7 @@ import { getTextTitle } from "./textTitle";
 const COMPACT = "@media (max-width: 639px)";
 const bottleIconUrl = "/assets/bottle.svg";
 
-export type BottleVisualSize = "sm" | "md" | "lg";
+export type BottleVisualSize = "sm" | "md" | "lg" | "xl";
 export type BottleIdentityRowSize = Extract<BottleVisualSize, "sm" | "md">;
 
 export type BottleVisualProps = {
@@ -228,6 +228,11 @@ const styles = stylex.create({
     height: { default: "176px", [COMPACT]: "120px" },
     padding: { default: space.x2, [COMPACT]: space.x1 },
   },
+  visualExtraLarge: {
+    width: "100%",
+    aspectRatio: "4 / 5",
+    padding: space.x4,
+  },
   image: {
     display: "block",
     width: "100%",
@@ -414,4 +419,5 @@ const visualSizeStyles = {
   sm: styles.visualSmall,
   md: styles.visualMedium,
   lg: styles.visualLarge,
+  xl: styles.visualExtraLarge,
 } satisfies Record<BottleVisualSize, stylex.StyleXStyles>;
