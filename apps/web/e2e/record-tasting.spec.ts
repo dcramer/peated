@@ -30,14 +30,14 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "What do you want to log?" }),
     ).toBeVisible();
-    await snapshot("Choose tasting or review");
+    await snapshot("Tasting form / Choose entry type");
     await page.getByRole("button", { name: /^Write a review/ }).click();
 
     await expect(
       page.getByRole("heading", { name: "Write a review" }),
     ).toBeVisible();
     await expect(page.getByLabel("Score out of 100")).toHaveValue("80");
-    await snapshot("Review score step");
+    await snapshot("Tasting form / Review / 1 Score");
     const progress = page.getByRole("navigation", { name: "Form progress" });
     await expect(progress).toContainText("Score");
     await expect(progress).toContainText("Notes");
@@ -48,11 +48,11 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Your notes" }),
     ).toBeVisible();
     await page.getByLabel("Notes").fill("Coastal and waxy.");
-    await snapshot("Review notes step");
+    await snapshot("Tasting form / Review / 2 Notes");
 
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page.getByRole("heading", { name: "Picture" })).toBeVisible();
-    await snapshot("Review details step");
+    await snapshot("Tasting form / Review / 3 Details");
     await expect(
       page.getByRole("button", { name: "Save review" }),
     ).toBeVisible();
@@ -74,15 +74,15 @@ test.describe("log tasting", () => {
       new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=tasting$`),
     );
     await chooseVeryGood(page);
-    await snapshot("Tasting rating step");
+    await snapshot("Tasting form / Tasting / 1 Rating");
     await fillComments(page, tastingNotes);
-    await snapshot("Tasting notes step");
+    await snapshot("Tasting form / Tasting / 2 Notes");
     await page.getByRole("button", { name: "Browse" }).click();
     await expect(page.getByRole("heading", { name: "Notes" })).toBeVisible();
-    await snapshot("Tasting note browser");
+    await snapshot("Tasting form / Tasting / 2 Notes browser");
     await page.getByRole("button", { name: "Close note picker" }).click();
     await uploadTastingImage(page);
-    await snapshot("Tasting details step");
+    await snapshot("Tasting form / Tasting / 3 Details");
     const createRequestPromise = waitForTastingCreate(page);
     const imageRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/tastings/imageUpdate"),
