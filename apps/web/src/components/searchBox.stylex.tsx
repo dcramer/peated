@@ -378,6 +378,7 @@ export function SearchBox({
         {...stylex.props(
           styles.surface,
           expanded && styles.expandedSurface,
+          expanded && placement === "overlay" && styles.overlaySurface,
           placement === "page" && styles.pageSurface,
         )}
       >
@@ -387,7 +388,7 @@ export function SearchBox({
             <div aria-hidden="true" {...stylex.props(styles.dividerTrack)}>
               <span
                 {...stylex.props(
-                  styles.divider,
+                  styles.dropdownDivider,
                   status === "searching" && styles.searchingDivider,
                 )}
               />
@@ -508,13 +509,28 @@ const styles = stylex.create({
     width: "100%",
   },
   expandedSurface: {
+    position: "relative",
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.ground,
+    "::after": {
+      boxSizing: "border-box",
+      position: "absolute",
+      zIndex: 30,
+      inset: 0,
+      borderWidth: "2px",
+      borderStyle: "solid",
+      borderColor: colors.accent,
+      borderRadius: controlMetrics.radius,
+      content: '""',
+      pointerEvents: "none",
+    },
+  },
+  overlaySurface: {
     position: "absolute",
     zIndex: zIndices.menu,
     top: 0,
     right: 0,
     left: 0,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.ground,
     boxShadow: effects.overlayShadow,
   },
   pageSurface: {
@@ -533,6 +549,12 @@ const styles = stylex.create({
     width: "100%",
     height: "1px",
     backgroundColor: colors.hairline,
+  },
+  dropdownDivider: {
+    display: "block",
+    width: "100%",
+    height: "1px",
+    backgroundColor: "transparent",
   },
   dividerTrack: {
     height: "2px",
