@@ -7,23 +7,23 @@ export { expect };
 export type { TestInfo };
 
 type Snapshot = (
-  name: string,
+  title: string,
   options?: { fullPage?: boolean },
 ) => Promise<void>;
 
 /** Snapshot paths are durable Frameshift identities. Keep retries and workers out of them. */
 export const test = base.extend<{ snapshot: Snapshot }>({
   snapshot: async ({ page }, use, testInfo) => {
-    const names = new Set<string>();
+    const titles = new Set<string>();
 
-    await use(async (name, { fullPage = true } = {}) => {
-      const snapshotName = slug(name);
+    await use(async (title, { fullPage = true } = {}) => {
+      const snapshotName = slug(title);
       if (!snapshotName)
-        throw new Error("Snapshot names must contain a letter or number.");
-      if (names.has(snapshotName)) {
-        throw new Error(`Duplicate snapshot name in one test: ${name}`);
+        throw new Error("Snapshot titles must contain a letter or number.");
+      if (titles.has(snapshotName)) {
+        throw new Error(`Duplicate snapshot title in one test: ${title}`);
       }
-      names.add(snapshotName);
+      titles.add(snapshotName);
 
       await page.evaluate(async () => document.fonts.ready);
       await page.addStyleTag({
@@ -50,13 +50,9 @@ export const test = base.extend<{ snapshot: Snapshot }>({
           {
             browserVersion: page.context().browser()?.version() ?? null,
             file,
-            label: [
-              ...snapshotTitles(testInfo),
-              name,
-              projectLabel(testInfo.project.name),
-            ].join(" · "),
+            label: title,
             project: testInfo.project.name,
-            snapshot: name,
+            snapshot: title,
             test: snapshotTitles(testInfo).join(" › "),
           },
           null,
@@ -93,14 +89,6 @@ export function snapshotFile(testInfo: TestInfo, snapshotName: string) {
 function snapshotTitles(testInfo: Pick<TestInfo, "title" | "titlePath">) {
   const titles = testInfo.titlePath.slice(1);
   return titles.length > 0 ? titles : [testInfo.title];
-}
-
-function projectLabel(project: string) {
-  return project
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map((part) => part[0]?.toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function slug(value: string) {

@@ -21,7 +21,7 @@ test("opens the account menu", async ({ page, snapshot }) => {
   await page.getByRole("button", { name: "Account" }).click();
   await expect(page.getByRole("menu")).toBeVisible();
 
-  await snapshot("account menu open");
+  await snapshot("Account menu open");
 });
 ```
 
@@ -30,9 +30,10 @@ hides the Next.js development portal. It uses a full-page screenshot by
 default. Pass `{ fullPage: false }` when the viewport itself is part of the
 workflow state, such as an open mobile menu.
 
-Use a short checkpoint name that describes the visible state. The stable path
-also includes the spec, test titles, and Playwright project. A test cannot use
-the same checkpoint name twice.
+Use a short, plain-language title that describes what the reviewer sees. This
+title appears in Frameshift. Do not include test names, browser names, or terms
+such as "route" and "detail." The stable path includes the spec, test titles,
+and Playwright project. A test cannot use the same title twice.
 
 ## Run locally
 
