@@ -132,9 +132,9 @@ const styles = stylex.create({
     cursor: "default",
   },
   label: {
-    width: "92px",
+    width: "128px",
     minWidth: 0,
-    flex: "0 1 92px",
+    flex: "0 1 128px",
     overflow: "hidden",
     fontSize: "13px",
     fontWeight: 600,
@@ -182,8 +182,8 @@ const styles = stylex.create({
     backgroundColor: colors.accent,
   },
   count: {
-    width: "26px",
-    flex: "0 0 26px",
+    width: "48px",
+    flex: "0 0 48px",
     overflow: "hidden",
     fontFamily: fonts.data,
     fontSize: "11px",
