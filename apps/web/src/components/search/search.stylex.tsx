@@ -100,6 +100,7 @@ export type SearchProps = {
   scopeValues?: readonly SearchScope[];
   showBottleRatings?: boolean;
   submitLabel?: string;
+  typeaheadNavigation?: boolean;
 };
 
 const SEARCH_DEBOUNCE_MS = 140;
@@ -437,6 +438,7 @@ export function Search({
   scopeValues,
   showBottleRatings = true,
   submitLabel,
+  typeaheadNavigation = true,
 }: SearchProps = {}) {
   const { user } = useAuth();
   const orpc = useORPC();
@@ -659,6 +661,7 @@ export function Search({
           : undefined
       }
       submitLabel={submitLabel}
+      typeaheadNavigation={typeaheadNavigation}
     />
   );
 

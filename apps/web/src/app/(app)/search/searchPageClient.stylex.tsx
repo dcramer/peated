@@ -202,6 +202,7 @@ export function SearchPageClient({
           scopeValues={scopeValues}
           showBottleRatings={false}
           submitLabel={databaseSearch ? "Search" : undefined}
+          typeaheadNavigation={false}
         />
       </section>
     </div>

@@ -108,4 +108,22 @@ describe("SearchBox active result", () => {
 
     expect(html).not.toContain("aria-activedescendant");
   });
+
+  it("does not activate results when typeahead navigation is disabled", () => {
+    const html = renderToStaticMarkup(
+      <SearchBox
+        groups={groups}
+        onQueryChange={() => undefined}
+        onScopeChange={() => undefined}
+        query="ardbeg"
+        resultQuery="ardbeg"
+        scope="all"
+        scopes={[{ label: "Everything", value: "all" }]}
+        typeaheadNavigation={false}
+      />,
+    );
+
+    expect(html).not.toContain("aria-activedescendant");
+    expect(html).not.toContain('aria-autocomplete="list"');
+  });
 });

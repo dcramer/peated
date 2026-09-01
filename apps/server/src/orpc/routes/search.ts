@@ -63,10 +63,30 @@ type EntityRow = EntityResult & {
 type RegionRow = RegionResult & { totalBottles: number };
 type ScopeTotals = SearchOutput["scopeTotals"];
 type GroupRows =
-  | { type: "bottles"; total: number; results: BottleRow[] }
-  | { type: EntitySearchScope; total: number; results: EntityRow[] }
-  | { type: "regions"; total: number; results: RegionRow[] }
-  | { type: "members"; total: number; results: MemberResult[] };
+  | {
+      type: "bottles";
+      total: number;
+      results: BottleRow[];
+      exactMatch: boolean;
+    }
+  | {
+      type: EntitySearchScope;
+      total: number;
+      results: EntityRow[];
+      exactMatch: boolean;
+    }
+  | {
+      type: "regions";
+      total: number;
+      results: RegionRow[];
+      exactMatch: boolean;
+    }
+  | {
+      type: "members";
+      total: number;
+      results: MemberResult[];
+      exactMatch: boolean;
+    };
 
 type ExactRow =
   | { type: "bottle"; ref: BottleRow }
@@ -286,8 +306,8 @@ async function searchBottles(
   database: AnyDatabase,
   query: string,
   limit: number,
-): Promise<{ total: number; results: BottleRow[] }> {
-  if (!query) return { total: 0, results: [] };
+): Promise<{ total: number; results: BottleRow[]; exactMatch: boolean }> {
+  if (!query) return { total: 0, results: [], exactMatch: false };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
   const referenceMatch = exactBottleReferenceMatch(query);
@@ -307,6 +327,7 @@ async function searchBottles(
   const rows = await database
     .select({
       ...bottleColumns(),
+      searchRank: rank,
       searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(bottles)
@@ -318,7 +339,10 @@ async function searchBottles(
     .orderBy(rank, sql`${bottleRatingCount()} DESC`, asc(bottles.id));
   return {
     total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(({ searchTotal: _, ...result }) => result),
+    results: rows.map(
+      ({ searchRank: _, searchTotal: __, ...result }) => result,
+    ),
+    exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
 
@@ -328,8 +352,8 @@ async function searchEntities(
   scope: EntitySearchScope,
   query: string,
   limit: number,
-): Promise<{ total: number; results: EntityRow[] }> {
-  if (!query) return { total: 0, results: [] };
+): Promise<{ total: number; results: EntityRow[]; exactMatch: boolean }> {
+  if (!query) return { total: 0, results: [], exactMatch: false };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
   const referenceMatch = exactEntityReferenceMatch(query);
@@ -349,6 +373,7 @@ async function searchEntities(
   const rows = await database
     .select({
       ...entityColumns(context),
+      searchRank: rank,
       searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(entities)
@@ -358,7 +383,10 @@ async function searchEntities(
     .orderBy(rank, sql`${entities.totalTastings} DESC`, asc(entities.id));
   return {
     total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(({ searchTotal: _, ...result }) => result),
+    results: rows.map(
+      ({ searchRank: _, searchTotal: __, ...result }) => result,
+    ),
+    exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
 
@@ -366,8 +394,8 @@ async function searchRegions(
   database: AnyDatabase,
   query: string,
   limit: number,
-): Promise<{ total: number; results: RegionRow[] }> {
-  if (!query) return { total: 0, results: [] };
+): Promise<{ total: number; results: RegionRow[]; exactMatch: boolean }> {
+  if (!query) return { total: 0, results: [], exactMatch: false };
   const normalizedQuery = normalizeText(query);
   const name = sql`LOWER(unaccent(${regions.name}))`;
   const where = like(name, `%${escapeLike(normalizedQuery)}%`);
@@ -375,6 +403,7 @@ async function searchRegions(
   const rows = await database
     .select({
       ...regionColumns(),
+      searchRank: rank,
       searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(regions)
@@ -384,7 +413,10 @@ async function searchRegions(
     .orderBy(rank, sql`${regions.totalBottles} DESC`, asc(regions.id));
   return {
     total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(({ searchTotal: _, ...result }) => result),
+    results: rows.map(
+      ({ searchRank: _, searchTotal: __, ...result }) => result,
+    ),
+    exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
 
@@ -393,9 +425,9 @@ async function searchMembers(
   context: Context,
   query: string,
   limit: number,
-): Promise<{ total: number; results: MemberResult[] }> {
+): Promise<{ total: number; results: MemberResult[]; exactMatch: boolean }> {
   if (!context.user || !query) {
-    return { total: 0, results: [] };
+    return { total: 0, results: [], exactMatch: false };
   }
   const normalizedQuery = normalizeText(query.replace(/^@/, ""));
   const username = sql`LOWER(unaccent(${users.username}))`;
@@ -415,6 +447,7 @@ async function searchMembers(
         pictureUrl: users.pictureUrl,
       },
       totalTastings: publicTastingCount,
+      searchRank: rank,
       searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(users)
@@ -429,6 +462,7 @@ async function searchMembers(
       member: row.member,
       totalTastings: Number(row.totalTastings),
     })),
+    exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
 
@@ -744,6 +778,10 @@ async function readSearchRows(
           ),
         );
       }
+      // Exact name matches own the first group position across search scopes.
+      groups.sort(
+        (left, right) => Number(right.exactMatch) - Number(left.exactMatch),
+      );
       const matchTotal = groups.reduce(
         (total, group) => total + group.total,
         0,
@@ -795,7 +833,8 @@ function serializeGroup(group: GroupRows) {
   switch (group.type) {
     case "bottles":
       return {
-        ...group,
+        type: group.type,
+        total: group.total,
         results: group.results.map((row) => bottleResult(row, true)),
       };
     case "distilleries":
@@ -803,10 +842,15 @@ function serializeGroup(group: GroupRows) {
     case "bottlers":
     case "companies":
     case "regions":
-      return group;
+      return {
+        type: group.type,
+        total: group.total,
+        results: group.results,
+      };
     case "members":
       return {
-        ...group,
+        type: group.type,
+        total: group.total,
         results: group.results.map(memberResult),
       };
   }
