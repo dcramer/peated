@@ -1,0 +1,191 @@
+{
+  "id": "audit-production-dramfool-octomore-9.3-edition-wording",
+  "name": "audit: remove prose-only Release descriptor from Dramfool Octomore 9.3",
+  "scenario": "bottle_update",
+  "requireExpectedOperationEvidence": false,
+  "input": {
+    "audit": {
+      "bottleId": 51922,
+      "origin": "moderator",
+      "note": "Check the stored edition against the visible label and the producer product page at https://dramfool.com/previous-bottlings/93-octomore-jmsc."
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 51922,
+        "fullName": "Dramfool Octomore - Release 9.3",
+        "brand": "Dramfool",
+        "bottler": "Dramfool",
+        "series": "Jim McEwan Signature Collection",
+        "distillery": ["Bruichladdich"],
+        "category": "single_malt",
+        "statedAge": 11,
+        "edition": "Release 9.3",
+        "caskStrength": true,
+        "singleCask": true,
+        "maturation": "1st fill Bourbon barrel",
+        "caskNumber": "4355",
+        "abv": 63.3,
+        "vintageYear": 2012,
+        "releaseYear": 2024,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 51922,
+          "fullName": "Dramfool Octomore - Release 9.3",
+          "groupId": 24882,
+          "shared": {
+            "name": "Octomore",
+            "statedAge": null,
+            "series": {
+              "seriesId": 421,
+              "name": "Jim McEwan Signature Collection"
+            },
+            "category": "single_malt",
+            "brand": {
+              "entityId": 5441,
+              "name": "Dramfool"
+            },
+            "distillers": [
+              {
+                "entityId": 192,
+                "name": "Bruichladdich"
+              }
+            ],
+            "bottler": {
+              "entityId": 5441,
+              "name": "Dramfool"
+            }
+          },
+          "exact": {
+            "edition": "Release 9.3",
+            "statedAge": 11,
+            "abv": 63.3,
+            "singleCask": true,
+            "caskStrength": true,
+            "vintageYear": 2012,
+            "releaseYear": 2024,
+            "caskNumber": "4355",
+            "maturation": "1st fill Bourbon barrel",
+            "outturn": 226
+          },
+          "siblings": [],
+          "references": [],
+          "observations": [
+            {
+              "sourceType": "producer_page",
+              "sourceKey": "dramfool:93-octomore-jmsc",
+              "sourceName": "Dramfool",
+              "sourceUrl": "https://dramfool.com/previous-bottlings/93-octomore-jmsc",
+              "rawText": "Octomore 9.3 11-year old 1st fill Bourbon barrel",
+              "parsedIdentity": {
+                "expression": "Octomore",
+                "series": "Jim McEwan Signature Collection",
+                "edition": "9.3"
+              },
+              "facts": {
+                "productTitle": "Octomore 9.3 11-year old 1st fill Bourbon barrel"
+              }
+            }
+          ],
+          "imageSources": [
+            {
+              "source": {
+                "kind": "bottle"
+              },
+              "url": "https://api.peated.com/uploads/bottles-f59mvnjk2msw3hdstux4l0u9.webp",
+              "sourceUrl": "https://dramfool.com/previous-bottlings/93-octomore-jmsc"
+            }
+          ]
+        }
+      ],
+      "inspectedEntities": [
+        {
+          "entityId": 5441,
+          "name": "Dramfool",
+          "shortName": null,
+          "kind": "bottler",
+          "reference": null,
+          "score": 1,
+          "source": ["context"]
+        }
+      ]
+    }
+  },
+  "searchResponses": [
+    {
+      "when": ["dramfool", "octomore"],
+      "results": [
+        {
+          "bottleId": 51922,
+          "fullName": "Dramfool Octomore - Release 9.3",
+          "brand": "Dramfool",
+          "bottler": "Dramfool",
+          "series": "Jim McEwan Signature Collection",
+          "distillery": ["Bruichladdich"],
+          "category": "single_malt",
+          "statedAge": 11,
+          "edition": "Release 9.3",
+          "caskStrength": true,
+          "singleCask": true,
+          "maturation": "1st fill Bourbon barrel",
+          "caskNumber": "4355",
+          "abv": 63.3,
+          "vintageYear": 2012,
+          "releaseYear": 2024,
+          "score": 1,
+          "source": ["search"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://dramfool.com/previous-bottlings/93-octomore-jmsc",
+      "https://api.peated.com/v1/bottles/51922"
+    ],
+    "dbOutcome": {
+      "bottleId": 51922,
+      "createsBottle": false,
+      "summary": "Keep Bottle 51922 and correct its edition from Release 9.3 to 9.3."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 51922,
+        "field": "edition",
+        "productionValue": "Release 9.3",
+        "evidenceValue": "9.3",
+        "source": "production_search",
+        "issue": "conflicts_with_evidence",
+        "safeToAutoFill": false,
+        "notes": "The producer title and visible packaging use 9.3. The word Release appears only in narrative sentence prose."
+      }
+    ],
+    "notes": "Observed September 1, 2026 after a reviewed repair workflow created the Jim McEwan Signature Collection with prose-derived Release descriptors. The fixture preserves the production Bottle and the structured producer-page evidence gathered for the correction. The producer page title and packaging use the bare 9.3 collection code."
+  },
+  "expected": {
+    "summary": "Bottle 51922 adds the word Release to an edition that the producer title and label market as 9.3.",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 51922,
+          "patch": {
+            "edition": "9.3"
+          }
+        },
+        "rationale": "The producer title and visible label use the bare 9.3 code. Narrative prose does not make Release part of the marketed edition wording.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 51922
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

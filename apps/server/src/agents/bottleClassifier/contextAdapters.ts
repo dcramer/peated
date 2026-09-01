@@ -16,6 +16,7 @@ import {
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
+  bottleImages,
   bottleObservations,
   bottleReferences,
   bottles,
@@ -150,83 +151,99 @@ export async function getBottleClassifierContext(
     return null;
   }
 
-  const [references, observations, tastingImages, siblingBottles] =
-    await Promise.all([
-      db
-        .select({
-          name: bottleReferences.name,
-          ignored: bottleReferences.ignored,
-        })
-        .from(bottleReferences)
-        .where(eq(bottleReferences.bottleId, bottleId))
-        .orderBy(asc(bottleReferences.name))
-        .limit(MAX_BOTTLE_CONTEXT_REFERENCES),
-      db
-        .select({
-          sourceType: bottleObservations.sourceType,
-          sourceKey: bottleObservations.sourceKey,
-          sourceName: bottleObservations.sourceName,
-          sourceUrl: bottleObservations.sourceUrl,
-          rawText: bottleObservations.rawText,
-          parsedIdentity: bottleObservations.parsedIdentity,
-          facts: bottleObservations.facts,
-        })
-        .from(bottleObservations)
-        .where(eq(bottleObservations.bottleId, bottleId))
-        .orderBy(desc(bottleObservations.id))
-        .limit(MAX_BOTTLE_CONTEXT_OBSERVATIONS),
-      db
-        .select({
-          tastingId: tastings.id,
-          imageUrl: tastings.imageUrl,
-        })
-        .from(tastings)
-        .innerJoin(users, eq(users.id, tastings.createdById))
-        .where(
-          and(
-            eq(tastings.bottleId, bottleId),
-            isNotNull(tastings.imageUrl),
-            eq(users.private, false),
-            eq(users.active, true),
-          ),
-        )
-        .orderBy(desc(tastings.createdAt), desc(tastings.id))
-        .limit(MAX_BOTTLE_CONTEXT_IMAGES),
-      bottle.groupId
-        ? db
-            .select({
-              bottleId: bottles.id,
-              fullName: bottles.fullName,
-              statedAge: bottles.statedAge,
-              edition: bottles.edition,
-              abv: bottles.abv,
-              singleCask: bottles.singleCask,
-              caskStrength: bottles.caskStrength,
-              vintageYear: bottles.vintageYear,
-              bottlingYear: bottles.bottlingYear,
-              releaseYear: bottles.releaseYear,
-              releaseMonth: bottles.releaseMonth,
-              releaseDay: bottles.releaseDay,
-              caskNumber: bottles.caskNumber,
-              maturation: bottles.maturation,
-              outturn: bottles.outturn,
-            })
-            .from(bottles)
-            .where(
-              and(
-                eq(bottles.groupId, bottle.groupId),
-                notExists(
-                  db
-                    .select({ bottleId: bottleTombstones.bottleId })
-                    .from(bottleTombstones)
-                    .where(eq(bottleTombstones.bottleId, bottles.id)),
-                ),
+  const [
+    references,
+    observations,
+    primaryImages,
+    tastingImages,
+    siblingBottles,
+  ] = await Promise.all([
+    db
+      .select({
+        name: bottleReferences.name,
+        ignored: bottleReferences.ignored,
+      })
+      .from(bottleReferences)
+      .where(eq(bottleReferences.bottleId, bottleId))
+      .orderBy(asc(bottleReferences.name))
+      .limit(MAX_BOTTLE_CONTEXT_REFERENCES),
+    db
+      .select({
+        sourceType: bottleObservations.sourceType,
+        sourceKey: bottleObservations.sourceKey,
+        sourceName: bottleObservations.sourceName,
+        sourceUrl: bottleObservations.sourceUrl,
+        rawText: bottleObservations.rawText,
+        parsedIdentity: bottleObservations.parsedIdentity,
+        facts: bottleObservations.facts,
+      })
+      .from(bottleObservations)
+      .where(eq(bottleObservations.bottleId, bottleId))
+      .orderBy(desc(bottleObservations.id))
+      .limit(MAX_BOTTLE_CONTEXT_OBSERVATIONS),
+    db
+      .select({ sourceUrl: bottleImages.sourceUrl })
+      .from(bottleImages)
+      .where(
+        and(
+          eq(bottleImages.bottleId, bottleId),
+          eq(bottleImages.isPrimary, true),
+        ),
+      )
+      .orderBy(desc(bottleImages.id))
+      .limit(1),
+    db
+      .select({
+        tastingId: tastings.id,
+        imageUrl: tastings.imageUrl,
+      })
+      .from(tastings)
+      .innerJoin(users, eq(users.id, tastings.createdById))
+      .where(
+        and(
+          eq(tastings.bottleId, bottleId),
+          isNotNull(tastings.imageUrl),
+          eq(users.private, false),
+          eq(users.active, true),
+        ),
+      )
+      .orderBy(desc(tastings.createdAt), desc(tastings.id))
+      .limit(MAX_BOTTLE_CONTEXT_IMAGES),
+    bottle.groupId
+      ? db
+          .select({
+            bottleId: bottles.id,
+            fullName: bottles.fullName,
+            statedAge: bottles.statedAge,
+            edition: bottles.edition,
+            abv: bottles.abv,
+            singleCask: bottles.singleCask,
+            caskStrength: bottles.caskStrength,
+            vintageYear: bottles.vintageYear,
+            bottlingYear: bottles.bottlingYear,
+            releaseYear: bottles.releaseYear,
+            releaseMonth: bottles.releaseMonth,
+            releaseDay: bottles.releaseDay,
+            caskNumber: bottles.caskNumber,
+            maturation: bottles.maturation,
+            outturn: bottles.outturn,
+          })
+          .from(bottles)
+          .where(
+            and(
+              eq(bottles.groupId, bottle.groupId),
+              notExists(
+                db
+                  .select({ bottleId: bottleTombstones.bottleId })
+                  .from(bottleTombstones)
+                  .where(eq(bottleTombstones.bottleId, bottles.id)),
               ),
-            )
-            .orderBy(asc(bottles.id))
-            .limit(MAX_BOTTLE_CONTEXT_SIBLINGS + 1)
-        : Promise.resolve([]),
-    ]);
+            ),
+          )
+          .orderBy(asc(bottles.id))
+          .limit(MAX_BOTTLE_CONTEXT_SIBLINGS + 1)
+      : Promise.resolve([]),
+  ]);
 
   const group = bottle.group;
   const sharedBrand = group?.brand ?? bottle.brand;
@@ -254,6 +271,7 @@ export async function getBottleClassifierContext(
     imageSources.push({
       source: { kind: "bottle" },
       url: absoluteUrl(config.API_SERVER, bottle.imageUrl),
+      sourceUrl: normalizedHttpUrl(primaryImages[0]?.sourceUrl ?? null),
     });
   }
   for (const tasting of tastingImages) {
@@ -267,6 +285,7 @@ export async function getBottleClassifierContext(
     imageSources.push({
       source: { kind: "tasting", tastingId: tasting.tastingId },
       url,
+      sourceUrl: null,
     });
   }
 

@@ -70,14 +70,17 @@ product evidence shows the assignment is wrong. Likewise, change a populated exa
 with evidence for the same Bottle. Values from other batches or releases show
 variation, not a correction.
 
-A single public-image extraction may fill a missing scalar Bottle field, but it
-cannot replace a populated scalar value. Replacement requires a matching
-structured Bottle observation or two distinct label images whose structured
-extractions agree. An unstructured web result may inform moderator review but
-cannot authorize the replacement because it does not identify the field and
-value it supports. The audited Bottle name, not its image extraction, seeds
-initial candidate retrieval so one OCR or vision error cannot redirect the
-investigation before the agent sees the complete context.
+A single public-image extraction may fill a missing scalar Bottle fact, but it
+cannot replace a populated age, ABV, year, cask, outturn, or similar factual
+value. Replacement requires a matching structured Bottle observation or two
+distinct label images whose structured extractions agree. An unstructured web
+result may inform moderator review but cannot authorize those factual
+replacements because it does not identify the field and value it supports. A
+canonical name or edition wording correction can instead use one readable
+label plus the matching producer product title. The audited Bottle name, not
+its image extraction, seeds initial candidate retrieval so one OCR or vision
+error cannot redirect the investigation before the agent sees the complete
+context.
 
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier

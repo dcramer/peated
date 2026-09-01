@@ -88,6 +88,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     outputField: "`edition`",
     guidance: [
       "Use this for batch labels, store-pick codes, release identifiers, or numbered editions such as `Batch 3`, `2021 Release`, `Vol. 3`, `Release No. 5`, or `S2B13`.",
+      "Copy the exact marketed wording from the producer's product title or visible label. Narrative prose can confirm that a code identifies a release, but it cannot add `Release`, `Edition`, `Batch`, `Volume`, or another descriptor that the title and label omit.",
       "Treat short suffix codes as meaningful identity signals when they look like a batch or store-pick marker.",
       "For a marketed exact-cask label, preserve the complete visible marker such as `Cask No. 71` or `Barrel No. 4769`; never reduce it to bare digits.",
       "Re-read handwritten or visually ambiguous cask, barrel, batch, and edition digits before returning them. If the exact characters remain uncertain, leave `edition` null instead of guessing.",

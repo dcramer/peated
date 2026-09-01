@@ -500,7 +500,7 @@ export const BottleCandidateSearchInputSchema = z
       .nullable()
       .default(null)
       .describe(
-        "Batch label, store-pick code, release code, or numbered edition.",
+        "Exact marketed batch label, store-pick code, release code, or numbered edition from the product title or visible label.",
       ),
     vintage_year: z
       .number()

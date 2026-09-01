@@ -88,6 +88,7 @@ describe("Bottle context contracts", () => {
           tastingId: 500 + index,
         },
         url: `https://example.com/images/${index}.webp`,
+        sourceUrl: null,
       }),
     );
 
