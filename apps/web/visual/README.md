@@ -1,8 +1,8 @@
 # Web screenshots in pull requests
 
 This tool takes repeatable screenshots for web changes. CI captures the pull
-request base and candidate revisions, compares matching PNG files, and posts
-only visual changes. A page change does not fail CI.
+request base and candidate revisions, compares matching PNG files, and links to
+a focused Frameshift report. A page change does not fail CI.
 
 Each page has its own file in `visual/scenarios/`. That file contains:
 
@@ -18,8 +18,7 @@ limit is in `visual/select-scenarios.mjs`.
 ## How CI chooses pages
 
 CI checks each changed file against each scenario's `shouldRunFor` function.
-It captures the first four matching scenarios. This keeps the pull request
-comment short.
+It captures the first four matching scenarios. This keeps each report focused.
 
 Shared UI and web setup changes match four representative pages: home, bottle
 detail, member profile, and log a tasting. Changes to fixed test data match
@@ -61,8 +60,8 @@ review images. The full baseline and candidate screenshots stay on the runner.
 
 ## Frameshift setup
 
-Peated's integration is one pinned comparison step. Matching relative paths
-identify the same screenshot:
+Peated uses pinned Frameshift comparison and publisher Actions. Matching
+relative paths identify the same screenshot:
 
 ```yaml
 - uses: dcramer/frameshift@<full-commit-sha>
@@ -73,8 +72,11 @@ identify the same screenshot:
 ```
 
 The Action writes the report directory and returns the number of visual changes
-as the `changes` output. Peated keeps capture and privileged publication in
-separate workflows so pull request code cannot receive write permissions.
+as the `changes` output. A trusted `workflow_run` job passes that directory to
+`dcramer/frameshift/publish`. The publisher validates the Zod contract, creates
+the immutable report tag, and posts only a compact change summary plus the
+Frameshift link. Peated keeps capture and privileged publication in separate
+workflows so pull request code cannot receive write permissions.
 
 ## Add a scenario
 
