@@ -35,13 +35,24 @@ describe("member review form submissions", () => {
     expect(
       buildMemberReviewFormSubmission({
         bottleId: 12,
-        fields: { score: 91, notes: "Coastal and waxy." },
+        fields: {
+          score: 91,
+          tags: ["coastal", "wax"],
+          color: 8,
+          notes: "Coastal and waxy.",
+          servingStyle: "neat",
+          friends: [34],
+        },
         image: null,
       }),
     ).toEqual({
       bottle: 12,
       score: 91,
+      tags: ["coastal", "wax"],
+      color: 8,
       notes: "Coastal and waxy.",
+      servingStyle: "neat",
+      friends: [34],
       image: null,
     });
   });

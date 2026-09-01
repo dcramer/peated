@@ -1252,6 +1252,19 @@ async function handleRpcRequest({ request, response, url }) {
     case "comments/list":
       sendRpcResponse(response, emptyList);
       return true;
+    case "friends/list":
+      sendRpcResponse(response, {
+        results: [
+          {
+            id: moderatorUser.id,
+            status: "friends",
+            createdAt: "2026-06-07T12:00:00.000Z",
+            user: moderatorUser,
+          },
+        ],
+        rel: { nextCursor: null, prevCursor: null },
+      });
+      return true;
     case "memberReviews/list":
       if (!isNumber(input?.bottle)) {
         sendRpcError(response, "Unexpected member review list payload");
@@ -1267,6 +1280,35 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       sendRpcResponse(response, null);
+      return true;
+    case "memberReviews/save":
+      if (
+        !isNumber(input?.bottle) ||
+        input?.score !== 80 ||
+        input?.color !== 8 ||
+        input?.notes !== "Coastal and waxy." ||
+        input?.servingStyle !== "neat" ||
+        JSON.stringify(input?.tags) !== JSON.stringify(["smoke"]) ||
+        JSON.stringify(input?.friends) !== JSON.stringify([moderatorUser.id])
+      ) {
+        sendRpcError(response, "Unexpected member review save payload");
+        return true;
+      }
+
+      sendRpcResponse(response, {
+        id: 9402,
+        bottleId: input.bottle,
+        score: input.score,
+        tags: input.tags,
+        color: input.color,
+        notes: input.notes,
+        servingStyle: input.servingStyle,
+        friends: [moderatorUser],
+        imageUrl: null,
+        createdBy: testUser,
+        createdAt: "2026-06-07T12:00:00.000Z",
+        updatedAt: "2026-06-07T12:00:00.000Z",
+      });
       return true;
     case "externalReviews/list":
       if (input?.bottle !== undefined && !isNumber(input.bottle)) {

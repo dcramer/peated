@@ -6,6 +6,7 @@ import {
   createdTastingId,
   existingBottle,
   failingTastingNotes,
+  moderatorUser,
   photoTastingNotes,
   tastingNotes,
   testAccessToken,
@@ -45,13 +46,25 @@ test.describe("log tasting", () => {
 
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(
-      page.getByRole("heading", { name: "Your notes" }),
+      page.getByRole("heading", { name: "What you noticed" }),
     ).toBeVisible();
-    await page.getByLabel("Notes").fill("Coastal and waxy.");
+    await page.getByLabel("Find a tasting note").fill("smoke");
+    await page.getByRole("option", { name: /smoke/ }).click();
+    await page.getByLabel("Color of the pour").fill("8");
+    await page.getByLabel("Comments").fill("Coastal and waxy.");
     await snapshot("Tasting form / Review / 2 Notes");
+    await page.getByRole("button", { name: "Browse" }).click();
+    await expect(page.getByRole("heading", { name: "Notes" })).toBeVisible();
+    await snapshot("Tasting form / Review / 2 Notes browser");
+    await page.getByRole("button", { name: "Close note picker" }).click();
 
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByRole("heading", { name: "Picture" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Picture and company" }),
+    ).toBeVisible();
+    await page.getByLabel("Served").selectOption("neat");
+    await page.getByLabel("Drinking with").fill("moderator");
+    await page.getByRole("option", { name: /moderator-review/ }).click();
     await snapshot("Tasting form / Review / 3 Details");
     await expect(
       page.getByRole("button", { name: "Save review" }),
@@ -59,6 +72,23 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("button", { name: /^Write a review/ }),
     ).toHaveCount(0);
+
+    const saveRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/memberReviews/save"),
+    );
+    await page.getByRole("button", { name: "Save review" }).click();
+    expect(getRpcInput(await saveRequestPromise)).toMatchObject({
+      bottle: existingBottle.id,
+      score: 80,
+      tags: ["smoke"],
+      color: 8,
+      notes: "Coastal and waxy.",
+      servingStyle: "neat",
+      friends: [moderatorUser.id],
+    });
+    await expect(page).toHaveURL(
+      new RegExp(`/bottles/${existingBottle.id}(?:-|$)`),
+    );
   });
 
   test("logs a tasting for a fixture bottle", async ({

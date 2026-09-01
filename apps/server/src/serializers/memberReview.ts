@@ -1,5 +1,6 @@
 import type { MemberReview, User } from "@peated/server/db/schema";
 import { users } from "@peated/server/db/schema";
+import { notEmpty } from "@peated/server/lib/filter";
 import type { MemberReviewSchema } from "@peated/server/schemas";
 import { inArray } from "drizzle-orm";
 import type { z } from "zod";
@@ -11,6 +12,7 @@ import { UserSerializer } from "./user";
 
 type Attrs = {
   createdBy: ReturnType<(typeof UserSerializer)["item"]>;
+  friends: ReturnType<(typeof UserSerializer)["item"]>[];
 };
 
 export const MemberReviewSerializer = serializer({
@@ -20,7 +22,12 @@ export const MemberReviewSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<number, Attrs>> => {
     const userIds = [
-      ...new Set(itemList.map(({ createdById }) => createdById)),
+      ...new Set(
+        itemList.flatMap(({ createdById, friends }) => [
+          createdById,
+          ...friends,
+        ]),
+      ),
     ];
     const userList = await db
       .select()
@@ -38,7 +45,15 @@ export const MemberReviewSerializer = serializer({
             `Member review ${review.id} references missing member ${review.createdById}.`,
           );
         }
-        return [review.id, { createdBy }];
+        return [
+          review.id,
+          {
+            createdBy,
+            friends: review.friends
+              .map((friendId) => usersById.get(friendId))
+              .filter(notEmpty),
+          },
+        ];
       }),
     );
   },
@@ -49,7 +64,11 @@ export const MemberReviewSerializer = serializer({
     id: item.id,
     bottleId: item.bottleId,
     score: item.score,
+    tags: item.tags,
+    color: item.color,
     notes: item.notes,
+    servingStyle: item.servingStyle,
+    friends: attrs.friends,
     imageUrl: item.imageUrl
       ? absoluteUrl(config.API_SERVER, item.imageUrl)
       : null,

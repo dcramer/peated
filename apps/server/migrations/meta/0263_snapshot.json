@@ -1,6 +1,6 @@
 {
-  "id": "015bd389-addb-4674-993e-aad84977f7b1",
-  "prevId": "be080010-c6b6-49a7-89c4-4383eed78f29",
+  "id": "4211a0eb-89ee-4176-a50f-4ddee67756dc",
+  "prevId": "015bd389-addb-4674-993e-aad84977f7b1",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -6656,11 +6656,38 @@
           "primaryKey": false,
           "notNull": true
         },
+        "tags": {
+          "name": "tags",
+          "type": "varchar(64)[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "array[]::varchar[]"
+        },
+        "color": {
+          "name": "color",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "notes": {
           "name": "notes",
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "serving_style": {
+          "name": "serving_style",
+          "type": "servingStyle",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "friends": {
+          "name": "friends",
+          "type": "bigint[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "array[]::bigint[]"
         },
         "image_url": {
           "name": "image_url",

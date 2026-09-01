@@ -4,13 +4,16 @@ import {
   bigserial,
   check,
   index,
+  integer,
   pgTable,
   smallint,
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
+import { servingStyleEnum } from "./tastings";
 import { users } from "./users";
 
 export const memberReviews = pgTable(
@@ -24,7 +27,17 @@ export const memberReviews = pgTable(
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
     score: smallint("score").notNull(),
+    tags: varchar("tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
+    color: integer("color"),
     notes: text("notes"),
+    servingStyle: servingStyleEnum("serving_style"),
+    friends: bigint("friends", { mode: "number" })
+      .array()
+      .default(sql`array[]::bigint[]`)
+      .notNull(),
     imageUrl: text("image_url"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

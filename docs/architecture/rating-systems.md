@@ -11,8 +11,9 @@ These records have different intent. Do not add review fields to a tasting.
 
 Member reviews and external reviews share the same basic meaning. Their source
 and fields differ. A member review has a member, a whole-number score from 0
-through 100, and optional notes. An external review can have a publication,
-reviewer, article link, and the score format used by its source.
+through 100, and optional tasting notes, color, comments, serving style,
+friends, and picture. An external review can have a publication, reviewer,
+article link, and the score format used by its source.
 
 ## Tasting bands
 

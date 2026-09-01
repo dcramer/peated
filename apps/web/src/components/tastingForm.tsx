@@ -140,11 +140,22 @@ export default function TastingForm(
     control: reviewControl,
     trigger: triggerReview,
   } = useForm<MemberReviewFormFields>({
-    defaultValues: { score: 80, notes: null },
+    defaultValues: {
+      score: 80,
+      tags: [],
+      color: null,
+      notes: null,
+      servingStyle: null,
+      friends: [],
+    },
     resolver: zodResolver(MemberReviewFormFieldsSchema),
   });
   const ratingBand = useWatch({ control, name: "ratingBand" });
   const reviewScore = useWatch({ control: reviewControl, name: "score" });
+  const reviewFriendIds = useWatch({
+    control: reviewControl,
+    name: "friends",
+  });
   const reviewQuery = useQuery({
     ...orpc.memberReviews.getMy.queryOptions({
       input: { bottle: initialData.bottle.id },
@@ -152,6 +163,17 @@ export default function TastingForm(
     enabled: isReview,
     staleTime: Infinity,
   });
+  const reviewFriendOptions = new Map(
+    [
+      ...(reviewQuery.data?.friends ?? []).map(userToMember),
+      ...(friendResults.data?.results ?? []).map(({ user }) =>
+        userToMember(user),
+      ),
+    ].map((friend) => [friend.id, friend]),
+  );
+  const selectedReviewFriends = (reviewFriendIds ?? [])
+    .map((friendId) => reviewFriendOptions.get(friendId))
+    .filter((friend): friend is MemberPickerOption => Boolean(friend));
   const [currentStep, setCurrentStep] = useState(0);
   const steps = isReview
     ? (["Score", "Notes", "Details"] as const)
@@ -160,7 +182,7 @@ export default function TastingForm(
   const needsRating = props.mode !== "edit" && !ratingBand;
   const noteOptions: NotePickerOption[] = buildTastingTagOptions(
     suggestedTags.results,
-    initialData.tags ?? [],
+    isReview ? (reviewQuery.data?.tags ?? []) : (initialData.tags ?? []),
   ).map((option) => ({
     category: option.tag ? toTitleCase(option.tag.tagCategory) : "Other notes",
     common: option.count > 0,
@@ -186,7 +208,11 @@ export default function TastingForm(
     if (reviewQuery.data === undefined) return;
     resetReview({
       score: reviewQuery.data?.score ?? 80,
+      tags: reviewQuery.data?.tags ?? [],
+      color: reviewQuery.data?.color ?? null,
       notes: reviewQuery.data?.notes ?? null,
+      servingStyle: reviewQuery.data?.servingStyle ?? null,
+      friends: reviewQuery.data?.friends.map((friend) => friend.id) ?? [],
     });
   }, [resetReview, reviewQuery.data]);
 
@@ -248,7 +274,11 @@ export default function TastingForm(
   async function continueForm() {
     const stepIsValid = isReview
       ? await triggerReview(
-          currentStep === 0 ? ["score"] : currentStep === 1 ? ["notes"] : [],
+          currentStep === 0
+            ? ["score"]
+            : currentStep === 1
+              ? ["tags", "color", "notes"]
+              : ["servingStyle", "friends"],
         )
       : await trigger(
           currentStep === 0
@@ -419,29 +449,87 @@ export default function TastingForm(
                 ) : null}
               </FormSection>
             ) : currentStep === 1 ? (
-              <FormSection
-                description="Review the bottle as a whole, not only this pour."
-                title="Your notes"
-              >
+              <FormSection title="What you noticed">
+                <Field htmlFor="review-notes" label="Notes" optional>
+                  <Controller
+                    control={reviewControl}
+                    name="tags"
+                    render={({ field }) => (
+                      <NotePickerField
+                        id="review-notes"
+                        notes={noteOptions}
+                        onChange={field.onChange}
+                        value={field.value ?? []}
+                      />
+                    )}
+                  />
+                  {reviewErrors.tags?.message ? (
+                    <ValidationMessage>
+                      {reviewErrors.tags.message}
+                    </ValidationMessage>
+                  ) : null}
+                </Field>
+                <Field htmlFor="review-color" label="Color" optional>
+                  <Controller
+                    control={reviewControl}
+                    name="color"
+                    render={({ field }) => (
+                      <ColorInput
+                        disabled={isReviewSubmitting}
+                        id="review-color"
+                        name={field.name}
+                        onChange={field.onChange}
+                        value={field.value ?? null}
+                      />
+                    )}
+                  />
+                  {reviewErrors.color?.message ? (
+                    <ValidationMessage>
+                      {reviewErrors.color.message}
+                    </ValidationMessage>
+                  ) : null}
+                </Field>
                 <Field
                   error={reviewErrors.notes?.message}
-                  htmlFor="review-notes"
-                  label="Notes"
+                  htmlFor="review-comments"
+                  label="Comment"
                   optional
                 >
                   <Textarea
                     {...registerReview("notes", {
                       setValueAs: (value) => value || null,
                     })}
-                    id="review-notes"
+                    aria-label="Comments"
+                    id="review-comments"
                     invalid={Boolean(reviewErrors.notes)}
-                    placeholder="What stands out across the bottle?"
-                    rows={10}
+                    placeholder="What stood out?"
+                    rows={6}
                   />
                 </Field>
               </FormSection>
             ) : (
-              <FormSection title="Picture">
+              <FormSection title="Picture and company">
+                <Field
+                  error={reviewErrors.servingStyle?.message}
+                  htmlFor="review-serving-style"
+                  label="Served"
+                  optional
+                >
+                  <Select
+                    {...registerReview("servingStyle", {
+                      setValueAs: (value) => value || null,
+                    })}
+                    id="review-serving-style"
+                    invalid={Boolean(reviewErrors.servingStyle)}
+                  >
+                    <option value="">Not set</option>
+                    {SERVING_STYLE_LIST.map((style) => (
+                      <option key={style} value={style}>
+                        {toTitleCase(style)}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
                 <Field htmlFor="review-picture" label="Picture" optional>
                   <PictureInput
                     disabled={isReviewSubmitting}
@@ -471,6 +559,24 @@ export default function TastingForm(
                     }
                   />
                 </Field>
+                <Controller
+                  control={reviewControl}
+                  name="friends"
+                  render={({ field }) => (
+                    <MemberPicker
+                      label="Drinking with"
+                      loading={friendResults.isFetching}
+                      onChange={(nextFriends) => {
+                        field.onChange(nextFriends.map((friend) => friend.id));
+                      }}
+                      onQueryChange={setFriendQuery}
+                      options={(friendResults.data?.results ?? []).map(
+                        ({ user }) => userToMember(user),
+                      )}
+                      value={selectedReviewFriends}
+                    />
+                  )}
+                />
               </FormSection>
             )
           ) : null}
@@ -556,29 +662,27 @@ export default function TastingForm(
           ) : null}
           {recordType === "tasting" && currentStep === 2 ? (
             <FormSection title="Picture and company">
-              {props.mode === "edit" ? (
-                <Field
-                  error={errors.servingStyle?.message}
-                  htmlFor="tasting-serving-style"
-                  label="Served"
-                  optional
+              <Field
+                error={errors.servingStyle?.message}
+                htmlFor="tasting-serving-style"
+                label="Served"
+                optional
+              >
+                <Select
+                  {...register("servingStyle", {
+                    setValueAs: (value) => value || null,
+                  })}
+                  id="tasting-serving-style"
+                  invalid={Boolean(errors.servingStyle)}
                 >
-                  <Select
-                    {...register("servingStyle", {
-                      setValueAs: (value) => value || null,
-                    })}
-                    id="tasting-serving-style"
-                    invalid={Boolean(errors.servingStyle)}
-                  >
-                    <option value="">Not set</option>
-                    {SERVING_STYLE_LIST.map((style) => (
-                      <option key={style} value={style}>
-                        {toTitleCase(style)}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-              ) : null}
+                  <option value="">Not set</option>
+                  {SERVING_STYLE_LIST.map((style) => (
+                    <option key={style} value={style}>
+                      {toTitleCase(style)}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
               <Field htmlFor="tasting-picture" label="Picture" optional>
                 <PictureInput
                   disabled={isSubmitting}
