@@ -69,6 +69,7 @@ export default defineConfig({
           command: `pnpm exec next dev -p ${webPort}`,
           env: {
             API_SERVER: apiServer,
+            PLAYWRIGHT_TEST: "1",
             SESSION_SECRET:
               process.env.SESSION_SECRET ??
               "peated-playwright-session-secret-for-local-browser-tests",
