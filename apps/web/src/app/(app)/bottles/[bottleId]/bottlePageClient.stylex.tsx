@@ -100,6 +100,14 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
           : `${bottle.statedAge} years`,
     },
     { label: "Cask", value: bottle.maturation },
+    { label: "Cask number", value: bottle.caskNumber },
+    {
+      label: "Outturn",
+      value:
+        bottle.outturn === null
+          ? null
+          : `${bottle.outturn.toLocaleString("en-US")} bottles`,
+    },
     {
       label: "Release",
       value: getBottleReleasePlacement(bottle).header,
