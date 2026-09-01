@@ -1,0 +1,83 @@
+{
+  "files": [
+    {
+      "file": "bottler-detail__desktop.png",
+      "height": 1211,
+      "image": "images/diff/bottler-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/bottler-detail__desktop.png",
+        "candidate": "images/candidate/bottler-detail__desktop.png",
+        "diff": "images/diff/bottler-detail__desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "bottler-detail__mobile.png",
+      "height": 1603,
+      "image": "images/diff/bottler-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/bottler-detail__mobile.png",
+        "candidate": "images/candidate/bottler-detail__mobile.png",
+        "diff": "images/diff/bottler-detail__mobile.png"
+      },
+      "status": "changed",
+      "width": 390
+    },
+    {
+      "file": "brand-detail__desktop.png",
+      "height": 1180,
+      "image": "images/diff/brand-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/brand-detail__desktop.png",
+        "candidate": "images/candidate/brand-detail__desktop.png",
+        "diff": "images/diff/brand-detail__desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "brand-detail__mobile.png",
+      "height": 1482,
+      "image": "images/diff/brand-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/brand-detail__mobile.png",
+        "candidate": "images/candidate/brand-detail__mobile.png",
+        "diff": "images/diff/brand-detail__mobile.png"
+      },
+      "status": "changed",
+      "width": 390
+    },
+    {
+      "file": "distillery-detail__desktop.png",
+      "height": 1190,
+      "image": "images/diff/distillery-detail__desktop.png",
+      "images": {
+        "baseline": "images/baseline/distillery-detail__desktop.png",
+        "candidate": "images/candidate/distillery-detail__desktop.png",
+        "diff": "images/diff/distillery-detail__desktop.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "distillery-detail__mobile.png",
+      "height": 1642,
+      "image": "images/diff/distillery-detail__mobile.png",
+      "images": {
+        "baseline": "images/baseline/distillery-detail__mobile.png",
+        "candidate": "images/candidate/distillery-detail__mobile.png",
+        "diff": "images/diff/distillery-detail__mobile.png"
+      },
+      "status": "changed",
+      "width": 390
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 6,
+    "removed": 0,
+    "unchanged": 0
+  },
+  "version": 1
+}
