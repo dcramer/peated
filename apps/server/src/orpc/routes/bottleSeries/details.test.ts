@@ -21,11 +21,8 @@ describe("GET /bottle-series/:series", () => {
       fullName: series.fullName,
       description: series.description,
       numReleases: series.numReleases,
-      brand: expect.objectContaining({
-        id: brand.id,
-        name: brand.name,
-      }),
     });
+    expect(result).not.toHaveProperty("brand");
   });
 
   it("returns 404 for non-existent series", async function () {

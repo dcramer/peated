@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { EntitySchema } from "./entities";
 
 const BottleSeriesNameSchema = z
   .string()
@@ -14,7 +13,6 @@ const BottleSeriesDescriptionSchema = z
 export const BottleSeriesSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the bottle series"),
   name: BottleSeriesNameSchema,
-  brand: EntitySchema.describe("The brand that produces this series"),
   fullName: z
     .string()
     .describe("Full name of the series (brand name + series name)")

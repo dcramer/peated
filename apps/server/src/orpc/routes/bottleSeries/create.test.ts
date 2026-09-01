@@ -24,10 +24,6 @@ describe("POST /bottle-series", () => {
     expect(result).toMatchObject({
       name: data.name,
       description: data.description,
-      brand: {
-        id: brand.id,
-        name: brand.name,
-      },
       numReleases: 0,
     });
 

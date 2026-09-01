@@ -36,19 +36,11 @@ describe("GET /bottle-series", () => {
           id: series1.id,
           name: series1.name,
           description: series1.description,
-          brand: expect.objectContaining({
-            id: brand.id,
-            name: brand.name,
-          }),
         }),
         expect.objectContaining({
           id: series2.id,
           name: series2.name,
           description: series2.description,
-          brand: expect.objectContaining({
-            id: brand.id,
-            name: brand.name,
-          }),
         }),
       ]),
     );
@@ -77,10 +69,6 @@ describe("GET /bottle-series", () => {
       id: series1.id,
       name: series1.name,
       description: series1.description,
-      brand: expect.objectContaining({
-        id: brand.id,
-        name: brand.name,
-      }),
     });
   });
 

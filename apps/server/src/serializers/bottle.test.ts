@@ -240,10 +240,6 @@ describe("BottleSerializer", () => {
         id: series.id,
         name: series.name,
         description: series.description,
-        brand: expect.objectContaining({
-          id: brand.id,
-          name: brand.name,
-        }),
       }),
     });
 
