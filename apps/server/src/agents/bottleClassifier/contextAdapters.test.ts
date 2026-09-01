@@ -1,6 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { bottleObservations } from "@peated/server/db/schema";
+import { bottleImages, bottleObservations } from "@peated/server/db/schema";
 import { storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { Readable } from "node:stream";
@@ -57,6 +57,13 @@ describe("Bottle classifier context adapters", () => {
         finish: "Private finish",
       },
       totalTastings: 777,
+    });
+    await db.insert(bottleImages).values({
+      bottleId: bottle.id,
+      imageUrl: "/context/bottle.webp",
+      sourceUrl: "https://producer.example/context/bottle",
+      isPrimary: true,
+      createdByActorId: bottle.createdByActorId,
     });
     const sibling = await fixtures.BottleGroupMember({
       groupId: bottle.groupId!,
@@ -137,6 +144,7 @@ describe("Bottle classifier context adapters", () => {
         {
           source: { kind: "bottle" },
           url: expect.stringContaining("/context/bottle.webp"),
+          sourceUrl: "https://producer.example/context/bottle",
         },
         {
           source: { kind: "tasting", tastingId: tasting.id },

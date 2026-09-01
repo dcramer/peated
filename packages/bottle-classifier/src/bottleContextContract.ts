@@ -141,6 +141,7 @@ export const BottleContextImageSourceSchema = z
         .strict(),
     ]),
     url: HttpUrlSchema,
+    sourceUrl: HttpUrlSchema.nullable().optional(),
   })
   .strict();
 

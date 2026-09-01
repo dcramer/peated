@@ -228,10 +228,14 @@ Entity.
   product. It may equal the Brand or a producing distillery.
 - `distillery` identifies the actual producer or producers.
 - `series` is a stable range or family, not a batch code or release year.
-- `edition` is a complete human-facing release descriptor such as `Batch 24`,
-  `2024 Release`, or `S2B13`. Preserve its descriptor words. A printed batch or
-  lot code is not an edition when the producer sells one ongoing product
-  without batch-specific marketing.
+- `edition` is the exact human-facing release descriptor shown in the
+  producer's product title or on the label, such as `Batch 24`, `2024 Release`,
+  or `S2B13`. Preserve descriptor words that appear there. Narrative prose can
+  confirm that a code identifies a marketed release, but it cannot add a word
+  to the edition. If the title and label show `4.2` while prose calls it
+  "release 4.2," store `4.2`. A printed batch or lot code is not an edition
+  when the producer sells one ongoing product without batch-specific
+  marketing.
 - Bottle names combine the stable expression with an explicit marketed
   edition. Age, vintage year, release year, ABV, cask strength, cask number, and
   outturn remain structured facts. Do not generate name suffixes from those

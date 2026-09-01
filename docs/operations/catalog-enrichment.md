@@ -53,7 +53,10 @@ Then apply these rules:
   year, release year, ABV, cask strength, cask number, outturn, package size, or
   package text to make it unique. Store those facts in their fields. Preserve
   wording only when the producer markets it as part of the expression. Use
-  `edition` only for an explicit marketed release descriptor.
+  `edition` only for an explicit marketed release descriptor. Copy its wording
+  from the producer's product title or visible label. Narrative prose can prove
+  that a code identifies a release, but it cannot add generic words such as
+  `Release`, `Edition`, `Batch`, or `Volume` that the title and label omit.
 - Store only known date parts. Use `releaseYear`, then `releaseMonth`, then
   `releaseDay`. A month needs a year, and a day needs a month. Do not invent the
   first day of a month. Do not copy a distillation or bottling date into release
