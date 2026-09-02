@@ -12,7 +12,7 @@ import {
   zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { IconButton } from "./button.stylex";
+import { IconButton, type ButtonVariant } from "./button.stylex";
 
 const MENU_ANCHORS = {
   page: {
@@ -44,14 +44,16 @@ export type RowMenuProps = {
   groups: readonly (RowMenuGroup | readonly RowMenuItem[])[];
   label: string;
   triggerLabel?: string;
+  triggerVariant?: ButtonVariant;
   variant?: "page" | "row";
 };
 
-/** Collects an item's secondary actions behind one vertical-dots control. */
+/** Shows an item's actions in a menu. */
 export function RowMenu({
   groups,
   label,
   triggerLabel = `Actions for ${label}`,
+  triggerVariant = "tonal",
   variant = "row",
 }: RowMenuProps) {
   const normalizedGroups = groups.map(normalizeGroup);
@@ -63,16 +65,11 @@ export function RowMenu({
           <span {...stylex.props(styles.triggerLayer)}>
             <MenuButton
               as={IconButton}
-              icon={
-                <span aria-hidden="true" {...stylex.props(styles.dots)}>
-                  <span {...stylex.props(styles.dot)} />
-                  <span {...stylex.props(styles.dot)} />
-                  <span {...stylex.props(styles.dot)} />
-                </span>
-              }
+              icon={<MenuDots />}
               label={triggerLabel}
+              mergeWithSurface={open}
               size={variant === "page" ? "lg" : "sm"}
-              variant="tonal"
+              variant={triggerVariant}
             />
           </span>
           <MenuItems
@@ -88,6 +85,17 @@ export function RowMenu({
               )}
             >
               {label}
+              <span aria-hidden="true" {...stylex.props(styles.menuTrigger)}>
+                <IconButton
+                  aria-hidden="true"
+                  icon={<MenuDots />}
+                  label=""
+                  mergeWithSurface
+                  size={variant === "page" ? "lg" : "sm"}
+                  tabIndex={-1}
+                  variant={triggerVariant}
+                />
+              </span>
             </div>
             <div {...stylex.props(styles.separator)} />
             {normalizedGroups.map((group, groupIndex) => (
@@ -141,6 +149,16 @@ export function RowMenu({
   );
 }
 
+function MenuDots() {
+  return (
+    <span aria-hidden="true" {...stylex.props(styles.dots)}>
+      <span {...stylex.props(styles.dot)} />
+      <span {...stylex.props(styles.dot)} />
+      <span {...stylex.props(styles.dot)} />
+    </span>
+  );
+}
+
 function normalizeGroup(
   group: RowMenuGroup | readonly RowMenuItem[],
 ): RowMenuGroup {
@@ -152,11 +170,9 @@ const styles = stylex.create({
     position: "relative",
     display: "inline-flex",
     flexShrink: 0,
-    // Keep the trigger inside this component's stacking context.
     isolation: "isolate",
   },
   openRoot: {
-    // The anchored menu uses a portal, so its open trigger must sit above it.
     zIndex: zIndices.menuControl,
   },
   triggerLayer: {
@@ -185,6 +201,24 @@ const styles = stylex.create({
     backgroundColor: colors.ground,
     color: colors.ink,
     boxShadow: effects.overlayShadow,
+    "::after": {
+      boxSizing: "border-box",
+      position: "absolute",
+      inset: 0,
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderColor: colors.sectionRule,
+      borderRadius: controlMetrics.radius,
+      content: '""',
+      pointerEvents: "none",
+    },
+  },
+  menuTrigger: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    display: "inline-flex",
+    pointerEvents: "none",
   },
   header: {
     boxSizing: "border-box",

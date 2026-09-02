@@ -109,15 +109,21 @@ export type IconButtonProps = Omit<
 > & {
   icon: ReactNode;
   label: string;
+  /** Removes the frame and fill so the parent surface shows through. */
+  mergeWithSurface?: boolean;
 };
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  function IconButton({ icon, label, variant = "tonal", ...props }, ref) {
+  function IconButton(
+    { icon, label, mergeWithSurface = false, variant = "tonal", ...props },
+    ref,
+  ) {
     return (
       <ButtonBase
         {...props}
         aria-label={label}
         layout="icon"
+        mergeWithSurface={mergeWithSurface}
         ref={ref}
         variant={variant}
       >
@@ -132,6 +138,7 @@ type ButtonBaseProps = SharedButtonProps & {
   children: ReactNode;
   fullWidth?: boolean;
   layout: "icon" | "label";
+  mergeWithSurface?: boolean;
 };
 
 const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
@@ -143,6 +150,7 @@ const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
       fullWidth = false,
       layout,
       loading = false,
+      mergeWithSurface = false,
       size = "md",
       type = "button",
       variant = "default",
@@ -169,6 +177,7 @@ const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
           layout === "label" && buttonSizeStyles[size],
           layout === "icon" && iconButtonSizeStyles[size],
           variantStyles[variant],
+          mergeWithSurface && styles.mergedWithSurface,
           loading && styles.loading,
           loading && variant === "accent" && styles.loadingAccent,
         )}
@@ -310,6 +319,22 @@ const styles = stylex.create({
       ":active": colors.accentTint,
     },
     color: colors.accentDeep,
+  },
+  mergedWithSurface: {
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "transparent",
+      ":active": "transparent",
+    },
+    opacity: {
+      default: 1,
+      ":hover": 1,
+      ":active": 1,
+    },
+    boxShadow: {
+      default: "none",
+      ":focus-visible": "none",
+    },
   },
   loading: {
     position: "relative",
