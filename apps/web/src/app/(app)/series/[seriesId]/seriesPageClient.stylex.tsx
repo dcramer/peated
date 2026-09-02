@@ -5,6 +5,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 import {
   Button,
@@ -20,13 +21,14 @@ import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.st
 import {
   PageColumns,
   PageHeader,
+  RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import useBottleRowActions from "@peated/web/hooks/useBottleRowActions";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import { space } from "../../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 type BottleList = Outputs["bottles"]["list"];
 type Series = Outputs["bottleSeries"]["details"];
@@ -47,6 +49,8 @@ const libraryOptions = [
   { label: "Not in your Library", value: "out" },
   { label: "In your Library", value: "in" },
 ] as const;
+
+const DISTILLERY_PREVIEW_LIMIT = 5;
 
 export function SeriesPageClient({
   initialBottleList,
@@ -138,7 +142,14 @@ export function SeriesPageClient({
           <span {...stylex.props(styles.title)}>{initialSeries.name}</span>
         }
       />
-      <PageColumns>
+      <PageColumns
+        rail={
+          initialSeries.distillers.length ? (
+            <SeriesDistilleries distillers={initialSeries.distillers} />
+          ) : undefined
+        }
+        railBehavior="stack"
+      >
         <FactList facts={facts} layout="grid" />
         {initialLibraryCount !== null && initialSeries.numReleases > 0 ? (
           <div
@@ -224,6 +235,52 @@ export function SeriesPageClient({
   );
 }
 
+function SeriesDistilleries({
+  distillers,
+}: {
+  distillers: Series["distillers"];
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const hasMore = distillers.length > DISTILLERY_PREVIEW_LIMIT;
+  const visibleDistillers = expanded
+    ? distillers
+    : distillers.slice(0, DISTILLERY_PREVIEW_LIMIT);
+
+  return (
+    <RailSection
+      heading={distillers.length === 1 ? "Distillery" : "Distilleries"}
+    >
+      <ul id="series-distilleries" {...stylex.props(styles.distillerList)}>
+        {visibleDistillers.map((distiller) => (
+          <li key={distiller.id} {...stylex.props(styles.distillerRow)}>
+            <TextLink href={getEntityUrl(distiller)} size="inherit">
+              {distiller.name}
+            </TextLink>
+            <span {...stylex.props(styles.distillerCount)}>
+              {distiller.numBottles.toLocaleString("en-US")}{" "}
+              {distiller.numBottles === 1 ? "bottle" : "bottles"}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {hasMore ? (
+        <div {...stylex.props(styles.distillerMore)}>
+          <Button
+            align="start"
+            aria-controls="series-distilleries"
+            aria-expanded={expanded}
+            onClick={() => setExpanded((value) => !value)}
+            size="sm"
+            variant="text"
+          >
+            {expanded ? "Show less" : "View more"}
+          </Button>
+        </div>
+      ) : null}
+    </RailSection>
+  );
+}
+
 const styles = stylex.create({
   page: {
     minWidth: 0,
@@ -245,5 +302,32 @@ const styles = stylex.create({
   bottles: {
     minWidth: 0,
     paddingTop: space.x4,
+  },
+  distillerList: {
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  distillerRow: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x3,
+    paddingTop: "9px",
+    paddingBottom: "9px",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  distillerCount: {
+    flexShrink: 0,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    lineHeight: 1.4,
+  },
+  distillerMore: {
+    marginTop: space.x1,
   },
 });

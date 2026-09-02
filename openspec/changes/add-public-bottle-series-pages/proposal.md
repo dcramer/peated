@@ -9,6 +9,7 @@ Bottle Series are durable catalog records, but people can only encounter them as
 - Link Series references and global search results to the dedicated page.
 - Add an "Other bottles in this series" section to Bottle pages, built from existing Bottle rail and list components, with a link to the complete Series page.
 - Put Series facts before the Bottle list and show signed-in members how many Series Bottles are in their Library.
+- Show a compact Distilleries breakdown beside the Series Bottle list.
 - Let signed-in members show all Series Bottles, Bottles in their Library, or Bottles not in their Library.
 - Omit empty ratings from Bottle lists and keep long page titles inside narrow screens.
 - Preserve public Series identity when duplicate Series are merged. **BREAKING**: populated Series can no longer be deleted without a destination.

@@ -35,3 +35,7 @@
 ## 7. Series overview facts
 
 - [x] 7.1 Present Series counts with the compact overview facts used on Bottle and Entity pages, then verify desktop and mobile layouts.
+
+## 8. Series Distilleries
+
+- [x] 8.1 Add the full-Series Distillery breakdown to the side rail with a short expandable preview, focused tests, and desktop and mobile UI checks.

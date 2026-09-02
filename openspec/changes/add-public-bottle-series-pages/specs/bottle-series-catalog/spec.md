@@ -48,6 +48,12 @@ The system SHALL provide a responsive Series page that explains the Series and l
 - **WHEN** a signed-out person opens a Series page
 - **THEN** the page shows the public Series facts without personal Library counts or filters
 
+#### Scenario: Series distilleries
+
+- **WHEN** a Series contains Bottles with assigned Distilleries
+- **THEN** the page shows a linked Distillery breakdown beside the Bottle list
+- **AND** a long breakdown starts with a short preview that the person can expand
+
 #### Scenario: Bottle without ratings
 
 - **WHEN** a Bottle list row has no tasting ratings and no published review score
