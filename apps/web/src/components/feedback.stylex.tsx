@@ -4,6 +4,7 @@ import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
+  bottleThumbnailMetrics,
   colors,
   controlMetrics,
   effects,
@@ -242,7 +243,7 @@ export type LoadingListProps = {
   rows?: LoadingRowCount;
 };
 
-/** Reserves the final row geometry while a list is loading. */
+/** Reserves standard three-line row and bottle-thumbnail geometry while a list loads. */
 export function LoadingList({
   label = "Loading records",
   rows = 3,
@@ -265,6 +266,10 @@ export function LoadingList({
             preset="thumbnail"
           />
           <span {...stylex.props(styles.loadingCopy)}>
+            <LoadingPlaceholder
+              delay={getPlaceholderDelay(index + 1)}
+              preset="metadata"
+            />
             <LoadingPlaceholder
               delay={getPlaceholderDelay(index + 1)}
               preset="text"
@@ -475,11 +480,11 @@ const styles = stylex.create({
   loadingRow: {
     display: "grid",
     minWidth: 0,
-    gridTemplateColumns: "32px minmax(0, 1fr) 46px",
+    gridTemplateColumns: "auto minmax(0, 1fr) 46px",
     alignItems: "center",
     columnGap: space.x3,
-    paddingTop: "10px",
-    paddingBottom: "10px",
+    paddingTop: space.x3,
+    paddingBottom: space.x3,
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
@@ -516,8 +521,8 @@ const styles = stylex.create({
     height: "13px",
   },
   thumbnail: {
-    width: "32px",
-    height: "46px",
+    width: bottleThumbnailMetrics.width,
+    height: bottleThumbnailMetrics.height,
   },
   score: {
     width: "46px",

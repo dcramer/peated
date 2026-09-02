@@ -185,7 +185,7 @@ function bottleItem(
     metadata: getBottleMetadata(bottle),
     title: formatBottleDisplayName(bottle),
     visual: {
-      fallback: "B",
+      kind: "bottle",
       imageUrl: bottle.imageUrl,
       label: `${formatBottleDisplayName(bottle)} bottle`,
     },
@@ -200,6 +200,7 @@ function entityItem(entity: EntitySearchResult) {
     metadata: entity.region?.name,
     title: entity.name,
     visual: {
+      kind: "initial",
       fallback: entity.name.slice(0, 1).toLocaleUpperCase(),
       label: entity.name,
     },
@@ -213,6 +214,7 @@ function seriesItem(series: SeriesSearchResult) {
     metadata: `${series.brand.name} · ${series.numReleases.toLocaleString("en-US")} ${series.numReleases === 1 ? "bottle" : "bottles"}`,
     title: series.name,
     visual: {
+      kind: "initial",
       fallback: "S",
       label: series.fullName,
     },
@@ -226,6 +228,7 @@ function memberItem({ member, totalTastings }: MemberSearchResult) {
     metadata: `${totalTastings.toLocaleString("en-US")} ${totalTastings === 1 ? "tasting" : "tastings"}`,
     title: member.username,
     visual: {
+      kind: "avatar",
       fallback: member.username.slice(0, 1).toLocaleUpperCase(),
       imageUrl: member.pictureUrl,
       label: `${member.username}'s profile`,
@@ -240,6 +243,7 @@ function regionItem(region: RegionSearchResult) {
     metadata: `${region.country.name} · ${region.totalDistillers.toLocaleString("en-US")} ${region.totalDistillers === 1 ? "distillery" : "distilleries"}`,
     title: region.name,
     visual: {
+      kind: "initial",
       fallback: region.name.slice(0, 1).toLocaleUpperCase(),
       label: region.name,
     },

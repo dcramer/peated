@@ -14,6 +14,7 @@ describe("getCommunityFeedItems", () => {
     });
 
     expect(item?.description).toBe(mockExternalReview.clip);
+    expect(item?.actorHref).toBe(mockExternalReview.url);
   });
 
   test("uses the article title when the review has no clip", () => {

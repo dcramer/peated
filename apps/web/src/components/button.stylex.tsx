@@ -2,11 +2,11 @@ import * as stylex from "@stylexjs/stylex";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 import { AppLink, type AppLinkProps } from "./appLink";
@@ -88,6 +88,7 @@ export function ButtonLink({
       data-size={size}
       data-variant={variant}
       {...stylex.props(
+        foundationStyles.interactive,
         styles.control,
         styles.button,
         styles.link,
@@ -141,6 +142,7 @@ type ButtonBaseProps = SharedButtonProps & {
   mergeWithSurface?: boolean;
 };
 
+/** Owns label and icon control sizing, native states, and keyboard feedback. */
 const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
   function ButtonBase(
     {
@@ -168,6 +170,7 @@ const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(
         ref={ref}
         type={type}
         {...stylex.props(
+          foundationStyles.interactive,
           styles.control,
           layout === "label" && styles.button,
           layout === "icon" && styles.iconButton,
@@ -210,10 +213,6 @@ const styles = stylex.create({
     outline: { default: "none", ":focus-visible": "2px solid currentColor" },
     outlineOffset: "-3px",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1,
     cursor: {
       default: "pointer",
       ":disabled": "not-allowed",
@@ -221,7 +220,8 @@ const styles = stylex.create({
     opacity: {
       default: 1,
       ":hover": 0.86,
-      ":active": 0.86,
+      ":active": 0.75,
+      ":focus-visible": 0.86,
       ":disabled": 0.45,
     },
     boxShadow: {
@@ -229,7 +229,7 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
     transitionProperty: "background-color, color, opacity",
-    transitionDuration: "120ms",
+    transitionDuration: { default: "120ms", [REDUCED_MOTION]: "0ms" },
   },
   button: {
     columnGap: space.x2,
@@ -289,7 +289,8 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
-      ":active": colors.surface,
+      ":active": colors.inset,
+      ":focus-visible": colors.surface,
     },
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.sectionRule}`,
@@ -306,6 +307,7 @@ const styles = stylex.create({
       default: "transparent",
       ":hover": colors.criticalQuiet,
       ":active": colors.criticalQuiet,
+      ":focus-visible": colors.criticalQuiet,
     },
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.critical}`,
@@ -318,10 +320,17 @@ const styles = stylex.create({
       default: "transparent",
       ":hover": colors.accentTint,
       ":active": colors.accentTint,
+      ":focus-visible": colors.accentTint,
     },
     color: colors.accentDeep,
   },
   mergedWithSurface: {
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+      ":focus-visible": colors.accentDeep,
+    },
     backgroundColor: {
       default: "transparent",
       ":hover": "transparent",

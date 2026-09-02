@@ -21,7 +21,27 @@ test.describe("activity feed", () => {
     await expect(page.getByText("Personal Favorites")).toHaveCount(0);
     await expect(page.getByRole("img", { name: "Favorite" })).toHaveCount(0);
 
-    await page.goto("/activity");
+    await page.goto("/");
+    const homeFeed = page.getByRole("list", {
+      name: "Recent tastings and reviews",
+    });
+    const homeReview = homeFeed
+      .getByRole("listitem")
+      .filter({ hasText: activityReview.clip });
+    await expect(homeReview).toBeVisible();
+    const reviewTitle = await homeReview
+      .locator(`a[title][href="${activityReview.url}"]`)
+      .innerText();
+    const bottleHref = await homeReview
+      .getByRole("link", { name: "View bottle" })
+      .getAttribute("href");
+
+    await page
+      .locator("section")
+      .filter({ has: homeFeed })
+      .getByRole("link", { name: "View all" })
+      .click();
+    await expect(page).toHaveURL(/\/activity$/);
     const feed = page.getByRole("list", {
       name: "Latest tastings and reviews",
     });
@@ -34,8 +54,8 @@ test.describe("activity feed", () => {
     await page.getByRole("link", { name: "Everyone", exact: true }).click();
     await expect(feed.getByText(activityReview.clip)).toBeVisible();
     await expect(
-      feed.getByText(activityReview.site.name, { exact: false }),
-    ).toBeVisible();
+      feed.getByRole("link", { name: activityReview.site.name, exact: true }),
+    ).toHaveAttribute("href", activityReview.url);
     await expect(
       feed.getByText("A tasting from the wider community."),
     ).toBeVisible();
@@ -45,7 +65,10 @@ test.describe("activity feed", () => {
       .getByRole("listitem")
       .filter({ hasText: activityReview.clip });
     const bottleLink = review.getByRole("link", { name: "View bottle" });
-    await expect(bottleLink).toHaveAttribute("href", /^\/bottles\//);
+    await expect(bottleLink).toHaveAttribute("href", bottleHref!);
+    await expect(
+      review.locator(`a[title][href="${activityReview.url}"]`),
+    ).toHaveText(reviewTitle);
     await bottleLink.click();
     await expect(page).toHaveURL(/\/bottles\//);
 
@@ -56,7 +79,9 @@ test.describe("activity feed", () => {
         body: "<h1>Full whisky review</h1>",
       }),
     );
-    await review.locator(`a[href="${activityReview.url}"]`).click();
+    await review
+      .getByRole("link", { name: activityReview.site.name, exact: true })
+      .click();
     await expect(page).toHaveURL(activityReview.url);
   });
 });

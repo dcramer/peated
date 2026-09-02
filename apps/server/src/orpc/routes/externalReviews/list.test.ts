@@ -5,6 +5,7 @@ import {
   externalReviewPublications,
   externalReviews,
 } from "@peated/server/db/schema";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
@@ -131,7 +132,13 @@ describe("GET /external-reviews", () => {
   test("lists recent public reviews by publication date", async ({
     fixtures,
   }) => {
-    const bottle = await fixtures.Bottle({
+    const originalBottle = await fixtures.Bottle({
+      name: "12-year-old",
+      statedAge: 12,
+    });
+    const bottle = await fixtures.BottleGroupMember({
+      groupId: originalBottle.groupId,
+      edition: "Batch 26/01",
       imageUrl: "/media/springbank-12.jpg",
       releaseYear: 2026,
       statedAge: 12,
@@ -257,8 +264,15 @@ describe("GET /external-reviews", () => {
         imageUrl: expect.stringContaining("/media/springbank-12.jpg"),
         releaseYear: 2026,
         statedAge: 12,
+        group: { id: originalBottle.groupId, name: originalBottle.name },
       },
     });
+    const listedBottle = await routerClient.bottles.details({
+      bottle: bottle.id,
+    });
+    expect(formatBottleDisplayName(firstPage.results[0].bottle!)).toBe(
+      formatBottleDisplayName(listedBottle),
+    );
     expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(secondPage.results.map(({ id }) => id)).toEqual([older.id]);
     expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });

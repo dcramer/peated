@@ -19,7 +19,6 @@ export type { BadgeImageProps } from "./badgeImage.stylex";
 export { BottleIdentityRow, BottleVisual } from "./bottleIdentityRow.stylex";
 export type {
   BottleIdentityRowProps,
-  BottleIdentityRowSize,
   BottleVisualProps,
   BottleVisualSize,
 } from "./bottleIdentityRow.stylex";

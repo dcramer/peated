@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { SectionHeading } from "./sectionHeading.stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -9,6 +10,8 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
+import { Avatar } from "./avatar.stylex";
+import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { MemberStatus } from "./memberStatus.stylex";
@@ -31,11 +34,18 @@ export type SearchResultItem = {
   ratings?: SearchResultRatings;
   metadata?: string;
   title: string;
-  visual?: {
-    fallback: string;
-    imageUrl?: string | null;
-    label: string;
-  };
+  visual?:
+    | {
+        kind: "bottle";
+        imageUrl?: string | null;
+        label: string;
+      }
+    | {
+        kind: "avatar" | "initial";
+        fallback: string;
+        imageUrl?: string | null;
+        label: string;
+      };
 };
 
 export type SearchResultGroup = {
@@ -71,7 +81,11 @@ export type SearchResultsProps = {
   variant?: "database" | "default";
 };
 
-/** Presents supplied search results without owning search, ranking, or navigation. */
+/**
+ * Presents search results without owning search, ranking, or navigation.
+ * Bottle visuals use the standard row thumbnail; member visuals use Avatar.
+ * Supply bottle titles from formatBottleDisplayName.
+ */
 export function SearchResults({
   activeId,
   contribution,
@@ -108,7 +122,10 @@ export function SearchResults({
         </p>
       ) : null}
       {hasColdLoadingState ? (
-        <p aria-live="polite" {...stylex.props(styles.searchingText)}>
+        <p
+          aria-live="polite"
+          {...stylex.props(foundationStyles.metadata, styles.searchingText)}
+        >
           {statusText ?? "Searching…"}
         </p>
       ) : emptyText && variant === "default" ? (
@@ -237,6 +254,7 @@ function SearchResultsGroup({
         {group.total !== undefined ? (
           <span
             {...stylex.props(
+              foundationStyles.metadata,
               styles.groupCount,
               variant === "database" && styles.databaseGroupCount,
             )}
@@ -274,14 +292,20 @@ function SearchResultsGroup({
             >
               {item.visual ? <ResultVisual visual={item.visual} /> : null}
               <span {...stylex.props(styles.copy)}>
-                <strong title={item.title} {...stylex.props(styles.title)}>
+                <strong
+                  title={item.title}
+                  {...stylex.props(foundationStyles.rowTitle, styles.title)}
+                >
                   <MatchedText query={query} text={item.title} />
                   {item.isFollowing ? <MemberStatus kind="following" /> : null}
                 </strong>
                 {item.metadata ? (
                   <span
                     title={item.metadata}
-                    {...stylex.props(styles.metadata)}
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.metadata,
+                    )}
                   >
                     {item.metadata}
                   </span>
@@ -320,24 +344,17 @@ function ResultVisual({
 }: {
   visual: NonNullable<SearchResultItem["visual"]>;
 }) {
+  if (visual.kind === "bottle") {
+    return <BottleVisual imageUrl={visual.imageUrl} label={visual.label} />;
+  }
+  if (visual.kind === "avatar") {
+    return (
+      <Avatar imageUrl={visual.imageUrl} initials={visual.fallback} size="sm" />
+    );
+  }
   return (
-    <span
-      aria-label={visual.label}
-      role="img"
-      {...stylex.props(
-        styles.visual,
-        Boolean(visual.imageUrl) && styles.visualWithImage,
-      )}
-    >
-      {visual.imageUrl ? (
-        <img
-          alt=""
-          src={visual.imageUrl}
-          {...stylex.props(styles.visualImage)}
-        />
-      ) : (
-        <span aria-hidden="true">{visual.fallback}</span>
-      )}
+    <span aria-label={visual.label} role="img" {...stylex.props(styles.visual)}>
+      <span aria-hidden="true">{visual.fallback}</span>
     </span>
   );
 }
@@ -389,9 +406,6 @@ const styles = stylex.create({
     paddingBottom: space.x4,
     paddingLeft: "14px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
   },
   stateText: {
     boxSizing: "border-box",
@@ -449,10 +463,7 @@ const styles = stylex.create({
   databaseGroupName: { flex: 0 },
   groupCount: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.3,
   },
   databaseGroupCount: {
     flex: 0,
@@ -503,6 +514,7 @@ const styles = stylex.create({
     backgroundColor: {
       default: "transparent",
       ":hover": colors.surface,
+      ":active": colors.inset,
       ":focus-visible": colors.surface,
     },
     boxShadow: {
@@ -517,7 +529,7 @@ const styles = stylex.create({
     paddingLeft: 0,
   },
   activeResult: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.inset,
     boxShadow: effects.focusRing,
   },
   visual: {
@@ -535,16 +547,6 @@ const styles = stylex.create({
     fontSize: "11px",
     fontWeight: 700,
   },
-  visualWithImage: {
-    backgroundColor: colors.imageBackground,
-    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
-  },
-  visualImage: {
-    display: "block",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
   copy: {
     display: "flex",
     minWidth: 0,
@@ -555,12 +557,7 @@ const styles = stylex.create({
   title: {
     maxWidth: "100%",
     overflow: "hidden",
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
+    color: "inherit",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -574,9 +571,6 @@ const styles = stylex.create({
     overflow: "hidden",
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },

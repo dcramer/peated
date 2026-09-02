@@ -7,6 +7,14 @@ import { StoryCanvas } from "./storyFixtures.stylex";
 const meta = {
   title: "Components/Search/Search Results",
   component: SearchResults,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use for both global search and database results. Bottle titles come from formatBottleDisplayName, and visual.kind selects the shared BottleVisual or Avatar. Include real images and missing-image results when reviewing a change.",
+      },
+    },
+  },
   args: {
     activeId: "bottle-872",
     contribution: {
@@ -33,7 +41,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const GroupedResults: Story = {};
+export const Overview: Story = {};
 
 export const Loading: Story = {
   args: {

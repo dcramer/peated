@@ -25,7 +25,7 @@ function BottleSearch() {
               metadata: "Springbank · 12 years · 57.2% ABV",
               title: "Springbank 12-year-old Cask Strength",
               visual: {
-                fallback: "B",
+                kind: "bottle" as const,
                 label: "Springbank 12-year-old Cask Strength bottle",
               },
             },

@@ -1,7 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
+  bottleThumbnailMetrics,
   colors,
   controlMetrics,
   effects,
@@ -19,7 +21,6 @@ const COMPACT = "@media (max-width: 639px)";
 const bottleIconUrl = "/assets/bottle.svg";
 
 export type BottleVisualSize = "sm" | "md" | "lg" | "xl";
-export type BottleIdentityRowSize = Extract<BottleVisualSize, "sm" | "md">;
 
 export type BottleVisualProps = {
   expandable?: boolean;
@@ -28,7 +29,10 @@ export type BottleVisualProps = {
   size?: BottleVisualSize;
 };
 
-/** Shows a supplied bottle image and uses Peated's bottle glyph when no image exists. */
+/**
+ * Shows a bottle image or Peated's bottle glyph when no image exists.
+ * Use the default medium size beside three-line identities, including activity entries.
+ */
 export function BottleVisual({
   expandable = false,
   imageUrl,
@@ -88,11 +92,13 @@ export type BottleIdentityRowProps = {
     count: number;
     href: string;
   };
-  size?: BottleIdentityRowSize;
   subtitle?: ReactNode;
 };
 
-/** Presents one catalog bottle using Peated's existing identity and member-status meanings. */
+/**
+ * Owns the standard bottle row and its thumbnail size. Supply a name from
+ * formatBottleDisplayName (or toBottleListItem), with brand context if omitted there.
+ */
 export function BottleIdentityRow({
   align = "center",
   brand,
@@ -106,21 +112,19 @@ export function BottleIdentityRow({
   metadata = [],
   name,
   relatedReleases,
-  size = "md",
   subtitle,
 }: BottleIdentityRowProps) {
   return (
     <div
       {...stylex.props(
         styles.row,
-        size === "sm" && styles.smallRow,
         align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
         Boolean(href) && layout === "row" && linkedRowStyles.container,
         Boolean(href) && layout === "row" && linkedRowStyles.onGround,
       )}
     >
-      <BottleVisual imageUrl={imageUrl} size={size} />
+      <BottleVisual imageUrl={imageUrl} />
       <div {...stylex.props(styles.copy)}>
         {brand ? (
           brandHref ? (
@@ -128,6 +132,7 @@ export function BottleIdentityRow({
               href={brandHref}
               title={brand}
               {...stylex.props(
+                foundationStyles.metadata,
                 styles.brand,
                 styles.brandLink,
                 linkedRowStyles.nestedAction,
@@ -136,7 +141,10 @@ export function BottleIdentityRow({
               {brand}
             </AppLink>
           ) : (
-            <span title={brand} {...stylex.props(styles.brand)}>
+            <span
+              title={brand}
+              {...stylex.props(foundationStyles.metadata, styles.brand)}
+            >
               {brand}
             </span>
           )
@@ -146,17 +154,15 @@ export function BottleIdentityRow({
             <AppLink
               href={href}
               {...stylex.props(
+                foundationStyles.rowTitle,
                 styles.name,
-                size === "sm" && styles.smallName,
                 linkedRowStyles.primaryLink,
               )}
             >
               {name}
             </AppLink>
           ) : (
-            <span
-              {...stylex.props(styles.name, size === "sm" && styles.smallName)}
-            >
+            <span {...stylex.props(foundationStyles.rowTitle, styles.name)}>
               {name}
             </span>
           )}
@@ -166,7 +172,7 @@ export function BottleIdentityRow({
         {subtitle ? (
           <div
             title={getTextTitle(subtitle)}
-            {...stylex.props(styles.subtitle)}
+            {...stylex.props(foundationStyles.metadata, styles.subtitle)}
           >
             {subtitle}
           </div>
@@ -174,10 +180,7 @@ export function BottleIdentityRow({
         {metadata.length ? (
           <div
             title={metadata.join(" · ")}
-            {...stylex.props(
-              styles.metadata,
-              size === "sm" && styles.smallMetadata,
-            )}
+            {...stylex.props(foundationStyles.metadata, styles.metadata)}
           >
             {metadata.map((item, index) => (
               <span key={`${item}-${index}`}>
@@ -229,8 +232,8 @@ const styles = stylex.create({
     padding: space.x1,
   },
   visualMedium: {
-    width: { default: "48px", [COMPACT]: "42px" },
-    height: { default: "64px", [COMPACT]: "58px" },
+    width: bottleThumbnailMetrics.width,
+    height: bottleThumbnailMetrics.height,
     padding: space.x2,
   },
   visualLarge: {
@@ -291,11 +294,6 @@ const styles = stylex.create({
   startAlignedRow: {
     alignItems: "flex-start",
   },
-  smallRow: {
-    gap: space.x2,
-    paddingTop: "11px",
-    paddingBottom: "11px",
-  },
   cellLayout: {
     width: "100%",
     marginRight: 0,
@@ -315,14 +313,8 @@ const styles = stylex.create({
     overflow: "hidden",
     outline: "none",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
-    fontWeight: 600,
-    letterSpacing: "0.06em",
-    lineHeight: 1.3,
     textDecoration: "none",
     textOverflow: "ellipsis",
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
     boxShadow: {
       default: "none",
@@ -334,10 +326,13 @@ const styles = stylex.create({
       default: colors.inkMuted,
       ":hover": colors.accentDeep,
       ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
     },
     textDecorationLine: {
       default: "none",
       ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
     },
     textDecorationThickness: "1px",
     textUnderlineOffset: "2px",
@@ -353,42 +348,25 @@ const styles = stylex.create({
     outline: "none",
     overflowWrap: "anywhere",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
     textDecoration: "none",
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
     },
   },
-  smallName: {
-    fontSize: "14px",
-  },
   metadata: {
     maxWidth: "100%",
     overflow: "hidden",
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-  },
-  smallMetadata: {
-    fontSize: "10px",
   },
   subtitle: {
     maxWidth: "100%",
     overflow: "hidden",
     marginTop: "3px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -399,6 +377,7 @@ const styles = stylex.create({
       default: colors.accentDeep,
       ":hover": colors.accent,
       ":active": colors.accent,
+      ":focus-visible": colors.accent,
     },
     fontFamily: fonts.reading,
     fontSize: "12px",
@@ -407,6 +386,8 @@ const styles = stylex.create({
     textDecorationLine: {
       default: "none",
       ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
     },
     textDecorationThickness: "1px",
     textUnderlineOffset: "2px",

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { RowMenu } from "./rowMenu.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
@@ -15,6 +16,7 @@ const meta = {
     members: [
       {
         href: "/bottles/lagavulin-16",
+        imageUrl: BottleImage.src,
         metadata: "Islay · 16 years · 43% ABV",
         name: "Lagavulin 16-year-old",
         ratingBand: "outstanding",
