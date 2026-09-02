@@ -79,17 +79,23 @@ export function getEntityTabs(
   const baseUrl = getEntityUrl(entity);
   const tabs: [PageTabItem, ...PageTabItem[]] = [
     { href: baseUrl, label: "Overview" },
-    {
+  ];
+
+  if (entityHasBottleCatalog(entity) || entity.totalBottles > 0) {
+    tabs.push({
       count: entity.totalBottles,
       href: `${baseUrl}/bottles`,
       label: "Bottles",
-    },
-    {
+    });
+  }
+
+  if (entityHasBottleCatalog(entity)) {
+    tabs.push({
       count: entity.totalTastings,
       href: `${baseUrl}/tastings`,
       label: "Tastings",
-    },
-  ];
+    });
+  }
 
   if (entity.shortName === "SMWS") {
     tabs.push({ href: `${baseUrl}/codes`, label: "Distillery codes" });

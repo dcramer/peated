@@ -34,6 +34,7 @@ test.describe("Entity page routes", () => {
 
   test("links a Bottle's distillery Brand and its owner to their canonical pages", async ({
     page,
+    snapshot,
   }) => {
     await page.goto(`/bottles/${distilleryBrandBottleId}`);
 
@@ -57,5 +58,21 @@ test.describe("Entity page routes", () => {
     await expect(
       page.getByRole("heading", { name: testOwner.name, exact: true }),
     ).toBeVisible();
+
+    const sections = page.getByRole("navigation", {
+      name: `${testOwner.name} sections`,
+    });
+    const bottlesLink = sections.getByRole("link", { name: "Bottles" });
+    await expect(bottlesLink).toBeVisible();
+    await expect(sections.getByRole("link", { name: "Tastings" })).toHaveCount(
+      0,
+    );
+    await snapshot("Company overview", { ready: sections });
+
+    await bottlesLink.click();
+    await expect(page).toHaveURL(`/companies/${testOwner.id}-diageo/bottles`);
+
+    await page.goto(`/companies/${testOwner.id}-diageo/tastings`);
+    await expect(page).toHaveURL(`/companies/${testOwner.id}-diageo`);
   });
 });
