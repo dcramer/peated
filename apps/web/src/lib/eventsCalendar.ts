@@ -25,10 +25,16 @@ function formatTimestamp(value: Date): string {
     .replace(/\.\d{3}/, "");
 }
 
-export function buildEventsCalendar(
-  eventList: CalendarEvent[],
+export function buildEventCalendar(
+  event: CalendarEvent,
   generatedAt = new Date(),
 ): string {
+  const location = [event.address, event.country?.name]
+    .filter(Boolean)
+    .join(", ");
+  const end = dayjs(event.dateEnd ?? event.dateStart)
+    .add(1, "day")
+    .format("YYYY-MM-DD");
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -36,29 +42,16 @@ export function buildEventsCalendar(
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "X-WR-CALNAME:Peated whisky events",
+    "BEGIN:VEVENT",
+    `UID:event-${event.id}@peated.com`,
+    `DTSTAMP:${formatTimestamp(generatedAt)}`,
+    `DTSTART;VALUE=DATE:${formatDate(event.dateStart)}`,
+    `DTEND;VALUE=DATE:${formatDate(end)}`,
+    `SUMMARY:${escapeText(event.name)}`,
   ];
 
-  for (const event of eventList) {
-    const location = [event.address, event.country?.name]
-      .filter(Boolean)
-      .join(", ");
-    const end = dayjs(event.dateEnd ?? event.dateStart)
-      .add(1, "day")
-      .format("YYYY-MM-DD");
-
-    lines.push(
-      "BEGIN:VEVENT",
-      `UID:event-${event.id}@peated.com`,
-      `DTSTAMP:${formatTimestamp(generatedAt)}`,
-      `DTSTART;VALUE=DATE:${formatDate(event.dateStart)}`,
-      `DTEND;VALUE=DATE:${formatDate(end)}`,
-      `SUMMARY:${escapeText(event.name)}`,
-    );
-    if (location) lines.push(`LOCATION:${escapeText(location)}`);
-    if (event.website) lines.push(`URL:${event.website}`);
-    lines.push("END:VEVENT");
-  }
-
-  lines.push("END:VCALENDAR");
+  if (location) lines.push(`LOCATION:${escapeText(location)}`);
+  if (event.website) lines.push(`URL:${event.website}`);
+  lines.push("END:VEVENT", "END:VCALENDAR");
   return `${lines.join("\r\n")}\r\n`;
 }

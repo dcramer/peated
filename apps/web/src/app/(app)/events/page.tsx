@@ -1,4 +1,4 @@
-import { ButtonLink, EmptyState } from "@peated/web/components";
+import { EmptyState } from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
@@ -29,11 +29,6 @@ export default async function EventsPage() {
   return (
     <div>
       <PageHeader
-        actions={
-          <ButtonLink href="/events/calendar.ics" variant="tonal">
-            Add to calendar
-          </ButtonLink>
-        }
         description="Major whisky festivals and shows, with dates and official websites."
         eyebrow="Whisky calendar"
         title="Whisky events"
