@@ -1,12 +1,13 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { PageTabItem } from "@peated/web/components";
-import type { BottleRailItem } from "@peated/web/components/pages/bottleRailSection.stylex";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import type { HomeOrigin } from "@peated/web/components/pages/homeBrowse.stylex";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
+type Distillery = Outputs["distilleries"]["list"]["results"][number];
+type Region = Outputs["regions"]["list"]["results"][number];
 
 export function getCountryLocationTabs({
   rootHref,
@@ -59,13 +60,36 @@ export function getLocationCategoryItems(
   );
 }
 
-export function getLocationPopularBottles(
-  bottles: readonly Bottle[],
-): BottleRailItem[] {
-  return bottles.map((bottle) => ({
-    href: getBottleUrl(bottle),
-    imageUrl: bottle.imageUrl,
-    metadata: getBottleMetadata(bottle),
-    name: formatBottleDisplayName(bottle),
+export function getLocationLatestReleases(bottles: readonly Bottle[]) {
+  return bottles.flatMap((bottle) =>
+    bottle.releaseYear === null
+      ? []
+      : [
+          toBottleListItem(bottle, {
+            includeRatings: true,
+            includeRelatedReleases: true,
+          }),
+        ],
+  );
+}
+
+export function getLocationDistilleries(distilleries: readonly Distillery[]) {
+  return distilleries.map((distillery) => ({
+    href: getEntityUrl(distillery),
+    location: [distillery.region?.name, distillery.country?.name]
+      .filter(Boolean)
+      .join(", "),
+    name: distillery.name,
+    totalBottles: distillery.totalBottles,
+  }));
+}
+
+export function getLocationRegions(regions: readonly Region[]): HomeOrigin[] {
+  return regions.map((region) => ({
+    description: region.description ?? undefined,
+    href: `/locations/${region.country.slug}/regions/${region.slug}`,
+    name: region.name,
+    slug: region.slug,
+    totalBottles: region.totalBottles,
   }));
 }

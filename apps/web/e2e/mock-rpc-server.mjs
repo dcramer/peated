@@ -54,6 +54,7 @@ import {
   tastingNotes,
   testBottler,
   testBrand,
+  testCountry,
   testOwnedEntity,
   testOwner,
   testRegion,
@@ -301,6 +302,13 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, testRegion);
       return true;
+    case "countries/details":
+      if (input?.country !== testCountry.slug) {
+        sendRpcError(response, "Unexpected country details payload");
+        return true;
+      }
+      sendRpcResponse(response, testCountry);
+      return true;
     case "countries/categories":
       if (input?.country !== testRegion.country.slug) {
         sendRpcError(response, "Unexpected country categories payload");
@@ -327,8 +335,15 @@ async function handleRpcRequest({ request, response, url }) {
     case "bottlers/list":
     case "companies/list":
     case "countries/list":
-    case "regions/list":
       sendRpcResponse(response, emptyList);
+      return true;
+    case "regions/list":
+      sendRpcResponse(
+        response,
+        input?.country === testCountry.slug
+          ? { ...emptyList, results: [testRegion] }
+          : emptyList,
+      );
       return true;
     case "bottles/editContext":
       if (input?.bottle !== unifiedBottleEditContext.bottleId) {
@@ -771,9 +786,12 @@ async function handleRpcRequest({ request, response, url }) {
         input?.country === testRegion.country.slug &&
         (input?.region === undefined || input.region === testRegion.slug) &&
         input?.limit === 5 &&
-        input?.sort === "-tastings"
+        input?.sort === "-release"
       ) {
-        sendRpcResponse(response, buildBottleListResponse([existingBottle]));
+        sendRpcResponse(
+          response,
+          buildBottleListResponse([bottleGroupRepresentative]),
+        );
         return true;
       }
       if (

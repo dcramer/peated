@@ -41,7 +41,11 @@ Alternative: add a configurable `CatalogPage` component that owns queries and na
 
 ### Overview content stays compact and evidence-based
 
-Each overview shows bottle and distillery facts, a category distribution, a location visual, and popular bottles. Country pages also show the existing production-rules summary when present. Widgets with no data are omitted; numeric facts still show zero.
+Each overview shows bottle and distillery facts, a category distribution, a location visual, latest releases, and the distilleries with the most recorded bottles. Country pages also show the existing production-rules summary and leading regions when present. Widgets with no data are omitted; numeric facts still show zero.
+
+The country region list reuses the homepage region-card renderer. The homepage and country overview therefore keep the same card markup, styles, truncation, and responsive grid. The location route only supplies country-scoped region data and the link to the complete Regions section.
+
+Other overview lists use the catalog-page `PageSection`, `BottleList`, `RailList`, and `TextLink` components. Homepage section wrappers remain owned by the homepage.
 
 The implementation will not add events, tasting demographics, or inferred regional facts because current APIs do not establish those relationships.
 
@@ -58,7 +62,7 @@ Changing the stored count job changes future calculations but does not rewrite p
 - [Stored totals can temporarily use old semantics] → Do not claim that deployment recomputes them. Record the required follow-up operation and keep queries internally consistent where they calculate live results.
 - [Moving distiller lists from root URLs changes bookmarked content] → Preserve the root URLs as useful overviews and expose clear Distillers tabs at stable child URLs.
 - [Multi-distillery bottles can appear in several locations] → Treat each location page as a production relationship, not a partition of the global bottle count.
-- [More overview queries can increase page work] → Run independent queries in parallel and keep the first slice to categories and popular bottles.
+- [More overview queries can increase page work] → Run independent queries in parallel and keep each discovery list to a small first slice.
 
 ## Migration Plan
 

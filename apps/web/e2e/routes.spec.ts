@@ -7,6 +7,7 @@ import {
   priceSite,
   testBottler,
   testBrand,
+  testCountry,
   testOwnedEntity,
   testOwner,
   testRegion,
@@ -29,6 +30,11 @@ const publicRoutes = [
     heading: existingBottleDetails.group.fullName,
     name: "Bottle",
     path: `/bottles/${existingBottle.id}`,
+  },
+  {
+    heading: testCountry.name,
+    name: "Country",
+    path: `/locations/${testCountry.slug}`,
   },
   {
     heading: testRegion.name,
@@ -117,6 +123,34 @@ test(
     await snapshot("Menu", { fullPage: false, ready: navigation });
     await navigation.getByRole("link", { name: "Bottles" }).click();
     await expect(page).toHaveURL(/\/bottles$/);
+  },
+);
+
+test(
+  "location overviews expose discovery sections on mobile",
+  { tag: "@mobile" },
+  async ({ page, snapshot }) => {
+    await page.goto(`/locations/${testCountry.slug}`);
+
+    const regions = page.getByRole("heading", { name: "Regions" });
+    await expect(regions).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Most recorded distilleries" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Latest releases" }),
+    ).toBeVisible();
+    await snapshot("Country overview", { ready: regions });
+
+    await page.goto(
+      `/locations/${testRegion.country.slug}/regions/${testRegion.slug}`,
+    );
+
+    const releases = page.getByRole("heading", { name: "Latest releases" });
+    await expect(
+      page.getByRole("heading", { name: "Most recorded distilleries" }),
+    ).toBeVisible();
+    await snapshot("Region overview", { ready: releases });
   },
 );
 

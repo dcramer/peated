@@ -16,9 +16,15 @@
 - [x] 3.2 Add country Overview, Bottles, Distillers, and existing Regions sections under one route layout
 - [x] 3.3 Add region Overview, Bottles, and Distillers sections under one route layout
 - [x] 3.4 Add focused web tests for location tab and optional-section logic
+- [x] 3.5 Reuse the homepage region cards on country overviews
+- [x] 3.6 Add latest releases and the most recorded distilleries to country and region overviews
+- [x] 3.7 Update location route fixtures and coverage for the added overview reads
+- [x] 3.8 Align discovery sections with catalog page components while preserving the homepage region renderer
 
 ## 4. Verification
 
 - [x] 4.1 Run focused server and web tests, typechecks, lint, and format checks
 - [x] 4.2 Run Storybook and desktop/mobile browser QA for representative country and region pages
 - [x] 4.3 Record the separate production count update without performing production writes
+- [x] 4.4 Re-run focused web tests, typecheck, lint, format, and desktop/mobile browser QA
+- [x] 4.5 Verify the catalog-aligned follow-up with focused checks and browser QA
