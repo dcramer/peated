@@ -38,3 +38,17 @@ export const WithoutMap: Story = {
     visual: getRegionMap("scotland", "speyside"),
   },
 };
+
+export const LongDescription: Story = {
+  args: {
+    description: `${meta.args.description} `.repeat(8).trim(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Long text stays within three lines without changing the card height.",
+      },
+    },
+  },
+};

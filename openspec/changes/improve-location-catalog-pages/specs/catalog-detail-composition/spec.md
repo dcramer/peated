@@ -38,3 +38,10 @@ Country and region previews SHALL use one shared card component for their visual
 - **WHEN** a region has no verified outline
 - **THEN** its preview omits the map and keeps its name, bottle count, and link
 - **AND** demo examples follow the same rule
+
+#### Scenario: Descriptions have different lengths
+
+- **WHEN** location cards have short, long, or missing descriptions
+- **THEN** all cards keep the same height on desktop and mobile
+- **AND** descriptions show at most three lines with an ellipsis when needed
+- **AND** opening a card provides the full location description
