@@ -43,19 +43,19 @@ describe("PATCH /tags/:name", () => {
   });
 
   test("updates tag category", async ({ fixtures }) => {
-    const tag = await fixtures.Tag({ tagCategory: "peaty" });
+    const tag = await fixtures.Tag({ tagCategory: "smoke" });
     const user = await fixtures.User({ admin: true });
 
     const newTag = await routerClient.tags.update(
       {
         tag: tag.name,
-        tagCategory: "fruity",
+        tagCategory: "fruit",
       },
       { context: { user } },
     );
 
     expect(newTag).toBeDefined();
-    expect(newTag.tagCategory).toEqual("fruity");
+    expect(newTag.tagCategory).toEqual("fruit");
   });
 
   test("updates tag synonyms", async ({ fixtures }) => {
@@ -75,7 +75,7 @@ describe("PATCH /tags/:name", () => {
   });
 
   test("no-op when no changes", async ({ fixtures }) => {
-    const tag = await fixtures.Tag({ tagCategory: "peaty" });
+    const tag = await fixtures.Tag({ tagCategory: "smoke" });
     const user = await fixtures.User({ admin: true });
 
     const newTag = await routerClient.tags.update(
@@ -86,6 +86,6 @@ describe("PATCH /tags/:name", () => {
     );
 
     expect(newTag).toBeDefined();
-    expect(newTag.tagCategory).toEqual("peaty");
+    expect(newTag.tagCategory).toEqual("smoke");
   });
 });

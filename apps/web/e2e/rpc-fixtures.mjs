@@ -948,7 +948,7 @@ export const suggestedTags = {
       tag: {
         name: "smoke",
         synonyms: [],
-        tagCategory: "peat",
+        tagCategory: "smoke",
         flavorProfiles: ["smoky"],
       },
       count: 3,
@@ -957,7 +957,7 @@ export const suggestedTags = {
       tag: {
         name: "citrus",
         synonyms: [],
-        tagCategory: "fruity",
+        tagCategory: "fruit",
         flavorProfiles: ["fruity"],
       },
       count: 1,

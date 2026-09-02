@@ -6,6 +6,7 @@ const links = [
   { href: "/about", label: "About" },
   { href: "/about/api", label: "API" },
   { href: "/about/categories", label: "Whisky categories" },
+  { href: "/about/tasting-wheel", label: "Tasting wheel" },
   { href: "/about/ratings", label: "Rating guide" },
   { href: "/events", label: "Whisky events" },
   { href: "/updates", label: "Recent changes" },

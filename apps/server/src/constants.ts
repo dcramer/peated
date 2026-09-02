@@ -227,17 +227,18 @@ export const FLAVOR_PROFILES = [
   "heavily_peated",
 ] as const;
 
-// TODO: maybe utilize https://www.whiskymax.co.uk/charles-macleans-whisky-wheel/
-// instead? its a bit easier to reason about for
+// These broad sensory groups are informed by WSET's current spirits lexicon.
+// A group says what a note resembles, not where the note came from.
 export const TAG_CATEGORIES = [
   "cereal",
-  "fruity",
+  "fruit",
   "floral",
-  "peaty",
-  "feinty",
-  "sulphury",
-  "woody",
-  "winey",
+  "smoke",
+  "earthy",
+  "sulfur",
+  "sweet",
+  "spice",
+  "wood",
 ] as const;
 
 // TODO: reference whisky magazine for numerical, but simplify
