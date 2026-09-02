@@ -1,17 +1,129 @@
 import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
-import { mockCountries, mockCountry, mockRegion, mockRegions } from "./places";
+import {
+  mockCork,
+  mockCountries,
+  mockCountry,
+  mockEngland,
+  mockFrance,
+  mockKarnataka,
+  mockOsaka,
+  mockRegion,
+  mockRegions,
+} from "./places";
 
 type Entity = MockOutputs["entities"]["list"]["results"][number];
 
-// Producers and bottles
+// Catalog facts belong to each entity. The mock API must not inherit another
+// producer's address, location, founding year, or ownership (see README.md).
+const entityDefaults = {
+  shortName: null,
+  ownerId: null,
+  owner: null,
+  description: null,
+  descriptionSrc: "user",
+  yearEstablished: null,
+  website: null,
+  region: null,
+  address: null,
+  location: null,
+  totalTastings: 0,
+  totalBottles: 0,
+  isFollowing: false,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} as const;
+
+export const mockDiageoEntity = {
+  ...entityDefaults,
+  id: 9210,
+  peatedId: "E9210",
+  name: "Diageo",
+  kind: "company",
+  country: mockEngland,
+  website: "https://www.diageo.com",
+  description:
+    "A London-based drinks company whose Scotch whisky brands include Lagavulin, Caol Ila, Talisker, and Johnnie Walker.",
+  yearEstablished: 1997,
+  address: "16 Great Marlborough Street, London, W1F 7HS, UK",
+} satisfies Entity;
+
+export const mockEdringtonEntity = {
+  ...entityDefaults,
+  id: 9216,
+  peatedId: "E9216",
+  name: "Edrington",
+  kind: "company",
+  country: mockCountry,
+  website: "https://www.edrington.com",
+  description:
+    "A Scottish spirits company that owns The Macallan and Highland Park.",
+} satisfies Entity;
+
+export const mockSazeracCompany = {
+  ...entityDefaults,
+  id: 9217,
+  peatedId: "E9217",
+  name: "Sazerac Company",
+  kind: "company",
+  country: mockCountries[2],
+  website: "https://www.sazerac.com",
+  description:
+    "An American spirits company that owns Buffalo Trace Distillery.",
+} satisfies Entity;
+
+export const mockPernodRicardEntity = {
+  ...entityDefaults,
+  id: 9218,
+  peatedId: "E9218",
+  name: "Pernod Ricard",
+  kind: "company",
+  country: mockFrance,
+  website: "https://www.pernod-ricard.com",
+  description: "A French drinks company and the owner of Irish Distillers.",
+} satisfies Entity;
+
+export const mockIrishDistillersEntity = {
+  ...entityDefaults,
+  id: 9219,
+  peatedId: "E9219",
+  name: "Irish Distillers",
+  kind: "company",
+  country: mockCountries[1],
+  website: "https://www.irishdistillers.ie",
+  description:
+    "An Irish whiskey producer that operates Midleton Distillery and owns Redbreast.",
+  yearEstablished: 1966,
+  ownerId: 9218,
+  owner: {
+    id: 9218,
+    peatedId: "E9218",
+    name: "Pernod Ricard",
+    kind: "company",
+  },
+} satisfies Entity;
+
+export const mockSuntoryGlobalSpiritsEntity = {
+  ...entityDefaults,
+  id: 9220,
+  peatedId: "E9220",
+  name: "Suntory Global Spirits",
+  kind: "company",
+  country: mockCountries[2],
+  website: "https://www.suntoryglobalspirits.com",
+  description:
+    "A spirits company based in New York. Its Scotch whisky distilleries include Laphroaig and Bowmore.",
+} satisfies Entity;
+
 export const mockEntity = {
+  ...entityDefaults,
   id: 9201,
   peatedId: "E9201",
   name: "Lagavulin",
   shortName: null,
   kind: "distillery",
-  ownerId: null,
+  ownerId: 9210,
+  owner: { id: 9210, peatedId: "E9210", name: "Diageo", kind: "company" },
   description: "An Islay distillery known for heavily peated single malt.",
   descriptionSrc: "user",
   yearEstablished: 1816,
@@ -30,7 +142,11 @@ export const mockEntity = {
 export const mockEntities: Entity[] = [
   mockEntity,
   {
-    ...mockEntity,
+    ...entityDefaults,
+    ownerId: 9216,
+    owner: { id: 9216, peatedId: "E9216", name: "Edrington", kind: "company" },
+    country: mockCountry,
+    kind: "distillery",
     id: 9202,
     peatedId: "E9202",
     name: "The Macallan",
@@ -46,7 +162,9 @@ export const mockEntities: Entity[] = [
     totalBottles: 190,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    country: mockCountry,
+    kind: "distillery",
     id: 9203,
     peatedId: "E9203",
     name: "Springbank",
@@ -62,13 +180,21 @@ export const mockEntities: Entity[] = [
     totalBottles: 120,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    ownerId: 9217,
+    owner: {
+      id: 9217,
+      peatedId: "E9217",
+      name: "Sazerac Company",
+      kind: "company",
+    },
+    kind: "distillery",
     id: 9204,
     peatedId: "E9204",
     name: "Buffalo Trace",
     shortName: null,
     description: "A Kentucky distillery that produces bourbon and rye whiskey.",
-    yearEstablished: 1775,
+    yearEstablished: 1858,
     website: "https://www.buffalotracedistillery.com",
     country: mockCountries[2],
     region: mockRegions[4],
@@ -78,7 +204,8 @@ export const mockEntities: Entity[] = [
     totalBottles: 95,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    kind: "distillery",
     id: 9205,
     peatedId: "E9205",
     name: "Yamazaki",
@@ -87,14 +214,22 @@ export const mockEntities: Entity[] = [
     yearEstablished: 1923,
     website: "https://house.suntory.com/yamazaki-whisky",
     country: mockCountries[3],
-    region: null,
+    region: mockOsaka,
     address: "5-2-1 Yamazaki, Shimamoto, Osaka 618-0001, Japan",
     location: [135.6745, 34.8923],
     totalTastings: 1300,
     totalBottles: 72,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    ownerId: 9219,
+    owner: {
+      id: 9219,
+      peatedId: "E9219",
+      name: "Irish Distillers",
+      kind: "company",
+    },
+    kind: "distillery",
     id: 9206,
     peatedId: "E9206",
     name: "Midleton",
@@ -104,21 +239,28 @@ export const mockEntities: Entity[] = [
     yearEstablished: 1975,
     website: "https://www.midletondistillerycollection.com",
     country: mockCountries[1],
-    region: null,
+    region: mockCork,
     address: "Distillery Walk, Midleton, County Cork, P25 Y394, Ireland",
     location: [-8.1755, 51.9158],
     totalTastings: 1500,
     totalBottles: 160,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    ownerId: 9219,
+    owner: {
+      id: 9219,
+      peatedId: "E9219",
+      name: "Irish Distillers",
+      kind: "company",
+    },
     id: 9207,
     peatedId: "E9207",
     name: "Redbreast",
     shortName: null,
     kind: "brand",
     description: "A range of Irish single pot still whiskey made at Midleton.",
-    yearEstablished: 1903,
+    yearEstablished: 1912,
     website: "https://www.redbreastwhiskey.com",
     country: mockCountries[1],
     region: null,
@@ -128,7 +270,8 @@ export const mockEntities: Entity[] = [
     totalBottles: 34,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    country: mockCountry,
     id: 9208,
     peatedId: "E9208",
     name: "Gordon & MacPhail",
@@ -145,7 +288,7 @@ export const mockEntities: Entity[] = [
     totalBottles: 1400,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
     id: 9209,
     peatedId: "E9209",
     name: "Compass Box",
@@ -154,32 +297,25 @@ export const mockEntities: Entity[] = [
     description: "A Scotch whisky blending house founded in London.",
     yearEstablished: 2000,
     website: "https://www.compassboxwhisky.com",
-    country: null,
+    country: mockCountry,
     region: null,
-    address: "3 Water Lane, Richmond, London, TW9 1TJ, UK",
-    location: [-0.3066, 51.4601],
+    address: "4th Floor, 115 George Street, Edinburgh, EH2 4JN, UK",
+    location: null,
     totalTastings: 890,
     totalBottles: 75,
   },
+  mockDiageoEntity,
   {
-    ...mockEntity,
-    id: 9210,
-    peatedId: "E9210",
-    name: "Diageo",
-    shortName: null,
-    kind: "company",
-    description: "A global drinks company that owns several whisky brands.",
-    yearEstablished: 1997,
-    website: "https://www.diageo.com",
-    country: null,
-    region: null,
-    address: "16 Great Marlborough Street, London, W1F 7HS, UK",
-    location: [-0.1383, 51.5145],
-    totalTastings: 5200,
-    totalBottles: 620,
-  },
-  {
-    ...mockEntity,
+    ...entityDefaults,
+    ownerId: 9220,
+    owner: {
+      id: 9220,
+      peatedId: "E9220",
+      name: "Suntory Global Spirits",
+      kind: "company",
+    },
+    country: mockCountry,
+    kind: "distillery",
     id: 9211,
     peatedId: "E9211",
     name: "Laphroaig",
@@ -187,13 +323,15 @@ export const mockEntities: Entity[] = [
     description: "An Islay distillery known for strongly peated single malt.",
     yearEstablished: 1815,
     website: "https://www.laphroaig.com",
+    region: mockRegion,
     address: "Laphroaig Distillery, Port Ellen, Isle of Islay, PA42 7DU, UK",
     location: [-6.1524, 55.6305],
     totalTastings: 1850,
     totalBottles: 130,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    country: mockCountry,
     id: 9212,
     peatedId: "E9212",
     name: "The Scotch Malt Whisky Society",
@@ -204,11 +342,16 @@ export const mockEntities: Entity[] = [
     yearEstablished: 1983,
     website: "https://smws.com",
     region: null,
+    address: "The Vaults, 87 Giles Street, Edinburgh, EH6 6BZ, UK",
     totalTastings: 0,
     totalBottles: 0,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    ownerId: 9216,
+    owner: { id: 9216, peatedId: "E9216", name: "Edrington", kind: "company" },
+    country: mockCountry,
+    kind: "distillery",
     id: 9213,
     peatedId: "E9213",
     name: "Highland Park",
@@ -216,12 +359,16 @@ export const mockEntities: Entity[] = [
     description: "An island single malt distillery in Orkney.",
     yearEstablished: 1798,
     website: "https://www.highlandparkwhisky.com",
-    region: null,
+    region: mockRegions[2],
+    address:
+      "Highland Park Distillery, Holm Road, Kirkwall, Orkney, KW15 1SU, UK",
     totalTastings: 640,
     totalBottles: 68,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    country: mockCountry,
+    kind: "distillery",
     id: 9214,
     peatedId: "E9214",
     name: "Caol Ila",
@@ -237,13 +384,16 @@ export const mockEntities: Entity[] = [
       "An Islay distillery known for a lighter, maritime style of peated single malt.",
     yearEstablished: 1846,
     website: "https://www.malts.com/en-row/distilleries/caol-ila",
+    region: mockRegion,
     address: "Caol Ila Distillery, Port Askaig, Isle of Islay, PA46 7RL, UK",
     location: [-6.109, 55.8543],
     totalTastings: 720,
     totalBottles: 604,
   },
   {
-    ...mockEntity,
+    ...entityDefaults,
+    country: mockCountry,
+    kind: "distillery",
     id: 9215,
     peatedId: "E9215",
     name: "Talisker",
@@ -259,11 +409,68 @@ export const mockEntities: Entity[] = [
       "An island distillery known for peppery, maritime single malt.",
     yearEstablished: 1830,
     website: "https://www.malts.com/en-row/distilleries/talisker",
-    region: null,
+    region: mockRegions[2],
     address: "Talisker Distillery, Carbost, Isle of Skye, IV47 8SR, UK",
     location: [-6.3552, 57.3026],
     totalTastings: 860,
     totalBottles: 188,
+  },
+  mockEdringtonEntity,
+  mockSazeracCompany,
+  mockPernodRicardEntity,
+  mockIrishDistillersEntity,
+  mockSuntoryGlobalSpiritsEntity,
+  {
+    ...entityDefaults,
+    id: 9221,
+    peatedId: "E9221",
+    name: "Johnnie Walker",
+    kind: "brand",
+    country: mockCountry,
+    ownerId: mockDiageoEntity.id,
+    owner: { id: 9210, peatedId: "E9210", name: "Diageo", kind: "company" },
+    yearEstablished: 1820,
+    website: "https://www.johnniewalker.com",
+    description:
+      "A blended Scotch whisky brand founded in Kilmarnock. Its range includes Black Label and Blue Label.",
+    totalBottles: 1,
+    totalTastings: 74,
+  },
+  {
+    ...entityDefaults,
+    id: 9222,
+    peatedId: "E9222",
+    name: "Sazerac Rye",
+    shortName: "Sazerac",
+    kind: "brand",
+    country: mockCountries[2],
+    ownerId: mockSazeracCompany.id,
+    owner: {
+      id: 9217,
+      peatedId: "E9217",
+      name: "Sazerac Company",
+      kind: "company",
+    },
+    website:
+      "https://www.buffalotracedistillery.com/our-brands/sazerac-rye-whiskey/sazerac-straight-rye-whiskey/",
+    description:
+      "A straight rye whiskey brand produced at Buffalo Trace Distillery in Kentucky. It takes its name from the Sazerac Coffee House in New Orleans.",
+    totalBottles: 1,
+    totalTastings: 48,
+  },
+  {
+    ...entityDefaults,
+    id: 9223,
+    peatedId: "E9223",
+    name: "Amrut",
+    kind: "distillery",
+    country: mockCountries[4],
+    region: mockKarnataka,
+    website: "https://amrutdistilleries.com",
+    description:
+      "An Indian whisky producer based in Bengaluru, Karnataka. Fusion uses both Indian and Scottish barley, with the whisky made in India.",
+    totalBottles: 1,
+    totalTastings: 56,
   },
 ];
 
@@ -287,6 +494,12 @@ export const mockYamazakiEntity = mockEntities[4]!;
 export const mockMidletonEntity = mockEntities[5]!;
 export const mockRedbreastEntity = mockEntities[6]!;
 export const mockLaphroaigEntity = mockEntities[10]!;
-export const mockDiageoEntity = mockEntities[9]!;
 export const mockCaolIlaEntity = mockEntities[13]!;
 export const mockTaliskerEntity = mockEntities[14]!;
+
+export const mockCompassBoxEntity = mockEntities[8]!;
+export const mockHighlandParkEntity = mockEntities[12]!;
+export const mockJohnnieWalkerEntity = mockEntities[20]!;
+export const mockSazeracRyeEntity = mockEntities[21]!;
+
+export const mockAmrutEntity = mockEntities[22]!;
