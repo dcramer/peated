@@ -307,9 +307,9 @@ export function HomeDistilleries({
 }) {
   return (
     <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading title="Most recorded distilleries" />
+      <HomeModuleHeading title="Distilleries" />
       <div {...stylex.props(styles.distilleries)}>
-        <ItemList ariaLabel="Most recorded distilleries">
+        <ItemList ariaLabel="Distilleries">
           {distilleries.map((distillery) => (
             <ItemRow
               href={distillery.href}
