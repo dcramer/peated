@@ -5,27 +5,27 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
-  AppLink,
   FactList,
   LoadingPlaceholder,
   RailList,
   RailListItem,
-  SectionHeading,
   TastingRatingDistribution,
   type FactListItem,
   type TastingRatingCounts,
 } from "@peated/web/components";
 import { MemberActivityList } from "@peated/web/components/pages/memberProfileContent.stylex";
-import {
-  PageColumns,
-  RailSection,
-} from "@peated/web/components/pages/pageLayout.stylex";
+import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import { colors, space } from "../../../../styles/tokens.stylex";
+import { space } from "../../../../styles/tokens.stylex";
 import { toActivityItem } from "./profileActivity";
 import { useProfile } from "./profileContext";
+import {
+  ProfileActivitySection,
+  ProfileOverviewLayout,
+} from "./profileOverviewLayout.stylex";
 import { ProfilePassport } from "./profilePassport.stylex";
+import { profileQueries } from "./profileQueries";
 
 type ActivityList = Outputs["users"]["activity"]["list"];
 type BadgeAward = Outputs["users"]["badgeList"]["results"][number];
@@ -41,18 +41,13 @@ type ProducerGroup = {
 export function ProfileOverviewPageClient({
   initialActivityList,
   initialBadgeAwards,
-  initialTastingStats,
 }: {
   initialActivityList: ActivityList;
   initialBadgeAwards: readonly BadgeAward[];
-  initialTastingStats: TastingStats;
 }) {
   const orpc = useORPC();
   const { isCurrentUser, user } = useProfile();
-  const statsQuery = useQuery({
-    ...orpc.users.tastingStats.queryOptions({ input: { user: user.id } }),
-    initialData: initialTastingStats,
-  });
+  const statsQuery = useQuery(profileQueries.tastingStats(orpc, user.id));
   const bands = getBands(statsQuery.data);
   const producerGroups = getProducerGroups(statsQuery.data?.producers);
   const facts: readonly [FactListItem, ...FactListItem[]] = user.createdAt
@@ -85,36 +80,11 @@ export function ProfileOverviewPageClient({
     .map(toActivityItem);
 
   return (
-    <div {...stylex.props(styles.overview)}>
-      <PageColumns
-        rail={
-          <>
-            {producerGroups.length ? (
-              <ProducerSections groups={producerGroups} />
-            ) : null}
-            <RailSection heading="Passport">
-              <ProfilePassport awards={initialBadgeAwards} />
-            </RailSection>
-            {statsQuery.isPending || bands ? (
-              <RatingSummary
-                bands={bands}
-                label={isCurrentUser ? "Your ratings" : "Their ratings"}
-                loading={statsQuery.isPending}
-              />
-            ) : null}
-          </>
-        }
-        railBehavior="stack"
-      >
-        <div {...stylex.props(styles.main)}>
+    <ProfileOverviewLayout
+      main={
+        <>
           <FactList facts={facts} layout="grid" />
-          <section aria-label="Recent activity">
-            <div {...stylex.props(styles.sectionHeader)}>
-              <SectionHeading>Recent activity</SectionHeading>
-              <AppLink href={`/users/${user.username}/activity`}>
-                View all
-              </AppLink>
-            </div>
+          <ProfileActivitySection username={user.username}>
             <MemberActivityList
               emptyDescription={
                 isCurrentUser
@@ -123,10 +93,27 @@ export function ProfileOverviewPageClient({
               }
               items={activity}
             />
-          </section>
-        </div>
-      </PageColumns>
-    </div>
+          </ProfileActivitySection>
+        </>
+      }
+      rail={
+        <>
+          {producerGroups.length ? (
+            <ProducerSections groups={producerGroups} />
+          ) : null}
+          <RailSection heading="Passport">
+            <ProfilePassport awards={initialBadgeAwards} />
+          </RailSection>
+          {statsQuery.isPending || bands ? (
+            <RatingSummary
+              bands={bands}
+              label={isCurrentUser ? "Your ratings" : "Their ratings"}
+              loading={statsQuery.isPending}
+            />
+          ) : null}
+        </>
+      }
+    />
   );
 }
 
@@ -238,25 +225,6 @@ function formatCount(count: number) {
 }
 
 const styles = stylex.create({
-  overview: {
-    minWidth: 0,
-  },
-  main: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x8,
-  },
-  sectionHeader: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x4,
-    paddingBottom: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
-  },
   ratingLoading: {
     display: "flex",
     minHeight: "66px",

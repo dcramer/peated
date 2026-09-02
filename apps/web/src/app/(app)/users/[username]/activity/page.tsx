@@ -1,7 +1,13 @@
-import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
+import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
+import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getProfilePage } from "@peated/web/lib/profilePage.server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import {
+  getProfileActivityRouteState,
+  profileQueries,
+} from "../profileQueries";
 import { ProfileActivityPageClient } from "./profileActivityPageClient.stylex";
 
 export default async function ProfileActivityPage(props: {
@@ -11,10 +17,16 @@ export default async function ProfileActivityPage(props: {
   const { username } = await props.params;
   const { client } = await createServerClient();
   const user = await getProfilePage(username);
-  const activityInput = getApiQueryParams(await props.searchParams, {
-    overrides: { limit: 10, user: user.id },
-  });
-  const activityList = await client.users.activity.list(activityInput);
+  const { cursor } = getProfileActivityRouteState(await props.searchParams);
+  const queryClient = getQueryClient();
+  const orpc = createTanstackQueryUtils(client);
+  await queryClient.prefetchInfiniteQuery(
+    profileQueries.activity(orpc, user.id, cursor),
+  );
 
-  return <ProfileActivityPageClient initialActivityList={activityList} />;
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProfileActivityPageClient />
+    </HydrationBoundary>
+  );
 }

@@ -15,43 +15,27 @@ import {
   RailListItem,
   SectionError,
 } from "@peated/web/components";
-import {
-  PageColumns,
-  RailSection,
-} from "@peated/web/components/pages/pageLayout.stylex";
+import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "../profileContext";
+import { getProfileTastingCursor, profileQueries } from "../profileQueries";
+import { ProfileTastingsLayout } from "./profileTastingsLayout";
 
-type TastingList = Outputs["tastings"]["list"];
 type RegionList = Outputs["users"]["regionList"];
 
-export function ProfileTastingsPageClient({
-  initialRegionList,
-  initialTastingList,
-}: {
-  initialRegionList: RegionList;
-  initialTastingList: TastingList;
-}) {
+export function ProfileTastingsPageClient() {
   const orpc = useORPC();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isCurrentUser, user } = useProfile();
-  const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
-  const regionQuery = useQuery({
-    ...orpc.users.regionList.queryOptions({ input: { user: user.id } }),
-    initialData: initialRegionList,
-  });
-  const tastingQuery = useQuery({
-    ...orpc.tastings.list.queryOptions({
-      input: { cursor, limit: 10, user: user.id },
-    }),
-    initialData: initialTastingList,
-  });
+  const cursor = getProfileTastingCursor(searchParams);
+  const regionQuery = useQuery(profileQueries.regions(orpc, user.id));
+  const tastingQuery = useQuery(profileQueries.tastings(orpc, user.id, cursor));
 
   return (
-    <PageColumns
+    <ProfileTastingsLayout
       rail={getRegionRail(regionQuery, user.username, isCurrentUser)}
     >
       <section aria-label={`${user.username}'s tastings`}>
@@ -108,7 +92,7 @@ export function ProfileTastingsPageClient({
           )}
         />
       </section>
-    </PageColumns>
+    </ProfileTastingsLayout>
   );
 }
 
