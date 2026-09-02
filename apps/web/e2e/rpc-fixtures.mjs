@@ -274,7 +274,7 @@ export const createdMemberReview = {
   imageUrl: null,
   createdBy: testUser,
   createdAt: timestamp,
-  updatedAt: timestamp,
+  updatedAt: "2026-06-08T12:00:00.000Z",
 };
 
 export const exactMergeOtherBottle = {

@@ -104,6 +104,7 @@ test.describe("log tasting", () => {
       name: existingBottle.fullName,
     });
     await expect(reviewHeading).toBeVisible();
+    await expect(page.getByText("Review · June 7, 2026")).toBeVisible();
     await expect(page.getByText(createdMemberReview.notes)).toBeVisible();
     await snapshot("Review detail / Saved review", { ready: reviewHeading });
   });

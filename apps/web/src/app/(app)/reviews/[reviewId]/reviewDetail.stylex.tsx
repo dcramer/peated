@@ -14,7 +14,7 @@ export function ReviewDetail({ review }: { review: Review }) {
       author={review.createdBy}
       bottle={review.bottle}
       color={review.color}
-      createdAt={review.updatedAt}
+      createdAt={review.createdAt}
       friends={review.friends}
       notes={review.notes}
       rating={{ kind: "review", score: review.score }}
