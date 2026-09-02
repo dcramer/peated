@@ -274,6 +274,9 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, { results: [] });
       return true;
+    case "events/list":
+      sendRpcResponse(response, emptyList);
+      return true;
     case "brands/list":
       sendRpcResponse(response, {
         ...emptyList,
