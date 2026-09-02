@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { Camera } from "lucide-react";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { Button } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
@@ -50,9 +51,7 @@ export function BottleResolverSection({
     <section {...stylex.props(styles.section)}>
       {title || description ? (
         <div {...stylex.props(styles.sectionHeader)}>
-          {title ? (
-            <h2 {...stylex.props(foundationStyles.sectionHeading)}>{title}</h2>
-          ) : null}
+          {title ? <SectionHeading>{title}</SectionHeading> : null}
           {description ? (
             <div
               {...stylex.props(
@@ -84,14 +83,9 @@ export function BottlePhotoAction({
         <Camera size={30} strokeWidth={1.5} />
       </span>
       <div {...stylex.props(styles.photoCopy)}>
-        <h2
-          {...stylex.props(
-            foundationStyles.sectionHeading,
-            styles.photoHeading,
-          )}
-        >
-          Photograph the label
-        </h2>
+        <div {...stylex.props(styles.photoHeading)}>
+          <SectionHeading>Photograph the label</SectionHeading>
+        </div>
         <p
           {...stylex.props(foundationStyles.metadata, styles.photoDescription)}
         >

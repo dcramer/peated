@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { HTMLAttributes, ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
@@ -169,7 +170,7 @@ export function EmptyState({
     <section {...stylex.props(styles.statePanel)}>
       <div {...stylex.props(styles.stateCopy)}>
         <div {...stylex.props(styles.stateHeadingRow)}>
-          <h2 {...stylex.props(foundationStyles.sectionHeading)}>{heading}</h2>
+          <SectionHeading>{heading}</SectionHeading>
           {status}
         </div>
         <div {...stylex.props(foundationStyles.body, styles.stateDescription)}>
@@ -217,7 +218,7 @@ export function SectionError({
               <span {...stylex.props(styles.errorDetail)}>{detail}</span>
             ) : null}
           </div>
-          <h2 {...stylex.props(foundationStyles.sectionHeading)}>{heading}</h2>
+          <SectionHeading>{heading}</SectionHeading>
         </div>
         <div {...stylex.props(foundationStyles.body, styles.stateDescription)}>
           {children}

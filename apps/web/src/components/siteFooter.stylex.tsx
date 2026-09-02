@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
@@ -50,7 +51,7 @@ export function SiteFooter({
       </div>
       {referenceLinks.length ? (
         <div {...stylex.props(styles.referenceSection)}>
-          <h2 {...stylex.props(styles.footerHeading)}>Reference</h2>
+          <SectionHeading>Reference</SectionHeading>
           <p {...stylex.props(styles.referenceLinks)}>
             {referenceLinks.map((link) => (
               <FooterAnchor key={link.href} link={link} />
@@ -110,16 +111,6 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "13px",
     lineHeight: 1.55,
-  },
-  footerHeading: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   footerLinks: {
     display: "flex",

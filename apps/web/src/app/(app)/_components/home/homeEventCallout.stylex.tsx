@@ -1,4 +1,5 @@
 import type { Event } from "@peated/server/types";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { TextLink } from "@peated/web/components";
@@ -17,9 +18,7 @@ export function HomeEventCallout({
 
   return (
     <section aria-labelledby={headingId} {...stylex.props(styles.root)}>
-      <h2 id={headingId} {...stylex.props(styles.heading)}>
-        Coming up
-      </h2>
+      <SectionHeading id={headingId}>Coming up</SectionHeading>
       <h3 {...stylex.props(styles.title)}>{event.name}</h3>
       <div {...stylex.props(styles.details)}>
         <DateRange start={event.dateStart} end={event.dateEnd} />
@@ -37,15 +36,6 @@ export function HomeEventCallout({
 const styles = stylex.create({
   root: {
     minWidth: 0,
-  },
-  heading: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "24px",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1.1,
   },
   title: {
     margin: 0,

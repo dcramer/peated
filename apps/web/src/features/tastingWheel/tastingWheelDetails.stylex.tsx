@@ -3,12 +3,13 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { TagCategory } from "@peated/server/types";
 import { BottleIdentityRow, Button, Slideout } from "@peated/web/components";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import {
   CATEGORY_DEFINITIONS,
   NOTE_DESCRIPTIONS,
@@ -121,11 +122,11 @@ function TastingWheelDetails({
         </p>
       ) : null}
       <section>
-        <h3 {...stylex.props(styles.heading)}>
+        <SectionHeading level={3}>
           {selection.note
             ? `More in ${category.name.toLowerCase()}`
             : "Explore the notes"}
-        </h3>
+        </SectionHeading>
         <div {...stylex.props(styles.notes)}>
           {notes.map((note) => (
             <Button
@@ -141,7 +142,7 @@ function TastingWheelDetails({
         </div>
       </section>
       <section aria-busy={query.isPending}>
-        <h3 {...stylex.props(styles.heading)}>Bottles across Peated</h3>
+        <SectionHeading level={3}>Bottles across Peated</SectionHeading>
         <p {...stylex.props(styles.explanation)}>
           Ranked by the share of public tastings with notes that mention{" "}
           {selection.note
@@ -206,14 +207,6 @@ const styles = stylex.create({
     margin: 0,
     color: colors.inkMuted,
     textWrap: "pretty",
-  },
-  heading: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
   },
   notes: {
     display: "flex",

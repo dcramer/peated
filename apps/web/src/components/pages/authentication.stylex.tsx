@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import NextLink from "next/link";
 import type { ComponentProps, ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { TextLink, type TextLinkProps } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
@@ -116,7 +117,7 @@ export function AuthenticationPanel({
   return (
     <section {...stylex.props(styles.panel)}>
       {back ? <div {...stylex.props(styles.back)}>{back}</div> : null}
-      <h2 {...stylex.props(styles.panelTitle)}>{title}</h2>
+      <SectionHeading>{title}</SectionHeading>
       {description ? (
         <div {...stylex.props(styles.panelDescription)}>{description}</div>
       ) : null}
@@ -386,15 +387,6 @@ const styles = stylex.create({
   },
   back: {
     marginBottom: "14px",
-  },
-  panelTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "34px",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1.08,
   },
   panelDescription: {
     marginTop: space.x2,

@@ -18,6 +18,7 @@ import {
 } from "react";
 import AvatarEditor from "react-avatar-editor";
 import { z } from "zod";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import { Button, Field } from ".";
 import setRef from "../lib/setRef";
@@ -236,7 +237,9 @@ function ImageCropDialog({
       <DialogBackdrop {...stylex.props(styles.backdrop)} />
       <div {...stylex.props(styles.position)}>
         <DialogPanel {...stylex.props(styles.panel)}>
-          <DialogTitle {...stylex.props(styles.title)}>Crop image</DialogTitle>
+          <DialogTitle as="div">
+            <SectionHeading>Crop image</SectionHeading>
+          </DialogTitle>
           <div {...stylex.props(styles.editor)}>
             <AvatarEditor
               border={20}
@@ -345,13 +348,6 @@ const styles = stylex.create({
     borderColor: colors.hairline,
     backgroundColor: colors.ground,
     boxShadow: effects.overlayShadow,
-  },
-  title: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
   },
   editor: {
     display: "flex",

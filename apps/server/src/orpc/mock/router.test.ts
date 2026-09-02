@@ -27,6 +27,9 @@ import {
   mockFriendDetails,
   mockFriends,
   mockFriendships,
+  mockHighlandParkEntity,
+  mockIrishDistillersEntity,
+  mockJohnnieWalkerEntity,
   mockLaphroaigEntity,
   mockNotifications,
   mockPublicUserDetails,
@@ -109,6 +112,8 @@ describe("mock oRPC router", () => {
     expect(diageoEntities.results).toEqual([
       mockCaolIlaEntity,
       mockTaliskerEntity,
+      mockEntity,
+      mockJohnnieWalkerEntity,
     ]);
     const laphroaigReleases = await anonymousClient.bottles.list({
       entity: mockLaphroaigEntity.id,
@@ -139,6 +144,8 @@ describe("mock oRPC router", () => {
     const countries = await anonymousClient.countries.list({});
     expect(countries.results).toHaveLength(mockCountries.length);
     expect(countries.results.map((country) => country.slug)).toEqual([
+      "england",
+      "france",
       "india",
       "ireland",
       "japan",
@@ -177,8 +184,15 @@ describe("mock oRPC router", () => {
       limit: 100,
     });
     expect(bottles.results).toHaveLength(mockBottles.length);
-    expect(new Set(bottles.results.map((bottle) => bottle.category)).size).toBe(
-      3,
+    expect(new Set(bottles.results.map((bottle) => bottle.category))).toEqual(
+      new Set([
+        "single_malt",
+        "single_pot_still",
+        "bourbon",
+        "rye",
+        "blend",
+        "blended_malt",
+      ]),
     );
     expect(
       new Set(bottles.results.map((bottle) => bottle.flavorProfile)).size,
@@ -241,6 +255,119 @@ describe("mock oRPC router", () => {
         }),
       ]),
     });
+  });
+
+  it("keeps real producer geography and ownership on detail pages", async () => {
+    const highlandPark = await anonymousClient.entities.details({
+      entity: mockHighlandParkEntity.id,
+    });
+    expect(highlandPark).toMatchObject({
+      kind: "distillery",
+      country: { slug: "scotland" },
+      region: { slug: "highlands" },
+      address:
+        "Highland Park Distillery, Holm Road, Kirkwall, Orkney, KW15 1SU, UK",
+      owner: { name: "Edrington", kind: "company" },
+    });
+    const society = await anonymousClient.entities.details({ entity: 9212 });
+    expect(society).toMatchObject({
+      kind: "bottler",
+      address: "The Vaults, 87 Giles Street, Edinburgh, EH6 6BZ, UK",
+      region: null,
+      location: null,
+    });
+    const redbreast = await anonymousClient.entities.details({ entity: 9207 });
+    expect(redbreast).toMatchObject({
+      yearEstablished: 1912,
+      ownerId: mockIrishDistillersEntity.id,
+      owner: { name: "Irish Distillers" },
+    });
+    const owner = await anonymousClient.entities.details({
+      entity: mockIrishDistillersEntity.id,
+    });
+    expect(owner.owner).toMatchObject({ name: "Pernod Ricard" });
+
+    const entities = await anonymousClient.entities.list({ limit: 100 });
+    expect(new Set(entities.results.map((entity) => entity.id)).size).toBe(
+      entities.results.length,
+    );
+    for (const entity of entities.results) {
+      if (entity.region)
+        expect(entity.region.country.id).toBe(entity.country?.id);
+      if (entity.ownerId !== null) {
+        const owner = entities.results.find(
+          (candidate) => candidate.id === entity.ownerId,
+        );
+        expect(owner).toBeDefined();
+        expect(entity.owner).toMatchObject({
+          id: owner!.id,
+          name: owner!.name,
+          kind: owner!.kind,
+        });
+      }
+    }
+  });
+
+  it("exposes sourced history for each producer without leaking another history", async () => {
+    const history = await anonymousClient.entities.events.list({
+      entity: 9204,
+    });
+    expect(history.results).toMatchObject([
+      { entityId: 9204, kind: "opened", date: "1858" },
+      { entityId: 9204, kind: "acquired", date: "1992", newOwnerId: 9217 },
+    ]);
+    for (const event of history.results) {
+      expect(event.sourceUrl).toBe(
+        "https://www.buffalotracedistillery.com/buffalo-trace-history/",
+      );
+    }
+    await expect(
+      anonymousClient.entities.events.list({ entity: 9205 }),
+    ).resolves.toEqual({ results: [] });
+  });
+
+  it("uses real bottle categories and producer relationships", async () => {
+    const rye = await anonymousClient.bottles.list({ category: "rye" });
+    expect(rye.results).toMatchObject([
+      {
+        brand: { name: "Sazerac Rye", kind: "brand" },
+        distillers: [{ name: "Buffalo Trace" }],
+        abv: 45,
+        statedAge: null,
+        noAgeStatement: true,
+      },
+    ]);
+    const blendedMalts = await anonymousClient.bottles.list({
+      category: "blended_malt",
+    });
+    expect(blendedMalts.results).toMatchObject([
+      {
+        name: "The Peat Monster",
+        brand: { name: "Compass Box" },
+        bottler: { name: "Compass Box" },
+        abv: 46,
+        statedAge: null,
+        naturalColor: true,
+        nonChillFiltered: true,
+      },
+    ]);
+    const india = await anonymousClient.distilleries.list({ country: "india" });
+    expect(india.results.map((entity) => entity.name)).toEqual(["Amrut"]);
+    const fusion = await anonymousClient.bottles.list({
+      distiller: india.results[0]!.id,
+    });
+    expect(fusion.results).toMatchObject([
+      { name: "Fusion", category: "single_malt", abv: 50 },
+    ]);
+    const releases = await anonymousClient.bottleGroups.bottles({
+      group: mockBottleGroup.id,
+    });
+    expect(
+      releases.results.every((bottle) => bottle.caskStrength === false),
+    ).toBe(true);
+    expect(
+      releases.results.every((bottle) => bottle.name.includes(bottle.edition!)),
+    ).toBe(true);
   });
 
   it("completes bottle, entity, and tasting detail pages", async () => {

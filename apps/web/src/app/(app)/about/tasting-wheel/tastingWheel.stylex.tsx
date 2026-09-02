@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@peated/web/components";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { textLinkStyles } from "@peated/web/components/textLinkStyles.stylex";
 import { WHEEL_CATEGORIES } from "@peated/web/features/tastingWheel/tastingWheelData";
 import { useTastingWheel } from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
@@ -187,7 +188,7 @@ export function TastingWheelFamilies() {
           key={category.key}
           {...stylex.props(styles.family)}
         >
-          <h3 {...stylex.props(styles.familyTitle)}>{category.name}</h3>
+          <SectionHeading level={3}>{category.name}</SectionHeading>
           <button
             type="button"
             aria-haspopup="dialog"
@@ -311,15 +312,6 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
     scrollMarginTop: space.x8,
-  },
-  familyTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
   },
   familyDescription: {
     margin: 0,

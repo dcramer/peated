@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { TextLink } from "../textLink.stylex";
@@ -31,7 +32,7 @@ export function RailListSection({
 }) {
   return (
     <section {...stylex.props(styles.section)}>
-      <h2 {...stylex.props(styles.heading)}>{heading}</h2>
+      <SectionHeading>{heading}</SectionHeading>
       {intro ? <p {...stylex.props(styles.intro)}>{intro}</p> : null}
       {action ? (
         "href" in action ? (
@@ -63,14 +64,6 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     gap: space.x2,
-  },
-  heading: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   intro: {
     margin: 0,

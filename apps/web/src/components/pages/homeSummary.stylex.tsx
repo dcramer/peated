@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import {
   CountChip,
@@ -31,9 +32,7 @@ export function HomeMemberSummary({
       {...stylex.props(styles.widget)}
     >
       <div {...stylex.props(styles.widgetHeading)}>
-        <h2 id="member-record-heading" {...stylex.props(styles.widgetTitle)}>
-          Your record
-        </h2>
+        <SectionHeading id="member-record-heading">Your record</SectionHeading>
         <CountChip count={totalTastings} />
       </div>
       <div {...stylex.props(styles.recordPanel)}>
@@ -84,15 +83,6 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     gap: "10px",
-  },
-  widgetTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   recordPanel: {
     paddingTop: "22px",

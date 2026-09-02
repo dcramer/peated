@@ -15,6 +15,30 @@ export const mockCountry = {
   totalDistillers: 150,
 } satisfies Country;
 
+export const mockEngland = {
+  id: 9406,
+  name: "England",
+  slug: "england",
+  description:
+    "Home to whisky distilleries, blending houses, and drinks companies.",
+  summary: "English whisky and the companies behind other whisky brands.",
+  location: [-1.5, 52.5],
+  totalBottles: 0,
+  totalDistillers: 0,
+} satisfies Country;
+
+export const mockFrance = {
+  id: 9407,
+  name: "France",
+  slug: "france",
+  description:
+    "Produces malt whisky and is home to international drinks companies.",
+  summary: "French whisky and international whisky producers.",
+  location: [2.2, 46.6],
+  totalBottles: 0,
+  totalDistillers: 0,
+} satisfies Country;
+
 export const mockCountries: Country[] = [
   mockCountry,
   {
@@ -61,6 +85,8 @@ export const mockCountries: Country[] = [
     totalBottles: 420,
     totalDistillers: 35,
   },
+  mockEngland,
+  mockFrance,
 ];
 
 export const mockRegion = {
@@ -72,6 +98,41 @@ export const mockRegion = {
   location: [-6.2, 55.8],
   totalBottles: 680,
   totalDistillers: 10,
+} satisfies Region;
+
+export const mockKarnataka = {
+  id: 9506,
+  name: "Karnataka",
+  slug: "karnataka",
+  country: mockCountries[4],
+  description: "A state in southern India. Bengaluru is home to Amrut.",
+  location: [76, 15],
+  totalBottles: 1,
+  totalDistillers: 1,
+} satisfies Region;
+
+export const mockOsaka = {
+  id: 9507,
+  name: "Osaka",
+  slug: "osaka",
+  country: mockCountries[3],
+  description:
+    "A prefecture in Japan's Kansai region. Yamazaki Distillery is in Shimamoto, near the border with Kyoto.",
+  location: [135.5, 34.7],
+  totalBottles: 72,
+  totalDistillers: 1,
+} satisfies Region;
+
+export const mockCork = {
+  id: 9508,
+  name: "County Cork",
+  slug: "county-cork",
+  country: mockCountries[1],
+  description:
+    "A county in southern Ireland and the home of Midleton Distillery.",
+  location: [-8.5, 51.9],
+  totalBottles: 160,
+  totalDistillers: 1,
 } satisfies Region;
 
 export const mockRegions: Region[] = [
@@ -120,4 +181,7 @@ export const mockRegions: Region[] = [
     totalBottles: 3400,
     totalDistillers: 130,
   },
+  mockKarnataka,
+  mockOsaka,
+  mockCork,
 ];

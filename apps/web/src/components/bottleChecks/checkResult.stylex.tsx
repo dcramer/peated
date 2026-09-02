@@ -7,6 +7,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
+import { SectionHeading } from "../sectionHeading.stylex";
 import {
   getBottleCheckFindings,
   getBottleCheckState,
@@ -29,7 +30,9 @@ export default function CheckResult({
     return (
       <section {...stylex.props(styles.panel, styles.warningPanel)}>
         <div {...stylex.props(styles.eyebrow)}>Unsupported schema</div>
-        <h2 {...stylex.props(styles.title)}>{title}</h2>
+        <div {...stylex.props(styles.title)}>
+          <SectionHeading>{title}</SectionHeading>
+        </div>
         <p {...stylex.props(styles.copy)}>
           This audit uses schema version {check.schemaVersion}. Its historical
           proposals cannot be reviewed safely
@@ -85,7 +88,7 @@ export default function CheckResult({
         <span {...stylex.props(styles.status)}>
           {getBottleCheckState(check)}
         </span>
-        <h2 {...stylex.props(styles.compactTitle)}>{title}</h2>
+        <SectionHeading>{title}</SectionHeading>
       </div>
       <p {...stylex.props(styles.copy)}>{getBottleCheckSummary(check)}</p>
 
@@ -97,7 +100,7 @@ export default function CheckResult({
 
       {findings.length > 0 ? (
         <div {...stylex.props(styles.findings)}>
-          <h3 {...stylex.props(styles.compactTitle)}>Findings</h3>
+          <SectionHeading level={3}>Findings</SectionHeading>
           <div {...stylex.props(styles.findingList)}>
             {findings.map((finding, index) => {
               return (
@@ -147,21 +150,7 @@ const styles = stylex.create({
     letterSpacing: "0.08em",
     textTransform: "uppercase",
   },
-  title: {
-    margin: 0,
-    marginTop: space.x2,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 600,
-  },
-  compactTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 600,
-  },
+  title: { marginTop: space.x2 },
   copy: {
     margin: 0,
     marginTop: space.x2,

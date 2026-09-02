@@ -14,6 +14,7 @@ import { Plus, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
+import { SectionHeading } from "../../sectionHeading.stylex";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { IconButton, TextLink } from "../..";
@@ -124,8 +125,8 @@ export default function ModerationBottlePicker({
       <div {...stylex.props(styles.position)}>
         <DialogPanel {...stylex.props(styles.panel)}>
           <header {...stylex.props(styles.header)}>
-            <DialogTitle {...stylex.props(styles.title)}>
-              Choose bottle
+            <DialogTitle as="div">
+              <SectionHeading>Choose bottle</SectionHeading>
             </DialogTitle>
             <IconButton
               icon={<X aria-hidden="true" size={18} />}
@@ -265,13 +266,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     backgroundColor: colors.ground,
-  },
-  title: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
   },
   searchRow: {
     padding: space.x4,

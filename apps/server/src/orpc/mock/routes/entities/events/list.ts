@@ -1,7 +1,6 @@
 import {
   mockEntities,
-  mockEntity,
-  mockEntityHistory,
+  mockEntityHistories,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
@@ -15,7 +14,9 @@ export default mockOS.entities.events.list.handler(
     }
 
     return {
-      results: entity.id === mockEntity.id ? mockEntityHistory : [],
+      results: mockEntityHistories.filter(
+        (event) => event.entityId === entity.id,
+      ),
     };
   },
 );

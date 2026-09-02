@@ -200,9 +200,9 @@ export function BrandVoicePage() {
               {...stylex.props(styles.ruleCard, rule.wide && styles.ruleWide)}
             >
               <div {...stylex.props(styles.ruleCopy)}>
-                <h3 {...stylex.props(styles.cardTitle)}>
+                <SectionHeading level={3}>
                   {index + 1} · {rule.title}
-                </h3>
+                </SectionHeading>
                 <p {...stylex.props(styles.cardBody)}>{rule.body}</p>
               </div>
               <div {...stylex.props(styles.example)}>{rule.example()}</div>
@@ -272,7 +272,7 @@ export function BrandVoicePage() {
         <div {...stylex.props(styles.mechanicsGrid)}>
           {mechanics.map((item) => (
             <div key={item.title} {...stylex.props(styles.mechanicCard)}>
-              <h3 {...stylex.props(styles.mechanicTitle)}>{item.title}</h3>
+              <SectionHeading level={3}>{item.title}</SectionHeading>
               <p {...stylex.props(styles.mechanicBody)}>{item.body}</p>
             </div>
           ))}
@@ -484,14 +484,6 @@ const styles = stylex.create({
   ruleCopy: {
     maxWidth: "680px",
   },
-  cardTitle: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
   cardBody: {
     marginTop: space.x2,
     marginBottom: 0,
@@ -675,14 +667,6 @@ const styles = stylex.create({
     paddingLeft: "18px",
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
-  },
-  mechanicTitle: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.3,
   },
   mechanicBody: {
     marginTop: space.x1,

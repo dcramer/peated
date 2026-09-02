@@ -4,6 +4,7 @@ import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import * as stylex from "@stylexjs/stylex";
 import type { FocusEvent } from "react";
 import { useId, useMemo, useState } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
@@ -272,12 +273,9 @@ export function NotePicker({
   return (
     <div data-state="open" {...stylex.props(styles.picker)}>
       <div {...stylex.props(styles.header)}>
-        <h3
-          id={titleId}
-          {...stylex.props(foundationStyles.sectionHeading, styles.title)}
-        >
+        <SectionHeading id={titleId} level={3}>
           Notes
-        </h3>
+        </SectionHeading>
         <input
           aria-describedby={resultCountId}
           aria-label="Search notes"
@@ -587,9 +585,6 @@ const styles = stylex.create({
     paddingRight: { default: space.x4, [COMPACT]: space.x3 },
     paddingBottom: space.x3,
     paddingLeft: { default: space.x4, [COMPACT]: space.x3 },
-  },
-  title: {
-    color: colors.ink,
   },
   search: {
     boxSizing: "border-box",

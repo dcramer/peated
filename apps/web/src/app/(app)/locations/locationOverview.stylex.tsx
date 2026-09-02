@@ -16,7 +16,6 @@ import { HomeRegionGrid } from "@peated/web/components/pages/homeBrowse.stylex";
 import {
   PageColumns,
   PageSection,
-  RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { colors, fonts } from "../../../styles/tokens.stylex";
 
@@ -59,28 +58,32 @@ export function LocationOverview({
   return (
     <PageColumns
       rail={
-        <>
+        <div>
           {visual ? (
-            <RailSection heading="Map">
+            <PageSection heading="Map">
               <LocationVisual visual={visual} />
-            </RailSection>
+            </PageSection>
           ) : null}
           {flavorProfile}
           {productionRules ? (
-            <RailSection heading="Production rules">
+            <PageSection heading="Production rules">
               <p {...stylex.props(styles.copy)}>{productionRules}</p>
-            </RailSection>
+            </PageSection>
           ) : null}
           {categories.length ? (
-            <RailSection heading="Bottles by category">
+            <PageSection heading="Bottles by category">
               <DistributionList items={categories} />
-            </RailSection>
+            </PageSection>
           ) : null}
           {otherRegions.length ? (
-            <RailSection heading="Other regions">
-              {otherRegionsHref ? (
-                <TextLink href={otherRegionsHref}>View all regions</TextLink>
-              ) : null}
+            <PageSection
+              heading="Other regions"
+              intro={
+                otherRegionsHref ? (
+                  <TextLink href={otherRegionsHref}>View all regions</TextLink>
+                ) : null
+              }
+            >
               <RailList ariaLabel="Other regions">
                 {otherRegions.map((region) => (
                   <RailListItem
@@ -93,9 +96,9 @@ export function LocationOverview({
                   />
                 ))}
               </RailList>
-            </RailSection>
+            </PageSection>
           ) : null}
-        </>
+        </div>
       }
       railBehavior="stack"
     >
