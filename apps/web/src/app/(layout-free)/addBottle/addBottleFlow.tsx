@@ -696,16 +696,14 @@ function AddBottleFlowContent() {
       setTastingLoadError(undefined);
 
       try {
-        const [bottle, collectionStatus] = await Promise.all([
-          orpc.bottles.details.call({
-            bottle: bottleId,
-          }),
-          orpc.collections.bottles.list.call({
-            user: "me",
-            collection: "library",
-            bottle: bottleId,
-          }),
-        ]);
+        const bottle = await orpc.bottles.details.call({
+          bottle: bottleId,
+        });
+        const collectionStatus = await orpc.collections.bottles.list.call({
+          user: "me",
+          collection: "library",
+          bottle: bottle.id,
+        });
 
         if (cancelled) return;
         const libraryEntry = collectionStatus.results[0] ?? null;
