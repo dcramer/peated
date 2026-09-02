@@ -202,6 +202,9 @@ sentiment poles.
 - Section headings use `SectionHeading` in every column. Heading levels express
   document structure and share one visual treatment. Do not add compact,
   uppercase, or page-specific section heading variants.
+- Browse headings should name the content or its relationship to the page.
+  State the ranking only when it helps people choose; sort controls should
+  still name their order.
 
 | Role            | Family  | Weight | Size and line height | Tracking |
 | --------------- | ------- | ------ | -------------------- | -------- |

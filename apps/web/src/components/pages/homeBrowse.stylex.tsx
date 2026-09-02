@@ -64,10 +64,10 @@ export function HomeHighestRated({
             <span aria-hidden="true">→</span>
           </Link>
         }
-        title="Highest rated"
+        title="Bottles to try"
       />
       <div {...stylex.props(styles.rows)}>
-        <BottleList ariaLabel="Highest rated bottles" items={bottles} />
+        <BottleList ariaLabel="Bottles to try" items={bottles} />
       </div>
     </section>
   );

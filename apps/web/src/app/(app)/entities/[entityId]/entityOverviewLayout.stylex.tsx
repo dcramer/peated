@@ -69,7 +69,7 @@ export function EntityOverviewLoading() {
         catalogSections={
           <div aria-hidden="true" {...stylex.props(styles.loadingSections)}>
             <LoadingSection label="Loading entity releases" rows={4} />
-            <LoadingSection label="Loading popular bottles" rows={4} />
+            <LoadingSection label="Loading bottles" rows={4} />
           </div>
         }
         relationships={

@@ -54,8 +54,8 @@ export const Overview: Story = {
       <PageColumns
         rail={
           <div>
-            <PageSection heading="Popular bottles">
-              <RailList ariaLabel="Popular bottles">
+            <PageSection heading="Bottles">
+              <RailList ariaLabel="Bottles">
                 <RailListItem
                   href="#"
                   metadata="Single malt"

@@ -42,7 +42,6 @@ export type BottleOverviewProps = {
   mainState?: ReactNode;
   moreTastingsHref?: string;
   recommendationHeading?: string;
-  recommendationIntro?: string;
   recommendationState?: ReactNode;
   recommendations?: readonly BottleRecommendation[];
   railSections?: ReactNode;
@@ -59,7 +58,6 @@ export function BottleOverview({
   mainState,
   moreTastingsHref,
   recommendationHeading = "If you liked this",
-  recommendationIntro,
   recommendationState,
   recommendations = [],
   railSections,
@@ -153,7 +151,6 @@ export function BottleOverview({
             {recommendations.length ? (
               <BottleRailSection
                 heading={recommendationHeading}
-                intro={recommendationIntro}
                 items={recommendations}
               />
             ) : recommendationState ? (

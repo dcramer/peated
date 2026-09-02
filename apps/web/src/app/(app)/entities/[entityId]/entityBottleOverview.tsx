@@ -40,7 +40,7 @@ export function EntityBottleOverview({
   const presentation = getEntityPresentation(entity);
   const entityHref = getEntityUrl(entity);
   const isDistillery = entity.kind === "distillery";
-  const heading = isDistillery ? "Popular other bottlings" : "Popular bottles";
+  const heading = isDistillery ? "Other bottlings" : "Bottles";
   const viewAllParams = new URLSearchParams({ sort: "-tastings" });
   if (isDistillery) viewAllParams.set("view", "other");
 
@@ -108,8 +108,8 @@ export function EntityBottleOverview({
       <BottleList
         ariaLabel={
           isDistillery
-            ? `${entity.name} popular other bottlings`
-            : `${entity.name} popular bottles`
+            ? `${entity.name} other bottlings`
+            : `${entity.name} bottles`
         }
         items={bottleList.results.map((bottle) =>
           toBottleListItem(bottle, {
