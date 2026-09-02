@@ -23,7 +23,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "How Peated records whisky bottles, the people who make them, and what drinkers thought.",
+    "Peated is a public record of whisky bottles, the people who make them, and what drinkers thought.",
 };
 
 export default async function AboutRoute() {
@@ -32,7 +32,7 @@ export default async function AboutRoute() {
   return (
     <AboutPage
       currentHref="/about"
-      description="A community-maintained record of whisky bottles, the people who make them, and what the people who drank them thought."
+      description="A public record of whisky bottles, the people who make them, and what the people who drank them thought."
       eyebrow="Reference · edited by members"
       rail={
         <>
@@ -91,14 +91,14 @@ export default async function AboutRoute() {
       <PageSection heading="Why Peated exists">
         <AboutTextStack>
           <AboutText>
-            Peated is a social record for tasting and collecting whisky. It
-            gives you one place to identify a bottle, record what you drank, and
-            leave useful notes.
+            Peated exists to document as much whisky as possible and make that
+            record freely accessible to everyone. You can browse the catalog,
+            suggest a correction, or read the data through the public API.
           </AboutText>
           <AboutText>
-            The catalog is central to that work. It combines public sources with
-            corrections from members. The same API that serves the site is open
-            to anyone building on top of it.
+            The catalog combines public sources with corrections from members.
+            Members can also record what they drank and add tasting notes and
+            reviews.
           </AboutText>
         </AboutTextStack>
       </PageSection>
@@ -122,7 +122,7 @@ export default async function AboutRoute() {
           facts={[
             { label: "Started", value: "2023" },
             { label: "Maintained by", value: "Members" },
-            { label: "License", value: "Apache 2.0" },
+            { label: "Source code license", value: "Apache 2.0" },
             { label: "API", value: "Public" },
           ]}
           layout="grid"

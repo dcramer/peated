@@ -4,6 +4,7 @@ import { SiteFooter, type SiteFooterProps } from "@peated/web/components";
 
 const links = [
   { href: "/about", label: "About" },
+  { href: "/about/api", label: "API" },
   { href: "/about/categories", label: "Whisky categories" },
   { href: "/about/ratings", label: "Rating guide" },
   { href: "/events", label: "Whisky events" },
@@ -40,7 +41,7 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
         },
       ]}
       responsibility="Drink responsibly"
-      statement="A record of whisky bottles, critic scores, and tasting notes from the people who drank them."
+      statement="A public record of whisky bottles, critic scores, and tasting notes from the people who drank them."
     />
   );
 }

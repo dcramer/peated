@@ -1,8 +1,10 @@
 # Peated
 
-The application that powers peated.com.
+Peated is a public record of whisky. Our goal is to document as much whisky as
+possible and make that data freely accessible to everyone.
 
-For more details, take a look at <https://peated.com/about>
+Browse the catalog at <https://peated.com> or read it through the public API at
+<https://peated.com/about/api>.
 
 A Discord is available if you want to contribute: <https://discord.gg/d7GFPfy88Z>
 
