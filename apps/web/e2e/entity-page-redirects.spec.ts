@@ -1,6 +1,7 @@
 import { expect, test } from "./test";
 
 import {
+  distilleryBrandBottleId,
   replacementSourceEntityId,
   testOwnedEntity,
   testOwner,
@@ -31,10 +32,18 @@ test.describe("Entity page routes", () => {
     }
   });
 
-  test("uses the canonical company link and completes client navigation", async ({
+  test("links a Bottle's distillery Brand and its owner to their canonical pages", async ({
     page,
   }) => {
-    await page.goto(`/distillers/${testOwnedEntity.id}`);
+    await page.goto(`/bottles/${distilleryBrandBottleId}`);
+
+    const brandLink = page
+      .getByRole("link", { name: testOwnedEntity.name, exact: true })
+      .first();
+    const distilleryUrl = `/distillers/${testOwnedEntity.id}-lagavulin-distillery`;
+    await expect(brandLink).toHaveAttribute("href", distilleryUrl);
+    await brandLink.click();
+    await expect(page).toHaveURL(distilleryUrl);
 
     const companyLink = page.getByRole("link", { name: "View company" });
     await expect(companyLink).toHaveAttribute(

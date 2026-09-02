@@ -53,13 +53,7 @@ export default async function EntityCodesPage(props: {
       rows.push({
         code,
         country: distiller?.country?.name ?? null,
-        href: distiller
-          ? getEntityUrl({
-              id: distiller.id,
-              kind: "distillery",
-              name: distiller.name,
-            })
-          : undefined,
+        href: distiller ? getEntityUrl(distiller) : undefined,
         name: distiller?.name ?? distillerName ?? "Unknown",
       });
     }
@@ -73,11 +67,7 @@ export default async function EntityCodesPage(props: {
     <EntityCodes
       entityName={entity.name}
       example={{
-        href: getEntityUrl({
-          id: exampleDistiller.id,
-          kind: "distillery",
-          name: exampleDistiller.name,
-        }),
+        href: getEntityUrl(exampleDistiller),
         name: exampleDistiller.name,
       }}
       groups={groups}

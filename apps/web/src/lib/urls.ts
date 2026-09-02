@@ -24,6 +24,7 @@ export function getBottleSeriesUrl(series: {
   return `/series/${series.id}-${createUrlSlug(series.fullName, "series")}`;
 }
 
+/** Entity identity owns the route: pass the stored kind, never a Bottle field's role. */
 export function getEntityUrl(entity: {
   id: number;
   kind: EntityKind | null;
@@ -52,22 +53,7 @@ function createUrlSlug(
 }
 
 export function getEntityKindSearchUrl(kind: EntityKind) {
-  let link: string;
-  switch (kind) {
-    case "bottler":
-      link = "/bottlers";
-      break;
-    case "brand":
-      link = "/brands";
-      break;
-    case "distillery":
-      link = "/distillers";
-      break;
-    case "company":
-      link = "/companies";
-      break;
-  }
-  return link;
+  return ENTITY_COLLECTION_BY_KIND[kind];
 }
 
 export function buildQueryString(

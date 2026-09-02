@@ -237,6 +237,7 @@ export const emptyEntityCatalog = {
 };
 
 export const existingBottleId = 9301;
+export const distilleryBrandBottleId = 9320;
 export const createdBottleId = 9302;
 export const exactMatchedBottleId = 9305;
 export const replacementSourceBottleId = 9307;

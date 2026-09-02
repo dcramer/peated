@@ -37,13 +37,7 @@ export function toBottleListItem(
     brand: includeBrandRow
       ? bottle.brand.shortName || bottle.brand.name
       : undefined,
-    brandHref: includeBrandRow
-      ? getEntityUrl({
-          id: bottle.brand.id,
-          kind: "brand",
-          name: bottle.brand.name,
-        })
-      : undefined,
+    brandHref: includeBrandRow ? getEntityUrl(bottle.brand) : undefined,
     hasTasted: bottle.hasTasted,
     href: getBottleUrl(bottle),
     id: bottle.peatedId,

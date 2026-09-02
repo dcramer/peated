@@ -435,11 +435,7 @@ export function BottlePageFrameClient({
               : null
           }
           brand={bottle.brand.shortName || bottle.brand.name}
-          brandHref={getEntityUrl({
-            id: bottle.brand.id,
-            kind: "brand",
-            name: bottle.brand.name,
-          })}
+          brandHref={getEntityUrl(bottle.brand)}
           eyebrow={getBottleEyebrow(bottle)}
           menu={<BottleActions bottle={bottle} />}
           name={formatBottleDisplayName(bottle, { includeBrand: false })}

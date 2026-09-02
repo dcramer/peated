@@ -20,6 +20,9 @@ Peated IDs are serialized in uppercase with at least four digits. Input and sear
 - Entity URLs use the collection for their primary kind: `/brands`,
   `/distillers`, `/bottlers`, or `/companies`, followed by the numeric ID and
   current name slug.
+  Web callers pass the Entity directly to `getEntityUrl` in
+  `apps/web/src/lib/urls.ts`. A Bottle's Brand, Bottler, or Distiller field does
+  not determine that Entity's kind or URL.
 - Series URLs use `/series/{numeric ID}-{current full-name slug}`. The full name
   includes the Brand.
 - The numeric ID identifies the object. The web app creates the slug when it

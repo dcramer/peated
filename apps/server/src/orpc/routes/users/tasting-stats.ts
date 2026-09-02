@@ -9,6 +9,7 @@ import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { implement } from "@peated/server/orpc";
 import userTastingStatsContract from "@peated/server/orpc/contracts/users/tasting-stats";
+import type { Entity } from "@peated/server/types";
 import { eq, inArray } from "drizzle-orm";
 import { buildAgeStats } from "./age-stats";
 import {
@@ -16,20 +17,18 @@ import {
   UserBottleReadIntegrityError,
 } from "./tasting-bottle-scan";
 
-type ProducerStat = { id: number; name: string; count: number };
-
 function incrementCount(counts: Map<number, number>, id: number) {
   counts.set(id, (counts.get(id) ?? 0) + 1);
 }
 
 function rankProducers(
   counts: Map<number, number>,
-  entitiesById: Map<number, { id: number; name: string }>,
-): ProducerStat[] {
+  entitiesById: Map<number, Pick<Entity, "id" | "name" | "kind">>,
+) {
   return Array.from(counts, ([id, count]) => {
     const entity = entitiesById.get(id);
     if (!entity) throw new Error(`Bottle references missing Entity ${id}.`);
-    return { id, name: entity.name, count };
+    return { id, name: entity.name, kind: entity.kind, count };
   })
     .sort(
       (left, right) =>
@@ -137,7 +136,7 @@ export default implement(userTastingStatsContract).handler(async function ({
   );
   const producerEntities = producerIds.length
     ? await db
-        .select({ id: entities.id, name: entities.name })
+        .select({ id: entities.id, name: entities.name, kind: entities.kind })
         .from(entities)
         .where(inArray(entities.id, producerIds))
     : [];
