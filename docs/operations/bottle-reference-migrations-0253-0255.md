@@ -1,9 +1,9 @@
-# BottleReference Cutover
+# Bottle Reference Migrations 0253–0255
 
-Use this checklist for the coordinated `bottle_alias` to `bottle_reference`
-schema rename. The old application cannot use the renamed schema. Do not run
-these production steps without an approved deployment window and database
-backup.
+Use this checklist to rename `bottle_alias` to `bottle_reference` in an
+environment that has not applied migrations `0253` through `0255`. The old
+application cannot use the new database shape. Do not run these production
+steps without an approved deployment window and database backup.
 
 ## Before The Migration
 
@@ -45,3 +45,10 @@ backup.
 
 Do not delete compatibility fields, migration reports, or review evidence in
 this rollout. Those cleanups require a separate approved change.
+
+## Removal
+
+Delete this guide and the migration-only audit code after every maintained
+environment has applied migrations `0253` through `0255`, the rollback window
+has closed, and an older application release can no longer be deployed. Until
+then, this versioned guide is intentional compatibility documentation.

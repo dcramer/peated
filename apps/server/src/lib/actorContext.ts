@@ -3,25 +3,22 @@ import { AsyncLocalStorage } from "node:async_hooks";
 export type ActorContext = {
   type: "user";
   userId: number;
-  username?: string;
 };
 
 const actorContextStorage = new AsyncLocalStorage<ActorContext | undefined>();
 
 /** Convert an authenticated Peated user into the app-owned actor shape. */
 export function userToActorContext(
-  user: { id: number; username?: string | null } | null | undefined,
+  user: { id: number } | null | undefined,
 ): ActorContext | undefined {
   if (!user) {
     return undefined;
   }
 
-  const actor: ActorContext = {
+  return {
     type: "user",
     userId: user.id,
   };
-  if (user.username) actor.username = user.username;
-  return actor;
 }
 
 /** Run code with app-owned actor context available to nested dispatches. */

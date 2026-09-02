@@ -1,35 +1,27 @@
 # `@peated/bottle-classifier`
 
-Generic bottle identity classifier for Peated.
+Shared whisky Bottle classification for Peated.
 
-This package takes a Bottle Reference such as a retailer listing, label OCR result, or user-entered Bottle name and returns a reviewed Bottle identity decision. It owns the extraction, prompt/tool orchestration, and deterministic post-processing needed to turn weak source text into a safe canonical result.
+The [Bottle Classifier architecture](../../docs/architecture/bottle-classifier.md)
+defines behavior and safety. This file covers the package boundary and how to
+work with it.
 
 ## Ownership
 
 This package owns:
 
-- the public classifier contract
-- file-backed classifier eval fixtures and their validation
-- whisky-specific extraction prompts and parsing
-- the identity reasoning loop, including local search, optional entity search,
-  and web search
-- the separate Bottle audit loop that can propose catalog changes
-- deterministic identity validation and downgrade policy
-- exact-cask versus product-scope inference
-- package-local unit tests and LLM-as-a-judge evals
+- the public classification, extraction, and audit contracts;
+- the model prompts, read-only tool loop, and result validation;
+- pure Bottle identity and automation-tier helpers;
+- classifier fixtures, unit tests, and live evals.
 
-This package does not own:
-
-- database access
-- HTTP clients for local bottle/entity search
-- price-match proposal semantics
-- persistence or automation decisions downstream of the reviewed classifier result
-
-Server code should compose this package by injecting adapters. The package should not import `apps/server`.
+Server code injects database, local-search, and web adapters. It owns saved
+workflow state and any resulting database changes. This package must not import
+`apps/server`.
 
 ## Public API
 
-The package root is intentionally small. It should export only the core ways we classify and normalize bottle identity:
+Create the reviewed classifier from the package root:
 
 ```ts
 import {
@@ -37,243 +29,126 @@ import {
   createWhiskyLabelExtractor,
   formatCanonicalBottleName,
   getResolvedBottleIdentity,
-  normalizeBottle,
   normalizeProposedBottleDraft,
 } from "@peated/bottle-classifier";
-```
 
-The main reviewed classifier boundary is:
-
-```ts
 const classifier = createBottleClassifier({ client, model, adapters });
 
-await classifier.classifyBottleReference({
-  reference,
-  extractedIdentity?,
-  initialCandidates?,
-  candidateExpansion?,
+const result = await classifier.classifyBottleReference({ reference });
+const audit = await classifier.auditBottle({
+  bottleId,
+  origin: "moderator",
 });
 ```
 
-The normal path is to pass only `reference`. The optional `extractedIdentity` and `initialCandidates` inputs exist for cases where extraction or retrieval has already been done upstream.
-Set `candidateExpansion: "initial_only"` for closed-set review flows that must stay within the provided candidate set instead of searching for more bottles.
+`classifyBottleReference` normally needs only `reference`. Callers that already
+performed extraction or retrieval may also provide `extractedIdentity`,
+`initialCandidates`, and `candidateExpansion`. Use `initial_only` when the agent
+must stay within the supplied candidates.
 
-Deterministic normalization entrypoints:
+The package root also exports the reviewed request and result schemas and types.
+The `contract` subpath provides that contract without the classifier factory.
 
-```ts
-normalizeBottle({ name, statedAge?, releaseYear?, ... });
-normalizeProposedBottleDraft(proposedBottle);
-```
-
-These are the package-owned pure helpers that downstream server code should
-compose instead of re-implementing. They are the main low-cost surface for
-deterministic edge-case tests. A create decision always describes one
-independently complete Bottle.
-
-Use the narrow subpath exports for specialized or internal-only surfaces:
+Use the normalization subpath for focused helpers:
 
 ```ts
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
-import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
-import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
+import {
+  normalizeBottleInput,
+  normalizeBottleReferenceKey,
+} from "@peated/bottle-classifier/normalize";
 ```
 
-Additional pure helpers that are package-owned but not part of the root API:
+`normalizeBottleReferenceKey` is the safe helper for exact reference keys.
+`normalizeBottleInput` performs wider display-name cleanup and structured fact
+extraction; do not use it for an exact-reference decision. The old helper name
+is fully removed, and legacy scraper adapters now call `normalizeBottleInput`.
+See
+[Bottle Reference Normalization](../../docs/architecture/bottle-reference-normalization.md).
 
-- `@peated/bottle-classifier/priceMatchingEvidence`
-- `@peated/bottle-classifier/smws`
+Other supported subpaths include:
 
-Internal server adapters should import internals only through the explicit
-`internal/*` namespace:
+- `bottleCreationDrafts`
+- `bottleIdentity`
+- `bottleSchemaGuidance`
+- `identityEvidenceCore`
+- `imageEvidence`
+- `openaiCompatibleConfig`
+- `priceMatchingEvidence`
+- `smws`
 
-- `@peated/bottle-classifier/internal/runtime`
-- `@peated/bottle-classifier/internal/types`
-- `@peated/bottle-classifier/internal/extractor`
-- `@peated/bottle-classifier/internal/prompts`
-- `@peated/bottle-classifier/internal/policy`
-
-The `contract` subpath remains public because it defines the reviewed request
-and response boundary itself.
-
-## Behavioral Expectations
-
-The behavior spec lives in
-[`docs/architecture/bottle-classifier.md`](../../docs/architecture/bottle-classifier.md).
-The controlled terms live in the
-[`Bottle Classifier Glossary`](../../docs/architecture/bottle-classifier-glossary.md).
-Package-specific reminders:
-
-- Keep price-matching proposal language out of this package.
-- The model may only match candidate ids that were actually retrieved.
-- Reference Classification has read-only evidence tools. Bottle audits own
-  Suggested Change tools.
-- Deterministic helpers must stay limited to structurally safe behavior.
-- SMWS code references are deterministic; most other whisky-family semantics are not.
-- Keep request-specific evidence in runtime input, tool results, schemas, and post-model validation.
-- Use eval fixtures for concrete regressions instead of brand-specific prompt tutoring.
+Server adapters may use only the explicit `internal/*` exports. These are not
+general package API.
 
 ## File Map
 
-- [`src/classifier.ts`](./src/classifier.ts): public classifier factory
-- [`src/contract.ts`](./src/contract.ts): public request/result schemas
-- [`src/classifierRuntime.ts`](./src/classifierRuntime.ts): orchestration and tool loop
-- [`src/reviewPolicy.ts`](./src/reviewPolicy.ts): validation, normalization, and downgrades
-- [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts
-- [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction
-- [`src/normalize.ts`](./src/normalize.ts): bottle/name/category/volume normalization
-- [`src/bottleIdentity.ts`](./src/bottleIdentity.ts): canonical Bottle name and exact-trait normalization shared with staged migration consumers
-- [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): create-draft normalization
-- [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): shared evidence checks
-- [`src/smws.ts`](./src/smws.ts): SMWS parsing and exact-code behavior
-- [`src/eval-fixtures/`](./src/eval-fixtures): file-backed eval fixtures
-- [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts): live classifier eval runner
+- [`src/classifier.ts`](./src/classifier.ts) — public classifier factory
+- [`src/contract.ts`](./src/contract.ts) — public request and result schemas
+- [`src/classifierRuntime.ts`](./src/classifierRuntime.ts) — runtime and tool loop
+- [`src/reviewPolicy.ts`](./src/reviewPolicy.ts) — final validation
+- [`src/instructions.ts`](./src/instructions.ts) — classifier prompts
+- [`src/extractor.ts`](./src/extractor.ts) — label extraction
+- [`src/normalize.ts`](./src/normalize.ts) — normalization helpers
+- [`src/bottleIdentity.ts`](./src/bottleIdentity.ts) — canonical Bottle identity
+- [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts) — creation draft cleanup
+- [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts) — evidence checks and `deriveAutomationTier`
+- [`src/smws.ts`](./src/smws.ts) — SMWS code handling
+- [`src/eval-fixtures/`](./src/eval-fixtures) — file-backed eval cases
+- [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts) — live eval runner
 
-## Iteration Workflow
+## Configuration
 
-When changing classifier behavior:
+The server and eval runner read these settings:
 
-1. Inspect the trace from extraction through tools, agent output, review policy, and fixture expectation. A poor model query belongs to the prompt or tool description; a valid query that errors or returns malformed data belongs to the adapter or provider and is not negative evidence.
-2. Update or add a focused unit test only for deterministic behavior.
-3. Update or add the relevant file-backed eval fixtures when the behavior changes exact Bottle identity boundaries.
-4. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
-   When automation behavior matters, assert the code-derived `expected.expectedTier: auto | review`. The tier comes from action risk, unresolved risks, and structured evidence or deterministic anchors; it does not read model-supplied numeric scores.
-5. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
-6. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
-7. Run package typecheck, focused unit tests, and fixture validation for routine changes. Use focused live evals while iterating and run the full live suite once at a deliberate checkpoint.
+| Setting                                    | Purpose                                      | Default           |
+| ------------------------------------------ | -------------------------------------------- | ----------------- |
+| `AI_GATEWAY_API_KEY`                       | Required hosted model access                 | none              |
+| `BOTTLE_CLASSIFIER_MODEL`                  | Reference and audit model                    | `gpt-5.6-terra`   |
+| `BOTTLE_CLASSIFIER_REASONING_EFFORT`       | Classifier reasoning effort                  | `medium`          |
+| `OPENAI_IMAGE_EXTRACTION_MODEL`            | Label extraction model                       | `gpt-5.6-luna`    |
+| `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT` | Label extraction reasoning effort            | `high`            |
+| `OPENAI_EVAL_MODEL`                        | Eval judge model                             | `gpt-5.6-luna`    |
+| `OPENAI_EVAL_REASONING_EFFORT`             | Eval judge reasoning effort                  | `medium`          |
+| `FIRECRAWL_API_KEY`                        | Optional web search and page reading         | none              |
+| `FIRECRAWL_API_URL`                        | Optional Firecrawl endpoint override         | provider default  |
+| `VITEST_EVALS_REPLAY_DIR`                  | Optional replay recording directory override | package directory |
 
-When adding an eval from a real production miss:
+Model calls use Vercel AI Gateway. Without Firecrawl, the classifier has no web
+tools. The eval config loads the repo-root `.env.local`; shell values take
+precedence.
 
-1. Start with the exact observed input: listing title, URL, extracted identity, local candidates, current assignment, and the failing classifier or automation outcome.
-2. Web-verify the real bottle before writing the expected result. Prioritize producer/brand pages, official shops, independent whisky databases, competition records, reviews, and publications whose content specifically confirms the bottle traits. Treat retailer copy as the source listing, not proof by itself.
-3. Decide the Peated DB outcome explicitly: exact `bottleId` or one complete Bottle creation, plus which source facts should remain observation-only. Historical release ids may remain in production provenance, but never enter classifier candidates or decisions. The classifier never creates a `bottle_release`, repairs a parent, or selects a BottleGroup.
-4. Apply `docs/architecture/whisky-identity-model.md`: every marketed release must remain independently correct as a Bottle, including its supported exact traits; BottleGroup assignment is automatic downstream.
-5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.expectedTier` when the automation outcome is part of the regression. Use `expected.verifyEligible` only when deliberately asserting the retained downstream existing-match verification compatibility projection; it is not the primary tier.
-6. Add `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome` so future reviewers can see the web verification and the intended DB action without rediscovering it from memory.
-7. If the family is ambiguous enough to regress in both directions, add paired positive and negative fixtures rather than a one-sided example.
-
-During the flattening migration, fixture-only negative Bottle ids represent
-historical release observations promoted to independently complete Bottle
-candidates. They prevent those rows from being confused with real Peated
-Bottle ids; the original positive release ids remain only in provenance.
-
-When adding a new bottle family or edge case:
-
-- add both a positive and a negative example when the family is ambiguous enough to regress
-- mark whether the case is `deterministic_safe`, `classifier_required`, or `block_if_uncertain`
-- keep one listing per JSON file under the appropriate `src/eval-fixtures/*` directory
-- record `peatedBottleIds` for real-world new-bottle fixtures so future cleanup can trace back to the observed family
-- do not promote a variable semantic case into deterministic logic just to make a test pass
-
-Useful commands:
+## Commands
 
 ```bash
+# Deterministic checks
+pnpm --filter @peated/bottle-classifier terms:check
 pnpm --filter @peated/bottle-classifier fixtures:validate
-pnpm --filter @peated/bottle-classifier typecheck
 pnpm --filter @peated/bottle-classifier test
-```
+pnpm --filter @peated/bottle-classifier typecheck
 
-Manual classifier smoke commands:
+# Live model checks
+pnpm evals:classifier
+pnpm evals:classifier:flaky
+pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
 
-```bash
+# Manual classifier smoke checks through server adapters and the local database
 pnpm cli classifier run "Ardbeg Uigeadail"
 pnpm cli classifier run --image /tmp/bottle.jpg
 pnpm cli classifier run --input-file /tmp/classifier-input.json
 ```
 
-The CLI uses the server adapters, local DB, and `.env.local` OpenAI config to
-run the real classifier. Local image paths are sent to the extractor as data
-URLs; public image URLs are passed through as image references.
+`pnpm evals:classifier` runs classifier evals only. Root `pnpm evals` runs
+classifier and scraper evals. Replay files under `.vitest-evals/recordings/` are
+reviewable eval evidence; commit only intentional changes.
 
-Live eval commands:
-
-```bash
-# Baseline: GPT-5.6 Terra with medium reasoning
-pnpm evals
-
-# Compare GPT-5.6 Luna at an explicit effort
-BOTTLE_CLASSIFIER_MODEL=gpt-5.6-luna \
-  BOTTLE_CLASSIFIER_REASONING_EFFORT=high pnpm evals
-
-pnpm --filter @peated/bottle-classifier evals
-pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
-
-# Focused classifier quality-debt cases
-pnpm evals:classifier:flaky
-```
-
-The focused command runs only these production-regression cases:
-
-- `Rogues' Banquet: image-backed match and Suggested Change`
-- `image-backed photo: requires a Spice Tree Extravaganza Suggested Change`
-- `store listing: matches Laphroaig Càirdeas 2022 Warehouse 1 and merges the malformed duplicate`
-- `audit: restore Pōkeno 2019 vintage without inferring a cask number`
-
-Keep this list narrow: it is the fast iteration slice for known classifier
-quality debt, not a replacement for the full live eval suite.
-
-`pnpm evals` is the intended repo-root entrypoint. It forwards extra Vitest args
-to the package runner and uses the `vitest-evals` reporter configured in
-[`vitest.evals.config.mts`](./vitest.evals.config.mts).
-The eval config loads the repo-root `.env.local`. Shell-provided environment
-variables still take precedence.
-`AI_GATEWAY_API_KEY` is required for hosted model calls. Production fails at
-startup without it, and local evals skip when it is absent. All model calls use
-Vercel AI Gateway. `BOTTLE_CLASSIFIER_MODEL` defaults to
-`openai/gpt-5.6-terra` and `OPENAI_EVAL_MODEL` defaults to
-`openai/gpt-5.6-luna`. The eval judge uses `medium` reasoning by default;
-override it with
-`OPENAI_EVAL_REASONING_EFFORT`.
-`BOTTLE_CLASSIFIER_REASONING_EFFORT` accepts `none`, `low`, `medium`, `high`, or
-`xhigh` for GPT-5 models and defaults to `medium`. The classifier sends the
-resolved effort explicitly so production and eval baselines stay repeatable.
-Reasoning tokens are included in output-token usage and billed as output tokens.
-The eval metadata and visible usage annotation record the resolved effort. Image
-extraction separately defaults to `gpt-5.6-luna` with
-`high` reasoning; use `OPENAI_IMAGE_EXTRACTION_MODEL` and
-`OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT` to override it. Image extraction
-evals report their own token usage, estimated cost, and latency rather than
-mixing those measurements into the classifier agent loop. `FIRECRAWL_API_KEY`
-enables the classifier's live web search and focused page-reading tools;
-`FIRECRAWL_API_URL` can override the default Firecrawl API host. Without the
-key, the classifier has no web-evidence tools; it does not substitute an OpenAI
-search-agent call.
-
-The live evals use a `vitest-evals` harness around the same
-`runBottleReference(...)` and `runBottleAudit(...)` entrypoints used in
-production. The harness records model usage and real tool events, and replays
-`firecrawl_web_search` and `firecrawl_read_page` when `FIRECRAWL_API_KEY`
-enables those tools. A batched search consumes one configured search-budget
-unit per query, and a page read consumes one unit.
-
-Reported token usage and estimated USD cost cover the measured agent loop only.
-The estimate uses the dated standard, short-context OpenAI rates recorded in the
-harness metadata. The native eval summary shows total tokens, while one `usage`
-annotation shows input tokens, output tokens, and estimated USD for each result.
-Extraction, web-search tool fees, pre-agent work,
-long-context pricing, alternate service tiers, and regional adjustments are not
-included. Unknown models or unavailable usage omit the estimate rather than
-reporting zero. Cache detail remains in structured usage metadata for pricing
-accuracy rather than adding noise to the visible summary. Missing cache-token
-detail is priced as standard input. Total timing is wall-clock time for the
-complete production entrypoint.
-
-Replay recordings default to the package-local upstream-style
-`packages/bottle-classifier/.vitest-evals/recordings/` directory via
-`VITEST_EVALS_REPLAY_DIR`. The normal commands above replay an existing
-recording and record a new one on a miss automatically.
-Replay JSON is reproducible eval evidence, not a disposable local cache. Review
-and commit replay changes only when they are intentional.
-
-Classifier eval CI publishes the native `vitest-evals` summary and a dedicated
-`classifier eval score` Check Run. The check requires at least 80% of cases to
-pass so isolated qualitative misses remain visible without hiding the suite's
-aggregate signal. The workflow job also fails below that floor, so the gate does
-not depend on branch-protection configuration. Missing or invalid Vitest result
-reports are infrastructure failures and still fail the workflow job directly.
+When behavior changes, add unit tests for deterministic rules and eval cases for
+model judgment. Preserve the real input and verified result for a production
+regression. Generalize the rule instead of adding a brand-specific prompt hint.
 
 ## Related Docs
 
-- [`docs/architecture/bottle-classifier.md`](../../docs/architecture/bottle-classifier.md)
-- [`docs/architecture/whisky-identity-model.md`](../../docs/architecture/whisky-identity-model.md)
-- [`docs/features/store-price-matching.md`](../../docs/features/store-price-matching.md)
-- [`AGENTS.md`](./AGENTS.md)
+- [Bottle Classifier](../../docs/architecture/bottle-classifier.md)
+- [Bottle Reference Normalization](../../docs/architecture/bottle-reference-normalization.md)
+- [Whisky Identity Model](../../docs/architecture/whisky-identity-model.md)
+- [Store-price Matching](../../docs/architecture/store-price-matching.md)
+- [Model Checks](../../docs/development/model-checks.md)
+- [Package Instructions](./AGENTS.md)

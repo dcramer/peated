@@ -7,9 +7,10 @@ Before changing classifier behavior, read:
 - `packages/bottle-classifier/README.md`
 - `docs/architecture/bottle-classifier.md`
 - `docs/architecture/bottle-classifier-glossary.md`
+- `docs/architecture/bottle-reference-normalization.md`
 - `docs/architecture/whisky-identity-model.md`
 - `docs/policies/agent-design.md`
-- `docs/policies/evals.md`
+- `docs/development/model-checks.md`
 
 ## Commands
 
@@ -20,6 +21,7 @@ Before changing classifier behavior, read:
 | Format file             | `pnpm exec prettier --write packages/bottle-classifier/src/path/to/file.ts`    |
 | Test one file           | `pnpm --filter @peated/bottle-classifier test -- src/path/to/file.test.ts`     |
 | Run a focused live eval | `pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts` |
+| Check controlled terms  | `pnpm --filter @peated/bottle-classifier terms:check`                          |
 
 ## Package Boundary
 
@@ -29,8 +31,8 @@ Before changing classifier behavior, read:
   semantics here.
 - Preserve the reviewed boundary in `src/contract.ts` and `src/classifier.ts`.
   Adapter-facing internals stay behind the `internal/*` package namespace.
-- Pre-agent deterministic resolvers may decide only closed syntax or curated
-  reference data. The model decides semantic marketed Bottle identity.
+- Pre-agent deterministic resolvers may supply verified identity anchors. The
+  model still decides marketed Bottle identity.
 - Post-agent code may validate schemas, reject impossible or unknown states,
   enforce direct explicit-field contradictions, and downgrade unsafe output. It
   must not promote semantic actions or require fuzzy name, search-rank, family,
@@ -44,9 +46,10 @@ Before changing classifier behavior, read:
 
 - Every marketed release is one independently complete Bottle. The classifier
   never selects a Bottle Group or release-family owner.
-- A Bottle Reference is an accepted exact-match name. A Bottle Alias is a
-  verified other name for display and customer search. One never grants the
-  authority of the other.
+- A Bottle Reference is a source name that can be assigned, unresolved, or
+  ignored. Only an assigned reference can provide an exact match. A Bottle Alias
+  is another verified name for display and customer search; it never grants
+  exact-match authority.
 - A Bottle Reference Input is raw source text, an image, or a URL submitted for
   classification. Do not call unaccepted source evidence a Bottle Reference.
 - Reference classification returns `match`, `create_bottle`, or `no_match`.
@@ -55,7 +58,8 @@ Before changing classifier behavior, read:
 - False-positive existing matches are worse than conservative creation or
   `no_match`. Bounded ambiguity resolves to `no_match` at this boundary.
 - Creation may use reviewed source, label, image, local-catalog, or web evidence.
-  Automatic verification needs corroboration or a closed-form identity anchor.
+  The code-derived `expectedTier` needs corroboration or a verified identity
+  anchor before it can be `auto`.
 - Judge source quality from content, independence, specificity, and
   corroboration. Do not add domain allowlists or brand-specific prompt tutoring.
 - Copy producer wording into `maturation`. Store a marketed cask identifier in
@@ -67,6 +71,8 @@ Before changing classifier behavior, read:
 
 - Keep stable prompt policy separate from dynamic facts, retrieved evidence,
   tool schemas, and validated output.
+- Tool spans may contain only bounded public catalog or source evidence. Do not
+  include private user data, credentials, image bytes, or full provider output.
 - Model-sensitive behavior belongs in realistic eval fixtures. Deterministic
   schemas, validation, and post-processing belong in unit or integration tests.
 - A prompt-only fix is incomplete when the invariant is deterministic. Change
@@ -78,8 +84,8 @@ Before changing classifier behavior, read:
 - A production-miss fixture must preserve the exact observed input, independently
   verify the real Bottle online, and encode `provenance.source =
 "production_miss"`, `verifiedSourceUrls`, and the exact `dbOutcome`.
-- Expected outcomes name exact Bottle ids, create actions, and auto-verification
-  expectations when known. Main field-level scoring remains deterministic; an
+- Expected outcomes name exact Bottle IDs, create actions, and `expectedTier`
+  when known. Main field-level scoring remains deterministic; an
   LLM judge does not decide encoded identity fields.
 - Live evals are expensive. Run focused live evals only for intentional
   model-sensitive work. Commit replay recordings required by deliberate fixture

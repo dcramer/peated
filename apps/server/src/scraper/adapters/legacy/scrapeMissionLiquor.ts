@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
@@ -73,7 +73,7 @@ function getProductName(title: string): string | null {
     .replace(/\s*\d+(?:\.\d+)?\s*(?:ml|cl|l)(?=\s*(?:\([^)]*\))?\s*$)/i, "")
     .trim();
   if (!withoutTerminalVolume) return null;
-  return normalizeBottle({ name: withoutTerminalVolume }).name;
+  return normalizeBottleInput({ name: withoutTerminalVolume }).name;
 }
 
 function parseMissionLiquorProducts(input: JsonValue): StorePrice[] {

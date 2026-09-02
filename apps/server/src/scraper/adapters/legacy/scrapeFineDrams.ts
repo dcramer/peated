@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { load as cheerio } from "cheerio";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
@@ -179,7 +179,7 @@ function parseFineDramsPage(html: string): FineDramsPage {
       return;
     }
 
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
     const listing = {
       name,
       price,

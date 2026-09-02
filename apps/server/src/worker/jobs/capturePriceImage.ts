@@ -4,9 +4,17 @@ import { storePrices } from "@peated/server/db/schema";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import type { JobContext } from "@peated/server/worker/types";
+import type { JobContext, JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";
+import { z } from "zod";
+
+export const CapturePriceImageJobArgsSchema = z
+  .object({
+    priceId: z.number().int().positive(),
+    imageUrl: z.string(),
+  })
+  .strict();
 
 export interface CapturePriceImageServices {
   compressImage: typeof compressAndResizeImage;
@@ -69,16 +77,12 @@ async function* readResponseBody(
 }
 
 export default async (
-  {
-    priceId,
-    imageUrl,
-  }: {
-    priceId: number;
-    imageUrl: string;
-  },
+  input: JobPayload,
   _context?: JobContext,
   services: CapturePriceImageServices = capturePriceImageServices,
 ) => {
+  const { priceId, imageUrl } = CapturePriceImageJobArgsSchema.parse(input);
+
   const price = await db.query.storePrices.findFirst({
     where: (storePrices, { eq }) => eq(storePrices.id, priceId),
   });

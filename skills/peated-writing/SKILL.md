@@ -69,7 +69,7 @@ cute plural.
 
 | Avoid                                           | Write                                                                 |
 | ----------------------------------------------- | --------------------------------------------------------------------- |
-| Discover your next favourite dram               | 184,204 bottlings. Someone has probably logged yours.                 |
+| Discover your next favourite dram               | 184,204 bottles. Someone has probably logged yours.                   |
 | On the shelf · 41                               | In your library · 41                                                  |
 | Your tasting journey starts here                | You haven't logged anything yet. That's fixable.                      |
 | Oops! Something went wrong                      | We couldn't save that tasting. Your notes are still here — try again. |

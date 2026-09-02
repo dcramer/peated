@@ -32,6 +32,6 @@
 ## 5. Security, Documentation, and Verification
 
 - [x] 5.1 Ensure the token endpoint does not log form bodies, codes, verifiers, or access tokens, and apply the specified no-store and no-referrer response headers.
-- [x] 5.2 Update `docs/architecture/account-policies.md` with admin-only public client registration, PKCE authorization, existing token behavior, seven-day reauthorization, and the explicit exclusion of refresh, revocation, discovery, dynamic registration, client secrets, and scopes.
+- [x] 5.2 Update `docs/architecture/account-access.md` with admin-only public client registration, PKCE authorization, existing token behavior, seven-day reauthorization, and the explicit exclusion of refresh, revocation, discovery, dynamic registration, client secrets, and scopes.
 - [x] 5.3 Run targeted server and web tests, server and web typechecks, and file-scoped lint/format checks for every touched surface.
 - [x] 5.4 Complete local browser verification of the successful loopback flow, denial, authenticated API access, and replay rejection using the local UI verification playbook.

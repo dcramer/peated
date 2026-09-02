@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
@@ -97,7 +97,7 @@ function getProductName(title: string, vendor: string): string | null {
   const publishedName = /^(?:nc['’]nean)\b/i.test(formattedTitle)
     ? formattedTitle
     : `Nc'nean ${formattedTitle}`;
-  return normalizeBottle({ name: publishedName }).name;
+  return normalizeBottleInput({ name: publishedName }).name;
 }
 
 function parseNcneanProducts(input: JsonValue): StorePrice[] {

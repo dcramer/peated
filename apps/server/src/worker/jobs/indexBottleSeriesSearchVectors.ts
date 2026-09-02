@@ -3,9 +3,19 @@ import { bottleSeries, bottles, entities } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSeriesSearchVector } from "@peated/server/lib/search";
 import { pushUniqueJob } from "@peated/server/worker/client";
+import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 
-export default async ({ seriesId }: { seriesId: number }) => {
+export const IndexBottleSeriesSearchVectorsJobArgsSchema = z
+  .object({
+    seriesId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async (input: JobPayload) => {
+  const { seriesId } = IndexBottleSeriesSearchVectorsJobArgsSchema.parse(input);
+
   const series = await db.query.bottleSeries.findFirst({
     where: (bottleSeries, { eq }) => eq(bottleSeries.id, seriesId),
   });

@@ -6,7 +6,7 @@
 | ------------------------------------------------------ | ------------- | --------------------------------------------------------------------------- |
 | `AGENTS.md`                                            | repo policy   | package manager, core commands, API host, docs index, test-vs-QA boundary   |
 | `package.json`                                         | repo manifest | root scripts, ports implied by dev docs, CLI wrappers                       |
-| `docs/development/local-ui-verification.md`            | repo doc      | local API/web ports, fallback ports, login, agent-browser notes             |
+| `docs/development/local-web-checks.md`                 | repo doc      | local API/web ports, fallback ports, login, agent-browser notes             |
 | `docs/development/orpc-routes.md`                      | repo doc      | API route shape, auth/error/manual route context                            |
 | `docs/development/orpc-client.md`                      | repo doc      | UI-to-API caller behavior and error handling                                |
 | `docs/development/backend-testing.md`                  | repo doc      | confirms manual QA is separate from automated backend test policy           |
@@ -32,15 +32,15 @@
 
 ## Coverage Matrix
 
-| Dimension           | Status   | Evidence                                                     |
-| ------------------- | -------- | ------------------------------------------------------------ |
-| API runtime         | complete | `local-ui-verification.md`, `orpc-routes.md`, `AGENTS.md`    |
-| CLI runtime         | complete | `package.json`, `apps/cli/src/program.ts`, command exports   |
-| UI runtime          | complete | `local-ui-verification.md`, `frontend-testing.md`            |
-| Auth/moderator flow | complete | `local-ui-verification.md`, `apps/cli/src/commands/users.ts` |
-| Agent-browser usage | complete | `local-ui-verification.md`                                   |
-| Evidence reporting  | complete | QA handoff needs from user request                           |
-| Version variance    | low      | Local ports/scripts may drift; maintenance note added.       |
+| Dimension           | Status   | Evidence                                                   |
+| ------------------- | -------- | ---------------------------------------------------------- |
+| API runtime         | complete | `local-web-checks.md`, `orpc-routes.md`, `AGENTS.md`       |
+| CLI runtime         | complete | `package.json`, `apps/cli/src/program.ts`, command exports |
+| UI runtime          | complete | `local-web-checks.md`, `frontend-testing.md`               |
+| Auth/moderator flow | complete | `local-web-checks.md`, `apps/cli/src/commands/users.ts`    |
+| Agent-browser usage | complete | `local-web-checks.md`                                      |
+| Evidence reporting  | complete | QA handoff needs from user request                         |
+| Version variance    | low      | Local ports/scripts may drift; maintenance note added.     |
 
 ## Trigger Sets
 

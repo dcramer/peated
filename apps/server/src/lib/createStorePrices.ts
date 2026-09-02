@@ -1,5 +1,5 @@
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeBottleReferenceKey,
 } from "@peated/bottle-classifier/normalize";
 import { db, type AnyTransaction } from "@peated/server/db";
@@ -369,7 +369,7 @@ export async function createStorePrices(
             : normalizeGtin(sp.barcode);
         const { price, referenceAssignment } = await db.transaction(
           async (tx) => {
-            const { name } = normalizeBottle({ name: sp.name });
+            const { name } = normalizeBottleInput({ name: sp.name });
             const referenceKey = normalizeBottleReferenceKey(sp.name);
             let bottleMatch;
             try {

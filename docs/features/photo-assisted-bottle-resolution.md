@@ -15,7 +15,8 @@ action.
 
 1. The user takes or uploads one Bottle photo, or chooses manual search.
 2. The browser shows a local preview immediately and sends the photo to
-   `POST /tastings/photo-identification` with an idempotency key.
+   `POST /tastings/photo-identification` with a key that prevents a repeated
+   request from creating another pending image.
 3. The server processes the image, creates an owned pending upload, and extracts
    label evidence. One literal stored reference resolves directly. All other
    references run the Bottle classifier once.
@@ -31,7 +32,7 @@ action.
 The flow never creates a tasting directly from model output. The user chooses
 the Bottle and action before any tasting is saved.
 
-## Experience Contract
+## User Experience
 
 - Photo upload is an accelerator, not a requirement. Manual Bottle search is
   available from the initial, failure, and result states.
@@ -56,7 +57,7 @@ Bottle classifier may propose a match or creation, while server code owns:
 
 - authentication and authorization;
 - pending-upload ownership and expiry;
-- schema validation and idempotency;
+- request checks and safe handling of repeated requests;
 - durable Bottle and tasting creation;
 - conflict handling and image promotion; and
 - automation and review thresholds.
@@ -64,7 +65,7 @@ Bottle classifier may propose a match or creation, while server code owns:
 Existing-Bottle matches may use strong local evidence without web research.
 An exact reference produces a deterministic Match without a classifier model call.
 Creation requires the classifier's complete `create_bottle` proposal and the
-approved automation tier. Otherwise the flow falls back to search or manual
+approved automation result. Otherwise the flow falls back to search or manual
 creation.
 
 ## Pending Images
@@ -76,11 +77,11 @@ Their current lifecycle is:
 - the default expiry is 48 hours;
 - ownership, purpose, status, deletion state, and expiry are checked before
   every permanent copy;
-- an idempotency key is unique per user and purpose;
+- the repeated-request key is unique per user and purpose;
 - a usable source may be copied to more than one supported destination;
 - copying marks the source attached but does not consume it; and
 - cleanup expires and eventually deletes the temporary source while permanent
-  copies remain in their destination namespaces.
+  copies remain in their permanent folders.
 
 The pending record is the authorization boundary. Clients pass its id, never an
 arbitrary permanent object URL. Permanent images are server-side copies in the
@@ -103,8 +104,9 @@ context to the extraction provider.
   next step, and the pending image reference; and
 - returns a signed creation token only for an auto-approved creation decision.
 
-The route's only durable product side effect is the pending upload and its
-diagnostic trace. It does not create a Bottle or tasting.
+The route's only saved product change is the pending upload. A trace may record
+safe diagnostic fields, but it is not product data. The route does not create a
+Bottle or tasting.
 
 ### Create Approved Bottle
 
@@ -142,15 +144,15 @@ best-effort attachment.
   manual creation rather than forcing a semantic decision.
 - An expired or foreign pending image is rejected before durable creation.
 - Catalog-image promotion never overwrites an existing Bottle image.
-- Post-commit tasting-image failure leaves a valid tasting and produces an
-  operator-visible error plus user-facing partial-success messaging where the
-  UI owns it.
+- A tasting-image copy failure leaves a valid tasting and produces an
+  operator-visible error. The current tasting create route does not return a
+  warning to the user.
 
 ## Verification And Ownership
 
 Use the repository's [backend testing](../development/backend-testing.md),
 [frontend testing](../development/frontend-testing.md), and
-[local UI verification](../development/local-ui-verification.md) guidance.
+[local UI verification](../development/local-web-checks.md) guidance.
 Model-sensitive behavior belongs in classifier evals; deterministic ownership,
 expiry, schema, conflict, and persistence behavior belongs in integration
 tests.
@@ -164,7 +166,7 @@ Primary owners:
 - pending image schema: `apps/server/src/db/schema/pendingUploads.ts`
 - image evidence: `packages/bottle-classifier/src/imageEvidence.ts`
 
-Follow [Observability](../policies/observability.md),
-[Data Redaction](../policies/data-redaction.md), and
-[Evals](../policies/evals.md) when changing the external-model or tracing parts
+Follow [Logs And Traces](../policies/logs-and-traces.md),
+[Sensitive Data](../policies/sensitive-data.md), and
+[Model Checks](../development/model-checks.md) when changing the model or tracing parts
 of this flow.

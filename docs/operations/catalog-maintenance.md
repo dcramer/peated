@@ -1,4 +1,4 @@
-# Catalog Enrichment
+# Catalog Maintenance
 
 Use this workflow to fill gaps for a brand, series, distillery, or other bounded
 set of Bottles. The [Whisky Identity Model](../architecture/whisky-identity-model.md)
@@ -109,7 +109,9 @@ add the old generated combined name as an alias.
 
 ## Use The Production API
 
-The CLI uses `https://api.peated.com` by default. It adds `/v1` to API paths.
+The CLI normally uses `https://api.peated.com`, but `.env.local` can override
+the target. Run `pnpm cli auth status` and confirm the target before any write.
+The CLI adds `/v1` to API paths.
 
 ```bash
 pnpm cli auth status
@@ -210,7 +212,7 @@ pnpm cli api post /bottle-references/456/review --input /tmp/reference-review.js
   current value differs from the manifest.
 - Before a name patch, read the Bottle edit context. Confirm the shared `name`,
   exact fields, and number of affected Bottles. A name patch is a shared edit
-  and can rematerialize every Bottle in the group.
+  and can update every Bottle in the group.
 - Get explicit authorization for the write scope. Use `--yes` only after that
   authorization.
 - Patch explicit IDs in small batches. Do not derive write targets from result

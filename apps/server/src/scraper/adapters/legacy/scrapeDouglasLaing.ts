@@ -3,7 +3,7 @@ import {
   type BottleExtractedDetails,
 } from "@peated/bottle-classifier/contract";
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -83,7 +83,7 @@ function buildSourceIdentity({
     vendor,
   );
   const hasConsumerBrandEvidence = sourceExpression !== title;
-  const normalized = normalizeBottle({
+  const normalized = normalizeBottleInput({
     name: sourceExpression,
     isFullName: false,
   });
@@ -136,7 +136,7 @@ export function parseDouglasLaingProducts(
       .find((variant) => variant.available && variant.parsedPrice !== null);
     if (!pricedVariant || pricedVariant.parsedPrice === null) continue;
 
-    const { name } = normalizeBottle({ name: product.title });
+    const { name } = normalizeBottleInput({ name: product.title });
     const listing = {
       ...getShopifyStorePriceIdentity(product, pricedVariant),
       name,

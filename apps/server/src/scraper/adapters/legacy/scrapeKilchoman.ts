@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
@@ -68,7 +68,9 @@ export function parseKilchomanProducts(
       throw new Error(`Invalid Kilchoman product price: ${product.priceRaw}`);
     }
 
-    const { name } = normalizeBottle({ name: `Kilchoman ${product.rawName}` });
+    const { name } = normalizeBottleInput({
+      name: `Kilchoman ${product.rawName}`,
+    });
     const listing = {
       name,
       price,

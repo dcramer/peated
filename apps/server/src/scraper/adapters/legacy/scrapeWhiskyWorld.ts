@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { load as cheerio } from "cheerio";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl } from "../../legacy/scraper";
@@ -127,7 +127,7 @@ function parseWhiskyWorldPage(html: string): WhiskyWorldPage {
       return;
     }
 
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
     const listing = {
       externalProductId: getExternalProductId(url),
       name,

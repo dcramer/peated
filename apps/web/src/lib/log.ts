@@ -4,8 +4,8 @@
  * This module owns LogTape setup and the Sentry adapter. `logError` is the only
  * facade method that creates Sentry issues; the other level helpers emit
  * diagnostic telemetry without issue capture. Callers own selecting safe
- * structured context under `docs/policies/observability.md` and
- * `docs/policies/data-redaction.md`.
+ * structured context under `docs/policies/logs-and-traces.md` and
+ * `docs/policies/sensitive-data.md`.
  */
 import {
   configureSync,

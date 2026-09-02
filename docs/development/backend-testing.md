@@ -16,7 +16,7 @@ Backend tests in this repo are integration-first. Test behavior over real wiring
 - Vitest is the test runner. Config lives in [apps/server/vitest.config.mts](../../apps/server/vitest.config.mts).
 - Shared test setup lives in [apps/server/src/test/setup-test-env.ts](../../apps/server/src/test/setup-test-env.ts).
 - Tests use the real `test_peated` PostgreSQL database and truncate tables between tests.
-- Execution is serialized with `fileParallelism: false` and `singleFork: true`.
+- Files run one at a time with `fileParallelism: false` and `maxConcurrency: 1`.
 - Route tests call the in-process [routerClient](../../apps/server/src/orpc/router.ts) instead of booting an HTTP server.
 - Shared fixtures and defaults come from the Vitest test context.
 
@@ -119,8 +119,8 @@ happened.
 ## Running Tests
 
 ```shell
-pnpm --filter=./apps/server test --run
-pnpm --filter=./apps/server test --run routes/entityKinds/list.test.ts
+pnpm --filter @peated/server test --
+pnpm --filter @peated/server test -- src/orpc/routes/entities/list.test.ts
 ```
 
 For local PR preparation, run the backend tests that cover the touched behavior

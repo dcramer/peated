@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 import {
   type BottleInputSchema,
@@ -109,7 +109,7 @@ export async function scrapeBottles(
     let name = details.name;
     let vintageYear;
 
-    ({ name, statedAge, vintageYear } = normalizeBottle({
+    ({ name, statedAge, vintageYear } = normalizeBottleInput({
       name,
       statedAge,
       isFullName: false,

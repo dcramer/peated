@@ -4,7 +4,7 @@ import type {
   BottleSearchEvidence,
 } from "./classifierTypes";
 import { listMatchesExpectedValue, textsOverlap } from "./identityEvidenceCore";
-import { normalizeBottle } from "./normalize";
+import { normalizeBottleInput } from "./normalize";
 import {
   hasExternalTargetIdentityEvidenceForExistingMatch,
   hasSupportiveWebEvidenceForExistingMatch as hasSharedSupportiveWebEvidenceForExistingMatch,
@@ -48,7 +48,7 @@ function nameMarketsStatedAge({
     return false;
   }
 
-  const normalizedName = normalizeBottle({
+  const normalizedName = normalizeBottleInput({
     name,
     statedAge,
   }).name.toLowerCase();

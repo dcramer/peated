@@ -9,8 +9,8 @@ import {
   type BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
 import {
-  normalizeBottle,
   normalizeBottleBatchNumber,
+  normalizeBottleInput,
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
@@ -107,7 +107,7 @@ const CANDIDATE_METADATA_FIELDS = [
 const CANDIDATE_SIBLING_LIMIT = 8;
 
 function getNormalizedPriceName(name: string) {
-  return normalizeBottle({
+  return normalizeBottleInput({
     name,
     isFullName: true,
   }).name;

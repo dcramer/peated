@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { GtinSchema } from "@peated/server/schemas";
 import { z } from "zod";
@@ -181,7 +181,7 @@ export function parseMasterOfMaltProducts(input: JsonValue): StorePrice[] {
       continue;
     }
 
-    const { name } = normalizeBottle({ name: product.name });
+    const { name } = normalizeBottleInput({ name: product.name });
     const barcode = GtinSchema.safeParse(product.upc);
     const listing: StorePrice = {
       externalProductId: product.sku,

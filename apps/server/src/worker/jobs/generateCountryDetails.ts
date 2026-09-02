@@ -5,6 +5,7 @@ import { logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { type Country } from "@peated/server/types";
+import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -13,6 +14,12 @@ if (!config.AI_GATEWAY_API_KEY) {
 }
 
 type InputCountry = Partial<Country>;
+
+export const GenerateCountryDetailsJobArgsSchema = z
+  .object({
+    countryId: z.number().int().positive(),
+  })
+  .strict();
 
 function generatePrompt(country: InputCountry) {
   return [
@@ -60,7 +67,9 @@ export async function getGeneratedCountryDetails(
   );
 }
 
-export default async ({ countryId }: { countryId: number }) => {
+export default async (input: JobPayload) => {
+  const { countryId } = GenerateCountryDetailsJobArgsSchema.parse(input);
+
   if (!config.AI_GATEWAY_API_KEY) {
     return;
   }

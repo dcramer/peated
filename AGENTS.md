@@ -3,17 +3,21 @@ possible and make that data freely accessible to everyone.
 
 ## Core Principles
 
-- Write for normal humans. Use concise
-  [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/) in
-  documentation, plans, comments, and explanations. Use short sentences, active
-  voice, and consistent terms.
-- Optimize for the next maintainer. Choose the smallest design that closes the
-  proven failure, keep complexity local, and avoid speculative abstractions,
-  configuration, extension points, and recovery paths.
-- Prefer functions, plain objects, simple types, and small modules. Expose
-  narrow capabilities and use the same domain noun for the same concept.
-- Keep ownership, permissions, identity, and irreversible actions explicit at
-  their runtime boundaries.
+- Build a useful public record. Prefer work that makes whisky information more
+  accurate, complete, and freely available.
+- Protect the database. Preserve correct IDs, links, ownership, history, and
+  user data. Limit data changes and verify them after they run.
+- Use evidence. Record where facts came from. Do not turn a guess into a fact.
+  Leave a value empty when evidence is weak or conflicting.
+- Write for everyday people. Do not assume whisky expertise. Use common words in
+  product text, docs, plans, comments, errors, and explanations. Explain a
+  necessary whisky term. Use short sentences, active voice, and one term for
+  each concept.
+- Protect trust. Respect privacy, permissions, licenses, and the sites from
+  which Peated reads data. Make clear who can act and what they can change.
+- Keep the code easy to maintain. Choose the smallest design that solves the
+  known problem. Prefer functions, plain objects, simple types, and small
+  modules. Do not add options or abstractions without a current need.
 
 ## Package Manager
 
@@ -33,17 +37,16 @@ possible and make that data freely accessible to everyone.
 
 ## Workflow
 
-- For non-trivial changes: discover, implement the smallest useful vertical
-  slice, verify it, and summarize the result.
-- Search every consumer before changing a shared signature, error contract,
-  schema, or domain name. Use a hard cutover unless compatibility is explicitly
-  required.
-- Let unexpected failures reach the owning boundary. Retry only expected
-  transient failures.
-- When a policy is enforced by a specific module or exported boundary, keep a
-  brief ownership/invariant comment beside that code.
-- Move durable explanations beside the code or feature that owns them. Delete
-  completed plans instead of preserving stale implementation history.
+- For a substantial change, first learn how the current code works. Make the
+  smallest complete change, verify it, and summarize the result.
+- Search every use before changing a shared function, type, error, data format,
+  or product term. Change all uses together unless compatibility is required.
+- Let unexpected failures reach the code responsible for handling them. Retry
+  only failures that are expected to be temporary.
+- When one module enforces an important rule, keep a short comment about the
+  rule and its owner beside that code.
+- Keep lasting explanations beside the code or feature that owns them. Delete
+  completed plans instead of keeping stale history.
 - After code changes, run the smallest relevant tests, typechecks, lint, and
   format checks. Use manual QA when automated checks do not prove the changed
   behavior. Report checks that you did not run. Pull request CI is the required
@@ -51,23 +54,22 @@ possible and make that data freely accessible to everyone.
 
 ## Catalog Operations
 
-- Before a catalog backfill, deduplication, or production Bottle edit, read the
-  Catalog Enrichment guide and Whisky Identity Model. Complete the inventory,
-  evidence manifest, approval, and verification gates before making production
-  writes.
-- Keep Bottle `name` to the stable marketed expression. Do not generate it from
-  structured facts. Use exact producer wording only when it is part of the
-  marketed expression, and verify each changed Bottle after the write.
+- Before a catalog backfill, duplicate cleanup, or production Bottle edit, read
+  Catalog Maintenance and the Whisky Identity Model. Complete their inventory,
+  evidence, approval, and verification steps before production writes.
+- Keep Bottle `name` to the stable product name used by the producer. Do not
+  build it from age, year, strength, or other fields. Verify every changed
+  Bottle after the write.
 
-## Testing and Validation
+## Testing And Validation
 
 - Backend tests are integration-first.
-- Frontend tests prove logic and user actions. Do not test how a page looks or
-  which visual elements it contains. Check those changes with browser QA.
-- Tests and live evals are separate gates. `pnpm test` runs deterministic Vitest
-  tests; classifier model evals run through `pnpm evals`.
-- Before adding coverage, search existing test and eval layers for the behavior's
-  primary owning scenario. Do not duplicate the same contract at several layers.
+- Frontend tests prove logic and user actions. Do not add a test whose only
+  purpose is appearance. Check visual changes in a browser.
+- Tests and live model checks are separate gates. `pnpm test` runs repeatable
+  Vitest tests; model checks run through `pnpm evals`.
+- Before adding coverage, find the existing test or model check that owns the
+  behavior. Do not prove the same rule in several layers.
 
 ## Architecture Conventions
 
@@ -87,37 +89,106 @@ possible and make that data freely accessible to everyone.
 
 ## Sentry Operations
 
-- Peated uses the `peated` Sentry organization and the `peated` project at
+- Peated uses the `peated` Sentry organization and `peated` project at
   `https://peated.sentry.io`.
-- Use [Sentry CLI](https://cli.sentry.dev) (`sentry`) to query production
-  issues, events, traces, spans, and logs. Let the CLI detect the target first.
-  Use `peated/peated` only if detection fails or selects the wrong project.
-- For agent-readable output, use `--json`, select only the required fields, and
-  set a small `--limit`. Full event and request data can contain sensitive data.
+- Use [Sentry CLI](https://cli.sentry.dev) (`sentry`) for production issues,
+  events, traces, spans, and logs. Let it detect the target first. Use
+  `peated/peated` only when detection is wrong.
+- For agent-readable output, use `--json`, select only needed fields, and set a
+  small `--limit`. Full events and requests can contain sensitive data.
 
-## Where Rules Live
+## Documentation
 
-Read the relevant policy and owning feature documentation before changing code
-in that area.
+This is the complete list of durable repository guidance. Read every file that
+applies to the work. OpenSpec change folders are temporary work records and are
+not listed. Generic OpenSpec command and skill files are tool instructions, not
+Peated product guidance.
 
-| Need                                      | Source                                                                                                                                                                   |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Repo-wide policy index                    | `docs/policies/README.md`                                                                                                                                                |
-| Design, interfaces, and failures          | `docs/policies/correctness-complexity.md`, `docs/policies/interface-design.md`, `docs/policies/error-handling.md`                                                        |
-| API, queue, storage, and async boundaries | `docs/policies/runtime-boundaries.md`, `docs/policies/background-work.md`                                                                                                |
-| Comments, logging, and sensitive data     | `docs/policies/code-comments.md`, `docs/policies/observability.md`, `docs/policies/data-redaction.md`                                                                    |
-| Agent architecture and evals              | `docs/policies/agent-design.md`, `docs/policies/evals.md`                                                                                                                |
-| Catalog classifier behavior               | `docs/architecture/whisky-identity-model.md`, `docs/architecture/bottle-classifier.md`, `docs/architecture/entity-classifier.md`, `packages/bottle-classifier/AGENTS.md` |
-| oRPC routes and clients                   | `docs/development/orpc-routes.md`, `docs/development/orpc-client.md`                                                                                                     |
-| Bottle entry and photo resolution         | `docs/features/bottle-entry-workflow.md`, `docs/features/photo-tasting-entry.md`                                                                                         |
-| Catalog enrichment                        | `docs/operations/catalog-enrichment.md`                                                                                                                                  |
-| Public catalog identifiers                | `docs/architecture/peated-ids.md`                                                                                                                                        |
-| Ratings and aggregates                    | `docs/architecture/rating-systems.md`                                                                                                                                    |
-| Web components, layouts, and caching      | `docs/policies/frontend-components.md`, `docs/policies/web-route-layouts.md`, `docs/development/web-caching.md`                                                          |
-| Local UI verification                     | `docs/development/local-ui-verification.md`                                                                                                                              |
-| Production debugging                      | `docs/operations/production-debugging.md`                                                                                                                                |
+Code, database schemas, exported types, and tests define exact behavior. These
+docs explain intent, rules, and safe procedures. Research notes do not override
+them.
 
-Policy documents contain repo-wide defaults. Feature architecture and
-non-obvious invariants belong in the owning package, module, or feature
-documentation. Code, schemas, exported types, and tests are authoritative;
-temporary plans cannot override policy.
+### Understand Peated
+
+- `DESIGN.md` — Durable visual design rules.
+- `docs/architecture/account-access.md` — Terms and email verification rules.
+- `docs/architecture/bottle-classifier-glossary.md` — Classifier terms.
+- `docs/architecture/bottle-classifier.md` — Bottle classifier behavior.
+- `docs/architecture/bottle-reference-normalization.md` — Safe reference-name cleanup.
+- `docs/architecture/bottle-reference-resolution.md` — Bottle lookup and assignment.
+- `docs/architecture/entity-classifier.md` — Entity classifier behavior.
+- `docs/architecture/oauth-clients.md` — OAuth client and token flow.
+- `docs/architecture/peated-ids.md` — Public Peated IDs.
+- `docs/architecture/ratings.md` — Tastings, reviews, scores, and totals.
+- `docs/architecture/store-price-matching.md` — Store-price matching and review.
+- `docs/architecture/web-caching.md` — Safe caching for signed-in and public pages.
+- `docs/architecture/whisky-identity-model.md` — Bottle and Entity identity rules.
+- `docs/features/bottle-entry-workflow.md` — Manual Bottle creation and editing.
+- `docs/features/bottle-presentation.md` — How Bottle identity appears to users.
+- `docs/features/external-reviews.md` — External review storage and publication.
+- `docs/features/moderation-workspace.md` — Moderation inbox, history, and automation.
+- `docs/features/photo-assisted-bottle-resolution.md` — Bottle lookup from a photo.
+- `openspec/specs/entity-identity/spec.md` — Entity kinds, ownership, and API behavior.
+- `packages/bottle-classifier/README.md` — Classifier package API and commands.
+- `skills/peated-writing/SKILL.md` — Peated's customer-facing writing style.
+
+### Build And Test Peated
+
+- `apps/web/AGENTS.md` — Web component, route, and product-language rules.
+- `apps/web/visual/README.md` — Browser screenshot reviews.
+- `docs/development/backend-testing.md` — Backend test rules and commands.
+- `docs/development/frontend-testing.md` — Frontend and browser test rules.
+- `docs/development/model-checks.md` — Rules for live model checks.
+- `docs/development/orpc-client.md` — Web client use of server routes.
+- `docs/development/orpc-routes.md` — Server route rules.
+- `docs/policies/README.md` — What belongs in a repo-wide policy.
+- `docs/policies/agent-design.md` — Rules for model-driven code.
+- `docs/policies/background-work.md` — Rules for work that runs later.
+- `docs/policies/code-comments.md` — Rules for code comments and TODOs.
+- `docs/policies/data-and-permissions.md` — Data and permission checks for APIs, queues, and storage.
+- `docs/policies/database-correctness.md` — Rules that keep stored data correct.
+- `docs/policies/error-handling.md` — Rules for failures, retries, and fallbacks.
+- `docs/policies/interfaces.md` — Rules for public functions and types.
+- `docs/policies/logs-and-traces.md` — Rules for logs, traces, and metrics.
+- `docs/policies/naming.md` — Rules for code and domain names.
+- `docs/policies/sensitive-data.md` — Private data in logs, tools, and models.
+- `packages/bottle-classifier/.vitest-evals/AGENTS.md` — Classifier replay recording rules.
+- `packages/bottle-classifier/AGENTS.md` — Rules for classifier changes.
+- `skills/agent-design-review/SKILL.md` — Agent design review workflow.
+- `skills/agent-design-review/SOURCES.md` — Sources used by the agent design skill.
+- `skills/agent-design-review/SPEC.md` — Scope of the agent design skill.
+- `skills/agent-design-review/references/classifier-agents.md` — Classifier agent patterns.
+- `skills/agent-design-review/references/evals-and-iteration.md` — Agent evaluation patterns.
+- `skills/agent-design-review/references/principles.md` — Agent design principles.
+- `skills/agent-design-review/references/prompt-and-caching.md` — Prompt and cache design.
+- `skills/agent-design-review/references/provider-specific-templates.md` — Provider examples.
+- `skills/agent-design-review/references/review-examples.md` — Agent review examples.
+- `skills/agent-design-review/references/runtime-and-guardrails.md` — Runtime safety patterns.
+- `skills/agent-design-review/references/system-prompt-templates.md` — Prompt templates.
+- `skills/agent-design-review/references/tool-and-schema-design.md` — Tool and schema rules.
+- `skills/agent-design-review/references/tool-schema-examples.md` — Tool schema examples.
+- `skills/peated-qa/SKILL.md` — Manual API, CLI, and browser checks.
+- `skills/peated-qa/SOURCES.md` — Sources used by the QA skill.
+- `skills/peated-qa/SPEC.md` — Scope of the QA skill.
+
+### Documentation And Research
+
+- `docs/README.md` — Where each kind of document belongs.
+- `docs/research/entity-image-source-audit-2026-08.md` — Dated image source and license checks.
+- `docs/research/external-review-source-audit-2026-08.md` — Dated source and terms research.
+
+### Operate Peated
+
+- `README.md` — Local setup and authenticated API use.
+- `apps/server/src/scraper/README.md` — Add and run scraper sources.
+- `apps/server/src/worker/README.md` — Add and run worker jobs.
+- `docs/development/local-web-checks.md` — Run local browser checks.
+- `docs/operations/bottle-reference-migrations-0253-0255.md` — Run or undo the Bottle Reference migration.
+- `docs/operations/catalog-maintenance.md` — Research, merge, and edit production Bottles.
+- `docs/operations/deployments.md` — Vercel, Render, and PlanetScale deploy checks.
+- `docs/operations/entity-images.md` — Add or replace production Entity images.
+- `docs/operations/external-review-sources.md` — Add, publish, stop, or remove a review source.
+- `docs/operations/production-debugging.md` — Diagnose production failures.
+- `skills/peated-cli/SKILL.md` — Safe Peated CLI use.
+- `skills/peated-cli/references/authenticated-api.md` — OAuth API commands.
+- `skills/peated-cli/references/moderation.md` — Price-match moderation commands.

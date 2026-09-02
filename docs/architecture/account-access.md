@@ -1,32 +1,7 @@
-# Account Access Policy
+# Account Access
 
-This document records the product decisions for OAuth access, Terms of Service
-acceptance, and email verification. Middleware, route schemas, and tests define
-the exact implemented coverage.
-
-## OAuth Public Clients
-
-Peated supports a narrow OAuth authorization-code flow for local and other
-public clients. OAuth clients are system-wide records created and managed only
-by Peated administrators under `/admin/oauth-clients`; there is no public or
-dynamic registration endpoint and clients do not receive secrets.
-
-The supported flow requires PKCE `S256` and an administrator-registered
-redirect URI. Authorization happens at `https://peated.com/oauth/authorize`
-using the existing Peated browser session. Short-lived authorization codes are
-stored only as digests, expire after two minutes, and can be exchanged once at
-`POST https://api.peated.com/oauth/token`.
-
-Successful exchange returns the same seven-day bearer JWT used by existing
-Peated login. It receives no additional permissions: API requests still reload
-the current user and use the existing active-user, ToS, verification,
-moderator, and administrator checks. Deactivating a client stops new
-authorizations and exchanges but does not revoke bearer tokens already issued;
-users reauthorize when the seven-day token expires.
-
-This baseline does not implement refresh tokens, durable grants, per-client
-token revocation, scopes, discovery metadata, dynamic registration, client
-secrets, device authorization, or OpenID Connect.
+This document records the product rules for Terms of Service acceptance and
+email verification. Middleware, route schemas, and tests define exact behavior.
 
 ## Terms Of Service
 
@@ -34,8 +9,9 @@ secrets, device authorization, or OpenID Connect.
 accepted the current required terms.
 
 - Email/password and new-passkey registration require explicit acceptance.
-- Google, magic-link, and passkey authentication may establish a session for an
-  existing account that has not accepted the terms.
+- Google and magic-link authentication may establish a session for an existing
+  account that has not accepted the terms. Passkey authentication requires
+  acceptance before it creates a session.
 - Such an account remains read-only until acceptance. Browsing and account
   recovery stay available, while user-authored writes are rejected.
 - The authenticated ToS acceptance route records acceptance once; clients do

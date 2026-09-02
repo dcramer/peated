@@ -11,10 +11,11 @@ import { parseJobContext } from "./types";
 
 describe("worker context", () => {
   test("serializes Peated users as queue actor context", () => {
-    expect(userToActorContext({ id: 123, username: "dcramer" })).toEqual({
+    const user = { id: 123, username: "dcramer" };
+
+    expect(userToActorContext(user)).toEqual({
       type: "user",
       userId: 123,
-      username: "dcramer",
     });
   });
 
@@ -28,13 +29,11 @@ describe("worker context", () => {
       {
         type: "user",
         userId: 321,
-        username: "stored",
       },
       async () => {
         expect(getCurrentActorContext()).toEqual({
           type: "user",
           userId: 321,
-          username: "stored",
         });
         expect(Sentry.getIsolationScope().getUser()?.id).toBeUndefined();
       },
@@ -46,7 +45,6 @@ describe("worker context", () => {
       {
         type: "user",
         userId: 123,
-        username: "dcramer",
       },
       async () => {
         expect(
@@ -61,7 +59,6 @@ describe("worker context", () => {
             actor: {
               type: "user",
               userId: 123,
-              username: "dcramer",
             },
           },
         });
@@ -74,17 +71,14 @@ describe("worker context", () => {
       applyJobActorContextToSentry(scope, {
         type: "user",
         userId: 456,
-        username: "peated",
       });
 
       expect(scope.getUser()).toEqual({
         id: "456",
-        username: "peated",
       });
       expect(scope.getScopeData().attributes).toEqual({
         "actor.type": "user",
         "actor.user_id": 456,
-        "actor.username": "peated",
       });
     });
   });
@@ -104,7 +98,6 @@ describe("worker context", () => {
       actor: {
         type: "user",
         userId: 789,
-        username: "queued",
       },
     });
   });
@@ -118,7 +111,6 @@ describe("worker context", () => {
           actor: {
             type: "user",
             userId: 789,
-            username: "queued",
           },
         },
       }),
@@ -129,7 +121,6 @@ describe("worker context", () => {
         actor: {
           type: "user",
           userId: 789,
-          username: "queued",
         },
       },
     });

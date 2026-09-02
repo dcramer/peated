@@ -23,17 +23,3 @@ Code, runtime schemas, exported types, and tests own exact behavior. Architectur
 and feature documents explain durable intent and boundaries. Policies define
 repo-wide defaults. Research and OpenSpec change artifacts cannot override
 those owners.
-
-Keep compatibility files only when an active or historical reference still
-needs the old path. `development/schema-conventions.md` and
-`features/simple-rating-system.md` are current compatibility files; they do not
-own independent rules.
-
-Useful starting points:
-
-- [Whisky Identity Model](./architecture/whisky-identity-model.md)
-- [Bottle Classifier](./architecture/bottle-classifier.md)
-- [Catalog Enrichment](./operations/catalog-enrichment.md)
-- [Catalog Image Maintenance](./operations/entity-images.md)
-- [Production Debugging](./operations/production-debugging.md)
-- [Policy Index](./policies/README.md)

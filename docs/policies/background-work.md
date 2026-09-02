@@ -12,20 +12,22 @@ has completed.
 - Keep AI review, catalog verification, indexing, email, search-vector refresh,
   and other slow side effects out of the blocking request path when a queued or
   follow-up path can preserve correctness.
-- Persist durable work state before starting background execution.
+- Persist work state before execution when the job must resume after queue state
+  is lost or replaced.
 - Make queued work idempotent. Use stable idempotency keys, unique jobs, durable
   state, or database constraints when retries can schedule the same logical work
   more than once.
-- Queue and callback payloads should carry small validated envelopes such as ids
-  and expected versions. Store full work payloads in the owning durable state.
-- Bound attempts, age, and continuation depth. Define explicit recovery for
-  stale non-terminal states and reconcile a prior attempt before redispatch.
-- Use durable leases or locks when concurrent workers may claim the same work.
-  Define ownership and lock ordering when a job touches multiple state domains.
+- Queue and callback arguments should contain only small values such as IDs and
+  expected versions. New or changed handlers must check their arguments at the
+  start. Store full work input in the database record that owns it.
+- Bound attempts, age, and continuation depth. For resumable work, define how to
+  recover stale state and check a prior attempt before dispatching it again.
+- Use durable leases or locks when concurrent workers can claim the same saved
+  work. Define lock order when one job changes several records.
 - Log post-save side-effect failures with enough object context to retry or
   investigate without failing an already persisted save.
-- Work that performs an authoritative mutation remains non-terminal until the
-  worker records the mutation result or a safe failure.
+- A resumable workflow that changes authoritative data is not complete until it
+  records the result or a safe failure.
 - Use database constraints, aliases, or other deterministic checks for immediate
   duplicate safety. Do not depend on a remote model or hosted service for
   request-path correctness.

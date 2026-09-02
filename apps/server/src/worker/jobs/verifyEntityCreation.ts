@@ -1,5 +1,5 @@
 import {
-  type CatalogVerificationCreationSource,
+  CatalogVerificationCreationSourceEnum,
   getCatalogVerificationSkipReason,
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
@@ -8,14 +8,20 @@ import {
   getCatalogVerificationDisplayName,
   getEntityCatalogVerificationFindings,
 } from "@peated/server/lib/catalogVerificationFindings";
+import type { JobPayload } from "@peated/server/worker/types";
+import { z } from "zod";
 
-export default async function ({
-  entityId,
-  creationSource,
-}: {
-  entityId: number;
-  creationSource: CatalogVerificationCreationSource;
-}) {
+export const VerifyEntityCreationJobArgsSchema = z
+  .object({
+    entityId: z.number().int().positive(),
+    creationSource: z.enum(CatalogVerificationCreationSourceEnum.options),
+  })
+  .strict();
+
+export default async function verifyEntityCreation(input: JobPayload) {
+  const { entityId, creationSource } =
+    VerifyEntityCreationJobArgsSchema.parse(input);
+
   const displayName = await getCatalogVerificationDisplayName({
     objectId: entityId,
     objectType: "entity",

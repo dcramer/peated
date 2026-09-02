@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import {
   getCategoryFromCask,
   parseDetailsFromName,
@@ -316,7 +316,7 @@ export function parseArchivePage(body: string): ArchivePage {
     const region = facts.get("REGION") ?? null;
     const spirit = facts.get("SPIRIT") ?? null;
     const rawName = details?.name ?? title;
-    const normalized = normalizeBottle({
+    const normalized = normalizeBottleInput({
       name: rawName,
       statedAge,
       vintageYear,
@@ -471,7 +471,7 @@ function mergeArchiveDetails(
         )
         .trim()
     : repairMojibake(product.name).trim();
-  const normalizedName = normalizeBottle({
+  const normalizedName = normalizeBottleInput({
     name: caskNumber ? `${caskNumber} ${productTitle}` : productTitle,
     statedAge: archived.bottle.statedAge,
     vintageYear: archived.bottle.vintageYear,
@@ -689,13 +689,14 @@ export async function scrapeBottles(
 
         const release = parseReleaseDate(item.release_date);
 
-        const { name, statedAge, vintageYear, releaseYear } = normalizeBottle({
-          name: details?.name ?? caskName,
-          statedAge: item.age,
-          vintageYear: parseVintageYear(item.distilleddate),
-          releaseYear: release?.releaseYear ?? null,
-          isFullName: false,
-        });
+        const { name, statedAge, vintageYear, releaseYear } =
+          normalizeBottleInput({
+            name: details?.name ?? caskName,
+            statedAge: item.age,
+            vintageYear: parseVintageYear(item.distilleddate),
+            releaseYear: release?.releaseYear ?? null,
+            isFullName: false,
+          });
 
         const abv = parseAbv(item.abv);
         const volume = parseVolume(item.sku);

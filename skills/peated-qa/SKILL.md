@@ -106,7 +106,7 @@ Minimal input-file payload:
 ## UI QA
 
 1. Start API and web with matched origins.
-2. Read `docs/development/local-ui-verification.md` before protected,
+2. Read `docs/development/local-web-checks.md` before protected,
    owner-only, or moderator UI checks.
 3. Choose the auth primitive before opening the target route:
    - Public/read-only route: no session setup.

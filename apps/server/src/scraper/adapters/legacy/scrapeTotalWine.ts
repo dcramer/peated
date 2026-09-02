@@ -1,5 +1,5 @@
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeVolume,
 } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
@@ -24,7 +24,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
       logScrapeWarning(SITE, "Unable to identify product name");
       return;
     }
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
 
     const volumeRaw = $("h2.title__2RoYeYuO > span", el).first().text();
     const volume = volumeRaw ? normalizeVolume(volumeRaw) : null;

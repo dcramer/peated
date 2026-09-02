@@ -29,5 +29,5 @@ The central invariant is alias safety: a generic listing title MUST NOT become a
 - `packages/bottle-classifier`: decision schema, prompts/instructions, review policy, eval fixture schema, production-miss fixtures, and replay recordings.
 - `apps/server/src/lib/priceMatching*`: proposal mapping, automation assessment, approval application, alias assignment behavior, and observation metadata.
 - Existing `store_price`, `bottle_observation`, proposal, and decision-log rows carry the MVP assignment and evidence. Repeated scrapes reuse the same StorePrice row; this change adds no second identity mapping table.
-- `docs/features/store-price-matching.md` and `docs/architecture/bottle-classifier.md`: document the distinction between reusable global aliases and source-specific listing identity.
+- `docs/architecture/store-price-matching.md` and `docs/architecture/bottle-classifier.md`: document the distinction between reusable global aliases and source-specific listing identity.
 - Scraper ingestion paths that create `store_price` rows: future matching should be able to use stable source identifiers, URL/product ids, and source fingerprints without globalizing generic titles.

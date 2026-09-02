@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import slugify from "@sindresorhus/slugify";
@@ -113,7 +113,7 @@ export function parseReserveBarProducts(input: JsonValue): ReserveBarProducts {
       product.name === product.name.toUpperCase()
         ? toTitleCase(product.name)
         : product.name;
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
     const listing = {
       externalProductId: product.salsifyGrouping,
       currency: "usd" as const,

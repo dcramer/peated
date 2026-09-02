@@ -1,5 +1,5 @@
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeVolume,
 } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
@@ -25,7 +25,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
       return;
     }
 
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
 
     const productUrl = $("a.item-name", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");

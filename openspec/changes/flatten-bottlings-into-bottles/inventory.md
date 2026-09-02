@@ -210,13 +210,12 @@ Cutover:
 Rewrite:
 
 - `docs/architecture/whisky-identity-model.md`
-- `docs/architecture/bottle-creation-alias-system.md`
-- `docs/architecture/rating-systems.md`
-- `docs/development/schema-conventions.md`
+- `docs/architecture/bottle-reference-resolution.md`
+- `docs/architecture/bottle-reference-normalization.md`
+- `docs/architecture/ratings.md`
 - `docs/features/bottle-entry-workflow.md`
-- `docs/features/photo-tasting-entry.md`
-- `docs/features/store-price-matching.md`
-- `docs/features/simple-rating-system.md`
+- `docs/features/photo-assisted-bottle-resolution.md`
+- `docs/architecture/store-price-matching.md`
 
 Remove CatalogTarget and generic activity semantics while preserving
 migration-created and singleton groups plus independently complete Bottles.

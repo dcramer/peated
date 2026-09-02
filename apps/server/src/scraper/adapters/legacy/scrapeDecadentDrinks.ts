@@ -1,5 +1,5 @@
 import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
@@ -110,7 +110,7 @@ export async function scrapeProducts(
       logScrapeWarning(SITE, "Invalid product size", { volume, rawName });
       return;
     }
-    const { name } = normalizeBottle({ name: nameWithoutVolume });
+    const { name } = normalizeBottleInput({ name: nameWithoutVolume });
 
     const priceRaw = $(".product-card__price", el).first().text().trim();
     const price = parsePrice(priceRaw);

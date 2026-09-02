@@ -5,7 +5,7 @@ This document describes the current manual Bottle create and edit workflow. The
 field ownership, grouping, and merge semantics.
 
 For researched catalog backfills, deduplication, and production API edits, use
-the [Catalog Enrichment](../operations/catalog-enrichment.md) workflow.
+the [Catalog Maintenance](../operations/catalog-maintenance.md) workflow.
 
 ## Creation
 
@@ -28,7 +28,8 @@ the [Catalog Enrichment](../operations/catalog-enrichment.md) workflow.
 
 When photo resolution suggests the wrong Bottle, the user can search or open
 manual creation with supported label fields and the pending photo. The
-[photo-assisted resolution contract](./photo-tasting-entry.md) owns that handoff.
+[photo-assisted Bottle resolution](./photo-assisted-bottle-resolution.md) owns
+that handoff.
 
 ## Editing
 
@@ -37,11 +38,11 @@ manual creation with supported label fields and the pending photo. The
 - A stated-age edit changes the selected Bottle. The client does not select an
   age storage scope.
 - An exact edit changes only the selected Bottle and its exact references.
-- A shared edit updates the BottleGroup and atomically rematerializes every
+- A shared edit updates the BottleGroup and updates every
   member Bottle while preserving exact fields and references.
 - Independently created Bottles stay in singleton groups. Similar names, brand,
   or series do not merge them automatically.
-- No manual or automatic regrouping operation ships in the current workflow.
+- The form cannot move a Bottle to another group.
 
 ## Save Boundary
 
@@ -60,4 +61,4 @@ safe context for investigation and retry. Follow
 Use integration tests for create, duplicate, exact-edit, shared-edit, and
 continuation branches. Verify user-facing add and edit changes at desktop and
 mobile widths with the
-[local UI verification playbook](../development/local-ui-verification.md).
+[local UI verification playbook](../development/local-web-checks.md).
