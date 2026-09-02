@@ -5,6 +5,7 @@ import type {
   PageTabItem,
 } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
+import { getRegionMap } from "@peated/web/lib/locationMap";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
@@ -94,9 +95,6 @@ export function getLocationRegions(
     href: `/locations/${region.country.slug}/regions/${region.slug}`,
     name: region.name,
     totalBottles: region.totalBottles,
-    visual:
-      region.country.slug === "united-states"
-        ? { kind: "state", slug: region.slug }
-        : { kind: "country", slug: region.country.slug },
+    visual: getRegionMap(region.country.slug, region.slug),
   }));
 }

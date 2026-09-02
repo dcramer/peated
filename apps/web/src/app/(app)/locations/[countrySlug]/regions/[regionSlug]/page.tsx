@@ -1,3 +1,4 @@
+import { getRegionMap } from "@peated/web/lib/locationMap";
 import { getRegionPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 
@@ -37,7 +38,6 @@ export default async function RegionOverviewPage(props: {
         sort: "-bottles",
       }),
     ]);
-  const isUsState = countrySlug === "united-states";
   const rootHref = `/locations/${countrySlug}/regions/${regionSlug}`;
   const otherRegions = getLocationRegions(
     regions.results
@@ -56,12 +56,7 @@ export default async function RegionOverviewPage(props: {
       releasesHref={`${rootHref}/bottles?sort=-release`}
       totalBottles={region.totalBottles}
       totalDistillers={region.totalDistillers}
-      visual={
-        isUsState
-          ? { kind: "state", slug: region.slug }
-          : { kind: "country", slug: region.country.slug }
-      }
-      visualHeading={isUsState ? "Map" : `In ${region.country.name}`}
+      visual={getRegionMap(region.country.slug, region.slug)}
     />
   );
 }

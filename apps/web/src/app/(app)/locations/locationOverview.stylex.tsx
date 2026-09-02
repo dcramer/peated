@@ -1,3 +1,4 @@
+import type { LocationMap } from "@peated/web/lib/locationMap";
 import * as stylex from "@stylexjs/stylex";
 
 import {
@@ -33,7 +34,6 @@ export function LocationOverview({
   totalBottles,
   totalDistillers,
   visual,
-  visualHeading = "Map",
 }: {
   categories: readonly { count: number; label: string }[];
   distilleries: readonly {
@@ -51,16 +51,17 @@ export function LocationOverview({
   releasesHref: string;
   totalBottles: number;
   totalDistillers: number;
-  visual: { kind: "country" | "state"; slug: string };
-  visualHeading?: string;
+  visual: LocationMap | null;
 }) {
   return (
     <PageColumns
       rail={
         <>
-          <RailSection heading={visualHeading}>
-            <LocationVisual visual={visual} />
-          </RailSection>
+          {visual ? (
+            <RailSection heading="Map">
+              <LocationVisual visual={visual} />
+            </RailSection>
+          ) : null}
           {productionRules ? (
             <RailSection heading="Production rules">
               <p {...stylex.props(styles.copy)}>{productionRules}</p>

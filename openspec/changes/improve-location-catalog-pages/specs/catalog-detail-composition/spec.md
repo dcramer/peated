@@ -31,4 +31,10 @@ Country and region previews SHALL use one shared card component for their visual
 
 - **WHEN** a page renders a region preview
 - **THEN** the card shows the same visual structure as a country preview
-- **AND** the visual identifies the region's state or country context
+- **AND** any map shows the region itself, not its parent country
+
+#### Scenario: Region outline is unavailable
+
+- **WHEN** a region has no verified outline
+- **THEN** its preview omits the map and keeps its name, bottle count, and link
+- **AND** demo examples follow the same rule

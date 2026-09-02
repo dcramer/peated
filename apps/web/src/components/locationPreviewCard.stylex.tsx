@@ -1,18 +1,16 @@
 import * as stylex from "@stylexjs/stylex";
 
+import type { LocationMap } from "../lib/locationMap";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { CardLink } from "./card.stylex";
-import CountryMapIcon from "./countryMapIcon";
-import UsStateMapIcon from "./usStateMapIcon";
+import { LocationMapIcon } from "./locationMapIcon";
 
 export type LocationPreviewCardProps = {
   description?: string;
   href: string;
   name: string;
   totalBottles: number;
-  visual:
-    | { kind: "country" | "state"; slug: string }
-    | { kind: "count"; value: number };
+  visual: LocationMap | { kind: "count"; value: number } | null;
 };
 
 const DESCRIPTION_MAX_LENGTH = 80;
@@ -52,23 +50,20 @@ export function LocationPreviewCard({
       appearance="outlined"
       href={href}
       padding="none"
-      {...stylex.props(styles.card)}
+      {...stylex.props(styles.card, visual && styles.withVisual)}
     >
-      <span aria-hidden="true" {...stylex.props(styles.visual)}>
-        {visual.kind === "count" ? (
-          <span {...stylex.props(styles.countVisual)}>+{visual.value}</span>
-        ) : visual.kind === "state" ? (
-          <UsStateMapIcon
-            slug={visual.slug}
-            {...stylex.props(styles.mapIcon)}
-          />
-        ) : (
-          <CountryMapIcon
-            slug={visual.slug}
-            {...stylex.props(styles.mapIcon)}
-          />
-        )}
-      </span>
+      {visual ? (
+        <span aria-hidden="true" {...stylex.props(styles.visual)}>
+          {visual.kind === "count" ? (
+            <span {...stylex.props(styles.countVisual)}>+{visual.value}</span>
+          ) : (
+            <LocationMapIcon
+              visual={visual}
+              {...stylex.props(styles.mapIcon)}
+            />
+          )}
+        </span>
+      ) : null}
       <strong title={name} {...stylex.props(styles.name)}>
         {name}
       </strong>
@@ -92,12 +87,14 @@ const styles = stylex.create({
   card: {
     display: "flex",
     minWidth: 0,
-    minHeight: "188px",
     flexDirection: "column",
     justifyContent: "flex-end",
     padding: "18px",
     color: colors.ink,
     textDecoration: "none",
+  },
+  withVisual: {
+    minHeight: "188px",
   },
   visual: {
     display: "flex",

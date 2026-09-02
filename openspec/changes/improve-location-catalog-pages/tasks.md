@@ -34,3 +34,4 @@
 - [x] 4.5 Verify the catalog-aligned follow-up with focused checks and browser QA
 - [x] 4.6 Add linked country and region sample data, then verify homepage-to-region navigation and desktop/mobile previews
 - [x] 4.7 Replace the incorrect Scotland outline and verify cards and location pages on desktop and mobile
+- [x] 4.8 Remove parent-country map substitutions, add the verified Islay coastline, and check missing-map regions in tests and desktop/mobile QA

@@ -25,6 +25,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 import { isEventWithinDays } from "@peated/web/lib/eventDates";
+import { getRegionMap } from "@peated/web/lib/locationMap";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   memberHomeQueries,
@@ -291,10 +292,7 @@ function Origins() {
         href: `/locations/${region.country.slug}/regions/${region.slug}`,
         name: region.name,
         totalBottles: region.totalBottles,
-        visual:
-          region.country.slug === "united-states"
-            ? { kind: "state" as const, slug: region.slug }
-            : { kind: "country" as const, slug: region.country.slug },
+        visual: getRegionMap(region.country.slug, region.slug),
       }))}
       remainingCountries={
         remainingCountries.length
