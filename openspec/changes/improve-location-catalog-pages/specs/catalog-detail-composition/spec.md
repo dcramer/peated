@@ -22,3 +22,13 @@ Storybook SHALL include a static catalog detail example built from the page comp
 
 - **WHEN** a maintainer opens the Minimal story
 - **THEN** the story shows that optional sections and side content can be omitted without empty placeholders
+
+### Requirement: Shared location preview cards
+
+Country and region previews SHALL use one shared card component for their visual, name, bottle count, optional description, and link behavior.
+
+#### Scenario: Show a region preview
+
+- **WHEN** a page renders a region preview
+- **THEN** the card shows the same visual structure as a country preview
+- **AND** the visual identifies the region's state or country context

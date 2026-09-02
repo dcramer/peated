@@ -281,18 +281,20 @@ function Origins() {
   return countryItems.length || regionItems.length ? (
     <HomeOrigins
       countries={featuredCountries.map((country) => ({
-        description: country.summary ?? undefined,
         href: `/locations/${country.slug}`,
         name: country.name,
-        slug: country.slug,
         totalBottles: country.totalBottles,
+        visual: { kind: "country" as const, slug: country.slug },
       }))}
       regions={regionItems.slice(0, 4).map((region) => ({
         description: region.description ?? undefined,
         href: `/locations/${region.country.slug}/regions/${region.slug}`,
         name: region.name,
-        slug: region.slug,
         totalBottles: region.totalBottles,
+        visual:
+          region.country.slug === "united-states"
+            ? { kind: "state" as const, slug: region.slug }
+            : { kind: "country" as const, slug: region.country.slug },
       }))}
       remainingCountries={
         remainingCountries.length

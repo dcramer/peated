@@ -1,4 +1,5 @@
 const timestamp = "2026-06-07T12:00:00.000Z";
+const mockApiServer = `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT ?? 4999}`;
 
 export const createdBottleName = "Playwright Reserve";
 export const tastingNotes = "Smoke, lemon peel, and sea salt.";
@@ -111,6 +112,65 @@ export const testRegion = {
   totalDistillers: 10,
 };
 
+export const testOtherRegion = {
+  ...testRegion,
+  id: 9153,
+  name: "Speyside",
+  slug: "speyside",
+  description:
+    "A mainland whisky region in Scotland. Browse its bottles and distilleries, or visit another Scottish region.",
+  location: null,
+  totalBottles: 1_240,
+  totalDistillers: 45,
+};
+
+export const testUsCountry = {
+  ...testCountry,
+  id: 9154,
+  name: "United States",
+  slug: "united-states",
+  description: null,
+  summary: null,
+  location: null,
+  totalBottles: 2_400,
+  totalDistillers: 80,
+};
+
+export const testState = {
+  ...testRegion,
+  id: 9155,
+  name: "Kentucky",
+  slug: "kentucky",
+  country: testUsCountry,
+  description: null,
+  location: null,
+  totalBottles: 1_600,
+  totalDistillers: 40,
+};
+
+export const testCountries = [
+  testCountry,
+  testUsCountry,
+  {
+    ...testUsCountry,
+    id: 9156,
+    name: "Ireland",
+    slug: "ireland",
+    totalBottles: 800,
+    totalDistillers: 30,
+  },
+  {
+    ...testUsCountry,
+    id: 9157,
+    name: "Japan",
+    slug: "japan",
+    totalBottles: 400,
+    totalDistillers: 20,
+  },
+];
+
+export const testRegions = [testState, testOtherRegion, testRegion];
+
 export const testBrand = {
   id: 9201,
   peatedId: "E9201",
@@ -185,7 +245,7 @@ export const exactMergeOtherBottleId = 9311;
 export const exactSearchBottleId = 9312;
 export const createdTastingId = 9401;
 export const bottleImageBottleId = 9501;
-export const bottleImageUrl = "http://127.0.0.1:4999/uploads/bottle-image.webp";
+export const bottleImageUrl = `${mockApiServer}/uploads/bottle-image.webp`;
 
 export function buildBottle({
   id = existingBottleId,
@@ -467,7 +527,7 @@ const homeBottleWithoutGroup = {
   singleCask: true,
   caskStrength: true,
   maturation: "Pedro Ximenez hogshead",
-  imageUrl: "http://127.0.0.1:4999/uploads/home-bottle.png",
+  imageUrl: `${mockApiServer}/uploads/home-bottle.png`,
 };
 
 export const homeBottle = {

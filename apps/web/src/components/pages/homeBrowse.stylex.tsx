@@ -5,12 +5,10 @@ import type { ReactNode } from "react";
 import {
   BottleList,
   type BottleListItem,
-  Card,
-  CardActionLink,
-  CardLink,
-  CardPrimaryLink,
   ItemList,
   ItemRow,
+  LocationPreviewCard,
+  type LocationPreviewCardProps,
 } from "..";
 import {
   colors,
@@ -19,7 +17,6 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
-import CountryMapIcon from "../countryMapIcon";
 
 const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (min-width: 640px) and (max-width: 899px)";
@@ -116,88 +113,20 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
   );
 }
 
-export type HomeOrigin = {
-  description?: string;
-  href: string;
-  name: string;
-  slug: string;
-  totalBottles: number;
-};
-
 function formatBottleCount(count: number) {
   return `${count.toLocaleString("en-US")} ${count === 1 ? "bottle" : "bottles"}`;
 }
 
-const REGION_DESCRIPTION_MAX_LENGTH = 80;
-
-function truncateRegionDescription(description: string) {
-  const normalized = description.trim().replace(/\s+/g, " ");
-
-  if (normalized.length <= REGION_DESCRIPTION_MAX_LENGTH) {
-    return { text: normalized, truncated: false };
-  }
-
-  const wordBoundary = normalized
-    .slice(0, REGION_DESCRIPTION_MAX_LENGTH + 1)
-    .lastIndexOf(" ");
-  const cutoff =
-    wordBoundary > 0 ? wordBoundary : REGION_DESCRIPTION_MAX_LENGTH;
-
-  return {
-    text: `${normalized.slice(0, cutoff).trimEnd()}…`,
-    truncated: true,
-  };
-}
-
-function RegionCard({ region }: { region: HomeOrigin }) {
-  const description = region.description
-    ? truncateRegionDescription(region.description)
-    : null;
-
-  return (
-    <Card
-      appearance="outlined"
-      linked
-      padding="none"
-      {...stylex.props(styles.region)}
-    >
-      <span {...stylex.props(styles.regionLine)}>
-        <CardPrimaryLink href={region.href}>
-          <strong {...stylex.props(styles.regionName)}>{region.name}</strong>
-        </CardPrimaryLink>
-        <span {...stylex.props(styles.regionFacts)}>
-          {region.totalBottles.toLocaleString("en-US")}
-        </span>
-      </span>
-      {description ? (
-        <>
-          <span {...stylex.props(styles.regionDescription)}>
-            {description.text}
-          </span>
-          {description.truncated ? (
-            <CardActionLink
-              href={region.href}
-              {...stylex.props(styles.regionMore)}
-            >
-              Read more <span aria-hidden="true">→</span>
-            </CardActionLink>
-          ) : null}
-        </>
-      ) : null}
-    </Card>
-  );
-}
-
-/** Keeps the homepage and country overview region cards identical. */
+/** Keeps homepage and country overview location previews identical. */
 export function HomeRegionGrid({
   regions,
 }: {
-  regions: readonly HomeOrigin[];
+  regions: readonly LocationPreviewCardProps[];
 }) {
   return (
     <div {...stylex.props(styles.regionGrid)}>
       {regions.map((region) => (
-        <RegionCard key={region.href} region={region} />
+        <LocationPreviewCard key={region.href} {...region} />
       ))}
     </div>
   );
@@ -208,9 +137,9 @@ export function HomeOrigins({
   remainingCountries,
   regions,
 }: {
-  countries: readonly HomeOrigin[];
+  countries: readonly LocationPreviewCardProps[];
   remainingCountries?: { count: number; totalBottles: number };
-  regions: readonly HomeOrigin[];
+  regions: readonly LocationPreviewCardProps[];
 }) {
   return (
     <section {...stylex.props(styles.section)}>
@@ -228,57 +157,15 @@ export function HomeOrigins({
       </p>
       <div {...stylex.props(styles.countryGrid)}>
         {countries.map((country) => (
-          <CardLink
-            appearance="outlined"
-            href={country.href}
-            key={country.href}
-            padding="none"
-            {...stylex.props(styles.country)}
-          >
-            <span aria-hidden="true" {...stylex.props(styles.countryMap)}>
-              <CountryMapIcon
-                slug={country.slug}
-                {...stylex.props(styles.countryMapSvg)}
-              />
-            </span>
-            <span {...stylex.props(styles.countryHeading)}>
-              <strong
-                title={country.name}
-                {...stylex.props(styles.countryName)}
-              >
-                {country.name}
-              </strong>
-            </span>
-            <span {...stylex.props(styles.countryCount)}>
-              {formatBottleCount(country.totalBottles)}
-            </span>
-          </CardLink>
+          <LocationPreviewCard key={country.href} {...country} />
         ))}
         {remainingCountries && remainingCountries.count > 0 ? (
-          <CardLink
-            appearance="outlined"
+          <LocationPreviewCard
             href="/locations"
-            padding="none"
-            {...stylex.props(styles.country)}
-          >
-            <span
-              aria-hidden="true"
-              {...stylex.props(styles.countryMap, styles.remainingMap)}
-            >
-              +{remainingCountries.count}
-            </span>
-            <span {...stylex.props(styles.countryHeading)}>
-              <strong
-                title="Everywhere else"
-                {...stylex.props(styles.countryName)}
-              >
-                Everywhere else
-              </strong>
-            </span>
-            <span {...stylex.props(styles.countryCount)}>
-              {formatBottleCount(remainingCountries.totalBottles)}
-            </span>
-          </CardLink>
+            name="Everywhere else"
+            totalBottles={remainingCountries.totalBottles}
+            visual={{ kind: "count", value: remainingCountries.count }}
+          />
         ) : null}
       </div>
       {regions.length ? (
@@ -428,55 +315,6 @@ const styles = stylex.create({
       gridTemplateColumns: "minmax(0, 1fr)",
     },
   },
-  region: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    padding: space.x3,
-    color: colors.ink,
-    textDecoration: "none",
-  },
-  regionName: {
-    display: "block",
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
-  regionLine: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x2,
-  },
-  regionFacts: {
-    display: "block",
-    flexShrink: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
-  },
-  regionDescription: {
-    display: "block",
-    marginTop: space.x1,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
-    textWrap: "pretty",
-  },
-  regionMore: {
-    width: "fit-content",
-    marginTop: space.x2,
-    color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    fontWeight: 600,
-    lineHeight: 1.2,
-  },
   countryGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
@@ -488,68 +326,6 @@ const styles = stylex.create({
     [COMPACT]: {
       gridTemplateColumns: "minmax(0, 1fr)",
     },
-  },
-  country: {
-    display: "flex",
-    minWidth: 0,
-    minHeight: "188px",
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    padding: "18px",
-    color: colors.ink,
-    textDecoration: "none",
-  },
-  countryHeading: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x2,
-  },
-  countryName: {
-    overflow: "hidden",
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  countryCount: {
-    display: "block",
-    flexShrink: 0,
-    marginTop: space.x1,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
-  },
-  countryMap: {
-    display: "flex",
-    width: "100%",
-    minHeight: 0,
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: space.x2,
-    paddingRight: space.x3,
-    paddingBottom: space.x4,
-    paddingLeft: space.x3,
-    color: colors.inkMuted,
-  },
-  countryMapSvg: {
-    width: "100%",
-    maxWidth: "132px",
-    height: "76px",
-  },
-  remainingMap: {
-    fontFamily: fonts.display,
-    fontSize: "42px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.04em",
   },
   distilleries: {
     marginTop: "14px",

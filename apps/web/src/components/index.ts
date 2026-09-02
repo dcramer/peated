@@ -162,6 +162,8 @@ export type {
 } from "./lists.stylex";
 export { LocationCard } from "./locationCard.stylex";
 export type { LocationCardProps } from "./locationCard.stylex";
+export { LocationPreviewCard } from "./locationPreviewCard.stylex";
+export type { LocationPreviewCardProps } from "./locationPreviewCard.stylex";
 export { MemberAvatar } from "./memberAvatar";
 export type { MemberAvatarProps } from "./memberAvatar";
 export { MemberPicker } from "./memberPicker.stylex";

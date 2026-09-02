@@ -1,7 +1,9 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
-import type { PageTabItem } from "@peated/web/components";
-import type { HomeOrigin } from "@peated/web/components/pages/homeBrowse.stylex";
+import type {
+  LocationPreviewCardProps,
+  PageTabItem,
+} from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
@@ -84,12 +86,17 @@ export function getLocationDistilleries(distilleries: readonly Distillery[]) {
   }));
 }
 
-export function getLocationRegions(regions: readonly Region[]): HomeOrigin[] {
+export function getLocationRegions(
+  regions: readonly Region[],
+): LocationPreviewCardProps[] {
   return regions.map((region) => ({
     description: region.description ?? undefined,
     href: `/locations/${region.country.slug}/regions/${region.slug}`,
     name: region.name,
-    slug: region.slug,
     totalBottles: region.totalBottles,
+    visual:
+      region.country.slug === "united-states"
+        ? { kind: "state", slug: region.slug }
+        : { kind: "country", slug: region.country.slug },
   }));
 }

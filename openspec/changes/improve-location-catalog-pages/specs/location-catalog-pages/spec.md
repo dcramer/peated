@@ -54,8 +54,10 @@ The country detail page SHALL provide Overview, Bottles, Distillers, and Regions
 #### Scenario: View country overview
 
 - **WHEN** a visitor opens a country root URL
-- **THEN** the page shows catalog facts, available category data, a country visual, available production rules, latest releases, the most recorded distilleries, and available leading regions
-- **AND** leading regions use the same region-card renderer as the homepage
+- **THEN** the page shows catalog facts, available category data, a country visual, available production rules, latest releases, distilleries, and available leading regions
+- **AND** available category data appears in the side column
+- **AND** leading regions use the same shared location preview card as the homepage
+- **AND** each leading region card includes a location visual
 
 #### Scenario: Browse country collections
 
@@ -69,7 +71,13 @@ The region detail page SHALL provide Overview, Bottles, and Distillers sections 
 #### Scenario: View region overview
 
 - **WHEN** a visitor opens a region root URL
-- **THEN** the page shows catalog facts, available category data, a location visual, latest releases, and the most recorded distilleries
+- **THEN** the page shows catalog facts, available category data, a location visual, latest releases, distilleries, and other regions in the same country
+- **AND** available category data appears in the side column
+
+#### Scenario: Country has no other regions
+
+- **WHEN** a visitor opens the only region with bottle data in a country
+- **THEN** the page omits the other-regions section
 
 #### Scenario: Browse region collections
 

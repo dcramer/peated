@@ -7,8 +7,11 @@ Country and region pages use a one-off layout and expose less catalog context th
 - Define bottle production location from the assigned producing distilleries. Brand and bottler addresses do not establish origin.
 - Add country and region bottle queries and category summaries that use the same production-location rule.
 - Give country and region pages a shared detail structure with overview, bottles, and distillers sections. Keep the existing country regions section.
-- Add compact overview content: catalog facts, bottle categories, a map, production rules when available, latest releases, and the most recorded distilleries.
-- Show a country's leading regions in the main overview column with the same region cards used on the homepage.
+- Add compact overview content: catalog facts, bottle categories, a map, production rules when available, latest releases, and distilleries.
+- Show a country's leading regions in the main overview column with the shared location preview cards used on the homepage.
+- Give country and region preview cards the same location visual, name, and bottle-count structure.
+- Show other regions in the region overview side column.
+- Show the bottle category distribution in the side column on country and region overviews.
 - Add a Storybook example for catalog detail pages using the existing page components.
 - Keep the production count update outside this change. It requires the catalog operation inventory, approval, and verification gates.
 

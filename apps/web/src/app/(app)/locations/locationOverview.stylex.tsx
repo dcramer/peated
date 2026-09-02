@@ -5,14 +5,12 @@ import {
   type BottleListItem,
   DistributionList,
   FactList,
+  type LocationPreviewCardProps,
   RailList,
   RailListItem,
   TextLink,
 } from "@peated/web/components";
-import {
-  type HomeOrigin,
-  HomeRegionGrid,
-} from "@peated/web/components/pages/homeBrowse.stylex";
+import { HomeRegionGrid } from "@peated/web/components/pages/homeBrowse.stylex";
 import {
   PageColumns,
   PageSection,
@@ -27,6 +25,8 @@ export function LocationOverview({
   distilleries,
   distillersHref,
   latestReleases,
+  otherRegions = [],
+  otherRegionsHref,
   productionRules,
   regions = [],
   releasesHref,
@@ -44,8 +44,10 @@ export function LocationOverview({
   }[];
   distillersHref: string;
   latestReleases: readonly BottleListItem[];
+  otherRegions?: readonly LocationPreviewCardProps[];
+  otherRegionsHref?: string;
   productionRules?: string | null;
-  regions?: readonly HomeOrigin[];
+  regions?: readonly LocationPreviewCardProps[];
   releasesHref: string;
   totalBottles: number;
   totalDistillers: number;
@@ -62,6 +64,30 @@ export function LocationOverview({
           {productionRules ? (
             <RailSection heading="Production rules">
               <p {...stylex.props(styles.copy)}>{productionRules}</p>
+            </RailSection>
+          ) : null}
+          {categories.length ? (
+            <RailSection heading="Bottles by category">
+              <DistributionList items={categories} />
+            </RailSection>
+          ) : null}
+          {otherRegions.length ? (
+            <RailSection heading="Other regions">
+              {otherRegionsHref ? (
+                <TextLink href={otherRegionsHref}>View all regions</TextLink>
+              ) : null}
+              <RailList ariaLabel="Other regions">
+                {otherRegions.map((region) => (
+                  <RailListItem
+                    href={region.href}
+                    key={region.href}
+                    metadata={`${region.totalBottles.toLocaleString("en-US")} ${
+                      region.totalBottles === 1 ? "bottle" : "bottles"
+                    }`}
+                    title={region.name}
+                  />
+                ))}
+              </RailList>
             </RailSection>
           ) : null}
         </>
@@ -85,7 +111,7 @@ export function LocationOverview({
       ) : null}
       {distilleries.length ? (
         <PageSection
-          heading="Most recorded distilleries"
+          heading="Distilleries"
           intro={
             <TextLink href={distillersHref}>
               {totalDistillers === 1
@@ -94,7 +120,7 @@ export function LocationOverview({
             </TextLink>
           }
         >
-          <RailList ariaLabel="Most recorded distilleries">
+          <RailList ariaLabel="Distilleries">
             {distilleries.map((distillery) => (
               <RailListItem
                 href={distillery.href}
@@ -119,11 +145,6 @@ export function LocationOverview({
           intro={<TextLink href={releasesHref}>View all releases</TextLink>}
         >
           <BottleList ariaLabel="Latest releases" items={latestReleases} />
-        </PageSection>
-      ) : null}
-      {categories.length ? (
-        <PageSection heading="Bottles by category">
-          <DistributionList items={categories} />
         </PageSection>
       ) : null}
     </PageColumns>
