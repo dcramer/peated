@@ -19,6 +19,7 @@ import { z } from "zod";
 
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
+  clip: z.string().trim().min(1).max(180).nullable().optional(),
 });
 
 export const ExternalReviewArticleInputSchema =
@@ -193,6 +194,9 @@ export async function storeExternalReviewArticleInTransaction(
     if (origin === "source") {
       values.category = externalReview.category;
       values.reviewerName = externalReview.reviewerName;
+      if (externalReview.clip !== undefined) {
+        values.clip = externalReview.clip;
+      }
     }
     const [stored] = existing
       ? await tx

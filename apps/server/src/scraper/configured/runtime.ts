@@ -145,10 +145,7 @@ function createScrapeSourceAdapter(input: {
         }
         const observation = {
           sourceKey: response.url.toString(),
-          value:
-            parsed.kind === "review"
-              ? { article: parsed.value.article }
-              : parsed.value,
+          value: parsed.value,
           itemCount:
             parsed.kind === "review"
               ? parsed.value.article.externalReviews.length

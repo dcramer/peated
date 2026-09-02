@@ -1,29 +1,26 @@
 ## ADDED Requirements
 
-### Requirement: Source policy gates every operation
+### Requirement: Source approval gates publication
 
-The system MUST maintain an explicit external-review policy for each source and
-MUST NOT process with an LLM, display scores, display summaries, or publish
-reviews unless the corresponding capability is enabled.
+The system MUST maintain explicit external-review publication approval for each
+source and MUST NOT publish source reviews until a moderator approves it.
 
 #### Scenario: Disabled source is fetched manually
 
 - **WHEN** an admin manually runs a registered review scraper with an enabled
-  target and a disabled or missing review policy
+  target and missing publication approval
 - **THEN** the scraper may fetch within its request and robots controls
-- **AND** ingested reviews remain hidden with content capabilities disabled
+- **AND** ingested reviews remain hidden
 
-#### Scenario: Summary processing is disabled
+#### Scenario: Source is unapproved
 
-- **WHEN** a source adapter fetches an article but policy does not permit LLM
-  processing
-- **THEN** the system ingests permitted metadata without sending article text
-  to a model or publishing a generated summary
+- **WHEN** a source adapter fetches an article before publication is approved
+- **THEN** the system ingests the review and keeps it hidden
 
-#### Scenario: Source is disabled
+#### Scenario: Approval is removed
 
-- **WHEN** a moderator disables a source or removes a display capability
-- **THEN** public reviews no longer expose the revoked content type
+- **WHEN** a moderator removes publication approval for a source
+- **THEN** public results no longer include reviews from that source
 - **AND** manual fetching remains available through the scraper runtime
 
 ### Requirement: Review articles own canonical article identity
@@ -73,46 +70,21 @@ deterministic normalized 0-100 rating for compatibility.
 - **THEN** the Bottle page displays the native score rather than the normalized
   compatibility value
 
-### Requirement: Generated summaries are short, attributed, and traceable
-
-The system SHALL treat a generated summary as optional derived data, SHALL
-attribute it to its source review, and SHALL record the source content hash,
-model, prompt version, and generation time used to create it.
-
-#### Scenario: Enabled summary is generated
-
-- **WHEN** source policy permits LLM processing and summary display and summary
-  generation succeeds
-- **THEN** the system stores a two- or three-sentence Peated summary with its
-  provenance and may display it beside the canonical source link
-
-#### Scenario: Summary generation fails
-
-- **WHEN** extraction succeeds but summary generation fails
-- **THEN** permitted review metadata remains ingested and no fabricated or stale
-  fallback summary is published
-
-#### Scenario: Review article changes
-
-- **WHEN** an article's content hash changes
-- **THEN** its prior generated summaries are not treated as current until they
-  are regenerated against the new content
-
 ### Requirement: Publisher article bodies are transient
 
 The system MUST NOT persist fetched publisher HTML, article bodies, tasting
 notes, conclusions, or publisher photography as part of external-review
 ingestion.
 
-#### Scenario: Article processing completes
+#### Scenario: Article parsing completes
 
-- **WHEN** extraction and optional summary generation finish
+- **WHEN** extraction finishes
 - **THEN** only canonical metadata, structured review facts, content hash,
-  Bottle identity, permitted summary, and provenance remain stored
+  and Bottle identity remain stored
 
 #### Scenario: Article processing fails
 
-- **WHEN** extraction or model processing raises an error
+- **WHEN** extraction raises an error
 - **THEN** logs and persisted error state exclude the article body and fetched
   HTML
 
@@ -145,18 +117,17 @@ without one active resolved Bottle.
 - **WHEN** a moderator hides a matched review and the source later refreshes it
 - **THEN** the refresh preserves the hidden state
 
-#### Scenario: Source policy changes during ingestion
+#### Scenario: Publication approval changes during ingestion
 
-- **WHEN** article ingestion and a publication-mode update run concurrently
-- **THEN** they serialize so the stored visibility uses one committed policy
+- **WHEN** article ingestion and a publication approval update run concurrently
+- **THEN** they serialize so the stored visibility uses one committed approval
   state
 
 ### Requirement: Bottle pages send readers to publishers
 
 The Bottle page SHALL present a visible external review with its publisher,
-reviewer when known, publication date when known, enabled native score, short
-attributed summary when enabled, and a prominent canonical link to the full
-review.
+reviewer when known, publication date when known, native score, short review
+clip when available, and a prominent canonical link to the full review.
 
 #### Scenario: Complete pilot review is displayed
 
@@ -166,7 +137,7 @@ review.
 
 #### Scenario: Optional metadata is absent
 
-- **WHEN** reviewer, publication date, score, or summary is absent or disabled
+- **WHEN** reviewer, publication date, score, or clip is absent
 - **THEN** the Bottle page omits that field without inventing a value and still
   provides the publisher link
 
@@ -185,8 +156,8 @@ review.
 
 ### Requirement: Pilot sources are reviewed before automatic publication
 
-The system SHALL ingest a new pilot source in review-only mode until
-its extraction and Bottle-matching sample passes the documented rollout gate.
+The system SHALL keep a new pilot source unapproved for publication until its
+extraction and Bottle-matching sample passes the documented rollout gate.
 
 #### Scenario: First source backfill runs
 

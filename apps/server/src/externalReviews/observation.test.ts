@@ -61,3 +61,12 @@ test("requires scrapers to include the review date", () => {
     }),
   ).toThrow();
 });
+
+test("rejects review text without a matching source key", () => {
+  expect(() =>
+    ExternalReviewArticleIngestionSchema.parse({
+      article: observation(),
+      externalReviewTexts: { unknown: "Review text" },
+    }),
+  ).toThrow("External review text must match an external review source key.");
+});

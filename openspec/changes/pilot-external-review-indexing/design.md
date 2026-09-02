@@ -4,14 +4,12 @@ Peated currently stores each external review as one `review` row containing a
 globally unique URL, one Bottle match, a required 0-100 rating, and a required
 issue. The only dedicated review scraper is Whisky Advocate. That model cannot
 represent the common case where one publisher article reviews several bottles,
-and it lacks the article, author, native-score, summary, and source-policy data
-needed for a referral-oriented review index.
+and it lacks the article, author, native-score, and publication data needed for
+a referral-oriented review index.
 
-The pilot must preserve the existing public reviews while introducing a safer
+The pilot must preserve the existing public reviews while introducing a clear
 boundary for review publishers. Publisher article text is needed transiently
-for extraction and summarization, but Peated does not need to retain or display
-the full text. Source capabilities vary independently across LLM use, score
-display, summary display, and automatic publication.
+for extraction, but Peated does not need to retain or display the full text.
 
 ## Goals / Non-Goals
 
@@ -19,9 +17,7 @@ display, summary display, and automatic publication.
 
 - Represent one review article with several Bottle reviews.
 - Preserve native score semantics and current normalized rating consumers.
-- Enforce content policy at processing and display boundaries.
-- Generate short, grounded, attributed summaries without retaining article
-  bodies.
+- Require source approval before public display.
 - Reuse Peated's existing Bottle resolution and unresolved-review moderation.
 - Prove an archive source and the existing Whisky Advocate source through a
   small, measurable rollout.
@@ -42,8 +38,7 @@ Add a `review_article` owned by one `external_site` and identified by its
 canonical URL. It stores title, publication date, source content hash, and fetch
 timestamps. An article owns zero or more existing `review` rows. Each review
 stores its source key, source bottle name, reviewer name, native score,
-normalized rating, optional summary, summary model, prompt version, and
-generation time.
+and normalized rating.
 
 The article URL is unique within its source, not globally. Each review is unique
 by article and stable source key. The source key is publisher-provided
@@ -64,38 +59,24 @@ Alternative considered: continue duplicating the article URL on each review.
 This was rejected because it preserves conflicting article metadata and cannot
 express article-level refresh or removal correctly.
 
-### Store explicit source capabilities
+### Store explicit publication approval
 
-Add a review-source policy owned by `external_site`. It has a disabled,
-review-only, or automatic publication mode plus independent booleans for
-processing article text with an LLM, displaying scores, and displaying
-generated summaries.
+Add review publication approval owned by `external_site`. New sources start
+unapproved. Ingestion stores their reviews as hidden. A moderator can approve a
+source after its quality gate passes. Approval publishes staged reviews only
+when they have an active resolved Bottle. Unresolved reviews remain hidden.
 
-All new policies default to disabled and no content capability. The ingestion
-boundary checks display capabilities before making a review visible, so a
-caller cannot bypass policy by directly submitting parsed data.
-Changing a policy is a moderator-only operation and is audit logged.
-
-The moderator API permits automatic mode after the source passes its quality
-gate. The transition publishes staged reviews only when they have an active
-resolved Bottle. Unresolved reviews remain hidden. A general policy-revision
-system is deferred until multiple revisions create a proven need.
-
-The policy records which content capabilities Peated has enabled. It does not
-control manual fetching. Registered targets, runtime request controls, and
-robots rules own network access.
-
-Alternative considered: keep source controls only in documentation or scraper
-constants. This was rejected because operational jobs need a single explicit
-runtime boundary and capabilities must be revocable without deploying code.
+Publication approval does not control fetching, parsing, clip generation, or
+score storage. Registered targets, runtime request controls, and robots rules
+own network access.
 
 ### Use source-specific adapters behind a narrow ingestion contract
 
 Each pilot adapter discovers allowed article URLs and extracts a typed article
 with reviews. It does not persist data or decide Bottle identity. The shared
-ingestion boundary validates the source policy, upserts the article, resolves
-each review using the existing external-review Bottle resolver, and persists
-the result.
+ingestion boundary upserts the article, resolves each review using the existing
+external-review Bottle resolver, applies publication approval, and persists the
+result.
 
 WhiskyNotes is the archive adapter. Whisky Advocate is the second bounded
 pilot because it already has production history and tests the legacy source
@@ -110,21 +91,16 @@ checkpoint each review so a deferred run resumes without repeating completed
 article requests. Sitemap modification dates and issue seasons are not treated
 as publication dates.
 
-Alternative considered: build a configurable LLM-only arbitrary-page crawler.
+Alternative considered: build a configurable arbitrary-page crawler.
 This was rejected because discovery, rate limits, identity keys, score scales,
 and site rules are source-specific and deserve code review during the pilot.
 
 ### Treat article text as transient processing data
 
 Fetched HTML and extracted article text remain in job memory only. Peated stores
-the canonical metadata, content hash, structured review facts, Bottle match,
-and generated summary, but not the source body or source photography. Logs and
-errors must not include article bodies.
-
-Summary generation is optional. A failed or disallowed summary does not discard
-an otherwise valid metadata/score review. Each generated summary records
-its model and prompt version, and a content-hash change makes the old summary
-stale until regeneration succeeds.
+the canonical metadata, content hash, structured review facts, and Bottle
+match, but not the source body or source photography. Logs and errors must not
+include article bodies.
 
 Alternative considered: retain raw HTML for debugging and future regeneration.
 This was rejected because it creates unnecessary rights, retention, security,
@@ -143,18 +119,18 @@ linear conversion as critic calibration.
 
 ### Roll out hidden before automatic publication
 
-The first backfill for each source uses review-only mode. Extracted
+The first backfill for each source runs before publication approval. Extracted
 reviews remain hidden and appear in moderation until a reviewed sample
 demonstrates at least 90% article/review extraction accuracy, correct
 multi-bottle splitting, and acceptable Bottle-match precision. Automatic mode
 can then publish reviews with resolved active Bottles; unresolved or
 invalid Bottle assignments always remain hidden.
 
-Disabling a source hides source reviews and blocks content processing when the
-current policy no longer permits it. It does not block manual fetching.
+Removing publication approval hides source reviews. It does not block manual
+fetching or clip generation.
 
-Policy updates and article ingestion serialize on the source record. This keeps
-the publication mode used by an ingestion transaction consistent with a
+Publication updates and article ingestion serialize on the source record. This
+keeps the approval state used by an ingestion transaction consistent with a
 concurrent moderator update. A refresh can publish a previously unresolved
 review after it gains its first active Bottle assignment. It does not make an
 already matched review visible after a moderator hides it.
@@ -169,9 +145,6 @@ Bottle validation, and review conflict behavior.
 
 - **Robots rules or public terms prohibit the planned requests** → Keep the
   source disabled and select another pilot.
-- **LLM summary is inaccurate or too close to source prose** → Use a constrained
-  prompt, provenance, deterministic length checks, reviewed pilot samples, and
-  keep summaries optional and hidden until enabled.
 - **A source page changes structure** → Use content hashes, stable source keys,
   fixture-backed adapter tests, extraction metrics, and fail the run without
   deleting prior reviews.
@@ -188,9 +161,10 @@ Bottle validation, and review conflict behavior.
 
 ## Migration Plan
 
-1. Generate additive schema changes for review-source policy, review articles,
+1. Generate additive schema changes for review publication, review articles,
    and nullable review fields.
-2. Create a disabled policy record for every existing external review source.
+2. Create an unapproved publication record for every existing external review
+   source.
 3. Backfill one review article per existing review URL and link each review;
    preserve its source, issue, URL, normalized rating, visibility, and Bottle.
 4. Switch ingestion, queries, serializers, moderation, and the Whisky Advocate
@@ -198,18 +172,18 @@ Bottle validation, and review conflict behavior.
 5. Verify review counts, visible Bottle review counts, unresolved counts, and
    canonical URLs before enforcing article relationships and removing the
    duplicated legacy URL, issue, and source columns.
-6. Deploy pilot adapters disabled. Enable review-only mode only after checking
-   current robots rules and public terms.
+6. Deploy pilot adapters with publication unapproved. Start a bounded run only
+   after checking current robots rules and public terms.
 7. Run a bounded backfill, review the sample, then explicitly choose whether to
    enable automatic publication.
 
 Before legacy-column removal, rollback uses the prior application and untouched
 legacy fields. After hard cutover, rollback requires the forward migration and
-restored application version rather than reconstructing data from summaries.
+restored application version rather than reconstructing derived data.
 
 ## Open Questions
 
 - Which source provides the best first bounded sample?
 - Do current Whisky Advocate robots rules and public terms permit its existing
-  ingestion and proposed LLM use?
+  ingestion?
 - What reviewed sample size is sufficient alongside the 90% extraction gate?

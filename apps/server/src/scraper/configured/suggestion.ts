@@ -175,7 +175,7 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
           name: review.name,
           reviewerName: review.reviewerName ?? null,
           nativeScore: review.nativeScore ?? null,
-          reviewText: value.reviewTextByKey[review.sourceKey] ?? null,
+          reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
         })),
       },
     };

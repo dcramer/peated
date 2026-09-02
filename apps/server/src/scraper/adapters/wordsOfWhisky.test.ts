@@ -61,6 +61,12 @@ test("extracts one scored review and only its tasting notes", async () => {
   expect(parsed.article.externalReviews[0]?.sourceKey).toBe(
     reparsed.article.externalReviews[0]?.sourceKey,
   );
+  expect(Object.values(parsed.externalReviewTexts)).toEqual([
+    "Nose: Fresh barley and lemon oil. Taste: Mineral malt and gentle spice. Finish: Long, bright, and coastal.",
+  ]);
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
+    /Article introduction|Publisher conclusion|Footer content/u,
+  );
 });
 
 test("extracts each Bottle and normalizes decimal scores", async () => {
@@ -79,6 +85,12 @@ test("extracts each Bottle and normalizes decimal scores", async () => {
       nativeScore: { value: 9, scale: 10, display: "9/10" },
     },
   ]);
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
+  );
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
+    /conclusion|Samples provided|Article introduction/iu,
+  );
 });
 
 test("resumes without requesting a completed current article", async () => {

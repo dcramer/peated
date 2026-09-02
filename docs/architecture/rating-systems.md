@@ -14,6 +14,8 @@ and fields differ. A member review has a member, a whole-number score from 0
 through 100, and optional tasting notes, color, comments, serving style,
 friends, and picture. An external review can have a publication, reviewer,
 article link, and the score format used by its source.
+An external review can also have one short generated clip. The complete source
+review text is not stored.
 
 ## Tasting bands
 

@@ -150,6 +150,7 @@ export const ExternalReviewSerializer = serializer({
       bottle: attrs.bottle,
       reviewerName: item.reviewerName,
       nativeScore,
+      clip: item.clip,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

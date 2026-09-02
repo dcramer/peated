@@ -220,6 +220,7 @@ export function parseDramfaceArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews,
     },
+    externalReviewTexts: reviewTexts,
   });
 }
 

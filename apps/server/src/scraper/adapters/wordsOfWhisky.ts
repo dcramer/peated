@@ -182,6 +182,7 @@ export function parseWordsOfWhiskyArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews,
     },
+    externalReviewTexts: reviewTexts,
   });
 }
 

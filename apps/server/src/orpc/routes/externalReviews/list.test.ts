@@ -24,6 +24,7 @@ describe("GET /external-reviews", () => {
     expect(results.length).toBe(2);
     const result = results.find(({ id }) => id === review.id)!;
     expect(result.bottle?.id).toBe(review.bottleId);
+    expect(result.clip).toBeNull();
     expect(result).not.toHaveProperty("target");
     expect(result).not.toHaveProperty("release");
   });
@@ -162,6 +163,7 @@ describe("GET /external-reviews", () => {
       nativeScoreValue: 8.4,
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.4/10",
+      clip: "Rich fruit and gentle smoke lead to a dry finish.",
     });
     await Promise.all([
       db
@@ -248,6 +250,7 @@ describe("GET /external-reviews", () => {
         publishedAt: "2026-08-23T00:00:00.000Z",
       },
       nativeScore: { value: 8.4, scale: 10, display: "8.4/10" },
+      clip: "Rich fruit and gentle smoke lead to a dry finish.",
       bottle: {
         id: bottle.id,
         fullName: bottle.fullName,

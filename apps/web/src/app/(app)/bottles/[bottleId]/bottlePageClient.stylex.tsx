@@ -182,6 +182,7 @@ function getCriticReview(
         ? externalReview.nativeScore.value
         : null,
     reviewerName: externalReview.reviewerName ?? undefined,
+    summary: externalReview.clip ?? undefined,
   };
 }
 

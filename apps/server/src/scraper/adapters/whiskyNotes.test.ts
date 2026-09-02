@@ -62,6 +62,12 @@ test("extracts multi-bottle reviews with stable source keys", async () => {
   expect(
     parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   ).toEqual(reparsed.article.externalReviews.map(({ sourceKey }) => sourceKey));
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
+  );
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toContain(
+    "Related posts",
+  );
 });
 
 test("accepts proof-strength review headings", async () => {

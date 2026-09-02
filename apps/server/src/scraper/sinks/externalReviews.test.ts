@@ -36,6 +36,7 @@ test("Whisky Advocate observations use article and source identity", async ({
           },
         ],
       },
+      externalReviewTexts: {},
     },
   };
 

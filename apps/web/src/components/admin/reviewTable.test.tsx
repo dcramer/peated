@@ -90,6 +90,7 @@ function makeReview(id: number, reviewBottle: Bottle | null): ExternalReview {
     article: { title: null, publishedAt: "2026-07-21T00:00:00.000Z" },
     reviewerName: null,
     nativeScore: { value: 91, scale: 100, display: "91/100" },
+    clip: null,
     bottle: reviewBottle,
     createdAt: timestamp,
     updatedAt: timestamp,
