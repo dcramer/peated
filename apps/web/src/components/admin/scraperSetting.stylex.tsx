@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
-import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 
 export default function ScraperSetting({
@@ -19,7 +19,7 @@ export default function ScraperSetting({
     <div {...stylex.props(styles.stack)}>
       <div {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.copy)}>
-          <h3 {...stylex.props(foundationStyles.sectionHeading)}>{title}</h3>
+          <SectionHeading level={3}>{title}</SectionHeading>
           <p {...stylex.props(styles.description)}>{description}</p>
         </div>
         {action}

@@ -3,7 +3,9 @@
 import * as stylex from "@stylexjs/stylex";
 import { ListFilter, Search } from "lucide-react";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -71,7 +73,7 @@ export function FilterPanel({
       >
         {query ? (
           <div {...stylex.props(styles.panelHeader)}>
-            <span {...stylex.props(styles.heading)}>Filters</span>
+            <SectionHeading>Filters</SectionHeading>
             {onClear ? (
               <Button onClick={onClear} size="sm" variant="text">
                 Clear all
@@ -140,7 +142,7 @@ function FilterQueryForm({
       )}
     >
       <label htmlFor={id} {...stylex.props(styles.field)}>
-        <span {...stylex.props(styles.heading)}>{label}</span>
+        <span {...stylex.props(foundationStyles.fieldLabel)}>{label}</span>
         <TextInput
           aria-label={label}
           controlSize="sm"
@@ -206,9 +208,9 @@ export function FacetGroup({
 
   return (
     <section aria-labelledby={id} {...stylex.props(styles.facetGroup)}>
-      <h3 id={id} {...stylex.props(styles.heading)}>
+      <SectionHeading id={id} level={3}>
         {label}
-      </h3>
+      </SectionHeading>
       <div {...stylex.props(styles.facetRows)}>
         {options.map((option) => {
           const isSelected = selected === option.value;
@@ -346,16 +348,6 @@ const styles = stylex.create({
     flex: 1,
     flexDirection: "column",
     gap: space.x2,
-  },
-  heading: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   facetGroup: {
     minWidth: 0,

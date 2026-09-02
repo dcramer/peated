@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { AdminSection } from "./adminContent.stylex";
@@ -42,7 +43,9 @@ export function BadgeCheckItem({
       <article {...stylex.props(styles.card)}>
         <header {...stylex.props(styles.cardHeader)}>
           <span {...stylex.props(styles.number)}>#{index + 1}</span>
-          <h3 {...stylex.props(styles.title)}>{title}</h3>
+          <div {...stylex.props(styles.title)}>
+            <SectionHeading level={3}>{title}</SectionHeading>
+          </div>
           {removeAction}
         </header>
         <div {...stylex.props(styles.cardBody)}>{children}</div>
@@ -113,12 +116,6 @@ const styles = stylex.create({
     backgroundColor: colors.inset,
   },
   number: { color: colors.inkMuted, fontFamily: fonts.data, fontSize: "10px" },
-  title: {
-    flexGrow: 1,
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-  },
+  title: { flexGrow: 1 },
   cardBody: { padding: space.x4 },
 });

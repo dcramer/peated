@@ -4,6 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
 import type { HTMLAttributes, ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { TextLink } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
@@ -130,11 +131,7 @@ export function AdminSection({
       {title || description || action ? (
         <div {...stylex.props(styles.sectionHeader)}>
           <div {...stylex.props(styles.sectionCopy)}>
-            {title ? (
-              <h2 {...stylex.props(foundationStyles.sectionHeading)}>
-                {title}
-              </h2>
-            ) : null}
+            {title ? <SectionHeading>{title}</SectionHeading> : null}
             {description ? (
               <div {...stylex.props(styles.description)}>{description}</div>
             ) : null}

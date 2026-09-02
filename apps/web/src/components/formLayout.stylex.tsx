@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown } from "lucide-react";
 import type { HTMLAttributes, ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
@@ -35,7 +36,7 @@ export function FormSection({
     <section {...props} {...stylex.props(styles.section)}>
       <div {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.copy)}>
-          <h2 {...stylex.props(foundationStyles.sectionHeading)}>{title}</h2>
+          <SectionHeading>{title}</SectionHeading>
           {description ? (
             <div {...stylex.props(foundationStyles.body, styles.description)}>
               {description}

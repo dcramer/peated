@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { TextLink, type TextLinkProps } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
@@ -39,7 +40,7 @@ export function ContentSection({
 }) {
   return (
     <section {...stylex.props(styles.section)}>
-      <h2 {...stylex.props(styles.sectionTitle)}>{title}</h2>
+      <SectionHeading>{title}</SectionHeading>
       {children}
     </section>
   );
@@ -54,7 +55,7 @@ export function ContentSubsection({
 }) {
   return (
     <section {...stylex.props(styles.subsection)}>
-      <h3 {...stylex.props(styles.subsectionTitle)}>{title}</h3>
+      <SectionHeading level={3}>{title}</SectionHeading>
       {children}
     </section>
   );
@@ -113,28 +114,10 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x3,
   },
-  sectionTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "24px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.2,
-  },
   subsection: {
     display: "flex",
     flexDirection: "column",
     rowGap: space.x2,
-  },
-  subsectionTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    fontWeight: 700,
-    letterSpacing: "-0.015em",
-    lineHeight: 1.25,
   },
   text: {
     maxWidth: "74ch",
