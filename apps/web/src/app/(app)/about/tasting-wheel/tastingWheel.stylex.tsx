@@ -260,8 +260,8 @@ export function TastingWheelGraphic() {
           give you more specific words.
         </p>
         <p {...stylex.props(styles.captionText)}>
-          A group tells you what a note smells or tastes like. It does not tell
-          you what caused it.
+          A group helps you find related words. It does not claim one cause for
+          a note.
         </p>
       </figcaption>
     </figure>
