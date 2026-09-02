@@ -7,7 +7,7 @@ import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
 import { PageColumns, PageHeader } from "./pageLayout.stylex";
 import { RailListSection } from "./railListSection.stylex";
 
-/** Uses the catalog columns for activity, with feed selection in the title row. */
+/** Keeps the title and feed selection aligned with the activity column. */
 export function ActivityPage({
   items,
   note,
@@ -19,14 +19,14 @@ export function ActivityPage({
 }) {
   return (
     <div>
-      <div {...stylex.props(styles.header)}>
-        <PageHeader
-          actions={selector}
-          actionsPosition="inline"
-          title="Activity"
-        />
-      </div>
       <PageColumns
+        header={
+          <PageHeader
+            actions={selector}
+            actionsPosition="inline"
+            title="Activity"
+          />
+        }
         rail={
           <div {...stylex.props(styles.rail)}>
             <RailListSection heading="What have you tried?">
@@ -72,9 +72,6 @@ export function ActivityPage({
 }
 
 const styles = stylex.create({
-  header: {
-    marginBottom: space.x4,
-  },
   rail: {
     display: "flex",
     minWidth: 0,

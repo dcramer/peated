@@ -23,7 +23,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Activity uses the catalog columns, with Following/Everyone beside the page title. The sidebar has the contribution action and rating guidance, and is hidden on mobile. A short notice explains when Following shows everyone's activity because there are no accepted follows.",
+          "Activity uses the catalog columns, with Following/Everyone beside the page title and aligned with the feed column. The sidebar has the contribution action and rating guidance, and is hidden on mobile. A short notice explains when Following shows everyone's activity because there are no accepted follows.",
       },
     },
   },
