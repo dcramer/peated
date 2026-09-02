@@ -618,7 +618,6 @@ export function BottleOverviewClient() {
         }}
         mainState={mainState}
         moreTastingsHref={`${getBottleUrl(bottle)}/tastings`}
-        recommendationIntro={recommendationsQuery.data?.reason}
         recommendationState={
           recommendationsQuery.isPending ? (
             <LoadingList label="Loading bottle recommendations" rows={3} />
