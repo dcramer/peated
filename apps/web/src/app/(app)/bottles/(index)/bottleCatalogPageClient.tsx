@@ -7,7 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { ButtonLink } from "@peated/web/components";
-import { BottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
+import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
 import {
   BottleCatalogFilters,
   BottleCatalogList,
@@ -139,26 +139,16 @@ export function BottleCatalogPageClient({
     router.push(buildSearchHref(pathname, nextParams));
   }
 
-  const items = bottleList.results.map((bottle) => {
-    const item = toBottleListItem(bottle, {
-      includeRatings: true,
-      includeRelatedReleases: true,
-    });
-
-    return {
-      ...item,
-      end: (
-        <BottleRowActions
-          bottle={bottle}
-          controls={bottleActions}
-          label={item.name}
-          ratings={item.ratings}
-        />
-      ),
-      isLibrary: bottleActions.isLibrary(bottle),
-      ratings: undefined,
-    };
-  });
+  const items = bottleList.results.map((bottle) =>
+    addBottleRowActions({
+      bottle,
+      controls: bottleActions,
+      item: toBottleListItem(bottle, {
+        includeRatings: true,
+        includeRelatedReleases: true,
+      }),
+    }),
+  );
   const title =
     queryParams.series && bottleList.results[0]?.series
       ? bottleList.results[0].series.name

@@ -21,22 +21,22 @@ export type BottleRowActionControls = {
 
 export function getBottleRowActionGroups({
   bottle,
-  changePending,
   isLibrary,
   isLoggedIn,
+  libraryChangePending,
   onLibraryToggle,
   thisBottlePending,
 }: {
   bottle: Pick<Bottle, "id">;
-  changePending: boolean;
   isLibrary: boolean;
   isLoggedIn: boolean;
+  libraryChangePending: boolean;
   onLibraryToggle: () => void;
   thisBottlePending: boolean;
 }): RowMenuItem[][] {
   const libraryAction: RowMenuItem = isLoggedIn
     ? {
-        disabled: changePending,
+        disabled: libraryChangePending,
         label: thisBottlePending
           ? isLibrary
             ? "Removing from Library…"
@@ -83,7 +83,6 @@ export default function useBottleRowActions(): BottleRowActionControls {
   const removeMutation = useMutation(
     orpc.collections.bottles.delete.mutationOptions(),
   );
-  const changePending = addMutation.isPending || removeMutation.isPending;
 
   function isLibrary(bottle: BottleActionTarget) {
     return libraryOverrides[bottle.id] ?? bottle.isLibrary;
@@ -139,9 +138,9 @@ export default function useBottleRowActions(): BottleRowActionControls {
     groupsFor: (bottle) =>
       getBottleRowActionGroups({
         bottle,
-        changePending,
         isLibrary: isLibrary(bottle),
         isLoggedIn: Boolean(user),
+        libraryChangePending: pendingBottleId !== undefined,
         onLibraryToggle: () => void toggleLibrary(bottle),
         thisBottlePending: pendingBottleId === bottle.id,
       }),

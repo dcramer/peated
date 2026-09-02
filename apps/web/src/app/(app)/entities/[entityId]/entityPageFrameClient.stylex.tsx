@@ -50,7 +50,7 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
   }
 
   const isFollowing = followControls.isFollowing(entity);
-  const pending = followControls.pendingId === entity.id;
+  const pending = followControls.pendingIds.has(entity.id);
 
   return (
     <Button

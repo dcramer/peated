@@ -6,12 +6,37 @@ import * as stylex from "@stylexjs/stylex";
 import type { BottleRowActionControls } from "@peated/web/hooks/useBottleRowActions";
 
 import { space } from "../styles/tokens.stylex";
+import type { BottleListItem } from "./bottleList.stylex";
 import { RowMenu } from "./rowMenu.stylex";
 import { BottleRatings, type BottleRatingsProps } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
+
+export function addBottleRowActions({
+  bottle,
+  controls,
+  item,
+}: {
+  bottle: Pick<Bottle, "id" | "isLibrary">;
+  controls: BottleRowActionControls;
+  item: BottleListItem;
+}): BottleListItem {
+  return {
+    ...item,
+    end: (
+      <BottleRowActions
+        bottle={bottle}
+        controls={controls}
+        label={item.name}
+        ratings={item.ratings}
+      />
+    ),
+    isLibrary: controls.isLibrary(bottle),
+    ratings: undefined,
+  };
+}
 
 export function BottleRowActions({
   controls,

@@ -7,9 +7,9 @@ function getGroups(
 ) {
   return getBottleRowActionGroups({
     bottle: { id: 42 },
-    changePending: false,
     isLibrary: false,
     isLoggedIn: true,
+    libraryChangePending: false,
     onLibraryToggle: vi.fn(),
     thisBottlePending: false,
     ...overrides,
@@ -49,12 +49,23 @@ describe("getBottleRowActionGroups", () => {
   it("shows which Library change is pending", () => {
     expect(
       getGroups({
-        changePending: true,
+        libraryChangePending: true,
         thisBottlePending: true,
       })[1]?.[0],
     ).toMatchObject({
       disabled: true,
       label: "Adding to Library…",
+    });
+  });
+
+  it("waits for the current Library change before starting another", () => {
+    expect(
+      getGroups({
+        libraryChangePending: true,
+      })[1]?.[0],
+    ).toMatchObject({
+      disabled: true,
+      label: "Add to Library",
     });
   });
 });

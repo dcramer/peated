@@ -1,10 +1,20 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import type { BottleRowActionControls } from "@peated/web/hooks/useBottleRowActions";
+
 import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
+import { BottleRowActions } from "./bottleRowActions.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
-import { RowMenu } from "./rowMenu.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
+
+const bottleActions = {
+  groupsFor: () => [
+    [{ label: "Log a tasting", onSelect: () => undefined }],
+    [{ label: "Remove from Library", onSelect: () => undefined }],
+  ],
+  isLibrary: () => true,
+} satisfies BottleRowActionControls;
 
 const meta = {
   title: "Components/Bottles/Bottle Identity Row",
@@ -77,23 +87,10 @@ export const Overview: Story = {
         <BottleIdentityRow
           {...args}
           end={
-            <RowMenu
-              groups={[
-                [
-                  {
-                    label: "Log a tasting",
-                    onSelect: () => undefined,
-                  },
-                ],
-                [
-                  {
-                    label: "Remove from Library",
-                    onSelect: () => undefined,
-                  },
-                ],
-              ]}
+            <BottleRowActions
+              bottle={{ id: 42, isLibrary: true }}
+              controls={bottleActions}
               label={args.name}
-              triggerVariant="text"
             />
           }
           isLibrary

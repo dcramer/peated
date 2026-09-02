@@ -46,7 +46,7 @@ describe("getEntityRowActionGroups", () => {
       getEntityRowActionGroups({
         item,
         onToggleFollowing: vi.fn(),
-        pendingId: item.id,
+        pendingIds: new Set([item.id]),
       })[1]?.[0],
     ).toMatchObject({
       disabled: true,
@@ -59,7 +59,7 @@ describe("getEntityRowActionGroups", () => {
       getEntityRowActionGroups({
         item,
         onToggleFollowing: vi.fn(),
-        pendingId: 7,
+        pendingIds: new Set([7]),
       })[1]?.[0],
     ).toMatchObject({
       disabled: false,

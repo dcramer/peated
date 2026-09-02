@@ -36,11 +36,11 @@ export type EntityCatalogItem = {
 export function getEntityRowActionGroups({
   item,
   onToggleFollowing,
-  pendingId,
+  pendingIds,
 }: {
   item: EntityCatalogItem;
   onToggleFollowing?: (item: EntityCatalogItem) => void;
-  pendingId?: number;
+  pendingIds?: ReadonlySet<number>;
 }): RowMenuItem[][] {
   const groups: RowMenuItem[][] = [];
 
@@ -49,7 +49,7 @@ export function getEntityRowActionGroups({
   }
 
   if (onToggleFollowing) {
-    const pending = pendingId === item.id;
+    const pending = pendingIds?.has(item.id) ?? false;
 
     groups.push([
       {
@@ -81,7 +81,7 @@ export type EntityCatalogListProps = {
   onToggleFollowing?: (item: EntityCatalogItem) => void;
   onSortChange: (value: string) => void;
   page: number;
-  pendingId?: number;
+  pendingIds?: ReadonlySet<number>;
   previousHref?: string;
   showFollowingMarks?: boolean;
   sort: string;
@@ -102,7 +102,7 @@ export function EntityCatalogList({
   onToggleFollowing,
   onSortChange,
   page,
-  pendingId,
+  pendingIds,
   previousHref,
   showFollowingMarks = true,
   sort,
@@ -125,7 +125,7 @@ export function EntityCatalogList({
             items={items}
             noun={noun}
             onToggleFollowing={onToggleFollowing}
-            pendingId={pendingId}
+            pendingIds={pendingIds}
             showFollowingMarks={showFollowingMarks}
           />
         </>
@@ -162,13 +162,13 @@ function EntityCatalogTable({
   items,
   noun,
   onToggleFollowing,
-  pendingId,
+  pendingIds,
   showFollowingMarks,
 }: {
   items: readonly EntityCatalogItem[];
   noun: string;
   onToggleFollowing?: (item: EntityCatalogItem) => void;
-  pendingId?: number;
+  pendingIds?: ReadonlySet<number>;
   showFollowingMarks: boolean;
 }) {
   const columns: CatalogTableColumn<EntityCatalogItem>[] = [
@@ -216,7 +216,7 @@ function EntityCatalogTable({
         const groups = getEntityRowActionGroups({
           item,
           onToggleFollowing,
-          pendingId,
+          pendingIds,
         });
 
         return groups.length ? (

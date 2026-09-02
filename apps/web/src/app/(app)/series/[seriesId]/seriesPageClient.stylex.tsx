@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { FactList, SectionError, TextLink } from "@peated/web/components";
-import { BottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
+import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
 import Markdown from "@peated/web/components/markdown";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import {
@@ -107,30 +107,19 @@ export function SeriesPageClient({
             <BottleCatalogList
               emptyDescription={`No bottles have been added to ${initialSeries.fullName} yet.`}
               emptyHeading="No bottles in this series yet"
-              items={bottleList.results.map((bottle) => {
-                const item = toBottleListItem(bottle, {
-                  includeBrandInName: false,
-                  includeBrandRow: false,
-                  includeRatings: true,
-                  includeRelatedReleases: true,
-                  includeSeriesInName: false,
-                });
-                const isLibrary = bottleActions.isLibrary(bottle);
-
-                return {
-                  ...item,
-                  end: (
-                    <BottleRowActions
-                      bottle={bottle}
-                      controls={bottleActions}
-                      label={item.name}
-                      ratings={item.ratings}
-                    />
-                  ),
-                  isLibrary,
-                  ratings: undefined,
-                };
-              })}
+              items={bottleList.results.map((bottle) =>
+                addBottleRowActions({
+                  bottle,
+                  controls: bottleActions,
+                  item: toBottleListItem(bottle, {
+                    includeBrandInName: false,
+                    includeBrandRow: false,
+                    includeRatings: true,
+                    includeRelatedReleases: true,
+                    includeSeriesInName: false,
+                  }),
+                }),
+              )}
               nextHref={getCursorHref(
                 pathname,
                 searchParams,

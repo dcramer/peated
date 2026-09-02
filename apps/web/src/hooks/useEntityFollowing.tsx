@@ -12,7 +12,9 @@ export default function useEntityFollowing() {
   const queryClient = useQueryClient();
   const { flash } = useFlashMessages();
   const [overrides, setOverrides] = useState<Record<number, boolean>>({});
-  const [pendingId, setPendingId] = useState<number>();
+  const [pendingIds, setPendingIds] = useState<ReadonlySet<number>>(
+    () => new Set(),
+  );
   const followMutation = useMutation(orpc.entities.follow.mutationOptions());
   const unfollowMutation = useMutation(
     orpc.entities.unfollow.mutationOptions(),
@@ -23,7 +25,7 @@ export default function useEntityFollowing() {
 
   async function toggle(entity: Pick<Entity, "id" | "isFollowing">) {
     const current = isFollowing(entity);
-    setPendingId(entity.id);
+    setPendingIds((ids) => new Set(ids).add(entity.id));
 
     try {
       if (current) {
@@ -48,9 +50,13 @@ export default function useEntityFollowing() {
         "error",
       );
     } finally {
-      setPendingId(undefined);
+      setPendingIds((ids) => {
+        const nextIds = new Set(ids);
+        nextIds.delete(entity.id);
+        return nextIds;
+      });
     }
   }
 
-  return { isFollowing, pendingId, toggle };
+  return { isFollowing, pendingIds, toggle };
 }

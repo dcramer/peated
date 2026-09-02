@@ -195,7 +195,7 @@ export function EntityCatalogPageClient({
         }
         onSortChange={(value) => updateParams({ sort: value })}
         page={page}
-        pendingId={followControls.pendingId}
+        pendingIds={followControls.pendingIds}
         previousHref={getCursorHref(
           pathname,
           searchParams,
