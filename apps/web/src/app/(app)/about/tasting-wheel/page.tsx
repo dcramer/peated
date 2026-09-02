@@ -18,7 +18,7 @@ import {
 import {
   TastingWheelCategoryLinks,
   TastingWheelProvider,
-} from "./tastingWheelDetails.stylex";
+} from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 
 export const dynamic = "force-static";
 

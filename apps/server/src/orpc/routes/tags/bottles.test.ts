@@ -100,6 +100,45 @@ describe("GET /tags/bottles", () => {
     ).toEqual([]);
   });
 
+  test("excludes private tastings from examples and prevalence, even for their author", async ({
+    fixtures,
+  }) => {
+    await fixtures.Tag({ name: "smoke", tagCategory: "smoke" });
+    await fixtures.Tag({ name: "honey", tagCategory: "sweet" });
+    const publicUser = await fixtures.User();
+    const privateUser = await fixtures.User({ private: true });
+    const publicBottle = await fixtures.Bottle();
+    const privateBottle = await fixtures.Bottle();
+    await db.insert(tastings).values([
+      {
+        bottleId: publicBottle.id,
+        tags: ["smoke"],
+        createdById: publicUser.id,
+      },
+      {
+        bottleId: publicBottle.id,
+        tags: ["honey"],
+        createdById: privateUser.id,
+      },
+      {
+        bottleId: privateBottle.id,
+        tags: ["smoke"],
+        createdById: privateUser.id,
+      },
+    ]);
+    const { results } = await routerClient.tags.bottles(
+      { category: "smoke" },
+      { context: { user: privateUser } },
+    );
+    expect(
+      results.map(({ bottle, matchingTastings, taggedTastings }) => [
+        bottle.id,
+        matchingTastings,
+        taggedTastings,
+      ]),
+    ).toEqual([[publicBottle.id, 1, 1]]);
+  });
+
   test("rejects invalid categories and limits", async () => {
     await expect(
       routerClient.tags.bottles({ category: "smoke", limit: 0 }),

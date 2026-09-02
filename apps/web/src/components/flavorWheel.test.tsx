@@ -10,8 +10,16 @@ test("selects flavor families with the keyboard and pointer", async () => {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
+  const explored: string[] = [];
   try {
-    act(() => root.render(<FlavorWheel profile={mockFlavorProfile} />));
+    act(() =>
+      root.render(
+        <FlavorWheel
+          profile={mockFlavorProfile}
+          onExplore={(category) => explored.push(category)}
+        />,
+      ),
+    );
     const fruit = container.querySelector(
       '[role="button"][aria-label^="Fruit,"]',
     )!;
@@ -36,6 +44,12 @@ test("selects flavor families with the keyboard and pointer", async () => {
       ),
     );
     expect(fruit.getAttribute("aria-pressed")).toBe("true");
+    await act(() =>
+      container
+        .querySelector("button[aria-haspopup=dialog]")!
+        .dispatchEvent(new MouseEvent("click", { bubbles: true })),
+    );
+    expect(explored).toEqual(["fruit"]);
   } finally {
     act(() => root.unmount());
     container.remove();

@@ -7,18 +7,33 @@ import {
   TextLink,
 } from "@peated/web/components";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
+import {
+  TastingWheelProvider,
+  useTastingWheel,
+} from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQuery } from "@tanstack/react-query";
 
-export function PlaceFlavorProfile({
-  scope,
-  bottlesHref,
-}: {
+type PlaceFlavorProfileProps = {
   scope:
     | { kind: "distillery"; entity: number }
     | { kind: "region"; country: string; region: string };
   bottlesHref: string;
-}) {
+};
+
+export function PlaceFlavorProfile(props: PlaceFlavorProfileProps) {
+  return (
+    <TastingWheelProvider>
+      <PlaceFlavorProfileContent {...props} />
+    </TastingWheelProvider>
+  );
+}
+
+function PlaceFlavorProfileContent({
+  scope,
+  bottlesHref,
+}: PlaceFlavorProfileProps) {
+  const { select } = useTastingWheel();
   const orpc = useORPC();
   const query = useQuery(
     scope.kind === "distillery"
@@ -45,7 +60,10 @@ export function PlaceFlavorProfile({
         </SectionError>
       ) : (
         <>
-          <FlavorWheel profile={query.data} />
+          <FlavorWheel
+            profile={query.data}
+            onExplore={(category) => select({ category })}
+          />
           {query.data.notedBottles < 5 ? (
             <TextLink href={bottlesHref}>
               Browse bottles to add tasting notes

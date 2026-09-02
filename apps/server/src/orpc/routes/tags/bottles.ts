@@ -4,6 +4,7 @@ import {
   bottleTombstones,
   tags,
   tastings,
+  users,
 } from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import contract from "@peated/server/orpc/contracts/tags/bottles";
@@ -30,6 +31,7 @@ export default implement(contract).handler(async ({ input, context }) => {
   ];
   if (!names.length) return { results: [] };
 
+  // Public examples exclude private tastings, even for their author or followers.
   // A tasting counts once even when it contains several notes in the category.
   // Untagged tastings provide no evidence about flavor and are not in the denominator.
   const matches = sql`${tastings.tags} && ARRAY[${sql.join(
@@ -45,7 +47,10 @@ export default implement(contract).handler(async ({ input, context }) => {
       tagged: sql<number>`count(*)`.mapWith(Number).as("tagged"),
     })
     .from(tastings)
-    .where(sql`cardinality(${tastings.tags}) > 0`)
+    .innerJoin(users, eq(users.id, tastings.createdById))
+    .where(
+      and(eq(users.private, false), sql`cardinality(${tastings.tags}) > 0`),
+    )
     .groupBy(tastings.bottleId)
     .having(sql`count(*) FILTER (WHERE ${matches}) > 0`)
     .as("note_counts");

@@ -2,11 +2,13 @@
 
 import { TAG_CATEGORIES } from "@peated/server/constants";
 import type { FlavorProfile } from "@peated/server/schemas/flavorProfile";
+import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { Info } from "lucide-react";
 import { useId, useState } from "react";
 
 import { colors, fonts, space } from "../styles/tokens.stylex";
+import { Button } from "./button.stylex";
 
 const CENTER_X = 168;
 const CENTER_Y = 148;
@@ -37,9 +39,16 @@ const formatCount = (count: number) => count.toLocaleString("en-US");
  * Sidebar distribution of public tasting-note families across bottles.
  * Each wedge has a fixed position and an independent 0–100% area scale.
  * Selection reveals its share and two leading notes in the center, without bars.
+ * Optional onExplore opens the selected family in the caller’s tasting guide.
  * The parent supplies the heading and any contribution action for empty data.
  */
-export function FlavorWheel({ profile }: { profile: FlavorProfile }) {
+export function FlavorWheel({
+  profile,
+  onExplore,
+}: {
+  profile: FlavorProfile;
+  onExplore?: (category: TagCategory) => void;
+}) {
   const descriptionId = useId();
   const [selection, setSelection] = useState<string | null>(null);
   const [focused, setFocused] = useState<string | null>(null);
@@ -193,6 +202,17 @@ export function FlavorWheel({ profile }: { profile: FlavorProfile }) {
           <p id={descriptionId} {...stylex.props(styles.hint)}>
             Select a family to explore its notes.
           </p>
+          {onExplore ? (
+            <Button
+              variant="text"
+              size="sm"
+              fullWidth
+              aria-haspopup="dialog"
+              onClick={() => onExplore(selected.category)}
+            >
+              Explore {label(selected.category).toLowerCase()} notes
+            </Button>
+          ) : null}
         </>
       )}
       <details {...stylex.props(styles.coverage)}>

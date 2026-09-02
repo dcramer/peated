@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@peated/web/components";
+import { WHEEL_CATEGORIES } from "@peated/web/features/tastingWheel/tastingWheelData";
+import { useTastingWheel } from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { Fragment } from "react";
-import { WHEEL_CATEGORIES } from "./tastingWheelData";
-import { useTastingWheel } from "./tastingWheelDetails.stylex";
 
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 

@@ -8,7 +8,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../styles/tokens.stylex";
 import {
   CATEGORY_DEFINITIONS,
   NOTE_DESCRIPTIONS,
@@ -143,9 +143,9 @@ function TastingWheelDetails({
         </div>
       </section>
       <section aria-busy={query.isPending}>
-        <h3 {...stylex.props(styles.heading)}>Bottles to explore</h3>
+        <h3 {...stylex.props(styles.heading)}>Bottles across Peated</h3>
         <p {...stylex.props(styles.explanation)}>
-          Ranked by the share of tastings with notes that mention{" "}
+          Ranked by the share of public tastings with notes that mention{" "}
           {selection.note
             ? selection.note
             : `a note in the ${category.name.toLowerCase()} category`}
