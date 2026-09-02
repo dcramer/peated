@@ -49,6 +49,7 @@ import root from "./routes/root";
 import search from "./routes/search";
 import smwsDistillerList from "./routes/smws/distiller-list";
 import stats from "./routes/stats";
+import tagBottles from "./routes/tags/bottles";
 import tastingCreate from "./routes/tastings/create";
 import tastingDetails from "./routes/tastings/details";
 import tastingList from "./routes/tastings/list";
@@ -63,6 +64,7 @@ import userTastingStats from "./routes/users/tasting-stats";
 
 // Requests for routes not listed here return 404 from the mock server.
 export const mockRouter = mockOS.router({
+  tags: { bottles: tagBottles },
   root,
   search,
   stats,

@@ -1,110 +1,14 @@
-import { TAG_CATEGORIES } from "@peated/server/constants";
-import type { TagCategory } from "@peated/server/types";
-import { Chip } from "@peated/web/components";
+"use client";
+
+import { Button } from "@peated/web/components";
 import * as stylex from "@stylexjs/stylex";
+import { Fragment } from "react";
+import { WHEEL_CATEGORIES } from "./tastingWheelData";
+import { useTastingWheel } from "./tastingWheelDetails.stylex";
 
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 const MOBILE = "@media (max-width: 559px)";
-const WHEEL_STACKED = "@media (max-width: 1219px)";
-const WHEEL_COMPACT = "@media (max-width: 899px)";
-
-type WheelCategoryDefinition = {
-  description: string;
-  name: string;
-  notes: readonly string[];
-  wheelNotes: readonly [string, string, string];
-};
-
-const CATEGORY_DEFINITIONS = {
-  cereal: {
-    name: "Cereal",
-    description: "Malt, bread, dough, and porridge.",
-    wheelNotes: ["malt", "biscuit", "porridge"],
-    notes: [
-      "malt",
-      "biscuit",
-      "porridge",
-      "barley sugar",
-      "sourdough",
-      "popcorn",
-    ],
-  },
-  fruit: {
-    name: "Fruit",
-    description: "Fresh, dried, cooked, tropical, and citrus fruit.",
-    wheelNotes: ["apple", "citrus", "raisin"],
-    notes: [
-      "green apple",
-      "pear",
-      "apricot",
-      "lemon zest",
-      "dried fruit",
-      "raisin",
-    ],
-  },
-  floral: {
-    name: "Floral",
-    description: "Flowers, herbs, leaves, grass, and tea.",
-    wheelNotes: ["heather", "mint", "grass"],
-    notes: ["heather", "cut grass", "lavender", "mint", "jasmine", "green tea"],
-  },
-  smoke: {
-    name: "Smoke",
-    description: "Peat smoke, ash, medicine, wet stone, and sea air.",
-    wheelNotes: ["smoke", "peat", "iodine"],
-    notes: ["smoke", "iodine", "seaweed", "bonfire", "brine", "wet stone"],
-  },
-  earthy: {
-    name: "Earthy",
-    description: "Leather, tobacco, nuts, coffee, wax, soil, and savory food.",
-    wheelNotes: ["leather", "coffee", "wax"],
-    notes: ["leather", "tobacco", "mushroom", "coffee", "walnut", "wax"],
-  },
-  sulfur: {
-    name: "Sulfur",
-    description: "Struck matches, rubber, metal, onion, and fireworks.",
-    wheelNotes: ["sulfur", "rubber", "copper"],
-    notes: [
-      "struck match",
-      "rubber",
-      "gunpowder",
-      "copper",
-      "onion",
-      "firework",
-    ],
-  },
-  sweet: {
-    name: "Sweet",
-    description: "Honey, vanilla, caramel, toffee, cream, and chocolate.",
-    wheelNotes: ["honey", "vanilla", "caramel"],
-    notes: ["honey", "vanilla", "caramel", "toffee", "cream", "chocolate"],
-  },
-  spice: {
-    name: "Spice",
-    description: "Pepper, cinnamon, clove, ginger, and licorice.",
-    wheelNotes: ["clove", "cinnamon", "ginger"],
-    notes: [
-      "black pepper",
-      "cinnamon",
-      "clove",
-      "ginger",
-      "licorice",
-      "nutmeg",
-    ],
-  },
-  wood: {
-    name: "Wood",
-    description: "Oak, cedar, resin, sherry, wine, and toasted wood.",
-    wheelNotes: ["oak", "sherry", "cedar"],
-    notes: ["oak", "sherry", "cedar", "toasted oak", "sandalwood", "resin"],
-  },
-} as const satisfies Record<TagCategory, WheelCategoryDefinition>;
-
-const WHEEL_CATEGORIES = TAG_CATEGORIES.map((key) => ({
-  key,
-  ...CATEGORY_DEFINITIONS[key],
-}));
 
 const CENTER = 260;
 const HUB_RADIUS = 88;
@@ -147,6 +51,7 @@ function labelTransform(radius: number, angle: number) {
 }
 
 export function TastingWheelGraphic() {
+  const { select, selection } = useTastingWheel();
   const categorySpan = 360 / WHEEL_CATEGORIES.length;
 
   return (
@@ -160,7 +65,8 @@ export function TastingWheelGraphic() {
         >
           <title id="tasting-wheel-title">Peated tasting wheel</title>
           <desc id="tasting-wheel-description">
-            9 groups of tasting words. Each group has 3 examples.
+            Explore a tasting category or a note to find related words and
+            example bottles.
           </desc>
           {WHEEL_CATEGORIES.map((category, categoryIndex) => {
             const startAngle = categoryIndex * categorySpan;
@@ -169,38 +75,72 @@ export function TastingWheelGraphic() {
             const noteSpan = categorySpan / category.wheelNotes.length;
 
             return (
-              <a
-                aria-label={`Go to the ${category.name} group`}
-                href={`#tasting-note-${category.key}`}
-                key={category.key}
-                {...stylex.props(styles.segmentLink)}
-              >
-                <path
-                  d={ringSegment(
-                    HUB_RADIUS,
-                    CATEGORY_RADIUS,
-                    startAngle + 0.6,
-                    endAngle - 0.6,
-                  )}
-                  {...stylex.props(
-                    styles.segment,
-                    SEGMENT_STYLES[categoryIndex],
-                  )}
-                />
-                <text
-                  textAnchor="middle"
-                  transform={labelTransform(123, middleAngle)}
-                  {...stylex.props(styles.categoryLabel)}
+              <Fragment key={category.key}>
+                <g
+                  role="button"
+                  tabIndex={0}
+                  aria-haspopup="dialog"
+                  aria-label={`Explore ${category.name}`}
+                  aria-pressed={
+                    selection?.category === category.key && !selection.note
+                  }
+                  onClick={() => select({ category: category.key })}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      select({ category: category.key });
+                    }
+                  }}
+                  {...stylex.props(styles.segmentLink)}
                 >
-                  {category.name}
-                </text>
+                  <path
+                    d={ringSegment(
+                      HUB_RADIUS,
+                      CATEGORY_RADIUS,
+                      startAngle + 0.6,
+                      endAngle - 0.6,
+                    )}
+                    {...stylex.props(
+                      styles.segment,
+                      SEGMENT_STYLES[categoryIndex],
+                      selection?.category === category.key &&
+                        !selection.note &&
+                        styles.selectedSegment,
+                    )}
+                  />
+                  <text
+                    textAnchor="middle"
+                    transform={labelTransform(123, middleAngle)}
+                    {...stylex.props(styles.categoryLabel)}
+                  >
+                    {category.name}
+                  </text>
+                </g>
                 {category.wheelNotes.map((note, noteIndex) => {
                   const noteStart = startAngle + noteIndex * noteSpan;
                   const noteEnd = noteStart + noteSpan;
                   const noteMiddle = noteStart + noteSpan / 2;
 
                   return (
-                    <g key={note}>
+                    <g
+                      key={note}
+                      role="button"
+                      tabIndex={0}
+                      aria-haspopup="dialog"
+                      aria-label={`Explore ${note} in ${category.name}`}
+                      aria-pressed={
+                        selection?.category === category.key &&
+                        selection.note === note
+                      }
+                      onClick={() => select({ category: category.key, note })}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          select({ category: category.key, note });
+                        }
+                      }}
+                      {...stylex.props(styles.segmentLink)}
+                    >
                       <path
                         d={ringSegment(
                           NOTE_INNER_RADIUS,
@@ -211,6 +151,9 @@ export function TastingWheelGraphic() {
                         {...stylex.props(
                           styles.outerSegment,
                           OUTER_SEGMENT_STYLES[categoryIndex],
+                          selection?.category === category.key &&
+                            selection.note === note &&
+                            styles.selectedSegment,
                         )}
                       />
                       <text
@@ -223,52 +166,17 @@ export function TastingWheelGraphic() {
                     </g>
                   );
                 })}
-              </a>
+              </Fragment>
             );
           })}
-          <circle
-            cx={CENTER}
-            cy={CENTER}
-            r={HUB_RADIUS - 3}
-            {...stylex.props(styles.hub)}
-          />
-          <text
-            textAnchor="middle"
-            x={CENTER}
-            y={CENTER - 5}
-            {...stylex.props(styles.hubTitle)}
-          >
-            9 groups
-          </text>
-          <text
-            textAnchor="middle"
-            x={CENTER}
-            y={CENTER + 18}
-            {...stylex.props(styles.hubLabel)}
-          >
-            Start here
-          </text>
         </svg>
       </div>
-      <figcaption {...stylex.props(styles.caption)}>
-        <div>
-          <div {...stylex.props(styles.captionEyebrow)}>How to use it</div>
-          <h3 {...stylex.props(styles.captionTitle)}>Start with a group</h3>
-        </div>
-        <p {...stylex.props(styles.captionText)}>
-          Pick the group that is closest to what you notice. The lists below
-          give you more specific words.
-        </p>
-        <p {...stylex.props(styles.captionText)}>
-          A group helps you find related words. It does not claim one cause for
-          a note.
-        </p>
-      </figcaption>
     </figure>
   );
 }
 
 export function TastingWheelFamilies() {
+  const { select } = useTastingWheel();
   return (
     <div {...stylex.props(styles.familyGrid)}>
       {WHEEL_CATEGORIES.map((category) => (
@@ -277,13 +185,30 @@ export function TastingWheelFamilies() {
           key={category.key}
           {...stylex.props(styles.family)}
         >
-          <h3 {...stylex.props(styles.familyTitle)}>{category.name}</h3>
+          <h3 {...stylex.props(styles.familyTitle)}>
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              onClick={() => select({ category: category.key })}
+              {...stylex.props(styles.categoryButton)}
+            >
+              {category.name}
+            </button>
+          </h3>
           <p {...stylex.props(styles.familyDescription)}>
             {category.description}
           </p>
           <div {...stylex.props(styles.notes)}>
             {category.notes.map((note) => (
-              <Chip key={note}>{note}</Chip>
+              <Button
+                key={note}
+                size="sm"
+                variant="tonal"
+                aria-haspopup="dialog"
+                onClick={() => select({ category: category.key, note })}
+              >
+                {note}
+              </Button>
             ))}
           </div>
         </article>
@@ -293,16 +218,7 @@ export function TastingWheelFamilies() {
 }
 
 const styles = stylex.create({
-  figure: {
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 520px) minmax(220px, 1fr)",
-    gap: space.x8,
-    alignItems: "center",
-    margin: 0,
-    [WHEEL_STACKED]: {
-      gridTemplateColumns: "minmax(0, 520px)",
-    },
-  },
+  figure: { margin: 0, maxWidth: "520px" },
   wheelFrame: {
     width: "100%",
     minWidth: 0,
@@ -319,12 +235,44 @@ const styles = stylex.create({
       ":hover": 0.78,
       ":focus-visible": 0.78,
     },
-    outline: "none",
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.accent}`,
+    },
+    outlineOffset: "2px",
+    transitionProperty: "opacity",
+    transitionDuration: {
+      default: "200ms",
+      "@media (prefers-reduced-motion: reduce)": "0ms",
+    },
+    ":active": { opacity: 0.6 },
+  },
+  categoryButton: {
+    appearance: "none",
+    border: 0,
+    padding: 0,
+    minHeight: "44px",
+    backgroundColor: "transparent",
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accent,
+    },
+    fontFamily: "inherit",
+    fontSize: "inherit",
+    fontWeight: "inherit",
+    cursor: "pointer",
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.accent}`,
+    },
+    outlineOffset: "2px",
   },
   segment: {
     stroke: colors.ground,
     strokeWidth: 2,
   },
+  selectedSegment: { fill: colors.accentTint, stroke: colors.accent },
   segmentSurface: { fill: colors.surface },
   segmentInset: { fill: colors.inset },
   segmentSunken: { fill: colors.sunken },
@@ -348,74 +296,11 @@ const styles = stylex.create({
     pointerEvents: "none",
   },
   noteLabel: {
-    display: { default: "block", [WHEEL_COMPACT]: "none" },
     fill: colors.inkMuted,
     fontFamily: fonts.reading,
     fontSize: "10.5px",
     fontWeight: 600,
     pointerEvents: "none",
-  },
-  hub: {
-    fill: colors.ground,
-    stroke: colors.hairline,
-    strokeWidth: 1,
-  },
-  hubTitle: {
-    fill: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    pointerEvents: "none",
-  },
-  hubLabel: {
-    fill: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "11px",
-    pointerEvents: "none",
-  },
-  caption: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x3,
-    paddingTop: space.x4,
-    paddingRight: space.x4,
-    paddingBottom: space.x4,
-    paddingLeft: space.x4,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    [WHEEL_STACKED]: {
-      maxWidth: "620px",
-      paddingRight: 0,
-      paddingLeft: 0,
-    },
-  },
-  captionEyebrow: {
-    color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
-  captionTitle: {
-    margin: 0,
-    marginTop: space.x1,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.2,
-  },
-  captionText: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.6,
   },
   familyGrid: {
     display: "grid",

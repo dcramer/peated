@@ -49,6 +49,7 @@ import root from "@peated/server/orpc/contracts/root";
 import search from "@peated/server/orpc/contracts/search";
 import smwsDistillerList from "@peated/server/orpc/contracts/smws/distiller-list";
 import stats from "@peated/server/orpc/contracts/stats";
+import tagBottles from "@peated/server/orpc/contracts/tags/bottles";
 import tastingCreate from "@peated/server/orpc/contracts/tastings/create";
 import tastingDetails from "@peated/server/orpc/contracts/tastings/details";
 import tastingList from "@peated/server/orpc/contracts/tastings/list";
@@ -63,6 +64,7 @@ import userTastingStats from "@peated/server/orpc/contracts/users/tasting-stats"
 
 // The mock API supports only the routes listed here.
 export const mockContract = {
+  tags: { bottles: tagBottles },
   root,
   search,
   stats,
