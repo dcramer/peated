@@ -8,7 +8,7 @@ const groups = [
     { label: "Log a tasting", onSelect: () => undefined },
     { label: "Add what you paid", onSelect: () => undefined },
   ],
-  [{ label: "Remove from library", onSelect: () => undefined }],
+  [{ label: "Remove from Library", onSelect: () => undefined }],
 ] as const;
 
 const meta = {
@@ -32,7 +32,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use Row Menu for secondary actions on one item. Keep the primary destination on the row and put only secondary actions in the menu.",
+          "Use this menu for actions that do not need a permanent button.",
       },
     },
   },
@@ -41,25 +41,35 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Overview: Story = {
+export const Closed: Story = {
   render: (args) => (
     <StoryRow>
       <RowMenu {...args} />
-      <RowMenu {...args} variant="page" />
-      <RowMenu
-        {...args}
-        groups={[
-          [
-            { label: "Log a tasting", onSelect: () => undefined },
-            {
-              disabled: true,
-              label: "Add what you paid",
-              onSelect: () => undefined,
-            },
-          ],
-          [{ label: "Remove from library", onSelect: () => undefined }],
-        ]}
-      />
+      <RowMenu {...args} label="Frameless menu" triggerVariant="text" />
     </StoryRow>
   ),
+};
+
+export const FramedOpen: Story = {
+  args: {
+    label: "Bottle actions",
+    variant: "page",
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Actions for Bottle actions" }),
+    );
+  },
+};
+
+export const FramelessOpen: Story = {
+  args: {
+    label: "Bowmore 15",
+    triggerVariant: "text",
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Actions for Bowmore 15" }),
+    );
+  },
 };

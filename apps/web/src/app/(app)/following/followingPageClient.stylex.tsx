@@ -152,7 +152,7 @@ export function FollowingPageClient({
           })
         }
         page={state.cursor}
-        pendingId={followControls.pendingId}
+        pendingIds={followControls.pendingIds}
         previousHref={getCursorHref(
           pathname,
           searchParams,

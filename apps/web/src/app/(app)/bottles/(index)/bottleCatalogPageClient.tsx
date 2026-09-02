@@ -7,6 +7,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { ButtonLink } from "@peated/web/components";
+import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
 import {
   BottleCatalogFilters,
   BottleCatalogList,
@@ -15,6 +16,7 @@ import {
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
+import useBottleRowActions from "@peated/web/hooks/useBottleRowActions";
 import {
   BOTTLE_CATALOG_ALLOWED_VALUES,
   BOTTLE_CATALOG_QUERY_FIELDS,
@@ -83,6 +85,7 @@ export function BottleCatalogPageClient({
 }) {
   const orpc = useORPC();
   const { user } = useAuth();
+  const bottleActions = useBottleRowActions();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -137,9 +140,13 @@ export function BottleCatalogPageClient({
   }
 
   const items = bottleList.results.map((bottle) =>
-    toBottleListItem(bottle, {
-      includeRatings: true,
-      includeRelatedReleases: true,
+    addBottleRowActions({
+      bottle,
+      controls: bottleActions,
+      item: toBottleListItem(bottle, {
+        includeRatings: true,
+        includeRelatedReleases: true,
+      }),
     }),
   );
   const title =

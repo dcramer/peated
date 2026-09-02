@@ -12,7 +12,9 @@ import {
   FilterPanel,
   ListToolbar,
   MemberStatus,
+  RowMenu,
   type ListSortOption,
+  type RowMenuItem,
 } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { AppLink } from "../appLink";
@@ -21,6 +23,7 @@ import { CatalogPageLoading } from "./catalogPage.stylex";
 import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 
 export type EntityCatalogItem = {
+  createBottleHref?: string;
   href: string;
   id: number;
   isFollowing: boolean;
@@ -29,6 +32,42 @@ export type EntityCatalogItem = {
   totalBottles: number;
   totalTastings: number;
 };
+
+export function getEntityRowActionGroups({
+  item,
+  onToggleFollowing,
+  pendingIds,
+}: {
+  item: EntityCatalogItem;
+  onToggleFollowing?: (item: EntityCatalogItem) => void;
+  pendingIds?: ReadonlySet<number>;
+}): RowMenuItem[][] {
+  const groups: RowMenuItem[][] = [];
+
+  if (item.createBottleHref) {
+    groups.push([{ href: item.createBottleHref, label: "Add a bottle" }]);
+  }
+
+  if (onToggleFollowing) {
+    const pending = pendingIds?.has(item.id) ?? false;
+
+    groups.push([
+      {
+        disabled: pending,
+        label: pending
+          ? item.isFollowing
+            ? "Unfollowing…"
+            : "Following…"
+          : item.isFollowing
+            ? "Unfollow"
+            : "Follow",
+        onSelect: () => onToggleFollowing(item),
+      },
+    ]);
+  }
+
+  return groups;
+}
 
 export type EntityCatalogListProps = {
   addHref?: string;
@@ -42,7 +81,7 @@ export type EntityCatalogListProps = {
   onToggleFollowing?: (item: EntityCatalogItem) => void;
   onSortChange: (value: string) => void;
   page: number;
-  pendingId?: number;
+  pendingIds?: ReadonlySet<number>;
   previousHref?: string;
   showFollowingMarks?: boolean;
   sort: string;
@@ -63,7 +102,7 @@ export function EntityCatalogList({
   onToggleFollowing,
   onSortChange,
   page,
-  pendingId,
+  pendingIds,
   previousHref,
   showFollowingMarks = true,
   sort,
@@ -86,7 +125,7 @@ export function EntityCatalogList({
             items={items}
             noun={noun}
             onToggleFollowing={onToggleFollowing}
-            pendingId={pendingId}
+            pendingIds={pendingIds}
             showFollowingMarks={showFollowingMarks}
           />
         </>
@@ -123,13 +162,13 @@ function EntityCatalogTable({
   items,
   noun,
   onToggleFollowing,
-  pendingId,
+  pendingIds,
   showFollowingMarks,
 }: {
   items: readonly EntityCatalogItem[];
   noun: string;
   onToggleFollowing?: (item: EntityCatalogItem) => void;
-  pendingId?: number;
+  pendingIds?: ReadonlySet<number>;
   showFollowingMarks: boolean;
 }) {
   const columns: CatalogTableColumn<EntityCatalogItem>[] = [
@@ -170,28 +209,25 @@ function EntityCatalogTable({
     },
   ];
 
-  if (onToggleFollowing) {
+  if (onToggleFollowing || items.some((item) => item.createBottleHref)) {
     columns.push({
       align: "right",
-      cell: (item) => (
-        <Button
-          aria-label={
-            item.isFollowing ? `Unfollow ${item.name}` : `Follow ${item.name}`
-          }
-          aria-pressed={item.isFollowing}
-          loading={pendingId === item.id}
-          loadingLabel={item.isFollowing ? "Unfollowing…" : "Following…"}
-          onClick={() => onToggleFollowing(item)}
-          size="sm"
-          variant={item.isFollowing ? "text" : "tonal"}
-        >
-          {item.isFollowing ? "Following" : "Follow"}
-        </Button>
-      ),
-      header: "Follow",
+      cell: (item) => {
+        const groups = getEntityRowActionGroups({
+          item,
+          onToggleFollowing,
+          pendingIds,
+        });
+
+        return groups.length ? (
+          <RowMenu groups={groups} label={item.name} triggerVariant="text" />
+        ) : null;
+      },
+      header: <span {...stylex.props(styles.visuallyHidden)}>Actions</span>,
       interactive: true,
-      key: "follow",
-      width: "action",
+      key: "actions",
+      priority: "secondary",
+      width: "menu",
     });
   }
 
@@ -269,6 +305,16 @@ export function EntityCatalogLoading({ title }: { title: string }) {
 }
 
 const styles = stylex.create({
+  visuallyHidden: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    padding: 0,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
   catalog: {
     minWidth: 0,
   },

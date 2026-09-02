@@ -126,6 +126,15 @@ type Story = StoryObj<typeof meta>;
 
 export const SignedIn: Story = { render: () => <HeaderExample /> };
 
+export const AccountMenuOpen: Story = {
+  render: () => <HeaderExample />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Open account menu" }),
+    );
+  },
+};
+
 export const SignedOut: Story = {
   render: () => <HeaderExample signedIn={false} />,
 };

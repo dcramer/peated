@@ -7,12 +7,14 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { FactList, SectionError, TextLink } from "@peated/web/components";
+import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
 import Markdown from "@peated/web/components/markdown";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import {
   PageColumns,
   PageHeader,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import useBottleRowActions from "@peated/web/hooks/useBottleRowActions";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -44,6 +46,7 @@ export function SeriesPageClient({
   initialSort: BottleSort;
 }) {
   const orpc = useORPC();
+  const bottleActions = useBottleRowActions();
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -105,12 +108,16 @@ export function SeriesPageClient({
               emptyDescription={`No bottles have been added to ${initialSeries.fullName} yet.`}
               emptyHeading="No bottles in this series yet"
               items={bottleList.results.map((bottle) =>
-                toBottleListItem(bottle, {
-                  includeBrandInName: false,
-                  includeBrandRow: false,
-                  includeRatings: true,
-                  includeRelatedReleases: true,
-                  includeSeriesInName: false,
+                addBottleRowActions({
+                  bottle,
+                  controls: bottleActions,
+                  item: toBottleListItem(bottle, {
+                    includeBrandInName: false,
+                    includeBrandRow: false,
+                    includeRatings: true,
+                    includeRelatedReleases: true,
+                    includeSeriesInName: false,
+                  }),
                 }),
               )}
               nextHref={getCursorHref(
