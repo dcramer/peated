@@ -138,9 +138,16 @@ export const InteractionStates: Story = {
   ),
   parameters: {
     pseudo: {
-      active: ["#bottle-row-pressed > div"],
+      active: [
+        "#bottle-row-pressed > div",
+        '#bottle-row-pressed a[href="/bottles/19936"]',
+      ],
+      focusVisible: ['#bottle-row-focused a[href="/bottles/19936"]'],
       focusWithin: ["#bottle-row-focused > div"],
-      hover: ["#bottle-row-hovered > div"],
+      hover: [
+        "#bottle-row-hovered > div",
+        '#bottle-row-hovered a[href="/bottles/19936"]',
+      ],
     },
   },
 };

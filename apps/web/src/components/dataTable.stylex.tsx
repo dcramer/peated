@@ -155,18 +155,7 @@ const styles = stylex.create({
     verticalAlign: "middle",
   },
   rowLink: {
-    color: {
-      default: colors.accentDeep,
-      ":hover": colors.accent,
-      ":active": colors.accent,
-    },
     fontWeight: 600,
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
   },
   secondary: {
     [COMPACT]: {
