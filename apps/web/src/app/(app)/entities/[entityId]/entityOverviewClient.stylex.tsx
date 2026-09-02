@@ -1,13 +1,9 @@
 "use client";
 
-import type { Outputs } from "@peated/server/orpc/router";
-import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
-import { SectionError } from "@peated/web/components";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { space } from "../../../../styles/tokens.stylex";
 
 import { EntityBottleOverview } from "./entityBottleOverview";
 import { EntityCatalogRelationships } from "./entityCatalogRelationships";
@@ -17,130 +13,41 @@ import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
 import { EntityOperatedOverview } from "./entityOperatedOverview";
-import {
-  entityHasBottleCatalog,
-  getEntityRelationshipOwnerIds,
-  type Entity,
-} from "./entityPageData";
+import { EntityOverviewLayout } from "./entityOverviewLayout.stylex";
+import { entityOverviewQueries } from "./entityOverviewQueries";
+import { useEntityPage } from "./entityPageFrameClient.stylex";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
-type BottleList = Outputs["bottles"]["list"];
-type EntityCatalog = Outputs["entities"]["catalog"];
-type EntityEventList = Outputs["entities"]["events"]["list"];
-type EntityList = Outputs["entities"]["list"];
-
-const NARROW = "@media (max-width: 759px)";
-
-export function EntityOverviewClient({
-  initialBottleList,
-  initialCatalog,
-  initialEntity,
-  initialEventList,
-  initialReleaseList,
-  initialSiblingList,
-}: {
-  initialBottleList?: BottleList;
-  initialCatalog?: EntityCatalog;
-  initialEntity: Entity;
-  initialEventList?: EntityEventList;
-  initialReleaseList?: BottleList;
-  initialSiblingList?: EntityList;
-}) {
+export function EntityOverviewClient() {
   const orpc = useORPC();
-  const ownsBottleSections = entityHasBottleCatalog(initialEntity);
-  const { operatedOwnerId, siblingOwnerId } =
-    getEntityRelationshipOwnerIds(initialEntity);
-  const entityQuery = useQuery({
-    ...orpc.entities.details.queryOptions({
-      input: { entity: initialEntity.id },
-    }),
-    initialData: initialEntity,
-  });
-  const catalogQuery = useQuery({
-    ...orpc.entities.catalog.queryOptions({
-      input: { entity: initialEntity.id },
-    }),
-    enabled: ownsBottleSections,
-    initialData: initialCatalog,
-  });
-  const eventListQuery = useQuery({
-    ...orpc.entities.events.list.queryOptions({
-      input: { entity: initialEntity.id },
-    }),
-    initialData: initialEventList,
-  });
-  const bottleListQuery = useQuery({
-    ...orpc.bottles.list.queryOptions({
-      input: {
-        distilleryView:
-          initialEntity.kind === "distillery" ? "other" : undefined,
-        entity: initialEntity.id,
-        limit: 4,
-        sort: "-tastings",
-      },
-    }),
-    enabled: ownsBottleSections,
-    initialData: initialBottleList,
-  });
-  const releaseListQuery = useQuery({
-    ...orpc.bottles.list.queryOptions({
-      input: {
-        distilleryView:
-          initialEntity.kind === "distillery" ? "releases" : undefined,
-        entity: initialEntity.id,
-        limit: 4,
-        sort: "-release",
-      },
-    }),
-    enabled: ownsBottleSections,
-    initialData: initialReleaseList,
-  });
-  const operatedListQuery = useQuery({
-    ...orpc.entities.list.queryOptions({
-      input: {
-        limit: 5,
-        owner: operatedOwnerId ?? undefined,
-        sort: "-bottles",
-      },
-    }),
-    enabled: Boolean(operatedOwnerId),
-  });
-  const siblingListQuery = useQuery({
-    ...orpc.entities.list.queryOptions({
-      input: {
-        kinds:
-          initialEntity.kind === "company"
-            ? undefined
-            : ["distillery", "bottler"],
-        limit: 5,
-        owner: siblingOwnerId ?? undefined,
-        sort: "-bottles",
-      },
-    }),
-    enabled: Boolean(siblingOwnerId),
-    initialData: initialSiblingList,
-  });
+  const entity = useEntityPage();
+  const catalogQuery = useQuery(
+    entityOverviewQueries.bottleCatalog(orpc, entity),
+  );
+  const eventListQuery = useQuery(entityOverviewQueries.events(orpc, entity));
+  const bottleListQuery = useQuery(
+    entityOverviewQueries.popularBottles(orpc, entity),
+  );
+  const releaseListQuery = useQuery(
+    entityOverviewQueries.releases(orpc, entity),
+  );
+  const operatedListQuery = useQuery(
+    entityOverviewQueries.operated(orpc, entity),
+  );
+  const siblingListQuery = useQuery(
+    entityOverviewQueries.siblings(orpc, entity),
+  );
 
-  if (entityQuery.error) {
-    return (
-      <SectionError
-        heading="Details are unavailable"
-        onRetry={() => void entityQuery.refetch()}
-      >
-        We could not load these details. Try again.
-      </SectionError>
-    );
-  }
-
-  const entity = entityQuery.data;
   return (
-    <div {...stylex.props(styles.overviewGrid)}>
-      <div {...stylex.props(styles.catalog)}>
-        <div {...stylex.props(styles.facts)}>
+    <EntityOverviewLayout
+      facts={
+        <>
           {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
-        </div>
-        <div {...stylex.props(styles.catalogSections)}>
+        </>
+      }
+      catalogSections={
+        <>
           <EntityOperatedOverview
             entity={entity}
             error={Boolean(operatedListQuery.error)}
@@ -171,11 +78,10 @@ export function EntityOverviewClient({
             pending={eventListQuery.isPending}
             retry={() => void eventListQuery.refetch()}
           />
-        </div>
-      </div>
-
-      <aside {...stylex.props(styles.details)}>
-        <div {...stylex.props(styles.media)}>
+        </>
+      }
+      media={
+        <>
           {entity.images?.length ? (
             <EntityImageGallery entity={entity} />
           ) : (
@@ -184,8 +90,10 @@ export function EntityOverviewClient({
               kind={entity.kind}
             />
           )}
-        </div>
-        <div {...stylex.props(styles.relationships)}>
+        </>
+      }
+      relationships={
+        <>
           <EntityMap entity={entity} />
           <EntityCatalogRelationships
             catalog={catalogQuery.data}
@@ -201,54 +109,8 @@ export function EntityOverviewClient({
             retry={() => void siblingListQuery.refetch()}
             siblingList={siblingListQuery.data}
           />
-        </div>
-      </aside>
-    </div>
+        </>
+      }
+    />
   );
 }
-
-const styles = stylex.create({
-  overviewGrid: {
-    display: "grid",
-    gridTemplateAreas: {
-      default: '"catalog details"',
-      [NARROW]: '"facts" "media" "catalogSections" "relationships"',
-    },
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr) 336px",
-      [NARROW]: "minmax(0, 1fr)",
-    },
-    columnGap: space.x12,
-  },
-  catalog: {
-    gridArea: "catalog",
-    minWidth: 0,
-    paddingTop: space.x4,
-    display: {
-      [NARROW]: "contents",
-    },
-  },
-  details: {
-    gridArea: "details",
-    minWidth: 0,
-    display: {
-      [NARROW]: "contents",
-    },
-  },
-  facts: {
-    gridArea: "facts",
-    minWidth: 0,
-  },
-  catalogSections: {
-    gridArea: "catalogSections",
-    minWidth: 0,
-  },
-  media: {
-    gridArea: "media",
-    minWidth: 0,
-  },
-  relationships: {
-    gridArea: "relationships",
-    minWidth: 0,
-  },
-});
