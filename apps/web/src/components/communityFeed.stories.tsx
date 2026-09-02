@@ -7,6 +7,14 @@ import { StoryCanvas } from "./storyFixtures.stylex";
 const meta = {
   title: "Components/Reviews & Tastings/Community Feed",
   component: CommunityFeed,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A mixed feed with reviews as the primary destination and separate bottle links. Review scores and tasting ratings are centered beside the bottle name, author, and details; italic previews sit below that header.",
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <StoryCanvas width="wide">
@@ -19,7 +27,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Mixed: Story = {
+export const Overview: Story = {
   args: {
     items: [
       {
@@ -31,9 +39,8 @@ export const Mixed: Story = {
         href: "/tastings/42",
         id: "tasting-42",
         imageUrl: BottleImage.src,
-        kind: "Member tasting",
         metadata: "Single malt · 16 years · 43% ABV",
-        rating: "Outstanding",
+        ratingBand: "outstanding",
         title: "Lagavulin 16-year-old",
       },
       {
@@ -43,9 +50,8 @@ export const Mixed: Story = {
         description: "Revisiting Lagavulin 16-year-old",
         href: "https://example.com/reviews/lagavulin-16",
         id: "critic-91",
-        kind: "Critic review",
         metadata: "Single malt · 16 years · 43% ABV",
-        rating: "90",
+        score: 90,
         title: "Lagavulin 16-year-old",
       },
     ],

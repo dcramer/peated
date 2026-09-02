@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { createBottleCheckMock } from "./mock-rpc/bottle-checks.mjs";
 import {
+  activityReview,
   addAnotherReleaseSourceBottle,
   adminUser,
   anotherReleaseSourceBottle,
@@ -941,7 +942,22 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcError(response, "Unexpected direct-Bottle Tasting list payload");
         return true;
       }
-      sendRpcResponse(response, emptyList);
+      sendRpcResponse(
+        response,
+        input?.limit === 20 && input?.bottle === undefined
+          ? {
+              ...emptyList,
+              results: [
+                buildTasting({
+                  notes:
+                    input?.filter === "friends"
+                      ? "A tasting from someone you follow."
+                      : "A tasting from the wider community.",
+                }),
+              ],
+            }
+          : emptyList,
+      );
       return true;
     case "tastings/photoIdentification":
       // E2E access-token suffixes select alternate mock photo-identification scenarios.
@@ -1368,7 +1384,12 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      sendRpcResponse(response, emptyList);
+      sendRpcResponse(
+        response,
+        input?.sort === "recent" && input?.bottle === undefined
+          ? { ...emptyList, results: [activityReview] }
+          : emptyList,
+      );
       return true;
     default:
       return false;

@@ -75,7 +75,8 @@ export function PageHeader({
   title,
 }: {
   actions?: ReactNode;
-  actionsPosition?: "end" | "start";
+  /** Inline actions stay beside the title and wrap to the right when space runs out. */
+  actionsPosition?: "end" | "start" | "inline";
   description?: ReactNode;
   eyebrow?: ReactNode;
   identity?: ReactNode;
@@ -90,6 +91,7 @@ export function PageHeader({
         {...stylex.props(
           styles.pageHeaderBody,
           actionsPosition === "start" && styles.startHeaderActions,
+          actionsPosition === "inline" && styles.inlineHeaderActions,
         )}
       >
         <div {...stylex.props(styles.pageHeaderCopy)}>
@@ -103,7 +105,12 @@ export function PageHeader({
           ) : null}
         </div>
         {actions || menu ? (
-          <div {...stylex.props(styles.headerActions)}>
+          <div
+            {...stylex.props(
+              styles.headerActions,
+              actionsPosition === "inline" && styles.inlineActions,
+            )}
+          >
             {actions}
             {menu}
           </div>
@@ -278,6 +285,16 @@ const styles = stylex.create({
     alignItems: "flex-start",
     flexDirection: "column",
     gap: space.x4,
+  },
+  inlineHeaderActions: {
+    flexWrap: "wrap",
+    [NARROW]: {
+      alignItems: "flex-end",
+      flexDirection: "row",
+    },
+  },
+  inlineActions: {
+    marginLeft: "auto",
   },
   eyebrow: {
     marginBottom: space.x2,

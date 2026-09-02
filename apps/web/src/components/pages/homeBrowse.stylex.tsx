@@ -105,7 +105,7 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <Link href="/community" {...stylex.props(styles.moreLink)}>
+          <Link href="/activity" {...stylex.props(styles.moreLink)}>
             View all <span aria-hidden="true">→</span>
           </Link>
         }
