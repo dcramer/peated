@@ -1,4 +1,5 @@
-# Agent Instructions
+Peated is a public record of whisky. Our goal is to document as much whisky as
+possible and make that data freely accessible to everyone.
 
 ## Core Principles
 
