@@ -12,6 +12,8 @@ import {
   Chip,
   FactList,
   PeatedId,
+  RailList,
+  RailListItem,
   SectionError,
   TextLink,
 } from "@peated/web/components";
@@ -21,14 +23,14 @@ import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.st
 import {
   PageColumns,
   PageHeader,
-  RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import { RailListSection } from "@peated/web/components/pages/railListSection.stylex";
 import useBottleRowActions from "@peated/web/hooks/useBottleRowActions";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { space } from "../../../../styles/tokens.stylex";
 
 type BottleList = Outputs["bottles"]["list"];
 type Series = Outputs["bottleSeries"]["details"];
@@ -247,37 +249,36 @@ function SeriesDistilleries({
     : distillers.slice(0, DISTILLERY_PREVIEW_LIMIT);
 
   return (
-    <RailSection
+    <RailListSection
+      action={
+        hasMore
+          ? {
+              ariaControls: "series-distilleries",
+              expanded,
+              label: expanded
+                ? "Show fewer distilleries"
+                : `View all ${distillers.length.toLocaleString("en-US")} distilleries`,
+              onClick: () => setExpanded((value) => !value),
+            }
+          : undefined
+      }
       heading={distillers.length === 1 ? "Distillery" : "Distilleries"}
     >
-      <ul id="series-distilleries" {...stylex.props(styles.distillerList)}>
-        {visibleDistillers.map((distiller) => (
-          <li key={distiller.id} {...stylex.props(styles.distillerRow)}>
-            <TextLink href={getEntityUrl(distiller)} size="inherit">
-              {distiller.name}
-            </TextLink>
-            <span {...stylex.props(styles.distillerCount)}>
-              {distiller.numBottles.toLocaleString("en-US")}{" "}
-              {distiller.numBottles === 1 ? "bottle" : "bottles"}
-            </span>
-          </li>
-        ))}
-      </ul>
-      {hasMore ? (
-        <div {...stylex.props(styles.distillerMore)}>
-          <Button
-            align="start"
-            aria-controls="series-distilleries"
-            aria-expanded={expanded}
-            onClick={() => setExpanded((value) => !value)}
-            size="sm"
-            variant="text"
-          >
-            {expanded ? "Show less" : "View more"}
-          </Button>
-        </div>
-      ) : null}
-    </RailSection>
+      <div id="series-distilleries">
+        <RailList ariaLabel="Series distilleries">
+          {visibleDistillers.map((distiller) => (
+            <RailListItem
+              end={`${distiller.numBottles.toLocaleString("en-US")} ${
+                distiller.numBottles === 1 ? "bottle" : "bottles"
+              }`}
+              href={getEntityUrl(distiller)}
+              key={distiller.id}
+              title={distiller.name}
+            />
+          ))}
+        </RailList>
+      </div>
+    </RailListSection>
   );
 }
 
@@ -302,32 +303,5 @@ const styles = stylex.create({
   bottles: {
     minWidth: 0,
     paddingTop: space.x4,
-  },
-  distillerList: {
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-  },
-  distillerRow: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x3,
-    paddingTop: "9px",
-    paddingBottom: "9px",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
-  distillerCount: {
-    flexShrink: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
-  },
-  distillerMore: {
-    marginTop: space.x1,
   },
 });

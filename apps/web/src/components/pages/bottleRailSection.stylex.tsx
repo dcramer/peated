@@ -1,13 +1,7 @@
-import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import {
-  AppLink,
-  BottleVisual,
-  RailList,
-  RailListItem,
-} from "@peated/web/components";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { BottleVisual, RailList, RailListItem } from "@peated/web/components";
+import { RailListSection } from "./railListSection.stylex";
 
 export type BottleRailItem = {
   end?: ReactNode;
@@ -34,9 +28,13 @@ export function BottleRailSection({
   moreLabel?: string;
 }) {
   return (
-    <section {...stylex.props(styles.section)}>
-      <h2 {...stylex.props(styles.heading)}>{heading}</h2>
-      {intro ? <p {...stylex.props(styles.intro)}>{intro}</p> : null}
+    <RailListSection
+      action={
+        moreHref && moreLabel ? { href: moreHref, label: moreLabel } : undefined
+      }
+      heading={heading}
+      intro={intro}
+    >
       {items.length ? (
         <RailList ariaLabel={heading}>
           {items.map((item) => (
@@ -52,62 +50,6 @@ export function BottleRailSection({
         </RailList>
       ) : null}
       {children}
-      {moreHref && moreLabel ? (
-        <AppLink href={moreHref} {...stylex.props(styles.moreLink)}>
-          {moreLabel} →
-        </AppLink>
-      ) : null}
-    </section>
+    </RailListSection>
   );
 }
-
-const styles = stylex.create({
-  section: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x2,
-  },
-  heading: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
-  intro: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
-  },
-  moreLink: {
-    display: "block",
-    boxSizing: "border-box",
-    width: "100%",
-    marginTop: "6px",
-    paddingTop: space.x3,
-    paddingRight: 0,
-    paddingBottom: space.x3,
-    paddingLeft: 0,
-    borderRadius: 0,
-    outline: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-      ":active": colors.surface,
-    },
-    color: colors.accentDeep,
-    fontFamily: fonts.display,
-    fontSize: "13px",
-    fontWeight: 700,
-    lineHeight: 1.3,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-});

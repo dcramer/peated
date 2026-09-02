@@ -52,7 +52,7 @@ The page uses the shared page header, Bottle list, sort control, cursor pager, e
 
 Series identity and counts sit above the Bottle list instead of in a side rail. Signed-in members also see the number of Series Bottles in their Library and can filter the list to Bottles in or outside their Library. These counts use the complete filtered result, not the current page. Signed-out visitors see only public facts.
 
-The side rail shows Distilleries derived from every active Bottle in the Series. Each linked Distillery includes its Bottle count. Long lists show five Distilleries until the person chooses “View more.” No new Distillery filter or Series endpoint is added.
+The side rail shows Distilleries derived from every active Bottle in the Series. Each linked Distillery includes its Bottle count. Long lists show five Distilleries until the person chooses to view all of them. The breakdown uses the same section heading, compact rows, and quiet footer action as Bottle-side collections. No new Distillery filter or Series endpoint is added.
 
 The shared Bottle list omits its ratings block when a Bottle has neither tasting ratings nor a published review score. Long page titles use a smaller narrow-screen size and may wrap long words so they do not leave the viewport.
 
