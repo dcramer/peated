@@ -31,3 +31,7 @@
 - [x] 6.2 Move Series identity and counts above the Bottle list, then add the Library count and filters.
 - [x] 6.3 Omit empty ratings from shared Bottle lists and keep long page titles inside narrow screens.
 - [x] 6.4 Run focused tests, typechecks, lint, formatting, and desktop and mobile UI checks.
+
+## 7. Series overview facts
+
+- [x] 7.1 Present Series counts with the compact overview facts used on Bottle and Entity pages, then verify desktop and mobile layouts.

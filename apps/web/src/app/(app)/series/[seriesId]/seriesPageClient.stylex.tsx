@@ -9,7 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
   Chip,
-  KeyFacts,
+  FactList,
   PeatedId,
   SectionError,
   TextLink,
@@ -139,7 +139,7 @@ export function SeriesPageClient({
         }
       />
       <PageColumns>
-        <KeyFacts facts={facts} />
+        <FactList facts={facts} layout="grid" />
         {initialLibraryCount !== null && initialSeries.numReleases > 0 ? (
           <div
             aria-label="Library filter"
