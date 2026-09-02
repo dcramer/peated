@@ -10,7 +10,7 @@ export async function GET() {
     { url: "/about" },
     { url: "/about/tasting-wheel" },
     { url: "/bottlers/4263/codes" },
-    { url: "/community" },
+    { url: "/activity" },
     { url: "/events" },
   ]);
 

@@ -36,7 +36,10 @@ export type ItemListItemProps = {
   id?: string;
 };
 
-/** Owns the divider for one custom row inside an ItemList. */
+/**
+ * Owns the divider for a custom row. Prefer ItemRow when its slots fit;
+ * custom linked rows must compose linkedRowStyles for their container and link.
+ */
 export function ItemListItem({ children, id }: ItemListItemProps) {
   return (
     <li id={id} {...stylex.props(styles.row)}>

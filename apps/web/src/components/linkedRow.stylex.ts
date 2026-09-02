@@ -7,7 +7,11 @@ import {
   zIndices,
 } from "../styles/tokens.stylex";
 
-/** Shared interaction geometry for rows with one primary destination. */
+/**
+ * Owns the hit area, title interaction, and focus treatment for linked rows.
+ * Compose primaryLink after local typography so every row gets the same states.
+ * Keep secondary controls above the hit area with nestedAction or TextLink.
+ */
 export const linkedRowStyles = stylex.create({
   container: {
     position: "relative",
@@ -38,6 +42,20 @@ export const linkedRowStyles = stylex.create({
     },
   },
   primaryLink: {
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
+    },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
     outline: "none",
     boxShadow: {
       default: "none",

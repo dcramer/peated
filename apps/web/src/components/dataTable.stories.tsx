@@ -125,9 +125,10 @@ export const InteractionStates: Story = {
   ),
   parameters: {
     pseudo: {
-      active: ['tr[data-record-key="pressed"]'],
+      active: ['tr[data-record-key="pressed"]', 'a[href="#pressed"]'],
+      focusVisible: ['a[href="#focused"]'],
       focusWithin: ['tr[data-record-key="focused"]'],
-      hover: ['tr[data-record-key="hovered"]'],
+      hover: ['tr[data-record-key="hovered"]', 'a[href="#hovered"]'],
     },
   },
 };
