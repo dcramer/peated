@@ -9,7 +9,7 @@ import { createRoot } from "react-dom/client";
 import { expect, test } from "vitest";
 import { FlavorWheel } from "./flavorWheel.stylex";
 
-test("selects flavor families with the keyboard and pointer", async () => {
+test("previews families on hover and focus, and explores only on activation", async () => {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
@@ -29,26 +29,43 @@ test("selects flavor families with the keyboard and pointer", async () => {
     const smoke = container.querySelector(
       '[role="button"][aria-label^="Smoke,"]',
     )!;
-    expect(smoke.getAttribute("aria-pressed")).toBe("true");
+    const center = container.querySelector('[aria-hidden="true"]')!;
+    expect(center.textContent).toBe("Smoke83%brineash");
+    await act(() =>
+      fruit.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })),
+    );
+    expect(center.textContent).toBe("Fruit79%applelemon zest");
+    expect(explored).toEqual([]);
     await act(() =>
       fruit.dispatchEvent(
+        new MouseEvent("mouseout", {
+          bubbles: true,
+          relatedTarget: document.body,
+        }),
+      ),
+    );
+    expect(center.textContent).toBe("Fruit79%applelemon zest");
+    await act(() =>
+      fruit.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+    );
+    expect(explored).toEqual(["fruit"]);
+    await act(() =>
+      smoke.dispatchEvent(new FocusEvent("focusin", { bubbles: true })),
+    );
+    expect(center.textContent).toBe("Smoke83%brineash");
+    expect(explored).toEqual(["fruit"]);
+    await act(() =>
+      smoke.dispatchEvent(
         new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
       ),
     );
-    expect(fruit.getAttribute("aria-pressed")).toBe("true");
-    expect(smoke.getAttribute("aria-pressed")).toBe("false");
     await act(() =>
-      smoke.dispatchEvent(new MouseEvent("click", { bubbles: true })),
-    );
-    expect(smoke.getAttribute("aria-pressed")).toBe("true");
-    await act(() =>
-      fruit.dispatchEvent(
+      smoke.dispatchEvent(
         new KeyboardEvent("keydown", { key: " ", bubbles: true }),
       ),
     );
-    expect(fruit.getAttribute("aria-pressed")).toBe("true");
-    expect(fruit.getAttribute("aria-haspopup")).toBe("dialog");
-    expect(explored).toEqual(["fruit", "smoke", "fruit"]);
+    expect(smoke.getAttribute("aria-haspopup")).toBe("dialog");
+    expect(explored).toEqual(["fruit", "smoke", "smoke"]);
     expect(container.querySelector("button")).toBeNull();
   } finally {
     act(() => root.unmount());

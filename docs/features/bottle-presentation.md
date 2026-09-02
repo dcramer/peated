@@ -148,8 +148,9 @@ for signed-in authors. Do not combine sibling releases or use summed tag counts
 as family counts.
 
 Distillery and region wheels instead count each active Bottle once per family.
-Both show commonality, not intensity. Keep family positions fixed and show the
-selected family's leading notes in the center. Clicking a family opens the
+Both show commonality, not intensity. Keep family positions fixed. Hovering or
+focusing a family previews its share and leading notes in the center, keeping
+the last preview when the pointer or focus leaves. Clicking a family opens the
 shared tasting-wheel panel with note descriptions and matching bottles. Omit
 instructional text, raw bottle counts, and contribution CTAs. Any recognized
 public notes produce a chart; none produces a short empty message. The
