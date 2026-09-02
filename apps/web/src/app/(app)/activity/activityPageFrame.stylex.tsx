@@ -22,7 +22,7 @@ export function ActivityPageFrame({ children }: { children: ReactNode }) {
     <div {...stylex.props(styles.page)}>
       <TabbedPage
         currentHref={pathname}
-        header={<PageHeader eyebrow="Community" title="Activity" />}
+        header={<PageHeader title="Activity" />}
         tabs={tabs}
         tabsLabel="Activity feeds"
       >

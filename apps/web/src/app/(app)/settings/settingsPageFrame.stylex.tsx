@@ -24,7 +24,6 @@ export function SettingsPageFrame({ children }: { children: ReactNode }) {
         header={
           <PageHeader
             description="Manage how your account appears and how you sign in."
-            eyebrow="Your account"
             title="Settings"
           />
         }

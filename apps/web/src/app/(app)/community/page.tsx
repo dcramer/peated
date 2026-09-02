@@ -38,7 +38,6 @@ export default async function CommunityPage() {
           </ButtonLink>
         }
         description="Member tasting notes and published critic reviews, together by date."
-        eyebrow="Tastings and reviews"
         title="Activity"
       />
       <PageColumns>

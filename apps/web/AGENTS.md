@@ -3,6 +3,9 @@
 ## Components
 
 - Read `../../DESIGN.md` before visual or shared-component changes.
+- Never add decorative eyebrow/kicker labels above headings (for example,
+  "Reference · 9 groups" or "Your account"). Use plain headings and put useful
+  facts in the content. Do not add this pattern to components or stories.
 - Search `src/components/` before adding components. Query `peated-storybook` MCP
   when running; use documented props and states.
 - Keep stories beside components; page-sized, render-only components go in `pages/`.

@@ -46,7 +46,6 @@ export function FriendsPageClient({
     <div>
       <PageHeader
         description="The people whose tasting records you follow."
-        eyebrow="Your record"
         title="Friends"
       />
       <div {...stylex.props(styles.search)}>

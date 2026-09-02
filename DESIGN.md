@@ -155,6 +155,10 @@ product behavior and data rules.
 Peated is a whisky database first. It is a reference work with community data,
 not a social feed with reference data attached.
 
+- Never add decorative eyebrow or kicker labels above headings. Labels such as
+  "Reference · 9 groups", "Whisky database", or "Your account" are not part of
+  this design system. Use plain headings; useful counts and facts belong in the
+  content, not a decorative pre-title line.
 - Prefer useful density over decorative space.
 - Let real data provide character through ratings, distributions, counts, and
   identifiers.

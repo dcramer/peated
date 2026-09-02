@@ -21,7 +21,7 @@ export function NotificationPageFrame({ children }: { children: ReactNode }) {
     <div {...stylex.props(styles.page)}>
       <TabbedPage
         currentHref={pathname}
-        header={<PageHeader eyebrow="Your account" title="Notifications" />}
+        header={<PageHeader title="Notifications" />}
         tabs={tabs}
         tabsLabel="Notification filters"
       >

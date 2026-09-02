@@ -33,7 +33,6 @@ export default function TastingWheelPage() {
       <AboutPage
         currentHref="/about/tasting-wheel"
         description="Start with 1 of 9 groups. Then choose a more specific smell or flavor. Every example below appears in Peated's tasting form."
-        eyebrow="Reference · 9 groups"
         rail={
           <>
             <RailSection heading="Sources">

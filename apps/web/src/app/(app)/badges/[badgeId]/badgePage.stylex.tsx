@@ -30,7 +30,6 @@ export function BadgePage({
     <div {...stylex.props(styles.page)}>
       <PageHeader
         description={`Up to level ${badge.maxLevel.toLocaleString("en-US")}`}
-        eyebrow="Community badge"
         identity={<BadgeImage badge={badge} size={72} />}
         title={badge.name}
       />

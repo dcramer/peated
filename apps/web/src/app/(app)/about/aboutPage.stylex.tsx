@@ -25,23 +25,19 @@ export function AboutPage({
   children,
   currentHref,
   description,
-  eyebrow,
   rail,
   title,
 }: {
   children: ReactNode;
   currentHref: string;
   description: ReactNode;
-  eyebrow: ReactNode;
   rail?: ReactNode;
   title: ReactNode;
 }) {
   return (
     <TabbedPage
       currentHref={currentHref}
-      header={
-        <PageHeader description={description} eyebrow={eyebrow} title={title} />
-      }
+      header={<PageHeader description={description} title={title} />}
       tabs={aboutTabs}
       tabsLabel="About Peated"
     >
