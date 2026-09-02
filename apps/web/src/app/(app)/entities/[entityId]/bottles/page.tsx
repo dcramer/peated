@@ -10,8 +10,12 @@ import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHre
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntityUrl } from "@peated/web/lib/urls";
+import { redirect } from "next/navigation";
 
-import { getDistilleryBottleView } from "../entityPageData";
+import {
+  entityHasBottleCatalog,
+  getDistilleryBottleView,
+} from "../entityPageData";
 import { EntityBottleListClient } from "./entityBottleListClient.stylex";
 
 export default async function EntityBottlesPage(props: {
@@ -20,8 +24,12 @@ export default async function EntityBottlesPage(props: {
 }) {
   const { entityId } = await props.params;
   const searchParams = await props.searchParams;
-  const { client } = await getPublicPageServerClient();
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
+  if (!entityHasBottleCatalog(entity) && entity.totalBottles === 0) {
+    redirect(getEntityUrl(entity));
+  }
+
+  const { client } = await getPublicPageServerClient();
   const createBottleHref = getEntityBottleCreateHref(entity);
   let distilleryView = getDistilleryBottleView(entity, searchParams.view);
   let queryParams = normalizeBottleCatalogQueryParams(
