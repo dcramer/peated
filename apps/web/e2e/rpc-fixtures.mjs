@@ -262,6 +262,21 @@ export const existingBottle = {
   group: buildBottleGroup({ bottle: existingBottleWithoutGroup }),
 };
 
+export const createdMemberReview = {
+  id: 9402,
+  bottleId: existingBottle.id,
+  score: 80,
+  tags: ["smoke"],
+  color: 8,
+  notes: "Coastal and waxy.",
+  servingStyle: "neat",
+  friends: [moderatorUser],
+  imageUrl: null,
+  createdBy: testUser,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+};
+
 export const exactMergeOtherBottle = {
   ...buildBottle({
     id: exactMergeOtherBottleId,

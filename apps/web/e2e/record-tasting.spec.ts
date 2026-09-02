@@ -3,6 +3,7 @@ import { z } from "zod";
 import { expect, type Page, type Request, test } from "./test";
 
 import {
+  createdMemberReview,
   createdTastingId,
   existingBottle,
   failingTastingNotes,
@@ -97,8 +98,14 @@ test.describe("log tasting", () => {
       friends: [moderatorUser.id],
     });
     await expect(page).toHaveURL(
-      new RegExp(`/bottles/${existingBottle.id}(?:-|$)`),
+      new RegExp(`/reviews/${createdMemberReview.id}$`),
     );
+    const reviewHeading = page.getByRole("heading", {
+      name: existingBottle.fullName,
+    });
+    await expect(reviewHeading).toBeVisible();
+    await expect(page.getByText(createdMemberReview.notes)).toBeVisible();
+    await snapshot("Review detail / Saved review", { ready: reviewHeading });
   });
 
   test("logs a tasting for a fixture bottle", async ({
