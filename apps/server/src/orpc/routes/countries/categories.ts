@@ -1,14 +1,9 @@
 import { db } from "@peated/server/db";
-import {
-  bottleTombstones,
-  bottles,
-  bottlesToDistillers,
-  countries,
-  entities,
-} from "@peated/server/db/schema";
+import { countries } from "@peated/server/db/schema";
+import { listBottleCategoriesByProductionLocation } from "@peated/server/lib/bottleProductionLocation";
 import { procedure } from "@peated/server/orpc";
 import { CategoryEnum } from "@peated/server/schemas";
-import { and, asc, eq, isNotNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -57,32 +52,9 @@ export default procedure
       countryId = result.id;
     }
 
-    const rows = await db
-      .select({
-        category: bottles.category,
-        count: sql<string>`COUNT(*)`,
-      })
-      .from(bottles)
-      .where(
-        and(
-          isNotNull(bottles.groupId),
-          sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-          sql`EXISTS(
-            SELECT FROM ${bottlesToDistillers}
-            INNER JOIN ${entities}
-              ON ${bottlesToDistillers.distillerId} = ${entities.id}
-            WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-              AND ${entities.countryId} = ${countryId}
-          )`,
-        ),
-      )
-      .groupBy(bottles.category)
-      .orderBy(asc(bottles.category));
-
-    const results = rows.map(({ count, category }) => ({
-      count: Number(count),
-      category,
-    }));
+    const results = await listBottleCategoriesByProductionLocation({
+      countryId,
+    });
 
     return {
       results,

@@ -1,23 +1,16 @@
 import { ButtonLink, ExpandableDescription } from "@peated/web/components";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { cache, type ReactNode } from "react";
+import { getCountryPage } from "@peated/web/lib/locationPage.server";
+import type { ReactNode } from "react";
 
+import { getCountryLocationTabs } from "../../locationPage";
 import { LocationPageFrame } from "../../locationPageFrame.stylex";
-
-const getCountry = cache(async (countrySlug: string) => {
-  const { client } = await getPublicPageServerClient();
-  return await resolveOrNotFound(
-    client.countries.details({ country: countrySlug }),
-  );
-});
 
 export async function generateMetadata(props: {
   params: Promise<{ countrySlug: string }>;
 }) {
   const { countrySlug } = await props.params;
-  const country = await getCountry(countrySlug);
+  const country = await getCountryPage(countrySlug);
 
   return {
     title: `Whisky from ${country.name}`,
@@ -31,7 +24,7 @@ export default async function CountryLayout(props: {
 }) {
   const { countrySlug } = await props.params;
   const [country, user] = await Promise.all([
-    getCountry(countrySlug),
+    getCountryPage(countrySlug),
     getCurrentUser(),
   ]);
   const rootHref = `/locations/${country.slug}`;
@@ -49,22 +42,17 @@ export default async function CountryLayout(props: {
           </ButtonLink>
         ) : undefined
       }
-      country={undefined}
       description={
         country.description ? (
           <ExpandableDescription content={country.description} noLinks />
         ) : undefined
       }
-      name={country.name}
-      tabs={[
-        {
-          count: country.totalDistillers,
-          href: rootHref,
-          label: "Distillers",
-        },
-        { href: `${rootHref}/regions`, label: "Regions" },
-      ]}
-      visual={{ kind: "country", slug: country.slug }}
+      location={{ kind: "country", name: country.name }}
+      tabs={getCountryLocationTabs({
+        rootHref,
+        totalBottles: country.totalBottles,
+        totalDistillers: country.totalDistillers,
+      })}
     >
       {props.children}
     </LocationPageFrame>

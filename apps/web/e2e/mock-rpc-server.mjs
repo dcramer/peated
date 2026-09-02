@@ -301,6 +301,29 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, testRegion);
       return true;
+    case "countries/categories":
+      if (input?.country !== testRegion.country.slug) {
+        sendRpcError(response, "Unexpected country categories payload");
+        return true;
+      }
+      sendRpcResponse(response, {
+        results: [{ category: "single_malt", count: 1 }],
+        totalCount: 1,
+      });
+      return true;
+    case "regions/categories":
+      if (
+        input?.country !== testRegion.country.slug ||
+        input?.region !== testRegion.slug
+      ) {
+        sendRpcError(response, "Unexpected region categories payload");
+        return true;
+      }
+      sendRpcResponse(response, {
+        results: [{ category: "single_malt", count: 1 }],
+        totalCount: 1,
+      });
+      return true;
     case "bottlers/list":
     case "companies/list":
     case "countries/list":
@@ -742,6 +765,15 @@ async function handleRpcRequest({ request, response, url }) {
           results: [existingBottle, exactMergeOtherBottle],
           rel: { nextCursor: null, prevCursor: null },
         });
+        return true;
+      }
+      if (
+        input?.country === testRegion.country.slug &&
+        (input?.region === undefined || input.region === testRegion.slug) &&
+        input?.limit === 5 &&
+        input?.sort === "-tastings"
+      ) {
+        sendRpcResponse(response, buildBottleListResponse([existingBottle]));
         return true;
       }
       if (

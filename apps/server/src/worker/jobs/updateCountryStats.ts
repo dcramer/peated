@@ -6,6 +6,7 @@ import {
   countries,
   entities,
 } from "@peated/server/db/schema";
+import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -40,18 +41,7 @@ export default async function updateCountryStats(input: JobPayload) {
       totalBottles: sql<string>`(
         SELECT COUNT(*)
         FROM ${bottles}
-        WHERE EXISTS (
-          SELECT FROM ${entities}
-          WHERE (
-            ${bottles.brandId} = ${entities.id}
-            OR ${bottles.bottlerId} = ${entities.id}
-            OR EXISTS(
-                SELECT FROM ${bottlesToDistillers}
-                WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                AND ${bottlesToDistillers.distillerId} = ${entities.id}
-            )
-          ) AND ${entities.countryId} = ${countries.id}
-        )
+        WHERE ${bottleProducedIn({ countryId: countries.id })}
         AND ${bottles.groupId} IS NOT NULL
         AND NOT EXISTS (
           SELECT 1

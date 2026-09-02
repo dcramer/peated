@@ -1238,6 +1238,73 @@ describe("GET /bottles", () => {
     expect(results.length).toBe(0);
   });
 
+  test("filters production location through distilleries", async ({
+    fixtures,
+  }) => {
+    const country = await fixtures.Country({ slug: "scotland" });
+    const otherCountry = await fixtures.Country({ slug: "japan" });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      slug: "islay",
+    });
+    const otherRegion = await fixtures.Region({
+      countryId: otherCountry.id,
+      slug: "islay",
+    });
+    const brand = await fixtures.Entity({ countryId: country.id });
+    const distiller = await fixtures.Entity({
+      countryId: country.id,
+      regionId: region.id,
+      kind: "distillery",
+    });
+    const otherDistiller = await fixtures.Entity({
+      countryId: otherCountry.id,
+      regionId: otherRegion.id,
+      kind: "distillery",
+    });
+    const localBottle = await fixtures.Bottle({
+      name: "Local bottle",
+      distillerIds: [distiller.id],
+    });
+    await fixtures.Bottle({
+      name: "Local brand only",
+      brandId: brand.id,
+      distillerIds: [otherDistiller.id],
+    });
+
+    const countryResults = await routerClient.bottles.list({
+      country: country.slug,
+    });
+    const regionResults = await routerClient.bottles.list({
+      country: country.slug,
+      region: region.slug,
+    });
+
+    expect(countryResults.results.map(({ id }) => id)).toEqual([
+      localBottle.id,
+    ]);
+    expect(regionResults.results.map(({ id }) => id)).toEqual([localBottle.id]);
+  });
+
+  test("requires and validates a region country", async ({ fixtures }) => {
+    const country = await fixtures.Country({ slug: "scotland" });
+    const otherCountry = await fixtures.Country({ slug: "japan" });
+    const region = await fixtures.Region({
+      countryId: otherCountry.id,
+      slug: "islay",
+    });
+
+    await expect(
+      routerClient.bottles.list({ region: region.slug }),
+    ).rejects.toThrow("Region requires country.");
+    await expect(
+      routerClient.bottles.list({
+        country: country.slug,
+        region: region.id.toString(),
+      }),
+    ).rejects.toThrow("Invalid region.");
+  });
+
   test("validates input parameters", async () => {
     const err = await waitError(
       routerClient.bottles.list({

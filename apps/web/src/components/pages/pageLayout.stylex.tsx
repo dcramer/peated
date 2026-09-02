@@ -29,6 +29,7 @@ export function PageFrame({
   );
 }
 
+/** Places page content beside an optional side column. */
 export function PageColumns({
   children,
   rail,
@@ -104,6 +105,7 @@ export function PageHeader({
   );
 }
 
+/** Keeps a detail page header and its tab content aligned. */
 export function TabbedPage({
   children,
   currentHref,

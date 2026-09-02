@@ -9,6 +9,7 @@
 - Put component usage, visible states, and examples in Storybook. Use concise component JSDoc so Storybook Docs and MCP expose the same guidance.
 - Start with one Overview story. Add another story only for a meaningful behavior, async state, permission boundary, error, or responsive composition.
 - Keep complete routes out of Storybook. Review them in the application.
+- Use the Catalog Detail Page story when building a catalog detail route.
 - Keep API queries, auth state, mutations, server actions, and navigation out of reusable components. Put route-only behavior beside the route and shared behavior in a narrowly named feature folder.
 - Do not add catch-all component folders such as `product/`.
 - Use StyleX for web styling. Do not add Tailwind utilities or configuration.

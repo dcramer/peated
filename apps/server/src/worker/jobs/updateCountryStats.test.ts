@@ -3,9 +3,7 @@ import { bottleTombstones, countries } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateCountryStats from "./updateCountryStats";
 
-test("counts active independently complete Bottles once", async ({
-  fixtures,
-}) => {
+test("counts active Bottles by producing distillery", async ({ fixtures }) => {
   const country1 = await fixtures.Country({ name: "United States" });
   const country2 = await fixtures.Country({ name: "Canada" });
 
@@ -41,7 +39,8 @@ test("counts active independently complete Bottles once", async ({
     .from(countries)
     .where(eq(countries.id, country1.id));
   expect(newCountry1).toBeDefined();
-  expect(newCountry1.totalBottles).toEqual(3);
+  expect(newCountry1.totalBottles).toEqual(1);
+  expect(newCountry1.totalDistillers).toEqual(2);
 });
 
 test.each([

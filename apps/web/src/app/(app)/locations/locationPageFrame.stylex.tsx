@@ -6,7 +6,10 @@ import type { ReactNode } from "react";
 
 import { PageTabs, TextLink, type PageTabItem } from "@peated/web/components";
 import CountryMapIcon from "@peated/web/components/countryMapIcon";
-import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
+import {
+  PageHeader,
+  TabbedPage,
+} from "@peated/web/components/pages/pageLayout.stylex";
 import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
 import { colors, space } from "../../../styles/tokens.stylex";
 
@@ -34,57 +37,54 @@ export function LocationsIndexFrame({ children }: { children: ReactNode }) {
 export function LocationPageFrame({
   actions,
   children,
-  country,
   description,
-  name,
+  location,
   tabs,
-  visual,
 }: {
   actions?: ReactNode;
   children: ReactNode;
-  country?: { href: string; name: string };
   description?: ReactNode;
-  name: string;
+  location:
+    | { kind: "country"; name: string }
+    | {
+        country: { href: string; name: string };
+        kind: "region";
+        name: string;
+      };
   tabs: readonly [PageTabItem, ...PageTabItem[]];
-  visual?: { kind: "country" | "state"; slug: string };
 }) {
   const pathname = usePathname();
+  const country = location.kind === "region" ? location.country : undefined;
 
   return (
-    <div>
-      <PageHeader
-        actions={actions}
-        description={description}
-        eyebrow={country ? "Whisky region" : "Whisky country"}
-        parent={
-          country ? (
-            <TextLink href={country.href} size="inherit">
-              {country.name}
-            </TextLink>
-          ) : undefined
-        }
-        title={name}
-      />
-      <div {...stylex.props(styles.tabs)}>
-        <PageTabs
-          ariaLabel={`${name} sections`}
-          currentHref={pathname}
-          items={tabs}
+    <TabbedPage
+      currentHref={pathname}
+      header={
+        <PageHeader
+          actions={actions}
+          description={description}
+          eyebrow={
+            location.kind === "region" ? "Whisky region" : "Whisky country"
+          }
+          parent={
+            country ? (
+              <TextLink href={country.href} size="inherit">
+                {country.name}
+              </TextLink>
+            ) : undefined
+          }
+          title={location.name}
         />
-      </div>
-      <div {...stylex.props(styles.overviewGrid)}>
-        <div {...stylex.props(styles.content)}>{children}</div>
-        {visual ? (
-          <aside {...stylex.props(styles.details)}>
-            <LocationVisual visual={visual} />
-          </aside>
-        ) : null}
-      </div>
-    </div>
+      }
+      tabs={tabs}
+      tabsLabel={`${location.name} sections`}
+    >
+      {children}
+    </TabbedPage>
   );
 }
 
-function LocationVisual({
+export function LocationVisual({
   visual,
 }: {
   visual: { kind: "country" | "state"; slug: string };
@@ -105,35 +105,11 @@ function LocationVisual({
   );
 }
 
-const NARROW = "@media (max-width: 759px)";
-
 const styles = stylex.create({
   indexTabs: { marginTop: space.x6 },
-  tabs: { marginTop: 0 },
-  overviewGrid: {
-    display: "grid",
-    gridTemplateAreas: {
-      default: '"content details"',
-      [NARROW]: '"details" "content"',
-    },
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr) 336px",
-      [NARROW]: "minmax(0, 1fr)",
-    },
-    columnGap: space.x12,
-  },
-  content: {
-    gridArea: "content",
-    minWidth: 0,
-    paddingTop: space.x4,
-  },
   indexContent: {
     minWidth: 0,
     marginTop: space.x6,
-  },
-  details: {
-    gridArea: "details",
-    minWidth: 0,
   },
   visual: {
     display: "flex",
@@ -141,7 +117,6 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-    marginTop: space.x4,
     padding: space.x6,
     borderRadius: "3px",
     backgroundColor: colors.inset,
