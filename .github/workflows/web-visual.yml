@@ -65,6 +65,10 @@ jobs:
           VISUAL_SOURCE_SHA: ${{ github.sha }}
           VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate
         run: pnpm test:e2e
+      - name: Capture Storybook stories
+        env:
+          VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate
+        run: pnpm storybook:screenshots
       # Every main commit can become a pull request base, so each gets an exact artifact.
       - name: Store baseline by source revision
         if: github.event_name != 'pull_request'

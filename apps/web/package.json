@@ -8,6 +8,7 @@
     "start": "next start",
     "storybook": "storybook dev -p 6006 --no-open",
     "storybook:build": "storybook build",
+    "storybook:screenshots": "playwright test --config playwright.storybook.config.ts",
     "lint": "cd ../.. && oxlint apps/web",
     "test": "vitest run",
     "test:ci": "vitest run --reporter=junit --reporter=default --outputFile=junit.xml",
@@ -84,6 +85,7 @@
     "storybook": "10.5.10",
     "storybook-addon-pseudo-states": "10.5.10",
     "typescript": "catalog:",
+    "vite-plugin-svgr": "5.2.0",
     "vitest": "catalog:"
   },
   "volta": {

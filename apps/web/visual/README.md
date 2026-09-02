@@ -9,6 +9,10 @@ Snapshots are checkpoints inside behavioral E2E tests. There is no separate
 visual scenario registry or visual test suite. Do not add a test whose only
 outcome is a screenshot.
 
+Storybook stories are the exception. The screenshot workflow captures each
+story in its isolated view after the E2E suite finishes. Storybook owns these
+component states, so the capture does not add another scenario registry.
+
 ## Capture a snapshot
 
 Import `test` and `expect` from the shared E2E fixture:
@@ -46,14 +50,24 @@ state. Use a number when workflow order matters.
 
 ## Run locally
 
-Run the normal E2E suite:
+Run the normal E2E suite, then capture the Storybook stories:
 
 ```sh
 pnpm test:e2e
+pnpm storybook:screenshots
 ```
 
-Images and `manifest.json` go to `apps/web/.playwright/visual/`. The directory
-is reset at the start of each Playwright run.
+Images and `manifest.json` go to `apps/web/.playwright/visual/`. The E2E suite
+resets the directory, and the Storybook command adds its screenshots.
+
+Storybook screenshot paths follow the story hierarchy. The story name is a
+Frameshift variant, so related states stay together. For example, the
+`Components/Layout/Workflow Screen` stories write:
+
+```text
+storybook/components/layout/workflow-screen__overview.png
+storybook/components/layout/workflow-screen__saving.png
+```
 
 ## Frameshift flow
 
@@ -65,7 +79,7 @@ merge commit's first parent and compares it with the candidate snapshots:
 ```text
 main commit --run E2E--> revision-keyed baseline artifact
                                       |
-pull request --run E2E----------------+--> Frameshift report
+pull request --run E2E + Storybook----+--> Frameshift report
 ```
 
 Before comparison, CI checks the source SHA, capture contract, platform,
