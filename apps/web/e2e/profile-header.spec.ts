@@ -3,27 +3,28 @@ import { expect, test } from "./test";
 import { adminUser, testAccessToken, testUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test("refreshes the profile after an administrator changes the moderator role", async ({
+test("updates the profile actions after an administrator changes the moderator role", async ({
   context,
   page,
 }, testInfo) => {
   await signIn(context, {
-    accessToken: `${testAccessToken}-profile-role-update-${testInfo.project.name}`,
+    accessToken: `${testAccessToken}-profile-role-update-${testInfo.project.name}-${testInfo.retry}`,
     user: adminUser,
   });
 
-  await page.goto(`/users/${testUser.username}/activity`, {
-    waitUntil: "commit",
+  await page.goto(`/users/${testUser.username}/activity`);
+  const profileActions = page.getByRole("button", {
+    name: `Actions for ${testUser.username}`,
   });
-  await page
-    .getByRole("button", { name: `Actions for ${testUser.username}` })
-    .click();
+  await profileActions.click();
   await page.getByRole("menuitem", { name: "Add moderator role" }).click();
 
-  const moderatorRole = page
-    .getByRole("main")
-    .getByText("Moderator", { exact: true });
-  await expect(moderatorRole).toBeVisible();
+  const removeModeratorRole = page.getByRole("menuitem", {
+    name: "Remove moderator role",
+  });
+  await profileActions.click();
+  await expect(removeModeratorRole).toBeVisible();
   await page.reload();
-  await expect(moderatorRole).toBeVisible();
+  await profileActions.click();
+  await expect(removeModeratorRole).toBeVisible();
 });
