@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { needsRegionMapCredit } from "../../lib/locationMap";
+import { RegionMapCredit } from "../locationMapIcon/credit.stylex";
 
 import {
   BottleList,
@@ -102,7 +104,7 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <Link href="/community" {...stylex.props(styles.moreLink)}>
+          <Link href="/activity" {...stylex.props(styles.moreLink)}>
             View all <span aria-hidden="true">→</span>
           </Link>
         }
@@ -124,11 +126,19 @@ export function HomeRegionGrid({
   regions: readonly LocationPreviewCardProps[];
 }) {
   return (
-    <div {...stylex.props(styles.regionGrid)}>
-      {regions.map((region) => (
-        <LocationPreviewCard key={region.href} {...region} />
-      ))}
-    </div>
+    <>
+      <div {...stylex.props(styles.regionGrid)}>
+        {regions.map((region) => (
+          <LocationPreviewCard key={region.href} {...region} />
+        ))}
+      </div>
+      {regions.some(
+        ({ visual }) =>
+          visual?.kind !== "count" && needsRegionMapCredit(visual),
+      ) ? (
+        <RegionMapCredit />
+      ) : null}
+    </>
   );
 }
 

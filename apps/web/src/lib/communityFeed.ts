@@ -2,7 +2,6 @@ import type { Outputs } from "@peated/server/orpc/router";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { CommunityFeedItem } from "@peated/web/components/communityFeed.stylex";
-import { RATING_BANDS } from "@peated/web/components/scoring.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottleUrl } from "@peated/web/lib/urls";
 
@@ -29,11 +28,10 @@ export function getCommunityFeedItems({
         href: review.url,
         id: `critic-${review.id}`,
         imageUrl: review.bottle.imageUrl,
-        kind: "Critic review",
         metadata: getBottleMetadata(review.bottle),
-        rating:
+        score:
           review.nativeScore?.scale === 100
-            ? String(review.nativeScore.value)
+            ? review.nativeScore.value
             : undefined,
         title: formatBottleDisplayName(review.bottle),
       },
@@ -49,11 +47,8 @@ export function getCommunityFeedItems({
       href: `/tastings/${tasting.id}`,
       id: `tasting-${tasting.id}`,
       imageUrl: tasting.bottle.imageUrl,
-      kind: "Member tasting",
       metadata: getBottleMetadata(tasting.bottle),
-      rating: tasting.ratingBand
-        ? RATING_BANDS.find((band) => band.key === tasting.ratingBand)?.label
-        : undefined,
+      ratingBand: tasting.ratingBand,
       title: formatBottleDisplayName(tasting.bottle),
     }),
   );

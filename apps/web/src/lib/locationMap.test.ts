@@ -18,7 +18,24 @@ describe("getRegionMap", () => {
   });
 
   it("omits unavailable maps instead of using the parent country", () => {
-    expect(getRegionMap("scotland", "speyside")).toBeNull();
+    expect(getRegionMap("scotland", "unknown")).toBeNull();
     expect(getRegionMap("ireland", "islay")).toBeNull();
+    expect(getRegionMap("ireland", "highland")).toBeNull();
+  });
+
+  it.each(["highland", "speyside", "lowland", "campbeltown", "islands"])(
+    "selects the Scottish %s map",
+    (region) => {
+      expect(getRegionMap("scotland", region)).toEqual({
+        kind: "region",
+        slug: `scotland/${region}`,
+      });
+    },
+  );
+
+  it("uses the Campbeltown map for the legacy catalog spelling", () => {
+    expect(getRegionMap("scotland", "cambeltown")).toEqual(
+      getRegionMap("scotland", "campbeltown"),
+    );
   });
 });

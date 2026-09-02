@@ -902,6 +902,25 @@ export function buildTasting({
   };
 }
 
+export const activityReview = {
+  id: 9801,
+  name: existingBottle.fullName,
+  url: "https://example.com/reviews/activity-whisky",
+  site: {
+    id: 9802,
+    name: "Whisky Advocate",
+    imageUrl: null,
+    type: "whiskyadvocate",
+  },
+  article: { title: "A whisky review", publishedAt: timestamp },
+  reviewerName: "Sample Reviewer",
+  nativeScore: { value: 92, scale: 100, display: "92" },
+  clip: "Dense smoke gives way to dark fruit and a long, dry finish.",
+  bottle: existingBottle,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+};
+
 export const homeAwards = [
   {
     id: 51_001,

@@ -19,13 +19,13 @@ function InteractionRows() {
       <ItemRow
         href="#hovered"
         id="hovered-row"
-        metadata="Tonal hover"
+        metadata="Tonal row with an accent, underlined title"
         title="Hovered"
       />
       <ItemRow
         href="#focused"
         id="focused-row"
-        metadata="Inset keyboard-focus ring"
+        metadata="Accent, underlined title for keyboard focus"
         title="Keyboard focused"
       />
       <ItemRow
@@ -41,7 +41,7 @@ function InteractionRows() {
       <ItemRow
         href="#pressed"
         id="pressed-row"
-        metadata="Accent-tint pressed state"
+        metadata="Tonal row with an accent, underlined title"
         title="Pressed"
       />
     </ItemList>
@@ -52,6 +52,14 @@ const meta = {
   title: "Components/Lists & Tables/Item List",
   component: ItemList,
   args: { ariaLabel: "Records", children: null },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use ItemRow for standard linked lists. Custom ItemListItem content must compose linkedRowStyles for the row and primary link. These shared styles own the full-row hit area, title hover and pressed states, and keyboard focus; secondary links remain independently clickable.",
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <StoryCanvas width="compact">
@@ -130,9 +138,10 @@ export const InteractionStates: Story = {
   ),
   parameters: {
     pseudo: {
-      active: ["#pressed-row > div"],
+      active: ["#pressed-row > div", '#pressed-row a[href="#pressed"]'],
+      focusVisible: ['#focused-row a[href="#focused"]'],
       focusWithin: ["#focused-row > div"],
-      hover: ["#hovered-row > div"],
+      hover: ["#hovered-row > div", '#hovered-row a[href="#hovered"]'],
     },
   },
 };

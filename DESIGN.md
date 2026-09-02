@@ -262,7 +262,9 @@ JSDoc.
   actions.
 - Do not let button labels wrap.
 - Keep a complete linked row actionable while keeping its nested links and
-  controls independently clickable.
+  controls independently clickable. Its primary text uses ink at rest and
+  accent with an underline on hover, press, and keyboard focus. Shared row
+  styles own these states; individual rows only supply layout and typography.
 - Keep menus and typeahead results in overlays with local shadows and stacking.
 - Respect reduced-motion preferences.
 

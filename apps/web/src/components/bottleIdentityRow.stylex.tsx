@@ -148,7 +148,6 @@ export function BottleIdentityRow({
               {...stylex.props(
                 styles.name,
                 size === "sm" && styles.smallName,
-                styles.nameLink,
                 linkedRowStyles.primaryLink,
               )}
             >
@@ -364,19 +363,6 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
-  },
-  nameLink: {
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accentDeep,
-    },
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
   },
   smallName: {
     fontSize: "14px",

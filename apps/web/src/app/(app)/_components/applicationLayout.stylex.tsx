@@ -19,10 +19,9 @@ import { publicHomeQueries } from "@peated/web/lib/orpc/homeQueries";
 import { ApplicationFooter } from "./applicationFooter.stylex";
 
 const databaseItems = [
+  { href: "/activity", label: "Activity" },
   { href: "/bottles", label: "Bottles" },
-  { href: "/locations", label: "Locations" },
   { href: "/distillers", label: "Distillers" },
-  { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
 ] as const;
 
@@ -58,12 +57,12 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
         },
         { href: "/tastings", label: "Tastings" },
         { href: "/following", label: "Following" },
-        { href: "/friends", label: "Friends" },
       ]
     : [];
   const accountItems = user
     ? [
         { href: `/users/${user.username}`, label: "Profile" },
+        { href: "/friends", label: "Friends" },
         { href: "/settings", label: "Settings" },
         {
           disabled: logoutPending,
