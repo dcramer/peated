@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: web-screenshots-${{ github.event.pull_request.number || github.ref }}
+  group: web-screenshots-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
