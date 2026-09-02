@@ -188,6 +188,21 @@ function RegionCard({ region }: { region: HomeOrigin }) {
   );
 }
 
+/** Keeps the homepage and country overview region cards identical. */
+export function HomeRegionGrid({
+  regions,
+}: {
+  regions: readonly HomeOrigin[];
+}) {
+  return (
+    <div {...stylex.props(styles.regionGrid)}>
+      {regions.map((region) => (
+        <RegionCard key={region.href} region={region} />
+      ))}
+    </div>
+  );
+}
+
 export function HomeOrigins({
   countries,
   remainingCountries,
@@ -269,11 +284,7 @@ export function HomeOrigins({
       {regions.length ? (
         <>
           <div {...stylex.props(styles.regionHeading)}>By region</div>
-          <div {...stylex.props(styles.regionGrid)}>
-            {regions.map((region) => (
-              <RegionCard key={region.href} region={region} />
-            ))}
-          </div>
+          <HomeRegionGrid regions={regions} />
         </>
       ) : null}
     </section>

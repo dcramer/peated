@@ -4,7 +4,8 @@ import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { LocationOverview } from "../../../locationOverview.stylex";
 import {
   getLocationCategoryItems,
-  getLocationPopularBottles,
+  getLocationDistilleries,
+  getLocationLatestReleases,
 } from "../../../locationPage";
 
 export default async function RegionOverviewPage(props: {
@@ -12,22 +13,32 @@ export default async function RegionOverviewPage(props: {
 }) {
   const { countrySlug, regionSlug } = await props.params;
   const { client } = await getPublicPageServerClient();
-  const [region, categories, popularBottles] = await Promise.all([
+  const [region, categories, latestReleases, distilleries] = await Promise.all([
     getRegionPage(countrySlug, regionSlug),
     client.regions.categories({ country: countrySlug, region: regionSlug }),
     client.bottles.list({
       country: countrySlug,
       region: regionSlug,
       limit: 5,
-      sort: "-tastings",
+      sort: "-release",
+    }),
+    client.distilleries.list({
+      country: countrySlug,
+      region: regionSlug,
+      limit: 5,
+      sort: "-bottles",
     }),
   ]);
   const isUsState = countrySlug === "united-states";
+  const rootHref = `/locations/${countrySlug}/regions/${regionSlug}`;
 
   return (
     <LocationOverview
       categories={getLocationCategoryItems(categories.results)}
-      popularBottles={getLocationPopularBottles(popularBottles.results)}
+      distilleries={getLocationDistilleries(distilleries.results)}
+      distillersHref={`${rootHref}/distillers`}
+      latestReleases={getLocationLatestReleases(latestReleases.results)}
+      releasesHref={`${rootHref}/bottles?sort=-release`}
       totalBottles={region.totalBottles}
       totalDistillers={region.totalDistillers}
       visual={

@@ -1,8 +1,18 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { DistributionList, FactList } from "@peated/web/components";
-import type { BottleRailItem } from "@peated/web/components/pages/bottleRailSection.stylex";
-import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
+import {
+  BottleList,
+  type BottleListItem,
+  DistributionList,
+  FactList,
+  RailList,
+  RailListItem,
+  TextLink,
+} from "@peated/web/components";
+import {
+  type HomeOrigin,
+  HomeRegionGrid,
+} from "@peated/web/components/pages/homeBrowse.stylex";
 import {
   PageColumns,
   PageSection,
@@ -14,16 +24,29 @@ import { LocationVisual } from "./locationPageFrame.stylex";
 
 export function LocationOverview({
   categories,
-  popularBottles,
+  distilleries,
+  distillersHref,
+  latestReleases,
   productionRules,
+  regions = [],
+  releasesHref,
   totalBottles,
   totalDistillers,
   visual,
   visualHeading = "Map",
 }: {
   categories: readonly { count: number; label: string }[];
-  popularBottles: readonly BottleRailItem[];
+  distilleries: readonly {
+    href: string;
+    location?: string;
+    name: string;
+    totalBottles: number;
+  }[];
+  distillersHref: string;
+  latestReleases: readonly BottleListItem[];
   productionRules?: string | null;
+  regions?: readonly HomeOrigin[];
+  releasesHref: string;
   totalBottles: number;
   totalDistillers: number;
   visual: { kind: "country" | "state"; slug: string };
@@ -41,12 +64,6 @@ export function LocationOverview({
               <p {...stylex.props(styles.copy)}>{productionRules}</p>
             </RailSection>
           ) : null}
-          {popularBottles.length ? (
-            <BottleRailSection
-              heading="Popular bottles"
-              items={popularBottles}
-            />
-          ) : null}
         </>
       }
       railBehavior="stack"
@@ -61,6 +78,49 @@ export function LocationOverview({
         ]}
         layout="grid"
       />
+      {regions.length ? (
+        <PageSection heading="Regions">
+          <HomeRegionGrid regions={regions} />
+        </PageSection>
+      ) : null}
+      {distilleries.length ? (
+        <PageSection
+          heading="Most recorded distilleries"
+          intro={
+            <TextLink href={distillersHref}>
+              {totalDistillers === 1
+                ? "View 1 distillery"
+                : `View all ${totalDistillers.toLocaleString("en-US")} distilleries`}
+            </TextLink>
+          }
+        >
+          <RailList ariaLabel="Most recorded distilleries">
+            {distilleries.map((distillery) => (
+              <RailListItem
+                href={distillery.href}
+                key={distillery.href}
+                metadata={[
+                  distillery.location,
+                  `${distillery.totalBottles.toLocaleString("en-US")} ${
+                    distillery.totalBottles === 1 ? "bottle" : "bottles"
+                  }`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+                title={distillery.name}
+              />
+            ))}
+          </RailList>
+        </PageSection>
+      ) : null}
+      {latestReleases.length ? (
+        <PageSection
+          heading="Latest releases"
+          intro={<TextLink href={releasesHref}>View all releases</TextLink>}
+        >
+          <BottleList ariaLabel="Latest releases" items={latestReleases} />
+        </PageSection>
+      ) : null}
       {categories.length ? (
         <PageSection heading="Bottles by category">
           <DistributionList items={categories} />
