@@ -115,7 +115,7 @@ describe("replaceStorybookScreenshotsInManifest", () => {
       path.join(output, "manifest.json"),
       JSON.stringify({
         capture: { browserVersion: "1" },
-        screenshots: [],
+        screenshots: [{ file: "routes/home.png", label: "Home" }],
       }),
     );
 
@@ -128,6 +128,28 @@ describe("replaceStorybookScreenshotsInManifest", () => {
     ).rejects.toThrow(
       "Storybook and E2E screenshots must use the same browser version.",
     );
+  });
+
+  test("uses the Storybook browser version when there are no route screenshots", async () => {
+    const output = await temporaryDirectory();
+    await fs.writeFile(
+      path.join(output, "manifest.json"),
+      JSON.stringify({
+        capture: { browserVersion: null },
+        screenshots: [],
+      }),
+    );
+
+    await replaceStorybookScreenshotsInManifest({
+      browserVersion: "1",
+      output,
+      screenshots: [],
+    });
+
+    const manifest = JSON.parse(
+      await fs.readFile(path.join(output, "manifest.json"), "utf8"),
+    );
+    expect(manifest.capture.browserVersion).toBe("1");
   });
 });
 

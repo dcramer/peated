@@ -76,15 +76,17 @@ export async function replaceStorybookScreenshotsInManifest({
   const manifest = manifestSchema.parse(
     JSON.parse(await fs.readFile(manifestFile, "utf8")),
   );
-  if (manifest.capture.browserVersion !== browserVersion) {
+  const routeScreenshots = manifest.screenshots.filter(
+    (screenshot) => !screenshot.file.startsWith("storybook/"),
+  );
+  if (
+    routeScreenshots.length > 0 &&
+    manifest.capture.browserVersion !== browserVersion
+  ) {
     throw new Error(
       "Storybook and E2E screenshots must use the same browser version.",
     );
   }
-
-  const routeScreenshots = manifest.screenshots.filter(
-    (screenshot) => !screenshot.file.startsWith("storybook/"),
-  );
   const files = new Set(routeScreenshots.map((screenshot) => screenshot.file));
 
   for (const screenshot of screenshots) {
@@ -98,6 +100,7 @@ export async function replaceStorybookScreenshotsInManifest({
   manifest.screenshots = [...routeScreenshots, ...screenshots].sort(
     (left, right) => left.file.localeCompare(right.file),
   );
+  manifest.capture.browserVersion = browserVersion;
   await fs.writeFile(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
