@@ -1,4 +1,4 @@
-import { PlaceFlavorProfile } from "@peated/web/features/flavorProfile/placeFlavorProfile";
+import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { getRegionMap } from "@peated/web/lib/locationMap";
 import { getRegionPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
@@ -52,9 +52,8 @@ export default async function RegionOverviewPage(props: {
       distilleries={getLocationDistilleries(distilleries.results)}
       distillersHref={`${rootHref}/distillers`}
       flavorProfile={
-        <PlaceFlavorProfile
+        <FlavorProfileSection
           scope={{ kind: "region", country: countrySlug, region: regionSlug }}
-          bottlesHref={`${rootHref}/bottles`}
         />
       }
       latestReleases={getLocationLatestReleases(latestReleases.results)}

@@ -82,6 +82,27 @@ test("public routes load", async ({ page, snapshot }) => {
           .getByRole("heading", { exact: true, name: route.heading })
           .first();
         await expect(heading).toBeVisible();
+        if (route.name === "Bottle") {
+          const smoke = page.getByRole("button", {
+            name: /^Smoke, 75% of tastings with notes/,
+          });
+          await smoke.click();
+          const panel = page.getByRole("dialog", {
+            name: "Smoke",
+            exact: true,
+          });
+          await expect(panel).toHaveAttribute("aria-modal", "true");
+          await expect(
+            panel.getByRole("heading", { name: "Bottles across Peated" }),
+          ).toBeVisible();
+          await expect(panel.getByRole("link").first()).toHaveAttribute(
+            "href",
+            `/bottles/${existingBottle.id}`,
+          );
+          await page.keyboard.press("Escape");
+          await expect(panel).toHaveCount(0);
+          await expect(smoke).toBeFocused();
+        }
         await snapshot(route.name, { ready: heading });
       }
     });

@@ -35,6 +35,7 @@ import { BottleOverview } from "@peated/web/components/pages/bottleOverview.styl
 import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
 import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
 import TimeSince from "@peated/web/components/timeSince";
+import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
   getAddBottleHref,
@@ -625,6 +626,12 @@ export function BottleOverviewClient() {
           ) : undefined
         }
         recommendations={recommendations}
+        flavorProfile={
+          <FlavorProfileSection
+            key={bottle.id}
+            scope={{ kind: "bottle", bottle: bottle.id }}
+          />
+        }
         railSections={seriesRail}
         tastingCount={bottle.totalTastings}
         tastings={tastings}

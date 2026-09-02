@@ -7,6 +7,7 @@ import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
 import editContext from "./edit-context";
+import flavorProfile from "./flavor-profile";
 import imageUpdate from "./image-update";
 import list from "./list";
 import merge from "./merge";
@@ -21,6 +22,7 @@ import validation from "./validation";
 
 export default base.tag("bottles").router({
   details,
+  flavorProfile,
   list,
   create,
   update,

@@ -11,6 +11,7 @@ import { Fragment } from "react";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 const MOBILE = "@media (max-width: 559px)";
+const TABLET = "@media (max-width: 899px)";
 
 const CENTER = 260;
 const HUB_RADIUS = 88;
@@ -53,7 +54,30 @@ function labelTransform(radius: number, angle: number) {
   return `translate(${x} ${y}) rotate(${rotation})`;
 }
 
-export function TastingWheelGraphic() {
+export function TastingWheelIntroduction() {
+  return (
+    <section
+      aria-labelledby="tasting-wheel-introduction"
+      {...stylex.props(styles.introduction)}
+    >
+      <TastingWheelGraphic />
+      <div {...stylex.props(styles.directions)}>
+        <SectionHeading id="tasting-wheel-introduction">
+          Start with what you notice
+        </SectionHeading>
+        <p {...stylex.props(styles.directionText)}>
+          Start with something broad, like fruit or spice, then look outward for
+          a more specific note. Choose only what fits what you smell and taste.
+        </p>
+        <p {...stylex.props(styles.directionText)}>
+          Select a note to read its description and see bottle examples.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function TastingWheelGraphic() {
   const { select, selection } = useTastingWheel();
   const categorySpan = 360 / WHEEL_CATEGORIES.length;
 
@@ -68,8 +92,8 @@ export function TastingWheelGraphic() {
         >
           <title id="tasting-wheel-title">Peated tasting wheel</title>
           <desc id="tasting-wheel-description">
-            Explore a tasting category or a note to find related words and
-            example bottles.
+            Explore a flavor family or a note to find related words and example
+            bottles.
           </desc>
           {WHEEL_CATEGORIES.map((category, categoryIndex) => {
             const startAngle = categoryIndex * categorySpan;
@@ -225,6 +249,24 @@ export function TastingWheelFamilies() {
 }
 
 const styles = stylex.create({
+  introduction: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 520px) minmax(0, 1fr)",
+      [TABLET]: "minmax(0, 1fr)",
+    },
+    alignItems: "center",
+    gap: space.x6,
+  },
+  directions: { display: "grid", gap: space.x3, maxWidth: "44ch" },
+  directionText: {
+    margin: 0,
+    fontFamily: fonts.reading,
+    fontSize: "16px",
+    lineHeight: 1.6,
+    color: colors.inkMuted,
+    textWrap: "pretty",
+  },
   figure: { margin: 0, maxWidth: "520px" },
   wheelFrame: {
     width: "100%",
@@ -299,7 +341,8 @@ const styles = stylex.create({
   familyGrid: {
     display: "grid",
     gridTemplateColumns: {
-      default: "repeat(2, minmax(0, 1fr))",
+      default: "repeat(3, minmax(0, 1fr))",
+      [TABLET]: "repeat(2, minmax(0, 1fr))",
       [MOBILE]: "minmax(0, 1fr)",
     },
     columnGap: space.x6,

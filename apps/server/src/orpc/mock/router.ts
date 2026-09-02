@@ -7,6 +7,7 @@ import bottleGroupBottles from "./routes/bottleGroups/bottles";
 import bottleGroupDetails from "./routes/bottleGroups/details";
 import bottlerList from "./routes/bottlers/list";
 import bottleDetails from "./routes/bottles/details";
+import bottleFlavorProfile from "./routes/bottles/flavor-profile";
 import bottleList from "./routes/bottles/list";
 import bottlePriceList from "./routes/bottles/prices/list";
 import bottleRecommendations from "./routes/bottles/recommendations";
@@ -84,6 +85,7 @@ export const mockRouter = mockOS.router({
   },
   bottles: {
     details: bottleDetails,
+    flavorProfile: bottleFlavorProfile,
     list: bottleList,
     prices: {
       list: bottlePriceList,

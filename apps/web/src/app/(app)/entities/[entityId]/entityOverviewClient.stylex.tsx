@@ -3,8 +3,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { space } from "../../../../styles/tokens.stylex";
 
-import { PlaceFlavorProfile } from "@peated/web/features/flavorProfile/placeFlavorProfile";
-import { getEntityUrl } from "@peated/web/lib/urls";
+import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { useQuery } from "@tanstack/react-query";
 
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
@@ -102,10 +101,9 @@ export function EntityOverviewClient() {
           <EntityMap entity={entity} />
           {entity.kind === "distillery" ? (
             <div {...stylex.props(styles.flavorProfile)}>
-              <PlaceFlavorProfile
+              <FlavorProfileSection
                 key={entity.id}
                 scope={{ kind: "distillery", entity: entity.id }}
-                bottlesHref={`${getEntityUrl(entity)}/bottles`}
               />
             </div>
           ) : null}

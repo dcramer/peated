@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+  BottleFlavorProfile,
+  FlavorProfile,
+} from "@peated/server/schemas/flavorProfile";
 import {
   FlavorWheel,
   LoadingPlaceholder,
@@ -14,35 +18,36 @@ import {
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQuery } from "@tanstack/react-query";
 
-type PlaceFlavorProfileProps = {
+type FlavorProfileSectionProps = {
   scope:
+    | { kind: "bottle"; bottle: number }
     | { kind: "distillery"; entity: number }
     | { kind: "region"; country: string; region: string };
-  bottlesHref: string;
 };
 
-export function PlaceFlavorProfile(props: PlaceFlavorProfileProps) {
+export function FlavorProfileSection(props: FlavorProfileSectionProps) {
   return (
     <TastingWheelProvider>
-      <PlaceFlavorProfileContent {...props} />
+      <FlavorProfileContent {...props} />
     </TastingWheelProvider>
   );
 }
 
-function PlaceFlavorProfileContent({
-  scope,
-  bottlesHref,
-}: PlaceFlavorProfileProps) {
+function FlavorProfileContent({ scope }: FlavorProfileSectionProps) {
   const { select } = useTastingWheel();
   const orpc = useORPC();
-  const query = useQuery(
-    scope.kind === "distillery"
-      ? orpc.entities.flavorProfile.queryOptions({
-          input: { entity: scope.entity },
+  const query = useQuery<FlavorProfile | BottleFlavorProfile>(
+    scope.kind === "bottle"
+      ? orpc.bottles.flavorProfile.queryOptions({
+          input: { bottle: scope.bottle },
         })
-      : orpc.regions.flavorProfile.queryOptions({
-          input: { country: scope.country, region: scope.region },
-        }),
+      : scope.kind === "distillery"
+        ? orpc.entities.flavorProfile.queryOptions({
+            input: { entity: scope.entity },
+          })
+        : orpc.regions.flavorProfile.queryOptions({
+            input: { country: scope.country, region: scope.region },
+          }),
   );
 
   return (
@@ -59,22 +64,15 @@ function PlaceFlavorProfileContent({
           Try loading the tasting notes again.
         </SectionError>
       ) : (
-        <>
-          <FlavorWheel
-            footer={
-              <TextLink href="/about/tasting-wheel" tone="muted">
-                About the tasting wheel
-              </TextLink>
-            }
-            profile={query.data}
-            onExplore={(category) => select({ category })}
-          />
-          {query.data.notedBottles < 5 ? (
-            <TextLink href={bottlesHref}>
-              Browse bottles to add tasting notes
+        <FlavorWheel
+          footer={
+            <TextLink href="/about/tasting-wheel" tone="muted">
+              About the tasting wheel
             </TextLink>
-          ) : null}
-        </>
+          }
+          profile={query.data}
+          onExplore={(category) => select({ category })}
+        />
       )}
     </RailSection>
   );

@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 
-import { mockFlavorProfile } from "@peated/server/orpc/mock/fixtures/flavorProfile";
+import {
+  mockBottleFlavorProfile,
+  mockFlavorProfile,
+} from "@peated/server/orpc/mock/fixtures/flavorProfile";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, test } from "vitest";
@@ -44,14 +47,64 @@ test("selects flavor families with the keyboard and pointer", async () => {
       ),
     );
     expect(fruit.getAttribute("aria-pressed")).toBe("true");
-    await act(() =>
-      container
-        .querySelector("button[aria-haspopup=dialog]")!
-        .dispatchEvent(new MouseEvent("click", { bubbles: true })),
-    );
-    expect(explored).toEqual(["fruit"]);
+    expect(fruit.getAttribute("aria-haspopup")).toBe("dialog");
+    expect(explored).toEqual(["fruit", "smoke", "fruit"]);
+    expect(container.querySelector("button")).toBeNull();
   } finally {
     act(() => root.unmount());
     container.remove();
+  }
+});
+
+test("uses tasting commonality for a bottle and keeps sparse notes interactive", () => {
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  try {
+    act(() => root.render(<FlavorWheel profile={mockBottleFlavorProfile} />));
+    expect(
+      container.querySelector(
+        '[aria-label^="Smoke, 83% of tastings with notes"]',
+      ),
+    ).not.toBeNull();
+    expect(container.textContent).not.toMatch(/\d+ bottles|Notes cover/);
+    act(() =>
+      root.render(
+        <FlavorWheel
+          profile={{
+            notedTastings: 1,
+            categories: [
+              {
+                category: "smoke",
+                tastingCount: 1,
+                notes: [{ name: "peat", tastingCount: 1 }],
+              },
+            ],
+          }}
+        />,
+      ),
+    );
+    expect(
+      container.querySelector(
+        '[aria-label^="Smoke, 100% of tastings with notes"]',
+      ),
+    ).not.toBeNull();
+    expect(
+      container.querySelector(
+        '[aria-label^="Wood, 0% of tastings with notes"]',
+      ),
+    ).not.toBeNull();
+    act(() =>
+      root.render(
+        <FlavorWheel
+          profile={{ ...mockFlavorProfile, notedBottles: 0, categories: [] }}
+        />,
+      ),
+    );
+    expect(container.querySelector("svg")).toBeNull();
+    expect(container.querySelector("button")).toBeNull();
+    expect(container.querySelector("details")).toBeNull();
+    expect(container.textContent).toBe("No public tasting notes yet.");
+  } finally {
+    act(() => root.unmount());
   }
 });

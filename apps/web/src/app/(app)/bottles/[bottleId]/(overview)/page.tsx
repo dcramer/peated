@@ -28,6 +28,9 @@ export default async function BottlePage(props: {
   const orpc = createTanstackQueryUtils(client);
 
   await Promise.all([
+    queryClient.prefetchQuery(
+      orpc.bottles.flavorProfile.queryOptions({ input: { bottle: bottle.id } }),
+    ),
     queryClient.prefetchQuery(bottleOverviewQueries.reviews(orpc, bottle.id)),
     queryClient.prefetchQuery(bottleOverviewQueries.tastings(orpc, bottle.id)),
     ...(bottle.series
