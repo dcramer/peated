@@ -4,6 +4,8 @@ import { SiteFooter, type SiteFooterProps } from "./siteFooter.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const links: SiteFooterProps["links"] = [
+  { href: "/locations", label: "Locations" },
+  { href: "/brands", label: "Brands" },
   { href: "/about", label: "About" },
   { href: "/updates", label: "Recent changes" },
   { href: "https://github.com/peated/peated", label: "Source" },

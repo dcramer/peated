@@ -3,6 +3,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { SiteFooter, type SiteFooterProps } from "@peated/web/components";
 
 const links = [
+  { href: "/locations", label: "Locations" },
+  { href: "/brands", label: "Brands" },
   { href: "/about", label: "About" },
   { href: "/about/api", label: "API" },
   { href: "/about/categories", label: "Whisky categories" },
