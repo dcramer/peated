@@ -77,27 +77,27 @@ describe("EntityCatalogRelationships", () => {
     expect(html).not.toContain(">Brands<");
   });
 
-  test.each(["brand", "bottler"] as const)(
-    "shows distilleries on a %s page",
-    (kind) => {
-      const html = renderRelationships(kind, {
-        brands: [],
-        bottlers: [],
-        distillers: [
-          {
-            id: 4,
-            name: "Caol Ila",
-            shortName: null,
-            kind: "distillery",
-            count: 5,
-          },
-        ],
-      });
+  test.each([
+    ["brand", "Distilled at"],
+    ["bottler", "Distilleries"],
+  ] as const)("shows distilleries on a %s page", (kind, heading) => {
+    const html = renderRelationships(kind, {
+      brands: [],
+      bottlers: [],
+      distillers: [
+        {
+          id: 4,
+          name: "Caol Ila",
+          shortName: null,
+          kind: "distillery",
+          count: 5,
+        },
+      ],
+    });
 
-      expect(html).toContain("Distilled at");
-      expect(html).toContain("Caol Ila");
-    },
-  );
+    expect(html).toContain(heading);
+    expect(html).toContain("Caol Ila");
+  });
 
   test("shows bottlers on a brand page when no distillery is known", () => {
     const html = renderRelationships("brand", {
