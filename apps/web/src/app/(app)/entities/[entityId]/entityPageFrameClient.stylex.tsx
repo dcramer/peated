@@ -43,7 +43,7 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
       <ButtonLink
         aria-label={`Follow ${entity.name}`}
         href={`/login?redirectTo=${encodeURIComponent(getEntityUrl(entity))}`}
-        size="md"
+        size="lg"
         variant="accent"
       >
         Follow
@@ -63,7 +63,7 @@ function EntityFollowAction({ entity }: { entity: Entity }) {
       loading={pending}
       loadingLabel={isFollowing ? "Unfollowing…" : "Following…"}
       onClick={() => followControls.toggle(entity)}
-      size="md"
+      size="lg"
       variant="accent"
     >
       {isFollowing ? "Unfollow" : "Follow"}
@@ -191,7 +191,7 @@ export function EntityPageFrameClient({
               {createBottleHref ? (
                 <ButtonLink
                   href={createBottleHref}
-                  size="md"
+                  size="lg"
                   variant={canFollow ? "tonal" : "accent"}
                 >
                   {bottleActionLabel}
