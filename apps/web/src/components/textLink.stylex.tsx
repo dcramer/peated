@@ -11,14 +11,16 @@ export type TextLinkProps = Omit<
   href: string;
   size?: "inherit" | "sm";
   truncate?: boolean;
+  tone?: "accent" | "muted";
 };
 
-/** Uses the shared inline-link interaction treatment. */
+/** Shared inline link. Use muted for supporting references; its underline stays visible. */
 export function TextLink({
   children,
   href,
   size = "sm",
   truncate = false,
+  tone = "accent",
   ...props
 }: TextLinkProps) {
   return (
@@ -28,6 +30,7 @@ export function TextLink({
       {...stylex.props(
         textLinkStyles.link,
         size === "sm" && textLinkStyles.small,
+        tone === "muted" && textLinkStyles.muted,
         truncate && textLinkStyles.truncate,
       )}
     >

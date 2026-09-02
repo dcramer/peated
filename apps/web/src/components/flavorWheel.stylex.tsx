@@ -5,7 +5,7 @@ import type { FlavorProfile } from "@peated/server/schemas/flavorProfile";
 import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { Info } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
@@ -18,8 +18,8 @@ const OUTER_RADIUS = 108;
 function point(radius: number, angle: number) {
   const radians = ((angle - 90) * Math.PI) / 180;
   return [
-    CENTER_X + radius * Math.cos(radians),
-    CENTER_Y + radius * Math.sin(radians),
+    Number((CENTER_X + radius * Math.cos(radians)).toFixed(4)),
+    Number((CENTER_Y + radius * Math.sin(radians)).toFixed(4)),
   ];
 }
 
@@ -40,13 +40,16 @@ const formatCount = (count: number) => count.toLocaleString("en-US");
  * Each wedge has a fixed position and an independent 0–100% area scale.
  * Selection reveals its share and two leading notes in the center, without bars.
  * Optional onExplore opens the selected family in the caller’s tasting guide.
- * The parent supplies the heading and any contribution action for empty data.
+ * The parent supplies the heading, reference links through footer,
+ * and any contribution action for empty data.
  */
 export function FlavorWheel({
   profile,
   onExplore,
+  footer,
 }: {
   profile: FlavorProfile;
+  footer?: ReactNode;
   onExplore?: (category: TagCategory) => void;
 }) {
   const descriptionId = useId();
@@ -234,6 +237,7 @@ export function FlavorWheel({
           This shows occurrence, not intensity.
         </p>
       </details>
+      {footer}
     </div>
   );
 }

@@ -61,6 +61,11 @@ function PlaceFlavorProfileContent({
       ) : (
         <>
           <FlavorWheel
+            footer={
+              <TextLink href="/about/tasting-wheel" tone="muted">
+                About the tasting wheel
+              </TextLink>
+            }
             profile={query.data}
             onExplore={(category) => select({ category })}
           />

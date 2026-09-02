@@ -18,9 +18,10 @@ const NOTE_OUTER_RADIUS = 244;
 
 function polarPoint(radius: number, angle: number) {
   const radians = ((angle - 90) * Math.PI) / 180;
+  // Keep SVG attributes identical across server and browser math implementations.
   return [
-    CENTER + radius * Math.cos(radians),
-    CENTER + radius * Math.sin(radians),
+    Number((CENTER + radius * Math.cos(radians)).toFixed(4)),
+    Number((CENTER + radius * Math.sin(radians)).toFixed(4)),
   ] as const;
 }
 

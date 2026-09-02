@@ -28,6 +28,9 @@ export const InteractionStates: Story = {
       <TextLink {...args} href="#pressed" id="text-link-pressed">
         Pressed
       </TextLink>
+      <TextLink href="/about/tasting-wheel" tone="muted">
+        About the tasting wheel
+      </TextLink>
       <p>
         Body copy with an{" "}
         <TextLink href="#inherited" size="inherit">

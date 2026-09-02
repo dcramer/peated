@@ -27,6 +27,15 @@ export const textLinkStyles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  muted: {
+    color: {
+      default: colors.inkMuted,
+      ":hover": colors.ink,
+      ":active": colors.ink,
+    },
+    fontWeight: 400,
+    textDecorationLine: "underline",
+  },
   small: {
     fontFamily: fonts.reading,
     fontSize: "13px",

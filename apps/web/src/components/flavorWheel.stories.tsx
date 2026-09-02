@@ -3,11 +3,19 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { FlavorWheel } from "./flavorWheel.stylex";
 import { RailSection } from "./pages/pageLayout.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
+import { TextLink } from "./textLink.stylex";
 
 const meta = {
   title: "Components/Data/Flavor Wheel",
   component: FlavorWheel,
-  args: { profile },
+  args: {
+    profile,
+    footer: (
+      <TextLink href="/about/tasting-wheel" tone="muted">
+        About the tasting wheel
+      </TextLink>
+    ),
+  },
   decorators: [
     (Story) => (
       <StoryCanvas width="compact">
