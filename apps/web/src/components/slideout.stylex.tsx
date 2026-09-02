@@ -22,7 +22,7 @@ export type SlideoutProps = {
   open: boolean;
   onClose: () => void;
   title: string;
-  eyebrow?: ReactNode;
+  navigation?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
 };
@@ -37,7 +37,7 @@ export function Slideout({
   open,
   onClose,
   title,
-  eyebrow,
+  navigation,
   children,
   footer,
 }: SlideoutProps) {
@@ -48,8 +48,8 @@ export function Slideout({
         <DialogPanel transition {...stylex.props(styles.panel)}>
           <header {...stylex.props(styles.header)}>
             <div {...stylex.props(styles.heading)}>
-              {eyebrow ? (
-                <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
+              {navigation ? (
+                <div {...stylex.props(styles.navigation)}>{navigation}</div>
               ) : null}
               <DialogTitle {...stylex.props(styles.title)}>{title}</DialogTitle>
             </div>
@@ -119,11 +119,8 @@ const styles = stylex.create({
     borderBottom: `1px solid ${colors.hairline}`,
   },
   heading: { minWidth: 0 },
-  eyebrow: {
+  navigation: {
     marginBottom: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
   },
   title: {
     margin: 0,

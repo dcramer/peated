@@ -50,7 +50,7 @@ export function TastingWheelProvider({ children }: { children: ReactNode }) {
             ? titleCase(selection.note)
             : (category?.name ?? "Tasting notes")
         }
-        eyebrow={
+        navigation={
           selection?.note ? (
             <Button
               size="sm"
@@ -59,9 +59,7 @@ export function TastingWheelProvider({ children }: { children: ReactNode }) {
             >
               <ArrowLeft size={16} /> {category?.name}
             </Button>
-          ) : (
-            "Tasting category"
-          )
+          ) : null
         }
       >
         {selection && category ? (

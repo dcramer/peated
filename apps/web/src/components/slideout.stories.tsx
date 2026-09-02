@@ -12,7 +12,6 @@ const meta = {
     open: true,
     onClose: () => {},
     title: "Smoke",
-    eyebrow: "Tasting category",
     children: <p>Peat smoke, ash, medicine, wet stone, and sea air.</p>,
   },
   argTypes: {
