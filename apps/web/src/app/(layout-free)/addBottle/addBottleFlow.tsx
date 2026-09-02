@@ -28,6 +28,7 @@ import type { CreateBottlePrefill } from "@peated/web/components/search/createBo
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
 import TastingForm, {
+  TastingFormLoading,
   type MemberReviewFormSubmitData,
   type TastingCreateFormSubmitData,
 } from "@peated/web/components/tastingForm";
@@ -160,7 +161,17 @@ function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
   );
 }
 
-function LoadingBottlePanel({ title }: { title: string }) {
+function LoadingBottlePanel({
+  intent,
+  title,
+}: {
+  intent: AddBottleIntent;
+  title: string;
+}) {
+  if (intent === "tasting") {
+    return <TastingFormLoading title={title} />;
+  }
+
   return (
     <WorkflowScreen title={title}>
       <LoadingList label="Loading bottle" rows={3} />
@@ -607,8 +618,7 @@ function AddBottleFlowContent() {
     requestedResultSource,
   ]);
 
-  const [loadedBottleKey, setLoadedBottleKey] = useState<string | null>(null);
-  const [loadingBottle, setLoadingBottle] = useState(false);
+  const [handledBottleKey, setHandledBottleKey] = useState<string | null>(null);
   const [bottleLoadError, setBottleLoadError] = useState<string | null>(null);
   const [selectedBottle, setSelectedBottle] = useState<FlowBottle | null>(null);
   const [libraryError, setLibraryError] = useState<string | undefined>();
@@ -671,7 +681,7 @@ function AddBottleFlowContent() {
 
   useEffect(() => {
     if (!requestedBottleKey || !requestedBottleId) {
-      setLoadedBottleKey(null);
+      setHandledBottleKey(null);
       return;
     }
 
@@ -679,7 +689,6 @@ function AddBottleFlowContent() {
     let cancelled = false;
 
     async function loadRequestedBottle() {
-      setLoadingBottle(true);
       setBottleLoadError(null);
       setAddedEntry(null);
       setAddedEntryPhotoTrace(null);
@@ -687,14 +696,16 @@ function AddBottleFlowContent() {
       setTastingLoadError(undefined);
 
       try {
-        const bottle = await orpc.bottles.details.call({
-          bottle: bottleId,
-        });
-        const collectionStatus = await orpc.collections.bottles.list.call({
-          user: "me",
-          collection: "library",
-          bottle: bottle.id,
-        });
+        const [bottle, collectionStatus] = await Promise.all([
+          orpc.bottles.details.call({
+            bottle: bottleId,
+          }),
+          orpc.collections.bottles.list.call({
+            user: "me",
+            collection: "library",
+            bottle: bottleId,
+          }),
+        ]);
 
         if (cancelled) return;
         const libraryEntry = collectionStatus.results[0] ?? null;
@@ -730,21 +741,19 @@ function AddBottleFlowContent() {
         } else {
           setSelectedBottle(selection);
         }
-        setLoadedBottleKey(requestedBottleKey);
+        setHandledBottleKey(requestedBottleKey);
       } catch (err) {
         logError(err);
         if (cancelled) return;
         setSelectedBottle(null);
-        setLoadedBottleKey(null);
+        setHandledBottleKey(requestedBottleKey);
         setBottleLoadError(
           "We couldn't load that bottle. Search again or start over.",
         );
-      } finally {
-        if (!cancelled) setLoadingBottle(false);
       }
     }
 
-    if (loadedBottleKey !== requestedBottleKey) {
+    if (handledBottleKey !== requestedBottleKey) {
       void loadRequestedBottle();
     }
 
@@ -753,7 +762,7 @@ function AddBottleFlowContent() {
     };
   }, [
     intent,
-    loadedBottleKey,
+    handledBottleKey,
     orpc,
     requestedBottleId,
     requestedPendingImage,
@@ -769,7 +778,7 @@ function AddBottleFlowContent() {
     setTastingDraft(null);
     setTastingLoadError(undefined);
     setBottleLoadError(null);
-    setLoadedBottleKey(requestedBottleKey);
+    setHandledBottleKey(requestedBottleKey);
     router.replace(getAddBottleHref({ intent: nextIntent }));
   }
 
@@ -1039,8 +1048,8 @@ function AddBottleFlowContent() {
     router.push(getBottleUrl(tastingDraft.bottle));
   }
 
-  if (loadingBottle) {
-    return <LoadingBottlePanel title={flowTitle} />;
+  if (requestedBottleKey && handledBottleKey !== requestedBottleKey) {
+    return <LoadingBottlePanel intent={intent} title={flowTitle} />;
   }
 
   if (bottleLoadError) {
