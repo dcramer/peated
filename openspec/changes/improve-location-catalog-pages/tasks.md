@@ -9,6 +9,7 @@
 
 - [x] 2.1 Add the smallest shared static distribution component needed by both location overviews, with focused tests or stories
 - [x] 2.2 Add a Storybook catalog detail page example and a short maintainer pointer
+- [x] 2.3 Extract shared country and region preview cards with a Storybook example
 
 ## 3. Location Pages
 
@@ -17,9 +18,12 @@
 - [x] 3.3 Add region Overview, Bottles, and Distillers sections under one route layout
 - [x] 3.4 Add focused web tests for location tab and optional-section logic
 - [x] 3.5 Reuse the homepage region cards on country overviews
-- [x] 3.6 Add latest releases and the most recorded distilleries to country and region overviews
+- [x] 3.6 Add latest releases and distilleries to country and region overviews
 - [x] 3.7 Update location route fixtures and coverage for the added overview reads
 - [x] 3.8 Align discovery sections with catalog page components while preserving the homepage region renderer
+- [x] 3.9 Add same-country region links to the region overview side column
+- [x] 3.10 Move category distributions to the country and region side columns
+- [x] 3.11 Simplify the distillery section heading
 
 ## 4. Verification
 
@@ -28,3 +32,7 @@
 - [x] 4.3 Record the separate production count update without performing production writes
 - [x] 4.4 Re-run focused web tests, typecheck, lint, format, and desktop/mobile browser QA
 - [x] 4.5 Verify the catalog-aligned follow-up with focused checks and browser QA
+- [x] 4.6 Add linked country and region sample data, then verify homepage-to-region navigation and desktop/mobile previews
+- [x] 4.7 Replace the incorrect Scotland outline and verify cards and location pages on desktop and mobile
+- [x] 4.8 Remove parent-country map substitutions, add the verified Islay coastline, and check missing-map regions in tests and desktop/mobile QA
+- [x] 4.9 Keep all location preview cards equal in height and limit descriptions to three lines; verify long, short, and missing descriptions on desktop and mobile

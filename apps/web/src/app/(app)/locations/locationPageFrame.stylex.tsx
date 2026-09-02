@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { PageTabs, TextLink, type PageTabItem } from "@peated/web/components";
-import CountryMapIcon from "@peated/web/components/countryMapIcon";
+import { LocationMapIcon } from "@peated/web/components/locationMapIcon";
 import {
   PageHeader,
   TabbedPage,
 } from "@peated/web/components/pages/pageLayout.stylex";
-import UsStateMapIcon from "@peated/web/components/usStateMapIcon";
+import type { LocationMap } from "@peated/web/lib/locationMap";
 import { colors, space } from "../../../styles/tokens.stylex";
 
 export function LocationsIndexFrame({ children }: { children: ReactNode }) {
@@ -84,11 +84,7 @@ export function LocationPageFrame({
   );
 }
 
-export function LocationVisual({
-  visual,
-}: {
-  visual: { kind: "country" | "state"; slug: string };
-}) {
+export function LocationVisual({ visual }: { visual: LocationMap }) {
   const props = {
     "aria-hidden": true,
     ...stylex.props(styles.visualIcon),
@@ -96,11 +92,7 @@ export function LocationVisual({
 
   return (
     <div {...stylex.props(styles.visual)}>
-      {visual.kind === "state" ? (
-        <UsStateMapIcon slug={visual.slug} {...props} />
-      ) : (
-        <CountryMapIcon slug={visual.slug} {...props} />
-      )}
+      <LocationMapIcon visual={visual} {...props} />
     </div>
   );
 }

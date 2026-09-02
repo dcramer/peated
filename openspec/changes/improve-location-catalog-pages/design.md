@@ -41,9 +41,9 @@ Alternative: add a configurable `CatalogPage` component that owns queries and na
 
 ### Overview content stays compact and evidence-based
 
-Each overview shows bottle and distillery facts, a category distribution, a location visual, latest releases, and the distilleries with the most recorded bottles. Country pages also show the existing production-rules summary and leading regions when present. Widgets with no data are omitted; numeric facts still show zero.
+Each overview shows bottle and distillery facts, a category distribution, a location visual, latest releases, and a short distillery list. The side column owns the location visual and category distribution. Country pages also show the existing production-rules summary and leading regions when present. Region pages show other regions in the same country in the side column. Widgets with no data are omitted; numeric facts still show zero.
 
-The country region list reuses the homepage region-card renderer. The homepage and country overview therefore keep the same card markup, styles, truncation, and responsive grid. The location route only supplies country-scoped region data and the link to the complete Regions section.
+Country and region previews use one shared `LocationPreviewCard`. Each card owns its available location visual, name, bottle count, optional description, and truncation. Country visuals use country silhouettes. US region visuals use state silhouettes. Other regions use their own verified outlines when available. Regions without an outline omit the visual; they must never substitute the parent country's shape. This rule also applies to the region overview map and demo data. Homepage and country overview grids own only their layout. The location route supplies country-scoped region data and the link to the complete Regions section.
 
 Other overview lists use the catalog-page `PageSection`, `BottleList`, `RailList`, and `TextLink` components. Homepage section wrappers remain owned by the homepage.
 

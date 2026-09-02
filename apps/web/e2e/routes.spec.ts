@@ -8,6 +8,7 @@ import {
   testBottler,
   testBrand,
   testCountry,
+  testOtherRegion,
   testOwnedEntity,
   testOwner,
   testRegion,
@@ -126,33 +127,45 @@ test(
   },
 );
 
-test(
-  "location overviews expose discovery sections on mobile",
-  { tag: "@mobile" },
-  async ({ page, snapshot }) => {
-    await page.goto(`/locations/${testCountry.slug}`);
+test("browse from the homepage through a country and its regions", async ({
+  page,
+  snapshot,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("link", { name: new RegExp(`^${testCountry.name} `) })
+    .click();
+  await expect(page).toHaveURL(`/locations/${testCountry.slug}`);
+  const countryHeading = page.getByRole("heading", {
+    name: testCountry.name,
+    exact: true,
+  });
+  await expect(countryHeading).toBeVisible();
+  await snapshot("Country overview", { ready: countryHeading });
 
-    const regions = page.getByRole("heading", { name: "Regions" });
-    await expect(regions).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Most recorded distilleries" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Latest releases" }),
-    ).toBeVisible();
-    await snapshot("Country overview", { ready: regions });
+  await page
+    .getByRole("link", { name: new RegExp(`^${testRegion.name} `) })
+    .click();
+  await expect(page).toHaveURL(
+    `/locations/${testCountry.slug}/regions/${testRegion.slug}`,
+  );
+  await expect(
+    page.getByRole("heading", { name: testRegion.name, exact: true }),
+  ).toBeVisible();
 
-    await page.goto(
-      `/locations/${testRegion.country.slug}/regions/${testRegion.slug}`,
-    );
-
-    const releases = page.getByRole("heading", { name: "Latest releases" });
-    await expect(
-      page.getByRole("heading", { name: "Most recorded distilleries" }),
-    ).toBeVisible();
-    await snapshot("Region overview", { ready: releases });
-  },
-);
+  await page
+    .getByRole("link", { name: testOtherRegion.name, exact: true })
+    .click();
+  await expect(page).toHaveURL(
+    `/locations/${testCountry.slug}/regions/${testOtherRegion.slug}`,
+  );
+  const regionHeading = page.getByRole("heading", {
+    name: testOtherRegion.name,
+    exact: true,
+  });
+  await expect(regionHeading).toBeVisible();
+  await snapshot("Region overview", { ready: regionHeading });
+});
 
 test("site administration route loads for an administrator", async ({
   context,

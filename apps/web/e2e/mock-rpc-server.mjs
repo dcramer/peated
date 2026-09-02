@@ -54,10 +54,11 @@ import {
   tastingNotes,
   testBottler,
   testBrand,
-  testCountry,
+  testCountries,
   testOwnedEntity,
   testOwner,
   testRegion,
+  testRegions,
   testUser,
   unifiedBottleEditContext,
 } from "./rpc-fixtures.mjs";
@@ -289,61 +290,83 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, {
         ...emptyList,
         results:
-          input?.owner && input.owner !== testOwner.id ? [] : [testOwnedEntity],
+          (input?.owner && input.owner !== testOwner.id) ||
+          (input?.country && input.country !== testRegion.country.slug) ||
+          (input?.region && input.region !== testRegion.slug)
+            ? []
+            : [testOwnedEntity],
       });
       return true;
-    case "regions/details":
-      if (
-        input?.country !== testRegion.country.slug ||
-        input?.region !== testRegion.slug
-      ) {
+    case "regions/details": {
+      const region = testRegions.find(
+        (region) =>
+          region.country.slug === input?.country &&
+          region.slug === input?.region,
+      );
+      if (!region) {
         sendRpcError(response, "Unexpected region details payload");
         return true;
       }
-      sendRpcResponse(response, testRegion);
+      sendRpcResponse(response, region);
       return true;
-    case "countries/details":
-      if (input?.country !== testCountry.slug) {
+    }
+    case "countries/details": {
+      const country = testCountries.find(
+        (country) => country.slug === input?.country,
+      );
+      if (!country) {
         sendRpcError(response, "Unexpected country details payload");
         return true;
       }
-      sendRpcResponse(response, testCountry);
+      sendRpcResponse(response, country);
       return true;
+    }
     case "countries/categories":
-      if (input?.country !== testRegion.country.slug) {
+      if (!testCountries.some((country) => country.slug === input?.country)) {
         sendRpcError(response, "Unexpected country categories payload");
         return true;
       }
       sendRpcResponse(response, {
-        results: [{ category: "single_malt", count: 1 }],
-        totalCount: 1,
+        results:
+          input.country === testRegion.country.slug
+            ? [{ category: "single_malt", count: 1 }]
+            : [],
+        totalCount: input.country === testRegion.country.slug ? 1 : 0,
       });
       return true;
     case "regions/categories":
       if (
-        input?.country !== testRegion.country.slug ||
-        input?.region !== testRegion.slug
+        !testRegions.some(
+          (region) =>
+            region.country.slug === input?.country &&
+            region.slug === input?.region,
+        )
       ) {
         sendRpcError(response, "Unexpected region categories payload");
         return true;
       }
       sendRpcResponse(response, {
-        results: [{ category: "single_malt", count: 1 }],
-        totalCount: 1,
+        results:
+          input.region === testRegion.slug
+            ? [{ category: "single_malt", count: 1 }]
+            : [],
+        totalCount: input.region === testRegion.slug ? 1 : 0,
       });
       return true;
     case "bottlers/list":
     case "companies/list":
-    case "countries/list":
       sendRpcResponse(response, emptyList);
       return true;
+    case "countries/list":
+      sendRpcResponse(response, { ...emptyList, results: testCountries });
+      return true;
     case "regions/list":
-      sendRpcResponse(
-        response,
-        input?.country === testCountry.slug
-          ? { ...emptyList, results: [testRegion] }
-          : emptyList,
-      );
+      sendRpcResponse(response, {
+        ...emptyList,
+        results: testRegions.filter(
+          (region) => !input?.country || region.country.slug === input.country,
+        ),
+      });
       return true;
     case "bottles/editContext":
       if (input?.bottle !== unifiedBottleEditContext.bottleId) {
@@ -782,15 +805,15 @@ async function handleRpcRequest({ request, response, url }) {
         });
         return true;
       }
-      if (
-        input?.country === testRegion.country.slug &&
-        (input?.region === undefined || input.region === testRegion.slug) &&
-        input?.limit === 5 &&
-        input?.sort === "-release"
-      ) {
+      if (input?.country || input?.region) {
         sendRpcResponse(
           response,
-          buildBottleListResponse([bottleGroupRepresentative]),
+          buildBottleListResponse(
+            input.country === testRegion.country.slug &&
+              (!input.region || input.region === testRegion.slug)
+              ? [bottleGroupRepresentative]
+              : [],
+          ),
         );
         return true;
       }
