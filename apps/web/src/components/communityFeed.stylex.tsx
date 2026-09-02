@@ -3,22 +3,26 @@ import * as stylex from "@stylexjs/stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { ItemList, ItemRow } from "./itemList.stylex";
+import { TextLink } from "./textLink.stylex";
 import TimeSince from "./timeSince";
 
 export type CommunityFeedItem = {
+  actor: string;
+  actorHref?: string;
+  bottleHref: string;
   date: string;
   description?: string;
   href: string;
   id: string;
   imageUrl?: string | null;
-  label: string;
+  kind: string;
   metadata?: string;
   rating?: string;
   title: string;
 };
 
 export function CommunityFeed({
-  ariaLabel = "Community",
+  ariaLabel = "Activity",
   items,
   limit,
 }: {
@@ -44,13 +48,30 @@ export function CommunityFeed({
               </span>
             </span>
           }
-          href={item.href}
           key={item.id}
           leading={<BottleVisual imageUrl={item.imageUrl} size="sm" />}
           metadata={item.metadata}
           metadataWrap
-          subtitle={item.label}
-          title={item.title}
+          subtitle={
+            <span {...stylex.props(styles.context)}>
+              {item.actorHref ? (
+                <TextLink href={item.actorHref} size="inherit">
+                  {item.actor}
+                </TextLink>
+              ) : (
+                item.actor
+              )}
+              <span aria-hidden="true"> · </span>
+              <TextLink href={item.href} size="inherit">
+                {item.kind}
+              </TextLink>
+            </span>
+          }
+          title={
+            <TextLink href={item.bottleHref} size="inherit" truncate>
+              {item.title}
+            </TextLink>
+          }
         />
       ))}
     </ItemList>
@@ -60,6 +81,12 @@ export function CommunityFeed({
 const MOBILE = "@media (max-width: 559px)";
 
 const styles = stylex.create({
+  context: {
+    display: "block",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
   facts: {
     display: "flex",
     minWidth: "84px",

@@ -10,7 +10,7 @@ import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Community",
+  title: "Activity",
   description: "Recent whisky tastings and critic reviews on Peated.",
 };
 
@@ -39,7 +39,7 @@ export default async function CommunityPage() {
         }
         description="Member tasting notes and published critic reviews, together by date."
         eyebrow="Tastings and reviews"
-        title="Community"
+        title="Activity"
       />
       <PageColumns>
         <PageSection heading="Latest">

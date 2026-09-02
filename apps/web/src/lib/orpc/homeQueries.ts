@@ -45,10 +45,6 @@ export const publicHomeQueries = {
     orpc.distilleries.list.queryOptions({
       input: { limit: 5, sort: "-bottles" },
     }),
-  recentBottles: (orpc: ORPCQueryUtils) =>
-    orpc.bottles.list.queryOptions({
-      input: { limit: 3, sort: "-created" },
-    }),
 };
 
 export const memberHomeQueries = {

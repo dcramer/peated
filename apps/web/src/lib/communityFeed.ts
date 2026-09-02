@@ -4,6 +4,7 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { CommunityFeedItem } from "@peated/web/components/communityFeed.stylex";
 import { RATING_BANDS } from "@peated/web/components/scoring.stylex";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 type CriticReview = Outputs["externalReviews"]["list"]["results"][number];
 type MemberTasting = Outputs["tastings"]["list"]["results"][number];
@@ -21,12 +22,14 @@ export function getCommunityFeedItems({
     const source = review.site?.name ?? review.reviewerName ?? "Critic";
     return [
       {
+        actor: source,
+        bottleHref: getBottleUrl(review.bottle),
         date: review.article.publishedAt ?? review.createdAt,
         description: getPreview(review.article.title),
         href: review.url,
         id: `critic-${review.id}`,
         imageUrl: review.bottle.imageUrl,
-        label: `${source} · Critic review`,
+        kind: "Critic review",
         metadata: getBottleMetadata(review.bottle),
         rating:
           review.nativeScore?.scale === 100
@@ -38,12 +41,15 @@ export function getCommunityFeedItems({
   });
   const tastingItems = memberTastings.map(
     (tasting): CommunityFeedItem => ({
+      actor: tasting.createdBy.username,
+      actorHref: `/users/${tasting.createdBy.username}`,
+      bottleHref: getBottleUrl(tasting.bottle),
       date: tasting.createdAt,
       description: getPreview(tasting.notes),
       href: `/tastings/${tasting.id}`,
       id: `tasting-${tasting.id}`,
       imageUrl: tasting.bottle.imageUrl,
-      label: `${tasting.createdBy.username} · Member tasting`,
+      kind: "Member tasting",
       metadata: getBottleMetadata(tasting.bottle),
       rating: tasting.ratingBand
         ? RATING_BANDS.find((band) => band.key === tasting.ratingBand)?.label
