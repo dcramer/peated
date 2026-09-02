@@ -1,32 +1,42 @@
-import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
+import type { Outputs } from "@peated/server/orpc/router";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { getProfilePage } from "@peated/web/lib/profilePage.server";
 
-import { ProfileTastingsPageClient } from "./profileTastingsPageClient.stylex";
+import { ProfileOverviewPageClient } from "./profileOverviewPageClient.stylex";
 
 export const fetchCache = "default-no-store";
 
-export default async function ProfilePageRoute(props: {
+export default async function ProfileOverviewPage(props: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { username } = await props.params;
   const { client } = await createServerClient();
   const user = await getProfilePage(username);
-  const tastingInput = getApiQueryParams(await props.searchParams, {
-    defaults: { cursor: 1 },
-    numericFields: ["cursor"],
-    overrides: { limit: 10, user: user.id },
-  });
-  const [regionList, tastingList] = await Promise.all([
-    client.users.regionList({ user: user.id }),
-    client.tastings.list(tastingInput),
+  const [activityList, badgePage, tastingStats] = await Promise.all([
+    client.users.activity.list({ limit: 3, user: user.id }),
+    client.users.badgeList({ cursor: 1, limit: 100, user: user.id }),
+    client.users.tastingStats({ user: user.id }),
   ]);
+  const badgeAwards: Outputs["users"]["badgeList"]["results"] = [
+    ...badgePage.results,
+  ];
+  let badgeCursor = badgePage.rel.nextCursor;
+
+  while (badgeCursor) {
+    const nextBadgePage = await client.users.badgeList({
+      cursor: badgeCursor,
+      limit: 100,
+      user: user.id,
+    });
+    badgeAwards.push(...nextBadgePage.results);
+    badgeCursor = nextBadgePage.rel.nextCursor;
+  }
 
   return (
-    <ProfileTastingsPageClient
-      initialRegionList={regionList}
-      initialTastingList={tastingList}
+    <ProfileOverviewPageClient
+      initialActivityList={activityList}
+      initialBadgeAwards={badgeAwards}
+      initialTastingStats={tastingStats}
     />
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
-import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
@@ -12,14 +11,12 @@ import {
   EmptyState,
   PageTabs,
   RowMenu,
-  SummaryStrip,
 } from "@peated/web/components";
 import { MemberProfileHeader } from "@peated/web/components/pages/memberProfileHeader.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../styles/tokens.stylex";
 import { ProfileProvider, type ProfileUser } from "./profileContext";
 
-type TastingStats = Outputs["users"]["tastingStats"];
 type FriendStatus = NonNullable<ProfileUser["friendStatus"]>;
 
 export function ProfileLayoutClient({
@@ -37,22 +34,7 @@ export function ProfileLayoutClient({
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
-  const isCurrentUser = currentUserId === initialUser.id;
   const [isModerator, setIsModerator] = useState(Boolean(initialUser.mod));
-  const ratingQuery = useQuery({
-    ...orpc.users.tastingStats.queryOptions({
-      input: { user: initialUser.id },
-    }),
-    enabled: !privateRecord,
-  });
-  const metadata = initialUser.createdAt
-    ? [`Joined ${formatJoinDate(initialUser.createdAt)}`]
-    : [];
-  const badges = initialUser.admin
-    ? ["Admin"]
-    : isModerator
-      ? ["Moderator"]
-      : [];
 
   return (
     <div {...stylex.props(styles.page)}>
@@ -66,13 +48,8 @@ export function ProfileLayoutClient({
             onModeratorChange={setIsModerator}
           />
         }
-        badges={badges}
-        metadata={metadata}
         pictureUrl={initialUser.pictureUrl}
         privateProfile={privateRecord}
-        ratingLabel={isCurrentUser ? "How you rate" : "How they rate"}
-        bands={getBands(ratingQuery.data)}
-        ratingsLoading={!privateRecord && ratingQuery.isPending}
         username={initialUser.username}
       />
 
@@ -85,36 +62,23 @@ export function ProfileLayoutClient({
         </div>
       ) : (
         <ProfileProvider currentUserId={currentUserId} user={initialUser}>
-          <div {...stylex.props(styles.summary)}>
-            <SummaryStrip
-              cells={[
-                { label: "Tastings", value: initialUser.stats.tastings },
-                { label: "Unique bottles", value: initialUser.stats.bottles },
-                { label: "In Library", value: initialUser.stats.library.total },
-                {
-                  label: "Contributions",
-                  value: initialUser.stats.contributions,
-                },
-              ]}
-            />
-          </div>
           <PageTabs
             ariaLabel={`${initialUser.username}'s profile`}
             currentHref={pathname}
             items={[
               {
-                count: initialUser.stats.tastings,
                 href: `/users/${initialUser.username}`,
+                label: "Overview",
+              },
+              {
+                count: initialUser.stats.tastings,
+                href: `/users/${initialUser.username}/tastings`,
                 label: "Tastings",
               },
               {
                 count: initialUser.stats.library.total,
                 href: `/users/${initialUser.username}/library`,
                 label: "Library",
-              },
-              {
-                href: `/users/${initialUser.username}/activity`,
-                label: "Activity",
               },
             ]}
           />
@@ -218,28 +182,8 @@ function ProfileActions({
   );
 }
 
-function getBands(stats?: TastingStats) {
-  if (!stats?.bands.total) return undefined;
-  return {
-    good: stats.bands.good,
-    mediocre: stats.bands.mediocre,
-    outstanding: stats.bands.outstanding,
-    unicorn: stats.bands.unicorn,
-    very_good: stats.bands.very_good,
-  };
-}
-
-function formatJoinDate(createdAt: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    timeZone: "UTC",
-    year: "numeric",
-  }).format(new Date(createdAt));
-}
-
 const styles = stylex.create({
   page: { minWidth: 0 },
-  summary: { marginTop: "6px", marginBottom: space.x6 },
-  content: { marginTop: space.x6 },
+  content: { marginTop: space.x8 },
   privateState: { maxWidth: "760px", marginTop: space.x6 },
 });

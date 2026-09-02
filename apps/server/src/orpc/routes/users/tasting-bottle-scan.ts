@@ -7,7 +7,13 @@ const TASTING_BOTTLE_SCAN_BATCH_SIZE = 200;
 
 export type UserBottleRead = Pick<
   typeof bottles.$inferSelect,
-  "brandId" | "category" | "flavorProfile" | "groupId" | "id" | "statedAge"
+  | "bottlerId"
+  | "brandId"
+  | "category"
+  | "flavorProfile"
+  | "groupId"
+  | "id"
+  | "statedAge"
 >;
 
 export type TastingBottleScanRow = {
@@ -72,6 +78,7 @@ export async function* scanUserTastingBottles(
         bottle: {
           id: bottles.id,
           groupId: bottles.groupId,
+          bottlerId: bottles.bottlerId,
           brandId: bottles.brandId,
           category: bottles.category,
           flavorProfile: bottles.flavorProfile,

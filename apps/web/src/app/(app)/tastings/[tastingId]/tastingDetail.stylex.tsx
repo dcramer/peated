@@ -82,7 +82,7 @@ export function TastingDetail({ tasting }: { tasting: Tasting }) {
           imageUrl={tasting.imageUrl ?? tasting.bottle.imageUrl}
           size="detail"
         />
-        <div {...stylex.props(styles.verdict)}>
+        <div {...stylex.props(styles.ratingSummary)}>
           <strong {...stylex.props(styles.ratingLabel)}>
             {rating?.label ?? "Not rated"}
           </strong>
@@ -97,9 +97,9 @@ export function TastingDetail({ tasting }: { tasting: Tasting }) {
         </div>
       </div>
 
-      <p {...stylex.props(styles.notes, !tasting.notes && styles.emptyNotes)}>
-        {tasting.notes || "No notes."}
-      </p>
+      {tasting.notes ? (
+        <p {...stylex.props(styles.notes)}>{tasting.notes}</p>
+      ) : null}
 
       {tasting.tags.length ? (
         <div {...stylex.props(styles.tags)}>
@@ -218,7 +218,7 @@ const styles = stylex.create({
       gap: space.x4,
     },
   },
-  verdict: {
+  ratingSummary: {
     display: "flex",
     minWidth: 0,
     flex: 1,
@@ -251,9 +251,6 @@ const styles = stylex.create({
     fontSize: "15px",
     lineHeight: 1.6,
     whiteSpace: "pre-wrap",
-  },
-  emptyNotes: {
-    color: colors.inkMuted,
   },
   tags: {
     display: "flex",

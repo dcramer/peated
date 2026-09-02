@@ -189,13 +189,13 @@ function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
   const member = {
     color: tasting.color === null ? undefined : formatColor(tasting.color),
     comments: tasting.comments,
-    description: tasting.notes ?? undefined,
-    descriptionHref: `/tastings/${tasting.id}`,
+    notes: tasting.notes ?? undefined,
+    notesHref: `/tastings/${tasting.id}`,
     hasToasted: tasting.hasToasted,
     imageKind: tasting.imageUrl ? ("photo" as const) : ("bottle" as const),
     imageUrl: tasting.imageUrl ?? bottle.imageUrl,
     name: formatBottleDisplayName(bottle, { includeBrand: false }),
-    notes: tasting.tags,
+    tags: tasting.tags,
     ratingBand: tasting.ratingBand ?? undefined,
     servingStyle: tasting.servingStyle
       ? formatServingStyle(tasting.servingStyle)

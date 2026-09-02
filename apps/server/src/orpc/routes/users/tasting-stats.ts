@@ -1,16 +1,42 @@
 import { EMPTY_TASTING_BAND_COUNTS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import {
+  bottles,
+  bottlesToDistillers,
+  entities,
+} from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { implement } from "@peated/server/orpc";
 import userTastingStatsContract from "@peated/server/orpc/contracts/users/tasting-stats";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { buildAgeStats } from "./age-stats";
 import {
   scanUserTastingBottles,
   UserBottleReadIntegrityError,
 } from "./tasting-bottle-scan";
+
+type ProducerStat = { id: number; name: string; count: number };
+
+function incrementCount(counts: Map<number, number>, id: number) {
+  counts.set(id, (counts.get(id) ?? 0) + 1);
+}
+
+function rankProducers(
+  counts: Map<number, number>,
+  entitiesById: Map<number, { id: number; name: string }>,
+): ProducerStat[] {
+  return Array.from(counts, ([id, count]) => {
+    const entity = entitiesById.get(id);
+    if (!entity) throw new Error(`Bottle references missing Entity ${id}.`);
+    return { id, name: entity.name, count };
+  })
+    .sort(
+      (left, right) =>
+        right.count - left.count || left.name.localeCompare(right.name),
+    )
+    .slice(0, 5);
+}
 
 export default implement(userTastingStatsContract).handler(async function ({
   input,
@@ -32,6 +58,9 @@ export default implement(userTastingStatsContract).handler(async function ({
 
   const ages: number[] = [];
   const bottleCounts = new Map<number, number>();
+  const brandCounts = new Map<number, number>();
+  const bottlerCounts = new Map<number, number>();
+  const distillerCounts = new Map<number, number>();
   const bands = { total: 0, ...EMPTY_TASTING_BAND_COUNTS };
   let total = 0;
   let unstatedCount = 0;
@@ -39,6 +68,22 @@ export default implement(userTastingStatsContract).handler(async function ({
   try {
     for await (const rows of scanUserTastingBottles(user.id)) {
       total += rows.length;
+      const bottleIds = Array.from(
+        new Set(rows.flatMap(({ bottle }) => (bottle ? [bottle.id] : []))),
+      );
+      const distillerRows = bottleIds.length
+        ? await db
+            .select()
+            .from(bottlesToDistillers)
+            .where(inArray(bottlesToDistillers.bottleId, bottleIds))
+        : [];
+      const distillerIdsByBottleId = new Map<number, number[]>();
+      for (const { bottleId, distillerId } of distillerRows) {
+        const ids = distillerIdsByBottleId.get(bottleId) ?? [];
+        ids.push(distillerId);
+        distillerIdsByBottleId.set(bottleId, ids);
+      }
+
       for (const { bottle, ratingBand } of rows) {
         if (ratingBand !== null) {
           bands[ratingBand] += 1;
@@ -47,6 +92,14 @@ export default implement(userTastingStatsContract).handler(async function ({
 
         if (bottle) {
           bottleCounts.set(bottle.id, (bottleCounts.get(bottle.id) ?? 0) + 1);
+          incrementCount(brandCounts, bottle.brandId);
+          if (bottle.bottlerId !== null) {
+            incrementCount(bottlerCounts, bottle.bottlerId);
+          }
+          for (const distillerId of distillerIdsByBottleId.get(bottle.id) ??
+            []) {
+            incrementCount(distillerCounts, distillerId);
+          }
         }
         if (bottle?.statedAge === null || !bottle) {
           unstatedCount += 1;
@@ -75,11 +128,32 @@ export default implement(userTastingStatsContract).handler(async function ({
           where: eq(bottles.id, mostTastedBottleId),
           with: { brand: true, group: true, series: true },
         });
+  const producerIds = Array.from(
+    new Set([
+      ...brandCounts.keys(),
+      ...bottlerCounts.keys(),
+      ...distillerCounts.keys(),
+    ]),
+  );
+  const producerEntities = producerIds.length
+    ? await db
+        .select({ id: entities.id, name: entities.name })
+        .from(entities)
+        .where(inArray(entities.id, producerIds))
+    : [];
+  const producersById = new Map(
+    producerEntities.map((entity) => [entity.id, entity]),
+  );
 
   return {
     total,
     uniqueBottles: bottleCounts.size,
     bands,
+    producers: {
+      brands: rankProducers(brandCounts, producersById),
+      bottlers: rankProducers(bottlerCounts, producersById),
+      distillers: rankProducers(distillerCounts, producersById),
+    },
     mostTastedBottle: mostTastedBottle
       ? {
           id: mostTastedBottle.id,

@@ -11,6 +11,7 @@ test("fails closed when a stored Bottle has no BottleGroup", () => {
       bottle: {
         id: 42,
         groupId: null,
+        bottlerId: null,
         brandId: 1,
         category: null,
         flavorProfile: null,

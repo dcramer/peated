@@ -37,6 +37,11 @@ describe("GET /users/:user/tasting-stats", () => {
         outstanding: 0,
         unicorn: 0,
       },
+      producers: {
+        brands: expect.any(Array),
+        bottlers: [],
+        distillers: [],
+      },
       mostTastedBottle: null,
       age: {
         knownCount: 4,
@@ -73,12 +78,89 @@ describe("GET /users/:user/tasting-stats", () => {
       unicorn: 0,
     });
     expect(data.mostTastedBottle).toBeNull();
+    expect(data.producers).toEqual({
+      brands: [],
+      bottlers: [],
+      distillers: [],
+    });
     expect(data.age).toMatchObject({
       knownCount: 0,
       median: null,
       oldest: null,
     });
     expect(data.age.buckets.every((bucket) => bucket.count === 0)).toBe(true);
+  });
+
+  test("ranks the producers represented in tastings", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brandA = await fixtures.Entity({
+      kind: "brand",
+      name: "Alpha Brand",
+    });
+    const brandB = await fixtures.Entity({
+      kind: "brand",
+      name: "Bravo Brand",
+    });
+    const bottlerA = await fixtures.Entity({
+      kind: "bottler",
+      name: "Alpha Bottler",
+    });
+    const bottlerB = await fixtures.Entity({
+      kind: "bottler",
+      name: "Bravo Bottler",
+    });
+    const distillerA = await fixtures.Entity({
+      kind: "distillery",
+      name: "Alpha Distillery",
+    });
+    const distillerB = await fixtures.Entity({
+      kind: "distillery",
+      name: "Bravo Distillery",
+    });
+    const bottleA = await fixtures.Bottle({
+      brandId: brandA.id,
+      bottlerId: bottlerA.id,
+      distillerIds: [distillerA.id],
+    });
+    const bottleB = await fixtures.Bottle({
+      brandId: brandA.id,
+      bottlerId: bottlerA.id,
+      distillerIds: [distillerA.id, distillerB.id],
+    });
+    const bottleC = await fixtures.Bottle({
+      brandId: brandB.id,
+      bottlerId: bottlerB.id,
+      distillerIds: [distillerB.id],
+    });
+
+    for (const bottleId of [bottleA.id, bottleA.id, bottleB.id, bottleC.id]) {
+      await fixtures.Tasting({
+        bottleId,
+        createdById: defaults.user.id,
+      });
+    }
+
+    const data = await routerClient.users.tastingStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.producers).toEqual({
+      brands: [
+        { id: brandA.id, name: brandA.name, count: 3 },
+        { id: brandB.id, name: brandB.name, count: 1 },
+      ],
+      bottlers: [
+        { id: bottlerA.id, name: bottlerA.name, count: 3 },
+        { id: bottlerB.id, name: bottlerB.name, count: 1 },
+      ],
+      distillers: [
+        { id: distillerA.id, name: distillerA.name, count: 3 },
+        { id: distillerB.id, name: distillerB.name, count: 2 },
+      ],
+    });
   });
 
   test("summarizes bands and repeated Bottles", async ({

@@ -9,28 +9,14 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import {
-  CursorPager,
-  LoadingList,
-  MemberAvatar,
-  SectionError,
-  type TastingEntryMember,
-} from "@peated/web/components";
-import {
-  MemberActivityList,
-  type MemberActivityItem,
-} from "@peated/web/components/pages/memberProfileContent.stylex";
+import { CursorPager, LoadingList, SectionError } from "@peated/web/components";
+import { MemberActivityList } from "@peated/web/components/pages/memberProfileContent.stylex";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
-import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
-import TimeSince from "@peated/web/components/timeSince";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import { toActivityItem } from "../profileActivity";
 import { useProfile } from "../profileContext";
 
-type Activity = Outputs["users"]["activity"]["list"]["results"][number];
 type ActivityList = Outputs["users"]["activity"]["list"];
 
 export function ProfileActivityPageClient({
@@ -137,62 +123,4 @@ export function ProfileActivityPageClient({
       </section>
     </PageColumns>
   );
-}
-
-function toActivityItem(activity: Activity): MemberActivityItem {
-  if (activity.type === "collection_add") {
-    return {
-      activity: {
-        author: activity.createdBy.username,
-        authorHref: `/users/${activity.createdBy.username}`,
-        collectionHref: activity.collection.href ?? undefined,
-        collectionName: activity.collection.name,
-        date: <TimeSince date={activity.createdAt} />,
-        id: activity.id,
-        items: activity.items.map((entry) => ({
-          brand: entry.bottle.brand.shortName || entry.bottle.brand.name,
-          brandHref: getEntityUrl({
-            id: entry.bottle.brand.id,
-            kind: "brand",
-            name: entry.bottle.brand.name,
-          }),
-          href: getBottleUrl(entry.bottle),
-          id: String(entry.id),
-          imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,
-          metadata: getBottleMetadata(entry.bottle).split(" · "),
-          name: formatBottleDisplayName(entry.bottle, {
-            includeBrand: false,
-          }),
-        })),
-        totalItems: activity.totalItems,
-      },
-      id: activity.id,
-      kind: "collection",
-    };
-  }
-
-  const [firstTasting, ...remainingTastings] = activity.tastings;
-  if (!firstTasting)
-    throw new Error("A tasting session must contain a tasting");
-  const members: [TastingEntryMember, ...TastingEntryMember[]] = [
-    getTastingEntryMember(firstTasting),
-    ...remainingTastings.map(getTastingEntryMember),
-  ];
-  return {
-    id: activity.id,
-    kind: "tasting",
-    tasting: {
-      author: activity.createdBy.username,
-      authorHref: `/users/${activity.createdBy.username}`,
-      authorId: activity.createdBy.id,
-      date: <TimeSince date={activity.lastActivityAt} />,
-      leading: (
-        <MemberAvatar
-          pictureUrl={activity.createdBy.pictureUrl}
-          username={activity.createdBy.username}
-        />
-      ),
-      members,
-    },
-  };
 }
