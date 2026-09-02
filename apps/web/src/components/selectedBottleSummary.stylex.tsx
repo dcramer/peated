@@ -33,7 +33,6 @@ export function SelectedBottleSummary({
         layout="cell"
         metadata={metadata ? metadata.split(" · ") : []}
         name={name}
-        size="sm"
       />
     </section>
   );

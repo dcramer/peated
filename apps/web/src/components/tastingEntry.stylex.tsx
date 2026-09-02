@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { foundationStyles } from "../styles/foundations.stylex";
 
 import {
   colors,
@@ -9,6 +10,7 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
+import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { Chip } from "./chip.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
 import { TastingToastSummary } from "./tastingToastButton.stylex";
@@ -91,7 +93,12 @@ export function TastingEntry({
                           {author}
                         </strong>
                       )}
-                      <span {...stylex.props(styles.date)}>
+                      <span
+                        {...stylex.props(
+                          foundationStyles.metadata,
+                          styles.date,
+                        )}
+                      >
                         {date}
                         {context ? (
                           <>
@@ -106,19 +113,29 @@ export function TastingEntry({
                     <AppLink
                       href={member.href}
                       title={member.name}
-                      {...stylex.props(styles.name, styles.nameLink)}
+                      {...stylex.props(
+                        foundationStyles.rowTitle,
+                        styles.name,
+                        styles.nameLink,
+                      )}
                     >
                       {member.name}
                     </AppLink>
                   ) : (
-                    <span title={member.name} {...stylex.props(styles.name)}>
+                    <span
+                      title={member.name}
+                      {...stylex.props(foundationStyles.rowTitle, styles.name)}
+                    >
                       {member.name}
                     </span>
                   )}
                   {member.metadata ? (
                     <span
                       title={member.metadata}
-                      {...stylex.props(styles.metadata)}
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.metadata,
+                      )}
                     >
                       {member.metadata}
                     </span>
@@ -151,7 +168,7 @@ export function TastingEntry({
                 </div>
               ) : null}
               {member.servingStyle || member.color ? (
-                <div {...stylex.props(styles.specs)}>
+                <div {...stylex.props(foundationStyles.metadata, styles.specs)}>
                   {member.servingStyle ? (
                     <span>{member.servingStyle}</span>
                   ) : null}
@@ -197,6 +214,10 @@ export function TastingMedia({
   imageUrl?: string | null;
   size: "card" | "detail";
 }) {
+  if (size === "card" && imageKind === "bottle") {
+    return <BottleVisual imageUrl={imageUrl} />;
+  }
+
   return (
     <span
       aria-hidden="true"
@@ -346,9 +367,6 @@ const styles = stylex.create({
   date: {
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -361,11 +379,6 @@ const styles = stylex.create({
     marginTop: space.x2,
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "19px",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1.15,
     textDecoration: "none",
     textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
@@ -380,15 +393,19 @@ const styles = stylex.create({
       default: colors.ink,
       ":hover": colors.accentDeep,
       ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
+    },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
     },
   },
   metadata: {
     marginTop: space.x1,
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
     textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
   },
@@ -428,9 +445,6 @@ const styles = stylex.create({
     gap: "14px",
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
   rating: {
     display: "flex",

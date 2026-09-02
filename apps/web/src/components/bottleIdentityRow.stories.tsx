@@ -5,8 +5,14 @@ import type { BottleRowActionControls } from "@peated/web/hooks/useBottleRowActi
 import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
 import { BottleRowActions } from "./bottleRowActions.stylex";
+import { CommunityFeed } from "./communityFeed.stylex";
+import { LoadingList } from "./feedback.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
+import { SearchResults } from "./searchResults.stylex";
+import { SectionHeading } from "./sectionHeading.stylex";
+import { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
+import { TastingEntry } from "./tastingEntry.stylex";
 
 const bottleActions = {
   groupsFor: () => [
@@ -38,7 +44,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use Bottle Identity Row in bottle lists. The bottle name is the main destination. Brand links, related releases, and action menus remain separate controls.",
+          "Use Bottle Identity Row in bottle lists. Three-line identities, activity entries, and selected-bottle summaries share the default medium BottleVisual size: 48 × 64px on desktop and 42 × 58px on mobile. The bottle name is the main destination. Brand links, related releases, and action menus remain separate controls.",
       },
     },
   },
@@ -108,6 +114,106 @@ export const Overview: Story = {
       </ItemListItem>
     </ItemList>
   ),
+};
+
+export const RowLayouts: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Compare the actual bottle, activity, tasting, search, selection, and loading components at wide and phone widths. They share thumbnail geometry and row typography. Use BottleVisual's small size only for compact two-line rails; BottleIdentityRow always uses the standard size.",
+      },
+    },
+  },
+  render: (args) => {
+    const title = [args.brand, args.name].filter(Boolean).join(" ");
+    const metadata = args.metadata?.join(" · ") ?? "";
+    return (
+      <StoryStack>
+        <section aria-label="Bottle list">
+          <SectionHeading level={3}>Bottle list</SectionHeading>
+          <BottleIdentityRow {...args} />
+        </section>
+        <section aria-label="Activity">
+          <SectionHeading level={3}>
+            Activity on the homepage and activity page
+          </SectionHeading>
+          <CommunityFeed
+            items={[
+              {
+                actor: "Whiskyfun",
+                actorHref: "https://example.com/review",
+                bottleHref: args.href!,
+                date: "2026-08-24T12:00:00.000Z",
+                href: "https://example.com/review",
+                id: "review",
+                imageUrl: args.imageUrl,
+                metadata,
+                score: 88,
+                title,
+              },
+            ]}
+          />
+        </section>
+        <section aria-label="Tasting">
+          <SectionHeading level={3}>Tasting</SectionHeading>
+          <TastingEntry
+            author="j.macleod"
+            date="August 24"
+            members={[
+              {
+                href: args.href,
+                imageUrl: args.imageUrl,
+                metadata,
+                name: title,
+                ratingBand: "outstanding",
+              },
+            ]}
+          />
+        </section>
+        <section aria-label="Search">
+          <SectionHeading level={3}>Search</SectionHeading>
+          <SearchResults
+            embedded
+            groups={[
+              {
+                id: "bottles",
+                label: "Bottles",
+                items: [
+                  {
+                    href: args.href!,
+                    id: "bottle",
+                    metadata,
+                    title,
+                    visual: {
+                      kind: "bottle",
+                      imageUrl: args.imageUrl,
+                      label: title,
+                    },
+                  },
+                ],
+              },
+            ]}
+            query=""
+          />
+        </section>
+        <section aria-label="Selection">
+          <SectionHeading level={3}>Selected bottle</SectionHeading>
+          <SelectedBottleSummary
+            brand={args.brand!}
+            imageUrl={args.imageUrl}
+            metadata={metadata}
+            name={args.name}
+            onChange={() => undefined}
+          />
+        </section>
+        <section aria-label="Loading">
+          <SectionHeading level={3}>Loading</SectionHeading>
+          <LoadingList rows={1} />
+        </section>
+      </StoryStack>
+    );
+  },
 };
 
 export const InteractionStates: Story = {

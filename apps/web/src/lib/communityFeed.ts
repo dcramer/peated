@@ -22,6 +22,7 @@ export function getCommunityFeedItems({
     return [
       {
         actor: source,
+        actorHref: review.url,
         bottleHref: getBottleUrl(review.bottle),
         date: review.article.publishedAt ?? review.createdAt,
         description: getPreview(review.clip ?? review.article.title),

@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
 
 import { colors, fonts, space } from "../styles/tokens.stylex";
-import { AppLink, isInternalAppHref } from "./appLink";
+import { AppLink } from "./appLink";
 import { BottleVisual } from "./bottleIdentityRow.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
@@ -24,7 +25,10 @@ export type CommunityFeedItem = {
   title: string;
 };
 
-/** Centers ratings beside bottle identity, with the excerpt below and independent bottle links. */
+/**
+ * Owns activity rows on the homepage and /activity, including ratings and independent bottle links.
+ * Callers supply items and limits; row markup and styling stay here.
+ */
 export function CommunityFeed({
   ariaLabel = "Activity",
   items,
@@ -47,17 +51,23 @@ export function CommunityFeed({
               linkedRowStyles.onGround,
             )}
           >
-            <BottleVisual imageUrl={item.imageUrl} size="sm" />
+            <BottleVisual imageUrl={item.imageUrl} />
             <div {...stylex.props(styles.heading)}>
               <div {...stylex.props(styles.identity)}>
                 <AppLink
                   href={item.href}
                   title={item.title}
-                  {...stylex.props(styles.title, linkedRowStyles.primaryLink)}
+                  {...stylex.props(
+                    foundationStyles.rowTitle,
+                    styles.title,
+                    linkedRowStyles.primaryLink,
+                  )}
                 >
                   {item.title}
                 </AppLink>
-                <div {...stylex.props(styles.context)}>
+                <div
+                  {...stylex.props(foundationStyles.metadata, styles.context)}
+                >
                   {item.actorHref ? (
                     <TextLink href={item.actorHref} size="inherit">
                       {item.actor}
@@ -65,13 +75,12 @@ export function CommunityFeed({
                   ) : (
                     item.actor
                   )}
-                  {!isInternalAppHref(item.href) ? (
-                    <span aria-hidden="true"> ↗</span>
-                  ) : null}
                   <span aria-hidden="true"> · </span>
                   <TimeSince date={item.date} />
                 </div>
-                <div {...stylex.props(styles.metadata)}>
+                <div
+                  {...stylex.props(foundationStyles.metadata, styles.metadata)}
+                >
                   {item.metadata ? <>{item.metadata} · </> : null}
                   <TextLink href={item.bottleHref} size="inherit">
                     View bottle
@@ -104,7 +113,9 @@ export function CommunityFeed({
               ) : null}
             </div>
             {item.description ? (
-              <p {...stylex.props(styles.excerpt)}>{item.description}</p>
+              <p {...stylex.props(foundationStyles.body, styles.excerpt)}>
+                {item.description}
+              </p>
             ) : null}
           </article>
         </ItemListItem>
@@ -119,7 +130,7 @@ const styles = stylex.create({
   entry: {
     boxSizing: "border-box",
     display: "grid",
-    gridTemplateColumns: "32px minmax(0, 1fr)",
+    gridTemplateColumns: "auto minmax(0, 1fr)",
     alignItems: "center",
     columnGap: space.x3,
     rowGap: space.x2,
@@ -141,11 +152,6 @@ const styles = stylex.create({
   title: {
     display: "block",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.25,
     textDecoration: "none",
     whiteSpace: "normal",
     textWrap: "pretty",
@@ -153,16 +159,10 @@ const styles = stylex.create({
   context: {
     marginTop: "3px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
   },
   metadata: {
     marginTop: "3px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
   facts: {
     display: "flex",
@@ -199,9 +199,6 @@ const styles = stylex.create({
     gridColumn: "2",
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
     fontStyle: "italic",
-    lineHeight: 1.6,
   },
 });

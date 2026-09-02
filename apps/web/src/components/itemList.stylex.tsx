@@ -1,14 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { foundationStyles } from "../styles/foundations.stylex";
 
-import {
-  colors,
-  controlMetrics,
-  effects,
-  fonts,
-  space,
-  zIndices,
-} from "../styles/tokens.stylex";
+import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { getTextTitle } from "./textTitle";
@@ -101,6 +95,7 @@ export function ItemRow({
               href={href}
               title={getTextTitle(title)}
               {...stylex.props(
+                foundationStyles.rowTitle,
                 styles.title,
                 size === "sm" && styles.smallTitle,
                 linkedRowStyles.primaryLink,
@@ -112,6 +107,7 @@ export function ItemRow({
             <span
               title={getTextTitle(title)}
               {...stylex.props(
+                foundationStyles.rowTitle,
                 styles.title,
                 size === "sm" && styles.smallTitle,
               )}
@@ -122,7 +118,7 @@ export function ItemRow({
           {subtitle ? (
             <div
               title={getTextTitle(subtitle)}
-              {...stylex.props(styles.subtitle)}
+              {...stylex.props(foundationStyles.metadata, styles.subtitle)}
             >
               {subtitle}
             </div>
@@ -131,6 +127,7 @@ export function ItemRow({
             <div
               title={getTextTitle(metadata)}
               {...stylex.props(
+                foundationStyles.metadata,
                 styles.metadata,
                 size === "sm" && styles.smallMetadata,
                 metadataWrap && styles.wrappedMetadata,
@@ -140,7 +137,9 @@ export function ItemRow({
             </div>
           ) : null}
           {description ? (
-            <div {...stylex.props(styles.description)}>{description}</div>
+            <div {...stylex.props(foundationStyles.body, styles.description)}>
+              {description}
+            </div>
           ) : null}
         </div>
         {end ? <div {...stylex.props(styles.end)}>{end}</div> : null}
@@ -210,9 +209,6 @@ const styles = stylex.create({
     maxWidth: "100%",
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -220,11 +216,6 @@ const styles = stylex.create({
     display: "block",
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.25,
     textDecoration: "none",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -241,9 +232,6 @@ const styles = stylex.create({
     marginTop: "3px",
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -258,9 +246,6 @@ const styles = stylex.create({
   description: {
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.55,
   },
   end: {
     display: "flex",

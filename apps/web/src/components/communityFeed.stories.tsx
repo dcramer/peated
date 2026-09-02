@@ -45,6 +45,7 @@ export const Overview: Story = {
       },
       {
         actor: "Words of Whisky",
+        actorHref: "https://example.com/reviews/lagavulin-16",
         bottleHref: "/bottles/7-lagavulin-16-year-old",
         date: "2026-08-27T12:00:00.000Z",
         description: "Revisiting Lagavulin 16-year-old",

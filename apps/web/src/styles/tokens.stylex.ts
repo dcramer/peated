@@ -176,6 +176,12 @@ export const space = stylex.defineVars({
   x12: "48px",
 });
 
+// BottleVisual and LoadingList share the standard row thumbnail geometry.
+export const bottleThumbnailMetrics = stylex.defineVars({
+  width: { default: "48px", "@media (max-width: 639px)": "42px" },
+  height: { default: "64px", "@media (max-width: 639px)": "58px" },
+});
+
 // These tokens own cross-component stacking. Local stacking contexts can use
 // localContent and localControl. Page-level surfaces must use the semantic
 // layer that matches their runtime role.
