@@ -241,8 +241,8 @@ importers:
   apps/server:
     dependencies:
       '@faker-js/faker':
-        specifier: ^8.4.1
-        version: 8.4.1
+        specifier: ^10.5.0
+        version: 10.5.0
       '@google-cloud/storage':
         specifier: ^7.19.0
         version: 7.19.0(supports-color@8.1.1)
@@ -2174,9 +2174,9 @@ packages:
     resolution: {integrity: sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@faker-js/faker@8.4.1':
-    resolution: {integrity: sha512-XQ3cU+Q8Uqmrbf2e0cIC/QN43sTBSC8KF12u29Mb47tWrt2hAgBXSgpZMj4Ao8Uk0iJcU99QsOCaIL8934obCg==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+  '@faker-js/faker@10.5.0':
+    resolution: {integrity: sha512-bsxD8WLS5lIj7aaoCx1YJkktqYj5vlBUE6HWzu2Q51ksrGJ0H737ECCKlFU7Yf8Br45z9t99frBp/J7kzbMPAg==}
+    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
   '@fission-ai/openspec@1.5.0':
     resolution: {integrity: sha512-SLZkyF51gFYkISufZKaka0X04z4y/WCjPOcCB+EC7tALd0TC+7V76BOIzWOSIOhdhBWwh5EMIBhrgLnugIh1DA==}
@@ -12217,7 +12217,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@faker-js/faker@8.4.1': {}
+  '@faker-js/faker@10.5.0': {}
 
   '@fission-ai/openspec@1.5.0(@types/node@26.1.0)(rxjs@7.8.1)':
     dependencies:
