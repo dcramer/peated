@@ -54,11 +54,13 @@ Run the normal E2E suite, then capture the Storybook stories:
 
 ```sh
 pnpm test:e2e
+pnpm storybook:screenshots:build
 pnpm storybook:screenshots
 ```
 
 Images and `manifest.json` go to `apps/web/.playwright/visual/`. The E2E suite
-resets the directory, and the Storybook command adds its screenshots.
+resets the directory, and the Storybook command adds its screenshots from the
+static build.
 
 Storybook screenshot paths follow the story hierarchy. The story name is a
 Frameshift variant, so related states stay together. For example, the

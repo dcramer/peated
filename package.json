@@ -14,6 +14,7 @@
     "dev:web": "dotenv -e .env.local -- turbo dev --filter=\"./apps/web\"",
     "storybook": "pnpm --filter @peated/web storybook",
     "storybook:build": "pnpm --filter @peated/web storybook:build",
+    "storybook:screenshots:build": "pnpm --filter @peated/web storybook:screenshots:build",
     "storybook:screenshots": "pnpm --filter @peated/web storybook:screenshots",
     "dev:server": "dotenv -e .env.local -- turbo dev --filter=\"./apps/server\"",
     "dev:server:api": "dotenv -e .env.local -- pnpm --filter='./apps/server' dev:api",

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -8,6 +8,8 @@ import {
   storiesFromIndex,
 } from "./storybook-screenshots.mjs";
 
+const capturePageCount = 4;
+
 test("capture Storybook stories", async ({ page, request }) => {
   const indexResponse = await request.get("/index.json");
   expect(indexResponse.ok()).toBe(true);
@@ -16,42 +18,26 @@ test("capture Storybook stories", async ({ page, request }) => {
 
   const output = visualOutputRoot();
   const screenshots: Array<{ file: string; label: string }> = [];
-  for (const story of stories) {
-    await test.step(`${story.title} / ${story.name}`, async () => {
-      const url = new URL("/iframe.html", storybookUrl());
-      url.searchParams.set("id", story.id);
-      url.searchParams.set("viewMode", "story");
-      url.searchParams.set("globals", "theme:light");
+  const extraPages = await Promise.all(
+    Array.from({ length: Math.min(capturePageCount, stories.length) - 1 }, () =>
+      page.context().newPage(),
+    ),
+  );
+  const pages = [page, ...extraPages];
+  let nextStory = 0;
 
-      await page.goto(url.href, { waitUntil: "domcontentloaded" });
-      await expect(page.locator("#storybook-root > *").first()).toBeVisible();
-      await page.evaluate(async () => {
-        await document.fonts.ready;
-        await Promise.all(
-          Array.from(document.images, (image) =>
-            image.decode().catch(() => {}),
-          ),
+  await Promise.all(
+    pages.map(async (capturePage) => {
+      while (nextStory < stories.length) {
+        const story = stories[nextStory++];
+        const label = `${story.title} / ${story.name}`;
+        const screenshot = await test.step(label, () =>
+          captureStory(capturePage, story, output),
         );
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      });
-
-      const file = screenshotFile(story);
-      await fs.mkdir(path.dirname(path.join(output, file)), {
-        recursive: true,
-      });
-      await page.screenshot({
-        animations: "disabled",
-        caret: "hide",
-        fullPage: true,
-        path: path.join(output, file),
-        type: "png",
-      });
-      screenshots.push({
-        file,
-        label: `${story.title} / ${story.name}`,
-      });
-    });
-  }
+        screenshots.push(screenshot);
+      }
+    }),
+  );
 
   const browserVersion = page.context().browser()?.version();
   if (!browserVersion) {
@@ -64,8 +50,42 @@ test("capture Storybook stories", async ({ page, request }) => {
   });
 });
 
-function storybookUrl() {
-  return process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+type Story = ReturnType<typeof storiesFromIndex>[number];
+
+async function captureStory(page: Page, story: Story, output: string) {
+  const search = new URLSearchParams({
+    globals: "theme:light",
+    id: story.id,
+    viewMode: "story",
+  });
+
+  await page.goto(`/iframe.html?${search}`, {
+    waitUntil: "domcontentloaded",
+  });
+  await expect(page.locator("#storybook-root > *").first()).toBeVisible();
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(
+      Array.from(document.images, (image) => image.decode().catch(() => {})),
+    );
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  });
+
+  const file = screenshotFile(story);
+  await fs.mkdir(path.dirname(path.join(output, file)), {
+    recursive: true,
+  });
+  await page.screenshot({
+    animations: "disabled",
+    caret: "hide",
+    fullPage: true,
+    path: path.join(output, file),
+    type: "png",
+  });
+  return {
+    file,
+    label: `${story.title} / ${story.name}`,
+  };
 }
 
 function visualOutputRoot() {

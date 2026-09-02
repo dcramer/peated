@@ -65,6 +65,8 @@ jobs:
           VISUAL_SOURCE_SHA: ${{ github.sha }}
           VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate
         run: pnpm test:e2e
+      - name: Build Storybook for screenshots
+        run: pnpm storybook:screenshots:build
       - name: Capture Storybook stories
         env:
           VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate

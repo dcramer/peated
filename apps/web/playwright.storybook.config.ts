@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6006";
+const baseURL = process.env.STORYBOOK_URL ?? "http://127.0.0.1:6007";
 
 export default defineConfig({
   testDir: "./visual",
@@ -29,9 +29,9 @@ export default defineConfig({
   webServer: process.env.STORYBOOK_URL
     ? undefined
     : {
-        command: "pnpm storybook",
-        reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        command: "pnpm storybook:preview",
+        reuseExistingServer: false,
+        timeout: 30_000,
         url: `${baseURL}/index.json`,
       },
 });
