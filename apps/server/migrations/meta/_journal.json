@@ -1856,6 +1856,13 @@
       "when": 1788304399017,
       "tag": "0264_right_demogoblin",
       "breakpoints": false
+    },
+    {
+      "idx": 265,
+      "version": "7",
+      "when": 1788359336827,
+      "tag": "0265_violet_legion",
+      "breakpoints": false
     }
   ]
 }

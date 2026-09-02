@@ -365,6 +365,7 @@ export function parseWhiskyfunArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews,
     },
+    externalReviewTexts: reviewTexts,
   });
 }
 

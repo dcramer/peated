@@ -142,6 +142,7 @@ export function parseWhiskyNotesArticle(
   if (!contentText) throw new Error("WhiskyNotes article content is missing.");
 
   const reviewList = [];
+  const externalReviewTexts: Record<string, string> = {};
   const headings = content
     .find("h2")
     .toArray()
@@ -174,6 +175,7 @@ export function parseWhiskyNotesArticle(
       reviewerName,
       nativeScore: reviewScore?.nativeScore ?? null,
     });
+    externalReviewTexts[sourceKey] = sectionText;
   }
 
   if (reviewList.length === 0) {
@@ -189,6 +191,7 @@ export function parseWhiskyNotesArticle(
       contentHash: createHash("sha256").update(contentText).digest("hex"),
       externalReviews: reviewList,
     },
+    externalReviewTexts,
   });
 }
 

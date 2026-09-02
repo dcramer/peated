@@ -65,6 +65,7 @@ export const externalReviews = pgTable(
     nativeScoreValue: doublePrecision("native_score_value"),
     nativeScoreScale: doublePrecision("native_score_scale"),
     nativeScoreDisplay: text("native_score_display"),
+    clip: text("clip"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

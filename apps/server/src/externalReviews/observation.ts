@@ -1,6 +1,7 @@
 import { CategoryEnum, NativeScoreSchema } from "@peated/server/schemas";
 import { z } from "zod";
 
+const MAX_REVIEW_TEXT_LENGTH = 50_000;
 const ReviewSourceKeySchema = z.string().trim().min(1).max(255);
 
 export const ExternalReviewObservationSchema = z
@@ -57,8 +58,33 @@ export const ExternalReviewArticleIngestionSchema = z
     article: ExternalReviewArticleObservationSchema.safeExtend({
       publishedAt: z.date(),
     }),
+    externalReviewTexts: z
+      .record(
+        ReviewSourceKeySchema,
+        z
+          .string()
+          .trim()
+          .min(1)
+          .transform((value) => value.slice(0, MAX_REVIEW_TEXT_LENGTH)),
+      )
+      .default({}),
   })
-  .strict();
+  .strict()
+  .superRefine(({ article, externalReviewTexts }, context) => {
+    const sourceKeys = new Set(
+      article.externalReviews.map(({ sourceKey }) => sourceKey),
+    );
+    for (const sourceKey of Object.keys(externalReviewTexts)) {
+      if (!sourceKeys.has(sourceKey)) {
+        context.addIssue({
+          code: "custom",
+          message:
+            "External review text must match an external review source key.",
+          path: ["externalReviewTexts", sourceKey],
+        });
+      }
+    }
+  });
 
 export type ExternalReviewArticleIngestion = z.infer<
   typeof ExternalReviewArticleIngestionSchema

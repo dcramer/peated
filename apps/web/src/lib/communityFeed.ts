@@ -22,7 +22,7 @@ export function getCommunityFeedItems({
     return [
       {
         date: review.article.publishedAt ?? review.createdAt,
-        description: getPreview(review.article.title),
+        description: getPreview(review.clip ?? review.article.title),
         href: review.url,
         id: `critic-${review.id}`,
         imageUrl: review.bottle.imageUrl,

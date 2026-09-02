@@ -1,7 +1,8 @@
 import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
-import { ExternalReviewArticleObservationSchema } from "@peated/server/externalReviews/observation";
+import { createReviewClip } from "@peated/server/externalReviews/clip";
+import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
@@ -9,23 +10,22 @@ import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = z
-  .object({
-    externalSiteId: z.number().int().positive(),
-    fetchedAt: z.date(),
-    article: ExternalReviewArticleObservationSchema,
-  })
-  .strict();
+const InputSchema = ExternalReviewArticleIngestionSchema.safeExtend({
+  externalSiteId: z.number().int().positive(),
+  fetchedAt: z.date(),
+});
 type ExternalReviewArticleIngestionCandidate = Partial<
   z.input<typeof InputSchema>
 >;
 
 export interface ExternalReviewIngestionServices {
+  createClip: typeof createReviewClip;
   queueMissingBottles: typeof pushUniqueJob;
   reportError: typeof logTelemetryError;
 }
 
 const externalReviewIngestionServices: ExternalReviewIngestionServices = {
+  createClip: createReviewClip,
   queueMissingBottles: pushUniqueJob,
   reportError: logTelemetryError,
 };
@@ -53,9 +53,12 @@ export async function ingestExternalReviewArticle(
       referenceMatch = await findBottleReferenceAssignment(referenceName);
       if (referenceMatch) break;
     }
+    const reviewText = input.externalReviewTexts[externalReview.sourceKey];
+    const clip = reviewText ? await services.createClip(reviewText) : null;
     storedExternalReviews.push({
       ...externalReview,
       bottleId: referenceMatch?.bottleId ?? null,
+      clip: clip ?? undefined,
     });
   }
 

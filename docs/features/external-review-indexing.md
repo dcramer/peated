@@ -1,8 +1,9 @@
 # External Review Indexing
 
 Peated indexes external reviews to help readers find the publisher's full
-article. Peated stores structured review facts. It does not republish the
-article body, tasting notes, conclusion, or images.
+article. Peated stores structured review facts and can generate a short review
+clip. It does not republish the article body, complete tasting notes,
+conclusion, or images.
 
 This document owns review publishing, the adapter contract, source approval,
 and rollback. The [scraper runtime](../../apps/server/src/scraper/README.md)
@@ -63,7 +64,8 @@ The adapter emits one strict article observation with:
   hash;
 - one or more Bottle review observations;
 - a stable key, Bottle name, optional reviewer, optional native score, and
-  exact source display text for each scored review.
+  exact source display text for each scored review; and
+- optional temporary review text keyed by the matching review source key.
 
 Review keys must be unique within the article and stable across runs. Array
 position is not a stable key. One article can own several reviews.
@@ -98,8 +100,9 @@ once in the scraper module. Each adapter test owns only publisher behavior.
 8. Test resume behavior. A completed article must not be requested again while
    it remains in the current discovery window. A failed parse or sink call must
    remain eligible for replay.
-9. Keep publisher prose transient. Parser setup can inspect the planned review
-   section, but collection must not store it or send it to another service.
+9. Keep publisher text temporary. The adapter can pass the planned review
+   section to the shared review import for clip generation. Do not store the
+   complete review text.
 10. Before merge, run the registered source through the local scraper runtime
     against the current public pages. Inspect the terminal status, request
     count, emitted article and review counts, cursor, and observations. Replace
@@ -118,15 +121,25 @@ visibility, call a model, or store records. The sink and external-review
 ingestion boundary own those actions. Unresolved or invalid Bottle matches stay
 hidden.
 
-## Transient Publisher Content
+## Temporary Publisher Content
 
 Fetched HTML and publisher prose stay in process memory only. Do not put them
 in article metadata, a cursor, checkpoint, log, error, database row, or test
 snapshot.
 
-Parser setup can use transient review text to prove that its selectors found
-the review body. The collection sink discards that text and stores only the
-structured article and review facts.
+Parser setup can use temporary review text to prove that its selectors found
+the review body. The shared review import can send that text to the clip
+function. It stores only the returned clip with the article and review facts.
+
+Clip generation uses one shared function for every review source. There are no
+source-specific model permissions. Set `EXTERNAL_REVIEW_CLIPS_ENABLED=false`
+to stop all clip calls for cost control or an operational problem. Missing
+text, a disabled setting, missing model configuration, invalid output, and
+request failures all produce no new clip and do not block review ingestion. A
+failed refresh keeps any clip already stored for that review.
+
+The live model check in `clip.eval.test.ts` uses both review text and a page
+with no review. It runs through `pnpm evals`, not the normal test command.
 
 ## Pilot Procedure
 
@@ -172,8 +185,8 @@ the next older link. Historical articles keep the publisher's daily date anchor
 and date. When the archive ends, later runs check only the current feed.
 Requests are at least 2.5 seconds apart. The target allows 25 requests per hour,
 and each worker pass stops after 30 requests. The scraper saves dates, reviewer
-names, scores, and review links. It does not save review text. After this date
-fix, the scraper starts the old archive from the beginning once.
+names, scores, and review links. Complete review text is not stored. After this
+date fix, the scraper starts the old archive from the beginning once.
 
 Dramface runs once per day. It reads at most 20 current links from the public
 review index. It does not request Squarespace feeds, JSON views, APIs, search,
@@ -189,8 +202,7 @@ archive, RSS, WordPress APIs, search, or the load-more endpoint. Requests are
 at least 2.5 seconds apart. The target allows 25 requests per hour, and each
 worker pass stops after 25 requests. The adapter splits multi-bottle articles
 into scored reviews. It stores exact timestamps, the published writer, native
-scores, and canonical links. Tasting notes stay transient and are discarded
-after parsing.
+scores, and canonical links. Complete tasting notes are not stored.
 
 The Whiskey Reviewer runs once per day. It reads only the five links in the
 public homepage Recent Reviews list. It does not request the alphabetical
@@ -198,7 +210,7 @@ archive, category pages, sitemaps, feeds, search, or WordPress APIs. Requests
 are at least five seconds apart. The target allows 10 requests per hour, and
 each worker pass stops after six requests. The adapter stores the writer,
 canonical link, displayed letter grade, and required URL date. Tasting-note
-paragraphs stay transient and are discarded after parsing.
+paragraphs stay transient and complete review text is not stored.
 
 Bourbon Culture runs once per day. It reads only the six links under Latest
 Whiskey Reviews on the public homepage. It does not request archives, ratings
@@ -206,7 +218,7 @@ pages, sitemaps, feeds, search, or WordPress APIs. Requests are at least five
 seconds apart. The target allows 10 requests per hour, and each worker pass
 stops after seven requests. The adapter stores the writer, exact publication
 timestamp, canonical link, and native 10-point score. Tasting-note paragraphs
-stay transient and are discarded after parsing.
+stay transient and complete review text is not stored.
 
 Fred Minnick runs once per day. It reads the public sitemap index and only the
 newest two post sitemaps. It does not request the empty Reviews page, the main
@@ -216,7 +228,7 @@ The target allows 10 requests per hour, and each worker pass stops after eight
 source requests plus the governed robots request when its cache is stale. The
 adapter stores the explicit date, canonical link, and Fred
 Minnick reviewer attribution. Native scores stay absent. Tasting paragraphs
-stay transient and are discarded after parsing.
+stay transient and complete review text is not stored.
 
 Whisky Saga runs once per day. It reads the 20 current article cards on the
 public Scotland category page, then advances one public Older Posts page from
@@ -225,8 +237,8 @@ links with `offset` and `category` parameters. It does not request the full
 sitemap, search, other query filters, or Squarespace APIs. Requests are at
 least 2.5 seconds apart. The target allows 25 requests per hour, and each worker
 pass stops after 22 requests. The scraper saves the exact date and time, author,
-review link, and 100-point score. It does not save review text. After this date
-fix, the scraper starts the old pages from the beginning once.
+review link, and 100-point score. Complete review text is not stored. After this
+date fix, the scraper starts the old pages from the beginning once.
 
 The Whisky Study runs once per day. It reads only the 20 article cards on the
 first public Scotch review index page. It does not request older pagination,
@@ -234,8 +246,8 @@ the sitemap, search, query filters, or Squarespace APIs. Requests are at least
 2.5 seconds apart. The target allows 25 requests per hour, and each worker pass
 stops after 21 source requests plus the governed robots request when its cache
 is stale. The adapter stores the exact publication timestamp, author, canonical
-link, and native 100-point score. Review text stays transient and is discarded
-after parsing.
+link, and native 100-point score. Review text stays transient and complete
+review text is not stored.
 
 Approve publication only after the reviewed sample passes the gate.
 Use the same source-specific process for each later publisher. Do not add a

@@ -236,6 +236,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
           },
         ],
       },
+      externalReviewTexts: {},
     });
     await session.emit({ sourceKey: review.url, value });
     completedReviewUrls.add(review.url);

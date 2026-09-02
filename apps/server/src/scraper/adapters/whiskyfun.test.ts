@@ -111,6 +111,12 @@ test("extracts scored reviews with stable source keys", async () => {
   expect(
     parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   ).toEqual(reparsed.article.externalReviews.map(({ sourceKey }) => sourceKey));
+  expect(Object.keys(parsed.externalReviewTexts)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
+  );
+  expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toContain(
+    "Unscored introduction",
+  );
 });
 
 test("discovers the newest archive and the next older linked page", () => {

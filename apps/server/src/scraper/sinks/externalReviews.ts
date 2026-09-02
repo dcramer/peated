@@ -9,5 +9,6 @@ export const externalReviewSink: ScraperSink<
     externalSiteId,
     fetchedAt: new Date(),
     article: observation.value.article,
+    externalReviewTexts: observation.value.externalReviewTexts,
   });
 };
