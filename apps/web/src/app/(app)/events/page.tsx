@@ -1,4 +1,4 @@
-import { EmptyState } from "@peated/web/components";
+import { ButtonLink, EmptyState } from "@peated/web/components";
 import {
   PageHeader,
   PageSection,
@@ -8,6 +8,8 @@ import dayjs from "dayjs";
 import type { Metadata } from "next";
 
 import { EventList } from "./eventList.stylex";
+import { getEventRegionPageState } from "./eventRegionData";
+import { EventRegionFilter } from "./eventRegionFilter.stylex";
 
 export const metadata: Metadata = {
   title: "Whisky events",
@@ -15,14 +17,22 @@ export const metadata: Metadata = {
     "Major whisky festivals and shows, with dates and official websites.",
 };
 
-export default async function EventsPage() {
-  const { client } = await getAnonymousServerClient();
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ region?: string | string[] }>;
+}) {
+  const [{ client }, params] = await Promise.all([
+    getAnonymousServerClient(),
+    searchParams,
+  ]);
   const eventList = await client.events.list({
     limit: 100,
     onlyUpcoming: true,
     sort: "date",
   });
-  const monthGroups = Map.groupBy(eventList.results, (event) =>
+  const regionState = getEventRegionPageState(eventList.results, params.region);
+  const monthGroups = Map.groupBy(regionState.results, (event) =>
     dayjs(event.dateStart).format("YYYY-MM"),
   );
 
@@ -34,6 +44,14 @@ export default async function EventsPage() {
         title="Whisky events"
       />
       {eventList.results.length ? (
+        <EventRegionFilter
+          options={regionState.options}
+          selectedRegion={regionState.selectedRegion}
+          total={eventList.results.length}
+          visible={regionState.results.length}
+        />
+      ) : null}
+      {regionState.results.length ? (
         [...monthGroups].map(([month, events]) => (
           <PageSection
             heading={dayjs(`${month}-01`).format("MMMM YYYY")}
@@ -44,8 +62,23 @@ export default async function EventsPage() {
         ))
       ) : (
         <PageSection heading="Upcoming events">
-          <EmptyState heading="No upcoming events">
-            There are no confirmed dates to show.
+          <EmptyState
+            action={
+              regionState.selectedRegion ? (
+                <ButtonLink href="/events" size="sm" variant="tonal">
+                  View all events
+                </ButtonLink>
+              ) : undefined
+            }
+            heading={
+              regionState.selectedRegion
+                ? `No upcoming events in ${regionState.selectedRegion.label}`
+                : "No upcoming events"
+            }
+          >
+            {regionState.selectedRegion
+              ? "There are no confirmed dates in this region."
+              : "There are no confirmed dates to show."}
           </EmptyState>
         </PageSection>
       )}
