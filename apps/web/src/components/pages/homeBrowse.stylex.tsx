@@ -407,7 +407,7 @@ const styles = stylex.create({
   },
   regionGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: "6px",
     marginTop: space.x2,
     [NARROW]: {
@@ -468,7 +468,7 @@ const styles = stylex.create({
   },
   countryGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: "6px",
     marginTop: space.x4,
     [NARROW]: {

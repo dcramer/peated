@@ -54,7 +54,6 @@ export function PublicHome({
     <HomePage
       content={
         <PageColumns
-          equal
           rail={
             <>
               {upcomingEvent ? (
@@ -66,7 +65,6 @@ export function PublicHome({
                 </div>
               ) : null}
               <div {...stylex.props(styles.secondaryRail)}>
-                <Activity />
                 <Distilleries totalDistilleries={stats.data?.distilleries} />
                 <HomeContributionPrompt
                   primaryAction={
@@ -99,6 +97,7 @@ export function PublicHome({
               </div>
             ) : null}
             <LatestReleases />
+            <Activity />
             <div {...stylex.props(styles.desktopOnly)}>
               <Origins />
             </div>
