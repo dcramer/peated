@@ -9,17 +9,16 @@ import { SearchBox } from "../searchBox.stylex";
 import { searchResultGroups } from "../storyData";
 
 const databaseItems = [
+  { href: "/activity", label: "Activity" },
   { href: "/bottles", label: "Bottles" },
-  { href: "/locations", label: "Locations" },
   { href: "/distillers", label: "Distillers" },
-  { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
 ] as const;
 
 const personalItems = [
   { count: 41, href: "/library", label: "Library" },
   { count: 412, href: "/tastings", label: "Tastings" },
-  { count: 38, href: "/friends", label: "Friends" },
+  { href: "/following", label: "Following" },
 ] as const;
 
 const scopes = [
@@ -49,6 +48,7 @@ function HeaderExample({
         signedIn
           ? [
               { href: "/profile", label: "Profile" },
+              { href: "/friends", label: "Friends" },
               { href: "/settings", label: "Settings" },
               { label: "Sign out", onSelect: () => undefined },
             ]

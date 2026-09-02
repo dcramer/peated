@@ -4,17 +4,16 @@ import { NavigationTabs } from "./navigation.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const databaseItems = [
+  { href: "/activity", label: "Activity" },
   { href: "/bottles", label: "Bottles" },
-  { href: "/locations", label: "Locations" },
   { href: "/distillers", label: "Distillers" },
-  { href: "/brands", label: "Brands" },
   { href: "/bottlers", label: "Bottlers" },
 ] as const;
 
 const personalItems = [
   { href: "/library", label: "Library" },
   { href: "/tastings", label: "Tastings" },
-  { href: "/friends", label: "Friends" },
+  { href: "/following", label: "Following" },
 ] as const;
 
 const meta = {
