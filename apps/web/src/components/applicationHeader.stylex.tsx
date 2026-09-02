@@ -20,6 +20,7 @@ import {
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { IconButton } from "./button.stylex";
+import { menuSurfaceStyles } from "./menuSurface.stylex";
 import {
   isCurrentNavigationHref,
   NavigationTabs,
@@ -185,28 +186,47 @@ export function ApplicationHeader({
             </div>
           ) : null}
           {account ? (
-            <HeadlessMenu
-              as="div"
-              {...stylex.props(
-                styles.account,
-                searchOpen && styles.hiddenDuringSearch,
+            <HeadlessMenu as={Fragment}>
+              {({ open }) => (
+                <div
+                  {...stylex.props(
+                    styles.account,
+                    open && styles.accountOpen,
+                    searchOpen && styles.hiddenDuringSearch,
+                  )}
+                >
+                  <MenuButton
+                    aria-label={accountLabel}
+                    {...stylex.props(
+                      styles.accountButton,
+                      open && styles.accountButtonOpen,
+                    )}
+                  >
+                    {account}
+                  </MenuButton>
+                  <MenuItems
+                    portal={false}
+                    {...stylex.props(
+                      styles.accountMenu,
+                      menuSurfaceStyles.surface,
+                    )}
+                  >
+                    <div {...stylex.props(styles.accountMenuHeader)}>
+                      Account
+                    </div>
+                    <div {...stylex.props(styles.accountMenuSeparator)} />
+                    <div {...stylex.props(styles.accountMenuItems)}>
+                      {(accountItems ?? personalItems).map((item) => (
+                        <AccountMenuItem
+                          currentHref={currentHref}
+                          item={item}
+                          key={"onSelect" in item ? item.label : item.href}
+                        />
+                      ))}
+                    </div>
+                  </MenuItems>
+                </div>
               )}
-            >
-              <MenuButton
-                aria-label={accountLabel}
-                {...stylex.props(styles.accountButton)}
-              >
-                {account}
-              </MenuButton>
-              <MenuItems portal={false} {...stylex.props(styles.accountMenu)}>
-                {(accountItems ?? personalItems).map((item) => (
-                  <AccountMenuItem
-                    currentHref={currentHref}
-                    item={item}
-                    key={"onSelect" in item ? item.label : item.href}
-                  />
-                ))}
-              </MenuItems>
             </HeadlessMenu>
           ) : null}
           {hasSearch ? (
@@ -461,8 +481,14 @@ const styles = stylex.create({
   account: {
     position: "relative",
     display: "inline-flex",
+    isolation: "isolate",
+  },
+  accountOpen: {
+    zIndex: zIndices.menuControl,
   },
   accountButton: {
+    position: "relative",
+    zIndex: zIndices.localControl,
     display: "inline-flex",
     width: controlMetrics.controlHeightSmall,
     height: controlMetrics.controlHeightSmall,
@@ -480,18 +506,43 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  accountButtonOpen: {
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "transparent",
+      ":active": "transparent",
+    },
+  },
   accountMenu: {
     position: "absolute",
-    top: "calc(100% + 4px)",
+    top: 0,
     right: 0,
-    zIndex: zIndices.menu,
+    zIndex: zIndices.localContent,
     width: "220px",
+    outline: "none",
+  },
+  accountMenuHeader: {
+    boxSizing: "border-box",
+    height: controlMetrics.controlHeightSmall,
+    paddingTop: "11px",
+    paddingRight: "48px",
+    paddingLeft: space.x3,
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "10px",
+    letterSpacing: "0.08em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
+  accountMenuSeparator: {
+    height: "1px",
+    marginRight: space.x3,
+    marginLeft: space.x3,
+    backgroundColor: colors.hairline,
+  },
+  accountMenuItems: {
     paddingTop: space.x1,
     paddingBottom: space.x1,
-    borderRadius: "3px",
-    outline: "none",
-    backgroundColor: colors.ground,
-    boxShadow: effects.overlayShadow,
   },
   accountMenuItem: {
     display: "flex",

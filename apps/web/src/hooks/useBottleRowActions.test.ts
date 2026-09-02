@@ -1,22 +1,22 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { getSeriesBottleActionGroups } from "./seriesPageClient.stylex";
+import { getBottleRowActionGroups } from "./useBottleRowActions";
 
 function getGroups(
-  overrides: Partial<Parameters<typeof getSeriesBottleActionGroups>[0]> = {},
+  overrides: Partial<Parameters<typeof getBottleRowActionGroups>[0]> = {},
 ) {
-  return getSeriesBottleActionGroups({
+  return getBottleRowActionGroups({
     bottle: { id: 42 },
+    changePending: false,
     isLibrary: false,
     isLoggedIn: true,
-    libraryMutationPending: false,
     onLibraryToggle: vi.fn(),
     thisBottlePending: false,
     ...overrides,
   });
 }
 
-describe("getSeriesBottleActionGroups", () => {
+describe("getBottleRowActionGroups", () => {
   it("links to the tasting form", () => {
     expect(getGroups()[0]).toEqual([
       {
@@ -26,7 +26,7 @@ describe("getSeriesBottleActionGroups", () => {
     ]);
   });
 
-  it("sends anonymous members through the protected library flow", () => {
+  it("sends anonymous members through the protected Library flow", () => {
     expect(getGroups({ isLoggedIn: false })[1]).toEqual([
       {
         href: "/addBottle?bottle=42&intent=library",
@@ -35,7 +35,7 @@ describe("getSeriesBottleActionGroups", () => {
     ]);
   });
 
-  it("toggles the signed-in member's library state", () => {
+  it("toggles the signed-in member's Library state", () => {
     const onLibraryToggle = vi.fn();
     const action = getGroups({ isLibrary: true, onLibraryToggle })[1]?.[0];
 
@@ -46,10 +46,10 @@ describe("getSeriesBottleActionGroups", () => {
     });
   });
 
-  it("shows which library change is pending", () => {
+  it("shows which Library change is pending", () => {
     expect(
       getGroups({
-        libraryMutationPending: true,
+        changePending: true,
         thisBottlePending: true,
       })[1]?.[0],
     ).toMatchObject({

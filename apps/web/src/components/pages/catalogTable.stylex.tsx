@@ -14,7 +14,7 @@ export type CatalogTableColumn<Item> = {
   key: string;
   padding?: "default" | "flush";
   priority?: "primary" | "secondary";
-  width?: "action" | "count" | "rating";
+  width?: "action" | "count" | "menu" | "rating";
 };
 
 export type CatalogTableProps<Item> = {
@@ -182,6 +182,9 @@ const styles = stylex.create({
       width: "92px",
     },
   },
+  menuWidth: {
+    width: "40px",
+  },
   ratingWidth: {
     width: "184px",
     [COMPACT]: {
@@ -202,5 +205,6 @@ const alignStyles = {
 const widthStyles = {
   action: styles.actionWidth,
   count: styles.countWidth,
+  menu: styles.menuWidth,
   rating: styles.ratingWidth,
 } as const;

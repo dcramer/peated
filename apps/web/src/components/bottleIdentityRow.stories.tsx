@@ -28,7 +28,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use Bottle Identity Row in bottle lists. The bottle name is the primary destination; brand, related-release, and row-action controls remain independently interactive.",
+          "Use Bottle Identity Row in bottle lists. The bottle name is the main destination. Brand links, related releases, and action menus remain separate controls.",
       },
     },
   },
@@ -81,12 +81,19 @@ export const Overview: Story = {
               groups={[
                 [
                   {
-                    label: "Remove from library",
+                    label: "Log a tasting",
+                    onSelect: () => undefined,
+                  },
+                ],
+                [
+                  {
+                    label: "Remove from Library",
                     onSelect: () => undefined,
                   },
                 ],
               ]}
               label={args.name}
+              triggerVariant="text"
             />
           }
           isLibrary

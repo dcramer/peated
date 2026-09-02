@@ -13,6 +13,7 @@ import {
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { IconButton, type ButtonVariant } from "./button.stylex";
+import { menuSurfaceStyles } from "./menuSurface.stylex";
 
 const MENU_ANCHORS = {
   page: {
@@ -75,7 +76,7 @@ export function RowMenu({
           <MenuItems
             anchor={MENU_ANCHORS[variant]}
             aria-label={`${label} actions`}
-            {...stylex.props(styles.menu)}
+            {...stylex.props(styles.menu, menuSurfaceStyles.surface)}
           >
             <div
               title={label}
@@ -195,23 +196,7 @@ const styles = stylex.create({
   menu: {
     zIndex: zIndices.menu,
     width: "216px",
-    overflow: "hidden",
-    borderRadius: controlMetrics.radius,
     outline: "none",
-    backgroundColor: colors.ground,
-    color: colors.ink,
-    boxShadow: effects.overlayShadow,
-    "::after": {
-      boxSizing: "border-box",
-      position: "absolute",
-      inset: 0,
-      borderWidth: "1px",
-      borderStyle: "solid",
-      borderColor: colors.sectionRule,
-      borderRadius: controlMetrics.radius,
-      content: '""',
-      pointerEvents: "none",
-    },
   },
   menuTrigger: {
     position: "absolute",

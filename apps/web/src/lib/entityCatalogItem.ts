@@ -2,6 +2,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity } from "@peated/server/types";
 
 import type { EntityCatalogItem } from "@peated/web/components/pages/entityCatalog.stylex";
+import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 export function toEntityCatalogItem(
@@ -18,6 +19,7 @@ export function toEntityCatalogItem(
   ].filter((value): value is string => value !== null);
 
   return {
+    createBottleHref: getEntityBottleCreateHref(entity),
     href: getEntityUrl(entity),
     id: entity.id,
     isFollowing,
