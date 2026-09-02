@@ -1,5 +1,6 @@
 import type { LocationMap } from "@peated/web/lib/locationMap";
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
 import {
   BottleList,
@@ -24,6 +25,7 @@ export function LocationOverview({
   categories,
   distilleries,
   distillersHref,
+  flavorProfile,
   latestReleases,
   otherRegions = [],
   otherRegionsHref,
@@ -42,6 +44,7 @@ export function LocationOverview({
     totalBottles: number;
   }[];
   distillersHref: string;
+  flavorProfile?: ReactNode;
   latestReleases: readonly BottleListItem[];
   otherRegions?: readonly LocationPreviewCardProps[];
   otherRegionsHref?: string;
@@ -61,6 +64,7 @@ export function LocationOverview({
               <LocationVisual visual={visual} />
             </PageSection>
           ) : null}
+          {flavorProfile}
           {productionRules ? (
             <PageSection heading="Production rules">
               <p {...stylex.props(styles.copy)}>{productionRules}</p>

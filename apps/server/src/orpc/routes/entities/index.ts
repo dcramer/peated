@@ -8,6 +8,7 @@ import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
 import events from "./events";
+import flavorProfile from "./flavor-profile";
 import follow from "./follow";
 import images from "./images";
 import list from "./list";
@@ -32,6 +33,7 @@ export default base.tag("entities").router({
   categories,
   events,
   follow,
+  flavorProfile,
   images,
   list,
   unfollow,

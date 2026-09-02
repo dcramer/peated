@@ -18,7 +18,6 @@ export const metadata: Metadata = {
 export default function BotPage() {
   return (
     <ContentPage
-      eyebrow="Automated access"
       intro="PeatedBot collects public whisky catalog, availability, and review metadata."
       title="PeatedBot"
     >

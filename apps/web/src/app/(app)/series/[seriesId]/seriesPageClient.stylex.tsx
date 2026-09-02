@@ -133,7 +133,6 @@ export function SeriesPageClient({
             <Markdown content={initialSeries.description} />
           ) : undefined
         }
-        eyebrow="Whisky series"
         identity={<PeatedId id={initialSeries.peatedId} />}
         parent={
           <TextLink href={getEntityUrl(initialSeries.brand)}>

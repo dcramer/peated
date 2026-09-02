@@ -82,7 +82,6 @@ export function FollowingPageClient({
 
   return (
     <CatalogPage
-      eyebrow="Your record"
       filters={
         <FilterPanel
           ariaLabel="Following filters"

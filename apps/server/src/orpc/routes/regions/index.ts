@@ -3,12 +3,14 @@ import categories from "./categories";
 import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
+import flavorProfile from "./flavor-profile";
 import list from "./list";
 import update from "./update";
 
 export default base.tag("regions").router({
   categories,
   details,
+  flavorProfile,
   list,
   create,
   update,

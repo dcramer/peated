@@ -52,7 +52,6 @@ export default function RatingsPage() {
     <AboutPage
       currentHref="/about/ratings"
       description="A tasting takes one of five ratings. A written review takes a whole number out of 100. Neither is ever converted into the other."
-      eyebrow="Reference · two measures"
       rail={
         <RailSection heading="Where these appear">
           <RailList ariaLabel="Rating examples">

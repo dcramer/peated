@@ -22,7 +22,7 @@ export function LocationsIndexFrame({ children }: { children: ReactNode }) {
 
   return (
     <div>
-      <PageHeader eyebrow="Whisky database" title="Locations" />
+      <PageHeader title="Locations" />
       <div {...stylex.props(styles.indexTabs)}>
         <PageTabs
           ariaLabel="Location sections"

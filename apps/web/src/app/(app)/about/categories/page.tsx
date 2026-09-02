@@ -90,7 +90,6 @@ export default function CategoriesPage() {
     <AboutPage
       currentHref="/about/categories"
       description="Peated records the most specific whisky style the bottle's label or another reliable source supports. Country and region stay separate from style."
-      eyebrow={`Reference · ${categories.length} categories`}
       rail={
         <>
           <RailSection heading="Sources">

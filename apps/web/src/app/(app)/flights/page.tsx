@@ -42,7 +42,6 @@ export default async function FlightsPage(props: {
           </ButtonLink>
         }
         description="Group bottles for a side-by-side tasting."
-        eyebrow="Your record"
         title="Flights"
       />
       <PageSection heading="Your flights">

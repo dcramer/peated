@@ -22,6 +22,7 @@ import {
   SelectedBottleSummary,
   ServingStyleInput,
   Textarea,
+  TextLink,
   ValidationMessage,
   type MemberPickerOption,
   type NotePickerOption,
@@ -482,7 +483,20 @@ export default function TastingForm(
             ) : currentStep === 1 ? (
               <FormSection title="What you tasted">
                 <Field
-                  hint="Suggested from this bottle's own tastings."
+                  hint={
+                    <>
+                      Suggested from this bottle's own tastings.{" "}
+                      <TextLink
+                        href="/about/tasting-wheel"
+                        tone="muted"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="About the tasting wheel (opens in a new tab)"
+                      >
+                        About the tasting wheel
+                      </TextLink>
+                    </>
+                  }
                   htmlFor="review-notes"
                   label="Notes"
                   optional
@@ -641,7 +655,20 @@ export default function TastingForm(
           {recordType === "tasting" && currentStep === 1 ? (
             <FormSection title="What you tasted">
               <Field
-                hint="Suggested from this bottle's own tastings."
+                hint={
+                  <>
+                    Suggested from this bottle's own tastings.{" "}
+                    <TextLink
+                      href="/about/tasting-wheel"
+                      tone="muted"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="About the tasting wheel (opens in a new tab)"
+                    >
+                      About the tasting wheel
+                    </TextLink>
+                  </>
+                }
                 htmlFor="tasting-notes"
                 label="Notes"
                 optional

@@ -1,5 +1,10 @@
 "use client";
 
+import * as stylex from "@stylexjs/stylex";
+import { space } from "../../../../styles/tokens.stylex";
+
+import { PlaceFlavorProfile } from "@peated/web/features/flavorProfile/placeFlavorProfile";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useQuery } from "@tanstack/react-query";
 
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
@@ -95,6 +100,15 @@ export function EntityOverviewClient() {
       relationships={
         <>
           <EntityMap entity={entity} />
+          {entity.kind === "distillery" ? (
+            <div {...stylex.props(styles.flavorProfile)}>
+              <PlaceFlavorProfile
+                key={entity.id}
+                scope={{ kind: "distillery", entity: entity.id }}
+                bottlesHref={`${getEntityUrl(entity)}/bottles`}
+              />
+            </div>
+          ) : null}
           <EntityCatalogRelationships
             catalog={catalogQuery.data}
             entity={entity}
@@ -114,3 +128,7 @@ export function EntityOverviewClient() {
     />
   );
 }
+
+const styles = stylex.create({
+  flavorProfile: { paddingTop: space.x6 },
+});

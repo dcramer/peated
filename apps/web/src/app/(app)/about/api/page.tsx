@@ -29,7 +29,6 @@ export default function ApiPage() {
     <AboutPage
       currentHref="/about/api"
       description="Peated publishes its whisky catalog through a JSON API."
-      eyebrow="Reference · JSON over HTTPS"
       rail={
         <RailSection heading="API resources">
           <RailList ariaLabel="Peated API resources">

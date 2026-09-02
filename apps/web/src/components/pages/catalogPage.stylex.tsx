@@ -3,21 +3,19 @@ import type { ReactNode } from "react";
 
 import { LoadingList, LoadingPlaceholder } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 
 export function CatalogPage({
   action,
   children,
-  eyebrow = "Whisky database",
   filters,
   navigation,
   title,
 }: {
   action?: ReactNode;
   children: ReactNode;
-  eyebrow?: ReactNode;
   filters: ReactNode;
   navigation?: ReactNode;
   title: ReactNode;
@@ -30,10 +28,7 @@ export function CatalogPage({
           navigation ? styles.titleRowWithNavigation : null,
         )}
       >
-        <div>
-          <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
-          <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
-        </div>
+        <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
         {action}
       </header>
       {navigation ? (
@@ -80,15 +75,6 @@ const styles = stylex.create({
   },
   navigation: {
     marginBottom: space.x6,
-  },
-  eyebrow: {
-    marginBottom: space.x1,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   layout: {
     display: "grid",
