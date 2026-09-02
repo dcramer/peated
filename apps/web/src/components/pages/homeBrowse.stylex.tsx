@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { needsRegionMapCredit } from "../../lib/locationMap";
+import { RegionMapCredit } from "../locationMapIcon/credit.stylex";
 
 import {
   BottleList,
@@ -124,11 +126,19 @@ export function HomeRegionGrid({
   regions: readonly LocationPreviewCardProps[];
 }) {
   return (
-    <div {...stylex.props(styles.regionGrid)}>
-      {regions.map((region) => (
-        <LocationPreviewCard key={region.href} {...region} />
-      ))}
-    </div>
+    <>
+      <div {...stylex.props(styles.regionGrid)}>
+        {regions.map((region) => (
+          <LocationPreviewCard key={region.href} {...region} />
+        ))}
+      </div>
+      {regions.some(
+        ({ visual }) =>
+          visual?.kind !== "count" && needsRegionMapCredit(visual),
+      ) ? (
+        <RegionMapCredit />
+      ) : null}
+    </>
   );
 }
 
