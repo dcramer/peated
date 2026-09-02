@@ -617,6 +617,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.1(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
       vite-plugin-svgr:
         specifier: 5.2.0
         version: 5.2.0(rollup@4.62.2)(supports-color@8.1.1)(typescript@5.9.3)(vite@8.2.1(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
