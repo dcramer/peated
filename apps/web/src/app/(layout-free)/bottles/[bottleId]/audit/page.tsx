@@ -85,10 +85,10 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
       <form onSubmit={runAudit}>
         <FormStack>
           <SelectedBottleSummary
-            bottleId={bottle.peatedId}
+            brand={bottle.brand.shortName || bottle.brand.name}
             imageUrl={bottle.imageUrl}
             metadata={getBottleMetadata(bottle)}
-            name={formatBottleDisplayName(bottle)}
+            name={formatBottleDisplayName(bottle, { includeBrand: false })}
           />
           {error ? <FormNotice>{error}</FormNotice> : null}
           {summary ? (

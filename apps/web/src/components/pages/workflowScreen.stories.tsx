@@ -25,9 +25,9 @@ export const Overview: Story = {
     <WorkflowScreen {...args} saveHint="Step 2 of 3">
       <FormStack>
         <SelectedBottleSummary
-          bottleId="B00872"
+          brand="Ardbeg"
           metadata="54.2% ABV · NAS · Islay"
-          name="Ardbeg Uigeadail"
+          name="Uigeadail"
         />
         <FormSection title="Your tasting">
           <FormGrid>
@@ -56,9 +56,9 @@ export const Saving: Story = {
   render: (args) => (
     <WorkflowScreen {...args} saveHint="Saving this tasting">
       <SelectedBottleSummary
-        bottleId="B00872"
+        brand="Ardbeg"
         metadata="54.2% ABV · NAS · Islay"
-        name="Ardbeg Uigeadail"
+        name="Uigeadail"
       />
     </WorkflowScreen>
   ),

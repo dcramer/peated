@@ -64,6 +64,15 @@ export type FormStepsProps = {
 export function FormSteps({ currentStep, steps }: FormStepsProps) {
   return (
     <nav aria-label="Form progress" {...stylex.props(styles.steps)}>
+      <div {...stylex.props(styles.stepSummary)}>
+        <strong {...stylex.props(styles.stepSummaryLabel)}>
+          {steps[currentStep]}
+        </strong>
+        <span aria-hidden="true">·</span>
+        <span>
+          {currentStep + 1} of {steps.length}
+        </span>
+      </div>
       <ol {...stylex.props(styles.stepList)}>
         {steps.map((step, index) => (
           <li
@@ -75,16 +84,20 @@ export function FormSteps({ currentStep, steps }: FormStepsProps) {
               index === currentStep && styles.currentStep,
             )}
           >
-            <span aria-hidden="true">{index + 1}</span>
             <span title={step} {...stylex.props(styles.stepLabel)}>
               {step}
             </span>
+            <span
+              aria-hidden="true"
+              {...stylex.props(
+                styles.stepSegment,
+                index < currentStep && styles.completedStepSegment,
+                index === currentStep && styles.currentStepSegment,
+              )}
+            />
           </li>
         ))}
       </ol>
-      <span {...stylex.props(styles.stepCount)}>
-        Step {currentStep + 1} of {steps.length}
-      </span>
     </nav>
   );
 }
@@ -211,35 +224,47 @@ const styles = stylex.create({
     boxSizing: "border-box",
     display: "flex",
     minWidth: 0,
-    alignItems: "center",
-    gap: space.x4,
+    flexDirection: "column",
+    rowGap: space.x2,
     paddingTop: 0,
     paddingRight: 0,
     paddingBottom: space.x3,
     paddingLeft: 0,
     backgroundColor: "transparent",
-    "@media (max-width: 559px)": {
-      gap: space.x3,
-    },
+  },
+  stepSummary: {
+    display: "none",
+    alignItems: "baseline",
+    columnGap: space.x1,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    lineHeight: 1.4,
+    "@media (max-width: 559px)": { display: "flex" },
+  },
+  stepSummaryLabel: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
   },
   stepList: {
     display: "flex",
     minWidth: 0,
-    flex: 1,
-    gap: space.x4,
+    gap: space.x2,
     margin: 0,
     padding: 0,
     listStyle: "none",
-    "@media (max-width: 559px)": { gap: space.x3 },
   },
   step: {
     display: "flex",
     minWidth: 0,
-    alignItems: "baseline",
+    flex: 1,
+    flexDirection: "column",
     gap: space.x2,
     color: colors.inkMuted,
     fontFamily: fonts.reading,
-    fontSize: "14px",
+    fontSize: "13px",
     fontWeight: 600,
     letterSpacing: 0,
     lineHeight: 1.3,
@@ -255,14 +280,17 @@ const styles = stylex.create({
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+    "@media (max-width: 559px)": { display: "none" },
   },
-  stepCount: {
-    flexShrink: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
+  stepSegment: {
+    display: "block",
+    width: "100%",
+    height: "4px",
+    borderRadius: "2px",
+    backgroundColor: colors.hairline,
   },
+  completedStepSegment: { backgroundColor: colors.accent },
+  currentStepSegment: { backgroundColor: colors.accent },
   notice: {
     boxSizing: "border-box",
     padding: 0,

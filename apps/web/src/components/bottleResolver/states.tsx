@@ -249,10 +249,12 @@ export function PhotoMatchCreateState({
             />
           ) : null}
           <SelectedBottleSummary
-            bottleId={matchedBottle.peatedId}
+            brand={matchedBottle.brand.shortName || matchedBottle.brand.name}
             imageUrl={matchedBottle.imageUrl}
             metadata={getMatchedBottleMetadata(matchedBottle)}
-            name={formatBottleDisplayName(matchedBottle)}
+            name={formatBottleDisplayName(matchedBottle, {
+              includeBrand: false,
+            })}
           />
           <LabelFacts result={result} />
           {renderMatchedResultActions ? (

@@ -8,10 +8,10 @@ const meta = {
   title: "Components/Bottles/Selected Bottle Summary",
   component: SelectedBottleSummary,
   args: {
-    bottleId: "B00872",
+    brand: "Lagavulin",
     imageUrl: BottleImage.src,
     metadata: "Islay · 16 years · 43.0% ABV · ex-bourbon",
-    name: "Lagavulin 16",
+    name: "16-year-old",
     onChange: () => undefined,
   },
   argTypes: {
@@ -35,7 +35,7 @@ export const Overview: Story = {
       <SelectedBottleSummary {...args} />
       <SelectedBottleSummary {...args} onChange={undefined} />
       <SelectedBottleSummary
-        bottleId="B104281"
+        brand="Bruichladdich"
         imageUrl={null}
         metadata="Islay · No age statement · 61.5% ABV · oloroso and bourbon casks"
         name="Octomore Edition 15.3 Islay Barley Super Heavily Peated"

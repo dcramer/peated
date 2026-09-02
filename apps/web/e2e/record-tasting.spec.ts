@@ -115,7 +115,7 @@ test.describe("log tasting", () => {
     );
     await chooseVeryGood(page);
     await snapshot("Tasting form / Tasting / 1 Rating", {
-      ready: page.getByRole("heading", { name: "Your rating" }),
+      ready: page.getByRole("heading", { name: "How was it?" }),
     });
     await fillComments(page, tastingNotes);
     await snapshot("Tasting form / Tasting / 2 Notes", {
