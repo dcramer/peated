@@ -13,6 +13,7 @@ const MOBILE = "@media (max-width: 559px)";
 
 const aboutTabs = [
   { href: "/about", label: "About" },
+  { href: "/about/api", label: "API" },
   { href: "/about/categories", label: "Whisky categories" },
   { href: "/about/ratings", label: "Rating guide" },
   { href: "/updates", label: "Recent changes" },
@@ -64,6 +65,21 @@ export function AboutLink({ children, ...props }: TextLinkProps) {
 export function AboutTextStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.textStack)}>{children}</div>;
 }
+
+/* oxlint-disable jsx-a11y/no-noninteractive-tabindex -- Overflowing code must be keyboard-scrollable. */
+export function AboutCode({ children }: { children: string }) {
+  return (
+    <pre
+      aria-label="Example API request"
+      role="region"
+      tabIndex={0}
+      {...stylex.props(styles.codeBlock)}
+    >
+      <code>{children}</code>
+    </pre>
+  );
+}
+/* oxlint-enable jsx-a11y/no-noninteractive-tabindex */
 
 export function ReviewSteps({
   steps,
@@ -119,6 +135,18 @@ const styles = stylex.create({
     fontFamily: fonts.reading,
     fontSize: "15px",
     lineHeight: 1.7,
+  },
+  codeBlock: {
+    maxWidth: "100%",
+    margin: 0,
+    padding: space.x4,
+    overflowX: "auto",
+    borderRadius: "3px",
+    backgroundColor: colors.inset,
+    color: colors.ink,
+    fontFamily: fonts.data,
+    fontSize: "12px",
+    lineHeight: 1.55,
   },
   steps: {
     display: "grid",
