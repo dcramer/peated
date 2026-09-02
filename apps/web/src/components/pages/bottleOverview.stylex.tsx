@@ -11,6 +11,8 @@ import {
   ImageAttribution,
   ItemList,
   ItemListItem,
+  LoadingList,
+  LoadingPlaceholder,
   SectionHeading,
   TastingEntry,
 } from "..";
@@ -21,6 +23,7 @@ import {
 } from "./bottleRailSection.stylex";
 
 const NARROW = "@media (max-width: 759px)";
+const loadingDelays = [0, 1, 2, 3] as const;
 
 export type BottleRecommendation = BottleRailItem;
 
@@ -40,6 +43,7 @@ export type BottleOverviewProps = {
   moreTastingsHref?: string;
   recommendationHeading?: string;
   recommendationIntro?: string;
+  recommendationState?: ReactNode;
   recommendations?: readonly BottleRecommendation[];
   railSections?: ReactNode;
   tastingCount?: number;
@@ -56,6 +60,7 @@ export function BottleOverview({
   moreTastingsHref,
   recommendationHeading = "If you liked this",
   recommendationIntro,
+  recommendationState,
   recommendations = [],
   railSections,
   tastingCount,
@@ -143,7 +148,7 @@ export function BottleOverview({
           ) : null}
         </figure>
 
-        {recommendations.length || railSections ? (
+        {recommendations.length || recommendationState || railSections ? (
           <div {...stylex.props(styles.railSections)}>
             {recommendations.length ? (
               <BottleRailSection
@@ -151,10 +156,54 @@ export function BottleOverview({
                 intro={recommendationIntro}
                 items={recommendations}
               />
+            ) : recommendationState ? (
+              <BottleRailSection heading={recommendationHeading}>
+                {recommendationState}
+              </BottleRailSection>
             ) : null}
             {railSections}
           </div>
         ) : null}
+      </aside>
+    </div>
+  );
+}
+
+/** Reserves the bottle overview geometry while the route streams. */
+export function BottleOverviewLoading() {
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Loading bottle details"
+      role="status"
+      {...stylex.props(styles.layout)}
+    >
+      <div aria-hidden="true" {...stylex.props(styles.main)}>
+        <div {...stylex.props(styles.facts, styles.loadingFacts)}>
+          {Array.from({ length: 6 }, (_, index) => (
+            <span key={index} {...stylex.props(styles.loadingFact)}>
+              <LoadingPlaceholder
+                delay={loadingDelays[index % loadingDelays.length]}
+                preset="metadata"
+              />
+              <LoadingPlaceholder
+                delay={loadingDelays[(index + 1) % loadingDelays.length]}
+                preset="text"
+              />
+            </span>
+          ))}
+        </div>
+        <div {...stylex.props(styles.content)}>
+          <LoadingList label="Loading bottle reviews and tastings" rows={3} />
+        </div>
+      </div>
+
+      <aside aria-hidden="true" {...stylex.props(styles.rail)}>
+        <div {...stylex.props(styles.media, styles.loadingMedia)} />
+        <div {...stylex.props(styles.railSections)}>
+          <LoadingPlaceholder preset="heading" />
+          <LoadingList label="Loading bottle recommendations" rows={3} />
+        </div>
       </aside>
     </div>
   );
@@ -216,6 +265,28 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     gap: space.x8,
+  },
+  loadingFacts: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(auto-fit, minmax(160px, 1fr))",
+      "@media (max-width: 559px)": "minmax(0, 1fr)",
+    },
+    gap: space.x4,
+    paddingTop: space.x4,
+    paddingBottom: space.x4,
+  },
+  loadingFact: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x1,
+  },
+  loadingMedia: {
+    width: "100%",
+    aspectRatio: "4 / 5",
+    borderRadius: "3px",
+    backgroundColor: colors.surface,
   },
   section: {
     minWidth: 0,
