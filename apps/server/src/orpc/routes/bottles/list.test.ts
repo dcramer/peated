@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleReferences,
   bottleTombstones,
+  collectionBottles,
   entityFollows,
   flightBottles,
 } from "@peated/server/db/schema";
@@ -594,6 +595,54 @@ describe("GET /bottles", () => {
 
     expect(results.length).toBe(1);
     expect(results[0].id).toBe(bottle1.id);
+  });
+
+  test("filters a Series by the signed-in user's Library", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const series = await fixtures.BottleSeries({ name: "Library Series" });
+    const inLibrary = await fixtures.Bottle({
+      name: "In Library",
+      seriesId: series.id,
+    });
+    const outsideLibrary = await fixtures.Bottle({
+      name: "Outside Library",
+      seriesId: series.id,
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values({
+      bottleId: inLibrary.id,
+      collectionId: libraryCollection.id,
+    });
+
+    const [included, excluded] = await Promise.all([
+      routerClient.bottles.list(
+        { library: "in", series: series.id },
+        { context: { user: defaults.user } },
+      ),
+      routerClient.bottles.list(
+        { library: "out", series: series.id },
+        { context: { user: defaults.user } },
+      ),
+    ]);
+
+    expect(included.total).toBe(1);
+    expect(included.results.map(({ id }) => id)).toEqual([inLibrary.id]);
+    expect(excluded.total).toBe(1);
+    expect(excluded.results.map(({ id }) => id)).toEqual([outsideLibrary.id]);
+  });
+
+  test("requires authentication for Library filtering", async () => {
+    const err = await waitError(() =>
+      routerClient.bottles.list({ library: "in" }),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   // Sorting tests

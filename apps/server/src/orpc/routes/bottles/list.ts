@@ -5,12 +5,14 @@ import {
   bottles,
   bottlesToDistillers,
   bottleTombstones,
+  collectionBottles,
   entities,
   entityFollows,
   flightBottles,
   flights,
   tastings,
 } from "@peated/server/db/schema";
+import { getReservedCollection } from "@peated/server/lib/db";
 import { bottlesForDistilleryView } from "@peated/server/lib/distilleryBottleView";
 import {
   plainTextSearchQuery,
@@ -55,7 +57,8 @@ export default implement(bottleListContract).handler(async function ({
   context,
   errors,
 }) {
-  const { query, cursor, limit, filter, category, ageBand, ...rest } = input;
+  const { query, cursor, limit, filter, library, category, ageBand, ...rest } =
+    input;
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
@@ -131,6 +134,33 @@ export default implement(bottleListContract).handler(async function ({
           )
         : sql`FALSE`,
     );
+  }
+
+  if (library) {
+    if (!context.user) {
+      throw errors.UNAUTHORIZED();
+    }
+
+    const libraryCollection = await getReservedCollection(
+      db,
+      context.user.id,
+      "library",
+    );
+    if (!libraryCollection) {
+      where.push(library === "in" ? sql`FALSE` : sql`TRUE`);
+    } else if (library === "in") {
+      where.push(sql`EXISTS(
+        SELECT FROM ${collectionBottles}
+        WHERE ${collectionBottles.collectionId} = ${libraryCollection.id}
+          AND ${collectionBottles.bottleId} = ${bottles.id}
+      )`);
+    } else {
+      where.push(sql`NOT EXISTS(
+        SELECT FROM ${collectionBottles}
+        WHERE ${collectionBottles.collectionId} = ${libraryCollection.id}
+          AND ${collectionBottles.bottleId} = ${bottles.id}
+      )`);
+    }
   }
 
   if (query) {

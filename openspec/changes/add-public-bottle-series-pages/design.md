@@ -13,6 +13,7 @@ The new surface crosses catalog identity, search, moderation lifecycle, API seri
 - Make Series discoverable from Bottle pages, canonical IDs, and global search.
 - Preserve old public references when duplicate Series merge.
 - Reuse the existing page layout, Bottle list, Bottle rail, ratings, pager, error, and empty-state components.
+- Keep public Series facts and signed-in Library progress visible before the Bottle list on every screen size.
 
 **Non-Goals:**
 
@@ -49,6 +50,10 @@ Add a `series` search scope, result group, nearest result, exact Peated ID resul
 
 The page uses the shared page header, Bottle list, sort control, cursor pager, error, and empty-state components. It shows a Brand link, Series name, optional description, Peated ID, and total Bottle count. Membership defaults to newest release and supports the existing relevant Bottle sort choices. Category and age filters are omitted because this page is already a scoped collection.
 
+Series identity and counts sit above the Bottle list instead of in a side rail. Signed-in members also see the number of Series Bottles in their Library and can filter the list to Bottles in or outside their Library. These counts use the complete filtered result, not the current page. Signed-out visitors see only public facts.
+
+The shared Bottle list omits its ratings block when a Bottle has neither tasting ratings nor a published review score. Long page titles use a smaller narrow-screen size and may wrap long words so they do not leave the viewport.
+
 ### Bottle pages use a shared Bottle rail section
 
 Extract the current recommendation rail markup into a small reusable Bottle rail section inside the Bottle overview component. The Series widget uses the same Bottle visual, metadata, and rating presentation. It requests up to four Series Bottles, removes the current Bottle, shows at most three other Bottles, and links “See all N bottles” to the canonical Series page. It renders only when the Series contains another Bottle and does not show an empty shell.
@@ -60,6 +65,7 @@ The existing Series fact remains and links to the same canonical page.
 - **Series search adds another global-search scope and query.** → Run it only when requested, retain the existing per-scope limit, and use the current indexed Series search vector.
 - **Merging a large Series can update many Bottle groups.** → Reuse the transactional Bottle update boundary and finalize affected search/stat work after commit, as current Series deletion does.
 - **Some Series have incomplete descriptions or release dates.** → Omit missing description text and use existing Bottle list fallbacks; do not infer Series prose or sequence.
+- **Peated may not contain every official Series release.** → Say "In your library" and show a count against the currently cataloged Bottles. Do not call the Series complete or show a completion percentage.
 - **Adding `S` changes Peated ID parsing exhaustiveness.** → Update exact-ID search and route tests at the same cutover.
 - **A Series can become empty after all Bottles are reassigned.** → The page remains valid while the Series exists; moderators may delete it explicitly, producing a destination-less tombstone and a not-found response.
 

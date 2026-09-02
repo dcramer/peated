@@ -37,6 +37,22 @@ The system SHALL provide a responsive Series page that explains the Series and l
 - **WHEN** a person opens an active Series with no Bottles
 - **THEN** the page shows the Series identity and a clear empty state without an inactive Bottle list shell
 
+#### Scenario: Signed-in Library progress
+
+- **WHEN** a signed-in member opens a Series page
+- **THEN** the page shows how many cataloged Series Bottles are in their Library before the Bottle list
+- **AND** the member can show all Bottles, Bottles in their Library, or Bottles not in their Library
+
+#### Scenario: Signed-out Series page
+
+- **WHEN** a signed-out person opens a Series page
+- **THEN** the page shows the public Series facts without personal Library counts or filters
+
+#### Scenario: Bottle without ratings
+
+- **WHEN** a Bottle list row has no tasting ratings and no published review score
+- **THEN** the row omits the empty ratings block
+
 ### Requirement: Bottle-to-Series navigation
 
 The system SHALL make the assigned Series and other member Bottles discoverable from a Bottle page.
