@@ -27,6 +27,7 @@ import entityCatalog from "./routes/entities/catalog";
 import entityCreate from "./routes/entities/create";
 import entityDetails from "./routes/entities/details";
 import entityEventList from "./routes/entities/events/list";
+import entityFlavorProfile from "./routes/entities/flavor-profile";
 import entityList from "./routes/entities/list";
 import entityResolve from "./routes/entities/resolve";
 import eventList from "./routes/events/list";
@@ -42,6 +43,7 @@ import notificationCount from "./routes/notifications/count";
 import notificationList from "./routes/notifications/list";
 import priceChangeList from "./routes/prices/change-list";
 import regionDetails from "./routes/regions/details";
+import regionFlavorProfile from "./routes/regions/flavor-profile";
 import regionList from "./routes/regions/list";
 import root from "./routes/root";
 import search from "./routes/search";
@@ -111,6 +113,7 @@ export const mockRouter = mockOS.router({
   },
   distilleries: { list: distilleryList },
   entities: {
+    flavorProfile: entityFlavorProfile,
     catalog: entityCatalog,
     create: entityCreate,
     details: entityDetails,
@@ -144,6 +147,7 @@ export const mockRouter = mockOS.router({
     changeList: priceChangeList,
   },
   regions: {
+    flavorProfile: regionFlavorProfile,
     details: regionDetails,
     list: regionList,
   },

@@ -109,6 +109,7 @@ export type {
   FilterPanelProps,
   FilterQueryProps,
 } from "./filterPanel.stylex";
+export { FlavorWheel } from "./flavorWheel.stylex";
 export { ChoiceList, Select, Switch } from "./formControls.stylex";
 export type {
   ChoiceListOption,

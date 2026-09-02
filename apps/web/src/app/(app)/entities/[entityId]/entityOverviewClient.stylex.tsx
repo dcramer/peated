@@ -1,5 +1,7 @@
 "use client";
 
+import { PlaceFlavorProfile } from "@peated/web/features/flavorProfile/placeFlavorProfile";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { useQuery } from "@tanstack/react-query";
 
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
@@ -95,6 +97,13 @@ export function EntityOverviewClient() {
       relationships={
         <>
           <EntityMap entity={entity} />
+          {entity.kind === "distillery" ? (
+            <PlaceFlavorProfile
+              key={entity.id}
+              scope={{ kind: "distillery", entity: entity.id }}
+              bottlesHref={`${getEntityUrl(entity)}/bottles`}
+            />
+          ) : null}
           <EntityCatalogRelationships
             catalog={catalogQuery.data}
             entity={entity}
