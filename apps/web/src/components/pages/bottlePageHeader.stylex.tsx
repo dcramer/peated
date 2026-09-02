@@ -1,9 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import type { ReviewScoreProps, TastingRatingDistributionProps } from "..";
 import { AppLink, ReviewScore, TastingRatingDistribution } from "..";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
 const NARROW = "@media (max-width: 900px)";
@@ -68,7 +69,9 @@ export function BottlePageHeader({
           ) : null}
           {bands ? (
             <section {...stylex.props(styles.rating)}>
-              <h2 {...stylex.props(styles.ratingLabel)}>Tasting ratings</h2>
+              <div {...stylex.props(styles.ratingLabel)}>
+                <SectionHeading>Tasting ratings</SectionHeading>
+              </div>
               <div {...stylex.props(styles.ratingContent)}>
                 <TastingRatingDistribution {...bands} />
               </div>
@@ -137,17 +140,7 @@ const styles = stylex.create({
     alignItems: "start",
     gap: { default: 0, [PHONE]: space.x3 },
   },
-  ratingLabel: {
-    margin: 0,
-    marginBottom: { default: space.x2, [PHONE]: 0 },
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
+  ratingLabel: { marginBottom: { default: space.x2, [PHONE]: 0 } },
   ratingContent: {
     minWidth: 0,
   },

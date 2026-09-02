@@ -6,7 +6,6 @@ import {
   PageColumns,
   PageHeader,
   PageSection,
-  RailSection,
   TabbedPage,
 } from "./pageLayout.stylex";
 
@@ -16,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use these components to build catalog detail pages. Keep data loading, sign-in state, navigation, and updates in the page route.",
+          "Use these components to build catalog detail pages. Use PageSection for section headings in both columns. Keep data loading, sign-in state, navigation, and updates in the page route.",
       },
     },
   },
@@ -54,8 +53,8 @@ export const Overview: Story = {
     >
       <PageColumns
         rail={
-          <>
-            <RailSection heading="Popular bottles">
+          <div>
+            <PageSection heading="Popular bottles">
               <RailList ariaLabel="Popular bottles">
                 <RailListItem
                   href="#"
@@ -68,11 +67,11 @@ export const Overview: Story = {
                   title="Another bottle"
                 />
               </RailList>
-            </RailSection>
-            <RailSection heading="Production rules">
+            </PageSection>
+            <PageSection heading="Production rules">
               Show established production facts when the page includes them.
-            </RailSection>
-          </>
+            </PageSection>
+          </div>
         }
         railBehavior="stack"
       >

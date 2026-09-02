@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { needsRegionMapCredit } from "../../lib/locationMap";
 import { RegionMapCredit } from "../locationMapIcon/credit.stylex";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import {
   BottleList,
@@ -35,7 +36,7 @@ function HomeModuleHeading({
   return (
     <div {...stylex.props(styles.heading)}>
       <div {...stylex.props(styles.headingLine)}>
-        <h2 {...stylex.props(styles.title)}>{title}</h2>
+        <SectionHeading>{title}</SectionHeading>
         {action}
       </div>
       {detail ? <div {...stylex.props(styles.detail)}>{detail}</div> : null}
@@ -180,7 +181,9 @@ export function HomeOrigins({
       </div>
       {regions.length ? (
         <>
-          <div {...stylex.props(styles.regionHeading)}>By region</div>
+          <div {...stylex.props(styles.regionHeading)}>
+            <SectionHeading level={3}>By region</SectionHeading>
+          </div>
           <HomeRegionGrid regions={regions} />
         </>
       ) : null}
@@ -243,7 +246,7 @@ export function HomeContributionPrompt({
 }) {
   return (
     <section {...stylex.props(styles.prompt)}>
-      <h2 {...stylex.props(styles.promptTitle)}>Missing a bottle?</h2>
+      <SectionHeading>Missing a bottle?</SectionHeading>
       <p {...stylex.props(styles.promptCopy)}>
         Add it. Cask number, vintage, ABV, finish—as much as the label tells
         you.
@@ -275,15 +278,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: space.x3,
   },
-  title: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "24px",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1.1,
-  },
   detail: {
     color: colors.inkMuted,
     fontFamily: fonts.data,
@@ -304,15 +298,7 @@ const styles = stylex.create({
     fontSize: "15px",
     lineHeight: 1.5,
   },
-  regionHeading: {
-    marginTop: space.x6,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.4,
-    textTransform: "uppercase",
-  },
+  regionHeading: { marginTop: space.x6 },
   regionGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
@@ -371,15 +357,6 @@ const styles = stylex.create({
     paddingTop: "18px",
     paddingBottom: "18px",
     backgroundColor: "transparent",
-  },
-  promptTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   promptCopy: {
     margin: 0,

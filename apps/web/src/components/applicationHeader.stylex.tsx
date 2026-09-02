@@ -9,6 +9,7 @@ import {
 import * as stylex from "@stylexjs/stylex";
 import { Menu as MenuIcon, Search, X } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import {
   colors,
@@ -346,7 +347,9 @@ function HeaderDrawerGroup({
 }) {
   return (
     <section>
-      <h2 {...stylex.props(styles.drawerHeading)}>{label}</h2>
+      <div {...stylex.props(styles.drawerHeading)}>
+        <SectionHeading>{label}</SectionHeading>
+      </div>
       <ul {...stylex.props(styles.drawerList)}>
         {items.map((item) => (
           <li key={item.href} {...stylex.props(styles.drawerListItem)}>
@@ -670,17 +673,7 @@ const styles = stylex.create({
       rowGap: space.x4,
     },
   },
-  drawerHeading: {
-    margin: 0,
-    marginBottom: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
+  drawerHeading: { marginBottom: space.x2 },
   drawerList: {
     margin: 0,
     paddingTop: space.x1,

@@ -8,6 +8,7 @@ import {
 } from "@headlessui/react";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import { Button } from ".";
 import {
@@ -38,7 +39,9 @@ export default function ConfirmationDialog({
       <DialogBackdrop {...stylex.props(styles.backdrop)} />
       <div {...stylex.props(styles.position)}>
         <DialogPanel {...stylex.props(styles.panel)}>
-          <DialogTitle {...stylex.props(styles.title)}>{title}</DialogTitle>
+          <DialogTitle as="div">
+            <SectionHeading>{title}</SectionHeading>
+          </DialogTitle>
           <div {...stylex.props(styles.message)}>{message}</div>
           <div {...stylex.props(styles.actions)}>
             <Button onClick={onCancel} variant="tonal">
@@ -80,13 +83,6 @@ const styles = stylex.create({
     borderColor: colors.hairline,
     backgroundColor: colors.ground,
     boxShadow: effects.overlayShadow,
-  },
-  title: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
   },
   message: {
     marginTop: space.x3,

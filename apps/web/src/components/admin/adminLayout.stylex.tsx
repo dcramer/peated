@@ -5,6 +5,7 @@ import { ArrowLeft, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 import { SkipLink } from "@peated/web/components/skipLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
@@ -54,7 +55,9 @@ function AdminNavigation({
     <nav aria-label="Admin navigation" {...stylex.props(styles.navigation)}>
       {groups.map((group) => (
         <section key={group.label} {...stylex.props(styles.navigationGroup)}>
-          <h2 {...stylex.props(styles.groupLabel)}>{group.label}</h2>
+          <div {...stylex.props(styles.groupLabel)}>
+            <SectionHeading>{group.label}</SectionHeading>
+          </div>
           <ul {...stylex.props(styles.navigationList)}>
             {group.items.map((item) => {
               const current = isCurrentHref(currentHref, item);
@@ -290,18 +293,7 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x2,
   },
-  groupLabel: {
-    margin: 0,
-    paddingRight: space.x2,
-    paddingLeft: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 500,
-    letterSpacing: "0.12em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
+  groupLabel: { paddingRight: space.x2, paddingLeft: space.x2 },
   navigationList: {
     display: "flex",
     margin: 0,

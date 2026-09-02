@@ -7,6 +7,14 @@ const meta = {
   title: "Components/Layout/Section Heading",
   component: SectionHeading,
   args: { children: "Similar bottles" },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use SectionHeading for every section heading, including sidebars. Heading levels change document structure, not appearance. Keep spacing in the containing layout; do not add local typography variants.",
+      },
+    },
+  },
 } satisfies Meta<typeof SectionHeading>;
 
 export default meta;

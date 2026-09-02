@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 import {
   colors,
@@ -116,9 +116,7 @@ export function SearchResults({
       ) : null}
       {emptyText && variant === "database" ? (
         <div {...stylex.props(styles.databaseEmptyState)}>
-          <h2 {...stylex.props(styles.databaseEmptyHeading)}>
-            Nothing matches “{query}”
-          </h2>
+          <SectionHeading>Nothing matches “{query}”</SectionHeading>
           <p {...stylex.props(styles.databaseEmptyDescription)}>
             Check the spelling, or record the bottle if the database is missing
             it.
@@ -224,15 +222,18 @@ function SearchResultsGroup({
           variant === "database" && styles.databaseGroupHeading,
         )}
       >
-        <h2
-          id={`${optionIdPrefix ?? "search"}-group-${group.id}`}
+        <div
           {...stylex.props(
             styles.groupName,
             variant === "database" && styles.databaseGroupName,
           )}
         >
-          {group.label}
-        </h2>
+          <SectionHeading
+            id={`${optionIdPrefix ?? "search"}-group-${group.id}`}
+          >
+            {group.label}
+          </SectionHeading>
+        </div>
         {group.total !== undefined ? (
           <span
             {...stylex.props(
@@ -414,15 +415,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
   },
-  databaseEmptyHeading: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
   databaseEmptyDescription: {
     maxWidth: "560px",
     marginTop: space.x2,
@@ -453,28 +445,8 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
   },
-  groupName: {
-    minWidth: 0,
-    flex: 1,
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
-  databaseGroupName: {
-    flex: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    letterSpacing: "-0.01em",
-    textTransform: "none",
-    whiteSpace: "nowrap",
-  },
+  groupName: { minWidth: 0, flex: 1 },
+  databaseGroupName: { flex: 0 },
   groupCount: {
     color: colors.inkMuted,
     fontFamily: fonts.data,

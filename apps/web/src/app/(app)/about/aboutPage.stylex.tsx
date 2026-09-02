@@ -1,3 +1,4 @@
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
@@ -95,7 +96,9 @@ export function ReviewSteps({
           <span {...stylex.props(styles.stepNumber)}>
             {String(index + 1).padStart(2, "0")}
           </span>
-          <h3 {...stylex.props(styles.stepTitle)}>{step.title}</h3>
+          <div {...stylex.props(styles.stepTitle)}>
+            <SectionHeading level={3}>{step.title}</SectionHeading>
+          </div>
           <div {...stylex.props(styles.stepBody)}>{step.body}</div>
         </li>
       ))}
@@ -175,16 +178,7 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     lineHeight: 1.3,
   },
-  stepTitle: {
-    margin: 0,
-    marginTop: space.x2,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    fontWeight: 700,
-    letterSpacing: "-0.015em",
-    lineHeight: 1.25,
-  },
+  stepTitle: { marginTop: space.x2 },
   stepBody: {
     marginTop: space.x2,
     color: colors.inkMuted,

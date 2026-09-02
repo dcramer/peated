@@ -1,6 +1,7 @@
 import { TAG_CATEGORIES } from "@peated/server/constants";
 import type { TagCategory } from "@peated/server/types";
 import { Chip } from "@peated/web/components";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
@@ -253,7 +254,9 @@ export function TastingWheelGraphic() {
       <figcaption {...stylex.props(styles.caption)}>
         <div>
           <div {...stylex.props(styles.captionEyebrow)}>How to use it</div>
-          <h3 {...stylex.props(styles.captionTitle)}>Start with a group</h3>
+          <div {...stylex.props(styles.captionTitle)}>
+            <SectionHeading level={3}>Start with a group</SectionHeading>
+          </div>
         </div>
         <p {...stylex.props(styles.captionText)}>
           Pick the group that is closest to what you notice. The lists below
@@ -277,7 +280,7 @@ export function TastingWheelFamilies() {
           key={category.key}
           {...stylex.props(styles.family)}
         >
-          <h3 {...stylex.props(styles.familyTitle)}>{category.name}</h3>
+          <SectionHeading level={3}>{category.name}</SectionHeading>
           <p {...stylex.props(styles.familyDescription)}>
             {category.description}
           </p>
@@ -400,16 +403,7 @@ const styles = stylex.create({
     lineHeight: 1.3,
     textTransform: "uppercase",
   },
-  captionTitle: {
-    margin: 0,
-    marginTop: space.x1,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.2,
-  },
+  captionTitle: { marginTop: space.x1 },
   captionText: {
     margin: 0,
     color: colors.inkMuted,
@@ -433,15 +427,6 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
     scrollMarginTop: space.x8,
-  },
-  familyTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
   },
   familyDescription: {
     margin: 0,

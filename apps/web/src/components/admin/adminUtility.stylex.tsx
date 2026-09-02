@@ -5,18 +5,11 @@ import * as stylex from "@stylexjs/stylex";
 import { AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { CursorPager } from "..";
 import { buildQueryString } from "../../lib/urls";
-import { foundationStyles } from "../../styles/foundations.stylex";
-import {
-  colors,
-  controlMetrics,
-  effects,
-  fonts,
-  space,
-} from "../../styles/tokens.stylex";
+import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 
 export function AdminPager({
   ariaLabel = "Pagination",
@@ -84,22 +77,6 @@ export function AdminEmptyActivity({
     </Link>
   ) : (
     <div {...stylex.props(styles.empty)}>{children}</div>
-  );
-}
-
-export function AdminHeading({
-  as: Component = "h1",
-  children,
-}: {
-  as?: ElementType;
-  children?: ReactNode;
-}) {
-  return (
-    <Component
-      {...stylex.props(foundationStyles.sectionHeading, styles.heading)}
-    >
-      {children}
-    </Component>
   );
 }
 
@@ -187,7 +164,6 @@ const styles = stylex.create({
     textDecoration: "none",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
-  heading: { color: colors.ink },
   alert: {
     display: "flex",
     alignItems: "flex-start",

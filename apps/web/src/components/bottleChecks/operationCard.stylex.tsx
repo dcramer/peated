@@ -15,6 +15,7 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
+import { SectionHeading } from "../sectionHeading.stylex";
 
 type Details = Outputs["audits"]["details"];
 export type BottleOperation = Details["audit"]["operations"][number];
@@ -661,7 +662,6 @@ export default function OperationCard({
   const allFieldsExcluded =
     editableFields.length > 0 &&
     editableFields.every((field) => excludedFields.has(field));
-  const Heading = compact ? "h2" : "h3";
 
   useEffect(() => {
     return () => {
@@ -731,9 +731,9 @@ export default function OperationCard({
       <article {...stylex.props(styles.card, styles.warningCard)}>
         <div {...stylex.props(styles.cardHeader, styles.centeredHeader)}>
           <div>
-            <Heading {...stylex.props(styles.cardTitle)}>
+            <SectionHeading level={compact ? 2 : 3}>
               {OPERATION_LABELS[operation.proposal.type]}
-            </Heading>
+            </SectionHeading>
             <p {...stylex.props(styles.copy)} role="status">
               {savingRemoval
                 ? "Removing operation…"
@@ -754,9 +754,9 @@ export default function OperationCard({
     <article {...stylex.props(styles.card)}>
       <div {...stylex.props(styles.cardHeader)}>
         <div>
-          <Heading {...stylex.props(styles.cardTitle)}>
+          <SectionHeading level={compact ? 2 : 3}>
             {OPERATION_LABELS[operation.proposal.type]}
-          </Heading>
+          </SectionHeading>
           {!compact ||
           operation.status !== "pending_review" ||
           notApprovalReady ? (
@@ -958,13 +958,6 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
   centeredHeader: { alignItems: "center" },
-  cardTitle: {
-    margin: 0,
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "16px",
-    fontWeight: 600,
-  },
   status: {
     display: "inline-block",
     marginTop: space.x2,

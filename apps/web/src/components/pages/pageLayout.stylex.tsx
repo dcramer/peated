@@ -153,6 +153,7 @@ export function TabbedPage({
   );
 }
 
+/** Groups catalog content under the standard section heading in either column. */
 export function PageSection({
   children,
   heading,
@@ -175,6 +176,7 @@ export function PageSection({
   );
 }
 
+/** Spaces sidebar content; headings use the same component as main-column sections. */
 export function RailSection({
   children,
   heading,
@@ -184,7 +186,7 @@ export function RailSection({
 }) {
   return (
     <section {...stylex.props(styles.railSection)}>
-      <h2 {...stylex.props(styles.railHeading)}>{heading}</h2>
+      <SectionHeading>{heading}</SectionHeading>
       {children}
     </section>
   );
@@ -366,15 +368,5 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     rowGap: space.x2,
-  },
-  railHeading: {
-    margin: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
 });

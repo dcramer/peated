@@ -195,6 +195,9 @@ sentiment poles.
 - **Karla** is the reading face for prose, labels, and member input.
 - **IBM Plex Mono** is available for rare values that must align as code-like
   data. Normal metadata and field labels use Karla.
+- Section headings use `SectionHeading` in every column. Heading levels express
+  document structure and share one visual treatment. Do not add compact,
+  uppercase, or page-specific section heading variants.
 
 | Role            | Family  | Weight | Size and line height | Tracking |
 | --------------- | ------- | ------ | -------------------- | -------- |
