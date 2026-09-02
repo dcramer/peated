@@ -14,6 +14,7 @@ export * from "./externalReviews";
 export * from "./flights";
 export * from "./friendships";
 export * from "./helpers";
+export * from "./memberReviews";
 export * from "./notifications";
 export * from "./places";
 export * from "./prices";

@@ -1043,7 +1043,7 @@ function AddBottleFlowContent() {
     });
 
     flash("Review saved.", "info");
-    router.push(getBottleUrl(tastingDraft.bottle));
+    router.push(`/reviews/${review.id}`);
   }
 
   if (requestedBottleKey && handledBottleKey !== requestedBottleKey) {

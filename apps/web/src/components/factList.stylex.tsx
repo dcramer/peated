@@ -9,7 +9,7 @@ export type FactListItem = {
 };
 
 export type FactListProps = {
-  facts: readonly [FactListItem, ...FactListItem[]];
+  facts: readonly FactListItem[];
   layout?: "grid" | "list";
 };
 

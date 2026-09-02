@@ -1,5 +1,6 @@
 import { base } from "@peated/server/orpc";
 import delete_ from "./delete";
+import details from "./details";
 import getMy from "./getMy";
 import imageDelete from "./image-delete";
 import imageUpdate from "./image-update";
@@ -7,6 +8,7 @@ import list from "./list";
 import save from "./save";
 
 export default base.tag("member reviews").router({
+  details,
   list,
   getMy,
   imageUpdate,

@@ -21,6 +21,7 @@ import {
   createdBottleId,
   createdBottleName,
   createdFlightBottleFixtureId,
+  createdMemberReview,
   createdTastingId,
   destinationBottleGroup,
   destinationBottleGroupId,
@@ -1276,6 +1277,17 @@ async function handleRpcRequest({ request, response, url }) {
 
       sendRpcResponse(response, emptyList);
       return true;
+    case "memberReviews/details":
+      if (input?.review !== createdMemberReview.id) {
+        sendRpcError(response, "Unexpected member review details payload");
+        return true;
+      }
+
+      sendRpcResponse(response, {
+        ...createdMemberReview,
+        bottle: existingBottle,
+      });
+      return true;
     case "memberReviews/getMy":
       if (!isNumber(input?.bottle)) {
         sendRpcError(response, "Unexpected member review lookup payload");
@@ -1298,20 +1310,7 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      sendRpcResponse(response, {
-        id: 9402,
-        bottleId: input.bottle,
-        score: input.score,
-        tags: input.tags,
-        color: input.color,
-        notes: input.notes,
-        servingStyle: input.servingStyle,
-        friends: [moderatorUser],
-        imageUrl: null,
-        createdBy: testUser,
-        createdAt: "2026-06-07T12:00:00.000Z",
-        updatedAt: "2026-06-07T12:00:00.000Z",
-      });
+      sendRpcResponse(response, createdMemberReview);
       return true;
     case "externalReviews/list":
       if (input?.bottle !== undefined && !isNumber(input.bottle)) {
