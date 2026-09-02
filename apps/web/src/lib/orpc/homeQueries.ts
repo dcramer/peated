@@ -16,13 +16,17 @@ export const publicHomeQueries = {
     orpc.events.list.queryOptions({
       input: { limit: 1, onlyUpcoming: true, sort: "date" },
     }),
+  memberTastings: (orpc: ORPCQueryUtils) =>
+    orpc.tastings.list.queryOptions({
+      input: { limit: 3 },
+    }),
   releases: (orpc: ORPCQueryUtils) =>
     orpc.bottles.list.queryOptions({
       input: { limit: 5, sort: "-release" },
     }),
   recentReviews: (orpc: ORPCQueryUtils) =>
     orpc.externalReviews.list.queryOptions({
-      input: { limit: 5, sort: "recent" },
+      input: { limit: 3, sort: "recent" },
     }),
   countries: (orpc: ORPCQueryUtils) =>
     orpc.countries.list.queryOptions({
@@ -39,7 +43,7 @@ export const publicHomeQueries = {
     }),
   distilleries: (orpc: ORPCQueryUtils) =>
     orpc.distilleries.list.queryOptions({
-      input: { limit: 12, sort: "-bottles" },
+      input: { limit: 5, sort: "-bottles" },
     }),
   recentBottles: (orpc: ORPCQueryUtils) =>
     orpc.bottles.list.queryOptions({

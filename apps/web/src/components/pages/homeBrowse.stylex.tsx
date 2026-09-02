@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import {
-  AppLink,
   BottleList,
   type BottleListItem,
   Card,
@@ -12,7 +11,6 @@ import {
   CardPrimaryLink,
   ItemList,
   ItemRow,
-  TextLink,
 } from "..";
 import {
   colors,
@@ -102,60 +100,18 @@ export function HomeLatestReleases({
   );
 }
 
-export type HomeReview = {
-  bottleHref: string;
-  bottleImageUrl?: string | null;
-  bottleName: string;
-  date: ReactNode;
-  id: string;
-  metadata: readonly string[];
-  rating?: number | null;
-  source: string;
-  sourceHref: string;
-};
-
-/** Shows recent attributed critic reviews. */
-export function HomeRecentReviews({
-  reviews,
-}: {
-  reviews: readonly HomeReview[];
-}) {
+export function HomeCommunity({ children }: { children: ReactNode }) {
   return (
     <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading title="From the critics" />
-      <div {...stylex.props(styles.rows)}>
-        <BottleList
-          ariaLabel="From the critics"
-          items={reviews.map((review) => ({
-            align: "start",
-            end: (
-              <span {...stylex.props(styles.reviewFacts)}>
-                {review.rating !== null && review.rating !== undefined ? (
-                  <strong {...stylex.props(styles.reviewRating)}>
-                    {review.rating}
-                  </strong>
-                ) : null}
-                <span {...stylex.props(styles.rowDate)}>{review.date}</span>
-              </span>
-            ),
-            href: review.bottleHref,
-            id: review.id,
-            imageUrl: review.bottleImageUrl,
-            metadata: review.metadata,
-            name: review.bottleName,
-            subtitle: (
-              <TextLink
-                href={review.sourceHref}
-                rel="noreferrer"
-                size="inherit"
-                target="_blank"
-              >
-                {review.source}
-              </TextLink>
-            ),
-          }))}
-        />
-      </div>
+      <HomeModuleHeading
+        action={
+          <Link href="/community" {...stylex.props(styles.moreLink)}>
+            View all <span aria-hidden="true">→</span>
+          </Link>
+        }
+        title="Community"
+      />
+      <div {...stylex.props(styles.rows)}>{children}</div>
     </section>
   );
 }
@@ -333,10 +289,10 @@ export type HomeDistillery = {
 
 export function HomeDistilleries({
   distilleries,
-  links,
+  totalDistilleries,
 }: {
   distilleries: readonly HomeDistillery[];
-  links: readonly { href: string; label: string }[];
+  totalDistilleries?: number;
 }) {
   return (
     <section {...stylex.props(styles.section)}>
@@ -358,19 +314,13 @@ export function HomeDistilleries({
           ))}
         </ItemList>
       </div>
-      <div {...stylex.props(styles.directoryLinks)}>
-        {links.map((link, index) => (
-          <span key={link.href} {...stylex.props(styles.directoryLinkItem)}>
-            {index > 0 ? (
-              <span aria-hidden="true" {...stylex.props(styles.separator)}>
-                ·
-              </span>
-            ) : null}
-            <AppLink href={link.href} {...stylex.props(styles.moreLink)}>
-              {link.label} <span aria-hidden="true">→</span>
-            </AppLink>
-          </span>
-        ))}
+      <div {...stylex.props(styles.distilleryLink)}>
+        <Link href="/distillers" {...stylex.props(styles.moreLink)}>
+          {totalDistilleries === undefined
+            ? "View all distilleries"
+            : `View ${totalDistilleries.toLocaleString("en-US")} distilleries`}{" "}
+          <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </section>
   );
@@ -460,30 +410,6 @@ const styles = stylex.create({
   },
   rows: {
     marginTop: space.x2,
-  },
-  reviewFacts: {
-    display: "flex",
-    alignItems: "flex-end",
-    flexDirection: "column",
-    gap: space.x1,
-  },
-  reviewRating: {
-    flexShrink: 0,
-    color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "24px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 600,
-    lineHeight: 1,
-  },
-  rowDate: {
-    flexShrink: 0,
-    color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.2,
-    textAlign: "right",
-    whiteSpace: "nowrap",
   },
   originIntro: {
     maxWidth: "640px",
@@ -665,22 +591,8 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
-  directoryLinks: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: "6px",
+  distilleryLink: {
     marginTop: space.x3,
-    flexWrap: "wrap",
-  },
-  directoryLinkItem: {
-    display: "inline-flex",
-    alignItems: "baseline",
-    gap: "6px",
-  },
-  separator: {
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
   recentBottles: {
     marginTop: "10px",
