@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { PageTabs, SectionHeading, SkipLink, type PageTabItem } from "..";
+import { PageTabs, SectionHeading, type PageTabItem } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 
@@ -19,7 +19,6 @@ export function PageFrame({
 }) {
   return (
     <div {...stylex.props(foundationStyles.document, styles.document)}>
-      <SkipLink href="#main-content">Skip to content</SkipLink>
       {header}
       <main id="main-content" {...stylex.props(styles.page)}>
         {children}

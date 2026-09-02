@@ -228,7 +228,6 @@ export { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 export type { SelectedBottleSummaryProps } from "./selectedBottleSummary.stylex";
 export { SiteFooter } from "./siteFooter.stylex";
 export type { FooterLink, SiteFooterProps } from "./siteFooter.stylex";
-export { SkipLink } from "./skipLink.stylex";
 export { Slideout } from "./slideout.stylex";
 export type { SlideoutProps } from "./slideout.stylex";
 export { SummaryStrip } from "./summaryStrip.stylex";

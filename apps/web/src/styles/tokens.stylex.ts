@@ -196,7 +196,6 @@ export const zIndices = stylex.defineVars({
   dialog: "400",
   notification: "500",
   fullscreen: "600",
-  accessibility: "700",
 });
 
 export const controlMetrics = stylex.defineVars({
