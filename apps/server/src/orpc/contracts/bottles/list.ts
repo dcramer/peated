@@ -38,6 +38,18 @@ export default contract
       distiller: z.coerce.number().nullish(),
       bottler: z.coerce.number().nullish(),
       entity: z.coerce.number().nullish(),
+      country: z.coerce
+        .string()
+        .nullish()
+        .describe(
+          "Filter by the country of an assigned distillery. Accepts a slug or numeric ID.",
+        ),
+      region: z.coerce
+        .string()
+        .nullish()
+        .describe(
+          "Filter by the region of an assigned distillery. Accepts a slug or numeric ID and requires `country`.",
+        ),
       distilleryView: z
         .enum(DISTILLERY_BOTTLE_VIEW_LIST)
         .nullish()

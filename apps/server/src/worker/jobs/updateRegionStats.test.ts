@@ -3,9 +3,7 @@ import { bottleTombstones, regions } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateRegionStats from "./updateRegionStats";
 
-test("counts active independently complete Bottles once", async ({
-  fixtures,
-}) => {
+test("counts active Bottles by producing distillery", async ({ fixtures }) => {
   const region1 = await fixtures.Region({ name: "Region 1" });
   const region2 = await fixtures.Region({ name: "Region 2" });
 
@@ -53,7 +51,8 @@ test("counts active independently complete Bottles once", async ({
     .from(regions)
     .where(eq(regions.id, region1.id));
   expect(newRegion1).toBeDefined();
-  expect(newRegion1.totalBottles).toEqual(3);
+  expect(newRegion1.totalBottles).toEqual(1);
+  expect(newRegion1.totalDistillers).toEqual(2);
 });
 
 test.each([

@@ -6,12 +6,15 @@ import {
   bottlesToDistillers,
   bottleTombstones,
   collectionBottles,
+  countries,
   entities,
   entityFollows,
   flightBottles,
   flights,
+  regions,
   tastings,
 } from "@peated/server/db/schema";
+import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { bottlesForDistilleryView } from "@peated/server/lib/distilleryBottleView";
 import {
@@ -57,8 +60,18 @@ export default implement(bottleListContract).handler(async function ({
   context,
   errors,
 }) {
-  const { query, cursor, limit, filter, library, category, ageBand, ...rest } =
-    input;
+  const {
+    query,
+    cursor,
+    limit,
+    filter,
+    library,
+    category,
+    ageBand,
+    country,
+    region,
+    ...rest
+  } = input;
   const offset = (cursor - 1) * limit;
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
@@ -173,6 +186,42 @@ export default implement(bottleListContract).handler(async function ({
           : undefined,
       ),
     );
+  }
+  if (region && !country) {
+    throw errors.BAD_REQUEST({ message: "Region requires country." });
+  }
+  if (country) {
+    let countryId: number;
+    if (Number.isFinite(+country)) {
+      countryId = Number(country);
+    } else {
+      const [result] = await db
+        .select({ id: countries.id })
+        .from(countries)
+        .where(eq(sql`LOWER(${countries.slug})`, country.toLowerCase()))
+        .limit(1);
+      if (!result) {
+        throw errors.BAD_REQUEST({ message: "Invalid country." });
+      }
+      countryId = result.id;
+    }
+
+    if (region) {
+      const regionWhere = Number.isFinite(+region)
+        ? eq(regions.id, Number(region))
+        : eq(sql`LOWER(${regions.slug})`, region.toLowerCase());
+      const [result] = await db
+        .select({ id: regions.id })
+        .from(regions)
+        .where(and(eq(regions.countryId, countryId), regionWhere))
+        .limit(1);
+      if (!result) {
+        throw errors.BAD_REQUEST({ message: "Invalid region." });
+      }
+      where.push(bottleProducedIn({ regionId: result.id }));
+    } else {
+      where.push(bottleProducedIn({ countryId }));
+    }
   }
   if (rest.brand) {
     where.push(eq(bottles.brandId, rest.brand));
