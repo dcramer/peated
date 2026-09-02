@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@peated/web/components";
+import { textLinkStyles } from "@peated/web/components/textLinkStyles.stylex";
 import { WHEEL_CATEGORIES } from "@peated/web/features/tastingWheel/tastingWheelData";
 import { useTastingWheel } from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 import * as stylex from "@stylexjs/stylex";
@@ -186,16 +187,20 @@ export function TastingWheelFamilies() {
           key={category.key}
           {...stylex.props(styles.family)}
         >
-          <h3 {...stylex.props(styles.familyTitle)}>
-            <button
-              type="button"
-              aria-haspopup="dialog"
-              onClick={() => select({ category: category.key })}
-              {...stylex.props(styles.categoryButton)}
-            >
-              {category.name}
-            </button>
-          </h3>
+          <h3 {...stylex.props(styles.familyTitle)}>{category.name}</h3>
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            aria-label={`See examples of ${category.name.toLowerCase()} notes`}
+            onClick={() => select({ category: category.key })}
+            {...stylex.props(
+              textLinkStyles.link,
+              textLinkStyles.small,
+              styles.examplesAction,
+            )}
+          >
+            See examples
+          </button>
           <p {...stylex.props(styles.familyDescription)}>
             {category.description}
           </p>
@@ -248,26 +253,13 @@ const styles = stylex.create({
     },
     ":active": { opacity: 0.6 },
   },
-  categoryButton: {
+  examplesAction: {
     appearance: "none",
-    border: 0,
+    marginTop: space.x2,
     padding: 0,
-    minHeight: "44px",
+    borderWidth: 0,
     backgroundColor: "transparent",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accent,
-    },
-    fontFamily: "inherit",
-    fontSize: "inherit",
-    fontWeight: "inherit",
     cursor: "pointer",
-    outline: {
-      default: "none",
-      ":focus-visible": `2px solid ${colors.accent}`,
-    },
-    outlineOffset: "2px",
   },
   segment: {
     stroke: colors.ground,
