@@ -6,11 +6,15 @@ import type { ReactNode } from "react";
 
 import { PageTabs, TextLink, type PageTabItem } from "@peated/web/components";
 import { LocationMapIcon } from "@peated/web/components/locationMapIcon";
+import { RegionMapCredit } from "@peated/web/components/locationMapIcon/credit.stylex";
 import {
   PageHeader,
   TabbedPage,
 } from "@peated/web/components/pages/pageLayout.stylex";
-import type { LocationMap } from "@peated/web/lib/locationMap";
+import {
+  needsRegionMapCredit,
+  type LocationMap,
+} from "@peated/web/lib/locationMap";
 import { colors, space } from "../../../styles/tokens.stylex";
 
 export function LocationsIndexFrame({ children }: { children: ReactNode }) {
@@ -91,9 +95,12 @@ export function LocationVisual({ visual }: { visual: LocationMap }) {
   } as const;
 
   return (
-    <div {...stylex.props(styles.visual)}>
-      <LocationMapIcon visual={visual} {...props} />
-    </div>
+    <>
+      <div {...stylex.props(styles.visual)}>
+        <LocationMapIcon visual={visual} {...props} />
+      </div>
+      {needsRegionMapCredit(visual) ? <RegionMapCredit /> : null}
+    </>
   );
 }
 

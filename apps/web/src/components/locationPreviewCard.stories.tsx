@@ -31,11 +31,11 @@ export const Overview: Story = {};
 
 export const WithoutMap: Story = {
   args: {
-    description: "A whisky region in northeastern Scotland.",
-    href: "#speyside",
-    name: "Speyside",
-    totalBottles: 1240,
-    visual: getRegionMap("scotland", "speyside"),
+    description: "A whisky region in northern Japan.",
+    href: "#hokkaido",
+    name: "Hokkaido",
+    totalBottles: 30,
+    visual: getRegionMap("japan", "hokkaido"),
   },
 };
 
