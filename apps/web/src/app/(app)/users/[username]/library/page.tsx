@@ -1,10 +1,10 @@
-import {
-  getApiQueryParams,
-  type ApiQueryParamValue,
-} from "@peated/web/lib/apiQueryParams";
+import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
+import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getProfilePage } from "@peated/web/lib/profilePage.server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { getProfileLibraryInput, profileQueries } from "../profileQueries";
 import { ProfileLibraryPageClient } from "./profileLibraryPageClient.stylex";
 
 export default async function ProfileLibraryPage(props: {
@@ -14,47 +14,20 @@ export default async function ProfileLibraryPage(props: {
   const { username } = await props.params;
   const { client } = await createServerClient();
   const user = await getProfilePage(username);
-  const queryParams = getApiQueryParams(await props.searchParams, {
-    defaults: { cursor: 1, query: "" },
-    numericFields: ["brand", "cursor", "distiller"],
-  });
-  const status = parseLibraryStatus(queryParams.status);
-  const libraryInput = {
-    brand: queryParams.brand,
-    collection: "library" as const,
-    cursor: queryParams.cursor,
-    distiller: queryParams.distiller,
-    limit: 25,
-    query: queryParams.query,
-    status,
-    user: user.id,
-  };
-  const [libraryList, libraryStats] = await Promise.all([
-    client.collections.bottles.list(libraryInput),
-    client.users.libraryStats({ user: user.id }),
+  const libraryInput = getProfileLibraryInput(
+    await props.searchParams,
+    user.id,
+  );
+  const queryClient = getQueryClient();
+  const orpc = createTanstackQueryUtils(client);
+  await Promise.all([
+    queryClient.prefetchQuery(profileQueries.library(orpc, libraryInput)),
+    queryClient.prefetchQuery(profileQueries.libraryStats(orpc, user.id)),
   ]);
 
   return (
-    <ProfileLibraryPageClient
-      initialLibraryList={libraryList}
-      initialLibraryStats={libraryStats}
-    />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProfileLibraryPageClient />
+    </HydrationBoundary>
   );
-}
-
-function parseLibraryStatus(
-  value: ApiQueryParamValue,
-): "empty" | "open" | "sealed" | "unset" | undefined {
-  switch (String(value ?? "")) {
-    case "empty":
-      return "empty";
-    case "open":
-      return "open";
-    case "sealed":
-      return "sealed";
-    case "unset":
-      return "unset";
-    default:
-      return undefined;
-  }
 }

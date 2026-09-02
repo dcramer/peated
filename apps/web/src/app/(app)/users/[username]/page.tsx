@@ -1,8 +1,12 @@
+import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { Outputs } from "@peated/server/orpc/router";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
+import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getProfilePage } from "@peated/web/lib/profilePage.server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { ProfileOverviewPageClient } from "./profileOverviewPageClient.stylex";
+import { profileQueries } from "./profileQueries";
 
 export const fetchCache = "default-no-store";
 
@@ -12,10 +16,12 @@ export default async function ProfileOverviewPage(props: {
   const { username } = await props.params;
   const { client } = await createServerClient();
   const user = await getProfilePage(username);
-  const [activityList, badgePage, tastingStats] = await Promise.all([
+  const queryClient = getQueryClient();
+  const orpc = createTanstackQueryUtils(client);
+  const [activityList, badgePage] = await Promise.all([
     client.users.activity.list({ limit: 3, user: user.id }),
     client.users.badgeList({ cursor: 1, limit: 100, user: user.id }),
-    client.users.tastingStats({ user: user.id }),
+    queryClient.prefetchQuery(profileQueries.tastingStats(orpc, user.id)),
   ]);
   const badgeAwards: Outputs["users"]["badgeList"]["results"] = [
     ...badgePage.results,
@@ -33,10 +39,11 @@ export default async function ProfileOverviewPage(props: {
   }
 
   return (
-    <ProfileOverviewPageClient
-      initialActivityList={activityList}
-      initialBadgeAwards={badgeAwards}
-      initialTastingStats={tastingStats}
-    />
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProfileOverviewPageClient
+        initialActivityList={activityList}
+        initialBadgeAwards={badgeAwards}
+      />
+    </HydrationBoundary>
   );
 }

@@ -1,5 +1,5 @@
-import { LoadingList } from "@peated/web/components";
+import { ProfileOverviewLoading } from "./profileOverviewLayout.stylex";
 
 export default function ProfileLoading() {
-  return <LoadingList label="Loading member profile" rows={4} />;
+  return <ProfileOverviewLoading />;
 }

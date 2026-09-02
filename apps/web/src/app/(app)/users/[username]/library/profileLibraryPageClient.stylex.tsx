@@ -15,28 +15,19 @@ import {
   type MemberLibraryFilterGroup,
   type MemberLibraryItem,
 } from "@peated/web/components/pages/memberProfileContent.stylex";
-import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
+import { getProfileLibraryInput, profileQueries } from "../profileQueries";
+import { ProfileLibraryLayout } from "./profileLibraryLayout.stylex";
 
 type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
-type LibraryList = Outputs["collections"]["bottles"]["list"];
-type LibraryStats = Outputs["users"]["libraryStats"];
-type LibraryStatus = NonNullable<LibraryEntry["status"]>;
 type LibraryEntryChange = LibraryEntry["status"] | "removed";
-const statusValues = new Set(["open", "sealed", "empty", "unset"]);
 
-export function ProfileLibraryPageClient({
-  initialLibraryList,
-  initialLibraryStats,
-}: {
-  initialLibraryList: LibraryList;
-  initialLibraryStats: LibraryStats;
-}) {
+export function ProfileLibraryPageClient() {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const pathname = usePathname();
@@ -48,35 +39,14 @@ export function ProfileLibraryPageClient({
     Record<number, LibraryEntryChange>
   >({});
   const [mutationError, setMutationError] = useState(false);
-  const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
-  const query = searchParams.get("query") ?? "";
-  const brand = positiveNumber(searchParams.get("brand"));
-  const distiller = positiveNumber(searchParams.get("distiller"));
-  const status = parseStatus(searchParams.get("status"));
-  const input = {
-    brand,
-    collection: "library" as const,
-    cursor,
-    distiller,
-    limit: 25,
-    query,
-    status,
-    user: user.id,
-  };
-  const libraryQueryOptions = orpc.collections.bottles.list.queryOptions({
-    input,
-  });
+  const input = getProfileLibraryInput(searchParams, user.id);
+  const { brand, cursor, distiller, query, status } = input;
+  const libraryQueryOptions = profileQueries.library(orpc, input);
   const libraryListQueryKey = orpc.collections.bottles.list.key({
     type: "query",
   });
-  const libraryQuery = useQuery({
-    ...libraryQueryOptions,
-    initialData: initialLibraryList,
-  });
-  const statsQuery = useQuery({
-    ...orpc.users.libraryStats.queryOptions({ input: { user: user.id } }),
-    initialData: initialLibraryStats,
-  });
+  const libraryQuery = useQuery(libraryQueryOptions);
+  const statsQuery = useQuery(profileQueries.libraryStats(orpc, user.id));
   const updateMutation = useMutation(
     orpc.collections.bottles.update.mutationOptions(),
   );
@@ -203,88 +173,90 @@ export function ProfileLibraryPageClient({
   );
 
   return (
-    <>
-      <MemberLibraryFilters
-        groups={filters}
-        mode="mobile"
-        onChange={setFilter}
-        onClear={clearFilters}
-        onQuerySubmit={setQuery}
-        query={query}
-        total={statsQuery.data?.total}
-      />
-      <PageColumns rail={filterPanel}>
-        <div aria-busy={isNavigating || mutationPending || undefined}>
-          {mutationError ? (
-            <p role="alert" {...stylex.props(styles.actionError)}>
-              The library change failed. Try the action again.
-            </p>
-          ) : null}
-          {libraryQuery.isPending ? (
-            <LoadingList label="Loading member library" rows={4} />
-          ) : libraryQuery.error ? (
-            <SectionError
-              heading="Library is unavailable"
-              onRetry={() => void libraryQuery.refetch()}
-            >
-              The member profile is still available. Try loading the Library
-              again.
-            </SectionError>
-          ) : (
-            <MemberLibraryList
-              emptyAction={
-                isCurrentUser &&
-                !hasActiveFilters({ brand, distiller, query, status }) ? (
-                  <ButtonLink
-                    href="/addBottle?intent=library"
-                    size="sm"
-                    variant="accent"
-                  >
-                    Add your first bottle
-                  </ButtonLink>
-                ) : undefined
-              }
-              emptyDescription={
-                hasActiveFilters({ brand, distiller, query, status })
-                  ? "No library bottles match these filters."
-                  : isCurrentUser
-                    ? "Track what you own, what you have finished, and what you want to open next."
-                    : `${user.username} has not added any bottles to their Library.`
-              }
-              emptyHeading={
-                hasActiveFilters({ brand, distiller, query, status })
-                  ? "No matching bottles"
-                  : "No library bottles yet"
-              }
-              items={applyEntryChanges(
-                libraryQuery.data.results,
-                entryChanges,
-              ).map((entry) =>
-                toLibraryItem(
-                  entry,
-                  isCurrentUser,
-                  mutationPending,
-                  updateStatus,
-                  removeEntry,
-                ),
-              )}
-              nextHref={getCursorHref(
-                pathname,
-                searchParams,
-                libraryQuery.data.rel.nextCursor,
-              )}
-              page={cursor}
-              previousHref={getCursorHref(
-                pathname,
-                searchParams,
-                libraryQuery.data.rel.prevCursor,
-              )}
-              total={statsQuery.data?.total}
-            />
-          )}
-        </div>
-      </PageColumns>
-    </>
+    <ProfileLibraryLayout
+      mobileFilters={
+        <MemberLibraryFilters
+          groups={filters}
+          mode="mobile"
+          onChange={setFilter}
+          onClear={clearFilters}
+          onQuerySubmit={setQuery}
+          query={query}
+          total={statsQuery.data?.total}
+        />
+      }
+      rail={filterPanel}
+    >
+      <div aria-busy={isNavigating || mutationPending || undefined}>
+        {mutationError ? (
+          <p role="alert" {...stylex.props(styles.actionError)}>
+            The library change failed. Try the action again.
+          </p>
+        ) : null}
+        {libraryQuery.isPending ? (
+          <LoadingList label="Loading member library" rows={4} />
+        ) : libraryQuery.error ? (
+          <SectionError
+            heading="Library is unavailable"
+            onRetry={() => void libraryQuery.refetch()}
+          >
+            The member profile is still available. Try loading the Library
+            again.
+          </SectionError>
+        ) : (
+          <MemberLibraryList
+            emptyAction={
+              isCurrentUser &&
+              !hasActiveFilters({ brand, distiller, query, status }) ? (
+                <ButtonLink
+                  href="/addBottle?intent=library"
+                  size="sm"
+                  variant="accent"
+                >
+                  Add your first bottle
+                </ButtonLink>
+              ) : undefined
+            }
+            emptyDescription={
+              hasActiveFilters({ brand, distiller, query, status })
+                ? "No library bottles match these filters."
+                : isCurrentUser
+                  ? "Track what you own, what you have finished, and what you want to open next."
+                  : `${user.username} has not added any bottles to their Library.`
+            }
+            emptyHeading={
+              hasActiveFilters({ brand, distiller, query, status })
+                ? "No matching bottles"
+                : "No library bottles yet"
+            }
+            items={applyEntryChanges(
+              libraryQuery.data.results,
+              entryChanges,
+            ).map((entry) =>
+              toLibraryItem(
+                entry,
+                isCurrentUser,
+                mutationPending,
+                updateStatus,
+                removeEntry,
+              ),
+            )}
+            nextHref={getCursorHref(
+              pathname,
+              searchParams,
+              libraryQuery.data.rel.nextCursor,
+            )}
+            page={cursor}
+            previousHref={getCursorHref(
+              pathname,
+              searchParams,
+              libraryQuery.data.rel.prevCursor,
+            )}
+            total={statsQuery.data?.total}
+          />
+        )}
+      </div>
+    </ProfileLibraryLayout>
   );
 }
 
@@ -449,24 +421,6 @@ function hasActiveFilters(values: {
   return Boolean(
     values.brand || values.distiller || values.query || values.status,
   );
-}
-
-function positiveNumber(value: string | null) {
-  if (!value) return undefined;
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
-}
-
-function parseStatus(
-  value: string | null,
-): LibraryStatus | "unset" | undefined {
-  return value && statusValues.has(value)
-    ? value === "unset"
-      ? "unset"
-      : value === "open" || value === "sealed" || value === "empty"
-        ? value
-        : undefined
-    : undefined;
 }
 
 function capitalize(value: string) {
