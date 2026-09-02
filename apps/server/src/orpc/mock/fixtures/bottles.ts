@@ -397,12 +397,12 @@ export function mockBottleTagsFor(
 }
 
 function mockSuggestedTagCategory(name: string) {
-  if (/ash|brine|peat|sea|smoke/.test(name)) return "peaty" as const;
+  if (/ash|brine|peat|sea|smoke/.test(name)) return "smoke" as const;
   if (/apple|fruit|lemon|orange|peach|pear|raisin/.test(name)) {
-    return "fruity" as const;
+    return "fruit" as const;
   }
-  if (/caramel|honey/.test(name)) return "cereal" as const;
-  return "woody" as const;
+  if (/caramel|honey/.test(name)) return "sweet" as const;
+  return "wood" as const;
 }
 
 export function mockBottleSuggestedTagsFor(

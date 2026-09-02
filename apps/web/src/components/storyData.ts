@@ -25,23 +25,23 @@ export const distillerOptions = [
 ] as const satisfies readonly ProducerPickerOption[];
 
 export const noteOptions = [
-  { category: "Peaty", common: true, name: "Smoke", usageCount: 12880 },
-  { category: "Peaty", common: true, name: "Sea salt", usageCount: 8720 },
-  { category: "Peaty", common: true, name: "Iodine", usageCount: 7164 },
-  { category: "Peaty", common: true, name: "Ash", usageCount: 6941 },
-  { category: "Peaty", common: true, name: "Brine", usageCount: 5840 },
-  { category: "Peaty", name: "Bonfire", usageCount: 4678 },
-  { category: "Peaty", name: "Seaweed", usageCount: 4320 },
-  { category: "Peaty", name: "Charred oak", usageCount: 1784 },
-  { category: "Fruity", common: true, name: "Dried fig", usageCount: 4102 },
-  { category: "Fruity", name: "Lemon peel", usageCount: 6288 },
-  { category: "Fruity", name: "Green apple", usageCount: 8210 },
+  { category: "Smoke", common: true, name: "Smoke", usageCount: 12880 },
+  { category: "Smoke", common: true, name: "Sea salt", usageCount: 8720 },
+  { category: "Smoke", common: true, name: "Iodine", usageCount: 7164 },
+  { category: "Smoke", common: true, name: "Ash", usageCount: 6941 },
+  { category: "Smoke", common: true, name: "Brine", usageCount: 5840 },
+  { category: "Smoke", name: "Bonfire", usageCount: 4678 },
+  { category: "Smoke", name: "Seaweed", usageCount: 4320 },
+  { category: "Wood", name: "Charred oak", usageCount: 1784 },
+  { category: "Fruit", common: true, name: "Dried fig", usageCount: 4102 },
+  { category: "Fruit", name: "Lemon peel", usageCount: 6288 },
+  { category: "Fruit", name: "Green apple", usageCount: 8210 },
   { category: "Cereal", name: "Malted barley", usageCount: 5910 },
   { category: "Floral", name: "Heather", usageCount: 3870 },
-  { category: "Winey", name: "Sherry", usageCount: 9214 },
-  { category: "Woody", name: "Oak", usageCount: 11240 },
-  { category: "Feinty", name: "Leather", usageCount: 4740 },
-  { category: "Sulphury", name: "Matchstick", usageCount: 1930 },
+  { category: "Wood", name: "Sherry", usageCount: 9214 },
+  { category: "Wood", name: "Oak", usageCount: 11240 },
+  { category: "Earthy", name: "Leather", usageCount: 4740 },
+  { category: "Sulfur", name: "Matchstick", usageCount: 1930 },
 ] as const satisfies readonly NotePickerOption[];
 
 export const memberOptions = [

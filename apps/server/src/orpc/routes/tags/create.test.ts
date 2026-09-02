@@ -9,7 +9,7 @@ describe("POST /tags", () => {
       routerClient.tags.create(
         {
           name: "Peated",
-          tagCategory: "peaty",
+          tagCategory: "smoke",
         },
         { context: { user } },
       ),
@@ -22,12 +22,12 @@ describe("POST /tags", () => {
     const tag = await routerClient.tags.create(
       {
         name: "Peated",
-        tagCategory: "peaty",
+        tagCategory: "smoke",
       },
       { context: { user } },
     );
 
     expect(tag.name).toEqual("peated");
-    expect(tag.tagCategory).toEqual("peaty");
+    expect(tag.tagCategory).toEqual("smoke");
   });
 });

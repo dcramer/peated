@@ -33,14 +33,14 @@ describe("GET /tags/:tag", () => {
   test("returns serialized tag data", async ({ fixtures }) => {
     const tag = await fixtures.Tag({
       name: "TestTag",
-      tagCategory: "fruity",
+      tagCategory: "fruit",
       flavorProfiles: ["young_spritely"],
     });
 
     const result = await routerClient.tags.details({ tag: "TestTag" });
 
     expect(result.name).toBe("TestTag");
-    expect(result.tagCategory).toBe("fruity");
+    expect(result.tagCategory).toBe("fruit");
     expect(result.flavorProfiles).toEqual(["young_spritely"]);
   });
 

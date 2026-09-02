@@ -75,7 +75,7 @@ export default function TagForm({
               {...field}
               label="Category"
               value={value ? { id: value, name: toTitleCase(value) } : null}
-              placeholder="e.g. fruity"
+              placeholder="e.g. fruit"
               options={CATEGORY_TYPES}
               onChange={(value) => onChange(value?.id)}
               error={errors.tagCategory}

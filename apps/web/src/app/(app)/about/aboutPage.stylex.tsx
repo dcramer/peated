@@ -10,11 +10,13 @@ import {
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
 
 const MOBILE = "@media (max-width: 559px)";
+const STEPS_STACKED = "@media (max-width: 899px)";
 
 const aboutTabs = [
   { href: "/about", label: "About" },
   { href: "/about/api", label: "API" },
   { href: "/about/categories", label: "Whisky categories" },
+  { href: "/about/tasting-wheel", label: "Tasting wheel" },
   { href: "/about/ratings", label: "Rating guide" },
   { href: "/updates", label: "Recent changes" },
 ] as const;
@@ -152,7 +154,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "repeat(3, minmax(0, 1fr))",
-      [MOBILE]: "minmax(0, 1fr)",
+      [STEPS_STACKED]: "minmax(0, 1fr)",
     },
     gap: space.x6,
     margin: 0,
