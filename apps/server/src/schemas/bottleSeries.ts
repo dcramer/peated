@@ -51,6 +51,23 @@ export const BottleSeriesDetailsSchema = BottleSeriesSchema.extend({
     shortName: true,
     kind: true,
   }).describe("Brand that owns this bottle series"),
+  distillers: z
+    .array(
+      EntitySchema.pick({
+        id: true,
+        peatedId: true,
+        name: true,
+        shortName: true,
+        kind: true,
+      }).extend({
+        numBottles: z
+          .number()
+          .readonly()
+          .describe("Number of active Series Bottles from this Distillery"),
+      }),
+    )
+    .readonly()
+    .describe("Distilleries represented by active Bottles in this Series"),
 });
 
 export const BottleSeriesInputFields = {

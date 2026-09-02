@@ -8,6 +8,10 @@ Bottle Series are durable catalog records, but people can only encounter them as
 - Add a dedicated Series page with Brand context, description, Bottle count, and a paginated Bottle list.
 - Link Series references and global search results to the dedicated page.
 - Add an "Other bottles in this series" section to Bottle pages, built from existing Bottle rail and list components, with a link to the complete Series page.
+- Put Series facts before the Bottle list and show signed-in members how many Series Bottles are in their Library.
+- Show a compact Distilleries breakdown beside the Series Bottle list.
+- Let signed-in members show all Series Bottles, Bottles in their Library, or Bottles not in their Library.
+- Omit empty ratings from Bottle lists and keep long page titles inside narrow screens.
 - Preserve public Series identity when duplicate Series are merged. **BREAKING**: populated Series can no longer be deleted without a destination.
 
 ## Capabilities
@@ -24,5 +28,6 @@ None.
 
 - Bottle Series schemas, serializers, API routes, search, Peated ID parsing, and catalog lifecycle behavior.
 - Web catalog URLs, canonical routing, metadata, sitemaps, search results, Series pages, and Bottle overview composition.
+- Shared Bottle-list ratings and narrow page-title presentation.
 - Database schema and generated migration metadata for Series tombstones.
 - Focused server and web tests plus desktop and mobile UI verification.

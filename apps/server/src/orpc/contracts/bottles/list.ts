@@ -45,6 +45,10 @@ export default contract
           "Filter a distillery to its own releases or releases from other brands and bottlers.",
         ),
       series: z.coerce.number().nullish(),
+      library: z
+        .enum(["in", "out"])
+        .nullish()
+        .describe("Filter by the signed-in user's Library."),
       tag: z.string().nullish(),
       flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
       flight: z.string().nullish(),

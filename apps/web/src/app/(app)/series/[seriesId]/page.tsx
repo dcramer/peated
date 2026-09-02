@@ -1,11 +1,15 @@
 import { BOTTLE_LIST_SORT_OPTIONS } from "@peated/server/constants";
+import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getSeriesSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getSeriesPage } from "@peated/web/lib/seriesPage.server";
 import type { Metadata } from "next";
 
-import { SeriesPageClient } from "./seriesPageClient.stylex";
+import {
+  SeriesPageClient,
+  type SeriesLibraryFilter,
+} from "./seriesPageClient.stylex";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -20,6 +24,10 @@ function getCursor(value: string | undefined) {
 
 function getSort(value: string | undefined) {
   return BOTTLE_LIST_SORT_OPTIONS.find((sort) => sort === value) ?? "-release";
+}
+
+function getLibraryFilter(value: string | undefined): SeriesLibraryFilter {
+  return value === "in" || value === "out" ? value : "all";
 }
 
 export async function generateMetadata(props: {
@@ -41,18 +49,36 @@ export default async function SeriesPage(props: {
   const series = await getSeriesPage(parseCatalogRouteId(seriesId));
   const cursor = getCursor(firstValue(searchParams.cursor));
   const sort = getSort(firstValue(searchParams.sort));
-  const { client } = await getPublicPageServerClient();
-  const bottleList = await client.bottles.list({
-    cursor,
-    limit: 25,
-    series: series.id,
-    sort,
-  });
+  const [currentUser, { client }] = await Promise.all([
+    getCurrentUser(),
+    getPublicPageServerClient(),
+  ]);
+  const library = currentUser
+    ? getLibraryFilter(firstValue(searchParams.library))
+    : "all";
+  const [bottleList, libraryBottleList] = await Promise.all([
+    client.bottles.list({
+      cursor,
+      library: library === "all" ? undefined : library,
+      limit: 25,
+      series: series.id,
+      sort,
+    }),
+    currentUser
+      ? client.bottles.list({
+          library: "in",
+          limit: 1,
+          series: series.id,
+        })
+      : null,
+  ]);
 
   return (
     <SeriesPageClient
       initialBottleList={bottleList}
       initialCursor={cursor}
+      initialLibrary={library}
+      initialLibraryCount={libraryBottleList?.total ?? null}
       initialSeries={series}
       initialSort={sort}
     />

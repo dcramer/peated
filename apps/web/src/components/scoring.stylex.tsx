@@ -221,7 +221,7 @@ export type BottleRatingsProps = {
   scoreCount?: number;
 };
 
-/** Combines tasting ratings and the published review score for one bottle row. */
+/** Combines available tasting ratings and the published review score for one bottle row. */
 export function BottleRatings({
   counts = {},
   high = null,
@@ -234,6 +234,8 @@ export function BottleRatings({
   const maxBandCount = Math.max(...bandCounts, 0);
   const sampleHeight = getRatingSampleHeight(tastingCount);
   const hasRange = low !== null && high !== null;
+  if (tastingCount === 0 && median === null) return null;
+
   const label = [
     median === null
       ? "No published score"
@@ -247,7 +249,7 @@ export function BottleRatings({
   return (
     <span
       aria-label={label}
-      data-state={tastingCount === 0 && median === null ? "empty" : "populated"}
+      data-state="populated"
       role="img"
       title={label}
       {...stylex.props(styles.bottleRatings)}
