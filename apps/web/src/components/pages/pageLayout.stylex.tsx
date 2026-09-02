@@ -32,15 +32,23 @@ export function PageFrame({
 /** Places page content beside an optional side column. */
 export function PageColumns({
   children,
+  equal = false,
   rail,
   railBehavior = "hide",
 }: {
   children: ReactNode;
+  equal?: boolean;
   rail?: ReactNode;
   railBehavior?: "hide" | "stack";
 }) {
   return (
-    <div {...stylex.props(styles.columns, !rail && styles.singleColumn)}>
+    <div
+      {...stylex.props(
+        styles.columns,
+        equal && styles.equalColumns,
+        !rail && styles.singleColumn,
+      )}
+    >
       <div {...stylex.props(styles.mainColumn)}>{children}</div>
       {rail ? (
         <aside
@@ -215,6 +223,12 @@ const styles = stylex.create({
     gridTemplateColumns: "minmax(0, 1fr) 336px",
     gap: space.x12,
     alignItems: "start",
+    [NARROW]: {
+      gridTemplateColumns: "minmax(0, 1fr)",
+    },
+  },
+  equalColumns: {
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     [NARROW]: {
       gridTemplateColumns: "minmax(0, 1fr)",
     },

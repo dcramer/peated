@@ -11,12 +11,11 @@ import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import Join from "@peated/web/components/join";
 import {
-  HomeCommunity,
+  HomeActivityFeed,
   HomeContributionPrompt,
   HomeDistilleries,
   HomeLatestReleases,
   HomeOrigins,
-  HomeRecentBottles,
 } from "@peated/web/components/pages/homeBrowse.stylex";
 import { HomePage } from "@peated/web/components/pages/homePage.stylex";
 import { HomeSectionLoading } from "@peated/web/components/pages/homeSummary.stylex";
@@ -47,7 +46,6 @@ export function PublicHome({
   const { user } = useAuth();
   const stats = useQuery(publicHomeQueries.stats(orpc));
   const events = useQuery(publicHomeQueries.events(orpc));
-  const totalBottles = stats.data?.bottles;
   const nextEvent = events.data?.results[0];
   const upcomingEvent =
     nextEvent && isEventWithinDays(nextEvent, 30) ? nextEvent : null;
@@ -56,6 +54,7 @@ export function PublicHome({
     <HomePage
       content={
         <PageColumns
+          equal
           rail={
             <>
               {upcomingEvent ? (
@@ -67,7 +66,7 @@ export function PublicHome({
                 </div>
               ) : null}
               <div {...stylex.props(styles.secondaryRail)}>
-                <RecentBottles totalBottles={totalBottles} />
+                <Activity />
                 <Distilleries totalDistilleries={stats.data?.distilleries} />
                 <HomeContributionPrompt
                   primaryAction={
@@ -100,7 +99,6 @@ export function PublicHome({
               </div>
             ) : null}
             <LatestReleases />
-            <Community />
             <div {...stylex.props(styles.desktopOnly)}>
               <Origins />
             </div>
@@ -205,7 +203,7 @@ function LatestReleases() {
   ) : null;
 }
 
-function Community() {
+function Activity() {
   const orpc = useORPC();
   const externalReviews = useQuery(publicHomeQueries.recentReviews(orpc));
   const tastings = useQuery(publicHomeQueries.memberTastings(orpc));
@@ -213,7 +211,7 @@ function Community() {
   if (tastings.isPending && externalReviews.isPending) {
     return (
       <HomeSectionLoading>
-        <LoadingList label="Loading community" rows={3} />
+        <LoadingList label="Loading activity" rows={3} />
       </HomeSectionLoading>
     );
   }
@@ -221,7 +219,7 @@ function Community() {
   if (tastings.error && externalReviews.error) {
     return (
       <SectionError
-        heading="Community is unavailable"
+        heading="Activity is unavailable"
         onRetry={() => {
           void tastings.refetch();
           void externalReviews.refetch();
@@ -238,13 +236,13 @@ function Community() {
   const items = getCommunityFeedItems({ criticReviews, memberTastings });
 
   return items.length ? (
-    <HomeCommunity>
+    <HomeActivityFeed>
       <CommunityFeed
-        ariaLabel="Recent community tastings and reviews"
+        ariaLabel="Recent tastings and reviews"
         items={items}
         limit={3}
       />
-    </HomeCommunity>
+    </HomeActivityFeed>
   ) : null;
 }
 
@@ -351,49 +349,6 @@ function Distilleries({ totalDistilleries }: { totalDistilleries?: number }) {
   ) : null;
 }
 
-function RecentBottles({ totalBottles }: { totalBottles?: number }) {
-  const orpc = useORPC();
-  const bottles = useQuery(publicHomeQueries.recentBottles(orpc));
-
-  if (bottles.isPending) {
-    return (
-      <HomeSectionLoading>
-        <LoadingList label="Loading recently added bottles" rows={3} />
-      </HomeSectionLoading>
-    );
-  }
-
-  if (bottles.error) {
-    return (
-      <SectionError
-        heading="Recent bottles are unavailable"
-        onRetry={() => void bottles.refetch()}
-      >
-        We couldn't load the latest records. Browse all bottles instead.
-      </SectionError>
-    );
-  }
-
-  return bottles.data.results.length ? (
-    <HomeRecentBottles
-      bottles={bottles.data.results.map((bottle) => ({
-        ...toBottleListItem(bottle),
-        metadata: getBottleMetadata(bottle),
-        size: "sm",
-      }))}
-      totalBottles={totalBottles}
-    />
-  ) : null;
-}
-
-function getBottleMetadata(bottle: Bottle) {
-  return [
-    bottle.caskNumber ? `Cask ${bottle.caskNumber}` : null,
-    bottle.statedAge === null ? null : `${bottle.statedAge} years`,
-    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
-  ].filter((value): value is string => Boolean(value));
-}
-
 function getReleaseMetadata(bottle: Bottle) {
   return [
     bottle.releaseYear === null ? null : `${bottle.releaseYear} release`,
@@ -421,9 +376,6 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: space.x12,
-    [NARROW]: {
-      display: "none",
-    },
   },
   sections: {
     display: "flex",

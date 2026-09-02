@@ -100,7 +100,7 @@ export function HomeLatestReleases({
   );
 }
 
-export function HomeCommunity({ children }: { children: ReactNode }) {
+export function HomeActivityFeed({ children }: { children: ReactNode }) {
   return (
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
@@ -109,7 +109,7 @@ export function HomeCommunity({ children }: { children: ReactNode }) {
             View all <span aria-hidden="true">→</span>
           </Link>
         }
-        title="Community"
+        title="Activity"
       />
       <div {...stylex.props(styles.rows)}>{children}</div>
     </section>
@@ -326,30 +326,6 @@ export function HomeDistilleries({
   );
 }
 
-export function HomeRecentBottles({
-  bottles,
-  totalBottles,
-}: {
-  bottles: readonly BottleListItem[];
-  totalBottles?: number;
-}) {
-  return (
-    <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading
-        detail={
-          totalBottles === undefined
-            ? "Anyone can add one"
-            : `${totalBottles.toLocaleString("en-US")} records · anyone can add one`
-        }
-        title="Added this week"
-      />
-      <div {...stylex.props(styles.recentBottles)}>
-        <BottleList ariaLabel="Bottles added this week" items={bottles} />
-      </div>
-    </section>
-  );
-}
-
 export function HomeContributionPrompt({
   primaryAction,
   secondaryAction,
@@ -431,7 +407,7 @@ const styles = stylex.create({
   },
   regionGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     gap: "6px",
     marginTop: space.x2,
     [NARROW]: {
@@ -492,7 +468,7 @@ const styles = stylex.create({
   },
   countryGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     gap: "6px",
     marginTop: space.x4,
     [NARROW]: {
@@ -593,9 +569,6 @@ const styles = stylex.create({
   },
   distilleryLink: {
     marginTop: space.x3,
-  },
-  recentBottles: {
-    marginTop: "10px",
   },
   prompt: {
     paddingTop: "18px",

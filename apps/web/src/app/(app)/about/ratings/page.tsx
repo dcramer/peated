@@ -66,7 +66,7 @@ export default function RatingsPage() {
               metadata="Ordered by median review score"
               title="Scored bottles"
             />
-            <RailListItem href="/community" title="Community" />
+            <RailListItem href="/community" title="Activity" />
           </RailList>
         </RailSection>
       }
