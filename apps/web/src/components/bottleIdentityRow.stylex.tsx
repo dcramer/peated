@@ -44,11 +44,16 @@ export function BottleVisual({
         styles.visual,
         Boolean(imageUrl) && styles.imageVisual,
         visualSizeStyles[size],
+        Boolean(imageUrl && expandable && label) && styles.expandableVisual,
       )}
     >
       {imageUrl && expandable && label ? (
         <ImageViewer alt="" fill label={label} src={imageUrl}>
-          <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
+          <img
+            alt=""
+            src={imageUrl}
+            {...stylex.props(styles.image, expandableImagePaddingStyles[size])}
+          />
         </ImageViewer>
       ) : imageUrl ? (
         <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
@@ -214,6 +219,9 @@ const styles = stylex.create({
     backgroundColor: colors.imageBackground,
     boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
   },
+  expandableVisual: {
+    padding: 0,
+  },
   visualSmall: {
     width: "32px",
     height: "46px",
@@ -235,10 +243,23 @@ const styles = stylex.create({
     padding: space.x4,
   },
   image: {
+    boxSizing: "border-box",
     display: "block",
     width: "100%",
     height: "100%",
     objectFit: "contain",
+  },
+  expandableImageSmall: {
+    padding: space.x1,
+  },
+  expandableImageMedium: {
+    padding: space.x2,
+  },
+  expandableImageLarge: {
+    padding: { default: space.x2, [COMPACT]: space.x1 },
+  },
+  expandableImageExtraLarge: {
+    padding: space.x4,
   },
   fallbackAsset: {
     display: "block",
@@ -421,4 +442,11 @@ const visualSizeStyles = {
   md: styles.visualMedium,
   lg: styles.visualLarge,
   xl: styles.visualExtraLarge,
+} satisfies Record<BottleVisualSize, stylex.StyleXStyles>;
+
+const expandableImagePaddingStyles = {
+  sm: styles.expandableImageSmall,
+  md: styles.expandableImageMedium,
+  lg: styles.expandableImageLarge,
+  xl: styles.expandableImageExtraLarge,
 } satisfies Record<BottleVisualSize, stylex.StyleXStyles>;
