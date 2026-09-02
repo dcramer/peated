@@ -65,6 +65,37 @@ export type {
   TastingEditFormSubmitData,
 } from "@peated/web/lib/tastingForm";
 
+function RecordTypeSection({
+  disabled,
+  onChange,
+  value,
+}: {
+  disabled: boolean;
+  onChange: (value: RecordType) => void;
+  value: RecordType | null;
+}) {
+  return (
+    <FormSection
+      description="A tasting records one pour. A review is your overall opinion of the bottle."
+      title="What do you want to log?"
+    >
+      <RecordTypeInput disabled={disabled} onChange={onChange} value={value} />
+    </FormSection>
+  );
+}
+
+/** Reserves the first-step tasting form while its bottle data loads. */
+export function TastingFormLoading({ title }: { title: string }) {
+  return (
+    <WorkflowScreen mobileSaveBar title={title}>
+      <FormStack>
+        <LoadingList label="Loading bottle" rows={1} />
+        <RecordTypeSection disabled onChange={() => undefined} value={null} />
+      </FormStack>
+    </WorkflowScreen>
+  );
+}
+
 type TastingCreateFormProps = {
   initialData: Partial<z.infer<typeof TastingSchema>> &
     Pick<z.infer<typeof TastingSchema>, "bottle">;
@@ -396,16 +427,11 @@ export default function TastingForm(
             <FormNotice>{submitError ?? errorMessage}</FormNotice>
           ) : null}
           {recordType === null ? (
-            <FormSection
-              description="A tasting records one pour. A review is your overall opinion of the bottle."
-              title="What do you want to log?"
-            >
-              <RecordTypeInput
-                disabled={saving}
-                onChange={selectRecordType}
-                value={recordType}
-              />
-            </FormSection>
+            <RecordTypeSection
+              disabled={saving}
+              onChange={selectRecordType}
+              value={recordType}
+            />
           ) : null}
           {recordType !== null ? (
             <FormSteps currentStep={currentStep} steps={steps} />
