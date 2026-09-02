@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { SkipLink } from "@peated/web/components/skipLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
@@ -95,8 +94,6 @@ export function AdminLayout({
 
   return (
     <div {...stylex.props(foundationStyles.document, styles.layout)}>
-      <SkipLink href="#admin-content">Skip to admin content</SkipLink>
-
       <header {...stylex.props(styles.mobileHeader)}>
         <Link href="/admin" {...stylex.props(styles.mobileBrand)}>
           <span {...stylex.props(styles.brandName)}>Peated</span>
