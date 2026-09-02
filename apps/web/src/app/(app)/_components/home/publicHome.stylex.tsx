@@ -5,34 +5,33 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import Join from "@peated/web/components/join";
 import {
+  HomeCommunity,
   HomeContributionPrompt,
   HomeDistilleries,
   HomeLatestReleases,
   HomeOrigins,
   HomeRecentBottles,
-  HomeRecentReviews,
 } from "@peated/web/components/pages/homeBrowse.stylex";
 import { HomePage } from "@peated/web/components/pages/homePage.stylex";
 import { HomeSectionLoading } from "@peated/web/components/pages/homeSummary.stylex";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
-import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import { getBottleReviewMetadata } from "@peated/web/lib/bottleMetadata";
+import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 import { isEventWithinDays } from "@peated/web/lib/eventDates";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   memberHomeQueries,
   publicHomeQueries,
 } from "@peated/web/lib/orpc/homeQueries";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 import { HomeEventCallout } from "./homeEventCallout.stylex";
 
@@ -56,17 +55,20 @@ export function PublicHome({
   return (
     <HomePage
       content={
-        <>
-          {upcomingEvent ? <HomeEventCallout event={upcomingEvent} /> : null}
-          <div {...stylex.props(styles.ratingsGrid)}>
-            <LatestReleases />
-            <RecentReviews />
-          </div>
-          <Origins />
-          <PageColumns
-            rail={
-              <>
+        <PageColumns
+          rail={
+            <>
+              {upcomingEvent ? (
+                <div {...stylex.props(styles.desktopOnly)}>
+                  <HomeEventCallout
+                    event={upcomingEvent}
+                    headingId="upcoming-event-desktop"
+                  />
+                </div>
+              ) : null}
+              <div {...stylex.props(styles.secondaryRail)}>
                 <RecentBottles totalBottles={totalBottles} />
+                <Distilleries totalDistilleries={stats.data?.distilleries} />
                 <HomeContributionPrompt
                   primaryAction={
                     <ButtonLink
@@ -83,17 +85,27 @@ export function PublicHome({
                     </ButtonLink>
                   }
                 />
-              </>
-            }
-            railBehavior="stack"
-          >
-            <Distilleries
-              totalBottlers={stats.data?.bottlers}
-              totalBrands={stats.data?.brands}
-              totalDistilleries={stats.data?.distilleries}
-            />
-          </PageColumns>
-        </>
+              </div>
+            </>
+          }
+          railBehavior="stack"
+        >
+          <div {...stylex.props(styles.sections)}>
+            {upcomingEvent ? (
+              <div {...stylex.props(styles.mobileEvent)}>
+                <HomeEventCallout
+                  event={upcomingEvent}
+                  headingId="upcoming-event-mobile"
+                />
+              </div>
+            ) : null}
+            <LatestReleases />
+            <Community />
+            <div {...stylex.props(styles.desktopOnly)}>
+              <Origins />
+            </div>
+          </div>
+        </PageColumns>
       }
       description="Browse whisky bottles, including single casks, with critic scores and tasting notes. No account needed."
       search={
@@ -193,56 +205,47 @@ function LatestReleases() {
   ) : null;
 }
 
-function RecentReviews() {
+function Community() {
   const orpc = useORPC();
   const externalReviews = useQuery(publicHomeQueries.recentReviews(orpc));
+  const tastings = useQuery(publicHomeQueries.memberTastings(orpc));
 
-  if (externalReviews.isPending) {
+  if (tastings.isPending && externalReviews.isPending) {
     return (
       <HomeSectionLoading>
-        <LoadingList label="Loading recent critic reviews" rows={4} />
+        <LoadingList label="Loading community" rows={3} />
       </HomeSectionLoading>
     );
   }
 
-  if (externalReviews.error) {
+  if (tastings.error && externalReviews.error) {
     return (
       <SectionError
-        heading="Critic reviews are unavailable"
-        onRetry={() => void externalReviews.refetch()}
+        heading="Community is unavailable"
+        onRetry={() => {
+          void tastings.refetch();
+          void externalReviews.refetch();
+        }}
       >
-        We couldn't load the latest critic reviews. The rest of the database is
-        still available.
+        We couldn't load the latest tastings and reviews. The rest of the
+        database is still available.
       </SectionError>
     );
   }
 
-  const items = externalReviews.data.results.flatMap((review) =>
-    review.bottle
-      ? [
-          {
-            bottleHref: getBottleUrl(review.bottle),
-            bottleImageUrl: review.bottle.imageUrl,
-            bottleName: formatBottleDisplayName(review.bottle),
-            date: (
-              <TimeSince
-                date={review.article.publishedAt ?? review.createdAt}
-              />
-            ),
-            id: String(review.id),
-            metadata: getBottleReviewMetadata(review.bottle),
-            rating:
-              review.nativeScore?.scale === 100
-                ? review.nativeScore.value
-                : null,
-            source: review.site?.name ?? review.reviewerName ?? "Critic review",
-            sourceHref: review.url,
-          },
-        ]
-      : [],
-  );
+  const memberTastings = tastings.data?.results ?? [];
+  const criticReviews = externalReviews.data?.results ?? [];
+  const items = getCommunityFeedItems({ criticReviews, memberTastings });
 
-  return items.length ? <HomeRecentReviews reviews={items} /> : null;
+  return items.length ? (
+    <HomeCommunity>
+      <CommunityFeed
+        ariaLabel="Recent community tastings and reviews"
+        items={items}
+        limit={3}
+      />
+    </HomeCommunity>
+  ) : null;
 }
 
 function Origins() {
@@ -309,15 +312,7 @@ function Origins() {
   ) : null;
 }
 
-function Distilleries({
-  totalBottlers,
-  totalBrands,
-  totalDistilleries,
-}: {
-  totalBottlers?: number;
-  totalBrands?: number;
-  totalDistilleries?: number;
-}) {
+function Distilleries({ totalDistilleries }: { totalDistilleries?: number }) {
   const orpc = useORPC();
   const distilleries = useQuery(publicHomeQueries.distilleries(orpc));
 
@@ -351,30 +346,7 @@ function Distilleries({
         name: distillery.name,
         totalBottles: distillery.totalBottles,
       }))}
-      links={[
-        {
-          href: "/distillers",
-          label:
-            totalDistilleries === undefined
-              ? "All distilleries"
-              : `All ${totalDistilleries.toLocaleString("en-US")} distilleries`,
-        },
-        {
-          href: "/brands",
-          label:
-            totalBrands === undefined
-              ? "Brands"
-              : `${totalBrands.toLocaleString("en-US")} brands`,
-        },
-        {
-          href: "/bottlers",
-          label:
-            totalBottlers === undefined
-              ? "Independent bottlers"
-              : `${totalBottlers.toLocaleString("en-US")} bottlers`,
-        },
-        { href: "/locations", label: "Map" },
-      ]}
+      totalDistilleries={totalDistilleries}
     />
   ) : null;
 }
@@ -430,16 +402,33 @@ function getReleaseMetadata(bottle: Bottle) {
   ].filter((value): value is string => Boolean(value));
 }
 
-const STACKED = "@media (max-width: 759px)";
+const NARROW = "@media (max-width: 759px)";
 
 const styles = stylex.create({
-  ratingsGrid: {
-    display: "grid",
-    minWidth: 0,
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: space.x8,
-    [STACKED]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
+  desktopOnly: {
+    display: "block",
+    [NARROW]: {
+      display: "none",
     },
+  },
+  mobileEvent: {
+    display: "none",
+    [NARROW]: {
+      display: "block",
+    },
+  },
+  secondaryRail: {
+    display: "flex",
+    flexDirection: "column",
+    gap: space.x12,
+    [NARROW]: {
+      display: "none",
+    },
+  },
+  sections: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x12,
   },
 });

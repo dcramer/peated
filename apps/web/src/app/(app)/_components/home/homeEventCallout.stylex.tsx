@@ -1,77 +1,73 @@
 import type { Event } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 
-import { ButtonLink } from "@peated/web/components";
+import { TextLink } from "@peated/web/components";
 import DateRange from "@peated/web/components/dateRange";
 import { formatEventLocation } from "@peated/web/lib/eventLocation";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
-export function HomeEventCallout({ event }: { event: Event }) {
+export function HomeEventCallout({
+  event,
+  headingId = "upcoming-event",
+}: {
+  event: Event;
+  headingId?: string;
+}) {
   const location = formatEventLocation(event);
 
   return (
-    <section aria-labelledby="upcoming-event" {...stylex.props(styles.root)}>
-      <div {...stylex.props(styles.copy)}>
-        <div {...stylex.props(styles.eyebrow)}>Coming up</div>
-        <h2 id="upcoming-event" {...stylex.props(styles.title)}>
-          {event.name}
-        </h2>
-        <div {...stylex.props(styles.details)}>
-          <DateRange start={event.dateStart} end={event.dateEnd} />
-          {location ? <span>{location}</span> : null}
-        </div>
+    <section aria-labelledby={headingId} {...stylex.props(styles.root)}>
+      <h2 id={headingId} {...stylex.props(styles.heading)}>
+        Coming up
+      </h2>
+      <h3 {...stylex.props(styles.title)}>{event.name}</h3>
+      <div {...stylex.props(styles.details)}>
+        <DateRange start={event.dateStart} end={event.dateEnd} />
+        {location ? <span>{location}</span> : null}
       </div>
-      <ButtonLink href="/events" size="sm" variant="accent">
-        View whisky events
-      </ButtonLink>
+      <div {...stylex.props(styles.action)}>
+        <TextLink href="/events">
+          View whisky events <span aria-hidden="true">→</span>
+        </TextLink>
+      </div>
     </section>
   );
 }
 
-const NARROW = "@media (max-width: 639px)";
-
 const styles = stylex.create({
   root: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space.x6,
-    padding: space.x6,
-    borderLeftWidth: "3px",
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.accent,
-    backgroundColor: colors.accentTint,
-    [NARROW]: {
-      alignItems: "flex-start",
-      flexDirection: "column",
-      gap: space.x4,
-    },
+    minWidth: 0,
   },
-  copy: { minWidth: 0 },
-  eyebrow: {
-    marginBottom: space.x1,
-    color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-  },
-  title: {
+  heading: {
     margin: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "22px",
+    fontSize: "24px",
     fontWeight: 700,
-    lineHeight: 1.2,
+    letterSpacing: "-0.03em",
+    lineHeight: 1.1,
+  },
+  title: {
+    margin: 0,
+    marginTop: space.x3,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "18px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.25,
   },
   details: {
     display: "flex",
-    flexWrap: "wrap",
-    gap: `${space.x1} ${space.x3}`,
+    flexDirection: "column",
+    gap: space.x1,
     marginTop: space.x2,
     color: colors.inkMuted,
     fontFamily: fonts.reading,
-    fontSize: "14px",
+    fontSize: "13px",
+    lineHeight: 1.45,
+  },
+  action: {
+    marginTop: space.x3,
   },
 });
