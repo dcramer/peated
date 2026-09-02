@@ -3,12 +3,11 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ButtonLink } from "@peated/web/components";
 import DateRange from "@peated/web/components/dateRange";
+import { formatEventLocation } from "@peated/web/lib/eventLocation";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
 export function HomeEventCallout({ event }: { event: Event }) {
-  const location = [event.address, event.country?.name]
-    .filter(Boolean)
-    .join(" · ");
+  const location = formatEventLocation(event);
 
   return (
     <section aria-labelledby="upcoming-event" {...stylex.props(styles.root)}>

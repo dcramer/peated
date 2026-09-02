@@ -1,7 +1,7 @@
 import type { Event } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 
-import { TextLink } from "@peated/web/components";
+import { ButtonLink, TextLink } from "@peated/web/components";
 import DateRange from "@peated/web/components/dateRange";
 import { colors, fonts, space } from "../../../styles/tokens.stylex";
 
@@ -18,18 +18,34 @@ export function EventList({ events }: { events: Event[] }) {
               <DateRange start={event.dateStart} end={event.dateEnd} />
             </div>
             <div {...stylex.props(styles.details)}>
-              <h3 {...stylex.props(styles.name)}>{event.name}</h3>
+              <h3 {...stylex.props(styles.name)}>
+                {event.website ? (
+                  <TextLink
+                    href={event.website}
+                    rel="noreferrer"
+                    size="inherit"
+                    target="_blank"
+                  >
+                    {event.name}
+                  </TextLink>
+                ) : (
+                  event.name
+                )}
+              </h3>
               {location ? (
                 <div {...stylex.props(styles.location)}>{location}</div>
               ) : null}
             </div>
-            {event.website ? (
-              <div {...stylex.props(styles.website)}>
-                <TextLink href={event.website} rel="noreferrer" target="_blank">
-                  Event website
-                </TextLink>
-              </div>
-            ) : null}
+            <div {...stylex.props(styles.action)}>
+              <ButtonLink
+                download
+                href={`/events/${event.id}/calendar.ics`}
+                size="sm"
+                variant="tonal"
+              >
+                Add to calendar
+              </ButtonLink>
+            </div>
           </article>
         );
       })}
@@ -81,5 +97,5 @@ const styles = stylex.create({
     fontSize: "14px",
     lineHeight: 1.4,
   },
-  website: { whiteSpace: "nowrap" },
+  action: { whiteSpace: "nowrap" },
 });

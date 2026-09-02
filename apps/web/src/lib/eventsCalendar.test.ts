@@ -1,27 +1,25 @@
 import { describe, expect, it } from "vitest";
 
-import { buildEventsCalendar } from "./eventsCalendar";
+import { buildEventCalendar } from "./eventsCalendar";
 
 describe("events calendar", () => {
   it("builds an all-day calendar with an exclusive end date", () => {
-    const calendar = buildEventsCalendar(
-      [
-        {
-          id: 12,
-          name: "Whisky, Wine & Friends",
-          dateStart: "2026-09-12",
-          dateEnd: "2026-09-13",
-          address: "Town Hall; Main Street",
-          country: {
-            id: 1,
-            name: "Scotland",
-            slug: "scotland",
-            totalBottles: 0,
-            totalDistillers: 0,
-          },
-          website: "https://example.com/event",
+    const calendar = buildEventCalendar(
+      {
+        id: 12,
+        name: "Whisky, Wine & Friends",
+        dateStart: "2026-09-12",
+        dateEnd: "2026-09-13",
+        address: "Town Hall; Main Street",
+        country: {
+          id: 1,
+          name: "Scotland",
+          slug: "scotland",
+          totalBottles: 0,
+          totalDistillers: 0,
         },
-      ],
+        website: "https://example.com/event",
+      },
       new Date("2026-09-01T12:30:00.123Z"),
     );
 
