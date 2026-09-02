@@ -141,10 +141,10 @@ function BottlePanel({
 }) {
   return (
     <SelectedBottleSummary
-      bottleId={bottle.peatedId}
+      brand={bottle.brand.shortName || bottle.brand.name}
       imageUrl={previewUrl ?? bottle.imageUrl}
       metadata={getBottleMetadata(bottle)}
-      name={formatBottleDisplayName(bottle)}
+      name={formatBottleDisplayName(bottle, { includeBrand: false })}
     />
   );
 }
@@ -152,10 +152,10 @@ function BottlePanel({
 function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
   return (
     <SelectedBottleSummary
-      bottleId={entry.bottle.peatedId}
+      brand={entry.bottle.brand.shortName || entry.bottle.brand.name}
       imageUrl={entry.imageUrl ?? entry.bottle.imageUrl}
       metadata={getBottleMetadata(entry.bottle)}
-      name={formatBottleDisplayName(entry.bottle)}
+      name={formatBottleDisplayName(entry.bottle, { includeBrand: false })}
     />
   );
 }

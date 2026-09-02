@@ -2,7 +2,15 @@
 
 import { COLOR_SCALE, type SERVING_STYLE_LIST } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
-import { Box, Droplets, GlassWater, Minus, Plus, Upload } from "lucide-react";
+import {
+  Box,
+  Check,
+  Droplets,
+  GlassWater,
+  Minus,
+  Plus,
+  Upload,
+} from "lucide-react";
 import { useRef } from "react";
 
 import {
@@ -176,26 +184,8 @@ export function RatingBandInput({
   required = false,
   value,
 }: RatingBandInputProps) {
-  const selectedBand = RATING_BANDS.find((band) => band.key === value);
-
   return (
     <div {...stylex.props(styles.scoreRoot, disabled && styles.disabled)}>
-      <div {...stylex.props(styles.ratingHeading)}>
-        <span {...stylex.props(styles.ratingLabel)}>{label}</span>
-        {required ? (
-          <span {...stylex.props(styles.requiredLabel)}>Required</span>
-        ) : null}
-      </div>
-      <div {...stylex.props(styles.bandSelectionHeading)}>
-        <strong {...stylex.props(styles.selectedBandLabel)}>
-          {selectedBand?.label ?? "Pick a rating"}
-        </strong>
-        {selectedBand ? (
-          <span {...stylex.props(styles.selectedBandRange)}>
-            {selectedBand.range}
-          </span>
-        ) : null}
-      </div>
       <div
         aria-label={label}
         role="radiogroup"
@@ -223,17 +213,30 @@ export function RatingBandInput({
                 value={band.key}
                 {...stylex.props(styles.visuallyHiddenInput)}
               />
-              <span {...stylex.props(styles.visuallyHiddenText)}>
-                {band.label}, {band.range}
-              </span>
               <span
-                aria-hidden="true"
                 {...stylex.props(
-                  styles.bandInputBracket,
-                  checked && bandInputBracketSelectedStyles[band.key],
+                  styles.bandInputName,
+                  checked && bandInputTextSelectedStyles[band.key],
                 )}
               >
-                {band.shortRange}
+                <Check
+                  aria-hidden="true"
+                  size={13}
+                  strokeWidth={2.5}
+                  {...stylex.props(
+                    styles.bandInputCheck,
+                    !checked && styles.bandInputCheckHidden,
+                  )}
+                />
+                {band.label}
+              </span>
+              <span
+                {...stylex.props(
+                  styles.bandInputRange,
+                  checked && bandInputTextSelectedStyles[band.key],
+                )}
+              >
+                {band.range}
               </span>
             </label>
           );
@@ -636,53 +639,46 @@ const styles = stylex.create({
   scoreRoot: {
     width: "100%",
   },
-  bandSelectionHeading: {
-    display: "flex",
-    alignItems: "baseline",
-    columnGap: space.x2,
-    marginTop: space.x3,
-  },
-  selectedBandLabel: {
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
-  selectedBandRange: {
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
-  },
   bandInputTrack: {
     display: "grid",
     width: "100%",
-    height: "52px",
+    height: "64px",
     gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-    gap: "2px",
-    marginTop: space.x3,
+    gap: space.x1,
+    "@media (max-width: 559px)": {
+      height: "auto",
+      gridTemplateColumns: "minmax(0, 1fr)",
+      gap: space.x2,
+    },
   },
   bandInputCell: {
     position: "relative",
     minWidth: 0,
     display: "flex",
-    height: "52px",
+    height: "64px",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    rowGap: space.x1,
     overflow: "hidden",
     borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: "transparent",
+    backgroundColor: colors.fieldBackground,
     cursor: "pointer",
     boxShadow: {
-      default: `inset 0 0 0 2px ${colors.fieldRule}`,
-      ":hover": `inset 0 0 0 2px ${colors.inkMuted}`,
+      default: `inset 0 0 0 1px ${colors.fieldRule}`,
+      ":hover": `inset 0 0 0 1px ${colors.inkMuted}`,
       ":focus-within": effects.focusRing,
     },
     opacity: {
       default: 1,
       ":hover": 0.86,
+    },
+    "@media (max-width: 559px)": {
+      height: "48px",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingRight: space.x3,
+      paddingLeft: space.x3,
     },
   },
   bandInputCellSelected: {
@@ -707,28 +703,38 @@ const styles = stylex.create({
   band5Selected: {
     backgroundColor: colors.band5,
   },
-  bandInputBracket: {
-    position: "relative",
+  bandInputName: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    columnGap: space.x1,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "19px",
-    fontVariantNumeric: "tabular-nums",
+    fontSize: "14px",
     fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1,
-    opacity: 0.26,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.2,
     pointerEvents: "none",
   },
-  bandInputBracketSelectedLight: {
-    opacity: 0.5,
+  bandInputRange: {
+    color: colors.inkMuted,
+    fontFamily: fonts.data,
+    fontSize: "11px",
+    fontVariantNumeric: "tabular-nums",
+    lineHeight: 1.2,
+    pointerEvents: "none",
   },
-  bandInputBracketSelectedDark: {
-    color: colors.ground,
-    opacity: 0.5,
+  bandInputCheck: {
+    flexShrink: 0,
   },
-  bandInputBracketSelectedDarkest: {
+  bandInputCheckHidden: {
+    visibility: "hidden",
+  },
+  bandInputTextSelectedLight: {
+    color: colors.ink,
+  },
+  bandInputTextSelectedDark: {
     color: colors.ground,
-    opacity: 0.62,
   },
   servingStyleTrack: {
     display: "grid",
@@ -759,21 +765,13 @@ const styles = stylex.create({
     },
   },
   servingStyleCellSelected: {
-    backgroundColor: colors.ground,
+    backgroundColor: colors.accentTint,
     color: colors.ink,
     boxShadow: {
-      default: `inset 0 0 0 2px ${colors.ink}`,
-      ":hover": `inset 0 0 0 2px ${colors.ink}`,
+      default: `inset 0 0 0 2px ${colors.accent}`,
+      ":hover": `inset 0 0 0 2px ${colors.accent}`,
       ":focus-within": effects.focusRing,
     },
-  },
-  visuallyHiddenText: {
-    position: "absolute",
-    width: "1px",
-    height: "1px",
-    overflow: "hidden",
-    clipPath: "inset(50%)",
-    whiteSpace: "nowrap",
   },
   colorRoot: {
     width: "100%",
@@ -916,12 +914,12 @@ const bandInputSelectedStyles = {
   unicorn: styles.band5Selected,
 } satisfies Record<RatingBand, stylex.StyleXStyles>;
 
-const bandInputBracketSelectedStyles = {
-  mediocre: styles.bandInputBracketSelectedLight,
-  good: styles.bandInputBracketSelectedLight,
-  very_good: styles.bandInputBracketSelectedDark,
-  outstanding: styles.bandInputBracketSelectedDark,
-  unicorn: styles.bandInputBracketSelectedDarkest,
+const bandInputTextSelectedStyles = {
+  mediocre: styles.bandInputTextSelectedLight,
+  good: styles.bandInputTextSelectedLight,
+  very_good: styles.bandInputTextSelectedLight,
+  outstanding: styles.bandInputTextSelectedDark,
+  unicorn: styles.bandInputTextSelectedDark,
 } satisfies Record<RatingBand, stylex.StyleXStyles>;
 
 const SERVING_STYLE_OPTIONS = [

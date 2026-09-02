@@ -1,11 +1,8 @@
-import * as stylex from "@stylexjs/stylex";
-
-import { colors, fonts, space } from "../styles/tokens.stylex";
-import { BottleVisual } from "./bottleIdentityRow.stylex";
+import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
 import { Button } from "./button.stylex";
 
 export type SelectedBottleSummaryProps = {
-  bottleId: string;
+  brand: string;
   imageUrl?: string | null;
   metadata: string;
   name: string;
@@ -15,74 +12,29 @@ export type SelectedBottleSummaryProps = {
 
 /** Keeps the selected bottle visible while a member completes a related form. */
 export function SelectedBottleSummary({
-  bottleId,
+  brand,
   imageUrl,
   metadata,
   name,
   onChange,
 }: SelectedBottleSummaryProps) {
   return (
-    <section aria-label="Selected bottle" {...stylex.props(styles.summary)}>
-      <BottleVisual imageUrl={imageUrl} label={`${name} bottle`} size="sm" />
-      <div {...stylex.props(styles.copy)}>
-        <strong title={name} {...stylex.props(styles.name)}>
-          {name}
-        </strong>
-        <span
-          title={`${bottleId} · ${metadata}`}
-          {...stylex.props(styles.metadata)}
-        >
-          {bottleId} · {metadata}
-        </span>
-      </div>
-      {onChange ? (
-        <Button onClick={onChange} size="sm" variant="text">
-          Change bottle
-        </Button>
-      ) : null}
+    <section aria-label="Selected bottle">
+      <BottleIdentityRow
+        brand={brand}
+        end={
+          onChange ? (
+            <Button onClick={onChange} size="sm" variant="text">
+              Change bottle
+            </Button>
+          ) : undefined
+        }
+        imageUrl={imageUrl}
+        layout="cell"
+        metadata={metadata ? metadata.split(" · ") : []}
+        name={name}
+        size="sm"
+      />
     </section>
   );
 }
-
-const styles = stylex.create({
-  summary: {
-    boxSizing: "border-box",
-    display: "flex",
-    width: "100%",
-    minWidth: 0,
-    alignItems: "center",
-    gap: space.x3,
-    paddingTop: space.x3,
-    paddingRight: 0,
-    paddingBottom: space.x3,
-    paddingLeft: 0,
-    backgroundColor: "transparent",
-  },
-  copy: {
-    display: "flex",
-    minWidth: 0,
-    flex: 1,
-    flexDirection: "column",
-    rowGap: space.x1,
-  },
-  name: {
-    overflow: "hidden",
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.25,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  metadata: {
-    overflow: "hidden",
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-});

@@ -318,10 +318,10 @@ export default function TastingForm(
         ? "Your review could not be loaded."
         : reviewScore === null
           ? "Enter a score to save."
-          : `Step ${currentStep + 1} of ${steps.length}`
+          : undefined
     : needsRating
       ? "Pick a rating to continue."
-      : `Step ${currentStep + 1} of ${steps.length}`;
+      : undefined;
   const saveLabel = isReview
     ? isLastStep
       ? reviewQuery.data
@@ -379,13 +379,18 @@ export default function TastingForm(
       <form onSubmit={formAction}>
         <FormStack>
           <SelectedBottleSummary
-            bottleId={initialData.bottle.peatedId}
+            brand={
+              initialData.bottle.brand.shortName ||
+              initialData.bottle.brand.name
+            }
             imageUrl={
               (isReview ? effectiveReviewImagePreview : imagePreview) ??
               initialData.bottle.imageUrl
             }
             metadata={getBottleMetadata(initialData.bottle)}
-            name={formatBottleDisplayName(initialData.bottle)}
+            name={formatBottleDisplayName(initialData.bottle, {
+              includeBrand: false,
+            })}
           />
           {submitError || errorMessage ? (
             <FormNotice>{submitError ?? errorMessage}</FormNotice>
@@ -585,7 +590,7 @@ export default function TastingForm(
             )
           ) : null}
           {recordType === "tasting" && currentStep === 0 ? (
-            <FormSection title="Your rating">
+            <FormSection title="How was it?">
               <Controller
                 control={control}
                 name="ratingBand"
@@ -593,7 +598,6 @@ export default function TastingForm(
                   <RatingBandInput
                     disabled={isSubmitting}
                     id="tasting-rating"
-                    label="How was it"
                     name={field.name}
                     onChange={field.onChange}
                     required={props.mode !== "edit"}

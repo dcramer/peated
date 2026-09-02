@@ -54,18 +54,16 @@ export const Default: Story = {
         mobileSaveBar
         onClose={() => undefined}
         onSave={() => undefined}
-        saveHint={
-          isReview ? "Saving updates your existing review." : "Step 1 of 3"
-        }
+        saveHint={isReview ? "Saving updates your existing review." : undefined}
         saveLabel={isReview ? "Update review" : "Continue"}
         title={isReview ? "Edit your review" : "Log a tasting"}
       >
         <form>
           <FormStack>
             <SelectedBottleSummary
-              bottleId="B-14829"
+              brand="Springbank"
               metadata="46% ABV · 15 years · Campbeltown single malt"
-              name="Springbank 15"
+              name="15-year-old"
             />
             <RecordTypeInput
               disabled={false}
@@ -123,7 +121,7 @@ export const Default: Story = {
                   currentStep={0}
                   steps={["Rating", "Notes", "Details"]}
                 />
-                <FormSection title="Your rating">
+                <FormSection title="How was it?">
                   <RatingBandInput
                     id="tasting-rating"
                     name="rating"
