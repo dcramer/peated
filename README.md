@@ -8,26 +8,21 @@ Browse the catalog at <https://peated.com> or read it through the public API at
 
 A Discord is available if you want to contribute: <https://discord.gg/d7GFPfy88Z>
 
-See the [documentation index](./docs/README.md) for architecture, feature,
+See the [documentation guide](./docs/README.md) for architecture, feature,
 development, operations, policy, and research documents.
 
 ## Features
 
 ### Rating Systems
 
-Peated uses a three-choice tasting rating:
-
-- **Pass**: Would not drink again
-- **Sip**: Enjoyable; would have sometimes
-- **Savor**: Excellent; would seek out
-
-Historical five-star values are retained as migration data, not as a second
-rating choice. See the
-[Rating Systems Architecture](./docs/architecture/rating-systems.md).
+Peated uses five tasting bands from Mediocre through Unicorn. Reviews use a
+score from 0 through 100. Old Pass, Sip, Savor, and star ratings remain only on
+historical tastings. See the
+[Rating Systems Architecture](./docs/architecture/ratings.md).
 
 ## Dev
 
-Setup the required frameworks:
+Set up the required tools:
 
 1. [pnpm](https://pnpm.io/installation)
 2. [Docker](https://docs.docker.com/get-docker/) (with Docker Compose)
@@ -105,9 +100,9 @@ checks, use `pnpm dev:server:api`.
 
 ## Operations
 
-The web app runs on Vercel and the API and worker run on Render. Use the
-[Production Debugging](./docs/operations/production-debugging.md) playbook for
-current hosts, logs, traces, and diagnostic commands.
+See [Deployments](./docs/operations/deployments.md) for the production service
+map and [Production Debugging](./docs/operations/production-debugging.md) for
+logs, traces, and diagnostic commands.
 
 ### Authenticated API maintenance
 
@@ -136,5 +131,5 @@ pnpm cli api patch /bottles/123 --input ./change.json --yes
 pnpm cli auth logout
 ```
 
-Use the [Catalog Enrichment](./docs/operations/catalog-enrichment.md) workflow
+Use the [Catalog Maintenance](./docs/operations/catalog-maintenance.md) workflow
 for researched Bottle backfills, deduplication, and verified batch edits.

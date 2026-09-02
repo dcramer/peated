@@ -86,8 +86,8 @@ server rendering completed.
 ## Upstream 502s
 
 An oRPC `BAD_GATEWAY` error usually means the client received an upstream HTTP
-error that was not a valid oRPC envelope. Inspect the logged response status,
-body, and headers.
+error that was not a valid oRPC response. Inspect the status, safe summary, and
+allowlisted headers. Do not log an unrestricted response body.
 
 Headers such as `server: cloudflare`, `rndr-id`, or `x-render-routing` indicate
 that Vercel received the failure from the API hosting path. Use the trace to
@@ -167,17 +167,6 @@ For non-interactive use, supply `RENDER_API_KEY` through the approved secret
 environment. Never paste keys into documentation, commands committed to the
 repository, issue bodies, or logs.
 
-## Code Follow-Up
-
-- Wrap a shared server loader in React `cache()` when both `generateMetadata()`
-  and the page invoke the same request during one render.
-- Keep noncritical server-side data fetches non-fatal only when the page has a
-  useful degraded state.
-- Do not swallow required route identity failures unless the UI explicitly owns
-  the missing state.
-- Preserve upstream status and safe trace context at runtime boundaries.
-- Verify the repaired route and check that the original Sentry/log signature no
-  longer occurs.
-
-Follow [Observability](../policies/observability.md) and
-[Data Redaction](../policies/data-redaction.md) when adding diagnostic context.
+After a fix, verify the repaired route and confirm that the original error no
+longer appears. Follow [Logs And Traces](../policies/logs-and-traces.md) and
+[Sensitive Data](../policies/sensitive-data.md) when adding diagnostic fields.

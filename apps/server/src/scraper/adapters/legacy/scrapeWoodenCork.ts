@@ -1,5 +1,5 @@
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeVolume,
 } from "@peated/bottle-classifier/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -47,7 +47,7 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
     }
 
     const [nameRaw, volumeRaw] = extractVolume(bottle);
-    const { name } = normalizeBottle({ name: nameRaw });
+    const { name } = normalizeBottleInput({ name: nameRaw });
 
     const productUrl = $("a.grid-item__link", el).first().attr("href");
     if (!productUrl) throw new Error("Unable to identify Product URL");

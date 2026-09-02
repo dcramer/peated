@@ -43,7 +43,7 @@
 
 ## 8. Documentation And Validation
 
-- [x] 8.1 Update `docs/features/store-price-matching.md` with source-scoped listing identity and BottleAlias safety behavior.
+- [x] 8.1 Update `docs/architecture/store-price-matching.md` with source-scoped listing identity and BottleAlias safety behavior.
 - [x] 8.2 Keep the documented classifier contract unchanged: exact Bottle match, exact Bottle create, or no safe match.
 - [x] 8.3 Run the focused ingestion integration suite, server typecheck, touched-file lint, and strict OpenSpec validation. Pull request CI owns the full-repo test gate.
 - [x] 8.4 Document source-key reuse, fingerprint invalidation, and the deferred time-based revalidation question.

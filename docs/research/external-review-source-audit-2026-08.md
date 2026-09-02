@@ -1,24 +1,8 @@
-# External Review Content Supply
+# External Review Source Audit — August 2026
 
-Status: research notes, checked 2026-08-21. This is product and technical
-research, not legal advice. Recheck every source before enabling ingestion.
-
-## Product Intent
-
-Peated should be a review index that sends readers to publishers, not a place
-that republishes their work. A Bottle page may show:
-
-- publisher, reviewer, publication date, and canonical URL;
-- the publisher's score in its native scale;
-- a Peated critic consensus derived from several published scores;
-- a prominent link to read the full review at the publisher.
-
-Do not copy full tasting notes, conclusions, photographs, or article text.
-
-This narrower display is part of the publisher value proposition, but it does
-not override a site's terms, robots policy, copyright, or database rights.
-RSS, a sitemap, and public crawlability are discovery mechanisms, not content
-licenses.
+Initial audit: 2026-08-21. Later dates in a source note supersede that date.
+This is research, not legal advice or a current permission record. Recheck every
+source before enabling or materially changing collection.
 
 ## Acquisition Modes
 
@@ -254,65 +238,6 @@ a separate platform-terms and creator-rights review.
 Do not build source-specific crawlers for these publishers while their public
 terms prohibit the planned use. A public sitemap or permissive robots file does
 not negate those terms.
-
-## Implemented Product Boundary
-
-The external-review feature now has the required article/review model,
-publication approval, governed fetch boundary, and Bottle-page presentation. See
-the [external review indexing guide](../features/external-review-indexing.md)
-for the current contract and pilot procedure.
-
-The pilot started with these limits:
-
-- `review.url` was globally unique, so one multi-bottle article could not own
-  several independent Bottle reviews.
-- Every review required a 0-100 score and an issue name.
-- Reviews had no author, publication date, article title, native score scale,
-  source evidence, or rights mode.
-- There was no review-article record separate from a Bottle review.
-- Outbound requests did not use one governed runtime with request budgets,
-  robots checks, and durable runs.
-
-Relevant implementation:
-
-- [external reviews schema](../../apps/server/src/db/schema/externalReviews.ts)
-- [review publication](../../apps/server/src/db/schema/externalReviewPublications.ts)
-- [article observation contract](../../apps/server/src/externalReviews/observation.ts)
-- [external review ingestion](../../apps/server/src/externalReviews/ingest.ts)
-- [scraper runtime](../../apps/server/src/scraper/README.md)
-
-The current model separates:
-
-- a source and its publication approval;
-- a review article identified by publisher and canonical URL;
-- zero or more scored or unscored Bottle reviews from that article.
-
-Add later publishers through source-specific adapters. Do not replace them
-with a generalized crawler unless repeated source work proves a smaller shared
-boundary.
-
-## Source Sequence
-
-1. WhiskyNotes supplies the first resumable historical archive import and a
-   daily current feed.
-2. Whisky Advocate supplies the existing large scored archive and current
-   issue.
-3. Whiskyfun supplies the next daily multi-bottle feed. Keep its historical
-   archive as a later bounded change.
-4. Dramface supplies the next daily multi-bottle and multi-writer feed.
-5. Words of Whisky supplies the next daily multi-bottle feed.
-6. The Whiskey Reviewer supplies the next daily American whiskey feed.
-7. Bourbon Culture supplies the next daily American whiskey feed.
-8. Fred Minnick supplies a low-cadence daily American whiskey review feed.
-9. Whisky Saga supplies the next daily Scotch review feed.
-10. The Whisky Study supplies the next daily Scotch review feed.
-11. Continue through the reviewed public-index candidates until Peated has at
-    least 12 reliable feeds.
-
-The pilot is successful with at least 90% article extraction accuracy on a
-reviewed sample, reliable splitting of multi-bottle articles, measurable
-Bottle-match yield, and a display contract that clearly sends readers to the
-publisher.
 
 ## Policy References
 

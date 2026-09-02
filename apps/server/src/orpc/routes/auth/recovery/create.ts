@@ -3,17 +3,22 @@ import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { sendPasswordResetEmail } from "@peated/server/lib/email";
-import { logError } from "@peated/server/lib/log";
+import { logError, type LogIssueOptions } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export type PasswordResetEmailSender = typeof sendPasswordResetEmail;
+export type RecoveryErrorReporter = (
+  cause: unknown,
+  options: LogIssueOptions,
+) => void;
 
 export function createRecoveryProcedure(
   sendEmail: PasswordResetEmailSender = sendPasswordResetEmail,
   rateLimit: typeof authRateLimit = authRateLimit,
+  reportError: RecoveryErrorReporter = logError,
 ) {
   return procedure
     .use(rateLimit)
@@ -49,7 +54,6 @@ export function createRecoveryProcedure(
           auditLog({
             event: AuditEvent.RECOVERY_REQUESTED,
             userId: user.id,
-            metadata: { email: input.email },
           });
         }
 
@@ -59,10 +63,9 @@ export function createRecoveryProcedure(
           throw error;
         }
 
-        logError(error, {
+        reportError(error, {
           extra: {
             name: "auth/recovery/create",
-            email: input.email,
           },
         });
 

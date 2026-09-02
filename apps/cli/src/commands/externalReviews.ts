@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import { externalReviews, type ExternalReview } from "@peated/server/db/schema";
@@ -36,7 +36,7 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const review of query) {
-        const { name } = normalizeBottle({
+        const { name } = normalizeBottleInput({
           name: review.name,
           isFullName: true,
         });

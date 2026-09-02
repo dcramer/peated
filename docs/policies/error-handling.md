@@ -2,23 +2,22 @@
 
 ## Intent
 
-Unexpected failures should fail at the owning runtime boundary so top-level
-exception handling, tracing, and retries can report one clear error. Local
-catch-and-log blocks make important failures look recoverable and create noisy
-duplicate diagnostics.
+Let unexpected failures reach the code responsible for reporting or retrying
+them. Local catch-and-log blocks can hide failures and create duplicate reports.
 
 ## Policy
 
 - Let operations that should succeed throw to the caller. Do not catch only to
   log a warning and continue.
-- Catch errors only when the current layer can recover, translate an expected
-  boundary failure into a typed domain result, or add required cleanup that
-  cannot be expressed with `finally`.
+- Catch errors only when the current layer can recover, turn an expected failure
+  into a declared domain error or result, or add cleanup that cannot use
+  `finally`.
 - If a catch block handles an error, it must either finish the recovery or
-  rethrow with useful domain context. Avoid log-and-rethrow duplicates.
+  rethrow with useful domain context and preserve the original `cause`. Avoid
+  log-and-rethrow duplicates.
 - Use `finally` for cleanup that must run without changing error ownership.
-- Keep best-effort observers explicit. If correctness depends on the operation,
-  it is not best-effort.
+- Name best-effort behavior in its contract. If correctness depends on the
+  operation, it is not best-effort.
 
 ## Exceptions
 

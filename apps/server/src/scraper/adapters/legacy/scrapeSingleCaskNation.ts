@@ -1,5 +1,5 @@
 import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
@@ -107,7 +107,7 @@ async function scrapeSingleCaskNationProducts(
       .find((variant) => variant.available && variant.parsedPrice !== null);
     if (!pricedVariant || pricedVariant.parsedPrice === null) continue;
 
-    const { name } = normalizeBottle({
+    const { name } = normalizeBottleInput({
       name: `Single Cask Nation ${product.title}`,
     });
     const productUrl = absoluteUrl(

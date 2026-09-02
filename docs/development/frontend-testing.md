@@ -48,8 +48,9 @@ pnpm test:e2e:install
 - Add breakpoint-specific Playwright coverage only when responsive behavior
   changes the interaction or available workflow. Do not rerun the same contract
   at multiple sizes solely to verify presentation.
-- Do not use automated tests to check copy, icons, labels, page structure, card
-  layout, element counts, or exact sizes and positions.
+- Do not add tests whose only purpose is presentation. Text, labels, structure,
+  and counts are valid assertions when they prove an error, permission,
+  navigation result, saved change, or removal of an old control.
 - Check spacing, color, artwork, copy, and responsive layouts manually or with
   browser screenshots.
 - E2E tests can call the shared `snapshot` fixture after they prove a useful
@@ -85,8 +86,8 @@ RPC responses for the routes they exercise.
 
 Import `test` and `expect` from `e2e/test.ts`, not directly from Playwright.
 This makes the optional `snapshot` fixture available to every browser test.
-Snapshot paths include the spec, test, checkpoint, and browser project, so keep
-these names stable unless the visual identity should change.
+The snapshot title sets its image path and must be unique across the suite. See
+[Web Screenshot Reviews](../../apps/web/visual/README.md) for capture details.
 
 CI runs all browser workflows once with desktop Chromium. The mobile project
 runs only tests tagged `@mobile`. Use the tag only when a touch interaction,

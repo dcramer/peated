@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
@@ -75,7 +75,7 @@ export function parseCompassBoxProducts(
       throw new Error(`Invalid Compass Box product price: ${product.priceRaw}`);
     }
 
-    const { name } = normalizeBottle({
+    const { name } = normalizeBottleInput({
       name: `Compass Box ${product.rawName}`,
     });
     const listing = {

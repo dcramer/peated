@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { load as cheerio } from "cheerio";
 import { z } from "zod";
@@ -167,7 +167,7 @@ function parseEdradourProduct(
   const prefixedName = /^(?:edradour|ballechin)\b/i.test(product.rawName)
     ? product.rawName
     : `Edradour ${product.rawName}`;
-  const { name } = normalizeBottle({ name: prefixedName });
+  const { name } = normalizeBottleInput({ name: prefixedName });
   const listing = {
     name,
     price,

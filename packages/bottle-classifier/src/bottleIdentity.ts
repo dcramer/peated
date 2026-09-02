@@ -8,7 +8,7 @@
  * syntax can own identity when its exact fields agree. New hardcoded phrase
  * rules need verified whisky research and focused tests before being added here.
  */
-import { normalizeBottle } from "./normalize";
+import { normalizeBottleInput } from "./normalize";
 
 export type BottleExactIdentityInput = {
   edition: string | null;
@@ -41,7 +41,7 @@ function nameMarketsStatedAge({
     return false;
   }
 
-  return normalizeBottle({
+  return normalizeBottleInput({
     name,
     statedAge,
   })

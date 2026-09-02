@@ -1,228 +1,74 @@
-# oRPC Client Usage for Next.js and TanStack Query
+# oRPC Clients
 
-This guide outlines how to use oRPC within the Next.js app using TanStack Query. It captures both the library-level patterns and the conventions already used in this repo.
+The web app uses the typed routes exported by `@peated/server/orpc/router`.
+Use [oRPC Route Conventions](./orpc-routes.md) when changing a route.
 
-## Overview
+## Server Code
 
-We use the `@peated/server/orpc` contract to communicate with the backend API through typed clients.
-
-- Client docs: <https://orpc.unnoq.com/docs/client/error-handling>
-- Next.js integration: <https://orpc.unnoq.com/docs/integrations/next>
-- TanStack Query integration: <https://orpc.unnoq.com/docs/tanstack-query/react>
-
-## Project Conventions
-
-- Use `createServerClient()` in server actions with the current `accessToken`.
-- Use the `useORPC()` hook in client components to access typed query and mutation helpers.
-- Use `safe()` when calling an oRPC function to extract `{ data, error, isDefined }`.
-- Use `queryOptions()` from `orpc.<namespace>.<method>` directly in `useQuery`.
-- Only spread `queryOptions()` when you need to add extra fields like `enabled`.
-- Handle expected `error.name` values such as `CONFLICT` and `UNAUTHORIZED` explicitly.
-- Do not rethrow expected user-facing errors. Rethrow unexpected failures.
-
-## Calling oRPC Routes
-
-oRPC routes are called the same way they are with the server-side `routerClient`. Route structure and naming conventions are documented in [oRPC Route Conventions](./orpc-routes.md).
-
-There are three common ways to obtain an oRPC client:
-
-1. `useORPC()` inside React components
-2. `createServerClient()` from `@peated/web/lib/orpc/client.server` on the server
-3. `createBrowserClient()` from `@peated/web/lib/orpc/client` when you need to manage the `accessToken` yourself
-
-### Server Components and Server Actions
-
-Use this in places like `route.ts` or `generateMetadata`. Do not use it in components marked `"use client"`.
+- Use `getServerClient()` for a request that may use the current session.
+- Use `getAnonymousServerClient()` for public data that must not vary by user.
+- Use `getPublicPageServerClient()` when a public page can also show member
+  state.
+- Use the uncached `create*` version only when the call needs separate context.
 
 ```ts
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 
-export async function GET() {
-  const { client } = await getServerClient();
-  const { bottles } = await client.stats();
-  // ...
-}
+const { client } = await getServerClient();
+const tasting = await client.tastings.details({ tasting: 123 });
 ```
 
-If you need control over the access token, use `createServerClient()` directly. This should be uncommon.
+`createServerClient()` reads the current session by default. Pass
+`accessToken: null` only when the caller must be anonymous.
 
-```ts
-import { createServerClient } from "@peated/web/lib/orpc/client.server";
-import { safe } from "@orpc/client";
+## Client Components
 
-async function registerUser({ email, password, username, session }) {
-  const { client } = await createServerClient({
-    accessToken: session.accessToken,
-  });
-
-  const { error, data, isDefined } = await safe(
-    client.auth.register({ email, password, username }),
-  );
-
-  if (isDefined && error?.name === "CONFLICT") {
-    return "An account already exists matching that username or email address.";
-  } else if (error) {
-    throw error;
-  }
-
-  return data;
-}
-```
-
-### `useQuery` and `useSuspenseQuery`
-
-Use `queryOptions()` on the route handler:
-
-```ts
-import useAuth from "@peated/web/hooks/useAuth";
-import { useORPC } from "@peated/web/lib/orpc/context";
-import { useQuery } from "@tanstack/react-query";
-
-function NotificationIndicator() {
-  const { user } = useAuth();
-  const orpc = useORPC();
-
-  const { data: unreadNotificationCount } = useQuery(
-    orpc.notifications.count.queryOptions({
-      input: { filter: "unread" },
-      enabled: !!user,
-    }),
-  );
-
-  return <span>{unreadNotificationCount}</span>;
-}
-```
-
-### `useInfiniteQuery` and `useSuspenseInfiniteQuery`
-
-Use `infiniteOptions()` on the route handler:
+Use `useORPC()` with TanStack Query helpers:
 
 ```ts
 const orpc = useORPC();
-const {
-  data: { pages },
-  error,
-  fetchNextPage,
-  hasNextPage,
-  isFetching,
-  isFetchingNextPage,
-} = useSuspenseInfiniteQuery(
-  orpc.tastings.list.infiniteOptions({
-    input: (pageParam: number | undefined) => ({
-      filter,
-      limit: 10,
-      cursor: pageParam,
-    }),
-    initialPageParam: undefined,
-    staleTime: Infinity,
-    initialData: () => {
-      return {
-        pages: [tastingList],
-        pageParams: [undefined],
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
-    getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
+
+const query = useQuery(
+  orpc.notifications.count.queryOptions({
+    input: { filter: "unread" },
+    enabled: Boolean(user),
   }),
 );
+
+const mutation = useMutation(orpc.collections.bottles.create.mutationOptions());
 ```
 
-### `useMutation`
+Use `infiniteOptions()` for paged queries. Use `key()` when changing cached
+data. Use `call()` only when a component needs a direct request outside a query
+or mutation hook.
 
-```ts
-const favoriteBottleMutation = useMutation(
-  orpc.collections.bottles.create.mutationOptions(),
-);
-```
+## Errors
 
-Call the mutation with the route input directly:
-
-```ts
-favoriteBottleMutation.mutateAsync({
-  bottle: bottle.id,
-  user: "me",
-  collection: "default",
-});
-```
-
-### Query and Mutation Keys
-
-Use `key()` on the oRPC client instead of manual key helpers:
-
-```ts
-orpc.users.details.key({ input: { user: toUserId } });
-```
-
-You can specify the key type explicitly:
-
-```ts
-orpc.users.details.key({
-  input: { user: toUserId },
-  type: "query",
-});
-```
-
-### Native Client in Components
-
-If you need the native oRPC client in a React component, use `useORPC()` and call `call()` directly:
-
-```ts
-const orpc = useORPC();
-const results = await orpc.tastings.list.call();
-
-const filteredResults = await orpc.tastings.list.call({
-  input: { country: "us" },
-});
-```
-
-## Error Handling
-
-Use `safe()` for all oRPC calls. It returns `{ data, error, isDefined }`.
-
-- `isDefined` is `true` if the request succeeded.
-- `error.name` distinguishes known error cases such as `CONFLICT` and `NOT_FOUND`.
-- Throw `error` only when it is unhandled or indicates a true failure.
+Let unexpected errors throw. Use `safe()` only when the caller handles a
+declared route error as normal product behavior.
 
 ```ts
 import { safe } from "@orpc/client";
 
-const { error, data, isDefined } = await safe(
-  client.auth.register({ email, password, username }),
-);
+const result = await safe(client.auth.register(input));
 
-if (isDefined && error?.name === "CONFLICT") {
-  return { error: error.message };
-} else if (error) {
-  throw error;
+if (result.error) {
+  if (result.isDefined && result.error.name === "CONFLICT") {
+    return { error: result.error.message };
+  }
+  throw result.error;
 }
+
+return result.data;
 ```
 
-## Inferring Inputs and Outputs
+`isDefined` is true when the server returned an error declared by that route.
+It is false on success and for an unexpected error.
 
-Use `Inputs` and `Outputs` from the router when you need explicit route types:
+Use `Inputs` and `Outputs` from `@peated/server/orpc/router` when code needs an
+explicit route type.
 
-```ts
-import { Inputs, Outputs } from "@peated/server/orpc/router";
-
-let tastingList: Outputs["tastings"]["list"];
-
-const queryParams: Inputs["tastings"]["list"] = useApiQueryParams({
-  numericFields: [
-    "cursor",
-    "limit",
-    "age",
-    "entity",
-    "distiller",
-    "bottler",
-    "entity",
-  ],
-  overrides: {
-    user: "me",
-  },
-});
-```
-
-## See Also
+Library references:
 
 - <https://orpc.unnoq.com/docs/client>
 - <https://orpc.unnoq.com/docs/tanstack-query/basic>

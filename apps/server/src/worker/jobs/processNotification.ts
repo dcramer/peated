@@ -1,11 +1,17 @@
 import { db } from "@peated/server/db";
 import { notifyComment } from "@peated/server/lib/email";
+import type { JobPayload } from "@peated/server/worker/types";
+import { z } from "zod";
 
-export default async function processNotification({
-  notificationId,
-}: {
-  notificationId: number;
-}) {
+export const ProcessNotificationJobArgsSchema = z
+  .object({
+    notificationId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async function processNotification(input: JobPayload) {
+  const { notificationId } = ProcessNotificationJobArgsSchema.parse(input);
+
   const notif = await db.query.notifications.findFirst({
     where: (notifications, { eq }) => eq(notifications.id, notificationId),
   });

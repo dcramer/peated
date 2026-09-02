@@ -133,4 +133,4 @@ export type {
   ImageTextRegion,
   ImageTextSpan,
 } from "./imageEvidence";
-export { normalizeBottle, type NormalizedBottle } from "./normalize";
+export { normalizeBottleInput, type NormalizedBottle } from "./normalize";

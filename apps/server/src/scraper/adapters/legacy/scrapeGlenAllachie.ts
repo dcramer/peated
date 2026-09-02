@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
@@ -59,11 +59,11 @@ function getProductName(title: string, tags: string[]): string | null {
     /^white\s+heather\b/i.test(title) ||
     /^macnair[’']s\b/i.test(title)
   ) {
-    return normalizeBottle({ name: title }).name;
+    return normalizeBottleInput({ name: title }).name;
   }
 
   if (tags.some((tag) => tag.trim().toLowerCase() === "meikle toir")) {
-    return normalizeBottle({ name: `Meikle Tòir ${title}` }).name;
+    return normalizeBottleInput({ name: `Meikle Tòir ${title}` }).name;
   }
 
   return null;

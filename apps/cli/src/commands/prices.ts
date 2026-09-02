@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
 import {
@@ -42,7 +42,7 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const price of query) {
-        const { name } = normalizeBottle({
+        const { name } = normalizeBottleInput({
           name: price.name,
           isFullName: true,
         });

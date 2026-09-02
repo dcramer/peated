@@ -1,4 +1,4 @@
-# Bottle Creation And Reference System
+# Bottle Reference Resolution
 
 This document defines the live architecture for creating and resolving Bottle
 identity across manual entry, scraped sources, reviews, prices, photos,
@@ -12,7 +12,7 @@ normalization remains evidence-reviewed.
 Related architecture:
 
 - [Whisky Identity Model](./whisky-identity-model.md)
-- [Bottle Normalization Contract](./bottle-normalization-contract.md)
+- [Bottle Reference Normalization](./bottle-reference-normalization.md)
 - [Bottle Classifier](./bottle-classifier.md)
 
 ## Goals
@@ -21,8 +21,8 @@ Related architecture:
   its BottleGroup.
 - Reuse exact accepted references without paying for a classifier call.
 - Use reviewed classifier evidence when no accepted prior decision exists.
-- Keep deterministic code limited to safe structural checks, exact accepted
-  references, and closed-form resolvers.
+- Keep deterministic code limited to safe structural checks, accepted
+  references, and verified identifier anchors.
 - Preserve observation-only source facts without silently promoting them into
   canonical Bottle identity.
 - Keep every assignment and automated create decision auditable.
@@ -38,8 +38,8 @@ Related architecture:
   tokens, cask wording, retailer names, normalized strings, or fuzzy rank alone.
 - Do not store generated, normalized, scraped, or unresolved candidate strings
   as references unless they have been accepted as assignments.
-- Do not make every write path synchronous on the classifier when an exact
-  accepted reference or closed-form identifier already proves Bottle identity.
+- Do not run the classifier when an exact accepted reference already proves
+  Bottle identity.
 
 ## Canonical Model
 
@@ -131,11 +131,11 @@ names as “Also known as.”
 
 All source-reference workflows follow the same conceptual pipeline:
 
-1. Preserve raw source facts.
+1. Keep the source name and available source facts for review.
 2. Build the workflow's identity-preserving reference key.
 3. Reuse an exact accepted reference when it resolves one valid Bottle.
-4. Apply a closed-form deterministic resolver when one exists, such as an exact
-   SMWS code.
+4. Extract verified identity anchors, such as an exact SMWS code, for the
+   classifier.
 5. Retrieve local Bottle and entity candidates.
 6. Run reviewed classification when semantic identity remains unresolved.
 7. Validate candidate ids, resolved entities, canonical fields, and Bottle
@@ -181,13 +181,13 @@ positive evidence, web-evidence status when applicable, and typed unresolved
 risks.
 
 An asserted unresolved risk forces review. No evidence field upgrades a decision
-that the derived tier routes to review. Exact accepted references and closed-form
-identifiers may bypass classifier review because they prove identity directly;
-semantic normalized text cannot.
+that the derived tier routes to review. Exact accepted references may bypass
+classifier review because they reuse an accepted decision. Verified identifiers
+are evidence supplied to the classifier; normalized text cannot decide identity.
 
 Automation may create or assign only when:
 
-- the raw source is retained;
+- the decision can be traced to its stored source record and available evidence;
 - the selected Bottle or create draft is independently complete;
 - duplicate Bottle and reference checks are safe;
 - required entities resolve or can be safely created;
@@ -209,9 +209,10 @@ a singleton group. It does not silently join the source group.
 
 ### Store Prices And Reviews
 
-Store-price and review ingestion preserve the raw reference first. An accepted
-reference supplies its validated Bottle id. Otherwise the row remains unresolved
-until reviewed resolution succeeds.
+Store-price and review ingestion keep the source name needed for review. An
+accepted reference supplies its validated Bottle ID. Otherwise the row remains
+unresolved until reviewed resolution succeeds. Some older paths retain only a
+normalized source name; do not treat that as the complete original evidence.
 
 A successful classifier match or create supplies one Bottle id. When the
 workflow genuinely knows only the general expression, it may select the
@@ -225,21 +226,12 @@ including source URL, raw title, retailer image, price/volume context, selector,
 bottle number, outturn, and unreviewed maturation fragments. They attach through
 the same validated Bottle id when identity is known.
 
-## Retired BottleRelease Identity
+## Legacy Compatibility
 
-BottleRelease is not part of live creation, public identity, or the
-application-owned runtime schema. Legacy releases were promoted to independently
-complete Bottles before migration-only writers and retained audit support were
-removed.
-
-Legacy tables and columns may remain physically present after that reversible
-code cleanup. A later, separately approved migration removes them only after
-backup verification; current application and worker code does not model, read,
-or write them.
-
-Historical change records may retain `bottle_release` as inert audit vocabulary,
-but current feeds exclude those records. New architecture must not add a second
-release identity layer.
+BottleRelease is not a public identity or a path for new product behavior.
+Some schema fields, audit tools, deletion paths, and migration checks still
+support old BottleRelease data. Do not remove or expand that support without a
+separate inventory, migration plan, and database verification.
 
 ## Minimum Test Coverage
 

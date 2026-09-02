@@ -1,6 +1,6 @@
 import type { ProposedBottle } from "./classifierTypes";
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
 } from "./normalize";
@@ -78,7 +78,7 @@ export function normalizeProposedBottleDraft(
   const nameWithoutExplicitAbv = extractExplicitAbvFromBottleName(
     proposedBottle.name,
   );
-  const normalized = normalizeBottle({
+  const normalized = normalizeBottleInput({
     name: stripDuplicateBrandPrefixFromBottleName(
       nameWithoutExplicitAbv.name,
       proposedBottle.brand.name,

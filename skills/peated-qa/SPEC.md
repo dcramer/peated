@@ -40,7 +40,7 @@ Authoritative sources:
 
 - `AGENTS.md`
 - `package.json`
-- `docs/development/local-ui-verification.md`
+- `docs/development/local-web-checks.md`
 - `docs/development/orpc-routes.md`
 - `docs/development/orpc-client.md`
 - `apps/cli/src/program.ts`

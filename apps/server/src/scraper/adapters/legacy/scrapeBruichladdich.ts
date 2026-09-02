@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
@@ -64,7 +64,7 @@ function getProductName(
   vendor: string,
 ): string | null {
   if (/^(?:bruichladdich|octomore|port charlotte)\b/i.test(title)) {
-    return normalizeBottle({ name: title }).name;
+    return normalizeBottleInput({ name: title }).name;
   }
 
   const brands = new Set(
@@ -78,7 +78,9 @@ function getProductName(
   if (brands.size !== 1) return null;
 
   const brand = [...brands][0];
-  return brand ? normalizeBottle({ name: `${brand} ${title}` }).name : null;
+  return brand
+    ? normalizeBottleInput({ name: `${brand} ${title}` }).name
+    : null;
 }
 
 function parseBruichladdichProducts(input: JsonValue): StorePrice[] {

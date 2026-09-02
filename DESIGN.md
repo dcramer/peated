@@ -6,7 +6,7 @@ colors:
   primary: "#9a5b12"
   primary-dark: "#d9922f"
   primary-deep: "#6e400c"
-  primary-deep-dark: "#f0d9b0"
+  primary-deep-dark: "#e8a752"
   primary-tint: "rgb(154 91 18 / 0.15)"
   primary-tint-dark: "rgb(217 146 47 / 0.15)"
   neutral: "#f7f8f5"
@@ -36,49 +36,49 @@ colors:
 typography:
   page-title:
     fontFamily: Space Grotesk
-    fontSize: 44px
+    fontSize: 72px
     fontWeight: 700
-    lineHeight: 1.04
-    letterSpacing: -0.035em
+    lineHeight: 0.95
+    letterSpacing: -0.05em
   section-heading:
+    fontFamily: Space Grotesk
+    fontSize: 20px
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: -0.025em
+  row-title:
     fontFamily: Space Grotesk
     fontSize: 18px
     fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.02em
-  row-title:
-    fontFamily: Space Grotesk
-    fontSize: 17px
-    fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.02em
+    lineHeight: 1.25
+    letterSpacing: -0.025em
   body:
     fontFamily: Karla
-    fontSize: 14px
+    fontSize: 15px
     fontWeight: 400
-    lineHeight: 1.55
+    lineHeight: 1.6
   interactive:
     fontFamily: Karla
-    fontSize: 14px
+    fontSize: 15px
     fontWeight: 600
     lineHeight: 1.2
   metadata:
-    fontFamily: IBM Plex Mono
-    fontSize: 12px
+    fontFamily: Karla
+    fontSize: 13px
+    fontWeight: 400
+    lineHeight: 1.45
+  field-label:
+    fontFamily: Karla
+    fontSize: 13px
     fontWeight: 400
     lineHeight: 1.4
-  field-label:
-    fontFamily: IBM Plex Mono
-    fontSize: 11px
-    fontWeight: 400
-    lineHeight: 1.2
-    letterSpacing: 0.08em
+    letterSpacing: 0
   micro-label:
-    fontFamily: IBM Plex Mono
-    fontSize: 10px
+    fontFamily: Karla
+    fontSize: 13px
     fontWeight: 400
-    lineHeight: 1.2
-    letterSpacing: 0.08em
+    lineHeight: 1.4
+    letterSpacing: 0
 rounded:
   small: 2px
   control: 3px
@@ -176,7 +176,7 @@ not keep separate theme state. Storybook can switch schemes for review.
 | `ink`             | `#161914`  | `#E8EAE3`  | Main text and committed actions  |
 | `inkMuted`        | 75% ink    | 75% ink    | Secondary text and metadata      |
 | `accent`          | `#9A5B12`  | `#D9922F`  | Active state, links, and ratings |
-| `accentDeep`      | `#6E400C`  | `#F0D9B0`  | Accent text on a tint            |
+| `accentDeep`      | `#6E400C`  | `#E8A752`  | Accent text on a tint            |
 | `accentTint`      | 15% accent | 15% accent | Selected and related data        |
 | `dataAccent`      | 42% accent | 42% accent | Secondary data fills             |
 | `ratingFill`      | 75% accent | 75% accent | Compact rating distributions     |
@@ -193,18 +193,19 @@ sentiment poles.
 - **Space Grotesk** is the display face for names, headings, and meaningful
   figures.
 - **Karla** is the reading face for prose, labels, and member input.
-- **IBM Plex Mono** is the data face for values that align or scan.
+- **IBM Plex Mono** is available for rare values that must align as code-like
+  data. Normal metadata and field labels use Karla.
 
-| Role            | Family  | Weight | Size and line height | Tracking          |
-| --------------- | ------- | ------ | -------------------- | ----------------- |
-| Page title      | Display | 700    | 44px / 1.04          | -0.035em          |
-| Section heading | Display | 700    | 18px / 1.2           | -0.02em           |
-| Row title       | Display | 700    | 17px / 1.2           | -0.02em           |
-| Body            | Reading | 400    | 14px / 1.55          | normal            |
-| Interactive     | Reading | 600    | 13–14px              | normal            |
-| Metadata        | Data    | 400    | 11–12px              | normal            |
-| Field label     | Data    | 400    | 11px                 | 0.08em, uppercase |
-| Micro label     | Data    | 400    | 10px                 | 0.08em, uppercase |
+| Role            | Family  | Weight | Size and line height | Tracking |
+| --------------- | ------- | ------ | -------------------- | -------- |
+| Page title      | Display | 700    | 40–72px / 0.95       | -0.05em  |
+| Section heading | Display | 700    | 20px / 1.2           | -0.025em |
+| Row title       | Display | 700    | 18px / 1.25          | -0.025em |
+| Body            | Reading | 400    | 15px / 1.6           | normal   |
+| Interactive     | Reading | 600    | 15px / 1.2           | normal   |
+| Metadata        | Reading | 400    | 13px / 1.45          | normal   |
+| Field label     | Reading | 400    | 13px / 1.4           | normal   |
+| Micro label     | Reading | 400    | 13px / 1.4           | normal   |
 
 Use tabular numerals for aligned numbers. Use uppercase text only for short
 data labels. Do not use the display face for body copy.
@@ -216,7 +217,8 @@ values before adding a local exception.
 
 - Start each page on `ground`. Use spacing and type for hierarchy.
 - Add `surface` only when a bounded group or overlay needs a clear container.
-- Use 34px, 40px, and 48px control heights. Use 40px by default.
+- Use 34px, 40px, and 44px control heights. Use 40px by default and at least
+  44px on narrow screens or coarse pointers.
 - Give controls in the same action row the same height.
 - Start with content that works at 320px without horizontal page overflow.
 - Preserve information order when columns collapse.
@@ -249,7 +251,8 @@ JSDoc.
 
 - Give every interactive control a visible hover, pressed, disabled, and
   keyboard-focus state.
-- Use a 2px inset accent ring for keyboard focus.
+- Each control owns a clear keyboard-focus treatment. Do not add a global ring
+  without updating the shared control tokens.
 - Do not use a pointer cursor as the only interaction state.
 - Use accent for one main action per view. Use tonal controls for secondary
   actions.
@@ -281,8 +284,8 @@ JSDoc.
 
 ### Storybook
 
-Storybook is the living reference for implemented components. Each component
-has one Overview story with useful variants and controls. Add another named
+Storybook is the living reference for implemented components. Start a component
+with one Overview story with useful variants and controls. Add another named
 story only for a meaningful behavior, state, permission boundary, error, or
 responsive composition. Use concise JSDoc and Storybook descriptions to explain
 when to use the component and what it owns.

@@ -4,7 +4,8 @@
  * Job handlers own validation of their `args`. This module carries only actor
  * and trace context across dispatch, then drops malformed context instead of
  * inferring authority. Preserve that fail-closed behavior under
- * `docs/policies/runtime-boundaries.md` and `docs/policies/background-work.md`.
+ * `docs/policies/data-and-permissions.md` and
+ * `docs/policies/background-work.md`.
  */
 import { z } from "zod";
 import { getCurrentActorContext } from "../lib/actorContext";

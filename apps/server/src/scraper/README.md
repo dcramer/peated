@@ -32,7 +32,7 @@ or product persistence clients. Boundary tests inspect the sources composed by
 the production registry, rather than only the top level of `adapters/`.
 
 External review sources must also follow the
-[external review indexing procedure](../../../../docs/features/external-review-indexing.md).
+[external review source procedure](../../../../docs/operations/external-review-sources.md).
 It owns review publishing, transient content, source approval, and rollback.
 
 ## Registering a source
@@ -73,10 +73,10 @@ boundaries as code-owned sources.
 
 The database stores each source and its parsing rules. Each saved revision is
 immutable. A preview reads sample pages and stores only parsed fields and errors.
-It does not store fetched HTML, review text, or full product records. Only a
-revision that passes its preview can become active. An admin can return to any
-older revision that passed. Pausing a source stops collection but keeps its
-revisions and run history.
+It does not store fetched HTML, review text, or full product records in the
+product database. Only a revision that passes its preview can become active. An
+admin can return to any older revision that passed. Pausing a source stops
+collection but keeps its revisions and run history.
 
 Rules format 1 supports same-origin HTML list and detail pages, an item limit,
 an optional next-page link, CSS selectors, and fixed date, number, price, and
@@ -84,10 +84,6 @@ volume conversions. Code follows at most five list pages. It does not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
 page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
 adapter when a source needs those capabilities.
-
-Event sources, such as whisky festivals, are the next planned source kind.
-Peated already stores these events. Add the scraper type only after its match
-and update rules are defined, so repeated runs do not create duplicate events.
 
 Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or
@@ -103,6 +99,12 @@ the AI has no tools. No revision is saved unless the code checks and AI review
 pass. The AI provider does not store request content. An admin must still
 preview and activate the inactive revision. AI never changes the active
 revision directly.
+
+Setup traces may record the complete model instructions, public website input,
+model output, and rule-check arguments and results. They must not include
+credentials, request headers, cookies, or private admin data. Normal collection
+must not record page bodies or publisher prose. Follow
+[Sensitive Data](../../../../docs/policies/sensitive-data.md).
 
 `pnpm evals:scraper` checks rule generation with fixed website fixtures and the
 live AI service. Normal test runs exclude these checks. Add the `trigger-evals`

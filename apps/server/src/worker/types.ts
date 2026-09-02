@@ -59,7 +59,6 @@ const TraceContextSchema = z
 const JobActorContextSchema = z.object({
   type: z.literal("user"),
   userId: z.number().int().positive(),
-  username: z.string().optional(),
 });
 
 export const JobContextSchema = z
@@ -79,7 +78,7 @@ export function parseJobContext(input: JobPayload | null): JobContext {
 }
 
 export type JobFunction<TResult = void> = (
-  args?: any,
+  args?: JobPayload,
   context?: JobContext,
 ) => Promise<TResult>;
 

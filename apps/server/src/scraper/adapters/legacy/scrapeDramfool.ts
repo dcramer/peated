@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { GtinSchema } from "@peated/server/schemas";
@@ -168,7 +168,7 @@ function parseDramfoolProducts(input: JsonValue): StorePrice[] {
       const rawName = /\bdramfool\b/i.test(product.title)
         ? product.title
         : `Dramfool ${product.title}`;
-      const { name } = normalizeBottle({ name: rawName });
+      const { name } = normalizeBottleInput({ name: rawName });
       const externalProductId = variant.id ?? product.id;
       const barcode = GtinSchema.safeParse(variant.barcode);
       const listing: StorePrice = {

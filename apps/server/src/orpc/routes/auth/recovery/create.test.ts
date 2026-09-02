@@ -4,6 +4,7 @@ import { createAuthRateLimit } from "@peated/server/orpc/middleware/rateLimit";
 import {
   createRecoveryProcedure,
   type PasswordResetEmailSender,
+  type RecoveryErrorReporter,
 } from "@peated/server/orpc/routes/auth/recovery/create";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -37,6 +38,30 @@ describe("POST /auth/password-reset", () => {
 
     // Email should not be sent for non-existent user
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  test("does not include the recovery email in failure telemetry", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const error = new Error("email provider unavailable");
+    const failingSender = vi
+      .fn<PasswordResetEmailSender>()
+      .mockRejectedValue(error);
+    const reportError = vi.fn<RecoveryErrorReporter>();
+    const client = createRouterClient(
+      {
+        create: createRecoveryProcedure(failingSender, undefined, reportError),
+      },
+      { context: { ip: "127.0.0.1", user: null } },
+    );
+
+    await client.create({ email: user.email });
+
+    expect(reportError).toHaveBeenCalledWith(error, {
+      extra: { name: "auth/recovery/create" },
+    });
+    expect(JSON.stringify(reportError.mock.calls)).not.toContain(user.email);
   });
 
   test("throws error for invalid email format", async () => {

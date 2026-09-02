@@ -177,7 +177,7 @@ export function normalizeBottleBatchNumber(name: string) {
 
 /**
  * Builds the deterministic key used for exact reference lookup and assignment.
- * This is narrower than normalizeBottle: it keeps release-year and other
+ * This is narrower than normalizeBottleInput: it keeps release-year and other
  * identity-bearing text in the string for classifier/moderator review.
  */
 export function normalizeBottleReferenceKey(name: string): string {
@@ -193,7 +193,7 @@ export function normalizeBottleReferenceKey(name: string): string {
  * Normalizes a bottle name and attached structured traits without making any
  * brand-specific identity inferences.
  */
-export function normalizeBottle({
+export function normalizeBottleInput({
   name,
   statedAge = null,
   vintageYear = null,

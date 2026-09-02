@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
@@ -90,7 +90,7 @@ function parseCadenheadsProducts(input: JsonValue): StorePrice[] {
       continue;
     }
 
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
     const listing = {
       ...getWooCommerceStorePriceIdentity(product),
       name,

@@ -8,6 +8,7 @@ import { logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { EntityKindEnum } from "@peated/server/schemas";
+import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -19,6 +20,13 @@ type InputEntity = Partial<Entity> & {
   country: { name: string } | null;
   region: { name: string } | null;
 };
+
+export const GenerateEntityDetailsJobArgsSchema = z
+  .object({
+    entityId: z.number().int().positive(),
+    force: z.boolean().default(false),
+  })
+  .strict();
 
 function generatePrompt(entity: InputEntity) {
   const infoLines = [];
@@ -109,13 +117,9 @@ export async function getGeneratedEntityDetails(
   );
 }
 
-export default async ({
-  entityId,
-  force = false,
-}: {
-  entityId: number;
-  force?: boolean;
-}) => {
+export default async (input: JobPayload) => {
+  const { entityId, force } = GenerateEntityDetailsJobArgsSchema.parse(input);
+
   if (!config.AI_GATEWAY_API_KEY) {
     return;
   }

@@ -1,7 +1,7 @@
-# Catalog Image Maintenance
+# Entity Images
 
-Use this workflow to add or replace Bottle and Entity images in production. The
-image APIs and database schemas own the exact runtime contract.
+Use this workflow to add or replace Entity images in production. The image API
+and database schema own exact behavior.
 
 ## Select Images
 
@@ -18,13 +18,9 @@ image APIs and database schemas own the exact runtime contract.
 
 ## Prepare Files
 
-An Entity's primary image appears at `16:10`. Secondary Entity images appear at
-`4:3`. Prepare primary images at `1600 x 1000` and secondary images at
-`1600 x 1200`. This avoids an unintended square crop in the current upload
-processor. Keep each source file below the 20 MiB upload limit.
-
-Bottle images are resized to fit within `1024 x 1024`. Prefer a clean product
-view that remains legible on a white background.
+Entity images appear at `16:10`. Prepare them at `1600 x 1000` to avoid an
+unintended crop in the current upload processor. Keep each source file below the
+20 MiB upload limit.
 
 The server converts uploads to WebP and removes embedded metadata. Do not rely
 on EXIF or IPTC fields for attribution.
@@ -42,11 +38,7 @@ Keep the source and license separate from the descriptive caption:
 - Put the canonical page where the image was found in `sourceUrl`.
 - Put the license name or reuse terms in `license`.
 
-Entity image rows use `caption`, `sourceUrl`, and `license`. Bottle image rows
-use `imageUrl`, `sourceUrl`, `license`, and `isPrimary`. Bottle images do not
-have captions. The Bottle API returns the primary row's source and license as
-`imageSourceUrl` and `imageLicense`. It still returns `bottle.imageUrl` until
-all image readers use Bottle image rows.
+Entity image rows use `caption`, `sourceUrl`, and `license`.
 
 Do not put a source URL or license in `caption`. Peated shows these fields below
 the caption so long URLs do not compete with the description.
@@ -61,22 +53,10 @@ the caption and attribution at desktop and mobile widths.
 
 ## Record Attribution
 
-Record each external image in the attribution ledger below. The ledger is the
-durable audit record because image processing removes source metadata. Store
-the same canonical source and license on the image record.
-
-| Entity        | Source                                                                                                               | Creator          | License                                                        | Checked    |
-| ------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------- | ---------- |
-| Ardbeg        | [Ardbeg distillery.jpg](https://commons.wikimedia.org/wiki/File:Ardbeg_distillery.jpg)                               | ErikRombaut      | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | 2026-08-31 |
-| Ardnahoe      | [Ardnahoe distillery](https://commons.wikimedia.org/wiki/File:Ardnahoe_distillery_-_geograph.org.uk_-_6990092.jpg)   | Andrew Abbott    | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0) | 2026-08-31 |
-| Bowmore       | [Bowmore Distillery](https://commons.wikimedia.org/wiki/File:Scotland_Argyll_Bute_Islay_Bowmore_Distillery_01.jpg)   | MSeses           | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | 2026-08-31 |
-| Bruichladdich | [Bruichladdich-Islay.jpg](https://commons.wikimedia.org/wiki/File:Bruichladdich-Islay.jpg)                           | Fumaro           | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0) | 2026-08-31 |
-| Bunnahabhain  | [Bunnahabhain distillery.jpg](https://commons.wikimedia.org/wiki/File:Bunnahabhain_distillery.jpg)                   | ErikRombaut      | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | 2026-08-31 |
-| Caol Ila      | [Caol Ila Distillery](https://commons.wikimedia.org/wiki/File:Scotland_Argyll_Bute_Islay_Caol_Ila_Distillery_01.jpg) | MSeses           | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | 2026-08-31 |
-| Kilchoman     | [Kilchoman 01.jpg](https://commons.wikimedia.org/wiki/File:Kilchoman_01.jpg)                                         | yashima          | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0) | 2026-08-31 |
-| Lagavulin     | [Lagavulin Distillery](https://commons.wikimedia.org/wiki/File:2019-05-05_Lagavulin_Distillery.jpg)                  | Charlie Marshall | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0)       | 2026-08-31 |
-| Laphroaig     | [Laphroaig Distillery](https://commons.wikimedia.org/wiki/File:2019-05-06_Laphroaig_Distillery.jpg)                  | Charlie Marshall | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0)       | 2026-08-31 |
-| Port Ellen    | [Port Ellen Distillery Warehouse](https://commons.wikimedia.org/wiki/File:Port_Ellen_Distillery_Warehouse.jpg)       | Karynmcghee      | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) | 2026-08-31 |
+Store the source page, license, and required creator credit on the image record.
+The database is the lasting attribution record because image processing removes
+embedded metadata. The original August 2026 source review is in
+[Entity Image Source Audit](../research/entity-image-source-audit-2026-08.md).
 
 ## Apply And Verify
 

@@ -2,9 +2,9 @@ import { describe, expect, test } from "vitest";
 
 import {
   bottleNameDuplicatesBrand,
-  normalizeBottle,
   normalizeBottleAge,
   normalizeBottleBatchNumber,
+  normalizeBottleInput,
   normalizeBottleReferenceKey,
   normalizeCategory,
   normalizeEntityName,
@@ -37,7 +37,7 @@ describe("normalize", () => {
 
   test("normalizes age expressions into bottle identity", () => {
     expect(
-      normalizeBottle({
+      normalizeBottleInput({
         name: "Delicious twelve Year thing",
       }),
     ).toMatchObject({
@@ -58,7 +58,7 @@ describe("normalize", () => {
     });
 
     expect(
-      normalizeBottle({
+      normalizeBottleInput({
         name: "42",
         statedAge: 42,
       }),
@@ -70,7 +70,7 @@ describe("normalize", () => {
 
   test("normalizes coded batch wording but leaves generic batch names alone", () => {
     expect(
-      normalizeBottle({
+      normalizeBottleInput({
         name: "Traigh Bhan 19-year-old Scotch Batch No. 5",
       }),
     ).toMatchObject({
@@ -79,7 +79,7 @@ describe("normalize", () => {
     });
 
     expect(
-      normalizeBottle({
+      normalizeBottleInput({
         name: "Batch Proof",
       }),
     ).toMatchObject({
@@ -90,7 +90,7 @@ describe("normalize", () => {
 
   test("extracts release traits without dropping stable bottle identity", () => {
     expect(
-      normalizeBottle({
+      normalizeBottleInput({
         name: "Octomore 15.1 2025 Release Cask Strength",
       }),
     ).toMatchObject({

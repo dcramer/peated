@@ -677,11 +677,6 @@ async function createBottleFixture(
       series,
     );
 
-    // Object.assign(
-    //   bottleData,
-    //   normalizeBottle({ ...bottleData, isFullName: false }),
-    // );
-
     const [bottle] = await tx
       .insert(bottles)
       .values({

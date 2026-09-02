@@ -1,5 +1,5 @@
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeBottleReferenceKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
@@ -92,7 +92,7 @@ export async function createExternalReview(
   if (!site) throw new ExternalSiteNotFoundError(input.site);
 
   const rawName = input.name;
-  const { name: normalizedName } = normalizeBottle({ name: rawName });
+  const { name: normalizedName } = normalizeBottleInput({ name: rawName });
   const referenceKey = normalizeBottleReferenceKey(rawName);
   const referenceInput = {
     reference: {

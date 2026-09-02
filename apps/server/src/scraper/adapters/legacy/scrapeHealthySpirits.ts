@@ -1,5 +1,5 @@
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeVolume,
 } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
@@ -210,7 +210,7 @@ export function parseHealthySpiritsProducts(
       continue;
     }
 
-    const { name } = normalizeBottle({ name: toTitleCase(nameRaw) });
+    const { name } = normalizeBottleInput({ name: toTitleCase(nameRaw) });
     const externalProductId =
       product.identifier?.productId ?? product.externalReferenceId;
     const barcode = getProductBarcode(product.seo.jsonLD);

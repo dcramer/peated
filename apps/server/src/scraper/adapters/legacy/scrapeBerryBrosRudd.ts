@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
@@ -105,7 +105,7 @@ function parseBerryBrosRuddPage(
     const imageUrl = image.attr("src") ?? image.attr("data-src");
     const url = absoluteUrl(sourceUrl, productUrl);
     const externalProductId = getExternalProductId(url);
-    const { name } = normalizeBottle({ name: rawName });
+    const { name } = normalizeBottleInput({ name: rawName });
     const listing: StorePrice = {
       name,
       price,

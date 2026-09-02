@@ -1,8 +1,8 @@
-# Bottle Identity Presentation
+# Bottle Presentation
 
 This document defines how Peated presents an already-modeled Bottle across user
 interfaces and generated text. It complements the
-[Whisky Identity Model](./whisky-identity-model.md), which remains the source of
+[Whisky Identity Model](../architecture/whisky-identity-model.md), which remains the source of
 truth for what the fields mean and which release a Bottle represents.
 
 Presentation is not canonicalization. A field may be correct and important to
@@ -25,9 +25,10 @@ Bottle and returns its concise marketed identity. A caller can suppress brand
 context only when the surrounding layout already supplies it.
 
 React components still own truncation, links, line breaks, and supporting
-metadata. Canonical `fullName` remains available for search, sorting,
-verification, and stored marketed identity. Exact matching also uses the
-structured Bottle fields or an accepted alias.
+metadata. Stored `fullName` remains available for search, sorting,
+verification, and the complete marketed identity. Exact matching uses
+structured Bottle fields or an accepted Bottle Reference. An alias never
+authorizes an exact match.
 
 ## Identity Layers
 
@@ -122,10 +123,9 @@ should not add that label even when ABV is unavailable.
 
 ### Treat category as taxonomy
 
-Category supports filtering, analytics, editing, and verification. It is not
-normally part of a bottle's marketed identity, so ordinary headers, results,
-tables, tasting panels, and flight rows should omit it. Purpose-built category
-views may still display it when comparison or classification is the point.
+Category supports filtering, editing, and verification. It is not part of a
+bottle's marketed name. A result or row may still show it as supporting
+information when that helps the task.
 
 ### Avoid duplicate or conflicting tokens
 
@@ -266,7 +266,7 @@ Use for Additional Details, edit and audit screens, resolver candidates,
 moderation, and other tasks where completeness is more important than concise
 recognition.
 
-- Label and show all known exact fields, including both years.
+- Label and show all known exact fields, including all known years.
 - Show `singleCask` and `caskStrength` as factual attributes when relevant.
 - Preserve conflicting or uncertain evidence rather than hiding it behind a
   polished label.
@@ -298,7 +298,7 @@ particular result component omits some of them visually.
 | Cask-strength flag        | No                       | No                | No                 | No               | No                | Yes          |
 | Marketed cask/barrel code | As release marker        | As release marker | If needed          | Primary          | If needed         | Yes          |
 | Cask type/size/fill       | No                       | Normally no       | No                 | No               | No                | Yes          |
-| Category                  | No                       | No                | No                 | No               | No                | Yes          |
+| Category                  | No                       | Optional          | No                 | No               | No                | Yes          |
 
 “No” for a derived flag does not remove identical wording that belongs to the
 marketed expression or edition.
@@ -326,7 +326,7 @@ The contract is applied at the presentation site that owns each branch:
 
 - Bottle headers, result rows, previews, and tasting identities compose their
   own structured layouts from the shared Bottle fields. Numbered batches and
-  inferred years use supporting metadata when the layout provides it.
+  stored years use supporting metadata when the layout provides it.
 - Relative release-family labels show the most useful difference without adding
   general cask labels.
 - SEO, sharing, notifications, and other unstructured consumers use concise

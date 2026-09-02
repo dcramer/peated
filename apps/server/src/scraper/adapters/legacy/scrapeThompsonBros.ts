@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
@@ -101,7 +101,7 @@ function parseThompsonBrosProducts(input: JsonValue): StorePrice[] {
     const prefixedName = /\bthompson\s+(?:bros?|brothers)\b/i.test(rawName)
       ? rawName
       : `Thompson Bros ${rawName}`;
-    const { name } = normalizeBottle({ name: prefixedName });
+    const { name } = normalizeBottleInput({ name: prefixedName });
     const listing = {
       ...getWooCommerceStorePriceIdentity(product),
       name,

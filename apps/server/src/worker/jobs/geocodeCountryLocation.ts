@@ -3,10 +3,20 @@ import { db } from "@peated/server/db";
 import type { Country } from "@peated/server/db/schema";
 import { countries } from "@peated/server/db/schema";
 import { OSMSchema } from "@peated/server/lib/osm";
+import type { JobPayload } from "@peated/server/worker/types";
 import axios from "axios";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 
-export default async ({ countryId }: { countryId: number }) => {
+export const GeocodeCountryLocationJobArgsSchema = z
+  .object({
+    countryId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async (input: JobPayload) => {
+  const { countryId } = GeocodeCountryLocationJobArgsSchema.parse(input);
+
   const country = await db.query.countries.findFirst({
     where: (countries, { eq }) => eq(countries.id, countryId),
   });

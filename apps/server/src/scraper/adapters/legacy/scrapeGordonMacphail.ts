@@ -1,4 +1,4 @@
-import { normalizeBottle } from "@peated/bottle-classifier/normalize";
+import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { z } from "zod";
@@ -96,7 +96,7 @@ function parseGordonMacphailProducts(
       continue;
     }
 
-    const { name } = normalizeBottle({ name: product.title });
+    const { name } = normalizeBottleInput({ name: product.title });
     const listing = {
       ...getShopifyStorePriceIdentity(product, pricedVariant),
       name,

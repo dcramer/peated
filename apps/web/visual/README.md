@@ -1,4 +1,4 @@
-# E2E snapshots in pull requests
+# Web Screenshot Reviews
 
 Playwright E2E tests can capture stable screenshots at useful workflow states.
 CI compares these snapshots with the exact pull request base through

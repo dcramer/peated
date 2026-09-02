@@ -3,9 +3,9 @@
 This is the source of truth for how Peated models whisky identity.
 
 Deterministic name cleanup is governed by the
-[Bottle Normalization Contract](./bottle-normalization-contract.md).
-Surface-specific rendering is governed by
-[Bottle Identity Presentation](./bottle-identity-presentation.md).
+[Bottle Reference Normalization](./bottle-reference-normalization.md).
+User-facing rendering is governed by
+[Bottle Presentation](../features/bottle-presentation.md).
 Classifier terms are governed by the
 [Bottle Classifier Glossary](./bottle-classifier-glossary.md).
 
@@ -44,6 +44,8 @@ does not create another catalog identity layer.
   vintage, or single-cask product.
 - Every Bottle is independently complete and belongs to exactly one
   BottleGroup.
+- `BottleGroup.name` stores the name shared by the group. `Bottle.name` stores
+  that shared name plus the Bottle's explicit edition.
 - Every assigned reference and activity-bearing record references one Bottle id.
   BottleGroup is never a fallback consumer identity.
 - A general expression reference points to the retained general Bottle, not the
@@ -174,20 +176,14 @@ the group's current age is an exact override; null or an equal value inherits
 the group age. Shared-age edits preserve differing exact overrides and
 materialize the new shared age on every other member.
 
-This release has no manual or dormant group merge/split service. Any future
-automatic regrouping system must be a separately reviewed change that preserves
-Bottle ids and consumer references, rematerializes shared fields
-transactionally, recomputes affected group aggregates, and records an auditable
-before/after result.
+Peated has no manual or automatic group merge or split service. Adding one
+requires a separate reviewed change that preserves Bottle IDs and references,
+updates shared fields in one transaction, rebuilds group totals, and records the
+before and after state.
 
-Bottle checks may report a non-executable `bottle_group` finding, but they
-cannot move or merge groups. An exact duplicate remains a Bottle merge: for the
-reviewed Laphroaig Càirdeas 2022 case, malformed Bottle `39096` merges into
-Warehouse 1 Bottle `45146` while generic Bottle `44288` remains unchanged.
-That case does not authorize a grouping operation. A separate follow-up may
-define the smallest regroup or group-merge operation only after real reviewed
-findings demonstrate the need. It must also preserve references, representatives,
-and auditable history in addition to the invariants above.
+Bottle checks may report a `bottle_group` finding, but they cannot move or merge
+groups. An exact duplicate remains a Bottle merge. A group operation needs
+separate design and reviewed evidence.
 
 ## Exact Bottle Merge
 

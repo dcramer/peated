@@ -11,7 +11,7 @@ import {
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   normalizeBottleReferenceKey,
 } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
@@ -784,7 +784,9 @@ describe("POST /external-sites/:site/prices", () => {
     });
     const listingName = "Concurrent Price Listing® 2024 Release";
     const referenceKey = normalizeBottleReferenceKey(listingName);
-    const normalizedListingName = normalizeBottle({ name: listingName }).name;
+    const normalizedListingName = normalizeBottleInput({
+      name: listingName,
+    }).name;
     expect(referenceKey).not.toBe(listingName);
     expect(normalizedListingName).not.toBe(referenceKey);
     await fixtures.BottleReference({

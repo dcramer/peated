@@ -1,22 +1,23 @@
-# Data Redaction
+# Sensitive Data
 
 ## Intent
 
-Logs, traces, errors, model context, and operational output should contain only
-the data needed for their purpose. Redaction is a safety backstop, not a reason
-to collect unrestricted user or provider data.
+Logs, traces, errors, model input, and command output must contain only the data
+needed for their purpose. Removing secrets later is a backup measure, not a
+reason to collect too much data.
 
 ## Policy
 
 - Never record passwords, authentication tokens, session cookies, OAuth codes,
   authorization headers, API keys, signed callbacks, or credential-bearing
   URLs in logs, traces, errors, or attachments.
+- Do not record direct identifiers such as email address, IP address, or
+  username unless the owning feature has a documented need and access rule.
 - Do not record complete tasting text, comments, email bodies, model prompts or
   responses, unrestricted tool payloads, uploaded image contents, SQL parameters
   containing user data, or unrestricted third-party responses.
-- Classifier tool telemetry may record bounded arguments and results when they
-  contain only public catalog or source evidence. Do not include private user
-  data, credentials, uploaded image contents, or unrestricted provider payloads.
+- A feature may record a bounded view of public catalog or source evidence when
+  its owning documentation defines the allowed fields.
 - Prefer stable identifiers, operation names, counts, sizes, classifications,
   status values, and bounded error summaries.
 - Persist normalized product fields instead of complete provider webhook, SDK,
@@ -37,9 +38,5 @@ to collect unrestricted user or provider data.
 
 ## Exceptions
 
-- Scrape-source setup traces may record the complete model instructions,
-  public website input, model output, and rule-check arguments and results.
-  This content is required to diagnose and improve the setup agent. Do not
-  include credentials, request headers, cookies, or private admin data.
 - A narrowly scoped administrative or migration tool may inspect raw data when
   access is explicit, output defaults are safe, and the operation is audited.

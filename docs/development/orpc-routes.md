@@ -28,14 +28,15 @@ import { BottleSerializer } from "@peated/server/serializers";
 
 ### File Rules
 
-| File                                         | HTTP semantics                                       |
-| -------------------------------------------- | ---------------------------------------------------- |
-| `list.ts`                                    | Collection route such as `GET /things`               |
-| `details.ts`                                 | Single-resource route such as `GET /things/{thing}`  |
-| `create.ts`                                  | Create route such as `POST /things`                  |
-| `upsert.ts`                                  | Upsert or update route such as `PUT /things/{thing}` |
-| `delete.ts`                                  | Delete route such as `DELETE /things/{thing}`        |
-| Descriptive names like `login.ts` or `me.ts` | Functional endpoints                                 |
+| File                                         | HTTP semantics                                      |
+| -------------------------------------------- | --------------------------------------------------- |
+| `list.ts`                                    | Collection route such as `GET /things`              |
+| `details.ts`                                 | Single-resource route such as `GET /things/{thing}` |
+| `create.ts`                                  | Create route such as `POST /things`                 |
+| `update.ts`                                  | Partial update such as `PATCH /things/{thing}`      |
+| `upsert.ts`                                  | Create or replace through `PUT`                     |
+| `delete.ts`                                  | Delete route such as `DELETE /things/{thing}`       |
+| Descriptive names like `login.ts` or `me.ts` | Functional endpoints                                |
 
 - Do not use dynamic segments in folder names. Path params belong inside the file.
 - Each folder should export an `index.ts` that assembles its children into a router object.
@@ -179,17 +180,17 @@ export default procedure.route({
 
 ## 5. HTTP Method Semantics
 
-| Method   | Meaning        | Typical file            |
-| -------- | -------------- | ----------------------- |
-| `GET`    | Read           | `list.ts`, `details.ts` |
-| `POST`   | Create         | `create.ts`             |
-| `PUT`    | Upsert         | `upsert.ts`             |
-| `PATCH`  | Partial update | `upsert.ts`             |
-| `DELETE` | Remove         | `delete.ts`             |
+| Method   | Meaning           | Typical file            |
+| -------- | ----------------- | ----------------------- |
+| `GET`    | Read              | `list.ts`, `details.ts` |
+| `POST`   | Create            | `create.ts`             |
+| `PUT`    | Create or replace | `upsert.ts`             |
+| `PATCH`  | Partial update    | `update.ts`             |
+| `DELETE` | Remove            | `delete.ts`             |
 
 - Use `PUT` on `/collectionName/{primaryKey}` when upserting by primary key.
-- Use `PUT` on `/collectionName` for batch or composite-key upserts.
-- Collection-level mutations are batch operations and should accept array input.
+- A collection-level mutation can accept one object or a list. Match the route's
+  actual operation instead of inferring its input shape from the path.
 
 ## 6. Path and Query Parameters
 
@@ -205,7 +206,7 @@ export default procedure.route({
 
 ```ts
 const Input = z.object({
-  tastingId: z.coerce.number(),
+  tasting: z.coerce.number(),
   cursor: z.coerce.number().gte(1).default(1),
 });
 ```

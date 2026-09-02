@@ -1,6 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import {
-  normalizeBottle,
+  normalizeBottleInput,
   stripDuplicateBrandPrefixFromBottleName,
   type NormalizedBottle,
 } from "@peated/bottle-classifier/normalize";
@@ -182,7 +182,7 @@ export async function bottleNormalize({
   };
 
   if (rv.name) {
-    normalized = normalizeBottle({
+    normalized = normalizeBottleInput({
       ...rv,
       isFullName: false,
     });

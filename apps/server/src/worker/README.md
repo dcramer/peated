@@ -1,107 +1,54 @@
 # Worker Jobs
 
-This directory contains the async worker job system using BullMQ.
+BullMQ runs Peated work that can finish after the user-facing request. Read
+[Background Work](../../../../docs/policies/background-work.md),
+[Data And Permission Boundaries](../../../../docs/policies/data-and-permissions.md),
+and [Sensitive Data](../../../../docs/policies/sensitive-data.md) first.
 
-## Architecture
+## Add A Job
 
-- **Registry** (`registry.ts`): Central job registry with Sentry instrumentation
-- **Types** (`types.ts`): Type definitions for job names and functions
-- **Client** (`client.ts`): Functions to queue and run jobs
-- **Jobs** (`jobs/`): Individual job implementations
+1. Add the job name to `JobName` in `types.ts`.
+2. Create the handler under `jobs/`.
+3. Check its arguments with a strict Zod schema at the start of the handler.
+4. Register the handler in `jobs/index.ts`.
+5. Add focused tests for argument checks, saved changes, and retry safety.
 
-## Creating a New Job
-
-### 1. Create the Job File
-
-Create a new file in `jobs/` directory:
-
-```typescript
-// jobs/myNewJob.ts
-import { logInfo } from "@peated/server/lib/log";
+```ts
+import { z } from "zod";
 import { type JobFunction } from "../types";
 
-const myNewJob: JobFunction = async (params, context) => {
-  // Your job logic here
-  logInfo("Running job with params", {
-    extra: {
-      params,
-    },
-  });
+const InputSchema = z
+  .object({ bottleId: z.number().int().positive() })
+  .strict();
+
+const updateExample: JobFunction = async (rawInput) => {
+  const { bottleId } = InputSchema.parse(rawInput);
+  // Load current state and apply the job's change.
 };
 
-export default myNewJob;
+export default updateExample;
 ```
 
-### 2. Register the Job
+Keep arguments small. Prefer IDs and expected versions over full records. Do
+not log the full argument object. Log only safe IDs, counts, and status values.
 
-Add your job to `jobs/index.ts`:
+## Queue Or Run A Job
 
-```typescript
-import myNewJob from "./myNewJob";
+```ts
+import { pushJob, runJob } from "@peated/server/worker/client";
 
-// ... other imports
-
-registry.add("MyNewJob", myNewJob);
+await pushJob("UpdateExample", { bottleId: 123 });
+await runJob("UpdateExample", { bottleId: 123 }); // tests and deliberate inline use
 ```
 
-### 3. Add to Type Union
+Add recurring schedules to `client.ts`, where the worker owns scheduler start
+and stop:
 
-**IMPORTANT**: Add the job name to the `JobName` type in `types.ts`:
-
-```typescript
-export type JobName =
-  | "CapturePriceImage"
-  | "MyNewJob" // <-- Add here
-  | "GenerateBottleDetails";
-// ... rest
-```
-
-Without this step, TypeScript will not allow you to queue the job.
-
-## Running Jobs
-
-### Queue a Job
-
-```typescript
-import { pushJob } from "@peated/server/worker/client";
-
-await pushJob("MyNewJob", { param1: "value" });
-```
-
-### Run Immediately (Testing)
-
-```typescript
-import { runJob } from "@peated/server/worker/client";
-
-await runJob("MyNewJob", { param1: "value" });
-```
-
-### Schedule a Job
-
-```typescript
-import { scheduledJob } from "@peated/server/worker/client";
-
-// Daily at 3am
-scheduledJob("0 3 * * *", "cleanup-job", async () => {
-  const { runJob } = await import("./client");
-  await runJob("MyNewJob");
+```ts
+scheduledJob("0 3 * * *", "update-example", async () => {
+  await runJob("UpdateExample", { bottleId: 123 });
 });
 ```
 
-## Job Function Signature
-
-```typescript
-type JobFunction = (
-  args?: any, // Job parameters
-  context?: JobContext, // Trace and app-owned actor context
-) => Promise<unknown>;
-```
-
-## Features
-
-- **Automatic Sentry instrumentation**: All jobs are wrapped with error tracking
-- **Trace propagation**: Supports distributed tracing via context
-- **Actor propagation**: Carries authenticated user attribution into queued
-  worker context and applies it to Sentry user/attributes in the worker
-- **Logging**: Automatic success/failure logging with duration
-- **Type safety**: TypeScript ensures job names are valid
+The registry adds Sentry spans, actor context, and success or failure logs.
+Handlers should let unexpected errors throw so BullMQ can record and retry them.

@@ -10,7 +10,16 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { logInfo } from "@peated/server/lib/log";
+import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
+
+export const GeocodeEntityLocationJobArgsSchema = z
+  .object({
+    entityId: z.number().int().positive(),
+    force: z.boolean().default(false),
+  })
+  .strict();
 
 async function locateAddress(
   entity: Entity & { country: Country | null; region: Region | null },
@@ -67,13 +76,9 @@ async function geocodeAddress(
   return result;
 }
 
-export default async ({
-  entityId,
-  force = false,
-}: {
-  entityId: number;
-  force?: boolean;
-}) => {
+export default async (input: JobPayload) => {
+  const { entityId, force } = GeocodeEntityLocationJobArgsSchema.parse(input);
+
   if (!config.GOOGLE_MAPS_API_KEY) {
     throw new Error("GOOGLE_MAPS_API_KEY is not configured");
   }
