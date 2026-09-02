@@ -51,11 +51,7 @@ export function FlightOverlay({
                 <ItemListItem key={bottle.id}>
                   <BottleIdentityRow
                     brand={bottle.brand.name}
-                    brandHref={getEntityUrl({
-                      id: bottle.brand.id,
-                      kind: "brand",
-                      name: bottle.brand.name,
-                    })}
+                    brandHref={getEntityUrl(bottle.brand)}
                     href={getBottleUrl(bottle)}
                     imageUrl={bottle.imageUrl}
                     metadata={getBottleMetadata(bottle).split(" · ")}

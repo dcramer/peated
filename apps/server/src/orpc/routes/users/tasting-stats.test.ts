@@ -91,21 +91,21 @@ describe("GET /users/:user/tasting-stats", () => {
     expect(data.age.buckets.every((bucket) => bucket.count === 0)).toBe(true);
   });
 
-  test("ranks the producers represented in tastings", async ({
+  test("ranks producers by Bottle role while preserving their Entity kind", async ({
     defaults,
     fixtures,
   }) => {
     const brandA = await fixtures.Entity({
-      kind: "brand",
-      name: "Alpha Brand",
+      kind: "distillery",
+      name: "Alpha Distillery Brand",
     });
     const brandB = await fixtures.Entity({
       kind: "brand",
       name: "Bravo Brand",
     });
     const bottlerA = await fixtures.Entity({
-      kind: "bottler",
-      name: "Alpha Bottler",
+      kind: "company",
+      name: "Alpha Bottling Company",
     });
     const bottlerB = await fixtures.Entity({
       kind: "bottler",
@@ -116,8 +116,8 @@ describe("GET /users/:user/tasting-stats", () => {
       name: "Alpha Distillery",
     });
     const distillerB = await fixtures.Entity({
-      kind: "distillery",
-      name: "Bravo Distillery",
+      kind: "brand",
+      name: "Bravo Distiller Brand",
     });
     const bottleA = await fixtures.Bottle({
       brandId: brandA.id,
@@ -149,16 +149,26 @@ describe("GET /users/:user/tasting-stats", () => {
 
     expect(data.producers).toEqual({
       brands: [
-        { id: brandA.id, name: brandA.name, count: 3 },
-        { id: brandB.id, name: brandB.name, count: 1 },
+        { id: brandA.id, name: brandA.name, kind: brandA.kind, count: 3 },
+        { id: brandB.id, name: brandB.name, kind: brandB.kind, count: 1 },
       ],
       bottlers: [
-        { id: bottlerA.id, name: bottlerA.name, count: 3 },
-        { id: bottlerB.id, name: bottlerB.name, count: 1 },
+        { id: bottlerA.id, name: bottlerA.name, kind: bottlerA.kind, count: 3 },
+        { id: bottlerB.id, name: bottlerB.name, kind: bottlerB.kind, count: 1 },
       ],
       distillers: [
-        { id: distillerA.id, name: distillerA.name, count: 3 },
-        { id: distillerB.id, name: distillerB.name, count: 2 },
+        {
+          id: distillerA.id,
+          name: distillerA.name,
+          kind: distillerA.kind,
+          count: 3,
+        },
+        {
+          id: distillerB.id,
+          name: distillerB.name,
+          kind: distillerB.kind,
+          count: 2,
+        },
       ],
     });
   });

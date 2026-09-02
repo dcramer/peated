@@ -98,18 +98,44 @@ export const mockUserTastingStats = {
   },
   producers: {
     brands: [
-      { id: mockRedbreastEntity.id, name: mockRedbreastEntity.name, count: 7 },
+      {
+        id: mockRedbreastEntity.id,
+        name: mockRedbreastEntity.name,
+        kind: mockRedbreastEntity.kind,
+        count: 7,
+      },
     ],
     bottlers: [
-      { id: mockEntities[7]!.id, name: mockEntities[7]!.name, count: 5 },
-      { id: mockEntities[8]!.id, name: mockEntities[8]!.name, count: 3 },
+      {
+        id: mockEntities[7]!.id,
+        name: mockEntities[7]!.name,
+        kind: mockEntities[7]!.kind,
+        count: 5,
+      },
+      {
+        id: mockEntities[8]!.id,
+        name: mockEntities[8]!.name,
+        kind: mockEntities[8]!.kind,
+        count: 3,
+      },
     ],
     distillers: [
-      { id: mockEntity.id, name: mockEntity.name, count: 15 },
-      { id: mockMacallanEntity.id, name: mockMacallanEntity.name, count: 8 },
+      {
+        id: mockEntity.id,
+        name: mockEntity.name,
+        kind: mockEntity.kind,
+        count: 15,
+      },
+      {
+        id: mockMacallanEntity.id,
+        name: mockMacallanEntity.name,
+        kind: mockMacallanEntity.kind,
+        count: 8,
+      },
       {
         id: mockSpringbankEntity.id,
         name: mockSpringbankEntity.name,
+        kind: mockSpringbankEntity.kind,
         count: 6,
       },
     ],

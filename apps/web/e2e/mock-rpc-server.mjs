@@ -26,6 +26,7 @@ import {
   createdTastingId,
   destinationBottleGroup,
   destinationBottleGroupId,
+  distilleryBrandBottleId,
   emptyEntityCatalog,
   emptyList,
   exactMatchedBottle,
@@ -2388,6 +2389,10 @@ function hasBottleInCollection(collection, bottleId) {
 }
 
 function buildBottleForId(id) {
+  if (id === distilleryBrandBottleId) {
+    return buildBottle({ id, brand: testOwnedEntity });
+  }
+
   if (id === createdBottleId) {
     return buildBottle({
       id: createdBottleId,

@@ -67,11 +67,7 @@ export default async function FlightPage(props: {
               <ItemListItem key={bottle.id}>
                 <BottleIdentityRow
                   brand={bottle.brand.name}
-                  brandHref={getEntityUrl({
-                    id: bottle.brand.id,
-                    kind: "brand",
-                    name: bottle.brand.name,
-                  })}
+                  brandHref={getEntityUrl(bottle.brand)}
                   end={
                     <ButtonLink
                       href={getAddBottleHref({

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getBottleSeriesUrl, getBottleUrl, getEntityUrl } from "./urls";
+import {
+  getBottleSeriesUrl,
+  getBottleUrl,
+  getEntityKindSearchUrl,
+  getEntityUrl,
+} from "./urls";
 
 const bottle = {
   id: 123,
@@ -22,14 +27,15 @@ describe("public catalog URLs", () => {
   });
 
   it.each([
-    ["brand", "/brands/123"],
-    ["distillery", "/distillers/123"],
-    ["bottler", "/bottlers/123"],
-    ["company", "/companies/123"],
+    ["brand", "/brands"],
+    ["distillery", "/distillers"],
+    ["bottler", "/bottlers"],
+    ["company", "/companies"],
   ] as const)("uses the %s Entity collection", (kind, expected) => {
     expect(getEntityUrl({ id: 123, kind, name: "Lagavulin" })).toBe(
-      `${expected}-lagavulin`,
+      `${expected}/123-lagavulin`,
     );
+    expect(getEntityKindSearchUrl(kind)).toBe(expected);
   });
 
   it("uses the generic Entity route when kind is unavailable", () => {

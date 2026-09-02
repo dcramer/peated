@@ -61,11 +61,7 @@ export default async function BottleReleasesPage(props: {
             <ItemListItem key={bottle.id}>
               <BottleIdentityRow
                 brand={bottle.brand.name}
-                brandHref={getEntityUrl({
-                  id: bottle.brand.id,
-                  kind: "brand",
-                  name: bottle.brand.name,
-                })}
+                brandHref={getEntityUrl(bottle.brand)}
                 end={
                   bottle.medianScore !== null && bottle.scoreCount >= 20
                     ? `${bottle.medianScore} / 100`

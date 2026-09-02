@@ -23,11 +23,7 @@ export function toActivityItem(activity: Activity): MemberActivityItem {
         id: activity.id,
         items: activity.items.map((entry) => ({
           brand: entry.bottle.brand.shortName || entry.bottle.brand.name,
-          brandHref: getEntityUrl({
-            id: entry.bottle.brand.id,
-            kind: "brand",
-            name: entry.bottle.brand.name,
-          }),
+          brandHref: getEntityUrl(entry.bottle.brand),
           href: getBottleUrl(entry.bottle),
           id: String(entry.id),
           imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,

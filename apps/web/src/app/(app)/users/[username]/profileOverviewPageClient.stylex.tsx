@@ -30,12 +30,10 @@ import { profileQueries } from "./profileQueries";
 type ActivityList = Outputs["users"]["activity"]["list"];
 type BadgeAward = Outputs["users"]["badgeList"]["results"][number];
 type TastingStats = Outputs["users"]["tastingStats"];
-type ProducerKind = "brand" | "bottler" | "distillery";
 type ProducerStat = TastingStats["producers"]["brands"][number];
 type ProducerGroup = {
   heading: string;
   items: readonly ProducerStat[];
-  kind: ProducerKind;
 };
 
 export function ProfileOverviewPageClient({
@@ -121,16 +119,12 @@ function ProducerSections({ groups }: { groups: readonly ProducerGroup[] }) {
   return (
     <>
       {groups.map((group) => (
-        <RailSection heading={group.heading} key={group.kind}>
+        <RailSection heading={group.heading} key={group.heading}>
           <RailList ariaLabel={`${group.heading} tasted often`}>
             {group.items.map((producer) => (
               <RailListItem
                 end={formatCount(producer.count)}
-                href={getEntityUrl({
-                  id: producer.id,
-                  kind: group.kind,
-                  name: producer.name,
-                })}
+                href={getEntityUrl(producer)}
                 key={producer.id}
                 title={producer.name}
               />
@@ -192,21 +186,18 @@ function getProducerGroups(
     groups.push({
       heading: "Distillers",
       items: producers.distillers.slice(0, 3),
-      kind: "distillery",
     });
   }
   if (producers.bottlers.length) {
     groups.push({
       heading: "Bottlers",
       items: producers.bottlers.slice(0, 3),
-      kind: "bottler",
     });
   }
   if (groups.length < 2 && producers.brands.length) {
     groups.push({
       heading: "Brands",
       items: producers.brands.slice(0, 3),
-      kind: "brand",
     });
   }
   return groups;

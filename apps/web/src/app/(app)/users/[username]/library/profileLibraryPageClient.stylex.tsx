@@ -320,11 +320,7 @@ function toLibraryItem(
         ]
       : undefined,
     brand: bottle.brand.shortName || bottle.brand.name,
-    brandHref: getEntityUrl({
-      id: bottle.brand.id,
-      kind: "brand",
-      name: bottle.brand.name,
-    }),
+    brandHref: getEntityUrl(bottle.brand),
     href: getBottleUrl(bottle),
     id: String(entry.id),
     imageUrl: entry.imageUrl ?? bottle.imageUrl,

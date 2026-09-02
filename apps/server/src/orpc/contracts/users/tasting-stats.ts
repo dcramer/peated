@@ -1,10 +1,12 @@
-import { AgeStatsSchema } from "@peated/server/schemas";
+import { AgeStatsSchema, EntitySchema } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
 
-const ProducerStatSchema = z.object({
-  id: z.number(),
-  name: z.string(),
+const ProducerStatSchema = EntitySchema.pick({
+  id: true,
+  name: true,
+  kind: true,
+}).extend({
   count: z.number(),
 });
 
