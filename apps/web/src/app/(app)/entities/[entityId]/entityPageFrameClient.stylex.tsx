@@ -3,7 +3,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
 import {
   Button,
@@ -31,6 +31,8 @@ import {
   getEntityTabs,
   type Entity,
 } from "./entityPageData";
+
+const EntityPageContext = createContext<Entity | null>(null);
 
 function EntityFollowAction({ entity }: { entity: Entity }) {
   const { user } = useAuth();
@@ -178,46 +180,54 @@ export function EntityPageFrameClient({
   const bottleActionLabel = "Add a bottle";
 
   return (
-    <div {...stylex.props(styles.page)}>
-      <PageHeader
-        actions={
-          <>
-            {canFollow ? (
-              <EntityFollowAction key={entity.id} entity={entity} />
-            ) : null}
-            {createBottleHref ? (
-              <ButtonLink
-                href={createBottleHref}
-                size="md"
-                variant={canFollow ? "tonal" : "accent"}
-              >
-                {bottleActionLabel}
-              </ButtonLink>
-            ) : null}
-          </>
-        }
-        actionsPosition="start"
-        description={
-          entity.description ? (
-            <ExpandableDescription content={entity.description} />
-          ) : null
-        }
-        eyebrow={getEntityClassification(entity)}
-        menu={<EntityActions entity={entity} />}
-        title={entity.name}
-      />
-
-      <div {...stylex.props(styles.tabs)}>
-        <PageTabs
-          ariaLabel={`${entity.name} sections`}
-          currentHref={currentHref}
-          items={getEntityTabs(entity)}
+    <EntityPageContext.Provider value={entity}>
+      <div {...stylex.props(styles.page)}>
+        <PageHeader
+          actions={
+            <>
+              {canFollow ? (
+                <EntityFollowAction key={entity.id} entity={entity} />
+              ) : null}
+              {createBottleHref ? (
+                <ButtonLink
+                  href={createBottleHref}
+                  size="md"
+                  variant={canFollow ? "tonal" : "accent"}
+                >
+                  {bottleActionLabel}
+                </ButtonLink>
+              ) : null}
+            </>
+          }
+          actionsPosition="start"
+          description={
+            entity.description ? (
+              <ExpandableDescription content={entity.description} />
+            ) : null
+          }
+          eyebrow={getEntityClassification(entity)}
+          menu={<EntityActions entity={entity} />}
+          title={entity.name}
         />
-      </div>
 
-      {children}
-    </div>
+        <div {...stylex.props(styles.tabs)}>
+          <PageTabs
+            ariaLabel={`${entity.name} sections`}
+            currentHref={currentHref}
+            items={getEntityTabs(entity)}
+          />
+        </div>
+
+        {children}
+      </div>
+    </EntityPageContext.Provider>
   );
+}
+
+export function useEntityPage() {
+  const entity = useContext(EntityPageContext);
+  if (!entity) throw new Error("Entity page content requires its route frame");
+  return entity;
 }
 
 const styles = stylex.create({
