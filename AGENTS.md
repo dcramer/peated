@@ -99,10 +99,9 @@ possible and make that data freely accessible to everyone.
 
 ## Documentation
 
-This is the complete list of durable repository guidance. Read every file that
-applies to the work. OpenSpec change folders are temporary work records and are
-not listed. Generic OpenSpec command and skill files are tool instructions, not
-Peated product guidance.
+Read the docs that apply to the work. All durable repository guides are listed
+below. Skills are available through `.agents/skills`; temporary OpenSpec changes
+and generic tool instructions are not listed.
 
 Code, database schemas, exported types, and tests define exact behavior. These
 docs explain intent, rules, and safe procedures. Research notes do not override
@@ -130,7 +129,6 @@ them.
 - `docs/features/photo-assisted-bottle-resolution.md` — Bottle lookup from a photo.
 - `openspec/specs/entity-identity/spec.md` — Entity kinds, ownership, and API behavior.
 - `packages/bottle-classifier/README.md` — Classifier package API and commands.
-- `skills/peated-writing/SKILL.md` — Peated's customer-facing writing style.
 
 ### Build And Test Peated
 
@@ -154,22 +152,6 @@ them.
 - `docs/policies/sensitive-data.md` — Private data in logs, tools, and models.
 - `packages/bottle-classifier/.vitest-evals/AGENTS.md` — Classifier replay recording rules.
 - `packages/bottle-classifier/AGENTS.md` — Rules for classifier changes.
-- `skills/agent-design-review/SKILL.md` — Agent design review workflow.
-- `skills/agent-design-review/SOURCES.md` — Sources used by the agent design skill.
-- `skills/agent-design-review/SPEC.md` — Scope of the agent design skill.
-- `skills/agent-design-review/references/classifier-agents.md` — Classifier agent patterns.
-- `skills/agent-design-review/references/evals-and-iteration.md` — Agent evaluation patterns.
-- `skills/agent-design-review/references/principles.md` — Agent design principles.
-- `skills/agent-design-review/references/prompt-and-caching.md` — Prompt and cache design.
-- `skills/agent-design-review/references/provider-specific-templates.md` — Provider examples.
-- `skills/agent-design-review/references/review-examples.md` — Agent review examples.
-- `skills/agent-design-review/references/runtime-and-guardrails.md` — Runtime safety patterns.
-- `skills/agent-design-review/references/system-prompt-templates.md` — Prompt templates.
-- `skills/agent-design-review/references/tool-and-schema-design.md` — Tool and schema rules.
-- `skills/agent-design-review/references/tool-schema-examples.md` — Tool schema examples.
-- `skills/peated-qa/SKILL.md` — Manual API, CLI, and browser checks.
-- `skills/peated-qa/SOURCES.md` — Sources used by the QA skill.
-- `skills/peated-qa/SPEC.md` — Scope of the QA skill.
 
 ### Documentation And Research
 
@@ -189,6 +171,3 @@ them.
 - `docs/operations/entity-images.md` — Add or replace production Entity images.
 - `docs/operations/external-review-sources.md` — Add, publish, stop, or remove a review source.
 - `docs/operations/production-debugging.md` — Diagnose production failures.
-- `skills/peated-cli/SKILL.md` — Safe Peated CLI use.
-- `skills/peated-cli/references/authenticated-api.md` — OAuth API commands.
-- `skills/peated-cli/references/moderation.md` — Price-match moderation commands.
