@@ -51,11 +51,9 @@ import {
 } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../styles/tokens.stylex";
 
+import { bottleOverviewQueries } from "./bottleOverviewQueries";
+
 type Bottle = Outputs["bottles"]["details"];
-type RecommendationList = Outputs["bottles"]["recommendations"];
-type BottleList = Outputs["bottles"]["list"];
-type ExternalReviewList = Outputs["externalReviews"]["list"];
-type TastingList = Outputs["tastings"]["list"];
 type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
@@ -479,48 +477,21 @@ export function BottlePageFrameClient({
   );
 }
 
-export function BottleOverviewClient({
-  initialRecommendations,
-  initialReviews,
-  initialSeriesBottles,
-  initialTastings,
-}: {
-  initialRecommendations?: RecommendationList;
-  initialReviews?: ExternalReviewList;
-  initialSeriesBottles?: BottleList;
-  initialTastings?: TastingList;
-}) {
+export function BottleOverviewClient() {
   const orpc = useORPC();
   const bottle = useBottlePage();
-  const externalReviewsQuery = useQuery({
-    ...orpc.externalReviews.list.queryOptions({
-      input: { bottle: bottle.id, limit: 3, sort: "recent" },
-    }),
-    initialData: initialReviews,
-  });
-  const tastingsQuery = useQuery({
-    ...orpc.tastings.list.queryOptions({
-      input: { bottle: bottle.id, limit: 3 },
-    }),
-    initialData: initialTastings,
-  });
-  const recommendationsQuery = useQuery({
-    ...orpc.bottles.recommendations.queryOptions({
-      input: { bottle: bottle.id, limit: 3 },
-    }),
-    initialData: initialRecommendations,
-  });
-  const seriesBottlesQuery = useQuery({
-    ...orpc.bottles.list.queryOptions({
-      input: {
-        limit: 4,
-        series: bottle.series?.id,
-        sort: "-release",
-      },
-    }),
-    enabled: Boolean(bottle.series),
-    initialData: initialSeriesBottles,
-  });
+  const externalReviewsQuery = useQuery(
+    bottleOverviewQueries.reviews(orpc, bottle.id),
+  );
+  const tastingsQuery = useQuery(
+    bottleOverviewQueries.tastings(orpc, bottle.id),
+  );
+  const recommendationsQuery = useQuery(
+    bottleOverviewQueries.recommendations(orpc, bottle.id),
+  );
+  const seriesBottlesQuery = useQuery(
+    bottleOverviewQueries.series(orpc, bottle.series?.id),
+  );
 
   const criticReviews =
     externalReviewsQuery.data?.results
@@ -647,6 +618,11 @@ export function BottleOverviewClient({
         mainState={mainState}
         moreTastingsHref={`${getBottleUrl(bottle)}/tastings`}
         recommendationIntro={recommendationsQuery.data?.reason}
+        recommendationState={
+          recommendationsQuery.isPending ? (
+            <LoadingList label="Loading bottle recommendations" rows={3} />
+          ) : undefined
+        }
         recommendations={recommendations}
         railSections={seriesRail}
         tastingCount={bottle.totalTastings}
