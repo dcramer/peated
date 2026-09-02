@@ -1,43 +1,26 @@
 "use client";
 
-import type { BOTTLE_LIST_SORT_OPTIONS } from "@peated/server/constants";
-import type { Outputs } from "@peated/server/orpc/router";
-import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
-import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useOptimistic, useState, useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 
-import {
-  Button,
-  Chip,
-  EntityIdentityRow,
-  FactList,
-  ItemListItem,
-  PeatedId,
-  RailList,
-  SectionError,
-  TextLink,
-} from "@peated/web/components";
+import { Button, Chip, FactList, SectionError } from "@peated/web/components";
 import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
-import Markdown from "@peated/web/components/markdown";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
-import {
-  PageColumns,
-  PageHeader,
-} from "@peated/web/components/pages/pageLayout.stylex";
-import { RailListSection } from "@peated/web/components/pages/railListSection.stylex";
 import useBottleRowActions from "@peated/web/hooks/useBottleRowActions";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getEntityUrl } from "@peated/web/lib/urls";
-import { space } from "../../../../styles/tokens.stylex";
 
-type BottleList = Outputs["bottles"]["list"];
-type Series = Outputs["bottleSeries"]["details"];
-type BottleSort = (typeof BOTTLE_LIST_SORT_OPTIONS)[number];
-export type SeriesLibraryFilter = "all" | "in" | "out";
+import {
+  SeriesPageContent,
+  useSeriesPageFrame,
+} from "./seriesPageFrame.stylex";
+import {
+  seriesPageQueries,
+  type SeriesBottleSort,
+  type SeriesLibraryFilter,
+} from "./seriesPageQueries";
 
 const sortOptions = [
   { label: "Latest release", value: "-release" },
@@ -54,24 +37,19 @@ const libraryOptions = [
   { label: "In your Library", value: "in" },
 ] as const;
 
-const DISTILLERY_PREVIEW_LIMIT = 5;
-
 export function SeriesPageClient({
-  initialBottleList,
   initialCursor,
   initialLibrary,
   initialLibraryCount,
-  initialSeries,
   initialSort,
 }: {
-  initialBottleList: BottleList;
   initialCursor: number;
   initialLibrary: SeriesLibraryFilter;
   initialLibraryCount: number | null;
-  initialSeries: Series;
-  initialSort: BottleSort;
+  initialSort: SeriesBottleSort;
 }) {
   const orpc = useORPC();
+  const { series } = useSeriesPageFrame();
   const bottleActions = useBottleRowActions();
   const pathname = usePathname();
   const router = useRouter();
@@ -81,18 +59,14 @@ export function SeriesPageClient({
     searchParams.toString(),
   );
   const displayedSearchParams = new URLSearchParams(displayedParams);
-  const bottleListQuery = useQuery({
-    ...orpc.bottles.list.queryOptions({
-      input: {
-        cursor: initialCursor,
-        library: initialLibrary === "all" ? undefined : initialLibrary,
-        limit: 25,
-        series: initialSeries.id,
-        sort: initialSort,
-      },
+  const bottleListQuery = useQuery(
+    seriesPageQueries.bottles(orpc, {
+      cursor: initialCursor,
+      library: initialLibrary,
+      seriesId: series.id,
+      sort: initialSort,
     }),
-    initialData: initialBottleList,
-  });
+  );
 
   function updateParams(updates: Record<string, string>) {
     const nextParams = new URLSearchParams(displayedParams);
@@ -109,12 +83,12 @@ export function SeriesPageClient({
 
   const facts =
     initialLibraryCount === null
-      ? ([{ label: "Bottles", value: initialSeries.numReleases }] as const)
+      ? ([{ label: "Bottles", value: series.numReleases }] as const)
       : ([
-          { label: "Bottles", value: initialSeries.numReleases },
+          { label: "Bottles", value: series.numReleases },
           {
             label: "In your Library",
-            value: `${initialLibraryCount.toLocaleString("en-US")} of ${initialSeries.numReleases.toLocaleString("en-US")}`,
+            value: `${initialLibraryCount.toLocaleString("en-US")} of ${series.numReleases.toLocaleString("en-US")}`,
           },
         ] as const);
   const bottleList = bottleListQuery.data;
@@ -122,52 +96,25 @@ export function SeriesPageClient({
   const emptyState =
     initialLibrary === "in"
       ? {
-          description: `None of the bottles from ${initialSeries.fullName} are in your Library.`,
+          description: `None of the bottles from ${series.fullName} are in your Library.`,
           heading: "No bottles in your Library",
         }
       : initialLibrary === "out"
         ? {
-            description: `Every bottle from ${initialSeries.fullName} on Peated is in your Library.`,
+            description: `Every bottle from ${series.fullName} on Peated is in your Library.`,
             heading: "Nothing missing",
           }
         : {
-            description: `No bottles have been added to ${initialSeries.fullName} yet.`,
+            description: `No bottles have been added to ${series.fullName} yet.`,
             heading: "No bottles in this series yet",
           };
 
   return (
-    <div {...stylex.props(styles.page)}>
-      <PageHeader
-        description={
-          initialSeries.description ? (
-            <Markdown content={initialSeries.description} />
-          ) : undefined
-        }
-        identity={<PeatedId id={initialSeries.peatedId} />}
-        parent={
-          <TextLink href={getEntityUrl(initialSeries.brand)}>
-            {initialSeries.brand.name}
-          </TextLink>
-        }
-        title={
-          <span {...stylex.props(styles.title)}>{initialSeries.name}</span>
-        }
-      />
-      <PageColumns
-        rail={
-          initialSeries.distillers.length ? (
-            <SeriesDistilleries distillers={initialSeries.distillers} />
-          ) : undefined
-        }
-        railBehavior="stack"
-      >
-        <FactList facts={facts} layout="grid" />
-        {initialLibraryCount !== null && initialSeries.numReleases > 0 ? (
-          <div
-            aria-label="Library filter"
-            role="group"
-            {...stylex.props(styles.filters)}
-          >
+    <SeriesPageContent
+      facts={<FactList facts={facts} layout="grid" />}
+      filters={
+        initialLibraryCount !== null && series.numReleases > 0 ? (
+          <>
             {libraryOptions.map((option) => {
               const selected =
                 option.value ===
@@ -187,9 +134,11 @@ export function SeriesPageClient({
                 </Chip>
               );
             })}
-          </div>
-        ) : null}
-        <div {...stylex.props(styles.bottles)}>
+          </>
+        ) : undefined
+      }
+      bottles={
+        <>
           {bottleListQuery.error ? (
             <SectionError
               heading="Bottles in this series are unavailable"
@@ -199,6 +148,7 @@ export function SeriesPageClient({
             </SectionError>
           ) : bottleList ? (
             <BottleCatalogList
+              key={`${initialCursor}:${initialLibrary}:${initialSort}`}
               emptyAction={
                 filtered ? (
                   <Button
@@ -242,75 +192,8 @@ export function SeriesPageClient({
               total={bottleList.total}
             />
           ) : null}
-        </div>
-      </PageColumns>
-    </div>
-  );
-}
-
-function SeriesDistilleries({
-  distillers,
-}: {
-  distillers: Series["distillers"];
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const hasMore = distillers.length > DISTILLERY_PREVIEW_LIMIT;
-  const visibleDistillers = expanded
-    ? distillers
-    : distillers.slice(0, DISTILLERY_PREVIEW_LIMIT);
-
-  return (
-    <RailListSection
-      action={
-        hasMore
-          ? {
-              ariaControls: "series-distilleries",
-              expanded,
-              label: expanded
-                ? "Show fewer distilleries"
-                : `View all ${distillers.length.toLocaleString("en-US")} distilleries`,
-              onClick: () => setExpanded((value) => !value),
-            }
-          : undefined
+        </>
       }
-      heading={distillers.length === 1 ? "Distillery" : "Distilleries"}
-    >
-      <div id="series-distilleries">
-        <RailList ariaLabel="Series distilleries">
-          {visibleDistillers.map((distiller) => (
-            <ItemListItem key={distiller.id}>
-              <EntityIdentityRow
-                {...getEntityIdentityProps(distiller)}
-                variant="sidebar"
-                end={`${distiller.numBottles.toLocaleString("en-US")} ${
-                  distiller.numBottles === 1 ? "bottle" : "bottles"
-                }`}
-                href={getEntityUrl(distiller)}
-              />
-            </ItemListItem>
-          ))}
-        </RailList>
-      </div>
-    </RailListSection>
+    />
   );
 }
-
-const styles = stylex.create({
-  page: {
-    minWidth: 0,
-  },
-  title: {
-    display: "block",
-    overflowWrap: "anywhere",
-  },
-  filters: {
-    display: "flex",
-    alignItems: "center",
-    gap: space.x2,
-    flexWrap: "wrap",
-  },
-  bottles: {
-    minWidth: 0,
-    paddingTop: space.x4,
-  },
-});

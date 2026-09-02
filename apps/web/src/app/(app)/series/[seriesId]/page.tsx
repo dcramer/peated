@@ -1,16 +1,19 @@
+import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { BOTTLE_LIST_SORT_OPTIONS } from "@peated/server/constants";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
-import { serializeSeriesStructuredData } from "@peated/web/lib/catalogStructuredData";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getSeriesSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getSeriesPage } from "@peated/web/lib/seriesPage.server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
+import { SeriesPageClient } from "./seriesPageClient.stylex";
 import {
-  SeriesPageClient,
+  seriesPageQueries,
   type SeriesLibraryFilter,
-} from "./seriesPageClient.stylex";
+} from "./seriesPageQueries";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -42,7 +45,6 @@ export async function generateMetadata(props: {
     searchParams: await props.searchParams,
   });
 }
-
 export default async function SeriesPage(props: {
   params: Promise<{ seriesId: string }>;
   searchParams: Promise<SearchParams>;
@@ -61,14 +63,17 @@ export default async function SeriesPage(props: {
   const library = currentUser
     ? getLibraryFilter(firstValue(searchParams.library))
     : "all";
-  const [bottleList, libraryBottleList] = await Promise.all([
-    client.bottles.list({
-      cursor,
-      library: library === "all" ? undefined : library,
-      limit: 25,
-      series: series.id,
-      sort,
-    }),
+  const queryClient = getQueryClient();
+  const orpc = createTanstackQueryUtils(client);
+  const [, libraryBottleList] = await Promise.all([
+    queryClient.prefetchQuery(
+      seriesPageQueries.bottles(orpc, {
+        cursor,
+        library,
+        seriesId: series.id,
+        sort,
+      }),
+    ),
     currentUser
       ? client.bottles.list({
           library: "in",
@@ -79,21 +84,13 @@ export default async function SeriesPage(props: {
   ]);
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeSeriesStructuredData(series),
-        }}
-      />
+    <HydrationBoundary state={dehydrate(queryClient)}>
       <SeriesPageClient
-        initialBottleList={bottleList}
         initialCursor={cursor}
         initialLibrary={library}
         initialLibraryCount={libraryBottleList?.total ?? null}
-        initialSeries={series}
         initialSort={sort}
       />
-    </>
+    </HydrationBoundary>
   );
 }
