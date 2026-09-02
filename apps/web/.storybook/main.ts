@@ -2,6 +2,7 @@ import type { StorybookConfig } from "@storybook/nextjs-vite";
 import stylex from "@stylexjs/unplugin";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import svgr from "vite-plugin-svgr";
 
 const webRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -15,7 +16,11 @@ const config: StorybookConfig = {
   ],
   framework: {
     name: "@storybook/nextjs-vite",
-    options: {},
+    options: {
+      image: {
+        excludeFiles: ["**/*.svg"],
+      },
+    },
   },
   core: {
     disableTelemetry: true,
@@ -37,6 +42,7 @@ const config: StorybookConfig = {
   },
   async viteFinal(config) {
     config.plugins = [
+      svgr({ include: "**/*.svg*" }),
       stylex.vite({
         devMode: "full",
         enableInlinedConditionalMerge: true,

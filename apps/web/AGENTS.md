@@ -12,7 +12,7 @@
 - Keep API queries, auth state, mutations, server actions, and navigation out of reusable components. Put route-only behavior beside the route and shared behavior in a narrowly named feature folder.
 - Do not add catch-all component folders such as `product/`.
 - Use StyleX for web styling. Do not add Tailwind utilities or configuration.
-- Do not add component snapshots or presentation tests. Use the accessibility panel and manual light, dark, desktop, and mobile review.
+- Do not add committed component snapshots or presentation tests. CI captures Storybook stories as non-blocking Frameshift review images. Use the accessibility panel and manual light, dark, desktop, and mobile review for component changes.
 
 ## Product language
 
