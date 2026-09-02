@@ -2,6 +2,7 @@ import type { MockOutputs } from "../contract";
 import { mockBottle } from "./bottles";
 import {
   mockBuffaloTraceEntity,
+  mockEntities,
   mockEntity,
   mockMacallanEntity,
   mockMidletonEntity,
@@ -94,6 +95,24 @@ export const mockUserTastingStats = {
     very_good: 10,
     outstanding: 15,
     unicorn: 7,
+  },
+  producers: {
+    brands: [
+      { id: mockRedbreastEntity.id, name: mockRedbreastEntity.name, count: 7 },
+    ],
+    bottlers: [
+      { id: mockEntities[7]!.id, name: mockEntities[7]!.name, count: 5 },
+      { id: mockEntities[8]!.id, name: mockEntities[8]!.name, count: 3 },
+    ],
+    distillers: [
+      { id: mockEntity.id, name: mockEntity.name, count: 15 },
+      { id: mockMacallanEntity.id, name: mockMacallanEntity.name, count: 8 },
+      {
+        id: mockSpringbankEntity.id,
+        name: mockSpringbankEntity.name,
+        count: 6,
+      },
+    ],
   },
   mostTastedBottle: {
     id: mockBottle.id,

@@ -206,6 +206,7 @@ export default implement(libraryStatsContract).handler(async function ({
           bottle: {
             id: bottles.id,
             groupId: bottles.groupId,
+            bottlerId: bottles.bottlerId,
             brandId: bottles.brandId,
             category: bottles.category,
             flavorProfile: bottles.flavorProfile,

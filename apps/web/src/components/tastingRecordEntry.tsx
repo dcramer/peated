@@ -43,15 +43,15 @@ export function getTastingEntryMember(
         ? undefined
         : formatColor(tasting.color),
     comments: tasting.comments,
-    description: tasting.notes ?? undefined,
-    descriptionHref: `/tastings/${tasting.id}`,
+    notes: tasting.notes ?? undefined,
+    notesHref: `/tastings/${tasting.id}`,
     hasToasted: tasting.hasToasted,
     href: getBottleUrl(tasting.bottle),
     imageKind: tasting.imageUrl ? "photo" : "bottle",
     imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
     metadata: getBottleMetadata(tasting.bottle),
     name: formatBottleDisplayName(tasting.bottle),
-    notes: tasting.tags ?? undefined,
+    tags: tasting.tags ?? undefined,
     ratingBand: tasting.ratingBand ?? undefined,
     servingStyle: tasting.servingStyle
       ? formatServingStyle(tasting.servingStyle)

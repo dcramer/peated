@@ -22,7 +22,7 @@ import {
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useProfile } from "./profileContext";
+import { useProfile } from "../profileContext";
 
 type TastingList = Outputs["tastings"]["list"];
 type RegionList = Outputs["users"]["regionList"];
@@ -51,7 +51,9 @@ export function ProfileTastingsPageClient({
   });
 
   return (
-    <PageColumns rail={getRegionRail(regionQuery, user.username)}>
+    <PageColumns
+      rail={getRegionRail(regionQuery, user.username, isCurrentUser)}
+    >
       <section aria-label={`${user.username}'s tastings`}>
         {tastingQuery.isPending ? (
           <LoadingList label="Loading member tastings" rows={4} />
@@ -60,8 +62,8 @@ export function ProfileTastingsPageClient({
             heading="Tastings are unavailable"
             onRetry={() => void tastingQuery.refetch()}
           >
-            The member profile is still available. Try loading their tastings
-            again.
+            The profile is still available. Try loading{" "}
+            {isCurrentUser ? "your" : "their"} tastings again.
           </SectionError>
         ) : tastingQuery.data.results.length ? (
           <ItemList ariaLabel={`${user.username}'s tasting records`}>
@@ -113,10 +115,12 @@ export function ProfileTastingsPageClient({
 function getRegionRail(
   query: ReturnType<typeof useQuery<RegionList>>,
   username: string,
+  isCurrentUser: boolean,
 ) {
+  const heading = isCurrentUser ? "What you pour" : "What they pour";
   if (query.isPending) {
     return (
-      <RailSection heading="What they pour">
+      <RailSection heading={heading}>
         <LoadingList label="Loading member regions" rows={3} />
       </RailSection>
     );
@@ -133,7 +137,7 @@ function getRegionRail(
   }
   if (!query.data.results.length) return undefined;
   return (
-    <RailSection heading="What they pour">
+    <RailSection heading={heading}>
       <RailList ariaLabel={`${username}'s most tasted regions`}>
         {query.data.results.slice(0, 6).map((item) => (
           <RailListItem

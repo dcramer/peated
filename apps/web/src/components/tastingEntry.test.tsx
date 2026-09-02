@@ -3,35 +3,32 @@ import { describe, expect, it } from "vitest";
 
 import { TastingEntry } from "./tastingEntry.stylex";
 
-function renderDescription(description: string, descriptionHref?: string) {
+function renderNotes(notes: string, notesHref?: string) {
   return renderToStaticMarkup(
     <TastingEntry
       author="peatfan"
       date="Today"
       members={[
         {
-          description,
-          descriptionHref,
           name: "Lagavulin 16-year-old",
+          notes,
+          notesHref,
         },
       ]}
     />,
   );
 }
 
-describe("TastingEntry descriptions", () => {
+describe("TastingEntry notes", () => {
   it("shows short tasting notes without a details link", () => {
-    const html = renderDescription(
-      "Smoke, fruit, and sea salt.",
-      "/tastings/1",
-    );
+    const html = renderNotes("Smoke, fruit, and sea salt.", "/tastings/1");
 
     expect(html).toContain("Smoke, fruit, and sea salt.");
     expect(html).not.toContain("Read more");
   });
 
   it("shortens long tasting notes and links to the tasting details", () => {
-    const html = renderDescription(
+    const html = renderNotes(
       `${"Smoke, fruit, and sea salt. ".repeat(12)}The final sentence.`,
       "/tastings/42",
     );
@@ -45,14 +42,14 @@ describe("TastingEntry descriptions", () => {
   });
 
   it("shows the full tasting notes when no details link is provided", () => {
-    const description = `${"Smoke, fruit, and sea salt. ".repeat(12)}The final sentence.`;
-    const html = renderDescription(description);
+    const notes = `${"Smoke, fruit, and sea salt. ".repeat(12)}The final sentence.`;
+    const html = renderNotes(notes);
 
     expect(html).toContain("The final sentence.");
     expect(html).not.toContain("Read more");
   });
 
-  it("shows the recorded tasting details and discussion link", () => {
+  it("omits missing tasting notes and shows the recorded details", () => {
     const html = renderToStaticMarkup(
       <TastingEntry
         author="peatfan"
@@ -64,9 +61,9 @@ describe("TastingEntry descriptions", () => {
             imageKind: "photo",
             imageUrl: "/tasting.jpg",
             name: "Springbank 15",
-            notes: ["wax", "coal smoke"],
             ratingBand: "outstanding",
             servingStyle: "Neat",
+            tags: ["wax", "coal smoke"],
             tastingId: 42,
           },
         ]}
@@ -74,7 +71,7 @@ describe("TastingEntry descriptions", () => {
     );
 
     expect(html).toContain('src="/tasting.jpg"');
-    expect(html).toContain("No notes.");
+    expect(html).not.toContain("No notes.");
     expect(html).toContain("wax");
     expect(html).toContain("Neat");
     expect(html).toContain("Deep gold");

@@ -17,15 +17,15 @@ const meta = {
         href: "/bottles/lagavulin-16",
         metadata: "Islay · 16 years · 43% ABV",
         name: "Lagavulin 16-year-old",
-        notes: ["Smoke", "Dried fruit", "Sea salt"],
         ratingBand: "outstanding",
+        tags: ["Smoke", "Dried fruit", "Sea salt"],
       },
       {
         href: "/bottles/ardbeg-uigeadail",
         metadata: "Islay · No age statement · 54.2% ABV",
         name: "Ardbeg Uigeadail",
-        notes: ["Tar", "Raisin", "Espresso"],
         ratingBand: "good",
+        tags: ["Tar", "Raisin", "Espresso"],
       },
     ],
     menu: (
@@ -74,18 +74,18 @@ export const Overview: Story = {
   ),
 };
 
-export const LongDescription: Story = {
+export const LongNotes: Story = {
   args: {
     members: [
       {
-        description:
+        notes:
           "The nose starts with wood smoke, dried orange, and old leather before moving into dark chocolate and sea salt. The palate adds roasted coffee, black pepper, and a little raisin sweetness. With time, the smoke softens and more fruit comes through. The finish is long, dry, and smoky, with espresso and orange peel lingering after the last sip.",
-        descriptionHref: "/tastings/42",
+        notesHref: "/tastings/42",
         href: "/bottles/lagavulin-16",
         metadata: "Islay · 16 years · 43% ABV",
         name: "Lagavulin 16-year-old",
-        notes: ["Smoke", "Dried fruit", "Sea salt"],
         ratingBand: "outstanding",
+        tags: ["Smoke", "Dried fruit", "Sea salt"],
       },
     ],
   },

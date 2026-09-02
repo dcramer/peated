@@ -21,17 +21,17 @@ export type TastingMediaKind = "bottle" | "photo";
 export type TastingEntryMember = {
   color?: string;
   comments?: number;
-  description?: string;
-  descriptionHref?: string;
   hasToasted?: boolean;
   href?: string;
   imageKind?: TastingMediaKind;
   imageUrl?: string | null;
   metadata?: string;
   name: string;
-  notes?: readonly string[];
+  notes?: string;
+  notesHref?: string;
   ratingBand?: RatingBand;
   servingStyle?: string;
+  tags?: readonly string[];
   tastingId?: number;
   toasts?: number;
 };
@@ -133,26 +133,19 @@ export function TastingEntry({
                 </div>
                 {menu ? <div {...stylex.props(styles.menu)}>{menu}</div> : null}
               </div>
-              <p
-                {...stylex.props(
-                  styles.description,
-                  !member.description && styles.emptyDescription,
-                )}
-              >
-                {member.description ? (
-                  <TastingDescription member={member} />
-                ) : (
-                  "No notes."
-                )}
-              </p>
-              {member.notes?.length ? (
-                <div {...stylex.props(styles.notes)}>
-                  {member.notes.map((note, index) => (
+              {member.notes?.trim() ? (
+                <p {...stylex.props(styles.notes)}>
+                  <TastingNotes member={member} />
+                </p>
+              ) : null}
+              {member.tags?.length ? (
+                <div {...stylex.props(styles.tags)}>
+                  {member.tags.map((tag, index) => (
                     <Chip
-                      key={`${note}-${index}`}
+                      key={`${tag}-${index}`}
                       variant={index < 2 ? "tinted" : "neutral"}
                     >
-                      {note}
+                      {tag}
                     </Chip>
                   ))}
                 </div>
@@ -235,32 +228,28 @@ export function TastingMedia({
   );
 }
 
-const DESCRIPTION_PREVIEW_LENGTH = 180;
+const NOTES_PREVIEW_LENGTH = 180;
 
-function TastingDescription({ member }: { member: TastingEntryMember }) {
-  const description = member.description?.trim().replace(/\s+/g, " ");
+function TastingNotes({ member }: { member: TastingEntryMember }) {
+  const notes = member.notes?.trim().replace(/\s+/g, " ");
 
-  if (
-    !member.descriptionHref ||
-    !description ||
-    description.length <= DESCRIPTION_PREVIEW_LENGTH
-  ) {
-    return member.description;
+  if (!member.notesHref || !notes || notes.length <= NOTES_PREVIEW_LENGTH) {
+    return member.notes;
   }
 
-  const wordBoundary = description
-    .slice(0, DESCRIPTION_PREVIEW_LENGTH + 1)
+  const wordBoundary = notes
+    .slice(0, NOTES_PREVIEW_LENGTH + 1)
     .lastIndexOf(" ");
-  const cutoff = wordBoundary > 0 ? wordBoundary : DESCRIPTION_PREVIEW_LENGTH;
-  const preview = `${description.slice(0, cutoff).trimEnd()}…`;
+  const cutoff = wordBoundary > 0 ? wordBoundary : NOTES_PREVIEW_LENGTH;
+  const preview = `${notes.slice(0, cutoff).trimEnd()}…`;
 
   return (
     <>
       {preview}{" "}
       <AppLink
         aria-label={`Read the full tasting notes for ${member.name}`}
-        href={member.descriptionHref}
-        {...stylex.props(styles.descriptionLink)}
+        href={member.notesHref}
+        {...stylex.props(styles.notesLink)}
       >
         Read more <span aria-hidden="true">→</span>
       </AppLink>
@@ -403,7 +392,7 @@ const styles = stylex.create({
     textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
   },
-  description: {
+  notes: {
     margin: 0,
     marginTop: "14px",
     color: colors.ink,
@@ -412,10 +401,7 @@ const styles = stylex.create({
     lineHeight: 1.6,
     whiteSpace: "pre-wrap",
   },
-  emptyDescription: {
-    color: colors.inkMuted,
-  },
-  descriptionLink: {
+  notesLink: {
     color: colors.accentDeep,
     fontWeight: 600,
     textDecoration: {
@@ -429,7 +415,7 @@ const styles = stylex.create({
     },
     whiteSpace: "nowrap",
   },
-  notes: {
+  tags: {
     display: "flex",
     flexWrap: "wrap",
     gap: "6px",

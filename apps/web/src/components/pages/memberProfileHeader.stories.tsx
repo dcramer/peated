@@ -11,13 +11,6 @@ const meta = {
   title: "Components/Members/Profile Header",
   component: MemberProfileHeader,
   args: {
-    bands: {
-      good: 15,
-      mediocre: 4,
-      outstanding: 44,
-      unicorn: 10,
-      very_good: 31,
-    },
     username: "dcramer",
   },
   decorators: [
@@ -35,7 +28,6 @@ type Story = StoryObj<MemberProfileHeaderProps>;
 export const AnotherMember: Story = {
   args: {
     actions: <Button variant="accent">Add friend</Button>,
-    ratingLabel: "How they rate",
   },
 };
 
@@ -51,8 +43,6 @@ export const YourProfile: Story = {
         </ButtonLink>
       </>
     ),
-    metadata: ["Joined August 2026"],
-    ratingLabel: "How you rate",
   },
 };
 
@@ -60,14 +50,5 @@ export const Private: Story = {
   args: {
     actions: <Button variant="accent">Add friend</Button>,
     privateProfile: true,
-    bands: undefined,
-  },
-};
-
-export const RatingLoading: Story = {
-  args: {
-    actions: <Button variant="accent">Add friend</Button>,
-    bands: undefined,
-    ratingsLoading: true,
   },
 };
