@@ -49,17 +49,18 @@ export function getEntityRowActionGroups({
   }
 
   if (onToggleFollowing) {
+    const pending = pendingId === item.id;
+
     groups.push([
       {
-        disabled: pendingId !== undefined,
-        label:
-          pendingId === item.id
-            ? item.isFollowing
-              ? "Unfollowing…"
-              : "Following…"
-            : item.isFollowing
-              ? "Unfollow"
-              : "Follow",
+        disabled: pending,
+        label: pending
+          ? item.isFollowing
+            ? "Unfollowing…"
+            : "Following…"
+          : item.isFollowing
+            ? "Unfollow"
+            : "Follow",
         onSelect: () => onToggleFollowing(item),
       },
     ]);

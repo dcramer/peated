@@ -53,4 +53,17 @@ describe("getEntityRowActionGroups", () => {
       label: "Following…",
     });
   });
+
+  it("keeps other follow actions enabled", () => {
+    expect(
+      getEntityRowActionGroups({
+        item,
+        onToggleFollowing: vi.fn(),
+        pendingId: 7,
+      })[1]?.[0],
+    ).toMatchObject({
+      disabled: false,
+      label: "Follow",
+    });
+  });
 });
