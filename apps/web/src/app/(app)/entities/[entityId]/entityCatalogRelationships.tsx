@@ -47,7 +47,7 @@ function getRelationshipGroup(entity: Entity, catalog?: EntityCatalog) {
           ]
         : [
             {
-              heading: "Distilled at",
+              heading: "Distilleries",
               itemLabel: "distilleries",
               items: catalog.related.distillers,
             },
@@ -81,7 +81,7 @@ export function EntityCatalogRelationships({
         }
       : entity.kind === "distillery"
         ? { heading: "Bottled by", itemLabel: "bottlers" }
-        : { heading: "Distilled at", itemLabel: "distilleries" });
+        : { heading: "Distilleries", itemLabel: "distilleries" });
 
   if (pending) {
     return (
