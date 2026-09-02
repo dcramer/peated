@@ -1,0 +1,175 @@
+{
+  "files": [
+    {
+      "file": "bottle.png",
+      "image": "images/candidate/bottle.png",
+      "images": {
+        "candidate": "images/candidate/bottle.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "bottler.png",
+      "image": "images/candidate/bottler.png",
+      "images": {
+        "candidate": "images/candidate/bottler.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "brand.png",
+      "image": "images/candidate/brand.png",
+      "images": {
+        "candidate": "images/candidate/brand.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "distillery.png",
+      "image": "images/candidate/distillery.png",
+      "images": {
+        "candidate": "images/candidate/distillery.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "home.png",
+      "image": "images/candidate/home.png",
+      "images": {
+        "candidate": "images/candidate/home.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "menu.png",
+      "image": "images/candidate/menu.png",
+      "images": {
+        "candidate": "images/candidate/menu.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "profile.png",
+      "image": "images/candidate/profile.png",
+      "images": {
+        "candidate": "images/candidate/profile.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "region.png",
+      "image": "images/candidate/region.png",
+      "images": {
+        "candidate": "images/candidate/region.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "search.png",
+      "image": "images/candidate/search.png",
+      "images": {
+        "candidate": "images/candidate/search.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "sign-in.png",
+      "image": "images/candidate/sign-in.png",
+      "images": {
+        "candidate": "images/candidate/sign-in.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "start-a-tasting.png",
+      "image": "images/candidate/start-a-tasting.png",
+      "images": {
+        "candidate": "images/candidate/start-a-tasting.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/choose-entry-type.png",
+      "image": "images/candidate/tasting-form/choose-entry-type.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/choose-entry-type.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/review/1-score.png",
+      "image": "images/candidate/tasting-form/review/1-score.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/review/1-score.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/review/2-notes-browser.png",
+      "image": "images/candidate/tasting-form/review/2-notes-browser.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/review/2-notes-browser.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/review/2-notes.png",
+      "image": "images/candidate/tasting-form/review/2-notes.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/review/2-notes.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/review/3-details.png",
+      "height": 900,
+      "image": "images/diff/tasting-form/review/3-details.png",
+      "images": {
+        "baseline": "images/baseline/tasting-form/review/3-details.png",
+        "candidate": "images/candidate/tasting-form/review/3-details.png",
+        "diff": "images/diff/tasting-form/review/3-details.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "tasting-form/tasting/1-rating.png",
+      "image": "images/candidate/tasting-form/tasting/1-rating.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/tasting/1-rating.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/tasting/2-notes-browser.png",
+      "image": "images/candidate/tasting-form/tasting/2-notes-browser.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/tasting/2-notes-browser.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/tasting/2-notes.png",
+      "image": "images/candidate/tasting-form/tasting/2-notes.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/tasting/2-notes.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "tasting-form/tasting/3-details.png",
+      "image": "images/candidate/tasting-form/tasting/3-details.png",
+      "images": {
+        "candidate": "images/candidate/tasting-form/tasting/3-details.png"
+      },
+      "status": "unchanged"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 1,
+    "removed": 0,
+    "unchanged": 19
+  },
+  "version": 2
+}
