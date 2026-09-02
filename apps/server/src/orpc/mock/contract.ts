@@ -7,6 +7,7 @@ import bottleGroupBottles from "@peated/server/orpc/contracts/bottleGroups/bottl
 import bottleGroupDetails from "@peated/server/orpc/contracts/bottleGroups/details";
 import bottlerList from "@peated/server/orpc/contracts/bottlers/list";
 import bottleDetails from "@peated/server/orpc/contracts/bottles/details";
+import bottleFlavorProfile from "@peated/server/orpc/contracts/bottles/flavor-profile";
 import bottleList from "@peated/server/orpc/contracts/bottles/list";
 import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
 import bottleRecommendations from "@peated/server/orpc/contracts/bottles/recommendations";
@@ -84,6 +85,7 @@ export const mockContract = {
   },
   bottles: {
     details: bottleDetails,
+    flavorProfile: bottleFlavorProfile,
     list: bottleList,
     prices: {
       list: bottlePriceList,

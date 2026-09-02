@@ -1332,6 +1332,30 @@ async function handleRpcRequest({ request, response, url }) {
       mutateCollectionBottle(request, input, "delete");
       sendRpcResponse(response, {});
       return true;
+    case "bottles/flavorProfile":
+      sendRpcResponse(response, {
+        notedTastings: 4,
+        categories: [
+          {
+            category: "smoke",
+            tastingCount: 3,
+            notes: [{ name: "peat", tastingCount: 3 }],
+          },
+          {
+            category: "fruit",
+            tastingCount: 1,
+            notes: [{ name: "apple", tastingCount: 1 }],
+          },
+        ],
+      });
+      return true;
+    case "tags/bottles":
+      sendRpcResponse(response, {
+        results: [
+          { bottle: existingBottle, matchingTastings: 3, taggedTastings: 4 },
+        ],
+      });
+      return true;
     case "bottles/tags":
       if (!isNumber(input?.bottle)) {
         sendRpcError(response, "Unexpected bottle tags payload");

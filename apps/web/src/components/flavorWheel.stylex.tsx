@@ -1,14 +1,15 @@
 "use client";
 
 import { TAG_CATEGORIES } from "@peated/server/constants";
-import type { FlavorProfile } from "@peated/server/schemas/flavorProfile";
+import type {
+  BottleFlavorProfile,
+  FlavorProfile,
+} from "@peated/server/schemas/flavorProfile";
 import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
-import { Info } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { colors, fonts, space } from "../styles/tokens.stylex";
-import { Button } from "./button.stylex";
 
 const CENTER_X = 168;
 const CENTER_Y = 148;
@@ -33,83 +34,72 @@ function segment(radius: number, start: number, end: number) {
 
 const label = (category: string) =>
   category.charAt(0).toUpperCase() + category.slice(1);
-const formatCount = (count: number) => count.toLocaleString("en-US");
 
 /**
- * Sidebar distribution of public tasting-note families across bottles.
+ * Distribution of public tasting-note families across bottles or one bottle's tastings.
  * Each wedge has a fixed position and an independent 0–100% area scale.
- * Selection reveals its share and two leading notes in the center, without bars.
- * Optional onExplore opens the selected family in the caller’s tasting guide.
- * The parent supplies the heading, reference links through footer,
- * and any contribution action for empty data.
+ * Hover or keyboard focus previews a family's share and two leading notes.
+ * The center keeps the last preview when the pointer or focus leaves the wheel.
+ * Activating a wedge calls onExplore to open that family's notes and bottles.
+ * The parent supplies the heading and centered reference links through footer.
+ * Any recognized notes render a chart; empty data shows a short message.
  */
 export function FlavorWheel({
   profile,
   onExplore,
   footer,
 }: {
-  profile: FlavorProfile;
+  profile: FlavorProfile | BottleFlavorProfile;
   footer?: ReactNode;
   onExplore?: (category: TagCategory) => void;
 }) {
-  const descriptionId = useId();
   const [selection, setSelection] = useState<string | null>(null);
   const [focused, setFocused] = useState<string | null>(null);
+  const isBottle = "notedTastings" in profile;
+  const sampleCount = isBottle ? profile.notedTastings : profile.notedBottles;
+  const sample = isBottle ? "tastings" : "bottles";
+  const values = isBottle
+    ? profile.categories.map((item) => ({
+        category: item.category,
+        count: item.tastingCount,
+        notes: item.notes,
+      }))
+    : profile.categories.map((item) => ({
+        category: item.category,
+        count: item.bottleCount,
+        notes: item.notes,
+      }));
   const categories = TAG_CATEGORIES.map(
     (category) =>
-      profile.categories.find((item) => item.category === category) ?? {
+      values.find((item) => item.category === category) ?? {
         category,
-        bottleCount: 0,
+        count: 0,
         notes: [],
       },
   );
   const mostCommon = categories.reduce((best, item) =>
-    item.bottleCount > best.bottleCount ? item : best,
+    item.count > best.count ? item : best,
   );
   const selected =
     categories.find((item) => item.category === selection) ?? mostCommon;
   const percentage = (count: number) =>
-    profile.notedBottles ? Math.round((count / profile.notedBottles) * 100) : 0;
-  const sparse = profile.notedBottles > 0 && profile.notedBottles < 5;
+    sampleCount ? Math.round((count / sampleCount) * 100) : 0;
+  function explore(category: TagCategory) {
+    setSelection(category);
+    onExplore?.(category);
+  }
 
   return (
     <div {...stylex.props(styles.root)}>
-      {profile.notedBottles === 0 ? (
-        <p {...stylex.props(styles.message)}>
-          No public tasting notes yet. Add tasting notes to a bottle to help
-          describe its flavor.
-        </p>
-      ) : sparse ? (
-        <div {...stylex.props(styles.early)}>
-          <p {...stylex.props(styles.message)}>
-            A few early notes from {formatCount(profile.notedBottles)}{" "}
-            {profile.notedBottles === 1 ? "bottle" : "bottles"}. More bottles
-            need notes before showing a distribution.
-          </p>
-          <p {...stylex.props(styles.earlyNotes)}>
-            {categories
-              .flatMap((item) => item.notes)
-              .sort(
-                (a, b) =>
-                  b.bottleCount - a.bottleCount || a.name.localeCompare(b.name),
-              )
-              .slice(0, 4)
-              .map((note) => note.name)
-              .join(" · ")}
-          </p>
-        </div>
+      {sampleCount === 0 ? (
+        <p {...stylex.props(styles.message)}>No public tasting notes yet.</p>
       ) : (
         <>
-          <div {...stylex.props(styles.context)}>
-            <span>Bottles with these notes</span>
-            <span>{formatCount(profile.notedBottles)} bottles</span>
-          </div>
           <div {...stylex.props(styles.chart)}>
             <svg
               viewBox="0 0 336 292"
               role="group"
               aria-label="Flavor families"
-              aria-describedby={descriptionId}
               {...stylex.props(styles.wheel)}
             >
               {categories.map((item, index) => {
@@ -117,12 +107,11 @@ export function FlavorWheel({
                 const start = index * span + 2;
                 const end = (index + 1) * span - 2;
                 const [x, y] = point(128, (start + end) / 2);
-                // Area, rather than radius, is proportional to bottle occurrence.
+                // FlavorWheel uses area, rather than radius, to show commonality.
                 const radius = Math.sqrt(
                   INNER_RADIUS ** 2 +
-                    ((OUTER_RADIUS ** 2 - INNER_RADIUS ** 2) *
-                      item.bottleCount) /
-                      profile.notedBottles,
+                    ((OUTER_RADIUS ** 2 - INNER_RADIUS ** 2) * item.count) /
+                      sampleCount,
                 );
                 const isSelected = selected.category === item.category;
                 const isFocused = focused === item.category;
@@ -131,15 +120,20 @@ export function FlavorWheel({
                     key={item.category}
                     role="button"
                     tabIndex={0}
-                    aria-label={`${label(item.category)}, ${percentage(item.bottleCount)}% of bottles${item.notes.length ? `; ${item.notes.map((note) => note.name).join(", ")}` : "; no notes recorded"}`}
+                    aria-label={`${label(item.category)}, ${percentage(item.count)}% of ${sample} with notes${item.notes.length ? `; ${item.notes.map((note) => note.name).join(", ")}` : "; no notes recorded"}`}
                     aria-pressed={isSelected}
-                    onClick={() => setSelection(item.category)}
-                    onFocus={() => setFocused(item.category)}
+                    aria-haspopup={onExplore ? "dialog" : undefined}
+                    onMouseEnter={() => setSelection(item.category)}
+                    onClick={() => explore(item.category)}
+                    onFocus={() => {
+                      setFocused(item.category);
+                      setSelection(item.category);
+                    }}
                     onBlur={() => setFocused(null)}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        setSelection(item.category);
+                        explore(item.category);
                       }
                     }}
                     {...stylex.props(styles.segment)}
@@ -148,7 +142,7 @@ export function FlavorWheel({
                       d={segment(OUTER_RADIUS, start, end)}
                       {...stylex.props(styles.track)}
                     />
-                    {item.bottleCount > 0 ? (
+                    {item.count > 0 ? (
                       <path
                         d={segment(radius, start, end)}
                         {...stylex.props(styles.fill)}
@@ -183,7 +177,7 @@ export function FlavorWheel({
                 {label(selected.category)}
               </strong>
               <span {...stylex.props(styles.centerValue)}>
-                {percentage(selected.bottleCount)}%
+                {percentage(selected.count)}%
               </span>
               <div {...stylex.props(styles.centerNotes)}>
                 {selected.notes.length ? (
@@ -202,59 +196,17 @@ export function FlavorWheel({
               </div>
             </div>
           </div>
-          <p id={descriptionId} {...stylex.props(styles.hint)}>
-            Select a family to explore its notes.
-          </p>
-          {onExplore ? (
-            <Button
-              variant="text"
-              size="sm"
-              fullWidth
-              aria-haspopup="dialog"
-              onClick={() => onExplore(selected.category)}
-            >
-              Explore {label(selected.category).toLowerCase()} notes
-            </Button>
-          ) : null}
         </>
       )}
-      <details {...stylex.props(styles.coverage)}>
-        <summary {...stylex.props(styles.coverageSummary)}>
-          <span>
-            Notes cover {formatCount(profile.notedBottles)} of{" "}
-            {formatCount(profile.totalBottles)} bottles
-          </span>
-          <Info size={14} aria-hidden="true" />
-        </summary>
-        <p {...stylex.props(styles.explanation)}>
-          Each family shows the share of bottles with a matching public tasting
-          note, among bottles with recognized notes. Each bottle counts once per
-          family. Private tastings and suggested notes are excluded.
-        </p>
-        <p {...stylex.props(styles.explanation)}>
-          Families can overlap. Missing notes do not mean a flavor is absent,
-          and more frequently tasted bottles have more chances to collect notes.
-          This shows occurrence, not intensity.
-        </p>
-      </details>
-      {footer}
+      {footer ? <div {...stylex.props(styles.footer)}>{footer}</div> : null}
     </div>
   );
 }
 
 const styles = stylex.create({
   root: { width: "100%", maxWidth: "336px", marginInline: "auto", minWidth: 0 },
-  context: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
-    fontVariantNumeric: "tabular-nums",
-  },
   chart: { position: "relative" },
+  footer: { textAlign: "center" },
   wheel: {
     display: "block",
     width: "100%",
@@ -333,54 +285,11 @@ const styles = stylex.create({
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
-  hint: {
-    margin: 0,
-    textAlign: "center",
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
-  },
-  coverage: {
-    marginTop: space.x2,
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
-  },
-  coverageSummary: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space.x2,
-    minHeight: "44px",
-    cursor: "pointer",
-    listStyle: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-      ":active": colors.inset,
-    },
-    outline: {
-      default: "none",
-      ":focus-visible": `2px solid ${colors.accent}`,
-    },
-    outlineOffset: "-2px",
-  },
-  explanation: { margin: 0, paddingBottom: space.x2 },
   message: {
     margin: 0,
     fontFamily: fonts.reading,
     fontSize: "15px",
     lineHeight: 1.6,
     color: colors.inkMuted,
-  },
-  early: { display: "grid", gap: space.x3 },
-  earlyNotes: {
-    margin: 0,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
-    color: colors.ink,
   },
 });

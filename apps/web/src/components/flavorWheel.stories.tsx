@@ -1,4 +1,7 @@
-import { mockFlavorProfile as profile } from "@peated/server/orpc/mock/fixtures/flavorProfile";
+import {
+  mockBottleFlavorProfile,
+  mockFlavorProfile as profile,
+} from "@peated/server/orpc/mock/fixtures/flavorProfile";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { FlavorWheel } from "./flavorWheel.stylex";
 import { RailSection } from "./pages/pageLayout.stylex";
@@ -30,6 +33,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {};
+export const Bottle: Story = { args: { profile: mockBottleFlavorProfile } };
 export const Sparse: Story = {
   args: {
     profile: {

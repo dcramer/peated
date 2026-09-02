@@ -38,6 +38,7 @@ export type BottleOverviewProps = {
   criticReviewDetail?: string;
   criticReviews?: readonly CriticReviewProps[];
   declaredFacts: readonly [FactListItem, ...FactListItem[]];
+  flavorProfile?: ReactNode;
   image: BottleOverviewImage;
   mainState?: ReactNode;
   moreTastingsHref?: string;
@@ -49,11 +50,12 @@ export type BottleOverviewProps = {
   tastings?: readonly TastingEntryProps[];
 };
 
-/** Composes the bottle facts, image, reviews, tastings, and recommendations. */
+/** Composes bottle facts, image, reviews, and tastings, with its flavor profile above related bottles. */
 export function BottleOverview({
   criticReviewDetail,
   criticReviews = [],
   declaredFacts,
+  flavorProfile,
   image,
   mainState,
   moreTastingsHref,
@@ -126,7 +128,7 @@ export function BottleOverview({
       </div>
 
       <aside
-        aria-label="Bottle media and recommendations"
+        aria-label="Bottle image, flavor profile, and recommendations"
         {...stylex.props(styles.rail)}
       >
         <figure {...stylex.props(styles.media)}>
@@ -146,8 +148,12 @@ export function BottleOverview({
           ) : null}
         </figure>
 
-        {recommendations.length || recommendationState || railSections ? (
+        {flavorProfile ||
+        recommendations.length ||
+        recommendationState ||
+        railSections ? (
           <div {...stylex.props(styles.railSections)}>
+            {flavorProfile}
             {recommendations.length ? (
               <BottleRailSection
                 heading={recommendationHeading}

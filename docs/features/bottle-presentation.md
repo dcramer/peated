@@ -138,6 +138,24 @@ When stored fields conflict, concise presentation should prefer the explicit
 human-facing marketed designation and avoid displaying a contradictory second
 token. The conflict belongs in verification or moderation workflows.
 
+## Tasting-note flavor profile
+
+Bottle overview pages show a flavor-family wheel below the bottle image. Each
+family measures its occurrence in that exact Bottle's public tastings with
+recognized notes. Each tasting counts once per family; repeat tastings remain
+separate observations. Private tastings and suggested tags are excluded, even
+for signed-in authors. Do not combine sibling releases or use summed tag counts
+as family counts.
+
+Distillery and region wheels instead count each active Bottle once per family.
+Both show commonality, not intensity. Keep family positions fixed. Hovering or
+focusing a family previews its share and leading notes in the center, keeping
+the last preview when the pointer or focus leaves. Clicking a family opens the
+shared tasting-wheel panel with note descriptions and matching bottles. Omit
+instructional text, raw bottle counts, and contribution CTAs. Any recognized
+public notes produce a chart; none produces a short empty message. The
+whole-bottle style classification is separate from this distribution.
+
 ## Presentation Branches
 
 Choose the branch from the needs and context of the surface, not from the

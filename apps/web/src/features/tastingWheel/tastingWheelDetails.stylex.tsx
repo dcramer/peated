@@ -10,11 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { colors, space } from "../../styles/tokens.stylex";
-import {
-  CATEGORY_DEFINITIONS,
-  NOTE_DESCRIPTIONS,
-  WHEEL_CATEGORIES,
-} from "./tastingWheelData";
+import { CATEGORY_DEFINITIONS, NOTE_DESCRIPTIONS } from "./tastingWheelData";
 
 type Selection = {
   category: TagCategory;
@@ -68,26 +64,6 @@ export function TastingWheelProvider({ children }: { children: ReactNode }) {
         ) : null}
       </Slideout>
     </TastingWheelContext>
-  );
-}
-
-export function TastingWheelCategoryLinks() {
-  const { select } = useTastingWheel();
-  return (
-    <div {...stylex.props(styles.categoryLinks)}>
-      {WHEEL_CATEGORIES.map((category) => (
-        <Button
-          key={category.key}
-          variant="text"
-          align="start"
-          fullWidth
-          aria-haspopup="dialog"
-          onClick={() => select({ category: category.key })}
-        >
-          {category.name}
-        </Button>
-      ))}
-    </div>
   );
 }
 
@@ -147,7 +123,7 @@ function TastingWheelDetails({
           Ranked by the share of public tastings with notes that mention{" "}
           {selection.note
             ? selection.note
-            : `a note in the ${category.name.toLowerCase()} category`}
+            : `a note in the ${category.name.toLowerCase()} family`}
           .
         </p>
         <div aria-live="polite">
@@ -182,7 +158,7 @@ function TastingWheelDetails({
           ) : (
             <p {...stylex.props(styles.status)}>
               No bottles have recorded tastings for{" "}
-              {selection.note ?? `this category`} yet. Try another note.
+              {selection.note ?? `this family`} yet. Try another note.
             </p>
           )}
         </div>
@@ -228,11 +204,5 @@ const styles = stylex.create({
       default: `1px solid ${colors.hairline}`,
       ":last-child": "none",
     },
-  },
-  categoryLinks: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
-    marginLeft: "-16px",
   },
 });
