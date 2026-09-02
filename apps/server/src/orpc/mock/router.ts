@@ -36,6 +36,8 @@ import flightList from "./routes/flights/list";
 import friendCreate from "./routes/friends/create";
 import friendDelete from "./routes/friends/delete";
 import friendList from "./routes/friends/list";
+import memberReviewDetails from "./routes/memberReviews/details";
+import memberReviewList from "./routes/memberReviews/list";
 import notificationCount from "./routes/notifications/count";
 import notificationList from "./routes/notifications/list";
 import priceChangeList from "./routes/prices/change-list";
@@ -129,6 +131,10 @@ export const mockRouter = mockOS.router({
     create: friendCreate,
     delete: friendDelete,
     list: friendList,
+  },
+  memberReviews: {
+    details: memberReviewDetails,
+    list: memberReviewList,
   },
   notifications: {
     count: notificationCount,

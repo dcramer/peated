@@ -1,28 +1,13 @@
 import { db } from "@peated/server/db";
 import { follows, memberReviews, users } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
-import { MemberReviewSchema, listResponse } from "@peated/server/schemas";
+import { implement } from "@peated/server/orpc";
+import memberReviewListContract from "@peated/server/orpc/contracts/memberReviews/list";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
 import { and, desc, eq, or, sql } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
-  .route({
-    method: "GET",
-    path: "/bottles/{bottle}/member-reviews",
-    summary: "List member reviews",
-    operationId: "listMemberReviews",
-  })
-  .input(
-    z.object({
-      bottle: z.coerce.number().int().positive(),
-      cursor: z.coerce.number().int().positive().default(1),
-      limit: z.coerce.number().int().min(1).max(100).default(20),
-    }),
-  )
-  .output(listResponse(MemberReviewSchema))
-  .handler(async ({ input, context }) => {
+export default implement(memberReviewListContract).handler(
+  async ({ input, context }) => {
     const offset = (input.cursor - 1) * input.limit;
     const visible = or(
       eq(users.private, false),
@@ -58,4 +43,5 @@ export default procedure
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
       },
     };
-  });
+  },
+);

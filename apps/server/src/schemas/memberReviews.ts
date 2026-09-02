@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BottleSchema } from "./bottles";
 import { ServingStyleEnum } from "./common";
 import { UserSchema } from "./users";
 
@@ -47,6 +48,10 @@ export const MemberReviewSchema = z.object({
   createdBy: UserSchema.readonly(),
   createdAt: z.string().datetime().readonly(),
   updatedAt: z.string().datetime().readonly(),
+});
+
+export const MemberReviewDetailsSchema = MemberReviewSchema.extend({
+  bottle: BottleSchema,
 });
 
 export const MemberReviewInputSchema = z

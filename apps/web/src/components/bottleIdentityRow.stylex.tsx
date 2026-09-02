@@ -35,19 +35,21 @@ export function BottleVisual({
   label,
   size = "md",
 }: BottleVisualProps) {
+  const hasExpandableImage = Boolean(imageUrl && expandable && label);
+
   return (
     <span
-      aria-hidden={label ? undefined : "true"}
-      aria-label={label}
-      role={label ? "img" : undefined}
+      aria-hidden={!label ? "true" : undefined}
+      aria-label={label && !hasExpandableImage ? label : undefined}
+      role={label && !hasExpandableImage ? "img" : undefined}
       {...stylex.props(
         styles.visual,
         Boolean(imageUrl) && styles.imageVisual,
         visualSizeStyles[size],
-        Boolean(imageUrl && expandable && label) && styles.expandableVisual,
+        hasExpandableImage && styles.expandableVisual,
       )}
     >
-      {imageUrl && expandable && label ? (
+      {hasExpandableImage && imageUrl && label ? (
         <ImageViewer alt="" fill label={label} src={imageUrl}>
           <img
             alt=""
