@@ -40,3 +40,4 @@
 
 - [x] 8.1 Add the full-Series Distillery breakdown to the side rail with a short expandable preview, focused tests, and desktop and mobile UI checks.
 - [x] 8.2 Match the established Bottle rail collection pattern and add Storybook examples for linked and expandable rail sections.
+- [x] 8.3 Place rail collection actions below their headings and match the established text-link treatment.

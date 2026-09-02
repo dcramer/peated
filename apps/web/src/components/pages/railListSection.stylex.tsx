@@ -1,8 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
-import { AppLink } from "../appLink";
+import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { TextLink } from "../textLink.stylex";
+import { textLinkStyles } from "../textLinkStyles.stylex";
 
 export type RailListSectionAction =
   | {
@@ -32,24 +33,26 @@ export function RailListSection({
     <section {...stylex.props(styles.section)}>
       <h2 {...stylex.props(styles.heading)}>{heading}</h2>
       {intro ? <p {...stylex.props(styles.intro)}>{intro}</p> : null}
-      {children}
       {action ? (
         "href" in action ? (
-          <AppLink href={action.href} {...stylex.props(styles.more)}>
-            {action.label} <span aria-hidden="true">→</span>
-          </AppLink>
+          <TextLink href={action.href}>{action.label}</TextLink>
         ) : (
           <button
             aria-controls={action.ariaControls}
             aria-expanded={action.expanded}
             onClick={action.onClick}
             type="button"
-            {...stylex.props(styles.more, styles.moreButton)}
+            {...stylex.props(
+              textLinkStyles.link,
+              textLinkStyles.small,
+              styles.actionButton,
+            )}
           >
             {action.label}
           </button>
         )
       ) : null}
+      {children}
     </section>
   );
 }
@@ -76,37 +79,12 @@ const styles = stylex.create({
     fontSize: "10px",
     lineHeight: 1.4,
   },
-  more: {
-    display: "block",
-    boxSizing: "border-box",
-    width: "100%",
-    marginTop: "6px",
-    paddingTop: space.x3,
-    paddingRight: 0,
-    paddingBottom: space.x3,
-    paddingLeft: 0,
-    borderRadius: 0,
-    outline: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-      ":active": colors.surface,
-    },
-    color: colors.accentDeep,
-    fontFamily: fonts.display,
-    fontSize: "13px",
-    fontWeight: 700,
-    lineHeight: 1.3,
-    textAlign: "left",
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  moreButton: {
+  actionButton: {
     appearance: "none",
+    margin: 0,
+    padding: 0,
     borderWidth: 0,
+    backgroundColor: "transparent",
     cursor: "pointer",
   },
 });
