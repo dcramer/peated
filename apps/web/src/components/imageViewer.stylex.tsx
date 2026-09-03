@@ -10,10 +10,10 @@ import * as stylex from "@stylexjs/stylex";
 import { ExternalLink, Maximize2, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   controlMetrics,
   effects,
-  fonts,
   space,
   zIndices,
 } from "../styles/tokens.stylex";
@@ -59,14 +59,19 @@ export function ImageViewer({
               <img alt={alt} src={src} {...stylex.props(styles.fullImage)} />
             </div>
             <div {...stylex.props(styles.footer)}>
-              <DialogTitle {...stylex.props(styles.title)}>
+              <DialogTitle
+                {...stylex.props(foundationStyles.interactive, styles.title)}
+              >
                 {caption ?? label}
               </DialogTitle>
               <a
                 href={src}
                 rel="noreferrer"
                 target="_blank"
-                {...stylex.props(styles.originalLink)}
+                {...stylex.props(
+                  foundationStyles.interactiveSmall,
+                  styles.originalLink,
+                )}
               >
                 Open original
                 <ExternalLink aria-hidden="true" size={14} strokeWidth={1.75} />
@@ -207,10 +212,7 @@ const styles = stylex.create({
     overflow: "hidden",
     margin: 0,
     color: "white",
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     fontWeight: 600,
-    lineHeight: 1.35,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -222,10 +224,7 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",
     color: "white",
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.2,
     textDecorationLine: {
       default: "none",
       ":hover": "underline",

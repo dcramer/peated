@@ -1,5 +1,7 @@
 "use client";
 
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
+
 import { Button } from "@peated/web/components";
 import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { textLinkStyles } from "@peated/web/components/textLinkStyles.stylex";
@@ -64,13 +66,13 @@ export function TastingWheelIntroduction() {
         <SectionHeading id="tasting-wheel-introduction">
           Start with what you notice
         </SectionHeading>
-        <p {...stylex.props(styles.directionText)}>
+        <p {...stylex.props(foundationStyles.prose, styles.directionText)}>
           Does it remind you of fruit? Follow that part of the wheel outward.
           Maybe it&apos;s a crisp apple, a little citrus, or a handful of
           raisins. A couple of words is plenty. Leave out anything you
           don&apos;t taste.
         </p>
-        <p {...stylex.props(styles.directionText)}>
+        <p {...stylex.props(foundationStyles.prose, styles.directionText)}>
           Pick a note to find out more and see bottles with that flavor.
         </p>
       </div>
@@ -222,13 +224,18 @@ export function TastingWheelCategories() {
             onClick={() => select({ category: category.key })}
             {...stylex.props(
               textLinkStyles.link,
-              textLinkStyles.small,
+              foundationStyles.interactiveSmall,
               styles.examplesAction,
             )}
           >
             See examples
           </button>
-          <p {...stylex.props(styles.categoryDescription)}>
+          <p
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.categoryDescription,
+            )}
+          >
             {category.description}
           </p>
           <div {...stylex.props(styles.notes)}>
@@ -259,9 +266,6 @@ const styles = stylex.create({
   directions: { display: "grid", gap: space.x3, maxWidth: "74ch" },
   directionText: {
     margin: 0,
-    fontFamily: fonts.reading,
-    fontSize: "16px",
-    lineHeight: 1.6,
     color: colors.inkMuted,
     textWrap: "pretty",
   },
@@ -363,9 +367,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   notes: {
     display: "flex",
@@ -374,7 +375,6 @@ const styles = stylex.create({
     marginTop: space.x3,
   },
 });
-
 const SEGMENT_STYLES = [
   styles.segmentSurface,
   styles.segmentInset,
@@ -386,7 +386,6 @@ const SEGMENT_STYLES = [
   styles.segmentAccent,
   styles.segmentSunken,
 ] as const;
-
 const OUTER_SEGMENT_STYLES = [
   styles.outerSurface,
   styles.outerInset,

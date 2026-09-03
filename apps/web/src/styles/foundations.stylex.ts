@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { colors, fonts } from "./tokens.stylex";
 
+/** Web typography roles. Components compose these with layout, color, and emphasis. */
 export const foundationStyles = stylex.create({
   document: {
     boxSizing: "border-box",
@@ -23,10 +24,18 @@ export const foundationStyles = stylex.create({
     letterSpacing: "-0.05em",
     lineHeight: 0.95,
   },
+  pageTitleCompact: {
+    margin: 0,
+    fontFamily: fonts.display,
+    fontSize: "clamp(32px, 4vw, 40px)",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    lineHeight: 1.1,
+  },
   sectionHeading: {
     margin: 0,
     fontFamily: fonts.display,
-    fontSize: "20px",
+    fontSize: "24px",
     fontWeight: 700,
     letterSpacing: "-0.025em",
     lineHeight: 1.2,
@@ -39,6 +48,14 @@ export const foundationStyles = stylex.create({
     letterSpacing: "-0.025em",
     lineHeight: 1.25,
   },
+  compactRowTitle: {
+    margin: 0,
+    fontFamily: fonts.display,
+    fontSize: "16px",
+    fontWeight: 700,
+    letterSpacing: "-0.025em",
+    lineHeight: 1.25,
+  },
   body: {
     margin: 0,
     fontFamily: fonts.reading,
@@ -46,11 +63,31 @@ export const foundationStyles = stylex.create({
     fontWeight: 400,
     lineHeight: 1.6,
   },
+  prose: {
+    margin: 0,
+    fontFamily: fonts.reading,
+    fontSize: "16px",
+    fontWeight: 400,
+    lineHeight: 1.65,
+    textWrap: "pretty",
+  },
+  input: {
+    fontFamily: fonts.reading,
+    fontSize: "16px",
+    fontWeight: 400,
+    lineHeight: 1.45,
+  },
   interactive: {
     fontFamily: fonts.reading,
     fontSize: "15px",
     fontWeight: 600,
     lineHeight: 1.2,
+  },
+  interactiveSmall: {
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 600,
+    lineHeight: 1.3,
   },
   metadata: {
     fontFamily: fonts.reading,
@@ -61,7 +98,7 @@ export const foundationStyles = stylex.create({
   fieldLabel: {
     fontFamily: fonts.reading,
     fontSize: "13px",
-    fontWeight: 400,
+    fontWeight: 600,
     letterSpacing: 0,
     lineHeight: 1.4,
   },
@@ -71,5 +108,11 @@ export const foundationStyles = stylex.create({
     fontWeight: 400,
     letterSpacing: 0,
     lineHeight: 1.4,
+  },
+  code: {
+    fontFamily: fonts.data,
+    fontSize: "13px",
+    fontWeight: 400,
+    lineHeight: 1.45,
   },
 });

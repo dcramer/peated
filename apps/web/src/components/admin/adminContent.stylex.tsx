@@ -34,7 +34,7 @@ export function AdminBreadcrumbs({
           <Link
             aria-label="Admin"
             href="/admin"
-            {...stylex.props(styles.breadcrumbLink)}
+            {...stylex.props(foundationStyles.metadata, styles.breadcrumbLink)}
           >
             <Home aria-hidden="true" size={14} />
           </Link>
@@ -54,6 +54,7 @@ export function AdminBreadcrumbs({
               href={item.href}
               title={item.label}
               {...stylex.props(
+                foundationStyles.metadata,
                 styles.breadcrumbLink,
                 item.current && styles.currentBreadcrumb,
               )}
@@ -74,7 +75,6 @@ export function AdminPage({ children }: { children: ReactNode }) {
 export type AdminPageHeaderProps = {
   actions?: ReactNode;
   description?: ReactNode;
-  eyebrow?: ReactNode;
   metadata?: ReactNode;
   title: ReactNode;
 };
@@ -82,24 +82,30 @@ export type AdminPageHeaderProps = {
 export function AdminPageHeader({
   actions,
   description,
-  eyebrow,
   metadata,
   title,
 }: AdminPageHeaderProps) {
   return (
     <header {...stylex.props(styles.pageHeader)}>
       <div {...stylex.props(styles.pageHeaderCopy)}>
-        {eyebrow ? (
-          <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
-        ) : null}
-        <h1 {...stylex.props(foundationStyles.pageTitle, styles.pageTitle)}>
+        <h1
+          {...stylex.props(
+            foundationStyles.pageTitle,
+            foundationStyles.pageTitleCompact,
+            styles.pageTitle,
+          )}
+        >
           {title}
         </h1>
         {description ? (
-          <div {...stylex.props(styles.description)}>{description}</div>
+          <div {...stylex.props(foundationStyles.body, styles.description)}>
+            {description}
+          </div>
         ) : null}
         {metadata ? (
-          <div {...stylex.props(styles.metadata)}>{metadata}</div>
+          <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+            {metadata}
+          </div>
         ) : null}
       </div>
       {actions ? <div {...stylex.props(styles.actions)}>{actions}</div> : null}
@@ -133,7 +139,9 @@ export function AdminSection({
           <div {...stylex.props(styles.sectionCopy)}>
             {title ? <SectionHeading>{title}</SectionHeading> : null}
             {description ? (
-              <div {...stylex.props(styles.description)}>{description}</div>
+              <div {...stylex.props(foundationStyles.body, styles.description)}>
+                {description}
+              </div>
             ) : null}
           </div>
           {action ? (
@@ -165,9 +173,15 @@ export function AdminStat({
 }) {
   return (
     <div {...stylex.props(styles.stat)}>
-      <dt {...stylex.props(styles.statLabel)}>{label}</dt>
+      <dt {...stylex.props(foundationStyles.metadata, styles.statLabel)}>
+        {label}
+      </dt>
       <dd {...stylex.props(styles.statValue)}>{value}</dd>
-      {detail ? <div {...stylex.props(styles.statDetail)}>{detail}</div> : null}
+      {detail ? (
+        <div {...stylex.props(foundationStyles.metadata, styles.statDetail)}>
+          {detail}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -180,7 +194,13 @@ export function AdminStatus({
   tone?: "accent" | "danger" | "neutral" | "success" | "warning";
 }) {
   return (
-    <span {...stylex.props(styles.status, statusToneStyles[tone])}>
+    <span
+      {...stylex.props(
+        foundationStyles.metadata,
+        styles.status,
+        statusToneStyles[tone],
+      )}
+    >
       {children}
     </span>
   );
@@ -205,11 +225,19 @@ export function AdminTextLink({
 }
 
 export function AdminCode({ children }: { children: ReactNode }) {
-  return <code {...stylex.props(styles.code)}>{children}</code>;
+  return (
+    <code {...stylex.props(foundationStyles.code, styles.code)}>
+      {children}
+    </code>
+  );
 }
 
 export function AdminCodeBlock({ children }: { children: ReactNode }) {
-  return <pre {...stylex.props(styles.codeBlock)}>{children}</pre>;
+  return (
+    <pre {...stylex.props(foundationStyles.code, styles.codeBlock)}>
+      {children}
+    </pre>
+  );
 }
 
 export function AdminDetails({
@@ -223,8 +251,14 @@ export function AdminDetails({
 }) {
   return (
     <details open={open || undefined} {...stylex.props(styles.details)}>
-      <summary {...stylex.props(styles.detailsSummary)}>{summary}</summary>
-      <div {...stylex.props(styles.detailsBody)}>{children}</div>
+      <summary
+        {...stylex.props(foundationStyles.interactive, styles.detailsSummary)}
+      >
+        {summary}
+      </summary>
+      <div {...stylex.props(foundationStyles.metadata, styles.detailsBody)}>
+        {children}
+      </div>
     </details>
   );
 }
@@ -292,9 +326,6 @@ const styles = stylex.create({
       ":hover": colors.accentDeep,
       ":active": colors.accentDeep,
     },
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.3,
     textDecoration: "none",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -320,28 +351,13 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x2,
   },
-  eyebrow: {
-    color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 600,
-    letterSpacing: "0.1em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
-  },
-  pageTitle: { fontSize: "clamp(30px, 5vw, 40px)", overflowWrap: "anywhere" },
+  pageTitle: { overflowWrap: "anywhere" },
   description: {
     maxWidth: "68ch",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   metadata: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.45,
   },
   actions: {
     display: "flex",
@@ -403,10 +419,6 @@ const styles = stylex.create({
   },
   statLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
   },
   statValue: {
     margin: 0,
@@ -420,9 +432,6 @@ const styles = stylex.create({
   statDetail: {
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
   },
   status: {
     display: "inline-flex",
@@ -431,10 +440,7 @@ const styles = stylex.create({
     paddingRight: space.x2,
     paddingLeft: space.x2,
     borderRadius: controlMetrics.radiusSmall,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontWeight: 600,
-    lineHeight: 1.2,
   },
   statusNeutral: { backgroundColor: colors.inset, color: colors.inkMuted },
   statusAccent: {
@@ -449,8 +455,6 @@ const styles = stylex.create({
   },
   code: {
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "0.92em",
     overflowWrap: "anywhere",
   },
   codeBlock: {
@@ -461,9 +465,6 @@ const styles = stylex.create({
     overflowX: "auto",
     backgroundColor: colors.inset,
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.5,
     whiteSpace: "pre-wrap",
   },
   details: {
@@ -475,7 +476,6 @@ const styles = stylex.create({
   detailsSummary: {
     padding: space.x4,
     color: colors.ink,
-    fontFamily: fonts.display,
     fontWeight: 700,
     listStyle: "none",
     cursor: "pointer",
@@ -492,9 +492,6 @@ const styles = stylex.create({
     paddingBottom: space.x4,
     paddingLeft: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   splitView: {
     display: "grid",
@@ -518,14 +515,12 @@ const styles = stylex.create({
   splitDetail: { minWidth: 0 },
   splitDetailHidden: { "@media (max-width: 839px)": { display: "none" } },
 });
-
 const toneStyles = {
   accent: styles.sectionAccent,
   danger: styles.sectionDanger,
   default: null,
   warning: styles.sectionWarning,
 } as const;
-
 const statusToneStyles = {
   accent: styles.statusAccent,
   danger: styles.statusDanger,

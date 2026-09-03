@@ -97,7 +97,7 @@ export function ItemRow({
               {...stylex.props(
                 foundationStyles.rowTitle,
                 styles.title,
-                size === "sm" && styles.smallTitle,
+                size === "sm" && foundationStyles.compactRowTitle,
                 linkedRowStyles.primaryLink,
               )}
             >
@@ -109,7 +109,7 @@ export function ItemRow({
               {...stylex.props(
                 foundationStyles.rowTitle,
                 styles.title,
-                size === "sm" && styles.smallTitle,
+                size === "sm" && foundationStyles.compactRowTitle,
               )}
             >
               {title}
@@ -225,9 +225,7 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
-  smallTitle: {
-    fontSize: "16px",
-  },
+
   metadata: {
     marginTop: "3px",
     overflow: "hidden",

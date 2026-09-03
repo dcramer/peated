@@ -8,7 +8,8 @@ import {
   PageHeader,
   TabbedPage,
 } from "@peated/web/components/pages/pageLayout.stylex";
-import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../styles/foundations.stylex";
+import { colors, space } from "../../../styles/tokens.stylex";
 
 const MOBILE = "@media (max-width: 559px)";
 const STEPS_STACKED = "@media (max-width: 899px)";
@@ -50,7 +51,9 @@ export function AboutPage({
 }
 
 export function AboutText({ children }: { children: ReactNode }) {
-  return <p {...stylex.props(styles.text)}>{children}</p>;
+  return (
+    <p {...stylex.props(foundationStyles.body, styles.text)}>{children}</p>
+  );
 }
 
 export function AboutLink({ children, ...props }: TextLinkProps) {
@@ -72,7 +75,7 @@ export function AboutCode({ children }: { children: string }) {
       aria-label="Example API request"
       role="region"
       tabIndex={0}
-      {...stylex.props(styles.codeBlock)}
+      {...stylex.props(foundationStyles.code, styles.codeBlock)}
     >
       <code>{children}</code>
     </pre>
@@ -89,13 +92,15 @@ export function ReviewSteps({
     <ol {...stylex.props(styles.steps)}>
       {steps.map((step, index) => (
         <li key={step.title} {...stylex.props(styles.step)}>
-          <span {...stylex.props(styles.stepNumber)}>
+          <span {...stylex.props(foundationStyles.metadata, styles.stepNumber)}>
             {String(index + 1).padStart(2, "0")}
           </span>
           <div {...stylex.props(styles.stepTitle)}>
             <SectionHeading level={3}>{step.title}</SectionHeading>
           </div>
-          <div {...stylex.props(styles.stepBody)}>{step.body}</div>
+          <div {...stylex.props(foundationStyles.metadata, styles.stepBody)}>
+            {step.body}
+          </div>
         </li>
       ))}
     </ol>
@@ -112,12 +117,20 @@ export function ReviewDirections({
   return (
     <dl {...stylex.props(styles.directions)}>
       <div>
-        <dt {...stylex.props(styles.directionLabel)}>Move up for</dt>
-        <dd {...stylex.props(styles.directionBody)}>{up}</dd>
+        <dt {...stylex.props(foundationStyles.metadata, styles.directionLabel)}>
+          Move up for
+        </dt>
+        <dd {...stylex.props(foundationStyles.metadata, styles.directionBody)}>
+          {up}
+        </dd>
       </div>
       <div>
-        <dt {...stylex.props(styles.directionLabel)}>Move down for</dt>
-        <dd {...stylex.props(styles.directionBody)}>{down}</dd>
+        <dt {...stylex.props(foundationStyles.metadata, styles.directionLabel)}>
+          Move down for
+        </dt>
+        <dd {...stylex.props(foundationStyles.metadata, styles.directionBody)}>
+          {down}
+        </dd>
       </div>
     </dl>
   );
@@ -133,9 +146,6 @@ const styles = stylex.create({
     maxWidth: "74ch",
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.7,
   },
   codeBlock: {
     maxWidth: "100%",
@@ -145,9 +155,6 @@ const styles = stylex.create({
     borderRadius: "3px",
     backgroundColor: colors.inset,
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "12px",
-    lineHeight: 1.55,
   },
   steps: {
     display: "grid",
@@ -169,18 +176,12 @@ const styles = stylex.create({
   },
   stepNumber: {
     color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.3,
   },
   stepTitle: { marginTop: space.x2 },
   stepBody: {
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.55,
   },
   directions: {
     display: "grid",
@@ -194,18 +195,10 @@ const styles = stylex.create({
   },
   directionLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.04em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   directionBody: {
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.55,
   },
 });

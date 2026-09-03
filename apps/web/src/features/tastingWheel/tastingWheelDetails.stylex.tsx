@@ -9,6 +9,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { CATEGORY_DEFINITIONS, NOTE_DESCRIPTIONS } from "./tastingWheelData";
 
@@ -87,7 +88,7 @@ function TastingWheelDetails({
   const notes = [...new Set([...category.wheelNotes, ...category.notes])];
   return (
     <div {...stylex.props(styles.details)}>
-      <p {...stylex.props(styles.description)}>
+      <p {...stylex.props(foundationStyles.prose, styles.description)}>
         {selection.note
           ? NOTE_DESCRIPTIONS[selection.note]
           : category.description}
@@ -119,7 +120,7 @@ function TastingWheelDetails({
       </section>
       <section aria-busy={query.isPending}>
         <SectionHeading level={3}>Bottles with these notes</SectionHeading>
-        <p {...stylex.props(styles.explanation)}>
+        <p {...stylex.props(foundationStyles.body, styles.explanation)}>
           Ordered by how often people mention these notes in their public
           tastings.
         </p>
@@ -160,8 +161,6 @@ const styles = stylex.create({
   details: { display: "flex", flexDirection: "column", gap: space.x6 },
   description: {
     margin: 0,
-    fontSize: "16px",
-    lineHeight: 1.6,
     textWrap: "pretty",
   },
   categoryDescription: {
@@ -179,7 +178,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontSize: "14px",
     textWrap: "pretty",
   },
   status: { marginTop: space.x4, color: colors.inkMuted },

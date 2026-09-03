@@ -15,6 +15,7 @@ import {
   type RatingBand,
 } from "@peated/web/components";
 import { getBottleUrl } from "@peated/web/lib/urls";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
@@ -71,7 +72,7 @@ export function TastingReviewDetail({
   return (
     <article {...stylex.props(styles.detail)}>
       <PageHeader
-        eyebrow={`${rating.kind === "review" ? "Review" : "Tasting"} · ${fullDateFormatter.format(new Date(createdAt))}`}
+        metadata={`${rating.kind === "review" ? "Review" : "Tasting"} · ${fullDateFormatter.format(new Date(createdAt))}`}
         title={
           <AppLink
             aria-label={bottleName}
@@ -95,7 +96,12 @@ export function TastingReviewDetail({
               <TextLink href={`/users/${author.username}`}>
                 {author.username}
               </TextLink>
-              <span {...stylex.props(styles.authorMetadata)}>
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.authorMetadata,
+                )}
+              >
                 {rating.kind === "review" ? "Member review" : "Tasting note"}
               </span>
             </div>
@@ -106,17 +112,31 @@ export function TastingReviewDetail({
               <strong {...stylex.props(styles.reviewScoreValue)}>
                 {rating.score}
               </strong>
-              <span {...stylex.props(styles.reviewScoreScale)}>/100</span>
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.reviewScoreScale,
+                )}
+              >
+                /100
+              </span>
             </div>
           ) : rating.ratingBand && ratingBand ? (
             <div {...stylex.props(styles.tastingRatingSummary)}>
               <TastingRating band={rating.ratingBand} />
-              <span {...stylex.props(styles.tastingRatingCaption)}>
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.tastingRatingCaption,
+                )}
+              >
                 {ratingBand.label} · {ratingBand.range}
               </span>
             </div>
           ) : (
-            <span {...stylex.props(styles.unrated)}>Not rated</span>
+            <span {...stylex.props(foundationStyles.metadata, styles.unrated)}>
+              Not rated
+            </span>
           )}
         </header>
 
@@ -126,7 +146,7 @@ export function TastingReviewDetail({
           </div>
         ) : null}
 
-        {notes ? <RecordNotes kind={rating.kind} notes={notes} /> : null}
+        {notes ? <RecordNotes notes={notes} /> : null}
 
         {tags.length ? (
           <div {...stylex.props(styles.tags)}>
@@ -142,7 +162,7 @@ export function TastingReviewDetail({
         ) : null}
 
         {friends.length ? (
-          <p {...stylex.props(styles.friends)}>
+          <p {...stylex.props(foundationStyles.metadata, styles.friends)}>
             {rating.kind === "review" ? "Shared with " : "Poured with "}
             {friends.map((friend, index) => (
               <span key={friend.id}>
@@ -167,16 +187,11 @@ export function TastingReviewDetail({
   );
 }
 
-function RecordNotes({ kind, notes }: { kind: Rating["kind"]; notes: string }) {
+function RecordNotes({ notes }: { notes: string }) {
   const paragraphs = notes.split(/\n\s*\n/).filter(Boolean);
 
   return (
-    <div
-      {...stylex.props(
-        styles.recordNotes,
-        kind === "review" ? styles.reviewNotes : styles.tastingNotes,
-      )}
-    >
+    <div {...stylex.props(foundationStyles.prose, styles.recordNotes)}>
       {paragraphs.map((paragraph, index) => (
         <p
           key={index}
@@ -205,8 +220,6 @@ const styles = stylex.create({
     },
     textDecoration: "none",
     textWrap: "balance",
-    fontSize: "clamp(36px, 4.5vw, 56px)",
-    lineHeight: 0.98,
     outline: "none",
     boxShadow: {
       default: "none",
@@ -240,9 +253,6 @@ const styles = stylex.create({
   },
   authorMetadata: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
   },
   reviewScore: {
     display: "flex",
@@ -260,9 +270,6 @@ const styles = stylex.create({
   },
   reviewScoreScale: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
   },
   tastingRatingSummary: {
     display: "flex",
@@ -273,16 +280,10 @@ const styles = stylex.create({
   },
   tastingRatingCaption: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
   },
   unrated: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
   },
   facts: {
     minWidth: 0,
@@ -295,16 +296,8 @@ const styles = stylex.create({
     maxWidth: "62ch",
     marginTop: space.x6,
     color: colors.ink,
-    fontFamily: fonts.reading,
   },
-  reviewNotes: {
-    fontSize: "17px",
-    lineHeight: 1.72,
-  },
-  tastingNotes: {
-    fontSize: "16px",
-    lineHeight: 1.65,
-  },
+
   noteParagraph: {
     marginTop: 0,
     marginRight: 0,
@@ -325,9 +318,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   footer: {
     display: "flex",

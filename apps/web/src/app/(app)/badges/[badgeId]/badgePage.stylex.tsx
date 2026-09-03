@@ -12,7 +12,8 @@ import {
   PageSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
-import { colors, fonts } from "../../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../../styles/foundations.stylex";
+import { colors } from "../../../../styles/tokens.stylex";
 
 type Badge = Outputs["badges"]["details"];
 type AwardList = Outputs["badges"]["userList"];
@@ -38,14 +39,16 @@ export function BadgePage({
           {awardList.results.map((award, index) => (
             <ItemRow
               end={
-                <span {...stylex.props(styles.points)}>
+                <span
+                  {...stylex.props(foundationStyles.metadata, styles.points)}
+                >
                   {award.xp.toLocaleString("en-US")} points
                 </span>
               }
               href={`/users/${award.user.username}`}
               key={award.id}
               leading={
-                <span {...stylex.props(styles.rank)}>
+                <span {...stylex.props(foundationStyles.rowTitle, styles.rank)}>
                   #{(page - 1) * 25 + index + 1}
                 </span>
               }
@@ -77,14 +80,10 @@ const styles = stylex.create({
   page: { maxWidth: "900px" },
   rank: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "16px",
     fontVariantNumeric: "tabular-nums",
   },
   points: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
     whiteSpace: "nowrap",
   },

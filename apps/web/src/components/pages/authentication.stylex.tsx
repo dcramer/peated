@@ -57,16 +57,31 @@ export function AuthenticationIntro({
         Peated
       </NextLink>
       <div {...stylex.props(styles.introBody)}>
-        <h1 {...stylex.props(styles.introTitle)}>{title}</h1>
+        <h1
+          {...stylex.props(
+            foundationStyles.pageTitleCompact,
+            styles.introTitle,
+          )}
+        >
+          {title}
+        </h1>
         {description ? (
-          <div {...stylex.props(styles.introDescription)}>{description}</div>
+          <div
+            {...stylex.props(foundationStyles.prose, styles.introDescription)}
+          >
+            {description}
+          </div>
         ) : null}
         {facts ? (
           <dl {...stylex.props(styles.facts)}>
             {facts.map((fact) => (
               <div key={fact.label}>
                 <dd {...stylex.props(styles.factValue)}>{fact.value}</dd>
-                <dt {...stylex.props(styles.factLabel)}>{fact.label}</dt>
+                <dt
+                  {...stylex.props(foundationStyles.metadata, styles.factLabel)}
+                >
+                  {fact.label}
+                </dt>
               </div>
             ))}
           </dl>
@@ -74,7 +89,10 @@ export function AuthenticationIntro({
         {points ? (
           <ul {...stylex.props(styles.points)}>
             {points.map((point, index) => (
-              <li key={index} {...stylex.props(styles.point)}>
+              <li
+                key={index}
+                {...stylex.props(foundationStyles.body, styles.point)}
+              >
                 {point}
               </li>
             ))}
@@ -82,7 +100,9 @@ export function AuthenticationIntro({
         ) : null}
       </div>
       {footer ? (
-        <div {...stylex.props(styles.introFooter)}>{footer}</div>
+        <div {...stylex.props(foundationStyles.metadata, styles.introFooter)}>
+          {footer}
+        </div>
       ) : null}
     </aside>
   );
@@ -119,7 +139,9 @@ export function AuthenticationPanel({
       {back ? <div {...stylex.props(styles.back)}>{back}</div> : null}
       <SectionHeading>{title}</SectionHeading>
       {description ? (
-        <div {...stylex.props(styles.panelDescription)}>{description}</div>
+        <div {...stylex.props(foundationStyles.body, styles.panelDescription)}>
+          {description}
+        </div>
       ) : null}
       <div {...stylex.props(styles.panelContent)}>{children}</div>
     </section>
@@ -140,7 +162,11 @@ export function AuthenticationDivider({ label }: { label?: string }) {
       {label ? (
         <>
           <span {...stylex.props(styles.rule)} />
-          <span {...stylex.props(styles.dividerLabel)}>{label}</span>
+          <span
+            {...stylex.props(foundationStyles.metadata, styles.dividerLabel)}
+          >
+            {label}
+          </span>
           <span {...stylex.props(styles.rule)} />
         </>
       ) : null}
@@ -159,19 +185,26 @@ export function AuthenticationTextButton({
   ...props
 }: Omit<ComponentProps<"button">, "className" | "style">) {
   return (
-    <button {...props} {...stylex.props(styles.textButton)}>
+    <button
+      {...props}
+      {...stylex.props(foundationStyles.interactiveSmall, styles.textButton)}
+    >
       {children}
     </button>
   );
 }
 
 export function AuthenticationLinks({ children }: { children: ReactNode }) {
-  return <div {...stylex.props(styles.footerLinks)}>{children}</div>;
+  return (
+    <div {...stylex.props(foundationStyles.metadata, styles.footerLinks)}>
+      {children}
+    </div>
+  );
 }
 
 export function AuthenticationNotice({ children }: { children: ReactNode }) {
   return (
-    <div role="alert" {...stylex.props(styles.notice)}>
+    <div role="alert" {...stylex.props(foundationStyles.body, styles.notice)}>
       {children}
     </div>
   );
@@ -185,7 +218,10 @@ export function AuthenticationDetails({
   return (
     <ul {...stylex.props(styles.detailList)}>
       {items.map((item, index) => (
-        <li key={index} {...stylex.props(styles.detailListItem)}>
+        <li
+          key={index}
+          {...stylex.props(foundationStyles.body, styles.detailListItem)}
+        >
           {item}
         </li>
       ))}
@@ -263,19 +299,11 @@ const styles = stylex.create({
     maxWidth: "440px",
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "clamp(34px, 5vw, 44px)",
-    fontWeight: 700,
-    letterSpacing: "-0.04em",
-    lineHeight: 1.02,
   },
   introDescription: {
     maxWidth: "440px",
     marginTop: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "16px",
-    lineHeight: 1.55,
   },
   facts: {
     display: "grid",
@@ -304,11 +332,6 @@ const styles = stylex.create({
   factLabel: {
     marginTop: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   points: {
     margin: 0,
@@ -323,8 +346,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.inkMuted,
-    fontSize: "15px",
-    lineHeight: 1.55,
     ":first-child": {
       paddingTop: 0,
     },
@@ -337,9 +358,6 @@ const styles = stylex.create({
     position: "relative",
     zIndex: zIndices.localContent,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.45,
     [NARROW]: {
       display: "none",
     },
@@ -391,8 +409,6 @@ const styles = stylex.create({
   panelDescription: {
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   panelContent: {
     marginTop: "22px",
@@ -424,11 +440,6 @@ const styles = stylex.create({
   },
   dividerLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.1em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   textButton: {
     margin: 0,
@@ -437,10 +448,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.4,
     cursor: "pointer",
     textAlign: "left",
     boxShadow: {
@@ -456,8 +464,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: "6px 8px",
     color: colors.inkMuted,
-    fontSize: "14px",
-    lineHeight: 1.55,
     flexWrap: "wrap",
   },
   notice: {
@@ -469,9 +475,7 @@ const styles = stylex.create({
     borderColor: colors.accentTint,
     backgroundColor: "transparent",
     color: colors.accentDeep,
-    fontSize: "14px",
     fontWeight: 600,
-    lineHeight: 1.45,
   },
   detailList: {
     margin: 0,
@@ -485,9 +489,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.45,
     ":first-child": {
       paddingTop: 0,
     },

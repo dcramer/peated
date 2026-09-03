@@ -4,11 +4,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import * as stylex from "@stylexjs/stylex";
 import { Fragment } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
@@ -81,6 +81,7 @@ export function RowMenu({
             <div
               title={label}
               {...stylex.props(
+                foundationStyles.fieldLabel,
                 styles.header,
                 variant === "page" && styles.pageHeader,
               )}
@@ -105,7 +106,14 @@ export function RowMenu({
                   <div {...stylex.props(styles.separator)} />
                 ) : null}
                 {group.label ? (
-                  <div {...stylex.props(styles.groupLabel)}>{group.label}</div>
+                  <div
+                    {...stylex.props(
+                      foundationStyles.fieldLabel,
+                      styles.groupLabel,
+                    )}
+                  >
+                    {group.label}
+                  </div>
                 ) : null}
                 {group.items.map((item, itemIndex) => (
                   <MenuItem
@@ -118,6 +126,7 @@ export function RowMenu({
                         <AppLink
                           href={item.href}
                           {...stylex.props(
+                            foundationStyles.interactive,
                             styles.item,
                             focus && styles.focusedItem,
                             disabled && styles.disabledItem,
@@ -130,6 +139,7 @@ export function RowMenu({
                           onClick={item.onSelect}
                           type="button"
                           {...stylex.props(
+                            foundationStyles.interactive,
                             styles.item,
                             focus && styles.focusedItem,
                             disabled && styles.disabledItem,
@@ -213,12 +223,7 @@ const styles = stylex.create({
     paddingRight: "48px",
     paddingLeft: "14px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
     textOverflow: "ellipsis",
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
   },
   pageHeader: {
@@ -235,11 +240,6 @@ const styles = stylex.create({
     paddingBottom: "4px",
     paddingLeft: "14px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   separator: {
     height: "1px",
@@ -259,10 +259,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 500,
-    lineHeight: 1.25,
     textAlign: "left",
     textDecoration: "none",
     cursor: "pointer",

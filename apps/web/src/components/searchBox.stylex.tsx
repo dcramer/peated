@@ -11,11 +11,11 @@ import {
   type ReactNode,
 } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
   zIndices,
 } from "../styles/tokens.stylex";
@@ -332,7 +332,13 @@ export function SearchBox({
                 </div>
               ) : null}
               {status === "ready" && resultCount !== undefined ? (
-                <p aria-live="polite" {...stylex.props(styles.databaseCount)}>
+                <p
+                  aria-live="polite"
+                  {...stylex.props(
+                    foundationStyles.rowTitle,
+                    styles.databaseCount,
+                  )}
+                >
                   {resultCount.toLocaleString("en-US")}{" "}
                   {resultCount === 1 ? "result" : "results"}
                 </p>
@@ -464,11 +470,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   databaseFacets: {
     minWidth: 0,

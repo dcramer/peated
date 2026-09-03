@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 
 export type FactListItem = {
   label: string;
@@ -42,6 +43,7 @@ export function FactList({ facts, layout = "list" }: FactListProps) {
         >
           <dt
             {...stylex.props(
+              foundationStyles.fieldLabel,
               styles.label,
               layout === "grid" && styles.gridLabel,
             )}
@@ -50,8 +52,9 @@ export function FactList({ facts, layout = "list" }: FactListProps) {
           </dt>
           <dd
             {...stylex.props(
+              foundationStyles.compactRowTitle,
               styles.value,
-              layout === "grid" && styles.gridValue,
+              layout === "grid" && [foundationStyles.body, styles.gridValue],
             )}
           >
             {fact.value}
@@ -101,38 +104,21 @@ const styles = stylex.create({
     width: "100px",
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    letterSpacing: 0,
-    lineHeight: 1.4,
   },
   gridLabel: {
     width: "auto",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.04em",
-    lineHeight: 1.3,
   },
   value: {
     minWidth: 0,
     flex: 1,
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "16px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.35,
     overflowWrap: "anywhere",
   },
   gridValue: {
     marginTop: space.x1,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     fontWeight: 700,
-    letterSpacing: 0,
-    lineHeight: 1.35,
   },
 });

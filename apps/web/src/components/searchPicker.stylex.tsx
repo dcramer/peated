@@ -196,13 +196,22 @@ function PickerControl({
           )}
         >
           <span {...stylex.props(styles.selectedCopy)}>
-            <span title={value[0].label} {...stylex.props(styles.selectedName)}>
+            <span
+              title={value[0].label}
+              {...stylex.props(
+                foundationStyles.compactRowTitle,
+                styles.selectedName,
+              )}
+            >
               {value[0].label}
             </span>
             {(value[0].selectedDetail ?? value[0].detail) ? (
               <span
                 title={value[0].selectedDetail ?? value[0].detail}
-                {...stylex.props(styles.selectedDetail)}
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.selectedDetail,
+                )}
               >
                 {value[0].selectedDetail ?? value[0].detail}
               </span>
@@ -266,7 +275,11 @@ function PickerControl({
             type="search"
             value={query}
             disabled={disabled}
-            {...stylex.props(styles.input, Boolean(error) && styles.invalid)}
+            {...stylex.props(
+              foundationStyles.input,
+              styles.input,
+              Boolean(error) && styles.invalid,
+            )}
           />
           {isOpen && !disabled ? (
             <FloatingPanel {...stylex.props(styles.overlay)}>
@@ -277,7 +290,10 @@ function PickerControl({
                 {...stylex.props(styles.results)}
               >
                 {loading ? (
-                  <p role="status" {...stylex.props(styles.empty)}>
+                  <p
+                    role="status"
+                    {...stylex.props(foundationStyles.body, styles.empty)}
+                  >
                     Searching…
                   </p>
                 ) : availableOptions.length ? (
@@ -295,18 +311,26 @@ function PickerControl({
                         index === activeIndex && styles.activeResult,
                       )}
                     >
-                      <span {...stylex.props(styles.resultLabel)}>
+                      <span {...stylex.props(foundationStyles.compactRowTitle)}>
                         {option.label}
                       </span>
                       {option.detail ? (
-                        <span {...stylex.props(styles.detail)}>
+                        <span
+                          {...stylex.props(
+                            foundationStyles.metadata,
+                            styles.detail,
+                          )}
+                        >
                           {option.detail}
                         </span>
                       ) : null}
                     </button>
                   ))
                 ) : (
-                  <p role="status" {...stylex.props(styles.empty)}>
+                  <p
+                    role="status"
+                    {...stylex.props(foundationStyles.body, styles.empty)}
+                  >
                     {emptyText}
                   </p>
                 )}
@@ -321,13 +345,21 @@ function PickerControl({
                     setIsOpen(false);
                   }}
                   type="button"
-                  {...stylex.props(styles.createAction)}
+                  {...stylex.props(
+                    foundationStyles.interactiveSmall,
+                    styles.createAction,
+                  )}
                 >
                   <span>
                     {getCreateLabel?.(trimmedQuery) ?? `Add “${trimmedQuery}”`}
                   </span>
                   {createHint ? (
-                    <span {...stylex.props(styles.createHint)}>
+                    <span
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.createHint,
+                      )}
+                    >
                       {createHint}
                     </span>
                   ) : null}
@@ -390,10 +422,6 @@ const styles = stylex.create({
   selectedName: {
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    fontWeight: 600,
-    lineHeight: 1.25,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -401,9 +429,6 @@ const styles = stylex.create({
     overflow: "hidden",
     marginTop: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.2,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -442,12 +467,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.inset,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: {
-      default: "14px",
-      "@media (max-width: 639px)": "16px",
-    },
-    lineHeight: 1.4,
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
@@ -487,25 +506,14 @@ const styles = stylex.create({
     backgroundColor: colors.inset,
     boxShadow: effects.focusRing,
   },
-  resultLabel: {
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    lineHeight: 1.2,
-  },
+
   detail: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
   },
   empty: {
     margin: 0,
     padding: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.4,
   },
   createAction: {
     boxSizing: "border-box",
@@ -522,8 +530,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: { default: colors.surface, ":hover": colors.inset },
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 700,
     textAlign: "left",
     cursor: "pointer",
@@ -535,12 +541,7 @@ const styles = stylex.create({
   createHint: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontWeight: 500,
-    letterSpacing: "0.06em",
-    lineHeight: 1.2,
-    textTransform: "uppercase",
   },
   help: { margin: 0, color: colors.inkMuted },
 });

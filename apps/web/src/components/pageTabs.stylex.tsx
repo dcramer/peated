@@ -1,11 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 
@@ -34,11 +34,15 @@ export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
             href={item.href}
             key={item.href}
             prefetch={false}
-            {...stylex.props(styles.tab, current && styles.currentTab)}
+            {...stylex.props(
+              foundationStyles.interactive,
+              styles.tab,
+              current && [foundationStyles.interactive, styles.currentTab],
+            )}
           >
             <span>{item.label}</span>
             {item.count !== undefined ? (
-              <span {...stylex.props(styles.count)}>
+              <span {...stylex.props(foundationStyles.metadata, styles.count)}>
                 {item.count.toLocaleString("en-US")}
               </span>
             ) : null}
@@ -77,10 +81,7 @@ const styles = stylex.create({
       default: colors.inkMuted,
       ":hover": colors.ink,
     },
-    fontFamily: fonts.reading,
-    fontSize: "15px",
     fontWeight: 600,
-    lineHeight: 1.2,
     textDecoration: "none",
     boxShadow: {
       default: "none",
@@ -89,8 +90,6 @@ const styles = stylex.create({
   },
   currentTab: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
     fontWeight: 700,
     boxShadow: {
       default: `inset 0 -2px 0 ${colors.ink}`,
@@ -106,11 +105,8 @@ const styles = stylex.create({
     paddingLeft: "6px",
     backgroundColor: colors.surface,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
     fontWeight: 600,
-    lineHeight: 1.2,
     textAlign: "center",
   },
 });

@@ -6,7 +6,8 @@ import { useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 import { Button, ButtonLink } from "./button.stylex";
 
 /** Owns the member-specific toast action and count for one tasting. */
@@ -61,11 +62,14 @@ export function TastingToastSummary({
           {toasted ? "Toasted" : "Toast"}
         </Button>
       ) : null}
-      <span {...stylex.props(styles.count)}>
+      <span {...stylex.props(foundationStyles.metadata, styles.count)}>
         {formatToastCount(count, toasted)}
       </span>
       {createToast.error ? (
-        <span aria-live="polite" {...stylex.props(styles.error)}>
+        <span
+          aria-live="polite"
+          {...stylex.props(foundationStyles.metadata, styles.error)}
+        >
           We couldn't save your toast. Try again.
         </span>
       ) : null}
@@ -92,16 +96,11 @@ const styles = stylex.create({
     minWidth: 0,
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
   error: {
     flexShrink: 0,
     color: colors.critical,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
   },
 });

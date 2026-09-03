@@ -20,9 +20,10 @@
 - Share add/edit forms. Routes supply data, auth checks, mutations, and redirects.
 - Keep StyleX with its markup. Use wrappers only when third-party markup cannot
   be styled safely otherwise. No Tailwind or catch-all folders like `product/`.
-- Compose `foundationStyles` for standard typography instead of copying font
-  values into rows. `BottleIdentityRow` owns bottle rows; `BottleVisual` owns
-  bottle images; `CommunityFeed` owns activity on the homepage and `/activity`.
+- Compose `foundationStyles` for typography instead of copying font recipes
+  into components. Use Karla for metadata and labels, and reserve monospace for
+  code. Page metadata goes below its title. `BottleIdentityRow` owns bottle rows;
+  `BottleVisual` owns bottle images; `CommunityFeed` owns activity on the homepage and `/activity`.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.
 - Review changes to shared bottle layouts together in Bottle Identity Row's

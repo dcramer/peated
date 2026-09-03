@@ -32,9 +32,6 @@ export function FlightOverlay({
     <main {...stylex.props(foundationStyles.document, styles.screen)}>
       <div {...stylex.props(styles.content)}>
         <header {...stylex.props(styles.header)}>
-          <p {...stylex.props(foundationStyles.microLabel, styles.eyebrow)}>
-            Whisky flight
-          </p>
           <h1 {...stylex.props(foundationStyles.pageTitle)}>{name}</h1>
           {description ? (
             <p {...stylex.props(foundationStyles.body, styles.description)}>
@@ -93,7 +90,6 @@ const styles = stylex.create({
     rowGap: space.x3,
     marginBottom: space.x8,
   },
-  eyebrow: { margin: 0, color: colors.accentDeep },
   description: { margin: 0, color: colors.inkMuted },
   layout: {
     display: "grid",

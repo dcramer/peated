@@ -8,7 +8,6 @@ import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
@@ -60,10 +59,21 @@ export function FlashMessage({
     <div
       {...props}
       role={role ?? (tone === "error" ? "alert" : "status")}
-      {...stylex.props(styles.flashMessage, flashMessageTones[tone])}
+      {...stylex.props(
+        foundationStyles.body,
+        styles.flashMessage,
+        flashMessageTones[tone],
+      )}
     >
       {statusWord ? (
-        <span {...stylex.props(styles.flashStatus)}>{statusWord}</span>
+        <span
+          {...stylex.props(
+            foundationStyles.interactiveSmall,
+            styles.flashStatus,
+          )}
+        >
+          {statusWord}
+        </span>
       ) : null}
       {children}
     </div>
@@ -106,14 +116,26 @@ export function Notice({
       {...stylex.props(styles.notice, noticeTones[tone])}
     >
       {statusWord ? (
-        <span {...stylex.props(styles.noticeStatus, noticeStatusTones[tone])}>
+        <span
+          {...stylex.props(
+            foundationStyles.interactiveSmall,
+            styles.noticeStatus,
+            noticeStatusTones[tone],
+          )}
+        >
           {statusWord}
         </span>
       ) : null}
       {heading ? (
-        <strong {...stylex.props(styles.noticeHeading)}>{heading}</strong>
+        <strong
+          {...stylex.props(foundationStyles.rowTitle, styles.noticeHeading)}
+        >
+          {heading}
+        </strong>
       ) : null}
-      <div {...stylex.props(styles.noticeBody)}>{children}</div>
+      <div {...stylex.props(foundationStyles.body, styles.noticeBody)}>
+        {children}
+      </div>
       {action ? (
         <div {...stylex.props(styles.noticeAction)}>{action}</div>
       ) : null}
@@ -213,10 +235,19 @@ export function SectionError({
     >
       <div {...stylex.props(styles.stateCopy, styles.criticalStateCopy)}>
         <div {...stylex.props(styles.errorHeading)}>
-          <div {...stylex.props(styles.stateStatus)}>
+          <div
+            {...stylex.props(
+              foundationStyles.interactiveSmall,
+              styles.stateStatus,
+            )}
+          >
             <span>{status}</span>
             {detail ? (
-              <span {...stylex.props(styles.errorDetail)}>{detail}</span>
+              <span
+                {...stylex.props(foundationStyles.metadata, styles.errorDetail)}
+              >
+                {detail}
+              </span>
             ) : null}
           </div>
           <SectionHeading>{heading}</SectionHeading>
@@ -309,9 +340,6 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.ground,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
     boxShadow: effects.overlayShadow,
   },
   flashSuccess: {
@@ -327,11 +355,7 @@ const styles = stylex.create({
     display: "block",
     marginBottom: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    letterSpacing: "-0.01em",
-    lineHeight: 1.3,
   },
   notice: {
     boxSizing: "border-box",
@@ -353,29 +377,17 @@ const styles = stylex.create({
     display: "block",
     marginBottom: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    letterSpacing: "-0.01em",
-    lineHeight: 1.3,
   },
   noticeStatusWarning: { color: colors.accentDeep },
   noticeStatusCritical: { color: colors.critical },
   noticeHeading: {
     display: "block",
     marginBottom: "3px",
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.25,
   },
   noticeBody: {
     maxWidth: "62ch",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.55,
   },
   noticeAction: {
     display: "flex",
@@ -451,12 +463,6 @@ const styles = stylex.create({
   },
   errorDetail: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
-    fontWeight: 400,
-    letterSpacing: "0.04em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   errorHeading: { width: "100%" },
   stateStatus: {
@@ -465,11 +471,7 @@ const styles = stylex.create({
     gap: space.x2,
     marginBottom: space.x1,
     color: colors.critical,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    letterSpacing: "-0.01em",
-    lineHeight: 1.3,
   },
   loadingList: {
     boxSizing: "border-box",
@@ -534,25 +536,21 @@ const styles = stylex.create({
   delay3: { animationDelay: "250ms" },
   delay4: { animationDelay: "350ms" },
 });
-
 const flashMessageTones = {
   error: styles.flashError,
   info: styles.flashInfo,
   success: styles.flashSuccess,
 } satisfies Record<FlashMessageTone, stylex.StyleXStyles>;
-
 const noticeTones = {
   critical: styles.noticeCritical,
   notice: null,
   warning: styles.noticeWarning,
 } satisfies Record<NoticeTone, stylex.StyleXStyles | null>;
-
 const noticeStatusTones = {
   critical: styles.noticeStatusCritical,
   notice: null,
   warning: styles.noticeStatusWarning,
 } satisfies Record<NoticeTone, stylex.StyleXStyles | null>;
-
 const presets = {
   heading: styles.heading,
   metadata: styles.metadata,
@@ -560,7 +558,6 @@ const presets = {
   text: styles.text,
   thumbnail: styles.thumbnail,
 } satisfies Record<PlaceholderPreset, stylex.StyleXStyles>;
-
 const delays = {
   0: styles.delay0,
   1: styles.delay1,

@@ -139,7 +139,7 @@ export function NotePickerField({
           role="combobox"
           type="search"
           value={query}
-          {...stylex.props(styles.fieldInput)}
+          {...stylex.props(foundationStyles.input, styles.fieldInput)}
         />
         <Button
           aria-expanded={isBrowserOpen}
@@ -176,17 +176,28 @@ export function NotePickerField({
                 >
                   <span
                     title={note.name}
-                    {...stylex.props(styles.suggestionName)}
+                    {...stylex.props(
+                      foundationStyles.interactiveSmall,
+                      styles.suggestionName,
+                    )}
                   >
                     {note.name}
                   </span>
-                  <span {...stylex.props(styles.suggestionCount)}>
+                  <span
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.suggestionCount,
+                    )}
+                  >
                     used {note.usageCount.toLocaleString("en-US")} times
                   </span>
                 </button>
               ))
             ) : (
-              <p role="status" {...stylex.props(styles.fieldEmpty)}>
+              <p
+                role="status"
+                {...stylex.props(foundationStyles.metadata, styles.fieldEmpty)}
+              >
                 No existing notes match “{query.trim()}”.
               </p>
             )}
@@ -217,7 +228,10 @@ export function NotePickerField({
       ) : null}
 
       {value.length ? (
-        <p aria-live="polite" {...stylex.props(styles.fieldSummary)}>
+        <p
+          aria-live="polite"
+          {...stylex.props(foundationStyles.metadata, styles.fieldSummary)}
+        >
           {value.length} {value.length === 1 ? "note" : "notes"} selected
         </p>
       ) : null}
@@ -283,7 +297,7 @@ export function NotePicker({
           placeholder={`Search ${notes.length.toLocaleString("en-US")} notes`}
           type="search"
           value={query}
-          {...stylex.props(styles.search)}
+          {...stylex.props(foundationStyles.input, styles.search)}
         />
         {onClose ? (
           <button
@@ -310,6 +324,7 @@ export function NotePicker({
               }}
               type="button"
               {...stylex.props(
+                foundationStyles.interactiveSmall,
                 styles.category,
                 isActive && styles.activeCategory,
               )}
@@ -350,6 +365,7 @@ export function NotePicker({
                   title={`Used ${note.usageCount.toLocaleString("en-US")} times`}
                   type="button"
                   {...stylex.props(
+                    foundationStyles.interactiveSmall,
                     styles.note,
                     isSelected
                       ? styles.selectedNote
@@ -428,9 +444,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: { default: "12px", [COMPACT]: "16px" },
-    lineHeight: 1.4,
     "::placeholder": {
       color: colors.inkMuted,
       opacity: 1,
@@ -479,28 +492,18 @@ const styles = stylex.create({
   },
   suggestionName: {
     overflow: "hidden",
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
   suggestionCount: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
   },
   fieldEmpty: {
     margin: 0,
     padding: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
   browserDialog: {
     position: "relative",
@@ -553,9 +556,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
   },
   picker: {
     boxSizing: "border-box",
@@ -604,9 +604,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: { default: "12px", [COMPACT]: "16px" },
-    lineHeight: 1.4,
     boxShadow: {
       default: "none",
       ":focus": `inset 0 0 0 1px ${colors.accent}`,
@@ -659,10 +656,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: { default: "transparent", ":hover": colors.surface },
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1,
     cursor: "pointer",
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.sectionRule}`,
@@ -707,10 +701,7 @@ const styles = stylex.create({
     borderWidth: 0,
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1,
     cursor: "pointer",
     opacity: {
       default: 1,

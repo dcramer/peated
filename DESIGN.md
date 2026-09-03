@@ -40,9 +40,15 @@ typography:
     fontWeight: 700
     lineHeight: 0.95
     letterSpacing: -0.05em
+  compact-page-title:
+    fontFamily: Space Grotesk
+    fontSize: 40px
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: -0.04em
   section-heading:
     fontFamily: Space Grotesk
-    fontSize: 20px
+    fontSize: 24px
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: -0.025em
@@ -52,6 +58,22 @@ typography:
     fontWeight: 700
     lineHeight: 1.25
     letterSpacing: -0.025em
+  compact-row-title:
+    fontFamily: Space Grotesk
+    fontSize: 16px
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: -0.025em
+  prose:
+    fontFamily: Karla
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.65
+  input:
+    fontFamily: Karla
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.45
   body:
     fontFamily: Karla
     fontSize: 15px
@@ -62,6 +84,16 @@ typography:
     fontSize: 15px
     fontWeight: 600
     lineHeight: 1.2
+  compact-interactive:
+    fontFamily: Karla
+    fontSize: 13px
+    fontWeight: 600
+    lineHeight: 1.3
+  code:
+    fontFamily: IBM Plex Mono
+    fontSize: 13px
+    fontWeight: 400
+    lineHeight: 1.45
   metadata:
     fontFamily: Karla
     fontSize: 13px
@@ -70,7 +102,7 @@ typography:
   field-label:
     fontFamily: Karla
     fontSize: 13px
-    fontWeight: 400
+    fontWeight: 600
     lineHeight: 1.4
     letterSpacing: 0
   micro-label:
@@ -206,16 +238,39 @@ sentiment poles.
   State the ranking only when it helps people choose; sort controls should
   still name their order.
 
-| Role            | Family  | Weight | Size and line height | Tracking |
-| --------------- | ------- | ------ | -------------------- | -------- |
-| Page title      | Display | 700    | 40–72px / 0.95       | -0.05em  |
-| Section heading | Display | 700    | 20px / 1.2           | -0.025em |
-| Row title       | Display | 700    | 18px / 1.25          | -0.025em |
-| Body            | Reading | 400    | 15px / 1.6           | normal   |
-| Interactive     | Reading | 600    | 15px / 1.2           | normal   |
-| Metadata        | Reading | 400    | 13px / 1.45          | normal   |
-| Field label     | Reading | 400    | 13px / 1.4           | normal   |
-| Micro label     | Reading | 400    | 13px / 1.4           | normal   |
+| Role                | Family  | Weight | Size and line height | Tracking |
+| ------------------- | ------- | ------ | -------------------- | -------- |
+| Page title          | Display | 700    | 40–72px / 0.95       | -0.05em  |
+| Compact page title  | Display | 700    | 32–40px / 1.1        | -0.04em  |
+| Section heading     | Display | 700    | 24px / 1.2           | -0.025em |
+| Row title           | Display | 700    | 18px / 1.25          | -0.025em |
+| Compact row title   | Display | 700    | 16px / 1.25          | -0.025em |
+| Prose               | Reading | 400    | 16px / 1.65          | normal   |
+| Body                | Reading | 400    | 15px / 1.6           | normal   |
+| Input               | Reading | 400    | 16px / 1.45          | normal   |
+| Interactive         | Reading | 600    | 15px / 1.2           | normal   |
+| Compact interactive | Reading | 600    | 13px / 1.3           | normal   |
+| Metadata            | Reading | 400    | 13px / 1.45          | normal   |
+| Field label         | Reading | 600    | 13px / 1.4           | normal   |
+| Micro label         | Reading | 400    | 13px / 1.4           | normal   |
+| Code                | Mono    | 400    | 13px / 1.45          | normal   |
+
+Compose these roles from `foundationStyles`; do not copy their font recipes
+into page or component styles. Local styles own layout, color, and deliberate
+emphasis. Use the compact page title for task screens such as search, sign-in,
+and admin; catalog identities use the larger page title. Long descriptions and
+reviews use prose; short interface copy uses body. Inputs stay at 16px on every
+screen. Regular and compact rows each have one shared title size.
+
+Dates, counts, table headers, hints, and navigation use Karla. Selected controls
+keep the same font family and size; use weight, color, and the active indicator
+to show selection. Keep metadata at 13px instead of shrinking it to fit. Let it
+wrap or give the layout more room. Put useful page metadata below the title.
+
+Logos, avatar initials, numeric scores, prominent statistics, and labels inside
+scaled diagrams may have sizes suited to their geometry. Their owning shared
+component defines those exceptions; they do not create new body or heading
+styles.
 
 Use tabular numerals for aligned numbers. Use uppercase text only for short
 data labels. Do not use the display face for body copy.

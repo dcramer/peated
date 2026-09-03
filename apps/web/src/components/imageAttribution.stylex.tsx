@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors } from "../styles/tokens.stylex";
 
 export type ImageAttributionProps = {
   sourceUrl?: string | null;
@@ -15,7 +16,7 @@ export function ImageAttribution({
   if (!sourceUrl && !license) return null;
 
   return (
-    <span {...stylex.props(styles.root)}>
+    <span {...stylex.props(foundationStyles.metadata, styles.root)}>
       {sourceUrl ? (
         <a href={sourceUrl} rel="noreferrer" {...stylex.props(styles.link)}>
           Image source
@@ -31,9 +32,6 @@ const styles = stylex.create({
   root: {
     color: colors.inkMuted,
     display: "block",
-    fontFamily: fonts.data,
-    fontSize: "12px",
-    lineHeight: 1.4,
     overflowWrap: "anywhere",
   },
   link: {

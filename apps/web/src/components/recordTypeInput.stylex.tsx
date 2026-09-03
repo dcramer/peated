@@ -3,11 +3,11 @@
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 
@@ -59,10 +59,15 @@ export function RecordTypeInput({
             )}
           >
             <span {...stylex.props(styles.choiceCopy)}>
-              <strong {...stylex.props(styles.choiceLabel)}>
+              <strong {...stylex.props(foundationStyles.compactRowTitle)}>
                 {choice.label}
               </strong>
-              <span {...stylex.props(styles.choiceDescription)}>
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.choiceDescription,
+                )}
+              >
                 {choice.description}
               </span>
             </span>
@@ -126,18 +131,9 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x1,
   },
-  choiceLabel: {
-    fontFamily: fonts.display,
-    fontSize: "16px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
-  },
+
   choiceDescription: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   disabledChoice: { cursor: "not-allowed", opacity: 0.45 },
 });

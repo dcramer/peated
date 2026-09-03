@@ -50,8 +50,9 @@ import {
   getBottleUrl,
   getEntityUrl,
 } from "@peated/web/lib/urls";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { colors, space } from "../../../../styles/tokens.stylex";
 
+import { foundationStyles } from "../../../../styles/foundations.stylex";
 import { bottleOverviewQueries } from "./bottleOverviewQueries";
 
 type Bottle = Outputs["bottles"]["details"];
@@ -67,7 +68,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-function getBottleEyebrow(bottle: Bottle) {
+function getBottleDistillers(bottle: Bottle) {
   return bottle.distillers.length ? (
     <EntityLinks entities={bottle.distillers} />
   ) : null;
@@ -437,7 +438,7 @@ export function BottlePageFrameClient({
           }
           brand={bottle.brand.shortName || bottle.brand.name}
           brandHref={getEntityUrl(bottle.brand)}
-          eyebrow={getBottleEyebrow(bottle)}
+          metadata={getBottleDistillers(bottle)}
           menu={<BottleActions bottle={bottle} />}
           name={formatBottleDisplayName(bottle, { includeBrand: false })}
           score={
@@ -452,13 +453,13 @@ export function BottlePageFrameClient({
           }
         />
         {bottle.aliases.length ? (
-          <p {...stylex.props(styles.aliases)}>
+          <p {...stylex.props(foundationStyles.body, styles.aliases)}>
             <span {...stylex.props(styles.aliasLabel)}>Also known as</span>{" "}
             {bottle.aliases.join(" · ")}
           </p>
         ) : null}
         {bottle.description ? (
-          <div {...stylex.props(styles.description)}>
+          <div {...stylex.props(foundationStyles.body, styles.description)}>
             <ExpandableDescription content={bottle.description} />
           </div>
         ) : null}
@@ -634,7 +635,10 @@ export function BottleOverviewClient() {
 
       {recommendationsQuery.error ||
       (!mainFailed && (externalReviewsQuery.error || tastingsQuery.error)) ? (
-        <p role="status" {...stylex.props(styles.partialError)}>
+        <p
+          role="status"
+          {...stylex.props(foundationStyles.metadata, styles.partialError)}
+        >
           Some reviews, tastings, or recommendations could not be loaded. The
           rest of this page is still available.
         </p>
@@ -661,9 +665,6 @@ const styles = stylex.create({
     marginTop: space.x4,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   aliasLabel: {
     color: colors.ink,
@@ -673,9 +674,6 @@ const styles = stylex.create({
     maxWidth: "680px",
     marginTop: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   overview: {
     minWidth: 0,
@@ -686,8 +684,5 @@ const styles = stylex.create({
     padding: space.x4,
     backgroundColor: colors.surface,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
 });

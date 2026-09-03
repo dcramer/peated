@@ -2,8 +2,9 @@ import * as stylex from "@stylexjs/stylex";
 
 import { Card, TextLink } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { colors, space } from "../../../../styles/tokens.stylex";
 
+import { foundationStyles } from "../../../../styles/foundations.stylex";
 import type { Entity } from "./entityPageData";
 
 function formatCoordinate(value: number, positive: string, negative: string) {
@@ -32,7 +33,9 @@ export function EntityMap({ entity }: { entity: Entity }) {
     <PageSection heading="Where">
       <Card appearance="plain" padding="sm">
         {entity.address ? (
-          <p {...stylex.props(styles.address)}>{entity.address}</p>
+          <p {...stylex.props(foundationStyles.metadata, styles.address)}>
+            {entity.address}
+          </p>
         ) : null}
         <iframe
           loading="lazy"
@@ -41,7 +44,9 @@ export function EntityMap({ entity }: { entity: Entity }) {
           {...stylex.props(styles.mapFrame)}
         />
         <div {...stylex.props(styles.mapFooter)}>
-          <span {...stylex.props(styles.coordinates)}>{coordinateLabel}</span>
+          <span {...stylex.props(foundationStyles.code, styles.coordinates)}>
+            {coordinateLabel}
+          </span>
           <TextLink href={mapHref} rel="noreferrer" target="_blank">
             Open in map →
           </TextLink>
@@ -56,9 +61,6 @@ const styles = stylex.create({
     margin: 0,
     marginBottom: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   mapFrame: {
     display: "block",
@@ -78,8 +80,5 @@ const styles = stylex.create({
   },
   coordinates: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
   },
 });

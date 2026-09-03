@@ -135,12 +135,19 @@ export function SearchResults({
           {statusText ?? "Searching…"}
         </p>
       ) : emptyText && variant === "default" ? (
-        <p {...stylex.props(styles.stateText)}>{emptyText}</p>
+        <p {...stylex.props(foundationStyles.body, styles.stateText)}>
+          {emptyText}
+        </p>
       ) : null}
       {emptyText && variant === "database" ? (
         <div {...stylex.props(styles.databaseEmptyState)}>
           <SectionHeading>Nothing matches “{query}”</SectionHeading>
-          <p {...stylex.props(styles.databaseEmptyDescription)}>
+          <p
+            {...stylex.props(
+              foundationStyles.body,
+              styles.databaseEmptyDescription,
+            )}
+          >
             Check the spelling, or record the bottle if the database is missing
             it.
           </p>
@@ -173,7 +180,10 @@ export function SearchResults({
           : null}
       </div>
       {status === "error" ? (
-        <div role="alert" {...stylex.props(styles.error)}>
+        <div
+          role="alert"
+          {...stylex.props(foundationStyles.metadata, styles.error)}
+        >
           <span>
             {statusText ??
               "Search is temporarily unavailable. Existing navigation still works."}
@@ -192,10 +202,20 @@ export function SearchResults({
             href={visibleContribution.href}
             {...stylex.props(styles.contribution)}
           >
-            <span {...stylex.props(styles.contributionDescription)}>
+            <span
+              {...stylex.props(
+                foundationStyles.metadata,
+                styles.contributionDescription,
+              )}
+            >
               {visibleContribution.description}
             </span>
-            <strong {...stylex.props(styles.contributionAction)}>
+            <strong
+              {...stylex.props(
+                foundationStyles.interactiveSmall,
+                styles.contributionAction,
+              )}
+            >
               {visibleContribution.label} →
             </strong>
           </AppLink>
@@ -269,7 +289,13 @@ function SearchResultsGroup({
           </span>
         ) : null}
         {variant === "database" && group.moreHref ? (
-          <AppLink href={group.moreHref} {...stylex.props(styles.databaseMore)}>
+          <AppLink
+            href={group.moreHref}
+            {...stylex.props(
+              foundationStyles.interactiveSmall,
+              styles.databaseMore,
+            )}
+          >
             See all {group.total?.toLocaleString("en-US")}
           </AppLink>
         ) : null}
@@ -373,7 +399,10 @@ function SearchResultsGroup({
         ))}
       </ul>
       {group.moreHref && variant === "default" ? (
-        <AppLink href={group.moreHref} {...stylex.props(styles.more)}>
+        <AppLink
+          href={group.moreHref}
+          {...stylex.props(foundationStyles.metadata, styles.more)}
+        >
           <span>
             {remaining === undefined || remaining === 0
               ? "More results"
@@ -447,9 +476,6 @@ const styles = stylex.create({
     paddingBottom: space.x4,
     paddingLeft: "14px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   databaseEmptyState: {
     paddingTop: space.x6,
@@ -465,9 +491,6 @@ const styles = stylex.create({
     marginBottom: space.x4,
     marginLeft: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   groupHeading: {
     display: "flex",
@@ -501,10 +524,7 @@ const styles = stylex.create({
     marginLeft: "auto",
     outline: "none",
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
     fontWeight: 700,
-    lineHeight: 1.3,
     textDecoration: "none",
     boxShadow: {
       default: "none",
@@ -632,9 +652,6 @@ const styles = stylex.create({
     borderTopColor: colors.hairline,
     outline: "none",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.35,
     textDecoration: "none",
     boxShadow: {
       default: "none",
@@ -672,18 +689,11 @@ const styles = stylex.create({
   contributionDescription: {
     minWidth: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
   contributionAction: {
     flexShrink: 0,
     color: colors.accentDeep,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    letterSpacing: "-0.01em",
-    lineHeight: 1.2,
   },
   error: {
     display: "flex",
@@ -699,9 +709,6 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     [COMPACT]: {
       alignItems: "flex-start",
       flexDirection: "column",

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { TextLink } from "../textLink.stylex";
 import { textLinkStyles } from "../textLinkStyles.stylex";
 
@@ -33,7 +34,11 @@ export function RailListSection({
   return (
     <section {...stylex.props(styles.section)}>
       <SectionHeading>{heading}</SectionHeading>
-      {intro ? <p {...stylex.props(styles.intro)}>{intro}</p> : null}
+      {intro ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.intro)}>
+          {intro}
+        </p>
+      ) : null}
       {action ? (
         "href" in action ? (
           <TextLink href={action.href}>{action.label}</TextLink>
@@ -45,7 +50,7 @@ export function RailListSection({
             type="button"
             {...stylex.props(
               textLinkStyles.link,
-              textLinkStyles.small,
+              foundationStyles.interactiveSmall,
               styles.actionButton,
             )}
           >
@@ -68,9 +73,6 @@ const styles = stylex.create({
   intro: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
   },
   actionButton: {
     appearance: "none",

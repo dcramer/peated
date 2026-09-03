@@ -4,7 +4,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import { colors, effects, space } from "../styles/tokens.stylex";
 
 export function FormStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.stack)}>{children}</div>;
@@ -65,8 +65,13 @@ export type FormStepsProps = {
 export function FormSteps({ currentStep, steps }: FormStepsProps) {
   return (
     <nav aria-label="Form progress" {...stylex.props(styles.steps)}>
-      <div {...stylex.props(styles.stepSummary)}>
-        <strong {...stylex.props(styles.stepSummaryLabel)}>
+      <div {...stylex.props(foundationStyles.metadata, styles.stepSummary)}>
+        <strong
+          {...stylex.props(
+            foundationStyles.interactiveSmall,
+            styles.stepSummaryLabel,
+          )}
+        >
           {steps[currentStep]}
         </strong>
         <span aria-hidden="true">·</span>
@@ -80,9 +85,13 @@ export function FormSteps({ currentStep, steps }: FormStepsProps) {
             aria-current={index === currentStep ? "step" : undefined}
             key={step}
             {...stylex.props(
+              foundationStyles.interactiveSmall,
               styles.step,
               index < currentStep && styles.completedStep,
-              index === currentStep && styles.currentStep,
+              index === currentStep && [
+                foundationStyles.interactiveSmall,
+                styles.currentStep,
+              ],
             )}
           >
             <span title={step} {...stylex.props(styles.stepLabel)}>
@@ -116,7 +125,11 @@ export function FormNotice({
   ...props
 }: FormNoticeProps) {
   return (
-    <div {...props} role={role} {...stylex.props(styles.notice)}>
+    <div
+      {...props}
+      role={role}
+      {...stylex.props(foundationStyles.body, styles.notice)}
+    >
       {children}
     </div>
   );
@@ -238,16 +251,11 @@ const styles = stylex.create({
     alignItems: "baseline",
     columnGap: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     "@media (max-width: 559px)": { display: "flex" },
   },
   stepSummaryLabel: {
     color: colors.ink,
-    fontFamily: fonts.display,
     fontWeight: 700,
-    letterSpacing: "-0.02em",
   },
   stepList: {
     display: "flex",
@@ -264,18 +272,12 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    letterSpacing: 0,
-    lineHeight: 1.3,
   },
   completedStep: { color: colors.ink },
   currentStep: {
     color: colors.ink,
-    fontFamily: fonts.display,
     fontWeight: 700,
-    letterSpacing: "-0.02em",
   },
   stepLabel: {
     overflow: "hidden",
@@ -298,9 +300,6 @@ const styles = stylex.create({
     borderWidth: 0,
     backgroundColor: "transparent",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.55,
   },
   details: {
     boxSizing: "border-box",

@@ -16,7 +16,8 @@ import {
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../../../styles/foundations.stylex";
+import { colors, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
 import { ProfileLibraryLayout } from "./profileLibraryLayout.stylex";
@@ -187,7 +188,10 @@ export function ProfileLibraryPageClient() {
     >
       <div aria-busy={isNavigating || mutationPending || undefined}>
         {mutationError ? (
-          <p role="alert" {...stylex.props(styles.actionError)}>
+          <p
+            role="alert"
+            {...stylex.props(foundationStyles.metadata, styles.actionError)}
+          >
             The library change failed. Try the action again.
           </p>
         ) : null}
@@ -413,7 +417,5 @@ const styles = stylex.create({
     borderRadius: "3px",
     backgroundColor: colors.accentTint,
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
 });

@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ButtonLink } from "@peated/web/components";
-import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../styles/foundations.stylex";
+import { colors, space } from "../../../styles/tokens.stylex";
 import type { EventRegion, EventRegionOption } from "./eventRegionData";
 
 export function EventRegionFilter({
@@ -18,7 +19,11 @@ export function EventRegionFilter({
   return (
     <section aria-label="Event region" {...stylex.props(styles.root)}>
       <div {...stylex.props(styles.row)}>
-        <span {...stylex.props(styles.label)}>Show events in</span>
+        <span
+          {...stylex.props(foundationStyles.interactiveSmall, styles.label)}
+        >
+          Show events in
+        </span>
         <nav aria-label="World regions" {...stylex.props(styles.options)}>
           <ButtonLink
             aria-current={!selectedRegion ? "page" : undefined}
@@ -27,7 +32,9 @@ export function EventRegionFilter({
             variant={!selectedRegion ? "accent" : "tonal"}
           >
             <span>All regions</span>
-            <span {...stylex.props(styles.count)}>{total}</span>
+            <span {...stylex.props(foundationStyles.metadata, styles.count)}>
+              {total}
+            </span>
           </ButtonLink>
           {options.map((option) => {
             const current = selectedRegion?.slug === option.slug;
@@ -40,13 +47,17 @@ export function EventRegionFilter({
                 variant={current ? "accent" : "tonal"}
               >
                 <span>{option.label}</span>
-                <span {...stylex.props(styles.count)}>{option.count}</span>
+                <span
+                  {...stylex.props(foundationStyles.metadata, styles.count)}
+                >
+                  {option.count}
+                </span>
               </ButtonLink>
             );
           })}
         </nav>
       </div>
-      <div {...stylex.props(styles.summary)}>
+      <div {...stylex.props(foundationStyles.metadata, styles.summary)}>
         {selectedRegion
           ? `Showing ${visible} upcoming ${visible === 1 ? "event" : "events"} in ${selectedRegion.label}`
           : `Showing ${total} upcoming ${total === 1 ? "event" : "events"} worldwide`}
@@ -74,8 +85,6 @@ const styles = stylex.create({
   },
   label: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     fontWeight: 600,
   },
   options: {
@@ -84,15 +93,10 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
   count: {
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
   },
   summary: {
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
 });

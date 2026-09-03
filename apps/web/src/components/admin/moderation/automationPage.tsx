@@ -89,7 +89,6 @@ export default function AutomationPage() {
       <ModerationNav />
       <AdminPage>
         <AdminPageHeader
-          eyebrow="Operational work"
           title="Automation"
           description="See what is moving, what is waiting, and what needs recovery. Human catalog decisions stay in Inbox."
           metadata={

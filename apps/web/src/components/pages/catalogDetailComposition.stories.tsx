@@ -44,7 +44,6 @@ export const Overview: Story = {
       header={
         <PageHeader
           description="A short description can sit here."
-          eyebrow="Country"
           title="Scotland"
         />
       }
@@ -100,7 +99,7 @@ export const Minimal: Story = {
   render: () => (
     <TabbedPage
       currentHref="/catalog/new-region"
-      header={<PageHeader eyebrow="Region" title="New region" />}
+      header={<PageHeader title="New region" />}
       tabs={[{ href: "/catalog/new-region", label: "Overview" }]}
       tabsLabel="New region catalog sections"
     >

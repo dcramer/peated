@@ -3,7 +3,8 @@ import type { ExternalReview, PagingRel } from "@peated/server/types";
 import { getBottleUrl } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { AdminTextLink } from "./adminContent.stylex";
 import { AdminTable } from "./adminTable.stylex";
 
@@ -63,7 +64,12 @@ export function ReviewRows({
                       {bottleName}
                     </span>
                   )}
-                  <span {...stylex.props(styles.metadata)}>
+                  <span
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.metadata,
+                    )}
+                  >
                     {" · "}
                     {review.article.publishedAt ? (
                       <time dateTime={review.article.publishedAt}>
@@ -123,8 +129,6 @@ const styles = stylex.create({
   metadata: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
   },
   score: {
     whiteSpace: "nowrap",

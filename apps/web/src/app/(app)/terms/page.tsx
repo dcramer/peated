@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Terms of Service" };
 export default function TermsPage() {
   return (
     <ContentPage
-      eyebrow="Effective Date: September 15, 2025"
+      metadata="Effective Date: September 15, 2025"
       intro="Welcome to peated.com (“Peated,” “we,” “our,” or “us”). By accessing or using our website, mobile application, or related services (collectively, the “Services”), you agree to be bound by these Terms of Service (“Terms”). If you do not agree, do not use our Services."
       title="Terms of Service"
     >

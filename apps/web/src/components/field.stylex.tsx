@@ -131,6 +131,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         data-size={controlSize}
         ref={ref}
         {...stylex.props(
+          foundationStyles.input,
           styles.control,
           styles.input,
           inputSizeStyles[controlSize],
@@ -159,6 +160,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         data-format={format}
         ref={ref}
         {...stylex.props(
+          foundationStyles.input,
           styles.control,
           styles.textarea,
           format === "data" && styles.data,
@@ -214,19 +216,13 @@ const styles = stylex.create({
   },
   label: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
   },
   required: {
     color: colors.accentDeep,
-    fontSize: "12px",
     fontStyle: "italic",
   },
   optional: {
     color: colors.inkMuted,
-    fontSize: "12px",
     fontStyle: "italic",
   },
   control: {
@@ -243,9 +239,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "16px",
-    lineHeight: 1.45,
     opacity: {
       default: 1,
       ":disabled": 0.45,
@@ -294,16 +287,13 @@ const styles = stylex.create({
   hint: {
     margin: 0,
     color: colors.inkMuted,
-    fontSize: "13px",
   },
   validation: {
     margin: 0,
     color: colors.critical,
-    fontSize: "13px",
     fontWeight: 600,
   },
 });
-
 const inputSizeStyles = {
   sm: styles.inputSmall,
   md: styles.inputMedium,

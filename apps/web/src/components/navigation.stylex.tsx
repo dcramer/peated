@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, effects, fonts, space } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, effects, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 
 const PERSONAL_FOLDS = "@media (max-width: 959px)";
@@ -42,7 +43,10 @@ export function NavigationTabs({
       </div>
       {personalItems.length > 0 ? (
         <div {...stylex.props(styles.personalGroup)}>
-          <span aria-hidden="true" {...stylex.props(styles.groupLabel)}>
+          <span
+            aria-hidden="true"
+            {...stylex.props(foundationStyles.fieldLabel, styles.groupLabel)}
+          >
             You
           </span>
           {personalItems.map((item) => (
@@ -69,7 +73,11 @@ function NavigationLink({
     <AppLink
       aria-current={current ? "page" : undefined}
       href={item.href}
-      {...stylex.props(styles.link, current && styles.currentLink)}
+      {...stylex.props(
+        foundationStyles.interactive,
+        styles.link,
+        current && [foundationStyles.interactive, styles.currentLink],
+      )}
     >
       {item.label}
     </AppLink>
@@ -120,11 +128,6 @@ const styles = stylex.create({
     alignItems: "center",
     paddingTop: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   link: {
     display: "inline-flex",
@@ -136,10 +139,7 @@ const styles = stylex.create({
       default: colors.inkMuted,
       ":hover": colors.ink,
     },
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     fontWeight: 600,
-    lineHeight: 1.2,
     textDecoration: "none",
     outline: "none",
     boxShadow: {
@@ -149,8 +149,6 @@ const styles = stylex.create({
   },
   currentLink: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
   },
 });

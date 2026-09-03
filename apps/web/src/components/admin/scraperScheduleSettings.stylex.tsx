@@ -8,7 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDuration } from "../../lib/format";
 import { getFormErrorMessage } from "../../lib/formHelpers";
 import { useORPC } from "../../lib/orpc/context";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors } from "../../styles/tokens.stylex";
 import TimeSince from "../timeSince";
 import { AdminButton } from "./adminButton.stylex";
 import {
@@ -167,7 +168,7 @@ export default function ScraperScheduleSettings({ site }: { site: Site }) {
         ) : null}
       </AdminFormGrid>
       {automaticUnavailable ? (
-        <p {...stylex.props(styles.help)}>
+        <p {...stylex.props(foundationStyles.metadata, styles.help)}>
           Set up this scraper before you schedule automatic runs.
         </p>
       ) : null}
@@ -179,7 +180,5 @@ const styles = stylex.create({
   help: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
 });

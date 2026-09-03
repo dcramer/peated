@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ChevronDown, Download } from "lucide-react";
 import type { ReactNode, SelectHTMLAttributes } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -47,13 +48,15 @@ export function ListToolbar({
           {count.toLocaleString("en-US")} {count === 1 ? noun : `${noun}s`}
         </strong>
         {total !== undefined ? (
-          <span {...stylex.props(styles.countDetail)}>
+          <span
+            {...stylex.props(foundationStyles.metadata, styles.countDetail)}
+          >
             of {total.toLocaleString("en-US")}
           </span>
         ) : null}
       </p>
       <div {...stylex.props(styles.actions)}>
-        <label {...stylex.props(styles.sortLabel)}>
+        <label {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}>
           <span>Sort</span>
           <CompactSelect
             aria-label={`Sort ${noun}s`}
@@ -87,7 +90,10 @@ function CompactSelect({
 }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <span {...stylex.props(styles.selectWrapper)}>
-      <select {...props} {...stylex.props(styles.select)}>
+      <select
+        {...props}
+        {...stylex.props(foundationStyles.input, styles.select)}
+      >
         {children}
       </select>
       <ChevronDown
@@ -136,7 +142,9 @@ export function CursorPager({
         ) : null}
       </div>
       {page !== undefined ? (
-        <span {...stylex.props(styles.pageNumber)}>Page {page}</span>
+        <span {...stylex.props(foundationStyles.metadata, styles.pageNumber)}>
+          Page {page}
+        </span>
       ) : null}
     </nav>
   );
@@ -180,22 +188,39 @@ export function RailListItem({
             <AppLink
               href={href}
               title={title}
-              {...stylex.props(styles.railTitle, styles.railTitleLink)}
+              {...stylex.props(
+                foundationStyles.compactRowTitle,
+                styles.railTitle,
+                styles.railTitleLink,
+              )}
             >
               {title}
             </AppLink>
           ) : (
-            <span title={title} {...stylex.props(styles.railTitle)}>
+            <span
+              title={title}
+              {...stylex.props(
+                foundationStyles.compactRowTitle,
+                styles.railTitle,
+              )}
+            >
               {title}
             </span>
           )}
           {metadata ? (
-            <span title={metadata} {...stylex.props(styles.railMetadata)}>
+            <span
+              title={metadata}
+              {...stylex.props(foundationStyles.metadata, styles.railMetadata)}
+            >
               {metadata}
             </span>
           ) : null}
         </div>
-        {end ? <span {...stylex.props(styles.railEnd)}>{end}</span> : null}
+        {end ? (
+          <span {...stylex.props(foundationStyles.metadata, styles.railEnd)}>
+            {end}
+          </span>
+        ) : null}
       </div>
     </ItemListItem>
   );
@@ -232,9 +257,6 @@ const styles = stylex.create({
   },
   countDetail: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
   },
   actions: {
     display: "flex",
@@ -246,10 +268,6 @@ const styles = stylex.create({
     alignItems: "center",
     gap: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    letterSpacing: 0,
-    lineHeight: 1.3,
   },
   selectWrapper: {
     position: "relative",
@@ -270,10 +288,7 @@ const styles = stylex.create({
     backgroundImage: "none",
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
     fontWeight: 600,
-    lineHeight: 1,
     cursor: "pointer",
     boxShadow: {
       default: "none",
@@ -306,10 +321,7 @@ const styles = stylex.create({
   },
   pageNumber: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "13px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
   },
   railList: {
     padding: 0,
@@ -332,11 +344,6 @@ const styles = stylex.create({
     display: "block",
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
     textDecoration: "none",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -358,9 +365,6 @@ const styles = stylex.create({
     marginTop: "2px",
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.35,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -371,9 +375,6 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "flex-end",
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.3,
   },
 });

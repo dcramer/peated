@@ -16,7 +16,8 @@ import {
   type ListSortOption,
   type RowMenuItem,
 } from "..";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors } from "../../styles/tokens.stylex";
 import { AppLink } from "../appLink";
 import { linkedRowStyles } from "../linkedRow.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
@@ -177,14 +178,18 @@ function EntityCatalogTable({
         <>
           <AppLink
             href={item.href}
-            {...stylex.props(styles.title, linkedRowStyles.primaryLink)}
+            {...stylex.props(
+              foundationStyles.rowTitle,
+              styles.title,
+              linkedRowStyles.primaryLink,
+            )}
           >
             {item.name}
             {item.isFollowing && showFollowingMarks ? (
               <MemberStatus kind="following" />
             ) : null}
           </AppLink>
-          <div {...stylex.props(styles.metadata)}>
+          <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
             {item.metadata.join(" · ")}
           </div>
         </>
@@ -322,11 +327,6 @@ const styles = stylex.create({
     display: "block",
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.25,
     textDecoration: "none",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -335,9 +335,6 @@ const styles = stylex.create({
     marginTop: "3px",
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },

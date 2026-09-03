@@ -17,7 +17,7 @@ import {
 } from "@peated/web/lib/addBottle";
 import { getBottleUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { colors, space } from "../../../styles/tokens.stylex";
 
 type BottleUrlSource = Parameters<typeof getBottleUrl>[0];
 
@@ -46,10 +46,15 @@ function getDatabaseScope(value: string | null): SearchScope {
 function BrowseHeader({ bottleTotal }: { bottleTotal: number }) {
   return (
     <header {...stylex.props(styles.browseHeader)}>
-      <h1 {...stylex.props(foundationStyles.pageTitle, styles.browseTitle)}>
+      <h1
+        {...stylex.props(
+          foundationStyles.pageTitle,
+          foundationStyles.pageTitleCompact,
+        )}
+      >
         Search the database
       </h1>
-      <p {...stylex.props(styles.browseDescription)}>
+      <p {...stylex.props(foundationStyles.body, styles.browseDescription)}>
         {bottleTotal.toLocaleString("en-US")} bottles, and someone has probably
         logged yours. Search bottles, series, distillers, brands, and bottlers.
       </p>
@@ -179,7 +184,12 @@ export function SearchPageClient({
     <div {...stylex.props(styles.page, databaseSearch && styles.databasePage)}>
       {!databaseSearch ? (
         <header {...stylex.props(styles.header)}>
-          <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>
+          <h1
+            {...stylex.props(
+              foundationStyles.pageTitle,
+              foundationStyles.pageTitleCompact,
+            )}
+          >
             {getTitle({ directToTasting, intent, memberSearch })}
           </h1>
         </header>
@@ -225,10 +235,7 @@ const styles = stylex.create({
     maxWidth: "none",
   },
   header: { marginBottom: space.x4 },
-  title: {
-    fontSize: "clamp(26px, 4vw, 32px)",
-    lineHeight: 1.1,
-  },
+
   search: {
     minWidth: 0,
   },
@@ -240,10 +247,7 @@ const styles = stylex.create({
     paddingTop: space.x6,
     textAlign: "center",
   },
-  browseTitle: {
-    fontSize: "clamp(28px, 5vw, 38px)",
-    lineHeight: 1.05,
-  },
+
   browseDescription: {
     maxWidth: "720px",
     marginTop: space.x4,
@@ -251,8 +255,5 @@ const styles = stylex.create({
     marginBottom: 0,
     marginLeft: "auto",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.5,
   },
 });

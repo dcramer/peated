@@ -67,6 +67,7 @@ function AdminNavigation({
                     aria-current={current ? "page" : undefined}
                     href={item.href}
                     {...stylex.props(
+                      foundationStyles.interactiveSmall,
                       styles.navigationLink,
                       current && styles.currentNavigationLink,
                     )}
@@ -97,16 +98,31 @@ export function AdminLayout({
       <header {...stylex.props(styles.mobileHeader)}>
         <Link href="/admin" {...stylex.props(styles.mobileBrand)}>
           <span {...stylex.props(styles.brandName)}>Peated</span>
-          <span {...stylex.props(styles.brandContext)}>Admin</span>
+          <span
+            {...stylex.props(foundationStyles.metadata, styles.brandContext)}
+          >
+            Admin
+          </span>
         </Link>
         <details {...stylex.props(styles.mobileMenu)}>
-          <summary {...stylex.props(styles.mobileMenuTrigger)}>
+          <summary
+            {...stylex.props(
+              foundationStyles.interactiveSmall,
+              styles.mobileMenuTrigger,
+            )}
+          >
             <Menu aria-hidden="true" size={18} />
             Menu
           </summary>
           <div {...stylex.props(styles.mobileMenuPanel)}>
             <AdminNavigation currentHref={activeHref} groups={groups} />
-            <Link href="/" {...stylex.props(styles.returnLink)}>
+            <Link
+              href="/"
+              {...stylex.props(
+                foundationStyles.interactiveSmall,
+                styles.returnLink,
+              )}
+            >
               <ArrowLeft aria-hidden="true" size={15} />
               Return to Peated
             </Link>
@@ -117,9 +133,19 @@ export function AdminLayout({
       <aside {...stylex.props(styles.sidebar)}>
         <Link href="/admin" {...stylex.props(styles.brand)}>
           <span {...stylex.props(styles.brandName)}>Peated</span>
-          <span {...stylex.props(styles.brandContext)}>Admin</span>
+          <span
+            {...stylex.props(foundationStyles.metadata, styles.brandContext)}
+          >
+            Admin
+          </span>
         </Link>
-        <Link href="/" {...stylex.props(styles.returnLink)}>
+        <Link
+          href="/"
+          {...stylex.props(
+            foundationStyles.interactiveSmall,
+            styles.returnLink,
+          )}
+        >
           <ArrowLeft aria-hidden="true" size={15} />
           Return to Peated
         </Link>
@@ -176,8 +202,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.inset,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 700,
     listStyle: "none",
     cursor: "pointer",
@@ -245,12 +269,7 @@ const styles = stylex.create({
   },
   brandContext: {
     color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontWeight: 600,
-    letterSpacing: "0.12em",
-    lineHeight: 1,
-    textTransform: "uppercase",
   },
   returnLink: {
     display: "inline-flex",
@@ -271,8 +290,6 @@ const styles = stylex.create({
       ":active": colors.inset,
     },
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
     fontWeight: 700,
     textDecoration: "none",
     boxShadow: {
@@ -313,8 +330,6 @@ const styles = stylex.create({
       ":active": colors.inset,
     },
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
     textDecoration: "none",
     boxShadow: {

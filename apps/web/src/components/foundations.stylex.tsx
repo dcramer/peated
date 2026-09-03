@@ -1,3 +1,9 @@
+import { Button } from "./button.stylex";
+import { Field, TextInput } from "./field.stylex";
+import { ItemList, ItemRow } from "./itemList.stylex";
+import { SectionHeading } from "./sectionHeading.stylex";
+import { TextLink } from "./textLink.stylex";
+
 import type { StyleXStyles } from "@stylexjs/stylex";
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -5,7 +11,6 @@ import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 
@@ -28,7 +33,7 @@ function TokenSwatch({ name, light, dark, use, colorStyle }: TokenSwatchProps) {
       </div>
       <h3 {...stylex.props(foundationStyles.rowTitle)}>{name}</h3>
       <p {...stylex.props(foundationStyles.body, styles.muted)}>{use}</p>
-      <p {...stylex.props(foundationStyles.metadata, styles.swatchValues)}>
+      <p {...stylex.props(foundationStyles.code, styles.swatchValues)}>
         {light} / {dark}
       </p>
     </article>
@@ -52,9 +57,7 @@ export default function Foundations({
   return (
     <main {...stylex.props(styles.page)}>
       <header {...stylex.props(styles.hero)}>
-        <h1 {...stylex.props(foundationStyles.pageTitle, styles.categoryTitle)}>
-          {title}
-        </h1>
+        <h1 {...stylex.props(foundationStyles.pageTitleCompact)}>{title}</h1>
       </header>
 
       {section === "color" ? (
@@ -147,83 +150,66 @@ export default function Foundations({
       {section === "typography" ? (
         <section {...stylex.props(styles.section)}>
           <div {...stylex.props(styles.typeGrid)}>
-            <article {...stylex.props(styles.typeSpecimen, styles.typeLead)}>
-              <span
-                {...stylex.props(
-                  foundationStyles.microLabel,
-                  styles.accentText,
-                )}
-              >
-                Display · Space Grotesk
-              </span>
-              <p
-                {...stylex.props(foundationStyles.pageTitle, styles.typeTitle)}
-              >
-                Lagavulin 16
-              </p>
-              <p {...stylex.props(foundationStyles.sectionHeading)}>
-                Similar bottles
-              </p>
-              <p {...stylex.props(foundationStyles.rowTitle)}>
-                Caol Ila 12-year-old
+            <article {...stylex.props(styles.typeSpecimen)}>
+              <p {...stylex.props(foundationStyles.pageTitleCompact)}>Whisky</p>
+              <SectionHeading>Distilleries</SectionHeading>
+              <ItemList ariaLabel="Standard row titles">
+                <ItemRow
+                  href="#lagavulin"
+                  title="Lagavulin"
+                  metadata="Islay · Scotland"
+                />
+              </ItemList>
+              <ItemList ariaLabel="Compact row titles">
+                <ItemRow
+                  href="#bruichladdich"
+                  title="Bruichladdich"
+                  metadata="Islay · Scotland"
+                  size="sm"
+                />
+              </ItemList>
+              <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+                Space Grotesk: page titles, section headings, and names.
+                Sections use 24px; rows use 18px or 16px in compact lists.
               </p>
             </article>
-
             <article {...stylex.props(styles.typeSpecimen)}>
-              <span
-                {...stylex.props(
-                  foundationStyles.microLabel,
-                  styles.accentText,
-                )}
-              >
-                Reading · Karla
-              </span>
-              <p {...stylex.props(foundationStyles.body, styles.readingSample)}>
+              <SectionHeading>Reading</SectionHeading>
+              <p {...stylex.props(foundationStyles.prose)}>
                 Smoke arrives first, followed by lemon peel, brine, and a dry
                 mineral finish. The texture stays light despite the long finish.
               </p>
-              <p {...stylex.props(foundationStyles.interactive)}>
-                Log a tasting
+              <p {...stylex.props(foundationStyles.body)}>
+                Browse bottles, read tasting notes, and add what you know.
               </p>
+              <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+                Islay · Single malt · 16 years · 43% ABV
+              </p>
+              <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+                Karla: 16px for longer reading, 15px for body copy, and 13px for
+                dates, counts, hints, and other supporting text.
+              </p>
+              <code {...stylex.props(foundationStyles.code)}>
+                GET /v1/bottles
+              </code>
             </article>
-
-            <article
-              {...stylex.props(styles.typeSpecimen, styles.dataSpecimen)}
-            >
-              <span
-                {...stylex.props(
-                  foundationStyles.microLabel,
-                  styles.accentText,
-                )}
+            <article {...stylex.props(styles.typeSpecimen)}>
+              <SectionHeading>Fields and actions</SectionHeading>
+              <Field
+                htmlFor="typography-name"
+                label="Bottle name"
+                hint="Use the name on the label."
+                required
               >
-                Labels · Karla; numerals · IBM Plex Mono
-              </span>
-              <dl {...stylex.props(styles.dataList)}>
-                <div {...stylex.props(styles.dataRow)}>
-                  <dt
-                    {...stylex.props(foundationStyles.fieldLabel, styles.muted)}
-                  >
-                    Peated ID
-                  </dt>
-                  <dd {...stylex.props(styles.dataValue)}>B00872</dd>
-                </div>
-                <div {...stylex.props(styles.dataRow)}>
-                  <dt
-                    {...stylex.props(foundationStyles.fieldLabel, styles.muted)}
-                  >
-                    ABV
-                  </dt>
-                  <dd {...stylex.props(styles.dataValue)}>43.0%</dd>
-                </div>
-                <div {...stylex.props(styles.dataRow)}>
-                  <dt
-                    {...stylex.props(foundationStyles.fieldLabel, styles.muted)}
-                  >
-                    Tastings
-                  </dt>
-                  <dd {...stylex.props(styles.dataValue)}>2,841</dd>
-                </div>
-              </dl>
+                <TextInput id="typography-name" defaultValue="Uigeadail" />
+              </Field>
+              <Button>Save bottle</Button>
+              <TextLink href="#bottles">View all bottles</TextLink>
+              <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+                Labels use 13px Karla with emphasis. Inputs stay at 16px on
+                every screen. Actions use 15px, or 13px in compact controls.
+                Monospace is reserved for code and technical identifiers.
+              </p>
             </article>
           </div>
         </section>
@@ -306,9 +292,6 @@ const styles = stylex.create({
   muted: {
     color: colors.inkMuted,
   },
-  categoryTitle: {
-    fontSize: { default: "40px", [COMPACT]: "32px" },
-  },
   section: {
     width: "100%",
     maxWidth: "1180px",
@@ -361,7 +344,6 @@ const styles = stylex.create({
   swatchValues: {
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontSize: "10px",
   },
   tonalExample: {
     display: "grid",
@@ -396,7 +378,10 @@ const styles = stylex.create({
   },
   typeGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "1.35fr 1fr 1fr", [NARROW]: "1fr" },
+    gridTemplateColumns: {
+      default: "repeat(3, minmax(0, 1fr))",
+      [NARROW]: "1fr",
+    },
     columnGap: space.x2,
     rowGap: space.x2,
   },
@@ -412,41 +397,6 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.sectionRule,
     backgroundColor: "transparent",
-  },
-  typeLead: {
-    backgroundColor: "transparent",
-  },
-  typeTitle: {
-    fontSize: { default: "44px", [COMPACT]: "36px" },
-  },
-  readingSample: {
-    maxWidth: "36ch",
-    fontSize: "17px",
-  },
-  dataSpecimen: {
-    backgroundColor: colors.ground,
-  },
-  dataList: {
-    display: "flex",
-    flexDirection: "column",
-    margin: 0,
-  },
-  dataRow: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    columnGap: space.x4,
-    paddingTop: space.x3,
-    paddingBottom: space.x3,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-  },
-  dataValue: {
-    margin: 0,
-    fontFamily: fonts.data,
-    fontSize: "13px",
-    fontVariantNumeric: "tabular-nums",
   },
   foundationGrid: {
     display: "grid",

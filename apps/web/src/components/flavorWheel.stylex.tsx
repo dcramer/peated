@@ -9,6 +9,7 @@ import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { useState, type ReactNode } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 
 const CENTER_X = 168;
@@ -92,7 +93,9 @@ export function FlavorWheel({
   return (
     <div {...stylex.props(styles.root)}>
       {sampleCount === 0 ? (
-        <p {...stylex.props(styles.message)}>No public tasting notes yet.</p>
+        <p {...stylex.props(foundationStyles.body, styles.message)}>
+          No public tasting notes yet.
+        </p>
       ) : (
         <>
           <div {...stylex.props(styles.chart)}>
@@ -162,6 +165,7 @@ export function FlavorWheel({
                       textAnchor="middle"
                       dominantBaseline="middle"
                       {...stylex.props(
+                        foundationStyles.metadata,
                         styles.label,
                         isSelected && styles.selectedLabel,
                       )}
@@ -173,13 +177,17 @@ export function FlavorWheel({
               })}
             </svg>
             <div aria-hidden="true" {...stylex.props(styles.center)}>
-              <strong {...stylex.props(styles.centerTitle)}>
+              <strong
+                {...stylex.props(foundationStyles.rowTitle, styles.centerTitle)}
+              >
                 {label(selected.category)}
               </strong>
               <span {...stylex.props(styles.centerValue)}>
                 {percentage(selected.count)}%
               </span>
-              <div {...stylex.props(styles.centerNotes)}>
+              <div
+                {...stylex.props(foundationStyles.metadata, styles.centerNotes)}
+              >
                 {selected.notes.length ? (
                   selected.notes.map((note) => (
                     <span
@@ -237,8 +245,6 @@ const styles = stylex.create({
   selected: { stroke: colors.ink },
   focused: { stroke: colors.ink, strokeWidth: 3, strokeDasharray: "3 2" },
   label: {
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fill: colors.inkMuted,
     pointerEvents: "none",
   },
@@ -256,10 +262,6 @@ const styles = stylex.create({
     pointerEvents: "none",
   },
   centerTitle: {
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    lineHeight: 1.2,
-    letterSpacing: "-0.02em",
     color: colors.ink,
   },
   centerValue: {
@@ -272,9 +274,6 @@ const styles = stylex.create({
     marginTop: space.x1,
   },
   centerNotes: {
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
     color: colors.inkMuted,
     marginTop: space.x2,
     maxWidth: "100%",
@@ -287,9 +286,6 @@ const styles = stylex.create({
   },
   message: {
     margin: 0,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
     color: colors.inkMuted,
   },
 });

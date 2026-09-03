@@ -1,11 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import {
-  colors,
-  controlMetrics,
-  fonts,
-  space,
-} from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 import { ImageViewer } from "../imageViewer.stylex";
 
 export type PhotoPreviewProps = {
@@ -54,10 +50,18 @@ export function PhotoPreview({
         ) : null}
       </span>
       <span {...stylex.props(styles.copy, loading && styles.loadingCopy)}>
-        <strong {...stylex.props(styles.title, loading && styles.loadingTitle)}>
+        <strong
+          {...stylex.props(
+            foundationStyles.compactRowTitle,
+            styles.title,
+            loading && foundationStyles.sectionHeading,
+          )}
+        >
           {title}
         </strong>
-        <span {...stylex.props(styles.metadata)}>{metadata}</span>
+        <span {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+          {metadata}
+        </span>
       </span>
     </section>
   );
@@ -142,22 +146,10 @@ const styles = stylex.create({
   },
   title: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
-  loadingTitle: {
-    fontSize: "24px",
-    letterSpacing: "-0.03em",
-    lineHeight: 1.08,
-  },
+
   metadata: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
-    lineHeight: 1.4,
   },
   progress: {
     position: "absolute",

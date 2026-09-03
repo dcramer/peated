@@ -9,7 +9,8 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { CursorPager } from "..";
 import { buildQueryString } from "../../lib/urls";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
 
 export function AdminPager({
   ariaLabel = "Pagination",
@@ -51,12 +52,22 @@ function AdminDefinitionListRoot(props: ComponentPropsWithoutRef<"dl">) {
 
 export function AdminDefinitionTerm(props: ComponentPropsWithoutRef<"dt">) {
   const { className: _className, ...rest } = props;
-  return <dt {...rest} {...stylex.props(styles.definitionTerm)} />;
+  return (
+    <dt
+      {...rest}
+      {...stylex.props(foundationStyles.metadata, styles.definitionTerm)}
+    />
+  );
 }
 
 export function AdminDefinitionDetails(props: ComponentPropsWithoutRef<"dd">) {
   const { className: _className, ...rest } = props;
-  return <dd {...rest} {...stylex.props(styles.definitionDetails)} />;
+  return (
+    <dd
+      {...rest}
+      {...stylex.props(foundationStyles.body, styles.definitionDetails)}
+    />
+  );
 }
 
 export const AdminDefinitionList = Object.assign(AdminDefinitionListRoot, {
@@ -72,11 +83,14 @@ export function AdminEmptyActivity({
   href?: string;
 }) {
   return href ? (
-    <Link href={href} {...stylex.props(styles.empty, styles.emptyLink)}>
+    <Link
+      href={href}
+      {...stylex.props(foundationStyles.body, styles.empty, styles.emptyLink)}
+    >
       {children}
     </Link>
   ) : (
-    <div {...stylex.props(styles.empty)}>{children}</div>
+    <div {...stylex.props(foundationStyles.body, styles.empty)}>{children}</div>
   );
 }
 
@@ -91,7 +105,11 @@ export function AdminAlert({
   return (
     <div
       role={type === "error" ? "alert" : "status"}
-      {...stylex.props(styles.alert, alertToneStyles[type])}
+      {...stylex.props(
+        foundationStyles.body,
+        styles.alert,
+        alertToneStyles[type],
+      )}
     >
       {type === "error" ? (
         <AlertTriangle
@@ -106,7 +124,11 @@ export function AdminAlert({
 }
 
 export function AdminMarkdown({ content }: { content: string }) {
-  return <div {...stylex.props(styles.markdown)}>{content}</div>;
+  return (
+    <div {...stylex.props(foundationStyles.prose, styles.markdown)}>
+      {content}
+    </div>
+  );
 }
 
 const styles = stylex.create({
@@ -125,10 +147,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
   },
   definitionDetails: {
     display: "flex",
@@ -142,8 +160,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     overflowWrap: "anywhere",
   },
   empty: {
@@ -154,8 +170,6 @@ const styles = stylex.create({
     padding: space.x8,
     borderWidth: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     textAlign: "center",
   },
   emptyLink: {
@@ -172,9 +186,6 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.45,
   },
   alertIcon: { flexShrink: 0 },
   alertDefault: {
@@ -195,13 +206,9 @@ const styles = stylex.create({
   },
   markdown: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.65,
     whiteSpace: "pre-wrap",
   },
 });
-
 const alertToneStyles = {
   default: styles.alertDefault,
   error: styles.alertError,

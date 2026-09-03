@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { getTextTitle } from "./textTitle";
 
@@ -14,7 +15,7 @@ export type PeatedIdProps = {
 
 export function PeatedId({ detail, id }: PeatedIdProps) {
   return (
-    <div {...stylex.props(styles.idStamp)}>
+    <div {...stylex.props(foundationStyles.metadata, styles.idStamp)}>
       <span {...stylex.props(styles.idLabel)}>Peated ID</span>
       <span {...stylex.props(styles.idValue)}>{id}</span>
       {detail ? (
@@ -71,7 +72,10 @@ export function KeyFacts({ facts }: { facts: KeyFactList }) {
               styles.keyFactPhoneEven,
           )}
         >
-          <dt title={fact.label} {...stylex.props(styles.keyFactLabel)}>
+          <dt
+            title={fact.label}
+            {...stylex.props(foundationStyles.fieldLabel, styles.keyFactLabel)}
+          >
             {fact.label}
           </dt>
           <dd title={String(fact.value)} {...stylex.props(styles.keyFactValue)}>
@@ -91,10 +95,6 @@ const styles = stylex.create({
     flexWrap: { default: "nowrap", [COMPACT]: "wrap" },
     columnGap: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    letterSpacing: 0,
-    lineHeight: 1.4,
   },
   idLabel: {
     flexShrink: 0,
@@ -157,10 +157,6 @@ const styles = stylex.create({
     marginTop: "6px",
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    letterSpacing: 0,
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -179,14 +175,12 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
 });
-
 const keyFactsColumnStyles = {
   1: styles.keyFactsOne,
   2: styles.keyFactsTwo,
   3: styles.keyFactsThree,
   4: styles.keyFactsFour,
 } satisfies Record<KeyFactList["length"], stylex.StyleXStyles>;
-
 function getKeyFactsColumnStyle(factCount: number) {
   if (factCount === 1) return keyFactsColumnStyles[1];
   if (factCount === 2) return keyFactsColumnStyles[2];

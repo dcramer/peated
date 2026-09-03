@@ -19,11 +19,11 @@ import { SectionHeading } from "../../sectionHeading.stylex";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { IconButton, TextLink } from "../..";
 import { useORPC } from "../../../lib/orpc/context";
+import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
   zIndices,
 } from "../../../styles/tokens.stylex";
@@ -152,10 +152,10 @@ export default function ModerationBottlePicker({
               placeholder="Search for a bottle"
               type="search"
               value={query}
-              {...stylex.props(styles.search)}
+              {...stylex.props(foundationStyles.input, styles.search)}
             />
           </div>
-          <div {...stylex.props(styles.context)}>
+          <div {...stylex.props(foundationStyles.metadata, styles.context)}>
             Select the bottle identified as <strong>{name}</strong>.
             {source ? (
               <>
@@ -174,12 +174,18 @@ export default function ModerationBottlePicker({
             ) : null}
           </div>
           {error ? (
-            <p role="alert" {...stylex.props(styles.error)}>
+            <p
+              role="alert"
+              {...stylex.props(foundationStyles.metadata, styles.error)}
+            >
               {error}
             </p>
           ) : null}
           {isLoading ? (
-            <p role="status" {...stylex.props(styles.status)}>
+            <p
+              role="status"
+              {...stylex.props(foundationStyles.body, styles.status)}
+            >
               Searching…
             </p>
           ) : null}
@@ -190,10 +196,12 @@ export default function ModerationBottlePicker({
                   disabled={isLoading}
                   onClick={() => void selectBottle(bottle)}
                   type="button"
-                  {...stylex.props(styles.result)}
+                  {...stylex.props(foundationStyles.body, styles.result)}
                 >
                   <strong>{formatBottleDisplayName(bottle)}</strong>
-                  <span {...stylex.props(styles.detail)}>
+                  <span
+                    {...stylex.props(foundationStyles.metadata, styles.detail)}
+                  >
                     {bottle.distillers
                       .map((distiller) => distiller.name)
                       .join(", ")}
@@ -205,12 +213,21 @@ export default function ModerationBottlePicker({
               <li {...stylex.props(styles.resultItem)}>
                 <Link
                   href={`/bottles/new?${newBottleParams.toString()}`}
-                  {...stylex.props(styles.result, styles.add)}
+                  {...stylex.props(
+                    foundationStyles.body,
+                    styles.result,
+                    styles.add,
+                  )}
                 >
                   <Plus aria-hidden="true" size={18} />
                   <span>
                     <strong>Can’t find it?</strong>
-                    <span {...stylex.props(styles.detail)}>
+                    <span
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.detail,
+                      )}
+                    >
                       {query
                         ? `Add ${toTitleCase(query)} to the database.`
                         : "Add a new bottle to the database."}
@@ -284,8 +301,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.inset,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
     "::-webkit-search-cancel-button": { appearance: "none" },
   },
@@ -295,23 +310,16 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   error: {
     margin: 0,
     padding: space.x4,
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
   status: {
     margin: 0,
     padding: space.x6,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     textAlign: "center",
   },
   results: { margin: 0, padding: 0, listStyle: "none" },
@@ -332,8 +340,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: { default: "transparent", ":hover": colors.inset },
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     textAlign: "left",
     textDecoration: "none",
     cursor: "pointer",
@@ -344,8 +350,5 @@ const styles = stylex.create({
     display: "block",
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
   },
 });

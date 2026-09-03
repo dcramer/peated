@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 
 export type DistributionListItem = {
   count: number;
@@ -23,8 +24,10 @@ export function DistributionList({
       {visibleItems.map(({ count, label }) => (
         <li key={label} {...stylex.props(styles.item)}>
           <div {...stylex.props(styles.copy)}>
-            <span {...stylex.props(styles.label)}>{label}</span>
-            <span {...stylex.props(styles.count)}>
+            <span {...stylex.props(foundationStyles.metadata, styles.label)}>
+              {label}
+            </span>
+            <span {...stylex.props(foundationStyles.metadata, styles.count)}>
               {count.toLocaleString()}
             </span>
           </div>
@@ -61,9 +64,6 @@ const styles = stylex.create({
   label: {
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -71,10 +71,7 @@ const styles = stylex.create({
     flexShrink: 0,
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.3,
   },
   track: {
     height: "5px",

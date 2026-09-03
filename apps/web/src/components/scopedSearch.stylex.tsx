@@ -5,11 +5,11 @@ import { Check, ChevronDown, X } from "lucide-react";
 import type { InputHTMLAttributes, Ref } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
   zIndices,
 } from "../styles/tokens.stylex";
@@ -117,6 +117,7 @@ export function ScopedSearch({
               }}
               type="button"
               {...stylex.props(
+                foundationStyles.interactiveSmall,
                 styles.scope,
                 scopeMenuOpen && styles.openScope,
                 hasAppliedScope && styles.appliedScope,
@@ -157,11 +158,19 @@ export function ScopedSearch({
                         }}
                         role="option"
                         type="button"
-                        {...stylex.props(styles.scopeMenuOption)}
+                        {...stylex.props(
+                          foundationStyles.interactiveSmall,
+                          styles.scopeMenuOption,
+                        )}
                       >
                         <span>{option.label}</span>
                         {option.count !== undefined ? (
-                          <span {...stylex.props(styles.scopeMenuCount)}>
+                          <span
+                            {...stylex.props(
+                              foundationStyles.metadata,
+                              styles.scopeMenuCount,
+                            )}
+                          >
                             {option.count.toLocaleString("en-US")}
                           </span>
                         ) : null}
@@ -191,7 +200,7 @@ export function ScopedSearch({
             inputProps.onPointerDown?.(event);
             setScopeMenuOpen(false);
           }}
-          {...stylex.props(styles.input)}
+          {...stylex.props(foundationStyles.input, styles.input)}
         />
         {hasQuery && onClear ? (
           <button
@@ -305,10 +314,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.accentTint,
     color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontWeight: 500,
-    lineHeight: 1,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     cursor: "pointer",
@@ -374,10 +380,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.2,
     textAlign: "left",
     cursor: "pointer",
     boxShadow: {
@@ -388,10 +391,7 @@ const styles = stylex.create({
   scopeMenuCount: {
     marginLeft: "auto",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    fontWeight: 400,
   },
   scopeMenuCheck: {
     flexShrink: 0,
@@ -412,9 +412,6 @@ const styles = stylex.create({
       ":focus-visible": "none",
     },
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: { default: "13px", [COMPACT]: "16px" },
-    lineHeight: 1.4,
     "::placeholder": {
       color: colors.inkMuted,
       opacity: 1,

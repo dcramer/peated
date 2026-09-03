@@ -20,7 +20,7 @@ const meta = {
     ),
     brand: "Laphroaig",
     brandHref: "/entities/809",
-    eyebrow: "Laphroaig Distillery",
+    metadata: "Laphroaig Distillery",
     menu: (
       <RowMenu
         groups={[
@@ -68,7 +68,7 @@ export const LongName: Story = {
   args: {
     brand: "The Scotch Malt Whisky Society",
     brandHref: "/entities/3417",
-    eyebrow: "Caol Ila Distillery",
+    metadata: "Caol Ila Distillery",
     name: "SMWS Highland peaty potion",
   },
 };
@@ -78,7 +78,7 @@ export const ThinData: Story = {
     actions: null,
     brand: "Port Ellen",
     brandHref: "/entities/214",
-    eyebrow: "Port Ellen Distillery",
+    metadata: "Port Ellen Distillery",
     menu: null,
     name: "Independent bottling",
     bands: null,

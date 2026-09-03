@@ -16,7 +16,8 @@ import {
   SectionHeading,
   TastingEntry,
 } from "..";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
 import {
   BottleRailSection,
   type BottleRailItem,
@@ -83,7 +84,12 @@ export function BottleOverview({
               <div {...stylex.props(styles.sectionHeader)}>
                 <SectionHeading>Critic reviews</SectionHeading>
                 {criticReviewDetail ? (
-                  <span {...stylex.props(styles.sectionDetail)}>
+                  <span
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.sectionDetail,
+                    )}
+                  >
                     {criticReviewDetail}
                   </span>
                 ) : null}
@@ -115,7 +121,10 @@ export function BottleOverview({
               tastingCount > tastings.length ? (
                 <AppLink
                   href={moreTastingsHref}
-                  {...stylex.props(styles.moreLink)}
+                  {...stylex.props(
+                    foundationStyles.interactiveSmall,
+                    styles.moreLink,
+                  )}
                 >
                   Show all {tastingCount.toLocaleString("en-US")} tastings →
                 </AppLink>
@@ -304,10 +313,6 @@ const styles = stylex.create({
   sectionDetail: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
-    textTransform: "lowercase",
   },
   moreLink: {
     display: "block",
@@ -326,10 +331,7 @@ const styles = stylex.create({
       ":active": colors.surface,
     },
     color: colors.accentDeep,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    lineHeight: 1.3,
     textDecoration: "none",
     boxShadow: {
       default: "none",

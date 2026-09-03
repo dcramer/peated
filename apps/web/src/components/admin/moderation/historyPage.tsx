@@ -68,7 +68,7 @@ function HistoryDetails({ eventKey }: { eventKey: string }) {
       <ModerationStack>
         <AdminPageHeader
           title={event.title}
-          eyebrow={`${event.category} · ${event.kind.replaceAll("_", " ")}`}
+          metadata={`${event.category} · ${event.kind.replaceAll("_", " ")}`}
         />
         <AdminStatGrid>
           <AdminStat

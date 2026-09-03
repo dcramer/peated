@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { PageTabs, SectionHeading, type PageTabItem } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 const MOBILE = "@media (max-width: 559px)";
@@ -71,7 +71,7 @@ export function PageHeader({
   actions,
   actionsPosition = "end",
   description,
-  eyebrow,
+  metadata,
   identity,
   menu,
   parent,
@@ -81,7 +81,7 @@ export function PageHeader({
   /** Inline actions stay beside the title and wrap to the right when space runs out. */
   actionsPosition?: "end" | "start" | "inline";
   description?: ReactNode;
-  eyebrow?: ReactNode;
+  metadata?: ReactNode;
   identity?: ReactNode;
   menu?: ReactNode;
   parent?: ReactNode;
@@ -98,13 +98,26 @@ export function PageHeader({
         )}
       >
         <div {...stylex.props(styles.pageHeaderCopy)}>
-          {eyebrow ? (
-            <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
+          {parent ? (
+            <div
+              {...stylex.props(
+                foundationStyles.interactiveSmall,
+                styles.parent,
+              )}
+            >
+              {parent}
+            </div>
           ) : null}
-          {parent ? <div {...stylex.props(styles.parent)}>{parent}</div> : null}
           <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
+          {metadata ? (
+            <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+              {metadata}
+            </div>
+          ) : null}
           {description ? (
-            <div {...stylex.props(styles.description)}>{description}</div>
+            <div {...stylex.props(foundationStyles.body, styles.description)}>
+              {description}
+            </div>
           ) : null}
         </div>
         {actions || menu ? (
@@ -167,7 +180,11 @@ export function PageSection({
       <div {...stylex.props(styles.sectionHeader)}>
         <SectionHeading>{heading}</SectionHeading>
         {intro ? (
-          <div {...stylex.props(styles.sectionIntro)}>{intro}</div>
+          <div
+            {...stylex.props(foundationStyles.metadata, styles.sectionIntro)}
+          >
+            {intro}
+          </div>
         ) : null}
       </div>
       {children}
@@ -305,30 +322,19 @@ const styles = stylex.create({
   inlineActions: {
     marginLeft: "auto",
   },
-  eyebrow: {
-    marginBottom: space.x2,
+  metadata: {
+    marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   parent: {
     marginBottom: space.x1,
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.3,
   },
   description: {
     maxWidth: "680px",
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   headerActions: {
     display: "flex",
@@ -359,9 +365,6 @@ const styles = stylex.create({
     maxWidth: "620px",
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   railSection: {
     display: "flex",

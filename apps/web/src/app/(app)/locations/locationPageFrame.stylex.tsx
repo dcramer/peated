@@ -67,9 +67,6 @@ export function LocationPageFrame({
         <PageHeader
           actions={actions}
           description={description}
-          eyebrow={
-            location.kind === "region" ? "Whisky region" : "Whisky country"
-          }
           parent={
             country ? (
               <TextLink href={country.href} size="inherit">

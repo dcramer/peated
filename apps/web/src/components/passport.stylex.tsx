@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts } from "../styles/tokens.stylex";
 
 export type PassportStamp = {
@@ -32,7 +33,7 @@ export function Passport(props: PassportProps) {
       >
         <PassportCount count={props.count} detail={`${props.unit} stamped`} />
         {props.nextStampIn ? (
-          <p {...stylex.props(styles.note)}>
+          <p {...stylex.props(foundationStyles.metadata, styles.note)}>
             {formatSmallCount(props.nextStampIn)} more for the next stamp
           </p>
         ) : null}
@@ -80,11 +81,13 @@ export function Passport(props: PassportProps) {
           >
             <span {...stylex.props(styles.coverageFill(`${percentage}%`))} />
           </span>
-          <span {...stylex.props(styles.percentage)}>{percentage}%</span>
+          <span {...stylex.props(foundationStyles.metadata, styles.percentage)}>
+            {percentage}%
+          </span>
         </div>
       )}
       {missing.length > 0 ? (
-        <p {...stylex.props(styles.note)}>
+        <p {...stylex.props(foundationStyles.metadata, styles.note)}>
           not yet stamped: {missing.join(", ")}
         </p>
       ) : null}
@@ -98,7 +101,10 @@ function PassportCount({ count, detail }: { count: number; detail: string }) {
       <strong {...stylex.props(styles.count)}>
         {count.toLocaleString("en-US")}
       </strong>
-      <span title={detail} {...stylex.props(styles.countDetail)}>
+      <span
+        title={detail}
+        {...stylex.props(foundationStyles.metadata, styles.countDetail)}
+      >
         {detail}
       </span>
     </div>
@@ -138,9 +144,6 @@ const styles = stylex.create({
     minWidth: 0,
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -181,17 +184,11 @@ const styles = stylex.create({
   percentage: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "13px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
   },
   note: {
     margin: 0,
     marginTop: "12px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
 });

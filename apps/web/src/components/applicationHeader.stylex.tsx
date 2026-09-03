@@ -11,6 +11,7 @@ import { Menu as MenuIcon, Search, X } from "lucide-react";
 import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -212,7 +213,12 @@ export function ApplicationHeader({
                       menuSurfaceStyles.surface,
                     )}
                   >
-                    <div {...stylex.props(styles.accountMenuHeader)}>
+                    <div
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.accountMenuHeader,
+                      )}
+                    >
                       Account
                     </div>
                     <div {...stylex.props(styles.accountMenuSeparator)} />
@@ -235,6 +241,7 @@ export function ApplicationHeader({
               onClick={() => setSearchOpen(false)}
               type="button"
               {...stylex.props(
+                foundationStyles.interactiveSmall,
                 styles.mobileSearchCancel,
                 searchOpen && styles.mobileSearchCancelVisible,
               )}
@@ -289,7 +296,12 @@ function AccountMenuItem({
           <>
             <span>{item.label}</span>
             {item.count !== undefined ? (
-              <span {...stylex.props(styles.accountMenuCount)}>
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.accountMenuCount,
+                )}
+              >
                 {item.count.toLocaleString("en-US")}
               </span>
             ) : null}
@@ -308,6 +320,7 @@ function AccountMenuItem({
               }}
               type="button"
               {...stylex.props(
+                foundationStyles.interactiveSmall,
                 styles.accountMenuItem,
                 styles.accountMenuAction,
                 focus && styles.focusedAccountMenuItem,
@@ -323,8 +336,12 @@ function AccountMenuItem({
             aria-current={current ? "page" : undefined}
             href={item.href}
             {...stylex.props(
+              foundationStyles.interactiveSmall,
               styles.accountMenuItem,
-              current && styles.currentMenuLink,
+              current && [
+                foundationStyles.interactiveSmall,
+                styles.currentMenuLink,
+              ],
               focus && styles.focusedAccountMenuItem,
             )}
           >
@@ -361,15 +378,20 @@ function HeaderDrawerGroup({
               }
               href={item.href}
               {...stylex.props(
+                foundationStyles.interactive,
                 styles.drawerLink,
-                isCurrentNavigationHref(currentHref, item.href) &&
+                isCurrentNavigationHref(currentHref, item.href) && [
+                  foundationStyles.interactiveSmall,
                   styles.currentMenuLink,
+                ],
               )}
             >
               {item.label}
             </AppLink>
             {item.count !== undefined ? (
-              <span {...stylex.props(styles.drawerCount)}>
+              <span
+                {...stylex.props(foundationStyles.metadata, styles.drawerCount)}
+              >
                 {item.count.toLocaleString("en-US")}
               </span>
             ) : null}
@@ -531,11 +553,6 @@ const styles = stylex.create({
     paddingRight: "48px",
     paddingLeft: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   accountMenuSeparator: {
     height: "1px",
@@ -556,10 +573,7 @@ const styles = stylex.create({
     paddingRight: space.x3,
     paddingLeft: space.x3,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.2,
     textDecoration: "none",
     outline: "none",
     backgroundColor: {
@@ -592,15 +606,10 @@ const styles = stylex.create({
   },
   currentMenuLink: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
   },
   accountMenuCount: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1,
   },
   mobileSearchButton: {
     display: "none",
@@ -616,10 +625,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.accentDeep,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
-    lineHeight: 1,
     cursor: "pointer",
     boxShadow: {
       default: "none",
@@ -699,10 +705,7 @@ const styles = stylex.create({
   drawerLink: {
     flex: 1,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     fontWeight: 600,
-    lineHeight: 1.3,
     textDecoration: "none",
     outline: "none",
     boxShadow: {
@@ -713,10 +716,7 @@ const styles = stylex.create({
   drawerCount: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1,
   },
   drawerAction: {
     display: "flex",

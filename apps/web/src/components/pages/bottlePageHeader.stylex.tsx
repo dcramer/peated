@@ -15,7 +15,7 @@ export type BottlePageHeaderProps = {
   bands?: TastingRatingDistributionProps | null;
   brand: string;
   brandHref?: string;
-  eyebrow?: ReactNode;
+  metadata?: ReactNode;
   menu?: ReactNode;
   name: string;
   score?: ReviewScoreProps | null;
@@ -27,7 +27,7 @@ export function BottlePageHeader({
   bands,
   brand,
   brandHref,
-  eyebrow,
+  metadata,
   menu,
   name,
   score,
@@ -39,7 +39,7 @@ export function BottlePageHeader({
       <PageHeader
         actions={actions}
         actionsPosition="start"
-        eyebrow={eyebrow}
+        metadata={metadata}
         menu={menu}
         title={
           <>
