@@ -1,5 +1,8 @@
 import { mockBottle } from "@peated/server/orpc/mock/fixtures";
-import { toBottleListItem } from "@peated/web/lib/bottleListItem";
+import {
+  toBottleListItem,
+  toBottlePickerOption,
+} from "@peated/web/lib/bottleListItem";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import type { BottleRowActionControls } from "@peated/web/hooks/useBottleRowActions";
@@ -10,6 +13,8 @@ import { BottleRowActions } from "./bottleRowActions.stylex";
 import { CommunityFeed } from "./communityFeed.stylex";
 import { LoadingList } from "./feedback.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
+import { BottleRailSection } from "./pages/bottleRailSection.stylex";
+import { SearchSelect } from "./searchPicker.stylex";
 import { SearchResults } from "./searchResults.stylex";
 import { SectionHeading } from "./sectionHeading.stylex";
 import { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
@@ -167,13 +172,12 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, activity, tasting, search, selection, and loading components at wide and phone widths. They share thumbnail geometry and row typography. Standard rows use the shared medium thumbnail; compact library additions use the extra-small thumbnail, and two-line rails use the small thumbnail.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows, including sidebars, use the same three identity lines and medium thumbnail. Compact library additions use the extra-small thumbnail.",
       },
     },
   },
   render: (args) => {
     const title = args.name;
-    const metadata = args.metadata?.join(" · ") ?? "";
     return (
       <StoryStack>
         <section aria-label="Bottle list">
@@ -184,6 +188,21 @@ export const RowLayouts: Story = {
           <SectionHeading level={3}>Library addition</SectionHeading>
           <BottleIdentityRow {...args} variant="compact" />
         </section>
+        <StoryCanvas width="compact">
+          <BottleRailSection
+            heading="Sidebar bottles"
+            items={[
+              { ...args, id: "sidebar-bottle" },
+              {
+                ...args,
+                id: "sidebar-long-name",
+                imageUrl: null,
+                name: "Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated",
+              },
+            ]}
+          />
+          <LoadingList label="Loading sidebar bottles" rows={2} />
+        </StoryCanvas>
         <section aria-label="Activity">
           <SectionHeading level={3}>
             Activity on the homepage and activity page
@@ -220,8 +239,6 @@ export const RowLayouts: Story = {
                 href: args.href,
                 bottle: args,
                 imageUrl: args.imageUrl,
-                metadata,
-                name: title,
                 ratingBand: "outstanding",
               },
             ]}
@@ -240,7 +257,6 @@ export const RowLayouts: Story = {
                     href: args.href!,
                     bottle: args,
                     id: "bottle",
-                    metadata,
                     title,
                     visual: {
                       kind: "bottle",
@@ -260,6 +276,15 @@ export const RowLayouts: Story = {
             bottle={rowBottle}
             imageUrl={args.imageUrl}
             onChange={() => undefined}
+          />
+        </section>
+        <section aria-label="Picker selection">
+          <SearchSelect
+            label="Selected bottle in a picker"
+            onChange={() => undefined}
+            options={[toBottlePickerOption(rowBottle)]}
+            placeholder="Search bottles"
+            value={toBottlePickerOption(rowBottle)}
           />
         </section>
         <section aria-label="Loading">

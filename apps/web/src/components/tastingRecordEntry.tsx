@@ -1,6 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import {
   MemberAvatar,
@@ -12,8 +11,7 @@ import {
   getBottleIdentityProps,
   type BottleIdentitySource,
 } from "@peated/web/lib/bottleListItem";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
@@ -42,13 +40,10 @@ export function getTastingEntryMember(
         : formatColor(tasting.color),
     comments: tasting.comments,
     notes: tasting.notes ?? undefined,
-    notesHref: `/tastings/${tasting.id}`,
+    notesHref: getTastingUrl(tasting),
     hasToasted: tasting.hasToasted,
     href: getBottleUrl(tasting.bottle),
-    imageKind: tasting.imageUrl ? "photo" : "bottle",
     imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
-    metadata: getBottleMetadata(tasting.bottle),
-    name: formatBottleDisplayName(tasting.bottle),
     tags: tasting.tags ?? undefined,
     ratingBand: tasting.ratingBand ?? undefined,
     servingStyle: tasting.servingStyle

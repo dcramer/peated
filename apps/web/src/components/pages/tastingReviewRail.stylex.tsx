@@ -8,8 +8,8 @@ import {
   RailListItem,
   TastingRating,
 } from "@peated/web/components";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
+import { getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
@@ -48,7 +48,6 @@ export function TastingReviewRail({
   memberTastings: readonly Tasting[];
 }) {
   const bottleName = formatBottleDisplayName(bottle);
-  const metadata = getBottleMetadata(bottle);
   const moreFromMember = memberTastings
     .filter((tasting) => tasting.id !== currentTastingId)
     .slice(0, 4);
@@ -74,27 +73,30 @@ export function TastingReviewRail({
       ) : null}
 
       <BottleRailSection
-        heading="The bottle"
-        items={[
-          {
-            href: getBottleUrl(bottle),
-            imageUrl: bottle.imageUrl,
-            metadata: metadata ?? undefined,
-            name: bottleName,
-          },
-        ]}
+        heading="This bottle"
+        items={[toBottleListItem(bottle)]}
       />
 
       <BottleRailSection
         heading={`More from ${author.username}`}
         items={moreFromMember.map((tasting) => ({
-          end: tasting.ratingBand ? (
-            <TastingRating band={tasting.ratingBand} />
-          ) : undefined,
-          href: `/tastings/${tasting.id}`,
+          ...toBottleListItem(tasting.bottle),
+          id: String(tasting.id),
+          end: (
+            <div {...stylex.props(styles.tastingMeta)}>
+              {tasting.ratingBand ? (
+                <TastingRating band={tasting.ratingBand} />
+              ) : null}
+              <time
+                dateTime={tasting.createdAt}
+                {...stylex.props(foundationStyles.metadata, styles.tastingDate)}
+              >
+                {dateFormatter.format(new Date(tasting.createdAt))}
+              </time>
+            </div>
+          ),
+          href: getTastingUrl(tasting),
           imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
-          metadata: dateFormatter.format(new Date(tasting.createdAt)),
-          name: formatBottleDisplayName(tasting.bottle),
         }))}
         moreHref={`/users/${author.username}/tastings`}
         moreLabel="See all tastings"
@@ -152,6 +154,16 @@ function formatPublishedDate(review: ExternalReview) {
 }
 
 const styles = stylex.create({
+  tastingMeta: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: space.x1,
+  },
+  tastingDate: {
+    color: colors.inkMuted,
+    whiteSpace: "nowrap",
+  },
   photo: {
     minWidth: 0,
     margin: 0,

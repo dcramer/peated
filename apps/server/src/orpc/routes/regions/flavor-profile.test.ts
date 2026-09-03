@@ -63,8 +63,9 @@ describe("GET /countries/{country}/regions/{region}/flavor-profile", () => {
   });
 
   test("keeps the region scoped to its country", async ({ fixtures }) => {
-    const region = await fixtures.Region();
-    const otherCountry = await fixtures.Country();
+    const country = await fixtures.Country({ name: "Scotland" });
+    const region = await fixtures.Region({ countryId: country.id });
+    const otherCountry = await fixtures.Country({ name: "Japan" });
     await expect(
       routerClient.regions.flavorProfile({
         country: String(otherCountry.id),

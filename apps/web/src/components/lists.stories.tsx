@@ -7,7 +7,6 @@ import {
   RailList,
   RailListItem,
 } from "./lists.stylex";
-import { TastingRating } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const sortOptions = [
@@ -35,7 +34,7 @@ function ToolbarExample() {
 const meta = {
   title: "Components/Lists & Tables/Lists",
   component: RailList,
-  args: { ariaLabel: "Bottles", children: null },
+  args: { ariaLabel: "Reviews", children: null },
   decorators: [
     (Story) => (
       <StoryCanvas width="wide">
@@ -52,17 +51,17 @@ export const Overview: Story = {
   render: () => (
     <StoryStack>
       <ToolbarExample />
-      <RailList ariaLabel="Recent tastings">
+      <RailList ariaLabel="Recent reviews">
         <RailListItem
-          end={<TastingRating band="outstanding" />}
-          href="/tastings/1"
-          metadata="Aug 22 · 46% ABV"
-          title="Port Charlotte 10 Year Old"
+          end="88/100"
+          href="/reviews/1"
+          metadata="Member · Aug 22, 2026"
+          title="j.macleod"
         />
         <RailListItem
-          end="–"
-          metadata="No score recorded"
-          title="Unknown bottle"
+          href="https://example.com/review"
+          metadata="Aug 20, 2026"
+          title="Whiskyfun"
         />
       </RailList>
       <CursorPager nextHref="#page-4" page={3} previousHref="#page-2" />

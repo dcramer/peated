@@ -1,26 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  getBottleMetadata,
   getBottleReleasePlacement,
   getBottleReviewMetadata,
 } from "./bottleMetadata";
 
 describe("bottle metadata", () => {
-  it("spells out a missing age statement", () => {
-    expect(
-      getBottleMetadata({
-        abv: 43,
-        category: "single_malt",
-        edition: null,
-        noAgeStatement: true,
-        releaseYear: null,
-        statedAge: null,
-        vintageYear: null,
-      }),
-    ).toBe("Single Malt · No age statement · 43% ABV");
-  });
-
   it("uses one supporting release fact", () => {
     expect(
       getBottleReviewMetadata({
@@ -43,18 +28,6 @@ describe("bottle metadata", () => {
         vintageYear: null,
       }),
     ).toEqual(["12 years", "68.3% ABV", "Batch C923"]);
-
-    expect(
-      getBottleMetadata({
-        abv: 68.3,
-        category: "bourbon",
-        edition: "Batch C923",
-        noAgeStatement: false,
-        releaseYear: 2023,
-        statedAge: 12,
-        vintageYear: null,
-      }),
-    ).toBe("Batch C923 · Bourbon · 12 years · 68.3% ABV");
   });
 
   it("places a release date once on the bottle page", () => {

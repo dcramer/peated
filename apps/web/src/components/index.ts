@@ -236,11 +236,10 @@ export type {
   SummaryStripCell,
   SummaryStripCells,
 } from "./summaryStrip.stylex";
-export { TastingEntry, TastingMedia } from "./tastingEntry.stylex";
+export { TastingEntry } from "./tastingEntry.stylex";
 export type {
   TastingEntryMember,
   TastingEntryProps,
-  TastingMediaKind,
 } from "./tastingEntry.stylex";
 export {
   ColorInput,

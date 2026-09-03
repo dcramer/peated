@@ -4,14 +4,14 @@ describe("GET /countries/:country/regions/:region/categories", () => {
   test("lists active Bottle categories by producing distillery", async ({
     fixtures,
   }) => {
-    const country = await fixtures.Country({ slug: "scotland" });
+    const country = await fixtures.Country({ name: "Scotland" });
     const region = await fixtures.Region({
       countryId: country.id,
-      slug: "islay",
+      name: "Islay",
     });
     const otherRegion = await fixtures.Region({
       countryId: country.id,
-      slug: "speyside",
+      name: "Speyside",
     });
     const distiller = await fixtures.Entity({
       countryId: country.id,
@@ -56,8 +56,8 @@ describe("GET /countries/:country/regions/:region/categories", () => {
   });
 
   test("rejects a region outside the country", async ({ fixtures }) => {
-    const country = await fixtures.Country();
-    const otherCountry = await fixtures.Country();
+    const country = await fixtures.Country({ name: "Scotland" });
+    const otherCountry = await fixtures.Country({ name: "Japan" });
     const region = await fixtures.Region({ countryId: otherCountry.id });
 
     await expect(

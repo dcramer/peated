@@ -1,11 +1,10 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   mockActivity,
   mockCollectionBottles,
   mockExternalReview,
 } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { getBottleUrl } from "../../lib/urls";
+import { toBottleListItem } from "../../lib/bottleListItem";
 
 import { getCommunityFeedItems } from "../../lib/communityFeed";
 import { PageTabs } from "../pageTabs.stylex";
@@ -38,11 +37,7 @@ const meta = {
     libraryBottles: mockCollectionBottles
       .filter((item) => !item.hasTasted)
       .slice(0, 3)
-      .map((item) => ({
-        href: getBottleUrl(item.bottle),
-        name: formatBottleDisplayName(item.bottle),
-        imageUrl: item.bottle.imageUrl,
-      })),
+      .map((item) => toBottleListItem(item.bottle)),
     libraryHref: "/users/mock-user/library",
     selector: (
       <PageTabs

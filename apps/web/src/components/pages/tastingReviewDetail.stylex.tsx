@@ -5,7 +5,6 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import {
-  AppLink,
   Chip,
   FactList,
   MemberAvatar,
@@ -14,9 +13,8 @@ import {
   TextLink,
   type RatingBand,
 } from "@peated/web/components";
-import { getBottleUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
@@ -73,15 +71,7 @@ export function TastingReviewDetail({
     <article {...stylex.props(styles.detail)}>
       <PageHeader
         metadata={`${rating.kind === "review" ? "Review" : "Tasting"} · ${fullDateFormatter.format(new Date(createdAt))}`}
-        title={
-          <AppLink
-            aria-label={bottleName}
-            href={getBottleUrl(bottle)}
-            {...stylex.props(styles.titleLink)}
-          >
-            {bottleTitle}
-          </AppLink>
-        }
+        title={bottleTitle}
       />
 
       <div {...stylex.props(styles.body)}>
@@ -210,21 +200,6 @@ function RecordNotes({ notes }: { notes: string }) {
 const styles = stylex.create({
   detail: {
     minWidth: 0,
-  },
-  titleLink: {
-    display: "inline-block",
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accentDeep,
-    },
-    textDecoration: "none",
-    textWrap: "balance",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
   },
   body: {
     paddingTop: "20px",

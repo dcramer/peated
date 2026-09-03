@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use for both global search and database results. Bottle titles come from formatBottleDisplayName, and visual.kind selects the shared BottleVisual or Avatar. Include real images and missing-image results when reviewing a change.",
+          "Use for both global search and database results. Bottle results require identity from getBottleIdentityProps and render BottleIdentityRow. Other results may show an Avatar or initial. Include real images and missing-image results when reviewing a change.",
       },
     },
   },

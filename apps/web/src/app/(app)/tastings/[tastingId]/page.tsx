@@ -1,49 +1,31 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   PageColumns,
   PageSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { cache } from "react";
+import { getTastingPage } from "@peated/web/lib/tastingPage.server";
+import {
+  getTastingSeoMetadata,
+  serializeTastingStructuredData,
+} from "@peated/web/lib/tastingSeo";
 
 import { TastingComments } from "./tastingComments.stylex";
 import { TastingDetail, TastingRail } from "./tastingDetail.stylex";
-
-const getTasting = cache(async (tastingId: number) => {
-  const { client } = await getPublicPageServerClient();
-  return await resolveOrNotFound(
-    client.tastings.details({ tasting: tastingId }),
-  );
-});
 
 export async function generateMetadata(props: {
   params: Promise<{ tastingId: string }>;
 }) {
   const { tastingId } = await props.params;
-  const tasting = await getTasting(Number(tastingId));
-  const title = `${formatBottleDisplayName(tasting.bottle)} — tasting by ${tasting.createdBy.username}`;
-
-  return {
-    title,
-    description: tasting.notes,
-    openGraph: {
-      title,
-      description: tasting.notes,
-      images: tasting.imageUrl ? [tasting.imageUrl] : undefined,
-    },
-    twitter: {
-      card: tasting.imageUrl ? "summary_large_image" : "summary",
-      images: tasting.imageUrl ? [tasting.imageUrl] : undefined,
-    },
-  };
+  const tasting = await getTastingPage(tastingId);
+  return getTastingSeoMetadata(tasting);
 }
 
 export default async function TastingPage(props: {
   params: Promise<{ tastingId: string }>;
 }) {
   const { tastingId } = await props.params;
-  const tasting = await getTasting(Number(tastingId));
+  const tasting = await getTastingPage(tastingId);
+  const structuredData = serializeTastingStructuredData(tasting);
   const { client } = await getPublicPageServerClient();
   const [memberTastings, memberReviews, externalReviews] = await Promise.all([
     client.tastings.list({ user: tasting.createdBy.id, limit: 5 }),
@@ -63,6 +45,12 @@ export default async function TastingPage(props: {
       }
       railBehavior="stack"
     >
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: structuredData }}
+        />
+      )}
       <TastingDetail tasting={tasting} />
       <div id="comments">
         <PageSection heading="Comments">

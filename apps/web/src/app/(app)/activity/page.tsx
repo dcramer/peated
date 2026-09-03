@@ -1,13 +1,11 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { PageTabs } from "@peated/web/components";
 import { ActivityPage } from "@peated/web/components/pages/activityPage.stylex";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import {
   getAnonymousServerClient,
   getServerClient,
 } from "@peated/web/lib/orpc/client.server";
-import { getBottleUrl } from "@peated/web/lib/urls";
 import type { Metadata } from "next";
 import { loadActivityFeed } from "./loadActivityFeed";
 
@@ -38,10 +36,8 @@ export default async function Activity({
     .filter((item) => !item.hasTasted)
     .slice(0, 3)
     .map((item) => ({
-      href: getBottleUrl(item.bottle),
+      ...toBottleListItem(item.bottle),
       imageUrl: item.imageUrl ?? item.bottle.imageUrl,
-      name: formatBottleDisplayName(item.bottle),
-      metadata: getBottleMetadata(item.bottle),
     }));
 
   return (

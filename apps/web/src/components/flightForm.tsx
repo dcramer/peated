@@ -1,6 +1,5 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";
 import {
@@ -15,7 +14,7 @@ import {
   type SearchPickerOption,
 } from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
 import {
   flightMembershipChanged,
   getFlightBottleIds,
@@ -51,7 +50,7 @@ export default function FlightForm({
   );
   const initialBottleIds = getFlightBottleIds(initialBottles);
   const [bottles, setBottles] = useState<readonly SearchPickerOption[]>(
-    initialBottles.map(toBottleOption),
+    initialBottles.map(toBottlePickerOption),
   );
   const [bottleQuery, setBottleQuery] = useState("");
   const [submitError, setSubmitError] = useState<string>();
@@ -160,7 +159,9 @@ export default function FlightForm({
               loading={bottleResults.isFetching}
               onChange={setBottles}
               onQueryChange={setBottleQuery}
-              options={(bottleResults.data?.results ?? []).map(toBottleOption)}
+              options={(bottleResults.data?.results ?? []).map(
+                toBottlePickerOption,
+              )}
               placeholder="Search bottles"
               value={bottles}
             />
@@ -169,28 +170,4 @@ export default function FlightForm({
       </form>
     </WorkflowScreen>
   );
-}
-
-function toBottleOption(
-  bottle: Pick<
-    Bottle,
-    | "abv"
-    | "brand"
-    | "category"
-    | "edition"
-    | "group"
-    | "id"
-    | "name"
-    | "noAgeStatement"
-    | "releaseYear"
-    | "series"
-    | "statedAge"
-    | "vintageYear"
-  >,
-): SearchPickerOption {
-  return {
-    detail: getBottleMetadata(bottle),
-    id: bottle.id,
-    label: formatBottleDisplayName(bottle),
-  };
 }

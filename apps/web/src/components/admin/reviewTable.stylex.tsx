@@ -1,7 +1,7 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { ExternalReview, PagingRel } from "@peated/server/types";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";
+import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
@@ -38,54 +38,35 @@ export function ReviewRows({
         {
           fill: true,
           name: "review",
-          value: (review) => {
-            const bottleName = review.bottle
-              ? formatBottleDisplayName(review.bottle)
-              : "No bottle";
-            return (
-              <span {...stylex.props(styles.review)}>
-                <AdminTextLink href={review.url} title={review.name} truncate>
-                  {review.name}
-                </AdminTextLink>
-                <span {...stylex.props(styles.matchLine)}>
-                  <span aria-hidden="true" {...stylex.props(styles.arrow)}>
-                    →
-                  </span>
-                  {review.bottle ? (
-                    <AdminTextLink
-                      href={getBottleUrl(review.bottle)}
-                      title={bottleName}
-                      truncate
-                    >
-                      {bottleName}
-                    </AdminTextLink>
-                  ) : (
-                    <span title={bottleName} {...stylex.props(styles.match)}>
-                      {bottleName}
-                    </span>
-                  )}
-                  <span
-                    {...stylex.props(
-                      foundationStyles.metadata,
-                      styles.metadata,
+          value: (review) => (
+            <div {...stylex.props(styles.review)}>
+              <AdminTextLink href={review.url} title={review.name} truncate>
+                {review.name}
+              </AdminTextLink>
+              <div
+                {...stylex.props(foundationStyles.metadata, styles.metadata)}
+              >
+                {review.article.publishedAt ? (
+                  <time dateTime={review.article.publishedAt}>
+                    Published{" "}
+                    {publishedDateFormatter.format(
+                      new Date(review.article.publishedAt),
                     )}
-                  >
-                    {" · "}
-                    {review.article.publishedAt ? (
-                      <time dateTime={review.article.publishedAt}>
-                        Published{" "}
-                        {publishedDateFormatter.format(
-                          new Date(review.article.publishedAt),
-                        )}
-                      </time>
-                    ) : (
-                      "Publish date unknown"
-                    )}
-                  </span>
-                </span>
-              </span>
-            );
-          },
+                  </time>
+                ) : (
+                  "Publish date unknown"
+                )}
+              </div>
+              {review.bottle ? (
+                <BottleIdentityRow
+                  {...toBottleListItem(review.bottle)}
+                  layout="cell"
+                />
+              ) : (
+                <span {...stylex.props(styles.metadata)}>No bottle</span>
+              )}
+            </div>
+          ),
         },
         {
           align: "right",
@@ -109,22 +90,6 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     gap: space.x1,
-  },
-  matchLine: {
-    display: "flex",
-    minWidth: 0,
-    alignItems: "baseline",
-    gap: space.x1,
-  },
-  arrow: {
-    flexShrink: 0,
-    color: colors.inkMuted,
-  },
-  match: {
-    minWidth: 0,
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
   metadata: {
     flexShrink: 0,

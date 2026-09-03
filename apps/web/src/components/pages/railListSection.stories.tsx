@@ -1,5 +1,7 @@
 "use client";
 
+import { mockBottles } from "@peated/server/orpc/mock/fixtures";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
@@ -88,23 +90,7 @@ export const LinkedBottleCollection: Story = {
   render: () => (
     <BottleRailSection
       heading="Other bottles in this series"
-      items={[
-        {
-          href: "#port-charlotte",
-          metadata: "Single Malt · Sep 2024",
-          name: "Port Charlotte 9.2",
-        },
-        {
-          href: "#bruichladdich",
-          metadata: "Single Malt · Sep 2024",
-          name: "Bruichladdich 9.1",
-        },
-        {
-          href: "#octomore",
-          metadata: "Single Malt · 2024",
-          name: "Octomore 8.3",
-        },
-      ]}
+      items={mockBottles.slice(0, 3).map((bottle) => toBottleListItem(bottle))}
       moreHref="#series"
       moreLabel="See all 27 bottles"
     />

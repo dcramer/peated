@@ -103,4 +103,24 @@ describe("GET /tastings", () => {
     );
     expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
+
+  test("paginates public tastings consistently when dates match", async ({
+    fixtures,
+  }) => {
+    const createdAt = new Date("2026-09-01T00:00:00Z");
+    const first = await fixtures.Tasting({ createdAt });
+    const second = await fixtures.Tasting({ createdAt });
+    const privateUser = await fixtures.User({ private: true });
+    await fixtures.Tasting({ createdAt, createdById: privateUser.id });
+
+    const firstPage = await routerClient.tastings.list({ cursor: 1, limit: 1 });
+    const secondPage = await routerClient.tastings.list({
+      cursor: 2,
+      limit: 1,
+    });
+
+    expect(firstPage.results.map(({ id }) => id)).toEqual([second.id]);
+    expect(secondPage.results.map(({ id }) => id)).toEqual([first.id]);
+    expect(secondPage.rel.nextCursor).toBeNull();
+  });
 });

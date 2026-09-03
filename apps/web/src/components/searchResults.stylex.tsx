@@ -15,7 +15,6 @@ import {
   BottleIdentityRow,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
-import { BottleVisual } from "./bottleVisual.stylex";
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { MatchedText } from "./matchedText.stylex";
@@ -33,26 +32,28 @@ export type SearchResultRatings = {
 };
 
 export type SearchResultItem = {
-  bottle?: Pick<BottleIdentityRowProps, "provenance" | "metadata">;
   href: string;
   id: string;
   isFollowing?: boolean;
   ratings?: SearchResultRatings;
-  metadata?: string;
   title: string;
-  visual?:
-    | {
-        kind: "bottle";
-        imageUrl?: string | null;
-        label: string;
-      }
-    | {
+} & (
+  | {
+      bottle: Pick<BottleIdentityRowProps, "provenance" | "metadata">;
+      metadata?: never;
+      visual: { kind: "bottle"; imageUrl?: string | null; label: string };
+    }
+  | {
+      bottle?: never;
+      metadata?: string;
+      visual?: {
         kind: "avatar" | "initial";
         fallback: string;
         imageUrl?: string | null;
         label: string;
       };
-};
+    }
+);
 
 export type SearchResultGroup = {
   id: string;
@@ -303,7 +304,7 @@ function SearchResultsGroup({
       <ul {...stylex.props(styles.list)}>
         {group.items.map((item) => (
           <li key={item.id} {...stylex.props(styles.listItem)}>
-            {item.visual?.kind === "bottle" ? (
+            {item.bottle ? (
               <div
                 id={
                   optionIdPrefix
@@ -321,10 +322,6 @@ function SearchResultsGroup({
                   align="start"
                   href={item.href}
                   imageUrl={item.visual.imageUrl}
-                  metadata={
-                    item.bottle?.metadata ??
-                    (item.metadata ? item.metadata.split(" · ") : [])
-                  }
                   name={item.title}
                   query={query}
                   onClick={(event) => {
@@ -418,11 +415,8 @@ function SearchResultsGroup({
 function ResultVisual({
   visual,
 }: {
-  visual: NonNullable<SearchResultItem["visual"]>;
+  visual: Exclude<NonNullable<SearchResultItem["visual"]>, { kind: "bottle" }>;
 }) {
-  if (visual.kind === "bottle") {
-    return <BottleVisual imageUrl={visual.imageUrl} label={visual.label} />;
-  }
   if (visual.kind === "avatar") {
     return (
       <Avatar imageUrl={visual.imageUrl} initials={visual.fallback} size="sm" />

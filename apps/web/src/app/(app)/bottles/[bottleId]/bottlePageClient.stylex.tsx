@@ -1,11 +1,9 @@
 "use client";
 
+import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
+
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import {
-  formatCategoryName,
-  formatColor,
-  formatServingStyle,
-} from "@peated/server/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +12,6 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
   AppLink,
-  BottleRatings,
   Button,
   ButtonLink,
   EmptyState,
@@ -41,6 +38,7 @@ import {
   getAddBottleHref,
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -189,23 +187,7 @@ function getCriticReview(
 }
 
 function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
-  const member = {
-    color: tasting.color === null ? undefined : formatColor(tasting.color),
-    comments: tasting.comments,
-    notes: tasting.notes ?? undefined,
-    notesHref: `/tastings/${tasting.id}`,
-    hasToasted: tasting.hasToasted,
-    imageKind: tasting.imageUrl ? ("photo" as const) : ("bottle" as const),
-    imageUrl: tasting.imageUrl ?? bottle.imageUrl,
-    name: formatBottleDisplayName(bottle, { includeBrand: false }),
-    tags: tasting.tags,
-    ratingBand: tasting.ratingBand ?? undefined,
-    servingStyle: tasting.servingStyle
-      ? formatServingStyle(tasting.servingStyle)
-      : undefined,
-    tastingId: tasting.id,
-    toasts: tasting.toasts,
-  };
+  const member = getTastingEntryMember({ ...tasting, bottle });
 
   return {
     author: tasting.createdBy.username,
@@ -500,44 +482,12 @@ export function BottleOverviewClient() {
     tastingsQuery.data?.results.map((tasting) => getTasting(tasting, bottle)) ??
     [];
   const recommendations =
-    recommendationsQuery.data?.results.map((recommendation) => ({
-      end: (
-        <BottleRatings
-          counts={recommendation.tastingBandCounts}
-          high={recommendation.maxScore}
-          low={recommendation.minScore}
-          median={recommendation.medianScore}
-          scoreCount={recommendation.scoreCount}
-        />
-      ),
-      href: getBottleUrl(recommendation),
-      imageUrl: recommendation.imageUrl,
-      metadata: [
-        formatCategoryName(recommendation.category),
-        recommendation.abv === null
-          ? null
-          : `${recommendation.abv.toFixed(1)}% ABV`,
-      ]
-        .filter((value): value is string => Boolean(value))
-        .join(" · "),
-      name: formatBottleDisplayName(recommendation),
-    })) ?? [];
+    recommendationsQuery.data?.results.map((recommendation) =>
+      toBottleListItem(recommendation, { includeRatings: true }),
+    ) ?? [];
   const otherSeriesBottles = seriesBottlesQuery.data
     ? selectOtherSeriesBottles(seriesBottlesQuery.data.results, bottle.id).map(
-        (seriesBottle) => ({
-          href: getBottleUrl(seriesBottle),
-          imageUrl: seriesBottle.imageUrl,
-          metadata: [
-            formatCategoryName(seriesBottle.category),
-            getBottleReleasePlacement(seriesBottle).header,
-          ]
-            .filter((value): value is string => Boolean(value))
-            .join(" · "),
-          name: formatBottleDisplayName(seriesBottle, {
-            includeBrand: false,
-            includeSeries: false,
-          }),
-        }),
+        (seriesBottle) => toBottleListItem(seriesBottle),
       )
     : [];
   const seriesRail = !bottle.series ? null : seriesBottlesQuery.isPending ? (

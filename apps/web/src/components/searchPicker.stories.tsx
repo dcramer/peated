@@ -1,5 +1,7 @@
 "use client";
 
+import { mockBottles } from "@peated/server/orpc/mock/fixtures";
+import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
@@ -10,11 +12,7 @@ import {
 } from "./searchPicker.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
-const options = [
-  { id: 1, label: "Lagavulin 16-year-old", detail: "Islay · 43% ABV" },
-  { id: 2, label: "Laphroaig 10-year-old", detail: "Islay · 40% ABV" },
-  { id: 3, label: "Springbank 10-year-old", detail: "Campbeltown · 46% ABV" },
-] satisfies SearchPickerOption[];
+const options = mockBottles.slice(0, 3).map(toBottlePickerOption);
 
 const meta = {
   title: "Components/Search/Search Picker",

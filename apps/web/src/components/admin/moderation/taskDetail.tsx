@@ -22,9 +22,10 @@ import {
 import CheckResult from "@peated/web/components/bottleChecks/checkResult.stylex";
 import type { ExcludedOperationField } from "@peated/web/components/bottleChecks/operationCard.stylex";
 import OperationCard from "@peated/web/components/bottleChecks/operationCard.stylex";
+import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getBottleUrl } from "@peated/web/lib/urls";
 import {
   useMutation,
   useQuery,
@@ -281,11 +282,7 @@ function ListingTask({
 
       {item.suggestedBottle ? (
         <AdminSection title="Recommended bottle" tone="accent">
-          <strong>{formatBottleDisplayName(item.suggestedBottle)}</strong>
-          {" · "}
-          <AdminTextLink href={getBottleUrl(item.suggestedBottle)}>
-            View bottle #{item.suggestedBottle.id}
-          </AdminTextLink>
+          <BottleIdentityRow {...toBottleListItem(item.suggestedBottle)} />
         </AdminSection>
       ) : null}
 

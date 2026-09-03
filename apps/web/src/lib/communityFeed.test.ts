@@ -56,7 +56,7 @@ describe("getCommunityFeedItems", () => {
     ).toBe(true);
     expect(items.map((item) => item.bottles[0]?.activityHref)).toEqual([
       mockExternalReview.url,
-      `/tastings/${mockTasting.id}`,
+      `/tastings/${mockTasting.id}-example-barrel-proof`,
     ]);
   });
 

@@ -17,6 +17,17 @@ export function getBottleUrl(
   return `/bottles/${bottle.id}-${slug}`;
 }
 
+export function getTastingUrl(tasting: {
+  id: number;
+  bottle: BottleDisplayNameSource;
+}): `/tastings/${number}-${string}` {
+  const slug = createUrlSlug(
+    formatBottleDisplayName(tasting.bottle),
+    "tasting",
+  );
+  return `/tastings/${tasting.id}-${slug}`;
+}
+
 export function getBottleSeriesUrl(series: {
   id: number;
   fullName: string;
@@ -38,7 +49,7 @@ export function getEntityUrl(entity: {
 
 function createUrlSlug(
   value: string,
-  fallback: "bottle" | "entity" | "series",
+  fallback: "bottle" | "entity" | "series" | "tasting",
 ): string {
   const asciiSlug = slugify(value);
   if (asciiSlug) return asciiSlug;

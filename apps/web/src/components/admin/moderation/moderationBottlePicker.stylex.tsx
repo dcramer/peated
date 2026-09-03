@@ -16,8 +16,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { SectionHeading } from "../../sectionHeading.stylex";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { IconButton, TextLink } from "../..";
+import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
+import { BottleIdentityRow, IconButton, TextLink } from "../..";
 import { useORPC } from "../../../lib/orpc/context";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
@@ -196,16 +196,17 @@ export default function ModerationBottlePicker({
                   disabled={isLoading}
                   onClick={() => void selectBottle(bottle)}
                   type="button"
-                  {...stylex.props(foundationStyles.body, styles.result)}
+                  {...stylex.props(
+                    foundationStyles.body,
+                    styles.result,
+                    styles.bottleResult,
+                  )}
                 >
-                  <strong>{formatBottleDisplayName(bottle)}</strong>
-                  <span
-                    {...stylex.props(foundationStyles.metadata, styles.detail)}
-                  >
-                    {bottle.distillers
-                      .map((distiller) => distiller.name)
-                      .join(", ")}
-                  </span>
+                  <BottleIdentityRow
+                    {...toBottlePickerOption(bottle).bottle}
+                    layout="cell"
+                    query={query}
+                  />
                 </button>
               </li>
             ))}
@@ -346,6 +347,7 @@ const styles = stylex.create({
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
   add: { color: colors.accentDeep },
+  bottleResult: { paddingTop: 0, paddingBottom: 0 },
   detail: {
     display: "block",
     marginTop: space.x1,

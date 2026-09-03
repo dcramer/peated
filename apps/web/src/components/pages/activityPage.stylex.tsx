@@ -1,14 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { ButtonLink, EmptyState, TextLink } from "..";
+import { ButtonLink, EmptyState, TextLink, type BottleListItem } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
-import {
-  BottleRailSection,
-  type BottleRailItem,
-} from "./bottleRailSection.stylex";
+import { BottleRailSection } from "./bottleRailSection.stylex";
 import { PageColumns, PageHeader } from "./pageLayout.stylex";
 import { RailListSection } from "./railListSection.stylex";
 
@@ -22,7 +19,7 @@ export function ActivityPage({
 }: {
   items: readonly CommunityFeedItem[];
   note?: string;
-  libraryBottles?: readonly BottleRailItem[];
+  libraryBottles?: readonly BottleListItem[];
   libraryHref?: string;
   selector: ReactNode;
 }) {
