@@ -33,7 +33,7 @@ the production registry, rather than only the top level of `adapters/`.
 
 External review sources must also follow the
 [external review source procedure](../../../../docs/operations/external-review-sources.md).
-It owns review publishing, transient content, source approval, and rollback.
+It covers review publishing, source approval, and rollback.
 
 ## Registering a source
 
@@ -100,10 +100,14 @@ pass. The AI provider does not store request content. An admin must still
 preview and activate the inactive revision. AI never changes the active
 revision directly.
 
+For reviews, `reviewItem` selects the full body to save internally; optional
+`reviewText` selects tasting notes for tags and clips. [External Reviews](../../../../docs/features/external-reviews.md)
+defines what is saved, who can read it, and when it is deleted.
+
 Setup traces may record the complete model instructions, public website input,
 model output, and rule-check arguments and results. They must not include
 credentials, request headers, cookies, or private admin data. Normal collection
-must not record page bodies or publisher prose. Follow
+must keep page bodies and publisher prose out of logs and traces. Follow
 [Sensitive Data](../../../../docs/policies/sensitive-data.md).
 
 `pnpm evals:scraper` checks rule generation with fixed website fixtures and the

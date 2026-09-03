@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { ScraperAdapter } from "../types";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 const ORIGIN = "https://www.whiskynotes.be";
 const TARGET = "whiskynotes";
@@ -143,6 +144,7 @@ export function parseWhiskyNotesArticle(
 
   const reviewList = [];
   const externalReviewTexts: Record<string, string> = {};
+  const externalReviewBodies: Record<string, string> = {};
   const headings = content
     .find("h2")
     .toArray()
@@ -176,6 +178,12 @@ export function parseWhiskyNotesArticle(
       nativeScore: reviewScore?.nativeScore ?? null,
     });
     externalReviewTexts[sourceKey] = sectionText;
+    const body = readReviewBody(
+      headings.length === 1
+        ? content
+        : $(heading).add($(heading).nextUntil("h2")),
+    );
+    if (body) externalReviewBodies[sourceKey] = body;
   }
 
   if (reviewList.length === 0) {
@@ -192,6 +200,7 @@ export function parseWhiskyNotesArticle(
       externalReviews: reviewList,
     },
     externalReviewTexts,
+    externalReviewBodies,
   });
 }
 

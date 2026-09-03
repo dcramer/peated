@@ -12,6 +12,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 const ORIGIN = "https://www.whiskyfun.com";
 const TARGET = "whiskyfun";
@@ -316,6 +317,7 @@ export function parseWhiskyfunArticle(
   const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
     [];
   const reviewTexts: Record<string, string> = {};
+  const reviewBodies: Record<string, string> = {};
   let hasReviewCandidate = false;
   let sessionTitle = article.title;
 
@@ -348,6 +350,8 @@ export function parseWhiskyfunArticle(
       nativeScore: reviewScore.nativeScore,
     });
     reviewTexts[sourceKey] = reviewText;
+    const body = readReviewBody($(element));
+    if (body) reviewBodies[sourceKey] = body;
   });
 
   if (externalReviews.length === 0) {
@@ -366,6 +370,7 @@ export function parseWhiskyfunArticle(
       externalReviews,
     },
     externalReviewTexts: reviewTexts,
+    externalReviewBodies: reviewBodies,
   });
 }
 

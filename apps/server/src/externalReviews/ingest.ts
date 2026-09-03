@@ -1,7 +1,8 @@
 import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { externalSites } from "@peated/server/db/schema";
+import { externalSites, tags } from "@peated/server/db/schema";
 import { createReviewClip } from "@peated/server/externalReviews/clip";
+import { extractReviewTags } from "@peated/server/externalReviews/extractTags";
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
@@ -44,6 +45,11 @@ export async function ingestExternalReviewArticle(
     throw new Error(`External site ${input.externalSiteId} not found.`);
 
   const storedExternalReviews = [];
+  const vocabulary =
+    Object.keys(input.externalReviewTexts).length ||
+    Object.keys(input.externalReviewBodies).length
+      ? await db.select({ name: tags.name, synonyms: tags.synonyms }).from(tags)
+      : [];
 
   for (const externalReview of input.article.externalReviews) {
     const rawName = externalReview.name;
@@ -54,11 +60,15 @@ export async function ingestExternalReviewArticle(
       if (referenceMatch) break;
     }
     const reviewText = input.externalReviewTexts[externalReview.sourceKey];
+    const body = input.externalReviewBodies[externalReview.sourceKey];
+    const tagText = reviewText ?? body;
     const clip = reviewText ? await services.createClip(reviewText) : null;
     storedExternalReviews.push({
       ...externalReview,
       bottleId: referenceMatch?.bottleId ?? null,
       clip: clip ?? undefined,
+      body,
+      tags: tagText ? extractReviewTags(tagText, vocabulary) : undefined,
     });
   }
 

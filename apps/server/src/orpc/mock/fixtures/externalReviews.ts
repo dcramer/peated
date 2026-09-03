@@ -28,6 +28,7 @@ export const mockExternalReview = {
     display: "92",
   },
   clip: "Dense smoke gives way to dark fruit and a long, dry finish.",
+  extractedTags: ["smoke"],
   bottle: mockBottle,
   createdAt: timestamp,
   updatedAt: timestamp,

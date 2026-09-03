@@ -68,23 +68,33 @@ export const ExternalReviewArticleIngestionSchema = z
           .transform((value) => value.slice(0, MAX_REVIEW_TEXT_LENGTH)),
       )
       .default({}),
+    externalReviewBodies: z
+      .record(ReviewSourceKeySchema, z.string().trim().min(1))
+      .default({}),
   })
   .strict()
-  .superRefine(({ article, externalReviewTexts }, context) => {
-    const sourceKeys = new Set(
-      article.externalReviews.map(({ sourceKey }) => sourceKey),
-    );
-    for (const sourceKey of Object.keys(externalReviewTexts)) {
-      if (!sourceKeys.has(sourceKey)) {
-        context.addIssue({
-          code: "custom",
-          message:
-            "External review text must match an external review source key.",
-          path: ["externalReviewTexts", sourceKey],
-        });
+  .superRefine(
+    ({ article, externalReviewTexts, externalReviewBodies }, context) => {
+      const sourceKeys = new Set(
+        article.externalReviews.map(({ sourceKey }) => sourceKey),
+      );
+      for (const [field, texts] of Object.entries({
+        externalReviewTexts,
+        externalReviewBodies,
+      })) {
+        for (const sourceKey of Object.keys(texts)) {
+          if (!sourceKeys.has(sourceKey)) {
+            context.addIssue({
+              code: "custom",
+              message:
+                "External review text must match an external review source key.",
+              path: [field, sourceKey],
+            });
+          }
+        }
       }
-    }
-  });
+    },
+  );
 
 export type ExternalReviewArticleIngestion = z.infer<
   typeof ExternalReviewArticleIngestionSchema

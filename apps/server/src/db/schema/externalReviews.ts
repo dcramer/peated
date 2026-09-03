@@ -11,6 +11,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
 import { categoryEnum } from "./enums";
@@ -66,6 +67,10 @@ export const externalReviews = pgTable(
     nativeScoreScale: doublePrecision("native_score_scale"),
     nativeScoreDisplay: text("native_score_display"),
     clip: text("clip"),
+    tags: varchar("tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -98,6 +103,15 @@ export const externalReviews = pgTable(
     ),
   ],
 );
+
+// Review ingestion owns internal source text; public review queries do not load it.
+export const externalReviewBodies = pgTable("review_body", {
+  externalReviewId: bigint("review_id", { mode: "number" })
+    .primaryKey()
+    .references(() => externalReviews.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  fetchedAt: timestamp("fetched_at").notNull(),
+});
 
 export const externalReviewArticlesRelations = relations(
   externalReviewArticles,

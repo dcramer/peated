@@ -6,6 +6,7 @@ import {
   type WhiskyAdvocateCursor,
   type WhiskyAdvocateObservation,
   parseIssueList,
+  parseReviewBody,
   parseReviewPublishedAt,
   parseReviews,
   whiskyAdvocateAdapter,
@@ -90,6 +91,12 @@ test("parses the publisher date template", async () => {
   expect(parseReviewPublishedAt(html)).toEqual(
     new Date("2023-12-19T00:00:00.000Z"),
   );
+  expect(parseReviewBody(html)).toBe(
+    "Nose: Vanilla and orchard fruit.\n\nPalate: Gentle oak. Finish: Long and dry.",
+  );
+  expect(() => parseReviewBody("<html></html>")).toThrow(
+    "Whisky Advocate review body is missing.",
+  );
   expect(() => parseReviewPublishedAt("<html></html>")).toThrow(
     "Whisky Advocate review date is missing.",
   );
@@ -146,6 +153,9 @@ test("fetches dates for the latest issue and checkpoints each review", async () 
     request.mock.calls[1]?.[0].url.searchParams.get("custom_rating_issue[0]"),
   ).toBe(issueNames[0]);
   expect(observations).toHaveLength(166);
+  expect(Object.values(observations[0]!.value.externalReviewBodies)).toEqual([
+    "Nose: Vanilla and orchard fruit.\n\nPalate: Gentle oak. Finish: Long and dry.",
+  ]);
   expect(observations[0]).toMatchObject({
     sourceKey:
       "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2",

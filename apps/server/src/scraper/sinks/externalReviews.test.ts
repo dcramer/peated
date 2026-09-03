@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
+  externalReviewBodies,
   externalReviews,
 } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
@@ -37,6 +38,10 @@ test("Whisky Advocate observations use article and source identity", async ({
         ],
       },
       externalReviewTexts: {},
+      externalReviewBodies: {
+        [url]:
+          "A complete introduction.\n\nNose: vanilla.\n\nA final conclusion.",
+      },
     },
   };
 
@@ -87,6 +92,12 @@ test("Whisky Advocate observations use article and source identity", async ({
       nativeScoreDisplay: "93.5/100",
       sourceKey: url,
       hidden: true,
+    },
+  ]);
+  expect(await db.select().from(externalReviewBodies)).toMatchObject([
+    {
+      externalReviewId: storedExternalReviews[0]!.externalReview.id,
+      body: observation.value.externalReviewBodies[url],
     },
   ]);
   expect(

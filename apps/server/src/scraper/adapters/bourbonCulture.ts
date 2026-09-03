@@ -11,6 +11,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 // This adapter owns Bourbon Culture parsing. The shared scraper runtime owns
 // every remote request and the shared review sink owns storage.
@@ -146,6 +147,7 @@ export function parseBourbonCultureArticle(
       .join(" "),
   );
   const reviewSourceKey = sourceKey(canonicalUrl.href);
+  const body = readReviewBody(content);
   const review = {
     sourceKey: reviewSourceKey,
     name,
@@ -156,6 +158,7 @@ export function parseBourbonCultureArticle(
   const contentText = JSON.stringify({
     review,
     reviewText: reviewText || null,
+    body,
   });
 
   return BourbonCultureObservationSchema.parse({
@@ -168,6 +171,7 @@ export function parseBourbonCultureArticle(
       externalReviews: [review],
     },
     externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
+    externalReviewBodies: body ? { [reviewSourceKey]: body } : {},
   });
 }
 

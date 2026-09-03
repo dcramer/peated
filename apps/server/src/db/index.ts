@@ -3,6 +3,7 @@ import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import config from "../config";
+import { logDebug } from "../lib/log";
 import { getPostgresConnectionConfig } from "./connection";
 import * as schema from "./schema";
 
@@ -45,7 +46,10 @@ if (config.ENV !== "production") {
 
 export const db = drizzle(pool, {
   schema,
-  logger: config.DEBUG,
+  // Database logging excludes parameter values, which can contain private text.
+  logger: config.DEBUG
+    ? { logQuery: (query) => logDebug("Database query", { extra: { query } }) }
+    : false,
 });
 
 export type AnyConnection = typeof db;

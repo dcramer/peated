@@ -1,6 +1,7 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import {
   externalReviewArticles,
+  externalReviewBodies,
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -20,6 +21,8 @@ import { z } from "zod";
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
   clip: z.string().trim().min(1).max(180).nullable().optional(),
+  tags: z.array(z.string().min(1).max(64)).optional(),
+  body: z.string().trim().min(1).optional(),
 });
 
 export const ExternalReviewArticleInputSchema =
@@ -197,6 +200,11 @@ export async function storeExternalReviewArticleInTransaction(
       if (externalReview.clip !== undefined) {
         values.clip = externalReview.clip;
       }
+      // Review imports own these tags. Missing text keeps the previous tags;
+      // supplied text replaces them, even when nothing matches.
+      if (externalReview.tags !== undefined) {
+        values.tags = [...new Set(externalReview.tags)].sort();
+      }
     }
     const [stored] = existing
       ? await tx
@@ -214,6 +222,21 @@ export async function storeExternalReviewArticleInTransaction(
           })
           .returning();
     if (!stored) throw new Error("Unable to store external review.");
+    if (origin === "source" && externalReview.body !== undefined) {
+      if (!input.fetchedAt)
+        throw new Error("A scraped review body requires its fetch date.");
+      await tx
+        .insert(externalReviewBodies)
+        .values({
+          externalReviewId: stored.id,
+          body: externalReview.body,
+          fetchedAt: input.fetchedAt,
+        })
+        .onConflictDoUpdate({
+          target: externalReviewBodies.externalReviewId,
+          set: { body: externalReview.body, fetchedAt: input.fetchedAt },
+        });
+    }
     storedExternalReviews.push({
       externalReview: stored,
       previousBottleId: existing?.bottleId,
@@ -224,9 +247,8 @@ export async function storeExternalReviewArticleInTransaction(
 }
 
 /**
- * Stores external review metadata. The input excludes full review text, HTML,
- * tasting notes, conclusions, and images. Callers must discard those values
- * before they call this function.
+ * Stores review facts and optional internal bodies. Scrapers must convert the
+ * selected review content to plain text before calling this function.
  */
 export async function storeExternalReviewArticle(
   rawInput: ExternalReviewArticleInputCandidate,

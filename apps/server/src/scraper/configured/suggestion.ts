@@ -41,6 +41,7 @@ type CheckedDetailPage = AiPage & {
             display: string;
           } | null;
           reviewText: string | null;
+          body: string | null;
         }>;
       }
     | {
@@ -176,6 +177,9 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
           reviewerName: review.reviewerName ?? null,
           nativeScore: review.nativeScore ?? null,
           reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
+          body:
+            value.externalReviewBodies[review.sourceKey]?.slice(0, 50_000) ??
+            null,
         })),
       },
     };

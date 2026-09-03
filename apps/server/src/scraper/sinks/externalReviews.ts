@@ -10,5 +10,6 @@ export const externalReviewSink: ScraperSink<
     fetchedAt: new Date(),
     article: observation.value.article,
     externalReviewTexts: observation.value.externalReviewTexts,
+    externalReviewBodies: observation.value.externalReviewBodies,
   });
 };

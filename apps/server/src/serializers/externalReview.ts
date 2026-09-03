@@ -153,6 +153,7 @@ export const ExternalReviewSerializer = serializer({
       reviewerName: item.reviewerName,
       nativeScore,
       clip: item.clip,
+      extractedTags: item.tags,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

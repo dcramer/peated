@@ -14,8 +14,14 @@ and fields differ. A member review has a member, a whole-number score from 0
 through 100, and optional tasting notes, color, comments, serving style,
 friends, and picture. An external review can have a publication, reviewer,
 article link, and the score format used by its source.
-An external review can also have one short generated clip. The complete source
-review text is not stored.
+An external review can also have one short generated clip and matched tasting
+tags. Its full body is saved for internal parsing, following
+[External Reviews](../features/external-reviews.md).
+
+TODO(ratings): Revisit shared storage for member and external reviews, and how
+tastings and both review types feed flavor wheels. Measure bottle, distillery,
+and region queries before choosing shared queries or saved totals. Preserve
+source attribution and privacy and publication rules.
 
 ## Tasting bands
 

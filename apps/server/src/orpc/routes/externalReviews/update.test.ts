@@ -47,12 +47,15 @@ describe("PATCH /external-reviews/:externalReview", () => {
     ).rejects.toThrow("Unauthorized.");
   });
 
-  test("hidden-only updates preserve Bottle identity", async ({ fixtures }) => {
+  test("hidden-only updates preserve Bottle identity and extracted tags", async ({
+    fixtures,
+  }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
     const review = await fixtures.ExternalReview({
       bottleId: bottle.id,
       hidden: false,
+      tags: ["smoke"],
     });
 
     const response = await routerClient.externalReviews.update(
@@ -67,8 +70,10 @@ describe("PATCH /external-reviews/:externalReview", () => {
     ).toMatchObject({
       bottleId: bottle.id,
       hidden: true,
+      tags: ["smoke"],
     });
     expect(response.bottle?.id).toBe(bottle.id);
+    expect(response.extractedTags).toEqual(["smoke"]);
   });
 
   test("assigns an independently valid Bottle", async ({ fixtures }) => {

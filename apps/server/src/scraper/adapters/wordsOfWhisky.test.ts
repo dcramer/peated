@@ -67,6 +67,11 @@ test("extracts one scored review and only its tasting notes", async () => {
   expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /Article introduction|Publisher conclusion|Footer content/u,
   );
+  const body = Object.values(parsed.externalReviewBodies)[0]!;
+  expect(body).toContain("Article introduction");
+  expect(body).toContain("Publisher conclusion");
+  expect(body).not.toContain("Footer content");
+  expect(body).toContain("\n\n");
 });
 
 test("extracts each Bottle and normalizes decimal scores", async () => {
@@ -91,6 +96,11 @@ test("extracts each Bottle and normalizes decimal scores", async () => {
   expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /conclusion|Samples provided|Article introduction/iu,
   );
+  const [firstBody, secondBody] = Object.values(parsed.externalReviewBodies);
+  expect(firstBody).toContain("First conclusion");
+  expect(firstBody).not.toMatch(/Kanosuke|Second conclusion|article title/u);
+  expect(secondBody).toContain("Second conclusion");
+  expect(secondBody).not.toMatch(/Dingle|First conclusion/u);
 });
 
 test("resumes without requesting a completed current article", async () => {

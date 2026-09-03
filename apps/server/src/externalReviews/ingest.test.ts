@@ -1,13 +1,17 @@
 import { db } from "@peated/server/db";
 import {
+  bottleTags,
   bottleTombstones,
   externalReviewArticles,
+  externalReviewBodies,
   externalReviews,
+  tags,
 } from "@peated/server/db/schema";
 import {
   ingestExternalReviewArticle as ingestExternalReviewArticleWithServices,
   type ExternalReviewIngestionServices,
 } from "@peated/server/externalReviews/ingest";
+import { routerClient } from "@peated/server/orpc/router";
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 
@@ -287,4 +291,224 @@ test("keeps an existing clip when later generation returns no clip", async ({
   expect(await db.query.externalReviews.findFirst()).toMatchObject({
     clip: "The first useful clip.",
   });
+});
+
+test.for<[string, string[]]>([
+  [
+    "Nose: VANILLA, ripe apples and cinnamon. Finish: vanilla.",
+    ["apple", "cinnamon", "vanilla"],
+  ],
+  ["Palate: pineapple and sweet fruit.", []],
+  [
+    "Palate: dark-chocolate and orange peel.",
+    ["dark chocolate", "orange peel"],
+  ],
+  ["Nose: chocolate. Palate: dark chocolate.", ["chocolate", "dark chocolate"]],
+  ["Nose: no smoke or oak, just vanilla.", ["vanilla"]],
+  [
+    "Palate: without a trace of dark chocolate, but cinnamon remains.",
+    ["cinnamon"],
+  ],
+  ["Nose: no smoke. Palate: smoky and vanilla.", ["smoke", "vanilla"]],
+  ["Nose: no smoke\nPalate: vanilla.", ["vanilla"]],
+  [
+    "Palate: less smoky than last year. Not only vanilla but cinnamon.",
+    ["cinnamon", "smoke", "vanilla"],
+  ],
+  ["Finish: no shortage of vanilla, smoke-free.", ["vanilla"]],
+  ["Palate: shared alias.", []],
+  ["Palate: oak.", ["oak"]],
+])(
+  "extracts review tags from %s",
+  async ([reviewText, expected], { fixtures }) => {
+    await db
+      .insert(tags)
+      .values(
+        [
+          { name: "apple", synonyms: ["apples"] },
+          { name: "vanilla", synonyms: ["shared alias"] },
+          { name: "cinnamon", synonyms: ["shared alias", "oak"] },
+          { name: "smoke", synonyms: ["smoky"] },
+          { name: "oak" },
+          { name: "chocolate" },
+          { name: "dark chocolate" },
+          { name: "orange" },
+          { name: "orange peel" },
+        ].map((tag) => ({ ...tag, tagCategory: "sweet" as const })),
+      );
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    await ingestExternalReviewArticle({
+      externalSiteId: site.id,
+      fetchedAt: new Date(),
+      article: {
+        canonicalUrl: "https://reviews.example/articles/tags",
+        title: "Vanilla and oak in the article title are not tasting evidence",
+        publishedAt: new Date("2026-09-01T00:00:00Z"),
+        contentHash: "sha256:tags",
+        externalReviews: [{ sourceKey: "tags", name: "Review Bottle" }],
+      },
+      externalReviewTexts: { tags: reviewText },
+    });
+    const review = await db.query.externalReviews.findFirst();
+    expect(review?.tags).toEqual(expected);
+    expect(await db.select().from(bottleTags)).toEqual([]);
+  },
+);
+
+test("refreshes tags per review, preserves them without text, and exposes them through the API", async ({
+  fixtures,
+}) => {
+  await fixtures.Tag({ name: "vanilla" });
+  await fixtures.Tag({ name: "smoke", synonyms: ["smoky"] });
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const user = await fixtures.User({ mod: true });
+  const input = {
+    externalSiteId: site.id,
+    fetchedAt: new Date(),
+    article: {
+      canonicalUrl: "https://reviews.example/articles/tag-refresh",
+      title: "Two reviewed bottles",
+      publishedAt: new Date("2026-09-01T00:00:00Z"),
+      contentHash: "sha256:tag-refresh",
+      externalReviews: [
+        { sourceKey: "first", name: "First Bottle" },
+        { sourceKey: "second", name: "Second Bottle" },
+      ],
+    },
+  };
+  const result = await ingestExternalReviewArticle({
+    ...input,
+    externalReviewTexts: {
+      first: "Nose: vanilla, vanilla.",
+      second: "Palate: smoky.",
+    },
+  });
+  const readTags = async () => {
+    const { results } = await routerClient.externalReviews.list(
+      { site: site.type, sort: "name" },
+      { context: { user } },
+    );
+    return results.map(({ id, extractedTags }) => ({ id, extractedTags }));
+  };
+  expect(await readTags()).toEqual([
+    { id: result.externalReviewIds[0], extractedTags: ["vanilla"] },
+    { id: result.externalReviewIds[1], extractedTags: ["smoke"] },
+  ]);
+
+  await ingestExternalReviewArticle(input);
+  await ingestExternalReviewArticle({
+    ...input,
+    externalReviewTexts: { first: "Palate: smoky." },
+  });
+  expect(await readTags()).toEqual([
+    { id: result.externalReviewIds[0], extractedTags: ["smoke"] },
+    { id: result.externalReviewIds[1], extractedTags: ["smoke"] },
+  ]);
+
+  // A dictionary edit is used on the next import, even with the same article hash.
+  await db.update(tags).set({ synonyms: [] }).where(eq(tags.name, "smoke"));
+  await ingestExternalReviewArticle({
+    ...input,
+    externalReviewTexts: { first: "Palate: smoky." },
+  });
+  expect(await readTags()).toEqual([
+    { id: result.externalReviewIds[0], extractedTags: [] },
+    { id: result.externalReviewIds[1], extractedTags: ["smoke"] },
+  ]);
+  await db
+    .delete(externalReviews)
+    .where(eq(externalReviews.id, result.externalReviewIds[1]));
+  expect(await readTags()).toEqual([
+    { id: result.externalReviewIds[0], extractedTags: [] },
+  ]);
+});
+
+test("retains complete bodies internally, refreshes them per review, and preserves them when absent", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ApprovedExternalReviewPublication({
+    externalSiteId: site.id,
+    approvedAt: new Date(),
+  });
+  const bottle = await fixtures.Bottle();
+  const user = await fixtures.User({ mod: true });
+  await fixtures.Tag({ name: "vanilla" });
+  await fixtures.Tag({ name: "oak" });
+  const body = `An introduction about oak casks.\n\n${"Long review prose. ".repeat(3000)}\n\nNose: Vanilla.\n\nThe final conclusion.`;
+  const fetchedAt = new Date("2026-09-01T12:00:00Z");
+  const input = {
+    externalSiteId: site.id,
+    fetchedAt,
+    article: {
+      canonicalUrl: "https://reviews.example/articles/internal-bodies",
+      title: "Two reviews",
+      publishedAt: new Date("2026-09-01T00:00:00Z"),
+      contentHash: "sha256:internal-bodies",
+      externalReviews: [
+        { sourceKey: "first", name: bottle.fullName },
+        { sourceKey: "second", name: "Second Bottle" },
+      ],
+    },
+  };
+  const {
+    externalReviewIds: [firstId, secondId],
+  } = await ingestExternalReviewArticle({
+    ...input,
+    externalReviewTexts: { first: "Nose: Vanilla." },
+    externalReviewBodies: { first: body, second: "Second review: oak." },
+  });
+  const readBodies = () =>
+    db
+      .select()
+      .from(externalReviewBodies)
+      .orderBy(asc(externalReviewBodies.externalReviewId));
+  expect(await readBodies()).toEqual([
+    { externalReviewId: firstId, body, fetchedAt },
+    { externalReviewId: secondId, body: "Second review: oak.", fetchedAt },
+  ]);
+  expect(createReviewClipMock).toHaveBeenCalledTimes(1);
+  for (const response of [
+    await routerClient.externalReviews.list({
+      bottle: bottle.id,
+      sort: "name",
+    }),
+    await routerClient.externalReviews.list(
+      { site: site.type, sort: "name" },
+      { context: { user } },
+    ),
+  ]) {
+    expect(
+      response.results.find(({ id }) => id === firstId)?.extractedTags,
+    ).toEqual(["vanilla"]);
+    expect(response.results.every((review) => !("body" in review))).toBe(true);
+    expect(JSON.stringify(response)).not.toContain("Long review prose");
+  }
+
+  await ingestExternalReviewArticle({
+    ...input,
+    fetchedAt: new Date("2026-09-02T12:00:00Z"),
+  });
+  expect(await readBodies()).toEqual([
+    { externalReviewId: firstId, body, fetchedAt },
+    { externalReviewId: secondId, body: "Second review: oak.", fetchedAt },
+  ]);
+  const refreshedAt = new Date("2026-09-02T13:00:00Z");
+  await ingestExternalReviewArticle({
+    ...input,
+    fetchedAt: refreshedAt,
+    externalReviewBodies: { first: "Updated introduction.\n\nVanilla finish." },
+  });
+  expect(await readBodies()).toEqual([
+    {
+      externalReviewId: firstId,
+      body: "Updated introduction.\n\nVanilla finish.",
+      fetchedAt: refreshedAt,
+    },
+    { externalReviewId: secondId, body: "Second review: oak.", fetchedAt },
+  ]);
+  await db.delete(externalReviews).where(eq(externalReviews.id, firstId));
+  expect(await readBodies()).toEqual([
+    { externalReviewId: secondId, body: "Second review: oak.", fetchedAt },
+  ]);
 });
