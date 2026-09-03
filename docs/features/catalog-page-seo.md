@@ -17,11 +17,19 @@ browse hierarchy. They do not claim that a series is one product or publish
 invented ratings. `catalogStructuredData.ts` escapes stored text before embedding
 it in a script element.
 
-The request proxy resolves bottle and series IDs, merged records, stale name
-slugs, and location slug casing before HTML streaming starts. Redirects return HTTP 308 and
-preserve tabs and query parameters. Locations keep their existing country and
-region slug URLs. Unknown records follow the normal not-found path. All proxy
-identity reads and sitemap reads are anonymous.
+The request proxy resolves numeric bottle and series IDs, Peated IDs, and location
+slug casing before HTML streaming starts. Those redirects return HTTP 308 and
+preserve tabs and query parameters. Normal catalog slug URLs make no proxy API
+calls. Bottle forms skip proxy identity reads for both numeric and slug URLs.
+Bottle and series page loaders use their existing memoized identity read
+to correct stale names and merged IDs; Next.js may deliver these redirects in the
+rendered response once streaming has started. Locations keep their existing
+country and region slug URLs. Unknown records follow the normal not-found path.
+All proxy identity reads and sitemap reads are anonymous.
+
+Metadata and structured data reuse the identity loaded for the page. They add no
+client-side JavaScript or list queries. Keep this behavior covered by the proxy's
+API call-count tests when changing catalog routing.
 
 The root sitemap includes catalog browse pages, series, countries, and regions.
 Region sitemaps are split by country so a single request does not need to fetch

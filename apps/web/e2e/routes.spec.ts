@@ -24,7 +24,7 @@ const publicRoutes = [
   {
     heading: testSeries.name,
     name: "Series",
-    path: `/series/${testSeries.id}`,
+    path: `/series/${testSeries.id}-old.name`,
   },
   {
     heading: "A record of whisky, bottle by bottle.",
@@ -79,8 +79,7 @@ const otherPublicRoutes = [["company", `/companies/${testOwner.id}`]] as const;
 test("public routes load", async ({ page, request, snapshot }) => {
   for (const source of [
     `/series/${testSeries.id}`,
-    `/series/${testSeries.id}-old.name`,
-    "/series/9402-old",
+    "/series/9402",
     `/S${testSeries.id}`,
   ]) {
     const response = await request.get(
@@ -102,6 +101,11 @@ test("public routes load", async ({ page, request, snapshot }) => {
           .getByRole("heading", { exact: true, name: route.heading })
           .first();
         await expect(heading).toBeVisible();
+        if (route.name === "Series") {
+          await expect(page).toHaveURL(
+            `/series/${testSeries.id}-lagavulin-special-releases`,
+          );
+        }
         if (route.name === "Bottle") {
           const smoke = page.getByRole("button", {
             name: /^Smoke, 75% of tastings with notes/,
