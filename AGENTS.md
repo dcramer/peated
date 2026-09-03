@@ -7,12 +7,14 @@ Peated is a public record of whisky, freely accessible to everyone.
   and verify results.
 - Record evidence. Never present guesses as facts; leave weak or conflicting
   facts unknown.
-- Write for everyday people: common words, short sentences, active voice,
-  consistent terms. Explain necessary whisky terms.
+- Write for everyday people in code, docs, and explanations. Use familiar names,
+  common words, short sentences, and active voice. Keep terms consistent and
+  explain necessary whisky terms.
 - Respect privacy, permissions, licenses, and source sites. Make clear who can
   change what.
 - Solve the current problem with small functions and modules, plain objects,
-  and simple types. Avoid speculative options or abstractions.
+  and simple types. Do not add options, extra steps, or new concepts without a
+  current need.
 
 ## Commands
 
@@ -31,8 +33,10 @@ Peated is a public record of whisky, freely accessible to everyone.
 ## Workflow
 
 - Inspect, make the smallest complete change, verify, summarize.
-- Find and change all uses of shared functions, types, errors, data formats,
-  and product terms. Preserve compatibility only when required.
+- Use stored IDs, kinds, and relationships; do not guess from names or placement.
+- Find and change all affected uses, including tests, sample data, stories,
+  and docs. Remove code made unnecessary by the change. Preserve compatibility
+  only when required.
 - Pass unexpected errors to their handler. Retry only expected temporary failures.
 - Comment beside code that enforces an important rule; name the rule and owner.
 - Keep lasting explanations with their code or feature. Delete completed plans.
@@ -49,6 +53,7 @@ Peated is a public record of whisky, freely accessible to everyone.
 
 ## Testing
 
+- Write tests from the required behavior, not from the code being tested.
 - Backend tests are integration-first.
 - Test frontend logic and actions, not appearance. Check visuals in a browser.
 - Keep deterministic tests (`pnpm test`) separate from live model checks
