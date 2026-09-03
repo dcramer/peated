@@ -1,6 +1,5 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
@@ -32,7 +31,6 @@ import {
   type RecordType,
 } from "@peated/web/components/recordTypeInput.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import type { ImageUploadValue } from "@peated/web/lib/imageUpload";
 import {
@@ -411,18 +409,11 @@ export default function TastingForm(
       <form onSubmit={formAction}>
         <FormStack>
           <SelectedBottleSummary
-            brand={
-              initialData.bottle.brand.shortName ||
-              initialData.bottle.brand.name
-            }
+            bottle={initialData.bottle}
             imageUrl={
               (isReview ? effectiveReviewImagePreview : imagePreview) ??
               initialData.bottle.imageUrl
             }
-            metadata={getBottleMetadata(initialData.bottle)}
-            name={formatBottleDisplayName(initialData.bottle, {
-              includeBrand: false,
-            })}
           />
           {submitError || errorMessage ? (
             <FormNotice>{submitError ?? errorMessage}</FormNotice>

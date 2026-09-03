@@ -1,5 +1,3 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import {
   Button,
@@ -19,7 +17,6 @@ import {
   BottleResolverSection,
 } from "./layout.stylex";
 import {
-  FallbackActions,
   getPhotoFailureCopyPayload,
   LabelFacts,
   PhotoFailurePanel,
@@ -248,14 +245,7 @@ export function PhotoMatchCreateState({
               title="Label photo"
             />
           ) : null}
-          <SelectedBottleSummary
-            brand={matchedBottle.brand.shortName || matchedBottle.brand.name}
-            imageUrl={matchedBottle.imageUrl}
-            metadata={getMatchedBottleMetadata(matchedBottle)}
-            name={formatBottleDisplayName(matchedBottle, {
-              includeBrand: false,
-            })}
-          />
+          <SelectedBottleSummary bottle={matchedBottle} />
           <LabelFacts result={result} />
           {renderMatchedResultActions ? (
             renderMatchedResultActions({
@@ -332,22 +322,4 @@ export function PhotoMatchCreateState({
       </BottleResolverSection>
     </BottleResolverColumn>
   );
-}
-
-function getMatchedBottleMetadata(bottle: Bottle) {
-  const release =
-    bottle.releaseYear !== null &&
-    !bottle.edition
-      ?.toLocaleLowerCase()
-      .includes(`${bottle.releaseYear} release`)
-      ? `${bottle.releaseYear} release`
-      : null;
-
-  return [
-    bottle.category ? formatCategoryName(bottle.category) : "Bottle",
-    bottle.edition,
-    release,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
 }

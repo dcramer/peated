@@ -1,6 +1,5 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Bottle } from "@peated/server/types";
 import {
   BottleIdentityRow,
@@ -10,8 +9,7 @@ import {
 } from "@peated/web/components";
 import { ClientOnly } from "@peated/web/components/clientOnly";
 import QRCodeClient from "@peated/web/components/qrcode.client.stylex";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
@@ -49,16 +47,7 @@ export function FlightOverlay({
             <ItemList ariaLabel="Flight bottles">
               {bottles.map(({ bottle }) => (
                 <ItemListItem key={bottle.id}>
-                  <BottleIdentityRow
-                    brand={bottle.brand.name}
-                    brandHref={getEntityUrl(bottle.brand)}
-                    href={getBottleUrl(bottle)}
-                    imageUrl={bottle.imageUrl}
-                    metadata={getBottleMetadata(bottle).split(" · ")}
-                    name={formatBottleDisplayName(bottle, {
-                      includeBrand: false,
-                    })}
-                  />
+                  <BottleIdentityRow {...toBottleListItem(bottle)} />
                 </ItemListItem>
               ))}
             </ItemList>

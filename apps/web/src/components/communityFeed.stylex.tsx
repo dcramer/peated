@@ -2,8 +2,10 @@ import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
 
 import { colors, fonts, space } from "../styles/tokens.stylex";
-import { AppLink } from "./appLink";
-import { BottleVisual } from "./bottleIdentityRow.stylex";
+import {
+  BottleIdentityRow,
+  type BottleIdentityRowProps,
+} from "./bottleIdentityRow.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { RATING_BANDS, TastingRating, type RatingBand } from "./scoring.stylex";
@@ -11,6 +13,7 @@ import { TextLink } from "./textLink.stylex";
 import TimeSince from "./timeSince";
 
 export type CommunityFeedItem = {
+  bottle?: Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata">;
   actor: string;
   actorHref?: string;
   bottleHref: string;
@@ -51,20 +54,20 @@ export function CommunityFeed({
               linkedRowStyles.onGround,
             )}
           >
-            <BottleVisual imageUrl={item.imageUrl} />
             <div {...stylex.props(styles.heading)}>
               <div {...stylex.props(styles.identity)}>
-                <AppLink
+                <BottleIdentityRow
+                  {...item.bottle}
+                  align="start"
+                  layout="cell"
                   href={item.href}
-                  title={item.title}
-                  {...stylex.props(
-                    foundationStyles.rowTitle,
-                    styles.title,
-                    linkedRowStyles.primaryLink,
-                  )}
-                >
-                  {item.title}
-                </AppLink>
+                  imageUrl={item.imageUrl}
+                  metadata={
+                    item.bottle?.metadata ??
+                    (item.metadata ? item.metadata.split(" · ") : [])
+                  }
+                  name={item.bottle?.name ?? item.title}
+                />
                 <div
                   {...stylex.props(foundationStyles.metadata, styles.context)}
                 >
@@ -81,7 +84,6 @@ export function CommunityFeed({
                 <div
                   {...stylex.props(foundationStyles.metadata, styles.metadata)}
                 >
-                  {item.metadata ? <>{item.metadata} · </> : null}
                   <TextLink href={item.bottleHref} size="inherit">
                     View bottle
                   </TextLink>
@@ -130,7 +132,7 @@ const styles = stylex.create({
   entry: {
     boxSizing: "border-box",
     display: "grid",
-    gridTemplateColumns: "auto minmax(0, 1fr)",
+    gridTemplateColumns: "minmax(0, 1fr)",
     alignItems: "center",
     columnGap: space.x3,
     rowGap: space.x2,
@@ -148,13 +150,6 @@ const styles = stylex.create({
   identity: {
     flex: 1,
     minWidth: 0,
-  },
-  title: {
-    display: "block",
-    color: colors.ink,
-    textDecoration: "none",
-    whiteSpace: "normal",
-    textWrap: "pretty",
   },
   context: {
     marginTop: "3px",
@@ -196,7 +191,7 @@ const styles = stylex.create({
     textAlign: "right",
   },
   excerpt: {
-    gridColumn: "2",
+    gridColumn: "1",
     margin: 0,
     color: colors.ink,
     fontStyle: "italic",

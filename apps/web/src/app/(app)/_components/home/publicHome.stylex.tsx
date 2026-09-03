@@ -1,15 +1,11 @@
 "use client";
 
-import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { formatCategoryName } from "@peated/server/lib/format";
 import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
-import { EntityLinks } from "@peated/web/components/entityLinks";
-import Join from "@peated/web/components/join";
 import {
   HomeActivityFeed,
   HomeContributionPrompt,
@@ -34,8 +30,6 @@ import {
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 import { HomeEventCallout } from "./homeEventCallout.stylex";
-
-type Bottle = Outputs["bottles"]["list"]["results"][number];
 
 export function PublicHome({
   searchPlaceholder,
@@ -168,26 +162,7 @@ function LatestReleases() {
   const items = releases.results.flatMap((bottle) => {
     if (bottle.releaseYear === null) return [];
 
-    const distillers = bottle.distillers.filter(
-      (distiller) => distiller.id !== bottle.brand.id,
-    );
-    const subtitle = [
-      distillers.length ? (
-        <EntityLinks entities={distillers} key="distillers" />
-      ) : null,
-      bottle.category ? formatCategoryName(bottle.category) : null,
-    ].filter((value) => value !== null);
-
-    return [
-      {
-        ...toBottleListItem(bottle, { includeBrandRow: false }),
-        align: "start" as const,
-        metadata: getReleaseMetadata(bottle),
-        subtitle: subtitle.length ? (
-          <Join divider=" · ">{subtitle}</Join>
-        ) : undefined,
-      },
-    ];
+    return [toBottleListItem(bottle)];
   });
 
   return items.length ? (
@@ -346,14 +321,6 @@ function Distilleries({ totalDistilleries }: { totalDistilleries?: number }) {
       totalDistilleries={totalDistilleries}
     />
   ) : null;
-}
-
-function getReleaseMetadata(bottle: Bottle) {
-  return [
-    bottle.releaseYear === null ? null : `${bottle.releaseYear} release`,
-    bottle.statedAge === null ? null : `${bottle.statedAge} years`,
-    bottle.abv === null ? null : `${bottle.abv.toFixed(1)}% ABV`,
-  ].filter((value): value is string => Boolean(value));
 }
 
 const NARROW = "@media (max-width: 759px)";

@@ -10,7 +10,11 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { BottleVisual } from "./bottleIdentityRow.stylex";
+import {
+  BottleIdentityRow,
+  BottleVisual,
+  type BottleIdentityRowProps,
+} from "./bottleIdentityRow.stylex";
 import { Chip } from "./chip.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
 import { TastingToastSummary } from "./tastingToastButton.stylex";
@@ -21,6 +25,7 @@ const bottleIconUrl = "/assets/bottle.svg";
 export type TastingMediaKind = "bottle" | "photo";
 
 export type TastingEntryMember = {
+  bottle?: Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata">;
   color?: string;
   comments?: number;
   hasToasted?: boolean;
@@ -70,11 +75,6 @@ export function TastingEntry({
             key={`${member.tastingId ?? member.href ?? member.name}-${member.name}`}
             {...stylex.props(styles.member)}
           >
-            <TastingMedia
-              imageKind={member.imageKind}
-              imageUrl={member.imageUrl}
-              size="card"
-            />
             <div {...stylex.props(styles.memberBody)}>
               <div {...stylex.props(styles.headingRow)}>
                 <div {...stylex.props(styles.memberCopy)}>
@@ -109,37 +109,17 @@ export function TastingEntry({
                       </span>
                     </div>
                   </header>
-                  {member.href ? (
-                    <AppLink
-                      href={member.href}
-                      title={member.name}
-                      {...stylex.props(
-                        foundationStyles.rowTitle,
-                        styles.name,
-                        styles.nameLink,
-                      )}
-                    >
-                      {member.name}
-                    </AppLink>
-                  ) : (
-                    <span
-                      title={member.name}
-                      {...stylex.props(foundationStyles.rowTitle, styles.name)}
-                    >
-                      {member.name}
-                    </span>
-                  )}
-                  {member.metadata ? (
-                    <span
-                      title={member.metadata}
-                      {...stylex.props(
-                        foundationStyles.metadata,
-                        styles.metadata,
-                      )}
-                    >
-                      {member.metadata}
-                    </span>
-                  ) : null}
+                  <BottleIdentityRow
+                    {...member.bottle}
+                    align="start"
+                    href={member.href}
+                    imageUrl={member.imageUrl}
+                    metadata={
+                      member.bottle?.metadata ??
+                      (member.metadata ? member.metadata.split(" · ") : [])
+                    }
+                    name={member.bottle?.name ?? member.name}
+                  />
                 </div>
                 <div {...stylex.props(styles.rating)}>
                   {member.ratingBand ? (
@@ -373,41 +353,6 @@ const styles = stylex.create({
   menu: {
     display: "flex",
     flexShrink: 0,
-  },
-  name: {
-    display: "block",
-    marginTop: space.x2,
-    overflow: "hidden",
-    color: colors.ink,
-    textDecoration: "none",
-    textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
-    whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  nameLink: {
-    color: {
-      default: colors.ink,
-      ":hover": colors.accentDeep,
-      ":active": colors.accentDeep,
-      ":focus-visible": colors.accentDeep,
-    },
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-      ":active": "underline",
-      ":focus-visible": "underline",
-    },
-  },
-  metadata: {
-    marginTop: space.x1,
-    overflow: "hidden",
-    color: colors.inkMuted,
-    textOverflow: { default: "ellipsis", [COMPACT]: "clip" },
-    whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
   },
   notes: {
     margin: 0,

@@ -2,6 +2,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { CommunityFeedItem } from "@peated/web/components/communityFeed.stylex";
+import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottleUrl } from "@peated/web/lib/urls";
 
@@ -22,6 +23,7 @@ export function getCommunityFeedItems({
     return [
       {
         actor: source,
+        bottle: getBottleIdentityProps(review.bottle),
         actorHref: review.url,
         bottleHref: getBottleUrl(review.bottle),
         date: review.article.publishedAt ?? review.createdAt,
@@ -41,6 +43,7 @@ export function getCommunityFeedItems({
   const tastingItems = memberTastings.map(
     (tasting): CommunityFeedItem => ({
       actor: tasting.createdBy.username,
+      bottle: getBottleIdentityProps(tasting.bottle),
       actorHref: `/users/${tasting.createdBy.username}`,
       bottleHref: getBottleUrl(tasting.bottle),
       date: tasting.createdAt,

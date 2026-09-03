@@ -1,3 +1,5 @@
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import type { BottleRowActionControls } from "@peated/web/hooks/useBottleRowActions";
@@ -22,6 +24,17 @@ const bottleActions = {
   isLibrary: () => true,
 } satisfies BottleRowActionControls;
 
+const rowBottle = {
+  ...mockBottle,
+  brand: { ...mockBottle.brand, name: "Laphroaig", shortName: null },
+  name: "Elements L 2.0",
+  group: undefined,
+  releaseYear: 2024,
+  statedAge: null,
+  abv: 59.6,
+  imageUrl: BottleImage.src,
+};
+
 const meta = {
   title: "Components/Bottles/Bottle Identity Row",
   component: BottleIdentityRow,
@@ -33,18 +46,15 @@ const meta = {
     ),
   ],
   args: {
-    brand: "Laphroaig",
-    brandHref: "/entities/809",
+    ...toBottleListItem(rowBottle),
     href: "/bottles/19936",
     imageUrl: BottleImage.src,
-    metadata: ["Single malt", "Islay"],
-    name: "Elements L 2.0",
   },
   parameters: {
     docs: {
       description: {
         component:
-          "Use Bottle Identity Row in bottle lists. Three-line identities, activity entries, and selected-bottle summaries share the default medium BottleVisual size: 48 × 64px on desktop and 42 × 58px on mobile. The bottle name is the main destination. Brand links, related releases, and action menus remain separate controls.",
+          "Use Bottle Identity Row wherever a standard bottle row appears. toBottleListItem and getBottleIdentityProps supply the same marketed name, provenance, and release facts used on the homepage and in Library. Rows share a 48 × 64px thumbnail on desktop and 42 × 58px on mobile. Producer links, related releases, and action menus remain separate controls.",
       },
     },
   },
@@ -71,12 +81,11 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
-          brand="Lagavulin"
-          brandHref="/entities/245"
+          provenance={[{ name: "Single Malt" }]}
           href="/bottles/42"
           imageUrl={null}
           metadata={["16 years", "43.0% ABV", "Distillers Edition"]}
-          name="16-year-old"
+          name="Lagavulin 16-year-old"
           relatedReleases={{ count: 3, href: "/bottles/42/releases" }}
         />
       </ItemListItem>
@@ -104,12 +113,11 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
-          brand="Bruichladdich"
-          brandHref="/entities/213"
+          provenance={[{ name: "Single Malt" }]}
           href="/bottles/18481"
           imageUrl={null}
           metadata={["61.5% ABV", "2024 release", "Islay barley"]}
-          name="Octomore Edition 15.3 Islay Barley Super Heavily Peated"
+          name="Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated"
         />
       </ItemListItem>
     </ItemList>
@@ -126,7 +134,7 @@ export const RowLayouts: Story = {
     },
   },
   render: (args) => {
-    const title = [args.brand, args.name].filter(Boolean).join(" ");
+    const title = args.name;
     const metadata = args.metadata?.join(" · ") ?? "";
     return (
       <StoryStack>
@@ -142,6 +150,7 @@ export const RowLayouts: Story = {
             items={[
               {
                 actor: "Whiskyfun",
+                bottle: args,
                 actorHref: "https://example.com/review",
                 bottleHref: args.href!,
                 date: "2026-08-24T12:00:00.000Z",
@@ -163,6 +172,7 @@ export const RowLayouts: Story = {
             members={[
               {
                 href: args.href,
+                bottle: args,
                 imageUrl: args.imageUrl,
                 metadata,
                 name: title,
@@ -182,6 +192,7 @@ export const RowLayouts: Story = {
                 items: [
                   {
                     href: args.href!,
+                    bottle: args,
                     id: "bottle",
                     metadata,
                     title,
@@ -200,10 +211,8 @@ export const RowLayouts: Story = {
         <section aria-label="Selection">
           <SectionHeading level={3}>Selected bottle</SectionHeading>
           <SelectedBottleSummary
-            brand={args.brand!}
+            bottle={rowBottle}
             imageUrl={args.imageUrl}
-            metadata={metadata}
-            name={args.name}
             onChange={() => undefined}
           />
         </section>

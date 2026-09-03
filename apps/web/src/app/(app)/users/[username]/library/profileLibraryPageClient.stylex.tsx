@@ -1,13 +1,11 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
 import {
   MemberLibraryFilters,
@@ -15,9 +13,9 @@ import {
   type MemberLibraryFilterGroup,
   type MemberLibraryItem,
 } from "@peated/web/components/pages/memberProfileContent.stylex";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
@@ -283,6 +281,9 @@ function toLibraryItem(
 ): MemberLibraryItem {
   const bottle = entry.bottle;
   return {
+    ...toBottleListItem(bottle),
+    hasTasted: false,
+    isLibrary: false,
     actions: canEdit
       ? [
           {
@@ -319,29 +320,10 @@ function toLibraryItem(
           },
         ]
       : undefined,
-    brand: bottle.brand.shortName || bottle.brand.name,
-    brandHref: getEntityUrl(bottle.brand),
-    href: getBottleUrl(bottle),
     id: String(entry.id),
     imageUrl: entry.imageUrl ?? bottle.imageUrl,
-    metadata: getLibraryMetadata(bottle),
-    name: formatBottleDisplayName(bottle, { includeBrand: false }),
     status: entry.status ? capitalize(entry.status) : undefined,
   };
-}
-
-function getLibraryMetadata(bottle: LibraryEntry["bottle"]) {
-  return [
-    bottle.category ? formatCategoryName(bottle.category) : null,
-    bottle.statedAge !== null
-      ? `${bottle.statedAge} years`
-      : bottle.noAgeStatement
-        ? "No age statement"
-        : null,
-    bottle.abv !== null
-      ? `${bottle.abv.toFixed(1).replace(/\.0$/, "")}% ABV`
-      : null,
-  ].filter((value): value is string => Boolean(value));
 }
 
 function getFilterGroups({

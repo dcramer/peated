@@ -1,5 +1,6 @@
 import { expect, test } from "./test";
 
+import { bottlePathPattern } from "./assertions";
 import {
   bottleGroupRepresentative,
   existingBottle,
@@ -97,13 +98,10 @@ test("public routes load", async ({ page, snapshot }) => {
           ).toBeVisible();
           await expect(
             panel.getByRole("link", {
-              name: existingBottle.group.name,
+              name: existingBottle.group.fullName,
               exact: true,
             }),
-          ).toHaveAttribute(
-            "href",
-            new RegExp(`^/bottles/${existingBottle.id}-`),
-          );
+          ).toHaveAttribute("href", bottlePathPattern(existingBottle.id));
           await page.keyboard.press("Escape");
           await expect(panel).toHaveCount(0);
           await expect(smoke).toBeFocused();

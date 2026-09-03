@@ -1,4 +1,3 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   BottleIdentityRow,
   CursorPager,
@@ -6,7 +5,7 @@ import {
   ItemList,
   ItemListItem,
 } from "@peated/web/components";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -16,7 +15,7 @@ import {
   requireReleaseFamilyAnchor,
   requireReleaseFamilyGroup,
 } from "@peated/web/lib/releaseFamily";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -60,19 +59,12 @@ export default async function BottleReleasesPage(props: {
           {bottleList.results.map((bottle) => (
             <ItemListItem key={bottle.id}>
               <BottleIdentityRow
-                brand={bottle.brand.name}
-                brandHref={getEntityUrl(bottle.brand)}
+                {...toBottleListItem(bottle)}
                 end={
                   bottle.medianScore !== null && bottle.scoreCount >= 20
                     ? `${bottle.medianScore} / 100`
                     : undefined
                 }
-                href={getBottleUrl(bottle)}
-                imageUrl={bottle.imageUrl}
-                metadata={getBottleMetadata(bottle).split(" · ")}
-                name={formatBottleDisplayName(bottle, {
-                  includeBrand: false,
-                })}
               />
             </ItemListItem>
           ))}

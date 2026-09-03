@@ -39,6 +39,7 @@ import {
 } from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
+import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import {
   getFormErrorMessage,
   toChoiceValue,
@@ -47,7 +48,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { WandSparkles } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -412,19 +413,8 @@ export default function BottleForm({
   const statedAge = watch("statedAge");
   const noAgeStatement = watch("noAgeStatement");
   const abv = watch("abv");
-  const previewMetadata = useMemo(
-    () =>
-      [
-        category ? formatCategoryName(category) : null,
-        noAgeStatement
-          ? "No age statement"
-          : statedAge != null
-            ? `${statedAge} years`
-            : null,
-        abv != null ? `${abv}% ABV` : null,
-      ].filter((item): item is string => Boolean(item)),
-    [abv, category, noAgeStatement, statedAge],
-  );
+  const edition = watch("edition");
+  const releaseYear = watch("releaseYear");
 
   useEffect(() => {
     return () => {
@@ -482,9 +472,16 @@ export default function BottleForm({
           </FormNotice>
           {name || brand ? (
             <BottleIdentityRow
-              brand={brand?.name}
-              metadata={previewMetadata}
-              name={name || "Bottle preview"}
+              {...getBottleIdentityProps({
+                name: name || "Bottle preview",
+                brand: { name: brand?.name ?? "" },
+                category: category ?? null,
+                statedAge: statedAge ?? null,
+                noAgeStatement: noAgeStatement ?? null,
+                abv: abv ?? null,
+                edition,
+                releaseYear,
+              })}
             />
           ) : null}
           {submitError ? (
