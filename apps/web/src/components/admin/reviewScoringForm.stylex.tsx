@@ -14,6 +14,7 @@ import { getFormErrorMessage } from "../../lib/formHelpers";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
+import { useHydrated } from "../clientOnly";
 import { DataTable } from "../dataTable.stylex";
 import { TextLink } from "../textLink.stylex";
 import { AdminButton } from "./adminButton.stylex";
@@ -43,6 +44,7 @@ const excluded: ExternalReviewScoringPolicy = { enabled: false, rules: [] };
 
 /** Site score setup. Each edit needs a new preview; original scores stay unchanged. */
 export function ReviewScoringForm({ settings, onPreview, onSave }: Props) {
+  const hydrated = useHydrated();
   const [policy, setPolicy] = useState(settings.policy ?? excluded);
   const [preview, setPreview] = useState<ReviewScoringPreview>();
   const [busy, setBusy] = useState(false);
@@ -118,7 +120,7 @@ export function ReviewScoringForm({ settings, onPreview, onSave }: Props) {
         </p>
       ) : null}
       {error ? <AdminFormError values={[error]} /> : null}
-      <fieldset disabled={busy} {...stylex.props(styles.fields)}>
+      <fieldset disabled={!hydrated || busy} {...stylex.props(styles.fields)}>
         <AdminSelectField
           name="score-inclusion"
           label="Use this site's scores"
