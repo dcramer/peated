@@ -12,7 +12,6 @@ import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 
@@ -36,6 +35,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           disabled={disabled}
           ref={ref}
           {...stylex.props(
+            foundationStyles.input,
             styles.select,
             invalid && styles.invalid,
             disabled && styles.disabled,
@@ -272,9 +272,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "16px",
-    lineHeight: 1.45,
     cursor: {
       default: "pointer",
       ":disabled": "not-allowed",

@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
 import type { LocationMap } from "../lib/locationMap";
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { CardLink } from "./card.stylex";
 import { LocationMapIcon } from "./locationMapIcon";
@@ -40,15 +41,20 @@ export function LocationPreviewCard({
           )}
         </span>
       ) : null}
-      <strong title={name} {...stylex.props(styles.name)}>
+      <strong
+        title={name}
+        {...stylex.props(foundationStyles.compactRowTitle, styles.name)}
+      >
         {name}
       </strong>
-      <span {...stylex.props(styles.count)}>
+      <span {...stylex.props(foundationStyles.metadata, styles.count)}>
         {totalBottles.toLocaleString("en-US")}{" "}
         {totalBottles === 1 ? "bottle" : "bottles"}
       </span>
       {description ? (
-        <span {...stylex.props(styles.description)}>{description}</span>
+        <span {...stylex.props(foundationStyles.metadata, styles.description)}>
+          {description}
+        </span>
       ) : null}
     </CardLink>
   );
@@ -93,11 +99,6 @@ const styles = stylex.create({
   name: {
     gridRow: 2,
     overflow: "hidden",
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -106,10 +107,7 @@ const styles = stylex.create({
     display: "block",
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
   },
   description: {
     gridRow: 4,
@@ -122,9 +120,6 @@ const styles = stylex.create({
     WebkitLineClamp: 3,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
     textWrap: "pretty",
   },
 });

@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 
 export type SummaryStripCell = {
@@ -34,13 +35,19 @@ export function SummaryStrip({ cells }: { cells: SummaryStripCells }) {
           key={`${cell.label}-${index}`}
           {...stylex.props(styles.cell)}
         >
-          <dt title={cell.label} {...stylex.props(styles.label)}>
+          <dt
+            title={cell.label}
+            {...stylex.props(foundationStyles.metadata, styles.label)}
+          >
             {cell.label}
           </dt>
           <dd {...stylex.props(styles.valueRow)}>
             <strong {...stylex.props(styles.value)}>{cell.value}</strong>
             {cell.detail ? (
-              <span title={cell.detail} {...stylex.props(styles.detail)}>
+              <span
+                title={cell.detail}
+                {...stylex.props(foundationStyles.metadata, styles.detail)}
+              >
                 {cell.detail}
               </span>
             ) : null}
@@ -71,10 +78,6 @@ const styles = stylex.create({
     marginTop: "6px",
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    letterSpacing: 0,
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -100,9 +103,6 @@ const styles = stylex.create({
     minWidth: 0,
     overflow: "hidden",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },

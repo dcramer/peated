@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { TextLink } from "./textLink.stylex";
 
@@ -29,9 +30,18 @@ export function CriticReview({
     <article {...stylex.props(styles.review)}>
       <div {...stylex.props(styles.heading)}>
         <div {...stylex.props(styles.source)}>
-          <strong {...stylex.props(styles.publication)}>{publication}</strong>
+          <strong
+            {...stylex.props(
+              foundationStyles.compactRowTitle,
+              styles.publication,
+            )}
+          >
+            {publication}
+          </strong>
           {byline ? (
-            <span {...stylex.props(styles.byline)}>{byline}</span>
+            <span {...stylex.props(foundationStyles.metadata, styles.byline)}>
+              {byline}
+            </span>
           ) : null}
         </div>
         {rating !== null && rating !== undefined ? (
@@ -44,10 +54,14 @@ export function CriticReview({
         ) : null}
       </div>
 
-      {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
+      {summary ? (
+        <p {...stylex.props(foundationStyles.prose, styles.summary)}>
+          {summary}
+        </p>
+      ) : null}
 
       {href ? (
-        <div {...stylex.props(styles.reviewLink)}>
+        <div {...stylex.props(foundationStyles.metadata, styles.reviewLink)}>
           <TextLink href={href} size="inherit">
             Read the full review on {publication} →
           </TextLink>
@@ -78,17 +92,9 @@ const styles = stylex.create({
   },
   publication: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "16px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
   },
   byline: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
   rating: {
     flexShrink: 0,
@@ -107,17 +113,9 @@ const styles = stylex.create({
     marginBottom: 0,
     marginLeft: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "19px",
-    fontWeight: 400,
-    letterSpacing: "-0.015em",
-    lineHeight: 1.4,
     textWrap: "pretty",
   },
   reviewLink: {
     marginTop: space.x3,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.35,
   },
 });

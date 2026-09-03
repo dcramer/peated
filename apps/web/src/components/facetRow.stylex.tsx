@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ButtonHTMLAttributes } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -60,9 +61,10 @@ export function FacetRow({
       <span
         title={label}
         {...stylex.props(
+          foundationStyles.interactiveSmall,
           styles.label,
           !counted && styles.labelWide,
-          selected && styles.selectedLabel,
+          selected && [foundationStyles.interactiveSmall, styles.selectedLabel],
         )}
       >
         {label}
@@ -80,7 +82,7 @@ export function FacetRow({
         </span>
       ) : null}
       {counted || !available ? (
-        <span {...stylex.props(styles.count)}>
+        <span {...stylex.props(foundationStyles.metadata, styles.count)}>
           {counted ? count.toLocaleString("en-US") : "–"}
         </span>
       ) : null}
@@ -136,9 +138,7 @@ const styles = stylex.create({
     minWidth: 0,
     flex: "0 1 128px",
     overflow: "hidden",
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.3,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -153,9 +153,7 @@ const styles = stylex.create({
     borderBottomWidth: "2px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.ink,
-    fontFamily: fonts.display,
     fontWeight: 700,
-    letterSpacing: "-0.02em",
   },
   trackSlot: {
     display: "flex",
@@ -185,10 +183,7 @@ const styles = stylex.create({
     width: "48px",
     flex: "0 0 48px",
     overflow: "hidden",
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.3,
     textAlign: "right",
     textOverflow: "clip",
     whiteSpace: "nowrap",
@@ -196,7 +191,7 @@ const styles = stylex.create({
   dismissSlot: {
     width: "14px",
     flex: "0 0 14px",
-    fontFamily: fonts.data,
+    fontFamily: fonts.reading,
     fontSize: "12px",
     lineHeight: 1,
     textAlign: "right",

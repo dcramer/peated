@@ -9,11 +9,11 @@ import { usePathname, useSearchParams } from "next/navigation";
 import type { ReactElement, ReactNode } from "react";
 
 import { buildQueryString } from "../../lib/urls";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../../styles/tokens.stylex";
 import { linkedRowStyles } from "../linkedRow.stylex";
@@ -97,7 +97,7 @@ export function AdminTableContent<
             name="query"
             placeholder="Search"
             type="search"
-            {...stylex.props(styles.searchInput)}
+            {...stylex.props(foundationStyles.input, styles.searchInput)}
           />
         </form>
       ) : null}
@@ -115,6 +115,7 @@ export function AdminTableContent<
                       key={column.name}
                       scope="col"
                       {...stylex.props(
+                        foundationStyles.fieldLabel,
                         styles.header,
                         alignStyles[align],
                         index > 0 && styles.secondary,
@@ -154,7 +155,10 @@ export function AdminTableContent<
                     <th
                       colSpan={columns.length}
                       scope="colgroup"
-                      {...stylex.props(styles.groupCell)}
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.groupCell,
+                      )}
                     >
                       {groupTo ? (
                         <Link
@@ -185,6 +189,7 @@ export function AdminTableContent<
                       <td
                         key={column.name}
                         {...stylex.props(
+                          foundationStyles.metadata,
                           styles.cell,
                           alignStyles[align],
                           column.fill && styles.fill,
@@ -198,7 +203,7 @@ export function AdminTableContent<
                             {...stylex.props(linkedRowStyles.primaryLink)}
                           />
                         ) : null}
-                        <span {...stylex.props(styles.cellContent)}>
+                        <span {...stylex.props()}>
                           {getColumnValue(item, column)}
                         </span>
                       </td>
@@ -305,8 +310,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
     "::placeholder": { color: colors.inkMuted, opacity: 1 },
     "::-webkit-search-cancel-button": { appearance: "none" },
@@ -327,11 +330,6 @@ const styles = stylex.create({
   header: {
     padding: `${space.x2} ${space.x3}`,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
   },
   row: {
@@ -342,13 +340,10 @@ const styles = stylex.create({
   cell: {
     padding: `${space.x3} ${space.x3}`,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     verticalAlign: "middle",
   },
   fill: { width: "100%", maxWidth: 0 },
-  cellContent: {},
+
   secondary: { "@media (max-width: 639px)": { display: "none" } },
   groupRow: {
     borderBottomWidth: "1px",
@@ -359,8 +354,6 @@ const styles = stylex.create({
   groupCell: {
     padding: `${space.x2} ${space.x3}`,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     textAlign: "left",
   },
   groupLink: {
@@ -384,7 +377,6 @@ const styles = stylex.create({
   center: { textAlign: "center" },
   right: { textAlign: "right" },
 });
-
 const alignStyles = {
   center: styles.center,
   left: styles.left,

@@ -11,13 +11,8 @@ import type { ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
 
 import { Button } from ".";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-  zIndices,
-} from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 
 export default function ConfirmationDialog({
   continueLabel = "Continue",
@@ -42,7 +37,9 @@ export default function ConfirmationDialog({
           <DialogTitle as="div">
             <SectionHeading>{title}</SectionHeading>
           </DialogTitle>
-          <div {...stylex.props(styles.message)}>{message}</div>
+          <div {...stylex.props(foundationStyles.body, styles.message)}>
+            {message}
+          </div>
           <div {...stylex.props(styles.actions)}>
             <Button onClick={onCancel} variant="tonal">
               Cancel
@@ -87,9 +84,6 @@ const styles = stylex.create({
   message: {
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   actions: {
     display: "flex",

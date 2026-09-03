@@ -1,10 +1,10 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../../styles/tokens.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
@@ -29,11 +29,13 @@ export default function CheckResult({
   if (!check.schemaSupported) {
     return (
       <section {...stylex.props(styles.panel, styles.warningPanel)}>
-        <div {...stylex.props(styles.eyebrow)}>Unsupported schema</div>
+        <div {...stylex.props(foundationStyles.fieldLabel, styles.label)}>
+          Unsupported schema
+        </div>
         <div {...stylex.props(styles.title)}>
           <SectionHeading>{title}</SectionHeading>
         </div>
-        <p {...stylex.props(styles.copy)}>
+        <p {...stylex.props(foundationStyles.body, styles.copy)}>
           This audit uses schema version {check.schemaVersion}. Its historical
           proposals cannot be reviewed safely
           {check.canClose
@@ -50,10 +52,18 @@ export default function CheckResult({
   if (compact) {
     return (
       <section aria-label="Review summary" {...stylex.props(styles.panel)}>
-        <p {...stylex.props(styles.copy)}>{getBottleCheckSummary(check)}</p>
+        <p {...stylex.props(foundationStyles.body, styles.copy)}>
+          {getBottleCheckSummary(check)}
+        </p>
 
         {clean ? (
-          <p {...stylex.props(styles.copy, styles.success)}>
+          <p
+            {...stylex.props(
+              foundationStyles.body,
+              styles.copy,
+              styles.success,
+            )}
+          >
             No catalog changes or unresolved findings were proposed.
           </p>
         ) : null}
@@ -62,12 +72,17 @@ export default function CheckResult({
           <div {...stylex.props(styles.findings)}>
             {findings.map((finding, index) => (
               <article
-                {...stylex.props(styles.finding)}
+                {...stylex.props(foundationStyles.body, styles.finding)}
                 key={`${finding.scope}:${finding.summary}:${index}`}
               >
                 <p>{finding.summary}</p>
                 {finding.evidenceRefs.length > 0 ? (
-                  <details {...stylex.props(styles.evidence)}>
+                  <details
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.evidence,
+                    )}
+                  >
                     <summary {...stylex.props(styles.summary)}>
                       Evidence
                     </summary>
@@ -85,15 +100,19 @@ export default function CheckResult({
   return (
     <section {...stylex.props(styles.panel)}>
       <div {...stylex.props(styles.heading)}>
-        <span {...stylex.props(styles.status)}>
+        <span {...stylex.props(foundationStyles.metadata, styles.status)}>
           {getBottleCheckState(check)}
         </span>
         <SectionHeading>{title}</SectionHeading>
       </div>
-      <p {...stylex.props(styles.copy)}>{getBottleCheckSummary(check)}</p>
+      <p {...stylex.props(foundationStyles.body, styles.copy)}>
+        {getBottleCheckSummary(check)}
+      </p>
 
       {clean ? (
-        <div {...stylex.props(styles.copy, styles.success)}>
+        <div
+          {...stylex.props(foundationStyles.body, styles.copy, styles.success)}
+        >
           No catalog changes or unresolved findings were proposed.
         </div>
       ) : null}
@@ -105,12 +124,17 @@ export default function CheckResult({
             {findings.map((finding, index) => {
               return (
                 <article
-                  {...stylex.props(styles.finding)}
+                  {...stylex.props(foundationStyles.body, styles.finding)}
                   key={`${finding.scope}:${finding.summary}:${index}`}
                 >
                   <p>{finding.summary}</p>
                   {finding.evidenceRefs.length > 0 ? (
-                    <details {...stylex.props(styles.evidence)}>
+                    <details
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.evidence,
+                      )}
+                    >
                       <summary {...stylex.props(styles.summary)}>
                         Evidence
                       </summary>
@@ -142,22 +166,14 @@ const styles = stylex.create({
     borderColor: colors.accent,
     backgroundColor: colors.accentTint,
   },
-  eyebrow: {
+  label: {
     color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
   },
   title: { marginTop: space.x2 },
   copy: {
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   success: { color: colors.ink },
   heading: {
@@ -173,8 +189,6 @@ const styles = stylex.create({
     borderColor: colors.hairline,
     borderRadius: controlMetrics.radiusSmall,
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontWeight: 600,
   },
   findings: {
@@ -185,15 +199,10 @@ const styles = stylex.create({
   findingList: { display: "grid", gap: space.x3 },
   finding: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   evidence: {
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
   },
   summary: {
     cursor: "pointer",

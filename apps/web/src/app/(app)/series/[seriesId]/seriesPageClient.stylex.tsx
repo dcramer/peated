@@ -286,10 +286,6 @@ const styles = stylex.create({
   },
   title: {
     display: "block",
-    fontSize: {
-      default: null,
-      "@media (max-width: 480px)": "36px",
-    },
     overflowWrap: "anywhere",
   },
   filters: {

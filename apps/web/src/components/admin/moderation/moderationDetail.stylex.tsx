@@ -3,6 +3,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, type ReactNode } from "react";
 
+import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -34,8 +35,12 @@ export function ModerationEmpty({
 }) {
   return (
     <div {...stylex.props(styles.empty)}>
-      <strong {...stylex.props(styles.emptyTitle)}>{title}</strong>
-      <p {...stylex.props(styles.emptyCopy)}>{children}</p>
+      <strong {...stylex.props(foundationStyles.rowTitle, styles.emptyTitle)}>
+        {title}
+      </strong>
+      <p {...stylex.props(foundationStyles.body, styles.emptyCopy)}>
+        {children}
+      </p>
       {action}
     </div>
   );
@@ -76,14 +81,20 @@ export function ModerationTaskHeader({
   useEffect(() => headingRef.current?.focus(), [taskKey]);
   return (
     <header {...stylex.props(styles.taskHeader)}>
-      <div {...stylex.props(styles.taskMeta)}>
+      <div {...stylex.props(foundationStyles.metadata, styles.taskMeta)}>
         {category} /{" "}
         <span {...stylex.props(blocked && styles.blocked)}>{status}</span>
       </div>
-      <h1 ref={headingRef} tabIndex={-1} {...stylex.props(styles.taskTitle)}>
+      <h1
+        ref={headingRef}
+        tabIndex={-1}
+        {...stylex.props(foundationStyles.sectionHeading, styles.taskTitle)}
+      >
         {question}
       </h1>
-      <p {...stylex.props(styles.taskCopy)}>{meta}</p>
+      <p {...stylex.props(foundationStyles.metadata, styles.taskCopy)}>
+        {meta}
+      </p>
     </header>
   );
 }
@@ -104,7 +115,9 @@ export function ModerationMedia({
           </ImageViewer>
         </div>
       ) : null}
-      <div {...stylex.props(styles.mediaCopy)}>{children}</div>
+      <div {...stylex.props(foundationStyles.body, styles.mediaCopy)}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -115,7 +128,7 @@ export function ModerationActions({ children }: { children: ReactNode }) {
 
 export function ModerationLoading({ children }: { children: ReactNode }) {
   return (
-    <div role="status" {...stylex.props(styles.loading)}>
+    <div role="status" {...stylex.props(foundationStyles.body, styles.loading)}>
       {children}
     </div>
   );
@@ -153,10 +166,8 @@ const styles = stylex.create({
   },
   emptyTitle: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
   },
-  emptyCopy: { maxWidth: "42ch", margin: 0, fontSize: "14px", lineHeight: 1.5 },
+  emptyCopy: { maxWidth: "42ch", margin: 0 },
   srOnly: {
     position: "absolute",
     width: "1px",
@@ -171,11 +182,7 @@ const styles = stylex.create({
   },
   taskMeta: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
   },
   blocked: { color: colors.accentDeep },
   taskTitle: {
@@ -183,16 +190,11 @@ const styles = stylex.create({
     marginTop: space.x3,
     outline: "none",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "24px",
-    lineHeight: 1.15,
   },
   taskCopy: {
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
   media: {
     display: "flex",
@@ -219,9 +221,6 @@ const styles = stylex.create({
   mediaCopy: {
     minWidth: 0,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   taskActions: {
     display: "flex",
@@ -233,7 +232,5 @@ const styles = stylex.create({
   loading: {
     padding: space.x8,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
   },
 });

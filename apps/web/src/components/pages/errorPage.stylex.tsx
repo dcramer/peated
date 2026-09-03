@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
 
 export type ErrorPageProps = {
   actions?: ReactNode;
@@ -38,9 +38,15 @@ export function ErrorPage({
 }: ErrorPageProps) {
   return (
     <section {...stylex.props(styles.root)}>
-      <div {...stylex.props(styles.status)}>{status}</div>
-      <h1 {...stylex.props(styles.title)}>{title}</h1>
-      <div {...stylex.props(styles.description)}>{children}</div>
+      <div {...stylex.props(foundationStyles.metadata, styles.status)}>
+        {status}
+      </div>
+      <h1 {...stylex.props(foundationStyles.pageTitleCompact, styles.title)}>
+        {title}
+      </h1>
+      <div {...stylex.props(foundationStyles.body, styles.description)}>
+        {children}
+      </div>
       {actions ? <ErrorPageActions>{actions}</ErrorPageActions> : null}
       {detail ? <div {...stylex.props(styles.detail)}>{detail}</div> : null}
       {support}
@@ -78,30 +84,53 @@ export function ErrorReference({
   return (
     <div {...stylex.props(styles.reference)}>
       <div {...stylex.props(styles.referenceRow)}>
-        <span {...stylex.props(styles.referenceLabel)}>{label}</span>
-        <span {...stylex.props(styles.referenceValue)}>{value}</span>
+        <span
+          {...stylex.props(foundationStyles.metadata, styles.referenceLabel)}
+        >
+          {label}
+        </span>
+        <span {...stylex.props(foundationStyles.code, styles.referenceValue)}>
+          {value}
+        </span>
         {action ? (
           <span {...stylex.props(styles.referenceAction)}>{action}</span>
         ) : null}
       </div>
       {description ? (
-        <div {...stylex.props(styles.referenceDescription)}>{description}</div>
+        <div
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.referenceDescription,
+          )}
+        >
+          {description}
+        </div>
       ) : null}
       {technicalDetail ? (
         <details
           open={technicalDetail.defaultOpen}
-          {...stylex.props(styles.technicalDetail)}
+          {...stylex.props(foundationStyles.code, styles.technicalDetail)}
         >
-          <summary {...stylex.props(styles.technicalSummary)}>
+          <summary
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.technicalSummary,
+            )}
+          >
             Technical detail
           </summary>
           <div {...stylex.props(styles.technicalBody)}>
             {technicalDetail.context ? (
-              <div {...stylex.props(styles.technicalContext)}>
+              <div
+                {...stylex.props(
+                  foundationStyles.code,
+                  styles.technicalContext,
+                )}
+              >
                 {technicalDetail.context}
               </div>
             ) : null}
-            <pre {...stylex.props(styles.stackTrace)}>
+            <pre {...stylex.props(foundationStyles.code, styles.stackTrace)}>
               {technicalDetail.stack}
             </pre>
           </div>
@@ -120,7 +149,9 @@ export function ErrorSupport({
 }) {
   return (
     <div {...stylex.props(styles.support)}>
-      <div {...stylex.props(styles.supportCopy)}>{children}</div>
+      <div {...stylex.props(foundationStyles.metadata, styles.supportCopy)}>
+        {children}
+      </div>
       <div {...stylex.props(styles.supportAction)}>{action}</div>
     </div>
   );
@@ -137,33 +168,18 @@ const styles = stylex.create({
   },
   status: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 400,
-    letterSpacing: "0.1em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   title: {
     marginTop: space.x1,
     marginRight: 0,
     marginBottom: 0,
     marginLeft: 0,
-    fontFamily: fonts.display,
-    fontSize: "clamp(28px, 6vw, 34px)",
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-    lineHeight: 1.1,
     textWrap: "pretty",
   },
   description: {
     maxWidth: "560px",
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    fontWeight: 400,
-    lineHeight: 1.6,
     textWrap: "pretty",
   },
   actions: {
@@ -193,22 +209,12 @@ const styles = stylex.create({
   referenceLabel: {
     flexShrink: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   referenceValue: {
     minWidth: 0,
     flexGrow: 1,
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "12px",
     fontVariantNumeric: "tabular-nums",
-    fontWeight: 400,
-    lineHeight: 1.45,
     overflowWrap: "anywhere",
   },
   referenceAction: {
@@ -218,22 +224,15 @@ const styles = stylex.create({
     maxWidth: "62ch",
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 400,
-    lineHeight: 1.5,
   },
   technicalDetail: {
     marginTop: space.x3,
     color: colors.ink,
-    fontFamily: fonts.data,
   },
   technicalSummary: {
     width: "fit-content",
     color: colors.accent,
-    fontSize: "11px",
     fontWeight: 500,
-    lineHeight: 1.45,
     cursor: "pointer",
     outline: "none",
     boxShadow: {
@@ -254,9 +253,6 @@ const styles = stylex.create({
   },
   technicalContext: {
     color: colors.inkMuted,
-    fontSize: "11px",
-    fontWeight: 400,
-    lineHeight: 1.5,
     overflowWrap: "anywhere",
   },
   stackTrace: {
@@ -268,10 +264,6 @@ const styles = stylex.create({
     overflowX: "auto",
     overflowY: "auto",
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 400,
-    lineHeight: 1.55,
     whiteSpace: "pre-wrap",
     overflowWrap: "anywhere",
   },
@@ -292,17 +284,12 @@ const styles = stylex.create({
     minWidth: "200px",
     flexGrow: 1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    fontWeight: 400,
-    lineHeight: 1.55,
     textWrap: "pretty",
   },
   supportAction: {
     flexShrink: 0,
   },
 });
-
 const shellStyles = stylex.create({
   shell: {
     boxSizing: "border-box",

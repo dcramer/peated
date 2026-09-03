@@ -4,27 +4,33 @@ import { SectionHeading } from "../sectionHeading.stylex";
 
 import { TextLink, type TextLinkProps } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 
 export function ContentPage({
   children,
-  eyebrow,
+  metadata,
   intro,
   title,
 }: {
   children: ReactNode;
-  eyebrow?: ReactNode;
+  metadata?: ReactNode;
   intro?: ReactNode;
   title: ReactNode;
 }) {
   return (
     <article {...stylex.props(styles.page)}>
       <header {...stylex.props(styles.header)}>
-        {eyebrow ? (
-          <div {...stylex.props(styles.eyebrow)}>{eyebrow}</div>
-        ) : null}
         <h1 {...stylex.props(foundationStyles.pageTitle)}>{title}</h1>
-        {intro ? <div {...stylex.props(styles.intro)}>{intro}</div> : null}
+        {metadata ? (
+          <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+            {metadata}
+          </div>
+        ) : null}
+        {intro ? (
+          <div {...stylex.props(foundationStyles.prose, styles.intro)}>
+            {intro}
+          </div>
+        ) : null}
       </header>
       <div {...stylex.props(styles.body)}>{children}</div>
     </article>
@@ -62,11 +68,15 @@ export function ContentSubsection({
 }
 
 export function ContentText({ children }: { children: ReactNode }) {
-  return <p {...stylex.props(styles.text)}>{children}</p>;
+  return (
+    <p {...stylex.props(foundationStyles.prose, styles.text)}>{children}</p>
+  );
 }
 
 export function ContentList({ children }: { children: ReactNode }) {
-  return <ul {...stylex.props(styles.list)}>{children}</ul>;
+  return (
+    <ul {...stylex.props(foundationStyles.prose, styles.list)}>{children}</ul>
+  );
 }
 
 export function ContentLink({ children, ...props }: TextLinkProps) {
@@ -86,22 +96,14 @@ const styles = stylex.create({
     maxWidth: "720px",
     paddingBottom: space.x6,
   },
-  eyebrow: {
-    marginBottom: space.x2,
+  metadata: {
+    marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   intro: {
     maxWidth: "680px",
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "16px",
-    lineHeight: 1.6,
   },
   body: {
     display: "flex",
@@ -123,9 +125,6 @@ const styles = stylex.create({
     maxWidth: "74ch",
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.7,
   },
   list: {
     display: "flex",
@@ -135,8 +134,5 @@ const styles = stylex.create({
     margin: 0,
     paddingLeft: "20px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
   },
 });

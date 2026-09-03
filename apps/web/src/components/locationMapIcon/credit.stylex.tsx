@@ -1,12 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { TextLink } from "../textLink.stylex";
 
 /** Attribution for the adapted Scottish whisky region illustrations. */
 export function RegionMapCredit() {
   return (
-    <p {...stylex.props(styles.credit)}>
+    <p {...stylex.props(foundationStyles.metadata, styles.credit)}>
       Maps adapted from{" "}
       <TextLink
         href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg"
@@ -30,8 +31,5 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
 });

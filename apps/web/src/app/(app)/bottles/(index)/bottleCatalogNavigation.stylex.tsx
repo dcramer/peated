@@ -3,7 +3,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { PageTabs, TextLink } from "@peated/web/components";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../../styles/foundations.stylex";
+import { colors, space } from "../../../../styles/tokens.stylex";
 
 export function BottleCatalogNavigation({
   allHref,
@@ -25,7 +26,7 @@ export function BottleCatalogNavigation({
         ]}
       />
       {scope === "following" ? (
-        <p {...stylex.props(styles.scopeHelp)}>
+        <p {...stylex.props(foundationStyles.body, styles.scopeHelp)}>
           Bottles from distillers, brands, and bottlers you follow. See followed{" "}
           <TextLink href="/distillers?filter=following" size="inherit">
             distillers
@@ -55,8 +56,5 @@ const styles = stylex.create({
   scopeHelp: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
 });

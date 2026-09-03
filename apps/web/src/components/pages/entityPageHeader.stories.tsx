@@ -22,7 +22,7 @@ const meta = {
     description:
       "An Islay distillery known for heavily peated single malt whisky.",
     detail: "Distillery",
-    eyebrow: "Islay · Scotland",
+    metadata: "Islay · Scotland",
     id: "E9201",
     menu: (
       <RowMenu
@@ -58,7 +58,7 @@ export const ThinData: Story = {
     actions: undefined,
     description: undefined,
     detail: "Distillery",
-    eyebrow: "Scotland",
+    metadata: "Scotland",
     menu: undefined,
     parent: undefined,
     specs: [

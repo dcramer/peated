@@ -2,13 +2,18 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
 import { AppLink, BadgeImage } from "@peated/web/components";
-import { colors, fonts, space } from "../../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../../styles/foundations.stylex";
+import { colors, space } from "../../../../styles/tokens.stylex";
 
 type BadgeAward = Outputs["users"]["badgeList"]["results"][number];
 
 export function ProfilePassport({ awards }: { awards: readonly BadgeAward[] }) {
   if (!awards.length) {
-    return <p {...stylex.props(styles.empty)}>No stamps yet.</p>;
+    return (
+      <p {...stylex.props(foundationStyles.metadata, styles.empty)}>
+        No stamps yet.
+      </p>
+    );
   }
 
   return (
@@ -21,8 +26,12 @@ export function ProfilePassport({ awards }: { awards: readonly BadgeAward[] }) {
           >
             <BadgeImage badge={award.badge} level={award.level} size={40} />
             <span {...stylex.props(styles.copy)}>
-              <strong {...stylex.props(styles.name)}>{award.badge.name}</strong>
-              <span {...stylex.props(styles.status)}>
+              <strong
+                {...stylex.props(foundationStyles.compactRowTitle, styles.name)}
+              >
+                {award.badge.name}
+              </strong>
+              <span {...stylex.props(foundationStyles.metadata, styles.status)}>
                 {award.level ? "Stamped" : "In progress"}
               </span>
             </span>
@@ -58,24 +67,14 @@ const styles = stylex.create({
   },
   name: {
     overflow: "hidden",
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    lineHeight: 1.25,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
   status: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
   },
   empty: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
 });

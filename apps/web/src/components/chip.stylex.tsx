@@ -1,12 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-import {
-  colors,
-  controlMetrics,
-  effects,
-  fonts,
-} from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, controlMetrics, effects } from "../styles/tokens.stylex";
 
 export type ChipVariant = "neutral" | "tinted" | "solid";
 
@@ -31,7 +27,12 @@ export function Chip({
         data-variant={variant}
         onClick={onClick}
         type="button"
-        {...stylex.props(styles.chip, styles.interactive, variants[variant])}
+        {...stylex.props(
+          foundationStyles.interactiveSmall,
+          styles.chip,
+          styles.interactive,
+          variants[variant],
+        )}
       >
         {children}
       </button>
@@ -41,7 +42,11 @@ export function Chip({
   return (
     <span
       data-variant={variant}
-      {...stylex.props(styles.chip, variants[variant])}
+      {...stylex.props(
+        foundationStyles.interactiveSmall,
+        styles.chip,
+        variants[variant],
+      )}
     >
       {children}
     </span>
@@ -59,6 +64,7 @@ export function CountChip({
     <span
       data-tone={tone}
       {...stylex.props(
+        foundationStyles.metadata,
         styles.count,
         tone === "accent" ? styles.countAccent : styles.countNeutral,
       )}
@@ -81,10 +87,7 @@ const styles = stylex.create({
     paddingRight: "10px",
     paddingBottom: "5px",
     paddingLeft: "10px",
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1,
     whiteSpace: "nowrap",
   },
   interactive: {
@@ -130,11 +133,7 @@ const styles = stylex.create({
     justifyContent: "center",
     borderRadius: controlMetrics.radiusSmall,
     padding: 0,
-    fontFamily: fonts.data,
-    fontSize: "15px",
     fontVariantNumeric: "tabular-nums",
-    fontWeight: 400,
-    lineHeight: 1,
   },
   countAccent: {
     backgroundColor: "transparent",
@@ -145,7 +144,6 @@ const styles = stylex.create({
     color: colors.inkMuted,
   },
 });
-
 const variants = {
   neutral: styles.neutral,
   tinted: styles.tinted,

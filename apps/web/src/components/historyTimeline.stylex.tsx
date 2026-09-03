@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 import { TextLink } from "./textLink.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -38,7 +38,9 @@ export function HistoryTimeline({ events, summary }: HistoryTimelineProps) {
               event.state === "operating" ? styles.operating : styles.silent,
             )}
           >
-            <time {...stylex.props(styles.date)}>{event.date}</time>
+            <time {...stylex.props(foundationStyles.metadata, styles.date)}>
+              {event.date}
+            </time>
             <div {...stylex.props(styles.content)}>
               <span {...stylex.props(styles.visuallyHidden)}>
                 {event.state === "operating"
@@ -61,7 +63,7 @@ export function HistoryTimeline({ events, summary }: HistoryTimelineProps) {
                 </span>
               ) : null}
               {event.source ? (
-                <span {...stylex.props(styles.source)}>
+                <span {...stylex.props(foundationStyles.metadata)}>
                   <TextLink
                     href={event.source.href}
                     rel="noreferrer"
@@ -121,10 +123,7 @@ const styles = stylex.create({
   },
   date: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.45,
   },
   content: {
     display: "flex",
@@ -136,11 +135,7 @@ const styles = stylex.create({
   note: {
     color: colors.inkMuted,
   },
-  source: {
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.45,
-  },
+
   summary: {
     marginTop: space.x3,
     color: colors.inkMuted,

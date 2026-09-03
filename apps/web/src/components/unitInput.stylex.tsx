@@ -1,11 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import type { InputHTMLAttributes } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 
@@ -39,9 +39,12 @@ export function UnitInput({
         aria-invalid={invalid || undefined}
         disabled={disabled}
         type={type}
-        {...stylex.props(styles.input)}
+        {...stylex.props(foundationStyles.input, styles.input)}
       />
-      <span aria-hidden="true" {...stylex.props(styles.unit)}>
+      <span
+        aria-hidden="true"
+        {...stylex.props(foundationStyles.metadata, styles.unit)}
+      >
         {unit}
       </span>
     </span>
@@ -90,10 +93,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "16px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1,
     "::placeholder": {
       color: colors.inkMuted,
       opacity: 1,
@@ -103,8 +103,5 @@ const styles = stylex.create({
     flexShrink: 0,
     paddingRight: "13px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1,
   },
 });

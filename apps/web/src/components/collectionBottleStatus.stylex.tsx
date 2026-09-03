@@ -2,11 +2,11 @@
 
 import * as stylex from "@stylexjs/stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 
@@ -49,6 +49,7 @@ export function CollectionBottleStatusChips({
             onClick={() => onChange(status)}
             type="button"
             {...stylex.props(
+              foundationStyles.interactiveSmall,
               styles.chip,
               selected && styles.selected,
               disabled && !selected && styles.disabled,
@@ -89,10 +90,7 @@ const styles = stylex.create({
       ":active": colors.surface,
     },
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
     fontWeight: 600,
-    lineHeight: 1,
     cursor: {
       default: "pointer",
       ":disabled": "default",

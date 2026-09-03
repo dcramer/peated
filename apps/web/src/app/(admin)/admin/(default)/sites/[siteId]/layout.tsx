@@ -103,7 +103,7 @@ export default function Layout({
             size="lg"
           />
         }
-        eyebrow={site.type}
+        description={site.type}
         metadata={<ExternalSiteRunStatus site={site} />}
         actions={
           <AdminActions>

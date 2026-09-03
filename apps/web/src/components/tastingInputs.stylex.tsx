@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -63,11 +64,18 @@ export function ReviewScoreInput({
   return (
     <div {...stylex.props(styles.reviewScoreRoot, disabled && styles.disabled)}>
       <div {...stylex.props(styles.ratingHeading)}>
-        <label htmlFor={id} {...stylex.props(styles.ratingLabel)}>
+        <label
+          htmlFor={id}
+          {...stylex.props(foundationStyles.fieldLabel, styles.ratingLabel)}
+        >
           {label}
         </label>
         {required ? (
-          <span {...stylex.props(styles.requiredLabel)}>Required</span>
+          <span
+            {...stylex.props(foundationStyles.microLabel, styles.requiredLabel)}
+          >
+            Required
+          </span>
         ) : null}
       </div>
       <div {...stylex.props(styles.reviewScoreHeading)}>
@@ -118,10 +126,20 @@ export function ReviewScoreInput({
           />
         </div>
         <div aria-live="polite" {...stylex.props(styles.reviewScoreBand)}>
-          <strong {...stylex.props(styles.reviewScoreBandLabel)}>
+          <strong
+            {...stylex.props(
+              foundationStyles.rowTitle,
+              styles.reviewScoreBandLabel,
+            )}
+          >
             {selectedBand?.label ?? "Choose a score"}
           </strong>
-          <span {...stylex.props(styles.reviewScoreBandRange)}>
+          <span
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.reviewScoreBandRange,
+            )}
+          >
             {selectedBand?.range ?? "0–100"}
           </span>
         </div>
@@ -147,7 +165,13 @@ export function ReviewScoreInput({
             />
           ) : null}
         </div>
-        <div aria-hidden="true" {...stylex.props(styles.reviewScoreAnchors)}>
+        <div
+          aria-hidden="true"
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.reviewScoreAnchors,
+          )}
+        >
           <span>60</span>
           <span {...stylex.props(styles.reviewScoreAnchor80)}>80 good</span>
           <span {...stylex.props(styles.reviewScoreAnchor90)}>
@@ -156,7 +180,7 @@ export function ReviewScoreInput({
           <span>100</span>
         </div>
       </div>
-      <p {...stylex.props(styles.reviewScoreHint)}>
+      <p {...stylex.props(foundationStyles.metadata, styles.reviewScoreHint)}>
         Whole numbers. Your score counts toward this bottle's review score and
         appears with your review.
       </p>
@@ -215,6 +239,7 @@ export function RatingBandInput({
               />
               <span
                 {...stylex.props(
+                  foundationStyles.compactRowTitle,
                   styles.bandInputName,
                   checked && bandInputTextSelectedStyles[band.key],
                 )}
@@ -232,6 +257,7 @@ export function RatingBandInput({
               </span>
               <span
                 {...stylex.props(
+                  foundationStyles.metadata,
                   styles.bandInputRange,
                   checked && bandInputTextSelectedStyles[band.key],
                 )}
@@ -275,6 +301,7 @@ export function ServingStyleInput({
           <label
             key={option}
             {...stylex.props(
+              foundationStyles.interactive,
               styles.servingStyleCell,
               checked && styles.servingStyleCellSelected,
             )}
@@ -324,7 +351,7 @@ export function ColorInput({
       <div {...stylex.props(styles.colorHeading)}>
         <strong
           title={selected?.[1] ?? "Unsure"}
-          {...stylex.props(styles.colorName)}
+          {...stylex.props(foundationStyles.rowTitle, styles.colorName)}
         >
           {selected?.[1] ?? "Unsure"}
         </strong>
@@ -367,13 +394,19 @@ export function ColorInput({
           {...stylex.props(styles.colorRange)}
         />
       </div>
-      <div aria-hidden="true" {...stylex.props(styles.colorAnchors)}>
+      <div
+        aria-hidden="true"
+        {...stylex.props(foundationStyles.metadata, styles.colorAnchors)}
+      >
         <span>clear</span>
         <span>gold</span>
         <span>amber</span>
         <span>dark</span>
       </div>
-      <p aria-live="polite" {...stylex.props(styles.colorHint)}>
+      <p
+        aria-live="polite"
+        {...stylex.props(foundationStyles.metadata, styles.colorHint)}
+      >
         {selected
           ? `${selected[1]} · ${selected[0]} of 20`
           : "Bar light can lie. Unsure is a real answer."}
@@ -478,19 +511,10 @@ const styles = stylex.create({
   },
   ratingLabel: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.4,
   },
   requiredLabel: {
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
     fontStyle: "italic",
-    letterSpacing: 0,
-    lineHeight: 1.4,
   },
   reviewScoreHeading: {
     display: "flex",
@@ -526,7 +550,7 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: "transparent",
     color: colors.ink,
-    fontFamily: fonts.data,
+    fontFamily: fonts.display,
     fontSize: "42px",
     fontVariantNumeric: "tabular-nums",
     letterSpacing: "-0.04em",
@@ -549,18 +573,10 @@ const styles = stylex.create({
   },
   reviewScoreBandLabel: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
-    fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.2,
   },
   reviewScoreBandRange: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "13px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.3,
   },
   reviewScoreScale: {
     paddingTop: space.x6,
@@ -596,10 +612,7 @@ const styles = stylex.create({
     height: "20px",
     justifyContent: "space-between",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
     paddingTop: space.x1,
   },
   reviewScoreAnchor80: {
@@ -620,9 +633,6 @@ const styles = stylex.create({
     marginBottom: 0,
     marginLeft: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   visuallyHiddenInput: {
     position: "absolute",
@@ -709,19 +719,11 @@ const styles = stylex.create({
     alignItems: "center",
     columnGap: space.x1,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
     pointerEvents: "none",
   },
   bandInputRange: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.2,
     pointerEvents: "none",
   },
   bandInputCheck: {
@@ -753,10 +755,7 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.fieldBackground,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
     fontWeight: 600,
-    lineHeight: 1,
     cursor: "pointer",
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.fieldRule}`,
@@ -788,11 +787,6 @@ const styles = stylex.create({
     minWidth: 0,
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
@@ -838,9 +832,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     marginTop: "6px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
   },
   colorHint: {
     marginTop: space.x2,
@@ -848,9 +839,6 @@ const styles = stylex.create({
     marginBottom: 0,
     marginLeft: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   pictureRoot: {
     width: "100%",
@@ -905,7 +893,6 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
 });
-
 const bandInputSelectedStyles = {
   mediocre: styles.band1Selected,
   good: styles.band2Selected,
@@ -913,7 +900,6 @@ const bandInputSelectedStyles = {
   outstanding: styles.band4Selected,
   unicorn: styles.band5Selected,
 } satisfies Record<RatingBand, stylex.StyleXStyles>;
-
 const bandInputTextSelectedStyles = {
   mediocre: styles.bandInputTextSelectedLight,
   good: styles.bandInputTextSelectedLight,
@@ -921,7 +907,6 @@ const bandInputTextSelectedStyles = {
   outstanding: styles.bandInputTextSelectedDark,
   unicorn: styles.bandInputTextSelectedDark,
 } satisfies Record<RatingBand, stylex.StyleXStyles>;
-
 const SERVING_STYLE_OPTIONS = [
   { icon: GlassWater, label: "Neat", value: "neat" },
   { icon: Box, label: "Rocks", value: "rocks" },

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { ButtonLink, EmptyState, TextLink } from "..";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
 import {
   BottleRailSection,
@@ -38,7 +39,7 @@ export function ActivityPage({
         rail={
           <div {...stylex.props(styles.rail)}>
             <RailListSection heading="What have you tried?">
-              <p {...stylex.props(styles.railText)}>
+              <p {...stylex.props(foundationStyles.body, styles.railText)}>
                 Add a rating and a few notes to remember what you tasted.
               </p>
               <div>
@@ -64,7 +65,11 @@ export function ActivityPage({
           </div>
         }
       >
-        {note ? <p {...stylex.props(styles.note)}>{note}</p> : null}
+        {note ? (
+          <p {...stylex.props(foundationStyles.metadata, styles.note)}>
+            {note}
+          </p>
+        ) : null}
         {items.length ? (
           <CommunityFeed ariaLabel="Latest activity" items={items} limit={20} />
         ) : (
@@ -88,16 +93,10 @@ const styles = stylex.create({
   railText: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
   },
   note: {
     marginTop: space.x4,
     marginBottom: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
 });

@@ -22,13 +22,8 @@ import { SectionHeading } from "./sectionHeading.stylex";
 
 import { Button, Field } from ".";
 import setRef from "../lib/setRef";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-  zIndices,
-} from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { ImageViewer } from "./imageViewer.stylex";
 
 type Props = {
@@ -251,7 +246,9 @@ function ImageCropDialog({
               width={displayWidth}
             />
           </div>
-          <label {...stylex.props(styles.rangeLabel)}>
+          <label
+            {...stylex.props(foundationStyles.fieldLabel, styles.rangeLabel)}
+          >
             Zoom
             <input
               max={3}
@@ -360,9 +357,6 @@ const styles = stylex.create({
     gap: space.x2,
     marginTop: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    textTransform: "uppercase",
   },
   range: { width: "100%", accentColor: colors.accent },
   dialogActions: {
@@ -373,5 +367,4 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
 });
-
 export default ImageField;

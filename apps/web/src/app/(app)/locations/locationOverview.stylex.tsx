@@ -17,8 +17,9 @@ import {
   PageColumns,
   PageSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
-import { colors, fonts } from "../../../styles/tokens.stylex";
+import { colors } from "../../../styles/tokens.stylex";
 
+import { foundationStyles } from "../../../styles/foundations.stylex";
 import { LocationVisual } from "./locationPageFrame.stylex";
 
 export function LocationOverview({
@@ -67,7 +68,9 @@ export function LocationOverview({
           {flavorProfile}
           {productionRules ? (
             <PageSection heading="Production rules">
-              <p {...stylex.props(styles.copy)}>{productionRules}</p>
+              <p {...stylex.props(foundationStyles.body, styles.copy)}>
+                {productionRules}
+              </p>
             </PageSection>
           ) : null}
           {categories.length ? (
@@ -163,8 +166,5 @@ const styles = stylex.create({
   copy: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
 });

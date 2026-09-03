@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 import { CardLink } from "./card.stylex";
 import CountryMapIcon from "./countryMapIcon";
 
@@ -33,9 +34,13 @@ export function LocationCard({
           {...stylex.props(styles.mapIcon)}
         />
       </div>
-      <h2 {...stylex.props(styles.title)}>{name}</h2>
-      {summary ? <p {...stylex.props(styles.summary)}>{summary}</p> : null}
-      <p {...stylex.props(styles.counts)}>
+      <h2 {...stylex.props(foundationStyles.rowTitle, styles.title)}>{name}</h2>
+      {summary ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.summary)}>
+          {summary}
+        </p>
+      ) : null}
+      <p {...stylex.props(foundationStyles.metadata, styles.counts)}>
         {totalBottles.toLocaleString("en-US")} {bottleNoun} ·{" "}
         {totalDistillers.toLocaleString("en-US")} {distillerNoun}
       </p>
@@ -67,29 +72,16 @@ const styles = stylex.create({
   title: {
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
   },
   summary: {
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   counts: {
     margin: 0,
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.04em",
-    lineHeight: 1.4,
-    textTransform: "uppercase",
   },
 });

@@ -4,6 +4,7 @@ import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
 import * as stylex from "@stylexjs/stylex";
 
+import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
 
 type Seller = Outputs["bottles"]["prices"]["list"]["results"][number];
@@ -15,16 +16,24 @@ export function BottleSellerList({ sellers }: { sellers: readonly Seller[] }) {
         const content = (
           <>
             <span {...stylex.props(styles.details)}>
-              <strong {...stylex.props(styles.seller)}>
+              <strong
+                {...stylex.props(foundationStyles.interactive, styles.seller)}
+              >
                 {seller.site.name}
               </strong>
-              <span {...stylex.props(styles.listing)}>{seller.name}</span>
-              <span {...stylex.props(styles.metadata)}>
+              <span
+                {...stylex.props(foundationStyles.metadata, styles.listing)}
+              >
+                {seller.name}
+              </span>
+              <span
+                {...stylex.props(foundationStyles.metadata, styles.metadata)}
+              >
                 {seller.volume.toLocaleString("en-US")} ml · Updated{" "}
                 <TimeSince date={seller.updatedAt} />
               </span>
             </span>
-            <span {...stylex.props(styles.price)}>
+            <span {...stylex.props(foundationStyles.body, styles.price)}>
               <Price currency={seller.currency} value={seller.price} />
             </span>
           </>
@@ -93,30 +102,20 @@ const styles = stylex.create({
   seller: {
     display: "block",
     color: colors.accentDeep,
-    fontSize: "14px",
     fontWeight: 700,
-    lineHeight: 1.35,
   },
   listing: {
     display: "block",
     marginTop: space.x1,
-    fontSize: "13px",
-    lineHeight: 1.4,
   },
   metadata: {
     display: "block",
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
   },
   price: {
     paddingTop: "1px",
-    fontFamily: fonts.data,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.35,
     whiteSpace: "nowrap",
   },
   outdated: {

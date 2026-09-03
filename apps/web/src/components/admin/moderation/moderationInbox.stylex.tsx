@@ -10,11 +10,11 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "../..";
+import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../../../styles/tokens.stylex";
 
@@ -113,8 +113,14 @@ export function ModerationInboxContent({
     <section aria-label="Moderation inbox" {...stylex.props(styles.root)}>
       <header {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.titleRow)}>
-          <h1 {...stylex.props(styles.title)}>Inbox</h1>
-          <span {...stylex.props(styles.count)}>{data.counts.all} open</span>
+          <h1
+            {...stylex.props(foundationStyles.pageTitleCompact, styles.title)}
+          >
+            Inbox
+          </h1>
+          <span {...stylex.props(foundationStyles.metadata, styles.count)}>
+            {data.counts.all} open
+          </span>
         </div>
         <form action={listPath} {...stylex.props(styles.searchForm)}>
           {category ? (
@@ -133,7 +139,7 @@ export function ModerationInboxContent({
             name="query"
             placeholder="Search decisions"
             type="search"
-            {...stylex.props(styles.search)}
+            {...stylex.props(foundationStyles.input, styles.search)}
           />
         </form>
         <nav aria-label="Inbox filters" {...stylex.props(styles.filters)}>
@@ -143,6 +149,7 @@ export function ModerationInboxContent({
               href={filter.href}
               key={filter.label}
               {...stylex.props(
+                foundationStyles.interactiveSmall,
                 styles.filter,
                 filter.active && styles.activeFilter,
               )}
@@ -162,14 +169,17 @@ export function ModerationInboxContent({
             >
               Ignore all {data.counts.inconclusive} inconclusive
             </Button>
-            <p {...stylex.props(styles.help)}>
+            <p {...stylex.props(foundationStyles.metadata, styles.help)}>
               These listings have no recommended bottle. Ignoring them removes
               them from the inbox without assigning one.
             </p>
           </div>
         ) : null}
         {bulkError ? (
-          <p role="alert" {...stylex.props(styles.error)}>
+          <p
+            role="alert"
+            {...stylex.props(foundationStyles.metadata, styles.error)}
+          >
             {bulkError}
           </p>
         ) : null}
@@ -199,23 +209,39 @@ export function ModerationInboxContent({
                     selected && styles.selectedTask,
                   )}
                 >
-                  <span {...stylex.props(styles.taskMeta)}>
+                  <span
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.taskMeta,
+                    )}
+                  >
                     <span>{task.category}</span>
                     <TimeSince date={task.attentionAt} />
                   </span>
                   <strong
                     title={task.title}
-                    {...stylex.props(styles.taskTitle)}
+                    {...stylex.props(
+                      foundationStyles.compactRowTitle,
+                      styles.taskTitle,
+                    )}
                   >
                     {task.title}
                   </strong>
                   <span
                     title={task.question}
-                    {...stylex.props(styles.question)}
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.question,
+                    )}
                   >
                     {task.question}
                   </span>
-                  <span {...stylex.props(styles.taskMeta)}>
+                  <span
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.taskMeta,
+                    )}
+                  >
                     <span
                       title={task.sourceLabel}
                       {...stylex.props(styles.truncate)}
@@ -236,7 +262,7 @@ export function ModerationInboxContent({
           })}
         </ol>
       ) : (
-        <div {...stylex.props(styles.empty)}>
+        <div {...stylex.props(foundationStyles.metadata, styles.empty)}>
           <strong>Nothing needs a decision</strong>
           <span>
             Clear the filters or check Automation for operational work.
@@ -270,10 +296,8 @@ const styles = stylex.create({
   title: {
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "20px",
   },
-  count: { color: colors.inkMuted, fontFamily: fonts.data, fontSize: "11px" },
+  count: { color: colors.inkMuted },
   searchForm: { marginTop: space.x4 },
   search: {
     boxSizing: "border-box",
@@ -288,8 +312,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.fieldBackground,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
     "::placeholder": { color: colors.inkMuted },
     "::-webkit-search-cancel-button": { appearance: "none" },
@@ -320,8 +342,6 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",
     color: { default: colors.inkMuted, ":hover": colors.ink },
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontWeight: 600,
     textDecoration: "none",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
@@ -335,16 +355,11 @@ const styles = stylex.create({
   help: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
-    lineHeight: 1.5,
   },
   error: {
     margin: 0,
     marginTop: space.x3,
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
   taskList: {
     minHeight: 0,
@@ -381,15 +396,10 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
   },
   taskTitle: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "14px",
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -397,9 +407,6 @@ const styles = stylex.create({
   question: {
     display: "-webkit-box",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     overflow: "hidden",
     WebkitBoxOrient: "vertical",
     WebkitLineClamp: 2,
@@ -415,8 +422,6 @@ const styles = stylex.create({
     gap: space.x2,
     padding: space.x8,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     textAlign: "center",
   },
 });

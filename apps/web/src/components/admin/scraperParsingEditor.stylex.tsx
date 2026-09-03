@@ -8,7 +8,8 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getFormErrorMessage } from "../../lib/formHelpers";
 import { useORPC } from "../../lib/orpc/context";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { AdminButton } from "./adminButton.stylex";
 import {
   AdminActions,
@@ -193,13 +194,22 @@ export function ScraperParsingEditor({
         <ol {...stylex.props(styles.setupList)}>
           {setupSteps.map((step) => (
             <li key={step.name} {...stylex.props(styles.setupStep)}>
-              <span {...stylex.props(styles.setupStepName)}>{step.name}</span>
+              <span
+                {...stylex.props(
+                  foundationStyles.interactiveSmall,
+                  styles.setupStepName,
+                )}
+              >
+                {step.name}
+              </span>
               <AdminStatus tone={step.tone}>{step.status}</AdminStatus>
             </li>
           ))}
         </ol>
         {setup?.error ? (
-          <p {...stylex.props(styles.setupError)}>{setup.error}</p>
+          <p {...stylex.props(foundationStyles.metadata, styles.setupError)}>
+            {setup.error}
+          </p>
         ) : null}
       </AdminSection>
       {latest ? (
@@ -351,7 +361,13 @@ export function ScraperParsingEditor({
                     </AdminButton>
                   </AdminActions>
                   {previewRevisionId === revision.id ? (
-                    <p {...stylex.props(styles.previewStatus)} role="status">
+                    <p
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.previewStatus,
+                      )}
+                      role="status"
+                    >
                       The test is running. Results will appear here when it
                       finishes.
                     </p>
@@ -490,8 +506,6 @@ const styles = stylex.create({
   },
   setupStepName: {
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
   },
   setupError: {
@@ -500,9 +514,6 @@ const styles = stylex.create({
     marginBottom: 0,
     marginLeft: 0,
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   revisionList: {
     display: "flex",
@@ -523,8 +534,6 @@ const styles = stylex.create({
   previewStatus: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
   muted: { color: colors.inkMuted },
 });

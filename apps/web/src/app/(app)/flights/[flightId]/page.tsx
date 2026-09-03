@@ -54,7 +54,7 @@ export default async function FlightPage(props: {
           </ButtonLink>
         }
         description={flight.description}
-        eyebrow={flight.public ? "Public flight" : "Private flight"}
+        metadata={flight.public ? "Public flight" : "Private flight"}
         menu={<FlightActions flight={flight} />}
         title={flight.name}
       />

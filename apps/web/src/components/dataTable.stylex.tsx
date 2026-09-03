@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
@@ -42,6 +43,7 @@ export function DataTable<Item>({
                 key={column.key}
                 scope="col"
                 {...stylex.props(
+                  foundationStyles.fieldLabel,
                   styles.header,
                   alignStyles[column.align ?? "left"],
                   column.priority === "secondary" && styles.secondary,
@@ -69,6 +71,7 @@ export function DataTable<Item>({
                   <td
                     key={column.key}
                     {...stylex.props(
+                      foundationStyles.metadata,
                       styles.cell,
                       alignStyles[column.align ?? "left"],
                       column.priority === "secondary" && styles.secondary,
@@ -130,12 +133,6 @@ const styles = stylex.create({
     paddingBottom: space.x2,
     paddingLeft: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
   },
   row: {
@@ -149,9 +146,6 @@ const styles = stylex.create({
     paddingBottom: "13px",
     paddingLeft: space.x3,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.4,
     verticalAlign: "middle",
   },
   rowLink: {
@@ -166,7 +160,6 @@ const styles = stylex.create({
   center: { textAlign: "center" },
   right: { textAlign: "right" },
 });
-
 const alignStyles = {
   left: styles.left,
   center: styles.center,

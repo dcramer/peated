@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 
 import { LoadingList, LoadingPlaceholder } from "@peated/web/components";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
-import { colors, fonts, space } from "../../../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../../../styles/foundations.stylex";
+import { colors, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLoadingRows } from "../profileLoading";
 
@@ -36,7 +37,13 @@ export function ProfileLibraryLoading() {
     <div aria-busy="true" aria-label="Loading member library" role="status">
       <ProfileLibraryLayout
         mobileFilters={
-          <div aria-hidden="true" {...stylex.props(styles.mobileFilters)}>
+          <div
+            aria-hidden="true"
+            {...stylex.props(
+              foundationStyles.interactiveSmall,
+              styles.mobileFilters,
+            )}
+          >
             Filter library
           </div>
         }
@@ -73,10 +80,7 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.3,
     [NARROW]: { display: "block" },
   },
   loadingRail: {

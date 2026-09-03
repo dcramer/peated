@@ -1,6 +1,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
 import issueText from "./scraperIssueText";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
@@ -63,7 +64,7 @@ export function ScraperPreviewResult({ result }: { result: Result }) {
   const morePages = pages.slice(VISIBLE_PAGE_COUNT);
 
   return (
-    <div {...stylex.props(styles.root)}>
+    <div {...stylex.props(foundationStyles.metadata, styles.root)}>
       {issues.length > 0 ? (
         <ul {...stylex.props(styles.issues)}>
           {issues.map((issue, index) => (
@@ -104,8 +105,6 @@ const styles = stylex.create({
     borderColor: colors.hairline,
     backgroundColor: "transparent",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
   },
   issues: {
     margin: 0,

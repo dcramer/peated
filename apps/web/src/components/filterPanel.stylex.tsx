@@ -10,7 +10,6 @@ import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 import { Button, IconButton } from "./button.stylex";
@@ -57,7 +56,7 @@ export function FilterPanel({
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
           type="button"
-          {...stylex.props(styles.toggle)}
+          {...stylex.props(foundationStyles.interactiveSmall, styles.toggle)}
         >
           <ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />
           Filters
@@ -263,8 +262,6 @@ const styles = stylex.create({
       ":active": colors.surface,
     },
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "13px",
     fontWeight: 700,
     cursor: "pointer",
     boxShadow: {

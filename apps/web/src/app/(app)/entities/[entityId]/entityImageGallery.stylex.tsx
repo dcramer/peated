@@ -8,10 +8,10 @@ import { ImageAttribution, ImageViewer } from "@peated/web/components";
 import {
   colors,
   controlMetrics,
-  fonts,
   space,
 } from "../../../../styles/tokens.stylex";
 
+import { foundationStyles } from "../../../../styles/foundations.stylex";
 import type { Entity } from "./entityPageData";
 
 function ImageNavigationButton({
@@ -112,7 +112,7 @@ export function EntityImageGallery({ entity }: { entity: Entity }) {
                 <span
                   aria-atomic="true"
                   aria-live="polite"
-                  {...stylex.props(styles.position)}
+                  {...stylex.props(foundationStyles.metadata, styles.position)}
                 >
                   {currentIndex + 1} / {images.length}
                 </span>
@@ -223,10 +223,7 @@ const styles = stylex.create({
   position: {
     minWidth: "40px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1,
     textAlign: "center",
   },
 });

@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { needsRegionMapCredit } from "../../lib/locationMap";
 import { RegionMapCredit } from "../locationMapIcon/credit.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
+import { TextLink } from "../textLink.stylex";
 
 import {
   BottleList,
@@ -13,13 +13,8 @@ import {
   LocationPreviewCard,
   type LocationPreviewCardProps,
 } from "..";
-import {
-  colors,
-  controlMetrics,
-  effects,
-  fonts,
-  space,
-} from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (min-width: 640px) and (max-width: 899px)";
@@ -39,7 +34,11 @@ function HomeModuleHeading({
         <SectionHeading>{title}</SectionHeading>
         {action}
       </div>
-      {detail ? <div {...stylex.props(styles.detail)}>{detail}</div> : null}
+      {detail ? (
+        <div {...stylex.props(foundationStyles.metadata, styles.detail)}>
+          {detail}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -56,13 +55,10 @@ export function HomeHighestRated({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <Link
-            href="/bottles?sort=-score&minScore=0"
-            {...stylex.props(styles.moreLink)}
-          >
+          <TextLink href="/bottles?sort=-score&minScore=0">
             All {totalRated.toLocaleString("en-US")} rated{" "}
             <span aria-hidden="true">→</span>
-          </Link>
+          </TextLink>
         }
         title="Bottles to try"
       />
@@ -87,9 +83,9 @@ export function HomeLatestReleases({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <Link href={seeAllHref} {...stylex.props(styles.moreLink)}>
+          <TextLink href={seeAllHref}>
             View all <span aria-hidden="true">→</span>
-          </Link>
+          </TextLink>
         }
         title={title}
       />
@@ -105,9 +101,9 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <Link href="/activity" {...stylex.props(styles.moreLink)}>
+          <TextLink href="/activity">
             View all <span aria-hidden="true">→</span>
-          </Link>
+          </TextLink>
         }
         title="Activity"
       />
@@ -156,13 +152,13 @@ export function HomeOrigins({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <Link href="/locations" {...stylex.props(styles.moreLink)}>
+          <TextLink href="/locations">
             Open the map <span aria-hidden="true">→</span>
-          </Link>
+          </TextLink>
         }
         title="Browse by origin"
       />
-      <p {...stylex.props(styles.originIntro)}>
+      <p {...stylex.props(foundationStyles.body, styles.originIntro)}>
         Mostly Scotch, a good deal of American, and a growing amount of
         everything else.
       </p>
@@ -226,12 +222,12 @@ export function HomeDistilleries({
         </ItemList>
       </div>
       <div {...stylex.props(styles.distilleryLink)}>
-        <Link href="/distillers" {...stylex.props(styles.moreLink)}>
+        <TextLink href="/distillers">
           {totalDistilleries === undefined
             ? "View all distilleries"
             : `View ${totalDistilleries.toLocaleString("en-US")} distilleries`}{" "}
           <span aria-hidden="true">→</span>
-        </Link>
+        </TextLink>
       </div>
     </section>
   );
@@ -247,7 +243,7 @@ export function HomeContributionPrompt({
   return (
     <section {...stylex.props(styles.prompt)}>
       <SectionHeading>Missing a bottle?</SectionHeading>
-      <p {...stylex.props(styles.promptCopy)}>
+      <p {...stylex.props(foundationStyles.metadata, styles.promptCopy)}>
         Add it. Cask number, vintage, ABV, finish—as much as the label tells
         you.
       </p>
@@ -280,11 +276,6 @@ const styles = stylex.create({
   },
   detail: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.06em",
-    lineHeight: 1.4,
-    textTransform: "uppercase",
   },
   rows: {
     marginTop: space.x2,
@@ -294,9 +285,6 @@ const styles = stylex.create({
     marginTop: space.x2,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.5,
   },
   regionHeading: { marginTop: space.x6 },
   regionGrid: {
@@ -326,30 +314,6 @@ const styles = stylex.create({
   distilleries: {
     marginTop: "14px",
   },
-  moreLink: {
-    display: "inline-block",
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    color: {
-      default: colors.accent,
-      ":hover": colors.accentDeep,
-      ":active": colors.accentDeep,
-    },
-    fontFamily: fonts.display,
-    fontSize: "13px",
-    fontWeight: 700,
-    lineHeight: 1.2,
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
   distilleryLink: {
     marginTop: space.x3,
   },
@@ -362,9 +326,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   promptActions: {
     display: "flex",

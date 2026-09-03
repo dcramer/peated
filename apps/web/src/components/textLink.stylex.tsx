@@ -1,3 +1,4 @@
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { AppLink, type AppLinkProps } from "./appLink";
@@ -29,7 +30,7 @@ export function TextLink({
       {...props}
       {...stylex.props(
         textLinkStyles.link,
-        size === "sm" && textLinkStyles.small,
+        size === "sm" && foundationStyles.interactiveSmall,
         tone === "muted" && textLinkStyles.muted,
         truncate && textLinkStyles.truncate,
       )}

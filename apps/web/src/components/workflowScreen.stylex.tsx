@@ -73,7 +73,10 @@ export function WorkflowScreen({
               Peated
             </Link>
           </div>
-          <h1 title={title} {...stylex.props(styles.title)}>
+          <h1
+            title={title}
+            {...stylex.props(foundationStyles.compactRowTitle, styles.title)}
+          >
             {title}
           </h1>
           {onSave ? (
@@ -121,7 +124,9 @@ export function WorkflowScreen({
         <div {...stylex.props(styles.mobileSaveBar)}>
           <div {...stylex.props(styles.mobileSaveInner)}>
             {saveHint ? (
-              <p {...stylex.props(styles.saveHint)}>{saveHint}</p>
+              <p {...stylex.props(foundationStyles.metadata, styles.saveHint)}>
+                {saveHint}
+              </p>
             ) : null}
             <div
               {...stylex.props(
@@ -236,11 +241,6 @@ const styles = stylex.create({
     margin: 0,
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
     textAlign: "center",
@@ -318,9 +318,6 @@ const styles = stylex.create({
   saveHint: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.3,
     textAlign: "center",
   },
 });

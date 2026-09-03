@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ButtonLink, TextLink } from "@peated/web/components";
 import DateRange from "@peated/web/components/dateRange";
-import { colors, fonts, space } from "../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../styles/foundations.stylex";
+import { colors, space } from "../../../styles/tokens.stylex";
 
 export function EventList({ events }: { events: Event[] }) {
   return (
@@ -14,11 +15,11 @@ export function EventList({ events }: { events: Event[] }) {
           .join(" · ");
         return (
           <article key={event.id} {...stylex.props(styles.event)}>
-            <div {...stylex.props(styles.date)}>
+            <div {...stylex.props(foundationStyles.metadata, styles.date)}>
               <DateRange start={event.dateStart} end={event.dateEnd} />
             </div>
             <div {...stylex.props(styles.details)}>
-              <h3 {...stylex.props(styles.name)}>
+              <h3 {...stylex.props(foundationStyles.rowTitle, styles.name)}>
                 {event.website ? (
                   <TextLink
                     href={event.website}
@@ -33,7 +34,11 @@ export function EventList({ events }: { events: Event[] }) {
                 )}
               </h3>
               {location ? (
-                <div {...stylex.props(styles.location)}>{location}</div>
+                <div
+                  {...stylex.props(foundationStyles.metadata, styles.location)}
+                >
+                  {location}
+                </div>
               ) : null}
             </div>
             <div {...stylex.props(styles.action)}>
@@ -78,24 +83,15 @@ const styles = stylex.create({
   },
   date: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
   },
   details: { minWidth: 0 },
   name: {
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "18px",
-    fontWeight: 650,
-    lineHeight: 1.25,
   },
   location: {
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.4,
   },
   action: { whiteSpace: "nowrap" },
 });

@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { linkedRowStyles } from "../linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -44,6 +45,7 @@ export function CatalogTable<Item>({
                 key={column.key}
                 scope="col"
                 {...stylex.props(
+                  foundationStyles.fieldLabel,
                   styles.header,
                   index === 0 && styles.firstColumn,
                   alignStyles[column.align ?? "left"],
@@ -77,7 +79,10 @@ export function CatalogTable<Item>({
                     column.padding === "flush" && styles.flushCell,
                     column.priority === "secondary" && styles.secondary,
                     column.width && widthStyles[column.width],
-                    column.width === "count" && styles.countCell,
+                    column.width === "count" && [
+                      foundationStyles.compactRowTitle,
+                      styles.countCell,
+                    ],
                     column.interactive && linkedRowStyles.nestedAction,
                   )}
                 >
@@ -125,12 +130,6 @@ const styles = stylex.create({
     paddingBottom: space.x2,
     paddingLeft: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
   },
   row: {
@@ -169,12 +168,7 @@ const styles = stylex.create({
   },
   countCell: {
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
     fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1,
   },
   actionWidth: {
     width: "104px",
@@ -195,13 +189,11 @@ const styles = stylex.create({
   center: { textAlign: "center" },
   right: { textAlign: "right" },
 });
-
 const alignStyles = {
   left: styles.left,
   center: styles.center,
   right: styles.right,
 } as const;
-
 const widthStyles = {
   action: styles.actionWidth,
   count: styles.countWidth,

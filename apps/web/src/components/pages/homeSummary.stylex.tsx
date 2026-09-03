@@ -7,6 +7,7 @@ import {
   TastingRatingDistribution,
   type TastingRatingCounts,
 } from "..";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 
 export type HomeMemberFact = {
@@ -40,7 +41,12 @@ export function HomeMemberSummary({
           <strong {...stylex.props(styles.recordTotalValue)}>
             {totalTastings.toLocaleString("en-US")}
           </strong>
-          <span {...stylex.props(styles.recordTotalLabel)}>
+          <span
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.recordTotalLabel,
+            )}
+          >
             tastings you've recorded
           </span>
         </div>
@@ -53,7 +59,13 @@ export function HomeMemberSummary({
               <dd {...stylex.props(styles.recordFactValue)}>
                 {fact.value.toLocaleString("en-US")}
               </dd>
-              <dt title={fact.label} {...stylex.props(styles.recordFactLabel)}>
+              <dt
+                title={fact.label}
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.recordFactLabel,
+                )}
+              >
                 {fact.label}
               </dt>
             </div>
@@ -105,9 +117,6 @@ const styles = stylex.create({
   },
   recordTotalLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.35,
   },
   recordDistribution: {
     marginTop: space.x4,
@@ -137,12 +146,7 @@ const styles = stylex.create({
     overflow: "hidden",
     marginTop: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "9px",
-    letterSpacing: "0.06em",
-    lineHeight: 1.3,
     textOverflow: "ellipsis",
-    textTransform: "uppercase",
     whiteSpace: "nowrap",
   },
   loading: {

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { AdminSection } from "./adminContent.stylex";
 
 export function BadgeCheckEditor({
@@ -18,7 +19,9 @@ export function BadgeCheckEditor({
     <AdminSection title="Checks">
       {error}
       <div {...stylex.props(styles.actions)}>
-        <span {...stylex.props(styles.actionsLabel)}>Add check</span>
+        <span {...stylex.props(foundationStyles.metadata, styles.actionsLabel)}>
+          Add check
+        </span>
         {actions}
       </div>
       <ol {...stylex.props(styles.list)}>{children}</ol>
@@ -39,10 +42,16 @@ export function BadgeCheckItem({
 }) {
   return (
     <li {...stylex.props(styles.item)}>
-      {index ? <div {...stylex.props(styles.connector)}>And</div> : null}
+      {index ? (
+        <div {...stylex.props(foundationStyles.metadata, styles.connector)}>
+          And
+        </div>
+      ) : null}
       <article {...stylex.props(styles.card)}>
         <header {...stylex.props(styles.cardHeader)}>
-          <span {...stylex.props(styles.number)}>#{index + 1}</span>
+          <span {...stylex.props(foundationStyles.metadata, styles.number)}>
+            #{index + 1}
+          </span>
           <div {...stylex.props(styles.title)}>
             <SectionHeading level={3}>{title}</SectionHeading>
           </div>
@@ -64,11 +73,7 @@ const styles = stylex.create({
   },
   actionsLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
   },
   list: {
     display: "grid",
@@ -83,10 +88,6 @@ const styles = stylex.create({
     alignItems: "center",
     gap: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
     "::before": {
       content: "''",
       height: "1px",
@@ -115,7 +116,7 @@ const styles = stylex.create({
     borderBottomColor: colors.hairline,
     backgroundColor: colors.inset,
   },
-  number: { color: colors.inkMuted, fontFamily: fonts.data, fontSize: "10px" },
+  number: { color: colors.inkMuted },
   title: { flexGrow: 1 },
   cardBody: { padding: space.x4 },
 });

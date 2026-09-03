@@ -9,13 +9,8 @@ import {
 import * as stylex from "@stylexjs/stylex";
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-  zIndices,
-} from "../styles/tokens.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { IconButton } from "./button.stylex";
 
 export type SlideoutProps = {
@@ -51,7 +46,11 @@ export function Slideout({
               {navigation ? (
                 <div {...stylex.props(styles.navigation)}>{navigation}</div>
               ) : null}
-              <DialogTitle {...stylex.props(styles.title)}>{title}</DialogTitle>
+              <DialogTitle
+                {...stylex.props(foundationStyles.sectionHeading, styles.title)}
+              >
+                {title}
+              </DialogTitle>
             </div>
             <IconButton
               data-autofocus
@@ -62,7 +61,9 @@ export function Slideout({
               variant="text"
             />
           </header>
-          <div {...stylex.props(styles.body)}>{children}</div>
+          <div {...stylex.props(foundationStyles.body, styles.body)}>
+            {children}
+          </div>
           {footer ? (
             <footer {...stylex.props(styles.footer)}>{footer}</footer>
           ) : null}
@@ -124,11 +125,6 @@ const styles = stylex.create({
   },
   title: {
     margin: 0,
-    fontFamily: fonts.display,
-    fontSize: "32px",
-    fontWeight: 700,
-    lineHeight: 1.1,
-    letterSpacing: "-0.03em",
     overflowWrap: "anywhere",
   },
   body: {
@@ -138,9 +134,6 @@ const styles = stylex.create({
     padding: space.x6,
     flex: 1,
     paddingBottom: `max(${space.x6}, env(safe-area-inset-bottom))`,
-    fontFamily: fonts.reading,
-    fontSize: { default: "14px", [MOBILE]: "16px" },
-    lineHeight: 1.55,
   },
   footer: {
     flexShrink: 0,

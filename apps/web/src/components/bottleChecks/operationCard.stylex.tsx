@@ -8,11 +8,11 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowRight, Copy } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../../styles/tokens.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
@@ -134,7 +134,7 @@ function ImpactList({
   if (entries.length === 0) return null;
 
   return (
-    <dl {...stylex.props(styles.impactList)}>
+    <dl {...stylex.props(foundationStyles.metadata, styles.impactList)}>
       {entries.map(([label, value]) => (
         <div {...stylex.props(styles.impactItem)} key={label}>
           <dd {...stylex.props(styles.impactValue)}>{value}</dd>
@@ -154,9 +154,17 @@ function Warnings({
 }) {
   if (warnings.length === 0) return null;
   return (
-    <div {...stylex.props(styles.notice, styles.warningNotice)}>
-      <div {...stylex.props(styles.eyebrow)}>Warnings</div>
-      <ul {...stylex.props(styles.bulletList)}>
+    <div
+      {...stylex.props(
+        foundationStyles.body,
+        styles.notice,
+        styles.warningNotice,
+      )}
+    >
+      <div {...stylex.props(foundationStyles.metadata, styles.label)}>
+        Warnings
+      </div>
+      <ul {...stylex.props(foundationStyles.body, styles.bulletList)}>
         {warnings.map((warning) => (
           <li key={`${warning.code}:${warning.message}`}>{warning.message}</li>
         ))}
@@ -186,13 +194,18 @@ function FieldDiff({
     const editable = editableFields.includes(field);
     if (!onToggleField) return null;
     if (!editable) {
-      return <span {...stylex.props(styles.meta)}>Linked</span>;
+      return (
+        <span {...stylex.props(foundationStyles.metadata, styles.meta)}>
+          Linked
+        </span>
+      );
     }
     return (
       <button
         aria-label={`${excluded ? "Include" : "Exclude"} ${labelField(field)}`}
         aria-pressed={!excluded}
         {...stylex.props(
+          foundationStyles.interactiveSmall,
           styles.toggle,
           excluded ? styles.toggleExcluded : styles.toggleIncluded,
         )}
@@ -219,7 +232,11 @@ function FieldDiff({
             >
               <div {...stylex.props(styles.diffCardHeader)}>
                 <div
-                  {...stylex.props(styles.diffLabel, excluded && styles.struck)}
+                  {...stylex.props(
+                    foundationStyles.fieldLabel,
+                    styles.diffLabel,
+                    excluded && styles.struck,
+                  )}
                 >
                   {labelField(field)}
                 </div>
@@ -227,8 +244,12 @@ function FieldDiff({
               </div>
               <dl {...stylex.props(styles.diffValues)}>
                 <div {...stylex.props(styles.minWidth)}>
-                  <dt {...stylex.props(styles.meta)}>Current</dt>
-                  <dd {...stylex.props(styles.diffValue)}>
+                  <dt {...stylex.props(foundationStyles.metadata, styles.meta)}>
+                    Current
+                  </dt>
+                  <dd
+                    {...stylex.props(foundationStyles.body, styles.diffValue)}
+                  >
                     {formatValue(getPath(before, field))}
                   </dd>
                 </div>
@@ -237,8 +258,16 @@ function FieldDiff({
                   {...stylex.props(styles.arrow)}
                 />
                 <div {...stylex.props(styles.minWidth)}>
-                  <dt {...stylex.props(styles.meta)}>Proposed</dt>
-                  <dd {...stylex.props(styles.diffValue, styles.strong)}>
+                  <dt {...stylex.props(foundationStyles.metadata, styles.meta)}>
+                    Proposed
+                  </dt>
+                  <dd
+                    {...stylex.props(
+                      foundationStyles.body,
+                      styles.diffValue,
+                      styles.strong,
+                    )}
+                  >
                     {formatValue(getPath(after, field))}
                   </dd>
                 </div>
@@ -247,9 +276,11 @@ function FieldDiff({
           );
         })}
       </div>
-      <table {...stylex.props(styles.diffTable)}>
+      <table {...stylex.props(foundationStyles.body, styles.diffTable)}>
         <thead>
-          <tr {...stylex.props(styles.tableHeading)}>
+          <tr
+            {...stylex.props(foundationStyles.fieldLabel, styles.tableHeading)}
+          >
             {onToggleField ? (
               <th {...stylex.props(styles.applyCell)}>Apply</th>
             ) : null}
@@ -301,7 +332,13 @@ function Preview({
 }) {
   if (review.status === "blocked") {
     return (
-      <div {...stylex.props(styles.notice, styles.dangerNotice)}>
+      <div
+        {...stylex.props(
+          foundationStyles.body,
+          styles.notice,
+          styles.dangerNotice,
+        )}
+      >
         {review.preparationError.message}
       </div>
     );
@@ -311,7 +348,9 @@ function Preview({
     case "update_bottle":
       return (
         <div {...stylex.props(styles.preview)}>
-          <div {...stylex.props(styles.eyebrow)}>Live Bottle diff</div>
+          <div {...stylex.props(foundationStyles.metadata, styles.label)}>
+            Live Bottle diff
+          </div>
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
@@ -334,7 +373,7 @@ function Preview({
     case "merge_bottles":
       return (
         <div {...stylex.props(styles.preview)}>
-          <div {...stylex.props(styles.copy)}>
+          <div {...stylex.props(foundationStyles.body, styles.copy)}>
             Retire{" "}
             <strong {...stylex.props(styles.strong)}>
               {review.preview.source.fullName}
@@ -352,7 +391,9 @@ function Preview({
     case "update_entity":
       return (
         <div {...stylex.props(styles.preview)}>
-          <div {...stylex.props(styles.eyebrow)}>Proposed changes</div>
+          <div {...stylex.props(foundationStyles.metadata, styles.label)}>
+            Proposed changes
+          </div>
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
@@ -368,7 +409,7 @@ function Preview({
     case "merge_entities":
       return (
         <div {...stylex.props(styles.preview)}>
-          <div {...stylex.props(styles.copy)}>
+          <div {...stylex.props(foundationStyles.body, styles.copy)}>
             Retire{" "}
             <strong {...stylex.props(styles.strong)}>
               {review.preview.source.name}
@@ -456,7 +497,11 @@ function ResourceLinks({ operation }: { operation: BottleOperation }) {
       ];
       break;
   }
-  return <div {...stylex.props(styles.resourceLinks)}>{links}</div>;
+  return (
+    <div {...stylex.props(foundationStyles.metadata, styles.resourceLinks)}>
+      {links}
+    </div>
+  );
 }
 
 function ExecutionSummary({ operation }: { operation: BottleOperation }) {
@@ -495,7 +540,7 @@ function ExecutionSummary({ operation }: { operation: BottleOperation }) {
     "reconciled" in operation.result &&
     operation.result.reconciled === true;
   return (
-    <div {...stylex.props(styles.notice)}>
+    <div {...stylex.props(foundationStyles.body, styles.notice)}>
       {message}
       {reconciled ? " The prior execution was reconciled safely." : ""}
     </div>
@@ -509,7 +554,7 @@ export function EvidenceList({
 }) {
   if (evidence.length === 0) return null;
   return (
-    <ul {...stylex.props(styles.evidenceList)}>
+    <ul {...stylex.props(foundationStyles.body, styles.evidenceList)}>
       {evidence.map((ref) => {
         switch (ref.kind) {
           case "bottle":
@@ -734,7 +779,10 @@ export default function OperationCard({
             <SectionHeading level={compact ? 2 : 3}>
               {OPERATION_LABELS[operation.proposal.type]}
             </SectionHeading>
-            <p {...stylex.props(styles.copy)} role="status">
+            <p
+              {...stylex.props(foundationStyles.body, styles.copy)}
+              role="status"
+            >
               {savingRemoval
                 ? "Removing operation…"
                 : "Operation removed. This will be saved shortly."}
@@ -760,7 +808,7 @@ export default function OperationCard({
           {!compact ||
           operation.status !== "pending_review" ||
           notApprovalReady ? (
-            <span {...stylex.props(styles.status)}>
+            <span {...stylex.props(foundationStyles.metadata, styles.status)}>
               {notApprovalReady
                 ? "Not ready to approve"
                 : STATUS_LABELS[operation.status]}
@@ -782,7 +830,14 @@ export default function OperationCard({
       </div>
 
       {notApprovalReady ? (
-        <p {...stylex.props(styles.copy, styles.accentCopy)} role="status">
+        <p
+          {...stylex.props(
+            foundationStyles.body,
+            styles.copy,
+            styles.accentCopy,
+          )}
+          role="status"
+        >
           The current catalog state does not support applying this proposal.
         </p>
       ) : null}
@@ -799,7 +854,7 @@ export default function OperationCard({
       ) : null}
 
       {excludedFields.size > 0 ? (
-        <p {...stylex.props(styles.copy)}>
+        <p {...stylex.props(foundationStyles.body, styles.copy)}>
           {excludedFields.size} proposed field
           {excludedFields.size === 1 ? " is" : "s are"} struck out and will not
           be applied.
@@ -807,20 +862,32 @@ export default function OperationCard({
       ) : null}
 
       {operation.rejectionReason ? (
-        <div {...stylex.props(styles.copy)}>
+        <div {...stylex.props(foundationStyles.body, styles.copy)}>
           Removed: {operation.rejectionReason.replaceAll("_", " ")}
           {operation.reviewerNote ? ` — ${operation.reviewerNote}` : ""}
         </div>
       ) : null}
       <ExecutionSummary operation={operation} />
       {operation.error ? (
-        <div {...stylex.props(styles.notice, styles.dangerNotice)}>
+        <div
+          {...stylex.props(
+            foundationStyles.body,
+            styles.notice,
+            styles.dangerNotice,
+          )}
+        >
           {operation.error}
         </div>
       ) : null}
 
       {actionError ? (
-        <div {...stylex.props(styles.notice, styles.dangerNotice)}>
+        <div
+          {...stylex.props(
+            foundationStyles.body,
+            styles.notice,
+            styles.dangerNotice,
+          )}
+        >
           {actionError}
         </div>
       ) : null}
@@ -869,10 +936,14 @@ export default function OperationCard({
       ) : null}
 
       <details {...stylex.props(styles.details)}>
-        <summary {...stylex.props(styles.detailsSummary)}>
+        <summary
+          {...stylex.props(foundationStyles.interactive, styles.detailsSummary)}
+        >
           {compact ? "Evidence" : "Evidence and reasoning"}
         </summary>
-        <p {...stylex.props(styles.copy)}>{operation.proposal.rationale}</p>
+        <p {...stylex.props(foundationStyles.body, styles.copy)}>
+          {operation.proposal.rationale}
+        </p>
         <EvidenceList evidence={operation.proposal.evidenceRefs} />
         <ResourceLinks operation={operation} />
       </details>
@@ -880,7 +951,9 @@ export default function OperationCard({
       {rejecting && canReject ? (
         <div ref={rejectionPanel} {...stylex.props(styles.rejectionPanel)}>
           <div {...stylex.props(styles.rejectionFields)}>
-            <label {...stylex.props(styles.fieldLabel)}>
+            <label
+              {...stylex.props(foundationStyles.fieldLabel, styles.fieldLabel)}
+            >
               Reason
               <select
                 disabled={disabled}
@@ -891,7 +964,7 @@ export default function OperationCard({
                   if (reason) setRejectionReason(reason.id);
                 }}
                 value={rejectionReason}
-                {...stylex.props(styles.input)}
+                {...stylex.props(foundationStyles.input, styles.input)}
               >
                 {REJECTION_REASONS.map((reason) => (
                   <option key={reason.id} value={reason.id}>
@@ -900,7 +973,9 @@ export default function OperationCard({
                 ))}
               </select>
             </label>
-            <label {...stylex.props(styles.fieldLabel)}>
+            <label
+              {...stylex.props(foundationStyles.fieldLabel, styles.fieldLabel)}
+            >
               Note {rejectionReason === "other" ? "(required)" : "(optional)"}
               <input
                 disabled={disabled}
@@ -908,7 +983,7 @@ export default function OperationCard({
                   setRejectionNote(event.currentTarget.value)
                 }
                 value={rejectionNote}
-                {...stylex.props(styles.input)}
+                {...stylex.props(foundationStyles.input, styles.input)}
               />
             </label>
           </div>
@@ -967,37 +1042,24 @@ const styles = stylex.create({
     borderColor: colors.hairline,
     borderRadius: controlMetrics.radiusSmall,
     color: colors.ink,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontWeight: 600,
   },
   preview: { marginTop: space.x4 },
-  eyebrow: {
+  label: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontWeight: 600,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
   },
   copy: {
     margin: 0,
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   accentCopy: { color: colors.accentDeep },
   strong: { color: colors.ink, fontWeight: 600 },
   muted: { color: colors.inkMuted },
   meta: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontWeight: 500,
-    letterSpacing: "0.05em",
-    textTransform: "uppercase",
   },
   impactList: {
     display: "flex",
@@ -1006,8 +1068,6 @@ const styles = stylex.create({
     padding: 0,
     gap: `${space.x1} ${space.x4}`,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     flexWrap: "wrap",
   },
   impactItem: { display: "flex", gap: space.x1 },
@@ -1022,9 +1082,6 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.inset,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   warningNotice: {
     borderColor: colors.accent,
@@ -1041,8 +1098,6 @@ const styles = stylex.create({
     paddingLeft: space.x6,
     gap: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     listStyleType: "disc",
   },
   toggle: {
@@ -1052,8 +1107,6 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderRadius: controlMetrics.radius,
     outline: "none",
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontWeight: 600,
     cursor: "pointer",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
@@ -1093,9 +1146,6 @@ const styles = stylex.create({
   },
   diffLabel: {
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    fontWeight: 600,
   },
   diffValues: {
     display: "grid",
@@ -1109,8 +1159,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     overflowWrap: "anywhere",
   },
   arrow: {
@@ -1124,16 +1172,10 @@ const styles = stylex.create({
     width: "100%",
     borderCollapse: "collapse",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
   },
   tableHeading: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    letterSpacing: "0.05em",
     textAlign: "left",
-    textTransform: "uppercase",
   },
   tableCell: {
     paddingTop: space.x2,
@@ -1163,8 +1205,6 @@ const styles = stylex.create({
     marginTop: space.x3,
     gap: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     flexWrap: "wrap",
   },
   link: {
@@ -1213,8 +1253,6 @@ const styles = stylex.create({
     padding: 0,
     gap: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     listStyle: "none",
   },
   icon: { width: "20px", height: "20px" },
@@ -1248,8 +1286,6 @@ const styles = stylex.create({
   },
   detailsSummary: {
     color: { default: colors.inkMuted, ":hover": colors.ink },
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     fontWeight: 600,
     cursor: "pointer",
     outline: "none",
@@ -1278,8 +1314,6 @@ const styles = stylex.create({
   },
   fieldLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
   },
   input: {
     boxSizing: "border-box",
@@ -1293,8 +1327,6 @@ const styles = stylex.create({
     outline: "none",
     backgroundColor: colors.surface,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
   rejectionActions: {

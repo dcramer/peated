@@ -9,7 +9,7 @@ export type EntityPageHeaderProps = {
   actions?: ReactNode;
   description?: ReactNode;
   detail?: string;
-  eyebrow?: ReactNode;
+  metadata?: ReactNode;
   id: string;
   menu?: ReactNode;
   parent?: ReactNode;
@@ -22,7 +22,7 @@ export function EntityPageHeader({
   actions,
   description,
   detail,
-  eyebrow,
+  metadata,
   id,
   menu,
   parent,
@@ -35,7 +35,7 @@ export function EntityPageHeader({
         actions={actions}
         actionsPosition="start"
         description={description}
-        eyebrow={eyebrow}
+        metadata={metadata}
         identity={<PeatedId detail={detail} id={id} />}
         menu={menu}
         parent={parent}

@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 
@@ -19,8 +20,14 @@ export function PublicHomeIntro({
 }: PublicHomeIntroProps) {
   return (
     <section {...stylex.props(styles.hero)}>
-      <h1 {...stylex.props(styles.heroTitle)}>{title}</h1>
-      <div {...stylex.props(styles.heroCopy)}>{description}</div>
+      <h1
+        {...stylex.props(foundationStyles.pageTitleCompact, styles.heroTitle)}
+      >
+        {title}
+      </h1>
+      <div {...stylex.props(foundationStyles.prose, styles.heroCopy)}>
+        {description}
+      </div>
       <div {...stylex.props(styles.heroSearch)}>{search}</div>
     </section>
   );
@@ -39,19 +46,11 @@ const styles = stylex.create({
     maxWidth: "760px",
     margin: 0,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "clamp(40px, 5vw, 44px)",
-    fontWeight: 700,
-    letterSpacing: "-0.04em",
-    lineHeight: 1.02,
   },
   heroCopy: {
     maxWidth: "620px",
     marginTop: "18px",
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "17px",
-    lineHeight: 1.55,
   },
   heroSearch: {
     maxWidth: "760px",

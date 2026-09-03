@@ -10,7 +10,8 @@ import {
 } from "@peated/web/components";
 import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottleUrl } from "@peated/web/lib/urls";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 import { RailListSection } from "./railListSection.stylex";
 
@@ -99,7 +100,9 @@ export function TastingReviewRail({
         moreLabel="See all tastings"
       >
         {!moreFromMember.length ? (
-          <p {...stylex.props(styles.empty)}>No other public tastings yet.</p>
+          <p {...stylex.props(foundationStyles.metadata, styles.empty)}>
+            No other public tastings yet.
+          </p>
         ) : null}
       </BottleRailSection>
 
@@ -134,7 +137,9 @@ export function TastingReviewRail({
             ))}
           </RailList>
         ) : (
-          <p {...stylex.props(styles.empty)}>No other reviews yet.</p>
+          <p {...stylex.props(foundationStyles.metadata, styles.empty)}>
+            No other reviews yet.
+          </p>
         )}
       </RailListSection>
     </>
@@ -155,8 +160,5 @@ const styles = stylex.create({
     margin: 0,
     paddingTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
 });

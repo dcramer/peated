@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -80,12 +81,18 @@ export function ReviewScore({
       data-state={hasScore ? "populated" : "withheld"}
       {...stylex.props(styles.score)}
     >
-      <div {...stylex.props(styles.reviewScoreLabel)}>Score</div>
+      <div
+        {...stylex.props(foundationStyles.fieldLabel, styles.reviewScoreLabel)}
+      >
+        Score
+      </div>
       {hasScore ? (
         <>
           <div {...stylex.props(styles.scoreHeading)}>
             <strong {...stylex.props(styles.scoreValue)}>{median}</strong>
-            <span {...stylex.props(styles.scoreMetadata)}>
+            <span
+              {...stylex.props(foundationStyles.metadata, styles.scoreMetadata)}
+            >
               / 100 · median of {formatCount(count)} {countNoun(count)}
             </span>
           </div>
@@ -96,13 +103,15 @@ export function ReviewScore({
             <span {...stylex.props(styles.scoreTick(median))} />
           </div>
           {hasRange ? (
-            <div {...stylex.props(styles.scoreCaption)}>
+            <div
+              {...stylex.props(foundationStyles.metadata, styles.scoreCaption)}
+            >
               low {low} · median {median} · high {high}
             </div>
           ) : null}
         </>
       ) : (
-        <div {...stylex.props(styles.scoreEmpty)}>
+        <div {...stylex.props(foundationStyles.body, styles.scoreEmpty)}>
           <span>
             {count === 0
               ? "No review scores yet."
@@ -158,7 +167,12 @@ export function TastingRatingDistribution({
           : null}
       </div>
       {showCounts && total > 0 ? (
-        <div {...stylex.props(styles.tastingRatingLabels)}>
+        <div
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.tastingRatingLabels,
+          )}
+        >
           {bins.map((bin, index) => (
             <span
               key={bin.key}
@@ -357,10 +371,6 @@ const styles = stylex.create({
   },
   reviewScoreLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    letterSpacing: 0,
-    lineHeight: 1.4,
   },
   scoreHeading: {
     display: "flex",
@@ -406,10 +416,7 @@ const styles = stylex.create({
   scoreCaption: {
     marginTop: "8px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.45,
   },
   scoreEmpty: {
     display: "flex",
@@ -418,9 +425,6 @@ const styles = stylex.create({
     rowGap: space.x1,
     marginTop: space.x2,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.5,
     flexWrap: "wrap",
   },
   tastingRatingDistribution: {
@@ -469,10 +473,7 @@ const styles = stylex.create({
     gap: "2px",
     marginTop: "5px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.35,
   },
   tastingRatingLabel: (share: number) => ({
     minWidth: 0,
@@ -601,12 +602,8 @@ const styles = stylex.create({
   },
   scoreMetadata: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
 });
-
 const bandFillStyles = {
   1: styles.band1Fill,
   2: styles.band2Fill,

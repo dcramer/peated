@@ -2,13 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { MouseEventHandler, ReactNode } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import {
-  colors,
-  effects,
-  fonts,
-  space,
-  zIndices,
-} from "../styles/tokens.stylex";
+import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { BottleVisual } from "./bottleVisual.stylex";
 import Join from "./join";
@@ -152,6 +146,7 @@ export function BottleIdentityRow({
           <AppLink
             href={relatedReleases.href}
             {...stylex.props(
+              foundationStyles.interactiveSmall,
               styles.relatedReleases,
               linkedRowStyles.nestedAction,
             )}
@@ -253,10 +248,7 @@ const styles = stylex.create({
       ":active": colors.accent,
       ":focus-visible": colors.accent,
     },
-    fontFamily: fonts.reading,
-    fontSize: "12px",
     fontWeight: 600,
-    lineHeight: 1.3,
     textDecorationLine: {
       default: "none",
       ":hover": "underline",

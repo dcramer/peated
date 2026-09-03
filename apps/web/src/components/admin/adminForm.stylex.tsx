@@ -17,6 +17,7 @@ import {
   Textarea,
   TextInput,
 } from "..";
+import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, fonts, space, zIndices } from "../../styles/tokens.stylex";
 import { WorkflowScreen } from "../workflowScreen.stylex";
 
@@ -61,7 +62,11 @@ export function AdminForm({
     <>
       {isSubmitting ? (
         <div aria-live="polite" role="status" {...stylex.props(styles.saving)}>
-          <span {...stylex.props(styles.savingLabel)}>Saving…</span>
+          <span
+            {...stylex.props(foundationStyles.interactive, styles.savingLabel)}
+          >
+            Saving…
+          </span>
         </div>
       ) : null}
       <form {...props} {...stylex.props(styles.form)}>
@@ -166,7 +171,9 @@ export const AdminTextField = forwardRef<HTMLInputElement, AdminTextFieldProps>(
               ref={ref}
               required={required}
             />
-            <span {...stylex.props(styles.suffix)}>{suffixLabel}</span>
+            <span {...stylex.props(foundationStyles.metadata, styles.suffix)}>
+              {suffixLabel}
+            </span>
           </span>
         ) : (
           <TextInput
@@ -308,7 +315,7 @@ export function AdminSwitchField<T extends FieldValues>({
 
 export function AdminFormError({ values }: { values: ReactNode[] }) {
   return (
-    <div role="alert" {...stylex.props(styles.error)}>
+    <div role="alert" {...stylex.props(foundationStyles.body, styles.error)}>
       <strong>There was an error with your submission.</strong>
       <ul {...stylex.props(styles.errorList)}>
         {values.map((value, index) => (
@@ -335,8 +342,6 @@ const styles = stylex.create({
     padding: space.x4,
     backgroundColor: colors.surface,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontWeight: 700,
   },
   suffixControl: {
     display: "grid",
@@ -347,8 +352,6 @@ const styles = stylex.create({
   suffix: {
     paddingRight: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
   },
   error: {
     padding: space.x4,
@@ -357,9 +360,6 @@ const styles = stylex.create({
     borderColor: colors.criticalQuiet,
     backgroundColor: colors.accentTint,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "14px",
-    lineHeight: 1.45,
   },
   errorList: { marginTop: space.x2, marginBottom: 0, paddingLeft: space.x6 },
 });

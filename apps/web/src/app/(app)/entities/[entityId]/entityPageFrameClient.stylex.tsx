@@ -205,7 +205,7 @@ export function EntityPageFrameClient({
               <ExpandableDescription content={entity.description} />
             ) : null
           }
-          eyebrow={getEntityClassification(entity)}
+          metadata={getEntityClassification(entity)}
           menu={<EntityActions entity={entity} />}
           title={entity.name}
         />

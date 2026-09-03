@@ -22,12 +22,8 @@ import TimeSince from "@peated/web/components/timeSince";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import {
-  colors,
-  controlMetrics,
-  fonts,
-  space,
-} from "../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../styles/foundations.stylex";
+import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
 
 export function NotificationList({
   emptyHeading,
@@ -144,7 +140,9 @@ export function NotificationList({
                   }
                 />
                 <div {...stylex.props(styles.copy)}>
-                  <div {...stylex.props(styles.message)}>
+                  <div
+                    {...stylex.props(foundationStyles.metadata, styles.message)}
+                  >
                     {from ? (
                       <TextLink href={`/users/${from.username}`} size="inherit">
                         {from.username}
@@ -162,14 +160,21 @@ export function NotificationList({
                       getNotificationMessage(notification)
                     )}
                   </div>
-                  <span {...stylex.props(styles.date)}>
+                  <span
+                    {...stylex.props(foundationStyles.metadata, styles.date)}
+                  >
                     <TimeSince date={notification.createdAt} />
                   </span>
                   {notification.type === "friend_request" &&
                   notification.ref ? (
                     <div {...stylex.props(styles.friendActions)}>
                       {notification.ref.status === "friends" ? (
-                        <span {...stylex.props(styles.friendStatus)}>
+                        <span
+                          {...stylex.props(
+                            foundationStyles.metadata,
+                            styles.friendStatus,
+                          )}
+                        >
                           Friends
                         </span>
                       ) : (
@@ -260,16 +265,11 @@ const styles = stylex.create({
   copy: { minWidth: 0, flex: 1 },
   message: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   date: {
     display: "block",
     marginTop: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
   },
   friendActions: { display: "flex", marginTop: space.x3 },
   friendStatus: {
@@ -281,8 +281,5 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.inset,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    textTransform: "uppercase",
   },
 });

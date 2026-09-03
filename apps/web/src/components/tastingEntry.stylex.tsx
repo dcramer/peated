@@ -6,7 +6,6 @@ import {
   colors,
   controlMetrics,
   effects,
-  fonts,
   space,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
@@ -84,12 +83,21 @@ export function TastingEntry({
                       {authorHref ? (
                         <AppLink
                           href={authorHref}
-                          {...stylex.props(styles.author, styles.authorLink)}
+                          {...stylex.props(
+                            foundationStyles.compactRowTitle,
+                            styles.author,
+                            styles.authorLink,
+                          )}
                         >
                           {author}
                         </AppLink>
                       ) : (
-                        <strong {...stylex.props(styles.author)}>
+                        <strong
+                          {...stylex.props(
+                            foundationStyles.compactRowTitle,
+                            styles.author,
+                          )}
+                        >
                           {author}
                         </strong>
                       )}
@@ -125,13 +133,20 @@ export function TastingEntry({
                   {member.ratingBand ? (
                     <TastingRating band={member.ratingBand} />
                   ) : (
-                    <span {...stylex.props(styles.unknown)}>–</span>
+                    <span
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.unknown,
+                      )}
+                    >
+                      –
+                    </span>
                   )}
                 </div>
                 {menu ? <div {...stylex.props(styles.menu)}>{menu}</div> : null}
               </div>
               {member.notes?.trim() ? (
-                <p {...stylex.props(styles.notes)}>
+                <p {...stylex.props(foundationStyles.body, styles.notes)}>
                   <TastingNotes member={member} />
                 </p>
               ) : null}
@@ -169,7 +184,10 @@ export function TastingEntry({
                   {member.comments !== undefined ? (
                     <AppLink
                       href={`/tastings/${member.tastingId}#comments`}
-                      {...stylex.props(styles.commentsLink)}
+                      {...stylex.props(
+                        foundationStyles.interactiveSmall,
+                        styles.commentsLink,
+                      )}
                     >
                       {formatCommentCount(member.comments)}
                     </AppLink>
@@ -180,7 +198,11 @@ export function TastingEntry({
           </li>
         ))}
       </ul>
-      {comment ? <p {...stylex.props(styles.comment)}>{comment}</p> : null}
+      {comment ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.comment)}>
+          {comment}
+        </p>
+      ) : null}
     </article>
   );
 }
@@ -323,11 +345,6 @@ const styles = stylex.create({
   author: {
     overflow: "hidden",
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    letterSpacing: "-0.02em",
-    lineHeight: 1.25,
     textDecoration: "none",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -358,9 +375,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: "14px",
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "15px",
-    lineHeight: 1.6,
     whiteSpace: "pre-wrap",
   },
   notesLink: {
@@ -399,8 +413,6 @@ const styles = stylex.create({
   },
   unknown: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
   },
   footer: {
     display: "flex",
@@ -420,10 +432,7 @@ const styles = stylex.create({
   commentsLink: {
     flexShrink: 0,
     color: colors.accentDeep,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.4,
     textDecoration: {
       default: "none",
       ":hover": "underline",
@@ -438,9 +447,6 @@ const styles = stylex.create({
     margin: 0,
     marginBottom: space.x4,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
   media: {
     boxSizing: "border-box",

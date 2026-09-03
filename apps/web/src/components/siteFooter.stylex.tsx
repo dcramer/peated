@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
 
+import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, fonts, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 
@@ -37,7 +38,9 @@ export function SiteFooter({
       <div {...stylex.props(styles.footerMain)}>
         <div {...stylex.props(styles.footerIdentity)}>
           <div {...stylex.props(styles.footerBrand)}>{brand}</div>
-          <p {...stylex.props(styles.statement)}>{statement}</p>
+          <p {...stylex.props(foundationStyles.metadata, styles.statement)}>
+            {statement}
+          </p>
         </div>
         <nav aria-label="Footer">
           <ul {...stylex.props(styles.footerLinks)}>
@@ -60,9 +63,17 @@ export function SiteFooter({
         </div>
       ) : null}
       <div {...stylex.props(styles.footerMeta)}>
-        {coverage ? <p {...stylex.props(styles.coverage)}>{coverage}</p> : null}
-        <p {...stylex.props(styles.provenance)}>{provenance}</p>
-        <p {...stylex.props(styles.responsibility)}>{responsibility}</p>
+        {coverage ? (
+          <p {...stylex.props(foundationStyles.metadata, styles.coverage)}>
+            {coverage}
+          </p>
+        ) : null}
+        <p {...stylex.props(foundationStyles.metadata, styles.provenance)}>
+          {provenance}
+        </p>
+        <p {...stylex.props(foundationStyles.metadata, styles.responsibility)}>
+          {responsibility}
+        </p>
       </div>
     </footer>
   );
@@ -70,7 +81,10 @@ export function SiteFooter({
 
 function FooterAnchor({ link }: { link: FooterLink }) {
   return (
-    <AppLink href={link.href} {...stylex.props(styles.footerLink)}>
+    <AppLink
+      href={link.href}
+      {...stylex.props(foundationStyles.interactiveSmall, styles.footerLink)}
+    >
       {link.label}
     </AppLink>
   );
@@ -108,9 +122,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.55,
   },
   footerLinks: {
     display: "flex",
@@ -131,10 +142,7 @@ const styles = stylex.create({
       default: colors.inkMuted,
       ":hover": colors.ink,
     },
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
-    lineHeight: 1.3,
     textDecoration: "none",
     outline: "none",
     boxShadow: {
@@ -165,23 +173,14 @@ const styles = stylex.create({
     flex: 1,
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
     fontVariantNumeric: "tabular-nums",
-    lineHeight: 1.4,
   },
   provenance: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
   },
   responsibility: {
     margin: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.4,
   },
 });

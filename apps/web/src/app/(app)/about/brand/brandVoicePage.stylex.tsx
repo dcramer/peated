@@ -6,7 +6,6 @@ import { foundationStyles } from "../../../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
-  fonts,
   space,
 } from "../../../../styles/tokens.stylex";
 
@@ -175,7 +174,7 @@ export function BrandVoicePage() {
           <br />
           Light about the drinking.
         </h1>
-        <p {...stylex.props(styles.lede)}>
+        <p {...stylex.props(foundationStyles.prose, styles.lede)}>
           The obvious way to sound relaxed is to dismiss whisky. The obvious way
           to sound credible is to revere it. Both are wrong. The database is not
           a joke. The hobby can be faintly ridiculous.
@@ -203,9 +202,13 @@ export function BrandVoicePage() {
                 <SectionHeading level={3}>
                   {index + 1} · {rule.title}
                 </SectionHeading>
-                <p {...stylex.props(styles.cardBody)}>{rule.body}</p>
+                <p {...stylex.props(foundationStyles.body, styles.cardBody)}>
+                  {rule.body}
+                </p>
               </div>
-              <div {...stylex.props(styles.example)}>{rule.example()}</div>
+              <div {...stylex.props(foundationStyles.body, styles.example)}>
+                {rule.example()}
+              </div>
             </li>
           ))}
         </ol>
@@ -216,7 +219,13 @@ export function BrandVoicePage() {
         intro="Preserve the useful fact. Remove the brochure voice, empty praise, and jokes that get in the way."
       >
         <div role="table" aria-label="Peated copy examples">
-          <div role="row" {...stylex.props(styles.comparisonHeader)}>
+          <div
+            role="row"
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.comparisonHeader,
+            )}
+          >
             <span role="columnheader">Don’t</span>
             <span role="columnheader">Do</span>
             <span role="columnheader">Why</span>
@@ -228,18 +237,43 @@ export function BrandVoicePage() {
               {...stylex.props(styles.comparisonRow)}
             >
               <div role="cell" {...stylex.props(styles.comparisonCell)}>
-                <span {...stylex.props(styles.mobileLabel)}>Don’t</span>
-                <s {...stylex.props(styles.before)}>{comparison.before}</s>
+                <span
+                  {...stylex.props(
+                    foundationStyles.metadata,
+                    styles.mobileLabel,
+                  )}
+                >
+                  Don’t
+                </span>
+                <s {...stylex.props(foundationStyles.body, styles.before)}>
+                  {comparison.before}
+                </s>
               </div>
               <div role="cell" {...stylex.props(styles.comparisonCell)}>
-                <span {...stylex.props(styles.mobileLabel)}>Do</span>
-                <strong {...stylex.props(styles.after)}>
+                <span
+                  {...stylex.props(
+                    foundationStyles.metadata,
+                    styles.mobileLabel,
+                  )}
+                >
+                  Do
+                </span>
+                <strong {...stylex.props(foundationStyles.body, styles.after)}>
                   {comparison.after}
                 </strong>
               </div>
               <div role="cell" {...stylex.props(styles.comparisonCell)}>
-                <span {...stylex.props(styles.mobileLabel)}>Why</span>
-                <span {...stylex.props(styles.reason)}>
+                <span
+                  {...stylex.props(
+                    foundationStyles.metadata,
+                    styles.mobileLabel,
+                  )}
+                >
+                  Why
+                </span>
+                <span
+                  {...stylex.props(foundationStyles.metadata, styles.reason)}
+                >
                   {comparison.reason}
                 </span>
               </div>
@@ -273,7 +307,14 @@ export function BrandVoicePage() {
           {mechanics.map((item) => (
             <div key={item.title} {...stylex.props(styles.mechanicCard)}>
               <SectionHeading level={3}>{item.title}</SectionHeading>
-              <p {...stylex.props(styles.mechanicBody)}>{item.body}</p>
+              <p
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.mechanicBody,
+                )}
+              >
+                {item.body}
+              </p>
             </div>
           ))}
         </div>
@@ -295,7 +336,11 @@ function VoiceSection({
     <section {...stylex.props(styles.section)}>
       <div {...stylex.props(styles.sectionHeader)}>
         <SectionHeading>{heading}</SectionHeading>
-        {intro ? <p {...stylex.props(styles.sectionIntro)}>{intro}</p> : null}
+        {intro ? (
+          <p {...stylex.props(foundationStyles.body, styles.sectionIntro)}>
+            {intro}
+          </p>
+        ) : null}
       </div>
       {children}
     </section>
@@ -314,11 +359,17 @@ function PositionCard({
   return (
     <div {...stylex.props(styles.positionCard)}>
       <div
-        {...stylex.props(styles.microLabel, accent && styles.accentMicroLabel)}
+        {...stylex.props(
+          foundationStyles.metadata,
+          styles.microLabel,
+          accent && styles.accentMicroLabel,
+        )}
       >
         {label}
       </div>
-      <p {...stylex.props(styles.positionBody)}>{children}</p>
+      <p {...stylex.props(foundationStyles.body, styles.positionBody)}>
+        {children}
+      </p>
     </div>
   );
 }
@@ -335,20 +386,28 @@ function WordList({
   return (
     <div {...stylex.props(styles.wordList)}>
       <div
-        {...stylex.props(styles.microLabel, accent && styles.accentMicroLabel)}
+        {...stylex.props(
+          foundationStyles.metadata,
+          styles.microLabel,
+          accent && styles.accentMicroLabel,
+        )}
       >
         {label}
       </div>
-      <div {...stylex.props(styles.words)}>{words}</div>
+      <div {...stylex.props(foundationStyles.metadata, styles.words)}>
+        {words}
+      </div>
     </div>
   );
 }
 
 function RegisterRow({ label, value }: { label: string; value: string }) {
   return (
-    <div {...stylex.props(styles.registerRow)}>
+    <div {...stylex.props(foundationStyles.metadata, styles.registerRow)}>
       <dt>{label}</dt>
-      <dd {...stylex.props(styles.registerValue)}>{value}</dd>
+      <dd {...stylex.props(foundationStyles.metadata, styles.registerValue)}>
+        {value}
+      </dd>
     </div>
   );
 }
@@ -370,14 +429,19 @@ function VoiceExample({
     >
       <div
         {...stylex.props(
+          foundationStyles.metadata,
           styles.microLabel,
           selected && styles.accentMicroLabel,
         )}
       >
         {label}
       </div>
-      <p {...stylex.props(styles.voiceQuote)}>{children}</p>
-      <div {...stylex.props(styles.voiceNote)}>{note}</div>
+      <p {...stylex.props(foundationStyles.body, styles.voiceQuote)}>
+        {children}
+      </p>
+      <div {...stylex.props(foundationStyles.metadata, styles.voiceNote)}>
+        {note}
+      </div>
     </div>
   );
 }
@@ -398,9 +462,6 @@ const styles = stylex.create({
     marginTop: space.x6,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "16px",
-    lineHeight: 1.6,
   },
   positionGrid: {
     display: "grid",
@@ -421,11 +482,6 @@ const styles = stylex.create({
   },
   microLabel: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
   },
   accentMicroLabel: {
     color: colors.accentDeep,
@@ -434,8 +490,6 @@ const styles = stylex.create({
     marginTop: "6px",
     marginBottom: 0,
     color: colors.ink,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   section: {
     paddingTop: space.x12,
@@ -452,8 +506,6 @@ const styles = stylex.create({
     marginTop: space.x2,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   ruleList: {
     display: "grid",
@@ -488,8 +540,6 @@ const styles = stylex.create({
     marginTop: space.x2,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontSize: "14px",
-    lineHeight: 1.55,
   },
   example: {
     display: "flex",
@@ -500,8 +550,6 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.ground,
     color: colors.ink,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   wordLists: {
     display: "grid",
@@ -519,9 +567,6 @@ const styles = stylex.create({
   words: {
     marginTop: "6px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "12px",
-    lineHeight: 1.7,
   },
   registerList: {
     margin: 0,
@@ -536,7 +581,6 @@ const styles = stylex.create({
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
-    fontSize: "13px",
     fontWeight: 600,
     ":last-child": {
       borderBottomWidth: 0,
@@ -550,10 +594,6 @@ const styles = stylex.create({
   registerValue: {
     margin: 0,
     color: colors.accentDeep,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    fontWeight: 400,
-    lineHeight: 1.3,
   },
   comparisonHeader: {
     display: "grid",
@@ -564,11 +604,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.sectionRule,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
     [NARROW]: {
       display: "none",
     },
@@ -594,30 +629,18 @@ const styles = stylex.create({
     display: "none",
     marginBottom: space.x1,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    letterSpacing: "0.08em",
-    lineHeight: 1.3,
-    textTransform: "uppercase",
     [NARROW]: {
       display: "block",
     },
   },
   before: {
     color: colors.inkMuted,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   after: {
     color: colors.ink,
-    fontSize: "14px",
-    lineHeight: 1.5,
   },
   reason: {
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "11px",
-    lineHeight: 1.5,
   },
   failureGrid: {
     display: "grid",
@@ -639,15 +662,10 @@ const styles = stylex.create({
     marginTop: space.x2,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontSize: "15px",
-    lineHeight: 1.55,
   },
   voiceNote: {
     marginTop: space.x3,
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.4,
   },
   mechanicsGrid: {
     display: "grid",
@@ -672,7 +690,5 @@ const styles = stylex.create({
     marginTop: space.x1,
     marginBottom: 0,
     color: colors.inkMuted,
-    fontSize: "13px",
-    lineHeight: 1.5,
   },
 });

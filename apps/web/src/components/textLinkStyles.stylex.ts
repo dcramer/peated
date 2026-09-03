@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { colors, effects, fonts, zIndices } from "../styles/tokens.stylex";
+import { colors, effects, zIndices } from "../styles/tokens.stylex";
 
 /** Shared text-link interaction styles for TextLink and bare AppLink fallback. */
 export const textLinkStyles = stylex.create({
@@ -38,11 +38,6 @@ export const textLinkStyles = stylex.create({
     },
     fontWeight: 400,
     textDecorationLine: "underline",
-  },
-  small: {
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.3,
   },
   truncate: {
     minWidth: 0,

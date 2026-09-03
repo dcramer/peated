@@ -25,7 +25,8 @@ import {
   type RowMenuGroup,
   type TastingEntryProps,
 } from "..";
-import { colors, effects, fonts, space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 
@@ -59,7 +60,7 @@ export function MemberLibraryList({
 }: MemberLibraryListProps) {
   return (
     <section aria-label="Member library" {...stylex.props(styles.library)}>
-      <div {...stylex.props(styles.libraryCount)}>
+      <div {...stylex.props(foundationStyles.rowTitle, styles.libraryCount)}>
         <strong>
           {items.length.toLocaleString("en-US")}{" "}
           {items.length === 1 ? "bottle" : "bottles"}
@@ -166,7 +167,14 @@ export function MemberLibraryFilters({
 
   return mode === "mobile" ? (
     <details {...stylex.props(styles.mobileFilters)}>
-      <summary {...stylex.props(styles.mobileSummary)}>Filter library</summary>
+      <summary
+        {...stylex.props(
+          foundationStyles.interactiveSmall,
+          styles.mobileSummary,
+        )}
+      >
+        Filter library
+      </summary>
       {content}
     </details>
   ) : (
@@ -234,7 +242,12 @@ function CollectionActivity({
     <article {...stylex.props(styles.collectionActivity)}>
       <header {...stylex.props(styles.activityHeader)}>
         <div {...stylex.props(styles.activityCopy)}>
-          <div {...stylex.props(styles.activitySentence)}>
+          <div
+            {...stylex.props(
+              foundationStyles.metadata,
+              styles.activitySentence,
+            )}
+          >
             <TextLink href={activity.authorHref} size="inherit">
               {activity.author}
             </TextLink>
@@ -247,7 +260,11 @@ function CollectionActivity({
               <strong>{activity.collectionName}</strong>
             )}
           </div>
-          <span {...stylex.props(styles.activityDate)}>{activity.date}</span>
+          <span
+            {...stylex.props(foundationStyles.metadata, styles.activityDate)}
+          >
+            {activity.date}
+          </span>
         </div>
       </header>
       {activity.items.length ? (
@@ -260,7 +277,9 @@ function CollectionActivity({
             ))}
             {hiddenCount ? (
               <ItemListItem>
-                <div {...stylex.props(styles.moreItems)}>
+                <div
+                  {...stylex.props(foundationStyles.metadata, styles.moreItems)}
+                >
                   +{hiddenCount.toLocaleString("en-US")} more
                 </div>
               </ItemListItem>
@@ -284,10 +303,6 @@ const styles = stylex.create({
     gap: space.x2,
     paddingBottom: space.x3,
     color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "17px",
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   libraryEnd: { display: "flex", alignItems: "center", gap: space.x2 },
   filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
@@ -307,8 +322,6 @@ const styles = stylex.create({
   mobileSummary: {
     padding: space.x3,
     color: colors.ink,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
     fontWeight: 600,
     cursor: "pointer",
     outline: "none",
@@ -330,16 +343,10 @@ const styles = stylex.create({
   },
   activitySentence: {
     color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "13px",
-    lineHeight: 1.45,
   },
   activityDate: {
     marginTop: "2px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
-    lineHeight: 1.35,
   },
   collectionItems: {
     marginTop: space.x3,
@@ -350,7 +357,5 @@ const styles = stylex.create({
     paddingBottom: space.x2,
     paddingLeft: "18px",
     color: colors.inkMuted,
-    fontFamily: fonts.data,
-    fontSize: "10px",
   },
 });

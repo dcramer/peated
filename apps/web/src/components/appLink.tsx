@@ -1,3 +1,4 @@
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
 import * as stylex from "@stylexjs/stylex";
 import NextLink from "next/link";
 import {
@@ -36,7 +37,7 @@ export const AppLink = forwardRef(function AppLink(
 ) {
   const fallbackProps = className
     ? undefined
-    : stylex.props(textLinkStyles.link, textLinkStyles.small);
+    : stylex.props(textLinkStyles.link, foundationStyles.interactiveSmall);
   const linkProps = {
     ...props,
     className: className ?? fallbackProps?.className,
