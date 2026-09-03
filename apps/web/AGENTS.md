@@ -26,6 +26,9 @@
   `BottleVisual` owns bottle images; `CommunityFeed` owns activity on the homepage and `/activity`.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.
+- Every bottle row, including sidebar, picker, selected, and admin rows, uses
+  `BottleIdentityRow`. Use `toBottlePickerOption` for selection controls. Do not
+  recreate bottle identity with generic text rows, chips, or image/name markup.
 - Review changes to shared bottle layouts together in Bottle Identity Row's
   Row Layouts story, including missing images, long names, and loading states.
 - Omit empty previews and inactive containers without a clear next action.

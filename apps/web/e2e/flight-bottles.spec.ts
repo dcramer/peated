@@ -30,6 +30,16 @@ test.describe("Flight bottles", () => {
       await option.click();
     }
 
+    await page
+      .getByRole("button", {
+        name: `Remove ${formatBottleDisplayName(exactSearchBottle)}`,
+        exact: true,
+      })
+      .click();
+    await bottleSearch.fill(formatBottleDisplayName(exactSearchBottle));
+    await bottleSearch.press("ArrowDown");
+    await bottleSearch.press("Enter");
+
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(

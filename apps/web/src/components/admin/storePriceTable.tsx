@@ -1,8 +1,8 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { PagingRel, StorePrice } from "@peated/server/types";
 import Price from "@peated/web/components/price";
 import TimeSince from "@peated/web/components/timeSince";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
+import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 
 import { AdminTextLink } from "./adminContent.stylex";
 import { AdminTable } from "./adminTable.stylex";
@@ -20,19 +20,17 @@ export default function StorePriceTable({
         {
           name: "listing",
           value: (price) => (
-            <span>
+            <div>
               <AdminTextLink href={price.url}>{price.name}</AdminTextLink>
               {price.bottle ? (
-                <>
-                  {" · "}
-                  <AdminTextLink href={getBottleUrl(price.bottle)}>
-                    {formatBottleDisplayName(price.bottle)}
-                  </AdminTextLink>
-                </>
+                <BottleIdentityRow
+                  {...toBottleListItem(price.bottle)}
+                  layout="cell"
+                />
               ) : (
-                " · No bottle"
+                <div>No bottle</div>
               )}
-            </span>
+            </div>
           ),
         },
         {

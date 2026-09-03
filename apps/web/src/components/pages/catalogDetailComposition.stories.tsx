@@ -1,6 +1,8 @@
+import { mockBottles } from "@peated/server/orpc/mock/fixtures";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { DistributionList, FactList, RailList, RailListItem } from "..";
+import { BottleList, DistributionList, FactList } from "..";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   PageColumns,
@@ -54,18 +56,12 @@ export const Overview: Story = {
         rail={
           <div>
             <PageSection heading="Bottles">
-              <RailList ariaLabel="Bottles">
-                <RailListItem
-                  href="#"
-                  metadata="Single malt"
-                  title="Example 12-year-old"
-                />
-                <RailListItem
-                  href="#"
-                  metadata="Blend"
-                  title="Another bottle"
-                />
-              </RailList>
+              <BottleList
+                ariaLabel="Bottles"
+                items={mockBottles
+                  .slice(0, 2)
+                  .map((bottle) => toBottleListItem(bottle))}
+              />
             </PageSection>
             <PageSection heading="Production rules">
               Show established production facts when the page includes them.

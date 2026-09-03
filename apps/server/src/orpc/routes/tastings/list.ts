@@ -89,7 +89,7 @@ export default implement(tastingListContract).handler(async function ({
     .where(and(...baseWhere, ...bottleWhere))
     .limit(limit + 1)
     .offset(offset)
-    .orderBy(desc(tastings.createdAt));
+    .orderBy(desc(tastings.createdAt), desc(tastings.id));
 
   return {
     results: await serialize(

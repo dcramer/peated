@@ -5,6 +5,10 @@ import {
   resolveCatalogPeatedIdRoute,
   resolveEntityRoute,
 } from "@peated/web/lib/peatedIdRoutes";
+import {
+  getTastingRouteRedirect,
+  matchTastingRoute,
+} from "@peated/web/lib/tastingRoutes";
 import { type NextRequest, NextResponse } from "next/server";
 
 const PRIVATE_CACHE_CONTROL =
@@ -18,6 +22,7 @@ export async function proxy(request: NextRequest) {
     `${request.nextUrl.pathname}${request.nextUrl.search}`,
   );
   const entityMatch = matchEntityRoute(request.nextUrl.pathname);
+  const tastingMatch = matchTastingRoute(request.nextUrl.pathname);
   let resolution = resolveCatalogPeatedIdRoute(request.nextUrl.pathname);
 
   if (entityMatch) {
@@ -30,6 +35,20 @@ export async function proxy(request: NextRequest) {
     } catch (error) {
       if (!isORPCNotFoundError(error)) throw error;
       resolution = null;
+    }
+  }
+  if (tastingMatch) {
+    try {
+      // Tasting privacy permits proxy redirects only for anonymously visible records.
+      // Authorized private requests are handled by the page's session-aware loader.
+      const { client } = await createAnonymousServerClient();
+      const tasting = await client.tastings.details({
+        tasting: tastingMatch.id,
+      });
+      const pathname = getTastingRouteRedirect(tastingMatch, tasting);
+      if (pathname) resolution = { action: "redirect", pathname };
+    } catch (error) {
+      if (!isORPCNotFoundError(error)) throw error;
     }
   }
   let response: NextResponse;
@@ -69,5 +88,6 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|robots.txt|uploads|.*\\..*).*)",
     "/sitemap.xml",
     "/sitemaps/:path*",
+    "/tastings/:path*",
   ],
 };

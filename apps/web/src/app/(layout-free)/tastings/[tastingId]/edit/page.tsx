@@ -8,9 +8,11 @@ import TastingForm, {
 } from "@peated/web/components/tastingForm";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
+import { getTastingUrl } from "@peated/web/lib/urls";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +36,7 @@ function TastingEditForm({ tastingId }: { tastingId: string }) {
   const { data: tasting } = useSuspenseQuery(
     formQueryOptions(
       orpc.tastings.details.queryOptions({
-        input: { tasting: Number(tastingId) },
+        input: { tasting: parseCatalogRouteId(tastingId) },
       }),
     ),
   );
@@ -73,7 +75,7 @@ function TastingEditForm({ tastingId }: { tastingId: string }) {
         );
       }
     }
-    router.push(`/tastings/${tasting.id}`);
+    router.push(getTastingUrl(tasting));
   }
 
   return <TastingEditFields tasting={tasting} onSubmit={submitTastingUpdate} />;

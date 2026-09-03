@@ -44,7 +44,7 @@ import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { TastingTagSuggestion } from "@peated/web/lib/tastingForm";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -978,7 +978,7 @@ function AddBottleFlowContent() {
     router.push(
       requestedFlightId
         ? `/flights/${requestedFlightId}`
-        : `/tastings/${tasting.id}`,
+        : getTastingUrl(tasting),
     );
   }
 

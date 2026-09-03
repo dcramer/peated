@@ -14,8 +14,8 @@ identity.
 - Make the marketed identity of a bottle recognizable.
 - Give series and release designations appropriate prominence.
 - Avoid turning headers and compact labels into inventories of stored fields.
-- Keep different rendering surfaces free to use layouts suited to their space
-  and surrounding context.
+- Use one shared bottle row across lists, pickers, tastings, and moderation.
+  Surrounding controls and page headings own their layout.
 - Apply rules from field semantics rather than recognizing particular brands,
   series, or product families in code.
 
@@ -206,9 +206,10 @@ Use for search results, bottle tables, activity cards, selection results, and
 similar repeated items that support a title plus secondary metadata.
 
 `BottleIdentityRow` owns the shared three-line layout used by the homepage's
-New for you list, Library, catalog lists, search results, activity, and selected
-bottle summaries. `getBottleIdentityProps` supplies its identity fields;
-`toBottleListItem` adds links, images, and optional list actions and ratings.
+New for you list, Library, catalog lists, search results, activity, sidebar
+lists, and selected bottle summaries. `getBottleIdentityProps` supplies its
+identity fields; `toBottleListItem` adds links, images, and optional list actions
+and ratings.
 Do not rebuild these lines in a page-specific mapper:
 
 1. The marketed bottle name, including brand context.
@@ -217,8 +218,14 @@ Do not rebuild these lines in a page-specific mapper:
 
 Missing facts do not create placeholder lines. Activity context, Library status,
 personal images, and actions belong to their owning view, not a competing bottle
-identity layout. Compact rails and primary page headings remain separate display
-contexts.
+identity layout. Sidebar bottle lists use the same standard rows and thumbnail
+size. Primary page headings remain a separate display context.
+
+Picker options and selected bottles also use `BottleIdentityRow`. Build them
+with `toBottlePickerOption`; it retains the numeric database ID and removes
+links inside the selection control. Generic text rows and chips are for other
+record types. Tasting and search results require structured bottle identity;
+they must not fall back to a separate name-and-metadata format.
 
 - Show enough producer, series, and expression context to recognize the Bottle
   outside its detail page.
@@ -368,7 +375,7 @@ shared visual reference for desktop and phone layouts.
 | Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                          |
 | Mixed activity              | `CommunityFeed`                       | Author, action, date, grouped bottles, scores, and review links; chooses compact rows for library additions. |
 | Selected bottle in a form   | `SelectedBottleSummary`               | Standard identity and optional change action.                                                                |
-| Sidebar bottle suggestions  | `pages/BottleRailSection`             | Two-line rail with smaller thumbnails and optional section action.                                           |
+| Sidebar bottle suggestions  | `pages/BottleRailSection`             | Standard BottleList rows with three identity lines, the shared thumbnail, and an optional section action.    |
 | Image within another layout | `BottleVisual`                        | Image sizing, white frame, missing-image glyph, and optional expansion.                                      |
 
 Use `toBottleListItem` from `apps/web/src/lib/bottleListItem.ts` for full API
@@ -397,9 +404,9 @@ Storybook controls document supported props and states.
 
 The contract is applied at the presentation site that owns each branch:
 
-- Bottle headers, result rows, previews, and tasting identities compose their
-  own structured layouts from the shared Bottle fields. Numbered batches and
-  stored years use supporting metadata when the layout provides it.
+- Primary bottle headers use the shared Bottle fields. Result rows, previews,
+  and tasting identities use `BottleIdentityRow`; their surrounding views supply
+  controls, ratings, and context.
 - Relative release-family labels show the most useful difference without adding
   general cask labels.
 - SEO, sharing, notifications, and other unstructured consumers use concise
@@ -409,8 +416,8 @@ The contract is applied at the presentation site that owns each branch:
 - Additional Details remains the complete home for years, cask flags, and cask
   details omitted from the usual Bottle display.
 
-These are intentionally separate implementation sites. They must follow the
-same semantic contract, but should not be replaced by one rendering function.
+Headers, plain-text labels, and verification facts follow the same naming
+contract. They do not introduce another renderer for bottle rows.
 
 ## Implementation Boundary
 

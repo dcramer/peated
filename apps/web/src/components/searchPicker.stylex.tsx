@@ -1,6 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
+import { X } from "lucide-react";
 import type { FocusEvent, ReactNode } from "react";
 import { useId, useMemo, useState } from "react";
 
@@ -13,12 +14,22 @@ import {
   space,
   zIndices,
 } from "../styles/tokens.stylex";
+import {
+  BottleIdentityRow,
+  type BottleIdentityRowProps,
+} from "./bottleIdentityRow.stylex";
+import { IconButton } from "./button.stylex";
 import { Chip } from "./chip.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { ValidationMessage } from "./field.stylex";
 import { useListboxNavigation } from "./useListboxNavigation";
 
 export type SearchPickerOption = {
+  /** Build bottle selections with toBottlePickerOption to retain all identity lines. */
+  bottle?: Pick<
+    BottleIdentityRowProps,
+    "name" | "provenance" | "metadata" | "imageUrl"
+  >;
   detail?: string;
   id: number | string;
   label: string;
@@ -195,28 +206,34 @@ function PickerControl({
             Boolean(error) && styles.invalid,
           )}
         >
-          <span {...stylex.props(styles.selectedCopy)}>
-            <span
-              title={value[0].label}
-              {...stylex.props(
-                foundationStyles.compactRowTitle,
-                styles.selectedName,
-              )}
-            >
-              {value[0].label}
-            </span>
-            {(value[0].selectedDetail ?? value[0].detail) ? (
-              <span
-                title={value[0].selectedDetail ?? value[0].detail}
-                {...stylex.props(
-                  foundationStyles.metadata,
-                  styles.selectedDetail,
-                )}
-              >
-                {value[0].selectedDetail ?? value[0].detail}
-              </span>
-            ) : null}
-          </span>
+          <div {...stylex.props(styles.selectedCopy)}>
+            {value[0].bottle ? (
+              <BottleIdentityRow {...value[0].bottle} layout="cell" />
+            ) : (
+              <>
+                <span
+                  title={value[0].label}
+                  {...stylex.props(
+                    foundationStyles.compactRowTitle,
+                    styles.selectedName,
+                  )}
+                >
+                  {value[0].label}
+                </span>
+                {(value[0].selectedDetail ?? value[0].detail) ? (
+                  <span
+                    title={value[0].selectedDetail ?? value[0].detail}
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.selectedDetail,
+                    )}
+                  >
+                    {value[0].selectedDetail ?? value[0].detail}
+                  </span>
+                ) : null}
+              </>
+            )}
+          </div>
           <button
             aria-label={`Clear ${value[0].label}`}
             disabled={disabled}
@@ -230,21 +247,43 @@ function PickerControl({
       ) : value.length ? (
         <div
           aria-label={`Selected ${label}`}
+          role="group"
           {...stylex.props(styles.selected)}
         >
-          {value.map((option) => (
-            <Chip
-              aria-label={`Remove ${option.label}`}
-              key={option.id}
-              onClick={() =>
-                !disabled &&
-                onChange(value.filter((item) => item.id !== option.id))
-              }
-              variant="tinted"
-            >
-              {option.label} ×
-            </Chip>
-          ))}
+          {value.map((option) =>
+            option.bottle ? (
+              <div key={option.id} {...stylex.props(styles.selectedBottle)}>
+                <BottleIdentityRow
+                  {...option.bottle}
+                  layout="cell"
+                  end={
+                    <IconButton
+                      disabled={disabled}
+                      icon={<X aria-hidden="true" size={16} />}
+                      label={`Remove ${option.label}`}
+                      onClick={() =>
+                        onChange(value.filter((item) => item.id !== option.id))
+                      }
+                      size="sm"
+                      variant="text"
+                    />
+                  }
+                />
+              </div>
+            ) : (
+              <Chip
+                aria-label={`Remove ${option.label}`}
+                key={option.id}
+                onClick={() =>
+                  !disabled &&
+                  onChange(value.filter((item) => item.id !== option.id))
+                }
+                variant="tinted"
+              >
+                {option.label} ×
+              </Chip>
+            ),
+          )}
         </div>
       ) : null}
       {selectionMode === "single" && value.length ? null : (
@@ -308,22 +347,35 @@ function PickerControl({
                       type="button"
                       {...stylex.props(
                         styles.result,
+                        Boolean(option.bottle) && styles.bottleResult,
                         index === activeIndex && styles.activeResult,
                       )}
                     >
-                      <span {...stylex.props(foundationStyles.compactRowTitle)}>
-                        {option.label}
-                      </span>
-                      {option.detail ? (
-                        <span
-                          {...stylex.props(
-                            foundationStyles.metadata,
-                            styles.detail,
-                          )}
-                        >
-                          {option.detail}
-                        </span>
-                      ) : null}
+                      {option.bottle ? (
+                        <BottleIdentityRow
+                          {...option.bottle}
+                          layout="cell"
+                          query={query}
+                        />
+                      ) : (
+                        <>
+                          <span
+                            {...stylex.props(foundationStyles.compactRowTitle)}
+                          >
+                            {option.label}
+                          </span>
+                          {option.detail ? (
+                            <span
+                              {...stylex.props(
+                                foundationStyles.metadata,
+                                styles.detail,
+                              )}
+                            >
+                              {option.detail}
+                            </span>
+                          ) : null}
+                        </>
+                      )}
                     </button>
                   ))
                 ) : (
@@ -401,7 +453,9 @@ const styles = stylex.create({
   label: { color: colors.inkMuted },
   required: { color: colors.accentDeep },
   selected: { display: "flex", gap: space.x2, flexWrap: "wrap" },
+  selectedBottle: { width: "100%", minWidth: 0 },
   selectedControl: {
+    boxSizing: "border-box",
     display: "flex",
     width: "100%",
     minWidth: 0,
@@ -506,6 +560,7 @@ const styles = stylex.create({
     backgroundColor: colors.inset,
     boxShadow: effects.focusRing,
   },
+  bottleResult: { paddingTop: 0, paddingBottom: 0 },
 
   detail: {
     color: colors.inkMuted,

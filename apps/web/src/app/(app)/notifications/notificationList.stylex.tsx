@@ -22,6 +22,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
 
@@ -230,7 +231,7 @@ function getNotificationHref(notification: Notification) {
         : undefined;
     case "comment":
     case "toast":
-      return notification.ref ? `/tastings/${notification.ref.id}` : undefined;
+      return notification.ref ? getTastingUrl(notification.ref) : undefined;
   }
 }
 

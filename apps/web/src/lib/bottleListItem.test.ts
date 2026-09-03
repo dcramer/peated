@@ -1,7 +1,7 @@
 import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, test } from "vitest";
 
-import { toBottleListItem } from "./bottleListItem";
+import { toBottleListItem, toBottlePickerOption } from "./bottleListItem";
 
 describe("toBottleListItem", () => {
   test("uses the full marketed name and separates provenance from release facts", () => {
@@ -38,6 +38,21 @@ describe("toBottleListItem", () => {
       toBottleListItem({ ...mockBottle, distillers: [mockBottle.brand] })
         .provenance,
     ).toEqual([{ name: "Single Malt" }]);
+  });
+
+  test("keeps the database ID for selection and removes links inside the option control", () => {
+    const option = toBottlePickerOption({
+      ...mockBottle,
+      brand: { ...mockBottle.brand, id: 999 },
+      distillers: [mockBottle.brand],
+    });
+
+    expect(option.id).toBe(mockBottle.id);
+    expect(option.bottle.provenance).toEqual([
+      { name: "Lagavulin" },
+      { name: "Single Malt" },
+    ]);
+    expect(option.bottle.metadata).toEqual(["16 years", "43.0% ABV"]);
   });
 
   test("can omit the brand from a list owned by that brand", () => {

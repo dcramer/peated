@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer";
 import { z } from "zod";
+import { tastingPathPattern } from "./assertions";
 import { expect, type Page, type Request, test } from "./test";
 
 import {
@@ -109,9 +110,10 @@ test.describe("log tasting", () => {
     await snapshot("Review detail / Saved review", { ready: reviewHeading });
   });
 
-  test("logs a tasting for a fixture bottle", async ({
+  test("logs a tasting and follows canonical detail and edit links", async ({
     context,
     page,
+    request,
     snapshot,
   }) => {
     await signIn(context);
@@ -153,7 +155,39 @@ test.describe("log tasting", () => {
     expect(createInput).not.toHaveProperty("target");
     expect(createInput).not.toHaveProperty("release");
 
-    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
+    await expect(page).toHaveURL(tastingPathPattern(createdTastingId));
+
+    const canonical = `/tastings/${createdTastingId}-lagavulin-16-year-old`;
+    for (const suffix of ["", "-old-name", "-old.name"]) {
+      const response = await request.get(
+        `/tastings/${createdTastingId}${suffix}?source=legacy&tag=one&tag=two`,
+        { headers: { "user-agent": "Twitterbot" }, maxRedirects: 0 },
+      );
+      expect(response.status()).toBe(308);
+      expect(response.headers().location).toBe(
+        `${canonical}?source=legacy&tag=one&tag=two`,
+      );
+    }
+
+    await page.goto(`/tastings/${createdTastingId}#comments`);
+    await expect(page).toHaveURL(`${canonical}#comments`);
+    await expect(
+      page.getByRole("heading", { name: "Comments", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      new URL(canonical, page.url()).href,
+    );
+    const data = await page
+      .locator('script[type="application/ld+json"]')
+      .textContent();
+    expect(JSON.parse(data!).url).toBe(new URL(canonical, page.url()).href);
+
+    await page.goto(`/tastings/${createdTastingId}/edit?source=legacy`);
+    await expect(page).toHaveURL(`${canonical}/edit?source=legacy`);
+    await expect(
+      page.getByRole("heading", { name: "Edit Tasting", exact: true }),
+    ).toBeVisible();
   });
 
   test("finishes saving when tasting image upload fails", async ({
@@ -176,7 +210,7 @@ test.describe("log tasting", () => {
         "We couldn't upload the picture, but your tasting was saved.",
       ),
     ).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
+    await expect(page).toHaveURL(tastingPathPattern(createdTastingId));
   });
 
   test("logs a tasting from a matched bottle photo", async ({
@@ -210,7 +244,7 @@ test.describe("log tasting", () => {
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Save tasting" }).click();
 
-    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
+    await expect(page).toHaveURL(tastingPathPattern(createdTastingId));
   });
 
   test("returns to the filled photo tasting form when submit fails", async ({

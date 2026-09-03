@@ -16,7 +16,7 @@ import {
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getBottleUrl } from "@peated/web/lib/urls";
@@ -98,11 +98,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
 
   useEffect(() => {
     if (!prefilledBottle.data || other) return;
-    const option = {
-      detail: getBottleMetadata(prefilledBottle.data),
-      id: prefilledBottle.data.id,
-      label: formatBottleDisplayName(prefilledBottle.data),
-    };
+    const option = toBottlePickerOption(prefilledBottle.data);
     setOther(option);
     setValue("bottleId", prefilledBottle.data.id);
   }, [other, prefilledBottle.data, setValue]);
@@ -156,11 +152,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
                     onQueryChange={setQuery}
                     options={(results.data?.results ?? [])
                       .filter((item) => item.id !== bottle.id)
-                      .map((item) => ({
-                        detail: getBottleMetadata(item),
-                        id: item.id,
-                        label: formatBottleDisplayName(item),
-                      }))}
+                      .map(toBottlePickerOption)}
                     placeholder="Search bottles"
                     value={other}
                   />

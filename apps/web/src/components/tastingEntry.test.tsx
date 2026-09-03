@@ -10,7 +10,7 @@ function renderNotes(notes: string, notesHref?: string) {
       date="Today"
       members={[
         {
-          name: "Lagavulin 16-year-old",
+          bottle: { name: "Lagavulin 16-year-old" },
           notes,
           notesHref,
         },
@@ -58,9 +58,9 @@ describe("TastingEntry notes", () => {
           {
             color: "Deep gold",
             comments: 4,
-            imageKind: "photo",
             imageUrl: "/tasting.jpg",
-            name: "Springbank 15",
+            bottle: { name: "Springbank 15" },
+            notesHref: "/tastings/42-springbank-15",
             ratingBand: "outstanding",
             servingStyle: "Neat",
             tags: ["wax", "coal smoke"],
@@ -75,7 +75,7 @@ describe("TastingEntry notes", () => {
     expect(html).toContain("wax");
     expect(html).toContain("Neat");
     expect(html).toContain("Deep gold");
-    expect(html).toContain('href="/tastings/42#comments"');
+    expect(html).toContain('href="/tastings/42-springbank-15#comments"');
     expect(html).toContain("4 comments");
   });
 });

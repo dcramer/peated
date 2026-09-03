@@ -8,6 +8,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import type {
   BottleIdentityRowProps,
   BottleListItem,
+  SearchPickerOption,
 } from "@peated/web/components";
 
 import { getReleaseFamilyHref } from "./releaseFamily";
@@ -27,6 +28,25 @@ export type BottleIdentitySource = BottleDisplayNameSource & {
   brand: BottleDisplayNameSource["brand"] & { id?: number };
 } & Pick<Bottle, "abv" | "category" | "noAgeStatement" | "statedAge"> &
   Partial<Pick<Bottle, "bottler" | "distillers">>;
+
+/** Selection controls own navigation; bottle content must not contain nested links. */
+export function toBottlePickerOption(
+  bottle: BottleIdentitySource & Pick<Bottle, "id" | "imageUrl">,
+): SearchPickerOption & {
+  id: number;
+  bottle: NonNullable<SearchPickerOption["bottle"]>;
+} {
+  const identity = getBottleIdentityProps(bottle);
+  return {
+    id: bottle.id,
+    label: identity.name,
+    bottle: {
+      ...identity,
+      imageUrl: bottle.imageUrl,
+      provenance: identity.provenance?.map(({ name }) => ({ name })),
+    },
+  };
+}
 
 /** The same three identity lines apply to lists, selections, and partial Bottle reads. */
 export function getBottleIdentityProps(

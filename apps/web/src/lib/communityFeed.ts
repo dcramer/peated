@@ -4,7 +4,7 @@ import type {
   CommunityFeedItem,
 } from "@peated/web/components/communityFeed.stylex";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
 
 type CriticReview = Outputs["externalReviews"]["list"]["results"][number];
 type Activity = Outputs["activity"]["list"]["results"][number];
@@ -79,7 +79,7 @@ export function getCommunityFeedItems({
             id: String(tasting.id),
             description: getPreview(tasting.notes),
             ratingBand: tasting.ratingBand,
-            activityHref: `/tastings/${tasting.id}`,
+            activityHref: getTastingUrl(tasting),
             activityLabel: "View tasting",
           })),
         },

@@ -22,7 +22,10 @@ function BottleSearch() {
             {
               href: "#bottle-42",
               id: "bottle-42",
-              metadata: "Springbank · 12 years · 57.2% ABV",
+              bottle: {
+                provenance: [{ name: "Single Malt" }],
+                metadata: ["12 years", "57.2% ABV"],
+              },
               title: "Springbank 12-year-old Cask Strength",
               visual: {
                 kind: "bottle" as const,

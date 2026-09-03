@@ -4,6 +4,7 @@ import {
   getBottleUrl,
   getEntityKindSearchUrl,
   getEntityUrl,
+  getTastingUrl,
 } from "./urls";
 
 const bottle = {
@@ -15,6 +16,22 @@ const bottle = {
 describe("public catalog URLs", () => {
   it("uses the Bottle collection, ID, and display name", () => {
     expect(getBottleUrl(bottle)).toBe("/bottles/123-lagavulin-16-year-old");
+  });
+
+  it("uses the tasting ID with its Bottle's display name", () => {
+    expect(getTastingUrl({ id: 456, bottle })).toBe(
+      "/tastings/456-lagavulin-16-year-old",
+    );
+  });
+
+  it.each([
+    ["Pōkeno", "pokeno"],
+    ["東京", "東京"],
+    ["🥃", "tasting"],
+  ])("creates a tasting URL for %s", (name, slug) => {
+    expect(
+      getTastingUrl({ id: 456, bottle: { name, brand: { name: "" } } }),
+    ).toBe(`/tastings/456-${slug}`);
   });
 
   it("uses the Series collection, ID, and full name", () => {

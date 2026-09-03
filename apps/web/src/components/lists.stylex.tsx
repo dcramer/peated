@@ -172,6 +172,7 @@ export type RailListItemProps = {
   title: string;
 };
 
+/** Generic sidebar links, such as reviewers or places. Use BottleList for bottles. */
 export function RailListItem({
   end,
   href,

@@ -1,7 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type { CriticReviewProps, FactListItem, TastingEntryProps } from "..";
+import type {
+  BottleListItem,
+  CriticReviewProps,
+  FactListItem,
+  TastingEntryProps,
+} from "..";
 import {
   AppLink,
   BottleVisual,
@@ -18,15 +23,10 @@ import {
 } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
-import {
-  BottleRailSection,
-  type BottleRailItem,
-} from "./bottleRailSection.stylex";
+import { BottleRailSection } from "./bottleRailSection.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 const loadingDelays = [0, 1, 2, 3] as const;
-
-export type BottleRecommendation = BottleRailItem;
 
 export type BottleOverviewImage = {
   label: string;
@@ -45,7 +45,7 @@ export type BottleOverviewProps = {
   moreTastingsHref?: string;
   recommendationHeading?: string;
   recommendationState?: ReactNode;
-  recommendations?: readonly BottleRecommendation[];
+  recommendations?: readonly BottleListItem[];
   railSections?: ReactNode;
   tastingCount?: number;
   tastings?: readonly TastingEntryProps[];

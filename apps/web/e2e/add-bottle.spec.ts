@@ -16,7 +16,11 @@ declare global {
   }
 }
 
-import { bottleHrefSelector, bottlePathPattern } from "./assertions";
+import {
+  bottleHrefSelector,
+  bottlePathPattern,
+  tastingPathPattern,
+} from "./assertions";
 import {
   addAnotherReleaseSourceBottle,
   createdBottleId,
@@ -1089,7 +1093,7 @@ test.describe("add bottle flow", () => {
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Save tasting" }).click();
 
-    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
+    await expect(page).toHaveURL(tastingPathPattern(createdTastingId));
     await expect(
       page.getByRole("heading", { name: "Bottle added" }),
     ).toBeHidden();

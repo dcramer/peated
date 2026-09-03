@@ -17,6 +17,7 @@ export async function GET() {
     ),
     "/sitemaps/bottles/sitemap.xml",
     "/sitemaps/series/sitemap.xml",
+    "/sitemaps/tastings/sitemap.xml",
     "/sitemaps/static.xml",
   ]);
 

@@ -2,37 +2,24 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { foundationStyles } from "../styles/foundations.stylex";
 
-import {
-  colors,
-  controlMetrics,
-  effects,
-  space,
-} from "../styles/tokens.stylex";
+import { colors, effects, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import {
   BottleIdentityRow,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
-import { BottleVisual } from "./bottleVisual.stylex";
 import { Chip } from "./chip.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
 import { TastingToastSummary } from "./tastingToastButton.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
-const bottleIconUrl = "/assets/bottle.svg";
-
-export type TastingMediaKind = "bottle" | "photo";
-
 export type TastingEntryMember = {
-  bottle?: Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata">;
+  bottle: Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata">;
   color?: string;
   comments?: number;
   hasToasted?: boolean;
   href?: string;
-  imageKind?: TastingMediaKind;
   imageUrl?: string | null;
-  metadata?: string;
-  name: string;
   notes?: string;
   notesHref?: string;
   ratingBand?: RatingBand;
@@ -71,7 +58,7 @@ export function TastingEntry({
       <ul {...stylex.props(styles.members)}>
         {members.map((member) => (
           <li
-            key={`${member.tastingId ?? member.href ?? member.name}-${member.name}`}
+            key={`${member.tastingId ?? member.href ?? member.bottle.name}-${member.bottle.name}`}
             {...stylex.props(styles.member)}
           >
             <div {...stylex.props(styles.memberBody)}>
@@ -122,11 +109,6 @@ export function TastingEntry({
                     align="start"
                     href={member.href}
                     imageUrl={member.imageUrl}
-                    metadata={
-                      member.bottle?.metadata ??
-                      (member.metadata ? member.metadata.split(" · ") : [])
-                    }
-                    name={member.bottle?.name ?? member.name}
                   />
                 </div>
                 <div {...stylex.props(styles.rating)}>
@@ -183,7 +165,7 @@ export function TastingEntry({
                   ) : null}
                   {member.comments !== undefined ? (
                     <AppLink
-                      href={`/tastings/${member.tastingId}#comments`}
+                      href={`${member.notesHref ?? `/tastings/${member.tastingId}`}#comments`}
                       {...stylex.props(
                         foundationStyles.interactiveSmall,
                         styles.commentsLink,
@@ -207,50 +189,6 @@ export function TastingEntry({
   );
 }
 
-export function TastingMedia({
-  imageKind = "bottle",
-  imageUrl,
-  size,
-}: {
-  imageKind?: TastingMediaKind;
-  imageUrl?: string | null;
-  size: "card" | "detail";
-}) {
-  if (size === "card" && imageKind === "bottle") {
-    return <BottleVisual imageUrl={imageUrl} />;
-  }
-
-  return (
-    <span
-      aria-hidden="true"
-      {...stylex.props(
-        styles.media,
-        size === "card" ? styles.cardMedia : styles.detailMedia,
-        Boolean(imageUrl) && styles.mediaWithImage,
-      )}
-    >
-      {imageUrl ? (
-        <img
-          alt=""
-          src={imageUrl}
-          {...stylex.props(
-            styles.mediaImage,
-            imageKind === "photo" ? styles.photoImage : styles.bottleImage,
-          )}
-        />
-      ) : (
-        <span
-          style={{
-            maskImage: `url("${bottleIconUrl}")`,
-            WebkitMaskImage: `url("${bottleIconUrl}")`,
-          }}
-          {...stylex.props(styles.fallbackAsset)}
-        />
-      )}
-    </span>
-  );
-}
-
 const NOTES_PREVIEW_LENGTH = 180;
 
 function TastingNotes({ member }: { member: TastingEntryMember }) {
@@ -270,7 +208,7 @@ function TastingNotes({ member }: { member: TastingEntryMember }) {
     <>
       {preview}{" "}
       <AppLink
-        aria-label={`Read the full tasting notes for ${member.name}`}
+        aria-label={`Read the full tasting notes for ${member.bottle.name}`}
         href={member.notesHref}
         {...stylex.props(styles.notesLink)}
       >
@@ -447,66 +385,5 @@ const styles = stylex.create({
     margin: 0,
     marginBottom: space.x4,
     color: colors.inkMuted,
-  },
-  media: {
-    boxSizing: "border-box",
-    display: "inline-flex",
-    flexShrink: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.inset,
-    color: colors.inkMuted,
-  },
-  cardMedia: {
-    width: "88px",
-    height: "88px",
-    padding: space.x3,
-    [COMPACT]: {
-      width: "72px",
-      height: "72px",
-      padding: space.x2,
-    },
-  },
-  detailMedia: {
-    width: "300px",
-    height: "300px",
-    padding: space.x6,
-    [COMPACT]: {
-      width: "100%",
-      height: "auto",
-      aspectRatio: "1 / 1",
-    },
-  },
-  mediaWithImage: {
-    backgroundColor: colors.imageBackground,
-    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
-    padding: 0,
-  },
-  mediaImage: {
-    display: "block",
-    width: "100%",
-    height: "100%",
-  },
-  photoImage: {
-    objectFit: "cover",
-  },
-  bottleImage: {
-    objectFit: "contain",
-    padding: space.x2,
-  },
-  fallbackAsset: {
-    display: "block",
-    width: "42%",
-    height: "72%",
-    backgroundColor: "currentColor",
-    opacity: 0.5,
-    maskPosition: "center",
-    maskRepeat: "no-repeat",
-    maskSize: "contain",
-    WebkitMaskPosition: "center",
-    WebkitMaskRepeat: "no-repeat",
-    WebkitMaskSize: "contain",
   },
 });

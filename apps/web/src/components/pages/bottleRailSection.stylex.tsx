@@ -1,17 +1,9 @@
 import type { ReactNode } from "react";
 
-import { BottleVisual, RailList, RailListItem } from "@peated/web/components";
+import { BottleList, type BottleListItem } from "@peated/web/components";
 import { RailListSection } from "./railListSection.stylex";
 
-export type BottleRailItem = {
-  end?: ReactNode;
-  href: string;
-  imageUrl?: string | null;
-  metadata?: string;
-  name: string;
-};
-
-/** Presents a compact bottle list in a page rail or its mobile stack. */
+/** Sidebar bottle lists use the standard three-line identity; build items with toBottleListItem. */
 export function BottleRailSection({
   children,
   heading,
@@ -23,7 +15,7 @@ export function BottleRailSection({
   children?: ReactNode;
   heading: string;
   intro?: string;
-  items?: readonly BottleRailItem[];
+  items?: readonly BottleListItem[];
   moreHref?: string;
   moreLabel?: string;
 }) {
@@ -35,20 +27,7 @@ export function BottleRailSection({
       heading={heading}
       intro={intro}
     >
-      {items.length ? (
-        <RailList ariaLabel={heading}>
-          {items.map((item) => (
-            <RailListItem
-              end={item.end}
-              href={item.href}
-              key={item.href}
-              leading={<BottleVisual imageUrl={item.imageUrl} size="sm" />}
-              metadata={item.metadata}
-              title={item.name}
-            />
-          ))}
-        </RailList>
-      ) : null}
+      {items.length ? <BottleList ariaLabel={heading} items={items} /> : null}
       {children}
     </RailListSection>
   );

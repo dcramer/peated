@@ -23,7 +23,7 @@ export type BottleVisualProps = {
 /**
  * Shows a bottle image or Peated's bottle glyph when no image exists.
  * BottleIdentityRow chooses its own size. Use this primitive directly only when
- * composing another layout: sm for two-line rails, md for standard rows, lg/xl
+ * composing another layout: md for standard rows including sidebars, lg/xl
  * for detail media. Omit label beside visible bottle text; expandable needs a label.
  * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
  */
