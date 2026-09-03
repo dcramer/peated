@@ -1,5 +1,5 @@
-import { CatalogPageLoading } from "@peated/web/components/pages/catalogPage.stylex";
+import { SeriesPageLoading } from "./seriesPageFrame.stylex";
 
 export default function SeriesLoading() {
-  return <CatalogPageLoading title="Series" />;
+  return <SeriesPageLoading />;
 }
