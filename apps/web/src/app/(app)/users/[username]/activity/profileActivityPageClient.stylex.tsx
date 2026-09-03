@@ -69,7 +69,7 @@ export function ProfileActivityPageClient() {
           <MemberActivityList
             emptyDescription={
               isCurrentUser
-                ? "Your tastings and library additions will appear here."
+                ? "Your tastings, reviews, and library additions will appear here."
                 : `${user.username} has no recent activity.`
             }
             items={visibleActivity.map(toActivityItem)}

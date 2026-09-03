@@ -16,14 +16,15 @@ export { Avatar } from "./avatar.stylex";
 export type { AvatarProps, AvatarSize } from "./avatar.stylex";
 export { BadgeImage } from "./badgeImage.stylex";
 export type { BadgeImageProps } from "./badgeImage.stylex";
-export { BottleIdentityRow, BottleVisual } from "./bottleIdentityRow.stylex";
-export type {
-  BottleIdentityRowProps,
-  BottleVisualProps,
-  BottleVisualSize,
-} from "./bottleIdentityRow.stylex";
+export { BottleIdentityRow } from "./bottleIdentityRow.stylex";
+export type { BottleIdentityRowProps } from "./bottleIdentityRow.stylex";
 export { BottleList } from "./bottleList.stylex";
 export type { BottleListItem, BottleListProps } from "./bottleList.stylex";
+export { BottleVisual } from "./bottleVisual.stylex";
+export type {
+  BottleVisualProps,
+  BottleVisualSize,
+} from "./bottleVisual.stylex";
 export { Button, ButtonLink, IconButton } from "./button.stylex";
 export type {
   ButtonLinkProps,

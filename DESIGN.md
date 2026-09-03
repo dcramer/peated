@@ -290,8 +290,8 @@ JSDoc.
   source images have useful transparency.
 - Standard three-line rows share one thumbnail size across bottle lists,
   activity, search, selection, and loading states. Keep the full bottle visible;
-  never crop it to an avatar square. Compact two-line rails may use a smaller
-  thumbnail.
+  never crop it to an avatar square. Single-line bottle rows and compact
+  two-line rails may use smaller thumbnails.
 - State precise values. Do not replace known numbers with vague labels.
 - Do not invent data, rankings, totals, ranges, or derived values in a visual
   component.

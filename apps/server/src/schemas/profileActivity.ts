@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CollectionBottleSchema, CollectionSchema } from "./collections";
+import { MemberReviewDetailsSchema } from "./memberReviews";
 import { TastingSchema } from "./tastings";
 import { UserSchema } from "./users";
 
@@ -66,9 +67,19 @@ export const ActivityCollectionAddEntrySchema = z.object({
     .describe("Total collection items represented by this entry"),
 });
 
+export const ActivityMemberReviewEntrySchema = z.object({
+  id: z.string().describe("Stable activity entry identifier"),
+  type: z.literal("member_review"),
+  priority: z.literal("primary"),
+  createdAt: z.string().datetime().readonly(),
+  createdBy: UserSchema.readonly(),
+  review: MemberReviewDetailsSchema,
+});
+
 export const ActivityEntrySchema = z.discriminatedUnion("type", [
   ActivityTastingSessionEntrySchema,
   ActivityCollectionAddEntrySchema,
+  ActivityMemberReviewEntrySchema,
 ]);
 
 export const ActivityCursorSchema = z.object({

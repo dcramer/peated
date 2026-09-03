@@ -3,16 +3,14 @@ import type { MouseEventHandler, ReactNode } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
-  bottleThumbnailMetrics,
   colors,
-  controlMetrics,
   effects,
   fonts,
   space,
   zIndices,
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { ImageViewer } from "./imageViewer.stylex";
+import { BottleVisual } from "./bottleVisual.stylex";
 import Join from "./join";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MatchedText } from "./matchedText.stylex";
@@ -20,67 +18,8 @@ import { MemberStatus } from "./memberStatus.stylex";
 import { TextLink } from "./textLink.stylex";
 import { getTextTitle } from "./textTitle";
 
-const COMPACT = "@media (max-width: 639px)";
-const bottleIconUrl = "/assets/bottle.svg";
-
-export type BottleVisualSize = "sm" | "md" | "lg" | "xl";
-
-export type BottleVisualProps = {
-  expandable?: boolean;
-  imageUrl?: string | null;
-  label?: string;
-  size?: BottleVisualSize;
-};
-
-/**
- * Shows a bottle image or Peated's bottle glyph when no image exists.
- * Use the default medium size beside three-line identities, including activity entries.
- * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
- */
-export function BottleVisual({
-  expandable = false,
-  imageUrl,
-  label,
-  size = "md",
-}: BottleVisualProps) {
-  const hasExpandableImage = Boolean(imageUrl && expandable && label);
-
-  return (
-    <span
-      aria-hidden={!label ? "true" : undefined}
-      aria-label={label && !hasExpandableImage ? label : undefined}
-      role={label && !hasExpandableImage ? "img" : undefined}
-      {...stylex.props(
-        styles.visual,
-        Boolean(imageUrl) && styles.imageVisual,
-        visualSizeStyles[size],
-        hasExpandableImage && styles.expandableVisual,
-      )}
-    >
-      {hasExpandableImage && imageUrl && label ? (
-        <ImageViewer alt="" fill label={label} src={imageUrl}>
-          <img
-            alt=""
-            src={imageUrl}
-            {...stylex.props(styles.image, expandableImagePaddingStyles[size])}
-          />
-        </ImageViewer>
-      ) : imageUrl ? (
-        <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
-      ) : (
-        <span
-          style={{
-            maskImage: `url("${bottleIconUrl}")`,
-            WebkitMaskImage: `url("${bottleIconUrl}")`,
-          }}
-          {...stylex.props(styles.fallbackAsset)}
-        />
-      )}
-    </span>
-  );
-}
-
 export type BottleIdentityRowProps = {
+  /** Aligns standard row content; compact rows always center their single line. */
   align?: "center" | "start";
   end?: ReactNode;
   hasTasted?: boolean;
@@ -98,11 +37,17 @@ export type BottleIdentityRowProps = {
     href: string;
   };
   subtitle?: ReactNode;
+  /** Standard: three identity lines. Compact: one name line for library additions. */
+  variant?: "standard" | "compact";
 };
 
 /**
- * Owns the standard three-line bottle row: marketed name, provenance, then release facts.
- * Use toBottleListItem for API Bottles so pages cannot drift from the home/Library identity.
+ * Bottle identity for lists and activity. Standard shows name, provenance, then
+ * release facts; compact shows one name line for library additions.
+ * Use toBottleListItem for API Bottles or getBottleIdentityProps for partial reads.
+ * Both variants take the same full marketed name and own their thumbnail size.
+ * Use layout="cell" inside an existing row/selection control. Compact omits
+ * provenance, metadata, subtitle, status, and related releases; end remains available.
  */
 export function BottleIdentityRow({
   align = "center",
@@ -119,20 +64,25 @@ export function BottleIdentityRow({
   provenance = [],
   relatedReleases,
   subtitle,
+  variant = "standard",
 }: BottleIdentityRowProps) {
+  const compact = variant === "compact";
   return (
     <div
       {...stylex.props(
         styles.row,
-        align === "start" && styles.startAlignedRow,
+        compact && styles.compactRow,
+        !compact && align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
         Boolean(href) && layout === "row" && linkedRowStyles.container,
         Boolean(href) && layout === "row" && linkedRowStyles.onGround,
       )}
     >
-      <BottleVisual imageUrl={imageUrl} />
+      <BottleVisual imageUrl={imageUrl} size={compact ? "xs" : "md"} />
       <div {...stylex.props(styles.copy)}>
-        <div {...stylex.props(styles.nameLine)}>
+        <div
+          {...stylex.props(styles.nameLine, compact && styles.compactNameLine)}
+        >
           {href ? (
             <AppLink
               href={href}
@@ -141,20 +91,28 @@ export function BottleIdentityRow({
               {...stylex.props(
                 foundationStyles.rowTitle,
                 styles.name,
+                compact && styles.compactName,
                 linkedRowStyles.primaryLink,
               )}
             >
               <MatchedText query={query} text={name} />
             </AppLink>
           ) : (
-            <span {...stylex.props(foundationStyles.rowTitle, styles.name)}>
+            <span
+              title={name}
+              {...stylex.props(
+                foundationStyles.rowTitle,
+                styles.name,
+                compact && styles.compactName,
+              )}
+            >
               <MatchedText query={query} text={name} />
             </span>
           )}
-          {isLibrary ? <MemberStatus kind="library" /> : null}
-          {hasTasted ? <MemberStatus kind="tasted" /> : null}
+          {!compact && isLibrary ? <MemberStatus kind="library" /> : null}
+          {!compact && hasTasted ? <MemberStatus kind="tasted" /> : null}
         </div>
-        {provenance.length ? (
+        {!compact && provenance.length ? (
           <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
             <Join divider=" · ">
               {provenance.map((item, index) =>
@@ -169,7 +127,7 @@ export function BottleIdentityRow({
             </Join>
           </div>
         ) : null}
-        {subtitle ? (
+        {!compact && subtitle ? (
           <div
             title={getTextTitle(subtitle)}
             {...stylex.props(foundationStyles.metadata, styles.subtitle)}
@@ -177,7 +135,7 @@ export function BottleIdentityRow({
             {subtitle}
           </div>
         ) : null}
-        {metadata.length ? (
+        {!compact && metadata.length ? (
           <div
             title={metadata.join(" · ")}
             {...stylex.props(foundationStyles.metadata, styles.metadata)}
@@ -190,7 +148,7 @@ export function BottleIdentityRow({
             ))}
           </div>
         ) : null}
-        {relatedReleases && relatedReleases.count > 1 ? (
+        {!compact && relatedReleases && relatedReleases.count > 1 ? (
           <AppLink
             href={relatedReleases.href}
             {...stylex.props(
@@ -208,91 +166,6 @@ export function BottleIdentityRow({
 }
 
 const styles = stylex.create({
-  visual: {
-    boxSizing: "border-box",
-    display: "inline-flex",
-    minWidth: 0,
-    minHeight: 0,
-    flexGrow: 0,
-    flexShrink: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: "transparent",
-    color: colors.inkMuted,
-  },
-  imageVisual: {
-    backgroundColor: colors.imageBackground,
-    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
-  },
-  expandableVisual: {
-    padding: 0,
-  },
-  visualSmall: {
-    width: "32px",
-    maxWidth: "32px",
-    height: "46px",
-    maxHeight: "46px",
-    padding: space.x1,
-  },
-  visualMedium: {
-    width: bottleThumbnailMetrics.width,
-    maxWidth: bottleThumbnailMetrics.width,
-    height: bottleThumbnailMetrics.height,
-    maxHeight: bottleThumbnailMetrics.height,
-    padding: space.x2,
-  },
-  visualLarge: {
-    width: { default: "132px", [COMPACT]: "80px" },
-    maxWidth: { default: "132px", [COMPACT]: "80px" },
-    height: { default: "176px", [COMPACT]: "120px" },
-    maxHeight: { default: "176px", [COMPACT]: "120px" },
-    padding: { default: space.x2, [COMPACT]: space.x1 },
-  },
-  visualExtraLarge: {
-    width: "100%",
-    maxWidth: "100%",
-    aspectRatio: "4 / 5",
-    padding: space.x4,
-  },
-  image: {
-    boxSizing: "border-box",
-    display: "block",
-    width: "100%",
-    maxWidth: "100%",
-    minWidth: 0,
-    height: "100%",
-    maxHeight: "100%",
-    minHeight: 0,
-    objectFit: "contain",
-  },
-  expandableImageSmall: {
-    padding: space.x1,
-  },
-  expandableImageMedium: {
-    padding: space.x2,
-  },
-  expandableImageLarge: {
-    padding: { default: space.x2, [COMPACT]: space.x1 },
-  },
-  expandableImageExtraLarge: {
-    padding: space.x4,
-  },
-  fallbackAsset: {
-    display: "block",
-    width: "100%",
-    maxWidth: "100%",
-    height: "100%",
-    maxHeight: "100%",
-    backgroundColor: "currentColor",
-    maskPosition: "center",
-    maskRepeat: "no-repeat",
-    maskSize: "contain",
-    WebkitMaskPosition: "center",
-    WebkitMaskRepeat: "no-repeat",
-    WebkitMaskSize: "contain",
-  },
   row: {
     boxSizing: "border-box",
     display: "flex",
@@ -309,6 +182,20 @@ const styles = stylex.create({
   },
   startAlignedRow: {
     alignItems: "flex-start",
+  },
+  compactRow: {
+    minHeight: "44px",
+    gap: space.x2,
+    paddingTop: space.x1,
+    paddingBottom: space.x1,
+  },
+  compactNameLine: { marginTop: 0 },
+  compactName: {
+    display: "block",
+    overflow: "hidden",
+    fontSize: "15px",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   cellLayout: {
     width: "100%",
@@ -392,17 +279,3 @@ const styles = stylex.create({
     justifyContent: "flex-end",
   },
 });
-
-const visualSizeStyles = {
-  sm: styles.visualSmall,
-  md: styles.visualMedium,
-  lg: styles.visualLarge,
-  xl: styles.visualExtraLarge,
-} satisfies Record<BottleVisualSize, stylex.StyleXStyles>;
-
-const expandableImagePaddingStyles = {
-  sm: styles.expandableImageSmall,
-  md: styles.expandableImageMedium,
-  lg: styles.expandableImageLarge,
-  xl: styles.expandableImageExtraLarge,
-} satisfies Record<BottleVisualSize, stylex.StyleXStyles>;

@@ -997,6 +997,33 @@ export function buildActivity({
   };
 }
 
+export function buildCommunityActivity({ following = false } = {}) {
+  const activity = buildActivity({
+    tastingSession: [
+      buildTasting({
+        notes: following
+          ? "A tasting from someone you follow."
+          : "A tasting from the wider community.",
+      }),
+    ],
+    collectionBottle: buildCollectionBottle({ status: "sealed" }),
+  });
+  return {
+    ...activity,
+    results: [
+      ...activity.results,
+      {
+        id: `member_review:${createdMemberReview.id}`,
+        type: "member_review",
+        priority: "primary",
+        createdAt: timestamp,
+        createdBy: testUser,
+        review: { ...createdMemberReview, bottle: existingBottle },
+      },
+    ],
+  };
+}
+
 export function buildFavoriteActivity({ nextCursor = null } = {}) {
   return {
     results: Array.from({ length: 10 }, (_, index) => ({

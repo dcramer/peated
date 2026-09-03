@@ -1,14 +1,14 @@
 import {
+  mockActivity,
   mockExternalReview,
   mockFriendships,
-  mockTasting,
 } from "@peated/server/orpc/mock/fixtures";
 import { beforeEach, expect, test, vi } from "vitest";
 import { loadActivityFeed } from "./loadActivityFeed";
 
 type Options = Parameters<typeof loadActivityFeed>[0];
 const publicClient = {
-  tastings: { list: vi.fn<Options["publicClient"]["tastings"]["list"]>() },
+  activity: { list: vi.fn<Options["publicClient"]["activity"]["list"]>() },
   externalReviews: {
     list: vi.fn<Options["publicClient"]["externalReviews"]["list"]>(),
   },
@@ -17,8 +17,8 @@ const memberClient = {
   friends: {
     list: vi.fn<NonNullable<Options["memberClient"]>["friends"]["list"]>(),
   },
-  tastings: {
-    list: vi.fn<NonNullable<Options["memberClient"]>["tastings"]["list"]>(),
+  activity: {
+    list: vi.fn<NonNullable<Options["memberClient"]>["activity"]["list"]>(),
   },
 };
 const rel = { nextCursor: null, prevCursor: null };
@@ -29,8 +29,11 @@ beforeEach(() => {
     results: mockFriendships,
     rel,
   });
-  memberClient.tastings.list.mockResolvedValue({ results: [], rel });
-  publicClient.tastings.list.mockResolvedValue({ results: [mockTasting], rel });
+  memberClient.activity.list.mockResolvedValue({ results: [], rel });
+  publicClient.activity.list.mockResolvedValue({
+    results: [mockActivity[0]],
+    rel,
+  });
   publicClient.externalReviews.list.mockResolvedValue({
     results: [mockExternalReview],
     rel,
@@ -48,13 +51,13 @@ test("keeps Following empty when followed people have no activity", async () => 
     filter: "active",
     limit: 1,
   });
-  expect(memberClient.tastings.list).toHaveBeenCalledWith({
+  expect(memberClient.activity.list).toHaveBeenCalledWith({
     filter: "friends",
     limit: 20,
   });
   expect(feed.items).toEqual([]);
   expect(feed.note).toBeUndefined();
-  expect(publicClient.tastings.list).not.toHaveBeenCalled();
+  expect(publicClient.activity.list).not.toHaveBeenCalled();
   expect(publicClient.externalReviews.list).not.toHaveBeenCalled();
 });
 
@@ -70,7 +73,7 @@ test("falls back to Everyone only when there are no accepted follows", async () 
     "You're not following anyone yet. Showing everyone's activity.",
   );
   expect(feed.items).toHaveLength(2);
-  expect(memberClient.tastings.list).not.toHaveBeenCalled();
+  expect(memberClient.activity.list).not.toHaveBeenCalled();
   expect(publicClient.externalReviews.list).toHaveBeenCalled();
 });
 
@@ -81,7 +84,7 @@ test("does not hide a failed follow lookup by showing Everyone", async () => {
   await expect(
     loadActivityFeed({ following: true, memberClient, publicClient }),
   ).rejects.toBe(error);
-  expect(publicClient.tastings.list).not.toHaveBeenCalled();
+  expect(publicClient.activity.list).not.toHaveBeenCalled();
 });
 
 test("uses public activity for Everyone even when signed in", async () => {
@@ -93,7 +96,7 @@ test("uses public activity for Everyone even when signed in", async () => {
 
   expect(feed.items).toHaveLength(2);
   expect(memberClient.friends.list).not.toHaveBeenCalled();
-  expect(memberClient.tastings.list).not.toHaveBeenCalled();
+  expect(memberClient.activity.list).not.toHaveBeenCalled();
 });
 
 test("anonymous Following uses public activity and explains sign-in", async () => {

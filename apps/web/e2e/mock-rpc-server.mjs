@@ -17,6 +17,7 @@ import {
   buildBottle,
   buildBottleGroup,
   buildCollectionBottle,
+  buildCommunityActivity,
   buildFavoriteActivity,
   buildTasting,
   createdBottleId,
@@ -186,9 +187,7 @@ async function handleRpcRequest({ request, response, url }) {
     case "activity/list":
       sendRpcResponse(
         response,
-        input?.cursor
-          ? buildActivity()
-          : buildFavoriteActivity({ nextCursor: "2:1780833600000" }),
+        buildCommunityActivity({ following: input?.filter === "friends" }),
       );
       return true;
     case "users/activity/list":

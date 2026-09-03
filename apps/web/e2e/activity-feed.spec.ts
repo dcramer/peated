@@ -1,6 +1,11 @@
 import { expect, test } from "./test";
 
-import { activityReview, tastingNotes, testUser } from "./rpc-fixtures.mjs";
+import {
+  activityReview,
+  createdMemberReview,
+  tastingNotes,
+  testUser,
+} from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 test.describe("activity feed", () => {
@@ -23,17 +28,17 @@ test.describe("activity feed", () => {
 
     await page.goto("/");
     const homeFeed = page.getByRole("list", {
-      name: "Recent tastings and reviews",
+      name: "Recent activity",
     });
     const homeReview = homeFeed
       .getByRole("listitem")
       .filter({ hasText: activityReview.clip });
     await expect(homeReview).toBeVisible();
     const reviewTitle = await homeReview
-      .locator(`a[title][href="${activityReview.url}"]`)
+      .locator(`a[href^="/bottles/"]`)
       .innerText();
     const bottleHref = await homeReview
-      .getByRole("link", { name: "View bottle" })
+      .locator('a[href^="/bottles/"]')
       .getAttribute("href");
 
     await page
@@ -43,7 +48,7 @@ test.describe("activity feed", () => {
       .click();
     await expect(page).toHaveURL(/\/activity$/);
     const feed = page.getByRole("list", {
-      name: "Latest tastings and reviews",
+      name: "Latest activity",
     });
 
     await expect(
@@ -59,16 +64,32 @@ test.describe("activity feed", () => {
     await expect(
       feed.getByText("A tasting from the wider community."),
     ).toBeVisible();
+    await expect(feed.getByText(createdMemberReview.notes)).toBeVisible();
+    await expect(
+      feed.getByRole("link", { name: "Read review", exact: true }),
+    ).toHaveAttribute("href", `/reviews/${createdMemberReview.id}`);
+    await expect(
+      feed.getByText("their library", { exact: true }),
+    ).toBeVisible();
+    await expect(feed.getByText("Sealed", { exact: true })).toHaveCount(0);
+    await expect(
+      page
+        .getByRole("complementary")
+        .getByRole("link", { name: "Add a tasting", exact: true }),
+    ).toBeVisible();
+    await expect(
+      feed.getByRole("link", { name: "Add a tasting", exact: true }),
+    ).toHaveCount(0);
     await snapshot("Activity / Everyone", { ready: feed });
 
     const review = feed
       .getByRole("listitem")
       .filter({ hasText: activityReview.clip });
-    const bottleLink = review.getByRole("link", { name: "View bottle" });
+    const bottleLink = review.locator('a[href^="/bottles/"]');
     await expect(bottleLink).toHaveAttribute("href", bottleHref!);
-    await expect(
-      review.locator(`a[title][href="${activityReview.url}"]`),
-    ).toHaveText(reviewTitle);
+    await expect(review.locator(`a[href^="/bottles/"]`)).toHaveText(
+      reviewTitle,
+    );
     await bottleLink.click();
     await expect(page).toHaveURL(/\/bottles\//);
 
@@ -80,7 +101,10 @@ test.describe("activity feed", () => {
       }),
     );
     await review
-      .getByRole("link", { name: activityReview.site.name, exact: true })
+      .getByRole("link", {
+        name: `Read at ${activityReview.site.name} ↗`,
+        exact: true,
+      })
       .click();
     await expect(page).toHaveURL(activityReview.url);
   });

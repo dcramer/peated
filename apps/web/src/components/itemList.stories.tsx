@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import * as stylex from "@stylexjs/stylex";
 
 import { colors, fonts, zIndices } from "../styles/tokens.stylex";
-import { BottleVisual } from "./bottleIdentityRow.stylex";
+import { BottleVisual } from "./bottleVisual.stylex";
 import { ItemList, ItemRow } from "./itemList.stylex";
 import { BottleRatings } from "./scoring.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
