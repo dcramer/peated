@@ -16,7 +16,6 @@ import { Button, IconButton } from "./button.stylex";
 import { FacetRow } from "./facetRow.stylex";
 import { TextInput } from "./field.stylex";
 
-const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (max-width: 759px)";
 
 export type FilterPanelProps = {
@@ -286,10 +285,7 @@ const styles = stylex.create({
   contentOpen: {
     [NARROW]: {
       display: "grid",
-      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    },
-    [COMPACT]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
+      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 272px), 1fr))",
     },
   },
   panelHeader: {

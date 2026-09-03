@@ -170,7 +170,7 @@ export default function Foundations({
               </ItemList>
               <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
                 Space Grotesk: page titles, section headings, and names.
-                Sections use 24px; rows use 18px or 16px in compact lists.
+                Sections use 20px; rows use 18px or 15px in compact lists.
               </p>
             </article>
             <article {...stylex.props(styles.typeSpecimen)}>

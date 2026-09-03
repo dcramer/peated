@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors } from "../styles/tokens.stylex";
 
-/** Section headings sit above 18px row titles at 24px; level changes semantics only. */
+/** Section headings sit above 18px row titles at 20px; level changes semantics only. */
 export function SectionHeading({
   children,
   id,

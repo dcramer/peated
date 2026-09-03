@@ -380,10 +380,8 @@ function HeaderDrawerGroup({
               {...stylex.props(
                 foundationStyles.interactive,
                 styles.drawerLink,
-                isCurrentNavigationHref(currentHref, item.href) && [
-                  foundationStyles.interactiveSmall,
+                isCurrentNavigationHref(currentHref, item.href) &&
                   styles.currentMenuLink,
-                ],
               )}
             >
               {item.label}

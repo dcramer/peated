@@ -214,7 +214,11 @@ export function BottleOverviewLoading() {
         <div {...stylex.props(styles.media, styles.loadingMedia)} />
         <div {...stylex.props(styles.railSections)}>
           <LoadingPlaceholder preset="heading" />
-          <LoadingList label="Loading bottle recommendations" rows={3} />
+          <LoadingList
+            label="Loading bottle recommendations"
+            rows={3}
+            variant="sidebar"
+          />
         </div>
       </aside>
     </div>

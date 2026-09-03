@@ -31,15 +31,18 @@ export type BottleIdentityRowProps = {
     href: string;
   };
   subtitle?: ReactNode;
-  /** Standard: three identity lines. Compact: one name line for library additions. */
-  variant?: "standard" | "compact";
+  /** Sidebar uses a small thumbnail, a two-line name, and a footer for trailing content. */
+  variant?: "standard" | "search" | "sidebar" | "compact";
 };
 
 /**
  * Bottle identity for lists and activity. Standard shows name, provenance, then
- * release facts; compact shows one name line for library additions.
+ * release facts; search tightens the title and spacing for typeahead results;
+ * sidebar uses compact titles and small thumbnails; compact shows one name line
+ * for library additions. Sidebar names use two lines with the full name in title.
+ * Search places trailing ratings or actions below the identity on narrow screens.
  * Use toBottleListItem for API Bottles or getBottleIdentityProps for partial reads.
- * Both variants take the same full marketed name and own their thumbnail size.
+ * All variants take the same full marketed name and own their thumbnail size.
  * Use layout="cell" inside an existing row/selection control. Compact omits
  * provenance, metadata, subtitle, status, and related releases; end remains available.
  */
@@ -61,10 +64,25 @@ export function BottleIdentityRow({
   variant = "standard",
 }: BottleIdentityRowProps) {
   const compact = variant === "compact";
+  const sidebar = variant === "sidebar";
+  const compactTitle = variant !== "standard";
+  const trailingContent = end ? (
+    <div
+      {...stylex.props(
+        styles.end,
+        sidebar && styles.sidebarEnd,
+        variant === "search" && styles.searchEnd,
+      )}
+    >
+      {end}
+    </div>
+  ) : null;
   return (
     <div
       {...stylex.props(
         styles.row,
+        variant === "search" && styles.searchRow,
+        sidebar && styles.sidebarRow,
         compact && styles.compactRow,
         !compact && align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
@@ -72,10 +90,16 @@ export function BottleIdentityRow({
         Boolean(href) && layout === "row" && linkedRowStyles.onGround,
       )}
     >
-      <BottleVisual imageUrl={imageUrl} size={compact ? "xs" : "md"} />
+      <BottleVisual
+        imageUrl={imageUrl}
+        size={compact ? "xs" : sidebar ? "sm" : "md"}
+      />
       <div {...stylex.props(styles.copy)}>
         <div
-          {...stylex.props(styles.nameLine, compact && styles.compactNameLine)}
+          {...stylex.props(
+            styles.nameLine,
+            (compact || sidebar) && styles.compactNameLine,
+          )}
         >
           {href ? (
             <AppLink
@@ -84,7 +108,9 @@ export function BottleIdentityRow({
               title={name}
               {...stylex.props(
                 foundationStyles.rowTitle,
+                compactTitle && foundationStyles.compactRowTitle,
                 styles.name,
+                sidebar && styles.sidebarName,
                 compact && styles.compactName,
                 linkedRowStyles.primaryLink,
               )}
@@ -96,15 +122,21 @@ export function BottleIdentityRow({
               title={name}
               {...stylex.props(
                 foundationStyles.rowTitle,
+                compactTitle && foundationStyles.compactRowTitle,
                 styles.name,
+                sidebar && styles.sidebarName,
                 compact && styles.compactName,
               )}
             >
               <MatchedText query={query} text={name} />
             </span>
           )}
-          {!compact && isLibrary ? <MemberStatus kind="library" /> : null}
-          {!compact && hasTasted ? <MemberStatus kind="tasted" /> : null}
+          {!compact && !sidebar && isLibrary ? (
+            <MemberStatus kind="library" />
+          ) : null}
+          {!compact && !sidebar && hasTasted ? (
+            <MemberStatus kind="tasted" />
+          ) : null}
         </div>
         {!compact && provenance.length ? (
           <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
@@ -154,8 +186,9 @@ export function BottleIdentityRow({
             {relatedReleases.count.toLocaleString("en-US")} related releases
           </AppLink>
         ) : null}
+        {sidebar ? trailingContent : null}
       </div>
-      {end ? <div {...stylex.props(styles.end)}>{end}</div> : null}
+      {!sidebar ? trailingContent : null}
     </div>
   );
 }
@@ -178,6 +211,37 @@ const styles = stylex.create({
   startAlignedRow: {
     alignItems: "flex-start",
   },
+  searchRow: {
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+    "@media (max-width: 559px)": {
+      display: "grid",
+      gridTemplateColumns: "auto minmax(0, 1fr)",
+      rowGap: space.x1,
+    },
+  },
+  searchEnd: {
+    "@media (max-width: 559px)": {
+      gridColumn: "2",
+      justifyContent: "flex-start",
+    },
+  },
+  sidebarRow: {
+    alignItems: "flex-start",
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+  },
+  sidebarName: {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2,
+    overflow: "hidden",
+  },
+  sidebarEnd: {
+    maxWidth: "100%",
+    marginTop: space.x1,
+    justifyContent: "flex-start",
+  },
   compactRow: {
     minHeight: "44px",
     gap: space.x2,
@@ -188,7 +252,6 @@ const styles = stylex.create({
   compactName: {
     display: "block",
     overflow: "hidden",
-    fontSize: "15px",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },

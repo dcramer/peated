@@ -82,6 +82,8 @@ export function TastingReviewRail({
         items={moreFromMember.map((tasting) => ({
           ...toBottleListItem(tasting.bottle),
           id: String(tasting.id),
+          provenance: [],
+          metadata: [],
           end: (
             <div {...stylex.props(styles.tastingMeta)}>
               {tasting.ratingBand ? (
@@ -156,9 +158,9 @@ function formatPublishedDate(review: ExternalReview) {
 const styles = stylex.create({
   tastingMeta: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: space.x1,
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: space.x2,
   },
   tastingDate: {
     color: colors.inkMuted,

@@ -51,7 +51,10 @@ const meta = {
     ),
   ],
   argTypes: {
-    variant: { control: "inline-radio", options: ["standard", "compact"] },
+    variant: {
+      control: "inline-radio",
+      options: ["standard", "search", "sidebar", "compact"],
+    },
   },
   args: {
     ...toBottleListItem(rowBottle),
@@ -61,14 +64,16 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: `Use BottleIdentityRow for one bottle, BottleList for a catalog list, and CommunityFeed for activity. Build props with toBottleListItem (API Bottles) or getBottleIdentityProps (partial reads). Both variants take the same full marketed name.
+        component: `Use BottleIdentityRow for one bottle, BottleList for a catalog list, and CommunityFeed for activity. Build props with toBottleListItem (API Bottles) or getBottleIdentityProps (partial reads). All variants take the same full marketed name.
 
 | Variant | Use | Content |
 | --- | --- | --- |
-| standard (default) | Catalog, search, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
+| standard (default) | Catalog, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
+| search | Typeahead results | Standard identity and thumbnail, 15px compact title, and 8px vertical padding. |
+| sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
 | compact | Single or grouped library additions | One name line, 24 × 32px thumbnail, and a 44px hit area. |
 
-Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control; end holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
+Sidebar omits membership status icons and keeps full accessible names when its two-line titles truncate. Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control; end holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
 
 Use Row Layouts to compare these components at desktop and phone widths.`,
       },
@@ -172,7 +177,7 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows, including sidebars, use the same three identity lines and medium thumbnail. Compact library additions use the extra-small thumbnail.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail.",
       },
     },
   },
@@ -201,7 +206,11 @@ export const RowLayouts: Story = {
               },
             ]}
           />
-          <LoadingList label="Loading sidebar bottles" rows={2} />
+          <LoadingList
+            label="Loading sidebar bottles"
+            rows={2}
+            variant="sidebar"
+          />
         </StoryCanvas>
         <section aria-label="Activity">
           <SectionHeading level={3}>
@@ -262,6 +271,21 @@ export const RowLayouts: Story = {
                       kind: "bottle",
                       imageUrl: args.imageUrl,
                       label: title,
+                    },
+                  },
+                  {
+                    href: "/bottles/18481",
+                    bottle: {
+                      provenance: [{ name: "Single Malt" }],
+                      metadata: ["61.5% ABV", "2024 release"],
+                    },
+                    id: "search-long-name",
+                    title:
+                      "Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated",
+                    visual: {
+                      kind: "bottle",
+                      imageUrl: null,
+                      label: "Bruichladdich Octomore",
                     },
                   },
                 ],

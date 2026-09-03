@@ -52,9 +52,11 @@ export function FactList({ facts, layout = "list" }: FactListProps) {
           </dt>
           <dd
             {...stylex.props(
-              foundationStyles.compactRowTitle,
+              layout === "grid"
+                ? foundationStyles.body
+                : foundationStyles.compactRowTitle,
               styles.value,
-              layout === "grid" && [foundationStyles.body, styles.gridValue],
+              layout === "grid" && styles.gridValue,
             )}
           >
             {fact.value}

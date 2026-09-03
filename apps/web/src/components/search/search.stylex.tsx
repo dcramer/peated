@@ -580,7 +580,7 @@ export function Search({
   useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
 
   useEffect(() => {
-    if (placement === "page") return;
+    if (placement !== "database") return;
     // Browser storage is unavailable during server rendering.
     // oxlint-disable-next-line react/set-state-in-effect
     setRecentSearches(readRecentSearches());
@@ -641,7 +641,9 @@ export function Search({
 
   const groups = query.trim()
     ? (currentSnapshot?.groups ?? [])
-    : recentSearchGroups(recentSearches);
+    : placement === "database"
+      ? recentSearchGroups(recentSearches)
+      : [];
 
   const searchBox = (
     <SearchBox

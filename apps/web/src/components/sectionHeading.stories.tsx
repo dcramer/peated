@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use SectionHeading for every section heading, including sidebars. The shared 24px heading sits above 18px row titles. Heading levels change document structure, not appearance. Keep spacing in the containing layout; do not add local typography variants.",
+          "Use SectionHeading for every section heading, including sidebars. The shared 20px heading sits above 18px row titles. Heading levels change document structure, not appearance. Keep spacing in the containing layout; do not add local typography variants.",
       },
     },
   },
