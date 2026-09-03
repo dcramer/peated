@@ -193,7 +193,7 @@ async function handleRpcRequest({ request, response, url }) {
     case "users/activity/list":
       sendRpcResponse(
         response,
-        input?.cursor
+        input?.cursor || input?.limit === 3
           ? buildActivity()
           : buildFavoriteActivity({ nextCursor: "2:1780833600000" }),
       );

@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
+  EmptyState,
   FactList,
   LoadingPlaceholder,
   RailList,
@@ -13,12 +14,12 @@ import {
   type FactListItem,
   type TastingRatingCounts,
 } from "@peated/web/components";
-import { MemberActivityList } from "@peated/web/components/pages/memberProfileContent.stylex";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
-import { toActivityItem } from "./profileActivity";
 import { useProfile } from "./profileContext";
 import {
   ProfileActivitySection,
@@ -68,14 +69,10 @@ export function ProfileOverviewPageClient({
           value: formatCount(user.stats.contributions),
         },
       ];
-  const activity = initialActivityList.results
-    .filter(
-      (item) =>
-        item.type !== "collection_add" ||
-        !item.collection.href?.endsWith("/favorites"),
-    )
-    .slice(0, 3)
-    .map(toActivityItem);
+  const activity = getCommunityFeedItems({
+    activity: initialActivityList.results,
+    criticReviews: [],
+  }).slice(0, 3);
 
   return (
     <ProfileOverviewLayout
@@ -83,14 +80,15 @@ export function ProfileOverviewPageClient({
         <>
           <FactList facts={facts} layout="grid" />
           <ProfileActivitySection username={user.username}>
-            <MemberActivityList
-              emptyDescription={
-                isCurrentUser
+            {activity.length ? (
+              <CommunityFeed ariaLabel="Member activity" items={activity} />
+            ) : (
+              <EmptyState heading="No activity yet">
+                {isCurrentUser
                   ? "Your tastings, reviews, and library additions will appear here."
-                  : `${user.username} has no recent activity.`
-              }
-              items={activity}
-            />
+                  : `${user.username} has no recent activity.`}
+              </EmptyState>
+            )}
           </ProfileActivitySection>
         </>
       }
