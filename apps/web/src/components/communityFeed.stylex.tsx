@@ -241,7 +241,6 @@ const styles = stylex.create({
     marginTop: 0,
     marginBottom: space.x2,
     color: colors.ink,
-    fontStyle: "italic",
   },
   footer: { color: colors.inkMuted },
 });
