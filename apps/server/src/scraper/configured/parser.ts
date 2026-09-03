@@ -4,6 +4,7 @@ import { StorePriceInputSchema } from "@peated/server/schemas";
 import { load } from "cheerio";
 import { createHash } from "node:crypto";
 import type { z } from "zod";
+import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
 import type { ScrapeRules, ScrapeValueSelector } from "./rules";
 
@@ -207,6 +208,7 @@ function parseReviewDetail(
     nativeScore: { value: number; scale: number; display: string } | null;
   }> = [];
   const externalReviewTexts: Record<string, string> = {};
+  const externalReviewBodies: Record<string, string> = {};
   const reviewItems = $(rules.detail.reviewItem).toArray();
   const readReviewValue = (
     item: ReturnType<typeof load>,
@@ -227,6 +229,8 @@ function parseReviewDetail(
         return;
       }
       const sourceKey = `${pageUrl.toString()}#review-${index + 1}`;
+      const body = readReviewBody($(element));
+      if (body) externalReviewBodies[sourceKey] = body;
       const reviewerName = rules.detail.reviewerName
         ? readReviewValue(item, rules.detail.reviewerName)
         : null;
@@ -277,6 +281,7 @@ function parseReviewDetail(
       externalReviews,
     },
     externalReviewTexts,
+    externalReviewBodies,
   });
   if (!result.success) {
     issues.push(

@@ -38,5 +38,9 @@ reason to collect too much data.
 
 ## Exceptions
 
+- External review bodies may be saved internally to run parsers again, as
+  defined in [External Reviews](../features/external-reviews.md). They must stay
+  out of public APIs, logs, cursors, and error reports.
+
 - A narrowly scoped administrative or migration tool may inspect raw data when
   access is explicit, output defaults are safe, and the operation is audited.

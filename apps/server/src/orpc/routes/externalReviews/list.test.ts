@@ -4,6 +4,7 @@ import {
   externalReviewArticles,
   externalReviewPublications,
   externalReviews,
+  externalReviewTags,
 } from "@peated/server/db/schema";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import waitError from "@peated/server/lib/test/waitError";
@@ -26,6 +27,7 @@ describe("GET /external-reviews", () => {
     const result = results.find(({ id }) => id === review.id)!;
     expect(result.bottle?.id).toBe(review.bottleId);
     expect(result.clip).toBeNull();
+    expect(result.extractedTags).toEqual([]);
     expect(result).not.toHaveProperty("target");
     expect(result).not.toHaveProperty("release");
   });
@@ -172,6 +174,11 @@ describe("GET /external-reviews", () => {
       nativeScoreDisplay: "8.4/10",
       clip: "Rich fruit and gentle smoke lead to a dry finish.",
     });
+    await fixtures.Tag({ name: "smoke" });
+    await db.insert(externalReviewTags).values({
+      externalReviewId: latest.id,
+      tag: "smoke",
+    });
     await Promise.all([
       db
         .update(externalReviewArticles)
@@ -258,6 +265,7 @@ describe("GET /external-reviews", () => {
       },
       nativeScore: { value: 8.4, scale: 10, display: "8.4/10" },
       clip: "Rich fruit and gentle smoke lead to a dry finish.",
+      extractedTags: ["smoke"],
       bottle: {
         id: bottle.id,
         fullName: bottle.fullName,

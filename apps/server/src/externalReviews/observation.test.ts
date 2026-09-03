@@ -70,3 +70,12 @@ test("rejects review text without a matching source key", () => {
     }),
   ).toThrow("External review text must match an external review source key.");
 });
+
+test("rejects a review body without a matching source key", () => {
+  expect(() =>
+    ExternalReviewArticleIngestionSchema.parse({
+      article: observation(),
+      externalReviewBodies: { unknown: "Review body" },
+    }),
+  ).toThrow("External review text must match an external review source key.");
+});

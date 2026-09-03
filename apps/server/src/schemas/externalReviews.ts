@@ -29,6 +29,11 @@ export const ExternalReviewSchema = z.object({
   reviewerName: z.string().nullable(),
   nativeScore: NativeScoreSchema.nullable(),
   clip: z.string().nullable(),
+  extractedTags: z
+    .array(z.string())
+    .describe(
+      "Tasting tags matched from review text; an empty list means no tags were extracted",
+    ),
   bottle: BottleSchema.nullable().describe(
     "Bottle associated with the review, or null when unresolved",
   ),

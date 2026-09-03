@@ -48,6 +48,7 @@ function observation(canonicalUrl: string): ExternalReviewArticleIngestion {
       ],
     },
     externalReviewTexts: {},
+    externalReviewBodies: {},
   };
 }
 

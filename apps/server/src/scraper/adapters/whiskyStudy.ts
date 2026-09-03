@@ -12,6 +12,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 // This adapter owns The Whisky Study parsing. The shared scraper runtime owns
 // every remote request and the shared review sink owns storage.
@@ -134,7 +135,8 @@ export function parseWhiskyStudyArticle(
     reviewerName: metadata.author,
     nativeScore: score.nativeScore,
   };
-  const contentText = JSON.stringify({ review, reviewText });
+  const body = readReviewBody(article.find(".blog-item-content").first());
+  const contentText = JSON.stringify({ review, reviewText, body });
 
   return WhiskyStudyObservationSchema.parse({
     article: {
@@ -146,6 +148,7 @@ export function parseWhiskyStudyArticle(
       externalReviews: [review],
     },
     externalReviewTexts: { [reviewSourceKey]: reviewText },
+    externalReviewBodies: body ? { [reviewSourceKey]: body } : {},
   });
 }
 

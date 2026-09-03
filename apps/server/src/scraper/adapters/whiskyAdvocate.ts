@@ -11,6 +11,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { ScraperAdapter } from "../types";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 const ORIGIN = "https://whiskyadvocate.com";
 const TARGET = "whiskyadvocate";
@@ -83,6 +84,13 @@ export function parseReviewPublishedAt(data: string): Date {
     throw new Error("Whisky Advocate review date is invalid.");
   }
   return publishedAt;
+}
+
+export function parseReviewBody(data: string): string {
+  const $ = cheerio(data);
+  const body = readReviewBody($(".postDetailsContent").first());
+  if (!body) throw new Error("Whisky Advocate review body is missing.");
+  return body;
 }
 
 export function parseIssueList(data: string) {
@@ -204,6 +212,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
       url: new URL(review.url),
     });
     const publishedAt = parseReviewPublishedAt(articleResponse.body);
+    const body = parseReviewBody(articleResponse.body);
     const nativeScore = {
       value: review.rating,
       scale: 100,
@@ -223,6 +232,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
               rating: review.rating,
               url: review.url,
               issue: review.issue,
+              body,
             }),
           )
           .digest("hex"),
@@ -237,6 +247,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
         ],
       },
       externalReviewTexts: {},
+      externalReviewBodies: { [review.url]: body },
     });
     await session.emit({ sourceKey: review.url, value });
     completedReviewUrls.add(review.url);

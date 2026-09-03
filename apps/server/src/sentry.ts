@@ -1,11 +1,18 @@
+/**
+ * Server Sentry setup owns span filtering. SQL values and local variables stay
+ * out of telemetry; callers still own reporting unexpected failures.
+ */
+import type { StreamedSpanJSON } from "@sentry/core";
 import * as Sentry from "@sentry/hono/node";
 import config from "./config";
 import { normalizeStreamedGenAiSpan } from "./lib/genAiTelemetry";
 import { configureLogging } from "./lib/log";
 
-type HonoNodeOptionsWithLocalVariables = Parameters<typeof Sentry.init>[0] & {
-  includeLocalVariables?: boolean;
-};
+export function prepareSpan(span: StreamedSpanJSON): StreamedSpanJSON {
+  const cleaned = { ...span, attributes: { ...span.attributes } };
+  delete cleaned.attributes["drizzle.query.params"];
+  return normalizeStreamedGenAiSpan(cleaned);
+}
 
 if (config.ENV !== "test") {
   const sentryOptions = {
@@ -14,12 +21,11 @@ if (config.ENV !== "test") {
     tracesSampleRate: 1.0,
     enableLogs: true,
     streamGenAiSpans: true,
-    beforeSendSpan: Sentry.withStreamedSpan(normalizeStreamedGenAiSpan),
+    beforeSendSpan: Sentry.withStreamedSpan(prepareSpan),
     tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
-    includeLocalVariables: true,
     sendDefaultPii: true,
     integrations: [Sentry.zodErrorsIntegration()],
-  } satisfies HonoNodeOptionsWithLocalVariables;
+  } satisfies Parameters<typeof Sentry.init>[0];
 
   Sentry.init(sentryOptions);
 

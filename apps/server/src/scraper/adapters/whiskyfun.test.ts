@@ -114,6 +114,14 @@ test("extracts scored reviews with stable source keys", async () => {
   expect(Object.keys(parsed.externalReviewTexts)).toEqual(
     parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   );
+  expect(Object.keys(parsed.externalReviewBodies)).toEqual(
+    parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
+  );
+  for (const review of parsed.article.externalReviews) {
+    expect(parsed.externalReviewBodies[review.sourceKey]).toContain(
+      review.name,
+    );
+  }
   expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toContain(
     "Unscored introduction",
   );

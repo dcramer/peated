@@ -116,6 +116,37 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("keeps complete plain-text bodies per review while selecting narrower tasting text", () => {
+    const longParagraph = "Body prose. ".repeat(5000).trim();
+    const result = parseScrapeDetail(
+      reviewConfig,
+      `
+      <nav>Page navigation</nav><h1>Two reviews</h1><time datetime="2026-09-01"></time>
+      <article class="review"><h2>First Bottle</h2><p>An introduction &amp;
+        background.</p>
+        <p>${longParagraph}</p><div class="body">Nose: vanilla.</div><p>A final conclusion.</p>
+        <script>privateScript()</script><style>privateStyle</style><form>Form data</form>
+        <aside>Other reviews</aside><div id="comments">User comments</div>
+      </article>
+      <article class="review"><h2>Second Bottle</h2><p>Another introduction.</p><div class="body">Palate: smoke.</div></article>
+    `,
+      new URL("https://reviews.test/full-bodies"),
+    );
+    expect(result.issues).toEqual([]);
+    if (result.kind !== "review" || !result.value)
+      throw new Error("Expected reviews");
+    const [first, second] = result.value.article.externalReviews;
+    expect(result.value.externalReviewBodies).toEqual({
+      [first.sourceKey]: `First Bottle\n\nAn introduction & background.\n\n${longParagraph}\n\nNose: vanilla.\n\nA final conclusion.`,
+      [second.sourceKey]:
+        "Second Bottle\n\nAnother introduction.\n\nPalate: smoke.",
+    });
+    expect(result.value.externalReviewTexts).toEqual({
+      [first.sourceKey]: "Nose: vanilla.",
+      [second.sourceKey]: "Palate: smoke.",
+    });
+  });
+
   it("does not reuse a page field for repeated reviews", () => {
     const result = parseScrapeDetail(
       reviewConfig,

@@ -70,6 +70,10 @@ test("extracts one scored review and only its tasting prose", async () => {
   expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /TL;DR|Publisher summary|Article introduction|Footer content/u,
   );
+  const body = Object.values(parsed.externalReviewBodies)[0]!;
+  expect(body).toContain("Article introduction");
+  expect(body).toContain("A balanced and characterful release.");
+  expect(body).not.toContain("Footer content");
 });
 
 test("accepts a standard HTML datetime value", async () => {
@@ -103,6 +107,11 @@ test("extracts each bottle and normalizes decimal scores", async () => {
   expect(Object.keys(parsed.externalReviewTexts)).toEqual(
     parsed.article.externalReviews.map(({ sourceKey }) => sourceKey),
   );
+  const [firstBody, secondBody] = Object.values(parsed.externalReviewBodies);
+  expect(firstBody).toContain("Isle of Raasay");
+  expect(firstBody).not.toContain("Ardmore");
+  expect(secondBody).toContain("Ardmore");
+  expect(secondBody).not.toContain("Isle of Raasay");
 });
 
 test("keeps separate reviewers for the same bottle", async () => {

@@ -6,6 +6,7 @@ import {
   bottles,
   bottleTombstones,
   externalReviewArticles,
+  externalReviewTags,
   externalSites,
   type ExternalReview,
   type ExternalReviewArticle,
@@ -16,6 +17,7 @@ import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
 type ExternalReviewAttrs = {
+  extractedTags: string[];
   article: Pick<
     ExternalReviewArticle,
     "canonicalUrl" | "externalSiteId" | "publishedAt" | "title"
@@ -53,6 +55,24 @@ export const ExternalReviewSerializer = serializer({
     const articlesById = new Map(
       articleList.map((article) => [article.id, article]),
     );
+    const reviewTags = itemList.length
+      ? await db
+          .select()
+          .from(externalReviewTags)
+          .where(
+            inArray(
+              externalReviewTags.externalReviewId,
+              itemList.map(({ id }) => id),
+            ),
+          )
+          .orderBy(externalReviewTags.tag)
+      : [];
+    const tagsByReview = new Map<number, string[]>();
+    for (const { externalReviewId, tag } of reviewTags) {
+      const names = tagsByReview.get(externalReviewId) ?? [];
+      names.push(tag);
+      tagsByReview.set(externalReviewId, names);
+    }
 
     const bottleIds = Array.from(
       new Set(
@@ -119,6 +139,7 @@ export const ExternalReviewSerializer = serializer({
           item.id,
           {
             article,
+            extractedTags: tagsByReview.get(item.id) ?? [],
             bottle,
             site: sitesByRef[article.externalSiteId],
           },
@@ -153,6 +174,7 @@ export const ExternalReviewSerializer = serializer({
       reviewerName: item.reviewerName,
       nativeScore,
       clip: item.clip,
+      extractedTags: attrs.extractedTags,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

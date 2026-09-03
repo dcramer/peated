@@ -1870,6 +1870,20 @@
       "when": 1788363351342,
       "tag": "0266_tasting-note-categories",
       "breakpoints": false
+    },
+    {
+      "idx": 267,
+      "version": "7",
+      "when": 1788393947703,
+      "tag": "0267_redundant_longshot",
+      "breakpoints": false
+    },
+    {
+      "idx": 268,
+      "version": "7",
+      "when": 1788394829221,
+      "tag": "0268_dizzy_peter_parker",
+      "breakpoints": false
     }
   ]
 }

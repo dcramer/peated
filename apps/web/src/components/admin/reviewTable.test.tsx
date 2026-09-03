@@ -91,6 +91,7 @@ function makeReview(id: number, reviewBottle: Bottle | null): ExternalReview {
     reviewerName: null,
     nativeScore: { value: 91, scale: 100, display: "91/100" },
     clip: null,
+    extractedTags: [],
     bottle: reviewBottle,
     createdAt: timestamp,
     updatedAt: timestamp,

@@ -118,6 +118,10 @@ test("extracts source facts and only direct tasting paragraphs", async () => {
   expect(
     Object.values(parsed?.externalReviewTexts ?? {}).join(" "),
   ).not.toMatch(/introduction|price|comment|sláinte/iu);
+  const body = Object.values(parsed!.externalReviewBodies)[0]!;
+  expect(body).toContain("This introduction");
+  expect(body).toContain("Comment: A balanced release.");
+  expect(body).toContain("\n\nNose:");
 });
 
 test("accepts object author metadata", async () => {

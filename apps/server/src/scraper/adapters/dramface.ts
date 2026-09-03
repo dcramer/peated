@@ -12,6 +12,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 // This adapter owns Dramface-specific discovery and parsing. The shared
 // scraper runtime owns every remote request and the shared sink owns storage.
@@ -141,6 +142,7 @@ export function parseDramfaceArticle(
   const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
     [];
   const reviewTexts: Record<string, string> = {};
+  const reviewBodies: Record<string, string> = {};
 
   for (const [reviewIndex, start] of reviewStarts.entries()) {
     const end = reviewStarts[reviewIndex + 1] ?? elements.length;
@@ -199,6 +201,20 @@ export function parseDramfaceArticle(
             .join(" "),
     );
     if (reviewText) reviewTexts[sourceKey] = reviewText;
+    const footerStart = section.findIndex(
+      (element) =>
+        /^h[1-4]$/u.test(element.tagName) &&
+        /^Latest Reviews$/iu.test(normalizeText($(element).text())),
+    );
+    const body = readReviewBody(
+      $(
+        elements.slice(
+          reviewStarts.length === 1 ? 0 : start,
+          footerStart < 0 ? end : start + footerStart,
+        ),
+      ),
+    );
+    if (body) reviewBodies[sourceKey] = body;
   }
 
   if (externalReviews.length === 0) {
@@ -209,6 +225,7 @@ export function parseDramfaceArticle(
     externalReviews.map((review) => ({
       ...review,
       reviewText: reviewTexts[review.sourceKey] ?? null,
+      body: reviewBodies[review.sourceKey] ?? null,
     })),
   );
   return DramfaceObservationSchema.parse({
@@ -221,6 +238,7 @@ export function parseDramfaceArticle(
       externalReviews,
     },
     externalReviewTexts: reviewTexts,
+    externalReviewBodies: reviewBodies,
   });
 }
 

@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
+  externalReviewBodies,
   externalSiteRuns,
   scrapeOrigins,
   scrapeSourceRevisions,
@@ -140,6 +141,7 @@ test("runs preview through the normal request controls without product writes", 
     "Publisher prose",
   );
   expect(await db.select().from(externalReviewArticles)).toHaveLength(0);
+  expect(await db.select().from(externalReviewBodies)).toHaveLength(0);
   const [run] = await db
     .select()
     .from(externalSiteRuns)

@@ -22,7 +22,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v6";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v7";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -163,6 +163,8 @@ const RULE_INSTRUCTIONS = [
   "Identify the content and attributes that represent each output field.",
   "Selectors must match the same field across the supplied detail pages.",
   "Review rules must read the publisher's publication date.",
+  "For reviews, reviewItem must select the complete content container for each reviewed bottle, including its introduction, tasting notes, and conclusion. Its text is retained internally for later parsing. Exclude navigation, comments, related articles, and other bottles' reviews.",
+  "Use reviewText for a narrower tasting-notes container when available; otherwise select the review body. This text is used for flavor matching and short clips.",
   "Include an optional field when the supplied pages clearly and consistently provide it.",
   "Pagination must add new detail-page links when the website has a next page.",
   "</success_criteria>",

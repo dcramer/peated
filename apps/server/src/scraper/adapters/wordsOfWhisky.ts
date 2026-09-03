@@ -12,6 +12,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 // This adapter owns Words of Whisky parsing. The shared scraper runtime owns
 // every remote request and the shared review sink owns storage.
@@ -127,6 +128,7 @@ export function parseWordsOfWhiskyArticle(
   const externalReviews: ExternalReviewArticleObservation["externalReviews"] =
     [];
   const reviewTexts: Record<string, string> = {};
+  const reviewBodies: Record<string, string> = {};
 
   for (const [reviewIndex, start] of reviewStarts.entries()) {
     const end = reviewStarts[reviewIndex + 1] ?? elements.length;
@@ -159,6 +161,10 @@ export function parseWordsOfWhiskyArticle(
         .join(" "),
     );
     if (reviewText) reviewTexts[sourceKey] = reviewText;
+    const body = readReviewBody(
+      $(reviewStarts.length === 1 ? elements : section),
+    );
+    if (body) reviewBodies[sourceKey] = body;
   }
 
   if (externalReviews.length === 0) {
@@ -171,6 +177,7 @@ export function parseWordsOfWhiskyArticle(
     externalReviews.map((review) => ({
       ...review,
       reviewText: reviewTexts[review.sourceKey] ?? null,
+      body: reviewBodies[review.sourceKey] ?? null,
     })),
   );
   return WordsOfWhiskyObservationSchema.parse({
@@ -183,6 +190,7 @@ export function parseWordsOfWhiskyArticle(
       externalReviews,
     },
     externalReviewTexts: reviewTexts,
+    externalReviewBodies: reviewBodies,
   });
 }
 

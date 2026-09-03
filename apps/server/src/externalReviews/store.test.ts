@@ -299,12 +299,12 @@ describe("storeExternalReviewArticle", () => {
     expect(await db.select().from(externalReviews)).toHaveLength(4);
   });
 
-  test("rejects transient publisher content without persisting or echoing it", async ({
+  test("rejects page HTML and unstructured publisher fields without echoing them", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-    const secretBody = "publisher article body must remain transient";
-    const secretNotes = "copied tasting notes must remain transient";
+    const secretBody = "publisher content in a disallowed field";
+    const secretNotes = "tasting prose in a disallowed field";
 
     const error = await waitError(
       storeExternalReviewArticle({

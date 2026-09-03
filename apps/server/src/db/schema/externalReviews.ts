@@ -8,13 +8,16 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { bottles } from "./bottles";
 import { categoryEnum } from "./enums";
 import { externalSites } from "./externalSites";
+import { tags } from "./tags";
 
 export const externalReviewArticles = pgTable(
   "review_article",
@@ -97,6 +100,28 @@ export const externalReviews = pgTable(
       )`,
     ),
   ],
+);
+
+// Review ingestion owns internal source text; public review queries do not load it.
+export const externalReviewBodies = pgTable("review_body", {
+  externalReviewId: bigint("review_id", { mode: "number" })
+    .primaryKey()
+    .references(() => externalReviews.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  fetchedAt: timestamp("fetched_at").notNull(),
+});
+
+export const externalReviewTags = pgTable(
+  "review_tag",
+  {
+    externalReviewId: bigint("review_id", { mode: "number" })
+      .references(() => externalReviews.id, { onDelete: "cascade" })
+      .notNull(),
+    tag: varchar("tag", { length: 64 })
+      .references(() => tags.name, { onDelete: "cascade", onUpdate: "cascade" })
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.externalReviewId, table.tag] })],
 );
 
 export const externalReviewArticlesRelations = relations(

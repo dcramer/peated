@@ -11,6 +11,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 // This adapter owns The Whiskey Reviewer parsing. The shared scraper runtime
 // owns every remote request and the shared review sink owns storage.
@@ -188,6 +189,7 @@ export function parseWhiskeyReviewerArticle(
       .join(" "),
   );
   const reviewSourceKey = sourceKey(canonicalUrl.href);
+  const body = readReviewBody(article.find(".entry-content").first());
   const review = {
     sourceKey: reviewSourceKey,
     name,
@@ -198,6 +200,7 @@ export function parseWhiskeyReviewerArticle(
   const contentText = JSON.stringify({
     review,
     reviewText: reviewText || null,
+    body,
   });
 
   return WhiskeyReviewerObservationSchema.parse({
@@ -210,6 +213,7 @@ export function parseWhiskeyReviewerArticle(
       externalReviews: [review],
     },
     externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
+    externalReviewBodies: body ? { [reviewSourceKey]: body } : {},
   });
 }
 

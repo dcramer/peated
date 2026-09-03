@@ -67,6 +67,10 @@ test("extracts publisher facts and only tasting notes", async () => {
   expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /introduction|conclusion/iu,
   );
+  const body = Object.values(parsed.externalReviewBodies)[0]!;
+  expect(body).toMatch(/introduction/iu);
+  expect(body).toMatch(/conclusion/iu);
+  expect(body).not.toContain("<p>");
 });
 
 test("resumes without requesting a completed current article", async () => {

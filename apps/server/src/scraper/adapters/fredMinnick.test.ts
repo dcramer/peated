@@ -74,6 +74,10 @@ test("extracts an unscored review and only direct tasting text", async () => {
   expect(Object.values(parsed.externalReviewTexts).join(" ")).not.toMatch(
     /introduction|conclusion|navigation|price|read more/iu,
   );
+  const body = Object.values(parsed.externalReviewBodies)[0]!;
+  expect(body).toContain("This introduction");
+  expect(body).toContain("The final conclusion");
+  expect(body).not.toMatch(/navigation|read more/iu);
 });
 
 test("skips a selected comparison article", async () => {

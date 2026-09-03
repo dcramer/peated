@@ -11,6 +11,7 @@ import {
   processCurrentReviews,
 } from "./currentReviews";
 import { parseDate } from "./dates";
+import { readReviewBody } from "./reviewBody";
 
 // This adapter owns Fred Minnick parsing. The shared scraper runtime owns
 // every remote request and the shared review sink owns storage.
@@ -135,6 +136,14 @@ export function parseFredMinnickArticle(
       .join(" "),
   );
   const reviewSourceKey = sourceKey(canonicalUrl.href);
+  const content = $(".rich-text-block-4").first().clone();
+  content
+    .find("p")
+    .filter((_, element) =>
+      /^Read more:/iu.test(normalizeText($(element).text())),
+    )
+    .remove();
+  const body = readReviewBody(content);
   const review = {
     sourceKey: reviewSourceKey,
     name,
@@ -145,6 +154,7 @@ export function parseFredMinnickArticle(
   const contentText = JSON.stringify({
     review,
     reviewText: reviewText || null,
+    body,
   });
 
   return FredMinnickObservationSchema.parse({
@@ -157,6 +167,7 @@ export function parseFredMinnickArticle(
       externalReviews: [review],
     },
     externalReviewTexts: reviewText ? { [reviewSourceKey]: reviewText } : {},
+    externalReviewBodies: body ? { [reviewSourceKey]: body } : {},
   });
 }
 

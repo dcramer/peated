@@ -63,6 +63,10 @@ test("extracts source facts and only direct tasting paragraphs", async () => {
   expect(
     Object.values(parsed?.externalReviewTexts ?? {}).join(" "),
   ).not.toMatch(/introduction|price|age:|review date|final thoughts/iu);
+  const body = Object.values(parsed!.externalReviewBodies)[0]!;
+  expect(body).toContain("This introduction");
+  expect(body).toContain("Final Thoughts");
+  expect(body).toContain("\n\nNose:");
 });
 
 test("skips a clear non-review but rejects an incomplete review", async () => {
