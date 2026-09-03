@@ -44,26 +44,6 @@ function getEntityKind(collection: string): EntityKind | null {
   }
 }
 
-export function resolveCatalogPeatedIdRoute(
-  pathname: string,
-): PeatedIdRouteResolution | null {
-  const rootMatch = ROOT_PEATED_ID_PATTERN.exec(pathname);
-  if (rootMatch) {
-    const parsed = parsePeatedId(rootMatch[1]);
-    if (!parsed) return null;
-
-    if (parsed.type === "bottle") {
-      return { action: "redirect", pathname: `/bottles/${parsed.id}` };
-    }
-    if (parsed.type === "series") {
-      return { action: "redirect", pathname: `/series/${parsed.id}` };
-    }
-    return null;
-  }
-
-  return null;
-}
-
 export function matchEntityRoute(pathname: string): EntityRouteMatch | null {
   const rootMatch = ROOT_PEATED_ID_PATTERN.exec(pathname);
   if (rootMatch) {

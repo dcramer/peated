@@ -5,14 +5,22 @@ import {
   normalizeBottleCatalogQueryParams,
 } from "@peated/web/lib/bottleCatalogQueryParams";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
-import type { Metadata } from "next";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import { BottleCatalogPageClient } from "./bottleCatalogPageClient";
 
-export const metadata: Metadata = {
-  title: "Whisky Bottles",
-  description: "Browse whisky bottles in the Peated database.",
-};
+export async function generateMetadata(props: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return getCatalogSeoMetadata(
+    {
+      title: "Whisky bottles",
+      description: "Browse whisky bottles in the Peated database.",
+      url: "/bottles",
+    },
+    await props.searchParams,
+  );
+}
 
 export default async function BottleListPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

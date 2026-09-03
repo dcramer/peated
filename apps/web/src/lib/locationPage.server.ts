@@ -2,11 +2,11 @@
 
 import { cache } from "react";
 
-import { getPublicPageServerClient } from "./orpc/client.server";
+import { getAnonymousServerClient } from "./orpc/client.server";
 import { resolveOrNotFound } from "./orpc/notFound.server";
 
 export const getCountryPage = cache(async (countrySlug: string) => {
-  const { client } = await getPublicPageServerClient();
+  const { client } = await getAnonymousServerClient();
   return await resolveOrNotFound(
     client.countries.details({ country: countrySlug }),
   );
@@ -14,7 +14,7 @@ export const getCountryPage = cache(async (countrySlug: string) => {
 
 export const getRegionPage = cache(
   async (countrySlug: string, regionSlug: string) => {
-    const { client } = await getPublicPageServerClient();
+    const { client } = await getAnonymousServerClient();
     return await resolveOrNotFound(
       client.regions.details({ country: countrySlug, region: regionSlug }),
     );

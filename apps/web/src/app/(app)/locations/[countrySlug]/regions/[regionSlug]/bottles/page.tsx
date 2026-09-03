@@ -5,12 +5,25 @@ import {
 } from "@peated/web/lib/bottleCatalogQueryParams";
 import { getRegionPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getRegionSeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import {
   LOCATION_BOTTLE_DEFAULT_SORT,
   LOCATION_BOTTLE_QUERY_FIELDS,
 } from "../../../../locationBottleList";
 import { LocationBottleListClient } from "../../../../locationBottleListClient";
+
+export async function generateMetadata(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ countrySlug, regionSlug }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const location = await getRegionPage(countrySlug, regionSlug);
+  return getRegionSeoMetadata(location, { section: "bottles", searchParams });
+}
 
 export default async function RegionBottlesPage(props: {
   params: Promise<{ countrySlug: string; regionSlug: string }>;

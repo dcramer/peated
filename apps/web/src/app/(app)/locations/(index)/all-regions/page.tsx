@@ -2,14 +2,22 @@ import { CursorPager } from "@peated/web/components";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import type { Metadata } from "next";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import { LocationTable } from "../../locationLists";
 
-export const metadata: Metadata = {
-  title: "Whisky Locations",
-  description: "Browse every whisky-producing country recorded by Peated.",
-};
+export async function generateMetadata(props: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return getCatalogSeoMetadata(
+    {
+      title: "Whisky countries",
+      description: "Browse every whisky-producing country recorded by Peated.",
+      url: "/locations/all-regions",
+    },
+    await props.searchParams,
+  );
+}
 
 export default async function AllLocationsPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

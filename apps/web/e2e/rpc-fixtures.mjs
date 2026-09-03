@@ -1079,3 +1079,16 @@ export const emptyList = {
     prevCursor: null,
   },
 };
+
+export const testSeries = {
+  id: 9401,
+  peatedId: "S9401",
+  name: "Special Releases",
+  fullName: "Lagavulin Special Releases",
+  description: "Whisky from the Special Releases series.",
+  numReleases: 1,
+  brand: testBrand,
+  distillers: [],
+  createdAt: timestamp,
+  updatedAt: timestamp,
+};

@@ -1,6 +1,7 @@
 import { BOTTLE_LIST_SORT_OPTIONS } from "@peated/server/constants";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
+import { serializeSeriesStructuredData } from "@peated/web/lib/catalogStructuredData";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getSeriesSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getSeriesPage } from "@peated/web/lib/seriesPage.server";
@@ -32,10 +33,14 @@ function getLibraryFilter(value: string | undefined): SeriesLibraryFilter {
 
 export async function generateMetadata(props: {
   params: Promise<{ seriesId: string }>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { seriesId } = await props.params;
   const series = await getSeriesPage(parseCatalogRouteId(seriesId));
-  return getSeriesSeoMetadata(series, { canonical: true });
+  return getSeriesSeoMetadata(series, {
+    canonical: true,
+    searchParams: await props.searchParams,
+  });
 }
 
 export default async function SeriesPage(props: {
@@ -74,13 +79,21 @@ export default async function SeriesPage(props: {
   ]);
 
   return (
-    <SeriesPageClient
-      initialBottleList={bottleList}
-      initialCursor={cursor}
-      initialLibrary={library}
-      initialLibraryCount={libraryBottleList?.total ?? null}
-      initialSeries={series}
-      initialSort={sort}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeSeriesStructuredData(series),
+        }}
+      />
+      <SeriesPageClient
+        initialBottleList={bottleList}
+        initialCursor={cursor}
+        initialLibrary={library}
+        initialLibraryCount={libraryBottleList?.total ?? null}
+        initialSeries={series}
+        initialSort={sort}
+      />
+    </>
   );
 }

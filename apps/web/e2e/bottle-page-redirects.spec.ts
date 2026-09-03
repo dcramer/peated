@@ -11,12 +11,16 @@ test.describe("Bottle page redirects", () => {
 
   test("permanently redirects an exact replacement and preserves its suffix", async ({
     page,
+    request,
   }) => {
     const sourcePath = `/bottles/${replacementSourceBottleId}/tastings?source=legacy&tag=one&tag=two`;
     const replacementPath = new RegExp(
       `/bottles/${exactMatchedBottleId}-[^/?#]+/tastings\\?source=legacy&tag=one&tag=two$`,
     );
 
+    const response = await request.get(sourcePath, { maxRedirects: 0 });
+    expect(response.status()).toBe(308);
+    expect(response.headers().location).toMatch(replacementPath);
     await page.goto(sourcePath, { waitUntil: "commit" });
     await expect(page).toHaveURL(replacementPath);
   });

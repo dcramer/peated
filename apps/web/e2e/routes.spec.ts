@@ -13,11 +13,17 @@ import {
   testOwnedEntity,
   testOwner,
   testRegion,
+  testSeries,
   testUser,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 const publicRoutes = [
+  {
+    heading: testSeries.name,
+    name: "Series",
+    path: `/series/${testSeries.id}`,
+  },
   {
     heading: "A record of whisky, bottle by bottle.",
     name: "Home",
@@ -72,7 +78,22 @@ const otherPublicRoutes = [
   ["company", `/companies/${testOwner.id}`],
 ] as const;
 
-test("public routes load", async ({ page, snapshot }) => {
+test("public routes load", async ({ page, request, snapshot }) => {
+  for (const source of [
+    `/series/${testSeries.id}`,
+    `/series/${testSeries.id}-old.name`,
+    "/series/9402-old",
+    `/S${testSeries.id}`,
+  ]) {
+    const response = await request.get(
+      `${source}?source=legacy&tag=one&tag=two`,
+      { maxRedirects: 0 },
+    );
+    expect(response.status()).toBe(308);
+    expect(response.headers().location).toBe(
+      `/series/${testSeries.id}-lagavulin-special-releases?source=legacy&tag=one&tag=two`,
+    );
+  }
   for (const route of publicRoutes) {
     await test.step(route.name, async () => {
       const response = await page.goto(route.path, { waitUntil: "commit" });
@@ -105,6 +126,24 @@ test("public routes load", async ({ page, snapshot }) => {
           await page.keyboard.press("Escape");
           await expect(panel).toHaveCount(0);
           await expect(smoke).toBeFocused();
+        }
+        if (["Series", "Country", "Region"].includes(route.name)) {
+          await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+            "href",
+            page.url(),
+          );
+          await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+            "content",
+            page.url(),
+          );
+          const structured = await page
+            .locator('script[type="application/ld+json"]')
+            .allTextContents();
+          expect(
+            structured.some(
+              (value) => JSON.parse(value)["@type"] === "CollectionPage",
+            ),
+          ).toBe(true);
         }
         await snapshot(route.name, { ready: heading });
       }
@@ -153,8 +192,25 @@ test(
 
 test("browse from the homepage through a country and its regions", async ({
   page,
+  request,
   snapshot,
 }) => {
+  const source = `/locations/${testCountry.slug.toUpperCase()}/regions/${testRegion.slug.toUpperCase()}/bottles?source=legacy&tag=one&tag=two`;
+  const redirect = await request.get(source, { maxRedirects: 0 });
+  expect(redirect.status()).toBe(308);
+  expect(redirect.headers().location).toBe(
+    `/locations/${testCountry.slug}/regions/${testRegion.slug}/bottles?source=legacy&tag=one&tag=two`,
+  );
+  await page.goto(
+    `/locations/${testCountry.slug}/regions/${testRegion.slug}/bottles?cursor=2`,
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    page.url(),
+  );
+  await expect(page).toHaveTitle(
+    `Whisky bottles from ${testRegion.name}, ${testCountry.name} | Peated`,
+  );
   await page.goto("/");
   await page
     .getByRole("link", { name: new RegExp(`^${testCountry.name} `) })

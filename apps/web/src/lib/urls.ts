@@ -35,6 +35,19 @@ export function getBottleSeriesUrl(series: {
   return `/series/${series.id}-${createUrlSlug(series.fullName, "series")}`;
 }
 
+export function getCountryUrl(country: {
+  slug: string;
+}): `/locations/${string}` {
+  return `/locations/${encodeURIComponent(country.slug)}`;
+}
+
+export function getRegionUrl(region: {
+  slug: string;
+  country: { slug: string };
+}): `/locations/${string}/regions/${string}` {
+  return `${getCountryUrl(region.country)}/regions/${encodeURIComponent(region.slug)}`;
+}
+
 /** Entity identity owns the route: pass the stored kind, never a Bottle field's role. */
 export function getEntityUrl(entity: {
   id: number;
