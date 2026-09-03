@@ -60,7 +60,6 @@ export function TastingWheelIntroduction() {
       aria-labelledby="tasting-wheel-introduction"
       {...stylex.props(styles.introduction)}
     >
-      <TastingWheelGraphic />
       <div {...stylex.props(styles.directions)}>
         <SectionHeading id="tasting-wheel-introduction">
           Start with what you notice
@@ -75,6 +74,7 @@ export function TastingWheelIntroduction() {
           Pick a note to find out more and see bottles with that flavor.
         </p>
       </div>
+      <TastingWheelGraphic />
     </section>
   );
 }
@@ -253,14 +253,10 @@ export function TastingWheelCategories() {
 const styles = stylex.create({
   introduction: {
     display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 520px) minmax(0, 1fr)",
-      [TABLET]: "minmax(0, 1fr)",
-    },
-    alignItems: "center",
+    gridTemplateColumns: "minmax(0, 1fr)",
     gap: space.x6,
   },
-  directions: { display: "grid", gap: space.x3, maxWidth: "44ch" },
+  directions: { display: "grid", gap: space.x3, maxWidth: "74ch" },
   directionText: {
     margin: 0,
     fontFamily: fonts.reading,
@@ -269,7 +265,12 @@ const styles = stylex.create({
     color: colors.inkMuted,
     textWrap: "pretty",
   },
-  figure: { margin: 0, maxWidth: "520px" },
+  figure: {
+    margin: 0,
+    width: "100%",
+    maxWidth: "520px",
+    justifySelf: "center",
+  },
   wheelFrame: {
     width: "100%",
     minWidth: 0,
