@@ -1,5 +1,6 @@
 "use client";
 
+import type { Inputs } from "@peated/server/orpc/router";
 import {
   AdminBreadcrumbs,
   AdminPage,
@@ -10,10 +11,12 @@ import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+const DEFAULT_SORT: NonNullable<Inputs["countries"]["list"]>["sort"] = "name";
+
 export default function Page() {
   const queryParams = useApiQueryParams({
     defaults: {
-      sort: "-created",
+      sort: DEFAULT_SORT,
     },
     numericFields: ["cursor", "limit"],
   });
@@ -45,7 +48,7 @@ export default function Page() {
       <Table
         items={countryList.results}
         rel={countryList.rel}
-        defaultSort="-created"
+        defaultSort={DEFAULT_SORT}
         url={(item) => `/admin/locations/${item.slug}`}
         columns={[{ name: "name", sort: "name", sortDefaultOrder: "asc" }]}
         withSearch
