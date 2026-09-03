@@ -15,9 +15,22 @@ test.describe("activity feed", () => {
     snapshot,
   }) => {
     await signIn(context);
-    await page.goto(`/users/${testUser.username}/activity`, {
+    await page.goto(`/users/${testUser.username}`, {
       waitUntil: "commit",
     });
+    const profileFeed = page.getByRole("list", { name: "Member activity" });
+    await profileFeed
+      .getByRole("link", { name: "View tasting" })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/tastings\//);
+    await page.goBack({ waitUntil: "commit" });
+    await page
+      .locator("section")
+      .filter({ has: profileFeed })
+      .getByRole("link", { name: "View all", exact: true })
+      .click();
+    await expect(page).toHaveURL(`/users/${testUser.username}/activity`);
 
     await expect(page.getByText(tastingNotes)).toBeVisible();
     await expect(
@@ -25,6 +38,11 @@ test.describe("activity feed", () => {
     ).toBeVisible();
     await expect(page.getByText("Personal Favorites")).toHaveCount(0);
     await expect(page.getByRole("img", { name: "Favorite" })).toHaveCount(0);
+    await snapshot("Profile / Activity", { ready: profileFeed });
+    await profileFeed
+      .getByRole("link", { name: "their library", exact: true })
+      .click();
+    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
 
     await page.goto("/");
     const homeFeed = page.getByRole("list", {

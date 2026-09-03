@@ -38,9 +38,9 @@ export type CommunityFeedItem = {
 };
 
 /**
- * Activity list for the homepage and /activity. Map API entries with
- * getCommunityFeedItems; this component owns author context, event grouping,
- * and the standard/compact bottle choice. Routes own queries and actions.
+ * Activity list for the homepage, /activity, and member profiles. Map API entries
+ * with getCommunityFeedItems; this component owns author context, event grouping,
+ * and the standard/compact bottle choice. Routes own queries, empty states, and actions.
  */
 export function CommunityFeed({
   ariaLabel = "Activity",
@@ -63,8 +63,7 @@ export function CommunityFeed({
   );
 }
 
-/** One event for an existing activity list, including member profile reviews. */
-export function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
+function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
   return (
     <article {...stylex.props(styles.entry)}>
       <header {...stylex.props(styles.author)}>
