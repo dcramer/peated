@@ -4,6 +4,7 @@ import {
   EmptyState,
   ItemList,
   ItemListItem,
+  LoadingList,
 } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
@@ -16,6 +17,7 @@ import {
   requireReleaseFamilyGroup,
 } from "@peated/web/lib/releaseFamily";
 import { getBottleUrl } from "@peated/web/lib/urls";
+import { Suspense } from "react";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -40,6 +42,32 @@ export default async function BottleReleasesPage(props: {
   ]);
   const anchorId = parseCatalogRouteId(bottleId);
   const cursor = Number(searchParams.cursor ?? 1) || 1;
+
+  return (
+    <BottleSection heading="Releases">
+      <Suspense
+        key={`${anchorId}:${cursor}`}
+        fallback={<LoadingList label="Loading releases" />}
+      >
+        <ReleaseResults
+          anchorId={anchorId}
+          cursor={cursor}
+          searchParams={searchParams}
+        />
+      </Suspense>
+    </BottleSection>
+  );
+}
+
+async function ReleaseResults({
+  anchorId,
+  cursor,
+  searchParams,
+}: {
+  anchorId: number;
+  cursor: number;
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
   const { anchorBottle, client, group } = await getReleaseGroup(anchorId);
   const bottleList = await resolveOrNotFound(
     client.bottleGroups.bottles({
@@ -53,7 +81,7 @@ export default async function BottleReleasesPage(props: {
   const pathname = `${getBottleUrl(anchorBottle)}/releases`;
 
   return (
-    <BottleSection heading="Releases">
+    <>
       {bottleList.results.length ? (
         <ItemList ariaLabel="Bottle releases">
           {bottleList.results.map((bottle) => (
@@ -88,7 +116,7 @@ export default async function BottleReleasesPage(props: {
           bottleList.rel.prevCursor,
         )}
       />
-    </BottleSection>
+    </>
   );
 }
 

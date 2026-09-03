@@ -5,7 +5,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import {
   Button,
@@ -74,6 +74,11 @@ export function SeriesPageClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
+  const displayedSearchParams = new URLSearchParams(displayedParams);
   const bottleListQuery = useQuery({
     ...orpc.bottles.list.queryOptions({
       input: {
@@ -88,13 +93,16 @@ export function SeriesPageClient({
   });
 
   function updateParams(updates: Record<string, string>) {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     for (const [name, value] of Object.entries(updates)) {
       if (value) nextParams.set(name, value);
       else nextParams.delete(name);
     }
     nextParams.delete("cursor");
-    router.push(buildSearchHref(pathname, nextParams));
+    startTransition(() => {
+      setDisplayedParams(nextParams.toString());
+      router.push(buildSearchHref(pathname, nextParams), { scroll: false });
+    });
   }
 
   const facts =
@@ -159,7 +167,9 @@ export function SeriesPageClient({
             {...stylex.props(styles.filters)}
           >
             {libraryOptions.map((option) => {
-              const selected = option.value === initialLibrary;
+              const selected =
+                option.value ===
+                (displayedSearchParams.get("library") ?? "all");
               return (
                 <Chip
                   aria-pressed={selected}
@@ -219,12 +229,13 @@ export function SeriesPageClient({
               )}
               onSortChange={(value) => updateParams({ sort: value })}
               page={initialCursor}
+              pending={isNavigating || bottleListQuery.isFetching}
               previousHref={getCursorHref(
                 pathname,
                 searchParams,
                 bottleList.rel.prevCursor,
               )}
-              sort={initialSort}
+              sort={displayedSearchParams.get("sort") ?? initialSort}
               sortOptions={sortOptions}
               total={bottleList.total}
             />

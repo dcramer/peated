@@ -104,6 +104,8 @@ export type SearchProps = {
   limit?: number;
   onScopeChange?: (scope: SearchScope, query: string) => void;
   onSubmit?: (query: string) => void;
+  /** Includes a containing route's server navigation in the search status. */
+  pending?: boolean;
   placement?: "database" | "overlay" | "page";
   placeholder?: string;
   scopeValues?: readonly SearchScope[];
@@ -464,6 +466,7 @@ export function Search({
   limit = 3,
   onScopeChange,
   onSubmit,
+  pending = false,
   placement = "overlay",
   placeholder = "bottles, series, distillers, brands…",
   scopeValues,
@@ -686,9 +689,9 @@ export function Search({
       scope={effectiveScope}
       scopeFacets={availableScopeFacets}
       scopes={availableScopes}
-      status={status}
+      status={pending ? "searching" : status}
       statusText={
-        status === "searching"
+        pending || status === "searching"
           ? getSearchingText(effectiveScope, Boolean(user))
           : undefined
       }

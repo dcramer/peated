@@ -3,7 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useOptimistic, useTransition } from "react";
 
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import {
@@ -111,6 +111,10 @@ export function SearchPageClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
   const query = searchParams.get("q") ?? "";
   const intent = getAddBottleIntent(searchParams.get("intent"));
   const directToTasting = searchParams.has("tasting");
@@ -160,14 +164,14 @@ export function SearchPageClient({
   );
 
   function submitSearch(nextQuery: string) {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     if (nextQuery) nextParams.set("q", nextQuery);
     else nextParams.delete("q");
     replaceSearch(nextParams);
   }
 
   function updateScope(nextScope: SearchScope, nextQuery: string) {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     if (nextQuery) nextParams.set("q", nextQuery);
     else nextParams.delete("q");
     if (nextScope === "all") nextParams.delete("type");
@@ -177,7 +181,12 @@ export function SearchPageClient({
 
   function replaceSearch(nextParams: URLSearchParams) {
     const nextQuery = nextParams.toString();
-    router.replace(nextQuery ? `/search?${nextQuery}` : "/search");
+    startTransition(() => {
+      setDisplayedParams(nextQuery);
+      router.replace(nextQuery ? `/search?${nextQuery}` : "/search", {
+        scroll: false,
+      });
+    });
   }
 
   return (
@@ -210,6 +219,7 @@ export function SearchPageClient({
           limit={databaseSearch ? 5 : 50}
           onScopeChange={databaseSearch ? updateScope : undefined}
           onSubmit={submitSearch}
+          pending={isNavigating}
           placement={databaseSearch ? "database" : "page"}
           placeholder={
             databaseSearch ? "Ardbeg 10, Supernova, Lagavulin…" : undefined

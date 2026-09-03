@@ -9,7 +9,8 @@ import {
   effects,
   space,
 } from "../styles/tokens.stylex";
-import { AppLink, type AppLinkProps } from "./appLink";
+import { AppLink, isInternalAppHref, type AppLinkProps } from "./appLink";
+import { LinkPending } from "./linkPending.stylex";
 
 const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
 
@@ -73,7 +74,7 @@ export type ButtonLinkProps = Omit<AppLinkProps, "className" | "style"> & {
   variant?: ButtonVariant;
 };
 
-/** Uses the button treatment for navigation without hiding its link semantics. */
+/** Keeps native link semantics; internal links show Next.js navigation progress. */
 export function ButtonLink({
   align = "center",
   children,
@@ -100,6 +101,11 @@ export function ButtonLink({
       )}
     >
       {children}
+      {props.href &&
+      isInternalAppHref(props.href) &&
+      props.download === undefined ? (
+        <LinkPending />
+      ) : null}
     </AppLink>
   );
 }
@@ -243,6 +249,7 @@ const styles = stylex.create({
     textAlign: "left",
   },
   link: {
+    position: "relative",
     textDecoration: "none",
   },
   iconButton: {

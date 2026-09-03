@@ -45,6 +45,7 @@ export type MemberLibraryListProps = {
   items: readonly MemberLibraryItem[];
   nextHref?: string;
   onSortChange: (value: string) => void;
+  pending?: boolean;
   page: number;
   previousHref?: string;
   sort: string;
@@ -60,6 +61,7 @@ export function MemberLibraryList({
   items,
   nextHref,
   onSortChange,
+  pending = false,
   page,
   previousHref,
   sort,
@@ -72,35 +74,38 @@ export function MemberLibraryList({
         count={items.length}
         noun="bottle"
         onSortChange={onSortChange}
+        pending={pending}
         sort={sort}
         sortOptions={sortOptions}
         total={total}
       />
-      {items.length ? (
-        <ItemList ariaLabel="Library bottles">
-          {items.map(({ actions, id, status, ...identity }) => (
-            <ItemListItem key={id}>
-              <BottleIdentityRow
-                {...identity}
-                end={
-                  status || actions?.length ? (
-                    <div {...stylex.props(styles.libraryEnd)}>
-                      {status ? <Chip>{status}</Chip> : null}
-                      {actions?.length ? (
-                        <RowMenu groups={actions} label={identity.name} />
-                      ) : null}
-                    </div>
-                  ) : undefined
-                }
-              />
-            </ItemListItem>
-          ))}
-        </ItemList>
-      ) : (
-        <EmptyState action={emptyAction} heading={emptyHeading}>
-          {emptyDescription}
-        </EmptyState>
-      )}
+      <div aria-busy={pending || undefined}>
+        {items.length ? (
+          <ItemList ariaLabel="Library bottles">
+            {items.map(({ actions, id, status, ...identity }) => (
+              <ItemListItem key={id}>
+                <BottleIdentityRow
+                  {...identity}
+                  end={
+                    status || actions?.length ? (
+                      <div {...stylex.props(styles.libraryEnd)}>
+                        {status ? <Chip>{status}</Chip> : null}
+                        {actions?.length ? (
+                          <RowMenu groups={actions} label={identity.name} />
+                        ) : null}
+                      </div>
+                    ) : undefined
+                  }
+                />
+              </ItemListItem>
+            ))}
+          </ItemList>
+        ) : (
+          <EmptyState action={emptyAction} heading={emptyHeading}>
+            {emptyDescription}
+          </EmptyState>
+        )}
+      </div>
       <CursorPager
         ariaLabel="Library pages"
         nextHref={nextHref}

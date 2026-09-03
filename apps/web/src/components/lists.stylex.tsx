@@ -26,17 +26,19 @@ export type ListToolbarProps = {
   noun: string;
   onExport?: () => void;
   onSortChange: (value: string) => void;
+  pending?: boolean;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
   total?: number;
 };
 
-/** Pairs an item count with sorting and optional export actions. */
+/** Keeps sorting available while pending results retain their last settled count. */
 export function ListToolbar({
   count,
   noun,
   onExport,
   onSortChange,
+  pending = false,
   sort,
   sortOptions,
   total,
@@ -56,6 +58,12 @@ export function ListToolbar({
         ) : null}
       </p>
       <div {...stylex.props(styles.actions)}>
+        <span
+          role="status"
+          {...stylex.props(foundationStyles.metadata, styles.status)}
+        >
+          {pending ? "Updating…" : null}
+        </span>
         <label {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}>
           <span>Sort</span>
           <CompactSelect
@@ -113,7 +121,7 @@ export type CursorPagerProps = {
   previousHref?: string;
 };
 
-/** Presents only the cursor actions supplied by the owning API. */
+/** Prefetches API-owned page links and shows their Next.js navigation progress. */
 export function CursorPager({
   ariaLabel = "Pages",
   nextHref,
@@ -131,12 +139,24 @@ export function CursorPager({
         )}
       >
         {previousHref ? (
-          <ButtonLink href={previousHref} rel="prev" size="sm" variant="tonal">
+          <ButtonLink
+            href={previousHref}
+            prefetch={null}
+            rel="prev"
+            size="sm"
+            variant="tonal"
+          >
             ← Previous
           </ButtonLink>
         ) : null}
         {nextHref ? (
-          <ButtonLink href={nextHref} rel="next" size="sm" variant="tonal">
+          <ButtonLink
+            href={nextHref}
+            prefetch={null}
+            rel="next"
+            size="sm"
+            variant="tonal"
+          >
             Next →
           </ButtonLink>
         ) : null}
@@ -263,6 +283,9 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     gap: space.x2,
+  },
+  status: {
+    minWidth: "9ch",
   },
   sortLabel: {
     display: "flex",

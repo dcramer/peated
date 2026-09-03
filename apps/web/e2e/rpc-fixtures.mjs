@@ -1,5 +1,5 @@
 const timestamp = "2026-06-07T12:00:00.000Z";
-const mockApiServer = `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT ?? 4999}`;
+export const mockApiServer = `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT ?? 4999}`;
 
 export const createdBottleName = "Playwright Reserve";
 export const tastingNotes = "Smoke, lemon peel, and sea salt.";

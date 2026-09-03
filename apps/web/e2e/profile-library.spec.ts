@@ -78,18 +78,46 @@ test.describe("profile library", () => {
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
 
-    await page.goto(`/users/${testUser.username}/library?cursor=2`, {
-      waitUntil: "commit",
-    });
+    await page.goto(`/users/${testUser.username}/library?cursor=2`);
     await expect(libraryBottleLink(page, bottleId)).toBeVisible();
 
     const sort = page.getByRole("combobox", { name: "Sort bottles" });
     await expect(sort).toHaveValue("name");
-    await sort.selectOption({ label: "Recently added" });
+    const navigation = `/users/${testUser.username}/library?sort=-created*`;
+    let releaseNavigation!: () => void;
+    const navigationReady = new Promise<void>((resolve) => {
+      releaseNavigation = resolve;
+    });
+    await page.route(`**${navigation}`, async (route) => {
+      await navigationReady;
+      await route.continue();
+    });
+    try {
+      await sort.focus();
+      await sort.selectOption({ label: "Recently added" });
+      await expect(sort).toHaveValue("-created");
+      await expect(sort).toBeFocused();
+      await expect(
+        page.getByRole("status").filter({ hasText: "Updating…" }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: testInfo.outputPath("library-sort-pending.png"),
+      });
+      await expect(libraryBottleLink(page, bottleId)).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: testUser.username, exact: true }),
+      ).toBeVisible();
+    } finally {
+      releaseNavigation();
+    }
     await expect(page).toHaveURL(
       `/users/${testUser.username}/library?sort=-created`,
     );
-    await page.reload({ waitUntil: "commit" });
+    await expect(
+      page.getByRole("status").filter({ hasText: "Updating…" }),
+    ).toHaveCount(0);
+    await page.unroute(`**${navigation}`);
+    await page.reload();
     await expect(sort).toHaveValue("-created");
 
     await page
@@ -109,19 +137,40 @@ test.describe("profile library", () => {
     await expect(page).toHaveURL(
       `/users/${testUser.username}/library?sort=name`,
     );
+    await page.goBack();
+    await expect(sort).toHaveValue("-created");
+    await page.goForward();
+    await expect(sort).toHaveValue("name");
 
-    await page.goto(`/users/${testUser.username}/library?cursor=2`, {
-      waitUntil: "commit",
+    await page.goto(`/users/${testUser.username}/library?cursor=2`);
+    const brandNavigation = `**/users/${testUser.username}/library?brand=*`;
+    let releaseBrandNavigation!: () => void;
+    const brandNavigationReady = new Promise<void>((resolve) => {
+      releaseBrandNavigation = resolve;
     });
-    await page
-      .getByRole("button", {
-        name: new RegExp(`^${existingBottle.brand.name}\\b`),
-      })
-      .click();
+    await page.route(brandNavigation, async (route) => {
+      await brandNavigationReady;
+      await route.continue();
+    });
+    try {
+      await page
+        .getByRole("button", {
+          name: new RegExp(`^${existingBottle.brand.name}\\b`),
+        })
+        .click();
+      await expect(
+        page.getByRole("status").filter({ hasText: "Updating…" }),
+      ).toBeVisible();
+      await sort.selectOption({ label: "Recently added" });
+      await expect(sort).toHaveValue("-created");
+    } finally {
+      releaseBrandNavigation();
+    }
     await expect(page).toHaveURL(
-      `/users/${testUser.username}/library?brand=${existingBottle.brand.id}`,
+      `/users/${testUser.username}/library?brand=${existingBottle.brand.id}&sort=-created`,
     );
     await expect(libraryBottleLink(page, bottleId)).toBeVisible();
+    await page.unroute(brandNavigation);
   });
 
   test("lets the owner remove a Library entry", async ({

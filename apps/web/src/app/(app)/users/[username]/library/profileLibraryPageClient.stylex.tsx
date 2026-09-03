@@ -4,7 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
 import {
@@ -39,12 +39,19 @@ export function ProfileLibraryPageClient() {
   const searchParams = useSearchParams();
   const { isCurrentUser, user } = useProfile();
   const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
   const [entryChanges, setEntryChanges] = useState<
     Record<number, LibraryEntryChange>
   >({});
   const [mutationError, setMutationError] = useState(false);
   const input = getProfileLibraryInput(searchParams, user.id);
-  const { brand, cursor, distiller, query, sort, status } = input;
+  const { cursor } = input;
+  const { brand, distiller, query, sort, status } = getProfileLibraryInput(
+    new URLSearchParams(displayedParams),
+    user.id,
+  );
   const libraryQueryOptions = profileQueries.library(orpc, input);
   const libraryListQueryKey = orpc.collections.bottles.list.key({
     type: "query",
@@ -67,16 +74,20 @@ export function ProfileLibraryPageClient() {
 
   function navigate(nextParams: URLSearchParams) {
     const nextQuery = nextParams.toString();
-    startTransition(() =>
-      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname),
-    );
+    startTransition(() => {
+      // Library queries follow the committed URL; only controls anticipate navigation.
+      setDisplayedParams(nextQuery);
+      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
+        scroll: false,
+      });
+    });
   }
 
   function setFilter(
     name: "brand" | "distiller" | "status" | "sort",
     value: string,
   ) {
-    const next = new URLSearchParams(searchParams);
+    const next = new URLSearchParams(displayedParams);
     next.delete("cursor");
     if (value) next.set(name, value);
     else next.delete(name);
@@ -84,7 +95,7 @@ export function ProfileLibraryPageClient() {
   }
 
   function setQuery(value: string) {
-    const next = new URLSearchParams(searchParams);
+    const next = new URLSearchParams(displayedParams);
     next.delete("cursor");
     if (value) next.set("query", value);
     else next.delete("query");
@@ -92,7 +103,7 @@ export function ProfileLibraryPageClient() {
   }
 
   function clearFilters() {
-    const next = new URLSearchParams(searchParams);
+    const next = new URLSearchParams(displayedParams);
     ["brand", "cursor", "distiller", "query", "status"].forEach((name) =>
       next.delete(name),
     );
@@ -194,7 +205,7 @@ export function ProfileLibraryPageClient() {
       }
       rail={filterPanel}
     >
-      <div aria-busy={isNavigating || mutationPending || undefined}>
+      <div aria-busy={mutationPending || undefined}>
         {mutationError ? (
           <p
             role="alert"
@@ -258,6 +269,7 @@ export function ProfileLibraryPageClient() {
             )}
             page={cursor}
             onSortChange={(value) => setFilter("sort", value)}
+            pending={isNavigating || libraryQuery.isFetching}
             previousHref={getCursorHref(
               pathname,
               searchParams,

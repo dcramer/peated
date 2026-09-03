@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
+import { LinkPending } from "./linkPending.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
@@ -33,13 +34,13 @@ export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
             aria-current={current ? "page" : undefined}
             href={item.href}
             key={item.href}
-            prefetch={false}
             {...stylex.props(
               foundationStyles.interactive,
               styles.tab,
               current && [foundationStyles.interactive, styles.currentTab],
             )}
           >
+            <LinkPending />
             <span>{item.label}</span>
             {item.count !== undefined ? (
               <span {...stylex.props(foundationStyles.metadata, styles.count)}>
@@ -71,6 +72,7 @@ const styles = stylex.create({
     },
   },
   tab: {
+    position: "relative",
     display: "inline-flex",
     minHeight: "40px",
     flexShrink: 0,

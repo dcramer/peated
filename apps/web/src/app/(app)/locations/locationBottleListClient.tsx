@@ -3,6 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useOptimistic, useTransition } from "react";
 
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -46,18 +47,24 @@ export function LocationBottleListClient({
       overrides: { country, limit: 25, region },
     }),
   );
-  const { data: bottleList } = useSuspenseQuery({
+  const { data: bottleList, isFetching } = useSuspenseQuery({
     ...orpc.bottles.list.queryOptions({ input: queryParams }),
     initialData: initialBottleList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const sort = String(queryParams.sort ?? LOCATION_BOTTLE_DEFAULT_SORT);
+  const [isNavigating, startTransition] = useTransition();
+  const [sort, setSort] = useOptimistic(
+    String(queryParams.sort ?? LOCATION_BOTTLE_DEFAULT_SORT),
+  );
 
   function updateSort(value: string) {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set("sort", value);
     nextParams.delete("cursor");
-    router.push(buildSearchHref(pathname, nextParams));
+    startTransition(() => {
+      setSort(value);
+      router.push(buildSearchHref(pathname, nextParams), { scroll: false });
+    });
   }
 
   return (
@@ -77,6 +84,7 @@ export function LocationBottleListClient({
       )}
       onSortChange={updateSort}
       page={page}
+      pending={isNavigating || isFetching}
       previousHref={getCursorHref(
         pathname,
         searchParams,

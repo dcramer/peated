@@ -4,6 +4,7 @@ import {
   EmptyState,
   ItemList,
   ItemListItem,
+  LoadingList,
 } from "@peated/web/components";
 import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
@@ -12,6 +13,7 @@ import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { getBottleUrl } from "@peated/web/lib/urls";
+import { Suspense } from "react";
 
 import { BottleSection } from "../bottleSection.stylex";
 
@@ -25,6 +27,28 @@ export default async function BottleTastingsPage(props: {
   ]);
   const id = parseCatalogRouteId(bottleId);
   const cursor = Number(searchParams.cursor ?? 1) || 1;
+
+  return (
+    <BottleSection heading="Tastings">
+      <Suspense
+        key={`${id}:${cursor}`}
+        fallback={<LoadingList label="Loading tastings" />}
+      >
+        <TastingResults id={id} cursor={cursor} searchParams={searchParams} />
+      </Suspense>
+    </BottleSection>
+  );
+}
+
+async function TastingResults({
+  id,
+  cursor,
+  searchParams,
+}: {
+  id: number;
+  cursor: number;
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
   const [bottle, { client }] = await Promise.all([
     getBottlePage(id),
     getAnonymousServerClient(),
@@ -37,7 +61,7 @@ export default async function BottleTastingsPage(props: {
   const pathname = `${getBottleUrl(bottle)}/tastings`;
 
   return (
-    <BottleSection heading="Tastings">
+    <>
       {tastingList.results.length ? (
         <ItemList ariaLabel="Bottle tasting records">
           {tastingList.results.map((tasting) => (
@@ -76,6 +100,6 @@ export default async function BottleTastingsPage(props: {
           tastingList.rel.prevCursor,
         )}
       />
-    </BottleSection>
+    </>
   );
 }

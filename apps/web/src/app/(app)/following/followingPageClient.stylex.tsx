@@ -3,6 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useOptimistic, useTransition } from "react";
 
 import {
   ButtonLink,
@@ -44,11 +45,18 @@ export function FollowingPageClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
+  const controls = getFollowingPageState(
+    Object.fromEntries(new URLSearchParams(displayedParams)),
+  );
   const state = getFollowingPageState(Object.fromEntries(searchParams));
   const listQueryOptions = orpc.entities.list.queryOptions({
     input: state.input,
   });
-  const { data: entityList } = useSuspenseQuery({
+  const { data: entityList, isFetching } = useSuspenseQuery({
     ...listQueryOptions,
     initialData: initialEntityList,
   });
@@ -62,20 +70,27 @@ export function FollowingPageClient({
     toEntityCatalogItem(entity, followControls.isFollowing(entity)),
   );
 
+  function navigate(nextParams: URLSearchParams) {
+    startTransition(() => {
+      setDisplayedParams(nextParams.toString());
+      router.push(buildSearchHref(pathname, nextParams), { scroll: false });
+    });
+  }
+
   function updateParams(updates: Record<string, string>) {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     Object.entries(updates).forEach(([name, value]) => {
       if (value) nextParams.set(name, value);
       else nextParams.delete(name);
     });
     nextParams.delete("cursor");
-    router.push(buildSearchHref(pathname, nextParams));
+    navigate(nextParams);
   }
 
   function clearFilters() {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     ["cursor", "query", "type"].forEach((name) => nextParams.delete(name));
-    router.push(buildSearchHref(pathname, nextParams));
+    navigate(nextParams);
   }
 
   const noMatches = state.hasFilters;
@@ -85,19 +100,19 @@ export function FollowingPageClient({
       filters={
         <FilterPanel
           ariaLabel="Following filters"
-          onClear={state.hasFilters ? clearFilters : undefined}
+          onClear={controls.hasFilters ? clearFilters : undefined}
           query={{
             label: "Name",
             onSubmit: (value) => updateParams({ query: value }),
             placeholder: "Distiller, brand, or bottler",
-            query: state.query,
+            query: controls.query,
           }}
         >
           <FacetGroup
             label="Type"
             onChange={(value) => updateParams({ type: value })}
             options={typeOptions}
-            selected={state.type === "all" ? "" : state.type}
+            selected={controls.type === "all" ? "" : controls.type}
           />
         </FilterPanel>
       }
@@ -151,6 +166,7 @@ export function FollowingPageClient({
           })
         }
         page={state.cursor}
+        pending={isNavigating || isFetching}
         pendingIds={followControls.pendingIds}
         previousHref={getCursorHref(
           pathname,
@@ -158,7 +174,7 @@ export function FollowingPageClient({
           entityList.rel.prevCursor,
         )}
         showFollowingMarks={state.view === "find"}
-        sort={state.sort}
+        sort={controls.sort}
         sortOptions={sortOptions}
         total={visibleList.total}
       />
