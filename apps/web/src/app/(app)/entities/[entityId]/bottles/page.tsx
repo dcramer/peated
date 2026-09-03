@@ -8,7 +8,7 @@ import {
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
-import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPageBottleList } from "@peated/web/lib/publicCatalog.server";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { redirect } from "next/navigation";
 
@@ -29,7 +29,6 @@ export default async function EntityBottlesPage(props: {
     redirect(getEntityUrl(entity));
   }
 
-  const { client } = await getPublicPageServerClient();
   const createBottleHref = getEntityBottleCreateHref(entity);
   let distilleryView = getDistilleryBottleView(entity, searchParams.view);
   let queryParams = normalizeBottleCatalogQueryParams(
@@ -54,7 +53,7 @@ export default async function EntityBottlesPage(props: {
       },
     }),
   );
-  let bottleList = await client.bottles.list(queryParams);
+  let bottleList = await getPageBottleList(queryParams);
 
   if (
     entity.kind === "distillery" &&
@@ -64,7 +63,7 @@ export default async function EntityBottlesPage(props: {
   ) {
     distilleryView = "other";
     queryParams = { ...queryParams, distilleryView };
-    bottleList = await client.bottles.list(queryParams);
+    bottleList = await getPageBottleList(queryParams);
   }
 
   return (

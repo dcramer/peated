@@ -18,7 +18,23 @@ Do not rely on client-side rendering to hide private controls in shared cached
 HTML. Do not assume `Vary: Cookie` survives Next.js rendering unless production
 headers prove it.
 
-## Adding Shared Caching
+## Public Data
+
+- `publicStats.server.ts` caches anonymous counts for one hour. Server reads use
+  `getPublicStats`; browser reads use `/api/stats`, backed by the same cache.
+  The endpoint sends `no-store` to avoid an extra HTTP cache lifetime.
+- `publicCatalog.server.ts` caches anonymous entity summaries and first-page
+  entity/series bottle lists for five minutes. Keys include entity, series,
+  distillery view, sort, and limit. Members, searches, extra filters, later
+  pages, and unscoped lists bypass this cache.
+- Read sessions outside shared cache callbacks; use anonymous clients inside.
+- Keep canonical details and edit reads fresh. Anonymous page frames reuse
+  canonical details; member frames fetch personalized state separately.
+- Next may serve old data while refreshing. Public lists and totals can lag
+  edits until refresh succeeds; mutations do not invalidate these caches.
+  Preserve overview hydration and loading space when changing data loading.
+
+## Shared HTML Caching
 
 Before adding `s-maxage` to a page:
 

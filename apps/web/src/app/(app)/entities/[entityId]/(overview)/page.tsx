@@ -3,6 +3,10 @@ import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getQueryClient } from "@peated/web/lib/orpc/query";
+import {
+  getPageBottleList,
+  getPageEntityCatalog,
+} from "@peated/web/lib/publicCatalog.server";
 import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
@@ -37,14 +41,21 @@ export default async function EntityPage(props: {
   ];
 
   if (entityHasBottleCatalog(entity)) {
+    const bottleQueries = [
+      entityOverviewQueries.popularBottles(orpc, entity),
+      entityOverviewQueries.releases(orpc, entity),
+    ];
     prefetches.push(
-      queryClient.prefetchQuery(
-        entityOverviewQueries.bottleCatalog(orpc, entity),
+      queryClient.prefetchQuery({
+        ...entityOverviewQueries.bottleCatalog(orpc, entity),
+        queryFn: () => getPageEntityCatalog(entity.id),
+      }),
+      ...bottleQueries.map((query) =>
+        queryClient.prefetchQuery({
+          ...query,
+          queryFn: () => getPageBottleList(query.input),
+        }),
       ),
-      queryClient.prefetchQuery(
-        entityOverviewQueries.popularBottles(orpc, entity),
-      ),
-      queryClient.prefetchQuery(entityOverviewQueries.releases(orpc, entity)),
     );
   }
 

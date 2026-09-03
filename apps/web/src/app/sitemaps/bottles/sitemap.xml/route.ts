@@ -1,4 +1,4 @@
-import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPublicStats } from "@peated/web/lib/publicStats.server";
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
 
 const SITEMAP_CACHE_CONTROL =
@@ -22,8 +22,7 @@ function range(start: number, end?: number): number[] {
 }
 
 export async function GET() {
-  const { client } = await createAnonymousServerClient();
-  const { bottles } = await client.stats();
+  const { bottles } = await getPublicStats();
   const sitemapIndexXML = await buildSitemapIndex(
     range(1, Math.ceil(bottles / PAGE_LIMIT)).map(
       (i) => `/sitemaps/bottles/${i}/sitemap.xml`,

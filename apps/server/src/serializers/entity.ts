@@ -82,9 +82,11 @@ export const EntitySerializer = serializer({
 
     const regionsById = regionList.length
       ? Object.fromEntries(
-          (await serialize(RegionSerializer, regionList, currentUser)).map(
-            (data, index) => [regionList[index].id, data],
-          ),
+          (
+            await serialize(RegionSerializer, regionList, currentUser, [], {
+              countries: countryList,
+            })
+          ).map((data, index) => [regionList[index].id, data]),
         )
       : {};
 

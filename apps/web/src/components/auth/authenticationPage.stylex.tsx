@@ -9,10 +9,11 @@ import {
   AuthenticationLink,
 } from "@peated/web/components/pages/authentication.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { publicHomeQueries } from "@peated/web/lib/orpc/homeQueries";
 
 function DatabaseIntro() {
   const orpc = useORPC();
-  const stats = useQuery(orpc.stats.queryOptions());
+  const stats = useQuery(publicHomeQueries.stats(orpc));
   const reviewCount = stats.data
     ? stats.data.memberReviews + stats.data.externalReviews
     : undefined;

@@ -2,7 +2,7 @@ import {
   getEntitySitemapCollection,
   getEntitySitemapPagePaths,
 } from "@peated/web/lib/entitySitemaps";
-import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPublicStats } from "@peated/web/lib/publicStats.server";
 import { buildSitemapIndex } from "@peated/web/lib/sitemaps";
 
 const SITEMAP_CACHE_CONTROL =
@@ -20,8 +20,7 @@ export async function GET(
     return new Response(null, { status: 404 });
   }
 
-  const { client } = await createAnonymousServerClient();
-  const stats = await client.stats();
+  const stats = await getPublicStats();
   const sitemapIndexXML = await buildSitemapIndex(
     getEntitySitemapPagePaths(collection, stats[sitemapCollection.statsKey]),
   );
