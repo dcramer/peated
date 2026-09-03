@@ -11,9 +11,9 @@ new source also stops collection.
 
 ## Bourbon Culture
 
-Use `POST /v1/admin/scrape-sources/prepare-bourbon-culture` with an authenticated
-admin account. An empty JSON object checks the records without saving. Sending
-`{"apply": true}` updates the keys used to recognize existing reviews and adds
+Use `POST /v1/admin/scrape-sources/prepare` with an authenticated admin account
+and `{"site": "bourbonculture"}` to check records without saving. Adding
+`"apply": true` updates the keys used to recognize existing reviews and adds
 a paused source without rules. All changes succeed together or none are saved.
 
 The operation keeps site, article, and review IDs, Bottle matches, hidden flags,
@@ -35,10 +35,10 @@ requests to the publisher or AI service. The checks live in
    `https://api.peated.com`:
 
    ```http
-   POST /v1/admin/scrape-sources/prepare-bourbon-culture
+   POST /v1/admin/scrape-sources/prepare
    Content-Type: application/json
 
-   {}
+   {"site": "bourbonculture"}
    ```
 
    The response reports `siteId`, `reviewCount`, `applied: false`, and
@@ -50,7 +50,7 @@ requests to the publisher or AI service. The checks live in
 5. Record approval for those records, then send the same request with:
 
    ```json
-   { "apply": true }
+   { "site": "bourbonculture", "apply": true }
    ```
 
    The response includes the new `scrapeSourceId` and `applied: true`. The source
@@ -91,6 +91,10 @@ the new review keys. Switching back needs a separate reviewed change that also
 handles reviews added after the switch. Do not delete source or run history.
 
 ## Other sources
+
+The preparation API is shared. Bourbon Culture is the first supported source;
+other sites are rejected without changing records. Add each site's conversion
+behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store

@@ -1,5 +1,6 @@
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
+import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { prepareBourbonCultureSource } from "@peated/server/scraper/configured/prepareBourbonCulture";
 import {
   ScrapeSourceConflictError,
@@ -12,18 +13,21 @@ export default procedure
   .use(requireAdmin)
   .route({
     method: "POST",
-    path: "/admin/scrape-sources/prepare-bourbon-culture",
-    summary: "Prepare Bourbon Culture for saved scraping rules",
+    path: "/admin/scrape-sources/prepare",
+    summary: "Prepare an existing scraper for saved rules",
     description:
       "Check existing reviews without saving. Set apply to true to save the changes and leave collection paused. Requires an administrator and a stopped schedule with no active runs.",
     spec: (spec) => ({
       ...spec,
-      operationId: "prepareBourbonCultureScrapeSource",
+      operationId: "prepareScrapeSource",
     }),
   })
   .input(
     z
       .object({
+        site: ExternalSiteKeySchema.describe(
+          "The existing site's key. Currently supports bourbonculture.",
+        ),
         apply: z
           .boolean()
           .default(false)
@@ -49,9 +53,14 @@ export default procedure
       .strict(),
   )
   .handler(async ({ input, context, errors }) => {
+    if (input.site !== "bourbonculture") {
+      throw errors.BAD_REQUEST({
+        message: "This scraper cannot move to saved rules yet.",
+      });
+    }
     try {
       return await prepareBourbonCultureSource({
-        ...input,
+        apply: input.apply,
         createdById: context.user.id,
       });
     } catch (error) {

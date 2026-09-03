@@ -37,9 +37,12 @@ beforeEach(async ({ fixtures }) => {
 });
 
 function prepare(input: { apply?: boolean } = {}) {
-  return routerClient.externalSites.scrapeSources.prepareBourbonCulture(input, {
-    context: { user: admin },
-  });
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "bourbonculture", ...input },
+    {
+      context: { user: admin },
+    },
+  );
 }
 
 const canonicalUrl =
@@ -107,12 +110,12 @@ async function setupMigration(bottleId: number | null = null) {
   return { site, article, review };
 }
 
-describe("POST /admin/scrape-sources/prepare-bourbon-culture", () => {
+describe("POST /admin/scrape-sources/prepare", () => {
   test("requires an administrator", async ({ defaults }) => {
     for (const user of [null, defaults.user]) {
       const error = await waitError(() =>
-        routerClient.externalSites.scrapeSources.prepareBourbonCulture(
-          { apply: true },
+        routerClient.externalSites.scrapeSources.prepare(
+          { site: "bourbonculture", apply: true },
           { context: { user } },
         ),
       );
@@ -129,11 +132,30 @@ describe("POST /admin/scrape-sources/prepare-bourbon-culture", () => {
     expect(error).toMatchObject({ code: "NOT_FOUND" });
   });
 
+  test("rejects an unsupported site without changing records", async () => {
+    const { review } = await setupMigration();
+    await expect(
+      routerClient.externalSites.scrapeSources.prepare(
+        { site: "totalwine", apply: true },
+        { context: { user: admin } },
+      ),
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "This scraper cannot move to saved rules yet.",
+    });
+    expect(await db.select().from(externalReviews)).toEqual([review]);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
   test("rejects an actor supplied by the caller", async () => {
     await expect(
-      routerClient.externalSites.scrapeSources.prepareBourbonCulture(
-        // @ts-expect-error Actor identity must come from the authenticated request.
-        { apply: true, createdById: admin.id },
+      routerClient.externalSites.scrapeSources.prepare(
+        {
+          site: "bourbonculture",
+          apply: true,
+          // @ts-expect-error Actor identity must come from the authenticated request.
+          createdById: admin.id,
+        },
         { context: { user: admin } },
       ),
     ).rejects.toMatchObject({ code: "BAD_REQUEST" });
