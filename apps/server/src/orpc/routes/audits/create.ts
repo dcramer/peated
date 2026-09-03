@@ -25,6 +25,8 @@ export function createAuditProcedure(runAudit?: AuditBottleRunner) {
       method: "POST",
       path: "/audits",
       summary: "Create an audit for an existing Bottle",
+      description:
+        "Check an existing bottle against available evidence. Return `clean` when no review is needed, or an audit for moderator review. Requires moderator privileges.",
       spec: (spec) => ({ ...spec, operationId: "createAudit" }),
     })
     .input(InputSchema)

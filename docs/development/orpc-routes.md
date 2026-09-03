@@ -243,6 +243,12 @@ filler.
   `Page number to return`.
 - Describe the public contract. Do not mention database columns, framework
   types, handler names, or other implementation details.
+- Every operation needs a summary, description, grouping tag, and unique
+  operation ID. The OpenAPI tests check the published `/spec.json` response.
+- For replacement operations, explain what omitted fields do. For background
+  work, say when the endpoint queues a job and how callers can track it.
+- Explain whether a missing resource returns `null` or an error when that
+  distinction affects the caller.
 
 Examples:
 
@@ -251,6 +257,15 @@ Examples:
 | Owner filter | Filter by the current owner Entity ID                           |
 | Region       | Filter by region slug or numeric ID. A slug requires `country`. |
 | Sort value   | Prefix a value with `-` for descending order.                   |
+
+### Image Uploads
+
+Use `ImageUploadSchema` from `schemas/images` for image file inputs. It accepts
+`Blob` values and documents a binary file in a `multipart/form-data` request.
+Use `imageUploadSpec` from `openapi/image-upload` in the route's `spec` callback
+to advertise multipart uploads. It preserves JSON for metadata changes when the
+file is optional. Keep size and permission checks in the handler. A bare `z.instanceof(Blob)`
+cannot be represented by the OpenAPI schema converter.
 
 ## 7. Error Handling
 
@@ -278,6 +293,31 @@ export default procedure
 If you truly need custom behavior, fall back to `new ORPCError(code, { message })`.
 
 ## 8. Authentication Middleware
+
+The shared authentication middleware also declares required bearer
+authentication in OpenAPI. Use it for protected operations, including routes
+implemented from shared contracts. Public operations inherit optional bearer
+authentication so callers can request personalized results. Describe additional
+role, ownership, verification, and Terms of Service requirements in the operation
+description.
+
+### Internal Operations
+
+Mark operations intended only for administration, moderation, or catalog
+maintenance with `x-peated-internal: true`. Keep them in `/spec.json` and in the
+API reference. Scalar displays the accompanying `x-badges` labels: `Internal`
+and the required role, where applicable.
+
+`requireAdmin` and `requireMod` add these annotations automatically, including
+operations outside `/admin`. For internal tools without a role restriction,
+add the flag and `Internal` badge in the route's `spec` callback. These labels
+describe the intended audience; they do not enforce permissions. Do not use
+`x-internal` or `x-scalar-ignore`, which hide operations from Scalar.
+
+Keep operations available to ordinary members public, including account
+management, bottle entry, tastings, reviews, and collections. When an operation
+also offers administrator or moderator options, document those restrictions on
+the operation or parameters instead of marking the whole operation internal.
 
 ```ts
 export default procedure

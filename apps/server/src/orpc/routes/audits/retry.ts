@@ -13,6 +13,8 @@ export default procedure
     method: "POST",
     path: "/audits/{audit}/operations/{operation}/retry",
     summary: "Retry a failed audit operation",
+    description:
+      "Retry a previously approved catalog change whose execution failed. Requires moderator privileges.",
     spec: (spec) => ({
       ...spec,
       operationId: "retryAuditOperation",

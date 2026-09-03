@@ -10,6 +10,8 @@ export default procedure
     method: "GET",
     path: "/oauth/authorization-details",
     summary: "Validate OAuth authorization request",
+    description:
+      "Validate an application's authorization request and return its client ID and display name for the consent screen.",
     operationId: "getOAuthAuthorizationDetails",
   })
   .input(OAuthAuthorizationRequestSchema)

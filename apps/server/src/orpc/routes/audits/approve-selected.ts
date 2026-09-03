@@ -13,6 +13,8 @@ export default procedure
     method: "POST",
     path: "/audits/{audit}/operations/approve",
     summary: "Approve selected audit operations",
+    description:
+      "Approve and apply selected proposed catalog changes. Return an outcome for each selected operation. Requires moderator privileges.",
     spec: (spec) => ({
       ...spec,
       operationId: "approveAuditOperations",

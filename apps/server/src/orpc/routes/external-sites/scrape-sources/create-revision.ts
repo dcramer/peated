@@ -20,6 +20,8 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/revisions",
     summary: "Save a parsing-rule revision",
+    description:
+      "Save a new version of the rules used to extract prices or reviews from a source. The revision must be previewed before activation. Requires administrator privileges.",
     operationId: "createScrapeSourceRevision",
   })
   .input(

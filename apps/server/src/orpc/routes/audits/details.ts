@@ -15,6 +15,8 @@ export default procedure
     method: "GET",
     path: "/audits/{audit}",
     summary: "Get an audit",
+    description:
+      "Get a bottle audit and the proposed changes available for review. Requires moderator privileges.",
     spec: (spec) => ({ ...spec, operationId: "getAudit" }),
   })
   .input(z.object({ audit: z.coerce.number().int().positive() }).strict())

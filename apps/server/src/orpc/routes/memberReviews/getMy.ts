@@ -14,6 +14,8 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/member-review",
     summary: "Get my member review",
+    description:
+      "Get the signed-in member's review for one bottle. Return `null` when they have not reviewed it. Requires authentication.",
     operationId: "getMyMemberReview",
   })
   .input(z.object({ bottle: z.coerce.number().int().positive() }))

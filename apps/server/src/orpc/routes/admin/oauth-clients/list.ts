@@ -14,6 +14,8 @@ export default procedure
     method: "GET",
     path: "/admin/oauth-clients",
     summary: "List OAuth clients",
+    description:
+      "List all registered applications, ordered by name. Requires administrator privileges.",
     operationId: "listOAuthClients",
   })
   .input(z.object({}))

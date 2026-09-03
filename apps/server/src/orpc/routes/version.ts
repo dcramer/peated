@@ -4,6 +4,7 @@ import { z } from "zod";
 
 export default procedure
   .route({
+    tags: ["system"],
     method: "GET",
     path: "/version",
     summary: "Get API version",

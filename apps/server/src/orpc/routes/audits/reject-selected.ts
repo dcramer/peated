@@ -17,6 +17,8 @@ export default procedure
     method: "POST",
     path: "/audits/{audit}/operations/reject",
     summary: "Reject selected audit operations",
+    description:
+      "Reject selected proposed catalog changes with a reason and optional note. Return an outcome for each selected operation. Requires moderator privileges.",
     spec: (spec) => ({
       ...spec,
       operationId: "rejectAuditOperations",

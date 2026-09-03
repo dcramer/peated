@@ -14,6 +14,8 @@ export default procedure
     method: "GET",
     path: "/audits",
     summary: "List actionable audits",
+    description:
+      "List bottle audits that need moderator attention. Requires moderator privileges.",
     spec: (spec) => ({ ...spec, operationId: "listAudits" }),
   })
   .input(ListActionableBottleChecksInputSchema)

@@ -6,8 +6,9 @@ export default contract
   .route({
     method: "GET",
     path: "/entities/{entity}/resolve",
-    summary: "Resolve an entity route",
-    description: "Resolve an Entity ID and primary kind through tombstones",
+    summary: "Resolve an entity ID",
+    description:
+      "Get the current entity ID, kind, and name. Follow merged IDs to the remaining entity; return not found for a deleted entity with no replacement.",
     operationId: "resolveEntity",
   })
   .input(z.object({ entity: z.coerce.number().int().positive() }))

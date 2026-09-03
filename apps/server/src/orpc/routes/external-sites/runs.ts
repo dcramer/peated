@@ -17,6 +17,8 @@ export default procedure
     method: "GET",
     path: "/admin/external-sites/{site}/runs",
     summary: "List recent external site runs",
+    description:
+      "List a site's import and setup runs, newest first. Requires administrator privileges.",
     operationId: "listExternalSiteRuns",
   })
   .input(

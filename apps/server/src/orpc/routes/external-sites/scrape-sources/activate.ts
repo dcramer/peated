@@ -13,6 +13,8 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/revisions/{revisionId}/activate",
     summary: "Activate a parsing-rule revision",
+    description:
+      "Make a revision the source's active parsing rules. The revision must have passed preview checks. Requires administrator privileges.",
     operationId: "activateScrapeSourceRevision",
   })
   .input(

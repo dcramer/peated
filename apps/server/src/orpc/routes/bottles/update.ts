@@ -27,7 +27,7 @@ export default procedure
     path: "/bottles/{bottle}",
     summary: "Update bottle",
     description:
-      "Update Bottle fields; the server owns shared BottleGroup fan-out",
+      "Update a bottle. Changes to shared fields also update other bottles in its Bottle Group. Requires moderator privileges.",
     spec: (spec) => ({
       ...spec,
       operationId: "updateBottle",

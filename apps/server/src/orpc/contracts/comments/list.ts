@@ -7,7 +7,8 @@ export default contract
     method: "GET",
     path: "/comments",
     summary: "List comments",
-    description: "Find comments by user or tasting",
+    description:
+      "Find comments by user or tasting. Only administrators can list comments without either filter; other callers receive an empty list.",
     spec: (spec) => ({ ...spec, operationId: "listComments" }),
   })
   .input(

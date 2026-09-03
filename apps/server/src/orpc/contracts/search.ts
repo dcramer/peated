@@ -190,6 +190,7 @@ export const SearchOutputSchema = z.object({
 
 export default contract
   .route({
+    tags: ["search"],
     method: "GET",
     path: "/search",
     summary: "Global search",

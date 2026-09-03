@@ -53,7 +53,7 @@ export default procedure
     path: "/admin/moderation/history/{key}",
     summary: "Get moderation history details",
     description:
-      "Read the available durable context for a completed moderation event. Requires administrator privileges.",
+      "Get the recorded evidence, decision, and activity for a completed moderation event. Requires administrator privileges.",
     operationId: "getModerationHistoryDetails",
   })
   .input(InputSchema)

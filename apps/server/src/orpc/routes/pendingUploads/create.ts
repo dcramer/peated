@@ -4,6 +4,7 @@ import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -18,6 +19,7 @@ export default procedure
   .use(requireAuth)
   .use(requireTosAccepted)
   .route({
+    spec: imageUploadSpec,
     method: "POST",
     path: "/pending-uploads",
     summary: "Create pending upload",

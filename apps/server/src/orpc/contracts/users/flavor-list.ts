@@ -6,7 +6,8 @@ export default contract
     method: "GET",
     path: "/users/{user}/flavors",
     summary: "List user flavor profiles",
-    description: "Count flavor profiles and top-band tastings for a user",
+    description:
+      "Count flavor profiles and Outstanding or Unicorn tastings for a user.",
     operationId: "listUserFlavors",
   })
   .input(

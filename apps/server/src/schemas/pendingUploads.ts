@@ -4,6 +4,7 @@ import {
   PENDING_UPLOAD_STATUS_LIST,
 } from "@peated/server/db/schema";
 import { z } from "zod";
+import { ImageUploadSchema } from "./images";
 
 export const PendingUploadKindEnum = z.enum(PENDING_UPLOAD_KIND_LIST);
 export const PendingUploadPurposeEnum = z.enum(PENDING_UPLOAD_PURPOSE_LIST);
@@ -19,7 +20,7 @@ export const PendingUploadSchema = z.object({
 });
 
 export const PendingUploadInputSchema = z.object({
-  file: z.instanceof(Blob).describe("Image file to store as a pending upload"),
+  file: ImageUploadSchema,
   purpose: PendingUploadPurposeEnum.default("photo_tasting_entry").describe(
     "Intended use for the pending upload",
   ),

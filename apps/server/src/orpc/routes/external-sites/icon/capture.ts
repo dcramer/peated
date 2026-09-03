@@ -39,6 +39,8 @@ export default procedure
     method: "POST",
     path: "/admin/external-sites/{site}/icon",
     summary: "Find and store an external site icon",
+    description:
+      "Fetch an icon from the site's configured websites and replace its stored icon. Requires administrator privileges.",
     operationId: "captureExternalSiteIcon",
   })
   .input(InputSchema)

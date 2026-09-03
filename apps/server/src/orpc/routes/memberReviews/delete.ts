@@ -16,6 +16,8 @@ export default procedure
     method: "DELETE",
     path: "/bottles/{bottle}/member-review",
     summary: "Delete my member review",
+    description:
+      "Delete the signed-in member's review for one bottle. Return not found when no review exists. Requires authentication and acceptance of the Terms of Service.",
     operationId: "deleteMemberReview",
   })
   .input(z.object({ bottle: z.coerce.number().int().positive() }))

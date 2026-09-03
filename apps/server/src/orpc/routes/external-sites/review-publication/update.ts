@@ -35,6 +35,8 @@ export default procedure
     method: "PUT",
     path: "/admin/external-sites/{site}/review-publication",
     summary: "Update external review publication",
+    description:
+      "Approve or withdraw public display of a site's reviews. Changes also queue updates to affected bottle score summaries. Requires moderator privileges.",
     operationId: "updateExternalReviewPublication",
   })
   .input(InputSchema)
