@@ -36,11 +36,11 @@ const label = (category: string) =>
   category.charAt(0).toUpperCase() + category.slice(1);
 
 /**
- * Distribution of public tasting-note families across bottles or one bottle's tastings.
+ * Distribution of public tasting-note categories across bottles or one bottle's tastings.
  * Each wedge has a fixed position and an independent 0–100% area scale.
- * Hover or keyboard focus previews a family's share and two leading notes.
+ * Hover or keyboard focus previews a category's share and two leading notes.
  * The center keeps the last preview when the pointer or focus leaves the wheel.
- * Activating a wedge calls onExplore to open that family's notes and bottles.
+ * Activating a wedge calls onExplore to open that category's notes and bottles.
  * The parent supplies the heading and centered reference links through footer.
  * Any recognized notes render a chart; empty data shows a short message.
  */
@@ -99,7 +99,7 @@ export function FlavorWheel({
             <svg
               viewBox="0 0 336 292"
               role="group"
-              aria-label="Flavor families"
+              aria-label="Flavor categories"
               {...stylex.props(styles.wheel)}
             >
               {categories.map((item, index) => {

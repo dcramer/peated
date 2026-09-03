@@ -66,11 +66,13 @@ export function TastingWheelIntroduction() {
           Start with what you notice
         </SectionHeading>
         <p {...stylex.props(styles.directionText)}>
-          Start with something broad, like fruit or spice, then look outward for
-          a more specific note. Choose only what fits what you smell and taste.
+          Does it remind you of fruit? Follow that part of the wheel outward.
+          Maybe it&apos;s a crisp apple, a little citrus, or a handful of
+          raisins. A couple of words is plenty. Leave out anything you
+          don&apos;t taste.
         </p>
         <p {...stylex.props(styles.directionText)}>
-          Select a note to read its description and see bottle examples.
+          Pick a note to find out more and see bottles with that flavor.
         </p>
       </div>
     </section>
@@ -92,8 +94,8 @@ function TastingWheelGraphic() {
         >
           <title id="tasting-wheel-title">Peated tasting wheel</title>
           <desc id="tasting-wheel-description">
-            Explore a flavor family or a note to find related words and example
-            bottles.
+            Explore a flavor category or a note to find related words and
+            example bottles.
           </desc>
           {WHEEL_CATEGORIES.map((category, categoryIndex) => {
             const startAngle = categoryIndex * categorySpan;
@@ -202,15 +204,15 @@ function TastingWheelGraphic() {
   );
 }
 
-export function TastingWheelFamilies() {
+export function TastingWheelCategories() {
   const { select } = useTastingWheel();
   return (
-    <div {...stylex.props(styles.familyGrid)}>
+    <div {...stylex.props(styles.categoryGrid)}>
       {WHEEL_CATEGORIES.map((category) => (
         <article
           id={`tasting-note-${category.key}`}
           key={category.key}
-          {...stylex.props(styles.family)}
+          {...stylex.props(styles.category)}
         >
           <SectionHeading level={3}>{category.name}</SectionHeading>
           <button
@@ -226,7 +228,7 @@ export function TastingWheelFamilies() {
           >
             See examples
           </button>
-          <p {...stylex.props(styles.familyDescription)}>
+          <p {...stylex.props(styles.categoryDescription)}>
             {category.description}
           </p>
           <div {...stylex.props(styles.notes)}>
@@ -338,7 +340,7 @@ const styles = stylex.create({
     fontWeight: 600,
     pointerEvents: "none",
   },
-  familyGrid: {
+  categoryGrid: {
     display: "grid",
     gridTemplateColumns: {
       default: "repeat(3, minmax(0, 1fr))",
@@ -348,7 +350,7 @@ const styles = stylex.create({
     columnGap: space.x6,
     rowGap: space.x8,
   },
-  family: {
+  category: {
     minWidth: 0,
     paddingTop: space.x3,
     borderTopWidth: "1px",
@@ -356,7 +358,7 @@ const styles = stylex.create({
     borderTopColor: colors.hairline,
     scrollMarginTop: space.x8,
   },
-  familyDescription: {
+  categoryDescription: {
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,

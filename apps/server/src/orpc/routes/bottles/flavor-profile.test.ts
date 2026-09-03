@@ -4,7 +4,7 @@ import { bottleTombstones, tastings } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /bottles/{bottle}/flavor-profile", () => {
-  test("counts public tastings once per family and keeps exact Bottle scope", async ({
+  test("counts public tastings once per category and keeps exact Bottle scope", async ({
     fixtures,
     defaults,
   }) => {

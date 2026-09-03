@@ -17,7 +17,7 @@ export default implement(flavorProfileContract).handler(
         await resolveActiveBottleIds(tx, [input.bottle]);
 
         // Bottle flavor profiles are public: this route excludes private notes,
-        // even for their author, and counts each tasting once per family.
+        // even for their author, and counts each tasting once per category.
         const result = await tx.execute<BottleFlavorProfile>(sql`
         WITH public_notes AS MATERIALIZED (
           SELECT DISTINCT ${tastings.id} AS tasting_id,
