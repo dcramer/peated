@@ -45,11 +45,12 @@ export type TastingSessionGroup = {
   tastings: Tasting[];
 };
 
+/** Keeps PostgreSQL timestamp text so preview bounds retain microsecond precision. */
 export type CollectionAddGroup = {
   collection: Collection;
   user: User;
-  windowStart: Date;
-  windowEnd: Date;
+  windowStart: string;
+  windowEnd: string;
   totalItems: number;
 };
 
@@ -545,26 +546,32 @@ export async function serializeCollectionAddEntries({
       serializedCollectionsById.set(group.collection.id, collection);
     }
 
+    // Activity previews must use exact database bounds; JS dates truncate microseconds.
     const previewRows = await db
       .select()
       .from(collectionBottles)
       .where(
         and(
           eq(collectionBottles.collectionId, group.collection.id),
-          gte(collectionBottles.createdAt, group.windowStart),
-          lte(collectionBottles.createdAt, group.windowEnd),
+          gte(
+            collectionBottles.createdAt,
+            sql`${group.windowStart}::timestamp`,
+          ),
+          lte(collectionBottles.createdAt, sql`${group.windowEnd}::timestamp`),
         ),
       )
       .orderBy(desc(collectionBottles.createdAt))
       .limit(COLLECTION_PREVIEW_LIMIT);
 
+    const windowStart = coerceActivityDate(group.windowStart);
+    const windowEnd = coerceActivityDate(group.windowEnd);
     entries.push({
-      id: `collection_add:${group.user.id}:${group.collection.id}:${group.windowEnd.getTime()}`,
+      id: `collection_add:${group.user.id}:${group.collection.id}:${windowEnd.getTime()}`,
       type: "collection_add",
       priority: "secondary",
-      createdAt: group.windowEnd.toISOString(),
-      windowStart: group.windowStart.toISOString(),
-      windowEnd: group.windowEnd.toISOString(),
+      createdAt: windowEnd.toISOString(),
+      windowStart: windowStart.toISOString(),
+      windowEnd: windowEnd.toISOString(),
       createdBy,
       collection,
       items: await serialize(
