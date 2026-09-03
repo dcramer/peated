@@ -18,7 +18,11 @@ export type BottleListProps = {
   items: readonly BottleListItem[];
 };
 
-/** Owns the standard bottle-list structure and delegates identity to one row. */
+/**
+ * Catalog list of BottleIdentityRow items. Build items with toBottleListItem;
+ * end overrides the optional rating summary. Use CommunityFeed when the author,
+ * action, or event grouping matters, and SelectedBottleSummary inside forms.
+ */
 export function BottleList({ ariaLabel, items }: BottleListProps) {
   return (
     <ItemList ariaLabel={ariaLabel}>

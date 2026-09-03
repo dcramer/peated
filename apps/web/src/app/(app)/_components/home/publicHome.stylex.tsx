@@ -181,9 +181,9 @@ function LatestReleases() {
 function Activity() {
   const orpc = useORPC();
   const externalReviews = useQuery(publicHomeQueries.recentReviews(orpc));
-  const tastings = useQuery(publicHomeQueries.memberTastings(orpc));
+  const activity = useQuery(publicHomeQueries.memberActivity(orpc));
 
-  if (tastings.isPending && externalReviews.isPending) {
+  if (activity.isPending && externalReviews.isPending) {
     return (
       <HomeSectionLoading>
         <LoadingList label="Loading activity" rows={3} />
@@ -191,32 +191,31 @@ function Activity() {
     );
   }
 
-  if (tastings.error && externalReviews.error) {
+  if (activity.error && externalReviews.error) {
     return (
       <SectionError
         heading="Activity is unavailable"
         onRetry={() => {
-          void tastings.refetch();
+          void activity.refetch();
           void externalReviews.refetch();
         }}
       >
-        We couldn't load the latest tastings and reviews. The rest of the
-        database is still available.
+        We couldn't load the latest activity. The rest of the database is still
+        available.
       </SectionError>
     );
   }
 
-  const memberTastings = tastings.data?.results ?? [];
+  const memberActivity = activity.data?.results ?? [];
   const criticReviews = externalReviews.data?.results ?? [];
-  const items = getCommunityFeedItems({ criticReviews, memberTastings });
+  const items = getCommunityFeedItems({
+    criticReviews,
+    activity: memberActivity,
+  });
 
   return items.length ? (
     <HomeActivityFeed>
-      <CommunityFeed
-        ariaLabel="Recent tastings and reviews"
-        items={items}
-        limit={3}
-      />
+      <CommunityFeed ariaLabel="Recent activity" items={items} limit={3} />
     </HomeActivityFeed>
   ) : null;
 }

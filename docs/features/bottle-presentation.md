@@ -355,6 +355,46 @@ the implementation.
 
 ## Implementation Map
 
+### Choosing a web component
+
+The components live in `apps/web/src/components/`, with stories beside them.
+Storybook's **Components / Bottles / Bottle Identity Row / Row Layouts** is the
+shared visual reference for desktop and phone layouts.
+
+| Need                        | Component                             | Responsibility                                                                                               |
+| --------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| One standard bottle row     | `BottleIdentityRow`                   | Full marketed name, provenance, release facts, thumbnail, and linked hit area.                               |
+| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name, smaller thumbnail, and a 44px hit area; long names truncate visually.                             |
+| Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                          |
+| Mixed activity              | `CommunityFeed`                       | Author, action, date, grouped bottles, scores, and review links; chooses compact rows for library additions. |
+| Selected bottle in a form   | `SelectedBottleSummary`               | Standard identity and optional change action.                                                                |
+| Sidebar bottle suggestions  | `pages/BottleRailSection`             | Two-line rail with smaller thumbnails and optional section action.                                           |
+| Image within another layout | `BottleVisual`                        | Image sizing, white frame, missing-image glyph, and optional expansion.                                      |
+
+Use `toBottleListItem` from `apps/web/src/lib/bottleListItem.ts` for full API
+Bottles. For partial reads, `getBottleIdentityProps` supplies the name,
+provenance, and release facts; the caller supplies the image and destination.
+API reads must include the BottleGroup summary needed by the name formatter.
+
+```tsx
+const item = toBottleListItem(bottle);
+
+<BottleIdentityRow {...item} />
+<BottleIdentityRow {...item} variant="compact" />
+```
+
+Both variants accept the full marketed name, including brand context. Compact
+rows omit provenance, metadata, subtitles, membership status, and related-release
+links. The optional `end` slot remains available. `layout="cell"` fits the identity
+inside an existing table or selection control; it does not change content density.
+The row owns thumbnail size, so callers do not build a second image/name layout.
+
+Routes own queries, authentication, and mutations. Keep API-to-feed mapping in
+`getCommunityFeedItems`; pass its output to `CommunityFeed`. Component JSDoc and
+Storybook controls document supported props and states.
+
+### Other presentation branches
+
 The contract is applied at the presentation site that owns each branch:
 
 - Bottle headers, result rows, previews, and tasting identities compose their

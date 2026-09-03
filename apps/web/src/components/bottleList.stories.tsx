@@ -69,6 +69,14 @@ const meta = {
     items,
   },
   argTypes: { items: { control: false } },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use for catalog results and other lists of bottles. Build items with toBottleListItem; BottleIdentityRow owns each identity and thumbnail. Ratings are optional, and an explicit end action takes their place. Use CommunityFeed for grouped activity and BottleRailSection for a sidebar list. See Bottle Identity Row / Row Layouts for the shared layout reference.",
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <StoryCanvas width="wide">

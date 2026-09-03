@@ -8,13 +8,13 @@ import {
 import {
   coerceActivityDate,
   composeActivity,
-  countTastingSessions,
+  countPrimaryActivity,
   encodeActivityCursor,
   getActivitySourceWindow,
-  getTastingSessions,
+  getPrimaryActivity,
   parseActivityCursor,
   serializeCollectionAddEntries,
-  serializeTastingSessionEntries,
+  serializePrimaryActivityEntries,
   type CollectionAddGroup,
 } from "@peated/server/lib/activityFeed";
 import { implement } from "@peated/server/orpc";
@@ -88,7 +88,7 @@ export default implement(activityListContract).handler(async function ({
   const collectionGroupCreatedAt = sql<Date>`MAX(${collectionBottles.createdAt})`;
 
   const [totalPrimary, secondaryCountResult] = await Promise.all([
-    countTastingSessions({
+    countPrimaryActivity({
       userCondition,
       snapshotAt: activityCursor.snapshotAt,
     }),
@@ -115,8 +115,8 @@ export default implement(activityListContract).handler(async function ({
     totalSecondary,
   });
 
-  const [tastingRows, collectionGroupRows] = await Promise.all([
-    getTastingSessions({
+  const [primaryRows, collectionGroupRows] = await Promise.all([
+    getPrimaryActivity({
       userCondition,
       snapshotAt: activityCursor.snapshotAt,
       limit: sourceWindow.primaryLimit,
@@ -148,8 +148,8 @@ export default implement(activityListContract).handler(async function ({
       .offset(sourceWindow.secondaryOffset),
   ]);
 
-  const primaryEntries = await serializeTastingSessionEntries(
-    tastingRows,
+  const primaryEntries = await serializePrimaryActivityEntries(
+    primaryRows,
     context.user,
   );
   const secondaryEntries = await serializeCollectionAddEntries({

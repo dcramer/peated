@@ -45,6 +45,9 @@ const meta = {
       </StoryCanvas>
     ),
   ],
+  argTypes: {
+    variant: { control: "inline-radio", options: ["standard", "compact"] },
+  },
   args: {
     ...toBottleListItem(rowBottle),
     href: "/bottles/19936",
@@ -53,8 +56,16 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component:
-          "Use Bottle Identity Row wherever a standard bottle row appears. toBottleListItem and getBottleIdentityProps supply the same marketed name, provenance, and release facts used on the homepage and in Library. Rows share a 48 × 64px thumbnail on desktop and 42 × 58px on mobile. Producer links, related releases, and action menus remain separate controls.",
+        component: `Use BottleIdentityRow for one bottle, BottleList for a catalog list, and CommunityFeed for activity. Build props with toBottleListItem (API Bottles) or getBottleIdentityProps (partial reads). Both variants take the same full marketed name.
+
+| Variant | Use | Content |
+| --- | --- | --- |
+| standard (default) | Catalog, search, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
+| compact | Single or grouped library additions | One name line, 24 × 32px thumbnail, and a 44px hit area. |
+
+Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control; end holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
+
+Use Row Layouts to compare these components at desktop and phone widths.`,
       },
     },
   },
@@ -124,12 +135,39 @@ export const Overview: Story = {
   ),
 };
 
+export const Compact: Story = {
+  args: { variant: "compact" },
+  render: (args) => (
+    <ItemList ariaLabel="Compact bottle examples">
+      <ItemListItem>
+        <BottleIdentityRow {...args} />
+      </ItemListItem>
+      <ItemListItem>
+        <BottleIdentityRow
+          {...args}
+          name="Lagavulin 16-year-old"
+          href="/bottles/42"
+          imageUrl={null}
+        />
+      </ItemListItem>
+      <ItemListItem>
+        <BottleIdentityRow
+          {...args}
+          name="Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated"
+          href="/bottles/18481"
+          imageUrl={null}
+        />
+      </ItemListItem>
+    </ItemList>
+  ),
+};
+
 export const RowLayouts: Story = {
   parameters: {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, activity, tasting, search, selection, and loading components at wide and phone widths. They share thumbnail geometry and row typography. Use BottleVisual's small size only for compact two-line rails; BottleIdentityRow always uses the standard size.",
+          "Compare the actual bottle, activity, tasting, search, selection, and loading components at wide and phone widths. They share thumbnail geometry and row typography. Standard rows use the shared medium thumbnail; compact library additions use the extra-small thumbnail, and two-line rails use the small thumbnail.",
       },
     },
   },
@@ -142,6 +180,10 @@ export const RowLayouts: Story = {
           <SectionHeading level={3}>Bottle list</SectionHeading>
           <BottleIdentityRow {...args} />
         </section>
+        <section aria-label="Library addition">
+          <SectionHeading level={3}>Library addition</SectionHeading>
+          <BottleIdentityRow {...args} variant="compact" />
+        </section>
         <section aria-label="Activity">
           <SectionHeading level={3}>
             Activity on the homepage and activity page
@@ -150,16 +192,20 @@ export const RowLayouts: Story = {
             items={[
               {
                 actor: "Whiskyfun",
-                bottle: args,
                 actorHref: "https://example.com/review",
-                bottleHref: args.href!,
+                action: "published a review",
+                kind: "critic_review",
                 date: "2026-08-24T12:00:00.000Z",
-                href: "https://example.com/review",
                 id: "review",
-                imageUrl: args.imageUrl,
-                metadata,
-                score: 88,
-                title,
+                bottles: [
+                  {
+                    ...args,
+                    id: "bottle",
+                    score: 88,
+                    activityHref: "https://example.com/review",
+                    activityLabel: "Read at Whiskyfun ↗",
+                  },
+                ],
               },
             ]}
           />

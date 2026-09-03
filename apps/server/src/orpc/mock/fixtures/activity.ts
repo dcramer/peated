@@ -2,6 +2,7 @@ import type { MockOutputs } from "../contract";
 import { mockBottles } from "./bottles";
 import { mockCollectionBottle, mockCollectionBottles } from "./collections";
 import { timestamp } from "./constants";
+import { mockMemberReviews } from "./memberReviews";
 import { mockTasting, mockTastings } from "./tastings";
 import { mockFriends, mockPublicUser } from "./users";
 
@@ -26,6 +27,33 @@ export const mockActivity = [
     createdBy: mockFriends[0]!,
     tastings: [mockTastings[2]!],
   },
+  ...mockMemberReviews.map((review) => ({
+    id: `member-review-${review.id}`,
+    type: "member_review" as const,
+    priority: "primary" as const,
+    createdAt: review.createdAt,
+    createdBy: review.createdBy,
+    review,
+  })),
+  {
+    id: "library-add-9703",
+    type: "collection_add",
+    priority: "secondary",
+    createdAt: "2026-08-25T17:00:00.000Z",
+    windowStart: "2026-08-25T17:00:00.000Z",
+    windowEnd: "2026-08-25T17:00:00.000Z",
+    createdBy: mockFriends[0]!,
+    collection: {
+      id: 9803,
+      name: "Library",
+      totalBottles: 1,
+      createdAt: "2026-07-01T12:00:00.000Z",
+      createdBy: mockFriends[0]!,
+      href: `/users/${mockFriends[0]!.username}/library`,
+    },
+    items: [mockCollectionBottles[2]!],
+    totalItems: 1,
+  },
   {
     id: "collection-add-9701",
     type: "collection_add",
@@ -36,11 +64,11 @@ export const mockActivity = [
     createdBy: mockPublicUser,
     collection: {
       id: 9801,
-      name: "Islay Favorites",
+      name: "Library",
       totalBottles: 3,
       createdAt: "2026-07-01T12:00:00.000Z",
       createdBy: mockPublicUser,
-      href: `/users/${mockPublicUser.username}/collections/9801`,
+      href: `/users/${mockPublicUser.username}/library`,
     },
     items: [
       mockCollectionBottle,

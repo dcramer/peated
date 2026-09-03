@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles, memberReviews } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -361,4 +361,114 @@ describe("GET /activity", () => {
       tastings: [{ id: interleaved.id }],
     });
   });
+});
+
+test("member reviews respect public and accepted-follow visibility", async ({
+  fixtures,
+  defaults,
+}) => {
+  const publicUser = await fixtures.User();
+  const friend = await fixtures.User({ private: true });
+  const pending = await fixtures.User({ private: true });
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
+    toUserId: friend.id,
+    status: "following",
+  });
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
+    toUserId: pending.id,
+    status: "pending",
+  });
+  const bottle = await fixtures.Bottle();
+  await db.insert(memberReviews).values(
+    [publicUser, friend, pending].map((user) => ({
+      bottleId: bottle.id,
+      createdById: user.id,
+      score: 90,
+      createdAt: new Date("2026-01-03T12:00:00Z"),
+    })),
+  );
+  const publicFeed = await routerClient.activity.list({ filter: "global" });
+  expect(publicFeed.results.map((item) => item.createdBy.id)).toEqual([
+    publicUser.id,
+  ]);
+  const friendFeed = await routerClient.activity.list(
+    { filter: "friends" },
+    { context: { user: defaults.user } },
+  );
+  expect(friendFeed.results.map((item) => item.createdBy.id)).toEqual([
+    friend.id,
+  ]);
+  const signedIn = await routerClient.activity.list(
+    { filter: "global" },
+    { context: { user: defaults.user } },
+  );
+  expect(
+    signedIn.results.map((item) => item.createdBy.id).sort((a, b) => a - b),
+  ).toEqual([friend.id, publicUser.id].sort((a, b) => a - b));
+  const profile = await routerClient.users.activity.list(
+    { user: friend.username },
+    { context: { user: defaults.user } },
+  );
+  expect(profile.results).toMatchObject([
+    {
+      type: "member_review",
+      review: {
+        score: 90,
+        bottle: { id: bottle.id },
+        createdBy: { id: friend.id },
+      },
+    },
+  ]);
+});
+
+test("pages member reviews and tasting sessions together without duplicates", async ({
+  fixtures,
+}) => {
+  const user = await fixtures.User();
+  const bottle = await fixtures.Bottle();
+  const early = await fixtures.Tasting({
+    createdById: user.id,
+    createdAt: new Date("2026-01-03T12:00:00Z"),
+  });
+  const latest = await fixtures.Tasting({
+    createdById: user.id,
+    createdAt: new Date("2026-01-03T13:00:00Z"),
+  });
+  const [review] = await db
+    .insert(memberReviews)
+    .values({
+      bottleId: bottle.id,
+      createdById: user.id,
+      score: 0,
+      notes: "Review notes",
+      createdAt: new Date("2026-01-03T14:00:00Z"),
+    })
+    .returning();
+  const first = await routerClient.activity.list({ limit: 1 });
+  expect(first.results).toMatchObject([
+    {
+      id: `member_review:${review.id}`,
+      type: "member_review",
+      review: { score: 0, notes: "Review notes", bottle: { id: bottle.id } },
+    },
+  ]);
+  expect(first.rel.nextCursor).not.toBeNull();
+  const second = await routerClient.activity.list({
+    limit: 1,
+    cursor: first.rel.nextCursor!,
+  });
+  expect(second.results).toMatchObject([
+    {
+      type: "tasting_session",
+      tastings: [{ id: latest.id }, { id: early.id }],
+    },
+  ]);
+  expect(second.rel.nextCursor).toBeNull();
+  const previous = await routerClient.activity.list({
+    limit: 1,
+    cursor: second.rel.prevCursor!,
+  });
+  expect(previous.results).toEqual(first.results);
 });

@@ -1,10 +1,24 @@
 import { db } from "@peated/server/db";
-import type { Collection, Tasting, User } from "@peated/server/db/schema";
-import { collectionBottles, tastings, users } from "@peated/server/db/schema";
+import type {
+  Bottle,
+  Collection,
+  MemberReview,
+  Tasting,
+  User,
+} from "@peated/server/db/schema";
+import {
+  bottles,
+  collectionBottles,
+  memberReviews,
+  tastings,
+  users,
+} from "@peated/server/db/schema";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
+import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { UserSerializer } from "@peated/server/serializers/user";
 import type {
@@ -58,7 +72,7 @@ export function coerceActivityDate(value: Date | string) {
 
 /**
  * Returns per-source offsets for a logical feed page while keeping secondary
- * collection groups capped whenever primary tasting activity exists.
+ * collection groups capped whenever primary tasting or review activity exists.
  */
 export function getActivitySourceWindow({
   cursor,
@@ -128,7 +142,7 @@ export function getActivitySourceWindow({
   };
 }
 
-/** Interleaves primary tastings with capped secondary collection activity. */
+/** Interleaves primary tastings and member reviews with capped secondary collection activity. */
 export function composeActivity({
   primary,
   secondary,
@@ -218,8 +232,8 @@ function markedTastingsSql({
   `;
 }
 
-/** Counts logical tasting sessions inside one stable activity snapshot. */
-export async function countTastingSessions({
+/** Counts tasting sessions and member reviews inside one activity snapshot. */
+export async function countPrimaryActivity({
   userCondition,
   snapshotAt,
 }: {
@@ -227,22 +241,33 @@ export async function countTastingSessions({
   snapshotAt: Date;
 }) {
   const result = await db.execute<{ count: string }>(sql`
-    SELECT COALESCE(SUM(marked_tastings.is_session_start), 0) AS count
-    FROM (${markedTastingsSql({ userCondition, snapshotAt })}) marked_tastings
+    SELECT (
+      SELECT COALESCE(SUM(marked_tastings.is_session_start), 0)
+      FROM (${markedTastingsSql({ userCondition, snapshotAt })}) marked_tastings
+    ) + (
+      SELECT COUNT(*) FROM ${memberReviews}
+      INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
+      WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+    ) AS count
   `);
   return Number(result.rows[0]?.count ?? 0);
 }
 
-type TastingSessionRow = {
-  session_id: string;
+type PrimaryActivityRow = {
+  type: "tasting_session" | "member_review";
+  id: string;
   created_by_id: string;
   started_at: Date | string;
   last_activity_at: Date | string;
   tasting_ids: (number | string)[];
 };
 
-/** Returns complete tasting sessions, so feed pagination never splits one. */
-export async function getTastingSessions({
+type PrimaryActivity =
+  | (TastingSessionGroup & { type: "tasting_session" })
+  | { type: "member_review"; review: MemberReview; bottle: Bottle };
+
+/** Pages sessions and member reviews together, without splitting a session. */
+export async function getPrimaryActivity({
   userCondition,
   snapshotAt,
   offset,
@@ -252,14 +277,14 @@ export async function getTastingSessions({
   snapshotAt: Date;
   offset: number;
   limit: number;
-}): Promise<TastingSessionGroup[]> {
+}): Promise<PrimaryActivity[]> {
   if (!limit) return [];
 
   // Session membership and hydration must share one MVCC snapshot so a
   // concurrent deletion cannot leave an aggregate referencing a missing row.
   return await db.transaction(
     async (tx) => {
-      const result = await tx.execute<TastingSessionRow>(sql`
+      const result = await tx.execute<PrimaryActivityRow>(sql`
         WITH marked_tastings AS (
           ${markedTastingsSql({ userCondition, snapshotAt })}
         ),
@@ -288,9 +313,21 @@ export async function getTastingSessions({
             numbered_tastings.created_by_id,
             numbered_tastings.session_number
         )
-        SELECT *
-        FROM tasting_sessions
-        ORDER BY tasting_sessions.last_activity_at DESC, tasting_sessions.session_id DESC
+        SELECT * FROM (
+          SELECT 'tasting_session' AS type, session_id AS id, created_by_id,
+            started_at, last_activity_at, tasting_ids
+          FROM tasting_sessions
+          UNION ALL
+          SELECT 'member_review' AS type, ${memberReviews.id} AS id,
+            ${memberReviews.createdById} AS created_by_id,
+            ${memberReviews.createdAt} AS started_at,
+            ${memberReviews.createdAt} AS last_activity_at,
+            ARRAY[]::bigint[] AS tasting_ids
+          FROM ${memberReviews}
+          INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
+          WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+        ) primary_activity
+        ORDER BY last_activity_at DESC, id DESC, type
         OFFSET ${offset}
         LIMIT ${limit}
       `);
@@ -308,28 +345,52 @@ export async function getTastingSessions({
         tastingRows.map((tasting) => [tasting.id, tasting]),
       );
 
-      return result.rows.map((row) => ({
-        id: Number(row.session_id),
-        createdById: Number(row.created_by_id),
-        startedAt: coerceActivityDate(row.started_at),
-        lastActivityAt: coerceActivityDate(row.last_activity_at),
-        tastings: row.tasting_ids.map((id) => {
-          const tasting = tastingsById.get(Number(id));
-          if (!tasting) {
+      const reviewIds = result.rows
+        .filter((row) => row.type === "member_review")
+        .map((row) => Number(row.id));
+      const reviewRows = reviewIds.length
+        ? await tx
+            .select({ review: memberReviews, bottle: bottles })
+            .from(memberReviews)
+            .innerJoin(bottles, eq(bottles.id, memberReviews.bottleId))
+            .where(inArray(memberReviews.id, reviewIds))
+        : [];
+      const reviewsById = new Map(
+        reviewRows.map((row) => [row.review.id, row]),
+      );
+
+      return result.rows.map((row): PrimaryActivity => {
+        if (row.type === "member_review") {
+          const review = reviewsById.get(Number(row.id));
+          if (!review)
             throw new Error(
-              `Activity session references missing Tasting ${id}.`,
+              `Activity references missing member review ${row.id}.`,
             );
-          }
-          return tasting;
-        }),
-      }));
+          return { type: "member_review", ...review };
+        }
+        return {
+          type: "tasting_session",
+          id: Number(row.id),
+          createdById: Number(row.created_by_id),
+          startedAt: coerceActivityDate(row.started_at),
+          lastActivityAt: coerceActivityDate(row.last_activity_at),
+          tastings: row.tasting_ids.map((id) => {
+            const tasting = tastingsById.get(Number(id));
+            if (!tasting)
+              throw new Error(
+                `Activity session references missing Tasting ${id}.`,
+              );
+            return tasting;
+          }),
+        };
+      });
     },
     { accessMode: "read only", isolationLevel: "repeatable read" },
   );
 }
 
 /** Serializes logical tasting sessions into the shared activity contract. */
-export async function serializeTastingSessionEntries(
+async function serializeTastingSessionEntries(
   sessions: TastingSessionGroup[],
   currentUser?: User | null,
 ) {
@@ -371,6 +432,52 @@ export async function serializeTastingSessionEntries(
       tastings: sessionTastings,
     };
   });
+}
+
+/** Serializes both primary sources with the same bottle and member contracts. */
+export async function serializePrimaryActivityEntries(
+  items: PrimaryActivity[],
+  currentUser?: User | null,
+): Promise<ActivityEntry[]> {
+  const sessions = items.filter((item) => item.type === "tasting_session");
+  const reviews = items.filter((item) => item.type === "member_review");
+  const [sessionEntries, serializedReviews, serializedBottles] =
+    await Promise.all([
+      serializeTastingSessionEntries(sessions, currentUser),
+      serialize(
+        MemberReviewSerializer,
+        reviews.map((item) => item.review),
+        currentUser,
+      ),
+      serialize(
+        BottleSerializer,
+        reviews.map((item) => item.bottle),
+        currentUser,
+        [],
+        { includeGroupSummary: true },
+      ),
+    ]);
+  const entries = new Map(sessionEntries.map((entry) => [entry.id, entry]));
+  reviews.forEach((item, index) => {
+    const review = serializedReviews[index]!;
+    const id = `member_review:${review.id}`;
+    entries.set(id, {
+      id,
+      type: "member_review",
+      priority: "primary",
+      createdAt: review.createdAt,
+      createdBy: review.createdBy,
+      review: { ...review, bottle: serializedBottles[index]! },
+    });
+  });
+  return items.map(
+    (item) =>
+      entries.get(
+        item.type === "member_review"
+          ? `member_review:${item.review.id}`
+          : `tasting_session:${item.createdById}:${item.id}`,
+      )!,
+  );
 }
 
 async function getCollectionHref(collection: Collection, user: User) {

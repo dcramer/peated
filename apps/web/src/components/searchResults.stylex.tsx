@@ -13,9 +13,9 @@ import { AppLink } from "./appLink";
 import { Avatar } from "./avatar.stylex";
 import {
   BottleIdentityRow,
-  BottleVisual,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
+import { BottleVisual } from "./bottleVisual.stylex";
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { MatchedText } from "./matchedText.stylex";

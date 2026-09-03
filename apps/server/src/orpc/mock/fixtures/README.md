@@ -14,6 +14,14 @@ catalog totals are synthetic UI samples, not observations about real people or
 current production data. The database test builders in `lib/test/fixtures.ts`
 and the CLI's database seed command are separate from this in-memory catalog.
 
+## Activity examples
+
+`activity.ts` includes tasting sessions, member reviews, and single and grouped
+library additions. The activity page combines these with the critic reviews in
+`externalReviews.ts`. The shared component stories use the same examples and
+also cover a critic review without a reviewer byline. Library status stays in
+the library data but is not shown in activity rows.
+
 ## Adding catalog data
 
 - Give each producer its own kind, country, region, address, and ownership.

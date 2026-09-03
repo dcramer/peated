@@ -16,8 +16,8 @@ export const publicHomeQueries = {
     orpc.events.list.queryOptions({
       input: { limit: 1, onlyUpcoming: true, sort: "date" },
     }),
-  memberTastings: (orpc: ORPCQueryUtils) =>
-    orpc.tastings.list.queryOptions({
+  memberActivity: (orpc: ORPCQueryUtils) =>
+    orpc.activity.list.queryOptions({
       input: { limit: 3 },
     }),
   releases: (orpc: ORPCQueryUtils) =>

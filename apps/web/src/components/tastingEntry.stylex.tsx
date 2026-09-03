@@ -12,9 +12,9 @@ import {
 import { AppLink } from "./appLink";
 import {
   BottleIdentityRow,
-  BottleVisual,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
+import { BottleVisual } from "./bottleVisual.stylex";
 import { Chip } from "./chip.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
 import { TastingToastSummary } from "./tastingToastButton.stylex";

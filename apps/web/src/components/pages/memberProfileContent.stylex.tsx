@@ -4,6 +4,11 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import {
+  CommunityFeedEntry,
+  type CommunityFeedItem,
+} from "../communityFeed.stylex";
+
+import {
   BottleIdentityRow,
   Button,
   Chip,
@@ -181,6 +186,7 @@ export type MemberCollectionActivity = {
 };
 
 export type MemberActivityItem =
+  | { id: string; kind: "review"; review: CommunityFeedItem }
   | { id: string; kind: "tasting"; tasting: TastingEntryProps }
   | { activity: MemberCollectionActivity; id: string; kind: "collection" };
 
@@ -200,7 +206,11 @@ export function MemberActivityList({
   return (
     <ItemList ariaLabel="Member activity">
       {items.map((item) =>
-        item.kind === "tasting" ? (
+        item.kind === "review" ? (
+          <ItemListItem key={item.id}>
+            <CommunityFeedEntry item={item.review} />
+          </ItemListItem>
+        ) : item.kind === "tasting" ? (
           <ItemListItem key={item.id}>
             <TastingEntry {...item.tasting} />
           </ItemListItem>
@@ -245,7 +255,7 @@ function CollectionActivity({
           <ItemList ariaLabel={`${activity.collectionName} additions`}>
             {activity.items.map(({ id, ...identity }) => (
               <ItemListItem key={id}>
-                <BottleIdentityRow {...identity} />
+                <BottleIdentityRow {...identity} variant="compact" />
               </ItemListItem>
             ))}
             {hiddenCount ? (

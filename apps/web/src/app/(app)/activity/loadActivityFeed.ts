@@ -3,7 +3,7 @@ import type { Router } from "@peated/server/orpc/router";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 
 type Client = RouterClient<Router>;
-type TastingClient = { tastings: Pick<Client["tastings"], "list"> };
+type ActivityClient = { activity: Pick<Client["activity"], "list"> };
 
 /** Falls back to public activity only when there are no accepted follows. */
 export async function loadActivityFeed({
@@ -12,8 +12,8 @@ export async function loadActivityFeed({
   publicClient,
 }: {
   following: boolean;
-  memberClient?: TastingClient & { friends: Pick<Client["friends"], "list"> };
-  publicClient: TastingClient & {
+  memberClient?: ActivityClient & { friends: Pick<Client["friends"], "list"> };
+  publicClient: ActivityClient & {
     externalReviews: Pick<Client["externalReviews"], "list">;
   };
 }) {
@@ -25,14 +25,14 @@ export async function loadActivityFeed({
       limit: 1,
     });
     if (follows.results.length) {
-      const tastings = await memberClient.tastings.list({
+      const activity = await memberClient.activity.list({
         filter: "friends",
         limit: 20,
       });
       return {
         items: getCommunityFeedItems({
           criticReviews: [],
-          memberTastings: tastings.results,
+          activity: activity.results,
         }),
         note,
       };
@@ -42,15 +42,15 @@ export async function loadActivityFeed({
     note = "Sign in to follow people. Showing everyone's activity.";
   }
 
-  const [tastings, reviews] = await Promise.all([
-    publicClient.tastings.list({ limit: 20 }),
+  const [activity, reviews] = await Promise.all([
+    publicClient.activity.list({ limit: 20 }),
     publicClient.externalReviews.list({ limit: 20, sort: "recent" }),
   ]);
 
   return {
     items: getCommunityFeedItems({
       criticReviews: reviews.results,
-      memberTastings: tastings.results,
+      activity: activity.results,
     }),
     note,
   };

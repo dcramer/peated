@@ -1,5 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
+import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 
 import { MemberAvatar, type TastingEntryMember } from "@peated/web/components";
 import type { MemberActivityItem } from "@peated/web/components/pages/memberProfileContent.stylex";
@@ -11,6 +12,16 @@ type Activity = Outputs["users"]["activity"]["list"]["results"][number];
 
 /** Maps one API activity item to the shared profile activity presentation. */
 export function toActivityItem(activity: Activity): MemberActivityItem {
+  if (activity.type === "member_review") {
+    return {
+      id: activity.id,
+      kind: "review",
+      review: getCommunityFeedItems({
+        activity: [activity],
+        criticReviews: [],
+      })[0]!,
+    };
+  }
   if (activity.type === "collection_add") {
     return {
       activity: {

@@ -1,36 +1,46 @@
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
-
 import { colors, fonts, space } from "../styles/tokens.stylex";
+import { Avatar } from "./avatar.stylex";
 import {
   BottleIdentityRow,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
-import { linkedRowStyles } from "./linkedRow.stylex";
 import { RATING_BANDS, TastingRating, type RatingBand } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
 import TimeSince from "./timeSince";
 
-export type CommunityFeedItem = {
-  bottle?: Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata">;
-  actor: string;
-  actorHref?: string;
-  bottleHref: string;
-  date: string;
-  description?: string;
-  href: string;
+export type CommunityFeedBottle = Pick<
+  BottleIdentityRowProps,
+  "provenance" | "href" | "imageUrl" | "metadata" | "name"
+> & {
   id: string;
-  imageUrl?: string | null;
-  metadata?: string;
+  description?: string;
+  activityHref?: string;
+  activityLabel?: string;
+  byline?: string;
   ratingBand?: RatingBand | null;
   score?: number;
-  title: string;
+};
+
+export type CommunityFeedItem = {
+  id: string;
+  kind: "tasting" | "critic_review" | "member_review" | "collection_add";
+  actor: string;
+  actorHref?: string;
+  actorImageUrl?: string | null;
+  action: string;
+  date: string;
+  bottles: readonly CommunityFeedBottle[];
+  destination?: { href: string; label: string };
+  more?: { href: string; label: string };
 };
 
 /**
- * Owns activity rows on the homepage and /activity, including ratings and independent bottle links.
- * Callers supply items and limits; row markup and styling stay here.
+ * Activity list for the homepage and /activity. Map API entries with
+ * getCommunityFeedItems; this component owns author context, event grouping,
+ * and the standard/compact bottle choice. Routes own queries and actions.
  */
 export function CommunityFeed({
   ariaLabel = "Activity",
@@ -42,158 +52,194 @@ export function CommunityFeed({
   limit?: number;
 }) {
   const visibleItems = limit === undefined ? items : items.slice(0, limit);
-
   return (
     <ItemList ariaLabel={ariaLabel}>
       {visibleItems.map((item) => (
         <ItemListItem key={item.id}>
-          <article
-            {...stylex.props(
-              styles.entry,
-              linkedRowStyles.container,
-              linkedRowStyles.onGround,
-            )}
-          >
-            <div {...stylex.props(styles.heading)}>
-              <div {...stylex.props(styles.identity)}>
-                <BottleIdentityRow
-                  {...item.bottle}
-                  align="start"
-                  layout="cell"
-                  href={item.href}
-                  imageUrl={item.imageUrl}
-                  metadata={
-                    item.bottle?.metadata ??
-                    (item.metadata ? item.metadata.split(" · ") : [])
-                  }
-                  name={item.bottle?.name ?? item.title}
-                />
-                <div
-                  {...stylex.props(foundationStyles.metadata, styles.context)}
-                >
-                  {item.actorHref ? (
-                    <TextLink href={item.actorHref} size="inherit">
-                      {item.actor}
-                    </TextLink>
-                  ) : (
-                    item.actor
-                  )}
-                  <span aria-hidden="true"> · </span>
-                  <TimeSince date={item.date} />
-                </div>
-                <div
-                  {...stylex.props(foundationStyles.metadata, styles.metadata)}
-                >
-                  <TextLink href={item.bottleHref} size="inherit">
-                    View bottle
-                  </TextLink>
-                </div>
-              </div>
-              {item.score !== undefined || item.ratingBand ? (
-                <div {...stylex.props(styles.facts)}>
-                  {item.score !== undefined ? (
-                    <strong
-                      aria-label={`Review score: ${item.score} out of 100`}
-                      {...stylex.props(styles.score)}
-                    >
-                      {item.score}
-                    </strong>
-                  ) : null}
-                  {item.ratingBand ? (
-                    <>
-                      <strong {...stylex.props(styles.rating)}>
-                        {
-                          RATING_BANDS.find(
-                            (band) => band.key === item.ratingBand,
-                          )?.label
-                        }
-                      </strong>
-                      <TastingRating band={item.ratingBand} />
-                    </>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-            {item.description ? (
-              <p {...stylex.props(foundationStyles.body, styles.excerpt)}>
-                {item.description}
-              </p>
-            ) : null}
-          </article>
+          <CommunityFeedEntry item={item} />
         </ItemListItem>
       ))}
     </ItemList>
   );
 }
 
-const MOBILE = "@media (max-width: 559px)";
+/** One event for an existing activity list, including member profile reviews. */
+export function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
+  return (
+    <article {...stylex.props(styles.entry)}>
+      <header {...stylex.props(styles.author)}>
+        <Avatar
+          imageUrl={item.actorImageUrl}
+          initials={item.actor.slice(0, 2).toUpperCase()}
+          size="xs"
+        />
+        <div {...stylex.props(foundationStyles.metadata, styles.context)}>
+          {item.actorHref ? (
+            <TextLink href={item.actorHref} size="inherit">
+              {item.actor}
+            </TextLink>
+          ) : (
+            <strong>{item.actor}</strong>
+          )}{" "}
+          {item.action}
+          {item.destination ? (
+            <>
+              {" "}
+              <TextLink href={item.destination.href} size="inherit">
+                {item.destination.label}
+              </TextLink>
+            </>
+          ) : null}
+          <span {...stylex.props(styles.date)}>
+            <span aria-hidden="true"> · </span>
+            <TimeSince date={item.date} />
+          </span>
+        </div>
+      </header>
+      <div
+        {...stylex.props(
+          styles.content,
+          item.kind === "collection_add" && styles.compactContent,
+        )}
+      >
+        {item.bottles.map((bottle) => (
+          <div key={bottle.id} {...stylex.props(styles.bottle)}>
+            <BottleIdentityRow
+              variant={item.kind === "collection_add" ? "compact" : "standard"}
+              provenance={bottle.provenance}
+              name={bottle.name}
+              href={bottle.href}
+              imageUrl={bottle.imageUrl}
+              metadata={bottle.metadata}
+              end={
+                bottle.score !== undefined || bottle.ratingBand ? (
+                  <div {...stylex.props(styles.facts)}>
+                    {bottle.score !== undefined ? (
+                      <strong
+                        aria-label={`Review score: ${bottle.score} out of 100`}
+                        {...stylex.props(styles.score)}
+                      >
+                        {bottle.score}
+                        <span {...stylex.props(styles.scoreScale)}>/100</span>
+                      </strong>
+                    ) : null}
+                    {bottle.ratingBand ? (
+                      <>
+                        <strong {...stylex.props(styles.rating)}>
+                          {
+                            RATING_BANDS.find(
+                              (band) => band.key === bottle.ratingBand,
+                            )?.label
+                          }
+                        </strong>
+                        <TastingRating band={bottle.ratingBand} />
+                      </>
+                    ) : null}
+                  </div>
+                ) : undefined
+              }
+            />
+            {bottle.description || bottle.activityHref || bottle.byline ? (
+              <div {...stylex.props(styles.details)}>
+                {bottle.description ? (
+                  <p {...stylex.props(foundationStyles.body, styles.excerpt)}>
+                    {bottle.description}
+                  </p>
+                ) : null}
+                {bottle.byline || bottle.activityHref ? (
+                  <div
+                    {...stylex.props(foundationStyles.metadata, styles.footer)}
+                  >
+                    {bottle.byline ? <span>By {bottle.byline}</span> : null}
+                    {bottle.byline && bottle.activityHref ? (
+                      <span aria-hidden="true"> · </span>
+                    ) : null}
+                    {bottle.activityHref ? (
+                      <TextLink href={bottle.activityHref} size="inherit">
+                        {bottle.activityLabel}
+                      </TextLink>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ))}
+        {item.more ? (
+          <TextLink href={item.more.href} size="sm">
+            {item.more.label}
+          </TextLink>
+        ) : null}
+      </div>
+    </article>
+  );
+}
 
+const MOBILE = "@media (max-width: 559px)";
 const styles = stylex.create({
-  entry: {
-    boxSizing: "border-box",
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr)",
-    alignItems: "center",
-    columnGap: space.x3,
-    rowGap: space.x2,
-    width: "calc(100% + 24px)",
-    marginLeft: "-12px",
-    marginRight: "-12px",
-    padding: "14px 12px",
-  },
-  heading: {
+  entry: { paddingTop: space.x4, paddingBottom: space.x4 },
+  author: {
     display: "flex",
-    minWidth: 0,
     alignItems: "center",
     gap: space.x3,
+    [MOBILE]: { gap: space.x2 },
   },
-  identity: {
-    flex: 1,
+  context: { minWidth: 0, color: colors.inkMuted },
+  date: { whiteSpace: "nowrap" },
+  content: {
     minWidth: 0,
+    marginLeft: "38px",
+    marginTop: space.x2,
+    display: "flex",
+    flexDirection: "column",
+    gap: space.x3,
+    [MOBILE]: { marginLeft: "34px" },
   },
-  context: {
-    marginTop: "3px",
-    color: colors.inkMuted,
-  },
-  metadata: {
-    marginTop: "3px",
-    color: colors.inkMuted,
+  bottle: { minWidth: 0 },
+  compactContent: { gap: 0 },
+  details: {
+    marginLeft: "60px",
+    ["@media (max-width: 639px)"]: { marginLeft: "54px" },
   },
   facts: {
     display: "flex",
-    maxWidth: "112px",
     flexShrink: 0,
     alignItems: "flex-end",
     flexDirection: "column",
     gap: space.x2,
   },
   rating: {
-    maxWidth: "120px",
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "18px",
+    fontSize: "15px",
     fontWeight: 700,
     lineHeight: 1.2,
     textAlign: "right",
-    [MOBILE]: {
-      maxWidth: "88px",
-      fontSize: "15px",
-    },
+    [MOBILE]: { fontSize: "13px" },
   },
   score: {
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "40px",
+    fontSize: "32px",
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.045em",
-    lineHeight: 0.9,
-    textAlign: "right",
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+    [MOBILE]: { fontSize: "26px" },
+  },
+  scoreScale: {
+    color: colors.inkMuted,
+    fontSize: "12px",
+    fontWeight: 400,
+    letterSpacing: "normal",
+    marginLeft: "3px",
   },
   excerpt: {
-    gridColumn: "1",
-    margin: 0,
+    marginTop: 0,
+    marginBottom: space.x2,
     color: colors.ink,
     fontStyle: "italic",
   },
+  footer: { color: colors.inkMuted },
 });

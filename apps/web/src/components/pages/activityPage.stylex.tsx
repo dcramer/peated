@@ -4,6 +4,10 @@ import type { ReactNode } from "react";
 import { ButtonLink, EmptyState, TextLink } from "..";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
+import {
+  BottleRailSection,
+  type BottleRailItem,
+} from "./bottleRailSection.stylex";
 import { PageColumns, PageHeader } from "./pageLayout.stylex";
 import { RailListSection } from "./railListSection.stylex";
 
@@ -12,9 +16,13 @@ export function ActivityPage({
   items,
   note,
   selector,
+  libraryBottles = [],
+  libraryHref,
 }: {
   items: readonly CommunityFeedItem[];
   note?: string;
+  libraryBottles?: readonly BottleRailItem[];
+  libraryHref?: string;
   selector: ReactNode;
 }) {
   return (
@@ -31,8 +39,7 @@ export function ActivityPage({
           <div {...stylex.props(styles.rail)}>
             <RailListSection heading="What have you tried?">
               <p {...stylex.props(styles.railText)}>
-                Choose a bottle, add a rating, and keep a note of what you
-                tasted.
+                Add a rating and a few notes to remember what you tasted.
               </p>
               <div>
                 <ButtonLink
@@ -44,26 +51,25 @@ export function ActivityPage({
                 </ButtonLink>
               </div>
             </RailListSection>
-            <RailListSection heading="Tastings and reviews">
-              <p {...stylex.props(styles.railText)}>
-                Tastings use five ratings, from Mediocre to Unicorn. Reviews can
-                include a score out of 100.
-              </p>
-              <TextLink href="/about/ratings">How ratings work →</TextLink>
-            </RailListSection>
+            {libraryBottles.length ? (
+              <BottleRailSection
+                heading="From your library"
+                intro="A few bottles you haven’t tasted on Peated."
+                items={libraryBottles}
+                moreHref={libraryHref}
+                moreLabel="View library →"
+              />
+            ) : null}
+            <TextLink href="/about/ratings">How ratings work →</TextLink>
           </div>
         }
       >
         {note ? <p {...stylex.props(styles.note)}>{note}</p> : null}
         {items.length ? (
-          <CommunityFeed
-            ariaLabel="Latest tastings and reviews"
-            items={items}
-            limit={20}
-          />
+          <CommunityFeed ariaLabel="Latest activity" items={items} limit={20} />
         ) : (
           <EmptyState heading="Nothing here yet">
-            New tastings and reviews will appear here.
+            Tastings, reviews, and library additions will appear here.
           </EmptyState>
         )}
       </PageColumns>
