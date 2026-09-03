@@ -882,7 +882,6 @@ const styles = stylex.create({
     gap: "1px",
     overflow: "hidden",
     borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.inset,
   },
   colorSwatch: {
     height: "32px",
