@@ -140,6 +140,20 @@ label. Fork pull requests run the ordinary tests without secrets.
 live AI service, including the full creation scenarios. Normal test runs exclude
 these checks. The `trigger-evals` label runs the broader eval suite in CI.
 
+Before saving a migration candidate, run its revision input through the local
+runtime. The command uses `.env.local`, the registered target, robots policy,
+request controls, production parser, and validators. It records the local run
+for inspection but uses a no-op sink, so it does not write reviews or prices:
+
+```bash
+pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 3
+```
+
+The input has the same `listUrl` and `rules` fields accepted by the revision
+API. Omit `--limit` for a full acceptance preview. A bounded preview is useful
+while editing rules; the complete rules still need a full local acceptance run
+before production activation.
+
 ## Source acceptance rules
 
 Every new or changed source must satisfy this contract. Prove a rule at the

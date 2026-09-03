@@ -108,13 +108,24 @@ function createPreviewPage(
   };
 }
 
-function createScrapeSourceAdapter(input: {
-  targetKey: string;
-  listUrl: string;
-  revisionId: number;
-  rules: ScrapeRules;
-  purpose: "collect" | "preview";
-}): ScraperAdapter<null, unknown> {
+type RecordScrapeSourcePreview = (input: {
+  status: "passed" | "failed";
+  result: {
+    issues: ScrapeIssue[];
+    pages: ScrapeSourcePreviewPage[];
+  };
+}) => Promise<void>;
+
+function createScrapeSourceAdapter(
+  input: {
+    targetKey: string;
+    listUrl: string;
+    rules: ScrapeRules;
+  } & (
+    | { purpose: "collect" }
+    | { purpose: "preview"; recordPreview: RecordScrapeSourcePreview }
+  ),
+): ScraperAdapter<null, unknown> {
   return async ({ session }) => {
     const pages: ScrapeSourcePreviewPage[] = [];
     try {
@@ -189,8 +200,7 @@ function createScrapeSourceAdapter(input: {
       }
 
       if (input.purpose === "preview") {
-        await recordScrapeSourcePreview({
-          revisionId: input.revisionId,
+        await input.recordPreview({
           status: pages.length > 0 ? "passed" : "failed",
           result: {
             issues:
@@ -211,14 +221,43 @@ function createScrapeSourceAdapter(input: {
         input.purpose === "preview" &&
         error instanceof ScrapeSourceParseError
       ) {
-        await recordScrapeSourcePreview({
-          revisionId: input.revisionId,
+        await input.recordPreview({
           status: "failed",
           result: { issues: error.issues, pages },
         });
       }
       throw error;
     }
+  };
+}
+
+/** Builds the no-write source used by local acceptance previews. */
+export function createLocalScrapeSourcePreview(input: {
+  siteKey: string;
+  targetKey: string;
+  listUrl: string;
+  rules: ScrapeRules;
+  recordPreview: RecordScrapeSourcePreview;
+}): ScraperSourceDefinition<null, unknown> {
+  return {
+    key: `local-preview-${input.siteKey}`,
+    externalSiteKey: input.siteKey,
+    targetKeys: [input.targetKey],
+    requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
+    resumeFromLastRun: false,
+    cursorSchema: z.null(),
+    observationSchema:
+      input.rules.kind === "review"
+        ? ExternalReviewArticleIngestionSchema
+        : z.array(StorePriceInputSchema),
+    adapter: createScrapeSourceAdapter({
+      targetKey: input.targetKey,
+      listUrl: input.listUrl,
+      rules: input.rules,
+      purpose: "preview",
+      recordPreview: input.recordPreview,
+    }),
+    sink: async () => {},
   };
 }
 
@@ -260,6 +299,28 @@ function createScrapeSourceDefinition(input: {
             });
           };
 
+  const adapter =
+    input.purpose === "preview"
+      ? createScrapeSourceAdapter({
+          targetKey: input.targetKey,
+          listUrl: input.listUrl,
+          rules: input.rules,
+          purpose: "preview",
+          recordPreview: async ({ status, result }) => {
+            await recordScrapeSourcePreview({
+              revisionId: input.revisionId,
+              status,
+              result,
+            });
+          },
+        })
+      : createScrapeSourceAdapter({
+          targetKey: input.targetKey,
+          listUrl: input.listUrl,
+          rules: input.rules,
+          purpose: "collect",
+        });
+
   return {
     key: `source-${input.scrapeSourceId}`,
     externalSiteKey: input.siteKey,
@@ -268,7 +329,7 @@ function createScrapeSourceDefinition(input: {
     resumeFromLastRun: false,
     cursorSchema: z.null(),
     observationSchema,
-    adapter: createScrapeSourceAdapter(input),
+    adapter,
     sink,
   };
 }

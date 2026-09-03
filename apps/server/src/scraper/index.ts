@@ -24,6 +24,9 @@ import {
 import { syncScraperDefinitions } from "./syncDefinitions";
 import type { ScraperRunPayload } from "./types";
 
+export { runLocalScrapeSourcePreview } from "./localPreview";
+export type { LocalScrapeSourcePreviewInput } from "./localPreview";
+
 const enqueueScraperRun: ScraperEnqueue = async (jobName, args, options) => {
   const { pushJob } = await import("@peated/server/worker/client");
   await pushJob(jobName, args, options);
