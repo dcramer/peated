@@ -27,6 +27,31 @@ describe("catalog page redirects", () => {
       ),
     ).toBe("/bottles/43-lagavulin-16-year-old/tastings");
     expect(matchBottleRoute("/bottles/0")).toBeNull();
+    for (const suffix of [
+      "aliases",
+      "tastings",
+      "similar",
+      "prices",
+      "releases",
+      "edit",
+      "audit",
+      "merge",
+      "addTasting",
+      "addRelease",
+    ]) {
+      expect(matchBottleRoute(`/bottles/42-old/${suffix}`)?.suffix).toBe(
+        `/${suffix}`,
+      );
+    }
+    for (const suffix of [
+      "bottlings",
+      "bottlings/new",
+      "bottlings/9303",
+      "bottlings/9303/edit",
+      "releases/9303/edit",
+    ]) {
+      expect(matchBottleRoute(`/bottles/42/${suffix}`)).toBeNull();
+    }
   });
   it("redirects numeric, stale, and Peated series IDs to the current identity", () => {
     for (const path of ["/series/42", "/series/42-old.name", "/S0042"]) {
