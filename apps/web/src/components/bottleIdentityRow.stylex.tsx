@@ -43,6 +43,7 @@ export type BottleIdentityRowProps = {
  * Search places trailing ratings or actions below the identity on narrow screens.
  * Use toBottleListItem for API Bottles or getBottleIdentityProps for partial reads.
  * All variants take the same full marketed name and own their thumbnail size.
+ * The name line owns title typography so surrounding body leading cannot shift it.
  * Use layout="cell" inside an existing row/selection control. Compact omits
  * provenance, metadata, subtitle, status, and related releases; end remains available.
  */
@@ -97,8 +98,9 @@ export function BottleIdentityRow({
       <div {...stylex.props(styles.copy)}>
         <div
           {...stylex.props(
+            foundationStyles.rowTitle,
+            compactTitle && foundationStyles.compactRowTitle,
             styles.nameLine,
-            (compact || sidebar) && styles.compactNameLine,
           )}
         >
           {href ? (
@@ -107,8 +109,6 @@ export function BottleIdentityRow({
               onClick={onClick}
               title={name}
               {...stylex.props(
-                foundationStyles.rowTitle,
-                compactTitle && foundationStyles.compactRowTitle,
                 styles.name,
                 sidebar && styles.sidebarName,
                 compact && styles.compactName,
@@ -121,8 +121,6 @@ export function BottleIdentityRow({
             <span
               title={name}
               {...stylex.props(
-                foundationStyles.rowTitle,
-                compactTitle && foundationStyles.compactRowTitle,
                 styles.name,
                 sidebar && styles.sidebarName,
                 compact && styles.compactName,
@@ -248,7 +246,6 @@ const styles = stylex.create({
     paddingTop: space.x1,
     paddingBottom: space.x1,
   },
-  compactNameLine: { marginTop: 0 },
   compactName: {
     display: "block",
     overflow: "hidden",
@@ -274,7 +271,6 @@ const styles = stylex.create({
     width: "100%",
     maxWidth: "100%",
     minWidth: 0,
-    marginTop: "2px",
   },
   name: {
     outline: "none",
@@ -289,7 +285,8 @@ const styles = stylex.create({
   metadata: {
     maxWidth: "100%",
     overflow: "hidden",
-    marginTop: space.x1,
+    // BottleIdentityRow uses 2px gaps to fit three lines beside its 64px thumbnail.
+    marginTop: "2px",
     color: colors.inkMuted,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -297,7 +294,7 @@ const styles = stylex.create({
   subtitle: {
     maxWidth: "100%",
     overflow: "hidden",
-    marginTop: "3px",
+    marginTop: "2px",
     color: colors.inkMuted,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
