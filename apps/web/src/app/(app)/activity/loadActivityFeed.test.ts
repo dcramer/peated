@@ -4,7 +4,7 @@ import {
   mockFriendships,
 } from "@peated/server/orpc/mock/fixtures";
 import { beforeEach, expect, test, vi } from "vitest";
-import { loadActivityFeed } from "./loadActivityFeed";
+import { getActivityFeedSelection, loadActivityFeed } from "./loadActivityFeed";
 
 type Options = Parameters<typeof loadActivityFeed>[0];
 const publicClient = {
@@ -38,6 +38,13 @@ beforeEach(() => {
     results: [mockExternalReview],
     rel,
   });
+});
+
+test("defaults the activity feed selection to Everyone", () => {
+  expect(getActivityFeedSelection()).toBe("everyone");
+  expect(getActivityFeedSelection("everyone")).toBe("everyone");
+  expect(getActivityFeedSelection("unknown")).toBe("everyone");
+  expect(getActivityFeedSelection("following")).toBe("following");
 });
 
 test("keeps Following empty when followed people have no activity", async () => {
