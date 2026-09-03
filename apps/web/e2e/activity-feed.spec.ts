@@ -9,7 +9,7 @@ import {
 import { signIn } from "./session";
 
 test.describe("activity feed", () => {
-  test("filters activity and keeps review and bottle links independent", async ({
+  test("shows activity and keeps review and bottle links independent", async ({
     context,
     page,
     snapshot,
@@ -69,12 +69,6 @@ test.describe("activity feed", () => {
       name: "Latest activity",
     });
 
-    await expect(
-      feed.getByText("A tasting from someone you follow."),
-    ).toBeVisible();
-    await expect(feed.getByText(activityReview.clip)).toHaveCount(0);
-
-    await page.getByRole("link", { name: "Everyone", exact: true }).click();
     await expect(feed.getByText(activityReview.clip)).toBeVisible();
     await expect(
       feed.getByRole("link", { name: activityReview.site.name, exact: true }),

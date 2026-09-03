@@ -7,7 +7,7 @@ import {
   getServerClient,
 } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
-import { loadActivityFeed } from "./loadActivityFeed";
+import { getActivityFeedSelection, loadActivityFeed } from "./loadActivityFeed";
 
 export const metadata: Metadata = {
   title: "Activity",
@@ -21,7 +21,8 @@ export default async function Activity({
   searchParams: Promise<{ feed?: string }>;
 }) {
   const [{ feed }, user] = await Promise.all([searchParams, getCurrentUser()]);
-  const following = feed === "following" || (feed !== "everyone" && !!user);
+  const selectedFeed = getActivityFeedSelection(feed);
+  const following = selectedFeed === "following";
   const { client: publicClient } = await getAnonymousServerClient();
   const memberClient = user ? (await getServerClient()).client : undefined;
   const [{ items, note }, library] = await Promise.all([
@@ -49,7 +50,7 @@ export default async function Activity({
       selector={
         <PageTabs
           ariaLabel="Activity feeds"
-          currentHref={`/activity?feed=${following ? "following" : "everyone"}`}
+          currentHref={`/activity?feed=${selectedFeed}`}
           items={[
             { href: "/activity?feed=following", label: "Following" },
             { href: "/activity?feed=everyone", label: "Everyone" },

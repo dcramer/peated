@@ -5,6 +5,10 @@ import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 type Client = RouterClient<Router>;
 type ActivityClient = { activity: Pick<Client["activity"], "list"> };
 
+export function getActivityFeedSelection(feed?: string) {
+  return feed === "following" ? "following" : "everyone";
+}
+
 /** Falls back to public activity only when there are no accepted follows. */
 export async function loadActivityFeed({
   following,
