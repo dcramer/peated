@@ -235,7 +235,7 @@ test.describe("create bottle", () => {
       ),
     );
     await expect(
-      page.getByRole("heading", { name: "Add a bottle" }).first(),
+      page.getByRole("heading", { name: "Bottle added", exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View bottle" }),
