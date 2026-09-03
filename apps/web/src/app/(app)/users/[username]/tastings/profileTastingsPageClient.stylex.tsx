@@ -11,8 +11,8 @@ import {
   ItemList,
   ItemListItem,
   LoadingList,
+  LocationIdentityRow,
   RailList,
-  RailListItem,
   SectionError,
 } from "@peated/web/components";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
@@ -124,17 +124,21 @@ function getRegionRail(
     <RailSection heading={heading}>
       <RailList ariaLabel={`${username}'s most tasted regions`}>
         {query.data.results.slice(0, 6).map((item) => (
-          <RailListItem
-            end={item.count.toLocaleString("en-US")}
-            href={
-              item.region
-                ? `/locations/${item.country.slug}/regions/${item.region.slug}`
-                : `/locations/${item.country.slug}`
-            }
+          <ItemListItem
             key={`${item.country.slug}-${item.region?.slug ?? "country"}`}
-            metadata={item.region ? item.country.name : undefined}
-            title={item.region?.name ?? item.country.name}
-          />
+          >
+            <LocationIdentityRow
+              end={item.count.toLocaleString("en-US")}
+              href={
+                item.region
+                  ? `/locations/${item.country.slug}/regions/${item.region.slug}`
+                  : `/locations/${item.country.slug}`
+              }
+              country={item.region ? item.country.name : undefined}
+              name={item.region?.name ?? item.country.name}
+              variant="sidebar"
+            />
+          </ItemListItem>
         ))}
       </RailList>
     </RailSection>

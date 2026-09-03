@@ -12,7 +12,9 @@ An interface should expose the smallest useful action and make its owner clear.
 - Keep framework and outside-service types inside the module that owns them.
 - Add an exported interface only when it represents a stable boundary or
   removes real coupling.
-- Do not add wrappers that only rename or forward arguments.
+- Wrappers must own behavior or a narrower domain contract, such as the facts
+  allowed in an entity identity row. Do not add wrappers that only rename or
+  forward arguments.
 
 ## Exceptions
 

@@ -180,7 +180,8 @@ components:
 This document defines Peated's durable visual system. It does not inventory
 React components or define product data and route behavior. Storybook owns
 component usage and visible states. Feature and architecture documents own
-product behavior and data rules.
+product behavior and data rules. The [naming policy](docs/policies/naming.md#ui-components)
+owns component names, roles, and file placement.
 
 ## Overview
 
@@ -341,6 +342,21 @@ JSDoc.
 - Use the same visual foundations in the public product and admin.
 - Keep errors inside the section that failed when the rest of the page still
   works.
+
+### Catalog rows
+
+- Each core catalog kind owns its identity row. Use that same identity in lists,
+  sidebars, search results, and selection controls.
+- Brand and producer rows show the name, known kind and location, and following
+  status. Series rows show the series name and brand; region rows show the name
+  and country. Leave unavailable facts absent.
+- Keep Peated IDs, descriptions, ownership explanations, and aggregate statistics
+  out of row identity. IDs remain useful on detail and maintenance screens.
+- Place contextual counts and independent actions beside the identity. Give menu
+  cells 12px padding on both sides and enough width for the complete touch target.
+  Keep row actions available on narrow screens.
+- Names and metadata wrap when needed. Use the compact title for sidebars and
+  search, with the same identity facts as a standard row.
 
 ### Images and data
 

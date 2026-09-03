@@ -65,6 +65,17 @@ export { DataTable } from "./dataTable.stylex";
 export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
 export { DistributionList } from "./distributionList.stylex";
 export type { DistributionListItem } from "./distributionList.stylex";
+export { EntityIdentityRow } from "./entityIdentityRow.stylex";
+export type {
+  EntityIdentity,
+  EntityIdentityRowProps,
+  EntityListItem,
+} from "./entityIdentityRow.stylex";
+export { EntityPicker } from "./entityPicker.stylex";
+export type {
+  EntityPickerOption,
+  EntityPickerProps,
+} from "./entityPicker.stylex";
 export { ExpandableDescription } from "./expandableDescription.stylex";
 export { FacetRow } from "./facetRow.stylex";
 export type { FacetRowProps } from "./facetRow.stylex";
@@ -163,6 +174,8 @@ export type {
 } from "./lists.stylex";
 export { LocationCard } from "./locationCard.stylex";
 export type { LocationCardProps } from "./locationCard.stylex";
+export { LocationIdentityRow } from "./locationIdentityRow.stylex";
+export type { LocationIdentityRowProps } from "./locationIdentityRow.stylex";
 export { LocationPreviewCard } from "./locationPreviewCard.stylex";
 export type { LocationPreviewCardProps } from "./locationPreviewCard.stylex";
 export { MemberAvatar } from "./memberAvatar";
@@ -181,12 +194,6 @@ export type {
 } from "./notePicker.stylex";
 export { PageTabs } from "./pageTabs.stylex";
 export type { PageTabItem, PageTabsProps } from "./pageTabs.stylex";
-export { ProducerPicker } from "./producerPicker.stylex";
-export type {
-  ProducerPickerKind,
-  ProducerPickerOption,
-  ProducerPickerProps,
-} from "./producerPicker.stylex";
 export { RowMenu } from "./rowMenu.stylex";
 export type { RowMenuGroup, RowMenuItem, RowMenuProps } from "./rowMenu.stylex";
 export { ScopedSearch } from "./scopedSearch.stylex";
@@ -227,6 +234,8 @@ export type {
 export { SectionHeading } from "./sectionHeading.stylex";
 export { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 export type { SelectedBottleSummaryProps } from "./selectedBottleSummary.stylex";
+export { SeriesIdentityRow } from "./seriesIdentityRow.stylex";
+export type { SeriesIdentityRowProps } from "./seriesIdentityRow.stylex";
 export { SiteFooter } from "./siteFooter.stylex";
 export type { FooterLink, SiteFooterProps } from "./siteFooter.stylex";
 export { Slideout } from "./slideout.stylex";

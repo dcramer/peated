@@ -55,7 +55,8 @@ describe("EntityOperatedOverview", () => {
     expect(html).toContain("Operates");
     expect(html).toContain("The Scotch Malt Whisky Society");
     expect(html).toContain('href="/bottlers/2-the-scotch-malt-whisky-society"');
-    expect(html).toContain("Bottler · 3,499 bottles");
+    expect(html).toContain("Bottler · Islay, Scotland");
+    expect(html).not.toContain("3,499 bottles");
     expect(html).toContain("Single Cask Nation");
     expect(html).toContain('href="/brands/3-single-cask-nation"');
   });

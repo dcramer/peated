@@ -8,28 +8,22 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
+  EntityIdentityRow,
   FacetGroup,
   FilterPanel,
   ListToolbar,
-  MemberStatus,
   RowMenu,
+  type EntityListItem,
   type ListSortOption,
   type RowMenuItem,
 } from "..";
-import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors } from "../../styles/tokens.stylex";
-import { AppLink } from "../appLink";
-import { linkedRowStyles } from "../linkedRow.stylex";
+import { CatalogTable, type CatalogTableColumn } from "../catalogTable.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
-import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 
-export type EntityCatalogItem = {
+export type EntityCatalogItem = EntityListItem & {
   createBottleHref?: string;
-  href: string;
   id: number;
   isFollowing: boolean;
-  metadata: readonly string[];
-  name: string;
   totalBottles: number;
   totalTastings: number;
 };
@@ -178,25 +172,16 @@ function EntityCatalogTable({
   const columns: CatalogTableColumn<EntityCatalogItem>[] = [
     {
       cell: (item) => (
-        <>
-          <AppLink
-            href={item.href}
-            {...stylex.props(
-              foundationStyles.rowTitle,
-              styles.title,
-              linkedRowStyles.primaryLink,
-            )}
-          >
-            {item.name}
-            {item.isFollowing && showFollowingMarks ? (
-              <MemberStatus kind="following" />
-            ) : null}
-          </AppLink>
-          <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
-            {item.metadata.join(" · ")}
-          </div>
-        </>
+        <EntityIdentityRow
+          href={item.href}
+          name={item.name}
+          kind={item.kind}
+          location={item.location}
+          isFollowing={item.isFollowing && showFollowingMarks}
+          layout="cell"
+        />
       ),
+      padding: "flush",
       header: "Name",
       key: "name",
     },
@@ -234,7 +219,6 @@ function EntityCatalogTable({
       header: <span {...stylex.props(styles.visuallyHidden)}>Actions</span>,
       interactive: true,
       key: "actions",
-      priority: "secondary",
       width: "menu",
     });
   }
@@ -325,20 +309,5 @@ const styles = stylex.create({
   },
   catalog: {
     minWidth: 0,
-  },
-  title: {
-    display: "block",
-    overflow: "hidden",
-    color: colors.ink,
-    textDecoration: "none",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-  metadata: {
-    marginTop: "3px",
-    overflow: "hidden",
-    color: colors.inkMuted,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
 });

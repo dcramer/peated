@@ -3,9 +3,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
-import { SearchBox } from "../searchBox.stylex";
-import { searchResultGroups } from "../storyData";
-import { StoryCanvas } from "../storyFixtures.stylex";
+import { SearchBox } from "./searchBox.stylex";
+import { searchResultGroups } from "./storyData";
+import { StoryCanvas } from "./storyFixtures.stylex";
 
 const scopes = [
   { count: 232808, label: "Everything", value: "everything" },

@@ -2,6 +2,7 @@ import type { SearchPickerOption } from "../searchPicker.stylex";
 
 export type Option = {
   bottle?: SearchPickerOption["bottle"];
+  entity?: SearchPickerOption["entity"];
   description?: string | null;
   id?: string | number | null;
   name: string;

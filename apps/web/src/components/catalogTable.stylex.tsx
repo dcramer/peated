@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, space } from "../../styles/tokens.stylex";
-import { linkedRowStyles } from "../linkedRow.stylex";
+import { foundationStyles } from "../styles/foundations.stylex";
+import { colors, space } from "../styles/tokens.stylex";
+import { linkedRowStyles } from "./linkedRow.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -177,7 +177,10 @@ const styles = stylex.create({
     },
   },
   menuWidth: {
-    width: "40px",
+    // CatalogTable leaves 12px on each side of the 44px mobile action target.
+    width: "68px",
+    paddingRight: space.x3,
+    paddingLeft: space.x3,
   },
   ratingWidth: {
     width: "184px",

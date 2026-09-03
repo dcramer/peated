@@ -6,7 +6,6 @@ import {
   formatCategoryName,
   formatFlavorProfile,
 } from "@peated/server/lib/format";
-import { toTitleCase } from "@peated/server/lib/strings";
 import {
   BottleInputFields,
   EntityChoiceSchema,
@@ -18,6 +17,7 @@ import type { Entity, EntityKind } from "@peated/server/types";
 import {
   BottleIdentityRow,
   Button,
+  EntityPicker,
   Field,
   FieldGroup,
   FormActions,
@@ -27,19 +27,19 @@ import {
   FormSection,
   FormStack,
   PictureInput,
-  ProducerPicker,
   SearchPicker,
   Select,
   Switch,
   Textarea,
   TextInput,
   UnitInput,
-  type ProducerPickerOption,
+  type EntityPickerOption,
   type SearchPickerOption,
 } from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import {
   getFormErrorMessage,
   toChoiceValue,
@@ -226,25 +226,15 @@ function choiceId(value: number | Entity | ChoiceLike) {
   return value.id ? String(value.id) : `new:${value.name}`;
 }
 
-function choiceDetail(value: number | Entity | ChoiceLike) {
-  if (isNumericChoice(value)) return "Existing catalog item";
-  if (isCatalogEntity(value)) {
-    return [toTitleCase(value.kind), value.region?.name ?? value.country?.name]
-      .filter(Boolean)
-      .join(" · ");
-  }
-  return value.id ? "Existing catalog item" : "New catalog item";
-}
-
-function toProducerPickerOption(
+function toEntityPickerOption(
   value: number | Entity | ChoiceLike | null | undefined,
-): ProducerPickerOption | null {
+): EntityPickerOption | null {
   if (value === null || value === undefined) return null;
   return {
-    detail: choiceDetail(value),
     id: choiceId(value),
-    meta: isCatalogEntity(value) ? value.peatedId : "Bottle form",
-    name: choiceName(value),
+    ...(isCatalogEntity(value)
+      ? getEntityIdentityProps(value)
+      : { name: choiceName(value) }),
   };
 }
 
@@ -252,31 +242,31 @@ function toSearchPickerOption(
   value: number | Entity | ChoiceLike,
 ): SearchPickerOption {
   return {
-    detail: choiceDetail(value),
+    entity: isCatalogEntity(value)
+      ? getEntityIdentityProps(value)
+      : { name: choiceName(value) },
     id: choiceId(value),
     label: choiceName(value),
   };
 }
 
-function producerPickerOption(entity: Entity): ProducerPickerOption {
+function entityPickerOption(entity: Entity): EntityPickerOption {
   return {
-    detail: choiceDetail(entity),
     id: String(entity.id),
-    meta: entity.peatedId,
-    name: entity.name,
+    ...getEntityIdentityProps(entity),
   };
 }
 
 function entitySearchOption(entity: Entity): SearchPickerOption {
   return {
-    detail: choiceDetail(entity),
+    entity: getEntityIdentityProps(entity),
     id: String(entity.id),
     label: entity.name,
   };
 }
 
 function entityChoiceFromOption(
-  option: ProducerPickerOption,
+  option: EntityPickerOption,
   kind: EntityKind,
 ): z.infer<typeof EntityChoiceSchema> {
   return option.id.startsWith("new:")
@@ -299,11 +289,10 @@ function draftSeries(name: string): NonNullable<FormSchemaType["series"]> {
 function makeDraftEntityOption(
   name: string,
   kind: EntityKind,
-): ProducerPickerOption {
+): EntityPickerOption {
   return {
-    detail: `New ${toTitleCase(kind).toLocaleLowerCase()}`,
     id: `new:${name}`,
-    meta: "Will be created on save",
+    kind,
     name,
   };
 }
@@ -335,11 +324,11 @@ export default function BottleForm({
   const [brandQuery, setBrandQuery] = useState("");
   const [bottlerQuery, setBottlerQuery] = useState("");
   const [distillerQuery, setDistillerQuery] = useState("");
-  const [brand, setBrand] = useState<ProducerPickerOption | null>(() =>
-    toProducerPickerOption(initialData.brand),
+  const [brand, setBrand] = useState<EntityPickerOption | null>(() =>
+    toEntityPickerOption(initialData.brand),
   );
-  const [bottler, setBottler] = useState<ProducerPickerOption | null>(() =>
-    toProducerPickerOption(initialData.bottler),
+  const [bottler, setBottler] = useState<EntityPickerOption | null>(() =>
+    toEntityPickerOption(initialData.bottler),
   );
   const [distillers, setDistillers] = useState<readonly SearchPickerOption[]>(
     () => initialData.distillers?.map(toSearchPickerOption) ?? [],
@@ -488,7 +477,7 @@ export default function BottleForm({
             <FormNotice role="alert">{submitError}</FormNotice>
           ) : null}
           <FormSection title="Bottle details">
-            <ProducerPicker
+            <EntityPicker
               error={errors.brand?.message}
               help="The main label the bottle is sold under."
               kind="brand"
@@ -521,7 +510,7 @@ export default function BottleForm({
               }}
               onQueryChange={setBrandQuery}
               options={(brandResults.data?.results ?? []).map(
-                producerPickerOption,
+                entityPickerOption,
               )}
               placeholder="Laphroaig"
               required
@@ -646,7 +635,7 @@ export default function BottleForm({
               }}
               onCreate={(query) => {
                 const option: SearchPickerOption = {
-                  detail: "New distillery",
+                  entity: { name: query, kind: "distillery" },
                   id: `new:${query}`,
                   label: query,
                 };
@@ -664,7 +653,7 @@ export default function BottleForm({
               placeholder="Search distilleries"
               value={distillers}
             />
-            <ProducerPicker
+            <EntityPicker
               help="The market-facing bottler or release imprint, when one is stated."
               kind="bottler"
               loading={bottlerResults.isFetching}
@@ -690,7 +679,7 @@ export default function BottleForm({
               }}
               onQueryChange={setBottlerQuery}
               options={(bottlerResults.data?.results ?? []).map(
-                producerPickerOption,
+                entityPickerOption,
               )}
               placeholder="Search bottlers"
               value={bottler}

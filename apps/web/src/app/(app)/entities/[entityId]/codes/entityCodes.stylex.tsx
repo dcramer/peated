@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { Card, TextLink } from "@peated/web/components";
-import { CatalogTable } from "@peated/web/components/pages/catalogTable.stylex";
+import { Card, EntityIdentityRow, TextLink } from "@peated/web/components";
+import { CatalogTable } from "@peated/web/components/catalogTable.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
@@ -70,29 +70,15 @@ export function EntityCodes({
               },
               {
                 key: "distillery",
+                padding: "flush",
                 header: "Distillery",
                 cell: (row) => (
-                  <div {...stylex.props(styles.distillery)}>
-                    <div {...stylex.props(foundationStyles.rowTitle)}>
-                      {row.href ? (
-                        <TextLink href={row.href} size="inherit">
-                          {row.name}
-                        </TextLink>
-                      ) : (
-                        row.name
-                      )}
-                    </div>
-                    {row.country ? (
-                      <div
-                        {...stylex.props(
-                          foundationStyles.metadata,
-                          styles.country,
-                        )}
-                      >
-                        {row.country}
-                      </div>
-                    ) : null}
-                  </div>
+                  <EntityIdentityRow
+                    href={row.href}
+                    location={row.country ?? undefined}
+                    name={row.name}
+                    layout="cell"
+                  />
                 ),
               },
             ]}
@@ -123,12 +109,5 @@ const styles = stylex.create({
     color: colors.ink,
     fontVariantNumeric: "tabular-nums",
     fontWeight: 600,
-  },
-  distillery: {
-    minWidth: 0,
-    overflowWrap: "anywhere",
-  },
-  country: {
-    color: colors.inkMuted,
   },
 });

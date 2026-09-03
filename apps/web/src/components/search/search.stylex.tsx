@@ -9,6 +9,7 @@ import { Button, SearchBox } from "@peated/web/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   addRecentSearch,
@@ -198,14 +199,8 @@ function entityItem(entity: EntitySearchResult) {
   return {
     href: getEntityUrl(entity),
     id: `entity-${entity.id}`,
-    isFollowing: entity.isFollowing,
-    metadata: entity.region?.name,
+    entity: getEntityIdentityProps(entity),
     title: entity.name,
-    visual: {
-      kind: "initial",
-      fallback: entity.name.slice(0, 1).toLocaleUpperCase(),
-      label: entity.name,
-    },
   } satisfies SearchResultItem;
 }
 
@@ -213,13 +208,8 @@ function seriesItem(series: SeriesSearchResult) {
   return {
     href: getBottleSeriesUrl(series),
     id: `series-${series.id}`,
-    metadata: `${series.brand.name} · ${series.numReleases.toLocaleString("en-US")} ${series.numReleases === 1 ? "bottle" : "bottles"}`,
+    series: { brand: series.brand.name },
     title: series.name,
-    visual: {
-      kind: "initial",
-      fallback: "S",
-      label: series.fullName,
-    },
   } satisfies SearchResultItem;
 }
 
@@ -242,13 +232,8 @@ function regionItem(region: RegionSearchResult) {
   return {
     href: `/locations/${region.country.slug}/regions/${region.slug}`,
     id: `region-${region.id}`,
-    metadata: `${region.country.name} · ${region.totalDistillers.toLocaleString("en-US")} ${region.totalDistillers === 1 ? "distillery" : "distilleries"}`,
+    location: { country: region.country.name },
     title: region.name,
-    visual: {
-      kind: "initial",
-      fallback: region.name.slice(0, 1).toLocaleUpperCase(),
-      label: region.name,
-    },
   } satisfies SearchResultItem;
 }
 

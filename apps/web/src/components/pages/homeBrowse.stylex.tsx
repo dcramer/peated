@@ -8,8 +8,10 @@ import { TextLink } from "../textLink.stylex";
 import {
   BottleList,
   type BottleListItem,
+  EntityIdentityRow,
+  type EntityListItem,
   ItemList,
-  ItemRow,
+  ItemListItem,
   LocationPreviewCard,
   type LocationPreviewCardProps,
 } from "..";
@@ -112,10 +114,6 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
   );
 }
 
-function formatBottleCount(count: number) {
-  return `${count.toLocaleString("en-US")} ${count === 1 ? "bottle" : "bottles"}`;
-}
-
 /** Keeps homepage and country overview location previews identical. */
 export function HomeRegionGrid({
   regions,
@@ -187,18 +185,11 @@ export function HomeOrigins({
   );
 }
 
-export type HomeDistillery = {
-  href: string;
-  location?: string;
-  name: string;
-  totalBottles: number;
-};
-
 export function HomeDistilleries({
   distilleries,
   totalDistilleries,
 }: {
-  distilleries: readonly HomeDistillery[];
+  distilleries: readonly EntityListItem[];
   totalDistilleries?: number;
 }) {
   return (
@@ -207,17 +198,9 @@ export function HomeDistilleries({
       <div {...stylex.props(styles.distilleries)}>
         <ItemList ariaLabel="Distilleries">
           {distilleries.map((distillery) => (
-            <ItemRow
-              href={distillery.href}
-              key={distillery.href}
-              metadata={
-                <>
-                  {distillery.location ? `${distillery.location} · ` : null}
-                  {formatBottleCount(distillery.totalBottles)}
-                </>
-              }
-              title={distillery.name}
-            />
+            <ItemListItem key={distillery.href}>
+              <EntityIdentityRow {...distillery} />
+            </ItemListItem>
           ))}
         </ItemList>
       </div>

@@ -10,7 +10,7 @@ const item: EntityCatalogItem = {
   href: "/brands/42",
   id: 42,
   isFollowing: false,
-  metadata: ["Brand"],
+  kind: "brand",
   name: "Example Brand",
   totalBottles: 3,
   totalTastings: 8,

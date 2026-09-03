@@ -1,15 +1,17 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import {
   EmptyState,
+  EntityIdentityRow,
   FactList,
+  ItemListItem,
   LoadingPlaceholder,
   RailList,
-  RailListItem,
   TastingRatingDistribution,
   type FactListItem,
   type TastingRatingCounts,
@@ -120,12 +122,14 @@ function ProducerSections({ groups }: { groups: readonly ProducerGroup[] }) {
         <RailSection heading={group.heading} key={group.heading}>
           <RailList ariaLabel={`${group.heading} tasted often`}>
             {group.items.map((producer) => (
-              <RailListItem
-                end={formatCount(producer.count)}
-                href={getEntityUrl(producer)}
-                key={producer.id}
-                title={producer.name}
-              />
+              <ItemListItem key={producer.id}>
+                <EntityIdentityRow
+                  {...getEntityIdentityProps(producer)}
+                  variant="sidebar"
+                  end={formatCount(producer.count)}
+                  href={getEntityUrl(producer)}
+                />
+              </ItemListItem>
             ))}
           </RailList>
         </RailSection>

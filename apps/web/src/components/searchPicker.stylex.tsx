@@ -4,6 +4,10 @@ import * as stylex from "@stylexjs/stylex";
 import { X } from "lucide-react";
 import type { FocusEvent, ReactNode } from "react";
 import { useId, useMemo, useState } from "react";
+import {
+  EntityIdentityRow,
+  type EntityIdentity,
+} from "./entityIdentityRow.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
@@ -25,6 +29,7 @@ import { ValidationMessage } from "./field.stylex";
 import { useListboxNavigation } from "./useListboxNavigation";
 
 export type SearchPickerOption = {
+  entity?: Pick<EntityIdentity, "name" | "kind" | "location">;
   /** Build bottle selections with toBottlePickerOption to retain all identity lines. */
   bottle?: Pick<
     BottleIdentityRowProps,
@@ -33,7 +38,6 @@ export type SearchPickerOption = {
   detail?: string;
   id: number | string;
   label: string;
-  selectedDetail?: string;
 };
 
 export type SearchPickerProps = {
@@ -209,6 +213,12 @@ function PickerControl({
           <div {...stylex.props(styles.selectedCopy)}>
             {value[0].bottle ? (
               <BottleIdentityRow {...value[0].bottle} layout="cell" />
+            ) : value[0].entity ? (
+              <EntityIdentityRow
+                {...value[0].entity}
+                layout="cell"
+                variant="search"
+              />
             ) : (
               <>
                 <span
@@ -220,15 +230,15 @@ function PickerControl({
                 >
                   {value[0].label}
                 </span>
-                {(value[0].selectedDetail ?? value[0].detail) ? (
+                {value[0].detail ? (
                   <span
-                    title={value[0].selectedDetail ?? value[0].detail}
+                    title={value[0].detail}
                     {...stylex.props(
                       foundationStyles.metadata,
                       styles.selectedDetail,
                     )}
                   >
-                    {value[0].selectedDetail ?? value[0].detail}
+                    {value[0].detail}
                   </span>
                 ) : null}
               </>
@@ -252,10 +262,30 @@ function PickerControl({
         >
           {value.map((option) =>
             option.bottle ? (
-              <div key={option.id} {...stylex.props(styles.selectedBottle)}>
+              <div key={option.id} {...stylex.props(styles.selectedIdentity)}>
                 <BottleIdentityRow
                   {...option.bottle}
                   layout="cell"
+                  end={
+                    <IconButton
+                      disabled={disabled}
+                      icon={<X aria-hidden="true" size={16} />}
+                      label={`Remove ${option.label}`}
+                      onClick={() =>
+                        onChange(value.filter((item) => item.id !== option.id))
+                      }
+                      size="sm"
+                      variant="text"
+                    />
+                  }
+                />
+              </div>
+            ) : option.entity ? (
+              <div key={option.id} {...stylex.props(styles.selectedIdentity)}>
+                <EntityIdentityRow
+                  {...option.entity}
+                  layout="cell"
+                  variant="search"
                   end={
                     <IconButton
                       disabled={disabled}
@@ -347,7 +377,8 @@ function PickerControl({
                       type="button"
                       {...stylex.props(
                         styles.result,
-                        Boolean(option.bottle) && styles.bottleResult,
+                        Boolean(option.bottle || option.entity) &&
+                          styles.identityResult,
                         index === activeIndex && styles.activeResult,
                       )}
                     >
@@ -356,6 +387,13 @@ function PickerControl({
                           {...option.bottle}
                           layout="cell"
                           query={query}
+                        />
+                      ) : option.entity ? (
+                        <EntityIdentityRow
+                          {...option.entity}
+                          layout="cell"
+                          query={query}
+                          variant="search"
                         />
                       ) : (
                         <>
@@ -453,7 +491,7 @@ const styles = stylex.create({
   label: { color: colors.inkMuted },
   required: { color: colors.accentDeep },
   selected: { display: "flex", gap: space.x2, flexWrap: "wrap" },
-  selectedBottle: { width: "100%", minWidth: 0 },
+  selectedIdentity: { width: "100%", minWidth: 0 },
   selectedControl: {
     boxSizing: "border-box",
     display: "flex",
@@ -562,7 +600,7 @@ const styles = stylex.create({
     backgroundColor: colors.inset,
     boxShadow: effects.focusRing,
   },
-  bottleResult: { paddingTop: 0, paddingBottom: 0 },
+  identityResult: { paddingTop: 0, paddingBottom: 0 },
 
   detail: {
     color: colors.inkMuted,

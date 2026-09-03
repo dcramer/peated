@@ -72,7 +72,7 @@ describe("EntityCatalogRelationships", () => {
     });
 
     expect(html).toContain("Bottled by");
-    expect(html).toContain("SMWS");
+    expect(html).toContain("The Scotch Malt Whisky Society");
     expect(html).not.toContain("Unused Brand");
     expect(html).not.toContain(">Brands<");
   });

@@ -1,15 +1,17 @@
 import type { Outputs } from "@peated/server/orpc/router";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 
 import {
+  EntityIdentityRow,
+  ItemListItem,
   LoadingList,
   RailList,
-  RailListItem,
   SectionError,
 } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
-import { getEntityPresentation, type Entity } from "./entityPageData";
+import { type Entity } from "./entityPageData";
 
 type EntityList = Outputs["entities"]["list"];
 
@@ -58,12 +60,13 @@ export function EntityOperatedOverview({
     <PageSection heading={heading}>
       <RailList ariaLabel={`${entity.name} brands and producers`}>
         {operated.map((item) => (
-          <RailListItem
-            href={getEntityUrl(item)}
-            key={item.id}
-            metadata={`${getEntityPresentation(item).label} · ${item.totalBottles.toLocaleString("en-US")} bottles`}
-            title={item.name}
-          />
+          <ItemListItem key={item.id}>
+            <EntityIdentityRow
+              {...getEntityIdentityProps(item)}
+              variant="sidebar"
+              href={getEntityUrl(item)}
+            />
+          </ItemListItem>
         ))}
       </RailList>
     </PageSection>

@@ -1,53 +1,52 @@
 "use client";
 
+import type { EntityKind } from "@peated/server/types";
 import { useMemo, type ReactNode } from "react";
+import type { EntityIdentity } from "./entityIdentityRow.stylex";
 
 import { SearchSelect, type SearchPickerOption } from "./searchPicker.stylex";
 
-export type ProducerPickerKind = "brand" | "bottler" | "distiller" | "producer";
+export type EntityPickerOption = Pick<
+  EntityIdentity,
+  "name" | "kind" | "location"
+> & { id: string };
 
-export type ProducerPickerOption = {
-  detail: string;
-  id: string;
-  meta: string;
-  name: string;
-};
-
-export type ProducerPickerProps = {
+export type EntityPickerProps = {
   error?: ReactNode;
   help?: string;
-  kind: ProducerPickerKind;
+  /** Stored entity kind for creation copy; omit when choosing across kinds. */
+  kind?: EntityKind;
   label?: string;
   loading?: boolean;
-  onChange: (value: ProducerPickerOption | null) => void;
+  onChange: (value: EntityPickerOption | null) => void;
   onCreate?: (query: string) => void;
   onQueryChange?: (query: string) => void;
-  options: readonly ProducerPickerOption[];
+  options: readonly EntityPickerOption[];
   placeholder?: string;
   required?: boolean;
-  value: ProducerPickerOption | null;
+  value: EntityPickerOption | null;
 };
 
 const kindCopy = {
   brand: { label: "Brand", plural: "brands", singular: "brand" },
   bottler: { label: "Bottler", plural: "bottlers", singular: "bottler" },
-  distiller: {
+  distillery: {
     label: "Distiller",
     plural: "distillers",
     singular: "distiller",
   },
-  producer: {
-    label: "Brand or producer",
-    plural: "brands and producers",
-    singular: "brand or producer",
-  },
+  company: { label: "Company", plural: "companies", singular: "company" },
 } satisfies Record<
-  ProducerPickerKind,
+  EntityKind,
   { label: string; plural: string; singular: string }
 >;
 
-/** Supplies brand and producer choices to the shared single-choice picker. */
-export function ProducerPicker({
+/**
+ * Selects one supplied brand, distillery, bottler, or company. Uses stored kinds;
+ * the caller owns queries, filtering, and creation. EntityField is the API-backed
+ * field adapter; EntityIdentityRow owns the identity displayed by this picker.
+ */
+export function EntityPicker({
   error,
   help,
   kind,
@@ -60,8 +59,14 @@ export function ProducerPicker({
   placeholder,
   required = false,
   value,
-}: ProducerPickerProps) {
-  const copy = kindCopy[kind];
+}: EntityPickerProps) {
+  const copy = kind
+    ? kindCopy[kind]
+    : {
+        label: "Brand or producer",
+        plural: "brands and producers",
+        singular: "brand or producer",
+      };
   const entitiesById = useMemo(
     () =>
       new Map(
@@ -73,12 +78,15 @@ export function ProducerPicker({
     [options, value],
   );
 
-  function toPickerOption(option: ProducerPickerOption): SearchPickerOption {
+  function toPickerOption(option: EntityPickerOption): SearchPickerOption {
     return {
-      detail: `${option.id} · ${option.meta}`,
+      entity: {
+        name: option.name,
+        kind: option.kind,
+        location: option.location,
+      },
       id: option.id,
       label: option.name,
-      selectedDetail: option.detail,
     };
   }
 
