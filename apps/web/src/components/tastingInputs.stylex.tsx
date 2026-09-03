@@ -40,7 +40,7 @@ export type ReviewScoreInputProps = {
   value: number | null;
 };
 
-/** Records one whole-number review score while showing its rating range. */
+/** Drag the 60–100 scale or type any whole-number review score from 0–100. */
 export function ReviewScoreInput({
   disabled = false,
   id,
@@ -145,25 +145,69 @@ export function ReviewScoreInput({
         </div>
       </div>
       <div {...stylex.props(styles.reviewScoreScale)}>
-        <div aria-hidden="true" {...stylex.props(styles.reviewScoreTrack)}>
-          {RATING_BANDS.map((band) => (
-            <span
-              key={band.key}
-              {...stylex.props(
-                styles.reviewScoreSegment,
-                selectedBand?.key === band.key &&
-                  bandInputSelectedStyles[band.key],
-              )}
-            />
-          ))}
-          {value !== null ? (
-            <span
-              {...stylex.props(
-                styles.reviewScoreMarker,
-                styles.reviewScoreMarkerPosition(value),
-              )}
-            />
-          ) : null}
+        <div {...stylex.props(styles.reviewScoreSlider)}>
+          <div aria-hidden="true" {...stylex.props(styles.reviewScoreTrack)}>
+            {RATING_BANDS.map((band) => (
+              <span
+                key={band.key}
+                {...stylex.props(
+                  styles.reviewScoreSegment,
+                  selectedBand?.key === band.key &&
+                    bandInputSelectedStyles[band.key],
+                )}
+              />
+            ))}
+            {value !== null ? (
+              <span
+                {...stylex.props(
+                  styles.reviewScoreMarker,
+                  styles.reviewScoreMarkerPosition(value),
+                )}
+              />
+            ) : null}
+          </div>
+          <input
+            aria-label="Review score slider, 60 to 100"
+            aria-describedby={`${id}-scale-help`}
+            aria-valuetext={
+              value === null
+                ? "No score selected"
+                : value < REVIEW_SCORE_TRACK_MIN
+                  ? `Typed score ${value}; slider starts at 60`
+                  : `${value} out of 100${selectedBand ? `, ${selectedBand.label}` : ""}`
+            }
+            disabled={disabled}
+            min={REVIEW_SCORE_TRACK_MIN}
+            max={100}
+            step={1}
+            type="range"
+            value={Math.max(REVIEW_SCORE_TRACK_MIN, value ?? 80)}
+            onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+            onClick={(event) => {
+              // ReviewScoreInput owns committing a first tap even when the native value is unchanged.
+              if (value === null || value < REVIEW_SCORE_TRACK_MIN) {
+                onChange(event.currentTarget.valueAsNumber);
+              }
+            }}
+            onKeyUp={(event) => {
+              if (
+                (value === null || value < REVIEW_SCORE_TRACK_MIN) &&
+                [
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "ArrowUp",
+                  "ArrowDown",
+                  "Home",
+                  "End",
+                  "PageUp",
+                  "PageDown",
+                ].includes(event.key)
+              ) {
+                onChange(event.currentTarget.valueAsNumber);
+              }
+            }}
+            {...stylex.props(styles.reviewScoreRange)}
+          />
         </div>
         <div
           aria-hidden="true"
@@ -180,9 +224,12 @@ export function ReviewScoreInput({
           <span>100</span>
         </div>
       </div>
-      <p {...stylex.props(foundationStyles.metadata, styles.reviewScoreHint)}>
-        Whole numbers. Your score counts toward this bottle's review score and
-        appears with your review.
+      <p
+        id={`${id}-scale-help`}
+        {...stylex.props(foundationStyles.metadata, styles.reviewScoreHint)}
+      >
+        Drag for 60–100, or type any score from 0–100. Your score counts toward
+        this bottle's review score and appears with your review.
       </p>
     </div>
   );
@@ -579,7 +626,30 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
   reviewScoreScale: {
-    paddingTop: space.x6,
+    paddingTop: space.x3,
+  },
+  reviewScoreSlider: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    height: "44px",
+    borderRadius: controlMetrics.radiusSmall,
+    boxShadow: {
+      default: "none",
+      ":focus-within": effects.focusRing,
+    },
+  },
+  reviewScoreRange: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    margin: 0,
+    opacity: 0,
+    cursor: {
+      default: "ew-resize",
+      ":disabled": "not-allowed",
+    },
   },
   reviewScoreTrack: {
     position: "relative",
@@ -597,10 +667,14 @@ const styles = stylex.create({
   },
   reviewScoreMarker: {
     position: "absolute",
-    top: "-4px",
-    bottom: "-4px",
-    width: "2px",
-    backgroundColor: colors.ink,
+    top: "-7px",
+    bottom: "-7px",
+    width: "12px",
+    borderRadius: controlMetrics.radiusSmall,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.ink,
+    backgroundColor: colors.ground,
     transform: "translateX(-50%)",
   },
   reviewScoreMarkerPosition: (score: number) => ({

@@ -6,11 +6,18 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ReviewScoreInput } from "./tastingInputs.stylex";
 
-function ReviewScoreHarness({ initialValue }: { initialValue: number | null }) {
+function ReviewScoreHarness({
+  initialValue,
+  disabled = false,
+}: {
+  initialValue: number | null;
+  disabled?: boolean;
+}) {
   const [value, setValue] = useState(initialValue);
 
   return (
     <ReviewScoreInput
+      disabled={disabled}
       id="score"
       name="score"
       onChange={setValue}
@@ -93,5 +100,78 @@ describe("ReviewScoreInput", () => {
     });
 
     expect(input.value).toBe("100");
+  });
+
+  it("updates the numeric score and rating range from the slider", () => {
+    act(() => root.render(<ReviewScoreHarness initialValue={85} />));
+    const slider = container.querySelector<HTMLInputElement>(
+      'input[type="range"]',
+    )!;
+
+    act(() => {
+      Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set?.call(slider, "94");
+      slider.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    expect(container.querySelector<HTMLInputElement>("#score")?.value).toBe(
+      "94",
+    );
+    expect(slider.getAttribute("aria-valuetext")).toBe(
+      "94 out of 100, Outstanding",
+    );
+  });
+
+  it("keeps empty and low typed scores until the slider is used", () => {
+    act(() => root.render(<ReviewScoreHarness initialValue={null} />));
+    expect(container.querySelector<HTMLInputElement>("#score")?.value).toBe("");
+    expect(
+      container
+        .querySelector('input[type="range"]')
+        ?.getAttribute("aria-valuetext"),
+    ).toBe("No score selected");
+
+    act(() =>
+      container.querySelector<HTMLInputElement>('input[type="range"]')!.click(),
+    );
+    expect(container.querySelector<HTMLInputElement>("#score")?.value).toBe(
+      "80",
+    );
+
+    act(() =>
+      root.render(<ReviewScoreHarness initialValue={42} key="low-score" />),
+    );
+    expect(container.querySelector<HTMLInputElement>("#score")?.value).toBe(
+      "42",
+    );
+    expect(
+      container.querySelector<HTMLInputElement>('input[type="range"]')?.value,
+    ).toBe("60");
+    expect(
+      container
+        .querySelector('input[type="range"]')
+        ?.getAttribute("aria-valuetext"),
+    ).toBe("Typed score 42; slider starts at 60");
+
+    act(() => {
+      container
+        .querySelector<HTMLInputElement>('input[type="range"]')!
+        .dispatchEvent(
+          new KeyboardEvent("keyup", { key: "Home", bubbles: true }),
+        );
+    });
+    expect(container.querySelector<HTMLInputElement>("#score")?.value).toBe(
+      "60",
+    );
+  });
+
+  it("disables the slider along with the other score controls", () => {
+    act(() => root.render(<ReviewScoreHarness disabled initialValue={89} />));
+    expect(
+      container.querySelector<HTMLInputElement>('input[type="range"]')
+        ?.disabled,
+    ).toBe(true);
   });
 });
