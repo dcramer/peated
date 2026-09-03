@@ -2,19 +2,34 @@ import type { Outputs } from "@peated/server/orpc/router";
 
 import { SiteFooter, type SiteFooterProps } from "@peated/web/components";
 
-const links = [
-  { href: "/locations", label: "Locations" },
-  { href: "/brands", label: "Brands" },
-  { href: "/about", label: "About" },
-  { href: "/about/api", label: "API" },
-  { href: "/about/categories", label: "Whisky categories" },
-  { href: "/about/tasting-wheel", label: "Tasting wheel" },
-  { href: "/about/ratings", label: "Rating guide" },
-  { href: "/events", label: "Whisky events" },
-  { href: "/updates", label: "Recent changes" },
-  { href: "https://github.com/peated/peated", label: "Source" },
-  { href: "/terms", label: "Terms" },
-] as const satisfies SiteFooterProps["links"];
+const groups = [
+  {
+    label: "Explore",
+    links: [
+      { href: "/locations", label: "Locations" },
+      { href: "/brands", label: "Brands" },
+      { href: "/events", label: "Whisky events" },
+    ],
+  },
+  {
+    label: "Reference",
+    links: [
+      { href: "/about/categories", label: "Whisky categories" },
+      { href: "/about/tasting-wheel", label: "Tasting wheel" },
+      { href: "/about/ratings", label: "Rating guide" },
+      { href: "/bottlers/4263/codes", label: "SMWS distillery codes" },
+    ],
+  },
+  {
+    label: "Project",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/updates", label: "Recent changes" },
+      { href: "/about/api", label: "API" },
+      { href: "https://github.com/peated/peated", label: "Source" },
+    ],
+  },
+] as const satisfies SiteFooterProps["groups"];
 
 function formatCount(value: number, noun: string) {
   return `${value.toLocaleString("en-US")} ${noun}`;
@@ -35,14 +50,9 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
   return (
     <SiteFooter
       coverage={coverage}
-      links={links}
+      groups={groups}
+      legalLinks={[{ href: "/terms", label: "Terms" }]}
       provenance="Edited by members · corrections welcome"
-      referenceLinks={[
-        {
-          href: "/bottlers/4263/codes",
-          label: "SMWS distillery codes",
-        },
-      ]}
       responsibility="Drink responsibly"
       statement="A public record of whisky bottles, critic scores, and tasting notes from the people who drank them."
     />
