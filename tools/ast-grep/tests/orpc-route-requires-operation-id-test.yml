@@ -1,5 +1,8 @@
 id: orpc-route-requires-operation-id
 valid:
+  - 'contract.route({ operationId: "listItems" })'
+  - "contract.route({ operationId })"
+  - "contract.route(options)"
   - |
     procedure.route({
       method: "GET",
@@ -7,6 +10,8 @@ valid:
       spec: (spec) => ({ ...spec, operationId: "listItems" }),
     })
 invalid:
+  - 'contract.route({ method: "GET", path: "/items" })'
+  - 'procedure.use(middleware({ operationId: "unrelated" })).route({ path: "/items" })'
   - |
     procedure.route({
       method: "GET",

@@ -1,0 +1,86 @@
+id: orpc-contract-no-runtime-imports
+language: TypeScript
+severity: error
+message: Shared contracts must not load database, configuration, worker, or real-handler modules.
+note: Import schemas, constants, pure helpers, or types instead so mock handlers remain independent of the real API.
+files:
+  - apps/server/src/orpc/contracts/**/*.ts
+ignores:
+  - apps/server/src/orpc/contracts/**/*.test.ts
+utils:
+  runtime-module:
+    regex: >-
+      ^["'](@peated/server/|\.{1,2}/(\.\./)*)(db|config|worker|orpc/routes|routes)(/|["']|\.ts["'])
+rule:
+  any:
+    - kind: import_statement
+      all:
+        - has:
+            field: source
+            matches: runtime-module
+        - not:
+            regex: '^import\s+type\b'
+        - not:
+            has:
+              kind: import_clause
+              all:
+                - not:
+                    has:
+                      any:
+                        - kind: identifier
+                        - kind: namespace_import
+                - has:
+                    kind: named_imports
+                    all:
+                      - has:
+                          kind: import_specifier
+                      - not:
+                          has:
+                            kind: import_specifier
+                            not:
+                              regex: '^type\s'
+    - kind: export_statement
+      all:
+        - has:
+            field: source
+            matches: runtime-module
+        - not:
+            regex: '^export\s+type\b'
+        - not:
+            has:
+              kind: export_clause
+              all:
+                - has:
+                    kind: export_specifier
+                - not:
+                    has:
+                      kind: export_specifier
+                      not:
+                        regex: '^type\s'
+    - kind: call_expression
+      all:
+        - has:
+            field: function
+            kind: import
+        - has:
+            field: arguments
+            has:
+              kind: string
+              matches: runtime-module
+        - not:
+            inside:
+              any:
+                - kind: type_alias_declaration
+                - kind: type_annotation
+                - kind: type_arguments
+                - kind: type_query
+                - kind: type_parameter
+                - nthChild: 2
+                  inside:
+                    any:
+                      - kind: as_expression
+                      - kind: satisfies_expression
+              stopBy:
+                any:
+                  - kind: statement_block
+                  - kind: arguments

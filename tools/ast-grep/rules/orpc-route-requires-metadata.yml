@@ -1,0 +1,44 @@
+id: orpc-route-requires-metadata
+language: TypeScript
+severity: error
+message: Declare method, path, summary, and description on each oRPC route or contract.
+files:
+  - apps/server/src/orpc/routes/**/*.ts
+  - apps/server/src/orpc/contracts/**/*.ts
+ignores:
+  - apps/server/src/orpc/**/*.test.ts
+rule:
+  pattern: $PROCEDURE.route($CONFIG)
+constraints:
+  CONFIG:
+    kind: object
+    not:
+      all:
+        - has:
+            any:
+              - pattern:
+                  context: "{ method: $METHOD }"
+                  selector: pair
+              - kind: shorthand_property_identifier
+                regex: ^method$
+        - has:
+            any:
+              - pattern:
+                  context: "{ path: $PATH }"
+                  selector: pair
+              - kind: shorthand_property_identifier
+                regex: ^path$
+        - has:
+            any:
+              - pattern:
+                  context: "{ summary: $SUMMARY }"
+                  selector: pair
+              - kind: shorthand_property_identifier
+                regex: ^summary$
+        - has:
+            any:
+              - pattern:
+                  context: "{ description: $DESCRIPTION }"
+                  selector: pair
+              - kind: shorthand_property_identifier
+                regex: ^description$

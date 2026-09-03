@@ -5,6 +5,7 @@ import {
   BottleImageTooLargeError,
   updateBottleImageForUser,
 } from "@peated/server/lib/updateBottleImage";
+import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -14,12 +15,13 @@ import {
   BottleImageLicenseSchema,
   BottleImageSourceUrlSchema,
 } from "@peated/server/schemas";
+import { ImageUploadSchema } from "@peated/server/schemas/images";
 import { z } from "zod";
 
 const InputSchema = z
   .object({
     bottle: z.coerce.number(),
-    file: z.instanceof(Blob).optional(),
+    file: ImageUploadSchema.optional(),
     sourceUrl: BottleImageSourceUrlSchema.unwrap().removeDefault().optional(),
     license: BottleImageLicenseSchema.unwrap().removeDefault().optional(),
   })
@@ -41,9 +43,9 @@ export default procedure
     path: "/bottles/{bottle}/image",
     summary: "Update bottle image",
     description:
-      "Upload a bottle image or update its source and license. Requires authentication and ownership or admin privileges",
+      "Upload a bottle image or update its source and license. Requires the bottle creator, a moderator, or an administrator.",
     spec: (spec) => ({
-      ...spec,
+      ...imageUploadSpec(spec),
       operationId: "updateBottleImage",
     }),
   })

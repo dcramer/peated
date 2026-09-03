@@ -12,6 +12,8 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/pause",
     summary: "Pause a scrape source",
+    description:
+      "Disable imports for a configured price or review source. Requires administrator privileges.",
     operationId: "pauseScrapeSource",
   })
   .input(z.object({ id: z.number().int().positive() }).strict())

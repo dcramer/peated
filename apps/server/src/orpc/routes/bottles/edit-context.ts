@@ -84,7 +84,7 @@ export default procedure
     path: "/bottles/{bottle}/edit-context",
     summary: "Get bottle edit context",
     description:
-      "Load group-owned shared choices and Bottle-owned exact values for moderator editing",
+      "Get shared Bottle Group fields and fields specific to this bottle for editing. Requires moderator privileges.",
     spec: (spec) => ({
       ...spec,
       operationId: "getBottleEditContext",

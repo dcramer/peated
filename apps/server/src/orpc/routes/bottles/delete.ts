@@ -48,7 +48,7 @@ export default procedure
     path: "/bottles/{bottle}",
     summary: "Delete bottle",
     description:
-      "Permanently delete an unused bottle and create a tombstone record. Requires admin privileges",
+      "Delete an unused bottle while reserving its public ID so it cannot be reused. Requires administrator privileges.",
     spec: (spec) => ({
       ...spec,
       operationId: "deleteBottle",

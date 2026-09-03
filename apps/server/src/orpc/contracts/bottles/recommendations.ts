@@ -8,7 +8,7 @@ export default contract
     path: "/bottles/{bottle}/recommendations",
     summary: "Get bottle recommendations",
     description:
-      "Recommend bottles based on preferences from the Peated community",
+      "Recommend bottles using shared member preferences from Outstanding and Unicorn tastings. Review scores do not affect recommendations.",
     spec: (spec) => ({
       ...spec,
       operationId: "listBottleRecommendations",

@@ -27,7 +27,7 @@ export default procedure
     path: "/bottle-references",
     summary: "List bottle references",
     description:
-      "Retrieve bottle references with filtering by bottle, unknown status, and search support",
+      "List reference names used to match imported prices and reviews to bottles. Requires moderator privileges.",
     operationId: "listBottleReferences",
   })
   .input(

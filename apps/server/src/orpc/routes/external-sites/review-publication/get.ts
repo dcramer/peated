@@ -19,7 +19,9 @@ export default procedure
   .route({
     method: "GET",
     path: "/admin/external-sites/{site}/review-publication",
-    summary: "Retrieve external review publication",
+    summary: "Get external review publication status",
+    description:
+      "Get whether reviews from an external site are approved for public display. Requires moderator privileges.",
     operationId: "retrieveExternalReviewPublication",
   })
   .input(z.object({ site: ExternalSiteKeySchema }).strict())

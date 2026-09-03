@@ -19,7 +19,7 @@ export default procedure
     path: "/bottle-references",
     summary: "Upsert bottle reference",
     description:
-      "Create or update a bottle reference and associate it with a bottle. Updates related prices and externalReviews. Requires moderator privileges",
+      "Create or assign a reference name to a bottle. Update related store prices and external reviews. Requires moderator privileges.",
     operationId: "upsertBottleReference",
   })
   .input(BottleReferenceSchema.strict())

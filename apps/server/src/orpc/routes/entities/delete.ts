@@ -21,7 +21,7 @@ export default procedure
     path: "/entities/{entity}",
     summary: "Delete entity",
     description:
-      "Delete an Entity and create a tombstone. Removes its aliases and references. Requires administrator privileges.",
+      "Delete an entity and its aliases and reference names while reserving its public ID so it cannot be reused. Requires administrator privileges.",
     operationId: "deleteEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))

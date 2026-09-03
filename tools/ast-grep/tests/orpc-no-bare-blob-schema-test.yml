@@ -1,0 +1,10 @@
+id: orpc-no-bare-blob-schema
+valid:
+  - "z.object({ file: ImageUploadSchema })"
+  - "z.object({ file: ImageUploadSchema.optional() })"
+  - "z.instanceof(Date)"
+  - "file instanceof Blob"
+invalid:
+  - "z.object({ file: z.instanceof(Blob) })"
+  - "z.instanceof(Blob).optional()"
+  - "schema.instanceof(Blob)"

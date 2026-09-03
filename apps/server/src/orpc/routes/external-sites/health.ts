@@ -272,6 +272,8 @@ export const healthList = procedure
     method: "GET",
     path: "/admin/external-sites",
     summary: "List external site health",
+    description:
+      "List import status, recent runs, and bottle matching counts for external sites. Includes reviews awaiting publication. Requires administrator privileges.",
     operationId: "listExternalSiteHealth",
   })
   .input(inputSchema)
@@ -307,7 +309,9 @@ export const healthDetails = procedure
   .route({
     method: "GET",
     path: "/admin/external-sites/{site}/health",
-    summary: "Retrieve external site health",
+    summary: "Get external site health",
+    description:
+      "Get import status, recent runs, and bottle matching counts for one external site. Includes reviews awaiting publication. Requires administrator privileges.",
     operationId: "retrieveExternalSiteHealth",
   })
   .input(z.object({ site: ExternalSiteKeySchema }))

@@ -18,6 +18,8 @@ export default procedure
     method: "DELETE",
     path: "/bottles/{bottle}/member-review/image",
     summary: "Delete my member review image",
+    description:
+      "Remove the image from the signed-in member's existing review. Requires authentication and acceptance of the Terms of Service.",
     operationId: "deleteMemberReviewImage",
   })
   .input(z.object({ bottle: z.coerce.number().int().positive() }))

@@ -14,6 +14,8 @@ export default procedure
     method: "GET",
     path: "/admin/oauth-clients/{clientId}",
     summary: "Get OAuth client",
+    description:
+      "Get an application's registration, allowed redirect URLs, and active status. Requires administrator privileges.",
     operationId: "getOAuthClient",
   })
   .input(z.object({ clientId: z.string().min(1) }))

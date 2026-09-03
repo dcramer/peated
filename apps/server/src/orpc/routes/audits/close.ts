@@ -21,6 +21,8 @@ export default procedure
     method: "POST",
     path: "/audits/{audit}/close",
     summary: "Close an audit",
+    description:
+      "Close a bottle audit with a reason and optional note. Return a conflict if it is already closed, has pending or applying changes, or has no remaining findings or blocked, stale, or failed changes to close. Requires moderator privileges.",
     spec: (spec) => ({ ...spec, operationId: "closeAudit" }),
   })
   .input(InputSchema)

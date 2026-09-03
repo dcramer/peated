@@ -29,7 +29,9 @@ const TastingBandSchema = z
   .enum(RATING_BAND_IDS)
   .nullable()
   .default(null)
-  .describe("Optional rating band for this tasting");
+  .describe(
+    "Rating category for this tasting: Mediocre, Good, Very good, Outstanding, or Unicorn. Stored as a category, not a numeric review score.",
+  );
 const TastingTagsSchema = z
   .array(z.string())
   .default([])
@@ -47,7 +49,9 @@ const TastingServingStyleSchema = ServingStyleEnum.nullable()
 const TastingImageInputSchema = z
   .null()
   .optional()
-  .describe("Optional image upload for the tasting");
+  .describe(
+    "Set to `null` to remove the tasting image when updating. Use the tasting image endpoint to upload a photo.",
+  );
 
 export const TastingSchema = z.object({
   id: z.number().describe("Unique identifier for the tasting"),

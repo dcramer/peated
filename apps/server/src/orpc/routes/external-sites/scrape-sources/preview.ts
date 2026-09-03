@@ -18,6 +18,8 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/revisions/{revisionId}/preview",
     summary: "Test one parsing-rule revision",
+    description:
+      "Queue a preview of a saved parsing-rule revision and return the run to track. Requires administrator privileges.",
     operationId: "previewScrapeSourceRevision",
   })
   .input(

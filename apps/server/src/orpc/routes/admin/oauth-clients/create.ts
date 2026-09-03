@@ -16,6 +16,8 @@ export default procedure
     method: "POST",
     path: "/admin/oauth-clients",
     summary: "Register OAuth client",
+    description:
+      "Register an application with its allowed redirect URLs and return its client ID. Requires administrator privileges.",
     operationId: "createOAuthClient",
   })
   .input(OAuthClientInputSchema)

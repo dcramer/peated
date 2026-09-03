@@ -15,6 +15,8 @@ export default procedure
     method: "POST",
     path: "/admin/scrape-sources/{id}/suggest",
     summary: "Ask AI to suggest parsing rules",
+    description:
+      "Queue AI suggestions for a source's parsing rules and return the run to track. Requires administrator privileges.",
     operationId: "suggestScrapeSourceRevision",
   })
   .input(z.object({ id: z.number().int().positive() }).strict())

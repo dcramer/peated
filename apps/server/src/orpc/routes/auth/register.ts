@@ -24,9 +24,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/auth/register",
-    summary: "User registration",
+    summary: "Register an account",
     description:
-      "Register a new user account with username, email, and password",
+      "Create an account with a password or passkey. Requires acceptance of the Terms of Service.",
     spec: (spec) => ({
       ...spec,
       operationId: "register",
@@ -36,16 +36,29 @@ export default procedure
     z.object({
       username: z.string().toLowerCase(),
       email: z.string().email().toLowerCase(),
-      password: z.string().optional(),
+      password: z
+        .string()
+        .optional()
+        .describe(
+          "Password for the new account. Required when not registering with a passkey.",
+        ),
       passkeyResponse: z
         .any()
         .optional()
-        .describe("WebAuthn registration response"),
+        .describe(
+          "WebAuthn registration response. Requires `signedChallenge`.",
+        ),
       signedChallenge: z
         .string()
         .optional()
-        .describe("Signed challenge from passkey options"),
-      tosAccepted: z.boolean().describe("User accepted Terms of Service"),
+        .describe(
+          "Signed challenge from `/auth/register/challenge`. Required with `passkeyResponse`.",
+        ),
+      tosAccepted: z
+        .boolean()
+        .describe(
+          "Must be `true` to confirm acceptance of the Terms of Service",
+        ),
     }),
   )
   .output(AuthSchema)

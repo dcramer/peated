@@ -1,0 +1,19 @@
+id: orpc-contract-requires-output
+language: TypeScript
+severity: error
+message: Declare an output schema on each shared oRPC contract.
+files:
+  - apps/server/src/orpc/contracts/**/*.ts
+ignores:
+  - apps/server/src/orpc/contracts/**/*.test.ts
+rule:
+  all:
+    - pattern: $CONTRACT.route($CONFIG)
+    - not:
+        inside:
+          pattern: $CHAIN.output($SCHEMA)
+          stopBy:
+            any:
+              - kind: arguments
+              - kind: lexical_declaration
+              - kind: statement_block

@@ -20,7 +20,14 @@ const InputSchema = z
     site: ExternalSiteKeySchema,
     schedule: z
       .object({
-        runEvery: z.number().int().positive().nullable(),
+        runEvery: z
+          .number()
+          .int()
+          .positive()
+          .nullable()
+          .describe(
+            "Interval in minutes between automatic imports. Set to `null` to disable the schedule.",
+          ),
       })
       .strict(),
   })
@@ -54,6 +61,8 @@ export default procedure
     method: "PUT",
     path: "/admin/external-sites/{site}/schedule",
     summary: "Update external site schedule",
+    description:
+      "Set the interval for automatic imports or disable the schedule. Enabling a schedule makes the site due for a run immediately. Requires administrator privileges.",
     operationId: "updateExternalSiteSchedule",
   })
   .input(InputSchema)

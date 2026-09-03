@@ -19,6 +19,8 @@ export default procedure
     method: "GET",
     path: "/admin/scrape-sources",
     summary: "List scrape sources",
+    description:
+      "List configured price and review sources with their parsing-rule revisions and latest setup status. Requires administrator privileges.",
     operationId: "listScrapeSources",
   })
   .input(z.object({ site: ExternalSiteKeySchema.optional() }).strict())

@@ -12,6 +12,7 @@ const SmwsDistillerSchema = EntitySchema.extend({
 
 export default contract
   .route({
+    tags: ["smws"],
     method: "GET",
     path: "/smws/distillers",
     summary: "List SMWS distillers",

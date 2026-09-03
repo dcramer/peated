@@ -3,12 +3,14 @@ import { db } from "@peated/server/db";
 import { memberReviews } from "@peated/server/db/schema";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
+import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { MemberReviewSchema } from "@peated/server/schemas";
+import { ImageUploadSchema } from "@peated/server/schemas/images";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
 import { and, eq, sql } from "drizzle-orm";
@@ -19,15 +21,18 @@ export default procedure
   .use(requireAuth)
   .use(requireTosAccepted)
   .route({
+    spec: imageUploadSpec,
     method: "POST",
     path: "/bottles/{bottle}/member-review/image",
     summary: "Update my member review image",
+    description:
+      "Upload an image for the signed-in member's existing review. Replace any previous image. Requires authentication and acceptance of the Terms of Service.",
     operationId: "updateMemberReviewImage",
   })
   .input(
     z.object({
       bottle: z.coerce.number().int().positive(),
-      file: z.instanceof(Blob),
+      file: ImageUploadSchema,
     }),
   )
   .output(MemberReviewSchema)

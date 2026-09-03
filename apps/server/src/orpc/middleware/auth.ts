@@ -1,9 +1,11 @@
+import { customOpenAPIOperation } from "@orpc/openapi";
 import { base } from "..";
 import type { Context } from "../context";
 
-export const requireAuth = base
-  .$context<Context>()
-  .middleware(({ context, next, errors }) => {
+// The auth middleware owns the OpenAPI authentication requirement so route
+// documentation stays aligned with the permission check.
+export const requireAuth = customOpenAPIOperation(
+  base.$context<Context>().middleware(({ context, next, errors }) => {
     if (!context.user) {
       throw errors.UNAUTHORIZED();
     }
@@ -13,11 +15,12 @@ export const requireAuth = base
         user: context.user,
       },
     });
-  });
+  }),
+  { security: [{ bearerAuth: [] }] },
+);
 
-export const requireVerified = base
-  .$context<Context>()
-  .middleware(({ context, next, errors }) => {
+export const requireVerified = customOpenAPIOperation(
+  base.$context<Context>().middleware(({ context, next, errors }) => {
     if (!context.user?.verified) {
       throw errors.UNAUTHORIZED();
     }
@@ -27,11 +30,14 @@ export const requireVerified = base
         user: context.user,
       },
     });
-  });
+  }),
+  { security: [{ bearerAuth: [] }] },
+);
 
-export const requireAdmin = base
-  .$context<Context>()
-  .middleware(({ context, next, errors }) => {
+// Permission middleware labels staff operations, including routes outside /admin.
+// Peated uses its own flag because Scalar hides operations marked x-internal.
+export const requireAdmin = customOpenAPIOperation(
+  base.$context<Context>().middleware(({ context, next, errors }) => {
     if (!context.user?.admin) {
       throw errors.UNAUTHORIZED();
     }
@@ -42,11 +48,20 @@ export const requireAdmin = base
         user: context.user,
       },
     });
-  });
+  }),
+  (spec) => ({
+    ...spec,
+    security: [{ bearerAuth: [] }],
+    "x-peated-internal": true,
+    "x-badges": [
+      { name: "Internal", position: "before" },
+      { name: "Admin only", position: "before" },
+    ],
+  }),
+);
 
-export const requireMod = base
-  .$context<Context>()
-  .middleware(({ context, next, errors }) => {
+export const requireMod = customOpenAPIOperation(
+  base.$context<Context>().middleware(({ context, next, errors }) => {
     if (!context.user?.admin && !context.user?.mod) {
       throw errors.UNAUTHORIZED();
     }
@@ -56,11 +71,20 @@ export const requireMod = base
         user: context.user,
       },
     });
-  });
+  }),
+  (spec) => ({
+    ...spec,
+    security: [{ bearerAuth: [] }],
+    "x-peated-internal": true,
+    "x-badges": [
+      { name: "Internal", position: "before" },
+      { name: "Moderator or admin", position: "before" },
+    ],
+  }),
+);
 
-export const requireTosAccepted = base
-  .$context<Context>()
-  .middleware(({ context, next, errors }) => {
+export const requireTosAccepted = customOpenAPIOperation(
+  base.$context<Context>().middleware(({ context, next, errors }) => {
     // Explicit auth check for safety (this middleware should always be used with requireAuth)
     if (!context.user) {
       throw errors.UNAUTHORIZED();
@@ -76,4 +100,6 @@ export const requireTosAccepted = base
         user: context.user,
       },
     });
-  });
+  }),
+  { security: [{ bearerAuth: [] }] },
+);

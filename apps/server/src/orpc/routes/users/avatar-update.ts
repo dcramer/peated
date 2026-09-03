@@ -5,11 +5,13 @@ import { users } from "@peated/server/db/schema";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
+import { ImageUploadSchema } from "@peated/server/schemas/images";
 import { eq } from "drizzle-orm";
 import { Readable } from "node:stream";
 import { z } from "zod";
@@ -18,6 +20,7 @@ export default procedure
   .use(requireAuth)
   .use(requireTosAccepted)
   .route({
+    spec: imageUploadSpec,
     method: "POST",
     path: "/users/{user}/avatar",
     summary: "Update user avatar",
@@ -28,7 +31,7 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.coerce.number(), z.literal("me")]),
-      file: z.instanceof(Blob),
+      file: ImageUploadSchema,
     }),
   )
   .output(

@@ -10,8 +10,14 @@ export default procedure
     path: "/entities/{entity}/references",
     summary: "List Entity references",
     description:
-      "List the names that can match input to an Entity automatically.",
+      "Inspect names used for automatic entity matching. Intended for internal catalog maintenance; use entity aliases for names shown to users.",
     operationId: "listEntityReferences",
+    // Entity references serve matching maintenance; aliases serve public display.
+    spec: (spec) => ({
+      ...spec,
+      "x-peated-internal": true,
+      "x-badges": [{ name: "Internal", position: "before" }],
+    }),
   })
   .input(
     z.object({

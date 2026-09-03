@@ -33,11 +33,15 @@ export const CursorSchema = z.object({
   nextCursor: z
     .number()
     .nullable()
-    .describe("Cursor for the next page of results"),
+    .describe(
+      "Next page number to pass as `cursor`, or `null` when there is no next page",
+    ),
   prevCursor: z
     .number()
     .nullable()
-    .describe("Cursor for the previous page of results"),
+    .describe(
+      "Previous page number to pass as `cursor`, or `null` when there is no previous page",
+    ),
 });
 
 // Generic HTTP response helpers shared across endpoints

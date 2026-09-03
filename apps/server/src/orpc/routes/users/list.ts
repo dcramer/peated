@@ -18,7 +18,7 @@ export default procedure
     path: "/users",
     summary: "List users",
     description:
-      "Search and list users with pagination support. Requires authentication",
+      "Search for members by username or email. Only administrators can list users without a search query; other members receive an empty list. Requires authentication.",
     operationId: "listUsers",
   })
   .input(

@@ -70,14 +70,20 @@ Most routes define their request, response, and handler in one file. If an
 endpoint also has a mock handler, move the shared request and response
 definition to `orpc/contracts`. Both handlers must use that contract.
 
-A contract file can import schemas and constants. It must not import database,
-configuration, external service, or handler code. This keeps the mock API
-independent of the real API.
+A contract file can import schemas, constants, pure helpers, and types. It must
+not load database, configuration, worker, external service, or handler code.
+This keeps the mock API independent of the real API.
 
 ```ts
 // contracts/bottles/list.ts
 export default contract
-  .route({ method: "GET", path: "/bottles" })
+  .route({
+    method: "GET",
+    path: "/bottles",
+    summary: "List bottles",
+    description: "Find bottles by name and catalog filters.",
+    operationId: "listBottles",
+  })
   .input(BottleListInputSchema)
   .output(BottleListOutputSchema);
 
@@ -115,7 +121,13 @@ Chain route definitions in this order:
 ```ts
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/ping", summary: "Health check" })
+  .route({
+    method: "GET",
+    path: "/ping",
+    summary: "Check API availability",
+    description: "Confirm that the API can respond to requests.",
+    operationId: "ping",
+  })
   .input(z.object({}))
   .output(z.object({ ping: z.literal("pong") }))
   .handler(() => ({ ping: "pong" }));
@@ -123,7 +135,8 @@ export default procedure
 
 ## 4. OpenAPI `operationId` Convention
 
-Routes should explicitly specify `operationId` values with the `spec` callback.
+Routes must explicitly specify `operationId`, either directly in `.route()` or
+in its `spec` callback.
 
 ### Naming Convention
 
@@ -163,6 +176,7 @@ export default procedure.route({
   method: "GET",
   path: "/bottles",
   summary: "List bottles",
+  description: "Find bottles by name and catalog filters.",
   spec: (spec) => ({
     ...spec,
     operationId: "listBottles",
@@ -197,6 +211,8 @@ export default procedure.route({
 ### Naming
 
 - Use descriptive nouns such as `bottle` and `tasting`.
+- Use `{parameter}` in paths. Express-style `:parameter` segments do not define
+  oRPC path parameters.
 - Do not reuse a path param name for a body or query field.
 
 ### Coercion and Validation
@@ -243,6 +259,12 @@ filler.
   `Page number to return`.
 - Describe the public contract. Do not mention database columns, framework
   types, handler names, or other implementation details.
+- Every operation needs a summary, description, grouping tag, and unique
+  operation ID. The OpenAPI tests check the published `/spec.json` response.
+- For replacement operations, explain what omitted fields do. For background
+  work, say when the endpoint queues a job and how callers can track it.
+- Explain whether a missing resource returns `null` or an error when that
+  distinction affects the caller.
 
 Examples:
 
@@ -252,13 +274,28 @@ Examples:
 | Region       | Filter by region slug or numeric ID. A slug requires `country`. |
 | Sort value   | Prefix a value with `-` for descending order.                   |
 
+### Image Uploads
+
+Use `ImageUploadSchema` from `schemas/images` for image file inputs. It accepts
+`Blob` values and documents a binary file in a `multipart/form-data` request.
+Use `imageUploadSpec` from `openapi/image-upload` in the route's `spec` callback
+to advertise multipart uploads. It preserves JSON for metadata changes when the
+file is optional. Keep size and permission checks in the handler. A bare `z.instanceof(Blob)`
+cannot be represented by the OpenAPI schema converter.
+
 ## 7. Error Handling
 
 `procedure` injects an `errors` helper with canonical REST errors like `NOT_FOUND`, `CONFLICT`, and `UNAUTHORIZED`. Prefer these over manual `ORPCError` construction.
 
 ```ts
 export default procedure
-  .route({ method: "GET", path: "/tastings/{tasting}" })
+  .route({
+    method: "GET",
+    path: "/tastings/{tasting}",
+    summary: "Get tasting details",
+    description: "Get one tasting that the caller can view.",
+    operationId: "getTasting",
+  })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(TastingSchema)
   .handler(async ({ input, context, errors }) => {
@@ -279,10 +316,41 @@ If you truly need custom behavior, fall back to `new ORPCError(code, { message }
 
 ## 8. Authentication Middleware
 
+The shared authentication middleware also declares required bearer
+authentication in OpenAPI. Use it for protected operations, including routes
+implemented from shared contracts. Public operations inherit optional bearer
+authentication so callers can request personalized results. Describe additional
+role, ownership, verification, and Terms of Service requirements in the operation
+description.
+
+### Internal Operations
+
+Mark operations intended only for administration, moderation, or catalog
+maintenance with `x-peated-internal: true`. Keep them in `/spec.json` and in the
+API reference. Scalar displays the accompanying `x-badges` labels: `Internal`
+and the required role, where applicable.
+
+`requireAdmin` and `requireMod` add these annotations automatically, including
+operations outside `/admin`. For internal tools without a role restriction,
+add the flag and `Internal` badge in the route's `spec` callback. These labels
+describe the intended audience; they do not enforce permissions. Do not use
+`x-internal` or `x-scalar-ignore`, which hide operations from Scalar.
+
+Keep operations available to ordinary members public, including account
+management, bottle entry, tastings, reviews, and collections. When an operation
+also offers administrator or moderator options, document those restrictions on
+the operation or parameters instead of marking the whole operation internal.
+
 ```ts
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/auth/me" })
+  .route({
+    method: "GET",
+    path: "/auth/me",
+    summary: "Get current user",
+    description: "Get the signed-in member's account details.",
+    operationId: "getCurrentUser",
+  })
   .output(z.object({ user: UserSchema }))
   .handler(({ context }) => ({
     user: serialize(UserSerializer, context.user, context.user),
@@ -315,3 +383,20 @@ Route-specific expectations:
 
 - Fetch `limit + 1` rows to detect `nextCursor`.
 - Remove the extra row before serialization.
+
+## 11. Automated Checks
+
+`pnpm ast-grep:lint` runs the API rules as part of `pnpm lint`. Rule fixtures
+live in `tools/ast-grep/tests` and run with `pnpm ast-grep:test`.
+
+The rules check route metadata in both handlers and shared contracts, output
+schemas, path parameter syntax, bare Blob schemas, imports of runtime modules
+in contracts, and annotations that hide operations. They allow shorthand
+metadata properties, pure helper imports, and type-only imports. Keep complete
+metadata beside the route declaration or in its shared builder.
+
+The OpenAPI tests check the assembled `/spec.json`, including metadata supplied
+through variables, unique operation IDs, inherited tags, authentication,
+internal badges, and upload formats. Source lint does not resolve imports or
+evaluate route builders. Permission correctness and description quality still
+need review.

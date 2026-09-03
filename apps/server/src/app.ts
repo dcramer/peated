@@ -250,7 +250,7 @@ export const app = honoApp
       <!doctype html>
       <html>
         <head>
-          <title>My Client</title>
+          <title>Peated API</title>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" type="image/svg+xml" href="https://orpc.unnoq.com/icon.svg" />
@@ -262,13 +262,6 @@ export const app = honoApp
           <script>
             Scalar.createApiReference('#app', {
               url: '/spec.json',
-              authentication: {
-                securitySchemes: {
-                  bearerAuth: {
-                    token: 'default-token',
-                  },
-                },
-              },
             })
           </script>
         </body>
@@ -281,9 +274,22 @@ export const app = honoApp
         info: {
           title: "Peated API",
           version: "1.0.0",
-          description: "The Peated API",
+          description:
+            "Access Peated's whisky catalog, tastings, and reviews. Public reads allow anonymous access. Send an access token in the Authorization header as `Bearer <token>` for account actions and personalized results. Authenticated requests outside `/auth/` require acceptance of the Terms of Service. Operations marked Internal support Peated administration, moderation, or catalog maintenance and are not intended for end-user integrations. They remain documented with `x-peated-internal: true` and visible badges. Role and ownership restrictions are described on each operation.",
         },
         servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
+        security: [{}, { bearerAuth: [] }],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+              description:
+                "Access token returned by sign-in or OAuth token exchange.",
+            },
+          },
+        },
         // Promote shared schemas into OpenAPI components and enable $ref reuse.
         // Note: If a schema differs between input/output, set strategy accordingly.
         // Common component schemas for reuse via $ref across the spec

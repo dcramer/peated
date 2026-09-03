@@ -1,25 +1,42 @@
+import { app } from "@peated/server/app";
 import { db } from "@peated/server/db";
 import { passkeys } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("PATCH /auth/passkey/:passkeyId", () => {
-  test("updates nickname for own passkey", async ({ fixtures }) => {
+describe("PATCH /auth/passkey/{passkeyId}", () => {
+  test("updates nickname for own passkey over HTTP", async ({ fixtures }) => {
     const user = await fixtures.User();
     const passkey = await fixtures.Passkey({
       userId: user.id,
       nickname: "Old Name",
     });
 
-    const result = await routerClient.auth.passkey.update(
-      { passkeyId: passkey.id, nickname: "New Name" },
+    const token = await fixtures.AuthToken({ user });
+    const response = await app.request(
+      `/v1/auth/passkey/${passkey.id}`,
       {
-        context: { user },
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nickname: "New Name" }),
+      },
+      {
+        incoming: {
+          socket: {
+            remoteAddress: "127.0.0.1",
+            remotePort: 12345,
+            remoteFamily: "IPv4",
+          },
+        },
       },
     );
 
-    expect(result.ok).toBe(true);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
 
     const [updated] = await db
       .select()

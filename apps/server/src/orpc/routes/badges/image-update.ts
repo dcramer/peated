@@ -5,8 +5,10 @@ import { badges } from "@peated/server/db/schema";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
+import { ImageUploadSchema } from "@peated/server/schemas/images";
 import { eq } from "drizzle-orm";
 import { Readable } from "node:stream";
 import { z } from "zod";
@@ -14,6 +16,7 @@ import { z } from "zod";
 export default procedure
   .use(requireAdmin)
   .route({
+    spec: imageUploadSpec,
     method: "POST",
     path: "/badges/{badge}/image",
     summary: "Update badge image",
@@ -24,7 +27,7 @@ export default procedure
   .input(
     z.object({
       badge: z.coerce.number(),
-      file: z.instanceof(Blob),
+      file: ImageUploadSchema,
     }),
   )
   .output(

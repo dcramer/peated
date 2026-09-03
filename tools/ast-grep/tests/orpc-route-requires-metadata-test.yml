@@ -1,0 +1,14 @@
+id: orpc-route-requires-metadata
+valid:
+  - |
+    procedure.route({ method: "GET", path: "/items", summary: "List items", description: "List available items." })
+  - contract.route({ method, path, summary, description })
+  - contract.route(metadata)
+invalid:
+  - 'procedure.route({ path: "/items", summary: "List items", description: "List available items." })'
+  - 'contract.route({ method: "GET", summary: "List items", description: "List available items." })'
+  - 'procedure.route({ method: "GET", path: "/items", description: "List available items." })'
+  - 'contract.route({ method: "GET", path: "/items", summary: "List items" })'
+  - "contract.route({ method, path, summary })"
+  - 'procedure.use(middleware({ description: "Unrelated" })).route({ method, path, summary })'
+  - 'contract.route({ method, path, summary, spec: { description: "Nested value" } })'

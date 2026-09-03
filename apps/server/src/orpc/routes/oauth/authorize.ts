@@ -12,6 +12,8 @@ export default procedure
     method: "POST",
     path: "/oauth/authorization-code",
     summary: "Approve OAuth authorization request",
+    description:
+      "Issue a one-time authorization code for an approved application request. Return the code, registered redirect URL, and request state as separate fields. Requires authentication.",
     operationId: "createOAuthAuthorizationCode",
   })
   .input(OAuthAuthorizationRequestSchema)

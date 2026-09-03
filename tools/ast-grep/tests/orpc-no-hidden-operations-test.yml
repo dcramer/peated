@@ -1,0 +1,9 @@
+id: orpc-no-hidden-operations
+valid:
+  - 'const spec = { "x-peated-internal": true };'
+  - 'const description = "Do not use x-internal.";'
+invalid:
+  - 'const spec = { "x-internal": true };'
+  - "const spec = { 'x-scalar-ignore': true };"
+  - 'const spec = { "x-internal": false };'
+  - 'procedure.route({ spec: (spec) => ({ ...spec, "x-internal": true }) });'

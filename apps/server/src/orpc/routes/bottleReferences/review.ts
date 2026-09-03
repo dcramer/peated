@@ -18,7 +18,7 @@ export default procedure
     path: "/bottle-references/{reference}/review",
     summary: "Review a Bottle reference",
     description:
-      "Verify or quarantine one Bottle reference without changing existing consumers.",
+      "Mark a reference name as verified or exclude it from automatic matching. Existing bottle assignments on prices and reviews stay unchanged. Requires moderator privileges.",
     operationId: "reviewBottleReference",
   })
   .input(

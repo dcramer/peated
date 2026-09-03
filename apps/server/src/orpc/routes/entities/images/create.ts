@@ -3,6 +3,7 @@ import {
   EntityImageNotFoundError,
   EntityImageTooLargeError,
 } from "@peated/server/lib/entityImages";
+import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -11,6 +12,7 @@ import {
   EntityImageSchema,
   EntityImageSourceUrlSchema,
 } from "@peated/server/schemas";
+import { ImageUploadSchema } from "@peated/server/schemas/images";
 import { serialize } from "@peated/server/serializers";
 import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
 import { z } from "zod";
@@ -18,6 +20,7 @@ import { z } from "zod";
 export default procedure
   .use(requireMod)
   .route({
+    spec: imageUploadSpec,
     method: "POST",
     path: "/entities/{entity}/images",
     summary: "Add entity image",
@@ -28,7 +31,7 @@ export default procedure
   .input(
     z.object({
       entity: z.coerce.number(),
-      file: z.instanceof(Blob),
+      file: ImageUploadSchema,
       caption: EntityImageCaptionSchema,
       sourceUrl: EntityImageSourceUrlSchema,
       license: EntityImageLicenseSchema,

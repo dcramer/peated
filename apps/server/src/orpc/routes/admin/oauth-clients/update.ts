@@ -17,6 +17,8 @@ export default procedure
     method: "PATCH",
     path: "/admin/oauth-clients/{clientId}",
     summary: "Update OAuth client",
+    description:
+      "Change an application's name, allowed redirect URLs, or active status. Requires administrator privileges.",
     operationId: "updateOAuthClient",
   })
   .input(

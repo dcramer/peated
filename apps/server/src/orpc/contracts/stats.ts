@@ -3,6 +3,7 @@ import { contract } from "./base";
 
 export default contract
   .route({
+    tags: ["system"],
     method: "GET",
     path: "/stats",
     summary: "Get public statistics",

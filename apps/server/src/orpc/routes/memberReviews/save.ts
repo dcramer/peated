@@ -33,12 +33,21 @@ export default procedure
     method: "PUT",
     path: "/bottles/{bottle}/member-review",
     summary: "Save my member review",
+    description:
+      "Create or replace the signed-in member's review for one bottle. Each member can have one review per bottle. Omitted review fields reset to their defaults; the existing image remains unless a pending image is attached. Requires authentication and acceptance of the Terms of Service.",
     operationId: "saveMemberReview",
   })
   .input(
     MemberReviewInputSchema.extend({
       bottle: z.coerce.number().int().positive(),
-      pendingImageId: z.string().trim().min(1).optional(),
+      pendingImageId: z
+        .string()
+        .trim()
+        .min(1)
+        .optional()
+        .describe(
+          "Pending upload ID with purpose `photo_tasting_entry`. Image attachment is best-effort; the review remains saved if attaching the image fails.",
+        ),
     }),
   )
   .output(MemberReviewSchema)

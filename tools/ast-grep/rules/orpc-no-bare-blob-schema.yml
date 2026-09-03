@@ -1,0 +1,14 @@
+id: orpc-no-bare-blob-schema
+language: TypeScript
+severity: error
+message: Use ImageUploadSchema so image files have an OpenAPI representation.
+note: The shared schema in schemas/images owns the Blob-to-binary mapping. Use imageUploadSpec on the route to document multipart requests.
+files:
+  - apps/server/src/orpc/routes/**/*.ts
+  - apps/server/src/orpc/contracts/**/*.ts
+  - apps/server/src/schemas/**/*.ts
+ignores:
+  - apps/server/src/**/*.test.ts
+  - apps/server/src/schemas/images.ts
+rule:
+  pattern: $ZOD.instanceof(Blob)

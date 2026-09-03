@@ -16,7 +16,7 @@ export default procedure
     path: "/admin/moderation/tasks",
     summary: "List moderation tasks",
     description:
-      "Project outstanding human moderation decisions across their owning sources. Requires administrator privileges.",
+      "List pending moderation decisions for imported listings and catalog changes. Requires administrator privileges.",
     operationId: "listModerationTasks",
   })
   .input(ModerationTaskListInputSchema)
