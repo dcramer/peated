@@ -20,7 +20,8 @@ it in a script element.
 The request proxy resolves numeric bottle and series IDs, Peated IDs, and location
 slug casing before HTML streaming starts. Those redirects return HTTP 308 and
 preserve tabs and query parameters. Normal catalog slug URLs make no proxy API
-calls. Bottle and series page loaders use their existing memoized identity read
+calls. Bottle forms skip proxy identity reads for both numeric and slug URLs.
+Bottle and series page loaders use their existing memoized identity read
 to correct stale names and merged IDs; Next.js may deliver these redirects in the
 rendered response once streaming has started. Locations keep their existing
 country and region slug URLs. Unknown records follow the normal not-found path.

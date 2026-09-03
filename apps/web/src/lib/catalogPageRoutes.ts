@@ -14,9 +14,9 @@ export function matchBottleRoute(pathname: string) {
       ? { id: parsed.id, pathname, slug: null, suffix: "" }
       : null;
   }
-  // Web routing keeps removed bottle pages as direct 404s.
+  // Web routing canonicalizes public pages; forms and removed routes skip this lookup.
   const match =
-    /^\/bottles\/([1-9]\d*)(?:-([^/]+))?(\/(?:aliases|tastings|similar|prices|releases|edit|audit|merge|addTasting|addRelease)\/?|\/)?$/.exec(
+    /^\/bottles\/([1-9]\d*)(?:-([^/]+))?(\/(?:aliases|tastings|similar|prices|releases)\/?|\/)?$/.exec(
       pathname,
     );
   if (!match || !Number.isSafeInteger(Number(match[1]))) return null;

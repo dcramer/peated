@@ -33,17 +33,17 @@ describe("catalog page redirects", () => {
       "similar",
       "prices",
       "releases",
-      "edit",
-      "audit",
-      "merge",
-      "addTasting",
-      "addRelease",
     ]) {
       expect(matchBottleRoute(`/bottles/42-old/${suffix}`)?.suffix).toBe(
         `/${suffix}`,
       );
     }
     for (const suffix of [
+      "edit",
+      "audit",
+      "merge",
+      "addTasting",
+      "addRelease",
       "bottlings",
       "bottlings/new",
       "bottlings/9303",
