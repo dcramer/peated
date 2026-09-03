@@ -5,7 +5,6 @@ import {
   users,
 } from "@peated/server/db/schema";
 import {
-  coerceActivityDate,
   composeActivity,
   countPrimaryActivity,
   encodeActivityCursor,
@@ -23,8 +22,8 @@ import { and, desc, eq, lte, sql } from "drizzle-orm";
 
 type CollectionAddGroupRow = {
   collection: typeof collections.$inferSelect;
-  windowStart: Date | string;
-  windowEnd: Date | string;
+  windowStart: string;
+  windowEnd: string;
   totalItems: string;
 };
 
@@ -91,8 +90,8 @@ export default implement(userActivityListContract).handler(async function ({
     db
       .select({
         collection: collections,
-        windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
-        windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
+        windowStart: sql<string>`MIN(${collectionBottles.createdAt})::text`,
+        windowEnd: sql<string>`MAX(${collectionBottles.createdAt})::text`,
         totalItems: sql<string>`COUNT(${collectionBottles.id})`,
       })
       .from(collectionBottles)
@@ -119,8 +118,8 @@ export default implement(userActivityListContract).handler(async function ({
       (row: CollectionAddGroupRow): CollectionAddGroup => ({
         collection: row.collection,
         user,
-        windowStart: coerceActivityDate(row.windowStart),
-        windowEnd: coerceActivityDate(row.windowEnd),
+        windowStart: row.windowStart,
+        windowEnd: row.windowEnd,
         totalItems: Number(row.totalItems),
       }),
     ),

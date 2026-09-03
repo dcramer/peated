@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { collectionBottles, memberReviews } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 async function insertCollectionBottles(
@@ -15,6 +16,56 @@ async function insertCollectionBottles(
 }
 
 describe("GET /activity", () => {
+  for (const feed of ["global", "profile"] as const) {
+    test(`includes microsecond-precision additions in ${feed} feed previews`, async ({
+      fixtures,
+    }) => {
+      const user = await fixtures.User();
+      const collection = await fixtures.Collection({
+        name: "Library",
+        createdById: user.id,
+      });
+      const addedBottles = await Promise.all(
+        Array.from({ length: 6 }, () => fixtures.Bottle()),
+      );
+      await db.insert(collectionBottles).values(
+        addedBottles.map((bottle, index) => ({
+          collectionId: collection.id,
+          bottleId: bottle.id,
+          createdAt:
+            index === 0
+              ? sql`TIMESTAMP '2026-01-04 12:00:00.123456'`
+              : sql`TIMESTAMP '2026-01-03 12:00:00.123000' + ${index} * INTERVAL '1 microsecond'`,
+        })),
+      );
+
+      const result =
+        feed === "global"
+          ? await routerClient.activity.list({ filter: "global", limit: 10 })
+          : await routerClient.users.activity.list({
+              user: user.username,
+              limit: 10,
+            });
+
+      expect(result.results).toMatchObject([
+        {
+          type: "collection_add",
+          totalItems: 1,
+          createdAt: "2026-01-04T12:00:00.123Z",
+          items: [{ bottle: { id: addedBottles[0].id } }],
+        },
+        {
+          type: "collection_add",
+          totalItems: 5,
+          createdAt: "2026-01-03T12:00:00.123Z",
+          items: [5, 4, 3, 2].map((index) => ({
+            bottle: { id: addedBottles[index].id },
+          })),
+        },
+      ]);
+    });
+  }
+
   test("returns tastings and grouped collection additions", async ({
     fixtures,
   }) => {

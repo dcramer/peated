@@ -6,7 +6,6 @@ import {
   users,
 } from "@peated/server/db/schema";
 import {
-  coerceActivityDate,
   composeActivity,
   countPrimaryActivity,
   encodeActivityCursor,
@@ -31,8 +30,8 @@ type ActivityFilter = "global" | "friends" | "local";
 type CollectionAddGroupRow = {
   collection: typeof collections.$inferSelect;
   user: typeof users.$inferSelect;
-  windowStart: Date | string;
-  windowEnd: Date | string;
+  windowStart: string;
+  windowEnd: string;
   totalItems: string;
 };
 
@@ -126,8 +125,8 @@ export default implement(activityListContract).handler(async function ({
       .select({
         collection: collections,
         user: users,
-        windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
-        windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
+        windowStart: sql<string>`MIN(${collectionBottles.createdAt})::text`,
+        windowEnd: sql<string>`MAX(${collectionBottles.createdAt})::text`,
         totalItems: sql<string>`COUNT(${collectionBottles.id})`,
       })
       .from(collectionBottles)
@@ -157,8 +156,8 @@ export default implement(activityListContract).handler(async function ({
       (row: CollectionAddGroupRow): CollectionAddGroup => ({
         collection: row.collection,
         user: row.user,
-        windowStart: coerceActivityDate(row.windowStart),
-        windowEnd: coerceActivityDate(row.windowEnd),
+        windowStart: row.windowStart,
+        windowEnd: row.windowEnd,
         totalItems: Number(row.totalItems),
       }),
     ),
