@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { BottleList, type BottleListItem } from "@peated/web/components";
 import { RailListSection } from "./railListSection.stylex";
 
-/** Sidebar bottle lists use the standard three-line identity; build items with toBottleListItem. */
+/** Uses the compact sidebar identity; build items with toBottleListItem. */
 export function BottleRailSection({
   children,
   heading,
@@ -27,7 +27,12 @@ export function BottleRailSection({
       heading={heading}
       intro={intro}
     >
-      {items.length ? <BottleList ariaLabel={heading} items={items} /> : null}
+      {items.length ? (
+        <BottleList
+          ariaLabel={heading}
+          items={items.map((item) => ({ ...item, variant: "sidebar" }))}
+        />
+      ) : null}
       {children}
     </RailListSection>
   );

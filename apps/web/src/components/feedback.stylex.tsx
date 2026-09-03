@@ -148,6 +148,7 @@ type PlaceholderPreset =
   | "metadata"
   | "score"
   | "text"
+  | "smallThumbnail"
   | "thumbnail";
 
 type PlaceholderDelay = 0 | 1 | 2 | 3 | 4;
@@ -272,13 +273,16 @@ type LoadingRowCount = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 export type LoadingListProps = {
   label?: string;
   rows?: LoadingRowCount;
+  variant?: "standard" | "sidebar";
 };
 
-/** Reserves standard three-line row and bottle-thumbnail geometry while a list loads. */
+/** Reserves standard or compact sidebar row geometry while a list loads. */
 export function LoadingList({
   label = "Loading records",
   rows = 3,
+  variant = "standard",
 }: LoadingListProps) {
+  const sidebar = variant === "sidebar";
   return (
     <div
       aria-busy="true"
@@ -290,30 +294,37 @@ export function LoadingList({
         <div
           aria-hidden="true"
           key={index}
-          {...stylex.props(styles.loadingRow)}
+          {...stylex.props(
+            styles.loadingRow,
+            sidebar && styles.loadingSidebarRow,
+          )}
         >
           <LoadingPlaceholder
             delay={getPlaceholderDelay(index)}
-            preset="thumbnail"
+            preset={sidebar ? "smallThumbnail" : "thumbnail"}
           />
           <span {...stylex.props(styles.loadingCopy)}>
             <LoadingPlaceholder
               delay={getPlaceholderDelay(index + 1)}
-              preset="metadata"
+              preset={sidebar ? "text" : "metadata"}
             />
             <LoadingPlaceholder
               delay={getPlaceholderDelay(index + 1)}
-              preset="text"
+              preset={sidebar ? "metadata" : "text"}
             />
-            <LoadingPlaceholder
-              delay={getPlaceholderDelay(index + 2)}
-              preset="metadata"
-            />
+            {!sidebar ? (
+              <LoadingPlaceholder
+                delay={getPlaceholderDelay(index + 2)}
+                preset="metadata"
+              />
+            ) : null}
           </span>
-          <LoadingPlaceholder
-            delay={getPlaceholderDelay(index + 3)}
-            preset="score"
-          />
+          {!sidebar ? (
+            <LoadingPlaceholder
+              delay={getPlaceholderDelay(index + 3)}
+              preset="score"
+            />
+          ) : null}
         </div>
       ))}
     </div>
@@ -494,6 +505,11 @@ const styles = stylex.create({
       borderBottomWidth: 0,
     },
   },
+  loadingSidebarRow: {
+    gridTemplateColumns: "auto minmax(0, 1fr)",
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+  },
   loadingCopy: {
     display: "flex",
     minWidth: 0,
@@ -526,6 +542,10 @@ const styles = stylex.create({
     width: bottleThumbnailMetrics.width,
     height: bottleThumbnailMetrics.height,
   },
+  smallThumbnail: {
+    width: "32px",
+    height: "46px",
+  },
   score: {
     width: "46px",
     height: "20px",
@@ -557,6 +577,7 @@ const presets = {
   score: styles.score,
   text: styles.text,
   thumbnail: styles.thumbnail,
+  smallThumbnail: styles.smallThumbnail,
 } satisfies Record<PlaceholderPreset, stylex.StyleXStyles>;
 const delays = {
   0: styles.delay0,

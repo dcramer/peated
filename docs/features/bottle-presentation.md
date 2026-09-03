@@ -218,8 +218,10 @@ Do not rebuild these lines in a page-specific mapper:
 
 Missing facts do not create placeholder lines. Activity context, Library status,
 personal images, and actions belong to their owning view, not a competing bottle
-identity layout. Sidebar bottle lists use the same standard rows and thumbnail
-size. Primary page headings remain a separate display context.
+identity layout. Sidebar bottle lists use the shared sidebar variant with
+compact titles, smaller thumbnails, and trailing content below the identity.
+Recent tastings show the tasting date and rating instead of catalog facts.
+Primary page headings remain a separate display context.
 
 Picker options and selected bottles also use `BottleIdentityRow`. Build them
 with `toBottlePickerOption`; it retains the numeric database ID and removes
@@ -368,15 +370,15 @@ The components live in `apps/web/src/components/`, with stories beside them.
 Storybook's **Components / Bottles / Bottle Identity Row / Row Layouts** is the
 shared visual reference for desktop and phone layouts.
 
-| Need                        | Component                             | Responsibility                                                                                               |
-| --------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| One standard bottle row     | `BottleIdentityRow`                   | Full marketed name, provenance, release facts, thumbnail, and linked hit area.                               |
-| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name, smaller thumbnail, and a 44px hit area; long names truncate visually.                             |
-| Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                          |
-| Mixed activity              | `CommunityFeed`                       | Author, action, date, grouped bottles, scores, and review links; chooses compact rows for library additions. |
-| Selected bottle in a form   | `SelectedBottleSummary`               | Standard identity and optional change action.                                                                |
-| Sidebar bottle suggestions  | `pages/BottleRailSection`             | Standard BottleList rows with three identity lines, the shared thumbnail, and an optional section action.    |
-| Image within another layout | `BottleVisual`                        | Image sizing, white frame, missing-image glyph, and optional expansion.                                      |
+| Need                        | Component                             | Responsibility                                                                                                                          |
+| --------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| One standard bottle row     | `BottleIdentityRow`                   | Full marketed name, provenance, release facts, thumbnail, and linked hit area.                                                          |
+| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name, smaller thumbnail, and a 44px hit area; long names truncate visually.                                                        |
+| Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                                                     |
+| Mixed activity              | `CommunityFeed`                       | Author, action, date, grouped bottles, scores, and review links; chooses compact rows for library additions.                            |
+| Selected bottle in a form   | `SelectedBottleSummary`               | Standard identity and optional change action.                                                                                           |
+| Sidebar bottle suggestions  | `pages/BottleRailSection`             | Shared sidebar rows with compact two-line names, small thumbnails, trailing details below the identity, and an optional section action. |
+| Image within another layout | `BottleVisual`                        | Image sizing, white frame, missing-image glyph, and optional expansion.                                                                 |
 
 Use `toBottleListItem` from `apps/web/src/lib/bottleListItem.ts` for full API
 Bottles. For partial reads, `getBottleIdentityProps` supplies the name,
@@ -390,7 +392,10 @@ const item = toBottleListItem(bottle);
 <BottleIdentityRow {...item} variant="compact" />
 ```
 
-Both variants accept the full marketed name, including brand context. Compact
+All variants accept the full marketed name, including brand context. Sidebar
+rows use compact two-line titles and smaller thumbnails, omit membership icons,
+and place trailing dates, ratings, or actions below the identity. Recent tasting
+rows show tasting dates and ratings instead of catalog provenance and facts. Compact
 rows omit provenance, metadata, subtitles, membership status, and related-release
 links. The optional `end` slot remains available. `layout="cell"` fits the identity
 inside an existing table or selection control; it does not change content density.

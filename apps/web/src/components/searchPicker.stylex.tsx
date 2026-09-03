@@ -472,6 +472,8 @@ const styles = stylex.create({
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
   },
   selectedName: {
     overflow: "hidden",

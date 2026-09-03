@@ -91,6 +91,7 @@ export type SearchResultsProps = {
 /**
  * Presents search results without owning search, ranking, or navigation.
  * Bottle visuals use the standard row thumbnail; member visuals use Avatar.
+ * Default uses compact typeahead rows and group labels; database uses page headings.
  * Supply bottle titles from formatBottleDisplayName.
  */
 export function SearchResults({
@@ -251,11 +252,6 @@ function SearchResultsGroup({
   query: string;
   variant: "database" | "default";
 }) {
-  const remaining =
-    group.total === undefined
-      ? undefined
-      : Math.max(group.total - group.items.length, 0);
-
   return (
     <section
       aria-labelledby={`${optionIdPrefix ?? "search"}-group-${group.id}`}
@@ -266,38 +262,37 @@ function SearchResultsGroup({
           variant === "database" && styles.databaseGroupHeading,
         )}
       >
-        <div
-          {...stylex.props(
-            styles.groupName,
-            variant === "database" && styles.databaseGroupName,
+        <div {...stylex.props(styles.groupName)}>
+          {variant === "database" ? (
+            <SectionHeading
+              id={`${optionIdPrefix ?? "search"}-group-${group.id}`}
+            >
+              {group.label}
+            </SectionHeading>
+          ) : (
+            <span
+              id={`${optionIdPrefix ?? "search"}-group-${group.id}`}
+              {...stylex.props(foundationStyles.fieldLabel, styles.groupLabel)}
+            >
+              {group.label}
+            </span>
           )}
-        >
-          <SectionHeading
-            id={`${optionIdPrefix ?? "search"}-group-${group.id}`}
-          >
-            {group.label}
-          </SectionHeading>
         </div>
         {group.total !== undefined ? (
-          <span
-            {...stylex.props(
-              foundationStyles.metadata,
-              styles.groupCount,
-              variant === "database" && styles.databaseGroupCount,
-            )}
-          >
+          <span {...stylex.props(foundationStyles.metadata, styles.groupCount)}>
             {group.total.toLocaleString("en-US")}
           </span>
         ) : null}
-        {variant === "database" && group.moreHref ? (
+        {group.moreHref ? (
           <AppLink
+            aria-label={`See all ${group.total === undefined ? "" : `${group.total.toLocaleString("en-US")} `}${group.label.toLowerCase()}`}
             href={group.moreHref}
             {...stylex.props(
               foundationStyles.interactiveSmall,
-              styles.databaseMore,
+              styles.groupMore,
             )}
           >
-            See all {group.total?.toLocaleString("en-US")}
+            {group.moreLabel ?? "See all"} →
           </AppLink>
         ) : null}
       </div>
@@ -313,6 +308,7 @@ function SearchResultsGroup({
                 }
                 {...stylex.props(
                   styles.result,
+                  styles.bottleResult,
                   variant === "database" && styles.databaseResult,
                   item.id === activeId && styles.activeResult,
                 )}
@@ -324,6 +320,7 @@ function SearchResultsGroup({
                   imageUrl={item.visual.imageUrl}
                   name={item.title}
                   query={query}
+                  variant={variant === "database" ? "standard" : "search"}
                   onClick={(event) => {
                     if (onItemSelect) {
                       event.preventDefault();
@@ -361,7 +358,12 @@ function SearchResultsGroup({
                 <span {...stylex.props(styles.copy)}>
                   <strong
                     title={item.title}
-                    {...stylex.props(foundationStyles.rowTitle, styles.title)}
+                    {...stylex.props(
+                      variant === "database"
+                        ? foundationStyles.rowTitle
+                        : foundationStyles.compactRowTitle,
+                      styles.title,
+                    )}
                   >
                     <MatchedText query={query} text={item.title} />
                     {item.isFollowing ? (
@@ -395,19 +397,6 @@ function SearchResultsGroup({
           </li>
         ))}
       </ul>
-      {group.moreHref && variant === "default" ? (
-        <AppLink
-          href={group.moreHref}
-          {...stylex.props(foundationStyles.metadata, styles.more)}
-        >
-          <span>
-            {remaining === undefined || remaining === 0
-              ? "More results"
-              : `${remaining.toLocaleString("en-US")} more ${group.label.toLowerCase()}`}
-          </span>
-          <strong>{group.moreLabel ?? "See all"} →</strong>
-        </AppLink>
-      ) : null}
     </section>
   );
 }
@@ -453,10 +442,10 @@ const styles = stylex.create({
   },
   searchingText: {
     margin: 0,
-    paddingTop: "14px",
-    paddingRight: "14px",
+    paddingTop: space.x3,
+    paddingRight: space.x3,
     paddingBottom: space.x4,
-    paddingLeft: "14px",
+    paddingLeft: space.x3,
     color: colors.inkMuted,
   },
   stateText: {
@@ -466,9 +455,9 @@ const styles = stylex.create({
     alignItems: "center",
     margin: 0,
     paddingTop: space.x4,
-    paddingRight: "14px",
+    paddingRight: space.x3,
     paddingBottom: space.x4,
-    paddingLeft: "14px",
+    paddingLeft: space.x3,
     color: colors.inkMuted,
   },
   databaseEmptyState: {
@@ -488,12 +477,12 @@ const styles = stylex.create({
   },
   groupHeading: {
     display: "flex",
-    alignItems: "baseline",
-    gap: space.x3,
+    alignItems: "center",
+    gap: space.x2,
     paddingTop: space.x3,
-    paddingRight: "14px",
+    paddingRight: space.x3,
     paddingBottom: space.x1,
-    paddingLeft: "14px",
+    paddingLeft: space.x3,
   },
   databaseGroupHeading: {
     gap: space.x2,
@@ -505,21 +494,27 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
   },
-  groupName: { minWidth: 0, flex: 1 },
-  databaseGroupName: { flex: 0 },
+  groupName: { minWidth: 0 },
+  groupLabel: { color: colors.inkMuted },
   groupCount: {
     color: colors.inkMuted,
     fontVariantNumeric: "tabular-nums",
   },
-  databaseGroupCount: {
-    flex: 0,
-  },
-  databaseMore: {
+  groupMore: {
+    display: "inline-flex",
+    minHeight: "24px",
+    alignItems: "center",
     marginLeft: "auto",
     outline: "none",
     color: colors.accentDeep,
     fontWeight: 700,
-    textDecoration: "none",
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
+    },
+    [COMPACT]: { minHeight: "44px" },
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
@@ -527,8 +522,8 @@ const styles = stylex.create({
   },
   list: {
     margin: 0,
-    paddingRight: "14px",
-    paddingLeft: "14px",
+    paddingRight: space.x3,
+    paddingLeft: space.x3,
     listStyle: "none",
   },
   listItem: {
@@ -543,14 +538,15 @@ const styles = stylex.create({
     boxSizing: "border-box",
     display: "flex",
     minWidth: 0,
+    minHeight: "44px",
     alignItems: "center",
     gap: space.x3,
-    marginRight: "-14px",
-    marginLeft: "-14px",
-    paddingTop: "10px",
-    paddingRight: "14px",
-    paddingBottom: "10px",
-    paddingLeft: "14px",
+    marginRight: "-12px",
+    marginLeft: "-12px",
+    paddingTop: space.x2,
+    paddingRight: space.x3,
+    paddingBottom: space.x2,
+    paddingLeft: space.x3,
     outline: "none",
     color: colors.ink,
     textDecoration: "none",
@@ -564,6 +560,10 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+  },
+  bottleResult: {
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   databaseResult: {
     marginRight: 0,
@@ -632,37 +632,24 @@ const styles = stylex.create({
       display: "flex",
     },
   },
-  more: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x3,
-    marginRight: "14px",
-    marginLeft: "14px",
-    paddingTop: "10px",
-    paddingBottom: "10px",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-    outline: "none",
-    color: colors.inkMuted,
-    textDecoration: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
   contribution: {
+    boxSizing: "border-box",
     display: "flex",
+    minHeight: "44px",
     alignItems: "baseline",
     justifyContent: "space-between",
     gap: space.x3,
     paddingTop: space.x3,
-    paddingRight: "14px",
+    paddingRight: space.x3,
     paddingBottom: space.x3,
-    paddingLeft: "14px",
+    paddingLeft: space.x3,
     outline: "none",
     textDecoration: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.surface,
+      ":active": colors.inset,
+    },
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
@@ -675,9 +662,8 @@ const styles = stylex.create({
   },
   contributionRule: {
     height: "1px",
-    marginTop: space.x2,
-    marginRight: "14px",
-    marginLeft: "14px",
+    marginRight: space.x3,
+    marginLeft: space.x3,
     backgroundColor: colors.hairline,
   },
   contributionDescription: {
@@ -696,9 +682,9 @@ const styles = stylex.create({
     gap: space.x3,
     marginTop: space.x2,
     paddingTop: space.x3,
-    paddingRight: "14px",
+    paddingRight: space.x3,
     paddingBottom: space.x3,
-    paddingLeft: "14px",
+    paddingLeft: space.x3,
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,

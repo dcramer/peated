@@ -35,7 +35,7 @@ export const foundationStyles = stylex.create({
   sectionHeading: {
     margin: 0,
     fontFamily: fonts.display,
-    fontSize: "24px",
+    fontSize: "20px",
     fontWeight: 700,
     letterSpacing: "-0.025em",
     lineHeight: 1.2,
@@ -51,7 +51,7 @@ export const foundationStyles = stylex.create({
   compactRowTitle: {
     margin: 0,
     fontFamily: fonts.display,
-    fontSize: "16px",
+    fontSize: "15px",
     fontWeight: 700,
     letterSpacing: "-0.025em",
     lineHeight: 1.25,

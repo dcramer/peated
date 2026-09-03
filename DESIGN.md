@@ -48,7 +48,7 @@ typography:
     letterSpacing: -0.04em
   section-heading:
     fontFamily: Space Grotesk
-    fontSize: 24px
+    fontSize: 20px
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: -0.025em
@@ -60,7 +60,7 @@ typography:
     letterSpacing: -0.025em
   compact-row-title:
     fontFamily: Space Grotesk
-    fontSize: 16px
+    fontSize: 15px
     fontWeight: 700
     lineHeight: 1.25
     letterSpacing: -0.025em
@@ -234,6 +234,9 @@ sentiment poles.
 - Section headings use `SectionHeading` in every column. Heading levels express
   document structure and share one visual treatment. Do not add compact,
   uppercase, or page-specific section heading variants.
+- Typeahead group names are control labels, not page sections. Use the field
+  label role for these groups and compact row titles for their results. Bottle
+  suggestions keep standard thumbnails and identity details with 8px row padding.
 - Browse headings should name the content or its relationship to the page.
   State the ranking only when it helps people choose; sort controls should
   still name their order.
@@ -242,9 +245,9 @@ sentiment poles.
 | ------------------- | ------- | ------ | -------------------- | -------- |
 | Page title          | Display | 700    | 40–72px / 0.95       | -0.05em  |
 | Compact page title  | Display | 700    | 32–40px / 1.1        | -0.04em  |
-| Section heading     | Display | 700    | 24px / 1.2           | -0.025em |
+| Section heading     | Display | 700    | 20px / 1.2           | -0.025em |
 | Row title           | Display | 700    | 18px / 1.25          | -0.025em |
-| Compact row title   | Display | 700    | 16px / 1.25          | -0.025em |
+| Compact row title   | Display | 700    | 15px / 1.25          | -0.025em |
 | Prose               | Reading | 400    | 16px / 1.65          | normal   |
 | Body                | Reading | 400    | 15px / 1.6           | normal   |
 | Input               | Reading | 400    | 16px / 1.45          | normal   |
@@ -346,8 +349,9 @@ JSDoc.
 - Standard three-line rows share one thumbnail size across bottle lists,
   activity, search, selection, and loading states. Keep the full bottle visible;
   never crop it to an avatar square. Single-line library additions use smaller
-  thumbnails. Sidebar bottle lists use the same standard rows and thumbnails as
-  other bottle lists.
+  thumbnails. Sidebar bottle lists use the shared sidebar variant with smaller
+  thumbnails, compact titles limited to two lines, and trailing details below
+  the identity. Recent tastings show their date and rating as supporting details.
 - State precise values. Do not replace known numbers with vague labels.
 - Do not invent data, rankings, totals, ranges, or derived values in a visual
   component.
