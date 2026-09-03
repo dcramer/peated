@@ -64,6 +64,7 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
         { href: `/users/${user.username}`, label: "Profile" },
         { href: "/friends", label: "Friends" },
         { href: "/settings", label: "Settings" },
+        ...(user.admin ? [{ href: "/admin", label: "Admin" }] : []),
         {
           disabled: logoutPending,
           label: logoutPending ? "Signing out…" : "Sign out",
