@@ -1,7 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { passkeys, users } from "@peated/server/db/schema";
-import { verifyPayload } from "@peated/server/lib/auth";
+import { TOKEN_LIFETIME_SECONDS, verifyToken } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
 import {
   AuthenticatorTransportsSchema,
@@ -14,8 +14,6 @@ import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/ser
 import { createHash, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-
-const TOKEN_CUTOFF = 600; // 10 minutes
 
 export default procedure
   .use(authRateLimit)
@@ -46,7 +44,7 @@ export default procedure
       // Verify the recovery token
       let payload;
       try {
-        payload = await verifyPayload(input.token);
+        payload = await verifyToken(input.token, "recovery");
       } catch (err) {
         throw errors.BAD_REQUEST({
           message: "Invalid verification token.",
@@ -56,7 +54,7 @@ export default procedure
       const token = PasswordResetSchema.parse(payload);
       if (
         new Date(token.createdAt).getTime() <
-        new Date().getTime() - TOKEN_CUTOFF * 1000
+        Date.now() - TOKEN_LIFETIME_SECONDS["recovery"] * 1000
       ) {
         throw errors.BAD_REQUEST({
           message: "Token has expired.",

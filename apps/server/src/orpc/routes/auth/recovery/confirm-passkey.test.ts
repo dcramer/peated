@@ -10,14 +10,14 @@ import { createHash } from "crypto";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const verifyPayload = vi.fn<RecoveryPasskeyServices["verifyToken"]>();
+const verifyToken = vi.fn<RecoveryPasskeyServices["verifyToken"]>();
 const verifyPasskeyRegistration =
   vi.fn<RecoveryPasskeyServices["verifyRegistration"]>();
 const confirmPasskeyClient = createRouterClient(
   {
     confirmPasskey: createRecoveryPasskeyConfirmProcedure({
       verifyRegistration: verifyPasskeyRegistration,
-      verifyToken: verifyPayload,
+      verifyToken,
     }),
   },
   { context: { ip: "127.0.0.1", user: null } },
@@ -47,7 +47,7 @@ describe("POST /auth/recovery/passkey/confirm", () => {
       },
     };
 
-    verifyPayload.mockResolvedValue({
+    verifyToken.mockResolvedValue({
       id: user.id,
       email: user.email,
       digest,
@@ -95,7 +95,7 @@ describe("POST /auth/recovery/passkey/confirm", () => {
     const expiredDate = new Date();
     expiredDate.setMinutes(expiredDate.getMinutes() - 11); // 11 minutes ago
 
-    verifyPayload.mockResolvedValue({
+    verifyToken.mockResolvedValue({
       id: user.id,
       email: user.email,
       digest,
@@ -123,7 +123,7 @@ describe("POST /auth/recovery/passkey/confirm", () => {
   });
 
   test("rejects invalid token", async ({ fixtures }) => {
-    verifyPayload.mockRejectedValue(new Error("Invalid token"));
+    verifyToken.mockRejectedValue(new Error("Invalid token"));
 
     const err = await waitError(
       confirmPasskeyClient.confirmPasskey({
@@ -146,7 +146,7 @@ describe("POST /auth/recovery/passkey/confirm", () => {
   });
 
   test("rejects user not found", async ({ fixtures }) => {
-    verifyPayload.mockResolvedValue({
+    verifyToken.mockResolvedValue({
       id: 99999,
       email: "nonexistent@example.com",
       digest: "mock-digest",
@@ -193,7 +193,7 @@ describe("POST /auth/recovery/passkey/confirm", () => {
       },
     };
 
-    verifyPayload.mockResolvedValue({
+    verifyToken.mockResolvedValue({
       id: user.id,
       email: user.email,
       digest,

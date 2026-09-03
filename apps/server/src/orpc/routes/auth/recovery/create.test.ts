@@ -93,4 +93,47 @@ describe("POST /auth/password-reset", () => {
     );
     expect(sendPasswordResetEmail).not.toHaveBeenCalled();
   });
+
+  test("stops requests when the rate-limit counter fails", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const counterError = new Error("Redis unavailable");
+    const client = createRouterClient(
+      {
+        create: createRecoveryProcedure(
+          sendPasswordResetEmail,
+          createAuthRateLimit(async () => {
+            throw counterError;
+          }),
+        ),
+      },
+      { context: { ip: "127.0.0.1", user: null } },
+    );
+
+    await expect(client.create({ email: user.email })).rejects.toThrow(
+      counterError,
+    );
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  test("allows 15 requests per IP and rejects the next request", async () => {
+    for (let count = 0; count < 15; count++) {
+      await expect(
+        recoveryClient.create({ email: "nonexistent@example.com" }),
+      ).resolves.toEqual({});
+    }
+
+    await expect(
+      recoveryClient.create({ email: "nonexistent@example.com" }),
+    ).rejects.toThrow("Too many requests. Please try again later.");
+
+    const otherClient = createRouterClient(
+      { create: createRecoveryProcedure(sendPasswordResetEmail) },
+      { context: { ip: "127.0.0.2", user: null } },
+    );
+    await expect(
+      otherClient.create({ email: "nonexistent@example.com" }),
+    ).resolves.toEqual({});
+  });
 });

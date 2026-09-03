@@ -107,11 +107,12 @@ export default function LoginForm() {
   if (result?.magicLink) {
     return (
       <AuthenticationPanel
-        description="Use the secure link we sent to finish signing in."
+        description="Use the link in your email to finish signing in."
         title="Check your email"
       >
         <AuthenticationNotice>
-          The link is on its way{email ? ` to ${email}` : ""}.
+          If an account uses this email, we'll send a sign-in link. If it
+          doesn't arrive, check your spam folder or try again.
         </AuthenticationNotice>
         <AccountLinks email={email} />
       </AuthenticationPanel>

@@ -5,7 +5,8 @@ import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
   createAccessToken,
   generatePasswordHash,
-  verifyPayload,
+  TOKEN_LIFETIME_SECONDS,
+  verifyToken,
 } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -22,16 +23,14 @@ import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const TOKEN_CUTOFF = 600; // 10 minutes
-
 export type RecoveryPasskeyServices = {
   verifyRegistration: typeof verifyPasskeyRegistration;
-  verifyToken: typeof verifyPayload;
+  verifyToken: typeof verifyToken;
 };
 
 const defaultServices: RecoveryPasskeyServices = {
   verifyRegistration: verifyPasskeyRegistration,
-  verifyToken: verifyPayload,
+  verifyToken,
 };
 
 export function createRecoveryPasskeyConfirmProcedure(
@@ -67,7 +66,7 @@ export function createRecoveryPasskeyConfirmProcedure(
         // Verify the recovery token
         let payload;
         try {
-          payload = await services.verifyToken(input.token);
+          payload = await services.verifyToken(input.token, "recovery");
         } catch (err) {
           throw errors.BAD_REQUEST({
             message: "Invalid verification token.",
@@ -77,7 +76,7 @@ export function createRecoveryPasskeyConfirmProcedure(
         const token = PasswordResetSchema.parse(payload);
         if (
           new Date(token.createdAt).getTime() <
-          new Date().getTime() - TOKEN_CUTOFF * 1000
+          Date.now() - TOKEN_LIFETIME_SECONDS["recovery"] * 1000
         ) {
           throw errors.BAD_REQUEST({
             message: "Token has expired.",

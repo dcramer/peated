@@ -4,7 +4,8 @@ import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
   createAccessToken,
   generatePasswordHash,
-  verifyPayload,
+  TOKEN_LIFETIME_SECONDS,
+  verifyToken,
 } from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
@@ -14,8 +15,6 @@ import { UserSerializer } from "@peated/server/serializers/user";
 import { createHash, timingSafeEqual } from "crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-
-const TOKEN_CUTOFF = 600; // 10 minutes
 
 export default procedure
   .use(authRateLimit)
@@ -40,7 +39,7 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     let payload;
     try {
-      payload = await verifyPayload(input.token);
+      payload = await verifyToken(input.token, "recovery");
     } catch (err) {
       throw errors.BAD_REQUEST({
         message: "Invalid verification token.",
@@ -50,7 +49,7 @@ export default procedure
     const token = PasswordResetSchema.parse(payload);
     if (
       new Date(token.createdAt).getTime() <
-      new Date().getTime() - TOKEN_CUTOFF * 1000
+      Date.now() - TOKEN_LIFETIME_SECONDS["recovery"] * 1000
     ) {
       throw errors.BAD_REQUEST({
         message: "Token has expired.",

@@ -1,5 +1,6 @@
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
+import jsonwebtoken from "jsonwebtoken";
 import { z } from "zod";
 import config from "../config";
 import type { AnyDatabase } from "../db";
@@ -9,15 +10,11 @@ import { users } from "../db/schema";
 import { random } from "../lib/rand";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
+import { sendVerificationEmail } from "./email";
 import { logWarn } from "./log";
 import { absoluteUrl } from "./urls";
 
-// I love to ESM.
-import type { JwtPayload } from "jsonwebtoken";
-import { default as jsonwebtoken } from "jsonwebtoken";
-import { sendVerificationEmail } from "./email";
-const { sign, verify } = jsonwebtoken;
-type JsonWebTokenPayload = Parameters<typeof sign>[0];
+const TokenDataSchema = z.record(z.string(), z.json());
 const UserTokenSchema = z.object({ id: z.number().int().positive() });
 const ChallengeTokenSchema = z.object({
   challenge: z.string().min(1),
@@ -26,41 +23,36 @@ const ChallengeTokenSchema = z.object({
 
 export const ACCESS_TOKEN_EXPIRES_IN_SECONDS = 7 * 24 * 60 * 60;
 
-export function signPayload(payload: JsonWebTokenPayload): Promise<string> {
-  return new Promise<string>((res, rej) => {
-    sign(payload, config.JWT_SECRET, { expiresIn: "7d" }, (err, token) => {
-      if (err) rej(err);
-      if (!token) throw new Error("Unknown error signing token.");
-      res(token);
-    });
+export const TOKEN_LIFETIME_SECONDS = {
+  access: ACCESS_TOKEN_EXPIRES_IN_SECONDS,
+  "magic-link": 10 * 60,
+  recovery: 10 * 60,
+  "email-verification": 7 * 24 * 60 * 60,
+  "webauthn-challenge": 10 * 60,
+  "photo-identification-create": 7 * 24 * 60 * 60,
+} as const;
+
+type TokenPurpose = keyof typeof TOKEN_LIFETIME_SECONDS;
+
+/** Creates a signed token with the lifetime assigned to its purpose. */
+export async function signToken(
+  payload: z.infer<typeof TokenDataSchema>,
+  purpose: TokenPurpose,
+): Promise<string> {
+  return jsonwebtoken.sign(payload, config.JWT_SECRET, {
+    audience: purpose,
+    expiresIn: TOKEN_LIFETIME_SECONDS[purpose],
   });
 }
 
-export function verifyPayload(
-  token: string | undefined,
-): Promise<string | JwtPayload | undefined> {
-  return new Promise((res, rej) => {
-    if (!token) {
-      rej("invalid token");
-      return;
-    }
-
-    verify(token, config.JWT_SECRET, {}, (err, decoded) => {
-      if (err) {
-        rej("invalid token");
-        return;
-      }
-      const payload = z.record(z.string(), z.json()).safeParse(decoded);
-      if (!payload.success) {
-        rej("invalid token");
-        return;
-      }
-      res(payload.data);
-    });
+/** Checks the signature, expiration, and purpose before returning the token's data. */
+export async function verifyToken(token: string, purpose: TokenPurpose) {
+  // Account access rule: a token may only be used for its signed purpose (`aud`).
+  const payload = jsonwebtoken.verify(token, config.JWT_SECRET, {
+    audience: purpose,
   });
+  return TokenDataSchema.parse(payload);
 }
-
-export { verifyPayload as verifyToken };
 
 export async function getUserFromHeader(
   authorizationHeader: string | undefined,
@@ -68,9 +60,9 @@ export async function getUserFromHeader(
   const token = authorizationHeader?.replace(/^Bearer /i, "");
   if (!token) return null;
 
-  let payload: Awaited<ReturnType<typeof verifyPayload>>;
+  let payload: Awaited<ReturnType<typeof verifyToken>>;
   try {
-    payload = await verifyPayload(token);
+    payload = await verifyToken(token, "access");
   } catch {
     logWarn("Invalid Bearer token", {});
     return null;
@@ -106,7 +98,7 @@ export async function getUserFromHeader(
 
 export async function createAccessToken(user: User): Promise<string> {
   const payload = await serialize(UserSerializer, user, user);
-  return await signPayload(payload);
+  return await signToken(payload, "access");
 }
 
 // OWASP recommends 10+ rounds for bcrypt
@@ -173,7 +165,7 @@ export async function generateMagicLink(user: User, redirectTo = "/") {
     createdAt: new Date().toISOString(),
   };
 
-  const signedToken = await signPayload(token);
+  const signedToken = await signToken(token, "magic-link");
   const url = absoluteUrl(
     config.URL_PREFIX,
     `/auth/magic-link?token=${signedToken}&redirectTo=${encodeURIComponent(redirectTo)}`,
@@ -185,46 +177,40 @@ export async function generateMagicLink(user: User, redirectTo = "/") {
   };
 }
 
-/**
- * Sign a WebAuthn challenge to prevent tampering and replay attacks
- * The signed token includes the challenge and creation timestamp
- */
+/** Signs a passkey challenge that expires in ten minutes. */
 export async function signChallenge(challenge: string): Promise<string> {
   const payload = {
     challenge,
     createdAt: new Date().toISOString(),
   };
-  return await signPayload(payload);
+  return await signToken(payload, "webauthn-challenge");
 }
 
-/**
- * Verify a signed WebAuthn challenge
- * Ensures the challenge hasn't been tampered with and is recent (within 5 minutes)
- * Returns the original challenge value if valid
- */
+/** Rejects expired, modified, or mismatched passkey challenges. */
 export async function verifyChallenge(
   signedChallenge: string,
   expectedChallenge: string,
 ): Promise<void> {
   let payload: z.infer<typeof ChallengeTokenSchema>;
   try {
-    payload = ChallengeTokenSchema.parse(await verifyPayload(signedChallenge));
+    payload = ChallengeTokenSchema.parse(
+      await verifyToken(signedChallenge, "webauthn-challenge"),
+    );
   } catch (err) {
     throw new Error("Challenge signature is invalid or has expired", {
       cause: err,
     });
   }
 
-  // Verify the challenge matches what we expect
   if (payload.challenge !== expectedChallenge) {
     throw new Error("Challenge does not match");
   }
 
-  // Verify challenge is recent (within 10 minutes)
-  const CHALLENGE_TTL = 10 * 60 * 1000; // 10 minutes
   const createdAt = new Date(payload.createdAt).getTime();
-  const now = new Date().getTime();
-  if (now - createdAt > CHALLENGE_TTL) {
+  if (
+    Date.now() - createdAt >
+    TOKEN_LIFETIME_SECONDS["webauthn-challenge"] * 1000
+  ) {
     throw new Error("Challenge expired");
   }
 }
