@@ -29,7 +29,7 @@ action.
    matches keep extracted label details and correction options collapsed.
    Adding to Library saves immediately, then offers an optional Sealed / Open /
    Empty status selector. Selecting a status saves it. From there, the member
-   can rate the same Bottle or find another one.
+   can rate or view the same Bottle, or find another one.
 6. **Rate this bottle** opens a choice between **Log a tasting** and **Write a
    review**, with the selected Bottle fixed and the pending photo attached.
 7. Both forms follow **Notes → The pour → Rating/Score**. Notes capture the

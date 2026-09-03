@@ -501,6 +501,14 @@ function AddedToLibrary({
           <Wine aria-hidden="true" size={16} />
           Rate this bottle
         </ButtonLink>
+        <ButtonLink
+          fullWidth
+          href={getViewBottleHref(entry.bottle)}
+          variant="tonal"
+        >
+          <Eye aria-hidden="true" size={16} />
+          View this bottle
+        </ButtonLink>
         <Button
           fullWidth
           onClick={onFindAnother}
