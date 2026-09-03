@@ -11,16 +11,21 @@ export function matchBottleRoute(pathname: string) {
   if (shortId) {
     const parsed = parsePeatedId(shortId[1]);
     return parsed?.type === "bottle"
-      ? { id: parsed.id, pathname, suffix: "" }
+      ? { id: parsed.id, pathname, slug: null, suffix: "" }
       : null;
   }
   // Web routing keeps removed bottle pages as direct 404s.
   const match =
-    /^\/bottles\/([1-9]\d*)(?:-[^/]+)?(\/(?:aliases|tastings|similar|prices|releases|edit|audit|merge|addTasting|addRelease)\/?|\/)?$/.exec(
+    /^\/bottles\/([1-9]\d*)(?:-([^/]+))?(\/(?:aliases|tastings|similar|prices|releases|edit|audit|merge|addTasting|addRelease)\/?|\/)?$/.exec(
       pathname,
     );
   if (!match || !Number.isSafeInteger(Number(match[1]))) return null;
-  return { id: Number(match[1]), pathname, suffix: match[2] ?? "" };
+  return {
+    id: Number(match[1]),
+    pathname,
+    slug: match[2] ?? null,
+    suffix: match[3] ?? "",
+  };
 }
 
 export function getBottleRouteRedirect(
@@ -38,12 +43,17 @@ export function matchSeriesRoute(pathname: string) {
   if (shortId) {
     const parsed = parsePeatedId(shortId[1]);
     return parsed?.type === "series"
-      ? { id: parsed.id, pathname, suffix: "" }
+      ? { id: parsed.id, pathname, slug: null, suffix: "" }
       : null;
   }
-  const match = /^\/series\/([1-9]\d*)(?:-[^/]+)?(\/.*)?$/.exec(pathname);
+  const match = /^\/series\/([1-9]\d*)(?:-([^/]+))?(\/.*)?$/.exec(pathname);
   if (!match || !Number.isSafeInteger(Number(match[1]))) return null;
-  return { id: Number(match[1]), pathname, suffix: match[2] ?? "" };
+  return {
+    id: Number(match[1]),
+    pathname,
+    slug: match[2] ?? null,
+    suffix: match[3] ?? "",
+  };
 }
 
 export function getSeriesRouteRedirect(

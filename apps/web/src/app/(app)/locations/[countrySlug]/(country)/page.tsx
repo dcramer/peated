@@ -13,14 +13,10 @@ import {
 
 export async function generateMetadata(props: {
   params: Promise<{ countrySlug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [{ countrySlug }, searchParams] = await Promise.all([
-    props.params,
-    props.searchParams,
-  ]);
+  const { countrySlug } = await props.params;
   const location = await getCountryPage(countrySlug);
-  return getCountrySeoMetadata(location, { searchParams });
+  return getCountrySeoMetadata(location);
 }
 
 export default async function CountryOverviewPage(props: {

@@ -15,14 +15,10 @@ import {
 
 export async function generateMetadata(props: {
   params: Promise<{ countrySlug: string; regionSlug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [{ countrySlug, regionSlug }, searchParams] = await Promise.all([
-    props.params,
-    props.searchParams,
-  ]);
+  const { countrySlug, regionSlug } = await props.params;
   const location = await getRegionPage(countrySlug, regionSlug);
-  return getRegionSeoMetadata(location, { searchParams });
+  return getRegionSeoMetadata(location);
 }
 
 export default async function RegionOverviewPage(props: {

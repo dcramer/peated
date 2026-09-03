@@ -34,6 +34,13 @@ export async function proxy(request: NextRequest) {
   const seriesMatch = matchSeriesRoute(request.nextUrl.pathname);
   const bottleMatch = matchBottleRoute(request.nextUrl.pathname);
   const locationMatch = matchLocationRoute(request.nextUrl.pathname);
+  const legacySeriesMatch = seriesMatch?.slug === null ? seriesMatch : null;
+  const legacyBottleMatch = bottleMatch?.slug === null ? bottleMatch : null;
+  const locationNeedsRedirect =
+    locationMatch &&
+    (locationMatch.countrySlug !== locationMatch.countrySlug.toLowerCase() ||
+      (locationMatch.regionSlug !== null &&
+        locationMatch.regionSlug !== locationMatch.regionSlug.toLowerCase()));
   let resolution: PeatedIdRouteResolution | null = null;
 
   if (entityMatch) {
@@ -62,19 +69,22 @@ export async function proxy(request: NextRequest) {
       if (!isORPCNotFoundError(error)) throw error;
     }
   }
-  if (bottleMatch || seriesMatch || locationMatch) {
+  if (legacyBottleMatch || legacySeriesMatch || locationNeedsRedirect) {
     try {
-      // Catalog routing resolves public identities before Next starts streaming HTML.
+      // Web performance: normal slug URLs use the page's memoized identity read.
+      // Only legacy IDs and location casing need a lookup before rendering.
       const { client } = await createAnonymousServerClient();
       let pathname: string | null;
-      if (bottleMatch) {
-        const bottle = await client.bottles.details({ bottle: bottleMatch.id });
-        pathname = getBottleRouteRedirect(bottleMatch, bottle);
-      } else if (seriesMatch) {
-        const series = await client.bottleSeries.details({
-          series: seriesMatch.id,
+      if (legacyBottleMatch) {
+        const bottle = await client.bottles.details({
+          bottle: legacyBottleMatch.id,
         });
-        pathname = getSeriesRouteRedirect(seriesMatch, series);
+        pathname = getBottleRouteRedirect(legacyBottleMatch, bottle);
+      } else if (legacySeriesMatch) {
+        const series = await client.bottleSeries.details({
+          series: legacySeriesMatch.id,
+        });
+        pathname = getSeriesRouteRedirect(legacySeriesMatch, series);
       } else if (locationMatch) {
         const country = await client.countries.details({
           country: locationMatch.countrySlug,
