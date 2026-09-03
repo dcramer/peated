@@ -3,7 +3,6 @@ import {
   externalReviewArticles,
   externalReviewBodies,
   externalReviews,
-  externalReviewTags,
   storePrices,
 } from "@peated/server/db/schema";
 import {
@@ -22,7 +21,7 @@ import { z } from "zod";
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
   clip: z.string().trim().min(1).max(180).nullable().optional(),
-  extractedTags: z.array(z.string().min(1).max(64)).optional(),
+  tags: z.array(z.string().min(1).max(64)).optional(),
   body: z.string().trim().min(1).optional(),
 });
 
@@ -201,6 +200,11 @@ export async function storeExternalReviewArticleInTransaction(
       if (externalReview.clip !== undefined) {
         values.clip = externalReview.clip;
       }
+      // Review imports own these tags. Missing text keeps the previous tags;
+      // supplied text replaces them, even when nothing matches.
+      if (externalReview.tags !== undefined) {
+        values.tags = [...new Set(externalReview.tags)].sort();
+      }
     }
     const [stored] = existing
       ? await tx
@@ -232,21 +236,6 @@ export async function storeExternalReviewArticleInTransaction(
           target: externalReviewBodies.externalReviewId,
           set: { body: externalReview.body, fetchedAt: input.fetchedAt },
         });
-    }
-    if (origin === "source" && externalReview.extractedTags !== undefined) {
-      // Review imports own these tags. Missing text keeps the previous tags;
-      // supplied text replaces them, even when nothing matches.
-      await tx
-        .delete(externalReviewTags)
-        .where(eq(externalReviewTags.externalReviewId, stored.id));
-      if (externalReview.extractedTags.length) {
-        await tx.insert(externalReviewTags).values(
-          [...new Set(externalReview.extractedTags)].map((tag) => ({
-            externalReviewId: stored.id,
-            tag,
-          })),
-        );
-      }
     }
     storedExternalReviews.push({
       externalReview: stored,

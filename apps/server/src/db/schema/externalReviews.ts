@@ -8,7 +8,6 @@ import {
   index,
   integer,
   pgTable,
-  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -17,7 +16,6 @@ import {
 import { bottles } from "./bottles";
 import { categoryEnum } from "./enums";
 import { externalSites } from "./externalSites";
-import { tags } from "./tags";
 
 export const externalReviewArticles = pgTable(
   "review_article",
@@ -69,6 +67,10 @@ export const externalReviews = pgTable(
     nativeScoreScale: doublePrecision("native_score_scale"),
     nativeScoreDisplay: text("native_score_display"),
     clip: text("clip"),
+    tags: varchar("tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -110,19 +112,6 @@ export const externalReviewBodies = pgTable("review_body", {
   body: text("body").notNull(),
   fetchedAt: timestamp("fetched_at").notNull(),
 });
-
-export const externalReviewTags = pgTable(
-  "review_tag",
-  {
-    externalReviewId: bigint("review_id", { mode: "number" })
-      .references(() => externalReviews.id, { onDelete: "cascade" })
-      .notNull(),
-    tag: varchar("tag", { length: 64 })
-      .references(() => tags.name, { onDelete: "cascade", onUpdate: "cascade" })
-      .notNull(),
-  },
-  (table) => [primaryKey({ columns: [table.externalReviewId, table.tag] })],
-);
 
 export const externalReviewArticlesRelations = relations(
   externalReviewArticles,

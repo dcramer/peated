@@ -1,5 +1,5 @@
 {
-  "id": "9ab4ea02-a950-412a-a9f2-3388e85aa3d1",
+  "id": "a70655cf-e523-46b8-a48a-df2b264a5dcb",
   "prevId": "2c4e6b55-e069-44b3-8287-1ef9ae8e5b11",
   "version": "7",
   "dialect": "postgresql",
@@ -5338,28 +5338,34 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.review_tag": {
-      "name": "review_tag",
+    "public.review_body": {
+      "name": "review_body",
       "schema": "",
       "columns": {
         "review_id": {
           "name": "review_id",
           "type": "bigint",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "body": {
+          "name": "body",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "tag": {
-          "name": "tag",
-          "type": "varchar(64)",
+        "fetched_at": {
+          "name": "fetched_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "review_tag_review_id_review_id_fk": {
-          "name": "review_tag_review_id_review_id_fk",
-          "tableFrom": "review_tag",
+        "review_body_review_id_review_id_fk": {
+          "name": "review_body_review_id_review_id_fk",
+          "tableFrom": "review_body",
           "tableTo": "review",
           "columnsFrom": [
             "review_id"
@@ -5369,30 +5375,9 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        },
-        "review_tag_tag_tag_name_fk": {
-          "name": "review_tag_tag_tag_name_fk",
-          "tableFrom": "review_tag",
-          "tableTo": "tag",
-          "columnsFrom": [
-            "tag"
-          ],
-          "columnsTo": [
-            "name"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
         }
       },
-      "compositePrimaryKeys": {
-        "review_tag_review_id_tag_pk": {
-          "name": "review_tag_review_id_tag_pk",
-          "columns": [
-            "review_id",
-            "tag"
-          ]
-        }
-      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -5487,6 +5472,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "varchar(64)[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "array[]::varchar[]"
         },
         "created_at": {
           "name": "created_at",

@@ -5,7 +5,6 @@ import {
   externalReviewArticles,
   externalReviewBodies,
   externalReviews,
-  externalReviewTags,
   tags,
 } from "@peated/server/db/schema";
 import {
@@ -350,11 +349,8 @@ test.for<[string, string[]]>([
       },
       externalReviewTexts: { tags: reviewText },
     });
-    const storedTags = await db
-      .select({ tag: externalReviewTags.tag })
-      .from(externalReviewTags)
-      .orderBy(asc(externalReviewTags.tag));
-    expect(storedTags.map(({ tag }) => tag)).toEqual(expected);
+    const review = await db.query.externalReviews.findFirst();
+    expect(review?.tags).toEqual(expected);
     expect(await db.select().from(bottleTags)).toEqual([]);
   },
 );
@@ -422,7 +418,9 @@ test("refreshes tags per review, preserves them without text, and exposes them t
   await db
     .delete(externalReviews)
     .where(eq(externalReviews.id, result.externalReviewIds[1]));
-  expect(await db.select().from(externalReviewTags)).toEqual([]);
+  expect(await readTags()).toEqual([
+    { id: result.externalReviewIds[0], extractedTags: [] },
+  ]);
 });
 
 test("retains complete bodies internally, refreshes them per review, and preserves them when absent", async ({

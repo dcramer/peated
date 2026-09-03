@@ -4,7 +4,6 @@ import {
   externalReviewArticles,
   externalReviewPublications,
   externalReviews,
-  externalReviewTags,
 } from "@peated/server/db/schema";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import waitError from "@peated/server/lib/test/waitError";
@@ -173,11 +172,7 @@ describe("GET /external-reviews", () => {
       nativeScoreScale: 10,
       nativeScoreDisplay: "8.4/10",
       clip: "Rich fruit and gentle smoke lead to a dry finish.",
-    });
-    await fixtures.Tag({ name: "smoke" });
-    await db.insert(externalReviewTags).values({
-      externalReviewId: latest.id,
-      tag: "smoke",
+      tags: ["smoke"],
     });
     await Promise.all([
       db

@@ -68,9 +68,7 @@ export async function ingestExternalReviewArticle(
       bottleId: referenceMatch?.bottleId ?? null,
       clip: clip ?? undefined,
       body,
-      extractedTags: tagText
-        ? extractReviewTags(tagText, vocabulary)
-        : undefined,
+      tags: tagText ? extractReviewTags(tagText, vocabulary) : undefined,
     });
   }
 

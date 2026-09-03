@@ -49,7 +49,8 @@ punctuation or a word such as "but". This is best effort: unusual wording,
 comparisons to other bottles, and metaphors can be misread. Plurals need their
 own synonyms. A missing match does not mean a flavor is absent.
 
-The review API returns these tags as `extractedTags`. They stay separate from
+Tags are saved in `review.tags` using the same array type as tastings and member
+reviews. The review API returns them as `extractedTags`. They stay separate from
 community tasting counts and Bottle flavor profiles. Matching makes no model
 requests and works when clips are disabled.
 
