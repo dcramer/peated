@@ -104,6 +104,11 @@ pass. The AI provider does not store request content. An admin must still
 preview and activate the inactive revision. AI never changes the active
 revision directly.
 
+Before limiting model input, setup removes script and style elements from its
+HTML copies so large page headers do not crowd out links and article content.
+It keeps the page structure and attributes used by selectors. Rule checks and
+collection still parse the original fetched HTML.
+
 For reviews, `reviewItem` selects the full body to save internally; optional
 `reviewText` selects tasting notes for tags and clips. [External Reviews](../../../../docs/features/external-reviews.md)
 defines what is saved, who can read it, and when it is deleted.
