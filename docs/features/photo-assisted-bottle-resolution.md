@@ -24,8 +24,12 @@ action.
    - an existing Bottle match;
    - an approved proposal for one new, independently complete Bottle; or
    - manual search when the evidence is insufficient or conflicting.
-5. After resolving a Bottle, the user may rate it, add it to their
-   Library, view it, search again, or start over.
+5. After resolving a Bottle, the main choices are **Rate this bottle** and
+   **Add to Library**. View bottle and Change bottle remain secondary. Photo
+   matches keep extracted label details and correction options collapsed.
+   Adding to Library saves immediately, then offers an optional Sealed / Open /
+   Empty status selector. Selecting a status saves it. From there, the member
+   can rate the same Bottle or find another one.
 6. **Rate this bottle** opens a choice between **Log a tasting** and **Write a
    review**, with the selected Bottle fixed and the pending photo attached.
 7. Both forms follow **Notes → The pour → Rating/Score**. Notes capture the

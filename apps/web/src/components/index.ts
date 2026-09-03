@@ -54,7 +54,7 @@ export { Checkbox } from "./checkbox.stylex";
 export type { CheckboxProps } from "./checkbox.stylex";
 export { Chip, CountChip } from "./chip.stylex";
 export type { ChipProps, ChipVariant } from "./chip.stylex";
-export { CollectionBottleStatusChips } from "./collectionBottleStatus.stylex";
+export { CollectionBottleStatusInput } from "./collectionBottleStatus.stylex";
 export type {
   CollectionBottleStatus,
   CollectionBottleStatusValue,

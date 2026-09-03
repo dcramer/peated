@@ -128,6 +128,8 @@ export function FormNotice({
 
 export type FormDetailsProps = {
   children: ReactNode;
+  /** Uses a control-sized label for secondary details inside a short workflow. */
+  compact?: boolean;
   defaultOpen?: boolean;
   description?: ReactNode;
   title: ReactNode;
@@ -136,15 +138,24 @@ export type FormDetailsProps = {
 /** Keeps optional form fields available without making the primary form dense. */
 export function FormDetails({
   children,
+  compact = false,
   defaultOpen = false,
   description,
   title,
 }: FormDetailsProps) {
   return (
     <details open={defaultOpen || undefined} {...stylex.props(styles.details)}>
-      <summary {...stylex.props(styles.summary)}>
+      <summary
+        {...stylex.props(styles.summary, compact && styles.compactSummary)}
+      >
         <span {...stylex.props(styles.copy)}>
-          <span {...stylex.props(foundationStyles.sectionHeading)}>
+          <span
+            {...stylex.props(
+              compact
+                ? foundationStyles.interactive
+                : foundationStyles.sectionHeading,
+            )}
+          >
             {title}
           </span>
           {description ? (
@@ -307,6 +318,13 @@ const styles = stylex.create({
     "::-webkit-details-marker": { display: "none" },
   },
   detailsIcon: { flexShrink: 0, color: colors.inkMuted },
+  compactSummary: {
+    alignItems: "center",
+    minHeight: "44px",
+    boxSizing: "border-box",
+    paddingTop: space.x3,
+    paddingBottom: space.x3,
+  },
   detailFields: {
     display: "flex",
     minWidth: 0,

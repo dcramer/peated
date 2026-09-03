@@ -525,6 +525,7 @@ test.describe("add bottle flow", () => {
   test("adds a resolved bottle to Library and starts a tasting", async ({
     context,
     page,
+    snapshot,
   }, testInfo) => {
     await signIn(context, {
       accessToken: uniqueAccessToken(testInfo, "resolved"),
@@ -537,9 +538,37 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
+    const status = page.getByRole("radiogroup", { name: "Bottle status" });
+    await expect(status.getByRole("radio", { checked: true })).toHaveCount(0);
+    await snapshot("bottle-flow/library/status-unselected", { ready: status });
+    await page.route(
+      "**/rpc/collections/bottles/update",
+      (route) => route.abort("failed"),
+      { times: 1 },
+    );
+    await status.getByText("Open", { exact: true }).click();
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText(
+      "Could not update Library status.",
+    );
+    await expect(status.getByRole("radio", { checked: true })).toHaveCount(0);
+    const statusRequest = page.waitForRequest(
+      (request) =>
+        request.method() === "POST" &&
+        request.url().includes("/rpc/collections/bottles/update"),
+    );
+    await status.getByText("Open", { exact: true }).click();
+    expect(getRpcInput(await statusRequest)).toMatchObject({
+      user: "me",
+      collection: "library",
+      status: "open",
+    });
     await expect(
-      page.getByRole("heading", { name: "Add to your Library" }).first(),
-    ).toBeVisible();
+      status.getByRole("radio", { name: "Open", exact: true }),
+    ).toBeChecked();
+    await expect(
+      status.getByRole("radio", { name: "Open", exact: true }),
+    ).toBeEnabled();
+    await snapshot("bottle-flow/library/status-open", { ready: status });
     await page.getByRole("link", { name: "Rate this bottle" }).click();
     await expect(page).toHaveURL(
       `/addBottle?bottle=${existingBottle.id}&intent=tasting`,
@@ -549,6 +578,7 @@ test.describe("add bottle flow", () => {
   test("routes generic bottle search results into the resolver outcome", async ({
     context,
     page,
+    snapshot,
   }, testInfo) => {
     await signIn(context, {
       accessToken: uniqueAccessToken(testInfo, "search-route"),
@@ -574,6 +604,9 @@ test.describe("add bottle flow", () => {
     );
     expect(addBottleUrl.searchParams.get("intent")).toBe("choose");
     expect(addBottleUrl.searchParams.get("release")).toBeNull();
+    await snapshot("bottle-flow/search/bottle-actions", {
+      ready: page.getByRole("button", { name: "Add to Library" }),
+    });
     await expect(
       page.getByRole("link", { name: "View bottle" }),
     ).toHaveAttribute("href", bottlePathPattern(exactSearchBottle.id));
@@ -613,7 +646,7 @@ test.describe("add bottle flow", () => {
       pendingScanImageUrl,
     );
     await expect(
-      page.getByRole("link", { name: "Search Bottles" }),
+      page.getByRole("link", { name: "Change bottle" }),
     ).toHaveAttribute(
       "href",
       `/search?intent=choose&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingScanImageUrl)}`,
@@ -699,6 +732,7 @@ test.describe("add bottle flow", () => {
   test("adds a matched scan to Library with the scanned photo", async ({
     context,
     page,
+    snapshot,
   }, testInfo) => {
     await signIn(context, {
       accessToken: uniqueAccessToken(testInfo, "scan-library-create-slow"),
@@ -725,12 +759,14 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Rate this bottle" }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: "Add Similar" })).toBeHidden();
+    const changeBottle = page
+      .locator("details")
+      .filter({ hasText: "Change bottle" });
+    await changeBottle.getByText("Change bottle", { exact: true }).click();
     await expect(
-      page.getByRole("heading", { name: "Not the right bottle?" }),
+      changeBottle.getByRole("link", { name: "Add a new bottle" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Add a new bottle" }),
-    ).toBeVisible();
+    await changeBottle.getByText("Change bottle", { exact: true }).click();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", bottlePathPattern(existingBottle.id));
@@ -738,6 +774,9 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
       traceFooter,
     );
+    await snapshot("bottle-flow/photo/bottle-actions", {
+      ready: page.getByRole("button", { name: "Add to Library" }),
+    });
     await page.getByRole("button", { name: "Add to Library" }).click();
 
     await expect(
@@ -755,14 +794,13 @@ test.describe("add bottle flow", () => {
         }),
       ),
     ).toBeVisible();
+    await page.getByRole("button", { name: "Find another bottle" }).click();
+    await expect(page).toHaveURL("/addBottle?intent=choose");
     await expect(
-      page.getByRole("button", { name: "Add another to Library" }),
+      page.getByRole("button", { name: "Photograph the label" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "View Library" }),
-    ).toHaveAttribute("href", `/users/${testUser.username}/library`);
 
-    await page.getByRole("link", { name: "View Library" }).click();
+    await page.goto(`/users/${testUser.username}/library`);
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
     await expect(
       page.locator(bottleHrefSelector(existingBottle.id)).first(),

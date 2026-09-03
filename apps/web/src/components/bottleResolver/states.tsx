@@ -2,6 +2,8 @@ import type { Bottle } from "@peated/server/types";
 import {
   Button,
   ButtonLink,
+  FormDetails,
+  FormNotice,
   FormStack,
   SelectedBottleSummary,
 } from "@peated/web/components";
@@ -229,24 +231,11 @@ export function PhotoMatchCreateState({
   if (matchedBottle) {
     return (
       <BottleResolverColumn>
-        <BottleResolverInlineAction>
-          <Button onClick={onStartOver} variant="text">
-            Use a different photo
-          </Button>
-        </BottleResolverInlineAction>
-        <BottleResolverSection
-          description="Compare this bottle with the label before you continue."
-          title="Check the bottle"
-        >
-          {previewUrl ? (
-            <PhotoPreview
-              metadata="Compare this photo with the bottle below"
-              src={previewUrl}
-              title="Label photo"
-            />
-          ) : null}
+        <BottleResolverSection>
           <SelectedBottleSummary bottle={matchedBottle} />
-          <LabelFacts result={result} />
+          <FormNotice>
+            Check the edition and strength against your label.
+          </FormNotice>
           {renderMatchedResultActions ? (
             renderMatchedResultActions({
               bottle: matchedBottle,
@@ -270,6 +259,16 @@ export function PhotoMatchCreateState({
               Continue
             </Button>
           )}
+          <FormDetails compact title="Label details">
+            {previewUrl ? (
+              <PhotoPreview
+                metadata="Details read from your photo"
+                src={previewUrl}
+                title="Label photo"
+              />
+            ) : null}
+            <LabelFacts result={result} />
+          </FormDetails>
         </BottleResolverSection>
       </BottleResolverColumn>
     );

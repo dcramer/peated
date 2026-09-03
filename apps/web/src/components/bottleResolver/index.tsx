@@ -1,6 +1,11 @@
 "use client";
 
-import { FormNotice, FormStack } from "@peated/web/components";
+import {
+  Button,
+  FormDetails,
+  FormNotice,
+  FormStack,
+} from "@peated/web/components";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -25,6 +30,7 @@ import {
   type PhotoIdentification,
   type PhotoIdentificationCreateInput,
 } from "./helpers";
+import { BottleResolverColumn } from "./layout.stylex";
 import {
   FallbackActions,
   getPhotoIdentificationCopyPayload,
@@ -430,7 +436,7 @@ export default function BottleResolver({
         )}
 
         {!isIdentifying && photoResult && (
-          <>
+          <BottleResolverColumn>
             {matchedBottle || createDecision ? (
               <PhotoMatchCreateState
                 result={photoResult}
@@ -472,22 +478,24 @@ export default function BottleResolver({
                 onStartOver={startOver}
               />
             )}
-            {(matchedBottle || createDecision) && (
+            {matchedBottle ? (
+              <FormDetails compact title="Change bottle">
+                <FallbackActions
+                  searchHref={searchHref}
+                  searchLabel={searchActionLabel}
+                  createBottleHref={createBottleHref}
+                  createBottleLabel="Add a new bottle"
+                />
+                <Button onClick={startOver} variant="tonal" fullWidth>
+                  Use a different photo
+                </Button>
+              </FormDetails>
+            ) : createDecision ? (
               <FallbackActions
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
-                createBottleHref={matchedBottle ? createBottleHref : null}
-                createBottleLabel={
-                  matchedBottle ? "Add a new bottle" : undefined
-                }
-                title={matchedBottle ? "Not the right bottle?" : undefined}
-                description={
-                  matchedBottle
-                    ? "Search for the correct bottle or add a new one using the details from this label."
-                    : undefined
-                }
               />
-            )}
+            ) : null}
             {photoIdentificationTraceId && (
               <PhotoIdentificationTraceFootnote
                 traceId={photoIdentificationTraceId}
@@ -497,7 +505,7 @@ export default function BottleResolver({
                 )}
               />
             )}
-          </>
+          </BottleResolverColumn>
         )}
 
         {error ? <FormNotice role="alert">{error}</FormNotice> : null}
