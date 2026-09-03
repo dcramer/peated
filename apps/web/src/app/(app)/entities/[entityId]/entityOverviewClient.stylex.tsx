@@ -128,5 +128,8 @@ export function EntityOverviewClient() {
 }
 
 const styles = stylex.create({
-  flavorProfile: { paddingTop: space.x6 },
+  flavorProfile: {
+    display: { default: "block", ":empty": "none" },
+    paddingTop: space.x6,
+  },
 });

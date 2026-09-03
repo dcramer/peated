@@ -277,7 +277,7 @@ const styles = stylex.create({
   },
   railSections: {
     gridArea: "railSections",
-    display: "flex",
+    display: { default: "flex", ":empty": "none" },
     minWidth: 0,
     flexDirection: "column",
     gap: space.x8,
