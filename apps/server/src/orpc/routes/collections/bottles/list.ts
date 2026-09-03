@@ -16,7 +16,7 @@ import collectionBottleListContract from "@peated/server/orpc/contracts/collecti
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { isLibraryCollection } from "./collectionBottleHelpers";
 
@@ -126,7 +126,11 @@ export default implement(collectionBottleListContract).handler(async function ({
     .where(and(...baseWhere))
     .limit(limit + 1)
     .offset(offset)
-    .orderBy(asc(bottles.fullName), asc(collectionBottles.id));
+    .orderBy(
+      ...(input.sort === "-created"
+        ? [desc(collectionBottles.createdAt), desc(collectionBottles.id)]
+        : [asc(bottles.fullName), asc(collectionBottles.id)]),
+    );
 
   return {
     results: await serialize(

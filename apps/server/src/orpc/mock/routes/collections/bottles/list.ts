@@ -58,6 +58,12 @@ export default mockOS.collections.bottles.list.handler(
           (input.status === "unset" && item.status === null)),
     );
 
+    collectionBottles.sort((a, b) =>
+      input.sort === "-created"
+        ? b.id - a.id
+        : a.bottle.fullName.localeCompare(b.bottle.fullName) || a.id - b.id,
+    );
+
     return mockPage(
       collectionBottles.map((item) => {
         const bottle = mockBottleFor(context.user, item.bottle);

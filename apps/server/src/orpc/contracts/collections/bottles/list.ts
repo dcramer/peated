@@ -33,6 +33,12 @@ export default contract
         status: z
           .union([CollectionBottleStatusSchema, z.literal("unset")])
           .optional(),
+        sort: z
+          .enum(["name", "-created"])
+          .default("name")
+          .describe(
+            "Order by bottle name or by the date added to the collection, newest first.",
+          ),
         cursor: z.coerce.number().gte(1).default(1),
         limit: z.coerce.number().gte(1).lte(100).default(25),
       })

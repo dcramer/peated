@@ -18,10 +18,12 @@ import {
   FilterQuery,
   ItemList,
   ItemListItem,
+  ListToolbar,
   RowMenu,
   TastingEntry,
   TextLink,
   type BottleIdentityRowProps,
+  type ListSortOption,
   type RowMenuGroup,
   type TastingEntryProps,
 } from "..";
@@ -42,8 +44,11 @@ export type MemberLibraryListProps = {
   emptyHeading: string;
   items: readonly MemberLibraryItem[];
   nextHref?: string;
+  onSortChange: (value: string) => void;
   page: number;
   previousHref?: string;
+  sort: string;
+  sortOptions: readonly [ListSortOption, ...ListSortOption[]];
   total?: number;
 };
 
@@ -54,21 +59,23 @@ export function MemberLibraryList({
   emptyHeading,
   items,
   nextHref,
+  onSortChange,
   page,
   previousHref,
+  sort,
+  sortOptions,
   total,
 }: MemberLibraryListProps) {
   return (
     <section aria-label="Member library" {...stylex.props(styles.library)}>
-      <div {...stylex.props(foundationStyles.rowTitle, styles.libraryCount)}>
-        <strong>
-          {items.length.toLocaleString("en-US")}{" "}
-          {items.length === 1 ? "bottle" : "bottles"}
-        </strong>
-        {total !== undefined ? (
-          <span>of {total.toLocaleString("en-US")}</span>
-        ) : null}
-      </div>
+      <ListToolbar
+        count={items.length}
+        noun="bottle"
+        onSortChange={onSortChange}
+        sort={sort}
+        sortOptions={sortOptions}
+        total={total}
+      />
       {items.length ? (
         <ItemList ariaLabel="Library bottles">
           {items.map(({ actions, id, status, ...identity }) => (
@@ -297,13 +304,6 @@ function formatBottleCount(count: number) {
 
 const styles = stylex.create({
   library: { minWidth: 0 },
-  libraryCount: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: space.x2,
-    paddingBottom: space.x3,
-    color: colors.ink,
-  },
   libraryEnd: { display: "flex", alignItems: "center", gap: space.x2 },
   filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
   railFilters: { display: "block", [NARROW]: { display: "none" } },

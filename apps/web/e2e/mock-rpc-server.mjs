@@ -2482,6 +2482,12 @@ function listCollectionBottles(request, input) {
     );
   }
 
+  results.sort((a, b) =>
+    input?.sort === "-created"
+      ? b.id - a.id
+      : a.bottle.fullName.localeCompare(b.bottle.fullName) || a.id - b.id,
+  );
+
   return {
     results,
     rel: {

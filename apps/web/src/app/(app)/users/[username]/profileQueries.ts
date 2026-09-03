@@ -16,6 +16,7 @@ export type ProfileLibraryInput = Inputs["collections"]["bottles"]["list"] & {
   distiller?: number;
   limit: 25;
   query: string;
+  sort: "name" | "-created";
   status?: "empty" | "open" | "sealed" | "unset";
   user: number;
 };
@@ -81,6 +82,7 @@ export function getProfileLibraryInput(
     distiller: parsePositiveNumber(getSearchParam(source, "distiller")),
     limit: 25,
     query: getSearchParam(source, "query") ?? "",
+    sort: getSearchParam(source, "sort") === "-created" ? "-created" : "name",
     status: parseLibraryStatus(getSearchParam(source, "status")),
     user: userId,
   };

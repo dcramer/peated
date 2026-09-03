@@ -50,7 +50,7 @@ test.describe("profile library", () => {
     ).toBeVisible();
   });
 
-  test("filters Library entries from the profile tab", async ({
+  test("sorts and filters Library entries from the profile tab", async ({
     context,
     page,
   }, testInfo) => {
@@ -83,16 +83,32 @@ test.describe("profile library", () => {
     });
     await expect(libraryBottleLink(page, bottleId)).toBeVisible();
 
+    const sort = page.getByRole("combobox", { name: "Sort bottles" });
+    await expect(sort).toHaveValue("name");
+    await sort.selectOption({ label: "Recently added" });
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?sort=-created`,
+    );
+    await page.reload({ waitUntil: "commit" });
+    await expect(sort).toHaveValue("-created");
+
     await page
       .getByRole("searchbox", { name: "Find in this library" })
       .fill("zzzz");
     await page.getByRole("button", { name: "Find" }).click();
-    await expect(page).toHaveURL(/\/library\?query=zzzz$/);
+    await expect(page).toHaveURL(/\/library\?sort=-created&query=zzzz$/);
     await expect(libraryBottleLink(page, bottleId)).toHaveCount(0);
 
     await page.getByRole("button", { name: "Clear filters" }).click();
-    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?sort=-created`,
+    );
     await expect(libraryBottleLink(page, bottleId)).toBeVisible();
+    await expect(sort).toHaveValue("-created");
+    await sort.selectOption({ label: "Alphabetical" });
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?sort=name`,
+    );
 
     await page.goto(`/users/${testUser.username}/library?cursor=2`, {
       waitUntil: "commit",

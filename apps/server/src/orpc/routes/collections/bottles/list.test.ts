@@ -62,6 +62,78 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results[0]).not.toHaveProperty("target");
   });
 
+  test("paginates recently added Library entries by membership date with stable ties", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const collection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const brand = await fixtures.Entity({ name: "Ordering Brand" });
+    const first = await fixtures.Bottle({ brandId: brand.id, name: "Zulu" });
+    const second = await fixtures.Bottle({ brandId: brand.id, name: "Beta" });
+    const oldest = await fixtures.Bottle({ brandId: brand.id, name: "Alpha" });
+    const excluded = await fixtures.Bottle({ brandId: brand.id });
+    const entries = await db
+      .insert(collectionBottles)
+      .values([
+        {
+          collectionId: collection.id,
+          bottleId: first.id,
+          status: "sealed",
+          createdAt: new Date("2026-08-02T12:00:00Z"),
+        },
+        {
+          collectionId: collection.id,
+          bottleId: second.id,
+          status: "sealed",
+          createdAt: new Date("2026-08-02T12:00:00Z"),
+        },
+        {
+          collectionId: collection.id,
+          bottleId: oldest.id,
+          status: "sealed",
+          createdAt: new Date("2026-08-01T12:00:00Z"),
+        },
+        {
+          collectionId: collection.id,
+          bottleId: excluded.id,
+          status: "open",
+          createdAt: new Date("2026-08-03T12:00:00Z"),
+        },
+      ])
+      .returning();
+
+    const input = {
+      user: "me",
+      collection: "library",
+      sort: "-created",
+      status: "sealed",
+      limit: 1,
+    } as const;
+    const context = { user: defaults.user };
+    const firstPage = await routerClient.collections.bottles.list(input, {
+      context,
+    });
+    const secondPage = await routerClient.collections.bottles.list(
+      { ...input, cursor: firstPage.rel.nextCursor! },
+      { context },
+    );
+    const lastPage = await routerClient.collections.bottles.list(
+      { ...input, cursor: secondPage.rel.nextCursor! },
+      { context },
+    );
+
+    expect(
+      [firstPage, secondPage, lastPage].flatMap((page) =>
+        page.results.map(({ id }) => id),
+      ),
+    ).toEqual([entries[1]!.id, entries[0]!.id, entries[2]!.id]);
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(lastPage.rel).toEqual({ nextCursor: null, prevCursor: 2 });
+  });
+
   test("filters direct membership by Bottle id", async ({
     defaults,
     fixtures,

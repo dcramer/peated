@@ -26,6 +26,11 @@ type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
 type LibraryEntryChange = LibraryEntry["status"] | "removed";
 
+const sortOptions = [
+  { label: "Alphabetical", value: "name" },
+  { label: "Recently added", value: "-created" },
+] as const;
+
 export function ProfileLibraryPageClient() {
   const orpc = useORPC();
   const queryClient = useQueryClient();
@@ -39,7 +44,7 @@ export function ProfileLibraryPageClient() {
   >({});
   const [mutationError, setMutationError] = useState(false);
   const input = getProfileLibraryInput(searchParams, user.id);
-  const { brand, cursor, distiller, query, status } = input;
+  const { brand, cursor, distiller, query, sort, status } = input;
   const libraryQueryOptions = profileQueries.library(orpc, input);
   const libraryListQueryKey = orpc.collections.bottles.list.key({
     type: "query",
@@ -67,7 +72,10 @@ export function ProfileLibraryPageClient() {
     );
   }
 
-  function setFilter(name: "brand" | "distiller" | "status", value: string) {
+  function setFilter(
+    name: "brand" | "distiller" | "status" | "sort",
+    value: string,
+  ) {
     const next = new URLSearchParams(searchParams);
     next.delete("cursor");
     if (value) next.set(name, value);
@@ -249,12 +257,15 @@ export function ProfileLibraryPageClient() {
               libraryQuery.data.rel.nextCursor,
             )}
             page={cursor}
+            onSortChange={(value) => setFilter("sort", value)}
             previousHref={getCursorHref(
               pathname,
               searchParams,
               libraryQuery.data.rel.prevCursor,
             )}
             total={statsQuery.data?.total}
+            sort={sort}
+            sortOptions={sortOptions}
           />
         )}
       </div>
