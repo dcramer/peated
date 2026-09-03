@@ -39,7 +39,7 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <ControlledScore {...args} />
+      <ControlledScore key={args.value} {...args} />
       <ControlledScore
         {...args}
         id="empty-score"

@@ -147,7 +147,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The shared fields used by tasting and review forms. Notes come first, serving and color follow, and the rating or score comes last. Optional photo and friend pickers preserve the main step.",
+          "The shared fields used by tasting and review forms. Notes come first, serving and color follow, and the rating or score comes last. Photos and friends open in a separate panel.",
       },
     },
   },

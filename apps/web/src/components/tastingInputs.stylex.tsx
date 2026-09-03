@@ -176,7 +176,7 @@ export function ReviewScoreInput({
             value={Math.max(REVIEW_SCORE_TRACK_MIN, value ?? 80)}
             onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
             onClick={(event) => {
-              // ReviewScoreInput owns committing a first tap even when the native value is unchanged.
+              // ReviewScoreInput must commit the first tap even when the native value is unchanged.
               if (value === null || value < REVIEW_SCORE_TRACK_MIN) {
                 onChange(event.currentTarget.valueAsNumber);
               }
@@ -220,8 +220,7 @@ export function ReviewScoreInput({
         id={`${id}-scale-help`}
         {...stylex.props(foundationStyles.metadata, styles.reviewScoreHint)}
       >
-        Drag for 60–100, or type any score from 0–100. Your score counts toward
-        this bottle's review score and appears with your review.
+        Drag for 60–100, or type a whole number from 0–100.
       </p>
     </div>
   );
@@ -310,7 +309,7 @@ export type ServingStyleInputProps = {
   value: ServingStyle | null;
 };
 
-/** Records how the whisky was served with the three serving styles. */
+/** Selects a serving style; null leaves all choices unselected. */
 export function ServingStyleInput({
   disabled = false,
   id,

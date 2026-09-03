@@ -11,6 +11,14 @@ const meta = {
     onChange: () => undefined,
     value: null,
   },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Sealed, Open, or Empty status for a bottle in Library. With no status, all choices remain unselected. The caller saves changes and disables the input while saving.",
+      },
+    },
+  },
   argTypes: {
     value: { control: "select", options: [null, "sealed", "open", "empty"] },
   },

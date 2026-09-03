@@ -1,7 +1,6 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import type { Bottle } from "@peated/server/types";
 import {
   Button,
   ButtonLink,
@@ -48,22 +47,13 @@ import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
 type AddBottleIntent = "catalog" | "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
-type FlowBottle = BottleResolverResult;
-type SuggestedTags = { results: TastingTagSuggestion[] };
-type TastingSubmitData = TastingCreateFormSubmitData;
-type TastingDraft = FlowBottle & {
-  suggestedTags: SuggestedTags;
+type RatingDraft = BottleResolverResult & {
+  suggestedTags: { results: TastingTagSuggestion[] };
   createdAt: string;
 };
 
@@ -77,10 +67,6 @@ function getIntent(value: string | null): AddBottleIntent {
     return value;
   }
   return "choose";
-}
-
-function getCreateReturnAction(intent: AddBottleIntent) {
-  return intent;
 }
 
 function getFlowTitle(intent: AddBottleIntent) {
@@ -112,11 +98,7 @@ function getSearchHref(
   return `/search?${params.toString()}`;
 }
 
-function getViewBottleHref(bottle: Bottle) {
-  return getBottleUrl(bottle);
-}
-
-function canSaveBottleToLibrary(selection: FlowBottle) {
+function canSaveBottleToLibrary(selection: BottleResolverResult) {
   return (
     !selection.hasLibraryEntry ||
     Boolean(selection.pendingImage && selection.libraryEntryImageUrl === null)
@@ -131,31 +113,7 @@ function getLibraryActionLabel(state: {
   return state.canSaveLibraryPhoto ? "Save photo" : "In Library";
 }
 
-function BottlePanel({
-  bottle,
-  previewUrl,
-}: {
-  bottle: Bottle;
-  previewUrl?: string | null;
-}) {
-  return (
-    <SelectedBottleSummary
-      bottle={bottle}
-      imageUrl={previewUrl ?? bottle.imageUrl}
-    />
-  );
-}
-
-function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
-  return (
-    <SelectedBottleSummary
-      bottle={entry.bottle}
-      imageUrl={entry.imageUrl ?? entry.bottle.imageUrl}
-    />
-  );
-}
-
-function LoadingBottlePanel({
+function BottleLoadingScreen({
   intent,
   title,
 }: {
@@ -173,13 +131,13 @@ function LoadingBottlePanel({
   );
 }
 
-function revokeBlobPreviewUrl(selection: FlowBottle) {
+function revokeBlobPreviewUrl(selection: BottleResolverResult) {
   if (selection.previewUrl?.startsWith("blob:")) {
     URL.revokeObjectURL(selection.previewUrl);
   }
 }
 
-function BottleLoadErrorPanel({
+function BottleLoadErrorScreen({
   message,
   onStartOver,
   title,
@@ -191,7 +149,7 @@ function BottleLoadErrorPanel({
   return (
     <WorkflowScreen title={title}>
       <FormStack>
-        <FormNotice>{message}</FormNotice>
+        <FormNotice role="alert">{message}</FormNotice>
         <FormGrid>
           <ButtonLink fullWidth href={getSearchHref()}>
             <Search aria-hidden="true" size={16} />
@@ -204,50 +162,6 @@ function BottleLoadErrorPanel({
         </FormGrid>
       </FormStack>
     </WorkflowScreen>
-  );
-}
-
-function OutcomeButton({
-  href,
-  onClick,
-  children,
-  icon,
-  emphasized,
-  disabled,
-  loading,
-}: {
-  href?: string;
-  onClick?: () => void;
-  children: ReactNode;
-  icon: ReactNode;
-  emphasized?: boolean;
-  disabled?: boolean;
-  loading?: boolean;
-}) {
-  if (href) {
-    return (
-      <ButtonLink
-        fullWidth
-        href={href}
-        variant={emphasized ? "accent" : "tonal"}
-      >
-        {icon}
-        {children}
-      </ButtonLink>
-    );
-  }
-
-  return (
-    <Button
-      disabled={disabled}
-      fullWidth
-      loading={loading}
-      onClick={onClick}
-      variant={emphasized ? "accent" : "tonal"}
-    >
-      {icon}
-      {children}
-    </Button>
   );
 }
 
@@ -275,11 +189,11 @@ function BottleResultActions({
         ? "library"
         : "tasting";
   const libraryButton = (
-    <OutcomeButton
+    <Button
+      fullWidth
       key="library"
       onClick={() => onResolve("library")}
-      icon={<BookOpen aria-hidden="true" size={16} />}
-      emphasized={primaryAction === "library"}
+      variant={primaryAction === "library" ? "accent" : "tonal"}
       disabled={
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
@@ -287,30 +201,33 @@ function BottleResultActions({
       }
       loading={resolvingAction === "library" || loadingExactLibraryStatus}
     >
+      <BookOpen aria-hidden="true" size={16} />
       {getLibraryActionLabel({ hasLibraryEntry, canSaveLibraryPhoto })}
-    </OutcomeButton>
+    </Button>
   );
   const tastingButton = (
-    <OutcomeButton
+    <Button
+      fullWidth
       key="tasting"
       onClick={() => onResolve("tasting")}
-      icon={<Wine aria-hidden="true" size={16} />}
-      emphasized={primaryAction === "tasting"}
+      variant={primaryAction === "tasting" ? "accent" : "tonal"}
       disabled={Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
+      <Wine aria-hidden="true" size={16} />
       Rate this bottle
-    </OutcomeButton>
+    </Button>
   );
   const viewButton = (
-    <OutcomeButton
+    <ButtonLink
+      fullWidth
       key="view"
-      href={getViewBottleHref(bottle)}
-      icon={<Eye aria-hidden="true" size={16} />}
-      emphasized={primaryAction === "view"}
+      href={getBottleUrl(bottle)}
+      variant={primaryAction === "view" ? "accent" : "tonal"}
     >
+      <Eye aria-hidden="true" size={16} />
       View bottle
-    </OutcomeButton>
+    </ButtonLink>
   );
   const mainActions =
     primaryAction === "library"
@@ -336,7 +253,7 @@ function BottleResultActions({
   );
 }
 
-function CreateProposalOutcomeActions({
+function BottleCreationActions({
   createPending,
   resolvingAction,
   intent,
@@ -350,40 +267,43 @@ function CreateProposalOutcomeActions({
         ? "library"
         : "tasting";
   const libraryButton = (
-    <OutcomeButton
+    <Button
+      fullWidth
       key="library"
       onClick={() => onResolve("library")}
-      icon={<BookOpen aria-hidden="true" size={16} />}
-      emphasized={primaryAction === "library"}
+      variant={primaryAction === "library" ? "accent" : "tonal"}
       disabled={creating}
       loading={resolvingAction === "library"}
     >
+      <BookOpen aria-hidden="true" size={16} />
       Add to Library
-    </OutcomeButton>
+    </Button>
   );
   const tastingButton = (
-    <OutcomeButton
+    <Button
+      fullWidth
       key="tasting"
       onClick={() => onResolve("tasting")}
-      icon={<Wine aria-hidden="true" size={16} />}
-      emphasized={primaryAction === "tasting"}
+      variant={primaryAction === "tasting" ? "accent" : "tonal"}
       disabled={creating}
       loading={resolvingAction === "tasting"}
     >
+      <Wine aria-hidden="true" size={16} />
       Rate this bottle
-    </OutcomeButton>
+    </Button>
   );
   const createButton = (
-    <OutcomeButton
+    <Button
+      fullWidth
       key="create"
       onClick={() => onResolve("create")}
-      icon={<Plus aria-hidden="true" size={16} />}
-      emphasized={primaryAction === "create"}
+      variant={primaryAction === "create" ? "accent" : "tonal"}
       disabled={creating}
       loading={resolvingAction === "create"}
     >
+      <Plus aria-hidden="true" size={16} />
       Add a bottle
-    </OutcomeButton>
+    </Button>
   );
   const actionButtons =
     primaryAction === "tasting"
@@ -401,23 +321,23 @@ function CreateProposalOutcomeActions({
   );
 }
 
-function OutcomeSelection({
+function BottleResultScreen({
   selection,
   intent,
   onAddToLibrary,
-  onLogTasting,
+  onRateBottle,
   onStartOver,
   addingToLibrary,
-  loggingTasting,
+  loadingRatingForm,
   error,
 }: {
-  selection: FlowBottle;
+  selection: BottleResolverResult;
   intent: AddBottleIntent;
   onAddToLibrary: () => void;
-  onLogTasting: () => void;
+  onRateBottle: () => void;
   onStartOver: () => void;
   addingToLibrary: boolean;
-  loggingTasting: boolean;
+  loadingRatingForm: boolean;
   error?: string;
 }) {
   return (
@@ -430,9 +350,9 @@ function OutcomeSelection({
       }
     >
       <FormStack>
-        <BottlePanel
+        <SelectedBottleSummary
           bottle={selection.bottle}
-          previewUrl={selection.previewUrl}
+          imageUrl={selection.previewUrl ?? selection.bottle.imageUrl}
         />
         {selection.warnings?.length ? (
           <FormNotice>{selection.warnings.join(" ")}</FormNotice>
@@ -444,10 +364,10 @@ function OutcomeSelection({
           changeBottleHref={getSearchHref("", intent, selection.pendingImage)}
           loadingExactLibraryStatus={false}
           resolvingAction={
-            addingToLibrary ? "library" : loggingTasting ? "tasting" : null
+            addingToLibrary ? "library" : loadingRatingForm ? "tasting" : null
           }
           onResolve={(action) =>
-            action === "library" ? onAddToLibrary() : onLogTasting()
+            action === "library" ? onAddToLibrary() : onRateBottle()
           }
         />
         {selection.photoTrace && (
@@ -470,7 +390,7 @@ function AddedToLibrary({
   updatingStatus = false,
 }: {
   entry: CollectionBottle;
-  photoTrace?: FlowBottle["photoTrace"] | null;
+  photoTrace?: BottleResolverResult["photoTrace"] | null;
   onFindAnother: () => void;
   onStatusChange: (status: NonNullable<CollectionBottleStatusValue>) => void;
   statusError?: string;
@@ -479,7 +399,10 @@ function AddedToLibrary({
   return (
     <WorkflowScreen title="Added to Library">
       <FormStack>
-        <CollectionBottlePanel entry={entry} />
+        <SelectedBottleSummary
+          bottle={entry.bottle}
+          imageUrl={entry.imageUrl ?? entry.bottle.imageUrl}
+        />
         <FieldGroup label="Bottle status" optional>
           <CollectionBottleStatusInput
             disabled={updatingStatus}
@@ -501,11 +424,7 @@ function AddedToLibrary({
           <Wine aria-hidden="true" size={16} />
           Rate this bottle
         </ButtonLink>
-        <ButtonLink
-          fullWidth
-          href={getViewBottleHref(entry.bottle)}
-          variant="tonal"
-        >
+        <ButtonLink fullWidth href={getBottleUrl(entry.bottle)} variant="tonal">
           <Eye aria-hidden="true" size={16} />
           View this bottle
         </ButtonLink>
@@ -561,22 +480,21 @@ function AddBottleFlowContent() {
 
   const [handledBottleKey, setHandledBottleKey] = useState<string | null>(null);
   const [bottleLoadError, setBottleLoadError] = useState<string | null>(null);
-  const [selectedBottle, setSelectedBottle] = useState<FlowBottle | null>(null);
+  const [selectedBottle, setSelectedBottle] =
+    useState<BottleResolverResult | null>(null);
   const [libraryError, setLibraryError] = useState<string | undefined>();
   const [addedEntry, setAddedEntry] = useState<CollectionBottle | null>(null);
   const [addedEntryPhotoTrace, setAddedEntryPhotoTrace] = useState<
-    FlowBottle["photoTrace"] | null
+    BottleResolverResult["photoTrace"] | null
   >(null);
-  const [tastingDraft, setTastingDraft] = useState<TastingDraft | null>(null);
-  const [tastingLoadError, setTastingLoadError] = useState<
-    string | undefined
-  >();
-  const [loadingTastingDraft, setLoadingTastingDraft] = useState(false);
+  const [ratingDraft, setRatingDraft] = useState<RatingDraft | null>(null);
+  const [ratingLoadError, setRatingLoadError] = useState<string | undefined>();
+  const [loadingRatingDraft, setLoadingRatingDraft] = useState(false);
   const inlineBottleHref = useCallback(
     (bottle: { id: number }) =>
       getAddBottleHref({
         bottleId: bottle.id,
-        intent: getCreateReturnAction(intent),
+        intent,
       }),
     [intent],
   );
@@ -584,7 +502,7 @@ function AddBottleFlowContent() {
     (query: string) =>
       getCreateBottleHref({
         query,
-        returnAction: getCreateReturnAction(intent),
+        returnAction: intent,
       }),
     [intent],
   );
@@ -632,8 +550,8 @@ function AddBottleFlowContent() {
       setBottleLoadError(null);
       setAddedEntry(null);
       setAddedEntryPhotoTrace(null);
-      setTastingDraft(null);
-      setTastingLoadError(undefined);
+      setRatingDraft(null);
+      setRatingLoadError(undefined);
 
       try {
         const bottle = await orpc.bottles.details.call({
@@ -647,7 +565,7 @@ function AddBottleFlowContent() {
 
         if (cancelled) return;
         const libraryEntry = collectionStatus.results[0] ?? null;
-        const selection: FlowBottle = {
+        const selection: BottleResolverResult = {
           bottle,
           hasLibraryEntry: Boolean(libraryEntry),
           libraryEntryImageUrl: libraryEntry?.imageUrl ?? null,
@@ -663,7 +581,7 @@ function AddBottleFlowContent() {
             });
             if (cancelled) return;
             setSelectedBottle(null);
-            setTastingDraft({
+            setRatingDraft({
               ...selection,
               suggestedTags,
               createdAt: new Date().toISOString(),
@@ -672,8 +590,8 @@ function AddBottleFlowContent() {
             logError(err);
             if (cancelled) return;
             setSelectedBottle(selection);
-            setTastingLoadError(
-              "We couldn't load the tasting form. Try again or search for the bottle.",
+            setRatingLoadError(
+              "We couldn't load the form. Try again or search for the bottle.",
             );
           }
         } else {
@@ -713,8 +631,8 @@ function AddBottleFlowContent() {
     setLibraryError(undefined);
     setAddedEntry(null);
     setAddedEntryPhotoTrace(null);
-    setTastingDraft(null);
-    setTastingLoadError(undefined);
+    setRatingDraft(null);
+    setRatingLoadError(undefined);
     setBottleLoadError(null);
     setHandledBottleKey(requestedBottleKey);
     router.replace(getAddBottleHref({ intent: nextIntent }));
@@ -728,51 +646,53 @@ function AddBottleFlowContent() {
     resetFlow("choose");
   }
 
-  async function startLogTasting(selection: FlowBottle) {
-    setTastingLoadError(undefined);
-    setLoadingTastingDraft(true);
+  async function openRatingForm(selection: BottleResolverResult) {
+    setRatingLoadError(undefined);
+    setLoadingRatingDraft(true);
     try {
       const suggestedTags = await orpc.bottles.suggestedTags.call({
         bottle: selection.bottle.id,
       });
       setLibraryError(undefined);
-      setTastingDraft({
+      setRatingDraft({
         ...selection,
         suggestedTags,
         createdAt: new Date().toISOString(),
       });
       revokeBlobPreviewUrl(selection);
     } catch (err) {
-      logError(err);
       setSelectedBottle(selection);
-      setTastingLoadError(
-        "We couldn't load the tasting form. Try again or search for the bottle.",
+      setRatingLoadError(
+        getFormErrorMessage(err, {
+          fallbackMessage:
+            "We couldn't load the form. Try again or search for the bottle.",
+        }),
       );
     } finally {
-      setLoadingTastingDraft(false);
+      setLoadingRatingDraft(false);
     }
   }
 
   async function handleResolvedBottle(
-    selection: FlowBottle,
+    selection: BottleResolverResult,
     action?: BottleResolverAction,
   ) {
     setLibraryError(undefined);
     setAddedEntry(null);
     setAddedEntryPhotoTrace(null);
-    setTastingDraft(null);
-    setTastingLoadError(undefined);
+    setRatingDraft(null);
+    setRatingLoadError(undefined);
 
     if (action) {
       selection.warnings?.forEach((warning) => flash(warning, "error"));
     }
 
     if (action === "library") {
-      await addToLibrary(selection, { showOutcomeWhileSaving: false });
+      await addToLibrary(selection, { showResultWhileSaving: false });
     } else if (action === "tasting") {
-      await startLogTasting(selection);
+      await openRatingForm(selection);
     } else if (action === "create") {
-      router.push(getViewBottleHref(selection.bottle));
+      router.push(getBottleUrl(selection.bottle));
       revokeBlobPreviewUrl(selection);
     } else {
       setSelectedBottle(selection);
@@ -782,18 +702,18 @@ function AddBottleFlowContent() {
   async function addToLibrary(
     selection = selectedBottle,
     {
-      showOutcomeWhileSaving = true,
+      showResultWhileSaving = true,
     }: {
-      showOutcomeWhileSaving?: boolean;
+      showResultWhileSaving?: boolean;
     } = {},
   ) {
     if (!selection) return;
 
-    if (showOutcomeWhileSaving) {
+    if (showResultWhileSaving) {
       setSelectedBottle(selection);
     }
     setLibraryError(undefined);
-    setTastingDraft(null);
+    setRatingDraft(null);
     if (!canSaveBottleToLibrary(selection)) return;
 
     try {
@@ -808,7 +728,6 @@ function AddBottleFlowContent() {
       setSelectedBottle(null);
       revokeBlobPreviewUrl(selection);
     } catch (err) {
-      logError(err);
       setSelectedBottle(selection);
       setLibraryError(
         getFormErrorMessage(err, {
@@ -861,7 +780,6 @@ function AddBottleFlowContent() {
         }),
       });
     } catch (err) {
-      logError(err, { context: "add_bottle_library_status_update" });
       setLibraryError(
         getFormErrorMessage(err, {
           expectedErrorNames: ["BAD_REQUEST", "FORBIDDEN", "NOT_FOUND"],
@@ -871,16 +789,19 @@ function AddBottleFlowContent() {
     }
   }
 
-  async function submitTasting({ image, ...data }: TastingSubmitData) {
-    if (!tastingDraft) return;
+  async function submitTasting({
+    image,
+    ...data
+  }: TastingCreateFormSubmitData) {
+    if (!ratingDraft) return;
 
     const pendingImageId =
-      image === undefined ? tastingDraft.pendingImage?.id : undefined;
+      image === undefined ? ratingDraft.pendingImage?.id : undefined;
 
     const { tasting, awards } = await tastingCreateMutation.mutateAsync({
       ...data,
       flight: requestedFlightId,
-      createdAt: tastingDraft.createdAt,
+      createdAt: ratingDraft.createdAt,
       pendingImageId,
     });
 
@@ -932,12 +853,12 @@ function AddBottleFlowContent() {
     image,
     ...data
   }: MemberReviewFormSubmitData) {
-    if (!tastingDraft) return;
+    if (!ratingDraft) return;
 
     let review = await memberReviewSaveMutation.mutateAsync({
       ...data,
       pendingImageId:
-        image === undefined ? tastingDraft.pendingImage?.id : undefined,
+        image === undefined ? ratingDraft.pendingImage?.id : undefined,
     });
 
     try {
@@ -987,12 +908,12 @@ function AddBottleFlowContent() {
   }
 
   if (requestedBottleKey && handledBottleKey !== requestedBottleKey) {
-    return <LoadingBottlePanel intent={intent} title={flowTitle} />;
+    return <BottleLoadingScreen intent={intent} title={flowTitle} />;
   }
 
   if (bottleLoadError) {
     return (
-      <BottleLoadErrorPanel
+      <BottleLoadErrorScreen
         message={bottleLoadError}
         onStartOver={startOver}
         title={flowTitle}
@@ -1013,15 +934,15 @@ function AddBottleFlowContent() {
     );
   }
 
-  if (tastingDraft) {
+  if (ratingDraft) {
     return (
       <TastingForm
         title="Rate this bottle"
         initialData={{
-          bottle: tastingDraft.bottle,
-          imageUrl: tastingDraft.pendingImage?.imageUrl,
+          bottle: ratingDraft.bottle,
+          imageUrl: ratingDraft.pendingImage?.imageUrl,
         }}
-        suggestedTags={tastingDraft.suggestedTags}
+        suggestedTags={ratingDraft.suggestedTags}
         onReviewSubmit={submitMemberReview}
         onSubmit={submitTasting}
       />
@@ -1030,20 +951,20 @@ function AddBottleFlowContent() {
 
   if (selectedBottle) {
     return (
-      <OutcomeSelection
+      <BottleResultScreen
         selection={selectedBottle}
         intent={intent}
-        error={libraryError ?? tastingLoadError}
+        error={libraryError ?? ratingLoadError}
         onAddToLibrary={() => {
           setLibraryError(undefined);
-          setTastingDraft(null);
-          setTastingLoadError(undefined);
+          setRatingDraft(null);
+          setRatingLoadError(undefined);
           void addToLibrary(selectedBottle);
         }}
-        onLogTasting={() => void startLogTasting(selectedBottle)}
+        onRateBottle={() => void openRatingForm(selectedBottle)}
         onStartOver={startOver}
         addingToLibrary={libraryCreateMutation.isPending}
-        loggingTasting={loadingTastingDraft}
+        loadingRatingForm={loadingRatingDraft}
       />
     );
   }
@@ -1072,7 +993,7 @@ function AddBottleFlowContent() {
       ) =>
         getCreateBottleHref({
           query,
-          returnAction: getCreateReturnAction(intent),
+          returnAction: intent,
           prefill,
           pendingImage,
         })
@@ -1083,7 +1004,7 @@ function AddBottleFlowContent() {
         <BottleResultActions {...props} intent={intent} />
       )}
       renderCreateProposalActions={(props) => (
-        <CreateProposalOutcomeActions {...props} intent={intent} />
+        <BottleCreationActions {...props} intent={intent} />
       )}
       onResolve={handleResolvedBottle}
     />
@@ -1091,9 +1012,8 @@ function AddBottleFlowContent() {
 }
 
 /**
- * Owns the standalone Bottle flow route: auth-gated resolution, direct
- * Bottle and legacy-release query parameters, direct Library saves, and tasting continuation
- * stay in this flow so scan image reuse remains attached to the user's action.
+ * Keeps bottle lookup, Library saves, tastings, and reviews together so a
+ * pending photo follows the selected action.
  */
 export default function AddBottleFlow() {
   return (

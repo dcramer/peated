@@ -2,14 +2,11 @@
 
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
+import { useId } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import {
-  colors,
-  controlMetrics,
-  effects,
-  space,
-} from "../styles/tokens.stylex";
+import { colors, space } from "../styles/tokens.stylex";
+import { Button } from "./button.stylex";
 
 export type TastingFormMode = "tasting" | "review";
 
@@ -21,14 +18,15 @@ export function TastingFormModeChoice({
   disabled: boolean;
   onChange: (value: TastingFormMode) => void;
 }) {
+  const id = useId();
   const choices = [
     {
-      description: "Save this pour with notes and a rating.",
+      description: "Notes and a rating for this pour.",
       label: "Log a tasting",
       value: "tasting",
     },
     {
-      description: "Save your overall opinion and a score for this bottle.",
+      description: "Your opinion of the bottle, with a score out of 100.",
       label: "Write a review",
       value: "review",
     },
@@ -40,32 +38,26 @@ export function TastingFormModeChoice({
       role="group"
       {...stylex.props(styles.choices)}
     >
-      {choices.map((choice) => {
-        return (
-          <button
+      {choices.map((choice) => (
+        <div key={choice.value} {...stylex.props(styles.choice)}>
+          <Button
+            aria-describedby={`${id}-${choice.value}`}
             disabled={disabled}
-            key={choice.value}
+            fullWidth
             onClick={() => onChange(choice.value)}
-            type="button"
-            {...stylex.props(styles.choice, disabled && styles.disabledChoice)}
+            variant="tonal"
           >
-            <span {...stylex.props(styles.choiceCopy)}>
-              <strong {...stylex.props(foundationStyles.compactRowTitle)}>
-                {choice.label}
-              </strong>
-              <span
-                {...stylex.props(
-                  foundationStyles.metadata,
-                  styles.choiceDescription,
-                )}
-              >
-                {choice.description}
-              </span>
-            </span>
-            <ArrowRight aria-hidden="true" size={19} strokeWidth={1.8} />
-          </button>
-        );
-      })}
+            {choice.label}
+            <ArrowRight aria-hidden="true" size={18} />
+          </Button>
+          <p
+            id={`${id}-${choice.value}`}
+            {...stylex.props(foundationStyles.metadata, styles.description)}
+          >
+            {choice.description}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
@@ -73,7 +65,6 @@ export function TastingFormModeChoice({
 const styles = stylex.create({
   choices: {
     display: "grid",
-    width: "100%",
     minWidth: 0,
     gridTemplateColumns: {
       default: "repeat(2, minmax(0, 1fr))",
@@ -82,42 +73,13 @@ const styles = stylex.create({
     gap: space.x3,
   },
   choice: {
-    boxSizing: "border-box",
     display: "flex",
     minWidth: 0,
-    minHeight: "112px",
-    alignItems: "center",
-    gap: space.x4,
-    padding: space.x4,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: {
-      default: colors.fieldRule,
-      ":hover": colors.inkMuted,
-    },
-    borderRadius: controlMetrics.radius,
-    backgroundColor: {
-      default: colors.fieldBackground,
-      ":hover": colors.surface,
-    },
-    color: colors.ink,
-    textAlign: "left",
-    cursor: "pointer",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  choiceCopy: {
-    display: "flex",
-    minWidth: 0,
-    flex: 1,
     flexDirection: "column",
-    gap: space.x1,
+    gap: space.x2,
   },
-
-  choiceDescription: {
+  description: {
+    margin: 0,
     color: colors.inkMuted,
   },
-  disabledChoice: { cursor: "not-allowed", opacity: 0.45 },
 });

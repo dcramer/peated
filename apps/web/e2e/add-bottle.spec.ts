@@ -1375,6 +1375,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
+    await page.getByText("Change bottle", { exact: true }).click();
     const createBottleLink = page.getByRole("link", {
       name: "Add a new bottle",
     });

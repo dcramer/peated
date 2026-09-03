@@ -24,7 +24,7 @@ const statusLabels = {
   empty: "Empty",
 } satisfies Record<CollectionBottleStatus, string>;
 
-/** Selects an optional Library bottle status with the same treatment as serving style. */
+/** Selects a Library bottle status; null leaves all choices unselected. */
 export function CollectionBottleStatusInput({
   disabled = false,
   onChange,

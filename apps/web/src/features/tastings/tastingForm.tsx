@@ -295,19 +295,14 @@ export default function TastingForm(
     scrollToFormTop();
   }
 
-  const tastingFormAction = isLastStep
-    ? handleSubmit(submit)
+  const formAction = isLastStep
+    ? isReview
+      ? handleReviewSubmit(submitReview)
+      : handleSubmit(submit)
     : (event: React.FormEvent) => {
         event.preventDefault();
         void continueForm();
       };
-  const reviewFormAction = isLastStep
-    ? handleReviewSubmit(submitReview)
-    : (event: React.FormEvent) => {
-        event.preventDefault();
-        void continueForm();
-      };
-  const formAction = isReview ? reviewFormAction : tastingFormAction;
   const saving = isReview ? isReviewSubmitting : isSubmitting;
   const reviewIsLoading = isReview && reviewQuery.isPending;
   const reviewLoadFailed = isReview && Boolean(reviewQuery.error);
@@ -324,15 +319,13 @@ export default function TastingForm(
     isLastStep && isReview && !validReviewScore
       ? "Enter a score from 0 to 100."
       : undefined;
-  const saveLabel = isReview
-    ? isLastStep
-      ? reviewQuery.data
-        ? "Update review"
-        : "Save review"
-      : "Continue"
-    : isLastStep
+  const saveLabel = !isLastStep
+    ? "Continue"
+    : !isReview
       ? "Save tasting"
-      : "Continue";
+      : reviewQuery.data
+        ? "Update review"
+        : "Save review";
 
   function selectFormMode(nextMode: TastingFormMode) {
     setSubmitError(undefined);
@@ -389,7 +382,7 @@ export default function TastingForm(
             imageUrl={photoPreview ?? initialData.bottle.imageUrl}
           />
           {submitError || errorMessage ? (
-            <FormNotice>{submitError ?? errorMessage}</FormNotice>
+            <FormNotice role="alert">{submitError ?? errorMessage}</FormNotice>
           ) : null}
           {formMode === null ? (
             <TastingFormModeSection
