@@ -15,6 +15,7 @@ export * from "./entities";
 export * from "./entityEvents";
 export * from "./events";
 export * from "./externalReviews";
+export * from "./externalReviewScoring";
 export * from "./externalSites";
 export * from "./flights";
 export * from "./follows";

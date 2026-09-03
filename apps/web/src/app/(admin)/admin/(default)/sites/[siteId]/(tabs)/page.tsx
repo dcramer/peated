@@ -17,6 +17,7 @@ import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
 
 import { styles } from "./page.stylex";
+import ReviewScoringSettings from "./reviewScoringSettings";
 
 export default function Page(props: { params: Promise<{ siteId: string }> }) {
   const { siteId } = use(props.params);
@@ -57,9 +58,14 @@ export default function Page(props: { params: Promise<{ siteId: string }> }) {
             <ScraperIconSettings site={site} />
           </div>
           {site.reviewPublication ? (
-            <div {...stylex.props(styles.dividedSetting)}>
-              <ScraperPublicationSettings site={site} />
-            </div>
+            <>
+              <div {...stylex.props(styles.dividedSetting)}>
+                <ScraperPublicationSettings site={site} />
+              </div>
+              <div {...stylex.props(styles.dividedSetting)}>
+                <ReviewScoringSettings site={siteKey} />
+              </div>
+            </>
           ) : null}
         </div>
       </AdminSection>

@@ -27,6 +27,7 @@ export type JobName =
   | "RunScraper"
   | "CreateMissingBottles"
   | "UpdateBottleStats"
+  | "UpdateSiteReviewScores"
   | "UpdateCountryStats"
   | "UpdateEntityStats"
   | "UpdateRegionStats"

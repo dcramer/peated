@@ -21,7 +21,7 @@ export type CommunityFeedBottle = Pick<
   activityLabel?: string;
   byline?: string;
   ratingBand?: RatingBand | null;
-  score?: number;
+  score?: { value: number; scale: number };
 };
 
 export type CommunityFeedItem = {
@@ -114,13 +114,16 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 bottle.score !== undefined || bottle.ratingBand ? (
                   <div {...stylex.props(styles.facts)}>
                     {bottle.score !== undefined ? (
-                      <strong
-                        aria-label={`Review score: ${bottle.score} out of 100`}
+                      <span
+                        role="img"
+                        aria-label={`Review score: ${bottle.score.value} out of ${bottle.score.scale}`}
                         {...stylex.props(styles.score)}
                       >
-                        {bottle.score}
-                        <span {...stylex.props(styles.scoreScale)}>/100</span>
-                      </strong>
+                        {bottle.score.value}
+                        <span {...stylex.props(styles.scoreScale)}>
+                          /{bottle.score.scale}
+                        </span>
+                      </span>
                     ) : null}
                     {bottle.ratingBand ? (
                       <>
@@ -229,7 +232,7 @@ const styles = stylex.create({
   },
   scoreScale: {
     color: colors.inkMuted,
-    fontSize: "12px",
+    fontSize: "13px",
     fontWeight: 400,
     letterSpacing: "normal",
     marginLeft: "3px",

@@ -1,14 +1,11 @@
 import { EMPTY_TASTING_BAND_COUNTS } from "@peated/server/constants";
 import type { AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
+import { memberReviews, tastings } from "@peated/server/db/schema";
 import {
-  externalReviewArticles,
-  externalReviewPublications,
-  externalReviews,
-  memberReviews,
-  tastings,
-} from "@peated/server/db/schema";
-import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
+  loadScoredExternalReviews,
+  type ReviewScoringOverride,
+} from "@peated/server/externalReviews/scoredReviews";
 import { inArray, sql } from "drizzle-orm";
 
 export type BottleActivityStats = Pick<
@@ -64,8 +61,14 @@ function requiredScore(value: number | string | null): number | null {
 export async function aggregateBottleActivityStatsInTransaction(
   tx: AnyTransaction,
   bottleIds: number[],
+  override?: ReviewScoringOverride,
 ): Promise<BottleActivityStats> {
-  const externalWhere = countedExternalReviewScoreWhere();
+  const reviews = await loadScoredExternalReviews({ bottleIds }, tx, override);
+  const externalScores = reviews.flatMap(({ contribution }) =>
+    contribution.value === null ? [] : [contribution.value],
+  );
+  // Ratings passes one integer-array parameter, including for large BottleGroups.
+  const scoreArray = `{${externalScores.join(",")}}`;
   const result = await tx.execute<RawBottleActivityStats>(sql`
     WITH score_values AS (
       SELECT ${memberReviews.score}::integer AS score, 'member'::text AS source
@@ -74,14 +77,7 @@ export async function aggregateBottleActivityStatsInTransaction(
 
       UNION ALL
 
-      SELECT ${externalReviews.nativeScoreValue}::integer AS score, 'external'::text AS source
-      FROM ${externalReviews}
-      INNER JOIN ${externalReviewArticles}
-        ON ${externalReviewArticles.id} = ${externalReviews.articleId}
-      LEFT JOIN ${externalReviewPublications}
-        ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
-      WHERE ${inArray(externalReviews.bottleId, bottleIds)}
-        AND ${externalWhere}
+      SELECT unnest(${scoreArray}::integer[]) AS score, 'external'::text AS source
     ), score_stats AS (
       SELECT
         COUNT(*) FILTER (WHERE source = 'member') AS "memberScoreCount",

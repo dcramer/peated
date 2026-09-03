@@ -48,7 +48,7 @@ test.describe("tastings and reviews", () => {
     await page.getByRole("button", { name: "Close note picker" }).click();
 
     await page.getByRole("button", { name: "Continue" }).click();
-    await page.getByRole("radio", { name: "Neat" }).check({ force: true });
+    await chooseRadio(page, "Serving", "Neat");
     await page.getByLabel("Color of the pour").fill("8");
     await page.getByRole("button", { name: "Add friends" }).click();
     await page
@@ -125,7 +125,7 @@ test.describe("tastings and reviews", () => {
     });
     await page.getByRole("button", { name: "Continue" }).click();
     await uploadTastingImage(page);
-    await page.getByRole("radio", { name: "Neat" }).check({ force: true });
+    await chooseRadio(page, "Serving", "Neat");
     await snapshot("Tasting form / Tasting / 2 The pour", {
       ready: page.getByRole("button", { name: "Photo attached" }),
     });
@@ -273,7 +273,19 @@ async function startTasting(page: Page, notes: string) {
 
 async function finishTasting(page: Page) {
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("radio", { name: /^Very good/ }).check({ force: true });
+  await chooseRadio(page, "How was it", /^Very good/);
+}
+
+async function chooseRadio(
+  page: Page,
+  groupName: string,
+  optionName: string | RegExp,
+) {
+  const radio = page
+    .getByRole("radiogroup", { name: groupName })
+    .getByRole("radio", { name: optionName });
+  await radio.locator("..").click();
+  await expect(radio).toBeChecked();
 }
 
 async function uploadTastingImage(page: Page) {

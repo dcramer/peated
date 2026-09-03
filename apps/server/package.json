@@ -8,7 +8,7 @@
     "dev:api": "tsx watch --require dotenv/config ./src/run-server.ts",
     "dev:mock": "tsx watch ./src/orpc/mock/run-server.ts",
     "dev:worker": "tsx watch --require dotenv/config ./src/run-worker.ts",
-    "evals": "sh -c 'if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest run --config vitest.evals.config.mts; else dotenv -e .env.test -- vitest run --config vitest.evals.config.mts; fi'",
+    "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest run --config vitest.evals.config.mts \"$@\"; else dotenv -e .env.test -- vitest run --config vitest.evals.config.mts \"$@\"; fi' --",
     "start": "concurrently 'npm:start:api' 'npm:start:worker'",
     "start:api": "tsx --require dotenv/config ./src/run-server.ts",
     "start:worker": "tsx --require dotenv/config ./src/run-worker.ts",

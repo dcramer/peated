@@ -5,6 +5,7 @@ import { healthDetails, healthList } from "./health";
 import icon from "./icon";
 import list from "./list";
 import reviewPublication from "./review-publication";
+import reviewScoring from "./review-scoring";
 import runs from "./runs";
 import schedule from "./schedule";
 import scrapeSources from "./scrape-sources";
@@ -22,4 +23,5 @@ export default base.tag("sites").router({
   config,
   scrapeSources,
   reviewPublication,
+  reviewScoring,
 });

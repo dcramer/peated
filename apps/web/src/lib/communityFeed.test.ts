@@ -60,7 +60,7 @@ describe("getCommunityFeedItems", () => {
     ]);
   });
 
-  test("keeps scores separate from tasting ratings and omits other score scales", () => {
+  test("keeps original score scales separate from tasting ratings", () => {
     const items = getCommunityFeedItems({
       criticReviews: [
         {
@@ -77,8 +77,8 @@ describe("getCommunityFeedItems", () => {
     });
 
     expect(items.map((item) => item.bottles[0]?.score)).toEqual([
-      0,
-      undefined,
+      { value: 0, scale: 100, display: "0" },
+      { value: 9, scale: 10, display: "9/10" },
       undefined,
     ]);
     expect(items[2]?.bottles[0]?.ratingBand).toBe(mockTasting.ratingBand);

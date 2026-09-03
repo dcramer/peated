@@ -48,10 +48,7 @@ export function getCommunityFeedItems({
               review.reviewerName && review.reviewerName !== source
                 ? review.reviewerName
                 : undefined,
-            score:
-              review.nativeScore?.scale === 100
-                ? review.nativeScore.value
-                : undefined,
+            score: review.nativeScore ?? undefined,
           },
         ],
       },
@@ -95,7 +92,7 @@ export function getCommunityFeedItems({
           bottles: [
             {
               ...feedBottle(entry.review.bottle),
-              score: entry.review.score,
+              score: { value: entry.review.score, scale: 100 },
               description: getPreview(entry.review.notes),
               activityHref: `/reviews/${entry.review.id}`,
               activityLabel: "Read review",

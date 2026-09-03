@@ -54,7 +54,8 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
     "format": "prettier --write --cache .",
-    "format:check": "prettier --check --cache ."
+    "format:check": "prettier --check --cache .",
+    "evals:scraper:e2e": "pnpm --filter @peated/server evals -- src/scraper/configured/createScraper.eval.test.ts"
   },
   "author": "David Cramer",
   "license": "Apache-2.0",

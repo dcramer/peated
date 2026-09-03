@@ -1,3 +1,5 @@
+import { loadScoredExternalReviews } from "@peated/server/externalReviews/scoredReviews";
+import type { ExternalReviewScoreContribution } from "@peated/server/schemas/externalReviewScoring";
 import { and, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { serialize, serializer } from ".";
@@ -16,6 +18,7 @@ import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
 type ExternalReviewAttrs = {
+  scoreContribution: ExternalReviewScoreContribution;
   article: Pick<
     ExternalReviewArticle,
     "canonicalUrl" | "externalSiteId" | "publishedAt" | "title"
@@ -52,6 +55,12 @@ export const ExternalReviewSerializer = serializer({
       .where(inArray(externalReviewArticles.id, articleIds));
     const articlesById = new Map(
       articleList.map((article) => [article.id, article]),
+    );
+    const scored = await loadScoredExternalReviews({
+      reviewIds: itemList.map((review) => review.id),
+    });
+    const contributions = new Map(
+      scored.map((review) => [review.id, review.contribution]),
     );
 
     const bottleIds = Array.from(
@@ -115,9 +124,14 @@ export const ExternalReviewSerializer = serializer({
             `External review ${item.id} references missing Bottle ${item.bottleId}.`,
           );
         }
+        const scoreContribution = contributions.get(item.id);
+        if (scoreContribution === undefined) {
+          throw new Error(`External review ${item.id} is missing score data.`);
+        }
         return [
           item.id,
           {
+            scoreContribution,
             article,
             bottle,
             site: sitesByRef[article.externalSiteId],
@@ -152,6 +166,7 @@ export const ExternalReviewSerializer = serializer({
       bottle: attrs.bottle,
       reviewerName: item.reviewerName,
       nativeScore,
+      scoreContribution: attrs.scoreContribution,
       clip: item.clip,
       extractedTags: item.tags,
       site: attrs.site,

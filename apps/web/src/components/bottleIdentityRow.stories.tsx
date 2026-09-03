@@ -233,7 +233,7 @@ export const RowLayouts: Story = {
                   {
                     ...args,
                     id: "bottle",
-                    score: 88,
+                    score: { value: 88, scale: 100 },
                     activityHref: "https://example.com/review",
                     activityLabel: "Read at Whiskyfun ↗",
                   },

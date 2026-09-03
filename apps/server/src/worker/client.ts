@@ -109,6 +109,11 @@ export function configureWorkerDispatch(dispatch: WorkerDispatch) {
   workerDispatch = dispatch;
 }
 
+/** Restore the production Redis-backed dispatch after a test-owned override. */
+export function useQueueWorkerDispatch() {
+  workerDispatch = queueDispatch;
+}
+
 export async function runJob(jobName: JobName, args?: JobArgs) {
   return args === undefined
     ? await workerDispatch.runJob(jobName)
@@ -142,6 +147,7 @@ export async function pushJob(
 }
 
 let connection: IORedis | null = null;
+const SCRAPER_JOB_LOCK_DURATION_MS = 60 * 60_000;
 
 export async function getQueue(
   name = "default",
@@ -168,27 +174,16 @@ export async function gracefulShutdown(signal?: string, worker?: Worker) {
   connection = null;
 }
 
-export async function runWorker() {
+export type WorkerRuntime = {
+  queues: [Queue, Queue];
+  workers: [Worker, Worker];
+  close: () => Promise<void>;
+};
+
+/** Start the same Redis queues and registered job handlers used by the worker process. */
+export async function startWorkerRuntime(): Promise<WorkerRuntime> {
   await syncExternalSites();
   await initializeScraperRuntime();
-
-  // dont run the scraper in dev
-  if (config.ENV === "production") {
-    scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
-    scheduledJob("15 4 * * *", "create-next-repeating-events", async () => {
-      await createNextRepeatingEvents();
-    });
-    scheduledJob(
-      "17 * * * *",
-      "reconcile-store-price-match-proposals",
-      async () => {
-        await runJob("ReconcileStorePriceMatchProposals");
-      },
-    );
-    scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
-      await runJob("CleanupPendingUploads");
-    });
-  }
 
   const connection = await getConnection();
   const defaultQueue = await getQueue("default", connection);
@@ -215,6 +210,8 @@ export async function runWorker() {
     connection,
     autorun: false,
     concurrency: 4,
+    // Scraper runs own a one-hour database lease and can wait on model or site requests.
+    lockDuration: SCRAPER_JOB_LOCK_DURATION_MS,
   });
 
   for (const worker of [defaultWorker, scraperWorker]) {
@@ -232,6 +229,43 @@ export async function runWorker() {
     });
   }
 
+  void defaultWorker.run();
+  void scraperWorker.run();
+  logInfo("Workers running", {
+    extra: { queues: [defaultQueue.name, scraperQueue.name] },
+  });
+
+  return {
+    queues: [defaultQueue, scraperQueue],
+    workers: [defaultWorker, scraperWorker],
+    async close() {
+      await Promise.all([defaultWorker.close(), scraperWorker.close()]);
+      await Promise.all([defaultQueue.close(), scraperQueue.close()]);
+    },
+  };
+}
+
+export async function runWorker() {
+  // dont run the scraper in dev
+  if (config.ENV === "production") {
+    scheduledJob("*/5 * * * *", "schedule-scrapers", scheduleScrapers);
+    scheduledJob("15 4 * * *", "create-next-repeating-events", async () => {
+      await createNextRepeatingEvents();
+    });
+    scheduledJob(
+      "17 * * * *",
+      "reconcile-store-price-match-proposals",
+      async () => {
+        await runJob("ReconcileStorePriceMatchProposals");
+      },
+    );
+    scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
+      await runJob("CleanupPendingUploads");
+    });
+  }
+
+  const runtime = await startWorkerRuntime();
+
   async function termProcess(signal: string) {
     logInfo("Received {signal}, closing worker", {
       extra: {
@@ -239,8 +273,7 @@ export async function runWorker() {
       },
     });
 
-    await Promise.all([defaultWorker.close(), scraperWorker.close()]);
-    await Promise.all([defaultQueue.close(), scraperQueue.close()]);
+    await runtime.close();
     await gracefulShutdown();
     process.exit(0);
   }
@@ -248,10 +281,4 @@ export async function runWorker() {
   process.on("SIGINT", () => termProcess("SIGINT"));
 
   process.on("SIGTERM", () => termProcess("SIGTERM"));
-
-  void defaultWorker.run();
-  void scraperWorker.run();
-  logInfo("Workers running", {
-    extra: { queues: [defaultQueue.name, scraperQueue.name] },
-  });
 }

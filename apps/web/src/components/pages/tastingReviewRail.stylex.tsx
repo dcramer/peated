@@ -126,8 +126,8 @@ export function TastingReviewRail({
               <RailListItem
                 key={`external-${review.id}`}
                 end={
-                  review.nativeScore?.scale === 100
-                    ? review.nativeScore.value
+                  review.nativeScore
+                    ? `${review.nativeScore.value}/${review.nativeScore.scale}`
                     : undefined
                 }
                 href={review.url}
