@@ -1,4 +1,3 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   BottleIdentityRow,
   ButtonLink,
@@ -11,11 +10,10 @@ import {
   PageSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { cache } from "react";
 
 import { FlightActions } from "./flightActions";
@@ -66,8 +64,7 @@ export default async function FlightPage(props: {
             {flight.bottles.map(({ bottle, hasTasted, isLibrary }) => (
               <ItemListItem key={bottle.id}>
                 <BottleIdentityRow
-                  brand={bottle.brand.name}
-                  brandHref={getEntityUrl(bottle.brand)}
+                  {...toBottleListItem(bottle)}
                   end={
                     <ButtonLink
                       href={getAddBottleHref({
@@ -82,13 +79,7 @@ export default async function FlightPage(props: {
                     </ButtonLink>
                   }
                   hasTasted={hasTasted}
-                  href={getBottleUrl(bottle)}
-                  imageUrl={bottle.imageUrl}
                   isLibrary={isLibrary}
-                  metadata={getBottleMetadata(bottle).split(" · ")}
-                  name={formatBottleDisplayName(bottle, {
-                    includeBrand: false,
-                  })}
                 />
               </ItemListItem>
             ))}

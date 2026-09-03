@@ -206,7 +206,6 @@ export function SeriesPageClient({
                   controls: bottleActions,
                   item: toBottleListItem(bottle, {
                     includeBrandInName: false,
-                    includeBrandRow: false,
                     includeRatings: true,
                     includeRelatedReleases: true,
                     includeSeriesInName: false,

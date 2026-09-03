@@ -1,3 +1,4 @@
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Field, Textarea, TextInput } from "../field.stylex";
@@ -24,11 +25,7 @@ export const Overview: Story = {
   render: (args) => (
     <WorkflowScreen {...args} saveHint="Step 2 of 3">
       <FormStack>
-        <SelectedBottleSummary
-          brand="Ardbeg"
-          metadata="54.2% ABV · NAS · Islay"
-          name="Uigeadail"
-        />
+        <SelectedBottleSummary bottle={mockBottle} />
         <FormSection title="Your tasting">
           <FormGrid>
             <Field htmlFor="workflow-date" label="Date">
@@ -55,11 +52,7 @@ export const Saving: Story = {
   args: { saving: true },
   render: (args) => (
     <WorkflowScreen {...args} saveHint="Saving this tasting">
-      <SelectedBottleSummary
-        brand="Ardbeg"
-        metadata="54.2% ABV · NAS · Islay"
-        name="Uigeadail"
-      />
+      <SelectedBottleSummary bottle={mockBottle} />
     </WorkflowScreen>
   ),
 };

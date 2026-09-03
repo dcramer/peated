@@ -1,6 +1,5 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import type {
   SearchResultGroup,
@@ -9,7 +8,7 @@ import type {
 import { Button, SearchBox } from "@peated/web/components";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import useAuth from "@peated/web/hooks/useAuth";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
+import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   addRecentSearch,
@@ -170,7 +169,9 @@ function bottleItem(
     showRatings: boolean;
   },
 ) {
+  const identity = getBottleIdentityProps(bottle);
   return {
+    bottle: identity,
     href: getBottleHref(bottle),
     id: `bottle-${bottle.id}`,
     ratings: showRatings
@@ -182,12 +183,11 @@ function bottleItem(
           bands: bottle.tastingBandCounts,
         }
       : undefined,
-    metadata: getBottleMetadata(bottle),
-    title: formatBottleDisplayName(bottle),
+    title: identity.name,
     visual: {
       kind: "bottle",
       imageUrl: bottle.imageUrl,
-      label: `${formatBottleDisplayName(bottle)} bottle`,
+      label: `${identity.name} bottle`,
     },
   } satisfies SearchResultItem;
 }

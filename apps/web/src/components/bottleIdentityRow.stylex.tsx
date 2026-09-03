@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
@@ -13,8 +13,11 @@ import {
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { ImageViewer } from "./imageViewer.stylex";
+import Join from "./join";
 import { linkedRowStyles } from "./linkedRow.stylex";
+import { MatchedText } from "./matchedText.stylex";
 import { MemberStatus } from "./memberStatus.stylex";
+import { TextLink } from "./textLink.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -78,8 +81,6 @@ export function BottleVisual({
 
 export type BottleIdentityRowProps = {
   align?: "center" | "start";
-  brand?: string;
-  brandHref?: string;
   end?: ReactNode;
   hasTasted?: boolean;
   href?: string;
@@ -88,6 +89,9 @@ export type BottleIdentityRowProps = {
   layout?: "cell" | "row";
   metadata?: readonly string[];
   name: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  query?: string;
+  provenance?: readonly { name: string; href?: string }[];
   relatedReleases?: {
     count: number;
     href: string;
@@ -96,13 +100,11 @@ export type BottleIdentityRowProps = {
 };
 
 /**
- * Owns the standard bottle row and its thumbnail size. Supply a name from
- * formatBottleDisplayName (or toBottleListItem), with brand context if omitted there.
+ * Owns the standard three-line bottle row: marketed name, provenance, then release facts.
+ * Use toBottleListItem for API Bottles so pages cannot drift from the home/Library identity.
  */
 export function BottleIdentityRow({
   align = "center",
-  brand,
-  brandHref,
   end,
   hasTasted = false,
   href,
@@ -111,6 +113,9 @@ export function BottleIdentityRow({
   layout = "row",
   metadata = [],
   name,
+  onClick,
+  query,
+  provenance = [],
   relatedReleases,
   subtitle,
 }: BottleIdentityRowProps) {
@@ -126,49 +131,43 @@ export function BottleIdentityRow({
     >
       <BottleVisual imageUrl={imageUrl} />
       <div {...stylex.props(styles.copy)}>
-        {brand ? (
-          brandHref ? (
-            <AppLink
-              href={brandHref}
-              title={brand}
-              {...stylex.props(
-                foundationStyles.metadata,
-                styles.brand,
-                styles.brandLink,
-                linkedRowStyles.nestedAction,
-              )}
-            >
-              {brand}
-            </AppLink>
-          ) : (
-            <span
-              title={brand}
-              {...stylex.props(foundationStyles.metadata, styles.brand)}
-            >
-              {brand}
-            </span>
-          )
-        ) : null}
         <div {...stylex.props(styles.nameLine)}>
           {href ? (
             <AppLink
               href={href}
+              onClick={onClick}
+              title={name}
               {...stylex.props(
                 foundationStyles.rowTitle,
                 styles.name,
                 linkedRowStyles.primaryLink,
               )}
             >
-              {name}
+              <MatchedText query={query} text={name} />
             </AppLink>
           ) : (
             <span {...stylex.props(foundationStyles.rowTitle, styles.name)}>
-              {name}
+              <MatchedText query={query} text={name} />
             </span>
           )}
           {isLibrary ? <MemberStatus kind="library" /> : null}
           {hasTasted ? <MemberStatus kind="tasted" /> : null}
         </div>
+        {provenance.length ? (
+          <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
+            <Join divider=" · ">
+              {provenance.map((item, index) =>
+                item.href ? (
+                  <TextLink href={item.href} key={index} size="inherit">
+                    {item.name}
+                  </TextLink>
+                ) : (
+                  <span key={index}>{item.name}</span>
+                ),
+              )}
+            </Join>
+          </div>
+        ) : null}
         {subtitle ? (
           <div
             title={getTextTitle(subtitle)}
@@ -307,35 +306,6 @@ const styles = stylex.create({
     flex: 1,
     flexDirection: "column",
     alignItems: "flex-start",
-  },
-  brand: {
-    maxWidth: "100%",
-    overflow: "hidden",
-    outline: "none",
-    color: colors.inkMuted,
-    textDecoration: "none",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  brandLink: {
-    color: {
-      default: colors.inkMuted,
-      ":hover": colors.accentDeep,
-      ":active": colors.accentDeep,
-      ":focus-visible": colors.accentDeep,
-    },
-    textDecorationLine: {
-      default: "none",
-      ":hover": "underline",
-      ":active": "underline",
-      ":focus-visible": "underline",
-    },
-    textDecorationThickness: "1px",
-    textUnderlineOffset: "2px",
   },
   nameLine: {
     display: "block",

@@ -4,11 +4,11 @@ import { describe, expect, test } from "vitest";
 import { toBottleListItem } from "./bottleListItem";
 
 describe("toBottleListItem", () => {
-  test("separates the brand from the expression in standard bottle lists", () => {
+  test("uses the full marketed name and separates provenance from release facts", () => {
     expect(toBottleListItem(mockBottle)).toMatchObject({
-      brand: "Lagavulin",
-      brandHref: "/distillers/9201-lagavulin",
-      name: "16-year-old",
+      name: "Lagavulin 16-year-old",
+      provenance: [{ name: "Single Malt" }],
+      metadata: ["16 years", "43.0% ABV"],
     });
   });
 
@@ -18,35 +18,34 @@ describe("toBottleListItem", () => {
     ["bottler", "bottlers"],
     ["company", "companies"],
   ] as const)(
-    "links a %s used as the brand to its own collection",
+    "links a %s used as a distinct distiller to its own collection",
     (kind, collection) => {
-      const bottle = { ...mockBottle, brand: { ...mockBottle.brand, kind } };
+      const bottle = {
+        ...mockBottle,
+        brand: { ...mockBottle.brand, id: 999 },
+        distillers: [{ ...mockBottle.brand, kind }],
+      };
 
-      expect(toBottleListItem(bottle).brandHref).toBe(
-        `/${collection}/9201-lagavulin`,
-      );
+      expect(toBottleListItem(bottle).provenance).toContainEqual({
+        name: "Lagavulin",
+        href: `/${collection}/9201-lagavulin`,
+      });
     },
   );
 
-  test("keeps the brand in the name when the brand row is disabled", () => {
+  test("does not repeat a distiller already identified by the brand", () => {
     expect(
-      toBottleListItem(mockBottle, { includeBrandRow: false }),
-    ).toMatchObject({
-      brand: undefined,
-      brandHref: undefined,
-      name: "Lagavulin 16-year-old",
-    });
+      toBottleListItem({ ...mockBottle, distillers: [mockBottle.brand] })
+        .provenance,
+    ).toEqual([{ name: "Single Malt" }]);
   });
 
   test("can omit the brand from a list owned by that brand", () => {
     expect(
       toBottleListItem(mockBottle, {
         includeBrandInName: false,
-        includeBrandRow: false,
       }),
     ).toMatchObject({
-      brand: undefined,
-      brandHref: undefined,
       name: "16-year-old",
     });
   });
@@ -63,8 +62,11 @@ describe("toBottleListItem", () => {
 
     expect(
       toBottleListItem({ ...mockBottle, bottler }, { includeBottler: true })
-        .subtitle,
-    ).toBe("Bottled by SMWS");
+        .provenance,
+    ).toContainEqual({
+      name: "Bottled by SMWS",
+      href: "/bottlers/4263-the-scotch-malt-whisky-society",
+    });
   });
 
   test("does not repeat the brand when it also fills the bottler role", () => {
@@ -72,7 +74,30 @@ describe("toBottleListItem", () => {
       toBottleListItem(
         { ...mockBottle, bottler: mockBottle.brand },
         { includeBottler: true },
-      ).subtitle,
-    ).toBeUndefined();
+      ).provenance,
+    ).toEqual([{ name: "Single Malt" }]);
+  });
+
+  test("uses only known release facts without manufacturing missing dates or ages", () => {
+    expect(
+      toBottleListItem({
+        ...mockBottle,
+        releaseYear: 2026,
+        releaseMonth: null,
+        releaseDay: null,
+        statedAge: null,
+        noAgeStatement: null,
+        abv: null,
+      }).metadata,
+    ).toEqual(["2026 release"]);
+    expect(
+      toBottleListItem({
+        ...mockBottle,
+        releaseYear: null,
+        statedAge: null,
+        noAgeStatement: true,
+        abv: null,
+      }).metadata,
+    ).toEqual(["No age statement"]);
   });
 });

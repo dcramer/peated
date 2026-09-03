@@ -1,27 +1,27 @@
+import {
+  getBottleIdentityProps,
+  type BottleIdentitySource,
+} from "@peated/web/lib/bottleListItem";
 import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
 import { Button } from "./button.stylex";
 
 export type SelectedBottleSummaryProps = {
-  brand: string;
+  bottle: BottleIdentitySource & { imageUrl?: string | null };
   imageUrl?: string | null;
-  metadata: string;
-  name: string;
   /** Shows a change action when the owning workflow allows bottle selection. */
   onChange?: () => void;
 };
 
 /** Keeps the selected bottle visible while a member completes a related form. */
 export function SelectedBottleSummary({
-  brand,
+  bottle,
   imageUrl,
-  metadata,
-  name,
   onChange,
 }: SelectedBottleSummaryProps) {
   return (
     <section aria-label="Selected bottle">
       <BottleIdentityRow
-        brand={brand}
+        {...getBottleIdentityProps(bottle)}
         end={
           onChange ? (
             <Button onClick={onChange} size="sm" variant="text">
@@ -29,10 +29,8 @@ export function SelectedBottleSummary({
             </Button>
           ) : undefined
         }
-        imageUrl={imageUrl}
+        imageUrl={imageUrl ?? bottle.imageUrl}
         layout="cell"
-        metadata={metadata ? metadata.split(" · ") : []}
-        name={name}
       />
     </section>
   );

@@ -1,6 +1,5 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import {
   Field,
   FormNotice,
@@ -12,7 +11,6 @@ import {
 import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getBottleUrl } from "@peated/web/lib/urls";
@@ -84,12 +82,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
     >
       <form onSubmit={runAudit}>
         <FormStack>
-          <SelectedBottleSummary
-            brand={bottle.brand.shortName || bottle.brand.name}
-            imageUrl={bottle.imageUrl}
-            metadata={getBottleMetadata(bottle)}
-            name={formatBottleDisplayName(bottle, { includeBrand: false })}
-          />
+          <SelectedBottleSummary bottle={bottle} />
           {error ? <FormNotice>{error}</FormNotice> : null}
           {summary ? (
             <FormNotice>No changes proposed. {summary}</FormNotice>

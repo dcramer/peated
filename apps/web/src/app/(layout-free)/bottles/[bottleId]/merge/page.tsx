@@ -133,12 +133,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
     >
       <form onSubmit={handleSubmit(submit)}>
         <FormStack>
-          <SelectedBottleSummary
-            brand={bottle.brand.shortName || bottle.brand.name}
-            imageUrl={bottle.imageUrl}
-            metadata={getBottleMetadata(bottle)}
-            name={formatBottleDisplayName(bottle, { includeBrand: false })}
-          />
+          <SelectedBottleSummary bottle={bottle} />
           {submitError ? <FormNotice>{submitError}</FormNotice> : null}
           <FormSection title="Duplicate bottle">
             <Controller

@@ -1,12 +1,11 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
+import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 
 import { MemberAvatar, type TastingEntryMember } from "@peated/web/components";
 import type { MemberActivityItem } from "@peated/web/components/pages/memberProfileContent.stylex";
 import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
 import TimeSince from "@peated/web/components/timeSince";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
-import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
+import { getBottleUrl } from "@peated/web/lib/urls";
 
 type Activity = Outputs["users"]["activity"]["list"]["results"][number];
 
@@ -22,15 +21,10 @@ export function toActivityItem(activity: Activity): MemberActivityItem {
         date: <TimeSince date={activity.createdAt} />,
         id: activity.id,
         items: activity.items.map((entry) => ({
-          brand: entry.bottle.brand.shortName || entry.bottle.brand.name,
-          brandHref: getEntityUrl(entry.bottle.brand),
+          ...getBottleIdentityProps(entry.bottle),
           href: getBottleUrl(entry.bottle),
           id: String(entry.id),
           imageUrl: entry.imageUrl ?? entry.bottle.imageUrl,
-          metadata: getBottleMetadata(entry.bottle).split(" · "),
-          name: formatBottleDisplayName(entry.bottle, {
-            includeBrand: false,
-          }),
         })),
         totalItems: activity.totalItems,
       },

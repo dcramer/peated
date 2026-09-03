@@ -1,5 +1,6 @@
 "use client";
 
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useEffect, useState } from "react";
 
@@ -60,11 +61,7 @@ export const Default: Story = {
       >
         <form>
           <FormStack>
-            <SelectedBottleSummary
-              brand="Springbank"
-              metadata="46% ABV · 15 years · Campbeltown single malt"
-              name="15-year-old"
-            />
+            <SelectedBottleSummary bottle={mockBottle} />
             <RecordTypeInput
               disabled={false}
               onChange={setRecordType}

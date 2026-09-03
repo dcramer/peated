@@ -11,9 +11,14 @@ import {
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { Avatar } from "./avatar.stylex";
-import { BottleVisual } from "./bottleIdentityRow.stylex";
+import {
+  BottleIdentityRow,
+  BottleVisual,
+  type BottleIdentityRowProps,
+} from "./bottleIdentityRow.stylex";
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
+import { MatchedText } from "./matchedText.stylex";
 import { MemberStatus } from "./memberStatus.stylex";
 import { BottleRatings, type TastingRatingCounts } from "./scoring.stylex";
 
@@ -28,6 +33,7 @@ export type SearchResultRatings = {
 };
 
 export type SearchResultItem = {
+  bottle?: Pick<BottleIdentityRowProps, "provenance" | "metadata">;
   href: string;
   id: string;
   isFollowing?: boolean;
@@ -271,57 +277,98 @@ function SearchResultsGroup({
       <ul {...stylex.props(styles.list)}>
         {group.items.map((item) => (
           <li key={item.id} {...stylex.props(styles.listItem)}>
-            <AppLink
-              href={item.href}
-              id={
-                optionIdPrefix
-                  ? `${optionIdPrefix}-${encodeURIComponent(item.id)}`
-                  : undefined
-              }
-              onClick={(event) => {
-                if (onItemSelect) {
-                  event.preventDefault();
-                  onItemSelect(item);
+            {item.visual?.kind === "bottle" ? (
+              <div
+                id={
+                  optionIdPrefix
+                    ? `${optionIdPrefix}-${encodeURIComponent(item.id)}`
+                    : undefined
                 }
-              }}
-              {...stylex.props(
-                styles.result,
-                variant === "database" && styles.databaseResult,
-                item.id === activeId && styles.activeResult,
-              )}
-            >
-              {item.visual ? <ResultVisual visual={item.visual} /> : null}
-              <span {...stylex.props(styles.copy)}>
-                <strong
-                  title={item.title}
-                  {...stylex.props(foundationStyles.rowTitle, styles.title)}
-                >
-                  <MatchedText query={query} text={item.title} />
-                  {item.isFollowing ? <MemberStatus kind="following" /> : null}
-                </strong>
-                {item.metadata ? (
-                  <span
-                    title={item.metadata}
-                    {...stylex.props(
-                      foundationStyles.metadata,
-                      styles.metadata,
-                    )}
+                {...stylex.props(
+                  styles.result,
+                  variant === "database" && styles.databaseResult,
+                  item.id === activeId && styles.activeResult,
+                )}
+              >
+                <BottleIdentityRow
+                  {...item.bottle}
+                  align="start"
+                  href={item.href}
+                  imageUrl={item.visual.imageUrl}
+                  metadata={
+                    item.bottle?.metadata ??
+                    (item.metadata ? item.metadata.split(" · ") : [])
+                  }
+                  name={item.title}
+                  query={query}
+                  onClick={(event) => {
+                    if (onItemSelect) {
+                      event.preventDefault();
+                      onItemSelect(item);
+                    }
+                  }}
+                  end={
+                    item.ratings ? (
+                      <ResultRatings ratings={item.ratings} />
+                    ) : undefined
+                  }
+                />
+              </div>
+            ) : (
+              <AppLink
+                href={item.href}
+                id={
+                  optionIdPrefix
+                    ? `${optionIdPrefix}-${encodeURIComponent(item.id)}`
+                    : undefined
+                }
+                onClick={(event) => {
+                  if (onItemSelect) {
+                    event.preventDefault();
+                    onItemSelect(item);
+                  }
+                }}
+                {...stylex.props(
+                  styles.result,
+                  variant === "database" && styles.databaseResult,
+                  item.id === activeId && styles.activeResult,
+                )}
+              >
+                {item.visual ? <ResultVisual visual={item.visual} /> : null}
+                <span {...stylex.props(styles.copy)}>
+                  <strong
+                    title={item.title}
+                    {...stylex.props(foundationStyles.rowTitle, styles.title)}
                   >
-                    {item.metadata}
-                  </span>
-                ) : null}
+                    <MatchedText query={query} text={item.title} />
+                    {item.isFollowing ? (
+                      <MemberStatus kind="following" />
+                    ) : null}
+                  </strong>
+                  {item.metadata ? (
+                    <span
+                      title={item.metadata}
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.metadata,
+                      )}
+                    >
+                      {item.metadata}
+                    </span>
+                  ) : null}
+                  {item.ratings ? (
+                    <span {...stylex.props(styles.compactRatings)}>
+                      <ResultRatings ratings={item.ratings} />
+                    </span>
+                  ) : null}
+                </span>
                 {item.ratings ? (
-                  <span {...stylex.props(styles.compactRatings)}>
+                  <span {...stylex.props(styles.wideRatings)}>
                     <ResultRatings ratings={item.ratings} />
                   </span>
                 ) : null}
-              </span>
-              {item.ratings ? (
-                <span {...stylex.props(styles.wideRatings)}>
-                  <ResultRatings ratings={item.ratings} />
-                </span>
-              ) : null}
-            </AppLink>
+              </AppLink>
+            )}
           </li>
         ))}
       </ul>
@@ -367,24 +414,6 @@ function ResultRatings({ ratings }: { ratings: SearchResultRatings }) {
       scoreCount={ratings.score?.count}
     />
   ) : null;
-}
-
-function MatchedText({ query, text }: { query: string; text: string }) {
-  const normalizedQuery = query.trim().toLocaleLowerCase();
-  const start = normalizedQuery
-    ? text.toLocaleLowerCase().indexOf(normalizedQuery)
-    : -1;
-
-  if (start < 0) return text;
-
-  const end = start + normalizedQuery.length;
-  return (
-    <>
-      {text.slice(0, start)}
-      <mark {...stylex.props(styles.match)}>{text.slice(start, end)}</mark>
-      {text.slice(end)}
-    </>
-  );
 }
 
 const styles = stylex.create({
@@ -560,11 +589,6 @@ const styles = stylex.create({
     color: "inherit",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-  },
-  match: {
-    borderRadius: "1px",
-    backgroundColor: colors.accentTint,
-    color: "inherit",
   },
   metadata: {
     maxWidth: "100%",

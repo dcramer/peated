@@ -1,9 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import {
-  formatBottleDisplayName,
-  type BottleDisplayNameSource,
-} from "@peated/server/lib/bottleDisplayName";
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import {
   MemberAvatar,
@@ -12,16 +9,16 @@ import {
 } from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import {
-  getBottleMetadata,
-  type BottleMetadata,
-} from "@peated/web/lib/bottleMetadata";
+  getBottleIdentityProps,
+  type BottleIdentitySource,
+} from "@peated/web/lib/bottleListItem";
+import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getBottleUrl } from "@peated/web/lib/urls";
 
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 type TastingEntryRecord = {
-  bottle: BottleDisplayNameSource &
-    BottleMetadata & { id: number; imageUrl?: string | null };
+  bottle: BottleIdentitySource & { id: number; imageUrl?: string | null };
   color?: number | null;
   comments?: number;
   hasToasted?: boolean;
@@ -38,6 +35,7 @@ export function getTastingEntryMember(
   tasting: TastingEntryRecord,
 ): TastingEntryMember {
   return {
+    bottle: getBottleIdentityProps(tasting.bottle),
     color:
       tasting.color === null || tasting.color === undefined
         ? undefined

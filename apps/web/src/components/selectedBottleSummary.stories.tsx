@@ -1,3 +1,4 @@
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
@@ -8,10 +9,8 @@ const meta = {
   title: "Components/Bottles/Selected Bottle Summary",
   component: SelectedBottleSummary,
   args: {
-    brand: "Lagavulin",
+    bottle: mockBottle,
     imageUrl: BottleImage.src,
-    metadata: "Islay · 16 years · 43.0% ABV · ex-bourbon",
-    name: "16-year-old",
     onChange: () => undefined,
   },
   argTypes: {
@@ -35,10 +34,21 @@ export const Overview: Story = {
       <SelectedBottleSummary {...args} />
       <SelectedBottleSummary {...args} onChange={undefined} />
       <SelectedBottleSummary
-        brand="Bruichladdich"
+        bottle={{
+          ...mockBottle,
+          brand: {
+            ...mockBottle.brand,
+            name: "Bruichladdich",
+            shortName: null,
+          },
+          name: "Octomore Edition 15.3 Islay Barley Super Heavily Peated",
+          group: null,
+          statedAge: null,
+          noAgeStatement: true,
+          abv: 61.5,
+          imageUrl: null,
+        }}
         imageUrl={null}
-        metadata="Islay · No age statement · 61.5% ABV · oloroso and bourbon casks"
-        name="Octomore Edition 15.3 Islay Barley Super Heavily Peated"
       />
     </StoryStack>
   ),

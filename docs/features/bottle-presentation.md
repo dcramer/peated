@@ -205,6 +205,21 @@ identity into `fullName`.
 Use for search results, bottle tables, activity cards, selection results, and
 similar repeated items that support a title plus secondary metadata.
 
+`BottleIdentityRow` owns the shared three-line layout used by the homepage's
+New for you list, Library, catalog lists, search results, activity, and selected
+bottle summaries. `getBottleIdentityProps` supplies its identity fields;
+`toBottleListItem` adds links, images, and optional list actions and ratings.
+Do not rebuild these lines in a page-specific mapper:
+
+1. The marketed bottle name, including brand context.
+2. Distillers not already identified by the brand, followed by the category.
+3. Known release facts, stated age, and ABV.
+
+Missing facts do not create placeholder lines. Activity context, Library status,
+personal images, and actions belong to their owning view, not a competing bottle
+identity layout. Compact rails and primary page headings remain separate display
+contexts.
+
 - Show enough producer, series, and expression context to recognize the Bottle
   outside its detail page.
 - Include a named release marker in the title.

@@ -1,6 +1,5 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
 import {
@@ -40,7 +39,6 @@ import {
   getPendingImageFromParams,
 } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
-import { getBottleMetadata } from "@peated/web/lib/bottleMetadata";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
@@ -142,10 +140,8 @@ function BottlePanel({
 }) {
   return (
     <SelectedBottleSummary
-      brand={bottle.brand.shortName || bottle.brand.name}
+      bottle={bottle}
       imageUrl={previewUrl ?? bottle.imageUrl}
-      metadata={getBottleMetadata(bottle)}
-      name={formatBottleDisplayName(bottle, { includeBrand: false })}
     />
   );
 }
@@ -153,10 +149,8 @@ function BottlePanel({
 function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
   return (
     <SelectedBottleSummary
-      brand={entry.bottle.brand.shortName || entry.bottle.brand.name}
+      bottle={entry.bottle}
       imageUrl={entry.imageUrl ?? entry.bottle.imageUrl}
-      metadata={getBottleMetadata(entry.bottle)}
-      name={formatBottleDisplayName(entry.bottle, { includeBrand: false })}
     />
   );
 }
