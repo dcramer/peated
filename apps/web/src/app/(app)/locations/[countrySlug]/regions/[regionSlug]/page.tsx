@@ -1,7 +1,9 @@
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
+import { serializeRegionStructuredData } from "@peated/web/lib/catalogStructuredData";
 import { getRegionMap } from "@peated/web/lib/locationMap";
 import { getRegionPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getRegionSeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import { LocationOverview } from "../../../locationOverview.stylex";
 import {
@@ -10,6 +12,18 @@ import {
   getLocationLatestReleases,
   getLocationRegions,
 } from "../../../locationPage";
+
+export async function generateMetadata(props: {
+  params: Promise<{ countrySlug: string; regionSlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ countrySlug, regionSlug }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const location = await getRegionPage(countrySlug, regionSlug);
+  return getRegionSeoMetadata(location, { searchParams });
+}
 
 export default async function RegionOverviewPage(props: {
   params: Promise<{ countrySlug: string; regionSlug: string }>;
@@ -47,22 +61,30 @@ export default async function RegionOverviewPage(props: {
   );
 
   return (
-    <LocationOverview
-      categories={getLocationCategoryItems(categories.results)}
-      distilleries={getLocationDistilleries(distilleries.results)}
-      distillersHref={`${rootHref}/distillers`}
-      flavorProfile={
-        <FlavorProfileSection
-          scope={{ kind: "region", country: countrySlug, region: regionSlug }}
-        />
-      }
-      latestReleases={getLocationLatestReleases(latestReleases.results)}
-      otherRegions={otherRegions}
-      otherRegionsHref={`/locations/${countrySlug}/regions`}
-      releasesHref={`${rootHref}/bottles?sort=-release`}
-      totalBottles={region.totalBottles}
-      totalDistillers={region.totalDistillers}
-      visual={getRegionMap(region.country.slug, region.slug)}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeRegionStructuredData(region),
+        }}
+      />
+      <LocationOverview
+        categories={getLocationCategoryItems(categories.results)}
+        distilleries={getLocationDistilleries(distilleries.results)}
+        distillersHref={`${rootHref}/distillers`}
+        flavorProfile={
+          <FlavorProfileSection
+            scope={{ kind: "region", country: countrySlug, region: regionSlug }}
+          />
+        }
+        latestReleases={getLocationLatestReleases(latestReleases.results)}
+        otherRegions={otherRegions}
+        otherRegionsHref={`/locations/${countrySlug}/regions`}
+        releasesHref={`${rootHref}/bottles?sort=-release`}
+        totalBottles={region.totalBottles}
+        totalDistillers={region.totalDistillers}
+        visual={getRegionMap(region.country.slug, region.slug)}
+      />
+    </>
   );
 }

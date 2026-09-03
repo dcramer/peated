@@ -1,16 +1,9 @@
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { notFound, redirect } from "next/navigation";
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
+import { redirect } from "next/navigation";
 
 function getFirst(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function parseId(value: string) {
-  const id = Number(value);
-  if (!Number.isSafeInteger(id) || id < 1) {
-    notFound();
-  }
-  return id;
 }
 
 export default async function AddTasting(props: {
@@ -23,7 +16,7 @@ export default async function AddTasting(props: {
   ]);
   redirect(
     getAddBottleHref({
-      bottleId: parseId(bottleId),
+      bottleId: parseCatalogRouteId(bottleId),
       flightId: getFirst(searchParams.flight),
       intent: "tasting",
     }),

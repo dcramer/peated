@@ -2,12 +2,82 @@ import { describe, expect, it } from "vitest";
 
 import {
   getBottleSeoMetadata,
+  getCatalogSeoMetadata,
+  getCountrySeoMetadata,
   getEntitySeoMetadata,
+  getRegionSeoMetadata,
   getSeriesSeoMetadata,
   homeMetadata,
 } from "./seoMetadata";
 
 describe("SEO metadata", () => {
+  it("provides plain location metadata and separate canonical URLs for tabs", () => {
+    const country = { name: "Scotland", slug: "scotland" };
+    expect(getCountrySeoMetadata(country)).toMatchObject({
+      title: "Whisky from Scotland",
+      description:
+        "Browse whisky bottles from Scotland, with ratings and tasting notes on Peated.",
+      alternates: { canonical: "/locations/scotland" },
+      openGraph: { title: "Whisky from Scotland", url: "/locations/scotland" },
+      twitter: { title: "Whisky from Scotland" },
+    });
+    expect(
+      getRegionSeoMetadata(
+        {
+          name: "Islay",
+          slug: "islay",
+          description: "**Smoky** whisky.\n\nMade on Islay.",
+          country,
+        },
+        {
+          section: "distillers",
+          searchParams: { cursor: "2", utm_source: "mail" },
+        },
+      ),
+    ).toMatchObject({
+      title: "Whisky distilleries in Islay, Scotland",
+      alternates: {
+        canonical: "/locations/scotland/regions/islay/distillers?cursor=2",
+      },
+      robots: undefined,
+    });
+    expect(
+      getCountrySeoMetadata({
+        ...country,
+        description: "**Scotch** whisky.\n\nMade in Scotland.",
+      }).description,
+    ).toBe("Scotch whisky. Made in Scotland.");
+  });
+  it("excludes filters and personal lists from indexing without losing pagination", () => {
+    const page = {
+      title: "Whisky bottles",
+      description: "Browse whisky bottles.",
+      url: "/bottles",
+    };
+    expect(getCatalogSeoMetadata(page, { cursor: "2" })).toMatchObject({
+      alternates: { canonical: "/bottles?cursor=2" },
+      robots: undefined,
+    });
+    for (const searchParams of [
+      { library: "in" },
+      { sort: "name" },
+      { query: "Islay" },
+    ]) {
+      expect(getCatalogSeoMetadata(page, searchParams).robots).toEqual({
+        index: false,
+        follow: true,
+      });
+    }
+    expect(
+      getCatalogSeoMetadata(page, { cursor: "1.5", _rsc: "abc" }).alternates,
+    ).toEqual({ canonical: "/bottles" });
+    expect(
+      getCatalogSeoMetadata({
+        ...page,
+        description: "A long description. ".repeat(20),
+      }).description?.length,
+    ).toBeLessThanOrEqual(160);
+  });
   it("defines the homepage search and social metadata", () => {
     expect(homeMetadata).toMatchObject({
       title: {

@@ -6,18 +6,6 @@ import type { ReactNode } from "react";
 import { getRegionLocationTabs } from "../../../locationPage";
 import { LocationPageFrame } from "../../../locationPageFrame.stylex";
 
-export async function generateMetadata(props: {
-  params: Promise<{ countrySlug: string; regionSlug: string }>;
-}) {
-  const { countrySlug, regionSlug } = await props.params;
-  const region = await getRegionPage(countrySlug, regionSlug);
-
-  return {
-    title: `Whisky from ${region.name}, ${region.country.name}`,
-    description: region.description,
-  };
-}
-
 export default async function RegionLayout(props: {
   children: ReactNode;
   params: Promise<{ countrySlug: string; regionSlug: string }>;

@@ -1,11 +1,19 @@
-import type { Metadata } from "next";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import { EntityCatalogPage } from "../entityCatalogPage";
 
-export const metadata: Metadata = {
-  title: "Whisky Bottlers",
-  description: "Browse whisky bottlers recorded in the Peated database.",
-};
+export async function generateMetadata(props: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  return getCatalogSeoMetadata(
+    {
+      title: "Whisky bottlers",
+      description: "Browse whisky bottlers recorded in the Peated database.",
+      url: "/bottlers",
+    },
+    await props.searchParams,
+  );
+}
 
 export default function BottlerListPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

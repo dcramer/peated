@@ -1,5 +1,7 @@
 "use client";
 
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
+
 import {
   Field,
   FormNotice,
@@ -33,7 +35,9 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
   const router = useRouter();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({
+      input: { bottle: parseCatalogRouteId(bottleId) },
+    }),
   );
   const audit = useMutation(orpc.audits.create.mutationOptions());
   const [note, setNote] = useState("");

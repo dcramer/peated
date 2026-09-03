@@ -98,7 +98,9 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
   );
   await page.getByRole("button", { name: "Run audit" }).click();
   await auditRequest;
-  await expect(page).toHaveURL(`/bottles/${existingBottleId}/audit`);
+  await expect(page).toHaveURL(
+    new RegExp(`/bottles/${existingBottleId}-[^/?#]+/audit$`),
+  );
   await expect(
     page.getByText(
       "No changes proposed. The Bottle identity is supported by the inspected evidence.",

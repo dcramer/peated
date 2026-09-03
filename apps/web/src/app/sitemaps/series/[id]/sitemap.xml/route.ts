@@ -15,6 +15,9 @@ export async function GET(
 ) {
   const { id } = await props.params;
   const sitemapPage = Number(id);
+  if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(sitemapPage)) {
+    return new Response(null, { status: 404 });
+  }
   const { client } = await createAnonymousServerClient();
   const pages: Sitemap = [];
   let cursor = (sitemapPage - 1) * API_PAGES_PER_SITEMAP + 1;

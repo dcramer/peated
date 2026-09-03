@@ -62,6 +62,7 @@ import {
   testOwner,
   testRegion,
   testRegions,
+  testSeries,
   testUser,
   unifiedBottleEditContext,
 } from "./rpc-fixtures.mjs";
@@ -301,22 +302,36 @@ async function handleRpcRequest({ request, response, url }) {
     case "regions/details": {
       const region = testRegions.find(
         (region) =>
-          region.country.slug === input?.country &&
-          region.slug === input?.region,
+          region.country.slug === input?.country?.toLowerCase() &&
+          region.slug === input?.region?.toLowerCase(),
       );
       if (!region) {
-        sendRpcError(response, "Unexpected region details payload");
+        sendRpcNotFound(response, "Region not found.");
         return true;
       }
       sendRpcResponse(response, region);
       return true;
     }
+    case "bottleSeries/details":
+      if (![testSeries.id, 9402].includes(Number(input?.series))) {
+        sendRpcNotFound(response, "Series not found.");
+        return true;
+      }
+      sendRpcResponse(response, testSeries);
+      return true;
+    case "bottleSeries/list":
+      sendRpcResponse(response, {
+        ...emptyList,
+        results: [testSeries],
+        total: 1,
+      });
+      return true;
     case "countries/details": {
       const country = testCountries.find(
-        (country) => country.slug === input?.country,
+        (country) => country.slug === input?.country?.toLowerCase(),
       );
       if (!country) {
-        sendRpcError(response, "Unexpected country details payload");
+        sendRpcNotFound(response, "Country not found.");
         return true;
       }
       sendRpcResponse(response, country);
@@ -799,6 +814,10 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "bottles/list":
+      if (Number(input?.series) === testSeries.id) {
+        sendRpcResponse(response, buildBottleListResponse([existingBottle]));
+        return true;
+      }
       if (getAccessToken(request).includes("exact-bottle-merge")) {
         sendRpcResponse(response, {
           results: [existingBottle, exactMergeOtherBottle],

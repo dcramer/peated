@@ -1,4 +1,6 @@
 "use client";
+
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { use } from "react";
 
 import BottleForm from "@peated/web/components/bottleForm";
@@ -34,7 +36,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
   const { data: context } = useSuspenseQuery(
     formQueryOptions(
       orpc.bottles.editContext.queryOptions({
-        input: { bottle: Number(bottleId) },
+        input: { bottle: parseCatalogRouteId(bottleId) },
       }),
     ),
   );

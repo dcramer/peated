@@ -1,8 +1,16 @@
 import { isORPCNotFoundError } from "@peated/orpc/client/errors";
+import {
+  getBottleRouteRedirect,
+  getLocationRouteRedirect,
+  getSeriesRouteRedirect,
+  matchBottleRoute,
+  matchLocationRoute,
+  matchSeriesRoute,
+} from "@peated/web/lib/catalogPageRoutes";
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import {
   matchEntityRoute,
-  resolveCatalogPeatedIdRoute,
+  type PeatedIdRouteResolution,
   resolveEntityRoute,
 } from "@peated/web/lib/peatedIdRoutes";
 import {
@@ -23,7 +31,10 @@ export async function proxy(request: NextRequest) {
   );
   const entityMatch = matchEntityRoute(request.nextUrl.pathname);
   const tastingMatch = matchTastingRoute(request.nextUrl.pathname);
-  let resolution = resolveCatalogPeatedIdRoute(request.nextUrl.pathname);
+  const seriesMatch = matchSeriesRoute(request.nextUrl.pathname);
+  const bottleMatch = matchBottleRoute(request.nextUrl.pathname);
+  const locationMatch = matchLocationRoute(request.nextUrl.pathname);
+  let resolution: PeatedIdRouteResolution | null = null;
 
   if (entityMatch) {
     try {
@@ -49,6 +60,39 @@ export async function proxy(request: NextRequest) {
       if (pathname) resolution = { action: "redirect", pathname };
     } catch (error) {
       if (!isORPCNotFoundError(error)) throw error;
+    }
+  }
+  if (bottleMatch || seriesMatch || locationMatch) {
+    try {
+      // Catalog routing resolves public identities before Next starts streaming HTML.
+      const { client } = await createAnonymousServerClient();
+      let pathname: string | null;
+      if (bottleMatch) {
+        const bottle = await client.bottles.details({ bottle: bottleMatch.id });
+        pathname = getBottleRouteRedirect(bottleMatch, bottle);
+      } else if (seriesMatch) {
+        const series = await client.bottleSeries.details({
+          series: seriesMatch.id,
+        });
+        pathname = getSeriesRouteRedirect(seriesMatch, series);
+      } else if (locationMatch) {
+        const country = await client.countries.details({
+          country: locationMatch.countrySlug,
+        });
+        const location = locationMatch.regionSlug
+          ? await client.regions.details({
+              country: country.slug,
+              region: locationMatch.regionSlug,
+            })
+          : country;
+        pathname = getLocationRouteRedirect(locationMatch, location);
+      } else {
+        pathname = null;
+      }
+      resolution = pathname ? { action: "redirect", pathname } : null;
+    } catch (error) {
+      if (!isORPCNotFoundError(error)) throw error;
+      resolution = null;
     }
   }
   let response: NextResponse;
@@ -89,5 +133,8 @@ export const config = {
     "/sitemap.xml",
     "/sitemaps/:path*",
     "/tastings/:path*",
+    "/series/:path*",
+    "/bottles/:path*",
+    "/locations/:path*",
   ],
 };

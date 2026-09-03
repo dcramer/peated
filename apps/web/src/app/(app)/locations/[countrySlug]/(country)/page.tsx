@@ -1,5 +1,7 @@
+import { serializeCountryStructuredData } from "@peated/web/lib/catalogStructuredData";
 import { getCountryPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getCountrySeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import { LocationOverview } from "../../locationOverview.stylex";
 import {
@@ -8,6 +10,18 @@ import {
   getLocationLatestReleases,
   getLocationRegions,
 } from "../../locationPage";
+
+export async function generateMetadata(props: {
+  params: Promise<{ countrySlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ countrySlug }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const location = await getCountryPage(countrySlug);
+  return getCountrySeoMetadata(location, { searchParams });
+}
 
 export default async function CountryOverviewPage(props: {
   params: Promise<{ countrySlug: string }>;
@@ -38,17 +52,25 @@ export default async function CountryOverviewPage(props: {
   const rootHref = `/locations/${countrySlug}`;
 
   return (
-    <LocationOverview
-      categories={getLocationCategoryItems(categories.results)}
-      distilleries={getLocationDistilleries(distilleries.results)}
-      distillersHref={`${rootHref}/distillers`}
-      latestReleases={getLocationLatestReleases(latestReleases.results)}
-      productionRules={country.summary}
-      regions={getLocationRegions(regions.results)}
-      releasesHref={`${rootHref}/bottles?sort=-release`}
-      totalBottles={country.totalBottles}
-      totalDistillers={country.totalDistillers}
-      visual={{ kind: "country", slug: country.slug }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeCountryStructuredData(country),
+        }}
+      />
+      <LocationOverview
+        categories={getLocationCategoryItems(categories.results)}
+        distilleries={getLocationDistilleries(distilleries.results)}
+        distillersHref={`${rootHref}/distillers`}
+        latestReleases={getLocationLatestReleases(latestReleases.results)}
+        productionRules={country.summary}
+        regions={getLocationRegions(regions.results)}
+        releasesHref={`${rootHref}/bottles?sort=-release`}
+        totalBottles={country.totalBottles}
+        totalDistillers={country.totalDistillers}
+        visual={{ kind: "country", slug: country.slug }}
+      />
+    </>
   );
 }

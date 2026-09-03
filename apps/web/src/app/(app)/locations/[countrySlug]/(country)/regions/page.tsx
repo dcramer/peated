@@ -1,7 +1,9 @@
 import { CursorPager, EmptyState } from "@peated/web/components";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
+import { getCountryPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getCountrySeoMetadata } from "@peated/web/lib/seoMetadata";
 
 import { REGION_LIST_SORT_OPTIONS } from "@peated/server/constants";
 import { LocationTable } from "../../../locationLists";
@@ -13,6 +15,18 @@ const REGION_QUERY_FIELDS = [
   "query",
   "sort",
 ] as const;
+export async function generateMetadata(props: {
+  params: Promise<{ countrySlug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const [{ countrySlug }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const location = await getCountryPage(countrySlug);
+  return getCountrySeoMetadata(location, { section: "regions", searchParams });
+}
+
 export default async function CountryRegionsPage(props: {
   params: Promise<{ countrySlug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
