@@ -37,6 +37,7 @@ describe("profile route query state", () => {
           distiller: "19",
           internalRouteValue: "ignore-me",
           query: "peated",
+          sort: "-created",
           status: "open",
         },
         42,
@@ -48,6 +49,7 @@ describe("profile route query state", () => {
       distiller: 19,
       limit: 25,
       query: "peated",
+      sort: "-created",
       status: "open",
       user: 42,
     });
@@ -56,7 +58,13 @@ describe("profile route query state", () => {
   test("normalizes unsupported library filters", () => {
     expect(
       getProfileLibraryInput(
-        { brand: "-1", cursor: "0", distiller: "nan", status: "removed" },
+        {
+          brand: "-1",
+          cursor: "0",
+          distiller: "nan",
+          sort: "invalid",
+          status: "removed",
+        },
         42,
       ),
     ).toEqual({
@@ -66,8 +74,17 @@ describe("profile route query state", () => {
       distiller: undefined,
       limit: 25,
       query: "",
+      sort: "name",
       status: undefined,
       user: 42,
     });
+  });
+
+  test("uses the same library sort for server and browser params", () => {
+    const params = { sort: "-created", query: "peated", cursor: "2" };
+    expect(getProfileLibraryInput(new URLSearchParams(params), 42)).toEqual(
+      getProfileLibraryInput(params, 42),
+    );
+    expect(getProfileLibraryInput({}, 42).sort).toBe("name");
   });
 });
