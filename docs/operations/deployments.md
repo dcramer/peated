@@ -6,6 +6,10 @@ Peated production has three parts:
 - Render runs the API at `https://api.peated.com` and the worker.
 - PlanetScale hosts the production database.
 
+The API and worker use `VERSION` as their release identifier when it is non-empty.
+Otherwise, they use Render's `RENDER_GIT_COMMIT`. The API exposes this value at
+`/v1/version`, and both services use it for Sentry releases.
+
 Before a deploy, identify which parts change and whether they must remain
 compatible during the rollout. Never assume that a database, API, worker, and
 web change become active at the same time.
