@@ -16,7 +16,7 @@ import {
   useTastingWheel,
 } from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
 type FlavorProfileSectionProps = {
   scope:
@@ -25,16 +25,7 @@ type FlavorProfileSectionProps = {
     | { kind: "region"; country: string; region: string };
 };
 
-export function FlavorProfileSection(props: FlavorProfileSectionProps) {
-  return (
-    <TastingWheelProvider>
-      <FlavorProfileContent {...props} />
-    </TastingWheelProvider>
-  );
-}
-
-function FlavorProfileContent({ scope }: FlavorProfileSectionProps) {
-  const { select } = useTastingWheel();
+export function FlavorProfileSection({ scope }: FlavorProfileSectionProps) {
   const orpc = useORPC();
   const query = useQuery<FlavorProfile | BottleFlavorProfile>(
     scope.kind === "bottle"
@@ -49,6 +40,29 @@ function FlavorProfileContent({ scope }: FlavorProfileSectionProps) {
             input: { country: scope.country, region: scope.region },
           }),
   );
+
+  if (
+    query.isSuccess &&
+    ("notedTastings" in query.data
+      ? query.data.notedTastings
+      : query.data.notedBottles) === 0
+  ) {
+    return null;
+  }
+
+  return (
+    <TastingWheelProvider>
+      <FlavorProfileContent query={query} />
+    </TastingWheelProvider>
+  );
+}
+
+function FlavorProfileContent({
+  query,
+}: {
+  query: UseQueryResult<FlavorProfile | BottleFlavorProfile>;
+}) {
+  const { select } = useTastingWheel();
 
   return (
     <RailSection heading="Flavor profile">
