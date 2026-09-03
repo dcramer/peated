@@ -5,20 +5,20 @@ import {
 } from "./prepareReviewSource";
 
 /** Checks one source by default; applying keeps record IDs and leaves collection paused. */
-export async function prepareBourbonCultureSource(
+export async function prepareWhiskyStudySource(
   input: PrepareReviewSourceInput,
 ) {
   return prepareReviewSource(input, {
-    siteKey: "bourbonculture",
-    siteName: "Bourbon Culture",
-    targetKey: "bourbonculture",
-    origin: "https://thebourbonculture.com",
-    listUrl: "https://thebourbonculture.com/",
+    siteKey: "whiskystudy",
+    siteName: "The Whisky Study",
+    targetKey: "whiskystudy",
+    origin: "https://thewhiskystudy.com",
+    listUrl: "https://thewhiskystudy.com/reviews-3",
     isCanonicalArticleUrl: (url) =>
-      /^https:\/\/thebourbonculture\.com\/whiskey-reviews\/[a-z0-9][a-z0-9-]*\/$/.test(
+      /^https:\/\/thewhiskystudy\.com\/reviews-3\/[a-z0-9][a-z0-9-]*$/.test(
         url,
       ),
     legacyReviewKey: (url) =>
-      `bourbonculture:${createHash("sha256").update(url).digest("hex")}`,
+      `whiskystudy:${createHash("sha256").update(url).digest("hex")}`,
   });
 }

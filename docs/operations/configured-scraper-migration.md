@@ -83,6 +83,29 @@ Publication settings stay the same. Follow
 [External Review Sources](external-review-sources.md) for publication decisions
 and current publisher access checks.
 
+## The Whisky Study
+
+Use the same process for The Whisky Study with `{"site": "whiskystudy"}`.
+The check-only request verifies that every stored article uses the expected
+`https://thewhiskystudy.com/reviews-3/...` URL without a trailing slash, has
+exactly one review, and still has the key written by the code scraper. Applying
+the preparation changes those review keys in place and adds a paused source
+whose list page is `https://thewhiskystudy.com/reviews-3`.
+
+Before applying, save the same records and stop the `whiskystudy` schedule as
+described above. Compare all stored records after applying. Keep the existing
+limit of 20 latest articles and one review per article when checking suggested
+rules. Verify each article URL, name, writer, date, score, selected review text,
+Bottle match, hidden state, and publication setting. The old scraper removes
+`Review` or `Shelf Review` from the end of Bottle names; saved rules do not do
+text cleanup, so review any name change before activation.
+
+Preview and activate the chosen revision, run one manual collection through
+`POST /v1/external-sites/whiskystudy/trigger`, and confirm that it updates the
+same review IDs recorded before applying without adding duplicate articles or
+reviews. Check the run and Sentry before restoring the saved schedule.
+Preparation must not change the source's publication setting.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -92,9 +115,9 @@ handles reviews added after the switch. Do not delete source or run history.
 
 ## Other sources
 
-The preparation API is shared. Bourbon Culture is the first supported source;
-other sites are rejected without changing records. Add each site's conversion
-behind this route as its existing records are reviewed.
+The preparation API is shared. It currently supports Bourbon Culture and The
+Whisky Study. Other sites are rejected without changing records. Add each
+site's conversion behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
