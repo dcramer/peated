@@ -16,6 +16,7 @@ import { ScraperHttpStatusError } from "../http";
 import { externalReviewSink } from "../sinks/externalReviews";
 import { createStorePriceSink } from "../sinks/storePrices";
 import type {
+  ScrapeTargetDefinition,
   ScraperAdapter,
   ScraperObservation,
   ScraperRegistry,
@@ -44,6 +45,29 @@ class ScrapeSourceParseError extends Error {
   constructor(readonly issues: ScrapeIssue[]) {
     super("The page did not match the saved parsing rules.");
   }
+}
+
+/** Runs use their saved source even while the old scraper code is deployed. */
+function registryForSource(
+  baseRegistry: ScraperRegistry,
+  source: ScraperSourceDefinition,
+  target: ScrapeTargetDefinition,
+): ScraperRegistry {
+  const sources = new Map(baseRegistry.sources);
+  for (const [key, registered] of sources) {
+    if (registered.externalSiteKey === source.externalSiteKey) {
+      sources.delete(key);
+    }
+  }
+  if (sources.has(source.key)) {
+    throw new Error(
+      "This scrape source key is already used by another source.",
+    );
+  }
+  sources.set(source.key, source);
+  const targets = new Map(baseRegistry.targets);
+  targets.set(target.key, target);
+  return { sources, targets };
 }
 
 function createPreviewPage(
@@ -422,11 +446,7 @@ export async function resolveScrapeSourceRunRegistry(
       sink: async () => {},
       adapter,
     };
-    const sources = new Map(baseRegistry.sources);
-    const targets = new Map(baseRegistry.targets);
-    sources.set(source.key, source);
-    targets.set(target.key, target);
-    return { sources, targets };
+    return registryForSource(baseRegistry, source, target);
   }
 
   const [row] = await db
@@ -484,12 +504,5 @@ export async function resolveScrapeSourceRunRegistry(
     purpose: row.run.purpose,
     rules,
   });
-  const sources = new Map(baseRegistry.sources);
-  const targets = new Map(baseRegistry.targets);
-  if (sources.has(source.key) || targets.has(target.key)) {
-    throw new Error("Scrape source collides with a code-owned definition.");
-  }
-  sources.set(source.key, source);
-  targets.set(target.key, target);
-  return { sources, targets };
+  return registryForSource(baseRegistry, source, target);
 }

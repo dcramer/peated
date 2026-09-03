@@ -33,11 +33,14 @@ const InputSchema = z
   })
   .strict();
 
-async function hasReadyConfiguredSource(externalSiteId: number) {
+async function getConfiguredSource(externalSiteId: number) {
   const [source] = await db
-    .select({ id: scrapeSources.id })
+    .select({
+      enabled: scrapeSources.enabled,
+      revisionId: scrapeSourceRevisions.id,
+    })
     .from(scrapeSources)
-    .innerJoin(
+    .leftJoin(
       scrapeSourceRevisions,
       and(
         eq(scrapeSourceRevisions.scrapeSourceId, scrapeSources.id),
@@ -45,14 +48,9 @@ async function hasReadyConfiguredSource(externalSiteId: number) {
         eq(scrapeSourceRevisions.previewStatus, "passed"),
       ),
     )
-    .where(
-      and(
-        eq(scrapeSources.externalSiteId, externalSiteId),
-        eq(scrapeSources.enabled, true),
-      ),
-    )
+    .where(eq(scrapeSources.externalSiteId, externalSiteId))
     .limit(1);
-  return source !== undefined;
+  return source;
 }
 
 export default procedure
@@ -75,13 +73,11 @@ export default procedure
       .limit(1);
     if (!site) throw errors.NOT_FOUND({ message: "Site not found." });
 
-    // Code-managed scrapers use the registry until they move to saved rules.
-    // Keep this path for custom scrapers, such as SMWS, that need code.
-    if (
-      input.schedule.runEvery !== null &&
-      getScraperRegistration(site.type) === null &&
-      !(await hasReadyConfiguredSource(site.id))
-    ) {
+    const configured = await getConfiguredSource(site.id);
+    const ready = configured
+      ? configured.enabled && configured.revisionId !== null
+      : getScraperRegistration(site.type) !== null;
+    if (input.schedule.runEvery !== null && !ready) {
       throw errors.BAD_REQUEST({
         message: "Set up this scraper before you schedule automatic runs.",
       });

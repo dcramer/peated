@@ -4,6 +4,7 @@ import create from "./create";
 import createRevision from "./create-revision";
 import list from "./list";
 import pause from "./pause";
+import prepare from "./prepare";
 import preview from "./preview";
 import suggest from "./suggest";
 
@@ -14,5 +15,6 @@ export default base.router({
   preview,
   activate,
   pause,
+  prepare,
   suggest,
 });
