@@ -14,6 +14,33 @@ receive HTML cached for another request.
 - Sitemap handlers can use public XML cache headers because they have no signed-
   in version.
 
+## Public Data Snapshots
+
+`publicStats.server.ts` owns a shared one-hour Next data cache. Homepage,
+About, search, and sitemap reads use that loader. Footer and authentication
+queries use `/api/stats`, which reads the same anonymous snapshot. The endpoint
+uses `no-store` response headers so HTTP caching does not add another freshness
+window; `asOf` continues to describe when the API counted the data.
+
+`publicCatalog.server.ts` uses five-minute Next data revalidation for anonymous
+entity catalog summaries and simple first-page entity/series bottle lists.
+List keys include the entity, series, distillery view, sort, and limit. Searches,
+extra filters, later pages, and unscoped lists bypass this cache. Signed-in
+requests always bypass it, preserving fresh member flags and edit results.
+The existing overview query keys, server hydration, and loading geometry stay
+the same.
+
+These public snapshots refresh on access after their interval; Next may serve
+the previous result while refreshing it. They are not used for edit forms or
+canonical detail lookups. Canonical Bottle and Entity reads remain request-time
+so merged IDs still redirect immediately. Anonymous page frames reuse those
+records; only member frames perform the additional personalized details read.
+
+Public list membership and totals can lag an edit until revalidation succeeds.
+There is no mutation-driven invalidation across the API and web deployment.
+Do not expand these caches to private data, moderation visibility, prices,
+reviews, or identity resolution without handling those freshness requirements.
+
 Do not rely on client-side rendering to hide private controls in shared cached
 HTML. Do not assume `Vary: Cookie` survives Next.js rendering unless production
 headers prove it.

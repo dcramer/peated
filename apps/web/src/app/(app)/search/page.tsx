@@ -1,4 +1,5 @@
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPublicStats } from "@peated/web/lib/publicStats.server";
 import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
 
@@ -75,7 +76,7 @@ export default async function SearchPage(props: {
       : (["bottles"] as const);
   const searchLimit = databaseSearch && selectedScope === "all" ? 5 : 50;
   const [stats, initialResponse] = await Promise.all([
-    client.stats(),
+    getPublicStats(),
     query
       ? client
           .search({

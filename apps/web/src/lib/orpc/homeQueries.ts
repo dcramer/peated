@@ -1,3 +1,4 @@
+import { StatsSchema } from "@peated/server/orpc/contracts/stats";
 import type { Outputs } from "@peated/server/orpc/router";
 import {
   infiniteQueryOptions,
@@ -11,7 +12,16 @@ type ActivityFilter = "friends" | "global" | "local";
 type ActivityList = Outputs["activity"]["list"];
 
 export const publicHomeQueries = {
-  stats: (orpc: ORPCQueryUtils) => orpc.stats.queryOptions(),
+  stats: (orpc: ORPCQueryUtils) =>
+    orpc.stats.queryOptions({
+      queryFn: async ({ signal }) => {
+        const response = await fetch("/api/stats", { signal });
+        if (!response.ok) {
+          throw new Error(`Unable to load public stats (${response.status}).`);
+        }
+        return StatsSchema.parse(await response.json());
+      },
+    }),
   events: (orpc: ORPCQueryUtils) =>
     orpc.events.list.queryOptions({
       input: { limit: 1, onlyUpcoming: true, sort: "date" },

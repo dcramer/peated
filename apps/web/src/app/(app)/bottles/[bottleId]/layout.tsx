@@ -7,6 +7,7 @@ import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { summarize } from "@peated/web/lib/markdown";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { getBottleSeoMetadata } from "@peated/web/lib/seoMetadata";
+import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
 
 import { BottlePageFrameClient } from "./bottlePageClient.stylex";
@@ -25,8 +26,13 @@ export default async function BottleLayout(props: {
 }) {
   const { bottleId } = await props.params;
   const canonicalBottle = await getBottlePage(parseCatalogRouteId(bottleId));
-  const { client } = await getServerClient();
-  const bottle = await client.bottles.details({ bottle: canonicalBottle.id });
+  const session = await getSession();
+  // BottleLayout reuses public details; only members need a second read for their state.
+  let bottle = canonicalBottle;
+  if (session.accessToken) {
+    const { client } = await getServerClient();
+    bottle = await client.bottles.details({ bottle: canonicalBottle.id });
+  }
   const title = formatBottleDisplayName(bottle);
   const jsonLd: WithContext<Product> = {
     "@context": "https://schema.org",

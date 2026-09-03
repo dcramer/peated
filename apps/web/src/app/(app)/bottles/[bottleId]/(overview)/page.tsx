@@ -3,6 +3,7 @@ import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getQueryClient } from "@peated/web/lib/orpc/query";
+import { getPageBottleList } from "@peated/web/lib/publicCatalog.server";
 import { getBottleSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
@@ -26,6 +27,9 @@ export default async function BottlePage(props: {
   const queryClient = getQueryClient();
   const { client } = await getPublicPageServerClient();
   const orpc = createTanstackQueryUtils(client);
+  const seriesQuery = bottle.series
+    ? bottleOverviewQueries.series(orpc, bottle.series.id)
+    : null;
 
   await Promise.all([
     queryClient.prefetchQuery(
@@ -33,11 +37,12 @@ export default async function BottlePage(props: {
     ),
     queryClient.prefetchQuery(bottleOverviewQueries.reviews(orpc, bottle.id)),
     queryClient.prefetchQuery(bottleOverviewQueries.tastings(orpc, bottle.id)),
-    ...(bottle.series
+    ...(seriesQuery
       ? [
-          queryClient.prefetchQuery(
-            bottleOverviewQueries.series(orpc, bottle.series.id),
-          ),
+          queryClient.prefetchQuery({
+            ...seriesQuery,
+            queryFn: () => getPageBottleList(seriesQuery.input),
+          }),
         ]
       : []),
   ]);

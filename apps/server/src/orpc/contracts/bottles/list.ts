@@ -16,6 +16,51 @@ const OutputSchema = listResponse(BottleSchema).extend({
   followedEntityCount: z.number().int().nonnegative().nullable(),
 });
 
+export const BottleListInputSchema = z.object({
+  query: z.coerce
+    .string()
+    .default("")
+    .describe("Search text only. Search operators are not supported."),
+  brand: z.coerce.number().nullish(),
+  distiller: z.coerce.number().nullish(),
+  bottler: z.coerce.number().nullish(),
+  entity: z.coerce.number().nullish(),
+  country: z.coerce
+    .string()
+    .nullish()
+    .describe(
+      "Filter by the country of an assigned distillery. Accepts a slug or numeric ID.",
+    ),
+  region: z.coerce
+    .string()
+    .nullish()
+    .describe(
+      "Filter by the region of an assigned distillery. Accepts a slug or numeric ID and requires `country`.",
+    ),
+  distilleryView: z
+    .enum(DISTILLERY_BOTTLE_VIEW_LIST)
+    .nullish()
+    .describe(
+      "Filter a distillery to its own releases or releases from other brands and bottlers.",
+    ),
+  series: z.coerce.number().nullish(),
+  library: z
+    .enum(["in", "out"])
+    .nullish()
+    .describe("Filter by the signed-in user's Library."),
+  tag: z.string().nullish(),
+  flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
+  flight: z.string().nullish(),
+  category: z.enum(CATEGORY_LIST).nullish(),
+  age: z.coerce.number().nullish(),
+  ageBand: z.enum(BOTTLE_AGE_BAND_LIST).nullish(),
+  minScore: z.coerce.number().int().min(0).max(100).nullish(),
+  cursor: z.coerce.number().gte(1).default(1),
+  limit: z.coerce.number().gte(1).lte(100).default(25),
+  filter: z.enum(["all", "following"]).default("all"),
+  sort: z.enum(BOTTLE_LIST_SORT_OPTIONS).default(DEFAULT_SORT),
+});
+
 export default contract
   .route({
     method: "GET",
@@ -28,52 +73,7 @@ export default contract
       operationId: "listBottles",
     }),
   })
-  .input(
-    z.object({
-      query: z.coerce
-        .string()
-        .default("")
-        .describe("Search text only. Search operators are not supported."),
-      brand: z.coerce.number().nullish(),
-      distiller: z.coerce.number().nullish(),
-      bottler: z.coerce.number().nullish(),
-      entity: z.coerce.number().nullish(),
-      country: z.coerce
-        .string()
-        .nullish()
-        .describe(
-          "Filter by the country of an assigned distillery. Accepts a slug or numeric ID.",
-        ),
-      region: z.coerce
-        .string()
-        .nullish()
-        .describe(
-          "Filter by the region of an assigned distillery. Accepts a slug or numeric ID and requires `country`.",
-        ),
-      distilleryView: z
-        .enum(DISTILLERY_BOTTLE_VIEW_LIST)
-        .nullish()
-        .describe(
-          "Filter a distillery to its own releases or releases from other brands and bottlers.",
-        ),
-      series: z.coerce.number().nullish(),
-      library: z
-        .enum(["in", "out"])
-        .nullish()
-        .describe("Filter by the signed-in user's Library."),
-      tag: z.string().nullish(),
-      flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
-      flight: z.string().nullish(),
-      category: z.enum(CATEGORY_LIST).nullish(),
-      age: z.coerce.number().nullish(),
-      ageBand: z.enum(BOTTLE_AGE_BAND_LIST).nullish(),
-      minScore: z.coerce.number().int().min(0).max(100).nullish(),
-      cursor: z.coerce.number().gte(1).default(1),
-      limit: z.coerce.number().gte(1).lte(100).default(25),
-      filter: z.enum(["all", "following"]).default("all"),
-      sort: z.enum(BOTTLE_LIST_SORT_OPTIONS).default(DEFAULT_SORT),
-    }),
-  )
+  .input(BottleListInputSchema)
   // TODO(response-envelope): Return { data, meta } when all list routes use the
   // same wrapper.
   .output(OutputSchema);

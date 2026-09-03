@@ -26,6 +26,7 @@ export type BottleVisualProps = {
  * composing another layout: md for standard rows including sidebars, lg/xl
  * for detail media. Omit label beside visible bottle text; expandable needs a label.
  * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
+ * Row images load near the viewport; lg/xl detail images load immediately.
  */
 export function BottleVisual({
   expandable = false,
@@ -34,6 +35,7 @@ export function BottleVisual({
   size = "md",
 }: BottleVisualProps) {
   const hasExpandableImage = Boolean(imageUrl && expandable && label);
+  const loading = size === "lg" || size === "xl" ? "eager" : "lazy";
 
   return (
     <span
@@ -52,11 +54,17 @@ export function BottleVisual({
           <img
             alt=""
             src={imageUrl}
+            loading={loading}
             {...stylex.props(styles.image, expandableImagePaddingStyles[size])}
           />
         </ImageViewer>
       ) : imageUrl ? (
-        <img alt="" src={imageUrl} {...stylex.props(styles.image)} />
+        <img
+          alt=""
+          src={imageUrl}
+          loading={loading}
+          {...stylex.props(styles.image)}
+        />
       ) : (
         <span
           style={{
