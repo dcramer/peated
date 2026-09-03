@@ -45,6 +45,15 @@ function prepare(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareWhiskyStudy(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "whiskystudy", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 const registry = createScraperRegistry({
@@ -53,6 +62,18 @@ const registry = createScraperRegistry({
     {
       ...scraperRegistry.sources.get("bourbonculture")!,
       externalSiteKey: "bourbonculture",
+    },
+  ],
+});
+
+const whiskyStudyCanonicalUrl =
+  "https://thewhiskystudy.com/reviews-3/example-scotch-review";
+const whiskyStudyRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("whiskystudy")!],
+  sources: [
+    {
+      ...scraperRegistry.sources.get("whiskystudy")!,
+      externalSiteKey: "whiskystudy",
     },
   ],
 });
@@ -100,6 +121,59 @@ async function setupMigration(bottleId: number | null = null) {
   await db.insert(externalReviewPublications).values({
     externalSiteId: site.id,
     approvedAt: new Date(),
+  });
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return { site, article, review };
+}
+
+async function setupWhiskyStudyMigration(bottleId: number | null = null) {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "whiskystudy",
+      name: "The Whisky Study",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(whiskyStudyRegistry);
+  const [article] = await db
+    .insert(externalReviewArticles)
+    .values({
+      externalSiteId: site.id,
+      canonicalUrl: whiskyStudyCanonicalUrl,
+      title: "Example Scotch 18 Year Shelf Review",
+      publishedAt: new Date("2026-07-04"),
+    })
+    .returning();
+  const [review] = await db
+    .insert(externalReviews)
+    .values({
+      articleId: article.id,
+      sourceKey: `whiskystudy:${createHash("sha256").update(whiskyStudyCanonicalUrl).digest("hex")}`,
+      name: "Example Scotch 18 Year",
+      bottleId,
+      hidden: true,
+      reviewerName: "Chris Ellis",
+      nativeScoreValue: 92,
+      nativeScoreScale: 100,
+      nativeScoreDisplay: "92/100",
+      clip: "An existing clip.",
+      tags: ["orchard fruit"],
+    })
+    .returning();
+  await db.insert(externalReviewBodies).values({
+    externalReviewId: review.id,
+    body: "Synthetic old review body.",
+    fetchedAt: new Date(),
+  });
+  await db.insert(externalReviewPublications).values({
+    externalSiteId: site.id,
+    approvedAt: null,
   });
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
@@ -254,6 +328,82 @@ describe("POST /admin/scrape-sources/prepare", () => {
       code: "CONFLICT",
       message: "Bourbon Culture is already prepared for saved scraping rules.",
     });
+  });
+
+  test("prepares The Whisky Study without replacing its records", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const { site, article, review } = await setupWhiskyStudyMigration(
+      bottle.id,
+    );
+    const bodies = await db.select().from(externalReviewBodies);
+    const publications = await db.select().from(externalReviewPublications);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareWhiskyStudy()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      reviewCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(externalReviews)).toEqual([review]);
+
+    const applied = await prepareWhiskyStudy({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      reviewCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(whiskyStudyRegistry);
+    expect(await db.select().from(externalReviewArticles)).toEqual([article]);
+    expect(await db.select().from(externalReviews)).toEqual([
+      {
+        ...review,
+        sourceKey: `${whiskyStudyCanonicalUrl}#review-1`,
+      },
+    ]);
+    expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
+    expect(await db.select().from(externalReviewPublications)).toEqual(
+      publications,
+    );
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "review",
+        listUrl: "https://thewhiskystudy.com/reviews-3",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("refuses an unexpected The Whisky Study article URL", async () => {
+    const { article } = await setupWhiskyStudyMigration();
+    await db
+      .update(externalReviewArticles)
+      .set({ canonicalUrl: `${whiskyStudyCanonicalUrl}/` })
+      .where(eq(externalReviewArticles.id, article.id));
+    const reviews = await db.select().from(externalReviews);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareWhiskyStudy({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining(
+        "Check the URL and review records for The Whisky Study article",
+      ),
+    });
+    expect(await db.select().from(externalReviews)).toEqual(reviews);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
   test.each([
