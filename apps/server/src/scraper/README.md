@@ -71,6 +71,10 @@ Admins can add a review or store-price source in Admin → Scrapers. These
 sources use the same run, request, robots, limit, retry, validation, and sink
 boundaries as code-owned sources.
 
+To replace an existing scraper, follow
+[Move an existing scraper to saved rules](../../../../docs/operations/configured-scraper-migration.md).
+Keep the existing site and record IDs when switching to the new rules.
+
 The database stores each source and its parsing rules. Each saved revision is
 immutable. A preview reads sample pages and stores only parsed fields and errors.
 It does not store fetched HTML, review text, or full product records in the

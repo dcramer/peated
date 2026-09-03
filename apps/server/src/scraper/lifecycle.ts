@@ -2,6 +2,7 @@ import { db, type AnyDatabase } from "@peated/server/db";
 import {
   externalSiteRuns,
   externalSites,
+  scrapeSources,
   type ExternalSite,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
@@ -18,6 +19,7 @@ import {
 } from "drizzle-orm";
 import { z } from "zod";
 import { createPinnedScrapeSourceRun } from "./configured/runs";
+import { ScrapeSourceValidationError } from "./configured/service";
 import {
   findScraperSourceBySiteKey,
   requireEnabledScraperTargets,
@@ -49,8 +51,8 @@ const ActiveRunConflictSchema = z.object({
   constraint: z.literal("external_site_run_active_unq"),
 });
 
-async function findActiveRun(siteId: number) {
-  const [run] = await db
+async function findActiveRun(siteId: number, connection: AnyDatabase = db) {
+  const [run] = await connection
     .select({ status: externalSiteRuns.status })
     .from(externalSiteRuns)
     .where(
@@ -70,8 +72,20 @@ async function insertRun(
   registry: ScraperRegistry,
   requestedById?: number,
 ) {
+  // Lifecycle holds the site lock. Reject active work before an insert can wait
+  // on a completing run that needs that same site lock to finish.
+  const activeRun = await findActiveRun(site.id, connection);
+  if (activeRun?.status === "queued" || activeRun?.status === "running") {
+    throw new ExternalSiteRunActiveError(activeRun.status);
+  }
   const source = findScraperSourceBySiteKey(registry, site.type);
-  if (!source) {
+  const [configuredSource] = await connection
+    .select({ id: scrapeSources.id })
+    .from(scrapeSources)
+    .where(eq(scrapeSources.externalSiteId, site.id));
+  // Scraper lifecycle chooses the scraper. A migrated site's paused or
+  // unfinished rules must never restart its old scraper.
+  if (configuredSource || !source) {
     const configured = await createPinnedScrapeSourceRun(connection, {
       externalSiteId: site.id,
       requestedById,
@@ -80,8 +94,6 @@ async function insertRun(
     });
     return configured.run;
   }
-  // TODO(scraper-source-migration): Prefer an active database-managed revision
-  // before this registry fallback when existing-site shadow setup is added.
   requireEnabledScraperTargets(registry, source);
   let cursor = null;
   if (source.resumeFromLastRun) {
@@ -266,7 +278,16 @@ async function queueManualExternalSiteRun({
 }) {
   let run: ExternalSiteRun;
   try {
-    run = await insertRun(db, site, "manual", registry, requestedById);
+    run = await db.transaction(async (tx) => {
+      // Site migrations also lock this row before changing which scraper runs.
+      const [currentSite] = await tx
+        .select()
+        .from(externalSites)
+        .where(eq(externalSites.id, site.id))
+        .for("no key update");
+      if (!currentSite) throw new Error("External site not found.");
+      return insertRun(tx, currentSite, "manual", registry, requestedById);
+    });
   } catch (error) {
     if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
     return await throwActiveRunConflict(site.id);
@@ -290,13 +311,15 @@ async function queueScrapeSourcePreview({
 }) {
   let run: ExternalSiteRun;
   try {
-    const configured = await createPinnedScrapeSourceRun(db, {
-      externalSiteId: site.id,
-      scrapeSourceId,
-      revisionId,
-      requestedById,
-      trigger: "manual",
-      purpose: "preview",
+    const configured = await db.transaction(async (tx) => {
+      return createPinnedScrapeSourceRun(tx, {
+        externalSiteId: site.id,
+        scrapeSourceId,
+        revisionId,
+        requestedById,
+        trigger: "manual",
+        purpose: "preview",
+      });
     });
     run = configured.run;
   } catch (error) {
@@ -337,6 +360,8 @@ async function queueScheduledExternalSiteRun(
       return { run, site };
     });
   } catch (error) {
+    // Paused or unfinished configured sources are not due for collection.
+    if (error instanceof ScrapeSourceValidationError) return null;
     if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
     return await throwActiveRunConflict(siteId);
   }

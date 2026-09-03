@@ -11,6 +11,7 @@ import {
   queueManualExternalSiteRun,
   ScraperTargetDisabledError,
 } from "@peated/server/scraper";
+import { ScrapeSourceValidationError } from "@peated/server/scraper/configured/service";
 import { serialize } from "@peated/server/serializers";
 import { ExternalSiteRunSerializer } from "@peated/server/serializers/externalSite";
 import { eq } from "drizzle-orm";
@@ -52,6 +53,9 @@ export default procedure
       });
       return serialize(ExternalSiteRunSerializer, run, context.user);
     } catch (error) {
+      if (error instanceof ScrapeSourceValidationError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
+      }
       if (
         error instanceof ExternalSiteRunActiveError ||
         error instanceof ScraperTargetDisabledError

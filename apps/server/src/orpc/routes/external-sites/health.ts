@@ -242,14 +242,14 @@ async function getHealthForSites(
       latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
       lastSucceededAt: lastSucceeded?.completedAt?.toISOString() ?? null,
       runtime: {
-        registered:
-          registration !== null ||
-          (configured?.enabled === true &&
+        registered: configured
+          ? configured.enabled &&
             configured.activeRevisionId !== null &&
-            configured.previewStatus === "passed"),
-        targetKeys:
-          registration?.targetKeys ??
-          (configured ? [...(targets?.keys() ?? [])] : []),
+            configured.previewStatus === "passed"
+          : registration !== null,
+        targetKeys: configured
+          ? [...(targets?.keys() ?? [])]
+          : (registration?.targetKeys ?? []),
         targets: targets ? [...targets.values()] : [],
       },
       reviewPublication: hasReviewPublication
