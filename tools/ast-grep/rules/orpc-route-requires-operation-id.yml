@@ -4,12 +4,20 @@ severity: error
 message: Every oRPC route must declare a stable OpenAPI operationId.
 files:
   - apps/server/src/orpc/routes/**/*.ts
+  - apps/server/src/orpc/contracts/**/*.ts
+ignores:
+  - apps/server/src/orpc/**/*.test.ts
 rule:
-  all:
-    - pattern: $PROCEDURE.route($CONFIG)
-    - not:
-        has:
-          pattern:
-            context: "{ operationId: $ID }"
-            selector: pair
-          stopBy: end
+  pattern: $PROCEDURE.route($CONFIG)
+constraints:
+  CONFIG:
+    kind: object
+    not:
+      has:
+        any:
+          - pattern:
+              context: "{ operationId: $ID }"
+              selector: pair
+          - kind: shorthand_property_identifier
+            regex: ^operationId$
+        stopBy: end

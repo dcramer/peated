@@ -1,0 +1,10 @@
+id: orpc-path-parameters-use-braces
+valid:
+  - 'procedure.route({ path: "/items/{item}" })'
+  - "contract.route({ path: `/items/{item}/notes/{note}` })"
+  - "procedure.route({ path })"
+  - 'procedure.route({ description: "Fetch from /:item" })'
+invalid:
+  - 'procedure.route({ path: "/items/:item" })'
+  - "contract.route({ path: `/items/:item/notes/:note` })"
+  - 'createContract({ path: "/items/:item" })'

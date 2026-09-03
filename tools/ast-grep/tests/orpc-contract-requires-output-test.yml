@@ -1,0 +1,11 @@
+id: orpc-contract-requires-output
+valid:
+  - contract.route(metadata).input(InputSchema).output(OutputSchema)
+  - "export default contract.route(metadata).output(z.void())"
+  - "function createContract() { return contract.route(metadata).input(InputSchema).output(OutputSchema); }"
+invalid:
+  - contract.route(metadata).input(InputSchema)
+  - "export default contract.route(metadata)"
+  - "const unrelated = contract.output(OutputSchema); export default contract.route(metadata);"
+  - "wrap(contract.route(metadata)).output(OutputSchema)"
+  - "contract.route(metadata).input(other.output(OutputSchema))"

@@ -10,7 +10,7 @@ export default procedure
   .use(requireAuth)
   .route({
     method: "DELETE",
-    path: "/auth/passkey/:passkeyId",
+    path: "/auth/passkey/{passkeyId}",
     summary: "Delete a passkey",
     description: "Remove a passkey from the user's account",
     spec: (spec) => ({

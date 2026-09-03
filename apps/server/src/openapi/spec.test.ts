@@ -186,6 +186,7 @@ describe("Published OpenAPI metadata", () => {
     const operationIds: string[] = [];
 
     for (const [path, item] of Object.entries(spec.paths ?? {})) {
+      expect(path).not.toMatch(/\/:[A-Za-z_][A-Za-z0-9_]*/);
       for (const method of ["get", "post", "put", "patch", "delete"] as const) {
         const operation = item?.[method];
         if (!operation) continue;
@@ -200,6 +201,21 @@ describe("Published OpenAPI metadata", () => {
 
     expect(operationIds.length).toBeGreaterThan(0);
     expect(new Set(operationIds).size).toBe(operationIds.length);
+  });
+
+  it("publishes passkey IDs as required path parameters", async () => {
+    const spec = await generateSpec();
+    for (const method of ["patch", "delete"] as const) {
+      expect(
+        spec.paths?.["/auth/passkey/{passkeyId}"]?.[method]?.parameters,
+      ).toContainEqual(
+        expect.objectContaining({
+          name: "passkeyId",
+          in: "path",
+          required: true,
+        }),
+      );
+    }
   });
 
   it("declares bearer authentication for protected routes and optional authentication for public reads", async () => {

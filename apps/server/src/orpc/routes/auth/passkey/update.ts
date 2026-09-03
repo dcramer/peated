@@ -10,7 +10,7 @@ export default procedure
   .use(requireAuth)
   .route({
     method: "PATCH",
-    path: "/auth/passkey/:passkeyId",
+    path: "/auth/passkey/{passkeyId}",
     summary: "Update passkey nickname",
     description: "Update the nickname for a passkey",
     spec: (spec) => ({

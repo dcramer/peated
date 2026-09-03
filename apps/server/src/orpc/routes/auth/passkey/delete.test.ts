@@ -1,20 +1,36 @@
+import { app } from "@peated/server/app";
 import { db } from "@peated/server/db";
 import { passkeys } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("DELETE /auth/passkey/:passkeyId", () => {
-  test("deletes passkey when user has password", async ({ fixtures }) => {
+describe("DELETE /auth/passkey/{passkeyId}", () => {
+  test("deletes passkey over HTTP when user has password", async ({
+    fixtures,
+  }) => {
     const user = await fixtures.User({ password: "testpassword" });
     const passkey = await fixtures.Passkey({ userId: user.id });
 
-    await routerClient.auth.passkey.delete(
-      { passkeyId: passkey.id },
+    const token = await fixtures.AuthToken({ user });
+    const response = await app.request(
+      `/v1/auth/passkey/${passkey.id}`,
       {
-        context: { user },
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+      {
+        incoming: {
+          socket: {
+            remoteAddress: "127.0.0.1",
+            remotePort: 12345,
+            remoteFamily: "IPv4",
+          },
+        },
       },
     );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
 
     const deletedPasskey = await db
       .select()

@@ -70,14 +70,20 @@ Most routes define their request, response, and handler in one file. If an
 endpoint also has a mock handler, move the shared request and response
 definition to `orpc/contracts`. Both handlers must use that contract.
 
-A contract file can import schemas and constants. It must not import database,
-configuration, external service, or handler code. This keeps the mock API
-independent of the real API.
+A contract file can import schemas, constants, pure helpers, and types. It must
+not load database, configuration, worker, external service, or handler code.
+This keeps the mock API independent of the real API.
 
 ```ts
 // contracts/bottles/list.ts
 export default contract
-  .route({ method: "GET", path: "/bottles" })
+  .route({
+    method: "GET",
+    path: "/bottles",
+    summary: "List bottles",
+    description: "Find bottles by name and catalog filters.",
+    operationId: "listBottles",
+  })
   .input(BottleListInputSchema)
   .output(BottleListOutputSchema);
 
@@ -115,7 +121,13 @@ Chain route definitions in this order:
 ```ts
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/ping", summary: "Health check" })
+  .route({
+    method: "GET",
+    path: "/ping",
+    summary: "Check API availability",
+    description: "Confirm that the API can respond to requests.",
+    operationId: "ping",
+  })
   .input(z.object({}))
   .output(z.object({ ping: z.literal("pong") }))
   .handler(() => ({ ping: "pong" }));
@@ -123,7 +135,8 @@ export default procedure
 
 ## 4. OpenAPI `operationId` Convention
 
-Routes should explicitly specify `operationId` values with the `spec` callback.
+Routes must explicitly specify `operationId`, either directly in `.route()` or
+in its `spec` callback.
 
 ### Naming Convention
 
@@ -163,6 +176,7 @@ export default procedure.route({
   method: "GET",
   path: "/bottles",
   summary: "List bottles",
+  description: "Find bottles by name and catalog filters.",
   spec: (spec) => ({
     ...spec,
     operationId: "listBottles",
@@ -197,6 +211,8 @@ export default procedure.route({
 ### Naming
 
 - Use descriptive nouns such as `bottle` and `tasting`.
+- Use `{parameter}` in paths. Express-style `:parameter` segments do not define
+  oRPC path parameters.
 - Do not reuse a path param name for a body or query field.
 
 ### Coercion and Validation
@@ -273,7 +289,13 @@ cannot be represented by the OpenAPI schema converter.
 
 ```ts
 export default procedure
-  .route({ method: "GET", path: "/tastings/{tasting}" })
+  .route({
+    method: "GET",
+    path: "/tastings/{tasting}",
+    summary: "Get tasting details",
+    description: "Get one tasting that the caller can view.",
+    operationId: "getTasting",
+  })
   .input(z.object({ tasting: z.coerce.number() }))
   .output(TastingSchema)
   .handler(async ({ input, context, errors }) => {
@@ -322,7 +344,13 @@ the operation or parameters instead of marking the whole operation internal.
 ```ts
 export default procedure
   .use(requireAuth)
-  .route({ method: "GET", path: "/auth/me" })
+  .route({
+    method: "GET",
+    path: "/auth/me",
+    summary: "Get current user",
+    description: "Get the signed-in member's account details.",
+    operationId: "getCurrentUser",
+  })
   .output(z.object({ user: UserSchema }))
   .handler(({ context }) => ({
     user: serialize(UserSerializer, context.user, context.user),
@@ -355,3 +383,20 @@ Route-specific expectations:
 
 - Fetch `limit + 1` rows to detect `nextCursor`.
 - Remove the extra row before serialization.
+
+## 11. Automated Checks
+
+`pnpm ast-grep:lint` runs the API rules as part of `pnpm lint`. Rule fixtures
+live in `tools/ast-grep/tests` and run with `pnpm ast-grep:test`.
+
+The rules check route metadata in both handlers and shared contracts, output
+schemas, path parameter syntax, bare Blob schemas, imports of runtime modules
+in contracts, and annotations that hide operations. They allow shorthand
+metadata properties, pure helper imports, and type-only imports. Keep complete
+metadata beside the route declaration or in its shared builder.
+
+The OpenAPI tests check the assembled `/spec.json`, including metadata supplied
+through variables, unique operation IDs, inherited tags, authentication,
+internal badges, and upload formats. Source lint does not resolve imports or
+evaluate route builders. Permission correctness and description quality still
+need review.

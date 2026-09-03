@@ -1,0 +1,19 @@
+id: orpc-path-parameters-use-braces
+language: TypeScript
+severity: error
+message: Use /{parameter} in oRPC paths instead of /:parameter.
+files:
+  - apps/server/src/orpc/routes/**/*.ts
+  - apps/server/src/orpc/contracts/**/*.ts
+ignores:
+  - apps/server/src/orpc/**/*.test.ts
+rule:
+  pattern:
+    context: "{ path: $PATH }"
+    selector: pair
+constraints:
+  PATH:
+    any:
+      - kind: string
+      - kind: template_string
+    regex: "/:[A-Za-z_][A-Za-z0-9_]*"
