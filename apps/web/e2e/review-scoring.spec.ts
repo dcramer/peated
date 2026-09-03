@@ -16,14 +16,14 @@ test("moderator previews and saves score rules; readers keep the original score"
   await page.waitForLoadState("networkidle");
   await page.getByLabel("Use this site's scores").selectOption("include");
   await page
-    .getByRole("button", { name: "Add score rule", exact: true })
+    .getByRole("button", { name: "Add another scale", exact: true })
     .click();
   await page.getByLabel("Site scores are out of").fill("5");
   await page
     .getByLabel("Site's scoring guide")
     .fill("https://example.com/scoring");
   await page
-    .getByLabel("Why these scores match")
+    .getByLabel("Why this comparison is fair")
     .fill(
       "Fictional guide for this browser test: 3 is very good; 4 is outstanding.",
     );
