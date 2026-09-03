@@ -315,7 +315,6 @@ function SearchResultsGroup({
               >
                 <BottleIdentityRow
                   {...item.bottle}
-                  align="start"
                   href={item.href}
                   imageUrl={item.visual.imageUrl}
                   name={item.title}

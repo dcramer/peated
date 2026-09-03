@@ -59,12 +59,11 @@ export function getBottleIdentityProps(
     BottleListItemOptions,
     "includeBottler" | "includeBrandInName" | "includeSeriesInName"
   > = {},
-): Pick<BottleIdentityRowProps, "align" | "name" | "provenance" | "metadata"> {
+): Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata"> {
   const releaseFact = getBottleReleaseMetadata(bottle);
   const releaseYear =
     bottle.releaseYear == null ? null : `${bottle.releaseYear} release`;
   return {
-    align: "start",
     name: formatBottleDisplayName(bottle, {
       includeBrand: includeBrandInName,
       includeSeries: includeSeriesInName,

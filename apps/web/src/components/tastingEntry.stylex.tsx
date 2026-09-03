@@ -106,7 +106,6 @@ export function TastingEntry({
                   </header>
                   <BottleIdentityRow
                     {...member.bottle}
-                    align="start"
                     href={member.href}
                     imageUrl={member.imageUrl}
                   />
