@@ -1,5 +1,7 @@
 "use client";
 
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
+
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { BottleMergeSchema } from "@peated/server/schemas";
@@ -53,7 +55,9 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
   const searchParams = useSearchParams();
   const { flash } = useFlashMessages();
   const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({
+      input: { bottle: parseCatalogRouteId(bottleId) },
+    }),
   );
   const prefilledId = Number(searchParams.get("other") ?? 0) || null;
   const prefilledDirection =

@@ -12,7 +12,7 @@ import {
 
 describe("SEO metadata", () => {
   it("provides plain location metadata and separate canonical URLs for tabs", () => {
-    const country = { name: "Scotland", slug: "scotland", description: null };
+    const country = { name: "Scotland", slug: "scotland" };
     expect(getCountrySeoMetadata(country)).toMatchObject({
       title: "Whisky from Scotland",
       description:

@@ -108,7 +108,7 @@ export function getCatalogSeoMetadata(
 type CountrySeoSource = {
   name: string;
   slug: string;
-  description: string | null;
+  description?: string | null;
 };
 type RegionSeoSource = CountrySeoSource & {
   country: { name: string; slug: string };
@@ -120,7 +120,7 @@ type LocationSeoOptions = {
 
 function getLocationSeoMetadata(
   name: string,
-  description: string | null,
+  description: string | null | undefined,
   url: string,
   { section, searchParams }: LocationSeoOptions,
 ): Metadata {

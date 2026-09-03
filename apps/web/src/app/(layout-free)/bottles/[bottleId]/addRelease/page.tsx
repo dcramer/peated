@@ -1,5 +1,7 @@
 "use client";
 
+import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
+
 import { use } from "react";
 
 import BottleForm from "@peated/web/components/bottleForm";
@@ -40,7 +42,9 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
   }
 
   const { data: sourceBottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+    orpc.bottles.details.queryOptions({
+      input: { bottle: parseCatalogRouteId(bottleId) },
+    }),
   );
   const proposalQuery = useQuery({
     ...orpc.prices.matchQueue.details.queryOptions({
