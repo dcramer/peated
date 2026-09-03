@@ -93,7 +93,10 @@ export function ReviewScore({
             <span
               {...stylex.props(foundationStyles.metadata, styles.scoreMetadata)}
             >
-              / 100 · median of {formatCount(count)} {countNoun(count)}
+              / 100
+              {count > 1
+                ? ` · median of ${formatCount(count)} ${countNoun(count)}`
+                : null}
             </span>
           </div>
           <div aria-hidden="true" {...stylex.props(styles.scoreTrack)}>

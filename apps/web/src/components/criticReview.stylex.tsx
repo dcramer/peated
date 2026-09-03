@@ -1,8 +1,8 @@
-import type { ExternalReviewScoreContribution } from "@peated/server/schemas";
 import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
+import { Avatar } from "./avatar.stylex";
 import { TextLink } from "./textLink.stylex";
 
 export type CriticReviewProps = {
@@ -10,152 +10,143 @@ export type CriticReviewProps = {
   publication: string;
   publishedAt?: string;
   nativeScore?: { value: number; scale: number } | null;
-  scoreContribution?: ExternalReviewScoreContribution;
   reviewerName?: string;
   summary?: string;
 };
 
-/** Shows the publication's original score and whether it enters the bottle score. */
+/** Shows an attributed critic review with the publication's original score. */
 export function CriticReview({
   href,
   publication,
   publishedAt,
   nativeScore,
-  scoreContribution,
   reviewerName,
   summary,
 }: CriticReviewProps) {
-  const byline = [reviewerName ? `By ${reviewerName}` : null, publishedAt]
-    .filter(Boolean)
-    .join(" · ");
+  const byline = reviewerName ? `By ${reviewerName}` : null;
+  const hasScore = nativeScore !== null && nativeScore !== undefined;
 
   return (
     <article {...stylex.props(styles.review)}>
-      <div {...stylex.props(styles.heading)}>
-        <div {...stylex.props(styles.source)}>
-          <strong
-            {...stylex.props(
-              foundationStyles.compactRowTitle,
-              styles.publication,
-            )}
-          >
-            {publication}
-          </strong>
-          {byline ? (
-            <span {...stylex.props(foundationStyles.metadata, styles.byline)}>
-              {byline}
-            </span>
-          ) : null}
-        </div>
-        {nativeScore ? (
-          <span
-            role="img"
-            aria-label={`${publication} score ${nativeScore.value} out of ${nativeScore.scale}`}
-            {...stylex.props(styles.rating)}
-          >
-            {nativeScore.value}
-            <span {...stylex.props(foundationStyles.metadata, styles.scale)}>
-              /{nativeScore.scale}
-            </span>
-          </span>
-        ) : null}
-      </div>
-
-      {nativeScore && scoreContribution ? (
-        <p {...stylex.props(foundationStyles.metadata, styles.contribution)}>
-          {scoreContribution.value === null
-            ? "Not included in the bottle score."
-            : nativeScore.scale === 100 &&
-                scoreContribution.value === nativeScore.value
-              ? "Included in the bottle score."
-              : `Counts as an estimated ${scoreContribution.value}/100 in the bottle score.`}{" "}
-          <TextLink href="/about/ratings" size="inherit">
-            How scores work
-          </TextLink>
-          {scoreContribution.guideUrl ? (
+      <header {...stylex.props(styles.source)}>
+        <Avatar initials={publication.slice(0, 2).toUpperCase()} size="xs" />
+        <div {...stylex.props(foundationStyles.metadata, styles.context)}>
+          <strong {...stylex.props(styles.publication)}>{publication}</strong>
+          {publishedAt ? (
             <>
-              {" "}
-              ·{" "}
-              <TextLink href={scoreContribution.guideUrl} size="inherit">
-                Scoring guide
-              </TextLink>
+              <span aria-hidden="true"> · </span>
+              <span>{publishedAt}</span>
             </>
           ) : null}
-        </p>
-      ) : null}
+        </div>
+      </header>
 
-      {summary ? (
-        <p {...stylex.props(foundationStyles.prose, styles.summary)}>
-          {summary}
-        </p>
-      ) : null}
+      {summary || hasScore || byline || href ? (
+        <div {...stylex.props(styles.content)}>
+          {summary || hasScore ? (
+            <div {...stylex.props(styles.body)}>
+              {summary ? (
+                <p {...stylex.props(foundationStyles.body, styles.summary)}>
+                  {summary}
+                </p>
+              ) : null}
+              {hasScore ? (
+                <span
+                  aria-label={`${publication} score ${nativeScore.value} out of ${nativeScore.scale}`}
+                  role="img"
+                  {...stylex.props(styles.rating)}
+                >
+                  {nativeScore.value}
+                  <span {...stylex.props(styles.ratingScale)}>
+                    /{nativeScore.scale}
+                  </span>
+                </span>
+              ) : null}
+            </div>
+          ) : null}
 
-      {href ? (
-        <div {...stylex.props(foundationStyles.metadata, styles.reviewLink)}>
-          <TextLink href={href} size="inherit">
-            Read the full review on {publication} →
-          </TextLink>
+          {byline || href ? (
+            <div {...stylex.props(foundationStyles.metadata, styles.footer)}>
+              {byline ? <span>{byline}</span> : null}
+              {byline && href ? <span aria-hidden="true"> · </span> : null}
+              {href ? (
+                <TextLink href={href} size="inherit">
+                  Read at {publication} ↗
+                </TextLink>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </article>
   );
 }
 
+const MOBILE = "@media (max-width: 559px)";
 const styles = stylex.create({
   review: {
     width: "100%",
-    paddingTop: "14px",
-    paddingBottom: "14px",
+    paddingTop: space.x4,
+    paddingBottom: space.x4,
   },
-  heading: {
+  source: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x3,
+    [MOBILE]: { gap: space.x2 },
+  },
+  context: {
+    minWidth: 0,
+    color: colors.inkMuted,
+  },
+  publication: {
+    color: colors.ink,
+  },
+  content: {
+    minWidth: 0,
+    marginTop: space.x2,
+    marginLeft: "38px",
+    [MOBILE]: { marginLeft: "34px" },
+  },
+  body: {
     display: "flex",
     minWidth: 0,
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: space.x4,
   },
-  source: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    rowGap: space.x1,
-  },
-  publication: {
-    color: colors.ink,
-  },
-  byline: {
-    color: colors.inkMuted,
-  },
   rating: {
     flexShrink: 0,
+    marginLeft: "auto",
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "40px",
+    fontSize: "32px",
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.045em",
-    lineHeight: 0.9,
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+    [MOBILE]: { fontSize: "26px" },
   },
-  scale: {
-    marginLeft: space.x1,
+  ratingScale: {
     color: colors.inkMuted,
+    fontSize: "12px",
+    fontWeight: 400,
     letterSpacing: "normal",
-  },
-  contribution: {
-    marginTop: space.x3,
-    marginBottom: 0,
-    color: colors.inkMuted,
+    marginLeft: "3px",
   },
   summary: {
     maxWidth: "54ch",
-    marginTop: space.x3,
+    marginTop: 0,
     marginRight: 0,
     marginBottom: 0,
     marginLeft: 0,
     color: colors.ink,
     textWrap: "pretty",
   },
-  reviewLink: {
-    marginTop: space.x3,
+  footer: {
+    marginTop: space.x2,
+    color: colors.inkMuted,
   },
 });

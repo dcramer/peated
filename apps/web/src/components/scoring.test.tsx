@@ -27,9 +27,18 @@ describe("ReviewScore", () => {
     );
 
     expect(container.textContent).toContain("92");
-    expect(container.textContent).toContain("median of 1 score");
+    expect(container.textContent).toContain("/ 100");
+    expect(container.textContent).not.toContain("median of 1 score");
     expect(container.textContent).not.toContain("Only 1 score so far");
     expect(container.textContent).not.toContain("low 92");
+  });
+
+  it("explains the median when several scores contribute", () => {
+    act(() =>
+      root.render(<ReviewScore count={3} high={94} low={88} median={92} />),
+    );
+
+    expect(container.textContent).toContain("median of 3 scores");
   });
 
   it("omits Bottle ratings when there is nothing to show", () => {
