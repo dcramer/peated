@@ -31,7 +31,7 @@ export default {
   SMTP_PASS: process.env.SMTP_PASS,
   SMTP_FROM_NAME: "Peated",
 
-  VERSION: process.env.VERSION || "",
+  VERSION: process.env.VERSION || process.env.RENDER_GIT_COMMIT || "",
 
   SENTRY_DSN: process.env.SENTRY_DSN || "",
   SENTRY_SERVICE: process.env.SENTRY_SERVICE || "@peated/server",

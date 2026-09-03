@@ -38,6 +38,7 @@
     "API_SERVER",
     "URL_PREFIX",
     "VERSION",
+    "RENDER_GIT_COMMIT",
     "GOOGLE_CLIENT_ID",
     "SENTRY_DSN",
     "SENTRY_ORG",
