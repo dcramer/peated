@@ -44,7 +44,8 @@ export type BottleIdentityRowProps = {
  * Use toBottleListItem for API Bottles or getBottleIdentityProps for partial reads.
  * All variants take the same full marketed name and own their thumbnail size.
  * The name line owns title typography so surrounding body leading cannot shift it.
- * Use layout="cell" inside an existing row/selection control. Compact omits
+ * Use layout="cell" inside an existing row/selection control. Linked cells keep
+ * their hit area inside the bottle identity. Compact omits
  * provenance, metadata, subtitle, status, and related releases; end remains available.
  */
 export function BottleIdentityRow({
@@ -87,7 +88,7 @@ export function BottleIdentityRow({
         compact && styles.compactRow,
         !compact && align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
-        Boolean(href) && layout === "row" && linkedRowStyles.container,
+        Boolean(href) && linkedRowStyles.container,
         Boolean(href) && layout === "row" && linkedRowStyles.onGround,
       )}
     >

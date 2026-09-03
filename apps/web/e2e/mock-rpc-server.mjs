@@ -52,6 +52,7 @@ import {
   priceSiteRuns,
   replacementSourceBottleId,
   replacementSourceEntityId,
+  siteReviewList,
   storePriceList,
   suggestedTags,
   tastingNotes,
@@ -1485,6 +1486,10 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, createdMemberReview);
       return true;
     case "externalReviews/list":
+      if (input?.site === priceSite.type) {
+        sendRpcResponse(response, siteReviewList);
+        return true;
+      }
       if (input?.bottle !== undefined && !isNumber(input.bottle)) {
         sendRpcError(response, "Unexpected external review list payload");
         return true;

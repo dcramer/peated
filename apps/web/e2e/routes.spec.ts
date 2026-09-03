@@ -8,6 +8,8 @@ import {
   existingBottleDetails,
   mockApiServer,
   priceSite,
+  siteReviewList,
+  storePriceList,
   testBottler,
   testBrand,
   testCountry,
@@ -399,15 +401,29 @@ test("browse from the homepage through a country and its regions", async ({
   await snapshot("Region overview", { ready: regionHeading });
 });
 
-test("site administration route loads for an administrator", async ({
+test("scraper lists keep bottle links and navigation independently clickable", async ({
   context,
   page,
 }) => {
   await signIn(context, { user: { ...testUser, admin: true } });
 
-  const response = await page.goto(`/admin/sites/${priceSite.type}`, {
-    waitUntil: "commit",
-  });
+  const root = `/admin/sites/${priceSite.type}`;
+  await page.goto(`${root}/reviews`);
+  const table = page.getByRole("table");
+  await expect(table.locator("tbody tr")).toHaveCount(
+    siteReviewList.results.length,
+  );
 
-  expect(response?.status()).toBeLessThan(400);
+  await page
+    .getByRole("navigation", { name: "Scraper", exact: true })
+    .getByRole("link", { name: "Prices", exact: true })
+    .click();
+  await expect(page).toHaveURL(`${root}/prices`);
+  const firstPriceBottle = storePriceList.results[0]!.bottle!;
+  await table.locator(bottleHrefSelector(firstPriceBottle.id)).click();
+  await expect(page).toHaveURL(bottlePathPattern(firstPriceBottle.id));
+
+  await page.goto(`${root}/reviews`);
+  await table.locator(bottleHrefSelector(existingBottle.id)).click();
+  await expect(page).toHaveURL(bottlePathPattern(existingBottle.id));
 });
