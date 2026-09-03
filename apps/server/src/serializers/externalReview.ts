@@ -124,10 +124,14 @@ export const ExternalReviewSerializer = serializer({
             `External review ${item.id} references missing Bottle ${item.bottleId}.`,
           );
         }
+        const scoreContribution = contributions.get(item.id);
+        if (scoreContribution === undefined) {
+          throw new Error(`External review ${item.id} is missing score data.`);
+        }
         return [
           item.id,
           {
-            scoreContribution: contributions.get(item.id)!,
+            scoreContribution,
             article,
             bottle,
             site: sitesByRef[article.externalSiteId],
