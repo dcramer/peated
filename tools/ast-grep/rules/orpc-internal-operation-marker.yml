@@ -1,0 +1,17 @@
+id: orpc-internal-operation-marker
+language: TypeScript
+severity: error
+message: Mark internal operations with x-internal and an Internal badge.
+note: Both the public spec and Scalar hide operations marked x-internal. Staff middleware adds this annotation automatically.
+files:
+  - apps/server/src/orpc/**/*.ts
+  - apps/server/src/openapi/**/*.ts
+  - apps/server/src/app.ts
+ignores:
+  - apps/server/src/**/*.test.ts
+rule:
+  kind: pair
+  has:
+    field: key
+    regex: >-
+      ^["']x-(peated-internal|scalar-ignore)["']$

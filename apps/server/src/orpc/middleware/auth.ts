@@ -35,7 +35,7 @@ export const requireVerified = customOpenAPIOperation(
 );
 
 // Permission middleware labels staff operations, including routes outside /admin.
-// Peated uses its own flag because Scalar hides operations marked x-internal.
+// The public spec filters this flag; the full document keeps the labels.
 export const requireAdmin = customOpenAPIOperation(
   base.$context<Context>().middleware(({ context, next, errors }) => {
     if (!context.user?.admin) {
@@ -52,7 +52,7 @@ export const requireAdmin = customOpenAPIOperation(
   (spec) => ({
     ...spec,
     security: [{ bearerAuth: [] }],
-    "x-peated-internal": true,
+    "x-internal": true,
     "x-badges": [
       { name: "Internal", position: "before" },
       { name: "Admin only", position: "before" },
@@ -75,7 +75,7 @@ export const requireMod = customOpenAPIOperation(
   (spec) => ({
     ...spec,
     security: [{ bearerAuth: [] }],
-    "x-peated-internal": true,
+    "x-internal": true,
     "x-badges": [
       { name: "Internal", position: "before" },
       { name: "Moderator or admin", position: "before" },

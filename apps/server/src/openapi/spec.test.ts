@@ -61,11 +61,15 @@ function expectBottleResponse(schema: any) {
 }
 
 describe("Published OpenAPI metadata", () => {
-  it("labels internal tools while keeping member operations public", async () => {
-    const response = await app.request("/spec.json");
+  it("publishes internal tools only in the full catalog and keeps member operations public", async () => {
+    const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);
-    // SAFETY: A successful /spec.json response is serialized directly from OpenAPIGenerator.
+    // SAFETY: A successful spec response is serialized directly from OpenAPIGenerator.
     const spec = (await response.json()) as OpenAPI.Document;
+    const publicResponse = await app.request("/spec.json");
+    expect(publicResponse.status).toBe(200);
+    // SAFETY: Both spec endpoints serialize an OpenAPIGenerator document.
+    const publicSpec = (await publicResponse.json()) as OpenAPI.Document;
 
     for (const [path, method, role] of [
       ["/admin/oauth-clients", "get", "Admin only"],
@@ -77,7 +81,7 @@ describe("Published OpenAPI metadata", () => {
     ] as const) {
       const operation = spec.paths?.[path]?.[method];
       expect(operation, `${method} ${path}`).toMatchObject({
-        "x-peated-internal": true,
+        "x-internal": true,
         "x-badges": [
           { name: "Internal", position: "before" },
           { name: role, position: "before" },
@@ -88,7 +92,7 @@ describe("Published OpenAPI metadata", () => {
 
     const references = spec.paths?.["/entities/{entity}/references"]?.get;
     expect(references).toMatchObject({
-      "x-peated-internal": true,
+      "x-internal": true,
       "x-badges": [{ name: "Internal", position: "before" }],
     });
     expect(references?.security).toBeUndefined();
@@ -109,31 +113,71 @@ describe("Published OpenAPI metadata", () => {
     ] as const) {
       const operation = spec.paths?.[path]?.[method];
       expect(operation, `${method} ${path}`).toBeDefined();
-      expect(operation).not.toHaveProperty("x-peated-internal");
+      expect(operation).not.toHaveProperty("x-internal");
       expect(operation).not.toHaveProperty("x-badges");
+      expect(publicSpec.paths?.[path]?.[method], `${method} ${path}`).toEqual(
+        operation,
+      );
     }
 
+    const publicPaths: string[] = [];
     for (const [path, item] of Object.entries(spec.paths ?? {})) {
-      for (const method of ["get", "post", "put", "patch", "delete"] as const) {
+      let hasPublicOperation = false;
+      for (const method of [
+        "get",
+        "put",
+        "post",
+        "delete",
+        "options",
+        "head",
+        "patch",
+        "trace",
+      ] as const) {
         const operation = item?.[method];
         if (!operation) continue;
+        if ("x-internal" in operation && operation["x-internal"] === true) {
+          expect(
+            publicSpec.paths?.[path]?.[method],
+            `${method} ${path}`,
+          ).toBeUndefined();
+        } else {
+          hasPublicOperation = true;
+          expect(
+            publicSpec.paths?.[path]?.[method],
+            `${method} ${path}`,
+          ).toEqual(operation);
+        }
         if (/^\/(admin|audits|ai|prices)(\/|$)/.test(path)) {
           expect(operation, `${method} ${path}`).toHaveProperty(
-            "x-peated-internal",
+            "x-internal",
             true,
           );
         }
-        // All operations stay visible in Scalar, including internal tools.
-        expect(operation).not.toHaveProperty("x-internal");
+        // The full document preserves internal operation metadata.
+        expect(operation).not.toHaveProperty("x-peated-internal");
         expect(operation).not.toHaveProperty("x-scalar-ignore");
       }
+      if (hasPublicOperation) publicPaths.push(path);
     }
+    expect(Object.keys(publicSpec.paths ?? {}).sort()).toEqual(
+      publicPaths.sort(),
+    );
+    expect(publicSpec.paths?.["/admin/oauth-clients"]).toBeUndefined();
+    expect(publicSpec.paths?.["/entities/{entity}/references"]).toBeUndefined();
+    expect(publicSpec.paths?.["/bottles/{bottle}"]?.get).toBeDefined();
+    expect(publicSpec.paths?.["/bottles/{bottle}"]?.patch).toBeUndefined();
+  });
+
+  it("loads the public catalog in Scalar", async () => {
+    const response = await app.request("/");
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("url: '/spec.json'");
   });
 
   it("publishes image files as multipart uploads", async () => {
-    const response = await app.request("/spec.json");
+    const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);
-    // SAFETY: A successful /spec.json response is serialized directly from OpenAPIGenerator.
+    // SAFETY: A successful spec response is serialized directly from OpenAPIGenerator.
     const spec = (await response.json()) as OpenAPI.Document;
 
     for (const path of [
@@ -179,9 +223,9 @@ describe("Published OpenAPI metadata", () => {
   });
 
   it("documents and groups every operation with a unique operation ID", async () => {
-    const response = await app.request("/spec.json");
+    const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);
-    // SAFETY: A successful /spec.json response is serialized directly from OpenAPIGenerator.
+    // SAFETY: A successful spec response is serialized directly from OpenAPIGenerator.
     const spec = (await response.json()) as OpenAPI.Document;
     const operationIds: string[] = [];
 
@@ -219,9 +263,9 @@ describe("Published OpenAPI metadata", () => {
   });
 
   it("declares bearer authentication for protected routes and optional authentication for public reads", async () => {
-    const response = await app.request("/spec.json");
+    const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);
-    // SAFETY: A successful /spec.json response is serialized directly from OpenAPIGenerator.
+    // SAFETY: A successful spec response is serialized directly from OpenAPIGenerator.
     const spec = (await response.json()) as OpenAPI.Document;
     expect(spec.components?.securitySchemes?.bearerAuth).toMatchObject({
       type: "http",

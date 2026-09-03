@@ -260,7 +260,8 @@ filler.
 - Describe the public contract. Do not mention database columns, framework
   types, handler names, or other implementation details.
 - Every operation needs a summary, description, grouping tag, and unique
-  operation ID. The OpenAPI tests check the published `/spec.json` response.
+  operation ID. The OpenAPI tests check both published documents, `/spec.json` and
+  `/spec-full.json`.
 - For replacement operations, explain what omitted fields do. For background
   work, say when the endpoint queues a job and how callers can track it.
 - Explain whether a missing resource returns `null` or an error when that
@@ -326,15 +327,23 @@ description.
 ### Internal Operations
 
 Mark operations intended only for administration, moderation, or catalog
-maintenance with `x-peated-internal: true`. Keep them in `/spec.json` and in the
-API reference. Scalar displays the accompanying `x-badges` labels: `Internal`
-and the required role, where applicable.
+maintenance with `x-internal: true`. `/spec.json` and the default Scalar
+reference at `/` include only public operations. `/spec-full.json` includes all
+operations as a JSON document. Both documents are publicly readable; endpoint
+permissions still apply.
+
+The public document removes internal operations after route and middleware
+annotations are applied. Public methods on the same path remain available, and
+paths with no public methods are removed. The full document preserves the
+accompanying `x-badges` labels: `Internal` and the required role, where applicable.
 
 `requireAdmin` and `requireMod` add these annotations automatically, including
 operations outside `/admin`. For internal tools without a role restriction,
 add the flag and `Internal` badge in the route's `spec` callback. These labels
-describe the intended audience; they do not enforce permissions. Do not use
-`x-internal` or `x-scalar-ignore`, which hide operations from Scalar.
+describe the intended audience; they do not enforce permissions. Scalar also
+recognizes `x-internal: true` and hides those operations if given the full
+document. Use this shared flag instead of `x-scalar-ignore` so JSON filtering
+and Scalar agree.
 
 Keep operations available to ordinary members public, including account
 management, bottle entry, tastings, reviews, and collections. When an operation
@@ -391,12 +400,13 @@ live in `tools/ast-grep/tests` and run with `pnpm ast-grep:test`.
 
 The rules check route metadata in both handlers and shared contracts, output
 schemas, path parameter syntax, bare Blob schemas, imports of runtime modules
-in contracts, and annotations that hide operations. They allow shorthand
+in contracts, and internal operation markers. They allow shorthand
 metadata properties, pure helper imports, and type-only imports. Keep complete
 metadata beside the route declaration or in its shared builder.
 
-The OpenAPI tests check the assembled `/spec.json`, including metadata supplied
-through variables, unique operation IDs, inherited tags, authentication,
-internal badges, and upload formats. Source lint does not resolve imports or
-evaluate route builders. Permission correctness and description quality still
-need review.
+The OpenAPI tests check the assembled `/spec-full.json`, including metadata
+supplied through variables, unique operation IDs, inherited tags,
+authentication, internal badges, and upload formats. They also check that
+`/spec.json` excludes internal operations and preserves public operations.
+Source lint does not resolve imports or evaluate route builders. Permission
+correctness and description quality still need review.

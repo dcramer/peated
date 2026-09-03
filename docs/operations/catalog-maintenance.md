@@ -124,8 +124,8 @@ pnpm cli api get '/admin/bottle-reference-audit?reviewState=unreviewed&limit=50'
 ```
 
 Follow `rel.nextCursor` until every page is loaded. Before a write, check the
-live [OpenAPI specification](https://api.peated.com/spec.json). Do not rely on a
-stale checkout or an old request shape.
+live [full OpenAPI specification](https://api.peated.com/spec-full.json). Do not
+rely on a stale checkout or an old request shape.
 
 For a Bottle whose facts a moderator already checked, use the normal create
 route and set `reviewed` to `true`. Only moderators and administrators can use
