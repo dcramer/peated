@@ -17,7 +17,6 @@ const navigationGroups = [
     label: "Admin tools",
     items: [
       { href: "/admin/badges", label: "Badges" },
-      { href: "/admin/bottle-references", label: "Bottle name review" },
       { href: "/admin/events", label: "Events" },
       { href: "/admin/locations", label: "Locations" },
       { href: "/admin/oauth-clients", label: "OAuth clients" },

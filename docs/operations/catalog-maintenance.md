@@ -120,7 +120,6 @@ pnpm cli api get '/bottles?brand=366603&limit=100&sort=name'
 pnpm cli api get /bottles/123/edit-context
 pnpm cli api get '/bottles/123/aliases'
 pnpm cli api get '/bottle-references?bottle=123&limit=100'
-pnpm cli api get '/admin/bottle-reference-audit?reviewState=unreviewed&limit=50'
 ```
 
 Follow `rel.nextCursor` until every page is loaded. Before a write, check the
@@ -191,21 +190,6 @@ pnpm cli api post /bottles/123/aliases --input /tmp/bottle-alias.json
 pnpm cli api delete /bottles/123/aliases/789
 ```
 
-Reference review uses the current `stateToken` returned by the list or audit
-endpoint. Choose `verify` to keep exact matching or `quarantine` to stop future
-matching:
-
-```json
-{
-  "action": "quarantine",
-  "stateToken": "current-state-token"
-}
-```
-
-```bash
-pnpm cli api post /bottle-references/456/review --input /tmp/reference-review.json
-```
-
 ## Batch Safety
 
 - Read every target immediately before the batch. Stop if an ID, identity, or
@@ -229,10 +213,8 @@ pnpm cli api post /bottle-references/456/review --input /tmp/reference-review.js
 - After a merge, fetch both IDs. Confirm that the old ID resolves to the chosen
   survivor and that references, facts, and the best image were preserved.
 - After a name change or merge, re-fetch aliases and references. Confirm that
-  verified display names remain visible and quarantined references no longer
-  appear in the active reference list.
-- Treat a stale reference `stateToken` as changed state. Re-fetch and review it
-  again instead of retrying the old decision.
+  verified display names remain visible and active references point to the
+  expected Bottle.
 - Report the target environment, changed count, verified count, sources, and
   rows skipped for missing or conflicting evidence.
 
@@ -243,8 +225,8 @@ The operation is complete only when:
 - every inventory row has a final status;
 - every writable field was reviewed, including image, dates, and outturn;
 - every in-scope alias has evidence for its marketed name, and every in-scope
-  reference other than the current full Bottle name was verified, quarantined,
-  or marked unresolved;
+  reference other than the current full Bottle name points to an evidence-backed
+  exact Bottle or remains unresolved;
 - every stored fact has adequate source evidence;
 - every create, update, image, and merge was read back and verified;
 - expected, stored, merged, and unresolved counts reconcile; and

@@ -29,7 +29,7 @@ steps without an approved deployment window and database backup.
 5. Confirm that `bottle_reference` contains the migrated rows and that the new
    `bottle_alias` table is empty. Do not copy references into aliases.
 6. Smoke-test a Bottle detail read, an exact reference match, a public search,
-   and an administrator reference-audit read.
+   and a moderator BottleReference list read.
 7. Resume application writes, then workers. Watch reference indexing,
    StorePrice ingestion, external-review ingestion, and search errors.
 

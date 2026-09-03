@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import { bottleReferences, bottles } from "@peated/server/db/schema";
-import { getBottleReferenceStateToken } from "@peated/server/lib/bottleReferenceReview";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { listResponse } from "@peated/server/schemas";
@@ -15,8 +14,6 @@ const OutputSchema = listResponse(
     bottleId: z.number().nullable(),
     isCanonical: z.boolean().optional(),
     assignmentSource: z.string(),
-    reviewedAt: z.string().nullable(),
-    stateToken: z.string(),
   }),
 );
 
@@ -91,8 +88,6 @@ export default procedure
         ignored: bottleReferences.ignored,
         assignmentSource: bottleReferences.assignmentSource,
         assignedByActorId: bottleReferences.assignedByActorId,
-        reviewedByActorId: bottleReferences.reviewedByActorId,
-        reviewedAt: bottleReferences.reviewedAt,
       })
       .from(bottleReferences)
       .where(and(...where))
@@ -108,8 +103,6 @@ export default procedure
         bottleId: reference.bottleId,
         isCanonical: bottle ? bottle.fullName === reference.name : undefined,
         assignmentSource: reference.assignmentSource,
-        reviewedAt: reference.reviewedAt?.toISOString() ?? null,
-        stateToken: getBottleReferenceStateToken(reference),
       })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

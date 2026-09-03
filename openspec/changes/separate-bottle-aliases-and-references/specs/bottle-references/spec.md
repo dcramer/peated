@@ -58,77 +58,16 @@ The cutover SHALL preserve every existing BottleAlias row as a BottleReference w
 - **THEN** the retained postflight verifies the preflight counts and reference identity fields
 - **AND** reports any mismatch as a failed rollout
 
-### Requirement: Reference review is durable and independent
-
-The system SHALL record whether a noncanonical BottleReference remains unreviewed or was reviewed by a moderator. Reviewing exact resolution and adding a displayed alias SHALL be separate decisions.
-
-#### Scenario: Verify an exact reference
-
-- **WHEN** a moderator confirms that a reference safely identifies its assigned Bottle
-- **THEN** the reference remains active
-- **AND** records the reviewer and review time
-
-#### Scenario: Add an alias while quarantining resolution
-
-- **WHEN** a moderator confirms that a generic string is a marketed alias but is unsafe for exact matching
-- **THEN** the moderator can create the BottleAlias and quarantine the BottleReference independently
-
-#### Scenario: Concurrent reference change
-
-- **WHEN** a reference changes after a moderator loads its audit state
-- **THEN** a review mutation fails instead of overwriting the newer state
-
-### Requirement: Reference audit is deterministic and bounded
-
-The system SHALL provide an administrator-only, read-only audit of active assigned noncanonical BottleReferences. Results SHALL be paginated and SHALL derive reproducible risk signals without an LLM decision.
-
-#### Scenario: Inspect an unaudited reference
-
-- **WHEN** an administrator requests the reference audit
-- **THEN** each result identifies the reference, assigned Bottle, canonical name, assignment provenance, review state, and BottleGroup context
-- **AND** includes counts of matching visible prices and reviews
-
-#### Scenario: Report identity risk
-
-- **WHEN** a reference has a parsed SMWS code, age, vintage year, release year, ABV, edition, or cask fact that conflicts with the assigned Bottle
-- **THEN** the audit reports the conflicting facts as signals
-- **AND** does not change the reference or Bottle
-
-#### Scenario: Report generic-name ambiguity
-
-- **WHEN** a reference omits distinguishing identity present on sibling Bottles or is an accepted-normalization prefix shared by multiple candidates
-- **THEN** the audit reports the candidate Bottles and ambiguity signal
-
-#### Scenario: Report redundant evidence
-
-- **WHEN** equivalent reference evidence exists under accepted normalization
-- **THEN** the audit reports the overlap without deleting either row
-
-### Requirement: Quarantine stops future use without rewriting history
-
-Quarantining a BottleReference SHALL exclude it from exact matching, reference embeddings, and Bottle search evidence. It SHALL queue the required indexes for refresh but SHALL NOT clear, retarget, or delete existing prices, reviews, or other consumers.
-
-#### Scenario: Quarantine a risky generic reference
-
-- **WHEN** a moderator quarantines an active assigned reference
-- **THEN** future matching and search omit that reference
-- **AND** existing consumer Bottle assignments remain unchanged
-
-#### Scenario: Show quarantine impact
-
-- **WHEN** a moderator reviews a reference before quarantine
-- **THEN** the system shows the counts and identifiers needed to inspect affected consumers
-
 ### Requirement: Reference operations remain private and source owned
 
-BottleReference list, audit, verification, quarantine, and assignment operations SHALL require administrator or moderator authority as appropriate. Public Bottle APIs SHALL NOT expose unresolved, quarantined, provenance, embedding, or review-state data.
+BottleReference list and assignment operations SHALL require moderator authority. Public Bottle APIs SHALL NOT expose unresolved, ignored, provenance, or embedding data.
 
 #### Scenario: Public user requests references
 
 - **WHEN** a user without required authority requests BottleReference data
 - **THEN** the system rejects the request
 
-#### Scenario: Moderator changes matching authority
+#### Scenario: Moderator assigns matching authority
 
-- **WHEN** a moderator verifies, assigns, or quarantines a BottleReference
+- **WHEN** a moderator assigns a BottleReference
 - **THEN** the BottleReference operation owns validation, locking, persistence, and index side effects

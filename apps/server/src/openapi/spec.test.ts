@@ -539,8 +539,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
       "bottleId",
       "isCanonical",
       "assignmentSource",
-      "reviewedAt",
-      "stateToken",
     ]);
     expect(listItem?.required).toEqual([
       "id",
@@ -548,8 +546,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
       "createdAt",
       "bottleId",
       "assignmentSource",
-      "reviewedAt",
-      "stateToken",
     ]);
     expect(JSON.stringify(listItem)).not.toContain("target");
     expect(Object.keys(upsertRequest?.properties ?? {})).toEqual([
