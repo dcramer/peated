@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { Card, RailList, RailListItem, TextLink } from "@peated/web/components";
+import { Card, TextLink } from "@peated/web/components";
+import { CatalogTable } from "@peated/web/components/pages/catalogTable.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
@@ -54,21 +55,50 @@ export function EntityCodes({
           }
           key={group.code || group.heading}
         >
-          <RailList ariaLabel={`${group.heading} distillery codes`}>
-            {group.rows.map((row) => (
-              <RailListItem
-                end={
+          <CatalogTable
+            caption={`${group.heading} distillery codes`}
+            columns={[
+              {
+                key: "code",
+                header: "Cask Code",
+                width: "count",
+                cell: (row) => (
                   <span {...stylex.props(foundationStyles.code, styles.code)}>
                     {row.code}
                   </span>
-                }
-                href={row.href}
-                key={row.code}
-                metadata={row.country ?? undefined}
-                title={row.name}
-              />
-            ))}
-          </RailList>
+                ),
+              },
+              {
+                key: "distillery",
+                header: "Distillery",
+                cell: (row) => (
+                  <div {...stylex.props(styles.distillery)}>
+                    <div {...stylex.props(foundationStyles.rowTitle)}>
+                      {row.href ? (
+                        <TextLink href={row.href} size="inherit">
+                          {row.name}
+                        </TextLink>
+                      ) : (
+                        row.name
+                      )}
+                    </div>
+                    {row.country ? (
+                      <div
+                        {...stylex.props(
+                          foundationStyles.metadata,
+                          styles.country,
+                        )}
+                      >
+                        {row.country}
+                      </div>
+                    ) : null}
+                  </div>
+                ),
+              },
+            ]}
+            getKey={(row) => row.code}
+            items={group.rows}
+          />
         </PageSection>
       ))}
     </div>
@@ -93,5 +123,12 @@ const styles = stylex.create({
     color: colors.ink,
     fontVariantNumeric: "tabular-nums",
     fontWeight: 600,
+  },
+  distillery: {
+    minWidth: 0,
+    overflowWrap: "anywhere",
+  },
+  country: {
+    color: colors.inkMuted,
   },
 });
