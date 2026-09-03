@@ -28,7 +28,7 @@ The system SHALL store a BottleAlias only when a moderator verifies that the nam
 
 ### Requirement: Alias presentation is independent from exact resolution
 
-Creating, updating, or deleting a BottleAlias SHALL NOT create, verify, quarantine, retarget, or delete a BottleReference. A BottleAlias SHALL be search evidence but SHALL NOT by itself authorize an ingestion workflow to bypass classification.
+Creating, updating, or deleting a BottleAlias SHALL NOT create, retarget, or delete a BottleReference. A BottleAlias SHALL be search evidence but SHALL NOT by itself authorize an ingestion workflow to bypass classification.
 
 #### Scenario: Add a display-only alias
 

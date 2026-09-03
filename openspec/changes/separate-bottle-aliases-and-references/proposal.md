@@ -8,8 +8,6 @@ Peated uses BottleAlias for canonical name claims, exact source matching, unreso
 - Preserve every existing BottleAlias row as a BottleReference so the migration does not silently change matching or consumer identity.
 - Add Bottle aliases only through explicit moderator verification. Existing references do not become public aliases automatically.
 - Treat display and resolution as independent decisions: an alias does not become an exact reference, and a reference does not become a displayed alias, without separate approval.
-- Add a deterministic, read-only reference audit that reports identity conflicts, generic-name risk, normalization overlap, BottleGroup ambiguity, provenance, and affected prices and reviews.
-- Allow moderators to add an alternate name, retain exact resolution, or quarantine a reference without automatically retargeting existing consumers.
 - Return verified aliases from Bottle details, show them as “Also known as,” and include them as search evidence.
 - **BREAKING**: rename the current internal BottleAlias domain, routes, jobs, and storage ownership to BottleReference. The BottleAlias API will represent only verified alternate marketed names.
 
@@ -18,7 +16,7 @@ Peated uses BottleAlias for canonical name claims, exact source matching, unreso
 ### New Capabilities
 
 - `bottle-aliases`: Verified alternate marketed names, moderator management, Bottle detail presentation, and safe search participation.
-- `bottle-references`: Internal exact-reference resolution, lossless migration, deterministic auditing, quarantine, and consumer-impact reporting.
+- `bottle-references`: Internal exact-reference resolution, lossless migration, and moderator assignment.
 
 ### Modified Capabilities
 
@@ -29,6 +27,6 @@ None.
 - Database schema and generated migrations for the existing `bottle_alias` data and the new customer-facing alias records.
 - Bottle creation, update, merge, source ingestion, price matching, external review matching, search indexing, vector indexing, and background jobs.
 - Bottle alias and reference oRPC/OpenAPI contracts, moderator tools, and Bottle detail serialization.
-- Bottle detail and moderator web routes, labels, and actions.
+- Bottle detail and moderator operations.
 - Bottle identity, normalization, creation, matching, and active `flatten-bottlings-into-bottles` documentation that currently uses “alias” for exact references.
-- Production rollout requires a retained preflight and postflight report. No audit finding may delete, retarget, or clear a consumer automatically.
+- Production rollout requires a retained preflight and postflight report. No reference operation may delete, retarget, or clear a consumer automatically.
