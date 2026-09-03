@@ -1,0 +1,11 @@
+id: orpc-internal-operation-marker
+valid:
+  - 'const spec = { "x-internal": true };'
+  - 'const spec = { "x-internal": false };'
+  - 'procedure.route({ spec: (spec) => ({ ...spec, "x-internal": true }) });'
+  - 'const description = "Do not use x-peated-internal.";'
+invalid:
+  - 'const spec = { "x-peated-internal": true };'
+  - 'const spec = { "x-peated-internal": false };'
+  - "const spec = { 'x-scalar-ignore': true };"
+  - 'procedure.route({ spec: (spec) => ({ ...spec, "x-scalar-ignore": false }) });'

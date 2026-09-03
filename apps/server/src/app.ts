@@ -268,67 +268,102 @@ export const app = honoApp
       </html>
     `);
   })
-  .get("/spec.json", async (c) => {
-    return c.json(
-      await openAPIGenerator.generate(router, {
-        info: {
-          title: "Peated API",
-          version: "1.0.0",
-          description:
-            "Access Peated's whisky catalog, tastings, and reviews. Public reads allow anonymous access. Send an access token in the Authorization header as `Bearer <token>` for account actions and personalized results. Authenticated requests outside `/auth/` require acceptance of the Terms of Service. Operations marked Internal support Peated administration, moderation, or catalog maintenance and are not intended for end-user integrations. They remain documented with `x-peated-internal: true` and visible badges. Role and ownership restrictions are described on each operation.",
-        },
-        servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
-        security: [{}, { bearerAuth: [] }],
-        components: {
-          securitySchemes: {
-            bearerAuth: {
-              type: "http",
-              scheme: "bearer",
-              bearerFormat: "JWT",
-              description:
-                "Access token returned by sign-in or OAuth token exchange.",
-            },
+  .on("GET", ["/spec.json", "/spec-full.json"], async (c) => {
+    const includeInternal = c.req.path === "/spec-full.json";
+    const spec = await openAPIGenerator.generate(router, {
+      info: {
+        title: includeInternal ? "Peated API (Full)" : "Peated API",
+        version: "1.0.0",
+        description:
+          "Access Peated's whisky catalog, tastings, and reviews. Public reads allow anonymous access. Send an access token in the Authorization header as `Bearer <token>` for account actions and personalized results. Authenticated requests outside `/auth/` require acceptance of the Terms of Service. Role and ownership restrictions are described on each operation." +
+          (includeInternal
+            ? " Operations marked Internal support Peated administration, moderation, or catalog maintenance and are not intended for end-user integrations."
+            : " This reference includes public integration endpoints."),
+      },
+      servers: [{ url: "/v1" } /** Should use absolute URLs in production */],
+      security: [{}, { bearerAuth: [] }],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+            description:
+              "Access token returned by sign-in or OAuth token exchange.",
           },
         },
-        // Promote shared schemas into OpenAPI components and enable $ref reuse.
-        // Note: If a schema differs between input/output, set strategy accordingly.
-        // Common component schemas for reuse via $ref across the spec
-        commonSchemas: {
-          // Core
-          Bottle: { schema: BottleSchema, strategy: "output" },
-          User: { schema: UserSchema, strategy: "output" },
-          Entity: { schema: EntitySchema, strategy: "output" },
-          Country: { schema: CountrySchema, strategy: "output" },
-          Region: { schema: RegionSchema, strategy: "output" },
-          Tag: { schema: TagSchema, strategy: "output" },
-          ExternalReview: {
-            schema: ExternalReviewSchema,
-            strategy: "output",
-          },
-          Tasting: { schema: TastingSchema, strategy: "output" },
-          Notification: { schema: NotificationSchema, strategy: "output" },
-          Comment: { schema: CommentSchema, strategy: "output" },
-          Collection: { schema: CollectionSchema, strategy: "output" },
-          CollectionBottle: {
-            schema: CollectionBottleSchema,
-            strategy: "output",
-          },
-          BottleSeries: { schema: BottleSeriesSchema, strategy: "output" },
-          Badge: { schema: BadgeSchema, strategy: "output" },
-          BadgeAward: { schema: BadgeAwardSchema, strategy: "output" },
-          Flight: { schema: FlightSchema, strategy: "output" },
-          ExternalSite: { schema: ExternalSiteSchema, strategy: "output" },
-          StorePrice: { schema: StorePriceSchema, strategy: "output" },
-          PriceChange: {
-            schema: PriceChangeSchema,
-            strategy: "output",
-          },
-          // Shared
-          Cursor: { schema: CursorSchema, strategy: "output" },
-          Auth: { schema: AuthSchema, strategy: "output" },
+      },
+      // Promote shared schemas into OpenAPI components and enable $ref reuse.
+      // Note: If a schema differs between input/output, set strategy accordingly.
+      // Common component schemas for reuse via $ref across the spec
+      commonSchemas: {
+        // Core
+        Bottle: { schema: BottleSchema, strategy: "output" },
+        User: { schema: UserSchema, strategy: "output" },
+        Entity: { schema: EntitySchema, strategy: "output" },
+        Country: { schema: CountrySchema, strategy: "output" },
+        Region: { schema: RegionSchema, strategy: "output" },
+        Tag: { schema: TagSchema, strategy: "output" },
+        ExternalReview: {
+          schema: ExternalReviewSchema,
+          strategy: "output",
         },
-      }),
-    );
+        Tasting: { schema: TastingSchema, strategy: "output" },
+        Notification: { schema: NotificationSchema, strategy: "output" },
+        Comment: { schema: CommentSchema, strategy: "output" },
+        Collection: { schema: CollectionSchema, strategy: "output" },
+        CollectionBottle: {
+          schema: CollectionBottleSchema,
+          strategy: "output",
+        },
+        BottleSeries: { schema: BottleSeriesSchema, strategy: "output" },
+        Badge: { schema: BadgeSchema, strategy: "output" },
+        BadgeAward: { schema: BadgeAwardSchema, strategy: "output" },
+        Flight: { schema: FlightSchema, strategy: "output" },
+        ExternalSite: { schema: ExternalSiteSchema, strategy: "output" },
+        StorePrice: { schema: StorePriceSchema, strategy: "output" },
+        PriceChange: {
+          schema: PriceChangeSchema,
+          strategy: "output",
+        },
+        // Shared
+        Cursor: { schema: CursorSchema, strategy: "output" },
+        Auth: { schema: AuthSchema, strategy: "output" },
+      },
+    });
+
+    const paths = spec.paths;
+    if (!includeInternal && paths) {
+      const methods = [
+        "get",
+        "put",
+        "post",
+        "delete",
+        "options",
+        "head",
+        "patch",
+        "trace",
+      ] as const;
+      // The documentation boundary filters after route and middleware annotations
+      // are applied, preserving public methods that share an internal route's path.
+      for (const [path, item] of Object.entries(paths)) {
+        for (const method of methods) {
+          const operation = item?.[method];
+          if (
+            operation &&
+            "x-internal" in operation &&
+            operation["x-internal"] === true
+          ) {
+            delete item[method];
+          }
+        }
+        if (!methods.some((method) => item?.[method])) {
+          delete paths[path];
+        }
+      }
+    }
+
+    return c.json(spec);
   })
   .use("/v1/*", async (c, next) => {
     const user = await getUserFromHeader(c.req.header("authorization"));

@@ -27,7 +27,7 @@ pnpm cli api delete /path
 
 - Omit `/v1`; the client adds it.
 - Start paths with one slash; quote query strings.
-- Validate writes against `https://api.peated.com/spec.json` or the owning route.
+- Validate writes against `https://api.peated.com/spec-full.json` or the owning route.
 - Put JSON bodies in temporary files.
 - Use `--yes` non-interactively only after explicit authorization.
 - Re-fetch after success; verify asynchronous effects separately.

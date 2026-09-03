@@ -15,7 +15,7 @@ export default procedure
     // Entity references serve matching maintenance; aliases serve public display.
     spec: (spec) => ({
       ...spec,
-      "x-peated-internal": true,
+      "x-internal": true,
       "x-badges": [{ name: "Internal", position: "before" }],
     }),
   })
