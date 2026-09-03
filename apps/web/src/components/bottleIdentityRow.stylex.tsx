@@ -35,6 +35,7 @@ export type BottleVisualProps = {
 /**
  * Shows a bottle image or Peated's bottle glyph when no image exists.
  * Use the default medium size beside three-line identities, including activity entries.
+ * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
  */
 export function BottleVisual({
   expandable = false,
@@ -210,6 +211,9 @@ const styles = stylex.create({
   visual: {
     boxSizing: "border-box",
     display: "inline-flex",
+    minWidth: 0,
+    minHeight: 0,
+    flexGrow: 0,
     flexShrink: 0,
     alignItems: "center",
     justifyContent: "center",
@@ -227,21 +231,28 @@ const styles = stylex.create({
   },
   visualSmall: {
     width: "32px",
+    maxWidth: "32px",
     height: "46px",
+    maxHeight: "46px",
     padding: space.x1,
   },
   visualMedium: {
     width: bottleThumbnailMetrics.width,
+    maxWidth: bottleThumbnailMetrics.width,
     height: bottleThumbnailMetrics.height,
+    maxHeight: bottleThumbnailMetrics.height,
     padding: space.x2,
   },
   visualLarge: {
     width: { default: "132px", [COMPACT]: "80px" },
+    maxWidth: { default: "132px", [COMPACT]: "80px" },
     height: { default: "176px", [COMPACT]: "120px" },
+    maxHeight: { default: "176px", [COMPACT]: "120px" },
     padding: { default: space.x2, [COMPACT]: space.x1 },
   },
   visualExtraLarge: {
     width: "100%",
+    maxWidth: "100%",
     aspectRatio: "4 / 5",
     padding: space.x4,
   },
@@ -249,7 +260,11 @@ const styles = stylex.create({
     boxSizing: "border-box",
     display: "block",
     width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
     height: "100%",
+    maxHeight: "100%",
+    minHeight: 0,
     objectFit: "contain",
   },
   expandableImageSmall: {
@@ -267,7 +282,9 @@ const styles = stylex.create({
   fallbackAsset: {
     display: "block",
     width: "100%",
+    maxWidth: "100%",
     height: "100%",
+    maxHeight: "100%",
     backgroundColor: "currentColor",
     maskPosition: "center",
     maskRepeat: "no-repeat",
