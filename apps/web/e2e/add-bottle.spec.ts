@@ -66,7 +66,7 @@ test.describe("create bottle", () => {
     for (const [intent, title] of [
       ["catalog", "Add a bottle"],
       ["library", "Add to your Library"],
-      ["tasting", "Log a tasting"],
+      ["tasting", "Rate this bottle"],
     ] as const) {
       await page.goto(`/addBottle?intent=${intent}`);
       await expect(
@@ -540,7 +540,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Add to your Library" }).first(),
     ).toBeVisible();
-    await page.getByRole("link", { name: "Log a tasting" }).click();
+    await page.getByRole("link", { name: "Rate this bottle" }).click();
     await expect(page).toHaveURL(
       `/addBottle?bottle=${existingBottle.id}&intent=tasting`,
     );
@@ -581,7 +581,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("main").getByRole("button", { name: "Log a tasting" }),
+      page.getByRole("main").getByRole("button", { name: "Rate this bottle" }),
     ).toBeVisible();
   });
 
@@ -675,7 +675,7 @@ test.describe("add bottle flow", () => {
     await expect(inLibraryButton).toBeVisible();
     await expect(inLibraryButton).toBeDisabled();
     await expect(
-      page.getByRole("main").getByRole("button", { name: "Log a tasting" }),
+      page.getByRole("main").getByRole("button", { name: "Rate this bottle" }),
     ).toBeEnabled();
   });
 
@@ -722,7 +722,7 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Continue" })).toBeHidden();
     await expect(
-      page.getByRole("button", { name: "Log a tasting" }),
+      page.getByRole("button", { name: "Rate this bottle" }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: "Add Similar" })).toBeHidden();
     await expect(
@@ -872,7 +872,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Log a tasting" }),
+      page.getByRole("button", { name: "Rate this bottle" }),
     ).toBeVisible();
     expect(createRequests).toHaveLength(0);
 
@@ -1074,23 +1074,23 @@ test.describe("add bottle flow", () => {
     await uploadLabel(page);
 
     const requestPromise = waitForPhotoIdentificationCreate(page);
-    await page.getByRole("button", { name: "Log a tasting" }).click();
+    await page.getByRole("button", { name: "Rate this bottle" }).click();
     const input = getRpcInput(await requestPromise);
 
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
     await expect(
-      page.getByRole("heading", { name: "Log a tasting" }),
+      page.getByRole("heading", { name: "Rate this bottle" }),
     ).toBeVisible();
     await expect(getSelectedBottle(page, createdBottleName)).toBeVisible();
     await page.getByRole("button", { name: /^Log a tasting/ }).click();
+    await page.getByLabel("What stood out?").fill(photoTastingNotes);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
     await page
       .getByRole("radio", { name: /^Very good/ })
       .check({ force: true });
-    await page.getByRole("button", { name: "Continue" }).click();
-    await page.getByLabel("Comments").fill(photoTastingNotes);
-    await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Save tasting" }).click();
 
     await expect(page).toHaveURL(tastingPathPattern(createdTastingId));
@@ -1165,14 +1165,14 @@ test.describe("add bottle flow", () => {
     await uploadLabel(page);
 
     const requestPromise = waitForPhotoIdentificationCreate(page);
-    await page.getByRole("button", { name: "Log a tasting" }).click();
+    await page.getByRole("button", { name: "Rate this bottle" }).click();
     const input = getRpcInput(await requestPromise);
 
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
     await expect(
-      page.getByRole("heading", { name: "Log a tasting" }),
+      page.getByRole("heading", { name: "Rate this bottle" }),
     ).toBeVisible();
     await expect(
       getSelectedBottle(

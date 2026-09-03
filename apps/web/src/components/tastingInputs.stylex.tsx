@@ -2,15 +2,7 @@
 
 import { COLOR_SCALE, type SERVING_STYLE_LIST } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
-import {
-  Box,
-  Check,
-  Droplets,
-  GlassWater,
-  Minus,
-  Plus,
-  Upload,
-} from "lucide-react";
+import { Box, Droplets, GlassWater, Minus, Plus, Upload } from "lucide-react";
 import { useRef } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -245,7 +237,7 @@ export type RatingBandInputProps = {
   value: RatingBand | null;
 };
 
-/** Records one tasting rating as one of the five canonical bands. */
+/** Selects one of the five tasting ratings. */
 export function RatingBandInput({
   disabled = false,
   id,
@@ -291,15 +283,6 @@ export function RatingBandInput({
                   checked && bandInputTextSelectedStyles[band.key],
                 )}
               >
-                <Check
-                  aria-hidden="true"
-                  size={13}
-                  strokeWidth={2.5}
-                  {...stylex.props(
-                    styles.bandInputCheck,
-                    !checked && styles.bandInputCheckHidden,
-                  )}
-                />
                 {band.label}
               </span>
               <span
@@ -327,7 +310,7 @@ export type ServingStyleInputProps = {
   value: ServingStyle | null;
 };
 
-/** Records how the whisky was served with the three canonical choices. */
+/** Records how the whisky was served with the three serving styles. */
 export function ServingStyleInput({
   disabled = false,
   id,
@@ -456,7 +439,7 @@ export function ColorInput({
       >
         {selected
           ? `${selected[1]} · ${selected[0]} of 20`
-          : "Bar light can lie. Unsure is a real answer."}
+          : "Choose the closest color, or leave it blank."}
       </p>
     </div>
   );
@@ -799,12 +782,6 @@ const styles = stylex.create({
     color: colors.inkMuted,
     fontVariantNumeric: "tabular-nums",
     pointerEvents: "none",
-  },
-  bandInputCheck: {
-    flexShrink: 0,
-  },
-  bandInputCheckHidden: {
-    visibility: "hidden",
   },
   bandInputTextSelectedLight: {
     color: colors.ink,

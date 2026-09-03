@@ -11,7 +11,7 @@ const meta = {
     actions: (
       <>
         <ButtonLink href="#tasting" size="lg" variant="accent">
-          Log a tasting
+          Rate this bottle
         </ButtonLink>
         <Button size="lg" variant="tonal">
           Add to Library

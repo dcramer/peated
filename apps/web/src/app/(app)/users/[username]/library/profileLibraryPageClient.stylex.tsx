@@ -305,7 +305,7 @@ function toLibraryItem(
             items: [
               {
                 href: `/bottles/${bottle.id}/addTasting`,
-                label: "Log a tasting",
+                label: "Rate this bottle",
               },
             ],
           },

@@ -61,7 +61,7 @@ export function getBottleRowActionGroups({
           bottleId: bottle.id,
           intent: "tasting",
         }),
-        label: "Log a tasting",
+        label: "Rate this bottle",
       },
     ],
     [libraryAction],

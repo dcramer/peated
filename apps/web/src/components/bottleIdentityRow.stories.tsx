@@ -23,7 +23,7 @@ import { TastingEntry } from "./tastingEntry.stylex";
 
 const bottleActions = {
   groupsFor: () => [
-    [{ label: "Log a tasting", onSelect: () => undefined }],
+    [{ label: "Rate this bottle", onSelect: () => undefined }],
     [{ label: "Remove from Library", onSelect: () => undefined }],
   ],
   isLibrary: () => true,

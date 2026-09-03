@@ -57,7 +57,7 @@ function HeaderExample({
       action={
         signedIn ? (
           <Button size="sm" variant="accent">
-            Log a tasting
+            Find a bottle
           </Button>
         ) : (
           <>

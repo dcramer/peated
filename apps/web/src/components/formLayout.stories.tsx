@@ -32,7 +32,7 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   args: {
     currentStep: 1,
-    steps: ["Rating", "Notes", "Details"],
+    steps: ["Notes", "The pour", "Rating"],
   },
   render: (args) => (
     <FormStack>

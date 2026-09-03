@@ -5,7 +5,7 @@ import { StoryCanvas, StoryRow } from "./storyFixtures.stylex";
 
 const groups = [
   [
-    { label: "Log a tasting", onSelect: () => undefined },
+    { label: "Rate this bottle", onSelect: () => undefined },
     { label: "Add what you paid", onSelect: () => undefined },
   ],
   [{ label: "Remove from Library", onSelect: () => undefined }],

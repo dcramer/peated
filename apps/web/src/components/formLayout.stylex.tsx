@@ -65,20 +65,6 @@ export type FormStepsProps = {
 export function FormSteps({ currentStep, steps }: FormStepsProps) {
   return (
     <nav aria-label="Form progress" {...stylex.props(styles.steps)}>
-      <div {...stylex.props(foundationStyles.metadata, styles.stepSummary)}>
-        <strong
-          {...stylex.props(
-            foundationStyles.interactiveSmall,
-            styles.stepSummaryLabel,
-          )}
-        >
-          {steps[currentStep]}
-        </strong>
-        <span aria-hidden="true">·</span>
-        <span>
-          {currentStep + 1} of {steps.length}
-        </span>
-      </div>
       <ol {...stylex.props(styles.stepList)}>
         {steps.map((step, index) => (
           <li
@@ -87,24 +73,29 @@ export function FormSteps({ currentStep, steps }: FormStepsProps) {
             {...stylex.props(
               foundationStyles.interactiveSmall,
               styles.step,
-              index < currentStep && styles.completedStep,
-              index === currentStep && [
-                foundationStyles.interactiveSmall,
-                styles.currentStep,
-              ],
+              index === currentStep && styles.currentStep,
             )}
           >
-            <span title={step} {...stylex.props(styles.stepLabel)}>
-              {step}
-            </span>
             <span
               aria-hidden="true"
               {...stylex.props(
-                styles.stepSegment,
-                index < currentStep && styles.completedStepSegment,
-                index === currentStep && styles.currentStepSegment,
+                styles.stepNumber,
+                index < currentStep && styles.completedStepNumber,
+                index === currentStep && styles.currentStepNumber,
               )}
-            />
+            >
+              {index + 1}
+            </span>
+            <span>{step}</span>
+            {index < steps.length - 1 ? (
+              <span
+                aria-hidden="true"
+                {...stylex.props(
+                  styles.stepConnector,
+                  index < currentStep && styles.completedStepConnector,
+                )}
+              />
+            ) : null}
           </li>
         ))}
       </ol>
@@ -234,66 +225,53 @@ const styles = stylex.create({
     gap: space.x2,
     flexWrap: "wrap",
   },
-  steps: {
-    boxSizing: "border-box",
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    rowGap: space.x2,
-    paddingTop: 0,
-    paddingRight: 0,
-    paddingBottom: space.x3,
-    paddingLeft: 0,
-    backgroundColor: "transparent",
-  },
-  stepSummary: {
-    display: "none",
-    alignItems: "baseline",
-    columnGap: space.x1,
-    color: colors.inkMuted,
-    "@media (max-width: 559px)": { display: "flex" },
-  },
-  stepSummaryLabel: {
-    color: colors.ink,
-    fontWeight: 700,
-  },
+  steps: { minWidth: 0 },
   stepList: {
     display: "flex",
     minWidth: 0,
-    gap: space.x2,
     margin: 0,
     padding: 0,
     listStyle: "none",
   },
   step: {
+    position: "relative",
     display: "flex",
     minWidth: 0,
     flex: 1,
     flexDirection: "column",
-    gap: space.x2,
+    alignItems: "center",
+    gap: space.x1,
     color: colors.inkMuted,
-    fontWeight: 600,
   },
-  completedStep: { color: colors.ink },
-  currentStep: {
-    color: colors.ink,
-    fontWeight: 700,
+  currentStep: { color: colors.ink, fontWeight: 700 },
+  stepNumber: {
+    boxSizing: "border-box",
+    display: "flex",
+    width: "24px",
+    height: "24px",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.sectionRule,
+    borderRadius: "50%",
+    backgroundColor: colors.ground,
   },
-  stepLabel: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-    "@media (max-width: 559px)": { display: "none" },
+  completedStepNumber: { borderColor: colors.accent, color: colors.accentDeep },
+  currentStepNumber: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accent,
+    color: colors.ground,
   },
-  stepSegment: {
-    display: "block",
-    width: "100%",
-    height: "4px",
-    borderRadius: "2px",
-    backgroundColor: colors.hairline,
+  stepConnector: {
+    position: "absolute",
+    top: "12px",
+    left: "calc(50% + 20px)",
+    width: "calc(100% - 40px)",
+    height: "1px",
+    backgroundColor: colors.sectionRule,
   },
-  completedStepSegment: { backgroundColor: colors.accent },
-  currentStepSegment: { backgroundColor: colors.accent },
+  completedStepConnector: { backgroundColor: colors.accent },
   notice: {
     boxSizing: "border-box",
     padding: 0,

@@ -24,10 +24,14 @@ action.
    - an existing Bottle match;
    - an approved proposal for one new, independently complete Bottle; or
    - manual search when the evidence is insufficient or conflicting.
-5. After resolving a Bottle, the user may log a tasting, add it to their
+5. After resolving a Bottle, the user may rate it, add it to their
    Library, view it, search again, or start over.
-6. The tasting continuation loads the normal tasting form with the selected
-   Bottle fixed and the pending photo preselected as its picture.
+6. **Rate this bottle** opens a choice between **Log a tasting** and **Write a
+   review**, with the selected Bottle fixed and the pending photo attached.
+7. Both forms follow **Notes → The pour → Rating/Score**. Notes capture the
+   member's words and flavors first. The pour contains serving style, color,
+   and separate photo and friend pickers. Back preserves the draft; saving is
+   available only on the final step. New reviews start without a score.
 
 The flow never creates a tasting directly from model output. The user chooses
 the Bottle and action before any tasting is saved.
@@ -44,6 +48,9 @@ the Bottle and action before any tasting is saved.
 - The user may remove or replace the pending image before tasting save.
 - General tasting entry uses the shared bottle resolver. Existing
   Bottle-scoped tasting links may continue directly with their known Bottle.
+- The main **Find a bottle** action opens lookup without a preset next action.
+- Keep normal steps within a phone screen with the keyboard closed. Long
+  notes, larger text, and open pickers must remain scrollable.
 
 ## Identity And Classification
 

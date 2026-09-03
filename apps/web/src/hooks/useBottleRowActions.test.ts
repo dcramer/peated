@@ -21,7 +21,7 @@ describe("getBottleRowActionGroups", () => {
     expect(getGroups()[0]).toEqual([
       {
         href: "/addBottle?bottle=42&intent=tasting",
-        label: "Log a tasting",
+        label: "Rate this bottle",
       },
     ]);
   });

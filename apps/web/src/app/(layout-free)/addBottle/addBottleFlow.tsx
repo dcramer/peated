@@ -26,12 +26,12 @@ import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
+import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import TastingForm, {
   TastingFormLoading,
   type MemberReviewFormSubmitData,
   type TastingCreateFormSubmitData,
-} from "@peated/web/components/tastingForm";
-import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+} from "@peated/web/features/tastings/tastingForm";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import {
@@ -86,7 +86,7 @@ function getCreateReturnAction(intent: AddBottleIntent) {
 function getFlowTitle(intent: AddBottleIntent) {
   if (intent === "catalog") return "Add a bottle";
   if (intent === "library") return "Add to your Library";
-  if (intent === "tasting") return "Log a tasting";
+  if (intent === "tasting") return "Rate this bottle";
   return "Find a bottle";
 }
 
@@ -297,7 +297,7 @@ function MatchedOutcomeActions({
       disabled={Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
-      Log a tasting
+      Rate this bottle
     </OutcomeButton>
   );
   const viewButton = (
@@ -362,7 +362,7 @@ function CreateProposalOutcomeActions({
       disabled={creating}
       loading={resolvingAction === "tasting"}
     >
-      Log a tasting
+      Rate this bottle
     </OutcomeButton>
   );
   const createButton = (
@@ -452,7 +452,7 @@ function OutcomeSelection({
       disabled={loggingTasting}
       loading={loggingTasting}
     >
-      Log a tasting
+      Rate this bottle
     </OutcomeButton>
   );
   const viewButton = (
@@ -552,7 +552,7 @@ function AddedToLibrary({
             fullWidth
           >
             <Wine aria-hidden="true" size={16} />
-            Log a tasting
+            Rate this bottle
           </ButtonLink>
           <ButtonLink
             href={getViewBottleHref(entry.bottle)}
@@ -1071,7 +1071,7 @@ function AddBottleFlowContent() {
   if (tastingDraft) {
     return (
       <TastingForm
-        title="Log a tasting"
+        title="Rate this bottle"
         initialData={{
           bottle: tastingDraft.bottle,
           imageUrl: tastingDraft.pendingImage?.imageUrl,

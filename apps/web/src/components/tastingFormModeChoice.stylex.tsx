@@ -11,27 +11,24 @@ import {
   space,
 } from "../styles/tokens.stylex";
 
-export type RecordType = "tasting" | "review";
+export type TastingFormMode = "tasting" | "review";
 
-export function RecordTypeInput({
+/** Starts a tasting or review before showing its form steps. */
+export function TastingFormModeChoice({
   disabled,
   onChange,
-  value,
 }: {
   disabled: boolean;
-  onChange: (value: RecordType) => void;
-  value: RecordType | null;
+  onChange: (value: TastingFormMode) => void;
 }) {
   const choices = [
     {
-      description:
-        "Record this pour with a rating, tasting notes, color, and details.",
+      description: "Save this pour with notes and a rating.",
       label: "Log a tasting",
       value: "tasting",
     },
     {
-      description:
-        "Give this bottle one overall score and a considered review.",
+      description: "Save your overall opinion and a score for this bottle.",
       label: "Write a review",
       value: "review",
     },
@@ -39,24 +36,18 @@ export function RecordTypeInput({
 
   return (
     <div
-      aria-label="Record type"
+      aria-label="Tasting or review"
       role="group"
       {...stylex.props(styles.choices)}
     >
       {choices.map((choice) => {
-        const checked = choice.value === value;
         return (
           <button
-            aria-pressed={checked || undefined}
             disabled={disabled}
             key={choice.value}
             onClick={() => onChange(choice.value)}
             type="button"
-            {...stylex.props(
-              styles.choice,
-              checked && styles.selectedChoice,
-              disabled && styles.disabledChoice,
-            )}
+            {...stylex.props(styles.choice, disabled && styles.disabledChoice)}
           >
             <span {...stylex.props(styles.choiceCopy)}>
               <strong {...stylex.props(foundationStyles.compactRowTitle)}>
@@ -114,13 +105,6 @@ const styles = stylex.create({
     cursor: "pointer",
     boxShadow: {
       default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
-  selectedChoice: {
-    borderColor: colors.accent,
-    boxShadow: {
-      default: `inset 0 0 0 1px ${colors.accent}`,
       ":focus-visible": effects.focusRing,
     },
   },
