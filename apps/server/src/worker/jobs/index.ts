@@ -27,6 +27,7 @@ import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
 import updateEntityStats from "./updateEntityStats";
 import updateRegionStats from "./updateRegionStats";
+import updateSiteReviewScores from "./updateSiteReviewScores";
 import verifyBottleCreation from "./verifyBottleCreation";
 import verifyEntityCreation from "./verifyEntityCreation";
 
@@ -58,6 +59,7 @@ registry.add("ResolveStorePriceBottle", resolveStorePriceBottle);
 registry.add("RunScraper", runScraper, { queueName: "scrapers" });
 registry.add("CreateMissingBottles", createMissingBottles);
 registry.add("UpdateBottleStats", updateBottleStats);
+registry.add("UpdateSiteReviewScores", updateSiteReviewScores);
 registry.add("UpdateCountryStats", updateCountryStats);
 registry.add("UpdateEntityStats", updateEntityStats);
 registry.add("UpdateRegionStats", updateRegionStats);

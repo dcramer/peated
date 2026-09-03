@@ -161,6 +161,59 @@ describe("scrape source parser", () => {
     ).toHaveLength(2);
   });
 
+  it.each([
+    [
+      "a writer inside one review",
+      "",
+      '<span class="author">Ada</span>',
+      ["Ada", null],
+    ],
+    [
+      "ambiguous page bylines",
+      '<span class="author">Ada</span><span class="author">Grace</span>',
+      "",
+      [null, null],
+    ],
+    [
+      "a review writer overriding the page byline",
+      '<span class="author">Ada</span>',
+      '<span class="author">Grace</span>',
+      ["Grace", "Ada"],
+    ],
+  ])(
+    "keeps review fields separate with %s",
+    (_, pageBylines, firstByline, reviewers) => {
+      const result = parseScrapeDetail(
+        reviewConfig,
+        `<h1>Two reviews</h1><time datetime="2026-08-22"></time>${pageBylines}
+      <span class="score">99</span>
+      <article class="review"><h2>First Bottle</h2>${firstByline}<span class="score">88</span></article>
+      <article class="review"><h2>Second Bottle</h2></article>`,
+        new URL("https://reviews.test/two-bottles"),
+      );
+      expect(result).toMatchObject({
+        kind: "review",
+        issues: [],
+        value: {
+          article: {
+            externalReviews: [
+              {
+                name: "First Bottle",
+                reviewerName: reviewers[0],
+                nativeScore: { value: 88 },
+              },
+              {
+                name: "Second Bottle",
+                reviewerName: reviewers[1],
+                nativeScore: null,
+              },
+            ],
+          },
+        },
+      });
+    },
+  );
+
   it("extracts repeated reviews and reports invalid dates and scores", () => {
     const result = parseScrapeDetail(
       reviewConfig,

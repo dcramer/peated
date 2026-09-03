@@ -177,10 +177,8 @@ function getCriticReview(
     publishedAt: externalReview.article.publishedAt
       ? dateFormatter.format(new Date(externalReview.article.publishedAt))
       : undefined,
-    rating:
-      externalReview.nativeScore?.scale === 100
-        ? externalReview.nativeScore.value
-        : null,
+    nativeScore: externalReview.nativeScore,
+    scoreContribution: externalReview.scoreContribution,
     reviewerName: externalReview.reviewerName ?? undefined,
     summary: externalReview.clip ?? undefined,
   };

@@ -218,6 +218,22 @@ function parseReviewDetail(
     (reviewItems.length === 1 ? readValue($, selector) : null);
 
   try {
+    const reviewerSelector = rules.detail.reviewerName;
+    const pageBylines = reviewerSelector
+      ? $(reviewerSelector.selector).filter(
+          (_, element) =>
+            $(element).closest(rules.detail.reviewItem).length === 0,
+        )
+      : null;
+    // Scraper parsing shares only one explicit page byline; a review's writer stays local.
+    const pageReviewerText =
+      reviewerSelector && pageBylines?.length === 1
+        ? reviewerSelector.attribute
+          ? pageBylines.attr(reviewerSelector.attribute)
+          : pageBylines.text()
+        : null;
+    const pageReviewerName =
+      pageReviewerText?.replaceAll(/\s+/g, " ").trim() || null;
     reviewItems.forEach((element, index) => {
       const item = load($.html(element));
       const name = readReviewValue(item, rules.detail.name);
@@ -231,8 +247,8 @@ function parseReviewDetail(
       const sourceKey = `${pageUrl.toString()}#review-${index + 1}`;
       const body = readReviewBody($(element));
       if (body) externalReviewBodies[sourceKey] = body;
-      const reviewerName = rules.detail.reviewerName
-        ? readReviewValue(item, rules.detail.reviewerName)
+      const reviewerName = reviewerSelector
+        ? (readValue(item, reviewerSelector) ?? pageReviewerName)
         : null;
       const scoreText = rules.detail.score
         ? readReviewValue(item, rules.detail.score.value)

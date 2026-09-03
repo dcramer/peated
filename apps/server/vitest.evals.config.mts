@@ -10,6 +10,7 @@ const AI_ENV_KEYS = [
   "AI_GATEWAY_API_KEY",
   "OPENAI_MODEL",
   "SCRAPER_AI_GATEWAY_API_KEY",
+  "SCRAPER_SETUP_MODEL",
 ] as const;
 
 function applyAiEnvFile(absolutePath: string): void {

@@ -51,7 +51,7 @@ export default function RatingsPage() {
   return (
     <AboutPage
       currentHref="/about/ratings"
-      description="A tasting takes one of five ratings. A written review takes a whole number out of 100. Neither is ever converted into the other."
+      description="A tasting takes one of five ratings. A member review takes a whole number out of 100. Neither is ever converted into the other."
       rail={
         <RailSection heading="Where these appear">
           <RailList ariaLabel="Rating examples">
@@ -114,13 +114,22 @@ export default function RatingsPage() {
       <PageSection heading="How a bottle score is worked out">
         <AboutTextStack>
           <AboutText>
-            A bottle shows a median from the first eligible score onward. It
-            never shows an average or a number converted from tasting ratings.
+            We line up the included review scores from lowest to highest and
+            take the middle one. This is the median. With two middle scores, we
+            use the lower one. The count tells you how many scores went in;
+            tasting ratings are kept separate.
           </AboutText>
           <AboutText>
-            An external score counts only when the publication permits its use
-            and scores on a whole-number 100-point scale. A publication on its
-            own scale gets an en dash beside its quote.
+            Review sites use different scales. We keep each original score and
+            link to its review. When a site's scoring guide makes the scales
+            comparable, Peated can estimate a score out of 100.
+          </AboutText>
+          <AboutText>
+            Each review says whether its score is included. Reviews without a
+            usable score or a saved comparison are left out, so the score count
+            can be smaller than the review count. Existing whole-number scores
+            out of 100 count unless the site is excluded or its saved settings
+            say otherwise.
           </AboutText>
         </AboutTextStack>
       </PageSection>

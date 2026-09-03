@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum } from "./common";
+import { ExternalReviewScoreContributionSchema } from "./externalReviewScoring";
 import { ExternalSiteKeySchema, ExternalSiteSchema } from "./externalSites";
 
 export const NativeScoreSchema = z
@@ -28,6 +29,9 @@ export const ExternalReviewSchema = z.object({
   }),
   reviewerName: z.string().nullable(),
   nativeScore: NativeScoreSchema.nullable(),
+  scoreContribution: ExternalReviewScoreContributionSchema.describe(
+    "Peated's interpretation and whether this review contributes to the bottle score.",
+  ),
   clip: z.string().nullable(),
   extractedTags: z
     .array(z.string())

@@ -91,16 +91,14 @@ adapter when a source needs those capabilities.
 
 Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or
-product pages. AI proposes the list, next-page, and detail rules. Code checks
-the list page, one next page when present, and up to three detail pages with the
-same parser used during collection. Another AI request compares those parsed
-fields with the HTML. If either check finds a rule problem, AI receives the
-concise errors and gets one repair attempt. Each repaired proposal repeats all
-checks. Expected final rule failures are stored on the run and shown in Admin;
-they do not fail only through Sentry. Provider, database, queue, and unexpected
-network failures remain system errors. AI responses require fixed fields, and
-the AI has no tools. No revision is saved unless the code checks and AI review
-pass. The AI provider does not store request content. An admin must still
+product pages. AI calls `check_rules` with the list, next-page, and detail rules.
+Code checks the list page, one next page when present, and up to three detail
+pages with the same parser used during collection. When a check fails, AI
+receives the errors and inspected pages to correct its rules. Setup allows
+three checks in total and saves a revision only after a check passes. Expected
+final rule failures are stored on the run and shown in Admin; they do not fail
+only through Sentry. Provider, database, queue, and unexpected network failures
+remain system errors. The AI provider does not store request content. An admin must still
 preview and activate the inactive revision. AI never changes the active
 revision directly.
 
@@ -112,6 +110,9 @@ collection still parse the original fetched HTML.
 For reviews, `reviewItem` selects the full body to save internally; optional
 `reviewText` selects tasting notes for tags and clips. [External Reviews](../../../../docs/features/external-reviews.md)
 defines what is saved, who can read it, and when it is deleted.
+Each review keeps its own writer when selected. One unambiguous byline outside
+the review sections can supply the article's writer for the remaining reviews.
+Names and scores stay inside their own sections on multi-review pages.
 
 Setup traces may record the complete model instructions, public website input,
 model output, and rule-check arguments and results. They must not include
@@ -119,9 +120,25 @@ credentials, request headers, cookies, or private admin data. Normal collection
 must keep page bodies and publisher prose out of logs and traces. Follow
 [Sensitive Data](../../../../docs/policies/sensitive-data.md).
 
+`pnpm evals:scraper:e2e` runs the [real-model create-scraper suite](./configured/createScraper.eval.test.ts).
+A local HTTP server serves [small website fixtures](../../__fixtures__/scraper-websites/README.md).
+Model requests go directly to the configured AI provider without interception. Each case
+starts with a homepage URL, lets the model build rules, previews and activates
+them, then collects reviews and checks stored fields, score totals, and repeated
+collection. No parsing rules or expected answers are supplied to the model.
+The suite requires the local test database and a gateway key; missing credentials
+skip the live cases locally. It uses real request timing, Redis queues, BullMQ
+workers, and registered production job handlers. Clip generation stays disabled.
+
+The dedicated `test / scraper` CI job runs on relevant
+same-repository pull requests and every push to `main`. It uses its own test
+database and uploads results. It reads `SCRAPER_AI_GATEWAY_API_KEY`, falling
+back to `AI_GATEWAY_API_KEY`, fails if neither is configured, and requires no
+label. Fork pull requests run the ordinary tests without secrets.
+
 `pnpm evals:scraper` checks rule generation with fixed website fixtures and the
-live AI service. Normal test runs exclude these checks. Add the `trigger-evals`
-label to a pull request to run them in CI.
+live AI service, including the full creation scenarios. Normal test runs exclude
+these checks. The `trigger-evals` label runs the broader eval suite in CI.
 
 ## Source acceptance rules
 
@@ -144,6 +161,12 @@ listed owner. Do not repeat a runtime test in every adapter.
 Keep source-specific facts in the adapter tests and the owning feature or
 research document. Update a fixture when the publisher changes markup. Do not
 weaken a shared schema or runtime rule to accept one malformed page.
+
+[Captured review score fixtures](../../__fixtures__/review-scores.md) exercise
+source parsing, review storage, site conversion settings, and Bottle totals
+without website or AI calls. They retain publisher scores and the markup needed
+to distinguish multiple reviews on one page. Their capture notes explain how
+to refresh them without keeping full articles.
 
 ## Run outcomes
 

@@ -81,9 +81,13 @@ logs, errors, cursors, and production-content test snapshots.
 Source setup can send size-limited public HTML and extracted bodies to its model
 and trace, following [Sensitive Data](../policies/sensitive-data.md).
 
-[Ratings](../architecture/ratings.md) defines when an external
-score contributes to Bottle totals. The database schema and ingestion code own
-the exact stored fields.
+Each source can have a saved table that compares its scores with Peated scores.
+Readers see the original score and whether it counts toward the Bottle score.
+A moderator can leave scores out while continuing to publish the reviews.
+
+[Ratings](../architecture/ratings.md) explains the comparison and when an
+external score counts toward Bottle totals. The database schema and import code
+own the exact stored fields.
 
 Use [External Review Sources](../operations/external-review-sources.md) to add,
 publish, stop, or remove a source.

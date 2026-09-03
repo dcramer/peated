@@ -98,16 +98,34 @@ true:
 - The source is approved for publication, or the review is a migrated public
   record.
 - The review belongs to an active exact Bottle.
-- The source supplied a whole-number value on a 100-point scale.
+- The source has a saved comparison that covers the score's scale, value, and
+  publication date; or it has no scoring settings and supplies a whole-number
+  score out of 100 (the existing rollout behavior).
 
-The shared SQL rule lives in `externalReviewScores.ts`. Imports store the value,
-scale, and display text exactly as published. Other scales remain visible with
-the external review but do not enter the Bottle score.
+`externalReviews/scoring.ts` owns the comparison. Moderators save a guide link,
+explanation, and a table that pairs source scores with Peated scores for each
+scale. Peated fills in values between rows and rounds once to the nearest whole
+number (halves round up). Values outside the table are left out. Date ranges for
+the same scale cannot overlap. Start dates count; end dates do not. A review
+without a date cannot use a table limited by date.
 
-The redesign interface shows a critic rating only when the permitted native
-score already uses the 100-point scale. It displays the numeric value without a
-scale explainer. Reviews on other scales remain attributed but omit the number;
-the interface does not convert them.
+Settings live under the reserved `review-scoring` external-site config key.
+They have a version for conflicting edits, the complete policy, and a pending
+refresh flag. The dedicated moderator routes validate writes; the generic
+config route rejects this key. Disabling scores does not stop publication.
+
+Imports preserve the original value, scale, and display text. Public reviews
+return these as `nativeScore`, with a separate `scoreContribution` explaining
+whether a score counts, its estimated value, and the scoring guide. Critic
+reviews, activity, and review lists show the original scale. Bottle summaries,
+previews, serializers, and maintenance use `loadScoredExternalReviews` so they
+follow the same score and visibility rules.
+
+Changing settings queues `UpdateSiteReviewScores`. It rebuilds affected
+Bottles and their groups from original review values in batches. A stale job
+cannot clear a newer pending refresh. If dispatch or work fails, settings stay
+pending; preview and save again to retry. Summaries may show the prior score
+until the refresh finishes. Settings changes are recorded in the audit log.
 
 `legacyNormalizedScore` is an old import field. Its SQL column remains
 `review.rating`. New writes do not fill it. Public APIs do not expose it, and

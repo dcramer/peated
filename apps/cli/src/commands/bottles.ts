@@ -6,17 +6,14 @@ import {
   bottles,
   bottleTombstones,
   entities,
-  externalReviewArticles,
-  externalReviewPublications,
-  externalReviews,
 } from "@peated/server/db/schema";
+import { loadScoredExternalReviews } from "@peated/server/externalReviews/scoredReviews";
 import {
   assertBottleReferenceMigrationReportsMatch,
   getBottleReferenceMigrationReport,
   parseBottleReferenceMigrationReport,
 } from "@peated/server/lib/bottleReferenceMigrationAudit";
 import { findEntityByExactNameOrReference } from "@peated/server/lib/db";
-import { countedExternalReviewScoreWhere } from "@peated/server/lib/externalReviewScores";
 import { fixBadExternalReviewEntities } from "@peated/server/lib/fixBadExternalReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
@@ -147,33 +144,18 @@ subcommand
     }
 
     if (processedBottleIds.length) {
-      const expectedRows = await db
-        .select({
-          bottleId: externalReviews.bottleId,
-          count: count(externalReviews.id),
-        })
-        .from(externalReviews)
-        .innerJoin(
-          externalReviewArticles,
-          eq(externalReviewArticles.id, externalReviews.articleId),
-        )
-        .innerJoin(
-          externalReviewPublications,
-          eq(
-            externalReviewPublications.externalSiteId,
-            externalReviewArticles.externalSiteId,
-          ),
-        )
-        .where(
-          and(
-            inArray(externalReviews.bottleId, processedBottleIds),
-            countedExternalReviewScoreWhere(),
-          ),
-        )
-        .groupBy(externalReviews.bottleId);
-      const expectedByBottle = new Map(
-        expectedRows.map(({ bottleId, count }) => [bottleId, count]),
-      );
+      const scoredReviews = await loadScoredExternalReviews({
+        bottleIds: processedBottleIds,
+      });
+      const expectedByBottle = new Map<number, number>();
+      for (const review of scoredReviews) {
+        if (review.bottleId !== null && review.contribution.value !== null) {
+          expectedByBottle.set(
+            review.bottleId,
+            (expectedByBottle.get(review.bottleId) ?? 0) + 1,
+          );
+        }
+      }
       const storedRows = await db
         .select({
           bottleId: bottles.id,

@@ -916,6 +916,7 @@ export const activityReview = {
   article: { title: "A whisky review", publishedAt: timestamp },
   reviewerName: "Sample Reviewer",
   nativeScore: { value: 92, scale: 100, display: "92" },
+  scoreContribution: { value: 92, reason: "counted", guideUrl: null },
   clip: "Dense smoke gives way to dark fruit and a long, dry finish.",
   bottle: existingBottle,
   createdAt: timestamp,

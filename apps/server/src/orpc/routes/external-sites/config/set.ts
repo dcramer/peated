@@ -2,7 +2,10 @@ import { setExternalSiteConfig } from "@peated/server/lib/externalSiteConfig";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { ExternalSiteKeySchema } from "@peated/server/schemas";
+import {
+  ExternalSiteKeySchema,
+  REVIEW_SCORING_CONFIG_KEY,
+} from "@peated/server/schemas";
 import { z } from "zod";
 
 export default procedure
@@ -18,7 +21,12 @@ export default procedure
   .input(
     z.object({
       site: ExternalSiteKeySchema,
-      key: z.string(),
+      key: z
+        .string()
+        .refine(
+          (key) => key !== REVIEW_SCORING_CONFIG_KEY,
+          "Use Review scores to change how this site's scores count.",
+        ),
       value: z.any(),
     }),
   )

@@ -1,3 +1,4 @@
+import type { ExternalReviewScoreContribution } from "@peated/server/schemas";
 import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -8,17 +9,19 @@ export type CriticReviewProps = {
   href?: string;
   publication: string;
   publishedAt?: string;
-  rating?: number | null;
+  nativeScore?: { value: number; scale: number } | null;
+  scoreContribution?: ExternalReviewScoreContribution;
   reviewerName?: string;
   summary?: string;
 };
 
-/** Renders an attributed critic review with its normalized 100-point rating. */
+/** Shows the publication's original score and whether it enters the bottle score. */
 export function CriticReview({
   href,
   publication,
   publishedAt,
-  rating,
+  nativeScore,
+  scoreContribution,
   reviewerName,
   summary,
 }: CriticReviewProps) {
@@ -44,15 +47,42 @@ export function CriticReview({
             </span>
           ) : null}
         </div>
-        {rating !== null && rating !== undefined ? (
-          <strong
-            aria-label={`${publication} critic rating ${rating} out of 100`}
+        {nativeScore ? (
+          <span
+            role="img"
+            aria-label={`${publication} score ${nativeScore.value} out of ${nativeScore.scale}`}
             {...stylex.props(styles.rating)}
           >
-            {rating}
-          </strong>
+            {nativeScore.value}
+            <span {...stylex.props(foundationStyles.metadata, styles.scale)}>
+              /{nativeScore.scale}
+            </span>
+          </span>
         ) : null}
       </div>
+
+      {nativeScore && scoreContribution ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.contribution)}>
+          {scoreContribution.value === null
+            ? "Not included in the bottle score."
+            : nativeScore.scale === 100 &&
+                scoreContribution.value === nativeScore.value
+              ? "Included in the bottle score."
+              : `Counts as an estimated ${scoreContribution.value}/100 in the bottle score.`}{" "}
+          <TextLink href="/about/ratings" size="inherit">
+            How scores work
+          </TextLink>
+          {scoreContribution.guideUrl ? (
+            <>
+              {" "}
+              ·{" "}
+              <TextLink href={scoreContribution.guideUrl} size="inherit">
+                Scoring guide
+              </TextLink>
+            </>
+          ) : null}
+        </p>
+      ) : null}
 
       {summary ? (
         <p {...stylex.props(foundationStyles.prose, styles.summary)}>
@@ -105,6 +135,16 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: "-0.045em",
     lineHeight: 0.9,
+  },
+  scale: {
+    marginLeft: space.x1,
+    color: colors.inkMuted,
+    letterSpacing: "normal",
+  },
+  contribution: {
+    marginTop: space.x3,
+    marginBottom: 0,
+    color: colors.inkMuted,
   },
   summary: {
     maxWidth: "54ch",

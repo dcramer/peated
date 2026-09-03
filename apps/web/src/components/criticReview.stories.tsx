@@ -11,7 +11,8 @@ const meta = {
     href: "#review",
     publication: "Whisky Advocate",
     publishedAt: "14 Mar 2025",
-    rating: 92,
+    nativeScore: { value: 92, scale: 100 },
+    scoreContribution: { value: 92, reason: "counted", guideUrl: null },
     reviewerName: "Jonny McCormick",
     summary:
       "Dense smoke gives way to dark fruit, salted caramel, and a dry finish.",
@@ -38,11 +39,16 @@ export const Overview: Story = {
         <CriticReview
           publication="Malt Review"
           publishedAt="2 Sep 2024"
-          rating={80}
+          nativeScore={{ value: 8, scale: 10 }}
+          scoreContribution={{
+            value: null,
+            reason: "not_configured",
+            guideUrl: null,
+          }}
         />
       </ItemListItem>
       <ItemListItem>
-        <CriticReview publication="Whisky Notes" rating={null} />
+        <CriticReview publication="Whisky Notes" nativeScore={null} />
       </ItemListItem>
     </ItemList>
   ),
