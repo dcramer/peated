@@ -701,8 +701,8 @@ export const priceSite = {
   nextRunAt: null,
   runEvery: 60,
   externalReviews: {
-    total: 0,
-    matched: 0,
+    total: 2,
+    matched: 2,
     unmatched: 0,
   },
   priceListings: {
@@ -920,6 +920,20 @@ export const activityReview = {
   bottle: existingBottle,
   createdAt: timestamp,
   updatedAt: timestamp,
+};
+
+export const siteReviewList = {
+  rel: { nextCursor: null, prevCursor: null },
+  results: [
+    activityReview,
+    {
+      ...activityReview,
+      id: 9803,
+      name: exactMatchedBottle.fullName,
+      url: "https://example.com/reviews/second-whisky",
+      bottle: exactMatchedBottle,
+    },
+  ],
 };
 
 export const homeAwards = [

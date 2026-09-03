@@ -1,4 +1,7 @@
-import { mockBottle } from "@peated/server/orpc/mock/fixtures";
+import {
+  mockBottle,
+  mockExternalReviews,
+} from "@peated/server/orpc/mock/fixtures";
 import {
   toBottleListItem,
   toBottlePickerOption,
@@ -8,6 +11,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { BottleRowActionControls } from "@peated/web/hooks/useBottleRowActions";
 
 import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
+import { ReviewRows } from "./admin/reviewTable.stylex";
 import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
 import { BottleRowActions } from "./bottleRowActions.stylex";
 import { CommunityFeed } from "./communityFeed.stylex";
@@ -73,7 +77,7 @@ const meta = {
 | sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
 | compact | Single or grouped library additions | One name line, 24 × 32px thumbnail, and a 44px hit area. |
 
-Sidebar omits membership status icons and keeps full accessible names when its two-line titles truncate. Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control; end holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
+Sidebar omits membership status icons and keeps full accessible names when its two-line titles truncate. Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control; linked cells keep their hit area inside the bottle identity. The end slot holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
 
 Use Row Layouts to compare these components at desktop and phone widths.`,
       },
@@ -292,6 +296,17 @@ export const RowLayouts: Story = {
               },
             ]}
             query=""
+          />
+        </section>
+        <section aria-label="Scraper reviews">
+          <SectionHeading level={3}>Scraper reviews</SectionHeading>
+          <ReviewRows
+            reviews={mockExternalReviews.slice(0, 2).map((review) => ({
+              ...review,
+              bottle: review.bottle
+                ? { ...review.bottle, imageUrl: null }
+                : null,
+            }))}
           />
         </section>
         <section aria-label="Selection">
