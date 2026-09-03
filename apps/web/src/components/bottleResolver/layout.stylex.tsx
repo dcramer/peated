@@ -5,7 +5,7 @@ import { SectionHeading } from "../sectionHeading.stylex";
 
 import { Button } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 
 export function BottleResolverColumn({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.column)}>{children}</div>;
@@ -28,7 +28,7 @@ export function BottleResolverIntroduction({
 }) {
   return (
     <header {...stylex.props(styles.introduction)}>
-      <h2 {...stylex.props(foundationStyles.pageTitle)}>{title}</h2>
+      <h2 {...stylex.props(foundationStyles.pageTitleCompact)}>{title}</h2>
       <div
         {...stylex.props(foundationStyles.body, styles.introductionDescription)}
       >
@@ -79,25 +79,13 @@ export function BottlePhotoAction({
       aria-label="Use a label photo"
       {...stylex.props(styles.photoAction)}
     >
-      <span aria-hidden="true" {...stylex.props(styles.photoVisual)}>
-        <Camera size={30} strokeWidth={1.5} />
-      </span>
-      <div {...stylex.props(styles.photoCopy)}>
-        <div {...stylex.props(styles.photoHeading)}>
-          <SectionHeading>Photograph the label</SectionHeading>
-        </div>
-        <p
-          {...stylex.props(foundationStyles.metadata, styles.photoDescription)}
-        >
-          Keep the whole front label in frame. A phone photo is fine; we’ll use
-          it as your tasting picture too.
-        </p>
-        <span {...stylex.props(styles.photoButton)}>
-          <Button fullWidth onClick={onSelectPhoto} size="md" variant="default">
-            Photograph the label
-          </Button>
-        </span>
-      </div>
+      <Button fullWidth onClick={onSelectPhoto} variant="tonal">
+        <Camera aria-hidden="true" size={18} />
+        Photograph the label
+      </Button>
+      <p {...stylex.props(foundationStyles.metadata, styles.photoDescription)}>
+        Keep the whole front label in frame.
+      </p>
     </section>
   );
 }
@@ -151,67 +139,12 @@ const styles = stylex.create({
     rowGap: space.x4,
   },
   photoAction: {
-    boxSizing: "border-box",
     display: "flex",
-    minWidth: 0,
-    alignItems: "center",
-    gap: space.x6,
-    paddingTop: space.x6,
-    paddingRight: space.x6,
-    paddingBottom: space.x6,
-    paddingLeft: space.x6,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.inset,
-    "@media (max-width: 559px)": {
-      display: "block",
-      paddingTop: 0,
-      paddingRight: 0,
-      paddingBottom: 0,
-      paddingLeft: 0,
-      backgroundColor: "transparent",
-    },
-  },
-  photoVisual: {
-    boxSizing: "border-box",
-    display: "grid",
-    width: "76px",
-    height: "104px",
-    flex: "0 0 auto",
-    placeItems: "center",
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.surface,
-    color: colors.inkMuted,
-    "@media (max-width: 559px)": {
-      display: "none",
-    },
-  },
-  photoCopy: {
-    display: "flex",
-    minWidth: 0,
-    flex: 1,
     flexDirection: "column",
-    rowGap: space.x2,
-  },
-  photoHeading: {
-    "@media (max-width: 559px)": {
-      display: "none",
-    },
+    gap: space.x2,
   },
   photoDescription: {
-    maxWidth: "44ch",
+    margin: 0,
     color: colors.inkMuted,
-    "@media (max-width: 559px)": {
-      order: 2,
-    },
-  },
-  photoButton: {
-    alignSelf: "flex-start",
-    width: "fit-content",
-    marginTop: space.x2,
-    "@media (max-width: 559px)": {
-      width: "100%",
-      order: 1,
-      marginTop: 0,
-    },
   },
 });

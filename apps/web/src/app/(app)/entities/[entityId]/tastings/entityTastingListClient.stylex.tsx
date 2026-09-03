@@ -60,7 +60,7 @@ export function EntityTastingListClient({
               size="sm"
               variant="accent"
             >
-              Log a tasting
+              Find a bottle
             </ButtonLink>
           }
           heading="No tastings yet"

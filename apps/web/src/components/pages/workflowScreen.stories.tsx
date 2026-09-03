@@ -13,7 +13,7 @@ const meta = {
     children: null,
     onClose: () => undefined,
     onSave: () => undefined,
-    title: "Log a tasting",
+    title: "Rate this bottle",
   },
   parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof WorkflowScreen>;

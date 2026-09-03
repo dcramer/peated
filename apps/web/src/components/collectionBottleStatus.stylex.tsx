@@ -1,6 +1,7 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
+import { useId } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
@@ -23,7 +24,8 @@ const statusLabels = {
   empty: "Empty",
 } satisfies Record<CollectionBottleStatus, string>;
 
-export function CollectionBottleStatusChips({
+/** Selects a Library bottle status; null leaves all choices unselected. */
+export function CollectionBottleStatusInput({
   disabled = false,
   onChange,
   value,
@@ -32,31 +34,36 @@ export function CollectionBottleStatusChips({
   onChange: (status: CollectionBottleStatus) => void;
   value?: CollectionBottleStatusValue;
 }) {
+  const name = useId();
   return (
     <div
       aria-label="Bottle status"
-      role="group"
-      {...stylex.props(styles.group)}
+      role="radiogroup"
+      {...stylex.props(styles.group, disabled && styles.disabled)}
     >
       {COLLECTION_BOTTLE_STATUS_VALUES.map((status) => {
         const selected = value === status;
 
         return (
-          <button
-            aria-pressed={selected}
-            disabled={disabled || selected}
+          <label
             key={status}
-            onClick={() => onChange(status)}
-            type="button"
             {...stylex.props(
-              foundationStyles.interactiveSmall,
-              styles.chip,
+              foundationStyles.interactive,
+              styles.option,
               selected && styles.selected,
-              disabled && !selected && styles.disabled,
             )}
           >
+            <input
+              checked={selected}
+              disabled={disabled}
+              name={name}
+              onChange={() => onChange(status)}
+              type="radio"
+              value={status}
+              {...stylex.props(styles.input)}
+            />
             {statusLabels[status]}
-          </button>
+          </label>
         );
       })}
     </div>
@@ -65,47 +72,46 @@ export function CollectionBottleStatusChips({
 
 const styles = stylex.create({
   group: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: space.x1,
-    flexWrap: "wrap",
+    display: "grid",
+    width: "100%",
+    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+    gap: space.x2,
   },
-  chip: {
-    boxSizing: "border-box",
-    display: "inline-flex",
-    height: "28px",
+  option: {
+    position: "relative",
+    display: "flex",
+    minWidth: 0,
+    height: "44px",
     alignItems: "center",
     justifyContent: "center",
-    paddingRight: space.x2,
-    paddingLeft: space.x2,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.hairline,
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    backgroundColor: {
-      default: "transparent",
-      ":hover": colors.surface,
-      ":active": colors.surface,
-    },
-    color: colors.ink,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.fieldBackground,
+    color: colors.inkMuted,
     fontWeight: 600,
-    cursor: {
-      default: "pointer",
-      ":disabled": "default",
-    },
+    cursor: "pointer",
     boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
+      default: `inset 0 0 0 1px ${colors.fieldRule}`,
+      ":hover": `inset 0 0 0 1px ${colors.inkMuted}`,
+      ":active": `inset 0 0 0 2px ${colors.accent}`,
+      ":focus-within": effects.focusRing,
     },
-    transitionProperty: "background-color, border-color, color, opacity",
-    transitionDuration: "120ms",
   },
   selected: {
-    borderColor: colors.accent,
-    backgroundColor: colors.accent,
-    color: colors.ground,
+    backgroundColor: colors.accentTint,
+    color: colors.ink,
+    boxShadow: {
+      default: `inset 0 0 0 2px ${colors.accent}`,
+      ":hover": `inset 0 0 0 2px ${colors.accent}`,
+      ":focus-within": effects.focusRing,
+    },
+  },
+  input: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    overflow: "hidden",
+    opacity: 0,
+    pointerEvents: "none",
   },
   disabled: {
     opacity: 0.45,

@@ -3,5 +3,5 @@ import { type Metadata } from "next";
 export { default } from "@peated/web/components/defaultLayout";
 
 export const metadata: Metadata = {
-  title: "Log a tasting",
+  title: "Rate this bottle",
 };

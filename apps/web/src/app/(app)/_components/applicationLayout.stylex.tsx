@@ -89,12 +89,8 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
           accountLabel={user ? "Open account menu" : "Open sign in menu"}
           action={
             user ? (
-              <ButtonLink
-                href="/addBottle?intent=tasting"
-                size="sm"
-                variant="accent"
-              >
-                Log a tasting
+              <ButtonLink href="/addBottle" size="sm" variant="accent">
+                Find a bottle
               </ButtonLink>
             ) : (
               <>

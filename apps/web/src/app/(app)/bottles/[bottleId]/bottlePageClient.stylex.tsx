@@ -408,7 +408,7 @@ export function BottlePageFrameClient({
                 size="lg"
                 variant="accent"
               >
-                Log a tasting
+                Rate this bottle
               </ButtonLink>
               <BottleLibraryAction bottle={bottle} />
             </>

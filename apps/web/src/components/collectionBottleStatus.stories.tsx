@@ -1,14 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { useState } from "react";
 
-import { CollectionBottleStatusChips } from "./collectionBottleStatus.stylex";
+import { CollectionBottleStatusInput } from "./collectionBottleStatus.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const meta = {
   title: "Components/Bottles/Collection Bottle Status",
-  component: CollectionBottleStatusChips,
+  component: CollectionBottleStatusInput,
   args: {
     onChange: () => undefined,
-    value: "sealed",
+    value: null,
+  },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Sealed, Open, or Empty status for a bottle in Library. With no status, all choices remain unselected. The caller saves changes and disables the input while saving.",
+      },
+    },
+  },
+  argTypes: {
+    value: { control: "select", options: [null, "sealed", "open", "empty"] },
   },
   decorators: [
     (Story) => (
@@ -17,7 +29,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof CollectionBottleStatusChips>;
+} satisfies Meta<typeof CollectionBottleStatusInput>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -25,10 +37,19 @@ type Story = StoryObj<typeof meta>;
 export const Overview: Story = {
   render: (args) => (
     <StoryStack>
-      <CollectionBottleStatusChips {...args} value="sealed" />
-      <CollectionBottleStatusChips {...args} value="open" />
-      <CollectionBottleStatusChips {...args} value="empty" />
-      <CollectionBottleStatusChips {...args} disabled value={null} />
+      <StatusExample key={args.value} {...args} />
+      <CollectionBottleStatusInput {...args} value="open" />
+      <CollectionBottleStatusInput {...args} value="empty" />
+      <CollectionBottleStatusInput {...args} disabled value={null} />
     </StoryStack>
   ),
 };
+
+function StatusExample(
+  props: React.ComponentProps<typeof CollectionBottleStatusInput>,
+) {
+  const [value, setValue] = useState(props.value);
+  return (
+    <CollectionBottleStatusInput {...props} onChange={setValue} value={value} />
+  );
+}

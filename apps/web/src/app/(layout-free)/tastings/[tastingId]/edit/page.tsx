@@ -5,7 +5,7 @@ import type { Tasting } from "@peated/server/types";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import TastingForm, {
   type TastingEditFormSubmitData,
-} from "@peated/web/components/tastingForm";
+} from "@peated/web/features/tastings/tastingForm";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";

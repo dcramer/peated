@@ -423,7 +423,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: {
-      default: colors.fieldRule,
+      default: colors.sectionRule,
       ":hover": colors.inkMuted,
       ":focus-within": colors.accent,
     },
@@ -596,7 +596,7 @@ const styles = stylex.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: {
-      default: colors.fieldRule,
+      default: colors.sectionRule,
       ":hover": colors.inkMuted,
       ":focus": colors.accent,
     },

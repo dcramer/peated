@@ -20,76 +20,75 @@ const testImage = Buffer.from(
   "base64",
 );
 
-test.describe("log tasting", () => {
-  test("chooses the record type once and steps through a review", async ({
+test.describe("tastings and reviews", () => {
+  test("chooses a review and saves notes, pour details, and an explicit score", async ({
     context,
     page,
     snapshot,
   }) => {
     await signIn(context);
-
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
-
-    await expect(
-      page.getByRole("heading", { name: "What do you want to log?" }),
-    ).toBeVisible();
-    await snapshot("Tasting form / Choose entry type", {
-      ready: page.getByRole("heading", { name: "What do you want to log?" }),
+    await snapshot("Tasting form / Choose tasting or review", {
+      ready: page.getByRole("heading", { name: "What would you like to add?" }),
     });
     await page.getByRole("button", { name: /^Write a review/ }).click();
-
-    await expect(
-      page.getByRole("heading", { name: "Write a review" }),
-    ).toBeVisible();
-    await expect(page.getByLabel("Score out of 100")).toHaveValue("80");
-    await snapshot("Tasting form / Review / 1 Score", {
-      ready: page.getByLabel("Score out of 100"),
-    });
-    const progress = page.getByRole("navigation", { name: "Form progress" });
-    await expect(progress).toContainText("Score");
-    await expect(progress).toContainText("Notes");
-    await expect(progress).toContainText("Details");
-
-    await page.getByRole("button", { name: "Continue" }).click();
-    await expect(
-      page.getByRole("heading", { name: "What you tasted" }),
-    ).toBeVisible();
+    await page.getByLabel("What do you think?").fill("Coastal and waxy.");
     await page.getByLabel("Find a tasting note").fill("smoke");
     await page.getByRole("option", { name: /smoke/ }).click();
-    await page.getByLabel("Color of the pour").fill("8");
-    await page.getByLabel("Comments").fill("Coastal and waxy.");
-    await snapshot("Tasting form / Review / 2 Notes", {
-      ready: page.getByRole("heading", { name: "What you tasted" }),
+    await expect(page.getByRole("button", { name: "Save review" })).toHaveCount(
+      0,
+    );
+    await snapshot("Tasting form / Review / 1 Notes", {
+      ready: page.getByLabel("What do you think?"),
     });
     await page.getByRole("button", { name: "Browse" }).click();
-    await expect(page.getByRole("heading", { name: "Notes" })).toBeVisible();
-    await snapshot("Tasting form / Review / 2 Notes browser", {
-      ready: page.getByRole("heading", { name: "Notes" }),
+    await snapshot("Tasting form / Review / Flavor picker", {
+      ready: page.getByRole("button", { name: "Close note picker" }),
     });
     await page.getByRole("button", { name: "Close note picker" }).click();
 
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(
-      page.getByRole("heading", { name: "The sitting" }),
-    ).toBeVisible();
     await page.getByRole("radio", { name: "Neat" }).check({ force: true });
-    await page.getByLabel("Friends").fill("moderator");
+    await page.getByLabel("Color of the pour").fill("8");
+    await page.getByRole("button", { name: "Add friends" }).click();
+    await page
+      .getByRole("combobox", { name: "Friends", exact: true })
+      .fill("moderator");
     await page.getByRole("option", { name: /moderator-review/ }).click();
-    await snapshot("Tasting form / Review / 3 Details", {
-      ready: page.getByRole("heading", { name: "The sitting" }),
+    await page.getByRole("button", { name: "Done", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "1 friend", exact: true }),
+    ).toBeVisible();
+    await snapshot("Tasting form / Review / 2 The pour", {
+      ready: page.getByLabel("Color of the pour"),
     });
+
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByLabel("Score out of 100")).toHaveValue("");
     await expect(
       page.getByRole("button", { name: "Save review" }),
-    ).toBeVisible();
+    ).toBeDisabled();
+    await page.getByLabel("Score out of 100").fill("80");
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await expect(page.getByLabel("What do you think?")).toHaveValue(
+      "Coastal and waxy.",
+    );
+    await page.getByRole("button", { name: "Continue" }).click();
     await expect(
-      page.getByRole("button", { name: /^Write a review/ }),
-    ).toHaveCount(0);
+      page.getByRole("button", { name: "1 friend", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByLabel("Score out of 100")).toHaveValue("80");
+    await snapshot("Tasting form / Review / 3 Score", {
+      ready: page.getByLabel("Score out of 100"),
+    });
 
-    const saveRequestPromise = page.waitForRequest((request) =>
+    const request = page.waitForRequest((request) =>
       request.url().includes("/rpc/memberReviews/save"),
     );
     await page.getByRole("button", { name: "Save review" }).click();
-    expect(getRpcInput(await saveRequestPromise)).toMatchObject({
+    expect(getRpcInput(await request)).toMatchObject({
       bottle: existingBottle.id,
       score: 80,
       tags: ["smoke"],
@@ -101,13 +100,12 @@ test.describe("log tasting", () => {
     await expect(page).toHaveURL(
       new RegExp(`/reviews/${createdMemberReview.id}$`),
     );
-    const reviewHeading = page.getByRole("heading", {
+    const heading = page.getByRole("heading", {
       name: existingBottle.fullName,
     });
-    await expect(reviewHeading).toBeVisible();
-    await expect(page.getByText("Review · June 7, 2026")).toBeVisible();
+    await expect(heading).toBeVisible();
     await expect(page.getByText(createdMemberReview.notes)).toBeVisible();
-    await snapshot("Review detail / Saved review", { ready: reviewHeading });
+    await snapshot("Review detail / Saved review", { ready: heading });
   });
 
   test("logs a tasting and follows canonical detail and edit links", async ({
@@ -117,41 +115,40 @@ test.describe("log tasting", () => {
     snapshot,
   }) => {
     await signIn(context);
-
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
-
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=tasting$`),
     );
-    await chooseVeryGood(page);
-    await snapshot("Tasting form / Tasting / 1 Rating", {
-      ready: page.getByRole("heading", { name: "How was it?" }),
+    await startTasting(page, tastingNotes);
+    await snapshot("Tasting form / Tasting / 1 Notes", {
+      ready: page.getByLabel("What stood out?"),
     });
-    await fillComments(page, tastingNotes);
-    await snapshot("Tasting form / Tasting / 2 Notes", {
-      ready: page.getByRole("heading", { name: "What you tasted" }),
-    });
-    await page.getByRole("button", { name: "Browse" }).click();
-    await expect(page.getByRole("heading", { name: "Notes" })).toBeVisible();
-    await snapshot("Tasting form / Tasting / 2 Notes browser", {
-      ready: page.getByRole("heading", { name: "Notes" }),
-    });
-    await page.getByRole("button", { name: "Close note picker" }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
     await uploadTastingImage(page);
     await page.getByRole("radio", { name: "Neat" }).check({ force: true });
-    await snapshot("Tasting form / Tasting / 3 Details", {
-      ready: page.getByRole("heading", { name: "The sitting" }),
+    await snapshot("Tasting form / Tasting / 2 The pour", {
+      ready: page.getByRole("button", { name: "Photo attached" }),
     });
-    const createRequestPromise = waitForTastingCreate(page);
-    const imageRequestPromise = page.waitForRequest((request) =>
+    await finishTasting(page);
+    await snapshot("Tasting form / Tasting / 3 Rating", {
+      ready: page.getByRole("button", { name: "Save tasting" }),
+    });
+    const createRequest = page.waitForRequest((request) =>
+      request.url().includes("/rpc/tastings/create"),
+    );
+    const imageRequest = page.waitForRequest((request) =>
       request.url().includes("/rpc/tastings/imageUpdate"),
     );
     await page.getByRole("button", { name: "Save tasting" }).click();
-    const createInput = getRpcInput(await createRequestPromise);
-    await imageRequestPromise;
+    const createInput = getRpcInput(await createRequest);
+    await imageRequest;
 
-    expect(createInput.bottle).toBe(existingBottle.id);
-    expect(createInput.servingStyle).toBe("neat");
+    expect(createInput).toMatchObject({
+      bottle: existingBottle.id,
+      notes: tastingNotes,
+      ratingBand: "very_good",
+      servingStyle: "neat",
+    });
     expect(createInput).not.toHaveProperty("target");
     expect(createInput).not.toHaveProperty("release");
 
@@ -197,14 +194,12 @@ test.describe("log tasting", () => {
     await signIn(context, {
       accessToken: `${testAccessToken}-tasting-image-failure-${testInfo.project.name}`,
     });
-
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
-    await chooseVeryGood(page);
-    await fillComments(page, tastingNotes);
+    await startTasting(page, tastingNotes);
+    await page.getByRole("button", { name: "Continue" }).click();
     await uploadTastingImage(page);
-
+    await finishTasting(page);
     await page.getByRole("button", { name: "Save tasting" }).click();
-
     await expect(
       page.getByText(
         "We couldn't upload the picture, but your tasting was saved.",
@@ -221,65 +216,78 @@ test.describe("log tasting", () => {
     await signIn(context, {
       accessToken: `${testAccessToken}-photo-tasting-${testInfo.project.name}`,
     });
-
     await page.goto("/addTasting");
-
     await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
-    const heading = page
-      .getByRole("heading", { exact: true, name: "Log a tasting" })
-      .first();
-    await expect(heading).toBeVisible();
-    await snapshot("Start a tasting", { ready: heading });
-
+    await snapshot("Start a tasting", {
+      ready: page
+        .getByRole("heading", { exact: true, name: "Rate this bottle" })
+        .first(),
+    });
     await uploadLabel(page);
-
-    await expect(
-      page.getByRole("heading", { name: "Check the bottle" }),
-    ).toBeVisible();
-
-    await page.getByRole("button", { name: "Log a tasting" }).click();
-
-    await chooseVeryGood(page);
-    await fillComments(page, photoTastingNotes);
+    await page.getByRole("button", { name: "Rate this bottle" }).click();
+    await startTasting(page, photoTastingNotes);
     await page.getByRole("button", { name: "Continue" }).click();
+    await expect(
+      page.getByRole("button", { name: "Photo attached" }),
+    ).toBeVisible();
+    await finishTasting(page);
     await page.getByRole("button", { name: "Save tasting" }).click();
 
     await expect(page).toHaveURL(tastingPathPattern(createdTastingId));
   });
 
-  test("returns to the filled photo tasting form when submit fails", async ({
+  test("preserves the photo tasting draft when saving fails", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
       accessToken: `${testAccessToken}-photo-tasting-fail-${testInfo.project.name}`,
     });
-
     await page.goto("/addTasting");
-    await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
-
     await uploadLabel(page);
-
-    await expect(
-      page.getByRole("heading", { name: "Check the bottle" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Log a tasting" }).click();
-
-    await chooseVeryGood(page);
-    await fillComments(page, failingTastingNotes);
+    await page.getByRole("button", { name: "Rate this bottle" }).click();
+    await startTasting(page, failingTastingNotes);
     await page.getByRole("button", { name: "Continue" }).click();
+    await finishTasting(page);
     await page.getByRole("button", { name: "Save tasting" }).click();
-
     await expect(
       page.getByText(
         "We couldn't save that tasting. Your notes are still here — try again.",
       ),
     ).toBeVisible();
     await page.getByRole("button", { name: "Back", exact: true }).click();
-    await expect(page.getByLabel("Comments")).toHaveValue(failingTastingNotes);
-    await expect(page).toHaveURL(/\/addBottle\?intent=tasting$/);
+    await expect(
+      page.getByRole("button", { name: "Photo attached" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Back", exact: true }).click();
+    await expect(page.getByLabel("What stood out?")).toHaveValue(
+      failingTastingNotes,
+    );
   });
 });
+
+async function startTasting(page: Page, notes: string) {
+  await page.getByRole("button", { name: /^Log a tasting/ }).click();
+  await page.getByLabel("What stood out?").fill(notes);
+}
+
+async function finishTasting(page: Page) {
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("radio", { name: /^Very good/ }).check({ force: true });
+}
+
+async function uploadTastingImage(page: Page) {
+  await page.getByRole("button", { name: "Add photo", exact: true }).click();
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "tasting.png",
+    mimeType: "image/png",
+    buffer: testImage,
+  });
+  await page.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Photo", exact: true }),
+  ).toBeHidden();
+}
 
 async function uploadLabel(page: Page) {
   await expect(
@@ -305,31 +313,6 @@ async function uploadLabel(page: Page) {
   }
 
   throw new Error("Photo identification request was not sent.");
-}
-
-async function uploadTastingImage(page: Page) {
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.locator('input[type="file"]').setInputFiles({
-    name: "tasting.png",
-    mimeType: "image/png",
-    buffer: testImage,
-  });
-}
-
-async function fillComments(page: Page, value: string) {
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByLabel("Comments").fill(value);
-}
-
-async function chooseVeryGood(page: Page) {
-  await page.getByRole("button", { name: /^Log a tasting/ }).click();
-  await page.getByRole("radio", { name: /^Very good/ }).check({ force: true });
-}
-
-function waitForTastingCreate(page: Page) {
-  return page.waitForRequest((request) =>
-    request.url().includes("/rpc/tastings/create"),
-  );
 }
 
 type RpcJsonValue =

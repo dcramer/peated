@@ -116,6 +116,9 @@ export function WorkflowScreen({
         {...stylex.props(
           styles.content,
           mobileSaveBar && styles.contentWithMobileSave,
+          mobileSaveBar &&
+            Boolean(saveHint) &&
+            styles.contentWithMobileSaveHint,
         )}
       >
         {children}
@@ -273,6 +276,11 @@ const styles = stylex.create({
   },
   contentWithMobileSave: {
     "@media (max-width: 559px)": {
+      paddingBottom: "calc(72px + env(safe-area-inset-bottom))",
+    },
+  },
+  contentWithMobileSaveHint: {
+    "@media (max-width: 559px)": {
       paddingBottom: "calc(104px + env(safe-area-inset-bottom))",
     },
   },
@@ -286,10 +294,7 @@ const styles = stylex.create({
       left: 0,
       display: "block",
       paddingBottom: "env(safe-area-inset-bottom)",
-      borderTopWidth: "1px",
-      borderTopStyle: "solid",
-      borderTopColor: colors.hairline,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.ground,
     },
   },
   mobileSaveInner: {

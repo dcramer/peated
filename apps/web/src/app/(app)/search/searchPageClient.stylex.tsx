@@ -96,7 +96,7 @@ function getTitle({
   if (intent === "catalog") return "Add a bottle";
   if (intent === "library") return "Add to your Library";
   if (intent === "tasting" || directToTasting) {
-    return "Log a tasting";
+    return "Rate this bottle";
   }
   if (intent) return "Find a bottle";
   return "Search";

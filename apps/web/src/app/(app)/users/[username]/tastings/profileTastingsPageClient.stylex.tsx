@@ -66,7 +66,7 @@ export function ProfileTastingsPageClient() {
                   size="sm"
                   variant="accent"
                 >
-                  Log a tasting
+                  Find a bottle
                 </ButtonLink>
               ) : undefined
             }
