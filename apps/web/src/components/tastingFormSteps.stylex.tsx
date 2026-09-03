@@ -111,7 +111,18 @@ export function TastingPourStep({
   friendsError?: string;
   disabled?: boolean;
 }) {
-  const [picker, setPicker] = useState<"photo" | "friends" | null>(null);
+  const [picker, setPicker] = useState<"photo" | "friends">("photo");
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  function openPicker(nextPicker: "photo" | "friends") {
+    setPicker(nextPicker);
+    setPickerOpen(true);
+  }
+
+  function closePicker() {
+    setPickerOpen(false);
+    if (picker === "friends") friends.onQueryChange?.("");
+  }
 
   return (
     <TastingFormStep title="The pour">
@@ -125,7 +136,7 @@ export function TastingPourStep({
         <Button
           aria-haspopup="dialog"
           disabled={disabled}
-          onClick={() => setPicker("photo")}
+          onClick={() => openPicker("photo")}
           variant="tonal"
         >
           <Camera aria-hidden="true" size={18} />
@@ -134,7 +145,7 @@ export function TastingPourStep({
         <Button
           aria-haspopup="dialog"
           disabled={disabled}
-          onClick={() => setPicker("friends")}
+          onClick={() => openPicker("friends")}
           variant="tonal"
         >
           <Users aria-hidden="true" size={18} />
@@ -147,11 +158,11 @@ export function TastingPourStep({
         <ValidationMessage>{friendsError}</ValidationMessage>
       ) : null}
       <Slideout
-        open={picker !== null}
-        onClose={() => setPicker(null)}
+        open={pickerOpen}
+        onClose={closePicker}
         title={picker === "photo" ? "Photo" : "Friends"}
         footer={
-          <Button fullWidth onClick={() => setPicker(null)} variant="accent">
+          <Button fullWidth onClick={closePicker} variant="accent">
             Done
           </Button>
         }
