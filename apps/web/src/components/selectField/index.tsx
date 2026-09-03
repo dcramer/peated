@@ -87,6 +87,7 @@ export default function SelectField<T extends Option>(props: Props<T>) {
   const byId = new Map(available.map((option) => [String(option.id), option]));
   const toPickerOption = (option: T): SearchPickerOption => ({
     bottle: option.bottle,
+    entity: option.entity,
     id: option.id ?? option.name,
     label: option.name,
   });

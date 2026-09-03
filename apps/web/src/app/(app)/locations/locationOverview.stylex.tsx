@@ -6,10 +6,13 @@ import {
   BottleList,
   type BottleListItem,
   DistributionList,
+  EntityIdentityRow,
+  type EntityListItem,
   FactList,
+  ItemListItem,
+  LocationIdentityRow,
   type LocationPreviewCardProps,
   RailList,
-  RailListItem,
   TextLink,
 } from "@peated/web/components";
 import { HomeRegionGrid } from "@peated/web/components/pages/homeBrowse.stylex";
@@ -38,12 +41,7 @@ export function LocationOverview({
   visual,
 }: {
   categories: readonly { count: number; label: string }[];
-  distilleries: readonly {
-    href: string;
-    location?: string;
-    name: string;
-    totalBottles: number;
-  }[];
+  distilleries: readonly EntityListItem[];
   distillersHref: string;
   flavorProfile?: ReactNode;
   latestReleases: readonly BottleListItem[];
@@ -89,14 +87,13 @@ export function LocationOverview({
             >
               <RailList ariaLabel="Other regions">
                 {otherRegions.map((region) => (
-                  <RailListItem
-                    href={region.href}
-                    key={region.href}
-                    metadata={`${region.totalBottles.toLocaleString("en-US")} ${
-                      region.totalBottles === 1 ? "bottle" : "bottles"
-                    }`}
-                    title={region.name}
-                  />
+                  <ItemListItem key={region.href}>
+                    <LocationIdentityRow
+                      href={region.href}
+                      name={region.name}
+                      variant="sidebar"
+                    />
+                  </ItemListItem>
                 ))}
               </RailList>
             </PageSection>
@@ -133,19 +130,9 @@ export function LocationOverview({
         >
           <RailList ariaLabel="Distilleries">
             {distilleries.map((distillery) => (
-              <RailListItem
-                href={distillery.href}
-                key={distillery.href}
-                metadata={[
-                  distillery.location,
-                  `${distillery.totalBottles.toLocaleString("en-US")} ${
-                    distillery.totalBottles === 1 ? "bottle" : "bottles"
-                  }`,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-                title={distillery.name}
-              />
+              <ItemListItem key={distillery.href}>
+                <EntityIdentityRow {...distillery} />
+              </ItemListItem>
             ))}
           </RailList>
         </PageSection>

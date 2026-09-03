@@ -1,16 +1,18 @@
 import type { Outputs } from "@peated/server/orpc/router";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 
 import {
+  EntityIdentityRow,
+  ItemListItem,
   LoadingList,
   RailList,
-  RailListItem,
   SectionError,
   TextLink,
 } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
-import { getEntityPresentation, type Entity } from "./entityPageData";
+import { type Entity } from "./entityPageData";
 import { getEntitySiblings } from "./entitySiblingData";
 
 type EntityList = Outputs["entities"]["list"];
@@ -71,12 +73,13 @@ export function EntitySiblingOverview({
     <PageSection heading={heading} intro={companyLink}>
       <RailList ariaLabel={heading}>
         {siblings.map((sibling) => (
-          <RailListItem
-            href={getEntityUrl(sibling)}
-            key={sibling.id}
-            metadata={`${getEntityPresentation(sibling).label} · ${sibling.totalBottles.toLocaleString("en-US")} bottles`}
-            title={sibling.name}
-          />
+          <ItemListItem key={sibling.id}>
+            <EntityIdentityRow
+              {...getEntityIdentityProps(sibling)}
+              variant="sidebar"
+              href={getEntityUrl(sibling)}
+            />
+          </ItemListItem>
         ))}
       </RailList>
     </PageSection>

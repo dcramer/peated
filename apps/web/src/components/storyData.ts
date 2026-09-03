@@ -1,28 +1,28 @@
+import type { EntityPickerOption } from "./entityPicker.stylex";
 import type { MemberPickerOption } from "./memberPicker.stylex";
 import type { NotePickerOption } from "./notePicker.stylex";
-import type { ProducerPickerOption } from "./producerPicker.stylex";
 import type { SearchResultGroup } from "./searchResults.stylex";
 
 export const distillerOptions = [
   {
-    detail: "Islay · 412 bottles · part of Rémy Cointreau",
     id: "D00192",
-    meta: "412 bottles",
     name: "Bruichladdich",
+    kind: "distillery",
+    location: "Islay, Scotland",
   },
   {
-    detail: "Islay · 86 bottles · part of Rémy Cointreau",
     id: "D00193",
-    meta: "86 bottles",
     name: "Bruichladdich (Port Charlotte)",
+    kind: "distillery",
+    location: "Islay, Scotland",
   },
   {
-    detail: "Islay · 64 bottles · part of Rémy Cointreau",
     id: "D00481",
-    meta: "64 bottles",
     name: "Bruichladdich (Octomore)",
+    kind: "distillery",
+    location: "Islay, Scotland",
   },
-] as const satisfies readonly ProducerPickerOption[];
+] as const satisfies readonly EntityPickerOption[];
 
 export const noteOptions = [
   { category: "Smoke", common: true, name: "Smoke", usageCount: 12880 },
@@ -107,9 +107,8 @@ export const searchResultGroups = [
       {
         href: "/entities/245",
         id: "entity-245",
-        metadata: "Islay",
+        entity: { kind: "distillery", location: "Islay, Scotland" },
         title: "Lagavulin",
-        visual: { kind: "initial", fallback: "L", label: "Lagavulin" },
       },
     ],
   },

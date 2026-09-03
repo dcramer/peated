@@ -192,7 +192,7 @@ export type RailListItemProps = {
   title: string;
 };
 
-/** Generic sidebar links, such as reviewers or places. Use BottleList for bottles. */
+/** Generic sidebar links, such as help pages or reviewers. Catalog items use their domain IdentityRow inside ItemListItem. */
 export function RailListItem({
   end,
   href,

@@ -2,6 +2,7 @@
 
 import type { BOTTLE_LIST_SORT_OPTIONS } from "@peated/server/constants";
 import type { Outputs } from "@peated/server/orpc/router";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -10,10 +11,11 @@ import { useOptimistic, useState, useTransition } from "react";
 import {
   Button,
   Chip,
+  EntityIdentityRow,
   FactList,
+  ItemListItem,
   PeatedId,
   RailList,
-  RailListItem,
   SectionError,
   TextLink,
 } from "@peated/web/components";
@@ -276,14 +278,16 @@ function SeriesDistilleries({
       <div id="series-distilleries">
         <RailList ariaLabel="Series distilleries">
           {visibleDistillers.map((distiller) => (
-            <RailListItem
-              end={`${distiller.numBottles.toLocaleString("en-US")} ${
-                distiller.numBottles === 1 ? "bottle" : "bottles"
-              }`}
-              href={getEntityUrl(distiller)}
-              key={distiller.id}
-              title={distiller.name}
-            />
+            <ItemListItem key={distiller.id}>
+              <EntityIdentityRow
+                {...getEntityIdentityProps(distiller)}
+                variant="sidebar"
+                end={`${distiller.numBottles.toLocaleString("en-US")} ${
+                  distiller.numBottles === 1 ? "bottle" : "bottles"
+                }`}
+                href={getEntityUrl(distiller)}
+              />
+            </ItemListItem>
           ))}
         </RailList>
       </div>

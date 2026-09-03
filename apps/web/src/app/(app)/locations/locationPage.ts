@@ -5,6 +5,7 @@ import type {
   PageTabItem,
 } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import { getRegionMap } from "@peated/web/lib/locationMap";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
@@ -79,11 +80,7 @@ export function getLocationLatestReleases(bottles: readonly Bottle[]) {
 export function getLocationDistilleries(distilleries: readonly Distillery[]) {
   return distilleries.map((distillery) => ({
     href: getEntityUrl(distillery),
-    location: [distillery.region?.name, distillery.country?.name]
-      .filter(Boolean)
-      .join(", "),
-    name: distillery.name,
-    totalBottles: distillery.totalBottles,
+    ...getEntityIdentityProps(distillery),
   }));
 }
 

@@ -1,9 +1,11 @@
 import type { Outputs } from "@peated/server/orpc/router";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 
 import {
+  EntityIdentityRow,
+  ItemListItem,
   LoadingList,
   RailList,
-  RailListItem,
   SectionError,
 } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
@@ -110,12 +112,14 @@ export function EntityCatalogRelationships({
     <PageSection heading={group.heading}>
       <RailList ariaLabel={`${entity.name} ${group.heading.toLowerCase()}`}>
         {group.items.map((related) => (
-          <RailListItem
-            end={related.count.toLocaleString("en-US")}
-            href={getEntityUrl(related)}
-            key={related.id}
-            title={related.shortName || related.name}
-          />
+          <ItemListItem key={related.id}>
+            <EntityIdentityRow
+              {...getEntityIdentityProps(related)}
+              variant="sidebar"
+              end={`${related.count.toLocaleString("en-US")} ${related.count === 1 ? "bottle" : "bottles"}`}
+              href={getEntityUrl(related)}
+            />
+          </ItemListItem>
         ))}
       </RailList>
     </PageSection>

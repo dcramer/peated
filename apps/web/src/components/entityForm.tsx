@@ -5,15 +5,15 @@ import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
 import type { Entity } from "@peated/server/types";
 import {
   Button,
+  EntityPicker,
   Field,
   FormNotice,
   FormSection,
   FormStack,
-  ProducerPicker,
   Select,
   Textarea,
   TextInput,
-  type ProducerPickerOption,
+  type EntityPickerOption,
 } from "@peated/web/components";
 import {
   entityImageDrafts,
@@ -22,6 +22,7 @@ import {
 } from "@peated/web/components/entityImageEditor.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
@@ -59,13 +60,11 @@ export default function EntityForm({
   const [images, setImages] = useState(() =>
     entityImageDrafts(initialData.images),
   );
-  const [owner, setOwner] = useState<ProducerPickerOption | null>(() =>
+  const [owner, setOwner] = useState<EntityPickerOption | null>(() =>
     initialData.owner
       ? {
-          detail: "Currently part of",
           id: String(initialData.owner.id),
-          meta: initialData.owner.peatedId,
-          name: initialData.owner.name,
+          ...getEntityIdentityProps(initialData.owner),
         }
       : null,
   );
@@ -280,9 +279,8 @@ export default function EntityForm({
             }
             title="Details"
           >
-            <ProducerPicker
+            <EntityPicker
               help="The company or organization this is part of, when known."
-              kind="producer"
               label="Part of"
               loading={ownerResults.isFetching}
               onChange={(value) => {
@@ -291,15 +289,8 @@ export default function EntityForm({
               }}
               onQueryChange={setOwnerQuery}
               options={(ownerResults.data?.results ?? []).map((item) => ({
-                detail: [
-                  toTitleCase(item.kind),
-                  item.region?.name ?? item.country?.name,
-                ]
-                  .filter(Boolean)
-                  .join(" · "),
                 id: String(item.id),
-                meta: item.peatedId,
-                name: item.name,
+                ...getEntityIdentityProps(item),
               }))}
               placeholder="Search brands and producers"
               value={owner}

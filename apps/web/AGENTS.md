@@ -8,6 +8,9 @@
   facts in the content. Do not add this pattern to components or stories.
 - Search `src/components/` before adding components. Query `peated-storybook` MCP
   when running; use documented props and states.
+- Follow `../../docs/policies/naming.md` for component roles, domain names,
+  file names, shared type ownership, and placement. Review the name and all
+  affected uses when a component's responsibility changes.
 - Keep stories beside components; page-sized, render-only components go in `pages/`.
 - Document usage, states, and examples in Storybook; expose the same guidance
   through concise component JSDoc.
@@ -27,6 +30,10 @@
   `/activity`, and member profiles.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.
+- `EntityIdentityRow`, `SeriesIdentityRow`, and `LocationIdentityRow` own other
+  catalog row identities across lists, sidebars, search, and selection. Keep IDs,
+  descriptions, and counts out of identity metadata; place contextual counts and
+  actions beside it. Use `getEntityIdentityProps` for partial or full Entity reads.
 - Every bottle row, including sidebar, picker, selected, and admin rows, uses
   `BottleIdentityRow`. Use `toBottlePickerOption` for selection controls. Do not
   recreate bottle identity with generic text rows, chips, or image/name markup.
@@ -45,9 +52,6 @@
   “entity,” “measure,” or “canonical ID.”
 - Say “rating” or show its name/range (`Very good · 85–89`), not “tasting band.”
   Use “review score” for an exact 0–100 score.
-- Name components for their Peated concept, task, or standard UI control. Avoid
-  `Product`, `Experience`, `Surface`, `Shell`, `Widget`, `Module`, `Structure`,
-  or `Record` unless it is the product term.
 
 ## Routes
 

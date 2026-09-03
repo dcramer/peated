@@ -1,5 +1,7 @@
 "use client";
 
+import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
+
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -311,11 +313,7 @@ function Distilleries({ totalDistilleries }: { totalDistilleries?: number }) {
     <HomeDistilleries
       distilleries={distilleries.data.results.map((distillery) => ({
         href: getEntityUrl(distillery),
-        location: [distillery.region?.name, distillery.country?.name]
-          .filter(Boolean)
-          .join(", "),
-        name: distillery.name,
-        totalBottles: distillery.totalBottles,
+        ...getEntityIdentityProps(distillery),
       }))}
       totalDistilleries={totalDistilleries}
     />

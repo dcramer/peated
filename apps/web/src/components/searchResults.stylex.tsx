@@ -1,14 +1,21 @@
 import * as stylex from "@stylexjs/stylex";
+import {
+  EntityIdentityRow,
+  type EntityIdentity,
+} from "./entityIdentityRow.stylex";
+import {
+  LocationIdentityRow,
+  type LocationIdentityRowProps,
+} from "./locationIdentityRow.stylex";
 import { SectionHeading } from "./sectionHeading.stylex";
+import {
+  SeriesIdentityRow,
+  type SeriesIdentityRowProps,
+} from "./seriesIdentityRow.stylex";
+import type { TextIdentityRowProps } from "./textIdentityRow.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import {
-  colors,
-  controlMetrics,
-  effects,
-  fonts,
-  space,
-} from "../styles/tokens.stylex";
+import { colors, effects, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { Avatar } from "./avatar.stylex";
 import {
@@ -18,7 +25,6 @@ import {
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { MatchedText } from "./matchedText.stylex";
-import { MemberStatus } from "./memberStatus.stylex";
 import { BottleRatings, type TastingRatingCounts } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
@@ -34,7 +40,9 @@ export type SearchResultRatings = {
 export type SearchResultItem = {
   href: string;
   id: string;
-  isFollowing?: boolean;
+  entity?: Pick<EntityIdentity, "kind" | "location" | "isFollowing">;
+  series?: Pick<SeriesIdentityRowProps, "brand">;
+  location?: Pick<LocationIdentityRowProps, "country">;
   ratings?: SearchResultRatings;
   title: string;
 } & (
@@ -47,7 +55,7 @@ export type SearchResultItem = {
       bottle?: never;
       metadata?: string;
       visual?: {
-        kind: "avatar" | "initial";
+        kind: "avatar";
         fallback: string;
         imageUrl?: string | null;
         label: string;
@@ -252,6 +260,26 @@ function SearchResultsGroup({
   query: string;
   variant: "database" | "default";
 }) {
+  function identityProps(
+    item: SearchResultItem,
+  ): Pick<
+    TextIdentityRowProps,
+    "href" | "name" | "query" | "variant" | "onClick"
+  > {
+    return {
+      href: item.href,
+      name: item.title,
+      query,
+      variant: variant === "database" ? "standard" : "search",
+      onClick: (event) => {
+        if (onItemSelect) {
+          event.preventDefault();
+          onItemSelect(item);
+        }
+      },
+    };
+  }
+
   return (
     <section
       aria-labelledby={`${optionIdPrefix ?? "search"}-group-${group.id}`}
@@ -308,7 +336,7 @@ function SearchResultsGroup({
                 }
                 {...stylex.props(
                   styles.result,
-                  styles.bottleResult,
+                  styles.identityResult,
                   variant === "database" && styles.databaseResult,
                   item.id === activeId && styles.activeResult,
                 )}
@@ -332,6 +360,37 @@ function SearchResultsGroup({
                     ) : undefined
                   }
                 />
+              </div>
+            ) : item.entity || item.series || item.location ? (
+              <div
+                id={
+                  optionIdPrefix
+                    ? `${optionIdPrefix}-${encodeURIComponent(item.id)}`
+                    : undefined
+                }
+                {...stylex.props(
+                  styles.result,
+                  styles.identityResult,
+                  variant === "database" && styles.databaseResult,
+                  item.id === activeId && styles.activeResult,
+                )}
+              >
+                {item.entity ? (
+                  <EntityIdentityRow
+                    {...item.entity}
+                    {...identityProps(item)}
+                  />
+                ) : item.series ? (
+                  <SeriesIdentityRow
+                    {...item.series}
+                    {...identityProps(item)}
+                  />
+                ) : (
+                  <LocationIdentityRow
+                    {...item.location}
+                    {...identityProps(item)}
+                  />
+                )}
               </div>
             ) : (
               <AppLink
@@ -365,9 +424,6 @@ function SearchResultsGroup({
                     )}
                   >
                     <MatchedText query={query} text={item.title} />
-                    {item.isFollowing ? (
-                      <MemberStatus kind="following" />
-                    ) : null}
                   </strong>
                   {item.metadata ? (
                     <span
@@ -405,15 +461,8 @@ function ResultVisual({
 }: {
   visual: Exclude<NonNullable<SearchResultItem["visual"]>, { kind: "bottle" }>;
 }) {
-  if (visual.kind === "avatar") {
-    return (
-      <Avatar imageUrl={visual.imageUrl} initials={visual.fallback} size="sm" />
-    );
-  }
   return (
-    <span aria-label={visual.label} role="img" {...stylex.props(styles.visual)}>
-      <span aria-hidden="true">{visual.fallback}</span>
-    </span>
+    <Avatar imageUrl={visual.imageUrl} initials={visual.fallback} size="sm" />
   );
 }
 
@@ -560,7 +609,7 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
-  bottleResult: {
+  identityResult: {
     paddingTop: 0,
     paddingBottom: 0,
   },
@@ -573,21 +622,6 @@ const styles = stylex.create({
   activeResult: {
     backgroundColor: colors.inset,
     boxShadow: effects.focusRing,
-  },
-  visual: {
-    display: "inline-flex",
-    width: "28px",
-    height: "28px",
-    flexShrink: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.inset,
-    color: colors.inkMuted,
-    fontFamily: fonts.display,
-    fontSize: "11px",
-    fontWeight: 700,
   },
   copy: {
     display: "flex",
