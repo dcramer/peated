@@ -1,7 +1,5 @@
-import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { base } from "..";
-import { logError } from "../../lib/log";
 import { getConnection } from "../../worker/client";
 import type { Context } from "../context";
 
@@ -58,25 +56,12 @@ export function createRateLimit<TContext extends Context = Context>(
 
       const key = `${keyPrefix}:${identifier}`;
 
-      try {
-        const count = await incrementCounter(key, windowMs);
+      // Rate-limit rule: stop the request if its count cannot be checked.
+      const count = await incrementCounter(key, windowMs);
 
-        if (count > maxRequests) {
-          throw errors.FORBIDDEN({
-            message: "Too many requests. Please try again later.",
-          });
-        }
-      } catch (error) {
-        if (error instanceof ORPCError) {
-          throw error;
-        }
-
-        logError(error, {
-          extra: {
-            keyPrefix,
-            maxRequests,
-            windowMs,
-          },
+      if (count > maxRequests) {
+        throw errors.FORBIDDEN({
+          message: "Too many requests. Please try again later.",
         });
       }
 

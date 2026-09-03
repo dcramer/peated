@@ -20,7 +20,7 @@ import {
   type User,
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
-import { generateMagicLink, signPayload } from "./auth";
+import { generateMagicLink, signToken } from "./auth";
 import { formatBottleDisplayName } from "./bottleDisplayName";
 import { logError, logInfo } from "./log";
 import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
@@ -204,10 +204,13 @@ export async function sendVerificationEmail({
     transport = mailTransport;
   }
 
-  const token = await signPayload({
-    email: user.email,
-    id: user.id,
-  } satisfies z.infer<typeof EmailVerifySchema>);
+  const token = await signToken(
+    {
+      email: user.email,
+      id: user.id,
+    } satisfies z.infer<typeof EmailVerifySchema>,
+    "email-verification",
+  );
 
   const verifyUrl = `${config.URL_PREFIX}/verify?token=${token}`;
 
@@ -247,12 +250,15 @@ export async function sendPasswordResetEmail({
     .update(user.passwordHash || "")
     .digest("hex");
 
-  const token = await signPayload({
-    email: user.email,
-    id: user.id,
-    createdAt: new Date().toISOString(),
-    digest,
-  } satisfies z.infer<typeof PasswordResetSchema>);
+  const token = await signToken(
+    {
+      email: user.email,
+      id: user.id,
+      createdAt: new Date().toISOString(),
+      digest,
+    } satisfies z.infer<typeof PasswordResetSchema>,
+    "recovery",
+  );
 
   const resetUrl = `${config.URL_PREFIX}/recover-account?token=${token}`;
 

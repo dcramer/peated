@@ -1,5 +1,14 @@
+import config from "@peated/server/config";
+import jsonwebtoken from "jsonwebtoken";
 import { db } from "../db";
-import { createAccessToken, createUser, getUserFromHeader } from "./auth";
+import {
+  createAccessToken,
+  createUser,
+  generateMagicLink,
+  getUserFromHeader,
+  signToken,
+  verifyToken,
+} from "./auth";
 
 test("creates user with no username conflict", async () => {
   const data = {
@@ -41,3 +50,44 @@ test("gets user from a valid authorization header", async ({ fixtures }) => {
 test("returns null for an invalid authorization header token", async () => {
   await expect(getUserFromHeader("Bearer invalid-token")).resolves.toBeNull();
 });
+
+test("does not accept a magic link as an API access token", async ({
+  fixtures,
+}) => {
+  const user = await fixtures.User();
+  const { token } = await generateMagicLink(user);
+
+  await expect(getUserFromHeader(`Bearer ${token}`)).resolves.toBeNull();
+});
+
+for (const purpose of ["recovery", "email-verification"] as const) {
+  test(`does not accept a ${purpose} token as an API access token`, async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const token = await signToken({ id: user.id, email: user.email }, purpose);
+
+    await expect(getUserFromHeader(`Bearer ${token}`)).resolves.toBeNull();
+  });
+}
+
+test("does not accept tokens without a purpose", async ({ fixtures }) => {
+  const user = await fixtures.User();
+  const token = jsonwebtoken.sign({ id: user.id }, config.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
+  await expect(getUserFromHeader(`Bearer ${token}`)).resolves.toBeNull();
+});
+
+test.each(["magic-link", "recovery", "webauthn-challenge"] as const)(
+  "%s JWTs expire after ten minutes",
+  async (purpose) => {
+    const token = await signToken(
+      { iat: Math.floor(Date.now() / 1000) - 601 },
+      purpose,
+    );
+
+    await expect(verifyToken(token, purpose)).rejects.toThrow("jwt expired");
+  },
+);

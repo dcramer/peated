@@ -1,6 +1,6 @@
 # Account Access
 
-This document records the product rules for Terms of Service acceptance and
+This document records the rules for sign-in, Terms of Service acceptance, and
 email verification. Middleware, route schemas, and tests define exact behavior.
 
 ## Terms Of Service
@@ -38,9 +38,34 @@ addition to their other authorization middleware. The UI may prompt unverified
 users without presenting verification as a requirement for operations that do
 not enforce it.
 
+## Authentication Safeguards
+
+Sign-in, registration, and recovery routes share a limit of 15 requests per
+hour per signed-in user or IP address. Redis stores the request count. If that
+count cannot be checked, the request stops and the error handler reports the
+failure.
+
+Magic-link requests return the same empty success response for active,
+inactive, and unknown accounts. Email delivery failures are reported internally
+without changing the response. Neither the status code nor the response body
+reveals whether an account exists. Response times can still differ.
+
+Each signed token records its purpose in the JWT `aud` (audience) field.
+`verifyToken` checks that purpose, the signature, and the expiration time before
+returning the token's data. API requests using `Authorization: Bearer` require
+an access token.
+Email sign-in links, recovery links, email verification links, passkey
+challenges, and proposals to create a Bottle from a photo each have a separate
+purpose. Email sign-in links, recovery links, and passkey challenges expire
+after 10 minutes; access tokens expire after 7 days.
+
+Tokens without a purpose are rejected. When this check is first deployed,
+users must sign in again and request new emailed links.
+
 ## Ownership
 
 - user fields: `apps/server/src/db/schema/users.ts`
+- token signing and verification: `apps/server/src/lib/auth.ts`
 - authentication middleware: `apps/server/src/orpc/middleware/auth.ts`
 - acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
 - registration and authentication: `apps/server/src/orpc/routes/auth/`

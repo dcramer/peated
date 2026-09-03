@@ -1,5 +1,4 @@
 import { createRouterClient } from "@orpc/server";
-import waitError from "@peated/server/lib/test/waitError";
 import {
   createMagicLinkProcedure,
   type MagicLinkSender,
@@ -26,39 +25,31 @@ describe("POST /auth/magic-link", () => {
     expect(sendMagicLinkEmail).toHaveBeenCalledWith({ user });
   });
 
-  test("throws error when magic link email delivery fails", async ({
-    fixtures,
-  }) => {
+  test("does not reveal email delivery failures", async ({ fixtures }) => {
     const user = await fixtures.User({ active: true });
     vi.mocked(sendMagicLinkEmail).mockRejectedValueOnce(
       new Error("SMTP credentials are not configured"),
     );
 
-    const error = await waitError(
+    await expect(
       magicLinkClient.create({ email: user.email }),
-    );
-
-    expect(error).toMatchInlineSnapshot(
-      `[Error: Unable to send magic link email.]`,
-    );
+    ).resolves.toEqual({});
   });
 
-  test("throws error when user is not found", async ({ fixtures }) => {
-    const error = await waitError(
+  test("does not reveal when user is not found", async () => {
+    await expect(
       magicLinkClient.create({ email: "nonexistent@example.com" }),
-    );
-
-    expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
+    ).resolves.toEqual({});
+    expect(sendMagicLinkEmail).not.toHaveBeenCalled();
   });
 
-  test("throws error when user is not active", async ({ fixtures }) => {
+  test("does not reveal when user is not active", async ({ fixtures }) => {
     const user = await fixtures.User({ active: false });
 
-    const error = await waitError(
+    await expect(
       magicLinkClient.create({ email: user.email }),
-    );
-
-    expect(error).toMatchInlineSnapshot(`[Error: Account not found.]`);
+    ).resolves.toEqual({});
+    expect(sendMagicLinkEmail).not.toHaveBeenCalled();
   });
 
   test("is case-insensitive for email", async ({ fixtures }) => {

@@ -2,7 +2,7 @@ import {
   BottleClassificationDecisionSchema,
   ImagePhotoSuitabilitySchema,
 } from "@peated/server/agents/bottleClassifier";
-import { signPayload, verifyPayload } from "@peated/server/lib/auth";
+import { signToken, verifyToken } from "@peated/server/lib/auth";
 import { z } from "zod";
 
 export const PhotoIdentificationCreateTokenPayloadSchema = z
@@ -12,6 +12,7 @@ export const PhotoIdentificationCreateTokenPayloadSchema = z
     pendingImageId: z.string().trim().min(1),
     decision: BottleClassificationDecisionSchema,
     photoSuitability: ImagePhotoSuitabilitySchema,
+    aud: z.literal("photo-identification-create").optional(),
     iat: z.number().optional(),
     exp: z.number().optional(),
   })
@@ -25,14 +26,15 @@ export type PhotoIdentificationCreateTokenPayload = z.infer<
 export async function signPhotoIdentificationCreateToken(
   payload: PhotoIdentificationCreateTokenPayload,
 ) {
-  return await signPayload(
+  return await signToken(
     PhotoIdentificationCreateTokenPayloadSchema.parse(payload),
+    "photo-identification-create",
   );
 }
 
 /** Verifies the create token and returns the user-owned create proposal it authorizes. */
 export async function verifyPhotoIdentificationCreateToken(token: string) {
   return PhotoIdentificationCreateTokenPayloadSchema.parse(
-    await verifyPayload(token),
+    await verifyToken(token, "photo-identification-create"),
   );
 }

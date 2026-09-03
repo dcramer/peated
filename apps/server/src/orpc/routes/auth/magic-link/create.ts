@@ -9,6 +9,7 @@ import { z } from "zod";
 
 export type MagicLinkSender = typeof sendMagicLinkEmail;
 
+/** Attempts email delivery and returns success even if no account exists or delivery fails. */
 export function createMagicLinkProcedure(
   sendEmail: MagicLinkSender = sendMagicLinkEmail,
 ) {
@@ -31,23 +32,14 @@ export function createMagicLinkProcedure(
       }),
     )
     .output(z.object({}))
-    .handler(async function ({ input: { email }, errors }) {
+    .handler(async function ({ input: { email } }) {
       const [user] = await db
         .select()
         .from(users)
         .where(eq(sql`LOWER(${users.email})`, email));
 
-      if (!user) {
-        throw errors.NOT_FOUND({
-          message: "Account not found.",
-        });
-      }
-
-      if (!user.active) {
-        throw errors.NOT_FOUND({
-          message: "Account not found.",
-        });
-      }
+      // Account access rule: the response must not reveal whether an account exists.
+      if (!user?.active) return {};
 
       try {
         await sendEmail({ user });
@@ -57,9 +49,6 @@ export function createMagicLinkProcedure(
             name: "auth/magic-link/create",
             userId: user.id,
           },
-        });
-        throw errors.INTERNAL_SERVER_ERROR({
-          message: "Unable to send magic link email.",
         });
       }
 

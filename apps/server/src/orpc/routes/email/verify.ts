@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
-import { verifyPayload } from "@peated/server/lib/auth";
+import { verifyToken } from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
 import { EmailVerifySchema } from "@peated/server/schemas";
 import { and, eq, sql } from "drizzle-orm";
@@ -20,7 +20,7 @@ export default procedure
   .handler(async function ({ input, errors }) {
     let payload;
     try {
-      payload = await verifyPayload(input.token);
+      payload = await verifyToken(input.token, "email-verification");
     } catch (err) {
       throw errors.BAD_REQUEST({
         message: "Invalid verification token.",

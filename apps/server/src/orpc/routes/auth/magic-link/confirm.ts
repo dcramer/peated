@@ -1,7 +1,11 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
-import { createAccessToken, verifyPayload } from "@peated/server/lib/auth";
+import {
+  createAccessToken,
+  TOKEN_LIFETIME_SECONDS,
+  verifyToken,
+} from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { AuthSchema } from "@peated/server/schemas";
@@ -11,113 +15,80 @@ import { UserSerializer } from "@peated/server/serializers/user";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const TOKEN_CUTOFF = 600; // 10 minutes
-
-export type MagicLinkAuthServices = {
-  createToken: typeof createAccessToken;
-  verifyToken: typeof verifyPayload;
-};
-
-const defaultServices: MagicLinkAuthServices = {
-  createToken: createAccessToken,
-  verifyToken: verifyPayload,
-};
-
-export function createMagicLinkConfirmProcedure(
-  services: MagicLinkAuthServices = defaultServices,
-) {
-  return procedure
-    .use(authRateLimit)
-    .route({
-      method: "POST",
-      path: "/auth/magic-link/confirm",
-      summary: "Confirm magic link",
-      description:
-        "Confirm magic link authentication and return access token. Automatically verifies the user account",
-      spec: (spec) => ({
-        ...spec,
-        operationId: "confirmMagicLink",
-      }),
-    })
-    .input(
-      z.object({
-        token: z.string(),
-      }),
-    )
-    .output(AuthSchema)
-    .handler(async function ({ input, context, errors }) {
-      let payload;
-      try {
-        payload = await services.verifyToken(input.token);
-      } catch (err) {
-        throw errors.BAD_REQUEST({
-          message: "Invalid magic link token.",
-          cause: err,
-        });
-      }
-
-      let parsedPayload;
-      try {
-        parsedPayload = MagicLinkSchema.parse(payload);
-      } catch (err) {
-        throw errors.BAD_REQUEST({
-          message: "Invalid magic link token.",
-          cause: err,
-        });
-      }
-
-      if (
-        new Date(parsedPayload.createdAt).getTime() <
-        new Date().getTime() - TOKEN_CUTOFF * 1000
-      ) {
-        throw errors.BAD_REQUEST({
-          message: "Invalid magic link token.",
-        });
-      }
-
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(
-          and(
-            eq(users.id, parsedPayload.id),
-            eq(sql`LOWER(${users.email})`, parsedPayload.email.toLowerCase()),
-          ),
-        );
-      if (!user) {
-        throw errors.BAD_REQUEST({
-          message: "Invalid magic link token.",
-        });
-      }
-
-      if (!user.active) {
-        throw errors.BAD_REQUEST({
-          message: "Invalid magic link token.",
-        });
-      }
-
-      // Update user as verified
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          verified: true,
-        })
-        .where(eq(users.id, user.id))
-        .returning();
-
-      auditLog({
-        event: AuditEvent.LOGIN_SUCCESS,
-        userId: user.id,
-        ip: context.ip,
-        userAgent: context.userAgent,
-        metadata: { method: "magic_link" },
+export default procedure
+  .use(authRateLimit)
+  .route({
+    method: "POST",
+    path: "/auth/magic-link/confirm",
+    summary: "Confirm magic link",
+    description:
+      "Confirm magic link authentication and return access token. Automatically verifies the user account",
+    spec: (spec) => ({
+      ...spec,
+      operationId: "confirmMagicLink",
+    }),
+  })
+  .input(
+    z.object({
+      token: z.string(),
+    }),
+  )
+  .output(AuthSchema)
+  .handler(async function ({ input, context, errors }) {
+    let token;
+    try {
+      token = MagicLinkSchema.parse(
+        await verifyToken(input.token, "magic-link"),
+      );
+    } catch (err) {
+      throw errors.BAD_REQUEST({
+        message: "Invalid magic link token.",
+        cause: err,
       });
+    }
 
-      return {
-        user: await serialize(UserSerializer, updatedUser, updatedUser),
-        accessToken: await services.createToken(updatedUser),
-      };
+    if (
+      new Date(token.createdAt).getTime() <
+      Date.now() - TOKEN_LIFETIME_SECONDS["magic-link"] * 1000
+    ) {
+      throw errors.BAD_REQUEST({
+        message: "Invalid magic link token.",
+      });
+    }
+
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.id, token.id),
+          eq(sql`LOWER(${users.email})`, token.email.toLowerCase()),
+        ),
+      );
+    if (!user?.active) {
+      throw errors.BAD_REQUEST({
+        message: "Invalid magic link token.",
+      });
+    }
+
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        verified: true,
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+
+    auditLog({
+      event: AuditEvent.LOGIN_SUCCESS,
+      userId: user.id,
+      ip: context.ip,
+      userAgent: context.userAgent,
+      metadata: { method: "magic_link" },
     });
-}
 
-export default createMagicLinkConfirmProcedure();
+    return {
+      user: await serialize(UserSerializer, updatedUser, updatedUser),
+      accessToken: await createAccessToken(updatedUser),
+    };
+  });

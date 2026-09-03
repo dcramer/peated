@@ -1,4 +1,4 @@
-import { signPayload } from "@peated/server/lib/auth";
+import { signToken } from "@peated/server/lib/auth";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { createHash } from "crypto";
@@ -11,12 +11,15 @@ describe("POST /auth/recovery/challenge", () => {
       .update(user.passwordHash || "")
       .digest("hex");
 
-    const token = await signPayload({
-      id: user.id,
-      email: user.email,
-      digest,
-      createdAt: new Date().toISOString(),
-    });
+    const token = await signToken(
+      {
+        id: user.id,
+        email: user.email,
+        digest,
+        createdAt: new Date().toISOString(),
+      },
+      "recovery",
+    );
 
     const result = await routerClient.auth.recovery.challenge(
       { token },
@@ -38,12 +41,15 @@ describe("POST /auth/recovery/challenge", () => {
     // Token created 15 minutes ago (expired, limit is 10 min)
     const expiredDate = new Date(Date.now() - 15 * 60 * 1000);
 
-    const token = await signPayload({
-      id: user.id,
-      email: user.email,
-      digest,
-      createdAt: expiredDate.toISOString(),
-    });
+    const token = await signToken(
+      {
+        id: user.id,
+        email: user.email,
+        digest,
+        createdAt: expiredDate.toISOString(),
+      },
+      "recovery",
+    );
 
     const err = await waitError(
       routerClient.auth.recovery.challenge(
@@ -58,12 +64,15 @@ describe("POST /auth/recovery/challenge", () => {
   test("rejects token with invalid digest", async ({ fixtures }) => {
     const user = await fixtures.User();
 
-    const token = await signPayload({
-      id: user.id,
-      email: user.email,
-      digest: "0".repeat(64), // Wrong digest
-      createdAt: new Date().toISOString(),
-    });
+    const token = await signToken(
+      {
+        id: user.id,
+        email: user.email,
+        digest: "0".repeat(64), // Wrong digest
+        createdAt: new Date().toISOString(),
+      },
+      "recovery",
+    );
 
     const err = await waitError(
       routerClient.auth.recovery.challenge(
@@ -78,12 +87,15 @@ describe("POST /auth/recovery/challenge", () => {
   test("rejects token for non-existent user", async () => {
     const digest = createHash("sha256").update("").digest("hex");
 
-    const token = await signPayload({
-      id: 99999,
-      email: "nonexistent@example.com",
-      digest,
-      createdAt: new Date().toISOString(),
-    });
+    const token = await signToken(
+      {
+        id: 99999,
+        email: "nonexistent@example.com",
+        digest,
+        createdAt: new Date().toISOString(),
+      },
+      "recovery",
+    );
 
     const err = await waitError(
       routerClient.auth.recovery.challenge(
