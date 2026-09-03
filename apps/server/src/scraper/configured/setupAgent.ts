@@ -1,5 +1,6 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { runAgent, runTool } from "@peated/server/lib/agentTrace";
+import { load } from "cheerio";
 import { zodResponsesFunction } from "openai/helpers/zod";
 import type {
   ResponseInput,
@@ -22,7 +23,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v7";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v8";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -272,10 +273,15 @@ export function prepareAiPages(pages: AiPage[]) {
     MAX_AI_PAGE_CHARS,
     Math.floor(MAX_AI_INPUT_CHARS / pages.length),
   );
-  return pages.map((page) => ({
-    url: page.url,
-    html: page.html.slice(0, charsPerPage),
-  }));
+  return pages.map((page) => {
+    const $ = load(page.html);
+    // Scraper setup needs selectable content before the shared input limit cuts it off.
+    $("script, style").remove();
+    return {
+      url: page.url,
+      html: $.html().slice(0, charsPerPage),
+    };
+  });
 }
 
 export function modelOutputIssues(error: Error): ScrapeIssue[] {

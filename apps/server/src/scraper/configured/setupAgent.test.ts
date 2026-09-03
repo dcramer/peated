@@ -1,3 +1,4 @@
+import { load } from "cheerio";
 import { expect, test, vi } from "vitest";
 import { SCRAPE_SOURCE_DEFAULT_MAX_ITEMS } from "./rules";
 import {
@@ -62,6 +63,41 @@ test("bounds total AI input while keeping every sample page", () => {
   expect(
     prepared.reduce((total, page) => total + page.html.length, 0),
   ).toBeLessThanOrEqual(200_000);
+});
+
+test("keeps links and review facts after a large page header", () => {
+  const pages = [
+    {
+      url: "https://example.test/reviews/one",
+      html: `<html><head>
+      <script>${"/* page script */".repeat(10_000)}</script>
+      <style>${".page { color: black; }".repeat(10_000)}</style>
+      <meta name="author" content="Example Writer">
+    </head><body>
+      <h2>Latest Reviews</h2>
+      <ul class="reviews"><li><a href="/reviews/one">Example Bourbon</a></li></ul>
+      <article class="review">
+        <h1>Example Bourbon</h1>
+        <time datetime="2026-08-01T12:00:00Z">August 1</time>
+        <div class="body"><p>Review introduction.</p><h2>Score: 8/10</h2></div>
+      </article>
+    </body></html>`,
+    },
+  ];
+  const [prepared] = prepareAiPages(pages);
+  const $ = load(prepared!.html);
+
+  expect(prepared!.url).toBe(pages[0]!.url);
+  expect(prepared!.html.length).toBeLessThanOrEqual(75_000);
+  expect($("h2 + ul.reviews a").attr("href")).toBe("/reviews/one");
+  expect($("article.review > h1").text()).toBe("Example Bourbon");
+  expect($("article.review time").attr("datetime")).toBe(
+    "2026-08-01T12:00:00Z",
+  );
+  expect($('meta[name="author"]').attr("content")).toBe("Example Writer");
+  expect($("article.review .body h2").text()).toBe("Score: 8/10");
+  expect($("article.review .body p").text()).toBe("Review introduction.");
+  expect(pages[0]!.html).toContain("/* page script */");
 });
 
 test("returns rules only after the rule check passes", async () => {
