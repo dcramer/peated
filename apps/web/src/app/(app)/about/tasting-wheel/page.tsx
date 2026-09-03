@@ -3,7 +3,7 @@ import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import type { Metadata } from "next";
 import { AboutPage, AboutText, AboutTextStack } from "../aboutPage.stylex";
 import {
-  TastingWheelFamilies,
+  TastingWheelCategories,
   TastingWheelIntroduction,
 } from "./tastingWheel.stylex";
 
@@ -21,38 +21,42 @@ export default function TastingWheelPage() {
     <TastingWheelProvider>
       <AboutPage
         currentHref="/about/tasting-wheel"
-        description="Find words for what you smell and taste."
+        description="Know the taste, but can’t quite name it? The wheel gives you a few words to try."
         title="Tasting wheel"
       >
         <TastingWheelIntroduction />
 
         <PageSection
           heading="Tasting notes"
-          intro="Browse the flavor families below. These words are suggestions, not a checklist."
+          intro="These are the notes you can choose when you log a tasting."
         >
-          <TastingWheelFamilies />
+          <TastingWheelCategories />
         </PageSection>
 
         <PageSection heading="About this wheel">
           <AboutTextStack>
             <AboutText>
-              Peated uses the Wine &amp; Spirit Education Trust&apos;s 2025
-              tasting guide as its main source. We also looked at tasting wheels
-              for Scotch, American whiskey, and Canadian whisky. None uses these
-              exact flavor families.
+              Our starting point was the Wine &amp; Spirit Education
+              Trust&apos;s 2025 tasting guide, alongside wheels for Scotch,
+              American whiskey, and Canadian whisky. The 9 categories here are
+              our own arrangement of those ideas.
             </AboutText>
             <AboutText>
-              Some guides put words together because they can have the same
-              cause. Peated puts words together when they smell or taste alike.
-              One note can have more than one cause.
+              The categories reflect what the notes remind you of. You
+              don&apos;t need to know whether a flavor came from the grain, the
+              still, or the cask to put a name to it.
             </AboutText>
             <AboutText>
-              The flavor profile on a bottle page shows how often its public
-              tastings mention each family. On distillery and region pages, it
-              shows how common each family is across bottles with notes. These
-              profiles show commonality, not intensity.
+              On a bottle page, a larger slice means more public tastings
+              mention that category. On distillery and region pages, it means
+              more bottles have those notes. Neither tells you how strong a
+              flavor tastes, and your notes don&apos;t have to match anyone
+              else&apos;s.
             </AboutText>
           </AboutTextStack>
+        </PageSection>
+
+        <PageSection heading="Sources and references">
           <RailList ariaLabel="Tasting wheel sources">
             <RailListItem
               href="https://www.wsetglobal.com/media/16506/wset_l3spirits_sat_en_feb2025_issue3.pdf"

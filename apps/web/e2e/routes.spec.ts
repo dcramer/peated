@@ -93,11 +93,16 @@ test("public routes load", async ({ page, snapshot }) => {
           });
           await expect(panel).toHaveAttribute("aria-modal", "true");
           await expect(
-            panel.getByRole("heading", { name: "Bottles across Peated" }),
+            panel.getByRole("heading", { name: "Bottles with these notes" }),
           ).toBeVisible();
-          await expect(panel.getByRole("link").first()).toHaveAttribute(
+          await expect(
+            panel.getByRole("link", {
+              name: existingBottle.group.name,
+              exact: true,
+            }),
+          ).toHaveAttribute(
             "href",
-            `/bottles/${existingBottle.id}`,
+            new RegExp(`^/bottles/${existingBottle.id}-`),
           );
           await page.keyboard.press("Escape");
           await expect(panel).toHaveCount(0);

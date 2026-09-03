@@ -9,7 +9,7 @@ import { createRoot } from "react-dom/client";
 import { expect, test } from "vitest";
 import { FlavorWheel } from "./flavorWheel.stylex";
 
-test("previews families on hover and focus, and explores only on activation", async () => {
+test("previews categories on hover and focus, and explores only on activation", async () => {
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);

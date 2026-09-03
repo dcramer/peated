@@ -1,9 +1,9 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { TagCategory } from "@peated/server/types";
-import { BottleIdentityRow, Button, Slideout } from "@peated/web/components";
+import { BottleList, Button, Slideout } from "@peated/web/components";
 import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
+import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
@@ -118,13 +118,10 @@ function TastingWheelDetails({
         </div>
       </section>
       <section aria-busy={query.isPending}>
-        <SectionHeading level={3}>Bottles across Peated</SectionHeading>
+        <SectionHeading level={3}>Bottles with these notes</SectionHeading>
         <p {...stylex.props(styles.explanation)}>
-          Ranked by the share of public tastings with notes that mention{" "}
-          {selection.note
-            ? selection.note
-            : `a note in the ${category.name.toLowerCase()} family`}
-          .
+          Ordered by how often people mention these notes in their public
+          tastings.
         </p>
         <div aria-live="polite">
           {query.isPending ? (
@@ -137,28 +134,16 @@ function TastingWheelDetails({
               </Button>
             </div>
           ) : query.data.results.length ? (
-            <ul {...stylex.props(styles.bottles)}>
-              {query.data.results.map(
-                ({ bottle, matchingTastings, taggedTastings }) => (
-                  <li key={bottle.id} {...stylex.props(styles.bottle)}>
-                    <BottleIdentityRow
-                      name={formatBottleDisplayName(bottle, {
-                        includeBrand: false,
-                      })}
-                      brand={bottle.brand.name}
-                      href={`/bottles/${bottle.id}`}
-                      imageUrl={bottle.imageUrl}
-                      subtitle={`${matchingTastings.toLocaleString()} of ${taggedTastings.toLocaleString()} ${taggedTastings === 1 ? "tasting" : "tastings"}`}
-                      metadata={[...(bottle.abv ? [`${bottle.abv}% ABV`] : [])]}
-                    />
-                  </li>
-                ),
+            <BottleList
+              ariaLabel="Bottles with these tasting notes"
+              items={query.data.results.map(({ bottle }) =>
+                toBottleListItem(bottle),
               )}
-            </ul>
+            />
           ) : (
             <p {...stylex.props(styles.status)}>
               No bottles have recorded tastings for{" "}
-              {selection.note ?? `this family`} yet. Try another note.
+              {selection.note ?? `this category`} yet. Try another note.
             </p>
           )}
         </div>
@@ -198,11 +183,4 @@ const styles = stylex.create({
     textWrap: "pretty",
   },
   status: { marginTop: space.x4, color: colors.inkMuted },
-  bottles: { margin: 0, marginTop: space.x3, padding: 0, listStyle: "none" },
-  bottle: {
-    borderBottom: {
-      default: `1px solid ${colors.hairline}`,
-      ":last-child": "none",
-    },
-  },
 });
