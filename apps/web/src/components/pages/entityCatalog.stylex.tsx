@@ -82,6 +82,7 @@ export type EntityCatalogListProps = {
   onToggleFollowing?: (item: EntityCatalogItem) => void;
   onSortChange: (value: string) => void;
   page: number;
+  pending?: boolean;
   pendingIds?: ReadonlySet<number>;
   previousHref?: string;
   showFollowingMarks?: boolean;
@@ -103,6 +104,7 @@ export function EntityCatalogList({
   onToggleFollowing,
   onSortChange,
   page,
+  pending = false,
   pendingIds,
   previousHref,
   showFollowingMarks = true,
@@ -112,16 +114,17 @@ export function EntityCatalogList({
 }: EntityCatalogListProps) {
   return (
     <section aria-label={`${noun} catalog`} {...stylex.props(styles.catalog)}>
-      {items.length ? (
-        <>
-          <ListToolbar
-            count={items.length}
-            noun={noun}
-            onSortChange={onSortChange}
-            sort={sort}
-            sortOptions={sortOptions}
-            total={total}
-          />
+      <ListToolbar
+        count={items.length}
+        noun={noun}
+        onSortChange={onSortChange}
+        pending={pending}
+        sort={sort}
+        sortOptions={sortOptions}
+        total={total}
+      />
+      <div aria-busy={pending || undefined}>
+        {items.length ? (
           <EntityCatalogTable
             items={items}
             noun={noun}
@@ -129,26 +132,26 @@ export function EntityCatalogList({
             pendingIds={pendingIds}
             showFollowingMarks={showFollowingMarks}
           />
-        </>
-      ) : (
-        <EmptyState
-          action={
-            emptyAction ??
-            (onClear ? (
-              <Button onClick={onClear} size="sm" variant="tonal">
-                Clear filters
-              </Button>
-            ) : addHref ? (
-              <ButtonLink href={addHref} size="sm" variant="tonal">
-                Add {noun}
-              </ButtonLink>
-            ) : undefined)
-          }
-          heading={emptyHeading ?? `No ${noun}s found`}
-        >
-          {emptyDescription}
-        </EmptyState>
-      )}
+        ) : (
+          <EmptyState
+            action={
+              emptyAction ??
+              (onClear ? (
+                <Button onClick={onClear} size="sm" variant="tonal">
+                  Clear filters
+                </Button>
+              ) : addHref ? (
+                <ButtonLink href={addHref} size="sm" variant="tonal">
+                  Add {noun}
+                </ButtonLink>
+              ) : undefined)
+            }
+            heading={emptyHeading ?? `No ${noun}s found`}
+          >
+            {emptyDescription}
+          </EmptyState>
+        )}
+      </div>
       <CursorPager
         ariaLabel={`${noun} pages`}
         nextHref={nextHref}

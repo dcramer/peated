@@ -4,7 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { ReactNode } from "react";
+import { useOptimistic, useTransition, type ReactNode } from "react";
 
 import { PageTabs } from "@peated/web/components";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
@@ -80,12 +80,15 @@ export function EntityBottleListClient({
       },
     }),
   );
-  const { data: bottleList } = useSuspenseQuery({
+  const { data: bottleList, isFetching } = useSuspenseQuery({
     ...orpc.bottles.list.queryOptions({ input: queryParams }),
     initialData: initialBottleList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const sort = String(queryParams.sort ?? DEFAULT_SORT);
+  const [isNavigating, startTransition] = useTransition();
+  const [sort, setSort] = useOptimistic(
+    String(queryParams.sort ?? DEFAULT_SORT),
+  );
 
   function getViewHref(view: "other" | "releases") {
     const nextParams = new URLSearchParams(searchParams);
@@ -98,7 +101,10 @@ export function EntityBottleListClient({
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set("sort", value);
     nextParams.delete("cursor");
-    router.push(buildSearchHref(pathname, nextParams));
+    startTransition(() => {
+      setSort(value);
+      router.push(buildSearchHref(pathname, nextParams), { scroll: false });
+    });
   }
 
   return (
@@ -148,6 +154,7 @@ export function EntityBottleListClient({
         )}
         onSortChange={updateSort}
         page={page}
+        pending={isNavigating || isFetching}
         previousHref={getCursorHref(
           pathname,
           searchParams,

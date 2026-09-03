@@ -10,7 +10,7 @@ import {
 import { textLinkStyles } from "./textLinkStyles.stylex";
 
 export type AppLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
-  prefetch?: boolean;
+  prefetch?: boolean | null;
 };
 
 export function isInternalAppHref(href: string) {

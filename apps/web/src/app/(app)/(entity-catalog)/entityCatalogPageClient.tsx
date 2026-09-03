@@ -6,6 +6,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import type { EntityKind } from "@peated/server/types";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useOptimistic, useTransition } from "react";
 
 import { ButtonLink, PageTabs } from "@peated/web/components";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
@@ -62,6 +63,11 @@ export function EntityCatalogPageClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
+  const displayedSearchParams = new URLSearchParams(displayedParams);
   const queryParams = useApiQueryParams({
     numericFields: ["cursor", "limit"],
   });
@@ -73,15 +79,15 @@ export function EntityCatalogPageClient({
         : kind === "bottler"
           ? orpc.bottlers.list.queryOptions({ input: queryParams })
           : orpc.companies.list.queryOptions({ input: queryParams });
-  const { data: entityList } = useSuspenseQuery({
+  const { data: entityList, isFetching } = useSuspenseQuery({
     ...listQueryOptions,
     initialData: initialEntityList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const sort = searchParams.get("sort") ?? DEFAULT_SORT;
-  const country = searchParams.get("country") ?? "";
-  const query = searchParams.get("query") ?? "";
-  const region = searchParams.get("region") ?? "";
+  const sort = displayedSearchParams.get("sort") ?? DEFAULT_SORT;
+  const country = displayedSearchParams.get("country") ?? "";
+  const query = displayedSearchParams.get("query") ?? "";
+  const region = displayedSearchParams.get("region") ?? "";
   const hasFilters = Boolean(country || query || region);
   const filter =
     searchParams.get("filter") === "following" ? "following" : "all";
@@ -89,8 +95,16 @@ export function EntityCatalogPageClient({
   const followingHref = getScopeHref(pathname, searchParams, "following");
   const showFollowing = Boolean(user && kind !== "company");
 
+  function navigate(nextParams: URLSearchParams) {
+    startTransition(() => {
+      // Catalog queries follow the committed URL; only controls anticipate navigation.
+      setDisplayedParams(nextParams.toString());
+      router.push(buildSearchHref(pathname, nextParams), { scroll: false });
+    });
+  }
+
   function updateParams(updates: Record<string, string>) {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
 
     Object.entries(updates).forEach(([name, value]) => {
       if (value) nextParams.set(name, value);
@@ -98,15 +112,15 @@ export function EntityCatalogPageClient({
     });
     if ("country" in updates) nextParams.delete("region");
     nextParams.delete("cursor");
-    router.push(buildSearchHref(pathname, nextParams));
+    navigate(nextParams);
   }
 
   function clearFilters() {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     ["country", "cursor", "query", "region"].forEach((name) =>
       nextParams.delete(name),
     );
-    router.push(buildSearchHref(pathname, nextParams));
+    navigate(nextParams);
   }
 
   const addHref = `/addEntity?kind=${kind}`;
@@ -130,7 +144,6 @@ export function EntityCatalogPageClient({
           ariaLabel={`${config.title} filters`}
           countries={countryOptions}
           country={country}
-          key={query}
           onClear={clearFilters}
           onCountryChange={(value) => updateParams({ country: value })}
           onQuerySubmit={(value) => updateParams({ query: value })}
@@ -195,6 +208,7 @@ export function EntityCatalogPageClient({
         }
         onSortChange={(value) => updateParams({ sort: value })}
         page={page}
+        pending={isNavigating || isFetching}
         pendingIds={followControls.pendingIds}
         previousHref={getCursorHref(
           pathname,

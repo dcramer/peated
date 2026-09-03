@@ -73,3 +73,17 @@ export const Overview: Story = {
     </StoryStack>
   ),
 };
+
+export const UpdatingResults: Story = {
+  render: () => (
+    <ListToolbar
+      count={12}
+      noun="bottle"
+      onSortChange={() => undefined}
+      pending
+      sort="name"
+      sortOptions={sortOptions}
+      total={41}
+    />
+  ),
+};

@@ -98,6 +98,8 @@ const appliedQueueProposalTokens = new Set();
 const ignoredInconclusiveProposalTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
+let releasePageReady = Promise.resolve();
+let releasePage = () => {};
 
 const bottleCheckMock = createBottleCheckMock({
   exactMatchedBottleId,
@@ -119,6 +121,24 @@ const server = http.createServer(async (request, response) => {
   }
 
   const url = new URL(request.url ?? "/", `http://${host}:${port}`);
+  if (
+    request.method === "POST" &&
+    url.pathname === "/__test/release-pages/hold"
+  ) {
+    releasePageReady = new Promise((resolve) => {
+      releasePage = resolve;
+    });
+    response.writeHead(204, corsHeaders).end();
+    return;
+  }
+  if (
+    request.method === "POST" &&
+    url.pathname === "/__test/release-pages/resume"
+  ) {
+    releasePage();
+    response.writeHead(204, corsHeaders).end();
+    return;
+  }
   if (url.pathname.startsWith("/uploads/")) {
     response
       .writeHead(200, {
@@ -715,9 +735,16 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "bottleGroups/bottles":
       if (input?.group === bottleGroupId) {
+        if (input.cursor === 2) await releasePageReady;
         sendRpcResponse(response, {
-          results: bottleGroupMembers,
-          rel: { nextCursor: null, prevCursor: null },
+          results:
+            input.cursor === 2
+              ? bottleGroupMembers.slice(1)
+              : bottleGroupMembers,
+          rel:
+            input.cursor === 2
+              ? { nextCursor: null, prevCursor: 1 }
+              : { nextCursor: 2, prevCursor: null },
         });
         return true;
       }
@@ -908,6 +935,19 @@ async function handleRpcRequest({ request, response, url }) {
           results: [homeBottle, existingBottle],
           rel: { nextCursor: null, prevCursor: null },
         });
+        return true;
+      }
+      if (input?.limit === 50 && input?.entity === undefined) {
+        sendRpcResponse(
+          response,
+          buildBottleListResponse(
+            input.query === "no-matching-whisky"
+              ? []
+              : input.sort === "name"
+                ? [existingBottle, homeBottle]
+                : [homeBottle, existingBottle],
+          ),
+        );
         return true;
       }
       if (!getAccessToken(request).includes("flight-bottles")) return false;

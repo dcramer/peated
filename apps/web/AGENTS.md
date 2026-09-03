@@ -51,6 +51,8 @@
 
 ## Routes
 
+- Follow `../../docs/development/web-loading.md` for loading boundaries,
+  navigation feedback, and query updates.
 - Nest pages under their parent layout when tabs, headers, or navigation should
   remain. Keep the parent tab active.
 - Load only the nested page's data.

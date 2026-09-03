@@ -17,6 +17,7 @@ import {
   space,
 } from "../../styles/tokens.stylex";
 import { linkedRowStyles } from "../linkedRow.stylex";
+import { LinkPending } from "../linkPending.stylex";
 import { AdminPager } from "./adminUtility.stylex";
 
 export type AdminTableColumn<Item extends object> = {
@@ -251,6 +252,7 @@ function SortLink({
       {...stylex.props(styles.sortLink)}
     >
       {label}
+      <LinkPending />
       {sort === name ? <ArrowDown aria-hidden="true" size={12} /> : null}
       {sort === inverted ? <ArrowUp aria-hidden="true" size={12} /> : null}
     </Link>
@@ -364,6 +366,7 @@ const styles = stylex.create({
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
   sortLink: {
+    position: "relative",
     display: "inline-flex",
     alignItems: "center",
     gap: space.x1,

@@ -5,6 +5,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useOptimistic, useTransition } from "react";
 
 import { ButtonLink } from "@peated/web/components";
 import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
@@ -89,6 +90,11 @@ export function BottleCatalogPageClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
+  const displayedSearchParams = new URLSearchParams(displayedParams);
   const queryParams = normalizeBottleCatalogQueryParams(
     useApiQueryParams({
       defaults: { sort: DEFAULT_SORT },
@@ -108,19 +114,30 @@ export function BottleCatalogPageClient({
       overrides: { limit: 50 },
     }),
   );
-  const { data: bottleList } = useSuspenseQuery({
+  const { data: bottleList, isFetching } = useSuspenseQuery({
     ...orpc.bottles.list.queryOptions({ input: queryParams }),
     initialData: initialBottleList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const sort = String(queryParams.sort ?? DEFAULT_SORT);
+  const sort =
+    sortOptions.find(
+      (option) => option.value === displayedSearchParams.get("sort"),
+    )?.value ?? DEFAULT_SORT;
   const filter =
     searchParams.get("filter") === "following" ? "following" : "all";
   const allHref = getScopeHref(pathname, searchParams, "all");
   const followingHref = getScopeHref(pathname, searchParams, "following");
 
+  function navigate(nextParams: URLSearchParams) {
+    startTransition(() => {
+      // Catalog queries follow the committed URL; only controls anticipate navigation.
+      setDisplayedParams(nextParams.toString());
+      router.push(buildSearchHref(pathname, nextParams), { scroll: false });
+    });
+  }
+
   function updateParams(updates: Record<string, string>) {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
 
     Object.entries(updates).forEach(([name, value]) => {
       if (value) nextParams.set(name, value);
@@ -130,13 +147,13 @@ export function BottleCatalogPageClient({
     if ("age" in updates) nextParams.delete("ageBand");
     nextParams.delete("cursor");
     nextParams.delete("minScore");
-    router.push(buildSearchHref(pathname, nextParams));
+    navigate(nextParams);
   }
 
   function clearFilters() {
-    const nextParams = new URLSearchParams(searchParams);
+    const nextParams = new URLSearchParams(displayedParams);
     clearedFilterKeys.forEach((name) => nextParams.delete(name));
-    router.push(buildSearchHref(pathname, nextParams));
+    navigate(nextParams);
   }
 
   const items = bottleList.results.map((bottle) =>
@@ -162,16 +179,15 @@ export function BottleCatalogPageClient({
       }
       filters={
         <BottleCatalogFilters
-          age={searchParams.get("age") ?? ""}
-          ageBand={searchParams.get("ageBand") ?? ""}
+          age={displayedSearchParams.get("age") ?? ""}
+          ageBand={displayedSearchParams.get("ageBand") ?? ""}
           ageBandOptions={ageBandOptions}
-          category={searchParams.get("category") ?? ""}
+          category={displayedSearchParams.get("category") ?? ""}
           categoryOptions={categoryOptions}
-          key={searchParams.get("query") ?? ""}
           onChange={(name, value) => updateParams({ [name]: value })}
           onClear={clearFilters}
           onQuerySubmit={(value) => updateParams({ query: value.trim() })}
-          query={searchParams.get("query") ?? ""}
+          query={displayedSearchParams.get("query") ?? ""}
         />
       }
       navigation={
@@ -212,6 +228,7 @@ export function BottleCatalogPageClient({
         onClear={clearFilters}
         onSortChange={(value) => updateParams({ sort: value })}
         page={page}
+        pending={isNavigating || isFetching}
         previousHref={getCursorHref(
           pathname,
           searchParams,

@@ -26,6 +26,7 @@ export type BottleCatalogListProps = {
   onClear?: () => void;
   onSortChange: (value: string) => void;
   page: number;
+  pending?: boolean;
   previousHref?: string;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
@@ -42,6 +43,7 @@ export function BottleCatalogList({
   onClear,
   onSortChange,
   page,
+  pending = false,
   previousHref,
   sort,
   sortOptions,
@@ -49,41 +51,42 @@ export function BottleCatalogList({
 }: BottleCatalogListProps) {
   return (
     <section aria-label="Bottle catalog" {...stylex.props(styles.catalog)}>
-      {items.length ? (
-        <>
-          <ListToolbar
-            count={items.length}
-            noun="bottle"
-            onSortChange={onSortChange}
-            sort={sort}
-            sortOptions={sortOptions}
-            total={total}
-          />
+      <ListToolbar
+        count={items.length}
+        noun="bottle"
+        onSortChange={onSortChange}
+        pending={pending}
+        sort={sort}
+        sortOptions={sortOptions}
+        total={total}
+      />
+      <div aria-busy={pending || undefined}>
+        {items.length ? (
           <BottleList ariaLabel="Bottle records" items={items} />
-        </>
-      ) : (
-        <EmptyState
-          action={
-            emptyAction ??
-            (onClear ? (
-              <Button onClick={onClear} size="sm" variant="tonal">
-                Clear filters
-              </Button>
-            ) : (
-              <ButtonLink
-                href="/addBottle?intent=catalog"
-                size="sm"
-                variant="tonal"
-              >
-                Add a bottle
-              </ButtonLink>
-            ))
-          }
-          heading={emptyHeading}
-        >
-          {emptyDescription}
-        </EmptyState>
-      )}
+        ) : (
+          <EmptyState
+            action={
+              emptyAction ??
+              (onClear ? (
+                <Button onClick={onClear} size="sm" variant="tonal">
+                  Clear filters
+                </Button>
+              ) : (
+                <ButtonLink
+                  href="/addBottle?intent=catalog"
+                  size="sm"
+                  variant="tonal"
+                >
+                  Add a bottle
+                </ButtonLink>
+              ))
+            }
+            heading={emptyHeading}
+          >
+            {emptyDescription}
+          </EmptyState>
+        )}
+      </div>
       <CursorPager
         ariaLabel="Bottle pages"
         nextHref={nextHref}
