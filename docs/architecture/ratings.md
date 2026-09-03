@@ -18,6 +18,11 @@ An external review can also have one short generated clip and matched tasting
 tags. Its full body is saved for internal parsing, following
 [External Reviews](../features/external-reviews.md).
 
+TODO(ratings): Revisit shared storage for member and external reviews, and how
+tastings and both review types feed flavor wheels. Measure bottle, distillery,
+and region queries before choosing shared queries or saved totals. Preserve
+source attribution and privacy and publication rules.
+
 ## Tasting bands
 
 The shared band table lives in `apps/server/src/constants.ts`.
