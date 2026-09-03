@@ -419,6 +419,9 @@ test("scraper lists keep bottle links and navigation independently clickable", a
     .getByRole("link", { name: "Prices", exact: true })
     .click();
   await expect(page).toHaveURL(`${root}/prices`);
+  await expect(table.locator("tbody tr")).toHaveCount(
+    storePriceList.results.length,
+  );
   const firstPriceBottle = storePriceList.results[0]!.bottle!;
   await table.locator(bottleHrefSelector(firstPriceBottle.id)).click();
   await expect(page).toHaveURL(bottlePathPattern(firstPriceBottle.id));
