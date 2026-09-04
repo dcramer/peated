@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-09-04T19:29:41.977Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Compass Box\" \"Hedonism²\" \"49%\" \"648 bottles\"",
+      "\"Hedonism²\" \"648\" Compass Box"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Compass Box\" \"Hedonism²\" \"49%\" \"648 bottles\"",
+        "summary": "5–15 day deliveryCompass Box Hedonism² (Exclusive to Hedonism Wines) ... Limited to 600 bottles. Blended Grain Whisky · Compass Box · Various, Scotland. 1 of 648 bottles. You may ...",
+        "results": [
+          {
+            "title": "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+            "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+            "domain": "hedonism.co.uk",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Hedonism²\" \"648\" Compass Box",
+        "summary": "Compass Box Hedonism² (Exclusive to Hedonism Wines) ... Limited to 600 bottles. Blended Grain Whisky · Compass Box · Various, Scotland. 1 of 648 bottles. You may ... # Compass Box Hedonism² / Hedonism Wines  7032612\n### Bottle Details\nOne of 648 bottles. Explore Hedonism² 23-year-old CB, a 23-year-old whisky bottled ... Compass Box (CB); Bottled: 2023; Stated Age: 23 years; Number of bottles: 648 ... Compass Box Hedonism² - one of 648 bottles - produced ... Hedonism² 23-year-old CB 23 Jahre. Abgefüllt durch Compass Box. Die ... Compass Box (CB); Abgefüllt: 2023; Deklariertes Alter: 23 Jahre al",
+        "results": [
+          {
+            "title": "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+            "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+            "domain": "hedonism.co.uk",
+            "description": "Compass Box Hedonism² (Exclusive to Hedonism Wines) ... Limited to 600 bottles. Blended Grain Whisky · Compass Box · Various, Scotland. 1 of 648 bottles. You may ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box Hedonism² / Hedonism Wines",
+            "url": "https://whiskyauctioneer.com/whisky-lot/7032612/compass-box-hedonism2-hedonism-wines",
+            "domain": "whiskyauctioneer.com",
+            "description": "# Compass Box Hedonism² / Hedonism Wines  7032612\n### Bottle Details\nOne of 648 bottles.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hedonism² 23-year-old CB - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/226721/hedonism-23-year-old-cb",
+            "domain": "whiskybase.com",
+            "description": "Explore Hedonism² 23-year-old CB, a 23-year-old whisky bottled ... Compass Box (CB); Bottled: 2023; Stated Age: 23 years; Number of bottles: 648 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "🍗🍤🍕🌮🍰🍮🍹🍸 (@food_chewed) • Instagram photos and ...",
+            "url": "https://www.instagram.com/food_chewed/",
+            "domain": "instagram.com",
+            "description": "Compass Box Hedonism² - one of 648 bottles - produced ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hedonism² 23-year-old CB - Bewertungen und Rezensionen",
+            "url": "https://www.whiskybase.com/whiskies/whisky/226721/hedonism-23-year-old-cb?language=de",
+            "domain": "whiskybase.com",
+            "description": "Hedonism² 23-year-old CB 23 Jahre. Abgefüllt durch Compass Box. Die ... Compass Box (CB); Abgefüllt: 2023; Deklariertes Alter: 23 Jahre alt; Anzahl Flaschen: 648 ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "acc480f38491c338dd52f524f69579f94d5fdd59534e3aa8994d3d1a6ab8c107",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:49:28.500Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Wild Turkey Rare Breed Rye official product 112.2 proof barrel proof ABV",
+      "\"Wild Turkey Rare Breed Rye\" 56.1%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye official product 112.2 proof barrel proof ABV",
+        "summary": "# Blog\n![IMAGE: Front label of Wild Turkey Rare Breed Rye. Barrel proof at 112.2° proof.](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1602196666161-5FADGSQMU7PKRZID7ASB/Wild-Turkey-Rare-Breed-Rye.jpg) # WILD TURKEY RARE BREED RYE\nA small batch, barrel proof, non-chill filtered blend of select ryes, Rare Breed Rye ages perfectly in charred oak barrels, resulting in rich complexity and a balanced flavor.\n\n## HOW WE MAKE OUR   RARE BREED RYE\nThis barrel-proof, rye is bottled directly from the barrels at the 112.2 proof it reaches in those barrels.\n\n### PROCESS\n112.2 Bar",
+        "results": [
+          {
+            "title": "Wild Turkey Rare Breed Rye - BOURBON GUY",
+            "url": "https://www.bourbonguy.com/blog/2020/10/8/wild-turkey-rare-breed-rye",
+            "domain": "bourbonguy.com",
+            "description": "# Blog\n![IMAGE: Front label of Wild Turkey Rare Breed Rye. Barrel proof at 112.2° proof.](https://images.squarespace-cdn.com/content/v1/51379b83e4b02119d184b2a2/1602196666161-5FADGSQMU7PKRZID7ASB/Wild-Turkey-Rare-Breed-R",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey | Wild Turkey Bourbon",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "# WILD TURKEY RARE BREED RYE\nA small batch, barrel proof, non-chill filtered blend of select ryes, Rare Breed Rye ages perfectly in charred oak barrels, resulting in rich complexity and a balanced flavor.\n\n## HOW WE MAKE",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye 112.2 (2021)",
+            "url": "https://rarebird101.com/2021/06/15/wild-turkey-rare-breed-rye-112-2-2021/",
+            "domain": "rarebird101.com",
+            "description": "Wild Turkey Rare Breed Rye (2021) – 112.2 proof, NCF – no age stated (reportedly a blend of four-, six-, and eight-year straight rye whiskeys) – ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Barrel Proof 750ml - Mission Liquor",
+            "url": "https://www.missionliquor.com/products/wild-turkey-rare-breed-750ml-1",
+            "domain": "missionliquor.com",
+            "description": "In stock Rating 4.8142This expression is barrel strength at 112.2 proof. Wild Turkey Rare Breed Rye is a blend of four-, six-, and eight-year-old non-chill filtered ryes.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #393 - Wild Turkey Rare Breed Rye : r/bourbon - Reddit",
+            "url": "https://www.reddit.com/r/bourbon/comments/1fw033l/review_393_wild_turkey_rare_breed_rye/",
+            "domain": "reddit.com",
+            "description": "Oct 4, 2024Review #587: Wild Turkey Rare Breed Rye WhiskeyWild Turkey Rare Breed Rye Has Officially Landed!More results from www.reddit.com",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Wild Turkey Rare Breed Rye\" 56.1%",
+        "summary": "Wild Turkey Rare Breed Rye: Specs. Classification: Rye. Origin: Wild Turkey Distillery. Mashbill: 51% Rye, 37% Corn, 12% Malted Barley. Proof: 112.2 (56.1% ABV). # Blog\n## Wild Turkey Rare Breed Rye\n**Details:** 56.1% ABV Wild Turkey Rare Breed Rye. USA - Rye. Current Locally Available Price: USD 70 (2024). Age Statement: NAS. Strength: 56.1% ABV. Details: Not ...Review #558: Wild Turkey \"Rare Breed\" Rye, 56.1%Wild Turkey Rare Breed Rye Has Officially Landed! : r/bourbonMore results from www.reddit.com Wild Turkey Rare Breed Rye ; Product 022172 ; Alcohol by Volume: 56.1% ; Proof: 112.2. Wild",
+        "results": [
+          {
+            "title": "Wild Turkey Rare Breed Rye Review - Whiskey in my Wedding Ring",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "Wild Turkey Rare Breed Rye: Specs. Classification: Rye. Origin: Wild Turkey Distillery. Mashbill: 51% Rye, 37% Corn, 12% Malted Barley. Proof: 112.2 (56.1% ABV).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye - BOURBON GUY",
+            "url": "https://www.bourbonguy.com/blog/2020/10/8/wild-turkey-rare-breed-rye",
+            "domain": "bourbonguy.com",
+            "description": "# Blog\n## Wild Turkey Rare Breed Rye\n**Details:** 56.1% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #393 - Wild Turkey Rare Breed Rye : r/bourbon - Reddit",
+            "url": "https://www.reddit.com/r/bourbon/comments/1fw033l/review_393_wild_turkey_rare_breed_rye/",
+            "domain": "reddit.com",
+            "description": "Wild Turkey Rare Breed Rye. USA - Rye. Current Locally Available Price: USD 70 (2024). Age Statement: NAS. Strength: 56.1% ABV. Details: Not ...Review #558: Wild Turkey \"Rare Breed\" Rye, 56.1%Wild Turkey Rare Breed Rye H",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye - Virginia ABC",
+            "url": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+            "domain": "abc.virginia.gov",
+            "description": "Wild Turkey Rare Breed Rye ; Product 022172 ; Alcohol by Volume: 56.1% ; Proof: 112.2.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #393 - Wild Turkey Rare Breed Rye - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-393-wild-turkey-rare-breed-rye",
+            "domain": "memywifeandwhisky.com",
+            "description": "Wild Turkey Rare Breed Rye · Current Locally Available Price: USD 70 (2024) · Age Statement: NAS · Strength: 56.1% ABV · Details: Not chill filtered.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5571269c63ce426d0230885f415f190f53fca0649adce75017623b48216ef5ba",
+    "mode": "auto"
+  }
+}

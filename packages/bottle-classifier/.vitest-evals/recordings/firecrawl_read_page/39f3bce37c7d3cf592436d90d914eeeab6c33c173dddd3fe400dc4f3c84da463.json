@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:54:11.227Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.astorwines.com/item/53748",
+    "focus": "Verify exact product identity: Single Cask Nation, Mannochmore, cask number, age, distillation year, bottling/release year, maturation/finish, outturn, and ABV."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify exact product identity: Single Cask Nation, Mannochmore, cask number, age, distillation year, bottling/release year, maturation/finish, outturn, and ABV.",
+    "summary": "From cask #173445 , this was distilled in September of 2007 and bottled in the fall of 2024. This aged for 3.5 years in refill recharred red wine barriques.\n\nVintage\n\n2007\n\nABV\n\n61.80%\n\nMannochmore",
+    "results": [
+      {
+        "title": "Single Cask Nation Mannochmore 17 Year Red Wine Barrique Speyside Single Malt Whisky | Astor Wines & Spirits",
+        "url": "https://www.astorwines.com/item/53748",
+        "domain": "astorwines.com",
+        "description": "Welcome to New York City's largest wine & spirits store online. Come see why The Wall Street Journal says Astorwines.com is one of the best websites for buying wine online. Check out our daily deals and features. View our large selection of wines, spirits, and sake. We specialize in everything from old world to new world, organic & natural wines, whiskeys & scotches and everything else.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "39f3bce37c7d3cf592436d90d914eeeab6c33c173dddd3fe400dc4f3c84da463",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:23:30.485Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Four Roses Single Barrel Barrel Strength official product ABV batch release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Single Barrel Barrel Strength official product ABV batch release",
+        "summary": "100 Proof / Aged 7 - 9 Years. A pronounced and elegant single-barrel bourbon experience. expertly-crafted, non-chill-filtered bourbon. Bottled at barrel strength, the 2025 Limited Edition Small Batch is built around two standout 13-year-old V batches, delivering luscious notes of apricot,… 4.58.7K · 5-day delivery Four Roses Small Batch Select — A blend of six recipes, bottled at 104 proof without chill filtration. More intense and complex than the standard Small Batch. This Small Batch Barrel Strength Four Roses is exquisite and robust. ABV: 45% AGE: Toffee penny, Four Roses Limited Edition S",
+        "results": [
+          {
+            "title": "Single Barrel OBSV - Four Roses",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "domain": "fourrosesbourbon.com",
+            "description": "100 Proof / Aged 7 - 9 Years. A pronounced and elegant single-barrel bourbon experience. expertly-crafted, non-chill-filtered bourbon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "2025Limited EditionSmall Batch - Four Roses",
+            "url": "https://www.fourrosesbourbon.com/bourbon/2025-limited-edition-small-batch",
+            "domain": "fourrosesbourbon.com",
+            "description": "Bottled at barrel strength, the 2025 Limited Edition Small Batch is built around two standout 13-year-old V batches, delivering luscious notes of apricot,…",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Bourbon | Yellow Label to Limited Edition - Wooden Cork",
+            "url": "https://woodencork.com/collections/four-roses",
+            "domain": "woodencork.com",
+            "description": "4.58.7K · 5-day delivery Four Roses Small Batch Select — A blend of six recipes, bottled at 104 proof without chill filtration. More intense and complex than the standard Small Batch.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Limited Edition 2022 bourbon whiskey review - Facebook",
+            "url": "https://www.facebook.com/groups/1564511077100004/posts/4516227888594960/",
+            "domain": "facebook.com",
+            "description": "This Small Batch Barrel Strength Four Roses is exquisite and robust. ABV: 45% AGE: Toffee penny,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Limited Edition Small Batch, 2025 - BOURBON GUY",
+            "url": "https://www.bourbonguy.com/blog/2025/8/20/four-roses-limited-edition-small-batch-2025",
+            "domain": "bourbonguy.com",
+            "description": "Four Roses Limited Edition Small Batch, This year's release was built around two batches of 13-year-old bourbon, The suggested retail price is ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b350aa2645bfbacb30ef516ed108fadd39e19dcbae739f56b89839317c17c3b5",
+    "mode": "auto"
+  }
+}

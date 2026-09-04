@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:22:12.454Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Ardbeg Traigh Bhan 19 Year Old official batch release ABV edition"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg Traigh Bhan 19 Year Old official batch release ABV edition",
+        "summary": "In stock 14-day returnsIncredibly rare, this small batch 19 Year Old Ardbeg greets the senses with a delicate aroma of olive oil Curious hints of freshly cut grass, ginger and soot ... In stock Rating 4.823Produced in small batches and released year on year, this exceptionally rare and ever-changing 19 year old draws its inspiration from Islay's Traigh Bhan beach ... Taste: Thin to medium mouthfeel with plenty of honey, ash, pepper, slate, salinity and cedar. Some vanilla bean, lemon curd, pear and sweet ...Scotch Whisky Review #363: Ardbeg Traigh Bhan 19 Year Batch 3 - RedditArdbeg Traigh Bha",
+        "results": [
+          {
+            "title": "Ardbeg 19 Years Old Traigh Bhan Batch 6",
+            "url": "https://www.ardbeg.com/en-gb/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+            "domain": "ardbeg.com",
+            "description": "In stock 14-day returnsIncredibly rare, this small batch 19 Year Old Ardbeg greets the senses with a delicate aroma of olive oil Curious hints of freshly cut grass, ginger and soot ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 'Traigh Bhan' 19 Year Old Single Malt Scotch Whisky",
+            "url": "https://bottlerocket.com/shop/product/ardbeg-traigh-bhan-19-year-old-single-malt-scotch-whisky/622f8f52b56a380295f9b988%3Foption-id%3Dadb32bfeeadde391716d580091ead8f9eba8b812c5f3689cdbadb83ae981c28e%26srsltid%3DAfmBOor2ocrQct5mAs5aqA3njWeNk5zThX3D4QR9oe1tZU0Bol3CUaH9",
+            "domain": "bottlerocket.com",
+            "description": "In stock Rating 4.823Produced in small batches and released year on year, this exceptionally rare and ever-changing 19 year old draws its inspiration from Islay's Traigh Bhan beach ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #2320 - Ardbeg 19 Years Old Traigh Bhan (Batch 4)",
+            "url": "https://www.reddit.com/r/Scotch/comments/1f6isil/review_2320_ardbeg_19_years_old_traigh_bhan_batch/",
+            "domain": "reddit.com",
+            "description": "Taste: Thin to medium mouthfeel with plenty of honey, ash, pepper, slate, salinity and cedar. Some vanilla bean, lemon curd, pear and sweet ...Scotch Whisky Review #363: Ardbeg Traigh Bhan 19 Year Batch 3 - RedditArdbeg ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 'Traigh Bhan' 19 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/ardbeg%2Btraigh%2Bbhan%2Bnineteen%2Bold%2Bsingle%2Bmalt%2Bscotch%2Bwhisky%2Bislay%2Bscotland%3Fsrsltid%3DAfmBOoou_AdjnVwUZf1vUPTMducaKNrUVefEcV9dagrhKjyS5SYp5uvB",
+            "domain": "wine-searcher.com",
+            "description": "Rating 4.6(4)Find the best local price for Ardbeg 'Traigh Bhan' 19 Year Old Single Malt Scotch Whisky, Islay, Scotland. Avg Price (ex-tax) $327 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Traigh Bhan - Batch 7 - 19 Years | Whisky Review - YouTube",
+            "url": "https://www.youtube.com/watch%3Fv%3DQ0_wPtylAog",
+            "domain": "youtube.com",
+            "description": "Comments ; Ardbeg Traigh Bhan 19 Year Old Islay Single Malt Scotch Whisky. Erik Wait Whisky Studies · 8.8K views ; I'm Picking a Fight With Whiskey ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "1da605d5b0655c1afaee199083beaf8043c11a5cec8d4165adc840dcd318dc46",
+    "mode": "auto"
+  }
+}

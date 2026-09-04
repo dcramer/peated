@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:59:01.569Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Harbor Ledger\" \"Batch 24\" 57.4% bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Harbor Ledger\" \"Batch 24\" 57.4% bourbon",
+        "summary": "Dec 31, 2024Review #421 - Booker's 2024-03 'Master Distillers Batch' : r/bourbonReview #15 - Booker's 2024-03 - Master Distillers Batch : r/bourbonMore results from www.reddit.com At around $100, this drinks like a much more expensive bottle: mature oak, roasted peanut, dark caramel, rich spice, excellent proof integration ... Jun 8, 2020 Booker's 2024-04 Bourbon is here. Join us for an in-depth review as we explore its bold flavor profile, barrel-proof strength, and the story ... Batch 024 is a marriage of high rye bourbons ranging in age from 9 to15 years old. The 9, 10, and 13 year-old barr",
+        "results": [
+          {
+            "title": "No More Two-Four (Booker's 2024-04 “Jimmy's Batch” Bourbon review!)",
+            "url": "https://www.reddit.com/r/bourbon/comments/1hqhp3n/no_more_twofour_bookers_202404_jimmys_batch/",
+            "domain": "reddit.com",
+            "description": "Dec 31, 2024Review #421 - Booker's 2024-03 'Master Distillers Batch' : r/bourbonReview #15 - Booker's 2024-03 - Master Distillers Batch : r/bourbonMore results from www.reddit.com",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jim Beam Lineage Batch 2 vs Booker's Reserves 24 - Instagram",
+            "url": "https://www.instagram.com/reel/DUOnJjSDeez/",
+            "domain": "instagram.com",
+            "description": "At around $100, this drinks like a much more expensive bottle: mature oak, roasted peanut, dark caramel, rich spice, excellent proof integration ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Barrell Bourbon Batch 024 Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/barrell-bourbon-batch-024-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Jun 8, 2020",
+            "extraSnippets": []
+          },
+          {
+            "title": "BOOKER'S 2024-04 BOURBON / Hidden Gem or Overhyped?",
+            "url": "https://www.youtube.com/watch?v=DQl6vG71qWU",
+            "domain": "youtube.com",
+            "description": "Booker's 2024-04 Bourbon is here. Join us for an in-depth review as we explore its bold flavor profile, barrel-proof strength, and the story ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "BARRELL BOURBON BATCH 024",
+            "url": "https://www.barrellbourbon.com/post/barrell-bourbon-batch-024",
+            "domain": "barrellbourbon.com",
+            "description": "Batch 024 is a marriage of high rye bourbons ranging in age from 9 to15 years old. The 9, 10, and 13 year-old barrels were chosen for their ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "13ec0a952052928ca1e0fcada2db136a0cc8a6e76e6621ad4aca6c672fc74035",
+    "mode": "auto"
+  }
+}

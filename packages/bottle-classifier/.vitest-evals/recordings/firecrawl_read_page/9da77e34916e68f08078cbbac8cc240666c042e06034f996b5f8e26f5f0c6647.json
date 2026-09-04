@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:44:55.230Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve/",
+    "focus": "Confirm the marketed product title, producer/brand relationship, ABV, age statement, and Caribbean rum-cask maturation wording."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product title, producer/brand relationship, ABV, age statement, and Caribbean rum-cask maturation wording.",
+    "summary": "Caribbean Reserve\n\nExperience a taste of the tropics with The Glenlivet Caribbean Reserve, a single malt whisky selectively* finished in Caribbean rum casks.\n\n40%\n\nSelectively finished in Caribbean rum barrels.",
+    "results": [
+      {
+        "title": "Caribbean Reserve Single Malt Scotch Whisky - The Glenlivet US",
+        "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve/",
+        "domain": "theglenlivet.com",
+        "description": "Caribbean Reserve single malt scotch whisky has been finished in barrels that previously held Caribbean rum, resulting in a balanced and smooth whisky.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9da77e34916e68f08078cbbac8cc240666c042e06034f996b5f8e26f5f0c6647",
+    "mode": "auto"
+  }
+}

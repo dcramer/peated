@@ -1,7 +1,7 @@
 # Bottle classifier evaluation, September 2026
 
 This study compared model settings, corrected unreliable checks, reviewed
-specific failures, and tested twenty classifier changes. The detailed run
+specific failures, and tested twenty-two classifier changes. The detailed run
 records live under
 [`packages/bottle-classifier/evals`](../../packages/bottle-classifier/evals/README.md).
 
@@ -97,29 +97,67 @@ Broad prompt changes and broad source-page reading did not hold up:
   web-enabled run created a duplicate; the result was correct only 2/3.
 - Telling Luna that catalog data is not product evidence was also correct only
   2/3 and selected the wrong Bottle once.
+- A positive and negative Bottle-name pair fixed one name but stripped a word
+  from a different producer-backed name. Full accuracy stayed 3/5.
+- A narrower pair based on producer versus retailer authority made two names
+  more consistent, but full accuracy stayed 10/15. It lost the only Creag Isle
+  pass and changed Black Label's correct category in two runs.
+- Telling Luna to read a result after exhausting search produced no Octomore
+  gain. The unchanged version passed 9/9 focused judgments; the changed version
+  passed 7/9, cost 6.6% more, and made the median case 41.9% slower.
+- Short true, false, and unknown examples for strength and single-cask fields
+  improved focused results from 6/9 to 8/9, while focused cost rose 31.5% and
+  time rose 5.5%. A later broad run returned 78/105 beside a saved 80/105 run.
+  Correcting ambiguous Whistler and Woodford expectations makes the scores
+  78/105 and 80/105, but the runs used different source revisions and still
+  cannot measure the examples. The later run did contain an unsupported
+  exact-cask creation.
 
 These results favor small code checks for facts Peated already knows. Extra
 prompt text and extra model passes need a stronger measured gain.
 
 ## Corrections to the checks
 
-Eight measurement changes make later comparisons more trustworthy. They show
+Ten measurement changes make later comparisons more trustworthy. They show
 the exact field that failed, keep an expected `null` distinct from an omitted
 value, allow reviewed audit outcomes without accepting unrelated edits, and
 give compared versions the same reviewed web and image evidence. We also fixed
-expectations for Jameson Cold Brew, several product names and categories, and
-an unsupported SMWS release year. These corrections are not classifier gains.
+expectations for Jameson Cold Brew, several product names and categories, an
+unsupported SMWS release year, and two name-only sources that cannot identify a
+complete release. These corrections are not classifier gains.
 
 ## What remains
 
-The clearest next problem is expensive audit work. In the latest no-web full
-run, the malformed Laphroaig audit used 87,044 tokens and 97 seconds without
-returning the required operations. A successful Dramfool audit used 49,187
-tokens and 79 seconds. Inspect their tool sequences and missing operations
-before testing a bounded audit change.
+The expensive audit traces did not support a shorter run. Dramfool corrected
+one missing target citation and passed. Laphroaig corrected two different
+rejections before recording an update. Its remaining error was choosing an
+update instead of a duplicate merge. A shorter turn limit would remove useful
+recovery rather than solve that choice.
+
+The flat-page hypothesis did not survive its first control. The unchanged
+classifier handled both Watchpost inputs correctly when it received the exact
+producer page: it left the component age off the Bottle and kept the expected
+Westland distiller. Structured Firecrawl JSON would raise each page read from
+one credit to five, so there was no target gain to justify it.
+
+The old Octomore 13.1 retrieval failure did not reproduce consistently. The
+unchanged classifier passed Octomore in all three new runs by reading a page or
+using strong search evidence. Extra page-read guidance appeared in only one
+changed run, produced no gain, and did not prevent two other failures. The
+change was reverted without a full-suite run.
+
+Paired Boolean examples remain inconclusive. They reliably carried the target
+cask-strength and multi-barrel facts in focused runs, but used more money and
+time. A broad run borrowed an exact cask from web evidence for a source that
+named only a broader batch, producing an unsupported Glenglassaugh creation.
+Its saved control came from different code, so that output cannot be assigned
+to the examples. The schema wording was reverted pending a same-revision
+comparison.
 
 Other repeated problems have separate causes:
 
+- stable Bottle naming still varies, but two general example pairs did not
+  improve complete results safely;
 - some web passages mix whole-product facts with component facts;
 - changing catalog state can make a historical wrong-candidate case obsolete;
 - changing retailer pages can disagree with an older expected release; and

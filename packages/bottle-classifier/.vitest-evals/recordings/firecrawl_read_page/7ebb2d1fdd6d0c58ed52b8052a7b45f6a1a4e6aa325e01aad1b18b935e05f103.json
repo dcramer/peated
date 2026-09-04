@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:26:14.366Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.whiskyconsidered.com/2023/07/28/octomore-bruichladdich-13-1/",
+    "focus": "Confirm the exact marketed product name, age, ABV, release year, maturation/cask details, and whether 13.1 is a distinct release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product name, age, ABV, release year, maturation/cask details, and whether 13.1 is a distinct release",
+    "summary": "Octomore is consistently peated to over 100 ppm, varying by expression (the one reviewed here is just north of 137 ppm phenols).\n\nOctomore 13.1 (137.3 ppm) 59.2% abv\n\nExpression: Octomore 13.1 59.2% abv (Bruichladdich Distillery)\n\nDetails: Mainland Concerto Barley peated to 137.3 PPM, matured for 5 years in Bourbon barrels",
+    "results": [
+      {
+        "title": "Octomore (Bruichladdich) 13.1 – Whisky Considered",
+        "url": "https://www.whiskyconsidered.com/2023/07/28/octomore-bruichladdich-13-1/",
+        "domain": "whiskyconsidered.com",
+        "description": "Specialty shops in UK, EU and major US cities Highly recommended For the details… Islay’s Bruichladdich distillery produces three distinct varietals: the core Bruichladdich range, using unpeated malt, Port Charlotte, using heavily peated malt, and Octomore, using super heavily peated malt. Port Charlotte is the nearest town, and also the name of a now defunct…",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7ebb2d1fdd6d0c58ed52b8052a7b45f6a1a4e6aa325e01aad1b18b935e05f103",
+    "mode": "auto"
+  }
+}

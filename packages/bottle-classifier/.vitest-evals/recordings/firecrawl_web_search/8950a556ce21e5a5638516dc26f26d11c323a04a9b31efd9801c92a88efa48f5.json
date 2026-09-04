@@ -1,0 +1,37 @@
+{
+  "writtenAt": "2026-09-04T19:57:34.693Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Pōkeno \"55.8%\" \"Pedro Ximenez\" \"340\" whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno \"55.8%\" \"Pedro Ximenez\" \"340\" whisky",
+        "summary": "... whisky from the #NewZealand distillery. Aged 4 years in a Pedro Ximenez sherry cask and bottled at 55.8% ABV. this is yet another rare insight into the ... ... whisky from the #NewZealand distillery. Aged 4 years in a Pedro Ximenez sherry cask and bottled at 55.8% ABV. this is yet another rare insight into the ...",
+        "results": [
+          {
+            "title": "Chris Uhde | Old Hickory 20yr bottled around 1969. This whisky is ...",
+            "url": "https://www.instagram.com/p/BBJOp42rnrC/",
+            "domain": "instagram.com",
+            "description": "... whisky from the #NewZealand distillery. Aged 4 years in a Pedro Ximenez sherry cask and bottled at 55.8% ABV. this is yet another rare insight into the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Chris Uhde | Macallan 25yr 43% abv Nose. Rich dry sherry. Some ...",
+            "url": "https://www.instagram.com/p/BBEPNvNLnrT/",
+            "domain": "instagram.com",
+            "description": "... whisky from the #NewZealand distillery. Aged 4 years in a Pedro Ximenez sherry cask and bottled at 55.8% ABV. this is yet another rare insight into the ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8950a556ce21e5a5638516dc26f26d11c323a04a9b31efd9801c92a88efa48f5",
+    "mode": "auto"
+  }
+}

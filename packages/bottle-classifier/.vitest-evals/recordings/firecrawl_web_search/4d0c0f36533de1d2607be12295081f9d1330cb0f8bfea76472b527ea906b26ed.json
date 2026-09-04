@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:27:00.767Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Talisker 2001 The Distillers Edition official product 2001 vintage ABV bottling year",
+      "\"Talisker 2001\" \"The Distillers Edition\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Talisker 2001 The Distillers Edition official product 2001 vintage ABV bottling year",
+        "summary": "Talisker Distillers Edition 45.8% ABV. $80 USD. Distilled in 2001 and bottled in 2012. Served in a Glencairn. Color: Pretty damn amber. Nose: ... Diageo released the first annual(-ish) 25 year old Talisker. was bottled at an ABV of 59.9%, Distillery: Talisker ・ 2001 Age: 25 years ・ ... Talisker - 2001 ; Type: Single Malt Whisky ; Distillation date: 01. Jan 2001 ; Bottling date: 01. Jan 2012 ; ABV: 45.8%. Out of stockProduct Details. Distillery/Brand Talisker. Region Islands. Age 13 year old. Alcohol ABV 45.8% ABV. Vintage 1988. Year Bottled 2001. Cask Wood Type Sherry. Rating 4.5May 21, 2012",
+        "results": [
+          {
+            "title": "Talisker - The Distillers Edition : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/2swigk/talisker_the_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "Talisker Distillers Edition 45.8% ABV. $80 USD. Distilled in 2001 and bottled in 2012. Served in a Glencairn. Color: Pretty damn amber. Nose: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Report: Talisker 25 year old 1975 (2001 bottling)",
+            "url": "http://www.divingforpearlsblog.com/2014/06/single-malt-report-talisker-25-year-old.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Diageo released the first annual(-ish) 25 year old Talisker. was bottled at an ABV of 59.9%, Distillery: Talisker ・ 2001 Age: 25 years ・ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker - 2001 - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html?cHash=c1e3b9bbbced60aa0550b21cfe5545c8&tx_datamintsflaschendb_flaschentastingnotes%5Baction%5D=listGeschmacksbeschreibungen&tx_datamintsflaschendb_flaschentastingnotes%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_flaschentastingnotes%5BcurPage%5D=3",
+            "domain": "whisky.com",
+            "description": "Talisker - 2001 ; Type: Single Malt Whisky ; Distillation date: 01. Jan 2001 ; Bottling date: 01. Jan 2012 ; ABV: 45.8%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 Distillers Edition Single Malt Scotch Whisky 13 Year Old",
+            "url": "https://www.htfw.com/talisker-2001-distillers-edition-single-malt-scotch-1988-13-year-old-whisky",
+            "domain": "htfw.com",
+            "description": "Out of stockProduct Details. Distillery/Brand Talisker. Region Islands. Age 13 year old. Alcohol ABV 45.8% ABV. Vintage 1988. Year Bottled 2001. Cask Wood Type Sherry.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Talisker Distillers Edition 2011 - Distilled 2001 - Drinkhacker",
+            "url": "https://www.drinkhacker.com/2012/05/21/review-talisker-distillers-edition-2012-distilled-2001/",
+            "domain": "drinkhacker.com",
+            "description": "Rating 4.5May 21, 2012",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Talisker 2001\" \"The Distillers Edition\"",
+        "summary": "Rating 4.4(330)Oct 20, 2012 · The Distillers Edition. Talisker 2001. Overall rating: 87.04/100; ratings: 330. Whiskybase ID: WB36535; Category: Single Malt; Distillery. Lot 1945. Talisker 2001 The Distillers Edition Single Malt Scotch (2012). Scotch. Result. $130. Sold. Estimate. $50-$75. Reserve. No Reserve. Size. 750 ml. Talisker 2001 The Distillers Edition 45.8% alc. Double Matured in Amoroso Sherry Wood. Distillery: Talisker Bottler: Distillery Bottling Region: The Islands 14-day returnsTalisker 2001 The Distillers Edition Cask Nr.TD-S: 5OA. Condition: Like New & Unopened | 70cl | 45.8% |",
+        "results": [
+          {
+            "title": "Talisker 2001 - Ratings and Reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+            "domain": "whiskybase.com",
+            "description": "Rating 4.4(330)Oct 20, 2012 · The Distillers Edition. Talisker 2001. Overall rating: 87.04/100; ratings: 330. Whiskybase ID: WB36535; Category: Single Malt; Distillery.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition Single Malt Scotch (2012 ...",
+            "url": "https://www.unicornauctions.com/auction/fc491c1c-af66-4987-8d12-80e1f50db1cc/lot/4d52dba9-baf1-49a2-b68e-cd6034ea196d",
+            "domain": "unicornauctions.com",
+            "description": "Lot 1945. Talisker 2001 The Distillers Edition Single Malt Scotch (2012). Scotch. Result. $130. Sold. Estimate. $50-$75. Reserve. No Reserve. Size. 750 ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition 45.8% - Rare Vintage Whisky",
+            "url": "https://rarevintagewhisky.nl/en/Talisker-2001-The-Distillers-Edition-45.8",
+            "domain": "rarevintagewhisky.nl",
+            "description": "Talisker 2001 The Distillers Edition 45.8% alc. Double Matured in Amoroso Sherry Wood. Distillery: Talisker Bottler: Distillery Bottling Region: The Islands",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition Cask Nr.TD-S: 5OA | Whisky | Spiritory",
+            "url": "https://spiritory.com/talisker-2001-the-distillers-edition-cask-nrtd-s-5oa-36535",
+            "domain": "spiritory.com",
+            "description": "14-day returnsTalisker 2001 The Distillers Edition Cask Nr.TD-S: 5OA. Condition: Like New & Unopened | 70cl | 45.8% | 1969. Price ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker - 2001 - Whisky.com",
+            "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20012012.html",
+            "domain": "whisky.com",
+            "description": "# Talisker  - 2001\nThis bottling of the Talisker is part of the Distillers Edition of the Classic Malts of Scotland.\n\nThis bottling of the Talisker is part of the Distillers Edition of the Classic Malts of Scotland.\n\n| D",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4d0c0f36533de1d2607be12295081f9d1330cb0f8bfea76472b527ea906b26ed",
+    "mode": "auto"
+  }
+}

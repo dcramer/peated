@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T18:26:07.701Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Octomore 13.1 official Bruichladdich 61.1% 5 years release 2022",
+      "Octomore 13.1 Bruichladdich product title ABV age official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 official Bruichladdich 61.1% 5 years release 2022",
+        "summary": "Nov 4, 2022Scotch Whisky Review #420: Octomore 13.1Octomore Series 13 Review : r/ScotchMore results from www.reddit.com Out of stock Rating 5.0(1)Sale price£140.00. The limited edition 2022 release is part of the Octomore series, The whisky has been aged in ex bourbon barrels for 5 years. Jul 5, 2026 In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ... Out of stock Rating 4.98(2022) Regular price £160.00 GBP. Age: 5 Year Old ABV: 59.20% of sweet nutty smoke, loaded",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Nov 4, 2022Scotch Whisky Review #420: Octomore 13.1Octomore Series 13 Review : r/ScotchMore results from www.reddit.com",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich - 5 Year Old (Octomore 13.1)",
+            "url": "https://www.stillspirit.com/en-us/products/bruichladdich-5-year-old-octomore-13-1",
+            "domain": "stillspirit.com",
+            "description": "Out of stock Rating 5.0(1)Sale price£140.00. The limited edition 2022 release is part of the Octomore series, The whisky has been aged in ex bourbon barrels for 5 years.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "Jul 5, 2026",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 Bourbon Cask (2022) - The Whisky Barrel",
+            "url": "https://www.thewhiskybarrel.com/products/bruichladdich-octomore-13-1-bourbon-cask-2022",
+            "domain": "thewhiskybarrel.com",
+            "description": "Out of stock Rating 4.98(2022) Regular price £160.00 GBP. Age: 5 Year Old ABV: 59.20% of sweet nutty smoke, loaded",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 Bruichladdich product title ABV age official",
+        "summary": "Nov 4, 2022 Comments · Bruichladdich Octomore 13.1 Super Heavily Peated Scotch · Who Does Sherry The Best? · You're using the Dock WRONG - do THIS instead! Jul 5, 2026 Octomore is the über-peated whisky produced at Bruichladdich Distillery on the isle of Islay, Scotland. Most official releases follow a specific numbering ... Expression: Octomore 13.1 59.2% abv (Bruichladdich Distillery). Bottler: Proprietor. Range: Octomore. Bottle Code: L165405 22/084 2022/03/15 17 ...",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Nov 4, 2022",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "Comments · Bruichladdich Octomore 13.1 Super Heavily Peated Scotch · Who Does Sherry The Best? · You're using the Dock WRONG - do THIS instead!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "Jul 5, 2026",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore - Whisky Saga",
+            "url": "https://www.whiskysaga.com/octomore",
+            "domain": "whiskysaga.com",
+            "description": "Octomore is the über-peated whisky produced at Bruichladdich Distillery on the isle of Islay, Scotland. Most official releases follow a specific numbering ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore (Bruichladdich) 13.1 - Whisky Considered",
+            "url": "https://whiskyconsidered.com/2023/07/28/octomore-bruichladdich-13-1/",
+            "domain": "whiskyconsidered.com",
+            "description": "Expression: Octomore 13.1 59.2% abv (Bruichladdich Distillery). Bottler: Proprietor. Range: Octomore. Bottle Code: L165405 22/084 2022/03/15 17 ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d791631d6866d2473744c447136b25a01121c7709335fde651b8c3b78402e912",
+    "mode": "auto"
+  }
+}

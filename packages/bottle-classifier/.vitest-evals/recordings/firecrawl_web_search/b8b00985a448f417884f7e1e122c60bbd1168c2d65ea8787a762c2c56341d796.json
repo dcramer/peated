@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:50:42.407Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Wild Turkey Rare Breed Rye Barrel Proof 56.1 ABV official product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye Barrel Proof 56.1 ABV official product",
+        "summary": "This will be the first permanent rye product from Wild Turkey, coming in at barrel proof. Proof: 112.2 (56.1% ABV) Price: $60 Official Website # Blog\n## Wild Turkey Rare Breed Rye\n**Details:** 56.1% ABV Wild Turkey released the rye whiskey version of Rare Breed in 2020. .5% ABV. Rare Breed rye could be anywhere from -0.3% to +1.0% ABV prior to ...Review #393 - Wild Turkey Rare Breed RyeReview #032: Wild Turkey Rare Breed RyeMore results from www.reddit.com # WILD TURKEY RARE BREED RYE\nA small batch, barrel proof blend of our finest rye whiskey\n\nWild Turkey Rare Breed Rye, 750Ml\n\nA small batch,",
+        "results": [
+          {
+            "title": "Wild Turkey Rare Breed Rye Review - Whiskey in my Wedding Ring",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "This will be the first permanent rye product from Wild Turkey, coming in at barrel proof. Proof: 112.2 (56.1% ABV) Price: $60 Official Website",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye - BOURBON GUY",
+            "url": "https://www.bourbonguy.com/blog/2020/10/8/wild-turkey-rare-breed-rye",
+            "domain": "bourbonguy.com",
+            "description": "# Blog\n## Wild Turkey Rare Breed Rye\n**Details:** 56.1% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #587: Wild Turkey Rare Breed Rye Whiskey : r/bourbon - Reddit",
+            "url": "https://www.reddit.com/r/bourbon/comments/10l5sr5/review_587_wild_turkey_rare_breed_rye_whiskey/",
+            "domain": "reddit.com",
+            "description": "Wild Turkey released the rye whiskey version of Rare Breed in 2020. .5% ABV. Rare Breed rye could be anywhere from -0.3% to +1.0% ABV prior to ...Review #393 - Wild Turkey Rare Breed RyeReview #032: Wild Turkey Rare Bree",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey | Wild Turkey Bourbon",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "# WILD TURKEY RARE BREED RYE\nA small batch, barrel proof blend of our finest rye whiskey\n\nWild Turkey Rare Breed Rye, 750Ml\n\nA small batch, barrel proof, non-chill filtered blend of select ryes, Rare Breed Rye ages perfe",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Barrel Proof Rye 112 Proof 750ml - Barrel Shoppe",
+            "url": "https://barrelshoppe.com/products/wild-turkey-rare-breed-barrel-proof-rye",
+            "domain": "barrelshoppe.com",
+            "description": "With a bold yet smooth blend of spice, oak, and a hint of sweetness, Rare Breed Rye offers a remarkable sipping experience. View full details.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b8b00985a448f417884f7e1e122c60bbd1168c2d65ea8787a762c2c56341d796",
+    "mode": "auto"
+  }
+}

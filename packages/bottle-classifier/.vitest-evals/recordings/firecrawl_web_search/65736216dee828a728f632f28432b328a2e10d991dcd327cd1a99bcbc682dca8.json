@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:51:04.423Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Jameson Cold Brew Irish Whiskey official product coffee ABV liqueur"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Jameson Cold Brew Irish Whiskey official product coffee ABV liqueur",
+        "summary": "Jameson Cold Brew combines the smooth taste of triple distilled-Jameson and the richness of natural Arabica bean cold brew coffee flavor into one bottle. Rating 4.7(277) · Free delivery over $50 · 60-day returnsJameson Cold Brew Irish Whiskey delivers the smooth taste of triple-distilled Jameson Irish Whiskey with cold brew coffee flavor. 60 proof or 30% alcohol by ... In stockJameson Cold Brew Whiskey & Coffee is a blend of triple-distilled Irish whiskey and Arabica coffee from Brazil and Colombia. Alcohol 30 % ABV it's a whiskey with coffee and chocolate notes. 30% and mostly tastes of coffe",
+        "results": [
+          {
+            "title": "Jameson Cold Brew",
+            "url": "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+            "domain": "jamesonwhiskey.com",
+            "description": "Jameson Cold Brew combines the smooth taste of triple distilled-Jameson and the richness of natural Arabica bean cold brew coffee flavor into one bottle.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Coffee Irish Whisky, 750 ml - Ralphs",
+            "url": "https://www.ralphs.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
+            "domain": "ralphs.com",
+            "description": "Rating 4.7(277) · Free delivery over $50 · 60-day returnsJameson Cold Brew Irish Whiskey delivers the smooth taste of triple-distilled Jameson Irish Whiskey with cold brew coffee flavor. 60 proof or 30% alcohol by ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Whiskey & Coffee - Bondston",
+            "url": "https://www.bondston.com/jameson-cold-brew-whiskey-coffee-p11067",
+            "domain": "bondston.com",
+            "description": "In stockJameson Cold Brew Whiskey & Coffee is a blend of triple-distilled Irish whiskey and Arabica coffee from Brazil and Colombia. Alcohol 30 % ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Anyone here tried Jameson Cold Brew? Verdict? : r/irishwhiskey",
+            "url": "https://www.reddit.com/r/irishwhiskey/comments/jgy5h4/anyone_here_tried_jameson_cold_brew_verdict/",
+            "domain": "reddit.com",
+            "description": "it's a whiskey with coffee and chocolate notes. 30% and mostly tastes of coffee. It's pretty good with ice and it's only €25 here in Ireland, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Irish Whiskey Cold Brew - Bourbon Central",
+            "url": "https://thebourboncentral.com/products/jameson-irish-whiskey-cold-brew-750ml",
+            "domain": "thebourboncentral.com",
+            "description": "Out of stock Rating 4.7349Jameson Cold Brew has an alcohol by volume (ABV) of 30%, which is lower than standard Jameson Irish Whiskey but still provides a bold, flavorful experience.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "65736216dee828a728f632f28432b328a2e10d991dcd327cd1a99bcbc682dca8",
+    "mode": "auto"
+  }
+}

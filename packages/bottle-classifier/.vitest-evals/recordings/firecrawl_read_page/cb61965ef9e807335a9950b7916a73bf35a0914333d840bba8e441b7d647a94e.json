@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:46:02.507Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate",
+    "focus": "Confirm the marketed product title, Batch 4 wording, age, ABV, release year, and whether it is an official Glenmorangie release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product title, Batch 4 wording, age, ABV, release year, and whether it is an official Glenmorangie release",
+    "summary": null,
+    "results": [
+      {
+        "title": "The Cadboll Estate, 2024 Batch 4 | Glenmorangie",
+        "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate",
+        "domain": "glenmorangie.com",
+        "description": "Buy Online. The Cadboll Estate 2024 is our whisky created entirely with Barley from our own fields & water from our Scottish Highlands spring., Render hosted liquid elements to pixel perfect parameters.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cb61965ef9e807335a9950b7916a73bf35a0914333d840bba8e441b7d647a94e",
+    "mode": "auto"
+  }
+}

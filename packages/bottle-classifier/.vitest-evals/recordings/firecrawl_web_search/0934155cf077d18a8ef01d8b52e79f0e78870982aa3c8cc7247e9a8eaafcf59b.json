@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:24:57.146Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Lagavulin Distillers Edition annual release vintage year bottling year official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Lagavulin Distillers Edition annual release vintage year bottling year official",
+        "summary": "The 2021 edition, the last one with a vintage, said 2006-2021–so the maximum that one could have been is 15, but it also could have been 14 ...Lagavulin distiller's editionReview #21: Lagavulin Distillers Edition 1999-2015More results from www.reddit.com The first bottling of Lagavulin 12 Year Old Cask Strength was launched as part of Diageo's Special Releases in 2002. They continue to be released annually and ... DE always had a vintage listed, as well as the release year, on its label. It was 16-18 years old, until 2020 it dropped to a 14-15yo. in 2022 ... # Lagavulin Distillers Edition Revi",
+        "results": [
+          {
+            "title": "Lagavulin Distiller's edition 16 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1aihr2t/lagavulin_distillers_edition_16/",
+            "domain": "reddit.com",
+            "description": "The 2021 edition, the last one with a vintage, said 2006-2021–so the maximum that one could have been is 15, but it also could have been 14 ...Lagavulin distiller's editionReview #21: Lagavulin Distillers Edition 1999-20",
+            "extraSnippets": []
+          },
+          {
+            "title": "An Auctioneer's Guide To Lagavulin",
+            "url": "https://magazine.whisky.auction/how-to/how-to-read-a-lagavulin-label/",
+            "domain": "magazine.whisky.auction",
+            "description": "The first bottling of Lagavulin 12 Year Old Cask Strength was launched as part of Diageo's Special Releases in 2002. They continue to be released annually and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition (2023, USA) - Diving for Pearls",
+            "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "DE always had a vintage listed, as well as the release year, on its label. It was 16-18 years old, until 2020 it dropped to a 14-15yo. in 2022 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition Review | E-150A EXPOSÉ - YouTube",
+            "url": "https://www.youtube.com/watch?v=wxOholQ6Wa4",
+            "domain": "youtube.com",
+            "description": "# Lagavulin Distillers Edition Review | E-150A EXPOSÉ | Whisky Whistle 759\n### [Lagavulin Distillers Edition](https://www.youtube.com/watch?v=4nfcimKeysc)\n22K7y ago\n\n### [10 Scotches Only SMART Buyers Know](https://www.y",
+            "extraSnippets": []
+          },
+          {
+            "title": "How does Lagavulin Distiller's Edition compare to 16 year? - Facebook",
+            "url": "https://www.facebook.com/groups/299731989586/posts/10162061592374587/",
+            "domain": "facebook.com",
+            "description": "Many prefer the Distiller's Edition over the 16 year, citing its balanced taste and unique finish. ... Better than the 16 but really thin at 43%.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0934155cf077d18a8ef01d8b52e79f0e78870982aa3c8cc7247e9a8eaafcf59b",
+    "mode": "auto"
+  }
+}

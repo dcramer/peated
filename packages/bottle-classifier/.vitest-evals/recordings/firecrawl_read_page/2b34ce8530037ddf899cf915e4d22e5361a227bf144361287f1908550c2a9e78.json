@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:35:03.054Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://collezionenewyork.com/products/the-macallan-1994-18yo-sherry-oak-750ml-43-abv",
+    "focus": "Confirm the exact marketed product name, 1994 vintage, stated age, and ABV"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product name, 1994 vintage, stated age, and ABV",
+    "summary": "The Macallan 1994 18yo Sherry Oak 750ml 43%abv",
+    "results": [
+      {
+        "title": "The Macallan 1994 18yo Sherry Oak 750ml | Collezione New York",
+        "url": "https://collezionenewyork.com/products/the-macallan-1994-18yo-sherry-oak-750ml-43-abv",
+        "domain": "collezionenewyork.com",
+        "description": "The Macallan 1994 18yo Sherry Oak 750ml. Scotch whisky curated by Collezione New York for private acquisition on Madison Avenue.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2b34ce8530037ddf899cf915e4d22e5361a227bf144361287f1908550c2a9e78",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:24:17.899Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Highland Park Cask Strength No. 5 official release ABV edition"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Highland Park Cask Strength No. 5 official release ABV edition",
+        "summary": "# BARLEYCORN REVIEW! Highland Park Cask Strength Release No. 5\n## Highland Park Cask Strength Release No. 5\nABV: 129.4 Proof (64.7%) The Whiskey Shelf tries the burly 64.7% ABV single malt Scotch in this Highland Park Cask Strength Batch 5 review. In stock Rating 5.0325 Release. $101.99. Earn up to 5% back on this product with Caskers Rewards. Size750mL Proof129.4 (64.7% ABV) *Please note that the ABV of this bottle may vary. Rating 9/10Oct 18, 2024 · For Release No. 5, the distillery says it “has been matured predominantly in first-fill, sherry-seasoned European oak casks – including Pedro ..",
+        "results": [
+          {
+            "title": "BARLEYCORN REVIEW! Highland Park Cask Strength Release No. 5",
+            "url": "https://www.barleycorndrinks.com/barleycorn-review-highland-park-cask-strength-release-no-5/",
+            "domain": "barleycorndrinks.com",
+            "description": "# BARLEYCORN REVIEW! Highland Park Cask Strength Release No. 5\n## Highland Park Cask Strength Release No. 5\nABV: 129.4 Proof (64.7%)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength Batch 5 Review [In Depth] - The Whiskey Shelf",
+            "url": "https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/",
+            "domain": "thewhiskeyshelf.com",
+            "description": "The Whiskey Shelf tries the burly 64.7% ABV single malt Scotch in this Highland Park Cask Strength Batch 5 review.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No. 5 Release - Caskers",
+            "url": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+            "domain": "caskers.com",
+            "description": "In stock Rating 5.0325 Release. $101.99. Earn up to 5% back on this product with Caskers Rewards. Size750mL Proof129.4 (64.7% ABV) *Please note that the ABV of this bottle may vary.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Highland Park Cask Strength Release No. 5 - Drinkhacker",
+            "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+            "domain": "drinkhacker.com",
+            "description": "Rating 9/10Oct 18, 2024 · For Release No. 5, the distillery says it “has been matured predominantly in first-fill, sherry-seasoned European oak casks – including Pedro ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No 5 : r/whisky - Reddit",
+            "url": "https://www.reddit.com/r/whisky/comments/1db2hvn/highland_park_cask_strength_no_5/",
+            "domain": "reddit.com",
+            "description": "Various online reviews seem to confirm this, in as far as the Cask Strength releases seem to be getting better with each generation. ... 64.7% Abv ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a35a8c7226e4fa6c7addd8e1ae9bc41dec0b85f39573b94617b6c3a5b35b6af7",
+    "mode": "auto"
+  }
+}

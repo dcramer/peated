@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:22:24.192Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.ardbeg.com/en-gb/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+    "focus": "Confirm whether Traigh Bhan 19 is marketed by batch and identify the batch and ABV shown on the official product page"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm whether Traigh Bhan 19 is marketed by batch and identify the batch and ABV shown on the official product page",
+    "summary": "Ardbeg 19 Years Old Traigh Bhan Batch 6 Islay Single Malt Scotch Whisky\n\nAGE19 Years Old\n\nABV46.2%",
+    "results": [
+      {
+        "title": "Ardbeg 19 Years Old Traigh Bhan Batch 6 | Islay Single Malt Scotch Whisky\n – Ardbeg - UK Market",
+        "url": "https://www.ardbeg.com/en-gb/products/ardbeg-19-years-old-traigh-bhan-batch-6",
+        "domain": "ardbeg.com",
+        "description": "Discover Ardbeg 19 Years Old Traigh Bhan Batch 6, a rare small batch Islay single malt Scotch whisky. Gusts of herbs and fennel mingle with citrus before a tidal wave of smoke. Explore tasting notes, ABV and buy online.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "15eb564025acee28648d99b7c1a2a5f969ad5afaf48b1a14445d3af82025c6ad",
+    "mode": "auto"
+  }
+}

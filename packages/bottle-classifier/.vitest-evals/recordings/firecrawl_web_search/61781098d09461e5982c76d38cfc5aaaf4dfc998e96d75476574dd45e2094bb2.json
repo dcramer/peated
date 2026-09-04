@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:27:28.950Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey Boann Distillery",
+      "\"The Whistler Bodega Cask\" whiskey ABV age"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Whistler\" \"Bodega Cask\" single malt Irish whiskey Boann Distillery",
+        "summary": "4.22.7K · $19.49 deliveryThe Whistler Bodega Cask ... Boann has released a line of Irish Whiskeys called 'The Whistler.' The ... # World’s Best Irish whiskey\n### Bodega Cask\nThe Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole life.\n\n[Learn more](https://thewhistlerwhiskey.com/whiskey/bodega-cask/)\n\nThe Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole life.\n\n[Learn more](https://thewhistlerw",
+        "results": [
+          {
+            "title": "The Whistler - Flaviar",
+            "url": "https://flaviar.com/collections/the-whistler",
+            "domain": "flaviar.com",
+            "description": "4.22.7K · $19.49 deliveryThe Whistler Bodega Cask ... Boann has released a line of Irish Whiskeys called 'The Whistler.' The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Whiskey – Sit and Whistle A While",
+            "url": "https://thewhistlerwhiskey.com/",
+            "domain": "thewhistlerwhiskey.com",
+            "description": "# World’s Best Irish whiskey\n### Bodega Cask\nThe Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole life.\n\n[Learn more]",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Single Malt Irish Whiskey 750ml",
+            "url": "https://www.liquoronbroadway.com/products/the-whistler-bodega-cask-single-malt-irish-whiskey",
+            "domain": "liquoronbroadway.com",
+            "description": "In stock Rating 5.01Buy The Whistler Bodega Cask Single Malt Irish Whiskey 750ml. Fully matured in oloroso sherry casks delivering rich dried fruit, spice, and nutty sweetness.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bodega Cask - The Whistler Whiskey",
+            "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+            "domain": "thewhistlerwhiskey.com",
+            "description": "[Skip to Content](https://thewhistlerwhiskey.com/whiskey/bodega-cask/#primary) [Skip to navigation](https://thewhistlerwhiskey.com/whiskey/bodega-cask/#primary-nav)\n\nSingle Malts\n\n# **The famed Bodegas**    of Jerez de l",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Single Malt Irish Whiskey - Wine-Searcher",
+            "url": "https://www.wine-searcher.com/find/the+whistler+cask+single+malt+whisky+ireland",
+            "domain": "wine-searcher.com",
+            "description": "Rating 90%(1)Find the best local price for The Whistler Bodega Cask Single Malt Irish Whiskey, Ireland. Avg Price (ex-tax) $55 / 750ml. Find and shop from stores and ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"The Whistler Bodega Cask\" whiskey ABV age",
+        "summary": "Rating 4/10(1)Mar 23, 2021 · We review The Whistler Bodega Cask Irish Single Malt, an Irish whiskey aged ... 92 proof, 46% ABV. Aged for five years in sherry butts from ... 4.22.7K · $19.49 delivery... Whiskey. Engravable. No reviews. The Whistler Bodega Cask Single Malt Irish Whiskey. 750ml . 46% ABV. $51.99. Earn. 612. points. Add to cart See details. A review of the Whistler Bodega, a 46% small batch Irish whiskey that's been triple distilled and aged ... The Whistler Bodega Cask Whiskey Review. PROOF 92 (46% ABV) ... Home PageIrish WhiskeyThe Whistler Bodega Cask Single Malt Irish Whiskey",
+        "results": [
+          {
+            "title": "The Whistler Bodega Cask Irish Single Malt Whiskey Review",
+            "url": "https://thewhiskeywash.com/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
+            "domain": "thewhiskeywash.com",
+            "description": "Rating 4/10(1)Mar 23, 2021 · We review The Whistler Bodega Cask Irish Single Malt, an Irish whiskey aged ... 92 proof, 46% ABV. Aged for five years in sherry butts from ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler - Flaviar",
+            "url": "https://flaviar.com/collections/the-whistler",
+            "domain": "flaviar.com",
+            "description": "4.22.7K · $19.49 delivery... Whiskey. Engravable. No reviews. The Whistler Bodega Cask Single Malt Irish Whiskey. 750ml . 46% ABV. $51.99. Earn. 612. points. Add to cart See details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Whiskey Review - YouTube",
+            "url": "https://www.youtube.com/watch?v=b_7qS0oMP7E",
+            "domain": "youtube.com",
+            "description": "A review of the Whistler Bodega, a 46% small batch Irish whiskey that's been triple distilled and aged ... The Whistler Bodega Cask Whiskey Review.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Single Malt Irish Whiskey - Fine Wine ...",
+            "url": "https://finewineliquors.eu/product/the-whistler-bodega-cask-single-malt-irish-whiskey/",
+            "domain": "finewineliquors.eu",
+            "description": "PROOF 92 (46% ABV) ... Home PageIrish WhiskeyThe Whistler Bodega Cask Single Malt Irish Whiskey ... Teeling Carcavelos Barrel Aged Single Cask Irish Whiskey ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/167533/the-whistler-bodega-cask?language=zh-CN",
+            "domain": "whiskybase.com",
+            "description": "The Whistler Bodega Cask 05 yr. The strength of this whisky is 46.0 % Vol. A bottle from Boann Distillery.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "61781098d09461e5982c76d38cfc5aaaf4dfc998e96d75476574dd45e2094bb2",
+    "mode": "auto"
+  }
+}

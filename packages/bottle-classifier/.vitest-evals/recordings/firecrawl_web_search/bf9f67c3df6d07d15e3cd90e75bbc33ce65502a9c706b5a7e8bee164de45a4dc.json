@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:32:58.922Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Watchpost\" whisky \"Westland\" 42.5",
+      "\"Watchpost\" whiskey \"Westland Distillery\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Watchpost\" whisky \"Westland\" 42.5",
+        "summary": "In stock Rating 4.03... bourbon grain whiskey, 42.5% ABV. Order online with fast shipping ... Westland Watchpost is an 8-year American Blended Whiskey from Seattle's Westland Distillery ... In stock Rating 4.9(7)It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ... Watchpost Whiskey will be available exclusively in Washington State beginning August 1, 2025, with bottles for sale at Westland's SoDo ... Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV",
+        "results": [
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey",
+            "domain": "woodencork.com",
+            "description": "In stock Rating 4.03... bourbon grain whiskey, 42.5% ABV. Order online with fast shipping ... Westland Watchpost is an 8-year American Blended Whiskey from Seattle's Westland Distillery ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - Westland Distillery",
+            "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+            "domain": "westlanddistillery.com",
+            "description": "In stock Rating 4.9(7)It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Announcing Watchpost American Blended Whiskey From the Team at ...",
+            "url": "https://sipmagazine.com/announcing-watchpost-american-blended-whiskey-from-the-team-at-westland-distillery/",
+            "domain": "sipmagazine.com",
+            "description": "Watchpost Whiskey will be available exclusively in Washington State beginning August 1, 2025, with bottles for sale at Westland's SoDo ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - thewhiskeywench",
+            "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+            "domain": "thewhiskeywench.com",
+            "description": "Watchpost is a new blended whiskey from Washington's own Westland Distillery. ... ABV: 42.5% | Cost: $35-$40. I really enjoyed this both ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost 8 Year Old Blended American Whiskey",
+            "url": "https://www.blackwellswines.com/products/westland-watchpost-8-year-old-blended-american-whiskey",
+            "domain": "blackwellswines.com",
+            "description": "In stock Rating 4.03Westland Watchpost 8 Year Old Blended American Whiskey is a distinctive Pacific Northwest whiskey ... 42.5% ABV (85 Proof), emphasizing accessibility and ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Watchpost\" whiskey \"Westland Distillery\"",
+        "summary": "In stock Rating 4.9(7)It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ... In stock Rating 4.03Bold and balanced, Watchpost 8 Year Blended Whiskey by Westland Distillery offers rich malt, oak, and spice with smooth American craft character on Royal ... $20 delivery 30-day returnsWestland Distillery. Shop ... Watchpost Whiskey. $34.99. Blended For Adventure. Beer Cask Finish. - +. Add to ... In stock Rating 4.03Westland Watchpost is an 8-year American Blended Whiskey from Seattle's Wes",
+        "results": [
+          {
+            "title": "Watchpost Whiskey - Westland Distillery",
+            "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+            "domain": "westlanddistillery.com",
+            "description": "In stock Rating 4.9(7)It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost 8-Year Blended Whiskey - Westland Distillery - Royal Batch",
+            "url": "https://www.royalbatch.com/watchpost-8-year-blended-whiskey-by-westland-distillery",
+            "domain": "royalbatch.com",
+            "description": "In stock Rating 4.03Bold and balanced, Watchpost 8 Year Blended Whiskey by Westland Distillery offers rich malt, oak, and spice with smooth American craft character on Royal ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "All Westland Products",
+            "url": "https://westlanddistillery.com/collections/all-westland-products",
+            "domain": "westlanddistillery.com",
+            "description": "$20 delivery 30-day returnsWestland Distillery. Shop ... Watchpost Whiskey. $34.99. Blended For Adventure. Beer Cask Finish. - +. Add to ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey",
+            "domain": "woodencork.com",
+            "description": "In stock Rating 4.03Westland Watchpost is an 8-year American Blended Whiskey from Seattle's Westland Distillery — the distillery's signature five-malt single malt (matured in ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Announcing Watchpost American Blended Whiskey From the Team at ...",
+            "url": "https://sipmagazine.com/announcing-watchpost-american-blended-whiskey-from-the-team-at-westland-distillery/",
+            "domain": "sipmagazine.com",
+            "description": "“Watchpost is for people who value where something comes from as much as how it tastes.” True to Westland Distillery's long-standing commitment ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "bf9f67c3df6d07d15e3cd90e75bbc33ce65502a9c706b5a7e8bee164de45a4dc",
+    "mode": "auto"
+  }
+}

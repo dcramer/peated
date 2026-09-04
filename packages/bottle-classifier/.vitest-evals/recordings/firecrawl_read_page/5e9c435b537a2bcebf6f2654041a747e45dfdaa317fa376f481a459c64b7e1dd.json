@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:29:20.542Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+    "focus": "Confirm the marketed product name, bourbon category, alcohol by volume, and whether this is an official Woodford Reserve release rather than an independent bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product name, bourbon category, alcohol by volume, and whether this is an official Woodford Reserve release rather than an independent bottling",
+    "summary": "Woodford Reserve Double Oaked Bottle\n\nDouble Oaked\n\nAn innovative approach to twice-barreled bourbon creates the rich and colorful flavor of Woodford Reserve Double Oaked. Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character.\n\nProof\n\n90.4 °\n\n[\\ \\ Double Double Oaked](https://www.woodfordreserve.com/whiskey/double-double-oaked/)",
+    "results": [
+      {
+        "title": "Double Oaked - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": "An innovative approach to twice-barreled bourbon creates the rich and colorful flavor of Woodford Reserve Double Oaked. Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5e9c435b537a2bcebf6f2654041a747e45dfdaa317fa376f481a459c64b7e1dd",
+    "mode": "auto"
+  }
+}

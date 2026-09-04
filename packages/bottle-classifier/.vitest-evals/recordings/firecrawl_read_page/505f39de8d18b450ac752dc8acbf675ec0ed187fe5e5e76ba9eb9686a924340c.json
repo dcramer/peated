@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:37:46.862Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750",
+    "focus": "Confirm the exact marketed product title, stated age, ABV, and whether the product is a single malt or any other release-specific wording."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product title, stated age, ABV, and whether the product is a single malt or any other release-specific wording.",
+    "summary": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky 750ml Bottle\n\nShieldaig Speyside Sin Malt 30Yr Scotch Whisky\n\n750ml Bottle\n\n[750ml (Single)](https://www.totalwine.com/p/219106750-1)\n\nCountry\n\n[Single Malt](https://www.totalwine.com/spirits/single-malt/single-malt/c/000887)\n\n43%",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750",
+        "domain": "totalwine.com",
+        "description": "Shop Shieldaig Speyside Sin Malt 30Yr Scotch Whisky at the best prices. Explore thousands of wines, spirits and beers, and shop online for delivery or pickup in a store near you.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "505f39de8d18b450ac752dc8acbf675ec0ed187fe5e5e76ba9eb9686a924340c",
+    "mode": "auto"
+  }
+}

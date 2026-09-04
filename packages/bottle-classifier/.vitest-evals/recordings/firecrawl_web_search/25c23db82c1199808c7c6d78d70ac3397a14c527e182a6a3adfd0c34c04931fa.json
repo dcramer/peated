@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:38:00.776Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Whiskyland\" \"Glenturret\" \"35\" \"Decadent Drinks\"",
+      "\"Decadent Drinks\" \"Glenturret\" \"35-year-old\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Whiskyland\" \"Glenturret\" \"35\" \"Decadent Drinks\"",
+        "summary": "# Shop\n- ![WL29 - Glenturret - Front](https://decadent-drinks.com/sites/default/files/styles/thumbnail/public/2026-04/WL29%20-%20Glenturret%20-%20Front.JPG?itok=BFdIHfGh)\n- ![WL29 - Glenturret - Back](https://decadent-drinks.com/sites/default/files/styles/thumbnail/public/2026-04/WL29%20-%20Glenturret%20-%20Back.JPG?itok=bDc4n92j)\n- ![WL29 - Glenturret - Hero](https://decadent-drinks.com/sites/default/files/styles/thumbnail/public/2026-04/WL29%20-%20Glenturret%20-%20Hero.JPG?itok=1Ae7VeRi)\n\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the n",
+        "results": [
+          {
+            "title": "Whiskyland Twenty Nine Glenturret 35 years old - Decadent Drinks",
+            "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+            "domain": "decadent-drinks.com",
+            "description": "# Shop\n- ![WL29 - Glenturret - Front](https://decadent-drinks.com/sites/default/files/styles/thumbnail/public/2026-04/WL29%20-%20Glenturret%20-%20Front.JPG?itok=BFdIHfGh)\n- ![WL29 - Glenturret - Back](https://decadent-dr",
+            "extraSnippets": []
+          },
+          {
+            "title": "[BUY] Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine ...",
+            "url": "https://caskcartel.com/collections/whiskey/products/glenturret-35-year-old-1990-whiskyland-chapter-twenty-nine-decadent-drinks-single-malt-scotch-whisky-700ml",
+            "domain": "caskcartel.com",
+            "description": "Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine (Decadent Drinks) Single Malt Scotch Whisky | 700ML Tasting Notes. Nose: White fruits, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenturret 1990 DeDr - Ratings and Reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/297786/glenturret-1990-dedr",
+            "domain": "whiskybase.com",
+            "description": "Rating 4.5(33)Apr 10, 2026 · Explore Glenturret 1990 DeDr, a 35-year-old whisky bottled by Decadent Drinks at 41.5% ABV, with ratings, reviews and bottle details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskyland Chapter Twenty Nine Glenturret 35 Years Old ... - Instagram",
+            "url": "https://www.instagram.com/p/DXcCsbPCeaA/",
+            "domain": "instagram.com",
+            "description": "Photo by Decadent Drinks on April 22, 2026. 116 likes. decadentdrinks. Whiskyland Chapter Twenty Nine Glenturret 35 Years Old 35 Years Old ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine ...",
+            "url": "https://www.masterofmalt.com/whiskies/glenturret/glenturret-35-year-old-1990-whiskyland-chapter-twenty-nine-decadent-drinks-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "12–13 day delivery 14-day returnsGlenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine (Decadent Drinks) ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Decadent Drinks\" \"Glenturret\" \"35-year-old\"",
+        "summary": "# Shop\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the nick of time and marvel at its soft, generous waxiness, its phantasmagoric mineral properties, its luscious white and yellow fruit notes and its general old school glory. Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine (Decadent Drinks) Single Malt Scotch Whisky | 700ML Tasting Notes. Nose: White fruits, ... 12–13 day delivery 14-day returnsGlenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine (Decadent Drinks) ... Rating 4.5(64)Sep 27, 2021 · Explore Glenturret 35-",
+        "results": [
+          {
+            "title": "Whiskyland Twenty Nine Glenturret 35 years old - Decadent Drinks",
+            "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+            "domain": "decadent-drinks.com",
+            "description": "# Shop\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the nick of time and marvel at its soft, generous waxiness, its phantasmagoric mineral properties, its luscious wh",
+            "extraSnippets": []
+          },
+          {
+            "title": "[BUY] Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine ...",
+            "url": "https://caskcartel.com/collections/whiskey/products/glenturret-35-year-old-1990-whiskyland-chapter-twenty-nine-decadent-drinks-single-malt-scotch-whisky-700ml",
+            "domain": "caskcartel.com",
+            "description": "Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine (Decadent Drinks) Single Malt Scotch Whisky | 700ML Tasting Notes. Nose: White fruits, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine ...",
+            "url": "https://www.masterofmalt.com/whiskies/glenturret/glenturret-35-year-old-1990-whiskyland-chapter-twenty-nine-decadent-drinks-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "12–13 day delivery 14-day returnsGlenturret 35 Year Old 1990 - Whiskyland Chapter Twenty Nine (Decadent Drinks) ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenturret 35-year-old BR - Ratings and Reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/45359/glenturret-35-year-old-br",
+            "domain": "whiskybase.com",
+            "description": "Rating 4.5(64)Sep 27, 2021 · Explore Glenturret 35-year-old BR, a 35-year-old whisky bottled by ... Decadent Drinks · Cadenhead's. Marketplace Resources. Marketplace ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Decadent — Spirits — The Three Drinkers",
+            "url": "https://www.thethreedrinkers.com/magazine-content/tag/Decadent",
+            "domain": "thethreedrinkers.com",
+            "description": "... Decadent Drinks unveiled the latest addition to ... The Whiskyland Chapter Twenty-Nine Glenturret 35 Year Old ... Glenturret won hearts through sheer ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "25c23db82c1199808c7c6d78d70ac3397a14c527e182a6a3adfd0c34c04931fa",
+    "mode": "auto"
+  }
+}

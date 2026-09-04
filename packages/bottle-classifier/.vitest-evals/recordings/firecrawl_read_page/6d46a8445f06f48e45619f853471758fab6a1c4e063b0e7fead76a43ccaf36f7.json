@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:54:38.528Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://example.com/keel-and-cooper/harbor-reserve",
+    "focus": "Confirm exact product identity, brand, bottler, distillery, age, ABV, and whether Harbor Reserve is a marketed release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm exact product identity, brand, bottler, distillery, age, ABV, and whether Harbor Reserve is a marketed release",
+    "summary": null,
+    "results": [
+      {
+        "title": "Example Domain",
+        "url": "https://example.com/keel-and-cooper/harbor-reserve",
+        "domain": "example.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d46a8445f06f48e45619f853471758fab6a1c4e063b0e7fead76a43ccaf36f7",
+    "mode": "auto"
+  }
+}

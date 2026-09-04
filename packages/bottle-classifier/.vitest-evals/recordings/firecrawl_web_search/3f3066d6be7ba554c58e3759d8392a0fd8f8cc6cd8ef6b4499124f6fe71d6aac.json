@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:25:56.563Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Maker's Mark Kentucky Straight Bourbon Whisky official product 45% ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Maker's Mark Kentucky Straight Bourbon Whisky official product 45% ABV",
+        "summary": "Smooth, full-bodied flavor and a distinct hand-dipped red wax seal define our bourbon bottles. y, 45% Alc./Vol. With a signature velvety mouthfeel, and balanced notes of bright cherry, delicate vanilla, caramel and a hint of soft spices, Bourbon Whisky, 45% Alc./Vol. ... Free delivery over $200 20-day returnsSize 750 ml ABV 45% made with soft red winter wheat, Sweet oak, vanilla, bright fruit and wheat prevail in the nose. Bourbon Whiskey | 45% ABV | 750ml | USA $ ... In stock Rating 4.6598Kentucky Straight Bourbon 70 cl, 45 %Vol Style Bourbon, Fruity, Spicy Density Rich Aroma Almond, Apricot,",
+        "results": [
+          {
+            "title": "Handmade Kentucky Bourbon Whisky | Maker's Mark®",
+            "url": "https://www.makersmark.com/en-us/",
+            "domain": "makersmark.com",
+            "description": "Smooth, full-bodied flavor and a distinct hand-dipped red wax seal define our bourbon bottles. y, 45% Alc./Vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark: Kentucky Straight Bourbon",
+            "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+            "domain": "makersmark.com",
+            "description": "With a signature velvety mouthfeel, and balanced notes of bright cherry, delicate vanilla, caramel and a hint of soft spices, Bourbon Whisky, 45% Alc./Vol. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark Kentucky Straight Bourbon Whisky | Passion Spirits",
+            "url": "https://www.passionspirits.com/makers-mark-kentucky-straight-bourbon-750ml",
+            "domain": "passionspirits.com",
+            "description": "Free delivery over $200 20-day returnsSize 750 ml ABV 45% made with soft red winter wheat, Sweet oak, vanilla, bright fruit and wheat prevail in the nose. Bourbon Whiskey | 45% ABV | 750ml | USA $ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark - Bourbon - Kentucky - The Whisky Lodge",
+            "url": "https://whiskylodge.com/en/bourbons/453-maker-s-mark--0085246342978.html",
+            "domain": "whiskylodge.com",
+            "description": "In stock Rating 4.6598Kentucky Straight Bourbon 70 cl, 45 %Vol Style Bourbon, Fruity, Spicy Density Rich Aroma Almond, Apricot, Caramel sauce, Cinnamon, Macadamia nuts, Nutmeg, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark Kentucky Straight Bourbon Whiskey - Wine.com",
+            "url": "https://www.wine.com/product/makers-mark-kentucky-straight-bourbon-whiskey/23803",
+            "domain": "wine.com",
+            "description": "Out of stock Rating 4.2(83)Size 750ML ABV 45% Maker's Mark offers aromas of woody oak, caramel, vanilla and wheat. vanilla and fruity essences.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3f3066d6be7ba554c58e3759d8392a0fd8f8cc6cd8ef6b4499124f6fe71d6aac",
+    "mode": "auto"
+  }
+}

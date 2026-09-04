@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:34:02.064Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+    "focus": "Confirm whether Double Double Oaked is a Distillery Series release, its marketed expression name, release year or edition wording, and ABV."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm whether Double Double Oaked is a Distillery Series release, its marketed expression name, release year or edition wording, and ABV.",
+    "summary": "[Woodford Reserve Distillery Series Double Double Oaked Bottle\\ \\ Double Double Oaked](https://www.woodfordreserve.com/?post_type=product&p=1977)",
+    "results": [
+      {
+        "title": "Distillery Series - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": "Woodford Reserve is announcing the latest addition to its esteemed Distillery Series, a limited-edition Cabernet Sauvignon Barrel Finish. This expression continues the brand’s commitment to pushing creative boundaries under the leadership of Master Distiller Elizabeth McCall. This new release features Woodford Reserve’s signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile […]",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "aa48cd42cd79a774bd606d09b1498a78832c986106ba67d851b7aa360a3dceb7",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:37:43.952Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Shieldaig Speyside Sin Malt\" \"30\" Scotch Whisky",
+      "\"Shieldaig Speyside Single Malt\" 30 year old Total Wine"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig Speyside Sin Malt\" \"30\" Scotch Whisky",
+        "summary": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky. See More ... A complex yet balanced full of flavor single malt whiskey, matured for at least 30 years. Find the best local price for Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price ... Shieldaig Speyside Sin Malt 30Yr ... In stock $0.50 deliveryShieldaig Speyside Sin Malt 30yr Scotch Whisky 750ml. 750 mL Available. Shieldaig Speyside ... 30. Share on: Contact Us. (845) 534-5140 · mail@cornwallwines.com ... ... 30 years. Best enjoyed straight ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky. Shieldaig Sp",
+        "results": [
+          {
+            "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky. See More ... A complex yet balanced full of flavor single malt whiskey, matured for at least 30 years.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+thirty+old+single+malt+scotch+whisky+speyside+scotland/1/usa-ct",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price ... Shieldaig Speyside Sin Malt 30Yr ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Sin Malt 30yr Scotch Whisky 750ml",
+            "url": "https://cornwallwines.com/shop/product/shieldaig-speyside-sin-malt-30yr-scotch-whisky-750ml/683f21d08936bb45fd13c706?option-id=91c15650c1f328e68d72de1126afc7aa033a43a0025f62a00a816d4d6e357e0e",
+            "domain": "cornwallwines.com",
+            "description": "In stock $0.50 deliveryShieldaig Speyside Sin Malt 30yr Scotch Whisky 750ml. 750 mL Available. Shieldaig Speyside ... 30. Share on: Contact Us. (845) 534-5140 · mail@cornwallwines.com ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky – Northwest Liquor ...",
+            "url": "https://northwestliquorwine.com/products/shieldaig-speyside-sin-malt-30yr-scotch-whisky",
+            "domain": "northwestliquorwine.com",
+            "description": "... 30 years. Best enjoyed straight ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky. Shieldaig Speyside Sin Malt 30Yr Scotch Whisky.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Shieldaig 'Speyside' 25 Year Old Single Malt ...",
+            "url": "https://www.wine-searcher.com/find/shieldaig+25+old+single+malt+scotch+whisky+speyside+scotland/1/usa-ok-y",
+            "domain": "wine-searcher.com",
+            "description": "Shieldaig Speyside Sin Malt 25Yr Scotch Whisky, Single Malt, Speyside, Scotland ... Shieldaig Speyside Sin Malt 25Yr Scotch Whisky ... Shieldaig 'Speyside' 30 Year ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig Speyside Single Malt\" 30 year old Total Wine",
+        "summary": "4.71.2KShieldaig Speyside Single Malt Scotch Whisky ... Speyside, Scotland- A fine Single Malt made from malted barley. A product of Speyside, the ... Shieldaig Speyside Single Malt 12Yr Scotch Whisky. $39.99. 4.3(441) · Shieldaig Speyside Single Malt 12Yr Scotch Whisky 750ml Bottle. Add to ... Shieldaig 'Speyside' Single Malt Scotch Whisky. Speyside, Scotland. $24. Label of Shieldaig &#039;Speyside&#039; 12 Year Old Single Malt. Shieldaig 'Speyside ... Shieldaig Speyside Single Malt 12Yr Scotch Whisky. See More Shieldaig. 750ml Bottle. Shieldaig Speyside Single Malt 12Yr Scotch Whisky. $39.99",
+        "results": [
+          {
+            "title": "Shieldaig Scotch | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/shieldaig-scotch",
+            "domain": "totalwine.com",
+            "description": "4.71.2KShieldaig Speyside Single Malt Scotch Whisky ... Speyside, Scotland- A fine Single Malt made from malted barley. A product of Speyside, the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Buy Shieldaig | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/brand/shieldaig",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Single Malt 12Yr Scotch Whisky. $39.99. 4.3(441) · Shieldaig Speyside Single Malt 12Yr Scotch Whisky 750ml Bottle. Add to ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 30 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+thirty+old+single+malt+scotch+whisky+speyside+scotland/1/usa-ct",
+            "domain": "wine-searcher.com",
+            "description": "Shieldaig 'Speyside' Single Malt Scotch Whisky. Speyside, Scotland. $24. Label of Shieldaig &#039;Speyside&#039; 12 Year Old Single Malt. Shieldaig 'Speyside ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt 12Yr Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-12yr-scotch-whisky/p/109033750",
+            "domain": "totalwine.com",
+            "description": "Shieldaig Speyside Single Malt 12Yr Scotch Whisky. See More Shieldaig. 750ml Bottle. Shieldaig Speyside Single Malt 12Yr Scotch Whisky. $39.99. Wine Enthusiast.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside 18 Year Review & Tasting Notes - Scotch Addict",
+            "url": "https://scotchaddict.com/shieldaig-speyside-18-year-review-tasting-notes.html",
+            "domain": "scotchaddict.com",
+            "description": "Shieldaig Speyside Single Malt 18Yr My local big liquor store was recently acquired by Total Wine and Spirits, it was formerly known as ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5062041e6d58b0a0d4010f98b0cee53beb7a84c29bb16c21d3ffcfebae08f98e",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-09-04T18:24:27.760Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky \"Canadian Club\" \"9-year-old Reserve\"",
+      "\"Canadian Club 9 Year Old Reserve\" whisky ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky \"Canadian Club\" \"9-year-old Reserve\"",
+        "summary": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=3840&q=75)\n\n# canadian club 9 year old reserve canadian whisky\n### Size\n750 ML\n\nEngravable\n\n#### + $50\nMake it memorable with a personalized message\n\nCheck Availability\n\nCheck Availability\n\nWe're sorry, you need to add an address before checking the availability of this product.\n\nCheck Availability\n\nCheck Availability\n\n### Product Detail\nCategory\n\nSpir",
+        "results": [
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+            "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+            "domain": "reservebar.com",
+            "description": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-468",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club 9 Year Old Reserve\" whisky ABV",
+        "summary": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=3840&q=75)\n\n# canadian club 9 year old reserve canadian whisky\n### Product Detail\nABV\n\n### About\nThis reserve whisky is matured in white-oak barrels for 9 years and then barrel-blended by our Master Blender, to create a rich and smooth flavor. Canadian Club Rsv 9yr 750ml (abv 40%), 750 ML. In ... Canadian Club - 9 Year Old Reserve Canadian Whisky. In s",
+        "results": [
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+            "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+            "domain": "reservebar.com",
+            "description": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-468",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Canadian Club Reserve Aged 9 Year Blended ...",
+            "url": "https://www.wine-searcher.com/find/canadaclub+rsrv+aged+nine+blend+whisky+ontario+canada?Xhide_nearest=N",
+            "domain": "wine-searcher.com",
+            "description": "Canadian Club Rsv 9yr 750ml (abv 40%), 750 ML. In ... Canadian Club - 9 Year Old Reserve Canadian Whisky. In stock () ... Label of Canadian Club Dry Blended ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky 750 ml | Buy ...",
+            "url": "https://liquorstorenearme.com/products/canadian-club-9-year-old-reserve-canadian-whisky",
+            "domain": "liquorstorenearme.com",
+            "description": "Canadian Club 9 Year Old Reserve Canadian Whisky delivers 9 years of barrel aging at 40% ABV in a 750ml bottle. This aged Canadian expression offers smooth ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "I'm liking what I see... If you're a fan of Canadian Club or most big ...",
+            "url": "https://www.instagram.com/p/DZKzaPojeYA/",
+            "domain": "instagram.com",
+            "description": "May be an image of whiskey. 29 likes. whiskeyfellow. Canadian Club 9-Year-Old Reserve Whisky Review Canadian Club 9-Year-Old Reserve is an affordable ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Best Canadian Whisky [Expert Selections] - Taster's Club",
+            "url": "https://tastersclub.com/blogs/articles/best-canadian-whisky-selection",
+            "domain": "tastersclub.com",
+            "description": "Region: Alberta, Canada | ABV: 70.36% | 750ml ... Purchase Good Money American Oak Barrel 5 Year Whisky. Canadian Club 9 Year Old Reserve Whisky Bottle ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7eb53cedea18387d5887fc376f7c30b8f7d5a3078ca21a7c5de25f353f5d85bf",
+    "mode": "auto"
+  }
+}

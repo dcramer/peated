@@ -1,0 +1,96 @@
+{
+  "name": "C26 single-cask true, false, and unknown evidence",
+  "reviewedAt": "2026-09-04",
+  "notes": "Fixed evidence keeps the compared schema descriptions on the same Bottle facts. The Proof and Wood evidence is a saved valid Firecrawl page result from the September 3 baseline. The Willett label and Cadboll title evidence were reviewed for C05.",
+  "sources": [
+    "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+    "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg",
+    "https://shop.example/products/cadboll-estate-batch-2"
+  ],
+  "cases": {
+    "image-backed-photo-creates-willett-family-estate-barrel-4769": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Willett Family Estate barrel 4769 label fields",
+            "summary": "The preserved label identifies Willett Family Estate Bottled Single Barrel Bourbon, aged five years, hand bottled from barrel 4769 at 64.2% ABV. The barrel number distinguishes this exact-cask release.",
+            "results": [
+              {
+                "title": "Willett Family Estate barrel 4769 label",
+                "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg",
+                "domain": "raw.githubusercontent.com",
+                "description": "Preserved label evidence for the exact cask, age, and strength.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "audit-production-proof-and-wood-representative-retains-bottler-and-batch-abv": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Proof and Wood The Representative evidence",
+            "summary": "The exact product is a barrel-proof straight bourbon distilled in Indiana by MGP and bottled by Proof and Wood. It is aged at least four years and is a small batch blended from approximately 20 barrels. ABV varies by batch.",
+            "results": [
+              {
+                "title": "Proof And Wood Straight Bourbon Whiskey The Representative",
+                "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+                "domain": "saratogawine.com",
+                "description": "Exact-product evidence for barrel proof and a blend of approximately 20 barrels.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Exact product cask strength and barrel count",
+            "summary": "Proof And Wood The Representative is barrel-proof straight bourbon whiskey. It is a small batch blended from approximately 20 barrels. ABV may vary by batch.",
+            "results": [
+              {
+                "title": "Proof And Wood Straight Bourbon Whiskey The Representative",
+                "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+                "domain": "saratogawine.com",
+                "description": "Exact-product page for The Representative.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "store-listing-creates-complete-cadboll-estate-batch-2-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Source title for Cadboll Estate Batch 2",
+            "summary": "The source title identifies Glenmorangie The Cadboll Estate Batch 2 as a 15-year-old single malt. It does not say whether the Bottle is single cask.",
+            "results": [
+              {
+                "title": "Glenmorangie The Cadboll Estate Batch 2 15-year-old",
+                "url": "https://shop.example/products/cadboll-estate-batch-2",
+                "domain": "shop.example",
+                "description": "Synthetic title evidence for the unknown control.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    }
+  }
+}

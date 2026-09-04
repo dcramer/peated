@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:43:34.080Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve Double Double Oaked 2022 Release 45.2% Distillery Series"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Double Oaked 2022 Release 45.2% Distillery Series",
+        "summary": "In stock Rating 4.362022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey 375ml ; Proof: 90.4 (45.2% ABV) ; Age: No age statement — fully mature Double ... This new release features Woodford Reserve's signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile. Double ... Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle. Double Double Oaked will also be available in limited ... Rating 90%(2)By extending the finishing process in a second set of new, charred oak barr",
+        "results": [
+          {
+            "title": "2022 Woodford Reserve Double Double Oaked Bourbon 375ml",
+            "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+            "domain": "canawineco.com",
+            "description": "In stock Rating 4.362022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey 375ml ; Proof: 90.4 (45.2% ABV) ; Age: No age statement — fully mature Double ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Distillery Series - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "This new release features Woodford Reserve's signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile. Double ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Returns as 2023 Winter ...",
+            "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle. Double Double Oaked will also be available in limited ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Distillery Series Double Double Oaked Straight ...",
+            "url": "https://www.wine-searcher.com/find/woodford+rsrv+distil+series+doubledoubleoak+straight+bourbon+whisky+kentucky+usa",
+            "domain": "wine-searcher.com",
+            "description": "Rating 90%(2)By extending the finishing process in a second set of new, charred oak barrels, this whiskey achieves an unprecedented level of depth, richness, and complexity, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Does the Woodford distillery have Double Double Oaked for purchase?",
+            "url": "https://www.facebook.com/groups/889144718291853/posts/1803015143571468/",
+            "domain": "facebook.com",
+            "description": "A limited quantity of Double Double Oaked will be available at Woodford Reserve Distillery starting at 10 AM. EST on January 13. While supplies ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "02becdde894ae9a2bc4ea4b6112dc2d82bd369fbe0b0882e934908649bb5fefb",
+    "mode": "auto"
+  }
+}

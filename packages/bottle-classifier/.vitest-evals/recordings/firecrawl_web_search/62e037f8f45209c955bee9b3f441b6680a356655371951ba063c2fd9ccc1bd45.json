@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:35:20.665Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Creag Isle\" \"12\" single malt Scotch whisky",
+      "\"Creag Isle 12-year-old\" whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Creag Isle\" \"12\" single malt Scotch whisky",
+        "summary": "Rating 3.7(134)Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine ... Here is the Creag Isle 12 Year, a peated single malt that would fall into the 'Island' subcategory of the Highlands. As usual, the distillery is ...Creag Isle : r/Scotch - RedditScotch Whisky Review #294: Creag Isle 33 Year Cognac Cask FinishMore results from www.reddit.com In stock $3.99 deliveryBuy Creag Isle 12 Year Island Single Malt 750ml for $40.95 from Bansum Wine & Liquor in Patchogue, NY. Free local delivery over $",
+        "results": [
+          {
+            "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750%3Fsrsltid%3DAfmBOoqzMHv08lW5az_VUQ_PGocfSX3hM1bpm9XzK0l-TG48UaPqrm54",
+            "domain": "totalwine.com",
+            "description": "Rating 3.7(134)Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #111 - Creag Isle 12 Year : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/15h5vhf/review_111_creag_isle_12_year/",
+            "domain": "reddit.com",
+            "description": "Here is the Creag Isle 12 Year, a peated single malt that would fall into the 'Island' subcategory of the Highlands. As usual, the distillery is ...Creag Isle : r/Scotch - RedditScotch Whisky Review #294: Creag Isle 33 Y",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Island Single Malt",
+            "url": "https://bansumwineandliquor.com/shop/product/creag-isle-12-year-island-single-malt/633dfbe9039c175531fd3693%3Foption-id%3Dde7b90e71776bd8e0d26d815e5ece27905d7cada79576015e15817b95b7fed23%26srsltid%3DAfmBOoo1cNVwwVKU4Nnw6T4ycYmMGXY98cmMrsJYEBSXoTfAzRDJ3ZaE",
+            "domain": "bansumwineandliquor.com",
+            "description": "In stock $3.99 deliveryBuy Creag Isle 12 Year Island Single Malt 750ml for $40.95 from Bansum Wine & Liquor in Patchogue, NY. Free local delivery over $99. Free shipping over $0.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle Island 12 Years Single Malt Scotch - Wine Enthusiast",
+            "url": "https://www.wineenthusiast.com/buying-guide/creag-isle-island-12-years-single-malt-scotch/%3Fsrsltid%3DAfmBOoolgLc-rFcQ5zaDLKX_Ha8YzBJJMyeOmlvr-tdu7QbCfybHKhXx",
+            "domain": "wineenthusiast.com",
+            "description": "Rating 90% · Review by Kara NewmanCreag Isle Island 12 Years Single Malt Scotch ; Rating. 90 ; Price. $46 ; Brand. Creag Isle ; Category. Scotch Whisky ; Alcohol. 42.2%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky - Frootbat",
+            "url": "https://www.frootbat.com/p/1246/creag-isle-12-year-old-single-malt-scotch-whisky%3Fsrsltid%3DAfmBOoqEgZ-2ph_I8qcY9CCSaSeeT4E5W6yKXYNKGw2byquWFCf-dL6m",
+            "domain": "frootbat.com",
+            "description": "5–6 day deliveryCreag Isle 12 Year Old Single Malt Scotch Whisky ... 42.2% ABV and packaged in a 750ml bottle. ... Most shipments are dispatched the next business day. We use a ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Creag Isle 12-year-old\" whisky",
+        "summary": "Rating 3.7(134)Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine ... 5–6 day deliveryCreag Isle 12 Year Old Single Malt Scotch Whisky ... 42.2% ABV and packaged in a 750ml bottle. ... Most shipments are dispatched the next business day. We use a ... Out of stock Rating 3.7125Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with ... Rating 4.5(4)Find the best local price for Creag Isle 12",
+        "results": [
+          {
+            "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+            "domain": "totalwine.com",
+            "description": "Rating 3.7(134)Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky - Frootbat",
+            "url": "https://www.frootbat.com/p/1246/creag-isle-12-year-old-single-malt-scotch-whisky",
+            "domain": "frootbat.com",
+            "description": "5–6 day deliveryCreag Isle 12 Year Old Single Malt Scotch Whisky ... 42.2% ABV and packaged in a 750ml bottle. ... Most shipments are dispatched the next business day. We use a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle Islay Single Malt Scotch 12 Year - MGM Wine & Spirits",
+            "url": "https://mgmrun.com/shop/product/creag-isle-islay-single-malt-scotch-12-year/5ed0687a48c6ee132dddbe65?option-id=16f9f98df8d2f1e9210912a29d3a5552cc4f984d8a7160a8ffc31ce7d6d9ff93",
+            "domain": "mgmrun.com",
+            "description": "Out of stock Rating 3.7125Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky - Wine-Searcher",
+            "url": "https://www.wine-searcher.com/find/creag+isle+twelve+old+single+malt+scotch+whisky+island+scotland/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Rating 4.5(4)Find the best local price for Creag Isle 12 Year Old Single Malt Scotch Whisky, Islands, Scotland. Avg Price (ex-tax) $53 / 750ml. Find and shop from stores ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "N.V. Quality Spirits International Creag Isle 12 Year Old Single Malt ...",
+            "url": "https://www.cellartracker.com/wine.asp?iWine=3803163",
+            "domain": "cellartracker.com",
+            "description": "Spirits. N.V. Quality Spirits International Creag Isle 12 Year Old Single Malt Scotch Whisky, 42.2%. Malt. United Kingdom; Scotland. (Add Drinking Window).",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "62e037f8f45209c955bee9b3f441b6680a356655371951ba063c2fd9ccc1bd45",
+    "mode": "auto"
+  }
+}

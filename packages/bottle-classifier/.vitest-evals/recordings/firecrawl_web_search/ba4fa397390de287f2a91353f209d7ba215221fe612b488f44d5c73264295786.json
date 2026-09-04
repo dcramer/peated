@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:36:10.142Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "ReserveBar Glendalough Double Barrel whiskey product ABV age distillery maturation"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "ReserveBar Glendalough Double Barrel whiskey product ABV age distillery maturation",
+        "summary": "# Glendalough Double Barrel\nOur Double Barrel Irish Whiskey begins its maturation process in flame-charred ex Bourbon American oak.\n\nWe choose the bodega, the liquid, the casks and the cooper in this region of Spain to deliver a terroir-driven sense of this land , encapsulated in the liquid when we put our whiskey in these slow-toasted casks for aging. In stock Rating 4.451This globally awarded, single grain whiskey has been aged twice – first in American oak Bourbon barrels and again in Spanish oak Oloroso Sherry barrels. whisky review 560 - Glendalough Double Barrel whiskey @ 42%vol:. Mar 15",
+        "results": [
+          {
+            "title": "Glendalough Double Barrel",
+            "url": "https://us.glendaloughdistillery.com/whiskey/double-barrel/",
+            "domain": "us.glendaloughdistillery.com",
+            "description": "# Glendalough Double Barrel\nOur Double Barrel Irish Whiskey begins its maturation process in flame-charred ex Bourbon American oak.\n\nWe choose the bodega, the liquid, the casks and the cooper in this region of Spain to d",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel - ReserveBar",
+            "url": "https://www.reservebar.com/products/glendalough-double-barrel/GROUPING-98272",
+            "domain": "reservebar.com",
+            "description": "In stock Rating 4.451This globally awarded, single grain whiskey has been aged twice – first in American oak Bourbon barrels and again in Spanish oak Oloroso Sherry barrels.",
+            "extraSnippets": []
+          },
+          {
+            "title": "whisky review 560 - Glendalough Double Barrel whiskey @ 42%vol",
+            "url": "https://www.youtube.com/watch?v=QSCY-_hZzMg",
+            "domain": "youtube.com",
+            "description": "whisky review 560 - Glendalough Double Barrel whiskey @ 42%vol:.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel - Flavor Camp",
+            "url": "https://flavorcamp.org/glendalough-double-barrel/",
+            "domain": "flavorcamp.org",
+            "description": "Mar 15, 2025",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel vs. Pot Still Irish Whiskey - Reddit",
+            "url": "https://www.reddit.com/r/whiskey/comments/tkj589/comparisonreview_glendalough_double_barrel_vs_pot/",
+            "domain": "reddit.com",
+            "description": "Palate: Wow, WAY more full-bodied than the double barrel, even though it's only 43% abv. Matches the nose quite closely, but I'm also getting a ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ba4fa397390de287f2a91353f209d7ba215221fe612b488f44d5c73264295786",
+    "mode": "auto"
+  }
+}

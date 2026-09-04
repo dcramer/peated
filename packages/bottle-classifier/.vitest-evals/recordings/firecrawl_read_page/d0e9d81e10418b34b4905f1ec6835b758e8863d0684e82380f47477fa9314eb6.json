@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:36:40.576Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://woodencork.com/collections/whiskey/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?utm=peated",
+    "focus": "Confirm the marketed product identity, including exact product name, age, ABV, French-oak finish, and any barrel or edition identifier."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product identity, including exact product name, age, ABV, French-oak finish, and any barrel or edition identifier.",
+    "summary": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr - Available at Wooden Cork\n\n```\nThis French finished rye is crafted from 100% rye grains grown in the verdant Pacific Northwest.\n```",
+    "results": [
+      {
+        "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr – Wooden Cork",
+        "url": "https://woodencork.com/collections/whiskey/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr?utm=peated",
+        "domain": "woodencork.com",
+        "description": "This French finished rye is crafted from 100% rye grains grown in the verdant Pacific Northwest.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d0e9d81e10418b34b4905f1ec6835b758e8863d0684e82380f47477fa9314eb6",
+    "mode": "auto"
+  }
+}

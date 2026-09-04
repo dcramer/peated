@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:46:24.710Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+    "focus": "Confirm the marketed product identity, release year, stated age, ABV, edition wording, and whether the 2023 release is a distinct bottle"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product identity, release year, stated age, ABV, edition wording, and whether the 2023 release is a distinct bottle",
+    "summary": null,
+    "results": [
+      {
+        "title": "Diving for Pearls: Lagavulin Distillers Edition (2023, USA)",
+        "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+        "domain": "divingforpearlsblog.com",
+        "description": "Though it's my least favorite of the Lagavulin Power Trio (16, 12 CS, and DE) each year, I'm always up for trying the Distillers Edition. To...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9d40e09f3ae11247a848986ef0af569bbea9e2b22e322e02db6749b2757bbdb3",
+    "mode": "auto"
+  }
+}

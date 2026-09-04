@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:27:31.545Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+    "focus": "Confirm the marketed product title, stated age, ABV, maturation, category, producer/distillery, and whether it is a distinct edition or single cask"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product title, stated age, ABV, maturation, category, producer/distillery, and whether it is a distinct edition or single cask",
+    "summary": "AGED 5 YEARS\n\nThe Whistler 5 Year Old Bodega Cask Single Malt is a triple distilled whiskey that has been wholly matured in the finest Spanish Sherry Butts for its whole life. These butts were sourced from our partners in the famed Bodegas of Jerez de la Frontera.\n\n86   Proof\n\nSmall   batch\n\nTripled   Distilled\n\n2021",
+    "results": [
+      {
+        "title": "Bodega Cask – The Whistler Whiskey",
+        "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+        "domain": "thewhistlerwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9b2d97ed6b4c5d9801bc6230c5c23cec66ad24995a45c8999801bc0bf6f3a7e4",
+    "mode": "auto"
+  }
+}

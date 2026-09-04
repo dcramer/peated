@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-09-04T19:48:25.784Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Glenmorangie Quinta Ruban 14 Year Old \"4th Edition\" 46%",
+      "site:glenmorangie.com \"The Quinta Ruban 14 Years Old\" \"4th Edition\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie Quinta Ruban 14 Year Old \"4th Edition\" 46%",
+        "summary": "In stock 14-day returnsGlenmorangie 14 Years Old Quinta Ruban - 4th Edition. Condition: Like New & Unopened | 70cl | 46% | 1969. Price Tag. Buy Now for ... I've had the 2nd, 3rd and 4th edition throughout the years. Each has been wonderful. I would rank them all pretty similarly at about an 85 ... Glenmorangie Quinta Ruban 4th Edition 46% 700ml information. You are looking at a 14-year-old spirit. The producer didn't provide any information about the ... Glenmorangie Quinta Ruban 14 Year Old 4th Edition Single Malt Scotch Whisky at Skull & Barrel, in Melbourne, Australia. Free Shipping for ord",
+        "results": [
+          {
+            "title": "Glenmorangie 14 Years Old Quinta Ruban - 4th Edition | Whisky | Spiritory",
+            "url": "https://spiritory.com/glenmorangie-14-years-old-quinta-ruban-4th-edition-130718%3Fsrsltid%3DAfmBOopDitbts9f3O-z_LjS6erAXkUyRUZs90tNB_BdNojEKwbigrfuI",
+            "domain": "spiritory.com",
+            "description": "In stock 14-day returnsGlenmorangie 14 Years Old Quinta Ruban - 4th Edition. Condition: Like New & Unopened | 70cl | 46% | 1969. Price Tag. Buy Now for ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Is it still a favourite? | Glenmorangie 14 Quinta Ruban REVIEW - YouTube",
+            "url": "https://www.youtube.com/watch%3Fv%3DVotmdLsy-Nw",
+            "domain": "youtube.com",
+            "description": "I've had the 2nd, 3rd and 4th edition throughout the years. Each has been wonderful. I would rank them all pretty similarly at about an 85 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Quinta Ruban 4th Edition 46% 700ml - Spirit Radar",
+            "url": "https://www.spiritradar.com/whisky-db/glenmorangie-quinta-ruban-4th-edition-46-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "Glenmorangie Quinta Ruban 4th Edition 46% 700ml information. You are looking at a 14-year-old spirit. The producer didn't provide any information about the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Quinta Ruban 14 Year Old 4th Edition Single Malt ...",
+            "url": "https://www.skullandbarrel.com.au/glenmorangie-the-quinta-ruban-14-year-old-4th-edit%3Fsrsltid%3DAfmBOopGCz-LAq_KSBpGuc8JKUfjeOS8MJ1KSETpvjpHabqy3DvbV8RA",
+            "domain": "skullandbarrel.com.au",
+            "description": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition Single Malt Scotch Whisky at Skull & Barrel, in Melbourne, Australia. Free Shipping for orders over $200.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14-year-old - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/217675/glenmorangie-14-year-old",
+            "domain": "whiskybase.com",
+            "description": "Glenmorangie; Quinta Ruban - 4th Edition. Glenmorangie 14-year-old. Overall rating: 84.25/100; ratings: 10. Whiskybase ID: WB217675; Category: Single Malt ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "site:glenmorangie.com \"The Quinta Ruban 14 Years Old\" \"4th Edition\"",
+        "summary": "Founded in 1843 in the Royal Burgh of Tain, Single Malt Scotch Whisky. Old ABV: 40.0% Sweet spice, floral notes of rose and jasmine … single malt whisky since ...",
+        "results": [
+          {
+            "title": "Glenmorangie Single Malt Scotch Whisky",
+            "url": "https://www.glenmorangie.com/en-us",
+            "domain": "glenmorangie.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2cf44bf7f9532dd90d32e0844d8c3f152da9e673276066890744345f409845ee",
+    "mode": "auto"
+  }
+}

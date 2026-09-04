@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:32:20.336Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Komagatake Limited Edition 2022 50% Mars Shinshu Distillery"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Komagatake Limited Edition 2022 50% Mars Shinshu Distillery",
+        "summary": "# Mars Komagatake (2022 Edition), 50%\nPrice: $155.00● Issue: Winter 2022 ● Reviewer: Jonny McCormick ● Category: Japanese Single Malt\n\n[Buy Now](https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50)\n\nProduced at Mars Shinshu Distillery and aged in bourbon, port, and sherry casks, this has a nose of pepper, ground ginger, cumin, sea salt, black olive tapenade, mushroom duxelle, fruit teas, and banana chews. With flavors of honey, almond fruitcake, orange zest, pepper, and clove, it retains the citrus sweetness throughout a long spicy phase, ending with dried cranberry, oak, persimmon, and",
+        "results": [
+          {
+            "title": "Mars Komagatake (2022 Edition), 50% - Whisky Advocate",
+            "url": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+            "domain": "whiskyadvocate.com",
+            "description": "# Mars Komagatake (2022 Edition), 50%\nPrice: $155.00● Issue: Winter 2022 ● Reviewer: Jonny McCormick ● Category: Japanese Single Malt\n\n[Buy Now](https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50)\n\nProduced at Ma",
+            "extraSnippets": []
+          },
+          {
+            "title": "Komagatake \"2022 Edition\" (50%, OB) : r/worldwhisky - Reddit",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/za9dte/komagatake_2022_edition_50_ob/",
+            "domain": "reddit.com",
+            "description": "Initially honeyed and floral on the nose. Candied walnuts. After some time, a bit of green apple, lemon pie, barley sugar, maybe some faint ...Mars Shinshu Komagatake 2020 Limited Edition, 50% : r/worldwhiskyWorld Whisky",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Whisky 'Komagatake Edition 2022' - Skurnik Wines",
+            "url": "https://www.skurnik.com/sku/single-malt-whisky-komagatake-limited-edition-2018-mars-shinshu-5/",
+            "domain": "skurnik.com",
+            "description": "2022 Edition of Komagatake Single Malt whisky from Mars Komagatake (fka Mars Shinshu) in Nagano, Japan · Distilled in copper pot stills from 100% malted barley, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake Limited Edition Single Malt 2022 | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/japanese-whisky/mars-komagatake-limited-edition-single-malt-2022/p/2126216321",
+            "domain": "totalwine.com",
+            "description": "Japan - 50% - The Komagatake Single Malt is Mars Distillery's annual single malt that showcase the depth generated in this Nagano based distillery. This ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "[Review] Single Malt Komagatake 2022 Edition",
+            "url": "https://en.jpwhisky.net/komagatake-2022-edition-2-20135/",
+            "domain": "en.jpwhisky.net",
+            "description": "This year's limited edition of 60,000 bottles is very large and may be relatively easy to obtain. The product name was “Limited Edition” until ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f8d5dc270561666e103c87c4d9bbc3f90babd03dc43516862696d51ebc4a0efa",
+    "mode": "auto"
+  }
+}

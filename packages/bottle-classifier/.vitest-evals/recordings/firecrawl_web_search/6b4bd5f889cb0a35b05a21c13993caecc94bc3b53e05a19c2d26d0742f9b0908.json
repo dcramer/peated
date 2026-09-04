@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:26:15.457Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Octomore 13.1 Bruichladdich official product ABV age release 2022"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 Bruichladdich official product ABV age release 2022",
+        "summary": "Age: 5 Year. Bottled March 15th, 2022. ABV: 59.2%. Cask Type: Ex-Bourbon. Peat PPM: 137.3 PPM. Barley Origin ...Review #27 - Bruichladdich Octomore 13.1 : r/ScotchReview #28 - Bruichladdich Octomore 13.2 : r/ScotchMore results from www.reddit.com Jul 5, 2026 Region, Country Islay, Scotland and United Kingdom ; Age 5 Years ; ABV 59.2% ; Volume 700 mL ; Bottling Year 2022. Comments · Bruichladdich Octomore 13.1 Super Heavily Peated Scotch · Who Does Sherry The Best? · You're using the Dock WRONG - do THIS instead! Octomore 13.2 shares the vintage and barley type with 13.1, but differs in its mat",
+        "results": [
+          {
+            "title": "Scotch Whisky Review #420: Octomore 13.1 - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/y5kb9r/scotch_whisky_review_420_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Age: 5 Year. Bottled March 15th, 2022. ABV: 59.2%. Cask Type: Ex-Bourbon. Peat PPM: 137.3 PPM. Barley Origin ...Review #27 - Bruichladdich Octomore 13.1 : r/ScotchReview #28 - Bruichladdich Octomore 13.2 : r/ScotchMore r",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "Jul 5, 2026",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 5 Year Old 2022 - Just Whisky Online Shop",
+            "url": "https://shop.just-whisky.co.uk/products/bruichladdich-octomore-13-1-5-year-old-2022-limited-edition-70cl-59-2-abv",
+            "domain": "shop.just-whisky.co.uk",
+            "description": "Region, Country Islay, Scotland and United Kingdom ; Age 5 Years ; ABV 59.2% ; Volume 700 mL ; Bottling Year 2022.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "Comments · Bruichladdich Octomore 13.1 Super Heavily Peated Scotch · Who Does Sherry The Best? · You're using the Dock WRONG - do THIS instead!",
+            "extraSnippets": []
+          },
+          {
+            "title": "This New Whisky From Bruichladdich Is One of the Smokiest Single Malts ...",
+            "url": "https://robbreport.com/food-drink/spirits/bruichladdich-octomore-whisky-series-1234757781/",
+            "domain": "robbreport.com",
+            "description": "Octomore 13.2 shares the vintage and barley type with 13.1, but differs in its maturation. This whisky spent its entire five-year aging period ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6b4bd5f889cb0a35b05a21c13993caecc94bc3b53e05a19c2d26d0742f9b0908",
+    "mode": "auto"
+  }
+}

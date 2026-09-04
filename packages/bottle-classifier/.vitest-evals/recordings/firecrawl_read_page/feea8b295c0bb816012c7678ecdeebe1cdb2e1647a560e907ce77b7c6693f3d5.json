@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:43:57.480Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://woodencork.com/collections/whiskey/products/springbank-aged-25-year-old-750-ml?utm=peated",
+    "focus": "Complete marketed product identity: exact product title, stated age, ABV, edition or release year, and whether it is a limited edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Complete marketed product identity: exact product title, stated age, ABV, edition or release year, and whether it is a limited edition",
+    "summary": "Springbank Aged 25 Year Old\n\n```\n**Springbank 25 Year Old 2023 is an annual limited release from Scotland’s oldest family-owned distillery — the Mitchell family’s Springbank in Campbeltown, the only Scottish distillery to handle every production step on site from floor malting through bottling — presenting rich caramel, millionaire shortbread, dried pineapple, and honeydew melon, with the palate elegant and velvety with a smooth and buttery texture and subtle dashes of gingerbread and liquorice.**\n- **Age Statement:** 25 Years\n- **Release:** 2023 Annual Release\n```",
+    "results": [
+      {
+        "title": "Springbank 25 Year Old 2023 Annual Release Campbeltown Single Malt Scotch Whisky | Mitchell Family Sweet Caramel Millionaire Shortbread Dried Pineapple Honeydew Melon Gingerbread Coffee – Wooden Cork",
+        "url": "https://woodencork.com/collections/whiskey/products/springbank-aged-25-year-old-750-ml?utm=peated",
+        "domain": "woodencork.com",
+        "description": "Springbank 25 Year Old 2023 — annual release from Scotland's oldest family-owned distillery. Sweet caramel, millionaire shortbread, dried pineapple, honeydew melon; gingerbread, liquorice, coffee; elegant velvety palate. Order online.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "feea8b295c0bb816012c7678ecdeebe1cdb2e1647a560e907ce77b7c6693f3d5",
+    "mode": "auto"
+  }
+}

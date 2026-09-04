@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:54:04.495Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Single Cask Nation Mannochmore cask 73445 17 year 2007 bottled Fall 2024"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Single Cask Nation Mannochmore cask 73445 17 year 2007 bottled Fall 2024",
+        "summary": "In stock Free deliveryFrom cask #173445 , this was distilled in September of 2007 and bottled in the fall of 2024. This aged for 3.5 years in refill recharred red wine barriques. Age: 17 Years. Finish: 3 years in a Refill Charred Red Wine Barrique. Distilled: in September 2007. Bottled: Fall 2024. 1 of 258 bottles. Cask#173445. 53.0% abv. In stock $17.99 deliveryFinished in a red wine barrique, this rare single malt features notes of strawberry rhubarb, ... key Type Single Malt ABV 53.60% Country Scotland Size 700ml In stock $19.99 deliverySingle Cask Nation Mannochmore 2007 17-year cask stren",
+        "results": [
+          {
+            "title": "Single Cask Nation Mannochmore 17 Year Red Wine Barrique Speyside ...",
+            "url": "https://www.astorwines.com/item/53748",
+            "domain": "astorwines.com",
+            "description": "In stock Free deliveryFrom cask #173445 , this was distilled in September of 2007 and bottled in the fall of 2024. This aged for 3.5 years in refill recharred red wine barriques.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mannochmore 17yo (Single Cask Nation) - DRINQY",
+            "url": "https://www.drinqy.com/shop/p/mannochmore-17yo-single-cask-nation-august-2025",
+            "domain": "drinqy.com",
+            "description": "Age: 17 Years. Finish: 3 years in a Refill Charred Red Wine Barrique. Distilled: in September 2007. Bottled: Fall 2024. 1 of 258 bottles. Cask#173445. 53.0% abv.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Cask Nation 2007 17 Year Mannochmore Cask #173445",
+            "url": "https://tastersclub.com/products/single-cask-nation-2007-17-year-mannochmore-cask-173445",
+            "domain": "tastersclub.com",
+            "description": "In stock $17.99 deliveryFinished in a red wine barrique, this rare single malt features notes of strawberry rhubarb, ... key Type Single Malt ABV 53.60% Country Scotland Size 700ml",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mannochmore 17 Year Cask Strength Whisky - Hi Proof",
+            "url": "https://www.hiproof.com/products/the-single-cask-nation-mannochmore-2007-17-year-53-alc-750ml",
+            "domain": "hiproof.com",
+            "description": "In stock $19.99 deliverySingle Cask Nation Mannochmore 2007 17-year cask strength single malt Scotch whisky. Red wine barrique finish, 53% ABV. Shop premium spirits at Hi-Proof.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #155, Mannochmore, 16 year old. Single Malts of Scotland and ...",
+            "url": "https://www.reddit.com/r/Scotch/comments/1om5v5n/review_155_mannochmore_16_year_old_single_malts/",
+            "domain": "reddit.com",
+            "description": "Taste: Sweet, rich caramel and toffee, very fresh and fruity. Score: 89/100. ABV 53.0% Color Pinkish gold. Nose: Salty, caramelized candied ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "fc2454d5fd25ea0efcb760f644da6341dd03613ef06545cf12c04998d4d7163c",
+    "mode": "auto"
+  }
+}

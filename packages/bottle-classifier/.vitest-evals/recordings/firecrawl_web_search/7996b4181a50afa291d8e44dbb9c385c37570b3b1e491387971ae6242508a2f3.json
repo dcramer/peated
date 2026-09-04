@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:28:42.380Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Woodford Reserve Double Double Oaked\" official ABV release",
+      "\"Woodford Reserve Double Double Oaked\" bourbon proof annual release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Woodford Reserve Double Double Oaked\" official ABV release",
+        "summary": "Woodford Reserve's Double Double Oaked. 0:41. “This handcrafted, double ... Get the latest cocktail recipes, early access to limited release products, and ... Woodford Reserve Double Double Oaked was a limited edition release that was part of the company's Distillery Series and was introduced by ... 163 votes, 41 comments. Review 84, Woodford Reserve, Double Double Oaked Misc: As always, my reviews are the work of an amateur. Q: Is this a limited-edition release? A: Yes! Woodford Reserve Double Double Oaked is released in limited quantities once a year, making it highly collectible. ... releas",
+        "results": [
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Woodford Reserve's Double Double Oaked. 0:41. “This handcrafted, double ... Get the latest cocktail recipes, early access to limited release products, and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon Review",
+            "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+            "domain": "breakingbourbon.com",
+            "description": "Woodford Reserve Double Double Oaked was a limited edition release that was part of the company's Distillery Series and was introduced by ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/bourbon - Review 84, Woodford Reserve, Double Double Oaked",
+            "url": "https://www.reddit.com/r/bourbon/comments/1o4s7mx/review_84_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "163 votes, 41 comments. Review 84, Woodford Reserve, Double Double Oaked Misc: As always, my reviews are the work of an amateur.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked - Nestor Liquor",
+            "url": "https://www.nestorliquor.com/products/woodford-reserve-double-double-oaked",
+            "domain": "nestorliquor.com",
+            "description": "Q: Is this a limited-edition release? A: Yes! Woodford Reserve Double Double Oaked is released in limited quantities once a year, making it highly collectible.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Barrel Proof Double Oaked - YouTube",
+            "url": "https://www.youtube.com/watch?v=ypFVRD5k3Og",
+            "domain": "youtube.com",
+            "description": "... release really worth nearly twice the price? So does this darker, richer ... ✨WOODFORD RESERVE DOUBLE DOUBLE OAKED / A Liquid Masterpiece?",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Woodford Reserve Double Double Oaked\" bourbon proof annual release",
+        "summary": "In stock Rating 5.0(2)Woodford Reserve Double Double Oaked Bourbon 2026 Release is a limited 90.4 proof bourbon with rich caramel, dark fruit, toasted oak, and deeper spice. Review: The Woodford Reserve Double Double Oaked. Woodford Reserve Double Double Oaked was introduced in 2015 as part of the Distillery series, designed to give fans a special reward for ... Year\n\nDouble Double Oaked\n\n# Double Double Oaked\nPresented at 90.4 Proof Today, Woodford Reserve announces its annual release of Double Double Oaked Bourbon. ... Woodford Reserve Double Double Oaked whiskey releases.",
+        "results": [
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon 2026 | The Barrel Tap",
+            "url": "https://www.thebarreltap.com/products/woodford-reserve-double-double-oaked-bourbon-2026",
+            "domain": "thebarreltap.com",
+            "description": "In stock Rating 5.0(2)Woodford Reserve Double Double Oaked Bourbon 2026 Release is a limited 90.4 proof bourbon with rich caramel, dark fruit, toasted oak, and deeper spice.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: The Woodford Reserve Double Double Oaked : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ht2ryo/review_the_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "Review: The Woodford Reserve Double Double Oaked.",
+            "extraSnippets": []
+          },
+          {
+            "title": "A coveted annual bourbon release from Woodford Reserve is back ...",
+            "url": "https://www.kentucky.com/lexgoeat/bourbon/article248747440.html",
+            "domain": "kentucky.com",
+            "description": "Woodford Reserve Double Double Oaked was introduced in 2015 as part of the Distillery series, designed to give fans a special reward for ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://shop.woodfordreserve.com/double-double-oaked-7aqy/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "Year\n\nDouble Double Oaked\n\n# Double Double Oaked\nPresented at 90.4 Proof",
+            "extraSnippets": []
+          },
+          {
+            "title": "Does the Woodford distillery have Double Double Oaked for purchase?",
+            "url": "https://www.facebook.com/groups/889144718291853/posts/1803015143571468/",
+            "domain": "facebook.com",
+            "description": "Today, Woodford Reserve announces its annual release of Double Double Oaked Bourbon. ... Woodford Reserve Double Double Oaked whiskey releases.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7996b4181a50afa291d8e44dbb9c385c37570b3b1e491387971ae6242508a2f3",
+    "mode": "auto"
+  }
+}

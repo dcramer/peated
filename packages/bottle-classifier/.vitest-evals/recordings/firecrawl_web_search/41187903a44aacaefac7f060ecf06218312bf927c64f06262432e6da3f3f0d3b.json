@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:56:54.358Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Laphroaig Càirdeas Warehouse 1 52.2% official"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Laphroaig Càirdeas Warehouse 1 52.2% official",
+        "summary": "Rating 5.0(2)The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today. In stock Rating 5.01Bottled at 52.2% ABV for a memorable experience to share with your Friends. The legend of Laphroaig spans over 200 years. ... Nose: Peaty, sweet and nutty with “ ... Oct 12, 2022Laphroaig Càirdeas 2022 “Warehouse 1” Is Coming! : r/ScotchReview #503 - Laphroaig Cairdeas Warehouse 1 : r/Scotch - RedditMore results from www.reddit.com In stock Rating 4.416Laphroaig Cairdeas Warehouse 1 2022 750ML is a cask strength Islay single",
+        "results": [
+          {
+            "title": "Càirdeas 2022 Warehouse 1 Whisky - Laphroaig",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            "domain": "laphroaig.com",
+            "description": "Rating 5.0(2)The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Càirdeas Warehouse 1 Islay Single Malt Scotch Whisky",
+            "url": "https://jensensliquors.com/products/laphroaig-cairdeas-warehouse-1-islay-single-malt-scotch-whisky",
+            "domain": "jensensliquors.com",
+            "description": "In stock Rating 5.01Bottled at 52.2% ABV for a memorable experience to share with your Friends. The legend of Laphroaig spans over 200 years. ... Nose: Peaty, sweet and nutty with “ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #755: Laphroaig Cairdeas 2022 \"Warehouse 1,\" 52.2% - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/y1u64c/review_755_laphroaig_cairdeas_2022_warehouse_1_522/",
+            "domain": "reddit.com",
+            "description": "Oct 12, 2022Laphroaig Càirdeas 2022 “Warehouse 1” Is Coming! : r/ScotchReview #503 - Laphroaig Cairdeas Warehouse 1 : r/Scotch - RedditMore results from www.reddit.com",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas Warehouse 1 2022 750ML | Cask Strength",
+            "url": "https://theliquorbarn.com/products/laphroaig-cairdeas-warehouse-1-2022-750ml",
+            "domain": "theliquorbarn.com",
+            "description": "In stock Rating 4.416Laphroaig Cairdeas Warehouse 1 2022 750ML is a cask strength Islay single malt Scotch whisky bottled at 52.2% ABV (104.4 proof).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas - Ratings and Reviews | Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/209611/laphroaig-cairdeas",
+            "domain": "whiskybase.com",
+            "description": "Rating 4.4(565)May 5, 2022 · The Cáirdeas Warehouse 1 is finely chiseled, initially even soft on the tongue, but this should not be confused with weakness, because it has an ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "41187903a44aacaefac7f060ecf06218312bf927c64f06262432e6da3f3f0d3b",
+    "mode": "auto"
+  }
+}

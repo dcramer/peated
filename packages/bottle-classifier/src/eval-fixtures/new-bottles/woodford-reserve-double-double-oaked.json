@@ -2,11 +2,20 @@
   "id": "woodford-double-double-oaked",
   "referenceName": "Woodford Reserve Double Double Oaked",
   "expectedBottleName": "Woodford Reserve Double Double Oaked",
-  "summary": "Treat Woodford Reserve Double Double Oaked as its own bottle identity and do not collapse the repeated Double wording into Double Oaked.",
+  "summary": "Require review when the source says only Woodford Reserve Double Double Oaked. The producer has marketed separate yearly releases under that name, so the name alone does not identify a complete Bottle.",
   "peatedBottleIds": [44022],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+      "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+      "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/"
+    ],
+    "notes": "Reviewed September 4, 2026. Woodford Reserve lists separate Double Double Oaked releases in 2015, 2017, 2018, 2019, and 2020, and calls the 2023 bottling an annual release. The current producer page omits a year, while the current 700 ml product describes two additional years in the second barrel and the 2023 release describes one. A name-only input cannot establish which marketed release was observed."
+  },
   "expected": {
-    "handlingStrategy": "classifier_required",
-    "classifierExpectation": "bottle",
+    "handlingStrategy": "block_if_uncertain",
+    "classifierExpectation": "review_required",
     "exactBottleIdentity": null
   }
 }

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:46:18.977Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Lagavulin Distillers Edition 2023 official product 43% PX cask"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Lagavulin Distillers Edition 2023 official product 43% PX cask",
+        "summary": "This generally incorporates an additional finishing cask into the maturation process; in this case, it's Pedro Ximenez-seasoned sherry casks, on ...Lagavulin distiller's editionLagavulin 16 and Lagavulin Distiller's EditionMore results from www.reddit.com In stock Rating 4.827Lagavulin Distillers Edition is a true masterpiece of whisky-making that has been enriched by a unique refining process in second maturing Pedro Ximenez ... In stock Rating 4.745Aged for sixteen years and finished in sherry casks, this limited edition whisky is one of the boldest and most intense whiskies ever made. $111.",
+        "results": [
+          {
+            "title": "Review #204 - Lagavulin Distiller's Edition : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/199s2zi/review_204_lagavulin_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "This generally incorporates an additional finishing cask into the maturation process; in this case, it's Pedro Ximenez-seasoned sherry casks, on ...Lagavulin distiller's editionLagavulin 16 and Lagavulin Distiller's Edit",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition PX Casks Scotch Whiskey 750ml",
+            "url": "https://uptownspirits.com/products/lagavulin-distillers-edition-px-casks-2022-scotch-whiskey-750ml",
+            "domain": "uptownspirits.com",
+            "description": "In stock Rating 4.827Lagavulin Distillers Edition is a true masterpiece of whisky-making that has been enriched by a unique refining process in second maturing Pedro Ximenez ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition Single Malt Scotch Whisky: Buy Now | Caskers",
+            "url": "https://www.caskers.com/lagavulin-distillers-edition-single-malt-scotch-whisky/",
+            "domain": "caskers.com",
+            "description": "In stock Rating 4.745Aged for sixteen years and finished in sherry casks, this limited edition whisky is one of the boldest and most intense whiskies ever made. $111.99.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review: Lagavulin Distillers Edition - Scotchology ·",
+            "url": "https://www.scotchology.com/islay/lagavulin-distillers-edition",
+            "domain": "scotchology.com",
+            "description": "Apr 24, 2014",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition (2023, USA) - Diving for Pearls",
+            "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Lagavulin Distillers Edition (2023, USA) ; Owner: Diageo ; Region: Southern Islay ; Maturation: bourbon casks first, then Pedro Ximenez casks.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "795279140efa4a1116dc9999e3f7e52caece6ae7c1e3f8a16eabc6cef267dbf2",
+    "mode": "auto"
+  }
+}

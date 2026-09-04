@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:45:09.900Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.glenmorangie.com/en-us/products/glenmorangie-a-tale-of-ice-cream",
+    "focus": "official product title, expression, ABV, series/release wording, and whether it is an independent bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "official product title, expression, ABV, series/release wording, and whether it is an independent bottling",
+    "summary": "Glenmorangie A Tale of Ice Cream\n\nABV: 46.0%\n\nGlenmorangie A Tale of Ice Cream is the fifth release in our award-winning A Tale Of… series, which showcases our whisky creators’ relentless imagination.",
+    "results": [
+      {
+        "title": "Glenmorangie A Tale of Ice Cream | Single Malt Whisky | Limited Edition",
+        "url": "https://www.glenmorangie.com/en-us/products/glenmorangie-a-tale-of-ice-cream",
+        "domain": "glenmorangie.com",
+        "description": "Sweet, indulgent and wondrously creamy, our latest limited edition encapsulates the ice cream parlour’s delights. Glenmorangie A Tale of Ice Cream is the fifth release in our award-winning A Tale Of… series, which showcases our whisky creators’ relentless imagination.   Some time ago, Dr Bill began to imagine how he co, Render hosted liquid elements to pixel perfect parameters., Render hosted liquid elements to pixel perfect parameters.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3ad404fe74b6b5fb31736a4cc22e164b33fe0b6aef9cc9581719d79dace7ee16",
+    "mode": "auto"
+  }
+}

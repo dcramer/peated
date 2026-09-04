@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:22:53.887Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Four Roses Limited Edition Small Batch 2017 official 2017 release ABV bourbon"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Limited Edition Small Batch 2017 official 2017 release ABV bourbon",
+        "summary": "# Blog\n## Four Roses 2017 Limited Edition Small Batch Bourbon\n**Details:** 54% ABV. ## 2017 Limited Edition Small Batch\n![Four roses](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.files.svdcdn.com%2Fproduction%2Fimages%2Fbourbons%2Ffour-roses.png%3Fdm%3D1757960468&w=2560&q=75)![2017 Limited Edition Small Batch](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.files.svdcdn.com%2Fproduction%2Fimages%2Fbourbons%2F2017-Limited-Edition-Small-Batch.png%3Fdm%3D1757960372&w=2560&q=75)\n\n![Four roses](https://www.fourrosesbourbon.com/_next/image?url=h",
+        "results": [
+          {
+            "title": "Four Roses 2017 Limited Edition Small Batch Bourbon",
+            "url": "https://www.bourbonguy.com/blog/2017/9/26/four-roses-2017-limited-edition-small-batch-bourbon",
+            "domain": "bourbonguy.com",
+            "description": "# Blog\n## Four Roses 2017 Limited Edition Small Batch Bourbon\n**Details:** 54% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "2017 Four Roses Limited Edition: A Perfect Year",
+            "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+            "domain": "fourrosesbourbon.com",
+            "description": "## 2017 Limited Edition Small Batch\n![Four roses](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.files.svdcdn.com%2Fproduction%2Fimages%2Fbourbons%2Ffour-roses.png%3Fdm%3D1757960468&w=2560&q=75",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #241: Four Roses Limited Edition 2017 : r/bourbon - Reddit",
+            "url": "https://www.reddit.com/r/bourbon/comments/1e5mzsb/review_241_four_roses_limited_edition_2017/",
+            "domain": "reddit.com",
+            "description": "Blend of 12-15 yo bourbons Proof: 107.3 proof (53.65%) it is 75% corn, 20% rye, 5% malted barley fresh cherries, go for around $300 and are ...Review #250: Four Roses Limited Edition Small Batch 2017 - RedditReview #202 ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Al Young 50th Anniversary Bourbon Review",
+            "url": "https://www.bourbonbanter.com/four-roses-2017-limited-edition-al-young-50th-anniversary-small-batch-bourbon-review/",
+            "domain": "bourbonbanter.com",
+            "description": "Sep 4, 2017",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Limited Edition Small Batch 2017 Release",
+            "url": "https://therarewhiskeyshop.com/products/four-roses-limited-edition-small-batch-2017-release",
+            "domain": "therarewhiskeyshop.com",
+            "description": "In stock $30 deliveryBottled at barrel strength, the remarkably balanced 2017 Limited Edition Small Batch introduces warm aromas of allspice and vanilla bean, mingled with rich ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ca81dfe12f76bc27e5c9b79dd23940d1743df57d7b33174f9c4720da1d5e082a",
+    "mode": "auto"
+  }
+}

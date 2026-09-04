@@ -1,0 +1,44 @@
+{
+  "writtenAt": "2026-09-04T19:41:37.522Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["site:compassboxwhisky.com \"Rogues' Banquet\" Compass Box"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:compassboxwhisky.com \"Rogues' Banquet\" Compass Box",
+        "summary": "# Rogues' Banquet\n[**Rogues' Banquet**](https://www.compassboxwhisky.com/products/rogues-banquet)\n\n# [www.compassboxwhisky.com](http://www.compassboxwhisky.com) is blocked\n## Welcome!\n![Rogues' Banquet](https://www.compassboxwhisky.com/cdn/shop/files/RoguesBanquet.png?v=1722005483&width=1445) From light, delicate, and elegant to rich, big and smoky, Compass Box ... Rogues' Banquet · Rogues' Banquet. Blended Scotch Whisky ... Sold out. Rivals · Rivals. Sold out. Rogues' Banquet · Rogues' Banquet. Scot-Free · Scot-Free · Secrets of Smoke ...",
+        "results": [
+          {
+            "title": "Rogues' Banquet - Compass Box",
+            "url": "https://www.compassboxwhisky.com/products/rogues-banquet",
+            "domain": "compassboxwhisky.com",
+            "description": "# Rogues' Banquet\n[**Rogues' Banquet**](https://www.compassboxwhisky.com/products/rogues-banquet)\n\n# [www.compassboxwhisky.com](http://www.compassboxwhisky.com) is blocked\n## Welcome!\n![Rogues' Banquet](https://www.compa",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskies - Compass Box",
+            "url": "https://www.compassboxwhisky.com/pages/whiskies",
+            "domain": "compassboxwhisky.com",
+            "description": "From light, delicate, and elegant to rich, big and smoky, Compass Box ... Rogues' Banquet · Rogues' Banquet. Blended Scotch Whisky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskies – Page 5 - Compass Box",
+            "url": "https://www.compassboxwhisky.com/collections/whiskies?page=5",
+            "domain": "compassboxwhisky.com",
+            "description": "Sold out. Rivals · Rivals. Sold out. Rogues' Banquet · Rogues' Banquet. Scot-Free · Scot-Free · Secrets of Smoke ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "29a68805bcf56115e725b72010bd28a3ea52bd45a22149b36559b233929e20fe",
+    "mode": "auto"
+  }
+}

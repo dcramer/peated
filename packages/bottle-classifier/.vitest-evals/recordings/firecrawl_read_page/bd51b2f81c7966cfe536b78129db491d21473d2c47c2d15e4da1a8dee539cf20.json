@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:33:19.280Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113.html?utm=peated",
+    "focus": "Confirm the producer's exact product title and identity details including brand, expression, age, category, ABV, edition or variant wording, and distillery/bottler relationships."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the producer's exact product title and identity details including brand, expression, age, category, ABV, edition or variant wording, and distillery/bottler relationships.",
+    "summary": "CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY\n\ncanadian club 9 year old reserve canadian whisky\n\nCanadian Whiskey\n\n40%\n\nThis reserve whisky is matured in white-oak barrels for 9 years and then barrel-blended by our Master Blender, to create a rich and smooth flavor.",
+    "results": [
+      {
+        "title": "Canadian Club 9 Year Old Reserve Canadian Whisky | ReserveBar",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113.html?utm=peated",
+        "domain": "reservebar.com",
+        "description": "For some of the best prices on Canadian Club 9 Year Old Reserve Canadian Whisky, order from ReserveBar today, get it in under 2-hours in select states.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bd51b2f81c7966cfe536b78129db491d21473d2c47c2d15e4da1a8dee539cf20",
+    "mode": "auto"
+  }
+}

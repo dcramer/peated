@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:51:53.108Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Glenglassaugh\" \"1978\" \"Rare Cask Release\" \"Batch 1\" 35 year old",
+      "\"Glenglassaugh Rare Cask Release\" 1978 35-year-old"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenglassaugh\" \"1978\" \"Rare Cask Release\" \"Batch 1\" 35 year old",
+        "summary": "1978 700ml. Glenglassaugh 35 Year Old 1978 (cask 1810) Rare Cask Release Batch 1 70cl, 42.9%. In stock (). Whisky-Online.com Ltd. Open Closed Closing soon ... 12–13 day delivery 14-day returnsGlenglassaugh 35 Year Old 1978 (cask 1810) - Rare Cask Release Batch 1 70cl Whisky. Scotland • 70cl • 42.9%. Product details. £365. 70cl (Sold out). Glenglassaugh 35 Year Old 1978 (cask 1810) Rare Cask Release Batch 1 70cl, 42.9%. €1,350 Original price was: €1,350. €1,180 ... Rating 4.6(43)Apr 6, 2014 · Glenglassaugh. Bottler: Distillery Bottling; Bottling series: Rare Cask Release - Batch 1; Vintage: 06.",
+        "results": [
+          {
+            "title": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single ...",
+            "url": "https://www.wine-searcher.com/find/glenglassaugh+rare+cask+35+old+port+hogs+head+single+malt+scotch+whisky+highlands+scotland",
+            "domain": "wine-searcher.com",
+            "description": "1978 700ml. Glenglassaugh 35 Year Old 1978 (cask 1810) Rare Cask Release Batch 1 70cl, 42.9%. In stock (). Whisky-Online.com Ltd. Open Closed Closing soon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 35 Year Old 1978 (cask 1810) - Master Of Malt",
+            "url": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1810-rare-cask-release-batch-1-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "12–13 day delivery 14-day returnsGlenglassaugh 35 Year Old 1978 (cask 1810) - Rare Cask Release Batch 1 70cl Whisky. Scotland • 70cl • 42.9%. Product details. £365. 70cl (Sold out).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh - Whisky Online Cyprus",
+            "url": "https://whiskyonlinecy.com/product-category/glenglassaugh/",
+            "domain": "whiskyonlinecy.com",
+            "description": "Glenglassaugh 35 Year Old 1978 (cask 1810) Rare Cask Release Batch 1 70cl, 42.9%. €1,350 Original price was: €1,350. €1,180 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 - Ratings and reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/53799/glenglassaugh-1978",
+            "domain": "whiskybase.com",
+            "description": "Rating 4.6(43)Apr 6, 2014 · Glenglassaugh. Bottler: Distillery Bottling; Bottling series: Rare Cask Release - Batch 1; Vintage: 06.10.1978; Bottled: 02.2014; Stated Age: 35 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry Hogshead ...",
+            "url": "https://www.spiritradar.com/whisky-db/glenglassaugh-1978-rare-cask-release-batch-1-41.6-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry Hogshead #1803 41.6% 700ml information. This is an exclusive whisky of only 351 bottles available ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenglassaugh Rare Cask Release\" 1978 35-year-old",
+        "summary": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single Malt Scotch Whisky ; Region: UK ; Price: over $ 750 ; Cyprus · Paphos ; UK · Blackpool ; Netherlands ... Glenglassaugh Rare Cask Release #1810 Whisky 35 Year Old · 1978 Vintage ... \"One of those quiet, unassuming chaps who takes about half an hour to fully fathom. In stock Free deliveryGlenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single Malt Scotch Whisky is a 42.9% Single Malt Scotch Whisky from Scotland. Glenlivet 21 Year Old Whisky · Glenglassaugh Rare Cask Release Batch 3 Whisky, Cask #3510 | Aged scotch whisky p",
+        "results": [
+          {
+            "title": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single ...",
+            "url": "https://www.wine-searcher.com/find/glenglassaugh+rare+cask+35+old+port+hogs+head+single+malt+scotch+whisky+highlands+scotland",
+            "domain": "wine-searcher.com",
+            "description": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single Malt Scotch Whisky ; Region: UK ; Price: over $ 750 ; Cyprus · Paphos ; UK · Blackpool ; Netherlands ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh - 35 year old Rare Cask Release #1810 1978 ...",
+            "url": "https://www.htfw.com/glenglassaugh-rare-cask-release-1810-1978-35-year-old-whisky",
+            "domain": "htfw.com",
+            "description": "Glenglassaugh Rare Cask Release #1810 Whisky 35 Year Old · 1978 Vintage ... \"One of those quiet, unassuming chaps who takes about half an hour to fully fathom.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single ...",
+            "url": "https://www.frootbat.com/p/256589/glenglassaugh-rare-cask-release-35-year-old-port-hogshead-single-malt-scotch-whisky",
+            "domain": "frootbat.com",
+            "description": "In stock Free deliveryGlenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single Malt Scotch Whisky is a 42.9% Single Malt Scotch Whisky from Scotland.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 / 35 Year Old Scotch Whisky | Glenesk single ...",
+            "url": "https://in.pinterest.com/pin/glenglassaugh-1978-35-year-old-scotch-whisky--795940934151674030/",
+            "domain": "in.pinterest.com",
+            "description": "Glenlivet 21 Year Old Whisky · Glenglassaugh Rare Cask Release Batch 3 Whisky, Cask #3510 | Aged scotch whisky packaging. Glenglassaugh Rare Cask Release Batch ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for 1978 glenglassaugh rare cask highlands single ...",
+            "url": "https://www.wine-searcher.com/find/glenglassaugh+rare+cask+highlands+single+malt+whisky/1978",
+            "domain": "wine-searcher.com",
+            "description": "Glenglassaugh Rare Cask Release 35 Year Old Port Hogshead Single Malt Scotch Whisky. Highlands, Scotland. $1670. Label of Glenglassaugh Rare Cask Release ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f133abc2605aafd61e7370518dce7666b1be971e407a5f5495695b4ecbec42ea",
+    "mode": "auto"
+  }
+}

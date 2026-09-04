@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:38:06.883Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+    "focus": "Confirm title, age, chapter, vintage year, ABV, and bottler details."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm title, age, chapter, vintage year, ABV, and bottler details.",
+    "summary": "Just crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the nick of time and marvel at its soft, generous waxiness, its phantasmagoric mineral properties, its luscious white and yellow fruit notes and its general old school glory.",
+    "results": [
+      {
+        "title": "Whiskyland Twenty Nine Glenturret 35 years old | Decadent Drinks",
+        "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+        "domain": "decadent-drinks.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f59a9aefc933fa2f4f656ed1ed5df7dbb01b45fa66adcacc2b2df54302418d36",
+    "mode": "auto"
+  }
+}

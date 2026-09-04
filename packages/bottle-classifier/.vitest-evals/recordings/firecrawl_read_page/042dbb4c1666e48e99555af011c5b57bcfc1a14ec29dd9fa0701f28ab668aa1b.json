@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:41:42.555Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.compassboxwhisky.com/products/rogues-banquet",
+    "focus": "Confirm the exact marketed product name, whether it is a distinct edition or batch, and any ABV, release year, bottler/producer, or other identity-critical details."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product name, whether it is a distinct edition or batch, and any ABV, release year, bottler/producer, or other identity-critical details.",
+    "summary": "Rogues' Banquet\n\nBlended Scotch Whisky\n\n46% ABV, Natural Colour, Not Chill-Filtered.\n\nRogues’ Banquet is a gastronomically-inspired Limited Edition, made for the gourmands and the hedonists who have accompanied us for the last two decades.\n\nWe released Rogues' Banquet in March 2020, just as gatherings of people were first discouraged, with the hope that people would soon be able to enjoy each other's company again safely and pour something delicious at the same time.\n\nA limited edition of 5,267 bottles.\n\nFebruary 2020.",
+    "results": [
+      {
+        "title": "Rogues' Banquet\n – Compass Box",
+        "url": "https://www.compassboxwhisky.com/products/rogues-banquet",
+        "domain": "compassboxwhisky.com",
+        "description": "Compass Box",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "042dbb4c1666e48e99555af011c5b57bcfc1a14ec29dd9fa0701f28ab668aa1b",
+    "mode": "auto"
+  }
+}

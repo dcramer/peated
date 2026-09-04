@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:26:03.865Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+    "focus": "Confirm the canonical product name, official producer or distillery relationship, and alcohol by volume for the standard Maker's Mark bourbon."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the canonical product name, official producer or distillery relationship, and alcohol by volume for the standard Maker's Mark bourbon.",
+    "summary": "Maker’s Mark® Kentucky Straight Bourbon\n\n90",
+    "results": [
+      {
+        "title": "Maker's Mark: Kentucky Straight Bourbon | Maker's Mark®",
+        "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+        "domain": "makersmark.com",
+        "description": "Made with soft red winter wheat, Maker's Mark® is a full-flavored bourbon handcrafted the way our founder intended. Shop our Kentucky Straight Bourbon.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c4b467c7f4b96c6a3436df28130174d56d2046e17eb8db9182020a7055f7d89c",
+    "mode": "auto"
+  }
+}

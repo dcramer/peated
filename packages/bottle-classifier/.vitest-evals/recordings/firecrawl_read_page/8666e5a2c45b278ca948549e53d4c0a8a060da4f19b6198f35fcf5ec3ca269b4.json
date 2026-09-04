@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:59:04.893Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://example.com/harbor-ledger/batch-24",
+    "focus": "Verify the exact Harbor Ledger Batch 24 product identity, release year, and bottled ABV/proof."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact Harbor Ledger Batch 24 product identity, release year, and bottled ABV/proof.",
+    "summary": null,
+    "results": [
+      {
+        "title": "Example Domain",
+        "url": "https://example.com/harbor-ledger/batch-24",
+        "domain": "example.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8666e5a2c45b278ca948549e53d4c0a8a060da4f19b6198f35fcf5ec3ca269b4",
+    "mode": "auto"
+  }
+}

@@ -33,7 +33,7 @@ evidence because their text is not globally unique.
 | Highland Park Cask Strength No. 5   | Luna created the right product with the right edition and ABV. Only `releaseYear: 2024` was absent. The captured evidence showed an article date, not an explicit product release year.                      | Expectation/evidence            | Verify the year expectation first. If a product-specific source states 2024, add it to the fixed evidence; otherwise remove the unsupported expected field.                                           |
 | Lagavulin Distillers Edition        | Luna found that Distillers Edition has annual releases and refused to assign the generic candidate from an underspecified title.                                                                             | Identity expectation            | Verify whether Peated intentionally treats the generic row as an ongoing Bottle. This is a catalog-policy decision before a classifier change.                                                        |
 | Octomore 13.1                       | Luna made two focused searches. Firecrawl returned a collection page and unrelated producer pages, and Luna never received an exact product page.                                                            | Retrieval                       | Test exact-product page recovery: read a high-ranked exact producer result automatically, and return a clear read failure when the exact page is unavailable.                                         |
-| The Whistler Bodega Cask            | The producer page said 86 proof while retailer evidence said 46% ABV. Luna returned `no_match` because it could not establish whether these were separate market releases.                                   | Expectation/evidence            | Verify whether 43% and 46% releases are separate Bottles. Preserve `no_match` if the observed source cannot identify the release.                                                                     |
+| The Whistler Bodega Cask            | The producer page said 86 proof while exact-product evidence said 46% ABV. Luna returned `no_match` because it could not establish which version the name-only input observed.                               | Expectation/evidence            | Corrected in M09: require review until the observed source supplies a release-specific label, URL, or ABV.                                                                                            |
 | Watchpost text case                 | Web evidence described an eight-year Westland component and an MGP component. Luna promoted the component age and both component makers into whole-Bottle fields.                                            | Web evidence shape              | Test structured page facts with an explicit subject: `whole_product` or `component`. The classifier should receive the role with the fact instead of recovering it from prose.                        |
 | Watchpost image case                | Luna repeated the component error: it set Bottle age to eight and added MGP as a second distiller. The expected Bottle keeps the age unknown and only Westland as the resolved distiller.                    | Web evidence shape              | Use the same component/whole-product experiment as the text case; these are two inputs for one failure mechanism.                                                                                     |
 | Compass Box Hedonism²               | Luna found age, bottling year, ABV, and outturn, but omitted all three component distilleries in one run. Other focused attempts alternated between the individual facts and the distilleries.               | Evidence retention/final output | Test a list of supported facts plus one draft check that names supported facts omitted from the final creation. It must not add facts automatically.                                                  |
@@ -69,17 +69,26 @@ boundaries:
 1. **Stable product name check:** test Russell's Reserve and Creag Isle with
    exact source titles and accepted references. Include deliberately short
    producer names and category words that are part of marketed identity.
+   C21's broad positive/negative pair was rejected after it fixed Black Label
+   but stripped producer-marketed `Whiskey` from Woodford Reserve.
+   C22 protected that producer wording, but full accuracy stayed flat while
+   Creag Isle and Black Label's category regressed. Do not add more general
+   naming examples from these cases.
 2. **Bound expensive audit work:** inspect the malformed Laphroaig and Dramfool
    traces. The latest run spent 87,044 and 49,187 tokens on those cases. Test a
    narrow stop or missing-operation check only after locating the repeated work.
-3. **List supported facts before the final draft:** test Hedonism², Willett,
-   and Proof and Wood. The check reports omissions to Luna once; it never fills
-   a field itself. Measure the added request, tokens, time, and repaired fields.
+3. **List supported facts before the final draft:** C26 first tested the
+   smaller prompt-only version on Willett and Proof and Wood. It fixed the
+   target Boolean fields in focused runs but cost more. Its broad comparison
+   used different source revisions, so it did not establish an accuracy change
+   or show that the examples caused an unsupported exact-cask creation. Any
+   future draft check must keep source scope explicit and use a same-revision
+   control.
 4. **Whole-product versus component facts:** test both Watchpost inputs and a
    true age-stated blend comparison case. This belongs in the web evidence contract.
 
-Expectation reviews for Highland Park, Lagavulin, Whistler, Quinta Ruban,
-Hibiki, and Pōkeno should happen before spending model tokens on those cases.
+Expectation reviews for Highland Park, Lagavulin, Quinta Ruban, Hibiki, and
+Pōkeno should happen before spending model tokens on those cases.
 
 C12 through C14 completed the source-page work. The broad versions were
 rejected; the accepted version reads one exact page only when verified local

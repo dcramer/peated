@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:23:57.753Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.auctionzip.com/Listings/4172226.html",
+    "focus": "exact product title, age, ABV, cask strength, maturation, edition or release year for Heaven's Door The Bootleg Series Vol. 3"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "exact product title, age, ABV, cask strength, maturation, edition or release year for Heaven's Door The Bootleg Series Vol. 3",
+    "summary": "| 99            Heaven's Door The Bootleg Series Vol. 3 13-Year |\n| Heaven's Door The Bootleg Series Volume 3 13-Year Cask Strength Kentucky Straight Bourbon Whiskey #0682 / 3949 121.1 Proof 750mL |",
+    "results": [
+      {
+        "title": "Public Auction Sale: Bourbon and Spirits Online Only Auction - Stamping Ground, KY",
+        "url": "https://www.auctionzip.com/Listings/4172226.html",
+        "domain": "auctionzip.com",
+        "description": "Public Auction: \"Bourbon and Spirits Online Only Auction\" by Moon Auction Group. Auction will be held on Sun Sep 13 @ 06:00PM at 3399 Main Street in Stamping Ground, KY 40379. See photos and more auction details on AuctionZip.com Now.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2dc4cab74dc61c057439c7cd7a9317266c2b21d88d3e7883a6b8e129e78f8f39",
+    "mode": "auto"
+  }
+}

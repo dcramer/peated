@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:39:12.713Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.prnewswire.com/news-releases/deouvrez-les-saveurs-de-l-ecosse-avec-la-gamme-johnnie-walker-black-label-origin-891724152.html",
+    "focus": "product title and exact details for Johnnie Walker Black Label Islay Origin, including age, category, ABV, and release wording"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "product title and exact details for Johnnie Walker Black Label Islay Origin, including age, category, ABV, and release wording",
+    "summary": null,
+    "results": [
+      {
+        "title": "https://www.prnewswire.com/news-releases/deouvrez-les-saveurs-de-l-ecosse-avec-la-gamme-johnnie-walker-black-label-origin-891724152.html",
+        "url": "https://www.prnewswire.com/news-releases/deouvrez-les-saveurs-de-l-ecosse-avec-la-gamme-johnnie-walker-black-label-origin-891724152.html",
+        "domain": "prnewswire.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7e8fabd6c1aeef97983abd3c59cedb45f469896e585034bef2a1eee06a29abc4",
+    "mode": "auto"
+  }
+}

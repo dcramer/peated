@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:45:06.663Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Glenmorangie \"A Tale of Ice Cream\" single malt official product ABV release year"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie \"A Tale of Ice Cream\" single malt official product ABV release year",
+        "summary": "In stock Rating 4.728Glenmorangie A Tale of Ice Cream is the fifth release in our award-winning A ... Year, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 ... Out of stock Rating 4.728Carefully distilled by Glenmorangie in Scotland and bottled at 46% ABV, this is a well-rounded Single Malt Scotch meant to be enjoyed by spirits enthusiasts ... In stock Rating 4.214Glenmorangie A Tale of Ice Cream, 5th in the award-winning A Tale Of series. High-vanillin and bourbon casks. Non chill filtered, 92 proof, 700ml. Glenmorangie A Tale of Ice Cream is the fifth release in our aw",
+        "results": [
+          {
+            "title": "Glenmorangie A Tale of Ice Cream | Single Malt Whisky | Limited Edition",
+            "url": "https://www.glenmorangie.com/en-us/products/glenmorangie-a-tale-of-ice-cream",
+            "domain": "glenmorangie.com",
+            "description": "In stock Rating 4.728Glenmorangie A Tale of Ice Cream is the fifth release in our award-winning A ... Year, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie A Tale of Ice Cream Single Malt Scotch Whisky - Flaviar",
+            "url": "https://flaviar.com/products/glenmorangie-a-tale-of-ice-cream-single-malt-scotch-whisky-750",
+            "domain": "flaviar.com",
+            "description": "Out of stock Rating 4.728Carefully distilled by Glenmorangie in Scotland and bottled at 46% ABV, this is a well-rounded Single Malt Scotch meant to be enjoyed by spirits enthusiasts ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie A Tale of Ice Cream Limited Edition 700ml",
+            "url": "https://www.liquoronbroadway.com/products/glenmorangie-a-tale-of-ice-cream-single-malt-scotch-whisky-750ml",
+            "domain": "liquoronbroadway.com",
+            "description": "In stock Rating 4.214Glenmorangie A Tale of Ice Cream, 5th in the award-winning A Tale Of series. High-vanillin and bourbon casks. Non chill filtered, 92 proof, 700ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Tale of Ice Cream | Glenmorangie Single Malt Whisky | Limited Edition",
+            "url": "https://www.glenmorangie.com/en-us/pages/a-tale-of-ice-cream",
+            "domain": "glenmorangie.com",
+            "description": "Glenmorangie A Tale of Ice Cream is the fifth release in our award-winning A ... Year, 2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review # 67 - Glenmorangie - A Tale of Ice Cream : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1fvjw1z/review_67_glenmorangie_a_tale_of_ice_cream/",
+            "domain": "reddit.com",
+            "description": "Glenmorangie A Tale of Ice Cream. Price: $99.99 before tax. ABV: 46% - 92 Proof. Went to a big box liquor store. Saw this.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d3486a65d5ae1f3a1d9d01e661483813f7a66ce81a96cb85809c385fa675936a",
+    "mode": "auto"
+  }
+}

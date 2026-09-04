@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:37:04.598Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.reservebar.com/products/russells-reserve-single-barrel-rye/GROUPING-324016?utm=peated",
+    "focus": "canonical product title, age statement, ABV/proof, cask strength or single barrel wording, and whether this is a distinct rye release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "canonical product title, age statement, ABV/proof, cask strength or single barrel wording, and whether this is a distinct rye release",
+    "summary": "RUSSELL'S RESERVE SINGLE BARREL RYE\n\n52%\n\nGluten Free\n\nRussell’s Reserve has continuously produced some of the best rye whiskeys on the market, and this non-chill filtered, 104 proof single barrel rye is no exception.",
+    "results": [
+      {
+        "title": "Russell's Reserve Single Barrel Rye | ReserveBar",
+        "url": "https://www.reservebar.com/products/russells-reserve-single-barrel-rye/GROUPING-324016?utm=peated",
+        "domain": "reservebar.com",
+        "description": "For some of the best prices on Russell's Reserve Single Barrel Rye, order from ReserveBar today, get it in under 2-hours in select states.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6c543d1a838b97f851d5f8375071367899677e02ca299c806970c659b341ce11",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:48:16.891Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+    "focus": "Confirm the official product title, stated age, marketed edition wording, and whether this is an official Glenmorangie release or an independent bottling."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the official product title, stated age, marketed edition wording, and whether this is an official Glenmorangie release or an independent bottling.",
+    "summary": "Glenmorangie The Quinta Ruban 14 Years Old\n\nABV: 46.0% | Volume: 75cl",
+    "results": [
+      {
+        "title": "The Quinta Ruban 14 Years Old | Glenmorangie",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": "Buy Online Now. The Quinta Ruban Glenmorangie 14 year old single malt whisky matured in port casks. It has incredible flavour combinations. Walnut and black pepper. Mandarin orange and melted marshmallow., Render hosted liquid elements to pixel perfect parameters., Render hosted liquid elements to pixel perfect parameters.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "19280edf65e5abdbc6d009fb19d08aa61194af17a26837fad36c6b9dd34ba13a",
+    "mode": "auto"
+  }
+}

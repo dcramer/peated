@@ -74,6 +74,18 @@ Do these before using the suite to judge more classifier changes.
       the real Peated Bottle is deliberately absent. Age 6 and 56% ABV remain
       required. See [M08 results](./M08-held-out-release-year.md).
 
+- [x] **M09 — Require review for an ambiguous Whistler source.** **Accepted as
+      a measurement correction.** The name-only input cannot distinguish the
+      producer's 86-proof Bodega Cask from exact-product evidence for a 46%
+      version. The safer `no_match` result is now correct. See
+      [M09 results](./M09-whistler-release-ambiguity.md).
+
+- [x] **M10 — Require review for name-only Double Double Oaked.** **Accepted as
+      a measurement correction.** Woodford Reserve has marketed separate yearly
+      releases under this name. A source without a year, label, or URL does not
+      identify a complete Bottle. See
+      [M10 results](./M10-woodford-release-ambiguity.md).
+
 ## Improve the classifier
 
 Test these one at a time, in this order. Each needs cases that must keep working
@@ -255,6 +267,44 @@ and cases with different Bottle names from the failure that led to it.
       wrong Bottle once. See
       [C20 results](./C20-catalog-is-not-product-evidence.md).
 
+- [x] **C21 — Show both sides of stable Bottle naming.** **Rejected and
+      reverted.** One positive and one negative fictional example fixed Black
+      Label but newly removed producer-marketed `Whiskey` from Woodford Reserve.
+      Full accuracy stayed 3/5, total tokens rose 2.4%, and median time rose
+      24.3%. See [C21 results](./C21-stable-name-examples.md).
+
+- [x] **C22 — Contrast producer and retailer name authority.** **Rejected and
+      reverted.** The narrower pair kept Woodford Reserve and Black Label names
+      more consistently, but full accuracy stayed 10/15. Creag Isle lost its
+      one pass and Black Label's category fell from 3/3 to 1/3. Tokens and cost
+      fell, while median time rose. See
+      [C22 results](./C22-source-authority-name-examples.md).
+
+- [x] **C23 — Stop expensive audits early.** **Rejected before a treatment
+      run.** Both saved traces used later turns to correct distinct tool
+      rejections. An early stop would remove useful recovery and make the
+      passing Dramfool audit fail. See [C23 results](./C23-audit-early-stop.md).
+
+- [x] **C24 — Label product and component page passages.** **Stopped after the
+      first control.** The unchanged classifier passed both Watchpost cases
+      when given the exact producer page. JSON passage sorting would raise each
+      Firecrawl page read from one credit to five. See
+      [C24 results](./C24-subject-labeled-page-passages.md).
+
+- [x] **C25 — Point an exhausted search to page reading.** **Rejected and
+      reverted.** The unchanged classifier passed 9/9 focused judgments. The
+      changed version passed 7/9, raised estimated cost 6.6%, and made the
+      median case 41.9% slower. See
+      [C25 results](./C25-page-read-after-search-exhaustion.md).
+
+- [x] **C26 — Explain true, false, and unknown single-cask values.**
+      **Inconclusive and reverted.** Focused passes improved from 6/9 to 8/9,
+      while cost rose 31.5% and time rose 5.5%. The broad comparison used a
+      saved control from a different source commit. After correcting two
+      ambiguous expectations, the observed runs score 78/105 and 80/105, but
+      the comparison still does not isolate the examples. See
+      [C26 results](./C26-single-cask-examples.md).
+
 ## Current stopping point
 
 C09 and C10 improve checks after Luna, while C11 removes model work for Bottle
@@ -270,11 +320,18 @@ row through its tombstone and the old URL resolves to Bottle 12825. A future
 test should first model that current catalog state instead of asking Luna to
 reason around a retired duplicate.
 
-The clearest remaining concern from the latest traces is expensive audit work.
-One malformed-Bottle audit used 87,044 tokens and 97 seconds without producing
-the required operations. Another spent 49,187 tokens and 79 seconds. Inspect
-the audit tool sequence and repeated missing operations before changing its
-prompt or turn budget.
+The audit traces did not justify a shorter run. C24 then showed that exact
+producer evidence was enough to fix both Watchpost cases without changing the
+evidence shape. C25 found that the old Octomore retrieval failure no longer
+reproduces consistently: the unchanged classifier passed all three runs. Its
+extra page-read guidance produced no gain and failed two judgments.
+
+C26 made the intended Boolean fields more reliable in the focused set, but at
+higher cost and time. Its broad check used a saved control from different code,
+so the apparent two-pass loss and unsupported exact-cask creation cannot be
+assigned to the examples. The unsafe output is still a valid failure. The
+descriptions were reverted until a same-revision comparison can establish a
+net gain.
 
 ## Completion rule
 

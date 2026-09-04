@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:39:09.617Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Johnnie Walker Black Label Islay Origin 12 Year official 40% ABV release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Johnnie Walker Black Label Islay Origin 12 Year official 40% ABV release",
+        "summary": "Feb 5, 2025 ... Official answers and comments will only be given on whisky.com. http ... ralfy review 937 - Johnnie Walker 12yo @40%vol: (2022). In stock Rating 3.8(102)Buy Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky, Islay, Scotland 1.75 LTR 1.75L for $69.99 from Wine Expo Santa Monica ... I'd bet marketing - the whole line is labeled as 42% abv. Not sure why that'd be a selling point considering it's not high for a whisky, but ... Johnnie Walker Black Label 12 Year Old. Compare 6 prices from $34. ABV: 40% ... Johnnie Walker Black Label 12 Year Old Islay O",
+        "results": [
+          {
+            "title": "Tasting Notes: Johnnie Walker – Black Label (Islay Origin)",
+            "url": "https://whiskyunplugged.com/2025/02/05/tasting-notes-johnnie-walker-black-label-islay-origins/",
+            "domain": "whiskyunplugged.com",
+            "description": "Feb 5, 2025",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label Islay Origin - YouTube",
+            "url": "https://www.youtube.com/watch?v=rDkG6F_2zVw",
+            "domain": "youtube.com",
+            "description": "... Official answers and comments will only be given on whisky.com. http ... ralfy review 937 - Johnnie Walker 12yo @40%vol: (2022).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt ...",
+            "url": "https://wineexpo.com/shop/product/johnnie-walker-black-label-islay-origin-12-year-old-blended-malt-scotch-whisky-islay-scotland-1-75-ltr/5521cefa6561310003220300?option-id=10e0077c045cc9f34c3ee9bc6f0cd3d5f08c3b831bb547eed0acdd339b5493de",
+            "domain": "wineexpo.com",
+            "description": "In stock Rating 3.8(102)Buy Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky, Islay, Scotland 1.75 LTR 1.75L for $69.99 from Wine Expo Santa Monica ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "JOHNNIE WALKER BLACK LABEL ORIGIN UNVEILED : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/c6j1xt/johnnie_walker_black_label_origin_unveiled/",
+            "domain": "reddit.com",
+            "description": "I'd bet marketing - the whole line is labeled as 42% abv. Not sure why that'd be a selling point considering it's not high for a whisky, but ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 12 Year Old | Whisky Marketplace US",
+            "url": "https://www.whiskymarketplace.com/whisky/johnnie-walker-black-label-12-year-old-blended-scotch",
+            "domain": "whiskymarketplace.com",
+            "description": "Johnnie Walker Black Label 12 Year Old. Compare 6 prices from $34. ABV: 40% ... Johnnie Walker Black Label 12 Year Old Islay Origin. 700ml • 42%. $57 ? The ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "fc63a0d432cee19caf00840981f41224f569cb3ce9b2f0306cf075034dc0dc64",
+    "mode": "auto"
+  }
+}

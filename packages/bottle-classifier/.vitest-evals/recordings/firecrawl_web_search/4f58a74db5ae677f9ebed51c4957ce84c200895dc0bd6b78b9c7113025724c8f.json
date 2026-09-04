@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:36:36.091Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Masterson's 10 year Straight Rye French Oak Barrel Finished barrel F2-038",
+      "\"Masterson's Straight Rye Whiskey French Oak Barrel Finished\" \"10\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Masterson's 10 year Straight Rye French Oak Barrel Finished barrel F2-038",
+        "summary": "Back\n\n# Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2-038), 45%\nPrice: $65.00● Issue: Spring 2015 ● Reviewer: Davin de Kergommeaux ● Category: Canadian\n\n[Buy Now](https://whiskyadvocate.com/Masterson-s-10-year-old-Straight-Rye-French-Oak-Finish-Barrel-F2-038-45)\n\nFruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black licorice. Tingling cloves and ginger add zip to traces of bitter chewing tobacco. Powerful, firm, and drying with pulling tannins like a fine Bordeaux. While this is gorgeous whisky in its own right, the French oak flavors h",
+        "results": [
+          {
+            "title": "Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2-038 ...",
+            "url": "https://whiskyadvocate.com/Masterson-s-10-year-old-Straight-Rye-French-Oak-Finish-Barrel-F2-038-45",
+            "domain": "whiskyadvocate.com",
+            "description": "Back\n\n# Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2-038), 45%\nPrice: $65.00● Issue: Spring 2015 ● Reviewer: Davin de Kergommeaux ● Category: Canadian\n\n[Buy Now](https://whiskyadvocate.com/Masterson-",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+            "url": "https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "bottlebuzz.com",
+            "description": "In stock Rating 4.449On the palate, you'll notice rich notes of grilled meat, mocha, and the essence of a fine cigar box. The finish is warm and lingering, with subtle hints of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+            "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "woodencork.com",
+            "description": "In stock Rating 5.01This French finished rye is crafted from 100% rye grains grown in the verdant Pacific Northwest.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 ...",
+            "url": "https://shop.wiseguysliquors.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf",
+            "domain": "shop.wiseguysliquors.com",
+            "description": "French Oak Barrel Finished 10 Years Old 750ml for $94.99. An alluring almond-like Amber color. finished in fine grain French oak barrels for 30 days. green ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's 10 year old Straight Rye French Oak Finish (Barrel F2-038)",
+            "url": "https://www.whiskyuncorked.com/whisky/mastersons/mastersons-10-year-old-straight-rye-french-oak-finish-barrel-f2-038",
+            "domain": "whiskyuncorked.com",
+            "description": "Fruity with dried dates and figs peaches peach pits purple plum pits and hints of black licorice. Tingling cloves and ginger add zip to traces of bitter ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Masterson's Straight Rye Whiskey French Oak Barrel Finished\" \"10\"",
+        "summary": "In stock Rating 4.449Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr for only $99.99 at BottleBuzz! In stock Rating 5.01Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr. Masterson's. Price. Regular price $9999 $99.99. Regular price Sale price $9999 $99.99. Save. Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old 750ml for $94.99 from Wise Guys Discount Liquors - Valparaiso in Valparaiso, ... In stock Rating 5.01Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old for $89.99 from Burlington Spirit Shoppe in",
+        "results": [
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+            "url": "https://bottlebuzz.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "bottlebuzz.com",
+            "description": "In stock Rating 4.449Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr for only $99.99 at BottleBuzz!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr",
+            "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "woodencork.com",
+            "description": "In stock Rating 5.01Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Yr. Masterson's. Price. Regular price $9999 $99.99. Regular price Sale price $9999 $99.99. Save.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 ...",
+            "url": "https://shop.wiseguysliquors.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf",
+            "domain": "shop.wiseguysliquors.com",
+            "description": "Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old 750ml for $94.99 from Wise Guys Discount Liquors - Valparaiso in Valparaiso, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 ...",
+            "url": "https://burlingtonspirit.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=b81ff22e0b9e43de0cc3dad040b81770faea99550f3a8ffe43c0faee7c9629be",
+            "domain": "burlingtonspirit.com",
+            "description": "In stock Rating 5.01Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old for $89.99 from Burlington Spirit Shoppe in Burlington, CT.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 ...",
+            "url": "https://silverbrookwines.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=7411e9423c1fb0c7376d58871766ab99b5411403598c73da23dd3e747304a0cf",
+            "domain": "silverbrookwines.com",
+            "description": "In stock Rating 5.01Buy Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 Years Old 750ml for $74.99 from Silverbrook Wines in Orange, CT. Free local delivery over ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4f58a74db5ae677f9ebed51c4957ce84c200895dc0bd6b78b9c7113025724c8f",
+    "mode": "auto"
+  }
+}

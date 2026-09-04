@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:49:07.082Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Shibui Grain Select Whisky\" 750ml",
+      "Shibui Grain Select whisky official product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shibui Grain Select Whisky\" 750ml",
+        "summary": "Japan - A light, and subtly sweet whisky made with 95% wheat & 5% malted barley. Tasting Notes: Shibui Grain Select Whisky. Vital Stats: 86 Proof, 43% ABV, 100% wheat, Aged in ex-bourbon, oloroso sherry, and mizunara casks ... In stock Rating 3.633Shibui Grain Select Whisky is a Japanese grain whisky matured in a blend of ex-bourbon, oloroso sherry, and mizunara oak casks — a light and floral nose ... Shibui Grain Select Whisky. A light & subtly sweet whisky made with 95% wheat & 5% malted barley. Matured in American Ex-Boubon Barrels, European Oloroso Sherry ... Finish: Medium finish. Fading",
+        "results": [
+          {
+            "title": "Shibui Grain Select Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/japanese-whisky/shibui-grain-select-whisky/p/231071750",
+            "domain": "totalwine.com",
+            "description": "Japan - A light, and subtly sweet whisky made with 95% wheat & 5% malted barley.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Whisky Review: Exploring Grain Select & Single Grain ...",
+            "url": "https://thewhiskeywash.com/world/whisky-reviews-shibui-grain-select-single-grain-whiskies/",
+            "domain": "thewhiskeywash.com",
+            "description": "Tasting Notes: Shibui Grain Select Whisky. Vital Stats: 86 Proof, 43% ABV, 100% wheat, Aged in ex-bourbon, oloroso sherry, and mizunara casks ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Grain Select Whisky 750ml - Wooden Cork",
+            "url": "https://woodencork.com/products/shibui-grain-select-whisky-750ml",
+            "domain": "woodencork.com",
+            "description": "In stock Rating 3.633Shibui Grain Select Whisky is a Japanese grain whisky matured in a blend of ex-bourbon, oloroso sherry, and mizunara oak casks — a light and floral nose ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Grain Select Whisky 750ml - La Vinotheque",
+            "url": "https://winetheque.com/spirits/6092-shibui-grain-select-whisky-750ml.html",
+            "domain": "winetheque.com",
+            "description": "Shibui Grain Select Whisky. A light & subtly sweet whisky made with 95% wheat & 5% malted barley. Matured in American Ex-Boubon Barrels, European Oloroso Sherry ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "139 – Shibui Grain Select, Shibui Pure Malt, Shibui 10 Year Old Virgin ...",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/xz64zj/review_136_139_shibui_grain_select_shibui_pure/",
+            "domain": "reddit.com",
+            "description": "Finish: Medium finish. Fading ginger, dark chocolate bitterness, more new woodiness. This Shibui Grain Select Whisky was interesting in that it ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Shibui Grain Select whisky official product",
+        "summary": "Select Whisky $59.99. A light, and subtly sweet whisky made with 95% wheat & 5% malted barley. ar Product Details Contact Customer Care + 1 (855) 328-9463 In stock Rating 3.633Price Regular price $4199. Shibui Grain Select Whisky is a Japanese grain whisky matured in a blend of ex-bourbon, oloroso sherry, and mizunara oak casks. ... Jan 26, 2021 Yes, it's pretty tasty, very clean with a pretty nose. Their ten year selections are really nice, albeit arguably a bit overpriced much like ... Matured in American Ex-Bourbon Barrels, European Oloroso Sherry Casks & finished in rare Japanese Mizunara",
+        "results": [
+          {
+            "title": "Shibui Grain Select Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/japanese-whisky/shibui-grain-select-whisky/p/231071750",
+            "domain": "totalwine.com",
+            "description": "Select Whisky $59.99. A light, and subtly sweet whisky made with 95% wheat & 5% malted barley. ar Product Details Contact Customer Care + 1 (855) 328-9463",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Grain Select Whisky 750ml - Wooden Cork",
+            "url": "https://woodencork.com/products/shibui-grain-select-whisky-750ml",
+            "domain": "woodencork.com",
+            "description": "In stock Rating 3.633Price Regular price $4199. Shibui Grain Select Whisky is a Japanese grain whisky matured in a blend of ex-bourbon, oloroso sherry, and mizunara oak casks. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Whisky Review: Exploring Grain Select & Single Grain ...",
+            "url": "https://thewhiskeywash.com/world/whisky-reviews-shibui-grain-select-single-grain-whiskies/",
+            "domain": "thewhiskeywash.com",
+            "description": "Jan 26, 2021",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shibui Grain Select Whiskey? : r/ATXwhisky - Reddit",
+            "url": "https://www.reddit.com/r/ATXwhisky/comments/tymg15/shibui_grain_select_whiskey/",
+            "domain": "reddit.com",
+            "description": "Yes, it's pretty tasty, very clean with a pretty nose. Their ten year selections are really nice, albeit arguably a bit overpriced much like ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Grain Select World Whisky",
+            "url": "https://www.shibuiwhisky.com/grain-select",
+            "domain": "shibuiwhisky.com",
+            "description": "Matured in American Ex-Bourbon Barrels, European Oloroso Sherry Casks & finished in rare Japanese Mizunara Oak, Shibui Grain Select is the perfect whisky to be ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "afb15654cc0102bf52dd87a21a96148a79b68700616e42fd56aea58e0cee4fa3",
+    "mode": "auto"
+  }
+}
