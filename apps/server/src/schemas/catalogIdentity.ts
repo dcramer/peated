@@ -1,3 +1,4 @@
+import { JSON_SCHEMA_REGISTRY } from "@orpc/zod/zod4";
 import { z } from "zod";
 import { CategoryEnum, ContentSourceEnum, FlavorProfileEnum } from "./common";
 
@@ -21,6 +22,16 @@ const TastingNotesSchema = z.object({
   finish: z.string(),
 });
 
+const DeprecatedBottleFlavorProfileSchema = FlavorProfileEnum.nullable().meta({
+  deprecated: true,
+  description:
+    "Deprecated legacy Bottle classification. Preserve existing values for compatibility, but do not set it for new or updated Bottles.",
+});
+JSON_SCHEMA_REGISTRY.add(DeprecatedBottleFlavorProfileSchema, {
+  deprecated: true,
+  description: DeprecatedBottleFlavorProfileSchema.description,
+});
+
 /** Runtime-owned v1 result for the stable expression shared by Bottles. */
 export const BottleGroupV1Fields = {
   schemaVersion: CatalogIdentitySchemaVersion,
@@ -34,7 +45,7 @@ export const BottleGroupV1Fields = {
   seriesId: z.number().int().positive().nullable(),
   statedAge: z.number().int().min(0).max(100).nullable(),
   representativeBottleId: z.number().int().positive().nullable(),
-  flavorProfile: FlavorProfileEnum.nullable(),
+  flavorProfile: DeprecatedBottleFlavorProfileSchema,
   medianScore: z.number().int().min(0).max(100).nullable(),
   minScore: z.number().int().min(0).max(100).nullable(),
   maxScore: z.number().int().min(0).max(100).nullable(),
@@ -64,7 +75,7 @@ export const BottleV1Fields = {
   distillerIds: z.array(z.number().int().positive()),
   category: CategoryEnum.nullable(),
   seriesId: z.number().int().positive().nullable(),
-  flavorProfile: FlavorProfileEnum.nullable(),
+  flavorProfile: DeprecatedBottleFlavorProfileSchema,
   edition: z.string().nullable(),
   statedAge: z.number().int().min(0).max(100).nullable(),
   noAgeStatement: z.boolean().nullable(),

@@ -5,31 +5,64 @@ clearly defined set of Bottles. The
 [Whisky Identity Model](../architecture/whisky-identity-model.md) defines what
 makes a Bottle unique and what each field means.
 
+## What “Catalog This” Means
+
+When someone asks to “catalog” a brand, series, distillery, bottler, or other
+defined scope, complete that scope in production unless they name another
+environment or ask only for a review. This is an outcome request, not a request
+for a sample, a list of suggestions, or a research report.
+
+By default, the work includes:
+
+- building the best supported inventory of current and historical marketed
+  releases in the scope;
+- checking every existing Peated Bottle in the scope, not only missing Bottles;
+- creating every missing Bottle whose identity is supported by evidence;
+- filling supported Bottle facts and correcting facts shown to be wrong;
+- reviewing BottleSeries membership and the Series records themselves;
+- finding and attaching an exact, usable Bottle image when one is available;
+- reviewing aliases, import references, and possible duplicates; and
+- listing every release, fact, image, or duplicate that remains unresolved.
+
+Do not stop after adding the easiest Bottles or after processing one convenient
+source. Work until every expected release and every existing Peated Bottle in
+scope has a final status.
+
 ## Goal
 
 Finish with one checked record for every marketed release in the selected set.
-Review every Bottle field that the API can update. Fill every fact supported by
-evidence, attach the best usable image, and remove confirmed duplicates. Leave
-unknown or disputed facts as `null`. A catalog is not complete only because
-every release has a record.
+Review every catalog field named in this guide. Fill every fact supported by
+evidence, attach the best usable image, and identify confirmed duplicates.
+Leave unknown or disputed facts as `null`. A catalog is not complete only
+because every release has a record.
 
 ## Build The Work List
 
 1. Define the exact set to review. Find its Brand, series, distillery, and
    Bottle IDs before making changes.
-2. Find a source independent of Peated that lists the complete set. Use it to
-   detect missing and extra records. Do not treat the current Peated list as
-   complete.
-3. Match each release by stable facts such as distillery, vintage, stated age,
+2. Build an independent release inventory. Start with a producer archive or
+   another source that claims to cover the set. Check it against other producer
+   pages, contemporary announcements, specialist archives, and exact auction
+   records as needed. Current producer pages rarely prove the historical set is
+   complete. Do not treat Peated or any single convenient source as complete.
+3. Record what time period, markets, release families, and source archives the
+   inventory covers. If no source proves the full set, state the coverage limit
+   and keep plausible missing releases unresolved instead of silently excluding
+   them.
+4. Match each release by stable facts such as distillery, vintage, stated age,
    ABV, edition, and cask number. Search alternate spellings and old distillery
    names.
-4. Fetch all Peated pages and compare them with the independent list.
-   Classify each expected release as create, update, merge, no change, or
-   unresolved.
-5. Keep one work list. For each release, record its expected identity, Peated
-   IDs, planned changes, image source, source URL for each changed fact, and any
-   decision about another public name or an import match. Mark uncertain
-   records for review instead of guessing.
+5. Fetch every page of Peated results using each relevant Brand, distillery,
+   bottler, and Series relationship. Search names and aliases for records that
+   a relationship filter may miss. Compare both directions: every expected
+   release needs a Peated status, and every Peated Bottle in scope needs an
+   inventory status.
+6. Keep one work list. Give each row a final status of create, update, merge,
+   no change, unresolved, or out of scope. Record its expected identity,
+   current and proposed Peated IDs and fields, planned changes, Series decision,
+   image source and license, source URL for each changed fact, alias and import
+   reference decisions, and post-write verification. Mark uncertain records for
+   review instead of guessing.
 
 Prefer producer material, label images, and announcements from the time of the
 release. A specialist archive or auction catalog can fill historical gaps when
@@ -40,15 +73,21 @@ a release date.
 
 ## Review Every Field
 
-Use the live OpenAPI Bottle schema as the complete checklist. Review at least:
+Use the live OpenAPI Bottle schema to confirm current request shapes. For
+catalog completeness, review:
 
 - who made and named it: `brand`, `distillers`, `bottler`, `series`, `name`,
   `edition`, and `category`;
-- Bottle facts: stated age or no age statement (NAS), ABV, vintage and bottling
-  year, cask facts, maturation, natural color, chill filtration, and phenol
-  level;
-- release facts: release year, month, day, and outturn;
-- content: description, description source, and image.
+- Bottle facts: `statedAge` or `noAgeStatement`, `abv`, `vintageYear`,
+  `bottlingYear`, `singleCask`, `caskStrength`, `maturation`, `caskNumber`,
+  `naturalColor`, `nonChillFiltered`, and `maltPhenolPpm`;
+- release facts: `releaseYear`, `releaseMonth`, `releaseDay`, and `outturn`;
+- content: `description`, `descriptionSrc`, and the Bottle image with its source
+  and license.
+
+Do not spend catalog time backfilling `flavorProfile`; it is not part of this
+workflow. Producer tasting notes may be added when they are readily available,
+but missing tasting notes do not block completion.
 
 Then apply these rules:
 
@@ -71,16 +110,61 @@ Then apply these rules:
   fields.
 - Store `outturn` only when a source gives the exact bottle count. A maximum
   case count does not prove an exact bottle outturn.
-- Use an image only when age, vintage, ABV, edition, and other visible facts
-  match the Bottle. Prefer the clearest, highest-resolution front label from a
-  source Peated may store. Do not use a thumbnail, watermark, or similar-looking
-  release when an exact image is available.
 - Merge records only when they describe the same marketed release. Package
   volume and market packaging alone do not create a new Bottle. Different
   vintage, age, ABV, edition, or cask facts usually require separate Bottles.
 
 Use `null` for unknown facts. Preserve a current value unless stronger evidence
 shows that it is wrong.
+
+## Review Series And Related Entities
+
+Review Series as catalog records, not only as a field on a Bottle:
+
+- Use a Series only for an evidenced stable range or family. A batch code,
+  release year, or one-off edition is not a Series.
+- Inventory existing Series records for the Brand and look for missing or
+  duplicate Series before creating one.
+- Review the Series Brand, name, and description. Keep the name to the marketed
+  range name without repeating the Brand.
+- Assign every Bottle supported by the Series evidence. Do not infer membership
+  from similar packaging or release dates alone.
+- After Series changes, fetch the Series and its Bottles. Confirm its identity,
+  membership, release count, and any redirects created by a merge.
+
+When the requested scope is an Entity such as a Brand, distillery, or bottler,
+also review the target Entity's catalog record. Fill supported names, kind,
+owner, description and source, establishment year, official website, country,
+region, address, and location. Review its aliases and exact references. Follow
+[Entity Images](./entity-images.md) for reusable images and attribution. Do not
+expand the operation to unrelated owners, companies, or places merely because
+the target links to them.
+
+## Review Images
+
+Try to find an image for every Bottle in scope. A missing image does not justify
+using a similar release.
+
+- Use an image only when age, vintage, ABV, edition, and other visible facts
+  match the exact Bottle.
+- Prefer the clearest, highest-resolution front label from a source Peated may
+  store. Do not use a thumbnail, watermark, promotional composite, or another
+  release when an exact image is available.
+- Check the source site's reuse terms. Record the canonical source page in
+  `sourceUrl` and the license or reuse terms in `license`. A direct image URL is
+  not enough provenance.
+- Record why no usable image was found when a Bottle remains without one.
+- After upload, fetch and inspect the stored image and confirm its `sourceUrl`
+  and `license` survived processing.
+
+Use the authenticated image upload command:
+
+```bash
+pnpm cli api upload-image /bottles/123/image \
+  --file /tmp/bottle-123.jpg \
+  --source-url 'https://example.com/bottle-123' \
+  --license 'CC BY-SA 4.0'
+```
 
 ## Review Names, Aliases, And References
 
@@ -124,6 +208,7 @@ The CLI adds `/v1` to API paths.
 pnpm cli auth status
 pnpm cli api get '/entities?query=Rare%20Malts%20Selection&limit=25'
 pnpm cli api get '/bottles?brand=366603&limit=100&sort=name'
+pnpm cli api get '/bottle-series?brand=366603&limit=100'
 pnpm cli api get /bottles/123/edit-context
 pnpm cli api get '/bottles/123/aliases'
 pnpm cli api get '/bottle-references?bottle=123&limit=100'
@@ -136,7 +221,8 @@ rely on a stale checkout or an old request shape.
 For a Bottle whose facts a moderator already checked, use the normal create
 route and set `reviewed` to `true`. Only moderators and administrators can use
 this option. The server updates search and counts, but it does not generate
-details or start another automated check.
+details or start another automated check. Upload its image separately after
+creation.
 
 Include the option with the reviewed Bottle fields:
 
@@ -200,13 +286,17 @@ pnpm cli api delete /bottles/123/aliases/789
 
 ## Make Changes Safely
 
+- A direct request to “catalog” a named scope authorizes evidence-backed Bottle
+  creates and non-destructive Bottle, Series, Entity, and image updates inside
+  that scope. Summarize the bounded scope and planned counts before writing.
+  Get separate explicit authorization before merges, deletes, uncertain
+  identity changes, or changes that affect records outside the named scope.
 - Read every Bottle immediately before changing it. Stop if an ID, identifying
   fact, or current value differs from the work list.
 - Before changing a name, read the Bottle edit context. Confirm the shared
   `name`, the release facts, and the number of Bottles that will change. A name
   change is shared and can update every Bottle in the group.
-- Get explicit authorization for the set of changes. Use `--yes` only after that
-  authorization.
+- Use `--yes` only after the requested or separately approved authorization.
 - Update known IDs in small groups. Do not choose IDs from result order or an
   unchecked search result.
 - Stop on validation errors, conflicts, or changed identifying facts. Read the
@@ -231,15 +321,26 @@ pnpm cli api delete /bottles/123/aliases/789
 
 The operation is complete only when:
 
-- every release on the work list has a final status;
-- every field that can be changed was reviewed, including image, dates, and
+- the source coverage and any known limits are recorded;
+- every expected release and every existing Peated Bottle in scope has a final
+  status;
+- every verifiable missing Bottle was created;
+- every catalog field in this guide was reviewed, including image, dates, and
   outturn;
+- every Series in scope was reviewed, and its Bottle membership and release
+  count were checked;
+- the target Entity record was reviewed when the scope is a Brand, distillery,
+  bottler, or company;
+- every Bottle has a verified image with provenance or a recorded reason that
+  no usable image was found;
 - every alias in the selected set has a source for its public name;
 - every import match in the selected set, other than the current full Bottle
   name, points to an evidence-backed exact Bottle or remains unresolved;
 - every stored fact has a good source;
-- every new record, update, image, and merge was fetched and checked;
-- the counts for expected, stored, merged, and unresolved releases agree; and
+- every new or updated Bottle, Series, Entity, image, and merge was fetched and
+  checked;
+- the counts for expected, existing, created, updated, merged, unchanged,
+  unresolved, and out-of-scope releases agree; and
 - unresolved facts and releases are listed explicitly for later work.
 
 ## Completed Audits

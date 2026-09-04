@@ -45,6 +45,9 @@ Peated is a public record of whisky, freely accessible to everyone.
 
 ## Catalog Operations
 
+- Treat `catalog <scope>` as a request to complete that production catalog
+  scope, not to add a sample or return a research report. Follow Catalog
+  Maintenance through inventory, evidence-backed writes, and verification.
 - Before backfills, duplicate cleanup, or production Bottle edits, follow
   Catalog Maintenance and Whisky Identity Model: inventory, evidence, approval,
   and verification.
