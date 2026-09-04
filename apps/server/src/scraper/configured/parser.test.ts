@@ -5,6 +5,7 @@ import {
   parseBourbonCultureArticle,
 } from "../adapters/bourbonCulture";
 import { parseCompassBoxProducts } from "../adapters/legacy/scrapeCompassBox";
+import { parseKilchomanProducts } from "../adapters/legacy/scrapeKilchoman";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
@@ -164,6 +165,28 @@ const compassBoxRules = {
   },
 } satisfies ScrapeRules;
 
+const kilchomanRules = {
+  kind: "price",
+  list: {
+    item: "ul.grid-products > li.product",
+    detailLink: { selector: 'a[href*="/our-whisky/"]', attribute: "href" },
+    excludeWhen: {
+      selector: '.product_soldout, h3:contains("Gift Pack")',
+    },
+    maxItems: 99,
+  },
+  detail: {
+    name: { selector: "h1", prefix: "Kilchoman " },
+    price: { selector: ".price" },
+    currency: "gbp",
+    volume: { value: "700 ml" },
+    imageUrl: {
+      selector: 'meta[property="og:image"]',
+      attribute: "content",
+    },
+  },
+} satisfies ScrapeRules;
+
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
   legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
@@ -255,6 +278,20 @@ describe("scrape source parser", () => {
     );
 
     expect(parseScrapeList(compassBoxRules, html, pageUrl)).toEqual({
+      links: legacyLinks,
+      nextPageUrl: null,
+      issues: [],
+    });
+  });
+
+  it("matches the current Kilchoman parser's available product links", async () => {
+    const pageUrl = new URL("https://www.kilchomandistillery.com/whisky-shop/");
+    const html = await loadFixture("kilchoman", "bottle-list.html");
+    const legacyLinks = parseKilchomanProducts(html, pageUrl.toString()).map(
+      ({ url }) => url,
+    );
+
+    expect(parseScrapeList(kilchomanRules, html, pageUrl)).toEqual({
       links: legacyLinks,
       nextPageUrl: null,
       issues: [],

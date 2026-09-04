@@ -74,6 +74,15 @@ function prepareCompassBox(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareKilchoman(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "kilchoman", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 const registry = createScraperRegistry({
@@ -116,6 +125,16 @@ const compassBoxRegistry = createScraperRegistry({
     {
       ...scraperRegistry.sources.get("compassbox")!,
       externalSiteKey: "compassbox",
+    },
+  ],
+});
+
+const kilchomanRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("kilchoman")!],
+  sources: [
+    {
+      ...scraperRegistry.sources.get("kilchoman")!,
+      externalSiteKey: "kilchoman",
     },
   ],
 });
@@ -289,6 +308,25 @@ async function setupCompassBoxMigration() {
     })
     .returning();
   await syncScraperDefinitions(compassBoxRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupKilchomanMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "kilchoman",
+      name: "Kilchoman",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(kilchomanRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -664,6 +702,112 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await expect(prepareCompassBox({ apply: true })).rejects.toMatchObject({
       code: "BAD_REQUEST",
       message: "Compass Box has no stored prices to verify.",
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Kilchoman without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupKilchomanMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Kilchoman Machir Bay 70cl",
+      price: 4990,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.kilchomandistillery.com/our-whisky/machir-bay/",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Kilchoman Rockside 11 Years Old",
+      price: 5500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.kilchomandistillery.com/our-whisky/rockside-11-years-old/",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareKilchoman()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareKilchoman({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(kilchomanRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://www.kilchomandistillery.com/whisky-shop/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareKilchoman({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Kilchoman is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Kilchoman price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupKilchomanMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Kilchoman Machir Bay 70cl",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/our-whisky/machir-bay/",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareKilchoman({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Kilchoman price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("refuses Kilchoman without stored prices", async () => {
+    await setupKilchomanMigration();
+
+    await expect(prepareKilchoman({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Kilchoman has no stored prices to verify.",
     });
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
