@@ -27,7 +27,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v12";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v13";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -191,6 +191,7 @@ const SuggestedReviewRulesSchema = z
         score: z
           .object({
             value: SuggestedValueSelectorSchema,
+            firstReviewFallback: SuggestedValueSelectorSchema.nullable(),
             scale: z.number().positive(),
             map: z.array(SuggestedScoreMapEntrySchema).max(25).nullable(),
           })
@@ -290,6 +291,7 @@ const RULE_INSTRUCTIONS = [
   "Set canonicalUrl only when the article's stored canonical URL needs to come from page markup or bounded cleanup such as removing a trailing slash. Otherwise set it to null.",
   "For reviews, reviewItem selector must identify either each complete review container or each heading that starts a review section. Its text is retained internally for later parsing. Exclude navigation, comments, related articles, and other bottles' reviews.",
   "Set reviewItem startsSection to true only when each selected heading starts a review and the elements after it contain the rest of that review. Parsing stops before the next selected heading. When only one heading matches, its parent is the review. Set sectionEndsBefore only when another element must end the last section; otherwise set it to null. Keep selectors for name, reviewText, writer, and score inside each review section.",
+  "Set score firstReviewFallback only when the page keeps the first review's score outside its review section. It is used only when that section has no score. Otherwise set it to null.",
   "Use reviewText for a narrower tasting-notes container when available; otherwise select the review body. This text is used for flavor matching and short clips.",
   "Include an optional field when the supplied pages clearly and consistently provide it.",
   "Pagination must add new detail-page links when the website has a next page.",
@@ -417,6 +419,11 @@ function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
       scale: input.detail.score.scale,
       value: toScrapeValue(input.detail.score.value),
     };
+    if (input.detail.score.firstReviewFallback !== null) {
+      detail.score.firstReviewFallback = toScrapeValue(
+        input.detail.score.firstReviewFallback,
+      );
+    }
     if (input.detail.score.map?.length) {
       detail.score.map = input.detail.score.map;
     }

@@ -10,6 +10,10 @@ import {
   discoverWhiskeyReviewerArticles,
   parseWhiskeyReviewerArticle,
 } from "../adapters/whiskeyReviewer";
+import {
+  discoverWhiskyNotesArticles,
+  parseWhiskyNotesArticle,
+} from "../adapters/whiskyNotes";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
 import {
@@ -292,6 +296,48 @@ const wordsOfWhiskyRules = {
   },
 } satisfies ScrapeRules;
 
+const whiskyNotesRules = {
+  kind: "review",
+  list: {
+    item: "#featured article, #posts article",
+    detailLink: { selector: "a.entry-permalink", attribute: "href" },
+    excludeWhen: {
+      selector:
+        ".category-armagnac, .category-bars, .category-cognac, .category-distillery-visits, .category-other-spirits, .category-rum, .category-whisky-news",
+    },
+    nextPage: { selector: 'link[rel="next"]', attribute: "href" },
+    maxItems: 20,
+  },
+  detail: {
+    title: { selector: "#main article.post .entry-title" },
+    publishedAt: {
+      selector: "#main article.post time.entry-date.published",
+      attribute: "datetime",
+    },
+    reviewItem: {
+      start:
+        '.entry-content > h2:contains("%"), .entry-content > h2:contains("Proof"), .entry-content > h2:contains("proof")',
+      endBefore: ".entry-content > .yarpp",
+    },
+    name: { selector: "h2" },
+    reviewerName: { selector: ".author.vcard" },
+    reviewText: { selector: "h2, h2 ~ p", all: true },
+    score: {
+      value: {
+        selector:
+          'p:contains("Score:") > span:last-child strong, p:contains("Score:") > strong:last-child',
+        removeSuffixes: ["/100"],
+        suffix: "/100",
+      },
+      firstReviewFallback: {
+        selector: ".entry-score",
+        suffix: "/100",
+      },
+      scale: 100,
+    },
+  },
+} satisfies ScrapeRules;
+
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
   legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
@@ -453,6 +499,20 @@ describe("scrape source parser", () => {
     ).toEqual(legacyLinks);
   });
 
+  it("matches the current WhiskyNotes article links", async () => {
+    const pageUrl = new URL("https://www.whiskynotes.be/");
+    const html = await loadFixture("whiskynotes", "archive.html");
+    const legacyLinks = discoverWhiskyNotesArticles(html).map(
+      (url) => url.href,
+    );
+
+    expect(parseScrapeList(whiskyNotesRules, html, pageUrl)).toEqual({
+      links: legacyLinks,
+      nextPageUrl: "https://www.whiskynotes.be/page/2/",
+      issues: [],
+    });
+  });
+
   it("rejects a next page on another website", () => {
     const result = parseScrapeList(
       {
@@ -601,6 +661,46 @@ describe("scrape source parser", () => {
       );
     },
   );
+
+  it.each([
+    [
+      "single-review.html",
+      "https://www.whiskynotes.be/2026/world/kanekou-okinawa-whisky/",
+    ],
+    [
+      "multi-review.html",
+      "https://www.whiskynotes.be/2026/bowmore/bowmore-2005-ben-nevis-1996-whisky-agency/",
+    ],
+  ])("matches the current WhiskyNotes parser for %s", async (fixture, url) => {
+    const html = await loadFixture("whiskynotes", fixture);
+    const pageUrl = new URL(url);
+    const legacy = parseWhiskyNotesArticle(html, pageUrl);
+    const configured = parseScrapeDetail(whiskyNotesRules, html, pageUrl);
+
+    expect(configured.kind).toBe("review");
+    expect(configured.issues).toEqual([]);
+    if (configured.kind !== "review" || !configured.value) {
+      throw new Error("Expected configured review output.");
+    }
+    expect(configured.value.article).toMatchObject({
+      canonicalUrl: legacy.article.canonicalUrl,
+      title: legacy.article.title,
+      publishedAt: legacy.article.publishedAt,
+    });
+    expect(configured.value.article.externalReviews).toMatchObject(
+      legacy.article.externalReviews.map((review) => ({
+        name: review.name,
+        reviewerName: review.reviewerName,
+        nativeScore: review.nativeScore,
+      })),
+    );
+    expect(Object.values(configured.value.externalReviewTexts)).toEqual(
+      Object.values(legacy.externalReviewTexts),
+    );
+    expect(Object.values(configured.value.externalReviewBodies)).toEqual(
+      Object.values(legacy.externalReviewBodies),
+    );
+  });
 
   it("rejects conflicting URL dates and unmapped scores", async () => {
     const html = (await loadFixture("whiskeyreviewer", "review.html"))

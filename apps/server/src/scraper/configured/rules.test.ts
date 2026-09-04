@@ -8,6 +8,7 @@ import {
   ScrapeRulesV1Schema,
   ScrapeRulesV2Schema,
   ScrapeRulesV3Schema,
+  ScrapeRulesV4Schema,
   ScrapeValueSchema,
 } from "./rules";
 
@@ -39,8 +40,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesSchema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(5, rules)).toThrow(
-    "Unsupported scrape rules version: 5.",
+  expect(() => parseScrapeRules(6, rules)).toThrow(
+    "Unsupported scrape rules version: 6.",
   );
 });
 
@@ -53,7 +54,7 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(4);
+  expect(SCRAPE_RULES_VERSION).toBe(5);
 });
 
 test("loads version 2 rules only through their original contract", () => {
@@ -73,8 +74,8 @@ test("loads version 2 rules only through their original contract", () => {
   ).toThrow();
 });
 
-test("accepts bounded canonical URLs, URL dates, and score maps", () => {
-  const rules = ScrapeRulesSchema.parse({
+test("loads version 4 rules only through their original contract", () => {
+  const rules = ScrapeRulesV4Schema.parse({
     ...reviewConfig(25),
     detail: {
       ...reviewConfig(25).detail,
@@ -96,6 +97,23 @@ test("accepts bounded canonical URLs, URL dates, and score maps", () => {
   });
 
   expect(parseScrapeRules(4, rules)).toEqual(rules);
+  expect(() =>
+    parseScrapeRules(4, {
+      ...rules,
+      detail: {
+        ...rules.detail,
+        score: {
+          value: { selector: ".rating", removePrefixes: ["Rating:"] },
+          scale: 100,
+          map: [
+            { text: "A", value: 95 },
+            { text: "B+", value: 87 },
+          ],
+          firstReviewFallback: { selector: ".article-rating" },
+        },
+      },
+    }),
+  ).toThrow();
 });
 
 test("loads version 3 rules only through their original contract", () => {
@@ -125,7 +143,7 @@ test("accepts review sections with an end selector", () => {
     },
   });
 
-  expect(parseScrapeRules(4, rules)).toMatchObject({
+  expect(parseScrapeRules(5, rules)).toMatchObject({
     kind: "review",
     detail: {
       reviewItem: {
@@ -134,6 +152,23 @@ test("accepts review sections with an end selector", () => {
       },
     },
   });
+});
+
+test("accepts a separate first-review score", () => {
+  const config = reviewConfig(25);
+  const rules = ScrapeRulesSchema.parse({
+    ...config,
+    detail: {
+      ...config.detail,
+      score: {
+        value: { selector: ".review-score" },
+        firstReviewFallback: { selector: ".article-score" },
+        scale: 100,
+      },
+    },
+  });
+
+  expect(parseScrapeRules(5, rules)).toEqual(rules);
 });
 
 test.each([
