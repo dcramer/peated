@@ -1,9 +1,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
-import type {
-  LocationPreviewCardProps,
-  PageTabItem,
-} from "@peated/web/components";
+import type { LocationPreviewItem, PageTabItem } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import { getRegionMap } from "@peated/web/lib/locationMap";
@@ -86,7 +83,7 @@ export function getLocationDistilleries(distilleries: readonly Distillery[]) {
 
 export function getLocationRegions(
   regions: readonly Region[],
-): LocationPreviewCardProps[] {
+): LocationPreviewItem[] {
   return regions.map((region) => ({
     description: region.description ?? undefined,
     href: `/locations/${region.country.slug}/regions/${region.slug}`,

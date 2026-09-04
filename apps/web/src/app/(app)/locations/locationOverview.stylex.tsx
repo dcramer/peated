@@ -11,11 +11,11 @@ import {
   FactList,
   ItemListItem,
   LocationIdentityRow,
-  type LocationPreviewCardProps,
+  type LocationPreviewItem,
   RailList,
+  RegionPreviewGrid,
   TextLink,
 } from "@peated/web/components";
-import { HomeRegionGrid } from "@peated/web/components/pages/homeBrowse.stylex";
 import {
   PageColumns,
   PageSection,
@@ -45,10 +45,10 @@ export function LocationOverview({
   distillersHref: string;
   flavorProfile?: ReactNode;
   latestReleases: readonly BottleListItem[];
-  otherRegions?: readonly LocationPreviewCardProps[];
+  otherRegions?: readonly LocationPreviewItem[];
   otherRegionsHref?: string;
   productionRules?: string | null;
-  regions?: readonly LocationPreviewCardProps[];
+  regions?: readonly LocationPreviewItem[];
   releasesHref: string;
   totalBottles: number;
   totalDistillers: number;
@@ -114,7 +114,7 @@ export function LocationOverview({
       />
       {regions.length ? (
         <PageSection heading="Regions">
-          <HomeRegionGrid regions={regions} />
+          <RegionPreviewGrid regions={regions} />
         </PageSection>
       ) : null}
       {distilleries.length ? (

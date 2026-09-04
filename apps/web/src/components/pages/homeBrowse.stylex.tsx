@@ -1,7 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
-import { needsRegionMapCredit } from "../../lib/locationMap";
-import { RegionMapCredit } from "../locationMapIcon/credit.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
 import { TextLink } from "../textLink.stylex";
 
@@ -12,14 +10,12 @@ import {
   type EntityListItem,
   ItemList,
   ItemListItem,
-  LocationPreviewCard,
-  type LocationPreviewCardProps,
+  LocationPreviewGrid,
+  type LocationPreviewItem,
+  RegionPreviewGrid,
 } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
-
-const COMPACT = "@media (max-width: 639px)";
-const NARROW = "@media (min-width: 640px) and (max-width: 899px)";
 
 function HomeModuleHeading({
   action,
@@ -114,38 +110,32 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
   );
 }
 
-/** Keeps homepage and country overview location previews identical. */
-export function HomeRegionGrid({
-  regions,
-}: {
-  regions: readonly LocationPreviewCardProps[];
-}) {
-  return (
-    <>
-      <div {...stylex.props(styles.regionGrid)}>
-        {regions.map((region) => (
-          <LocationPreviewCard key={region.href} {...region} />
-        ))}
-      </div>
-      {regions.some(
-        ({ visual }) =>
-          visual?.kind !== "count" && needsRegionMapCredit(visual),
-      ) ? (
-        <RegionMapCredit />
-      ) : null}
-    </>
-  );
-}
-
 export function HomeOrigins({
   countries,
   remainingCountries,
   regions,
 }: {
-  countries: readonly LocationPreviewCardProps[];
+  countries: readonly LocationPreviewItem[];
   remainingCountries?: { count: number; totalBottles: number };
-  regions: readonly LocationPreviewCardProps[];
+  regions: readonly LocationPreviewItem[];
 }) {
+  const countryLocations: LocationPreviewItem[] = [
+    ...countries,
+    ...(remainingCountries && remainingCountries.count > 0
+      ? [
+          {
+            href: "/locations",
+            name: "Everywhere else",
+            totalBottles: remainingCountries.totalBottles,
+            visual: {
+              kind: "count" as const,
+              value: remainingCountries.count,
+            },
+          },
+        ]
+      : []),
+  ];
+
   return (
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
@@ -161,24 +151,17 @@ export function HomeOrigins({
         everything else.
       </p>
       <div {...stylex.props(styles.countryGrid)}>
-        {countries.map((country) => (
-          <LocationPreviewCard key={country.href} {...country} />
-        ))}
-        {remainingCountries && remainingCountries.count > 0 ? (
-          <LocationPreviewCard
-            href="/locations"
-            name="Everywhere else"
-            totalBottles={remainingCountries.totalBottles}
-            visual={{ kind: "count", value: remainingCountries.count }}
-          />
-        ) : null}
+        <LocationPreviewGrid
+          locations={countryLocations}
+          showDescriptions={false}
+        />
       </div>
       {regions.length ? (
         <>
           <div {...stylex.props(styles.regionHeading)}>
             <SectionHeading level={3}>By region</SectionHeading>
           </div>
-          <HomeRegionGrid regions={regions} />
+          <RegionPreviewGrid regions={regions} />
         </>
       ) : null}
     </section>
@@ -270,29 +253,8 @@ const styles = stylex.create({
     color: colors.inkMuted,
   },
   regionHeading: { marginTop: space.x6 },
-  regionGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: "6px",
-    marginTop: space.x2,
-    [NARROW]: {
-      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    },
-    [COMPACT]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
-    },
-  },
   countryGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: "6px",
     marginTop: space.x4,
-    [NARROW]: {
-      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    },
-    [COMPACT]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
-    },
   },
   distilleries: {
     marginTop: "14px",

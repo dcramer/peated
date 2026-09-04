@@ -258,6 +258,7 @@ function Origins() {
   return countryItems.length || regionItems.length ? (
     <HomeOrigins
       countries={featuredCountries.map((country) => ({
+        description: country.description ?? undefined,
         href: `/locations/${country.slug}`,
         name: country.name,
         totalBottles: country.totalBottles,
