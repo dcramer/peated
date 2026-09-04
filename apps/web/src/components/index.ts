@@ -176,8 +176,17 @@ export { LocationCard } from "./locationCard.stylex";
 export type { LocationCardProps } from "./locationCard.stylex";
 export { LocationIdentityRow } from "./locationIdentityRow.stylex";
 export type { LocationIdentityRowProps } from "./locationIdentityRow.stylex";
-export { LocationPreviewCard } from "./locationPreviewCard.stylex";
-export type { LocationPreviewCardProps } from "./locationPreviewCard.stylex";
+export {
+  LocationPreviewCard,
+  LocationPreviewGrid,
+  RegionPreviewGrid,
+} from "./locationPreviewCard.stylex";
+export type {
+  LocationPreviewCardProps,
+  LocationPreviewGridProps,
+  LocationPreviewItem,
+  RegionPreviewGridProps,
+} from "./locationPreviewCard.stylex";
 export { MemberAvatar } from "./memberAvatar";
 export type { MemberAvatarProps } from "./memberAvatar";
 export { MemberPicker } from "./memberPicker.stylex";

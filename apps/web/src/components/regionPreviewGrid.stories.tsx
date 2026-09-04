@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { getRegionMap } from "../../lib/locationMap";
-import { StoryCanvas } from "../storyFixtures.stylex";
-import { HomeRegionGrid } from "./homeBrowse.stylex";
+import { getRegionMap } from "../lib/locationMap";
+import { RegionPreviewGrid } from "./locationPreviewCard.stylex";
+import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
   title: "Components/Places/Region Grid",
-  component: HomeRegionGrid,
+  component: RegionPreviewGrid,
   parameters: {
     docs: {
       description: {
         component:
-          "Region cards shared by the homepage and country overview. Scottish regions have illustrative silhouettes and map credits. Regions without an asset remain text-only.",
+          "Region cards used on the homepage and country pages. Scottish regions include map shapes and a source credit. Regions without a map still show their names and bottle counts.",
       },
     },
   },
@@ -37,7 +37,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof HomeRegionGrid>;
+} satisfies Meta<typeof RegionPreviewGrid>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
