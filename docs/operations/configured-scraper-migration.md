@@ -130,6 +130,34 @@ exact output, trigger one manual collection, and confirm that it updates the
 same article and review IDs without adding trailing-slash duplicates. Check
 Bottle matches, the run, and Sentry before restoring the saved schedule.
 
+## Words of Whisky
+
+Use the preparation endpoint with `{"site": "wordsofwhisky"}`. The check-only
+request locks and verifies every stored article and review. It accepts only the
+publisher's canonical article URLs without a trailing slash, requires at least
+one review per article, and verifies each legacy review key from its stored
+article URL, Bottle name, and writer. Applying changes only those keys to the
+version 4 positional form and adds a paused source whose list page is
+`https://wordsofwhisky.com/`.
+
+Before applying, save article URLs, review IDs and order, Bottle matches,
+visibility, scores, writers, publication settings, stored-body counts, and the
+current schedule. Stop the schedule and wait for active runs. Compare every
+record after applying; multi-Bottle articles must keep the same review order
+and IDs.
+
+Version 4 rules must select only tasting-note articles from the homepage. On
+detail pages, use each direct `h2` Bottle heading to start a sibling review
+section. Select the canonical URL without its trailing slash, exact publication
+time, writer, Bottle name, tasting paragraphs, and score out of 10. Run the
+rules through a full local no-write preview and compare single- and multi-Bottle
+articles with the code parser before applying.
+
+Activate only a production preview with exact output. Trigger one manual
+collection and confirm it updates the same review IDs without adding articles
+or reviews. Check Bottle matches, review bodies, the run, and Sentry before
+restoring the saved daily schedule. Preparation must not change publication.
+
 ## Compass Box
 
 Use the same preparation endpoint with `{"site": "compassbox"}`. The check-only
@@ -186,9 +214,9 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture, Compass
-Box, Kilchoman, The Whiskey Reviewer, Whisky Saga, and The Whisky Study. Other
-sites are rejected without changing records. Add each site's conversion behind
-this route as its existing records are reviewed.
+Box, Kilchoman, The Whiskey Reviewer, Whisky Saga, The Whisky Study, and Words
+of Whisky. Other sites are rejected without changing records. Add each site's
+conversion behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
