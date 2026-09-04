@@ -219,13 +219,12 @@ function categoryFromSmwsFacts({
 function categoryFromSmwsDescription(
   description: string | null | undefined,
 ): z.input<typeof BottleInputSchema>["category"] {
-  if (
-    /\bsmall[- ]batch(?: sherried)? single malt\b/iu.test(description ?? "")
-  ) {
-    return "single_malt";
-  }
-  if (/\bsmall[- ]batch blended malt\b/iu.test(description ?? "")) {
+  const text = description ?? "";
+  if (/\bsmall[- ]batch\b/iu.test(text) && /\bblended malt\b/iu.test(text)) {
     return "blended_malt";
+  }
+  if (/\bsmall[- ]batch\b/iu.test(text) && /\bsingle malt\b/iu.test(text)) {
+    return "single_malt";
   }
   return null;
 }
@@ -237,6 +236,8 @@ function isSingleCask(
 ): boolean {
   if (
     !caskNumber ||
+    // These are marketed batch-family codes, not single-cask identifiers.
+    /^(?:BAT|SM0|TIF)\.\d+$/iu.test(caskNumber) ||
     category === "blend" ||
     category === "blended_malt" ||
     category === "blended_grain"

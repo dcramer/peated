@@ -141,6 +141,62 @@ test("marks an explicitly multi-cask Society release as a small batch", () => {
   });
 });
 
+test("keeps Society batch-family codes separate from single-cask codes", () => {
+  const result = parseArchivePage(`
+    <p class="productCount">4 Products</p>
+    <ul class="productGrid">
+      <li class="product"><article class="itemSmall"
+        data-item-name="Douro Cruise"
+        data-item-sku="BATCH-FAMILY-14"
+        data-item-type="1st fill ex-port pipes &amp; 2nd fill ex-bourbon barrels">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">BAT.14</span></li>
+          <li><span class="name">ABV</span><span class="value">50.0%</span></li>
+        </ul></div>
+      </article></li>
+      <li class="product"><article class="itemSmall"
+        data-item-name="Lemon odyssey"
+        data-item-sku="SMALL-BATCH-1"
+        data-item-type="1st &amp; 2nd fill ex-bourbon barrels">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">SM0.1</span></li>
+          <li><span class="name">ABV</span><span class="value">50.0%</span></li>
+        </ul></div>
+      </article></li>
+      <li class="product"><article class="itemSmall"
+        data-item-name="70s chart topper"
+        data-item-sku="TIF-BATCH-1"
+        data-item-type="Cognac barrel">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">TIF.1</span></li>
+          <li><span class="name">ABV</span><span class="value">53.0%</span></li>
+        </ul></div>
+      </article></li>
+      <li class="product"><article class="itemSmall"
+        data-item-name="Muscovado meringue"
+        data-item-sku="ARMAGNAC-CASK-1"
+        data-item-type="refill armagnac black oak barrel">
+        <div class="itemInfoWrap"><ul>
+          <li><span class="name">CASK NO.</span><span class="value">A9.1</span></li>
+          <li><span class="name">ABV</span><span class="value">51.9%</span></li>
+        </ul></div>
+      </article></li>
+    </ul>
+  `);
+
+  expect(
+    result.bottles.map(({ bottle }) => ({
+      caskNumber: bottle.caskNumber,
+      singleCask: bottle.singleCask,
+    })),
+  ).toEqual([
+    { caskNumber: "BAT.14", singleCask: false },
+    { caskNumber: "SM0.1", singleCask: false },
+    { caskNumber: "TIF.1", singleCask: false },
+    { caskNumber: "A9.1", singleCask: true },
+  ]);
+});
+
 test("keeps reused Society labels out of bottle names and cask numbers", () => {
   const result = parseArchivePage(`
     <p class="productCount">4 Products</p>
@@ -632,7 +688,7 @@ test("keeps current batch and rare-release titles clean", async ({
   payload.items[2].region = null;
   payload.items[2].spirit_type = "Malt Whisky";
   payload.items[2].list_description =
-    "A delightful small batch sherried single malt.";
+    "A delightful small batch drawn from casks of Speyside single malt.";
   payload.items[3].sku = "SM0126GB0700612";
   payload.items[3].name = "Dark 'n' stormy crème brûlée";
   payload.items[3].cask_no = "Distillery G16 Rare Release";
