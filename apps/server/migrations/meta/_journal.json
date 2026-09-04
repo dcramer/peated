@@ -1884,6 +1884,13 @@
       "when": 1788536748130,
       "tag": "0268_gorgeous_paladin",
       "breakpoints": false
+    },
+    {
+      "idx": 269,
+      "version": "7",
+      "when": 1788543049863,
+      "tag": "0269_useful_shiver_man",
+      "breakpoints": false
     }
   ]
 }
