@@ -48,7 +48,7 @@ const rules: readonly VoiceRule[] = [
       <div {...stylex.props(styles.wordLists)}>
         <WordList
           label="Trade jargon"
-          words="expression · liquid · NAS without expansion · organoleptic · the water of life"
+          words="expression · liquid · organoleptic · the water of life"
         />
         <WordList
           accent

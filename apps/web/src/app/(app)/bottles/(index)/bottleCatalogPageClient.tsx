@@ -50,7 +50,7 @@ const categoryOptions = [
 ] satisfies readonly BottleCatalogFilterOption[];
 
 const ageBandLabels = {
-  nas: "No age statement",
+  nas: "NAS",
   under_12: "Under 12",
   "12_17": "12–17 years",
   "18_24": "18–24 years",

@@ -42,8 +42,7 @@ general or about Peated.
 
 Avoid these terms in customer-facing copy:
 
-- Trade jargon: `expression`, `liquid`, unexplained `NAS`, `organoleptic`,
-  `the water of life`.
+- Trade jargon: `expression`, `liquid`, `organoleptic`, `the water of life`.
 - Internal terms: `aggregate`, `entity`, `canonical`, `verdict`, `grain`,
   `band`.
 - Product marketing: `curated`, `discover`, `journey`, `unlock`, `seamless`,
@@ -54,6 +53,10 @@ or `How people rated` instead of exposing an internal measure name.
 
 `Dram` is allowed at most once per screen. Do not use it in a heading or as a
 cute plural.
+
+Use `NAS` for a Bottle confirmed to have no age statement. Age labels and
+surrounding context normally explain the term; learning-oriented surfaces can
+spell it out once.
 
 ## Use Peated Mechanics
 
