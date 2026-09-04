@@ -24,3 +24,4 @@
 - [x] 5.1 Add focused overlap coverage proving concurrent Bottle changes and repair preserve the final total.
 - [x] 5.2 Run focused backend tests, server and web typechecks, lint, formatting, terminology checks, and strict OpenSpec validation.
 - [x] 5.3 Return a controlled conflict for an invalid BottleGroup representative during BottleSeries merge and cover rollback.
+- [x] 5.4 Reject an Entity merge before catalog mutation when an affected Bottle has not completed BottleGroup migration.

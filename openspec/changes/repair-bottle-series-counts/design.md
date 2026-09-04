@@ -51,6 +51,8 @@ The job will use a strict empty input, be dispatched uniquely, and run from the 
 
 BottleSeries and Entity merges may move many Bottles and retire a BottleSeries. They will use the same count owner or its one-series recount rather than embedding their own `COUNT(*)` expressions. Their existing identity checks, tombstones, audit rows, and transaction boundaries remain unchanged.
 
+An Entity merge will stop before making changes if an affected Bottle has not completed BottleGroup migration. Moving only its BottleSeries would leave its producer links and saved identity inconsistent. The dedicated BottleSeries merge can still move an ungrouped Bottle because that operation does not change its producer identity.
+
 ## Risks / Trade-offs
 
 - **A large repair scan still reads the Bottle and BottleSeries tables.** → The scan is read-only; writes are limited to one locked BottleSeries per transaction.

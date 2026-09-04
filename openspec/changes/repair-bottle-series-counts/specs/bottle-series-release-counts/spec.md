@@ -58,6 +58,11 @@ The system SHALL save every BottleSeries release-total change in the same transa
 - **WHEN** an Entity merge moves or combines BottleSeries rows
 - **THEN** every surviving BottleSeries total matches its Bottle membership when the merge commits
 
+#### Scenario: Entity merge finds a Bottle without a group
+
+- **WHEN** an affected Bottle does not belong to a BottleGroup
+- **THEN** the Entity merge reports that the Bottle must be migrated and commits no catalog changes
+
 ### Requirement: Concurrent release-total changes
 
 The system SHALL preserve every committed release-total change when Bottle operations overlap. When one operation affects several BottleSeries rows, it SHALL change those rows in ascending BottleSeries ID order.

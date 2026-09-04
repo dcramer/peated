@@ -55,8 +55,26 @@ import {
   EntityMergeJobInputSchema,
   isOperationEntityMergeJobInput,
 } from "@peated/server/worker/entityMerge";
-import { and, asc, eq, inArray, notInArray, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNull,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 import type { JobPayload } from "../types";
+
+class EntityMergeBottleGroupRequiredError extends Error {
+  constructor(bottleId: number) {
+    super(
+      `Bottle ${bottleId} must belong to a BottleGroup before this Entity merge can continue.`,
+    );
+    this.name = "EntityMergeBottleGroupRequiredError";
+  }
+}
 
 function replaceMergedEntityIds(
   ids: readonly number[],
@@ -67,6 +85,33 @@ function replaceMergedEntityIds(
   return Array.from(
     new Set(ids.map((id) => (sourceIds.has(id) ? toEntityId : id))),
   ).sort((left, right) => left - right);
+}
+
+async function findBottleWithoutGroup(
+  database: AnyDatabase,
+  fromEntityIds: number[],
+  sourceSeriesIds: number[],
+): Promise<number | null> {
+  const [bottle] = await database
+    .select({ id: bottles.id })
+    .from(bottles)
+    .leftJoin(bottlesToDistillers, eq(bottlesToDistillers.bottleId, bottles.id))
+    .where(
+      and(
+        isNull(bottles.groupId),
+        or(
+          inArray(bottles.brandId, fromEntityIds),
+          inArray(bottles.bottlerId, fromEntityIds),
+          inArray(bottlesToDistillers.distillerId, fromEntityIds),
+          sourceSeriesIds.length
+            ? inArray(bottles.seriesId, sourceSeriesIds)
+            : undefined,
+        ),
+      ),
+    )
+    .orderBy(asc(bottles.id))
+    .limit(1);
+  return bottle?.id ?? null;
 }
 
 type EntityKind = NonNullable<(typeof entities.$inferSelect)["kind"]>;
@@ -235,6 +280,32 @@ async function performEntityMerge({
       logWarn("Merge target entity not found", { extra: { toEntityId } });
       return;
     }
+
+    const sourceSeriesRows = await tx
+      .select()
+      .from(bottleSeries)
+      .where(inArray(bottleSeries.brandId, fromEntityIds));
+    const sourceSeriesIds = sourceSeriesRows.map(({ id }) => id);
+    // BottleGroup owns shared Bottle identity changes. Stop instead of
+    // partially rewriting a Bottle that has not completed group migration.
+    const bottleWithoutGroupId = await findBottleWithoutGroup(
+      tx,
+      fromEntityIds,
+      sourceSeriesIds,
+    );
+    if (bottleWithoutGroupId !== null) {
+      const error = new EntityMergeBottleGroupRequiredError(
+        bottleWithoutGroupId,
+      );
+      if (operation) {
+        throw new EntityMergeOperationExecutionError(
+          error.message,
+          operation.operationId,
+          { cause: error },
+        );
+      }
+      throw error;
+    }
     performedMutation = true;
 
     const mutationUser =
@@ -280,12 +351,6 @@ async function performEntityMerge({
       entityId: toEntityId,
       ownerId: destinationOwnerId,
     });
-
-    const sourceSeriesRows = await tx
-      .select()
-      .from(bottleSeries)
-      .where(inArray(bottleSeries.brandId, fromEntityIds));
-    const sourceSeriesIds = sourceSeriesRows.map(({ id }) => id);
 
     const authorityGroups = await tx
       .select({ id: bottleGroups.id })

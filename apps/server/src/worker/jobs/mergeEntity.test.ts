@@ -483,6 +483,77 @@ test("fails an operation when its check schema version is unsupported", async ({
   ).toHaveLength(2);
 });
 
+test("rejects an affected Bottle without a group before changing data", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({ name: "Ungrouped Source" });
+  const destination = await fixtures.Entity({ name: "Ungrouped Destination" });
+  const sourceSeries = await fixtures.BottleSeries({
+    brandId: source.id,
+    name: "Range",
+    numReleases: 1,
+  });
+  const destinationSeries = await fixtures.BottleSeries({
+    brandId: destination.id,
+    name: sourceSeries.name,
+    numReleases: 0,
+  });
+  const bottle = await fixtures.LegacyBottle({
+    brandId: source.id,
+    seriesId: sourceSeries.id,
+  });
+  const moderator = await fixtures.User({ mod: true });
+  const checkBottle = await fixtures.Bottle({ brandId: destination.id });
+  const operation = await createApplyingEntityMergeOperation({
+    approvingModeratorId: moderator.id,
+    bottleId: checkBottle.id,
+    sourceEntityId: source.id,
+    destinationEntityId: destination.id,
+  });
+
+  await expect(
+    mergeEntity({
+      operationId: operation.id,
+      approvingModeratorId: moderator.id,
+    }),
+  ).rejects.toThrow(
+    `Bottle ${bottle.id} must belong to a BottleGroup before this Entity merge can continue.`,
+  );
+
+  await expect(
+    db.query.bottleOperations.findFirst({
+      where: eq(bottleOperations.id, operation.id),
+    }),
+  ).resolves.toMatchObject({
+    status: "failed",
+    error: `Bottle ${bottle.id} must belong to a BottleGroup before this Entity merge can continue.`,
+  });
+
+  await expect(
+    db.query.entities.findFirst({ where: eq(entities.id, source.id) }),
+  ).resolves.toBeDefined();
+  await expect(
+    db.query.entities.findFirst({ where: eq(entities.id, destination.id) }),
+  ).resolves.toBeDefined();
+  await expect(
+    db.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, sourceSeries.id),
+    }),
+  ).resolves.toMatchObject({ brandId: source.id, numReleases: 1 });
+  await expect(
+    db.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, destinationSeries.id),
+    }),
+  ).resolves.toMatchObject({ brandId: destination.id, numReleases: 0 });
+  await expect(
+    db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+  ).resolves.toMatchObject({
+    brandId: source.id,
+    seriesId: sourceSeries.id,
+    groupId: null,
+  });
+});
+
 test("merge A into B", async ({ fixtures }) => {
   const entityA = await fixtures.Entity({
     name: "Entity A",
