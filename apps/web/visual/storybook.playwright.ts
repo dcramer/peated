@@ -52,6 +52,14 @@ test("capture Storybook stories", async ({ page, request }) => {
 
 type Story = ReturnType<typeof storiesFromIndex>[number];
 
+declare global {
+  interface Window {
+    __STORYBOOK_PREVIEW__?: {
+      currentRender?: { id?: string; phase?: string };
+    };
+  }
+}
+
 async function captureStory(page: Page, story: Story, output: string) {
   const search = new URLSearchParams({
     globals: "theme:light",
@@ -63,6 +71,14 @@ async function captureStory(page: Page, story: Story, output: string) {
     waitUntil: "domcontentloaded",
   });
   await expect(page.locator("#storybook-root > *").first()).toBeVisible();
+  // Storybook's root appears before portal effects and play functions finish.
+  await page.waitForFunction((storyId) => {
+    const render = window.__STORYBOOK_PREVIEW__?.currentRender;
+    return (
+      render?.id === storyId &&
+      (render.phase === "afterEach" || render.phase === "finished")
+    );
+  }, story.id);
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(
