@@ -21,6 +21,6 @@
 ## 4. Verification and pilots
 
 - [x] 4.1 Run focused parser, service, runtime, route, CLI, typecheck, lint, and formatting checks
-- [ ] 4.2 Run local no-write full previews for Whisky Study and Whisky Saga and compare URLs, names, reviewers, dates, scores, review evidence, and item counts with stored records
+- [x] 4.2 Run local no-write full previews for Whisky Study and Whisky Saga and compare URLs, names, reviewers, dates, scores, review evidence, and item counts with stored records
 - [ ] 4.3 Run a local no-write full preview for one small price source and compare names, prices, currency, volume, URLs, images, Bottle matches, and item count with its current scraper
 - [ ] 4.4 Only after exact parity, create inactive production revisions, pass production previews, activate the pilot sources, restore their prior schedules, run once, and verify stored IDs and relationships remain unchanged

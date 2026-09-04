@@ -1,6 +1,9 @@
+import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { describe, expect, it } from "vitest";
+import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
+import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
-import { parseScrapeRules } from "./rules";
+import { parseScrapeRules, type ScrapeRules } from "./rules";
 
 const reviewConfig = {
   kind: "review" as const,
@@ -18,6 +21,114 @@ const reviewConfig = {
     score: { value: { selector: ".score" }, scale: 100 },
   },
 };
+
+const whiskyStudyRules = {
+  kind: "review",
+  list: {
+    detailLink: {
+      selector: "article.blog-item h1.blog-title a[href]",
+      attribute: "href",
+    },
+    maxItems: 20,
+  },
+  detail: {
+    title: { selector: "h1.entry-title" },
+    publishedAt: {
+      selector: 'meta[itemprop="datePublished"]',
+      attribute: "content",
+    },
+    reviewItem: "article.h-entry .blog-item-content.e-content",
+    name: {
+      selector: "h1.entry-title",
+      removeSuffixes: ["Shelf Review", "Review"],
+    },
+    reviewerName: {
+      selector: 'meta[itemprop="author"]',
+      attribute: "content",
+    },
+    reviewText: {
+      selector: "article.h-entry .blog-item-content.e-content p",
+      startsWith: ["Nose:", "Palate:", "Taste:", "Finish:"],
+      all: true,
+    },
+    score: {
+      value: {
+        selector:
+          "article.h-entry .blog-item-content.e-content h1, article.h-entry .blog-item-content.e-content h2, article.h-entry .blog-item-content.e-content h3, article.h-entry .blog-item-content.e-content h4, article.h-entry .blog-item-content.e-content p",
+        startsWith: ["Score"],
+        removePrefixes: ["Score:"],
+        suffix: "/100",
+      },
+      scale: 100,
+    },
+  },
+} satisfies ScrapeRules;
+
+const whiskySagaRules = {
+  kind: "review",
+  list: {
+    detailLink: {
+      selector: "article.blog-item a.blog-more-link[href]",
+      attribute: "href",
+    },
+    maxItems: 20,
+  },
+  detail: {
+    title: { selector: "h1.entry-title" },
+    publishedAt: {
+      selector: 'meta[itemprop="datePublished"]',
+      attribute: "content",
+    },
+    reviewItem: "article.h-entry .blog-item-content",
+    name: { selector: "h1.entry-title" },
+    reviewerName: {
+      selector: 'meta[itemprop="author"]',
+      attribute: "content",
+    },
+    reviewText: {
+      selector: "article.h-entry .blog-item-content p",
+      startsWith: ["Nose:", "Palate:", "Taste:", "Finish:"],
+      all: true,
+    },
+    score: {
+      value: {
+        selector: "article.h-entry .blog-item-content p",
+        startsWith: ["Score"],
+        removePrefixes: ["Score:", "Score"],
+      },
+      scale: 100,
+    },
+  },
+} satisfies ScrapeRules;
+
+function expectReviewFactsAndEvidenceToMatch(
+  configured: ReturnType<typeof parseScrapeDetail>,
+  legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
+) {
+  expect(configured.kind).toBe("review");
+  expect(configured.issues).toEqual([]);
+  if (configured.kind !== "review" || !configured.value) {
+    throw new Error("Expected configured review output.");
+  }
+  const configuredReview = configured.value.article.externalReviews[0];
+  const legacyReview = legacy.article.externalReviews[0];
+  expect(configured.value.article).toMatchObject({
+    canonicalUrl: legacy.article.canonicalUrl,
+    title: legacy.article.title,
+    publishedAt: legacy.article.publishedAt,
+  });
+  expect(configuredReview).toMatchObject({
+    name: legacyReview?.name,
+    reviewerName: legacyReview?.reviewerName,
+    nativeScore: legacyReview?.nativeScore,
+  });
+  expect(Object.values(configured.value.externalReviewTexts)).toEqual(
+    Object.values(legacy.externalReviewTexts),
+  );
+  expect(Object.values(configured.value.externalReviewBodies)).toEqual(
+    Object.values(legacy.externalReviewBodies),
+  );
+}
 
 describe("scrape source parser", () => {
   it("limits detail links to the same website", () => {
@@ -173,6 +284,40 @@ describe("scrape source parser", () => {
       value: 90,
       display: "90/100",
     });
+  });
+
+  it("matches the current Whisky Study parser facts and evidence", async () => {
+    const url = new URL(
+      "https://thewhiskystudy.com/reviews-3/example-scotch-review",
+    );
+    const html = (await loadFixture("whiskystudy", "review.html")).replace(
+      "<head>",
+      '<head><meta itemprop="datePublished" content="2026-07-04T12:03:15-0700"><meta itemprop="author" content="Chris Ellis">',
+    );
+    const legacy = parseWhiskyStudyArticle(html, url);
+    expect(legacy).not.toBeNull();
+    if (!legacy) throw new Error("Expected legacy review output.");
+
+    expectReviewFactsAndEvidenceToMatch(
+      parseScrapeDetail(whiskyStudyRules, html, url),
+      legacy,
+    );
+  });
+
+  it("matches the current Whisky Saga parser facts and evidence", async () => {
+    const url = new URL("https://www.whiskysaga.com/blog/example-scotch");
+    const html = (await loadFixture("whiskysaga", "review.html")).replace(
+      "<head>",
+      '<head><meta itemprop="datePublished" content="2026-08-17T22:36:08+0200"><meta itemprop="author" content="Thomas Øhrbom">',
+    );
+    const legacy = parseWhiskySagaArticle(html, url);
+    expect(legacy).not.toBeNull();
+    if (!legacy) throw new Error("Expected legacy review output.");
+
+    expectReviewFactsAndEvidenceToMatch(
+      parseScrapeDetail(whiskySagaRules, html, url),
+      legacy,
+    );
   });
 
   it("uses fixed values and literal prefixes before price validation", () => {
