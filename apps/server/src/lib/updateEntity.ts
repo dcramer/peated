@@ -23,6 +23,10 @@ import {
   EntityOwnershipConflictError,
 } from "@peated/server/lib/entityOwnership";
 import { arraysEqual } from "@peated/server/lib/equals";
+import {
+  getBottleProductionLocations,
+  updateLocationBottleCounts,
+} from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
 import {
   BottleUpdateConflictError,
@@ -34,7 +38,7 @@ import {
 } from "@peated/server/lib/updateBottle";
 import { EntityInputFields } from "@peated/server/schemas/entities";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
-import { asc, eq, or, sql } from "drizzle-orm";
+import { asc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export const EntityUpdateInputSchema = z.object({
@@ -202,8 +206,7 @@ export async function updateEntityInTransaction(
       .select()
       .from(countries)
       .where(eq(countries.id, input.country))
-      .limit(1)
-      .for("share");
+      .limit(1);
     if (!country) {
       throw new EntityUpdateNotFoundError("Country");
     }
@@ -230,8 +233,7 @@ export async function updateEntityInTransaction(
       .select()
       .from(regions)
       .where(eq(regions.id, input.region))
-      .limit(1)
-      .for("share");
+      .limit(1);
     if (!region || region.countryId !== (data.countryId ?? entity.countryId)) {
       throw new EntityUpdateNotFoundError("Region");
     }
@@ -314,6 +316,64 @@ export async function updateEntityInTransaction(
     };
   }
 
+  const productionLocationChanged =
+    data.countryId !== undefined || data.regionId !== undefined;
+  const countryIdsToLock =
+    data.countryId === undefined
+      ? []
+      : Array.from(
+          new Set(
+            [entity.countryId, data.countryId].filter(
+              (id): id is number => id !== null,
+            ),
+          ),
+        ).sort((left, right) => left - right);
+  const regionIdsToLock =
+    data.regionId === undefined
+      ? []
+      : Array.from(
+          new Set(
+            [entity.regionId, data.regionId].filter(
+              (id): id is number => id !== null,
+            ),
+          ),
+        ).sort((left, right) => left - right);
+  // Entity location edits use the same Country-then-Region, ascending-ID order
+  // as Bottle writes so two moves cannot take these locks in reverse.
+  if (countryIdsToLock.length) {
+    const lockedCountries = await transaction
+      .select({ id: countries.id })
+      .from(countries)
+      .where(inArray(countries.id, countryIdsToLock))
+      .orderBy(asc(countries.id))
+      .for("update");
+    if (lockedCountries.length !== countryIdsToLock.length) {
+      throw new EntityUpdateNotFoundError("Country");
+    }
+  }
+  if (regionIdsToLock.length) {
+    const lockedRegions = await transaction
+      .select({ id: regions.id })
+      .from(regions)
+      .where(inArray(regions.id, regionIdsToLock))
+      .orderBy(asc(regions.id))
+      .for("update");
+    if (lockedRegions.length !== regionIdsToLock.length) {
+      throw new EntityUpdateNotFoundError("Region");
+    }
+  }
+  const relatedBottleIds = productionLocationChanged
+    ? (
+        await transaction
+          .selectDistinct({ id: bottlesToDistillers.bottleId })
+          .from(bottlesToDistillers)
+          .where(eq(bottlesToDistillers.distillerId, entity.id))
+      ).map(({ id }) => id)
+    : [];
+  const locationsBefore = productionLocationChanged
+    ? await getBottleProductionLocations(transaction, relatedBottleIds)
+    : [];
+
   let newEntity: Entity | undefined;
   const bottleUpdates: BottleUpdateFinalizationManifest[] = [];
   try {
@@ -335,6 +395,18 @@ export async function updateEntityInTransaction(
   }
   if (!newEntity) {
     throw new EntityUpdateFailedError();
+  }
+
+  if (productionLocationChanged) {
+    const locationsAfter = await getBottleProductionLocations(
+      transaction,
+      relatedBottleIds,
+    );
+    await updateLocationBottleCounts(
+      transaction,
+      locationsBefore,
+      locationsAfter,
+    );
   }
 
   try {

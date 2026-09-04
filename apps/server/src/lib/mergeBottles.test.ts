@@ -13,11 +13,13 @@ import {
   changes,
   collectionBottles,
   collections,
+  countries,
   entities,
   externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
   memberReviews,
+  regions,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -443,18 +445,37 @@ describe("exact Bottle merges", () => {
   }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Low Count Merge Brand" });
+    const country = await fixtures.Country({ totalBottles: 0 });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      totalBottles: 0,
+    });
+    const distillery = await fixtures.Entity({
+      countryId: country.id,
+      regionId: region.id,
+    });
     const source = await fixtures.Bottle({
       name: "Low Count Merge Source",
       brandId: brand.id,
+      distillerIds: [distillery.id],
     });
     const destination = await fixtures.Bottle({
       name: "Low Count Merge Destination",
       brandId: brand.id,
+      distillerIds: [distillery.id],
     });
     await db
       .update(entities)
       .set({ totalBottles: 0 })
       .where(eq(entities.id, brand.id));
+    await db
+      .update(countries)
+      .set({ totalBottles: 0 })
+      .where(eq(countries.id, country.id));
+    await db
+      .update(regions)
+      .set({ totalBottles: 0 })
+      .where(eq(regions.id, region.id));
 
     await mergeBottles({
       sourceBottleId: source.id,
@@ -467,6 +488,12 @@ describe("exact Bottle merges", () => {
     ).resolves.toBeUndefined();
     await expect(
       db.query.entities.findFirst({ where: eq(entities.id, brand.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, country.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, region.id) }),
     ).resolves.toMatchObject({ totalBottles: 1 });
   });
 

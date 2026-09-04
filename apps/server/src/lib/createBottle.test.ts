@@ -8,7 +8,9 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  countries,
   entities,
+  regions,
   type User,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -33,6 +35,37 @@ interface BottleCreateAttempt {
 }
 
 describe("Bottle creation", () => {
+  test("updates production-location Bottle counts", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const country = await fixtures.Country({ totalBottles: 0 });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      totalBottles: 0,
+    });
+    const distillery = await fixtures.Entity({
+      countryId: country.id,
+      regionId: region.id,
+    });
+
+    await createBottle({
+      context: contextFor(defaults.user),
+      input: {
+        name: "Located Bottle",
+        brand: (await fixtures.Entity()).id,
+        distillers: [distillery.id],
+      },
+    });
+
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, country.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, region.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+  });
+
   test("creates an atomic singleton graph from flat Bottle input", async ({
     defaults,
     fixtures,

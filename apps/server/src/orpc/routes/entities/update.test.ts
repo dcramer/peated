@@ -4,8 +4,10 @@ import {
   bottleReferences,
   bottles,
   changes,
+  countries,
   entities,
   entityReferences,
+  regions,
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
@@ -177,6 +179,100 @@ describe("PATCH /entities/:entity", () => {
       omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt"),
     );
     expect(newEntity.regionId).toBe(region.id);
+  });
+
+  test("moves linked Bottle counts when a Distillery moves", async ({
+    fixtures,
+  }) => {
+    const oldCountry = await fixtures.Country({ totalBottles: 0 });
+    const oldRegion = await fixtures.Region({
+      countryId: oldCountry.id,
+      totalBottles: 0,
+    });
+    const newCountry = await fixtures.Country({ totalBottles: 0 });
+    const newRegion = await fixtures.Region({
+      countryId: newCountry.id,
+      totalBottles: 0,
+    });
+    const movingDistillery = await fixtures.Entity({
+      countryId: oldCountry.id,
+      regionId: oldRegion.id,
+    });
+    const retainedDistillery = await fixtures.Entity({
+      countryId: oldCountry.id,
+      regionId: oldRegion.id,
+    });
+    await fixtures.Bottle({
+      distillerIds: [movingDistillery.id, retainedDistillery.id],
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    await routerClient.entities.update(
+      {
+        entity: movingDistillery.id,
+        country: newCountry.id,
+        region: newRegion.id,
+      },
+      { context: { user: modUser } },
+    );
+
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, oldCountry.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, oldRegion.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, newCountry.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, newRegion.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+  });
+
+  test("moves two Distilleries between Countries without losing counts", async ({
+    fixtures,
+  }) => {
+    const firstCountry = await fixtures.Country({ totalBottles: 0 });
+    const secondCountry = await fixtures.Country({ totalBottles: 0 });
+    const firstDistillery = await fixtures.Entity({
+      countryId: firstCountry.id,
+    });
+    const secondDistillery = await fixtures.Entity({
+      countryId: secondCountry.id,
+    });
+    await fixtures.Bottle({ distillerIds: [firstDistillery.id] });
+    await fixtures.Bottle({ distillerIds: [firstDistillery.id] });
+    await fixtures.Bottle({ distillerIds: [secondDistillery.id] });
+    const modUser = await fixtures.User({ mod: true });
+
+    await Promise.all([
+      routerClient.entities.update(
+        {
+          entity: firstDistillery.id,
+          country: secondCountry.id,
+        },
+        { context: { user: modUser } },
+      ),
+      routerClient.entities.update(
+        {
+          entity: secondDistillery.id,
+          country: firstCountry.id,
+        },
+        { context: { user: modUser } },
+      ),
+    ]);
+
+    await expect(
+      db.query.countries.findFirst({
+        where: eq(countries.id, firstCountry.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.countries.findFirst({
+        where: eq(countries.id, secondCountry.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 2 });
   });
 
   test("can remove region", async ({ fixtures }) => {

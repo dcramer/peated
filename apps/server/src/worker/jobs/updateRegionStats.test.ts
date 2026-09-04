@@ -43,6 +43,10 @@ test("counts active Bottles by producing distillery", async ({ fixtures }) => {
     bottleId: retiredBottle.id,
     newBottleId: null,
   });
+  await db
+    .update(regions)
+    .set({ totalBottles: 7 })
+    .where(eq(regions.id, region1.id));
 
   await updateRegionStats({ regionId: region1.id });
 
@@ -51,7 +55,7 @@ test("counts active Bottles by producing distillery", async ({ fixtures }) => {
     .from(regions)
     .where(eq(regions.id, region1.id));
   expect(newRegion1).toBeDefined();
-  expect(newRegion1.totalBottles).toEqual(1);
+  expect(newRegion1.totalBottles).toEqual(7);
   expect(newRegion1.totalDistillers).toEqual(2);
 });
 

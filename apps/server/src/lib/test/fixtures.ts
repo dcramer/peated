@@ -56,6 +56,10 @@ import {
   updateEntityBottleCounts,
 } from "../entityBottleCounts";
 import { formatBottleName } from "../format";
+import {
+  getBottleProductionLocations,
+  updateLocationBottleCounts,
+} from "../locationBottleCounts";
 import { choose, random, sample } from "../rand";
 import {
   buildBottleSearchVector,
@@ -720,6 +724,8 @@ async function createBottleFixture(
 
     const bottleEntityLinks = await getBottleEntityLinks(tx, [bottle.id]);
     await updateEntityBottleCounts(tx, [], bottleEntityLinks);
+    const bottleLocations = await getBottleProductionLocations(tx, [bottle.id]);
+    await updateLocationBottleCounts(tx, [], bottleLocations);
 
     await tx
       .insert(bottleReferences)

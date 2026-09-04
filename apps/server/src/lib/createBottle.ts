@@ -40,6 +40,10 @@ import {
   updateEntityBottleCounts,
 } from "@peated/server/lib/entityBottleCounts";
 import { formatBottleName } from "@peated/server/lib/format";
+import {
+  getBottleProductionLocations,
+  updateLocationBottleCounts,
+} from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { buildBottleSearchVector } from "@peated/server/lib/search";
@@ -631,6 +635,10 @@ export async function createBottleInTransaction(
     bottleResult.bottle.id,
   ]);
   await updateEntityBottleCounts(tx, [], bottleEntityLinks);
+  const bottleLocations = await getBottleProductionLocations(tx, [
+    bottleResult.bottle.id,
+  ]);
+  await updateLocationBottleCounts(tx, [], bottleLocations);
 
   return {
     ...bottleResult,
