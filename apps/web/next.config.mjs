@@ -8,6 +8,7 @@ const { stylexOptions } = require("./stylex.config.cjs");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   allowedDevOrigins: ["127.0.0.1"],
   experimental: {
     globalNotFound: true,

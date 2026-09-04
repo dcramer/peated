@@ -6,7 +6,6 @@ export function createBottleCheckMock({
   testUser,
 }) {
   const approvedTokens = new Set();
-  const rejectedTokens = new Set();
   const linkedStorePriceCheckId = 92;
   const linkedStorePriceOperationId = 703;
   const linkedStorePriceDistillersEdition2023BottleId = 9313;
@@ -46,7 +45,7 @@ export function createBottleCheckMock({
             status: "needs_review",
             audit: buildBottleCheckDetails({
               approved: approvedTokens.has(token),
-              rejected: rejectedTokens.has(token),
+              rejected: false,
             }).audit,
           });
         }
@@ -78,7 +77,7 @@ export function createBottleCheckMock({
         return response(
           buildBottleCheckDetails({
             approved: approvedTokens.has(token),
-            rejected: rejectedTokens.has(token),
+            rejected: false,
           }),
         );
       case "audits/list":
@@ -95,13 +94,10 @@ export function createBottleCheckMock({
         if (token.includes("bottle-check-review")) {
           const details = buildBottleCheckDetails({
             approved: approvedTokens.has(token),
-            rejected: rejectedTokens.has(token),
+            rejected: false,
           });
           return response({
-            results:
-              approvedTokens.has(token) && rejectedTokens.has(token)
-                ? []
-                : [details.audit],
+            results: [details.audit],
             rel: { nextCursor: null, prevCursor: null },
           });
         }
@@ -138,24 +134,6 @@ export function createBottleCheckMock({
         return response({
           results: [{ operationId: 701, status: "applied", error: null }],
         });
-      case "audits/rejectSelected":
-        if (!token.includes("bottle-check-review")) {
-          return null;
-        }
-        if (
-          input?.audit !== 91 ||
-          !Array.isArray(input?.operationIds) ||
-          input.operationIds.length !== 1 ||
-          input.operationIds[0] !== 702 ||
-          input.reason !== "wrong_change" ||
-          input.note !== undefined
-        ) {
-          return error("Unexpected Bottle Check rejection payload");
-        }
-        rejectedTokens.add(token);
-        return response({
-          results: [{ operationId: 702, status: "rejected", error: null }],
-        });
       default:
         return null;
     }
@@ -177,7 +155,7 @@ export function createBottleCheckMock({
     if (!token.includes("bottle-check-review")) return null;
     const details = buildBottleCheckDetails({
       approved: approvedTokens.has(token),
-      rejected: rejectedTokens.has(token),
+      rejected: false,
     });
     return details.audit.operations
       .filter(({ status }) => ["blocked", "pending_review"].includes(status))

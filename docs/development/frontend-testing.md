@@ -80,6 +80,12 @@ The suite starts two local servers:
 - a small mock RPC server on `127.0.0.1:4999`;
 - Next.js on `127.0.0.1:3200`.
 
+Each web port uses its own Next.js build directory under `.playwright`, so
+fallback-port and concurrent local runs do not share a compiler lock or cache.
+The suite uses one browser worker because every test shares that Next process
+and the stateful mock API. Keep the suite small enough to stay within the CI
+budget instead of adding parallel access to those shared services.
+
 This keeps browser tests independent from a local database and API server.
 Browser workflow tests should reuse the shared e2e fixtures and add narrow mock
 RPC responses for the routes they exercise.
@@ -119,7 +125,7 @@ web server is already running with the API pointed at a compatible test target.
 - The Playwright command should finish in less than 5 minutes on a healthy CI
   runner. Its hard timeout is 7 minutes. The 15-minute GitHub job timeout also
   includes dependency and browser setup.
-- The suite can schedule at most 80 tests across all browser projects. The
+- The suite can schedule at most 40 tests across all browser projects. The
   `test:e2e` command checks this limit and the mobile tagging, timeout, retry,
   and failure policies before it starts a browser.
 - A test gets one CI retry. Do not increase retries or timeouts to hide an
