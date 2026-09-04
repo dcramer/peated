@@ -14,6 +14,7 @@ import { homeMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { loadPublicHomeLocations } from "./homeLocations.server";
 import { HomePageClient } from "./homePageClient";
 
 export const metadata = homeMetadata;
@@ -39,6 +40,7 @@ export default async function Page() {
     queryClient.prefetchQuery(publicHomeQueries.memberActivity(orpc)),
     queryClient.prefetchQuery(publicHomeQueries.recentReviews(orpc)),
     queryClient.prefetchQuery(publicHomeQueries.releases(orpc)),
+    loadPublicHomeLocations(queryClient, orpc),
     ...(session.user
       ? [queryClient.prefetchQuery(memberHomeQueries.followedReleases(orpc))]
       : []),

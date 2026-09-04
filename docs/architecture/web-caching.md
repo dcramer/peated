@@ -23,6 +23,8 @@ headers prove it.
 - `publicStats.server.ts` caches anonymous counts for one hour. Server reads use
   `getPublicStats`; browser reads use `/api/stats`, backed by the same cache.
   The endpoint sends `no-store` to avoid an extra HTTP cache lifetime.
+- `homeLocations.server.ts` caches the homepage country and region lists
+  for one hour. Visitors and members use the same public data.
 - `publicCatalog.server.ts` caches anonymous entity summaries and first-page
   entity/series bottle lists for five minutes. Keys include entity, series,
   distillery view, sort, and limit. Members, searches, extra filters, later

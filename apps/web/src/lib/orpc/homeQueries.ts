@@ -1,5 +1,5 @@
 import { StatsSchema } from "@peated/server/orpc/contracts/stats";
-import type { Outputs } from "@peated/server/orpc/router";
+import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import {
   infiniteQueryOptions,
   type InfiniteData,
@@ -10,6 +10,22 @@ import type { ORPCQueryUtils } from "./context";
 
 type ActivityFilter = "friends" | "global" | "local";
 type ActivityList = Outputs["activity"]["list"];
+
+const ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
+
+export const homeLocationCriteria = {
+  countries: {
+    hasBottles: true,
+    limit: 100,
+    sort: "-bottles",
+  } satisfies Inputs["countries"]["list"],
+  regions: {
+    country: "scotland",
+    hasBottles: true,
+    limit: 6,
+    sort: "-bottles",
+  } satisfies Inputs["regions"]["list"],
+};
 
 export const publicHomeQueries = {
   stats: (orpc: ORPCQueryUtils) =>
@@ -40,16 +56,13 @@ export const publicHomeQueries = {
     }),
   countries: (orpc: ORPCQueryUtils) =>
     orpc.countries.list.queryOptions({
-      input: { hasBottles: true, limit: 100, sort: "-bottles" },
+      input: homeLocationCriteria.countries,
+      staleTime: ONE_HOUR_IN_MILLISECONDS,
     }),
   regions: (orpc: ORPCQueryUtils) =>
     orpc.regions.list.queryOptions({
-      input: {
-        country: "scotland",
-        hasBottles: true,
-        limit: 6,
-        sort: "-bottles",
-      },
+      input: homeLocationCriteria.regions,
+      staleTime: ONE_HOUR_IN_MILLISECONDS,
     }),
   distilleries: (orpc: ORPCQueryUtils) =>
     orpc.distilleries.list.queryOptions({
