@@ -222,6 +222,39 @@ and cases with different Bottle names from the failure that led to it.
       the new path. See the
       [C14 result](./C14-read-verified-create-page.md).
 
+- [x] **C15 — Preserve a composed SMWS cask code.** **Accepted.** The C09
+      validator dropped the verified `1.285` code after it had been composed
+      from separate label fields. The validator now checks that same anchor.
+      All 424 package tests and the full-run SMWS case passed, with no added
+      model work. See [C15 results](./C15-composed-smws-cask-code.md).
+
+- [x] **C16 — Preserve raw photo-label text.** **Accepted.** The server discarded
+      `rawLabelText` and rebuilt image evidence only from structured fields. It
+      now passes the full transcription through, with the structured summary as
+      a fallback. This adds no model request. See
+      [C16 results](./C16-preserve-raw-photo-label.md).
+
+- [x] **C17 — Separate a package code from a marketed edition during image
+      extraction.** **Rejected and reverted.** High Country extraction improved
+      3/3 while marketed controls stayed correct, but the classifier still
+      promoted the raw code and selected the wrong Bottle. See
+      [C17 results](./C17-image-batch-lot-role.md).
+
+- [x] **C18 — Carry a typed package-code observation.** **Rejected and
+      reverted.** Extraction populated the field 3/3, but classification still
+      selected Bottle 44284 in all three runs. See
+      [C18 results](./C18-observed-batch-lot-field.md).
+
+- [x] **C19 — Remove a candidate built from a package-only code.** **Rejected
+      and reverted.** It passed three no-web runs, but with Firecrawl available
+      it passed only 2/3 and created a duplicate once. See
+      [C19 results](./C19-exclude-observed-lot-candidate.md).
+
+- [x] **C20 — State that catalog data cannot prove a marketed edition.**
+      **Rejected and reverted.** It passed 2/3 web-enabled runs and selected the
+      wrong Bottle once. See
+      [C20 results](./C20-catalog-is-not-product-evidence.md).
+
 ## Current stopping point
 
 C09 and C10 improve checks after Luna, while C11 removes model work for Bottle
@@ -231,11 +264,17 @@ work. It distinguishes fixes in search results, source facts, candidate context,
 checks after Luna, and expectations instead of treating every failure as a
 prompt problem.
 
-Next test a narrow stable-product-name check. Russell's Reserve repeatedly has
-enough source evidence to create `Single Barrel Rye`, but Luna sometimes returns
-`Single Barrel`. The check must use an exact source title or accepted Bottle
-Reference, preserve deliberate shorter stable names, and avoid assembling a
-name from Bottle fields.
+The High Country miss should not receive another broad classifier rule. The
+production Bottle has already been merged: current queries exclude the retired
+row through its tombstone and the old URL resolves to Bottle 12825. A future
+test should first model that current catalog state instead of asking Luna to
+reason around a retired duplicate.
+
+The clearest remaining concern from the latest traces is expensive audit work.
+One malformed-Bottle audit used 87,044 tokens and 97 seconds without producing
+the required operations. Another spent 49,187 tokens and 79 seconds. Inspect
+the audit tool sequence and repeated missing operations before changing its
+prompt or turn budget.
 
 ## Completion rule
 

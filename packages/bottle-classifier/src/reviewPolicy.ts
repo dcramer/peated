@@ -535,8 +535,11 @@ function rejectInvalidExistingMatch({
   }
 
   const candidateCaskCode = getCandidateMarketedCaskCodeAnchor(target);
+  // SMWS identity rule: a code composed from the label is verified source evidence.
+  const smwsCode = getSmwsCodeAnchor({ reference, decision, artifacts });
   const allowSourceProgramCode = candidateCaskCode?.includes(".") === true;
   const sourceCaskCodes = [
+    smwsCode,
     getMarketedCaskCodeAnchor(reference.name, {
       allowProgramCode: allowSourceProgramCode,
     }),
@@ -600,7 +603,6 @@ function rejectInvalidExistingMatch({
       ? identityConflicts.filter((field) => field !== "abv")
       : identityConflicts;
 
-  const smwsCode = getSmwsCodeAnchor({ reference, decision, artifacts });
   const materialIdentityConflicts =
     smwsCode &&
     candidateLooksSmws(target) &&

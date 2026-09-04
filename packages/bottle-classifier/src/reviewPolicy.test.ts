@@ -1797,11 +1797,15 @@ describe("unverified candidate cask codes", () => {
     candidate,
     referenceName,
     extractedCaskNumber = null,
+    extractedBrand = null,
+    imageLabelText = null,
     observationBarrelNumber = null,
   }: {
     candidate: BottleCandidate;
     referenceName: string;
     extractedCaskNumber?: string | null;
+    extractedBrand?: string | null;
+    imageLabelText?: string | null;
     observationBarrelNumber?: string | null;
   }) {
     return finalizeBottleReferenceClassification({
@@ -1824,24 +1828,46 @@ describe("unverified candidate cask codes", () => {
       },
       artifacts: buildBottleClassificationArtifacts({
         candidates: [candidate],
-        extractedIdentity: extractedCaskNumber
+        extractedIdentity:
+          extractedCaskNumber || extractedBrand
+            ? {
+                brand: extractedBrand ?? candidate.brand,
+                bottler: candidate.bottler,
+                expression: null,
+                series: null,
+                distillery: candidate.distillery,
+                category: candidate.category,
+                stated_age: candidate.statedAge,
+                abv: candidate.abv,
+                release_year: candidate.releaseYear,
+                vintage_year: candidate.vintageYear,
+                cask_strength: candidate.caskStrength,
+                single_cask: candidate.singleCask,
+                maturation: candidate.maturation,
+                cask_number: extractedCaskNumber,
+                outturn: candidate.outturn,
+                edition: candidate.edition,
+              }
+            : null,
+        imageEvidence: imageLabelText
           ? {
-              brand: candidate.brand,
-              bottler: candidate.bottler,
-              expression: null,
-              series: null,
-              distillery: candidate.distillery,
-              category: candidate.category,
-              stated_age: candidate.statedAge,
-              abv: candidate.abv,
-              release_year: candidate.releaseYear,
-              vintage_year: candidate.vintageYear,
-              cask_strength: candidate.caskStrength,
-              single_cask: candidate.singleCask,
-              maturation: candidate.maturation,
-              cask_number: extractedCaskNumber,
-              outturn: candidate.outturn,
-              edition: candidate.edition,
+              sourceImageId: "review-policy-test-image",
+              extractors: [
+                {
+                  kind: "ocr",
+                  confidence: 0.98,
+                  textSpans: [{ text: imageLabelText, confidence: 0.98 }],
+                  observations: [],
+                },
+              ],
+              fieldCandidates: {},
+              photoSuitability: {
+                isSingleBottlePhoto: true,
+                labelReadable: true,
+                suitableAsTastingImage: true,
+                suitableAsBottleImage: true,
+              },
+              conflicts: [],
             }
           : null,
       }),
@@ -1931,6 +1957,35 @@ describe("unverified candidate cask codes", () => {
         observationBarrelNumber: "F2-038",
       }),
     ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
+  });
+
+  test("keeps an SMWS match when the source code is composed from label components", () => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      bottleId: 11940,
+      fullName: "SMWS 1.285 Party in the afternoon",
+      brand: "SMWS",
+      bottler: "The Scotch Malt Whisky Society",
+      category: "single_malt",
+      statedAge: 11,
+      abv: 63.4,
+      singleCask: true,
+    };
+
+    expect(
+      finalizeCandidateMatch({
+        candidate,
+        referenceName: "Bottle photo upload",
+        extractedBrand: "The Scotch Malt Whisky Society",
+        imageLabelText:
+          "THE SCOTCH MALT WHISKY SOCIETY. Society Distillery No. 1. Single Cask No. 285. 11 years Aged. 63.4% ALC/VOL.",
+      }),
+    ).toMatchObject({
+      action: "match",
+      identityScope: "exact_cask",
+      matchedBottleId: 11940,
+      observation: { caskNumber: "1.285" },
+    });
   });
 
   test.each([

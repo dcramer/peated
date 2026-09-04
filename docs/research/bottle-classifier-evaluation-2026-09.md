@@ -1,7 +1,7 @@
 # Bottle classifier evaluation, September 2026
 
 This study compared model settings, corrected unreliable checks, reviewed
-specific failures, and tested fourteen classifier changes. The detailed run
+specific failures, and tested twenty classifier changes. The detailed run
 records live under
 [`packages/bottle-classifier/evals`](../../packages/bottle-classifier/evals/README.md).
 
@@ -39,7 +39,7 @@ not just the pass count.
 
 ## Changes we kept
 
-Four changes solved a specific problem without adding broad instructions:
+Six changes solved a specific problem without adding broad instructions:
 
 1. **Reject an unsupported cask-specific match.** Luna repeatedly matched a
    general product to a Bottle whose cask code appeared only in the candidate
@@ -61,6 +61,16 @@ Four changes solved a specific problem without adding broad instructions:
    recovering supported age and ABV. Nine controls passed, and the full suite
    made this extra read for only the intended case. The affected case added one
    Firecrawl request and an average $0.000156 in model cost.
+5. **Preserve composed SMWS codes through final review.** The cask safety check
+   discarded `1.285` after the image path had correctly composed it from
+   separate society and cask numbers. Final review now uses the verified
+   composed code. All deterministic controls passed, and the full Luna run
+   matched Bottle 11940. The check adds no model work.
+6. **Keep the raw label transcription.** Photo identification previously
+   rebuilt evidence from structured fields and discarded the extractor's
+   `rawLabelText`. It now passes that text through so a visible code is not lost
+   merely because it was omitted from a structured identity field. This adds no
+   model work and does not decide what the code means.
 
 These rules contain no product names from the test cases. They rely on accepted
 Peated references, exact identifiers, and the source URL already supplied with
@@ -80,6 +90,13 @@ Broad prompt changes and broad source-page reading did not hold up:
   correct results.
 - A general candidate-relationship field improved the small selected set but
   failed safety checks and lost six earlier passes in the full run.
+- Removing ordinary lot codes from `edition` corrected extraction 3/3 but did
+  not change the classifier's wrong choice.
+- A separate typed package-code field still selected the wrong Bottle 3/3.
+- Filtering the lot-specific candidate passed without web tools, but a
+  web-enabled run created a duplicate; the result was correct only 2/3.
+- Telling Luna that catalog data is not product evidence was also correct only
+  2/3 and selected the wrong Bottle once.
 
 These results favor small code checks for facts Peated already knows. Extra
 prompt text and extra model passes need a stronger measured gain.
@@ -95,16 +112,16 @@ an unsupported SMWS release year. These corrections are not classifier gains.
 
 ## What remains
 
-The next clear problem is stable product naming. Luna found evidence for
-Russell's Reserve Single Barrel Rye but sometimes returned `Single Barrel` and
-dropped `Rye`. The next test should use an exact source title or accepted
-reference to check Luna's proposed name. It must preserve deliberately short
-producer names and must not build a name from age, ABV, year, or other fields.
+The clearest next problem is expensive audit work. In the latest no-web full
+run, the malformed Laphroaig audit used 87,044 tokens and 97 seconds without
+returning the required operations. A successful Dramfool audit used 49,187
+tokens and 79 seconds. Inspect their tool sequences and missing operations
+before testing a bounded audit change.
 
 Other repeated problems have separate causes:
 
 - some web passages mix whole-product facts with component facts;
-- image extraction can treat an ordinary lot code as a marketed edition;
+- changing catalog state can make a historical wrong-candidate case obsolete;
 - changing retailer pages can disagree with an older expected release; and
 - several audit runs omit supported changes or spend too many turns retrying.
 
