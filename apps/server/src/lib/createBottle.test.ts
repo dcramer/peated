@@ -294,6 +294,28 @@ describe("Bottle creation", () => {
     });
   });
 
+  test("stores maturation wording longer than the legacy cask type limit", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const maturation = "Long producer-stated maturation detail. "
+      .repeat(8)
+      .trim();
+    const brand = await fixtures.Entity({ name: "Long Maturation Brand" });
+
+    const result = await createBottle({
+      context: contextFor(defaults.user),
+      input: {
+        name: "Long Maturation Expression",
+        brand: brand.id,
+        maturation,
+      },
+    });
+
+    expect(maturation.length).toBeGreaterThan(255);
+    expect(result.bottle.maturation).toBe(maturation);
+  });
+
   test.each([
     ["stated age", { statedAge: 12.5 }],
     ["vintage year", { vintageYear: 2000.5 }],
