@@ -75,7 +75,7 @@ const meta = {
 | standard (default) | Catalog, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
 | search | Typeahead results | Standard identity and thumbnail, 15px compact title, and 8px vertical padding. |
 | sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
-| compact | Single or grouped library additions | One name line, 24 × 32px thumbnail, and a 44px hit area. |
+| compact | Single or grouped library additions | One regular-weight name line, 24 × 32px thumbnail, and a 44px hit area. |
 
 Sidebar omits membership status icons and keeps full accessible names when its two-line titles truncate. Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control so its bottle link stays within the identity. Use linkArea="title" when the surrounding card is also clickable. The end slot holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
 

@@ -40,8 +40,9 @@ export type BottleIdentityRowProps = {
 /**
  * Bottle identity for lists and activity. Standard shows name, provenance, then
  * release facts; search tightens the title and spacing for typeahead results;
- * sidebar uses compact titles and small thumbnails; compact shows one name line
- * for library additions. Sidebar names use two lines with the full name in title.
+ * sidebar uses compact titles and small thumbnails; compact shows one regular-weight
+ * name line for dense lists of library additions. Sidebar names use two lines with
+ * the full name in title.
  * Search places trailing ratings or actions below the identity on narrow screens.
  * Use toBottleListItem for API Bottles or getBottleIdentityProps for partial reads.
  * All variants take the same full marketed name and own their thumbnail size.
@@ -259,6 +260,7 @@ const styles = stylex.create({
   compactName: {
     display: "block",
     overflow: "hidden",
+    fontWeight: 400,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
