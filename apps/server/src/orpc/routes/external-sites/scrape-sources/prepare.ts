@@ -2,6 +2,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { prepareBourbonCultureSource } from "@peated/server/scraper/configured/prepareBourbonCulture";
+import { prepareCompassBoxSource } from "@peated/server/scraper/configured/prepareCompassBox";
 import { prepareWhiskySagaSource } from "@peated/server/scraper/configured/prepareWhiskySaga";
 import { prepareWhiskyStudySource } from "@peated/server/scraper/configured/prepareWhiskyStudy";
 import {
@@ -18,7 +19,7 @@ export default procedure
     path: "/admin/scrape-sources/prepare",
     summary: "Prepare an existing scraper for saved rules",
     description:
-      "Check existing reviews without saving. Set apply to true to save the changes and leave collection paused. Requires an administrator and a stopped schedule with no active runs.",
+      "Check existing source records without saving. Set apply to true to transfer request settings and leave collection paused. Requires an administrator and a stopped schedule with no active runs.",
     spec: (spec) => ({
       ...spec,
       operationId: "prepareScrapeSource",
@@ -28,7 +29,7 @@ export default procedure
     z
       .object({
         site: ExternalSiteKeySchema.describe(
-          "The existing site's key. Currently supports bourbonculture, whiskysaga, and whiskystudy.",
+          "The existing site's key. Currently supports bourbonculture, compassbox, whiskysaga, and whiskystudy.",
         ),
         apply: z
           .boolean()
@@ -49,7 +50,10 @@ export default procedure
           .describe(
             "The prepared source ID, or null when checking without saving.",
           ),
-        reviewCount: z.number().int().nonnegative(),
+        reviewCount: z.number().int().nonnegative().optional(),
+        priceCount: z.number().int().positive().optional(),
+        visiblePriceCount: z.number().int().nonnegative().optional(),
+        matchedPriceCount: z.number().int().nonnegative().optional(),
         applied: z.boolean(),
       })
       .strict(),
@@ -57,6 +61,7 @@ export default procedure
   .handler(async ({ input, context, errors }) => {
     const prepareSource = {
       bourbonculture: prepareBourbonCultureSource,
+      compassbox: prepareCompassBoxSource,
       whiskysaga: prepareWhiskySagaSource,
       whiskystudy: prepareWhiskyStudySource,
     }[input.site];

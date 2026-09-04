@@ -107,6 +107,29 @@ same review IDs recorded before applying without adding duplicate articles or
 reviews. Check the run and Sentry before restoring the saved schedule.
 Preparation must not change the source's publication setting.
 
+## Compass Box
+
+Use the same preparation endpoint with `{"site": "compassbox"}`. The check-only
+request locks and inventories every stored price without changing it. It reports
+the total, visible, and Bottle-matched price counts. It stops if a price has an
+unexpected product URL, external product ID, name prefix, currency, or volume.
+Applying transfers the existing request settings to administrator ownership and
+adds a paused price source whose list page is
+`https://www.compassboxwhisky.com/collections`. It does not update price rows or
+history.
+
+Before applying, stop the `compassbox` schedule and wait for active runs. Save
+the price IDs, product URLs, names, prices, currencies, volumes, image URLs,
+Bottle matches, hidden states, histories, request limits, and run history. Run
+the version 2 rules through the local no-write preview without an item limit.
+The current catalog must match the code scraper, including excluding sold-out
+cards.
+
+After applying, save the reviewed version 2 revision and run its production
+preview. Activate only exact output, trigger one manual collection, and confirm
+that it updates the same price IDs and Bottle matches. Check the run and Sentry
+before restoring the saved schedule.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -116,9 +139,10 @@ handles reviews added after the switch. Do not delete source or run history.
 
 ## Other sources
 
-The preparation API is shared. It currently supports Bourbon Culture and The
-Whisky Study. Other sites are rejected without changing records. Add each
-site's conversion behind this route as its existing records are reviewed.
+The preparation API is shared. It currently supports Bourbon Culture, Compass
+Box, and The Whisky Study. Other sites are rejected without changing records.
+Add each site's conversion behind this route as its existing records are
+reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
