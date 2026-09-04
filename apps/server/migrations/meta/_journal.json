@@ -1877,6 +1877,13 @@
       "when": 1788398259141,
       "tag": "0267_external-review-text-and-tags",
       "breakpoints": false
+    },
+    {
+      "idx": 268,
+      "version": "7",
+      "when": 1788536748130,
+      "tag": "0268_gorgeous_paladin",
+      "breakpoints": false
     }
   ]
 }

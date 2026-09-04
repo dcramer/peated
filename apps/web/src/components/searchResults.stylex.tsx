@@ -25,17 +25,11 @@ import {
 import { Button, ButtonLink } from "./button.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { MatchedText } from "./matchedText.stylex";
-import { BottleRatings, type TastingRatingCounts } from "./scoring.stylex";
+import { BottleRatings, type BottleRatingsProps } from "./scoring.stylex";
 
 const COMPACT = "@media (max-width: 559px)";
 
-export type SearchResultRatings = {
-  score?: {
-    count: number;
-    value: number;
-  };
-  bands?: TastingRatingCounts;
-};
+export type SearchResultRatings = BottleRatingsProps;
 
 export type SearchResultItem = {
   href: string;
@@ -467,13 +461,7 @@ function ResultVisual({
 }
 
 function ResultRatings({ ratings }: { ratings: SearchResultRatings }) {
-  return ratings.score || ratings.bands ? (
-    <BottleRatings
-      counts={ratings.bands}
-      median={ratings.score?.value}
-      scoreCount={ratings.score?.count}
-    />
-  ) : null;
+  return <BottleRatings {...ratings} />;
 }
 
 const styles = stylex.create({

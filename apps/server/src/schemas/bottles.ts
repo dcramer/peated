@@ -262,6 +262,16 @@ export const BottleSchema = z.object({
     .gte(0)
     .readonly()
     .describe("Combined member and external score count"),
+  reviewScoreBandCounts: z
+    .object({
+      mediocre: z.number().int().gte(0),
+      good: z.number().int().gte(0),
+      very_good: z.number().int().gte(0),
+      outstanding: z.number().int().gte(0),
+      unicorn: z.number().int().gte(0),
+    })
+    .readonly()
+    .describe("Review score counts in each rating range"),
   tastingBandCounts: z
     .object({
       mediocre: z.number().int().gte(0),

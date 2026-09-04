@@ -31,6 +31,7 @@ export type BottleStatsResult = Omit<
     | "maxScore"
     | "memberScoreCount"
     | "externalScoreCount"
+    | "reviewScoreBandCounts"
     | "tastingBandCounts"
     | "updatedAt"
   >,
@@ -83,6 +84,7 @@ export async function recomputeBottleStatsInTransaction(
       maxScore: bottles.maxScore,
       memberScoreCount: bottles.memberScoreCount,
       externalScoreCount: bottles.externalScoreCount,
+      reviewScoreBandCounts: bottles.reviewScoreBandCounts,
       tastingBandCounts: bottles.tastingBandCounts,
       updatedAt: bottles.updatedAt,
     });

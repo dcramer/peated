@@ -89,6 +89,13 @@ test("combines fractional five-point scores with native and converted scores", a
     minScore: 84,
     maxScore: 87,
     externalScoreCount: 3,
+    reviewScoreBandCounts: {
+      mediocre: 0,
+      good: 1,
+      very_good: 2,
+      outstanding: 0,
+      unicorn: 0,
+    },
   });
 });
 
@@ -202,12 +209,17 @@ test("previews the complete bottle score, saves, refreshes bottles and groups, a
     medianScore: 87,
     externalScoreCount: 1,
     memberScoreCount: 1,
+    reviewScoreBandCounts: { outstanding: 1, very_good: 1 },
   });
   expect(
     await db.query.bottleGroups.findFirst({
       where: eq(bottleGroups.id, bottle.groupId),
     }),
-  ).toMatchObject({ medianScore: 87, externalScoreCount: 1 });
+  ).toMatchObject({
+    medianScore: 87,
+    externalScoreCount: 1,
+    reviewScoreBandCounts: { outstanding: 1, very_good: 1 },
+  });
   expect(
     await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),

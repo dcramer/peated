@@ -34,17 +34,25 @@ const meta = {
       />
     ),
     name: "Elements L 2.0",
-    bands: {
-      counts: {
+    rating: {
+      externalScoreCount: 2,
+      memberScoreCount: 3,
+      median: 91,
+      reviewCounts: {
+        good: 0,
+        mediocre: 0,
+        outstanding: 4,
+        unicorn: 0,
+        very_good: 1,
+      },
+      tastingCounts: {
         good: 8,
         mediocre: 3,
         outstanding: 19,
         unicorn: 6,
         very_good: 12,
       },
-      showCounts: true,
     },
-    score: { count: 48, high: 96, low: 78, median: 88 },
   },
   argTypes: {
     actions: { control: false },
@@ -81,7 +89,6 @@ export const ThinData: Story = {
     metadata: "Port Ellen Distillery",
     menu: null,
     name: "Independent bottling",
-    bands: null,
-    score: null,
+    rating: null,
   },
 };

@@ -1,4 +1,8 @@
-import { EMPTY_TASTING_BAND_COUNTS } from "@peated/server/constants";
+import {
+  EMPTY_REVIEW_SCORE_BAND_COUNTS,
+  EMPTY_TASTING_BAND_COUNTS,
+  RATING_BANDS,
+} from "@peated/server/constants";
 import type { AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { memberReviews, tastings } from "@peated/server/db/schema";
@@ -16,6 +20,7 @@ export type BottleActivityStats = Pick<
   | "maxScore"
   | "memberScoreCount"
   | "externalScoreCount"
+  | "reviewScoreBandCounts"
   | "tastingBandCounts"
 >;
 
@@ -28,6 +33,11 @@ type RawBottleActivityStats = {
   unicorn: number | string;
   memberScoreCount: number | string;
   externalScoreCount: number | string;
+  reviewMediocre: number | string;
+  reviewGood: number | string;
+  reviewVeryGood: number | string;
+  reviewOutstanding: number | string;
+  reviewUnicorn: number | string;
   medianScore: number | string | null;
   minScore: number | string | null;
   maxScore: number | string | null;
@@ -57,12 +67,13 @@ function requiredScore(value: number | string | null): number | null {
   return score;
 }
 
-/** Aggregates current tasting bands and counted review scores for active Bottles. */
+/** Counts current tasting ratings and included review scores for active Bottles. */
 export async function aggregateBottleActivityStatsInTransaction(
   tx: AnyTransaction,
   bottleIds: number[],
   override?: ReviewScoringOverride,
 ): Promise<BottleActivityStats> {
+  const [mediocre, good, veryGood, outstanding, unicorn] = RATING_BANDS;
   const reviews = await loadScoredExternalReviews({ bottleIds }, tx, override);
   const externalScores = reviews.flatMap(({ contribution }) =>
     contribution.value === null ? [] : [contribution.value],
@@ -82,6 +93,11 @@ export async function aggregateBottleActivityStatsInTransaction(
       SELECT
         COUNT(*) FILTER (WHERE source = 'member') AS "memberScoreCount",
         COUNT(*) FILTER (WHERE source = 'external') AS "externalScoreCount",
+        COUNT(*) FILTER (WHERE score BETWEEN ${mediocre.min} AND ${mediocre.max}) AS "reviewMediocre",
+        COUNT(*) FILTER (WHERE score BETWEEN ${good.min} AND ${good.max}) AS "reviewGood",
+        COUNT(*) FILTER (WHERE score BETWEEN ${veryGood.min} AND ${veryGood.max}) AS "reviewVeryGood",
+        COUNT(*) FILTER (WHERE score BETWEEN ${outstanding.min} AND ${outstanding.max}) AS "reviewOutstanding",
+        COUNT(*) FILTER (WHERE score BETWEEN ${unicorn.min} AND ${unicorn.max}) AS "reviewUnicorn",
         PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY score) AS "medianScore",
         MIN(score) AS "minScore",
         MAX(score) AS "maxScore"
@@ -100,6 +116,11 @@ export async function aggregateBottleActivityStatsInTransaction(
     GROUP BY
       score_stats."memberScoreCount",
       score_stats."externalScoreCount",
+      score_stats."reviewMediocre",
+      score_stats."reviewGood",
+      score_stats."reviewVeryGood",
+      score_stats."reviewOutstanding",
+      score_stats."reviewUnicorn",
       score_stats."medianScore",
       score_stats."minScore",
       score_stats."maxScore"
@@ -117,6 +138,14 @@ export async function aggregateBottleActivityStatsInTransaction(
     maxScore: requiredScore(raw.maxScore),
     memberScoreCount,
     externalScoreCount,
+    reviewScoreBandCounts: {
+      ...EMPTY_REVIEW_SCORE_BAND_COUNTS,
+      mediocre: requiredCount(raw.reviewMediocre),
+      good: requiredCount(raw.reviewGood),
+      very_good: requiredCount(raw.reviewVeryGood),
+      outstanding: requiredCount(raw.reviewOutstanding),
+      unicorn: requiredCount(raw.reviewUnicorn),
+    },
     tastingBandCounts: {
       ...EMPTY_TASTING_BAND_COUNTS,
       mediocre: requiredCount(raw.mediocre),
