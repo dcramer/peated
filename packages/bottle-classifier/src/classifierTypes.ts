@@ -428,7 +428,7 @@ export const BottleCandidateSearchInputSchema = z
       .nullable()
       .default(null)
       .describe(
-        "Named market-facing bottler or release imprint for this product. It may equal the brand or a distillery; leave null when product-specific evidence does not establish this Bottle relationship.",
+        "Business that independently selects and releases whisky made by another producer. It may also be the brand. Leave null for an official Brand or distillery release, or when product evidence does not establish the role.",
       ),
     expression: z
       .string()

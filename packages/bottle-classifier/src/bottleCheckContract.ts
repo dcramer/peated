@@ -125,7 +125,7 @@ export const BottlePatchSchema = z
     bottler: BottleOperationEntityChoiceSchema.nullable()
       .optional()
       .describe(
-        "Market-facing bottler or release imprint. Clear an existing value only when product evidence shows it is wrong; omission or matching the Brand or a distiller is not enough.",
+        "Business that independently selects and releases whisky made by another producer. An official Brand or distillery release has no bottler. Clear an existing value only when product evidence shows it is wrong; omission or matching the Brand is not enough.",
       ),
     edition: ProposedBottleFields.edition.removeDefault().optional(),
     abv: ProposedBottleFields.abv

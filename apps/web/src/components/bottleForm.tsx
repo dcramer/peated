@@ -654,7 +654,7 @@ export default function BottleForm({
               value={distillers}
             />
             <EntityPicker
-              help="The market-facing bottler or release imprint, when one is stated."
+              help="The independent bottler, if this isn't an official brand or distillery release."
               kind="bottler"
               loading={bottlerResults.isFetching}
               onChange={(option) => {

@@ -49,8 +49,9 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     label: "Bottler",
     outputField: "`bottler`",
     guidance: [
-      "Populate `bottler` only when product-specific evidence names the market-facing bottler or release imprint for this product.",
-      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing alone do not establish this Bottle relationship.",
+      "Set `bottler` only for a business that independently selects and releases whisky made by another producer.",
+      "An official Brand or distillery release has no bottler.",
+      "The bottler may also be `brand`. Ownership, importing, distribution, or physical packing alone does not prove the role.",
       "Leave this null when product-specific evidence does not establish this Bottle relationship.",
     ],
   },
@@ -456,7 +457,7 @@ const EXTRACTION_EXAMPLES: ExtractionExample[] = [
     input: "Gordon & MacPhail Caol Ila 12 Year First Fill Bourbon Cask",
     output: {
       brand: "Gordon & MacPhail",
-      bottler: null,
+      bottler: "Gordon & MacPhail",
       expression: null,
       series: null,
       distillery: ["Caol Ila"],
@@ -579,8 +580,9 @@ export function buildWhiskyLabelExtractorInstructions({
     renderBulletLines([
       "For official distillery bottlings, `brand` often matches the single item inside `distillery`, but do not force them to be identical.",
       "Keep the consumer-facing brand when it differs from the producing distillery name. Official single-distillery bottlings such as `Jura` / `Isle of Jura` or `Ledaig` / `Tobermory` are real examples.",
-      "Populate `bottler` only when product-specific evidence names the market-facing bottler or release imprint for the product.",
-      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing alone do not establish this Bottle relationship.",
+      "Set `bottler` only for a business that independently selects and releases whisky made by another producer.",
+      "An official Brand or distillery release has no bottler.",
+      "The bottler may also be `brand`. Ownership, importing, distribution, or physical packing alone does not prove the role.",
       "When the visible label, capsule, or neck tag explicitly names a producer with `Distillery` in the name, include that producer in `distillery` even if the front brand is a shorter consumer label.",
       "Prefer `[]` over guessing when the producing distillery is unknown.",
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",

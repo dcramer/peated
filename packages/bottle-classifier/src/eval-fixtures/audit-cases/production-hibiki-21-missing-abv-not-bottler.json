@@ -7,7 +7,7 @@
     "audit": {
       "bottleId": 11863,
       "origin": "moderator",
-      "note": "Audit this existing Bottle against focused product evidence without treating an ordinary official producer as an independent bottler."
+      "note": "Audit this Bottle without treating its official producer as an independent bottler."
     },
     "context": {
       "currentBottle": {
@@ -119,7 +119,7 @@
         "notes": "Independent product references consistently identify the standard Hibiki 21-year-old blend at 43% ABV."
       }
     ],
-    "notes": "Observed August 2, 2026 from Bottle Check #9 for production Bottle 11863. The audit correctly found the missing 43% ABV but also proposed creating and assigning Suntory as bottler. Production Entity 1383 already owns the Suntory identity, which mechanically blocked the proposal. More importantly, the House of Suntory product page presents Hibiki 21 as an ordinary official Hibiki release and does not establish a separate market-facing bottler or release-imprint relationship. The exact Peated outcome is therefore an ABV-only update with bottler left null."
+    "notes": "Observed August 2, 2026 from Bottle Check #9 for production Bottle 11863. The audit correctly found the missing 43% ABV but also proposed creating and assigning Suntory as bottler. Production Entity 1383 already owns the Suntory identity, which mechanically blocked the proposal. The House of Suntory product page presents Hibiki 21 as an official Hibiki release and does not establish an independent bottler. The Peated outcome is an ABV-only update with bottler left null."
   },
   "expected": {
     "summary": "Hibiki 21-year-old Bottle 11863 is missing its supported 43% ABV; the evidence does not establish a separate bottler relationship.",
@@ -132,7 +132,7 @@
             "abv": 43
           }
         },
-        "rationale": "Independent product evidence identifies the standard Hibiki 21-year-old blend at 43% ABV; the available evidence does not establish a separate bottler or release imprint.",
+        "rationale": "Product evidence identifies the standard Hibiki 21-year-old blend at 43% ABV and shows an official release, not an independent bottling.",
         "evidenceRefs": [
           {
             "kind": "bottle",

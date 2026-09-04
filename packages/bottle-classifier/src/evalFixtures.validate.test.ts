@@ -241,6 +241,35 @@ describe("eval fixture validation", () => {
     });
   });
 
+  test("keeps an ordinary Hibiki release free of a Suntory bottler", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) => id === "audit-production-hibiki-21-missing-abv-not-bottler",
+    );
+
+    expect(fixture).toBeDefined();
+    expect(fixture?.provenance.source).toBe("production_miss");
+    expect(fixture?.input.context.currentBottle).toMatchObject({
+      brand: "Hibiki",
+      bottler: null,
+    });
+    expect(fixture?.provenance.dbOutcome).toMatchObject({
+      bottleId: 11863,
+      createsBottle: false,
+    });
+    expect(fixture?.expected.proposedOperations).toEqual([
+      expect.objectContaining({
+        type: "update_bottle",
+        input: {
+          bottleId: 11863,
+          patch: { abv: 43 },
+        },
+      }),
+    ]);
+    expect(JSON.stringify(fixture?.expected.proposedOperations)).not.toContain(
+      '"bottler"',
+    );
+  });
+
   test("covers real Compass Box photo misses without forcing duplicate creation", () => {
     const matchFixture = loadDecisionFixture(roguesBanquetMatchFixtureFile);
     const requiredChangeFixture = loadDecisionFixture(

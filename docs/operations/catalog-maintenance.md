@@ -52,9 +52,12 @@ Use the live OpenAPI Bottle schema as the complete checklist. Review at least:
 
 Then apply these rules:
 
-- Set `brand`, `distillers`, `bottler`, and `series` from product evidence. Do
-  not infer a bottler from the Brand owner or distributor.
-- Keep `name` to the stable release name used by the producer. Do not append age, vintage
+- Set `brand`, `distillers`, `bottler`, and `series` from product evidence. A
+  Bottler independently selects and releases whisky made by another producer.
+  An official Brand or distillery release has no bottler. Do not infer one from
+  an owner, importer, distributor, or physical packer.
+- Keep `name` to the stable release name used by the producer. Do not append
+  age, vintage
   year, release year, ABV, cask strength, cask number, outturn, package size, or
   package text to make it unique. Store those facts in their fields. Preserve
   wording only when the producer markets it as part of the expression. Use

@@ -9,7 +9,7 @@ export {
 
 export const MATCH_COMPONENT_PRIORITY = [
   "brand",
-  "bottler relationship, when evidenced",
+  "independent bottler relationship, when evidenced",
   "distillery, when known",
   "core expression name",
   "series or range",
@@ -36,7 +36,7 @@ const BOTTLE_IDENTITY_POLICY = [
     BOTTLE_SCHEMA_RULES.referencePolicy,
     "Unsupported novelty flavored whisky, whiskey liqueur, and additive-flavor products are outside the whisky catalog. Return `no_match` instead of matching or creating a Bottle.",
     "`brand` is the consumer-facing label Brand. When product evidence presents a distinct consumer label and independent bottler company, assign the label to `brand` and the company to `bottler`. `series` is a range beneath a consumer-facing Brand; use it only when evidence establishes that parent Brand. An Entity's catalog `kind` does not restrict which Bottle relationship it can fill.",
-    "Brand, distillers, and bottler are separate Bottle relationships, but one Entity may fill more than one. Set `bottler` only when product evidence identifies the Entity as the market-facing bottler or release imprint. It may be the Brand or a distiller; a separate imprint is not required. Ownership, importing, distribution, packing, or page hosting alone does not establish the relationship. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required relationship; exact or shorter name overlap is not stronger relationship evidence.",
+    "Brand, distillers, and bottler are separate Bottle relationships, but one Entity may fill more than one. Set `bottler` only for a business that independently selects and releases whisky made by another producer. An official Brand or distillery release has no bottler. The bottler may also be the Brand. Ownership, importing, distribution, packing, or page hosting alone does not establish the relationship. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required relationship; exact or shorter name overlap is not stronger relationship evidence.",
     "For a blend, keep every product-specific component distillery established by reviewed evidence in `proposedBottle.distillers`.",
     "When `proposedBottle` creates an Entity with a null id, set its `kind` from the best identity evidence. Do not mechanically copy the Bottle relationship: Compass Box is a `bottler` even when it fills Brand and bottler relationships. Existing Entity ids keep their stored kind.",
   ]),
