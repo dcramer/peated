@@ -54,7 +54,7 @@ const PricePageSchema = z
   })
   .strict();
 
-const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
+export const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
   ReviewPageSchema,
   PricePageSchema,
 ]);

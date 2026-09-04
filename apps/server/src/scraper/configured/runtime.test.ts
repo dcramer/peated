@@ -6,6 +6,7 @@ import {
   scrapeOrigins,
   scrapeSourceRevisions,
   scrapeSourceRuns,
+  scrapeTargets,
   users,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -33,6 +34,20 @@ function fixedClock(): ScraperHttpClock {
       now = new Date(now.getTime() + milliseconds);
     },
     random: () => 0,
+  };
+}
+
+function controllableClock() {
+  let now = new Date("2026-08-28T12:00:00Z");
+  return {
+    now: () => now,
+    sleep: async (milliseconds: number) => {
+      now = new Date(now.getTime() + milliseconds);
+    },
+    random: () => 0,
+    advanceTo: (value: Date) => {
+      now = value;
+    },
   };
 }
 
@@ -176,6 +191,67 @@ test("follows a bounded next-page selector", async () => {
       { url: "https://preview.example/two" },
     ],
   });
+});
+
+test("resumes configured previews without rereading completed pages", async () => {
+  const { pinned, revision, site } = await setupPreview("h1", true);
+  await db
+    .update(scrapeTargets)
+    .set({ requestsPerWindow: 3, windowMs: 60_000 })
+    .where(eq(scrapeTargets.key, site.type));
+  const fetchImpl = previewFetch(true);
+  const clock = controllableClock();
+
+  const first = await executeScraperRun(
+    { runId: pinned.run.id },
+    {
+      registry: createScraperRegistry({ targets: [], sources: [] }),
+      fetchImpl,
+      clock,
+      executionToken: "first-preview-owner",
+    },
+  );
+  expect(first.status).toBe("deferred");
+  if (!("nextAttemptAt" in first)) throw new Error("Expected deferral.");
+
+  const [deferred] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(deferred?.cursor).toMatchObject({
+    detailIndex: 1,
+    previewPages: [{ url: "https://preview.example/one" }],
+  });
+
+  clock.advanceTo(first.nextAttemptAt);
+  await expect(
+    executeScraperRun(
+      { runId: pinned.run.id },
+      {
+        registry: createScraperRegistry({ targets: [], sources: [] }),
+        fetchImpl,
+        clock,
+        executionToken: "second-preview-owner",
+      },
+    ),
+  ).resolves.toEqual({ status: "completed" });
+
+  const [storedRevision] = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision?.previewResult).toMatchObject({
+    pages: [
+      { url: "https://preview.example/one" },
+      { url: "https://preview.example/two" },
+    ],
+  });
+  const requestedPaths = fetchImpl.mock.calls.map(
+    ([input]) => new URL(input instanceof Request ? input.url : input).pathname,
+  );
+  expect(requestedPaths.filter((path) => path === "/archive")).toHaveLength(2);
+  expect(requestedPaths.filter((path) => path === "/one")).toHaveLength(1);
+  expect(requestedPaths.filter((path) => path === "/two")).toHaveLength(1);
 });
 
 test("stores safe validation issues when a selector stops matching", async () => {
