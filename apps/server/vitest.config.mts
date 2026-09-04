@@ -10,10 +10,6 @@ export default defineConfig({
     },
   },
   test: {
-    coverage: {
-      provider: "v8",
-      reporter: ["json"],
-    },
     maxConcurrency: 1,
     pool: "forks",
     fileParallelism: false,
