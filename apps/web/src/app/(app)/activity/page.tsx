@@ -1,5 +1,6 @@
 import { CursorPager, PageTabs } from "@peated/web/components";
 import { ActivityPage } from "@peated/web/components/pages/activityPage.stylex";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -12,6 +13,7 @@ import {
   getActivityFeedHref,
   getActivityFeedSelection,
   loadActivityFeed,
+  requiresActivityFeedLogin,
 } from "./loadActivityFeed";
 
 export const metadata: Metadata = {
@@ -34,6 +36,18 @@ export default async function Activity({
   const page = getPageNumber(getFirstValue(resolvedSearchParams.page));
   const selectedFeed = getActivityFeedSelection(feed);
   const following = selectedFeed === "following";
+  if (
+    requiresActivityFeedLogin({
+      feed: selectedFeed,
+      isLoggedIn: Boolean(user),
+    })
+  ) {
+    redirectToAuth({
+      pathname: "/activity",
+      searchParams: new URLSearchParams({ feed: selectedFeed }),
+    });
+  }
+
   const { client: publicClient } = await getAnonymousServerClient();
   const memberClient = user ? (await getServerClient()).client : undefined;
   const [{ items, note, rel }, library] = await Promise.all([

@@ -10,6 +10,16 @@ export function getActivityFeedSelection(feed?: string) {
   return feed === "following" ? "following" : "everyone";
 }
 
+export function requiresActivityFeedLogin({
+  feed,
+  isLoggedIn,
+}: {
+  feed: "everyone" | "following";
+  isLoggedIn: boolean;
+}) {
+  return feed === "following" && !isLoggedIn;
+}
+
 export function getActivityFeedHref({
   feed,
   isLoggedIn,
