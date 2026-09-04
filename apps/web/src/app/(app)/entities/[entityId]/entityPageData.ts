@@ -58,15 +58,6 @@ export function getDistilleryBottleView(
   return view === "other" || view === "releases" ? view : fallback;
 }
 
-export function getEntityRelationshipOwnerIds(
-  entity: Pick<Entity, "id" | "kind" | "ownerId">,
-) {
-  return {
-    operatedOwnerId: entity.kind === "company" ? entity.id : null,
-    siblingOwnerId: entity.ownerId,
-  };
-}
-
 export function getEntityLocationLabel(entity: Entity) {
   return [entity.region?.name, entity.country?.name]
     .filter((value): value is string => Boolean(value))

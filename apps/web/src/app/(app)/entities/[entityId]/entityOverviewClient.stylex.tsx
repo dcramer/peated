@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 
+import { CompanyOwnedList } from "./companyOwnedList";
 import { EntityBottleOverview } from "./entityBottleOverview";
 import { EntityCatalogRelationships } from "./entityCatalogRelationships";
 import { EntityDetails, hasEntityDetails } from "./entityDetails.stylex";
@@ -16,7 +17,6 @@ import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
 import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
-import { EntityOperatedOverview } from "./entityOperatedOverview";
 import { EntityOverviewLayout } from "./entityOverviewLayout.stylex";
 import { entityOverviewQueries } from "./entityOverviewQueries";
 import { useEntityPage } from "./entityPageFrameClient.stylex";
@@ -36,8 +36,12 @@ export function EntityOverviewClient() {
   const releaseListQuery = useQuery(
     entityOverviewQueries.releases(orpc, entity),
   );
-  const operatedListQuery = useQuery(
-    entityOverviewQueries.operated(orpc, entity),
+  const brandList = useQuery(entityOverviewQueries.companyBrands(orpc, entity));
+  const distilleryList = useQuery(
+    entityOverviewQueries.companyDistilleries(orpc, entity),
+  );
+  const bottlerAndCompanyList = useQuery(
+    entityOverviewQueries.companyBottlersAndCompanies(orpc, entity),
   );
   const siblingListQuery = useQuery(
     entityOverviewQueries.siblings(orpc, entity),
@@ -52,12 +56,29 @@ export function EntityOverviewClient() {
       }
       catalogSections={
         <>
-          <EntityOperatedOverview
-            entity={entity}
-            error={Boolean(operatedListQuery.error)}
-            operatedList={operatedListQuery.data}
-            pending={operatedListQuery.isPending}
-            retry={() => void operatedListQuery.refetch()}
+          <CompanyOwnedList
+            company={entity}
+            error={Boolean(distilleryList.error)}
+            items={distilleryList.data?.results}
+            pending={distilleryList.isPending}
+            retry={() => void distilleryList.refetch()}
+            section="distilleries"
+          />
+          <CompanyOwnedList
+            company={entity}
+            error={Boolean(brandList.error)}
+            items={brandList.data?.results}
+            pending={brandList.isPending}
+            retry={() => void brandList.refetch()}
+            section="brands"
+          />
+          <CompanyOwnedList
+            company={entity}
+            error={Boolean(bottlerAndCompanyList.error)}
+            items={bottlerAndCompanyList.data?.results}
+            pending={bottlerAndCompanyList.isPending}
+            retry={() => void bottlerAndCompanyList.refetch()}
+            section="operates"
           />
           <EntityReleaseOverview
             entity={entity}
