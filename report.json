@@ -1,0 +1,1323 @@
+{
+  "files": [
+    {
+      "file": "storybook/admin/review-score-setup__overview.png",
+      "image": "images/candidate/storybook/admin/review-score-setup__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/admin/review-score-setup__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/admin/review-score-setup__pending-refresh.png",
+      "image": "images/candidate/storybook/admin/review-score-setup__pending-refresh.png",
+      "images": {
+        "candidate": "images/candidate/storybook/admin/review-score-setup__pending-refresh.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/admin/review-score-setup__save-conflict.png",
+      "image": "images/candidate/storybook/admin/review-score-setup__save-conflict.png",
+      "images": {
+        "candidate": "images/candidate/storybook/admin/review-score-setup__save-conflict.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/admin/review-score-setup__unreviewed.png",
+      "image": "images/candidate/storybook/admin/review-score-setup__unreviewed.png",
+      "images": {
+        "candidate": "images/candidate/storybook/admin/review-score-setup__unreviewed.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-header__default.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-header__default.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-header__default.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-header__long-name.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-header__long-name.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-header__long-name.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-header__thin-data.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-header__thin-data.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-header__thin-data.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-identity-row__compact.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-identity-row__compact.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-identity-row__compact.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-identity-row__interaction-states.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-identity-row__interaction-states.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-identity-row__interaction-states.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-identity-row__overview.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-identity-row__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-identity-row__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-identity-row__row-layouts.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-identity-row__row-layouts.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-identity-row__row-layouts.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-list__interaction-states.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-list__interaction-states.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-list__interaction-states.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-list__overview.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-list__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-list__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-visual__expandable.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-visual__expandable.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-visual__expandable.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/bottle-visual__overview.png",
+      "image": "images/candidate/storybook/components/bottles/bottle-visual__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/bottle-visual__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/collection-bottle-status__overview.png",
+      "image": "images/candidate/storybook/components/bottles/collection-bottle-status__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/collection-bottle-status__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/bottles/selected-bottle-summary__overview.png",
+      "image": "images/candidate/storybook/components/bottles/selected-bottle-summary__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/bottles/selected-bottle-summary__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/brands-producers/brand-and-producer-header__default.png",
+      "image": "images/candidate/storybook/components/brands-producers/brand-and-producer-header__default.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/brands-producers/brand-and-producer-header__default.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/brands-producers/brand-and-producer-header__thin-data.png",
+      "image": "images/candidate/storybook/components/brands-producers/brand-and-producer-header__thin-data.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/brands-producers/brand-and-producer-header__thin-data.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/buttons-menus/button__overview.png",
+      "image": "images/candidate/storybook/components/buttons-menus/button__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/buttons-menus/button__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/buttons-menus/icon-button__overview.png",
+      "image": "images/candidate/storybook/components/buttons-menus/icon-button__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/buttons-menus/icon-button__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/buttons-menus/row-menu__closed.png",
+      "image": "images/candidate/storybook/components/buttons-menus/row-menu__closed.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/buttons-menus/row-menu__closed.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/buttons-menus/row-menu__framed-open.png",
+      "image": "images/candidate/storybook/components/buttons-menus/row-menu__framed-open.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/buttons-menus/row-menu__framed-open.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/buttons-menus/row-menu__frameless-open.png",
+      "image": "images/candidate/storybook/components/buttons-menus/row-menu__frameless-open.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/buttons-menus/row-menu__frameless-open.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/aliases__overview.png",
+      "image": "images/candidate/storybook/components/catalog/aliases__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/aliases__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/brand-and-producer-identity-row__overview.png",
+      "image": "images/candidate/storybook/components/catalog/brand-and-producer-identity-row__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/brand-and-producer-identity-row__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/brand-and-producer-identity-row__row-layouts.png",
+      "image": "images/candidate/storybook/components/catalog/brand-and-producer-identity-row__row-layouts.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/brand-and-producer-identity-row__row-layouts.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/brand-and-producer-picker__overview.png",
+      "image": "images/candidate/storybook/components/catalog/brand-and-producer-picker__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/brand-and-producer-picker__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/brand-and-producer-picker__selected.png",
+      "image": "images/candidate/storybook/components/catalog/brand-and-producer-picker__selected.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/brand-and-producer-picker__selected.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/brand-and-producer-picker__with-create-handoff.png",
+      "image": "images/candidate/storybook/components/catalog/brand-and-producer-picker__with-create-handoff.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/brand-and-producer-picker__with-create-handoff.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/key-facts__overview.png",
+      "image": "images/candidate/storybook/components/catalog/key-facts__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/key-facts__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/location-identity-row__overview.png",
+      "image": "images/candidate/storybook/components/catalog/location-identity-row__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/location-identity-row__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/peated-id__overview.png",
+      "image": "images/candidate/storybook/components/catalog/peated-id__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/peated-id__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/catalog/series-identity-row__overview.png",
+      "image": "images/candidate/storybook/components/catalog/series-identity-row__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/catalog/series-identity-row__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/content/image-viewer__overview.png",
+      "image": "images/candidate/storybook/components/content/image-viewer__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/content/image-viewer__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/data/flavor-wheel__bottle.png",
+      "image": "images/candidate/storybook/components/data/flavor-wheel__bottle.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/data/flavor-wheel__bottle.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/data/flavor-wheel__empty.png",
+      "image": "images/candidate/storybook/components/data/flavor-wheel__empty.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/data/flavor-wheel__empty.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/data/flavor-wheel__overview.png",
+      "image": "images/candidate/storybook/components/data/flavor-wheel__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/data/flavor-wheel__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/data/flavor-wheel__sparse.png",
+      "image": "images/candidate/storybook/components/data/flavor-wheel__sparse.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/data/flavor-wheel__sparse.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/authentication-panel__application-consent.png",
+      "image": "images/candidate/storybook/components/forms/authentication-panel__application-consent.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/authentication-panel__application-consent.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/authentication-panel__browser-support.png",
+      "image": "images/candidate/storybook/components/forms/authentication-panel__browser-support.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/authentication-panel__browser-support.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/authentication-panel__check-email.png",
+      "image": "images/candidate/storybook/components/forms/authentication-panel__check-email.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/authentication-panel__check-email.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/authentication-panel__recovery.png",
+      "image": "images/candidate/storybook/components/forms/authentication-panel__recovery.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/authentication-panel__recovery.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/authentication-panel__updated-terms.png",
+      "image": "images/candidate/storybook/components/forms/authentication-panel__updated-terms.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/authentication-panel__updated-terms.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/bottle-resolver__overview.png",
+      "image": "images/candidate/storybook/components/forms/bottle-resolver__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/bottle-resolver__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/checkbox__overview.png",
+      "image": "images/candidate/storybook/components/forms/checkbox__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/checkbox__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/choice-list__overview.png",
+      "image": "images/candidate/storybook/components/forms/choice-list__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/choice-list__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/color-input__overview.png",
+      "image": "images/candidate/storybook/components/forms/color-input__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/color-input__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/field__overview.png",
+      "image": "images/candidate/storybook/components/forms/field__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/field__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/form-layout__overview.png",
+      "image": "images/candidate/storybook/components/forms/form-layout__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/form-layout__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/picture-input__overview.png",
+      "image": "images/candidate/storybook/components/forms/picture-input__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/picture-input__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/review-score-input__overview.png",
+      "image": "images/candidate/storybook/components/forms/review-score-input__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/review-score-input__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/scoped-search__focused.png",
+      "image": "images/candidate/storybook/components/forms/scoped-search__focused.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/scoped-search__focused.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/scoped-search__overview.png",
+      "image": "images/candidate/storybook/components/forms/scoped-search__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/scoped-search__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/scoped-search__scope-menu-open.png",
+      "image": "images/candidate/storybook/components/forms/scoped-search__scope-menu-open.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/scoped-search__scope-menu-open.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/select__overview.png",
+      "image": "images/candidate/storybook/components/forms/select__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/select__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/serving-style__overview.png",
+      "image": "images/candidate/storybook/components/forms/serving-style__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/serving-style__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/switch__overview.png",
+      "image": "images/candidate/storybook/components/forms/switch__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/switch__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/tasting-form-steps__overview.png",
+      "image": "images/candidate/storybook/components/forms/tasting-form-steps__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/tasting-form-steps__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/tasting-rating__overview.png",
+      "image": "images/candidate/storybook/components/forms/tasting-rating__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/tasting-rating__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/text-input__overview.png",
+      "image": "images/candidate/storybook/components/forms/text-input__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/text-input__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/textarea__overview.png",
+      "image": "images/candidate/storybook/components/forms/textarea__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/textarea__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/unit-input__overview.png",
+      "image": "images/candidate/storybook/components/forms/unit-input__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/unit-input__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/forms/validation-message__default.png",
+      "image": "images/candidate/storybook/components/forms/validation-message__default.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/forms/validation-message__default.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/history/history-timeline__continuously-operating.png",
+      "image": "images/candidate/storybook/components/history/history-timeline__continuously-operating.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/history/history-timeline__continuously-operating.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/history/history-timeline__distillery-history.png",
+      "image": "images/candidate/storybook/components/history/history-timeline__distillery-history.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/history/history-timeline__distillery-history.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/identity/avatar__overview.png",
+      "image": "images/candidate/storybook/components/identity/avatar__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/identity/avatar__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/identity/badge-image__overview.png",
+      "image": "images/candidate/storybook/components/identity/badge-image__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/identity/badge-image__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/labels/chip__interactive-notes.png",
+      "image": "images/candidate/storybook/components/labels/chip__interactive-notes.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/labels/chip__interactive-notes.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/labels/chip__overview.png",
+      "image": "images/candidate/storybook/components/labels/chip__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/labels/chip__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/labels/count-chip__overview.png",
+      "image": "images/candidate/storybook/components/labels/count-chip__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/labels/count-chip__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/authentication-layout__registration.png",
+      "image": "images/candidate/storybook/components/layout/authentication-layout__registration.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/authentication-layout__registration.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/authentication-layout__sign-in.png",
+      "image": "images/candidate/storybook/components/layout/authentication-layout__sign-in.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/authentication-layout__sign-in.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/card__interaction-states.png",
+      "image": "images/candidate/storybook/components/layout/card__interaction-states.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/card__interaction-states.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/card__overview.png",
+      "image": "images/candidate/storybook/components/layout/card__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/card__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/catalog-detail-page__minimal.png",
+      "image": "images/candidate/storybook/components/layout/catalog-detail-page__minimal.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/catalog-detail-page__minimal.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/catalog-detail-page__overview.png",
+      "image": "images/candidate/storybook/components/layout/catalog-detail-page__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/catalog-detail-page__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/rail-list-section__expandable-collection.png",
+      "image": "images/candidate/storybook/components/layout/rail-list-section__expandable-collection.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/rail-list-section__expandable-collection.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/rail-list-section__linked-bottle-collection.png",
+      "image": "images/candidate/storybook/components/layout/rail-list-section__linked-bottle-collection.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/rail-list-section__linked-bottle-collection.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/section-heading__overview.png",
+      "image": "images/candidate/storybook/components/layout/section-heading__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/section-heading__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/workflow-screen__overview.png",
+      "image": "images/candidate/storybook/components/layout/workflow-screen__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/workflow-screen__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/layout/workflow-screen__saving.png",
+      "image": "images/candidate/storybook/components/layout/workflow-screen__saving.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/layout/workflow-screen__saving.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/distribution-list__overview.png",
+      "image": "images/candidate/storybook/components/lists-tables/distribution-list__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/distribution-list__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/fact-list__overview.png",
+      "image": "images/candidate/storybook/components/lists-tables/fact-list__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/fact-list__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/item-list__interaction-states.png",
+      "height": 900,
+      "image": "images/diff/storybook/components/lists-tables/item-list__interaction-states.png",
+      "images": {
+        "baseline": "images/baseline/storybook/components/lists-tables/item-list__interaction-states.png",
+        "candidate": "images/candidate/storybook/components/lists-tables/item-list__interaction-states.png",
+        "diff": "images/diff/storybook/components/lists-tables/item-list__interaction-states.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "storybook/components/lists-tables/item-list__overview.png",
+      "image": "images/candidate/storybook/components/lists-tables/item-list__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/item-list__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/lists__overview.png",
+      "image": "images/candidate/storybook/components/lists-tables/lists__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/lists__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/lists__updating-results.png",
+      "image": "images/candidate/storybook/components/lists-tables/lists__updating-results.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/lists__updating-results.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/summary-strip__overview.png",
+      "image": "images/candidate/storybook/components/lists-tables/summary-strip__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/summary-strip__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/table__interaction-states.png",
+      "image": "images/candidate/storybook/components/lists-tables/table__interaction-states.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/table__interaction-states.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/lists-tables/table__overview.png",
+      "image": "images/candidate/storybook/components/lists-tables/table__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/lists-tables/table__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/member-picker__search.png",
+      "image": "images/candidate/storybook/components/members/member-picker__search.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/member-picker__search.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/member-picker__selected.png",
+      "image": "images/candidate/storybook/components/members/member-picker__selected.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/member-picker__selected.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/member-status__overview.png",
+      "image": "images/candidate/storybook/components/members/member-status__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/member-status__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/passport__overview.png",
+      "image": "images/candidate/storybook/components/members/passport__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/passport__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/profile-header__another-member.png",
+      "image": "images/candidate/storybook/components/members/profile-header__another-member.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/profile-header__another-member.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/profile-header__private.png",
+      "image": "images/candidate/storybook/components/members/profile-header__private.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/profile-header__private.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/members/profile-header__your-profile.png",
+      "image": "images/candidate/storybook/components/members/profile-header__your-profile.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/members/profile-header__your-profile.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/empty-state__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/empty-state__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/empty-state__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/error-page__forbidden.png",
+      "image": "images/candidate/storybook/components/messages-status/error-page__forbidden.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/error-page__forbidden.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/error-page__not-found.png",
+      "image": "images/candidate/storybook/components/messages-status/error-page__not-found.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/error-page__not-found.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/error-page__offline.png",
+      "image": "images/candidate/storybook/components/messages-status/error-page__offline.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/error-page__offline.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/error-page__page-failure.png",
+      "image": "images/candidate/storybook/components/messages-status/error-page__page-failure.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/error-page__page-failure.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/flash-message__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/flash-message__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/flash-message__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/floating-panel__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/floating-panel__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/floating-panel__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/global-loading__loading.png",
+      "image": "images/candidate/storybook/components/messages-status/global-loading__loading.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/global-loading__loading.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/link-pending__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/link-pending__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/link-pending__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/loading-list__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/loading-list__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/loading-list__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/loading-placeholder__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/loading-placeholder__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/loading-placeholder__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/notice__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/notice__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/notice__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/messages-status/section-error__overview.png",
+      "image": "images/candidate/storybook/components/messages-status/section-error__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/messages-status/section-error__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/application-header__account-menu-open.png",
+      "image": "images/candidate/storybook/components/navigation/application-header__account-menu-open.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/application-header__account-menu-open.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/application-header__search-open.png",
+      "image": "images/candidate/storybook/components/navigation/application-header__search-open.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/application-header__search-open.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/application-header__signed-in.png",
+      "image": "images/candidate/storybook/components/navigation/application-header__signed-in.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/application-header__signed-in.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/application-header__signed-out.png",
+      "image": "images/candidate/storybook/components/navigation/application-header__signed-out.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/application-header__signed-out.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/navigation-tabs__overview.png",
+      "image": "images/candidate/storybook/components/navigation/navigation-tabs__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/navigation-tabs__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/page-tabs__overview.png",
+      "image": "images/candidate/storybook/components/navigation/page-tabs__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/page-tabs__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/site-footer__overview.png",
+      "image": "images/candidate/storybook/components/navigation/site-footer__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/navigation/site-footer__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/navigation/text-link__interaction-states.png",
+      "height": 900,
+      "image": "images/diff/storybook/components/navigation/text-link__interaction-states.png",
+      "images": {
+        "baseline": "images/baseline/storybook/components/navigation/text-link__interaction-states.png",
+        "candidate": "images/candidate/storybook/components/navigation/text-link__interaction-states.png",
+        "diff": "images/diff/storybook/components/navigation/text-link__interaction-states.png"
+      },
+      "status": "changed",
+      "width": 1440
+    },
+    {
+      "file": "storybook/components/overlays/slideout__overview.png",
+      "image": "images/candidate/storybook/components/overlays/slideout__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/overlays/slideout__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/overlays/slideout__scrollable-body.png",
+      "image": "images/candidate/storybook/components/overlays/slideout__scrollable-body.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/overlays/slideout__scrollable-body.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/places/location-card__overview.png",
+      "image": "images/candidate/storybook/components/places/location-card__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/places/location-card__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/places/location-preview-card__long-description.png",
+      "image": "images/candidate/storybook/components/places/location-preview-card__long-description.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/places/location-preview-card__long-description.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/places/location-preview-card__overview.png",
+      "image": "images/candidate/storybook/components/places/location-preview-card__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/places/location-preview-card__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/places/location-preview-card__without-map.png",
+      "image": "images/candidate/storybook/components/places/location-preview-card__without-map.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/places/location-preview-card__without-map.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/places/region-grid__overview.png",
+      "image": "images/candidate/storybook/components/places/region-grid__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/places/region-grid__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/places/region-grid__without-map.png",
+      "image": "images/candidate/storybook/components/places/region-grid__without-map.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/places/region-grid__without-map.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/ratings/bottle-ratings__overview.png",
+      "image": "images/candidate/storybook/components/ratings/bottle-ratings__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/ratings/bottle-ratings__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/ratings/review-score__overview.png",
+      "image": "images/candidate/storybook/components/ratings/review-score__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/ratings/review-score__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/ratings/tasting-rating__overview.png",
+      "image": "images/candidate/storybook/components/ratings/tasting-rating__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/ratings/tasting-rating__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/ratings/tasting-rating-distribution__overview.png",
+      "image": "images/candidate/storybook/components/ratings/tasting-rating-distribution__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/ratings/tasting-rating-distribution__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/community-feed__overview.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/community-feed__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/community-feed__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/community-feed__without-critic-byline.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/community-feed__without-critic-byline.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/community-feed__without-critic-byline.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/critic-review__overview.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/critic-review__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/critic-review__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/note-picker__empty.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/note-picker__empty.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/note-picker__empty.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/note-picker__form-field.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/note-picker__form-field.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/note-picker__form-field.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/note-picker__preselected.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/note-picker__preselected.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/note-picker__preselected.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/tasting-entry__long-notes.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/tasting-entry__long-notes.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/tasting-entry__long-notes.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/tasting-entry__overview.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/tasting-entry__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/tasting-entry__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/tasting-review-rail__empty.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/tasting-review-rail__empty.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/tasting-review-rail__empty.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/reviews-tastings/tasting-review-rail__overview.png",
+      "image": "images/candidate/storybook/components/reviews-tastings/tasting-review-rail__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/reviews-tastings/tasting-review-rail__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/facet-row__overview.png",
+      "image": "images/candidate/storybook/components/search/facet-row__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/facet-row__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/filter-panel__overview.png",
+      "image": "images/candidate/storybook/components/search/filter-panel__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/filter-panel__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/filter-panel__without-counts.png",
+      "image": "images/candidate/storybook/components/search/filter-panel__without-counts.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/filter-panel__without-counts.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__debouncing.png",
+      "image": "images/candidate/storybook/components/search/search-box__debouncing.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__debouncing.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__exact-match.png",
+      "image": "images/candidate/storybook/components/search/search-box__exact-match.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__exact-match.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__loading.png",
+      "image": "images/candidate/storybook/components/search/search-box__loading.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__loading.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__nearest-match.png",
+      "image": "images/candidate/storybook/components/search/search-box__nearest-match.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__nearest-match.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__no-results.png",
+      "image": "images/candidate/storybook/components/search/search-box__no-results.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__no-results.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__results.png",
+      "image": "images/candidate/storybook/components/search/search-box__results.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__results.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__searching-after-no-results.png",
+      "image": "images/candidate/storybook/components/search/search-box__searching-after-no-results.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__searching-after-no-results.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__searching.png",
+      "image": "images/candidate/storybook/components/search/search-box__searching.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__searching.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-box__unavailable.png",
+      "image": "images/candidate/storybook/components/search/search-box__unavailable.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-box__unavailable.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-picker__overview.png",
+      "image": "images/candidate/storybook/components/search/search-picker__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-picker__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-results__loading.png",
+      "image": "images/candidate/storybook/components/search/search-results__loading.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-results__loading.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-results__no-results.png",
+      "image": "images/candidate/storybook/components/search/search-results__no-results.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-results__no-results.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-results__overview.png",
+      "image": "images/candidate/storybook/components/search/search-results__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-results__overview.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/components/search/search-results__unavailable.png",
+      "image": "images/candidate/storybook/components/search/search-results__unavailable.png",
+      "images": {
+        "candidate": "images/candidate/storybook/components/search/search-results__unavailable.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/foundations__color.png",
+      "image": "images/candidate/storybook/foundations__color.png",
+      "images": {
+        "candidate": "images/candidate/storybook/foundations__color.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/foundations__geometry-and-spacing.png",
+      "image": "images/candidate/storybook/foundations__geometry-and-spacing.png",
+      "images": {
+        "candidate": "images/candidate/storybook/foundations__geometry-and-spacing.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/foundations__typography.png",
+      "image": "images/candidate/storybook/foundations__typography.png",
+      "images": {
+        "candidate": "images/candidate/storybook/foundations__typography.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/pages/activity__no-follows.png",
+      "image": "images/candidate/storybook/pages/activity__no-follows.png",
+      "images": {
+        "candidate": "images/candidate/storybook/pages/activity__no-follows.png"
+      },
+      "status": "unchanged"
+    },
+    {
+      "file": "storybook/pages/activity__overview.png",
+      "image": "images/candidate/storybook/pages/activity__overview.png",
+      "images": {
+        "candidate": "images/candidate/storybook/pages/activity__overview.png"
+      },
+      "status": "unchanged"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 2,
+    "removed": 0,
+    "unchanged": 161
+  },
+  "version": 2
+}
