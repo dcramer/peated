@@ -4,7 +4,12 @@ import {
   mockFriendships,
 } from "@peated/server/orpc/mock/fixtures";
 import { beforeEach, expect, test, vi } from "vitest";
-import { getActivityFeedSelection, loadActivityFeed } from "./loadActivityFeed";
+import {
+  getActivityFeedHref,
+  getActivityFeedSelection,
+  loadActivityFeed,
+  requiresActivityFeedLogin,
+} from "./loadActivityFeed";
 
 type Options = Parameters<typeof loadActivityFeed>[0];
 const publicClient = {
@@ -45,6 +50,33 @@ test("defaults the activity feed selection to Everyone", () => {
   expect(getActivityFeedSelection("everyone")).toBe("everyone");
   expect(getActivityFeedSelection("unknown")).toBe("everyone");
   expect(getActivityFeedSelection("following")).toBe("following");
+});
+
+test("sends anonymous Following visitors to login", () => {
+  expect(getActivityFeedHref({ feed: "following", isLoggedIn: false })).toBe(
+    "/login?redirectTo=%2Factivity%3Ffeed%3Dfollowing",
+  );
+  expect(getActivityFeedHref({ feed: "everyone", isLoggedIn: false })).toBe(
+    "/activity?feed=everyone",
+  );
+});
+
+test("keeps signed-in activity links on the activity page", () => {
+  expect(getActivityFeedHref({ feed: "following", isLoggedIn: true })).toBe(
+    "/activity?feed=following",
+  );
+});
+
+test("requires login only for anonymous Following visitors", () => {
+  expect(
+    requiresActivityFeedLogin({ feed: "following", isLoggedIn: false }),
+  ).toBe(true);
+  expect(
+    requiresActivityFeedLogin({ feed: "following", isLoggedIn: true }),
+  ).toBe(false);
+  expect(
+    requiresActivityFeedLogin({ feed: "everyone", isLoggedIn: false }),
+  ).toBe(false);
 });
 
 test("keeps Following empty when followed people have no activity", async () => {

@@ -1,5 +1,6 @@
 import { CursorPager, PageTabs } from "@peated/web/components";
 import { ActivityPage } from "@peated/web/components/pages/activityPage.stylex";
+import { redirectToAuth } from "@peated/web/lib/auth";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -8,7 +9,12 @@ import {
   getServerClient,
 } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
-import { getActivityFeedSelection, loadActivityFeed } from "./loadActivityFeed";
+import {
+  getActivityFeedHref,
+  getActivityFeedSelection,
+  loadActivityFeed,
+  requiresActivityFeedLogin,
+} from "./loadActivityFeed";
 
 export const metadata: Metadata = {
   title: "Activity",
@@ -30,6 +36,18 @@ export default async function Activity({
   const page = getPageNumber(getFirstValue(resolvedSearchParams.page));
   const selectedFeed = getActivityFeedSelection(feed);
   const following = selectedFeed === "following";
+  if (
+    requiresActivityFeedLogin({
+      feed: selectedFeed,
+      isLoggedIn: Boolean(user),
+    })
+  ) {
+    redirectToAuth({
+      pathname: "/activity",
+      searchParams: new URLSearchParams({ feed: selectedFeed }),
+    });
+  }
+
   const { client: publicClient } = await getAnonymousServerClient();
   const memberClient = user ? (await getServerClient()).client : undefined;
   const [{ items, note, rel }, library] = await Promise.all([
@@ -77,8 +95,20 @@ export default async function Activity({
           ariaLabel="Activity feeds"
           currentHref={`/activity?feed=${selectedFeed}`}
           items={[
-            { href: "/activity?feed=following", label: "Following" },
-            { href: "/activity?feed=everyone", label: "Everyone" },
+            {
+              href: getActivityFeedHref({
+                feed: "following",
+                isLoggedIn: Boolean(user),
+              }),
+              label: "Following",
+            },
+            {
+              href: getActivityFeedHref({
+                feed: "everyone",
+                isLoggedIn: Boolean(user),
+              }),
+              label: "Everyone",
+            },
           ]}
         />
       }

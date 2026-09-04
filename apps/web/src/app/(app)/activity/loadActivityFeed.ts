@@ -1,5 +1,6 @@
 import type { RouterClient } from "@orpc/server";
 import type { Router } from "@peated/server/orpc/router";
+import { getAuthRedirect } from "@peated/web/lib/auth";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 
 type Client = RouterClient<Router>;
@@ -7,6 +8,33 @@ type ActivityClient = { activity: Pick<Client["activity"], "list"> };
 
 export function getActivityFeedSelection(feed?: string) {
   return feed === "following" ? "following" : "everyone";
+}
+
+export function requiresActivityFeedLogin({
+  feed,
+  isLoggedIn,
+}: {
+  feed: "everyone" | "following";
+  isLoggedIn: boolean;
+}) {
+  return feed === "following" && !isLoggedIn;
+}
+
+export function getActivityFeedHref({
+  feed,
+  isLoggedIn,
+}: {
+  feed: "everyone" | "following";
+  isLoggedIn: boolean;
+}) {
+  const href = `/activity?feed=${feed}`;
+
+  return feed === "following" && !isLoggedIn
+    ? getAuthRedirect({
+        pathname: "/activity",
+        searchParams: new URLSearchParams({ feed }),
+      })
+    : href;
 }
 
 /** Falls back to public activity only when there are no accepted follows. */
