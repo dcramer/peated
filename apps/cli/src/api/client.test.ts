@@ -52,6 +52,33 @@ describe("requestPeatedApi", () => {
     } satisfies Partial<PeatedApiError>);
   });
 
+  test("lets fetch set the multipart boundary for form data", async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () =>
+      Response.json({ imageUrl: "https://api.peated.com/uploads/bottle.webp" }),
+    );
+    const body = new FormData();
+    body.set(
+      "file",
+      new File([new Uint8Array([1, 2, 3])], "bottle.jpg", {
+        type: "image/jpeg",
+      }),
+    );
+
+    await requestPeatedApi({
+      accessToken: "secret-token",
+      apiServer: "https://api.peated.com",
+      method: "POST",
+      path: "/bottles/123/image",
+      body,
+      fetch,
+    });
+
+    const [, init] = fetch.mock.calls[0];
+    expect(init?.body).toBe(body);
+    const headers = new Headers(init?.headers);
+    expect(headers.get("content-type")).toBeNull();
+  });
+
   test("rejects paths that could send credentials to another origin", async () => {
     for (const path of ["//evil.example/bottles", "/../oauth/token"]) {
       await expect(

@@ -1,0 +1,35 @@
+{
+  "source": "Whisky Auctioneer",
+  "auditStartedOn": "2026-09-02",
+  "completedAt": "2026-09-04T03:22:29.528Z",
+  "environment": "https://api.peated.com",
+  "inventoryRows": 835,
+  "auditResultRows": 724,
+  "distinctAuditRows": 717,
+  "addedBottleRows": 210,
+  "skippedRows": 376,
+  "existingOrReconciledRows": 138,
+  "verifiedImagesInFinalBatch": 23,
+  "sourceSnapshot": {
+    "pages": 25,
+    "lots": 4542,
+    "distinctTitles": 3271,
+    "completeAtCapture": true
+  },
+  "lotMap": {
+    "rows": 930,
+    "distinctLotIds": 924,
+    "finalEvidenceRows": 563,
+    "reviewLeadRows": 367,
+    "rowsWithVerifiedPeatedIds": 471,
+    "rowsWithPossiblePeatedIds": 19
+  },
+  "files": {
+    "audit-results.csv": {
+      "sha256": "e94da5e076b82b929dcf21c51e7228fb2fb4f02c1d61ef0e0a211f9e151495fc"
+    },
+    "whisky-auctioneer-lot-map.csv": {
+      "sha256": "282a47b13a2c06b557e228889200ed78466cdc07d9aa8dc201c2cfa037f2174f"
+    }
+  }
+}

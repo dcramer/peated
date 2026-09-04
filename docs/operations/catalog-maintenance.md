@@ -241,3 +241,7 @@ The operation is complete only when:
 - every new record, update, image, and merge was fetched and checked;
 - the counts for expected, stored, merged, and unresolved releases agree; and
 - unresolved facts and releases are listed explicitly for later work.
+
+## Completed Audits
+
+- [Whisky Auctioneer catalog audit, September 2026](catalog-audits/2026-09-02-whisky-auctioneer/README.md)
