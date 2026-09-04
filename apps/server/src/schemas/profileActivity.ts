@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CollectionBottleSchema, CollectionSchema } from "./collections";
+import { ExternalReviewSchema } from "./externalReviews";
 import { MemberReviewDetailsSchema } from "./memberReviews";
 import { TastingSchema } from "./tastings";
 import { UserSchema } from "./users";
@@ -76,10 +77,19 @@ export const ActivityMemberReviewEntrySchema = z.object({
   review: MemberReviewDetailsSchema,
 });
 
+export const ActivityCriticReviewEntrySchema = z.object({
+  id: z.string().describe("Stable activity entry identifier"),
+  type: z.literal("critic_review"),
+  priority: z.literal("primary"),
+  createdAt: z.string().datetime().readonly(),
+  review: ExternalReviewSchema,
+});
+
 export const ActivityEntrySchema = z.discriminatedUnion("type", [
   ActivityTastingSessionEntrySchema,
   ActivityCollectionAddEntrySchema,
   ActivityMemberReviewEntrySchema,
+  ActivityCriticReviewEntrySchema,
 ]);
 
 export const ActivityCursorSchema = z.object({
@@ -104,4 +114,8 @@ export const ProfileCollectionActivityCollectionSchema =
   ActivityCollectionSchema;
 export const ProfileCollectionAddActivitySchema =
   ActivityCollectionAddEntrySchema;
-export const ProfileActivityEntrySchema = ActivityEntrySchema;
+export const ProfileActivityEntrySchema = z.discriminatedUnion("type", [
+  ActivityTastingSessionEntrySchema,
+  ActivityCollectionAddEntrySchema,
+  ActivityMemberReviewEntrySchema,
+]);

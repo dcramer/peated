@@ -11,15 +11,15 @@ export function getActivityFeedSelection(feed?: string) {
 
 /** Falls back to public activity only when there are no accepted follows. */
 export async function loadActivityFeed({
+  cursor,
   following,
   memberClient,
   publicClient,
 }: {
+  cursor?: string;
   following: boolean;
   memberClient?: ActivityClient & { friends: Pick<Client["friends"], "list"> };
-  publicClient: ActivityClient & {
-    externalReviews: Pick<Client["externalReviews"], "list">;
-  };
+  publicClient: ActivityClient;
 }) {
   let note: string | undefined;
 
@@ -30,6 +30,7 @@ export async function loadActivityFeed({
     });
     if (follows.results.length) {
       const activity = await memberClient.activity.list({
+        cursor,
         filter: "friends",
         limit: 20,
       });
@@ -39,6 +40,7 @@ export async function loadActivityFeed({
           activity: activity.results,
         }),
         note,
+        rel: activity.rel,
       };
     }
     note = "You're not following anyone yet. Showing everyone's activity.";
@@ -46,16 +48,18 @@ export async function loadActivityFeed({
     note = "Sign in to follow people. Showing everyone's activity.";
   }
 
-  const [activity, reviews] = await Promise.all([
-    publicClient.activity.list({ limit: 20 }),
-    publicClient.externalReviews.list({ limit: 20, sort: "recent" }),
-  ]);
+  const activity = await publicClient.activity.list({
+    cursor,
+    includeCriticReviews: true,
+    limit: 20,
+  });
 
   return {
     items: getCommunityFeedItems({
-      criticReviews: reviews.results,
+      criticReviews: [],
       activity: activity.results,
     }),
     note,
+    rel: activity.rel,
   };
 }

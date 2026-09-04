@@ -55,6 +55,35 @@ export function getCommunityFeedItems({
     ];
   });
   const memberItems = activity.flatMap((entry): CommunityFeedItem[] => {
+    if (entry.type === "critic_review") {
+      const review = entry.review;
+      if (!review.bottle) return [];
+      const source = review.site?.name ?? review.reviewerName ?? "Critic";
+      return [
+        {
+          id: entry.id,
+          kind: "critic_review",
+          actor: source,
+          actorHref: review.url,
+          actorImageUrl: review.site?.imageUrl,
+          action: "published a review",
+          date: entry.createdAt,
+          bottles: [
+            {
+              ...feedBottle(review.bottle),
+              description: getPreview(review.clip ?? review.article.title),
+              activityHref: review.url,
+              activityLabel: `Read at ${source} ↗`,
+              byline:
+                review.reviewerName && review.reviewerName !== source
+                  ? review.reviewerName
+                  : undefined,
+              score: review.nativeScore ?? undefined,
+            },
+          ],
+        },
+      ];
+    }
     const actor = {
       id: entry.id,
       actor: entry.createdBy.username,

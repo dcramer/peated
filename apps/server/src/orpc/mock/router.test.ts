@@ -65,6 +65,17 @@ describe("mock oRPC router", () => {
       results: mockActivity,
       rel: { nextCursor: null, prevCursor: null },
     });
+    await expect(
+      anonymousClient.activity.list({ includeCriticReviews: true, limit: 1 }),
+    ).resolves.toMatchObject({
+      results: [
+        {
+          id: `critic_review:${mockExternalReview.id}`,
+          type: "critic_review",
+          review: { id: mockExternalReview.id },
+        },
+      ],
+    });
 
     const bottles = await anonymousClient.bottles.list({ query: "Lagavulin" });
     expect(bottles.results).toHaveLength(3);

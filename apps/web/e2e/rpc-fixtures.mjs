@@ -1012,7 +1012,10 @@ export function buildActivity({
   };
 }
 
-export function buildCommunityActivity({ following = false } = {}) {
+export function buildCommunityActivity({
+  following = false,
+  includeCriticReviews = false,
+} = {}) {
   const activity = buildActivity({
     tastingSession: [
       buildTasting({
@@ -1026,6 +1029,17 @@ export function buildCommunityActivity({ following = false } = {}) {
   return {
     ...activity,
     results: [
+      ...(includeCriticReviews
+        ? [
+            {
+              id: `critic_review:${activityReview.id}`,
+              type: "critic_review",
+              priority: "primary",
+              createdAt: activityReview.article.publishedAt,
+              review: activityReview,
+            },
+          ]
+        : []),
       ...activity.results,
       {
         id: `member_review:${createdMemberReview.id}`,

@@ -20,6 +20,33 @@ describe("getCommunityFeedItems", () => {
     expect(item?.actorHref).toBe(mockExternalReview.url);
   });
 
+  test("maps critic reviews returned as paginated activity", () => {
+    const [item] = getCommunityFeedItems({
+      criticReviews: [],
+      activity: [
+        {
+          id: `critic_review:${mockExternalReview.id}`,
+          type: "critic_review",
+          priority: "primary",
+          createdAt: mockExternalReview.article.publishedAt!,
+          review: mockExternalReview,
+        },
+      ],
+    });
+
+    expect(item).toMatchObject({
+      kind: "critic_review",
+      actor: mockExternalReview.site?.name,
+      actorHref: mockExternalReview.url,
+      bottles: [
+        {
+          description: mockExternalReview.clip,
+          activityHref: mockExternalReview.url,
+        },
+      ],
+    });
+  });
+
   test("uses the article title when the review has no clip", () => {
     const [item] = getCommunityFeedItems({
       criticReviews: [{ ...mockExternalReview, clip: null }],

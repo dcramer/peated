@@ -132,6 +132,11 @@ export function CursorPager({
 
   return (
     <nav aria-label={ariaLabel} {...stylex.props(styles.pagination)}>
+      {page !== undefined ? (
+        <span {...stylex.props(foundationStyles.metadata, styles.pageNumber)}>
+          Page {page}
+        </span>
+      ) : null}
       <div
         {...stylex.props(
           styles.paginationLinks,
@@ -161,11 +166,6 @@ export function CursorPager({
           </ButtonLink>
         ) : null}
       </div>
-      {page !== undefined ? (
-        <span {...stylex.props(foundationStyles.metadata, styles.pageNumber)}>
-          Page {page}
-        </span>
-      ) : null}
     </nav>
   );
 }
