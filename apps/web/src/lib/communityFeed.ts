@@ -38,12 +38,11 @@ export function getCommunityFeedItems({
         actorImageUrl: review.site?.imageUrl,
         action: "published a review",
         date: review.article.publishedAt ?? review.createdAt,
+        href: review.url,
         bottles: [
           {
             ...feedBottle(review.bottle),
             description: getPreview(review.clip ?? review.article.title),
-            activityHref: review.url,
-            activityLabel: `Read at ${source} ↗`,
             byline:
               review.reviewerName && review.reviewerName !== source
                 ? review.reviewerName
@@ -68,12 +67,11 @@ export function getCommunityFeedItems({
           actorImageUrl: review.site?.imageUrl,
           action: "published a review",
           date: entry.createdAt,
+          href: review.url,
           bottles: [
             {
               ...feedBottle(review.bottle),
               description: getPreview(review.clip ?? review.article.title),
-              activityHref: review.url,
-              activityLabel: `Read at ${source} ↗`,
               byline:
                 review.reviewerName && review.reviewerName !== source
                   ? review.reviewerName
@@ -85,46 +83,42 @@ export function getCommunityFeedItems({
       ];
     }
     const actor = {
-      id: entry.id,
       actor: entry.createdBy.username,
       actorHref: `/users/${entry.createdBy.username}`,
       actorImageUrl: entry.createdBy.pictureUrl,
     };
     if (entry.type === "tasting_session") {
-      return [
-        {
-          ...actor,
-          kind: "tasting",
-          action:
-            entry.tastings.length === 1
-              ? "tasted"
-              : `tasted ${entry.tastings.length} bottles`,
-          date: entry.lastActivityAt,
-          bottles: entry.tastings.map((tasting) => ({
+      return entry.tastings.map((tasting) => ({
+        ...actor,
+        id: `${entry.id}:${tasting.id}`,
+        kind: "tasting",
+        action: "tasted",
+        date: tasting.createdAt,
+        href: getTastingUrl(tasting),
+        bottles: [
+          {
             ...feedBottle(tasting.bottle),
             id: String(tasting.id),
             description: getPreview(tasting.notes),
             ratingBand: tasting.ratingBand,
-            activityHref: getTastingUrl(tasting),
-            activityLabel: "View tasting",
-          })),
-        },
-      ];
+          },
+        ],
+      }));
     }
     if (entry.type === "member_review") {
       return [
         {
           ...actor,
+          id: entry.id,
           kind: "member_review",
           action: "reviewed",
           date: entry.createdAt,
+          href: `/reviews/${entry.review.id}`,
           bottles: [
             {
               ...feedBottle(entry.review.bottle),
               score: { value: entry.review.score, scale: 100 },
               description: getPreview(entry.review.notes),
-              activityHref: `/reviews/${entry.review.id}`,
-              activityLabel: "Read review",
             },
           ],
         },
@@ -141,8 +135,10 @@ export function getCommunityFeedItems({
     return [
       {
         ...actor,
+        id: entry.id,
         kind: "collection_add",
         date: entry.createdAt,
+        href: entry.collection.href ?? undefined,
         action: `added ${count === 1 ? "a bottle" : `${count} bottles`} to${entry.collection.href ? "" : ` ${destinationLabel}`}`,
         destination: entry.collection.href
           ? { href: entry.collection.href, label: destinationLabel }

@@ -14,7 +14,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shared by the homepage, global activity, and member profiles. Map API entries with getCommunityFeedItems. Tastings, critic reviews, member reviews, and library additions share an author header. Tastings and reviews use the standard three-line bottle identity; library additions use compact, single-line bottle rows. Critic bylines are optional; library status is omitted.",
+          "Shared by the homepage, activity page, and member profiles. Map API entries with getCommunityFeedItems. Each card includes the author and links to the activity. Bottle titles still link to their bottles. Tastings and reviews use the standard three-line bottle identity; library additions use compact, single-line bottle rows. Critic bylines are optional; library status is omitted.",
       },
     },
   },

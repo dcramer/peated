@@ -77,7 +77,7 @@ const meta = {
 | sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
 | compact | Single or grouped library additions | One name line, 24 × 32px thumbnail, and a 44px hit area. |
 
-Sidebar omits membership status icons and keeps full accessible names when its two-line titles truncate. Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control; linked cells keep their hit area inside the bottle identity. The end slot holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
+Sidebar omits membership status icons and keeps full accessible names when its two-line titles truncate. Compact omits provenance, metadata, subtitle, status, and related releases. Long compact names truncate visually and retain their full accessible name and title. Use layout="cell" inside an existing control so its bottle link stays within the identity. Use linkArea="title" when the surrounding card is also clickable. The end slot holds independent actions or scores. BottleVisual owns the image frame and fallback; the row chooses its size.
 
 Use Row Layouts to compare these components at desktop and phone widths.`,
       },
@@ -234,10 +234,9 @@ export const RowLayouts: Story = {
                     ...args,
                     id: "bottle",
                     score: { value: 88, scale: 100 },
-                    activityHref: "https://example.com/review",
-                    activityLabel: "Read at Whiskyfun ↗",
                   },
                 ],
+                href: "https://example.com/review",
               },
             ]}
           />

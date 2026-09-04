@@ -79,7 +79,7 @@ test("falls back to Everyone only when there are no accepted follows", async () 
   expect(feed.note).toBe(
     "You're not following anyone yet. Showing everyone's activity.",
   );
-  expect(feed.items).toHaveLength(2);
+  expect(feed.items).toHaveLength(3);
   expect(memberClient.activity.list).not.toHaveBeenCalled();
   expect(publicClient.activity.list).toHaveBeenCalledWith({
     cursor: undefined,
@@ -105,7 +105,7 @@ test("uses public activity for Everyone even when signed in", async () => {
     publicClient,
   });
 
-  expect(feed.items).toHaveLength(2);
+  expect(feed.items).toHaveLength(3);
   expect(memberClient.friends.list).not.toHaveBeenCalled();
   expect(memberClient.activity.list).not.toHaveBeenCalled();
 });
@@ -139,6 +139,6 @@ test("anonymous Following uses public activity and explains sign-in", async () =
   expect(feed.note).toBe(
     "Sign in to follow people. Showing everyone's activity.",
   );
-  expect(feed.items).toHaveLength(2);
+  expect(feed.items).toHaveLength(3);
   expect(memberClient.friends.list).not.toHaveBeenCalled();
 });
