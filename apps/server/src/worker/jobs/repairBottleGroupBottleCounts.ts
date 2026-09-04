@@ -22,7 +22,7 @@ export default async function repairBottleGroupBottleCountsJob(
     }
   }
 
-  logInfo("Finished Bottle group count repair", {
+  logInfo("Finished BottleGroup count repair", {
     extra: {
       wrongCount: wrongCounts.length,
       repairedCount,
