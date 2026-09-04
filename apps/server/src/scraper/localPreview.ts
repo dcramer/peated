@@ -6,7 +6,7 @@ import { z } from "zod";
 import type { ScrapeSourcePreviewResult } from "./configured/preview";
 import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
-  ScrapeRulesSchema,
+  parseScrapeRules,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
 import { findScraperSourceBySiteKey } from "./definitions";
@@ -19,7 +19,8 @@ const InputSchema = z
   .object({
     site: z.string().trim().min(1),
     listUrl: z.url(),
-    rules: ScrapeRulesSchema,
+    rulesVersion: z.number().int().positive().default(1),
+    rules: z.json(),
     limit: z.number().int().positive().max(99).optional(),
   })
   .strict();
@@ -37,15 +38,16 @@ export async function runLocalScrapeSourcePreview(
 ) {
   const parsed = InputSchema.parse(input);
   const clock = options.clock ?? scraperSystemClock;
+  const parsedRules = parseScrapeRules(parsed.rulesVersion, parsed.rules);
   const rules = parsed.limit
     ? {
-        ...parsed.rules,
+        ...parsedRules,
         list: {
-          ...parsed.rules.list,
-          maxItems: Math.min(parsed.rules.list.maxItems, parsed.limit),
+          ...parsedRules.list,
+          maxItems: Math.min(parsedRules.list.maxItems, parsed.limit),
         },
       }
-    : parsed.rules;
+    : parsedRules;
 
   await syncExternalSites();
   await syncScraperDefinitions(scraperRegistry);

@@ -1,9 +1,12 @@
 import { expect, test } from "vitest";
 import {
   parseScrapeRules,
+  SCRAPE_RULES_VERSION,
   SCRAPE_SOURCE_MAX_ITEMS,
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   ScrapeRulesSchema,
+  ScrapeRulesV1Schema,
+  ScrapeValueSchema,
 } from "./rules";
 
 function reviewConfig(maxItems: number) {
@@ -34,7 +37,109 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesSchema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(2, rules)).toThrow(
-    "Unsupported scrape rules version: 2.",
+  expect(() => parseScrapeRules(3, rules)).toThrow(
+    "Unsupported scrape rules version: 3.",
   );
+});
+
+test("loads old rules only through the version 1 contract", () => {
+  const rules = ScrapeRulesV1Schema.parse(reviewConfig(25));
+  expect(parseScrapeRules(1, rules)).toEqual(rules);
+  expect(() =>
+    parseScrapeRules(1, {
+      ...rules,
+      list: { ...rules.list, item: ".card" },
+    }),
+  ).toThrow();
+  expect(SCRAPE_RULES_VERSION).toBe(2);
+});
+
+test("accepts bounded list-card exclusion only with an item selector", () => {
+  expect(
+    ScrapeRulesSchema.parse({
+      ...reviewConfig(25),
+      list: {
+        ...reviewConfig(25).list,
+        item: ".product-card",
+        excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+      },
+    }).list,
+  ).toMatchObject({
+    item: ".product-card",
+    excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+  });
+  expect(() =>
+    ScrapeRulesSchema.parse({
+      ...reviewConfig(25),
+      list: {
+        ...reviewConfig(25).list,
+        excludeWhen: { selector: ".badge" },
+      },
+    }),
+  ).toThrow("List exclusion requires an item selector.");
+});
+
+test("accepts bounded selector and fixed value operations", () => {
+  expect(
+    ScrapeValueSchema.parse({
+      selector: ".notes p",
+      startsWith: ["Nose:", "Finish:"],
+      all: true,
+      removePrefixes: ["Score:"],
+      removeSuffixes: [" Review"],
+      prefix: "Kilchoman ",
+      suffix: "/100",
+    }),
+  ).toEqual({
+    selector: ".notes p",
+    startsWith: ["Nose:", "Finish:"],
+    all: true,
+    removePrefixes: ["Score:"],
+    removeSuffixes: ["Review"],
+    prefix: "Kilchoman ",
+    suffix: "/100",
+  });
+  expect(ScrapeValueSchema.parse({ value: "700 ml" })).toEqual({
+    value: "700 ml",
+  });
+});
+
+test.each([
+  ["both inputs", { selector: "h1", value: "700 ml" }],
+  ["no input", { prefix: "Kilchoman " }],
+  ["unknown operation", { selector: "h1", regex: "Review$" }],
+  [
+    "attribute prefix filter",
+    { selector: "meta", attribute: "content", startsWith: ["Score"] },
+  ],
+  ["attribute joining", { selector: "meta", attribute: "content", all: true }],
+  ["fixed value length", { value: "x".repeat(201) }],
+  ["prefix length", { selector: "h1", prefix: "x".repeat(201) }],
+  ["suffix length", { selector: "h1", suffix: "x".repeat(201) }],
+  [
+    "prefix count",
+    { selector: "p", startsWith: Array.from({ length: 11 }, () => "Nose") },
+  ],
+  ["prefix length", { selector: "p", startsWith: ["x".repeat(101)] }],
+  [
+    "suffix count",
+    {
+      selector: "h1",
+      removeSuffixes: Array.from({ length: 11 }, () => "Review"),
+    },
+  ],
+  ["suffix length", { selector: "h1", removeSuffixes: ["x".repeat(101)] }],
+  [
+    "removed prefix count",
+    {
+      selector: "h1",
+      removePrefixes: Array.from({ length: 11 }, () => "Score"),
+    },
+  ],
+  [
+    "removed prefix length",
+    { selector: "h1", removePrefixes: ["x".repeat(101)] },
+  ],
+])("rejects invalid or unbounded value rules: %s", (_, rule) => {
+  expect(() => ScrapeValueSchema.parse(rule)).toThrow();
 });

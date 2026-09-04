@@ -3,6 +3,7 @@ import { ScrapeSourcePreviewResultSchema } from "../scraper/configured/preview";
 import {
   SCRAPE_SOURCE_KIND_LIST,
   ScrapeRulesSchema,
+  StoredScrapeRulesSchema,
 } from "../scraper/configured/rules";
 import { ExternalSiteSchema } from "./externalSites";
 
@@ -30,7 +31,7 @@ const ScrapeSourceRevisionBaseSchema = z
     revision: z.number().int().positive(),
     rulesVersion: z.number().int().positive(),
     listUrl: ScrapeSourceUrlSchema,
-    rules: ScrapeRulesSchema,
+    rules: StoredScrapeRulesSchema,
     active: z.boolean(),
     previewStatus: z.enum(["pending", "passed", "failed"]),
     previewResult: ScrapeSourcePreviewResultSchema,

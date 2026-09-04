@@ -97,8 +97,9 @@ described above. Compare all stored records after applying. Keep the existing
 limit of 20 latest articles and one review per article when checking suggested
 rules. Verify each article URL, name, writer, date, score, selected review text,
 Bottle match, hidden state, and publication setting. The old scraper removes
-`Review` or `Shelf Review` from the end of Bottle names; saved rules do not do
-text cleanup, so review any name change before activation.
+`Review` or `Shelf Review` from the end of Bottle names; version 1 rules cannot
+do that cleanup. Use version 2 literal suffix cleanup and confirm the names
+remain unchanged before activation.
 
 Preview and activate the chosen revision, run one manual collection through
 `POST /v1/external-sites/whiskystudy/trigger`, and confirm that it updates the

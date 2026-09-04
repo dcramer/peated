@@ -33,7 +33,7 @@ import {
 import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   parseScrapeRules,
-  type ScrapeRules,
+  type StoredScrapeRules,
 } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
 import {
@@ -136,7 +136,7 @@ function createScrapeSourceAdapter(
   input: {
     targetKey: string;
     listUrl: string;
-    rules: ScrapeRules;
+    rules: StoredScrapeRules;
   } & (
     | { purpose: "collect" }
     | { purpose: "preview"; recordPreview: RecordScrapeSourcePreview }
@@ -267,7 +267,7 @@ export function createLocalScrapeSourcePreview(input: {
   siteKey: string;
   targetKey: string;
   listUrl: string;
-  rules: ScrapeRules;
+  rules: StoredScrapeRules;
   recordPreview: RecordScrapeSourcePreview;
 }): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
   return {
@@ -299,7 +299,7 @@ function createScrapeSourceDefinition(input: {
   targetKey: string;
   listUrl: string;
   purpose: "collect" | "preview";
-  rules: ScrapeRules;
+  rules: StoredScrapeRules;
 }): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
   const observationSchema =
     input.rules.kind === "review"

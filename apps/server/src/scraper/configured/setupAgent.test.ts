@@ -7,22 +7,61 @@ import {
   suggestionRequestLimit,
 } from "./setupAgent";
 
-function reviewCandidate(nameSelector: string) {
+function suggestedValue(
+  selector: string,
+  attribute: string | null = null,
+  operations: {
+    startsWith?: string[];
+    all?: boolean;
+    removePrefixes?: string[];
+    removeSuffixes?: string[];
+    prefix?: string;
+    suffix?: string;
+  } = {},
+) {
+  return {
+    input: "selector" as const,
+    selector,
+    attribute,
+    value: null,
+    startsWith: operations.startsWith ?? null,
+    all: operations.all ?? false,
+    removePrefixes: operations.removePrefixes ?? null,
+    removeSuffixes: operations.removeSuffixes ?? null,
+    prefix: operations.prefix ?? null,
+    suffix: operations.suffix ?? null,
+  };
+}
+
+function reviewCandidate(
+  nameSelector: string,
+  listOptions: {
+    item?: string;
+    excludeWhen?: { selector: string; startsWith: string[] | null };
+  } = {},
+) {
   return {
     listPageUrl: "https://example.test/reviews",
     rules: {
       kind: "review" as const,
       list: {
+        item: listOptions.item ?? null,
         detailLink: { selector: "a.review", attribute: "href" as const },
+        excludeWhen: listOptions.excludeWhen ?? null,
         nextPage: null,
       },
       detail: {
-        title: { selector: "h1", attribute: null },
-        publishedAt: { selector: "time", attribute: "datetime" },
+        title: suggestedValue("h1"),
+        publishedAt: suggestedValue("time", "datetime"),
         reviewItem: "article.review",
-        name: { selector: nameSelector, attribute: null },
+        name: suggestedValue(nameSelector, null, {
+          removeSuffixes: ["Review"],
+        }),
         reviewerName: null,
-        reviewText: { selector: ".body", attribute: null },
+        reviewText: suggestedValue(".body p", null, {
+          startsWith: ["Nose:", "Finish:"],
+          all: true,
+        }),
         score: null,
       },
     },
@@ -105,11 +144,20 @@ test("returns rules only after the rule check passes", async () => {
     .fn()
     .mockResolvedValueOnce(toolCallResponse("first", reviewCandidate(".bad")))
     .mockResolvedValueOnce(
-      toolCallResponse("second", reviewCandidate(".bottle-name")),
+      toolCallResponse(
+        "second",
+        reviewCandidate(".bottle-name", {
+          item: ".product-card",
+          excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+        }),
+      ),
     );
   const checkRules = vi.fn(async ({ rules }) => {
     if (rules.kind !== "review") throw new Error("Expected review rules.");
-    if (rules.detail.name.selector === ".bad") {
+    if (
+      "selector" in rules.detail.name &&
+      rules.detail.name.selector === ".bad"
+    ) {
       return {
         status: "failed" as const,
         feedback: {
@@ -152,8 +200,19 @@ test("returns rules only after the rule check passes", async () => {
   expect(result.model).toBe("test-setup-model");
   expect(result.rules).toMatchObject({
     kind: "review",
-    list: { maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS },
-    detail: { name: { selector: ".bottle-name" } },
+    list: {
+      item: ".product-card",
+      excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+      maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
+    },
+    detail: {
+      name: { selector: ".bottle-name", removeSuffixes: ["Review"] },
+      reviewText: {
+        selector: ".body p",
+        startsWith: ["Nose:", "Finish:"],
+        all: true,
+      },
+    },
   });
   expect(request).toHaveBeenCalledTimes(2);
   const firstRequest = request.mock.calls[0]?.[0];
@@ -164,7 +223,6 @@ test("returns rules only after the rule check passes", async () => {
     parameters: { type: "object" },
   });
   expect(JSON.stringify(firstRequest?.tools[0])).not.toContain('"oneOf"');
-  expect(JSON.stringify(firstRequest?.tools[0])).not.toContain('"maxItems"');
   const secondRequest = request.mock.calls[1]?.[0];
   expect(JSON.stringify(secondRequest?.input)).toContain("detail.name");
   expect(JSON.stringify(secondRequest?.input)).toContain("North Coast 12");

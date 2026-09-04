@@ -17,8 +17,8 @@ import {
 } from "drizzle-orm/pg-core";
 import type { ScrapeSourcePreviewResult } from "../../scraper/configured/preview";
 import {
-  type ScrapeRules,
   SCRAPE_SOURCE_KIND_LIST,
+  type StoredScrapeRules,
 } from "../../scraper/configured/rules";
 import { externalSiteRuns, externalSites } from "./externalSites";
 import { users } from "./users";
@@ -76,7 +76,7 @@ export const scrapeSourceRevisions = pgTable(
     revision: integer("revision").notNull(),
     rulesVersion: integer("rules_version").notNull(),
     listUrl: text("list_url").notNull(),
-    rules: jsonb("rules").$type<ScrapeRules>().notNull(),
+    rules: jsonb("rules").$type<StoredScrapeRules>().notNull(),
     author: scrapeSourceRevisionAuthorEnum("author").notNull(),
     aiModel: text("ai_model"),
     aiInstructionsVersion: text("ai_instructions_version"),
