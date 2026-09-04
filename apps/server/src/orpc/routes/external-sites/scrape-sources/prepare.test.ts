@@ -54,6 +54,15 @@ function prepareWhiskyStudy(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareWhiskySaga(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "whiskysaga", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 const registry = createScraperRegistry({
@@ -74,6 +83,18 @@ const whiskyStudyRegistry = createScraperRegistry({
     {
       ...scraperRegistry.sources.get("whiskystudy")!,
       externalSiteKey: "whiskystudy",
+    },
+  ],
+});
+
+const whiskySagaCanonicalUrl =
+  "https://www.whiskysaga.com/blog/example-scotch-review";
+const whiskySagaRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("whiskysaga")!],
+  sources: [
+    {
+      ...scraperRegistry.sources.get("whiskysaga")!,
+      externalSiteKey: "whiskysaga",
     },
   ],
 });
@@ -162,6 +183,59 @@ async function setupWhiskyStudyMigration(bottleId: number | null = null) {
       nativeScoreValue: 92,
       nativeScoreScale: 100,
       nativeScoreDisplay: "92/100",
+      clip: "An existing clip.",
+      tags: ["orchard fruit"],
+    })
+    .returning();
+  await db.insert(externalReviewBodies).values({
+    externalReviewId: review.id,
+    body: "Synthetic old review body.",
+    fetchedAt: new Date(),
+  });
+  await db.insert(externalReviewPublications).values({
+    externalSiteId: site.id,
+    approvedAt: null,
+  });
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return { site, article, review };
+}
+
+async function setupWhiskySagaMigration(bottleId: number | null = null) {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "whiskysaga",
+      name: "Whisky Saga",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(whiskySagaRegistry);
+  const [article] = await db
+    .insert(externalReviewArticles)
+    .values({
+      externalSiteId: site.id,
+      canonicalUrl: whiskySagaCanonicalUrl,
+      title: "Example Scotch Review",
+      publishedAt: new Date("2026-07-05"),
+    })
+    .returning();
+  const [review] = await db
+    .insert(externalReviews)
+    .values({
+      articleId: article.id,
+      sourceKey: `whiskysaga:${createHash("sha256").update(whiskySagaCanonicalUrl).digest("hex")}`,
+      name: "Example Scotch",
+      bottleId,
+      hidden: true,
+      reviewerName: "Thomas Øhrbom",
+      nativeScoreValue: 89,
+      nativeScoreScale: 100,
+      nativeScoreDisplay: "89/100",
       clip: "An existing clip.",
       tags: ["orchard fruit"],
     })
@@ -380,6 +454,60 @@ describe("POST /admin/scrape-sources/prepare", () => {
         externalSiteId: site.id,
         kind: "review",
         listUrl: "https://thewhiskystudy.com/reviews-3",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("prepares Whisky Saga without replacing its records", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const { site, article, review } = await setupWhiskySagaMigration(bottle.id);
+    const bodies = await db.select().from(externalReviewBodies);
+    const publications = await db.select().from(externalReviewPublications);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareWhiskySaga()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      reviewCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(externalReviews)).toEqual([review]);
+
+    const applied = await prepareWhiskySaga({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      reviewCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(whiskySagaRegistry);
+    expect(await db.select().from(externalReviewArticles)).toEqual([article]);
+    expect(await db.select().from(externalReviews)).toEqual([
+      {
+        ...review,
+        sourceKey: `${whiskySagaCanonicalUrl}#review-1`,
+      },
+    ]);
+    expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
+    expect(await db.select().from(externalReviewPublications)).toEqual(
+      publications,
+    );
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "review",
+        listUrl: "https://www.whiskysaga.com/blog/category/Scotland",
         enabled: false,
         createdById: admin.id,
       }),
