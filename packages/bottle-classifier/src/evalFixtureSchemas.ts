@@ -5,7 +5,10 @@ import {
   FindingSchema,
   ProposedOperationsSchema,
 } from "./bottleCheckContract";
-import { listBottleCheckOperationTargets } from "./bottleCheckEvalScoring";
+import {
+  listBottleCheckOperationTargets,
+  proposedOperationIncludes,
+} from "./bottleCheckEvalScoring";
 import {
   BottleContextSeriesRefSchema,
   BottleContextSourceSchema,
@@ -369,6 +372,9 @@ export const auditBottleEvalFixtureSchema = z
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
     provenance: evalFixtureProvenanceSchema,
     requireExpectedOperationEvidence: z.boolean().default(false),
+    acceptedProposedOperationSets: z
+      .array(ProposedOperationsSchema)
+      .default([]),
     expected: AuditBottleResultSchema.omit({ artifacts: true }),
   })
   .strict()
@@ -448,37 +454,70 @@ export const auditBottleEvalFixtureSchema = z
       ),
     );
 
-    for (const [
-      operationIndex,
-      operation,
-    ] of value.expected.proposedOperations.entries()) {
-      for (const target of listBottleCheckOperationTargets(operation)) {
-        const inspected =
-          target.kind === "bottle"
-            ? bottleIds.has(target.id)
-            : target.kind === "entity"
-              ? entityIds.has(target.id)
-              : seriesIds.has(target.id);
-        if (inspected) {
+    const proposedOperationSets = [
+      value.expected.proposedOperations,
+      ...value.acceptedProposedOperationSets,
+    ];
+    for (const [setIndex, operationSet] of proposedOperationSets.entries()) {
+      for (const [operationIndex, operation] of operationSet.entries()) {
+        for (const target of listBottleCheckOperationTargets(operation)) {
+          const inspected =
+            target.kind === "bottle"
+              ? bottleIds.has(target.id)
+              : target.kind === "entity"
+                ? entityIds.has(target.id)
+                : seriesIds.has(target.id);
+          if (inspected) continue;
+
+          const label =
+            target.kind === "bottle"
+              ? "Bottle"
+              : target.kind === "entity"
+                ? "Entity"
+                : "BottleSeries";
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Expected operation references uninspected ${label} id ${target.id}.`,
+            path:
+              setIndex === 0
+                ? [
+                    "expected",
+                    "proposedOperations",
+                    operationIndex,
+                    "input",
+                    ...target.path,
+                  ]
+                : [
+                    "acceptedProposedOperationSets",
+                    setIndex - 1,
+                    operationIndex,
+                    "input",
+                    ...target.path,
+                  ],
+          });
+        }
+      }
+    }
+
+    for (const [setIndex, operationSet] of (
+      value.acceptedProposedOperationSets ?? []
+    ).entries()) {
+      for (const [requiredIndex, requiredOperation] of (
+        value.expected.proposedOperations ?? []
+      ).entries()) {
+        if (
+          operationSet.some((operation) =>
+            proposedOperationIncludes(operation, requiredOperation),
+          )
+        ) {
           continue;
         }
 
-        const label =
-          target.kind === "bottle"
-            ? "Bottle"
-            : target.kind === "entity"
-              ? "Entity"
-              : "BottleSeries";
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Expected operation references uninspected ${label} id ${target.id}.`,
-          path: [
-            "expected",
-            "proposedOperations",
-            operationIndex,
-            "input",
-            ...target.path,
-          ],
+          message:
+            "Each accepted operation set must include every required operation and field.",
+          path: ["acceptedProposedOperationSets", setIndex, requiredIndex],
         });
       }
     }

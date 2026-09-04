@@ -23,6 +23,7 @@ export {
 export {
   createBottleWebSearchBudget,
   executeBottleWebSearchInvocation,
+  hydrateBottleSearchEvidence,
   type BottleWebSearchBatchResult,
   type BottleWebSearchExecutor,
   type BottleWebToolResult,

@@ -1,0 +1,114 @@
+{
+  "item": "M05",
+  "decision": "accepted_measurement_infrastructure",
+  "classifierChanged": false,
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "fixtureId": "store-listing-resolves-black-label-family-under-johnnie-walker",
+  "fixedEvidenceFile": "evals/evidence/black-label-islay-origin.json",
+  "attempts": [
+    {
+      "name": "filter_setup_failure",
+      "result": "no_test_matched",
+      "skippedTests": 104,
+      "modelCalls": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "estimatedModelCostUsd": 0
+    },
+    {
+      "name": "fixed_executor_without_initial_evidence",
+      "implementationAccepted": false,
+      "score": 0,
+      "expectedCategory": "blended_malt",
+      "actualCategory": "blend",
+      "webEvidenceAssessment": "not_used",
+      "usage": {
+        "inputTokens": 11589,
+        "outputTokens": 1531,
+        "totalTokens": 13120,
+        "cachedInputTokens": 5537,
+        "cacheWriteTokens": 6046,
+        "reasoningTokens": 1138,
+        "modelRequests": 2,
+        "toolCalls": 1,
+        "toolNames": ["search_bottles"]
+      },
+      "timingMs": 18023.019791,
+      "estimatedModelCostUsd": 0.00346064,
+      "estimatedUncachedModelCostUsd": 0.004155,
+      "firecrawlToolCalls": 0
+    },
+    {
+      "name": "fixed_evidence_supplied_at_start",
+      "implementationAccepted": true,
+      "score": 0,
+      "expectedCategory": "blended_malt",
+      "actualCategory": "blend",
+      "webEvidenceAssessment": "supportive",
+      "usage": {
+        "inputTokens": 24644,
+        "outputTokens": 2399,
+        "totalTokens": 27043,
+        "cachedInputTokens": 22923,
+        "cacheWriteTokens": 1709,
+        "reasoningTokens": 1881,
+        "modelRequests": 4,
+        "toolCalls": 3,
+        "toolNames": ["search_bottles", "search_entities", "search_entities"]
+      },
+      "timingMs": 27881.660917,
+      "estimatedModelCostUsd": 0.00376691,
+      "estimatedUncachedModelCostUsd": 0.0078076,
+      "firecrawlToolCalls": 0
+    },
+    {
+      "name": "current_live_web",
+      "score": 0,
+      "expectedCategory": "blended_malt",
+      "actualCategory": "blend",
+      "webEvidenceAssessment": "supportive",
+      "usage": {
+        "inputTokens": 47177,
+        "outputTokens": 3624,
+        "totalTokens": 50801,
+        "cachedInputTokens": 38560,
+        "cacheWriteTokens": 8599,
+        "reasoningTokens": 2954,
+        "modelRequests": 6,
+        "toolCalls": 5,
+        "toolNames": [
+          "firecrawl_web_search",
+          "firecrawl_read_page",
+          "search_bottles",
+          "search_entities",
+          "search_entities"
+        ]
+      },
+      "timingMs": 42523.783208,
+      "estimatedModelCostUsd": 0.00727335,
+      "estimatedUncachedModelCostUsd": 0.0137842,
+      "firecrawlToolCalls": 2,
+      "searchQueries": 2,
+      "pageReads": 1
+    }
+  ],
+  "modelAttemptTotals": {
+    "inputTokens": 83410,
+    "outputTokens": 7554,
+    "totalTokens": 90964,
+    "cachedInputTokens": 67020,
+    "cacheWriteTokens": 16354,
+    "reasoningTokens": 5973,
+    "timingMs": 88428.463916,
+    "estimatedModelCostUsd": 0.0145009,
+    "estimatedUncachedModelCostUsd": 0.0257468
+  },
+  "verification": {
+    "fixedAndReplayTests": { "passed": 7, "seconds": 0.88 },
+    "runtimeFixedAndReplayTests": { "passed": 70, "seconds": 2.21 },
+    "typecheck": "passed",
+    "lint": "passed",
+    "format": "passed"
+  }
+}

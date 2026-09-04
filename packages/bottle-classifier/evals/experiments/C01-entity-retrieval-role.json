@@ -1,0 +1,123 @@
+{
+  "item": "C01",
+  "decision": "rejected",
+  "classifierTreatmentReverted": true,
+  "keptMeasurementChanges": [
+    "raw reference-agent decision observer",
+    "exact fixture-ID eval filter"
+  ],
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "fixedEvidenceFile": "evals/evidence/C01-entity-roles.json",
+  "repeatsPerVariant": 3,
+  "runOrder": [
+    "control-1",
+    "treatment-1",
+    "treatment-2",
+    "control-2",
+    "control-3",
+    "treatment-3"
+  ],
+  "accuracy": {
+    "controlPasses": 8,
+    "treatmentPasses": 9,
+    "casesPerVariant": 12,
+    "incorrectBottleMatches": { "control": 0, "treatment": 0 },
+    "plannedCaseRuntimeErrors": { "control": 0, "treatment": 0 },
+    "casePasses": {
+      "marsKomagatake": { "control": 0, "treatment": 2, "total": 3 },
+      "watchpost": { "control": 3, "treatment": 3, "total": 3 },
+      "whiskyland": { "control": 2, "treatment": 1, "total": 3 },
+      "smws": { "control": 3, "treatment": 3, "total": 3 }
+    },
+    "marsRawEntityChoices": {
+      "control": {
+        "canonical1953": 0,
+        "wrongDuplicate238555": 1,
+        "nullId": 2
+      },
+      "treatment": {
+        "canonical1953": 2,
+        "wrongDuplicate238555": 0,
+        "nullId": 1
+      }
+    },
+    "whiskylandRawCorrectEntityRoles": { "control": 3, "treatment": 3 },
+    "whiskylandRepeatedBrandAsSeries": { "control": 1, "treatment": 2 }
+  },
+  "measurements": {
+    "control": {
+      "inputTokens": 182946,
+      "outputTokens": 17457,
+      "totalTokens": 200403,
+      "cachedInputTokens": 163619,
+      "cacheWriteTokens": 19234,
+      "reasoningTokens": 12387,
+      "modelRequests": 31,
+      "toolCalls": 19,
+      "firecrawlToolCalls": 0,
+      "estimatedModelCostUsd": 0.02904788,
+      "estimatedUncachedModelCostUsd": 0.0575376,
+      "totalTimeMs": 177508.124793,
+      "medianCaseTimeMs": 15478.062208,
+      "p95CaseTimeMsNearestRank": 24585.362
+    },
+    "treatment": {
+      "inputTokens": 187811,
+      "outputTokens": 17052,
+      "totalTokens": 204863,
+      "cachedInputTokens": 174082,
+      "cacheWriteTokens": 13636,
+      "reasoningTokens": 11947,
+      "modelRequests": 31,
+      "toolCalls": 19,
+      "firecrawlToolCalls": 0,
+      "estimatedModelCostUsd": 0.02737164,
+      "estimatedUncachedModelCostUsd": 0.0580246,
+      "totalTimeMs": 198953.899209,
+      "medianCaseTimeMs": 16495.525875,
+      "p95CaseTimeMsNearestRank": 25877.615584
+    },
+    "caseTimesMs": {
+      "marsKomagatake": {
+        "controlMedian": 18241.856375,
+        "controlP95": 24585.362,
+        "treatmentMedian": 20598.158916,
+        "treatmentP95": 25877.615584
+      },
+      "watchpost": {
+        "controlMedian": 16101.855416,
+        "controlP95": 16470.468333,
+        "treatmentMedian": 17475.537625,
+        "treatmentP95": 21259.037209
+      },
+      "whiskyland": {
+        "controlMedian": 14854.269,
+        "controlP95": 16121.249875,
+        "treatmentMedian": 15515.514125,
+        "treatmentP95": 20280.987625
+      },
+      "smws": {
+        "controlMedian": 9280.208667,
+        "controlP95": 10530.972708,
+        "treatmentMedian": 9420.844959,
+        "treatmentP95": 12962.960917
+      }
+    }
+  },
+  "setupFailures": [
+    {
+      "run": "control-1",
+      "problem": "title filter selected three extra SMWS fixtures",
+      "extraModelCalls": 0,
+      "excludedFromComparison": true
+    },
+    {
+      "run": "treatment-1",
+      "problem": "exact fixture filter left four empty eval suites defined",
+      "extraModelCalls": 0,
+      "excludedFromComparison": true
+    }
+  ],
+  "fullModelSuiteRun": false
+}

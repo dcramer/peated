@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-03T16:42:40.850Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+    "focus": "Verify the exact marketed 2022 release name, series, release year, and ABV for Woodford Reserve Double Double Oaked."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact marketed 2022 release name, series, release year, and ABV for Woodford Reserve Double Double Oaked.",
+    "summary": "The 2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey is the 90.4 proof (45.2% ABV), 375ml vintage released at the Versailles, Kentucky distillery at 10 a.m.",
+    "results": [
+      {
+        "title": "2022 Woodford Reserve Double Double Oaked Bourbon 375ml - Cana Wine Company",
+        "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+        "domain": "canawineco.com",
+        "description": "2022 Woodford Reserve Distillery Series Double Double Oaked bourbon, 90.4 proof (45.2% ABV), 375ml, January 2023 release — the last credited to Chris Morris.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7d180727cc5f06d22764e04e7d0809c7eea0987578a0cd956c855bb29b54aa76",
+    "mode": "auto"
+  }
+}

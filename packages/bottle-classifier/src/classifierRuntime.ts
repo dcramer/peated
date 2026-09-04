@@ -83,6 +83,7 @@ import {
   type BottleClassifierToolEvent,
 } from "./runtime/bottleCheckRuntime";
 import {
+  buildEntityRetrievalRecord,
   mergeBottleCandidate,
   mergeResolvedEntity,
 } from "./runtime/candidates";
@@ -96,7 +97,12 @@ import {
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
 import type { BottleWebSearchExecutor } from "./tools";
-import { createBottleWebSearchBudget } from "./tools";
+import {
+  createBottleWebSearchBudget,
+  executeBottleWebSearchInvocation,
+  hydrateBottleSearchEvidence,
+  runFirecrawlReadPage,
+} from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 export { createBottleContextLoader } from "./runtime/bottleCheckContext";
 export type {
@@ -108,6 +114,33 @@ const CLASSIFIER_MAX_TURNS = 8;
 // Parallel tool calls are disabled, and the agent needs one final-output turn.
 const CLASSIFIER_MAX_PROPOSED_OPERATIONS = CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
+
+function buildReferencePageFocus(referenceName: string): string {
+  const compactName = referenceName.trim().slice(0, 80);
+  return `Verify the exact product "${compactName}": marketed name, whisky category, age, ABV or proof, release or vintage year, edition, cask or batch code, and single-cask or cask-strength status.`;
+}
+
+export function shouldReadReferencePageBeforeClassification({
+  reference,
+  extractedIdentitySource,
+  deterministicDecision,
+  candidateExpansion,
+  hasSearchEvidence,
+}: {
+  reference: BottleReferenceInput;
+  extractedIdentitySource: "image" | "text" | "structured" | null;
+  deterministicDecision: BottleClassificationDecision | null;
+  candidateExpansion: CandidateExpansionMode;
+  hasSearchEvidence: boolean;
+}): boolean {
+  return Boolean(
+    reference.url &&
+    candidateExpansion === "open" &&
+    !hasSearchEvidence &&
+    deterministicDecision?.action === "create_bottle" &&
+    extractedIdentitySource === "text",
+  );
+}
 
 export type BottleClassifierAgentResult = {
   decision: BottleClassifierAgentDecisionInput;
@@ -253,8 +286,14 @@ type BaseCreateBottleClassifierOptions = {
   maxSearchQueries: number;
   firecrawlApiKey?: string | null;
   firecrawlApiUrl?: string | null;
+  // Reviewed evidence collected before this run. Controlled evals use it so
+  // prompt variants receive the same source facts.
+  initialSearchEvidence?: BottleSearchEvidence[];
   executeWebSearch?: BottleWebSearchExecutor;
   observeToolEvent?: (event: BottleClassifierToolEvent) => void;
+  observeReferenceAgentDecision?: (
+    decision: BottleClassifierAgentDecisionInput,
+  ) => void;
   overrides?: {
     extractFromImage?: (
       imageUrlOrBase64: string,
@@ -502,9 +541,7 @@ export async function collectInitialResolvedEntities({
       mergeResolvedEntity(resolvedEntities, {
         ...entity,
         retrievedFor: [
-          {
-            query: request.query,
-          },
+          buildEntityRetrievalRecord(request.query, entity.source),
         ],
       });
     }
@@ -988,6 +1025,7 @@ export function createBottleClassifier(
       extractedIdentity,
       extractedIdentitySource,
       imageEvidence: imageEvidence ?? null,
+      searchEvidence: options.initialSearchEvidence ?? [],
     });
     const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
       reference.name,
@@ -1026,10 +1064,86 @@ export function createBottleClassifier(
       ...preparedArtifacts,
       resolvedEntities,
     });
-    const webSearchBudget = createBottleWebSearchBudget(
-      options.maxSearchQueries,
-    );
+    let webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
+    const sourceUrl = reference.url;
+    const firecrawlApiKey = options.firecrawlApiKey;
+    if (
+      sourceUrl &&
+      firecrawlApiKey &&
+      shouldReadReferencePageBeforeClassification({
+        reference,
+        extractedIdentitySource,
+        deterministicDecision,
+        candidateExpansion,
+        hasSearchEvidence: preparedArtifacts.searchEvidence.length > 0,
+      })
+    ) {
+      const args = {
+        url: sourceUrl,
+        focus: buildReferencePageFocus(reference.name),
+      };
+      const toolCallId = `preparation:${randomUUID()}`;
+      options.observeToolEvent?.({
+        type: "tool_call",
+        phase: "preparation",
+        id: toolCallId,
+        name: "firecrawl_read_page",
+        arguments: args,
+      });
 
+      try {
+        const pageResult = await executeBottleWebSearchInvocation({
+          budget: webSearchBudget,
+          toolName: "firecrawl_read_page",
+          args,
+          execute: async () =>
+            await runFirecrawlReadPage({
+              apiKey: firecrawlApiKey,
+              apiUrl: options.firecrawlApiUrl ?? undefined,
+              ...args,
+            }),
+          executeWebSearch: options.executeWebSearch,
+        });
+        options.observeToolEvent?.({
+          type: "tool_result",
+          phase: "preparation",
+          toolCallId,
+          name: "firecrawl_read_page",
+          result: pageResult,
+        });
+
+        const searchEvidence = [...preparedArtifacts.searchEvidence];
+        const evidenceAdded = hydrateBottleSearchEvidence(
+          pageResult,
+          (evidence) => {
+            mergeSearchEvidence(searchEvidence, evidence);
+          },
+        );
+        if (evidenceAdded) {
+          preparedArtifacts = buildBottleClassificationArtifacts({
+            ...preparedArtifacts,
+            searchEvidence,
+          });
+        } else {
+          webSearchBudget = createBottleWebSearchBudget(
+            options.maxSearchQueries,
+          );
+        }
+      } catch (error) {
+        options.observeToolEvent?.({
+          type: "tool_result",
+          phase: "preparation",
+          toolCallId,
+          name: "firecrawl_read_page",
+          result: {
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+        // Bottle classifier owns this rule: an optional source read cannot
+        // block classification or consume the agent's page-read allowance.
+        webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
+      }
+    }
     return {
       artifacts: preparedArtifacts,
       autoIgnoreReason: null,
@@ -1227,6 +1341,7 @@ export function createBottleClassifier(
         ...preparedEvidence.artifacts,
         candidates: initialCandidates,
         bottleContexts: [currentBottleContext],
+        searchEvidence: options.initialSearchEvidence ?? [],
       });
 
       let output: BottleAuditAgentOutput;
@@ -1378,6 +1493,7 @@ export function createBottleClassifier(
           extractedIdentitySource: artifacts.extractedIdentitySource,
         }),
       };
+      options.observeReferenceAgentDecision?.(agentResult.decision);
       const finalized = await finalizeBottleClassifierAgentResult({
         reference: parsedInput.reference,
         agentResult,

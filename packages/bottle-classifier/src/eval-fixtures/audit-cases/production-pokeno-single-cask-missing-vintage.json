@@ -128,6 +128,27 @@
     ],
     "notes": "Observed August 1, 2026 from Bottle Check #2 for production Bottle 45174. The public image clearly states distilled 18.06.19, aged 4 years, and 55.8% ABV, so 2019 is a supported distillation vintage. A small 71 sticker and inconsistent external listings do not provide reliable normalized evidence for an exact cask-number repair in this classifier audit. Cask-number recovery remains an image-extraction diagnostic rather than a scored requirement here."
   },
+  "acceptedProposedOperationSets": [
+    [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 45174,
+          "patch": {
+            "vintageYear": 2019,
+            "outturn": 340
+          }
+        },
+        "rationale": "The public label explicitly states a 2019 distillation date and bottle 008 of 340, which supports a total outturn of 340.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 45174
+          }
+        ]
+      }
+    ]
+  ],
   "expected": {
     "summary": "Bottle 45174 is missing its label-supported 2019 distillation vintage; the available normalized evidence does not support changing its stored name or edition.",
     "proposedOperations": [

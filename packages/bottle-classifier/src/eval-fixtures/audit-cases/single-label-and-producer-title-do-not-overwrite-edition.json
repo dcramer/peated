@@ -1,0 +1,84 @@
+{
+  "id": "audit-single-label-and-producer-title-do-not-overwrite-edition",
+  "name": "audit: one label and producer title do not overwrite a populated edition",
+  "scenario": "clean",
+  "input": {
+    "audit": {
+      "bottleId": 60302,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 60302,
+        "fullName": "North Pier Ember - Release 7 - 46.0% ABV",
+        "brand": "North Pier",
+        "distillery": ["Aster Glen Distillery"],
+        "category": "single_malt",
+        "edition": "Release 7",
+        "caskStrength": false,
+        "singleCask": false,
+        "abv": 46,
+        "releaseYear": 2025,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 60302,
+          "fullName": "North Pier Ember - Release 7 - 46.0% ABV",
+          "groupId": 60302,
+          "shared": {
+            "name": "Ember",
+            "statedAge": null,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 603021,
+              "name": "North Pier"
+            },
+            "distillers": [
+              {
+                "entityId": 603022,
+                "name": "Aster Glen Distillery"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": "Release 7",
+            "statedAge": null,
+            "abv": 46,
+            "singleCask": false,
+            "caskStrength": false,
+            "vintageYear": null,
+            "releaseYear": 2025,
+            "caskNumber": null,
+            "maturation": null,
+            "outturn": null
+          },
+          "siblings": [],
+          "references": [],
+          "observations": [],
+          "imageSources": [
+            {
+              "source": {
+                "kind": "bottle"
+              },
+              "url": "https://example.com/north-pier/ember-7-label.webp",
+              "sourceUrl": "https://example.com/north-pier/ember-7"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Isolates the populated-edition evidence rule. The fictional producer title and one fictional label agree on edition 7, but there is no structured Bottle observation or second label image."
+  },
+  "expected": {
+    "summary": "One label and an unstructured producer title do not meet the enforced evidence rule for replacing the populated edition.",
+    "proposedOperations": [],
+    "findings": []
+  }
+}

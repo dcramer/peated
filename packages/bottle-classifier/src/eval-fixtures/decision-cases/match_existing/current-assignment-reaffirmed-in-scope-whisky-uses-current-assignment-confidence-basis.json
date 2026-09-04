@@ -1,0 +1,74 @@
+{
+  "id": "current-assignment-reaffirmed-in-scope-whisky-uses-current-assignment-confidence-basis",
+  "name": "current assignment: reaffirmed in-scope whisky uses current-assignment confidence basis",
+  "input": {
+    "reference": {
+      "name": "Ardbeg Uigeadail Single Malt Scotch Whisky 750ml",
+      "url": "https://shop.example/products/ardbeg-uigeadail-750ml",
+      "currentBottleId": 630
+    },
+    "initialCandidates": [
+      {
+        "reference": null,
+        "brand": "Ardbeg",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 54.2,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.95,
+        "source": ["exact"],
+        "bottleId": 630,
+        "fullName": "Ardbeg Uigeadail"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["ardbeg", "uigeadail"],
+      "results": [
+        {
+          "reference": null,
+          "brand": "Ardbeg",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Ardbeg"],
+          "category": "single_malt",
+          "statedAge": null,
+          "edition": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "abv": 54.2,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.95,
+          "source": ["exact"],
+          "bottleId": 630,
+          "fullName": "Ardbeg Uigeadail"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.ardbeg.com/whisky/Core%20Range/Ardbeg%20Uigeadail/",
+      "https://api.peated.com/v1/bottles/630"
+    ],
+    "notes": "Ardbeg markets Uigeadail as a single malt Scotch whisky at 54.2% ABV. This keeps the current-assignment confidence check on an in-scope whisky after the Jameson Cold Brew policy correction."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 630,
+    "expectedTier": "auto",
+    "summary": "When the classifier reaffirms an in-scope current assignment cleanly, use the current assignment as an automation anchor."
+  }
+}

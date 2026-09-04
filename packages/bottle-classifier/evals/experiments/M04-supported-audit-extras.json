@@ -1,0 +1,115 @@
+{
+  "item": "M04",
+  "decision": "accepted_scoring_correction",
+  "classifierChanged": false,
+  "rule": {
+    "acceptedOperationSetsMustIncludeRequiredOperations": true,
+    "acceptedOperationSetsUseExactMatching": true,
+    "unexpectedFindingsRemainStrict": true,
+    "groundingStillRequired": true
+  },
+  "historicalRescore": [
+    {
+      "setting": "no-web/terra-medium",
+      "recordedPassed": 74,
+      "afterM02Passed": 76,
+      "afterM03Passed": 74,
+      "afterM04Passed": 75,
+      "total": 102
+    },
+    {
+      "setting": "no-web/luna-high",
+      "recordedPassed": 75,
+      "afterM02Passed": 73,
+      "afterM03Passed": 71,
+      "afterM04Passed": 71,
+      "total": 102
+    },
+    {
+      "setting": "no-web/luna-xhigh",
+      "recordedPassed": 73,
+      "afterM02Passed": 75,
+      "afterM03Passed": 73,
+      "afterM04Passed": 73,
+      "total": 102
+    },
+    {
+      "setting": "web/terra-medium",
+      "recordedPassed": 76,
+      "afterM02Passed": 78,
+      "afterM03Passed": 78,
+      "afterM04Passed": 79,
+      "total": 102
+    },
+    {
+      "setting": "web/luna-high",
+      "recordedPassed": 73,
+      "afterM02Passed": 75,
+      "afterM03Passed": 77,
+      "afterM04Passed": 79,
+      "total": 102
+    },
+    {
+      "setting": "web/luna-xhigh",
+      "recordedPassed": 73,
+      "afterM02Passed": 75,
+      "afterM03Passed": 74,
+      "afterM04Passed": 75,
+      "total": 102
+    }
+  ],
+  "correctedOutcomes": [
+    {
+      "setting": "no-web/terra-medium",
+      "case": "Pōkeno",
+      "before": "fail",
+      "after": "pass"
+    },
+    {
+      "setting": "web/terra-medium",
+      "case": "Pōkeno",
+      "before": "fail",
+      "after": "pass"
+    },
+    {
+      "setting": "web/luna-high",
+      "case": "Laphroaig",
+      "before": "fail",
+      "after": "pass"
+    },
+    {
+      "setting": "web/luna-high",
+      "case": "SMWS 10.258",
+      "before": "fail",
+      "after": "pass"
+    },
+    {
+      "setting": "web/luna-xhigh",
+      "case": "SMWS 10.258",
+      "before": "fail",
+      "after": "pass"
+    }
+  ],
+  "unchangedReviewedOutcomes": {
+    "count": 13,
+    "reasons": [
+      "missing required operation",
+      "unexpected finding",
+      "unreviewed operation fields",
+      "runtime error or timeout"
+    ]
+  },
+  "measurements": {
+    "modelCalls": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "estimatedModelCostUsd": 0,
+    "modelTimeMs": 0,
+    "savedOutputRescoreMs": 380,
+    "focusedTestCount": 40,
+    "focusedTestSeconds": 1.85,
+    "fullPackageTestCount": 397,
+    "fullPackageTestSeconds": 14.82,
+    "typecheckSeconds": 4.67
+  }
+}

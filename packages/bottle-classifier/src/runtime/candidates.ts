@@ -1,6 +1,21 @@
 import { mergeBottleCandidateFamilyContext } from "../candidateFamilyContext";
 import type { BottleCandidate, EntityResolution } from "../classifierTypes";
 
+type EntityRetrievalRecord = NonNullable<
+  EntityResolution["retrievedFor"]
+>[number];
+
+export function buildEntityRetrievalRecord(
+  query: string,
+  source: string[],
+): EntityRetrievalRecord {
+  const record: EntityRetrievalRecord = { query };
+  if (source.includes("exact")) {
+    record.exact = true;
+  }
+  return record;
+}
+
 const CANDIDATE_METADATA_FIELDS = [
   "bottler",
   "series",
@@ -45,7 +60,10 @@ export function mergeBottleCandidate(
     existing.score = candidate.score;
   }
 
-  if (!existing.reference && candidate.reference) {
+  if (
+    candidate.reference &&
+    (candidate.source.includes("exact") || !existing.reference)
+  ) {
     existing.reference = candidate.reference;
   }
 
@@ -100,13 +118,14 @@ export function mergeResolvedEntity(
 
   existing.source = Array.from(new Set([...existing.source, ...entity.source]));
   const retrievedFor = [...(existing.retrievedFor ?? [])];
-  for (const provenance of entity.retrievedFor ?? []) {
-    if (
-      !retrievedFor.some(
-        (existingProvenance) => existingProvenance.query === provenance.query,
-      )
-    ) {
-      retrievedFor.push(provenance);
+  for (const record of entity.retrievedFor ?? []) {
+    const existingRecord = retrievedFor.find(
+      (item) => item.query === record.query,
+    );
+    if (!existingRecord) {
+      retrievedFor.push(record);
+    } else if (record.exact) {
+      existingRecord.exact = true;
     }
   }
   if (retrievedFor.length > 0) {

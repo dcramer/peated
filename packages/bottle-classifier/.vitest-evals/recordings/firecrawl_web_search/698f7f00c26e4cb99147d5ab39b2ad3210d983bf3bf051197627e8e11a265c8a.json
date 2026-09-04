@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-03T16:22:23.221Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve Double Double Oaked Distillery Series 2022 release 45.2% ABV",
+      "Woodford Reserve Double Double Oaked 2022 45.2 ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Double Oaked Distillery Series 2022 release 45.2% ABV",
+        "summary": "This new release features Woodford Reserve's signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile … 45.2% Alc ... In stock Rating 4.36Size: 375ml · Proof: 90.4 (45.2% ABV) · Age: No age statement — fully mature Double Oaked finished an additional year in its second barrel · Origin: Versailles, ... Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, Proof 90.4 ° Appearance … 45.",
+        "results": [
+          {
+            "title": "Distillery Series - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "This new release features Woodford Reserve's signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile … 45.2% Alc ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2022 Woodford Reserve Double Double Oaked Bourbon 375ml",
+            "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+            "domain": "canawineco.com",
+            "description": "In stock Rating 4.36Size: 375ml · Proof: 90.4 (45.2% ABV) · Age: No age statement — fully mature Double Oaked finished an additional year in its second barrel · Origin: Versailles, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Returns as 2023 Winter ...",
+            "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "Double Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, Proof 90.4 ° Appearance … 45.2% Alc. by Vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #902: Woodford Reserve Double Double Oaked (2025 release)",
+            "url": "https://www.reddit.com/r/bourbon/comments/1l2oxfe/review_902_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "Jun 3, 2025",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Double Oaked 2022 45.2 ABV",
+        "summary": "In stock Rating 4.36Size: 375ml ; Proof: 90.4 (45.2% ABV) ; Age: No age statement — fully mature Double Oaked finished an additional year in its second barrel ; Origin: Versailles, ... Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon ... Woodford Reserve Kentucky Straight Whiskey 43.2%-45.2% ALC. In stock Rating 4.184700ml | 45.2% ABV. Regular price$199.99. Enter your Address and This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – ... Oct",
+        "results": [
+          {
+            "title": "2022 Woodford Reserve Double Double Oaked Bourbon 375ml",
+            "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+            "domain": "canawineco.com",
+            "description": "In stock Rating 4.36Size: 375ml ; Proof: 90.4 (45.2% ABV) ; Age: No age statement — fully mature Double Oaked finished an additional year in its second barrel ; Origin: Versailles, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://shop.woodfordreserve.com/double-double-oaked-7aqy/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "Double Double Oaked is handcrafted by finishing fully-mature Woodford Reserve Double Oaked Bourbon ... Woodford Reserve Kentucky Straight Whiskey 43.2%-45.2% ALC.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Straight Bourbon Whiskey ...",
+            "url": "https://bevmo.com/products/256909",
+            "domain": "bevmo.com",
+            "description": "In stock Rating 4.184700ml | 45.2% ABV. Regular price$199.99. Enter your Address and",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/bourbon - Review 84, Woodford Reserve, Double Double Oaked",
+            "url": "https://www.reddit.com/r/bourbon/comments/1o4s7mx/review_84_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "Oct 12, 2025",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "698f7f00c26e4cb99147d5ab39b2ad3210d983bf3bf051197627e8e11a265c8a",
+    "mode": "auto"
+  }
+}

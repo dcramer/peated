@@ -30,7 +30,7 @@
       "https://smws.com/appley-ever-after/",
       "https://api.peated.com/v1/bottles/43260"
     ],
-    "notes": "Re-verified July 31, 2026. The official SMWS product page identifies cask RW6.5 as Appley ever after. This is a controlled missing-local-Bottle variant: the real SMWS and Kyrö entities remain available while the Bottle catalog is empty. It intentionally tests exact-cask creation and does not describe current production, where Peated Bottle 43260 exists."
+    "notes": "Re-verified September 3, 2026. The official SMWS product page identifies cask RW6.5 as Appley ever after, age 6, and 56% ABV, but does not state a release or bottling year. This is a controlled missing-local-Bottle variant: the real SMWS and Kyrö entities remain available while the Bottle catalog is empty. It intentionally tests exact-cask creation and does not describe current production, where Peated Bottle 43260 exists. The held-out Peated Bottle must not supply an expected release year through public web search."
   },
   "expected": {
     "status": "classified",
@@ -55,7 +55,6 @@
       "category": "rye",
       "statedAge": 6,
       "abv": 56,
-      "releaseYear": 2024,
       "singleCask": true,
       "caskStrength": null
     },

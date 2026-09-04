@@ -5,6 +5,7 @@ import type { Finding, ProposedOperation } from "./bottleCheckContract";
 import {
   scoreBottleCheckGrounding,
   scoreBottleCheckSemanticOutput,
+  selectBottleCheckExpectedOperations,
   type BottleCheckGroundingScore,
 } from "./bottleCheckEvalScoring";
 import {
@@ -199,6 +200,110 @@ describe("Bottle-check eval scoring", () => {
       recall: 1,
       extraCount: 1,
     });
+  });
+
+  test("accepts only explicitly reviewed operation sets with supported extras", () => {
+    const requiredOperation: ProposedOperation = {
+      type: "update_bottle",
+      input: { bottleId: 1, patch: { vintageYear: 2019 } },
+      rationale: "Restore the required vintage.",
+      evidenceRefs: [{ kind: "bottle", bottleId: 1 }],
+    };
+    const acceptedOperation: ProposedOperation = {
+      type: "update_bottle",
+      input: {
+        bottleId: 1,
+        patch: { vintageYear: 2019, outturn: 340 },
+      },
+      rationale: "Restore the vintage and the reviewed label outturn.",
+      evidenceRefs: [{ kind: "bottle", bottleId: 1 }],
+    };
+    const unsupportedOperation: ProposedOperation = {
+      ...acceptedOperation,
+      input: {
+        bottleId: 1,
+        patch: { vintageYear: 2019, outturn: 341 },
+      },
+    };
+    const expected = { proposedOperations: [requiredOperation], findings: [] };
+    const acceptedSets = [[acceptedOperation]];
+
+    expect(
+      scoreBottleCheckSemanticOutput(
+        expected,
+        { proposedOperations: [requiredOperation], findings: [] },
+        acceptedSets,
+      ).operations.score,
+    ).toBe(1);
+    expect(
+      scoreBottleCheckSemanticOutput(
+        expected,
+        { proposedOperations: [acceptedOperation], findings: [] },
+        acceptedSets,
+      ).operations.score,
+    ).toBe(1);
+    expect(
+      scoreBottleCheckSemanticOutput(
+        expected,
+        { proposedOperations: [unsupportedOperation], findings: [] },
+        acceptedSets,
+      ).operations.score,
+    ).toBe(0);
+    expect(
+      scoreBottleCheckSemanticOutput(
+        expected,
+        {
+          proposedOperations: [
+            {
+              ...acceptedOperation,
+              input: { bottleId: 1, patch: { outturn: 340 } },
+            },
+          ],
+          findings: [],
+        },
+        acceptedSets,
+      ).operations.score,
+    ).toBe(0);
+    expect(
+      selectBottleCheckExpectedOperations([requiredOperation], acceptedSets, [
+        acceptedOperation,
+      ]),
+    ).toEqual([acceptedOperation]);
+  });
+
+  test("keeps updates to a merge source forbidden when only the survivor repair is accepted", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
+    const acceptedSet = fixture!.acceptedProposedOperationSets[0];
+    expect(acceptedSet).toBeDefined();
+
+    expect(
+      scoreBottleCheckSemanticOutput(
+        fixture!.expected,
+        { proposedOperations: acceptedSet!, findings: [] },
+        fixture!.acceptedProposedOperationSets,
+      ).operations.score,
+    ).toBe(1);
+
+    const sourceUpdate = acceptedSet!.map(
+      (operation): ProposedOperation =>
+        operation.type === "update_bottle"
+          ? {
+              ...operation,
+              input: { ...operation.input, bottleId: 39096 },
+            }
+          : operation,
+    );
+    expect(
+      scoreBottleCheckSemanticOutput(
+        fixture!.expected,
+        { proposedOperations: sourceUpdate, findings: [] },
+        fixture!.acceptedProposedOperationSets,
+      ).operations.score,
+    ).toBe(0);
   });
 
   test("keeps unenumerated operations informational while grounding their actual targets", () => {

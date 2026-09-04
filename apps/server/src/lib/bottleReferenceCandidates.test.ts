@@ -1,3 +1,7 @@
+import {
+  BottleCandidateSchema,
+  type BottleCandidate,
+} from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { bottleTombstones } from "@peated/server/db/schema";
@@ -6,6 +10,7 @@ import {
   createBottleCandidateLookup,
   findBottleReferenceCandidates,
   getBottleCandidateById,
+  mergeBottleCandidate,
   searchBottleCandidates,
   type BottleEmbeddingCreator,
 } from "./bottleReferenceCandidates";
@@ -23,6 +28,34 @@ afterEach(() => {
   config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
   config.SCRAPER_AI_GATEWAY_API_KEY = originalScraperAIGatewayApiKey;
   vi.restoreAllMocks();
+});
+
+test("candidate merging preserves the accepted exact reference", () => {
+  const candidates = new Map<number, BottleCandidate>();
+
+  mergeBottleCandidate(
+    candidates,
+    BottleCandidateSchema.parse({
+      bottleId: 1,
+      reference: "Similar search reference",
+      fullName: "Example Small Batch",
+      source: ["vector"],
+    }),
+  );
+  mergeBottleCandidate(
+    candidates,
+    BottleCandidateSchema.parse({
+      bottleId: 1,
+      reference: "Accepted exact reference",
+      fullName: "Example Small Batch",
+      source: ["exact"],
+    }),
+  );
+
+  expect(candidates.get(1)).toMatchObject({
+    reference: "Accepted exact reference",
+    source: ["vector", "exact"],
+  });
 });
 
 test("returns a complete Bottle candidate with active BottleGroup siblings", async ({

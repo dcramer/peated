@@ -1,0 +1,43 @@
+{
+  "item": "C07",
+  "decision": "stopped_without_treatment",
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "maxSearchQueries": 0,
+  "controlGate": {
+    "passed": 5,
+    "cases": 6,
+    "correctActionsAndBottleIds": 6,
+    "incorrectExistingMatches": 0,
+    "inputTokens": 70081,
+    "outputTokens": 4509,
+    "totalTokens": 74590,
+    "cachedInputTokens": 55922,
+    "cacheWriteTokens": 14120,
+    "reasoningTokens": 2973,
+    "requests": 13,
+    "toolCalls": 3,
+    "estimatedModelCostUsd": 0.01006704,
+    "fullyUncachedModelCostUsd": 0.019427,
+    "timeMs": 62107.042833,
+    "medianTimeMs": 9314.707063,
+    "p95TimeMs": 18099.783458,
+    "caseResults": {
+      "coldBrewListing": "pass_no_match",
+      "coldBrewCurrentAssignment": "pass_no_match",
+      "skrewball": "pass_no_match",
+      "ardbegCurrentAssignment": "pass_match_630",
+      "smwsAppleyEverAfter": "pass_match_43260",
+      "singleBarrel1792": "matched_16051_but_wrong_exact_cask_scope"
+    }
+  },
+  "failedNetworkSetup": {
+    "cases": 6,
+    "modelTokens": 0,
+    "estimatedModelCostUsd": 0,
+    "reason": "The sandbox could not resolve the AI gateway hostname."
+  },
+  "treatmentImplemented": false,
+  "fullSuiteRun": false,
+  "reason": "Both target failures passed in the unchanged gate, while one ordinary control failed an unrelated identity-scope assertion."
+}

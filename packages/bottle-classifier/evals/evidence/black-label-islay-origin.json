@@ -1,0 +1,50 @@
+{
+  "name": "Black Label Islay Origin reviewed producer evidence",
+  "reviewedAt": "2026-09-03",
+  "notes": "The summaries are reviewed paraphrases of the cited source, stored in the same shape as Firecrawl evidence. They are not raw replay output.",
+  "sources": [
+    "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html"
+  ],
+  "cases": {
+    "store-listing-resolves-black-label-family-under-johnnie-walker": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Johnnie Walker Black Label Islay Origin producer evidence",
+            "summary": "Johnnie Walker's launch release describes the Origin Series as four 12-year-old blended Scotch whiskies and says Islay Origin is made exclusively with single malts from Islay, including Lagavulin and Caol Ila.",
+            "results": [
+              {
+                "title": "Explore the Flavours of Scotland With the Johnnie Walker Black Label Origin Series",
+                "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+                "domain": "prnewswire.com",
+                "description": "Producer launch evidence for the 12-year-old Islay Origin release and its exclusively Islay single-malt composition.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed Johnnie Walker Black Label Islay Origin producer page",
+            "summary": "The producer calls Black Label Islay Origin a 12-year-old release made exclusively with single malts from Islay, including Lagavulin and Caol Ila. This supports the blended malt category.",
+            "results": [
+              {
+                "title": "Explore the Flavours of Scotland With the Johnnie Walker Black Label Origin Series",
+                "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+                "domain": "prnewswire.com",
+                "description": "Reviewed exact-product producer evidence.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

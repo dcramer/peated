@@ -1,0 +1,92 @@
+{
+  "item": "C04",
+  "decision": "rejected",
+  "classifierTreatmentReverted": true,
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "repeatsPerVariant": 3,
+  "casesPerRepeat": 5,
+  "fixedEvidence": true,
+  "liveWebRequests": 0,
+  "controlGate": {
+    "passed": 1,
+    "cases": 3,
+    "inputTokens": 32756,
+    "outputTokens": 5121,
+    "totalTokens": 37877,
+    "cachedInputTokens": 17580,
+    "cacheWriteTokens": 15161,
+    "reasoningTokens": 4172,
+    "requests": 5,
+    "toolCalls": 2,
+    "estimatedModelCostUsd": 0.01029005,
+    "timeMs": 57418.230667
+  },
+  "comparison": {
+    "control": {
+      "passed": 11,
+      "cases": 15,
+      "incorrectExistingMatches": 0,
+      "inputTokens": 171372,
+      "outputTokens": 17562,
+      "totalTokens": 188934,
+      "cachedInputTokens": 148971,
+      "cacheWriteTokens": 22317,
+      "reasoningTokens": 12855,
+      "requests": 28,
+      "toolCalls": 13,
+      "estimatedModelCostUsd": 0.02964987,
+      "fullyUncachedModelCostUsd": 0.0553488,
+      "timeMs": 262933.599458,
+      "medianTimeMs": 10836.744834,
+      "p95TimeMs": 64833.064
+    },
+    "treatment": {
+      "passed": 9,
+      "cases": 15,
+      "incorrectExistingMatches": 0,
+      "inputTokens": 181578,
+      "outputTokens": 27003,
+      "totalTokens": 208581,
+      "cachedInputTokens": 131890,
+      "cacheWriteTokens": 41480,
+      "reasoningTokens": 17495,
+      "requests": 41,
+      "toolCalls": 11,
+      "estimatedModelCostUsd": 0.047053,
+      "fullyUncachedModelCostUsd": 0.0687192,
+      "timeMs": 312778.02804,
+      "medianTimeMs": 18788.578875,
+      "p95TimeMs": 33836.785416
+    },
+    "perCase": {
+      "elijahCraig18YearOld": {
+        "controlPasses": 0,
+        "treatmentPasses": 0,
+        "controlActions": ["no_match", "no_match", "create_bottle"],
+        "treatmentActions": ["no_match", "no_match", "create_bottle"]
+      },
+      "mastersonsFrenchOakFinish": {
+        "controlPasses": 2,
+        "treatmentPasses": 0,
+        "controlActions": ["no_match", "create_bottle", "create_bottle"],
+        "treatmentActions": ["no_match", "no_match", "no_match"]
+      },
+      "highWestHighCountry": {
+        "controlPasses": 3,
+        "treatmentPasses": 3
+      },
+      "cadbollEstateBatch4": {
+        "controlPasses": 3,
+        "treatmentPasses": 3
+      },
+      "penelopeBatch11": {
+        "controlPasses": 3,
+        "treatmentPasses": 3
+      }
+    }
+  },
+  "totalReportedModelCostUsd": 0.08699292,
+  "fullSuiteRun": false,
+  "reason": "The candidate-blind pass recorded the source traits correctly, but the main classifier still treated an over-specific local candidate as a reason to avoid creation. Accuracy fell while tokens, cost, and median time increased."
+}

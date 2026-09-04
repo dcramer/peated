@@ -382,6 +382,52 @@
     ],
     "notes": "Curated existing-Bottle audit variant derived from the July 29, 2026 production reference miss, not a second observed production miss. Re-verified July 31, 2026: Peated Bottle 39096 still stores vintageYear 2022 in BottleGroup 9433, whose shared identity is the 15-year-old Càirdeas represented by sibling Bottle 802, and owns tasting 223 with the public Warehouse 1 label image. The Peated Bottle, BottleGroup, and group-members endpoints show Bottle 802 with group/shared age 15, group Brand/distiller/bottler Entity 1129, and null Bottle-exact edition, ABV, cask, and year fields; the retained official Laphroaig sources do not independently document that 15-year identity. Bottle 45146 stores Warehouse 1, releaseYear 2022, and 52.2% ABV in BottleGroup 18105 beside generic representative Bottle 44288. The public alias endpoint currently returns no persisted aliases for Bottle 39096, and no Bottle-observation endpoint or retained fixture evidence establishes a production BottleObservation row, so its explicit context truthfully leaves aliases and observations empty. The audit corpus keeps only the four inspected Bottles and the two official producer pages rather than copying the reference flow's 15 retrieval candidates."
   },
+  "acceptedProposedOperationSets": [
+    [
+      {
+        "type": "merge_bottles",
+        "input": {
+          "sourceBottleId": 39096,
+          "destinationBottleId": 45146
+        },
+        "rationale": "Bottle 39096 is a malformed duplicate of the complete 2022 Warehouse 1 Bottle 45146.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 39096
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 45146
+          },
+          {
+            "kind": "web_result",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky"
+          }
+        ]
+      },
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 45146,
+          "patch": {
+            "maturation": "Aged in first-filled Maker’s Mark Bourbon casks in Warehouse 1, with extra exposure to the elements."
+          }
+        },
+        "rationale": "The producer gives this maturation for the exact surviving 2022 Warehouse 1 Bottle.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 45146
+          },
+          {
+            "kind": "web_result",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky"
+          }
+        ]
+      }
+    ]
+  ],
   "expected": {
     "summary": "The audited Bottle is a malformed duplicate of the complete 2022 Warehouse 1 Bottle; the generic Càirdeas Bottle remains a distinct unchanged catalog record.",
     "proposedOperations": [

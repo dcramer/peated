@@ -1,0 +1,492 @@
+{
+  "date": "2026-09-03",
+  "sourceCommit": "8d9aed1785ac2478fccb48c589c3c632b982b364",
+  "suite": "src/classifier.eval.test.ts",
+  "casesPerRun": 105,
+  "attemptsPerCasePerRun": 1,
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "imageExtraction": {
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high"
+  },
+  "provider": "Vercel AI Gateway",
+  "webEnabled": true,
+  "maxSearchQueries": 2,
+  "maxAgentTurns": 8,
+  "configuredTimeoutMs": 300000,
+  "rawReportSha256": "883a6bb90b362720c06f700b055800ccb812a8b5e0b6eabf3aefcd5d3faae990",
+  "result": {
+    "passed": 80,
+    "failed": 25,
+    "timeouts": 1,
+    "incorrectExistingBottleMatches": 1,
+    "falsePositiveAcceptedResults": 0,
+    "medianSeconds": 17.89981,
+    "p95NearestRankSeconds": 74.09655,
+    "totalCaseSeconds": 3094.58991,
+    "groups": {
+      "new bottles": {
+        "passed": 26,
+        "total": 42
+      },
+      "match existing": {
+        "passed": 35,
+        "total": 38
+      },
+      "corrections": {
+        "passed": 1,
+        "total": 1
+      },
+      "ignored / no match": {
+        "passed": 11,
+        "total": 12
+      },
+      "bottle audits": {
+        "passed": 7,
+        "total": 12
+      }
+    }
+  },
+  "usage": {
+    "casesWithUsage": 100,
+    "inputTokens": 2708996,
+    "cachedInputTokens": 2351570,
+    "cacheWriteTokens": 356291,
+    "outputTokens": 167108,
+    "reasoningTokens": 120782,
+    "totalTokens": 2876104,
+    "modelRequests": 379,
+    "estimatedModelCostUsd": 0.33686075,
+    "firecrawlToolCalls": 143,
+    "otherToolCalls": 108
+  },
+  "costBasis": "Per-call model-token estimates including reported cache usage. Excludes Firecrawl fees, provider adjustments, and the timed-out case because it reported no usage.",
+  "limitations": [
+    "This is one live run with changing web results and model output.",
+    "The timeout makes cost and token totals lower bounds.",
+    "The suite measures reviewed regression cases; it is not a production accuracy estimate."
+  ],
+  "cases": [
+    {
+      "fixture": "src/eval-fixtures/decision-cases/corrections/current-assignment-a-bottle-correction-stays-review-only-even-when-the-new-match-is-highly-confident.json",
+      "fixtureSha256": "8ee3bddfe145338108e5e12512fcecf084e28e9fe4a8d6e2bb0a5b461fc3ea01"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/current-assignment-out-of-scope-cold-brew-remains-no-match.json",
+      "fixtureSha256": "1dba7405b9eb0ae13b0e1d2b94c1613ec8d86cdabefe35865ef3dccd168bdd38"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/image-backed-photo-requires-review-for-springbank-open-day-may-2026-30-year-old.json",
+      "fixtureSha256": "6c0425ccee50750b6853eb659d6ec480d78251458024e38cedbc2b049db33d7f"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/image-backed-photo-requires-spice-tree-extravaganza-catalog-review.json",
+      "fixtureSha256": "2222fc5302a4b57c550d0cea66499fb64fb9b8a00b1bb809df8359a32e98b122"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-age-mismatch-rejects-incomplete-bottle-without-cask-identity.json",
+      "fixtureSha256": "fce820a538328eb3d5746a5df6c2242f5075bac23af48a9553a9124de9b6d6c8"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-ignores-a-bottle-multipack-even-when-the-bottle-identity-is-clear.json",
+      "fixtureSha256": "e68c32f5c3b7f6b8fb8173ee835c9b4470457230c5f08f095e9ff69cfaaa1a03"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-ignores-a-clear-non-whisky-spirit-reference.json",
+      "fixtureSha256": "60411b9666920dd81be8b2f0240039302e3d8aa2c577a23c391db28305d24022"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-ignores-a-damaged-condition-sale-listing-for-an-otherwise-known-bottle.json",
+      "fixtureSha256": "c6225257d502d66f12ba5deb24330464273f21cbcfe9d7bf3d1d9123bd05b116"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-a-packaging-only-gift-set-without-bottle-identity.json",
+      "fixtureSha256": "1bcdacacdf32faba8f85f8439c03debb7bf8309d36681e07c407a87fbd736353"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-a-sampler-bundle-without-a-single-bottle-identity.json",
+      "fixtureSha256": "051ffed2ba8a95397d7e3410ef4faf6b0a6327b2e2ce7b4a5518d602efadca7c"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-an-unsupported-novelty-flavored-whiskey-product.json",
+      "fixtureSha256": "d2ca7b431b73a7057f1dd810921b3455ecd65a85273c0b6d9a08e35022daba09"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-jameson-cold-brew-as-additive-flavor-product.json",
+      "fixtureSha256": "b2781d4490abe3cd47a82ecb1f0629ce0dd6ed058aabb5fa9583bd442331c778"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-requires-review-for-canadian-club-reserve-9-year-old.json",
+      "fixtureSha256": "fa61e61c4cad7f5ad0c1dd927e2fa4a1c62ca33fba86b2d20471e4da2cf0b0ae"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/current-assignment-reaffirmed-in-scope-whisky-uses-current-assignment-confidence-basis.json",
+      "fixtureSha256": "b3caaaa8a70764ee4557b6c0c140a39de395bf40b8d7287aab3638eea5329a79"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+      "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-composes-smws-1-285-from-label-components.json",
+      "fixtureSha256": "17a30511739a6471312f5a33702a2c70991c7dea9adcbdb1fd5909a2c79a797c"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-ardbeg-uigeadail-from-label.json",
+      "fixtureSha256": "602d73eaba9ce76079d8cc52e8465c800e0072daafcbfbb39949b1668e45865a"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-compass-box-rogues-banquet.json",
+      "fixtureSha256": "df5608365f227cc001e3bdff5dbe3e49836c2577c46338037f60a4fa475c5b66"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-existing-exclusive-malts-islay-2007-bottle.json",
+      "fixtureSha256": "789c1eafccc08dcf79e29d8f86db34735b681b6265c745560e3e0ecdffc9db24"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+      "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-laphroaig-elements-l2-0-bottle.json",
+      "fixtureSha256": "b9ac27ac84e6f0948a4605a1ee028e5ab677cd01f6b279047299b595e06eedf5"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-pappy-van-winkle-15-family-reserve.json",
+      "fixtureSha256": "06070d1afe164a6651e8a7e33f82697c34799ef64408559ef41245a28cae7185"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-pokeno-exploration-series-totara-cask.json",
+      "fixtureSha256": "c9f57b7019570337a44bd370aa7c767c0d791fa145337e4500a9118fdfc926cb"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-smws-95-71-prepare-for-winter.json",
+      "fixtureSha256": "35f1e051c9cf223b2846fae026e579f70f45ae4e93047c7978e5cdd94415b368"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-trestle-spirit-of-eclipse.json",
+      "fixtureSha256": "48af627b90600f5fb5418f0862cd9a1386363ec78b756be2022c754a15096bf8"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-woodford-reserve-double-double-oaked-2022-release.json",
+      "fixtureSha256": "c70d9af8b8355362eb241f4a5370aad32be28f2754850dacacf602d7b3654161"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+      "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-aged-springbank-25-year-old-matches-the-plain-age-statement-bottle.json",
+      "fixtureSha256": "139f910eb186b5cb807831b74da6267ca941bdb35daae4f9e5cea43144a6368a"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-dropped-possessive-brand-still-matches-basil-haydens-base-bourbon.json",
+      "fixtureSha256": "7bc4ef7de2b26c038018ff040c24494ecae66835284005383afa0658b2d3f62a"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-glenlivet-caribbean-reserve-reaches-bottle-verification-confidence-when-reliable-web-evidence-confirms-the-family.json",
+      "fixtureSha256": "73faafecf08ea4364fe5992ece7bd122dbc4157ae99767032bae4d4f845cd319"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-keeps-a-strong-local-match-when-only-a-standalone-article-differs.json",
+      "fixtureSha256": "06babbb2b5c1868b96043e84b26c40e4d48171f4dd1e8adb0597513164aaeef0"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-cadboll-estate-batch-4-bottle.json",
+      "fixtureSha256": "b47e617839cb6f578600155a3a954eb34bb1c29d6d929a7ce1202f6239bc3c8d"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-legacy-series-chapter-two-bottle.json",
+      "fixtureSha256": "805d152220b6d974e1bb5f7c95496ea99e16376db9bc65686d046ef88d3c802a"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-macallan-30-year-old-bottle.json",
+      "fixtureSha256": "69d3880fb5c5c2bec1a8570ac703be83ba8dfee85af6fd5e6d81e6ca7e53bf36"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-penelope-batch-11-bottle.json",
+      "fixtureSha256": "7758bdaf87b92e4d982727b80a9468ac0b7831184b29f1099d0ab4c485d8fd8e"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-existing-cadboll-estate-batch-4-bottle.json",
+      "fixtureSha256": "07be4aeb5916a90b2f517ecf3496b7ae514017f0720ddd3412b52bba71554776"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-existing-distillers-edition-2023-bottle.json",
+      "fixtureSha256": "a940cacab79b3b1630375b6f7caa09f8fd8261a6d0b5b279758165dc4a2eb2fb"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-hudson-back-room-deal-peated-scotch-barrel-finished-as-bottle-identity.json",
+      "fixtureSha256": "0cbb1c666eb4dbc920874a6b457ced64e641e39e2061d7761cdee9ad5f82af11"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1.json",
+      "fixtureSha256": "38a2adf5e532d3a95938292f87e4c6c5641fc5516f75dd75fa4d2eadfbc0ac31"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+      "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-noisy-extracted-age-keeps-exact-marketed-age-bottle-match.json",
+      "fixtureSha256": "dd59c8bb9244841094f345edefbca1a7f54bec5bcc301a05dd7db6b56e72a74d"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-plain-tomatin-12-year-old-does-not-redirect-into-the-cask-strength-family.json",
+      "fixtureSha256": "acfb805013af34399e61b23201f7f5aadbe0b32fef156c51727d1bec8008e240"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+      "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-unknown-category-does-not-block-shibui-grain-select.json",
+      "fixtureSha256": "12d9c2c1c0c3705c4cf9e585d01b7f171df3518dabe3fcb1bc9fd01e4262a5cd"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-uses-web-evidence-plus-local-follow-up-search-to-recover-the-right-bottle.json",
+      "fixtureSha256": "24349ab426552619d4d7d8422c120707ae41f4d0a5f021b991114b67e6f63df6"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-listing-extracts-and-recovers-wild-turkey-rare-breed-rye-from-the-title.json",
+      "fixtureSha256": "83e9c837abbcad711626d3ccf0245a2da8abbec879df8b40cec00390b8c2b6fd"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-listing-keeps-a-brand-led-age-statement-match-when-the-local-bottle-name-is-distillery-qualified.json",
+      "fixtureSha256": "d7fa6518ed6706e1f4420c7778644e5b12c0e6975f10b3bb58d76d7962cb7a90"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-listing-strips-retailer-suffix-noise-and-matches-ardbeg-uigeadail.json",
+      "fixtureSha256": "de1e1ef6d496597988782f469af5950d4ecf566278a2caad774cfa7cf07b5489"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+      "fixtureSha256": "ec1775b2ee8358ac72aa787c6736e7c406784d69521c2d01cd3d1bcc60d655b7"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-user-entry-matches-shorthand-springbank-10.json",
+      "fixtureSha256": "a65c499d23bb73a20693b15ab65f3cc4edfb1d81c2b26144f959e76d1fe858bd"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/user-entry-matches-a-shorthand-bottle-name.json",
+      "fixtureSha256": "c77c5df09c6292b76f11274896cd6ec787921a86ffff81d549d6d0f2757d8f8e"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-compass-box-hedonism-squared.json",
+      "fixtureSha256": "037b4216bf247c0f4fa764067387b67108efc30edcabc5bafcf8ccfd2e050aac"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+      "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+      "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-exclusive-malts-islay-single-cask-as-bottle.json",
+      "fixtureSha256": "8b421e9a3b27952ad0d444b74400d4b3e70177dae6f51f6d90493e0ce2cafc85"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-mars-komagatake-2022-edition.json",
+      "fixtureSha256": "b188d8d841600504e76762f284485602cd92a0f59c3edc7eb1b237035c6565c8"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-watchpost-whiskey.json",
+      "fixtureSha256": "eb23f9d9c5fe41d61b6eb461b4f6ac11d260a0b5527fb1ae4d19d344a12ee0f1"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-willett-family-estate-barrel-4769.json",
+      "fixtureSha256": "62cc874e5098845c39508de45cfcce56e38c52f1efaa1ef99ec1026a66c7ffc0"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+      "fixtureSha256": "8b9cf66406eb8fb5037b8d6f7c9f753b7d864a3bf3c85157a489f0a8e70e409c"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally.json",
+      "fixtureSha256": "f4c3bca20e27538734e76e48a4ed0e67bf0a3fbde5d81283eacc289cfdde8956"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-complete-cadboll-estate-batch-2-bottle.json",
+      "fixtureSha256": "40e65dabaa170f615fc9e5aa2188cf5823ac916556367e5c9f7da5daa9bbd4f8"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-complete-macallan-1994-vintage-bottle.json",
+      "fixtureSha256": "8a2cae786d775a24808a5dd199231cd0b2f0dfbaf90c149d02dfd67fdd15c685"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-creag-isle-12-year-old-island-single-malt.json",
+      "fixtureSha256": "8bc619dad3f75be5316637e9595fb3ef55912f6107c7260519909792ff605746"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+      "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-glendalough-double-barrel-instead-of-matching-forty-creek.json",
+      "fixtureSha256": "a214ad3500a1a2826f72eef817c98532f6f305b28293327aba9dece01ec5c63f"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+      "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-russells-reserve-single-barrel-rye-instead-of-matching-bourbon.json",
+      "fixtureSha256": "33b9f8eed0b5793ef68e149097daa557bf179b270610a0046e9fa8b329b3cd39"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-shieldaig-speyside-21-year-old-with-structured-age.json",
+      "fixtureSha256": "e8854c49e0abcdc3ddabdc5956021163e6a559a21c3848708877a86cd3a19eab"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-shieldaig-speyside-30-year-old-with-structured-age.json",
+      "fixtureSha256": "1070f65d4f72eec88107349efec718616296eb4a04278b28cab53e537fef59d6"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-whiskyland-under-its-consumer-brand.json",
+      "fixtureSha256": "b9105c7a9ac9cc847816ac6931a19aec094dde8500c7f71002cc9303e49a3c11"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-woodford-reserve-straight-malt-with-null-category.json",
+      "fixtureSha256": "bb686a870707cae7ec4947199bd5ceadba79925aac6bff3ad573b2b80f2dc9c4"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-resolves-black-label-family-under-johnnie-walker.json",
+      "fixtureSha256": "1790a1ad9957e48e201c75acb1ff7ed484a9efb29884fa7ad2094c6f14db860f"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/text-only-listing-creates-complete-elijah-craig-batch-c923-bottle.json",
+      "fixtureSha256": "f14583c03184fe98265cf627616a2d1c59399755cc4c5183b1a6742f20518d03"
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/text-only-smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally.json",
+      "fixtureSha256": "821e27d7d80991a9ddf8881cf01c0c9350c1982698ea34d4be4551afbd6c5949"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/1792-single-barrel.json",
+      "fixtureSha256": "bc6bdc07c9a266635561786178a7096b0493bac0e1b48af70e65fb69d3c27380"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/ardbeg-traigh-bhan-19-year-old.json",
+      "fixtureSha256": "486a477942bcedaa2d9368fce0a87a88ca7dbdb11a5f4153e00d6d87f7a461c9"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/elijah-craig-cask-strength.json",
+      "fixtureSha256": "29ba3fb4dd76f2772dc76174f97b3725168cb4d4bb9a2713126ef79ddfbb948a"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/four-roses-limited-edition-small-batch-2017.json",
+      "fixtureSha256": "c47f16a424283a61968dc9b132826bf461b944f291ce6a0bfbaab64b574aa6fd"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/four-roses-single-barrel-barrel-strength.json",
+      "fixtureSha256": "7a4a0691c5254e2cca1910cf0256eb3047292b53c404a9cab350243988366a3d"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/heavens-door-bootleg-vol-3.json",
+      "fixtureSha256": "b708378036c81f46b8f1e5459993d3154dadfc297c6f78168702d456132a0e33"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/highland-park-cask-strength-no-5.json",
+      "fixtureSha256": "ccbdf8efc820e58e0974f940ace4caeedf4132a24808f059b3c1ec31d43aa5ae"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/jura-12-brand-distillery.json",
+      "fixtureSha256": "2d5a1a92b1d672e6ee0bbeb7e05075173fd036b88c92e125793a0dc820961a88"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/lagavulin-distillers-edition-2023.json",
+      "fixtureSha256": "a7231e88a501e4b1c058e829865b323b2acc610be793e27f518e40e609017a8b"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/lagavulin-distillers-edition.json",
+      "fixtureSha256": "b526a0201f7bea7515aa8cbb1cfa48b390b883b49ab083b0ebe8f2dc1a483245"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/macallan-classic-cut-2021-edition.json",
+      "fixtureSha256": "f29aecd9a4bb1a6670086576823fa63eba8decc0bad4080ecca6bcc97fba894e"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/makers-mark-bourbon-brand-only.json",
+      "fixtureSha256": "f6de93deb183507b370dfd911adcaa0d26f611deb50d1ad5f715d4ef186104c4"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/octomore-13.1.json",
+      "fixtureSha256": "6b71357b562dfd074c83189ab0b8fd3babfc4d1f140e02df4d03c7f26a5c2b52"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/smws-72.123-big-moves-and-subtle-details.json",
+      "fixtureSha256": "d04dc45335d26fa95615400fba90538551000eb02b88c37c934b406cc43c132a"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/talisker-2001-the-distillers-edition.json",
+      "fixtureSha256": "fee75c20b78e34f9f0068e7857257ddc6d2a8d8cc48471b40bf12d6ae40b81cd"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/the-whistler-bodega-cask-single-malt-irish-whiskey.json",
+      "fixtureSha256": "784573db328225952839eb7a0af54f2fa8e26942d0f502b9dd2ebd2e71c64e55"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/watchpost-whiskey.json",
+      "fixtureSha256": "8f6be249adf78f3385bffe63b5589a5ad3ac4aebc6153882328047db9a0f138c"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/woodford-reserve-double-double-oaked.json",
+      "fixtureSha256": "b68f2724ecc54b540f40ad1724b6a3336204ee38a9615d6535ef7baf15f28dbd"
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/woodford-reserve-double-oaked.json",
+      "fixtureSha256": "44668c47e073c95d7d8fce5f2b7d9870d0130d808b3ade7c970e6054978d9c04"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/clean.json",
+      "fixtureSha256": "5429cf3ce8a829bc4c46422f02f29df5102cefbe81d590bd0c7fd79042fd7ccb"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/image-only-extraction-does-not-overwrite-populated-fields.json",
+      "fixtureSha256": "af13a4745ee857446d2ef3a198f18bfd2e6ed88a5c9f5229db2537e23b820621"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/independent-bottler-may-equal-brand.json",
+      "fixtureSha256": "71e39743b348454347d1483e46a0dd46eaad1a1a3d985b668935dacc05ed9b91"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/other-batch-abv-does-not-overwrite-exact-release.json",
+      "fixtureSha256": "31210284b2a2903e1e1008e96e8ddbce66c161c38bc94064d8747beecf7c7e42"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-dramfool-octomore-9.3-edition-wording.json",
+      "fixtureSha256": "f294adeb782ede4f72406031de8d10176c8d269838963ffe41fb3f7a2976519d"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-hibiki-21-missing-abv-not-bottler.json",
+      "fixtureSha256": "137c9cfa50bb761eb717714ffe502fa9feb878ee138592ea6dc5f028cc5b7292"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-laphroaig-cairdeas-2022-malformed-duplicate.json",
+      "fixtureSha256": "d524a46d7321b04edc29d4f19ad7177117624100a210ad54ec6ec1e6ed4cf450"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-pokeno-single-cask-missing-vintage.json",
+      "fixtureSha256": "8ebf170f4582efea7fddb69ea6f9df8bb029bc1313beec8e6527979adf8163a6"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-proof-and-wood-representative-retains-bottler-and-batch-abv.json",
+      "fixtureSha256": "6f6b4e3ed6daaf2164d8adc27af0d7d47e036ee01d6f294d99f55a7e42927e88"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-smws-10.258-code-already-in-name.json",
+      "fixtureSha256": "979b2568a4a77131c0b9249f6bad34d6aa8c84d73f87c51c6a0d48c565c8d31a"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/same-release-evidence-corrects-exact-abv.json",
+      "fixtureSha256": "e2ca56c9634a44b0fa8c3e34e2434bbd98404cb46f54abd98d16e0cba8a9f0fb"
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/single-label-and-producer-title-do-not-overwrite-edition.json",
+      "fixtureSha256": "815d65ba4a8e0ec4d2942830a7dbbbb4e7ef00b2a031439b980cffca54f96543"
+    }
+  ]
+}

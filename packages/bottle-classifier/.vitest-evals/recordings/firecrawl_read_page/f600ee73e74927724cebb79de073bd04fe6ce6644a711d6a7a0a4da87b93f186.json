@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-03T16:38:21.338Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+    "focus": "Confirm the marketed product name, Distillery Series relationship, edition or release year, and ABV for the 2023/2022 Double Double Oaked release."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product name, Distillery Series relationship, edition or release year, and ABV for the 2023/2022 Double Double Oaked release.",
+    "summary": "Versailles, Ky (January 18, 2023) — Woodford Reserve has released its highly-anticipated expression of Double Double Oaked Bourbon for 2023, part of an annual series that celebrates Master Distiller Chris Morris’ commitment to innovation and craftsmanship.\n\nThe product will be available at Woodford Reserve Distillery starting 10:00 AM EDT, Wednesday, January 18, 2023. Customers are limited to two 375ml bottles.\n\nDouble Double Oaked is presented at 90.4 proof with a suggested retail price of $59.99 for a 375ml bottle.",
+    "results": [
+      {
+        "title": "Woodford Reserve Double Double Oaked Returns as 2023 Winter Distillery Series - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+        "domain": "woodfordreserve.com",
+        "description": "Versailles, Ky (January 18, 2023) — Woodford Reserve has released its highly-anticipated expression of Double Double Oaked Bourbon for 2023, part of an annual series that celebrates Master Distiller Chris Morris’ commitment to innovation and craftsmanship.    The product will be available at Woodford Reserve Distillery starting 10:00 AM EDT, Wednesday, January 18, 2023. Customers […]",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f600ee73e74927724cebb79de073bd04fe6ce6644a711d6a7a0a4da87b93f186",
+    "mode": "auto"
+  }
+}

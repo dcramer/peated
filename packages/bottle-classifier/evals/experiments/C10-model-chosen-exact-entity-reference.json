@@ -1,0 +1,40 @@
+{
+  "item": "C10",
+  "decision": "accepted",
+  "classifierChanged": true,
+  "layer": "post_model_entity_finalization",
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "measurements": {
+    "savedExactEntityChoicesExamined": 20,
+    "unchangedCorrectChoices": 19,
+    "correctedEntityChoices": 1,
+    "fuzzyOrAmbiguousActivations": 0,
+    "savedAllJudgePassChange": 1,
+    "incorrectExistingBottleMatchChange": 0,
+    "modelRequestsAdded": 0,
+    "inputTokensAdded": 0,
+    "outputTokensAdded": 0,
+    "reasoningTokensAdded": 0,
+    "modelCostAddedUsd": 0,
+    "modelTimeAddedSeconds": 0,
+    "packageTestsPassed": 419,
+    "packageTestsTotal": 419,
+    "packageTestSeconds": 13.95,
+    "savedReplaySeconds": 0.52
+  },
+  "changedCases": [
+    {
+      "fixture": "image-backed-photo-creates-mars-komagatake-2022-edition",
+      "field": "proposedBottle.distillers[0]",
+      "before": {
+        "id": null,
+        "name": "Mars Shinshu Distillery"
+      },
+      "after": {
+        "id": 1953,
+        "name": "Komagatake"
+      }
+    }
+  ]
+}

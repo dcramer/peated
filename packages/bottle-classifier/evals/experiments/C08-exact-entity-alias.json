@@ -1,0 +1,70 @@
+{
+  "item": "C08",
+  "decision": "rejected",
+  "classifierTreatmentReverted": true,
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "fixedEvidenceFile": "evals/evidence/C01-entity-roles.json",
+  "repeatsPerVariant": 3,
+  "casesPerRepeat": 4,
+  "liveWebRequests": 0,
+  "comparison": {
+    "control": {
+      "passed": 8,
+      "cases": 12,
+      "incorrectExistingMatches": 0,
+      "runtimeFailures": 0,
+      "reportedUsageCases": 12,
+      "inputTokens": 204774,
+      "outputTokens": 17612,
+      "totalTokens": 222386,
+      "cachedInputTokens": 185318,
+      "cacheWriteTokens": 19354,
+      "reasoningTokens": 12404,
+      "requests": 34,
+      "toolCalls": 22,
+      "estimatedModelCostUsd": 0.02969966,
+      "fullyUncachedModelCostUsd": 0.0620892,
+      "timeMs": 185015.317874,
+      "medianTimeMs": 13716.613042,
+      "p95TimeMs": 37259.526125
+    },
+    "treatment": {
+      "passed": 10,
+      "cases": 12,
+      "incorrectExistingMatches": 0,
+      "runtimeFailures": 1,
+      "reportedUsageCases": 11,
+      "inputTokens": 165514,
+      "outputTokens": 14889,
+      "totalTokens": 180403,
+      "cachedInputTokens": 150624,
+      "cacheWriteTokens": 14806,
+      "reasoningTokens": 10206,
+      "requests": 28,
+      "toolCalls": 17,
+      "estimatedModelCostUsd": 0.02459758,
+      "fullyUncachedModelCostUsd": 0.0509696,
+      "timeMs": 899701.549334,
+      "medianTimeMs": 12019.642605,
+      "p95TimeMs": 768401.121083
+    },
+    "casePasses": {
+      "marsKomagatake": { "control": 0, "treatment": 2, "total": 3 },
+      "watchpost": { "control": 2, "treatment": 3, "total": 3 },
+      "whiskyland": { "control": 3, "treatment": 2, "total": 3 },
+      "smws": { "control": 3, "treatment": 3, "total": 3 }
+    },
+    "marsRawEntityChoices": {
+      "control": [238555, null, 238555],
+      "treatmentCompleted": [null, 1953]
+    },
+    "marsFinalEntityChoices": {
+      "control": [238555, null, 238555],
+      "treatmentCompleted": [1953, 1953]
+    }
+  },
+  "totalReportedModelCostUsd": 0.05429724,
+  "fullSuiteRun": false,
+  "reason": "The rule directly corrected one Mars choice, but one Mars treatment timed out and Whiskyland regressed, violating the registered acceptance rule."
+}

@@ -1,0 +1,109 @@
+{
+  "name": "C01 Entity-role reviewed source evidence",
+  "reviewedAt": "2026-09-03",
+  "notes": "The summaries are reviewed paraphrases of sources already verified by the fixture provenance. They are not raw replay output.",
+  "sources": [
+    "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+    "https://www.hombo.co.jp/en/2023/visiting/20231225-visiting-mars-komagatake-distillery/",
+    "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+    "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+    "https://smws.com/appley-ever-after/"
+  ],
+  "cases": {
+    "image-backed-photo-creates-mars-komagatake-2022-edition": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Mars Komagatake 2022 Edition producer evidence",
+            "summary": "Hombo identifies Single Malt Komagatake 2022 Edition as a 50% ABV annual release. Its distillery notice says Mars Shinshu Distillery was renamed Mars Komagatake Distillery effective March 1, 2024.",
+            "results": [
+              {
+                "title": "MARS Single Malt Komagatake 2022 Edition",
+                "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+                "domain": "hombo.co.jp",
+                "description": "Producer evidence for the product identity, edition, and strength.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Mars Komagatake Distillery rename notice",
+                "url": "https://www.hombo.co.jp/en/2023/visiting/20231225-visiting-mars-komagatake-distillery/",
+                "domain": "hombo.co.jp",
+                "description": "Producer evidence connecting the historical Shinshu and current Komagatake distillery names.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-creates-watchpost-whiskey": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Watchpost Whiskey producer evidence",
+            "summary": "The official product identifies Watchpost Whiskey as an American blended whiskey at 42.5% ABV. The eight-year statement describes a Westland component, not the complete blend.",
+            "results": [
+              {
+                "title": "Watchpost Whiskey",
+                "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+                "domain": "watchpostwhiskey.com",
+                "description": "Producer evidence for the Bottle name, category, strength, and component age distinction.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-creates-whiskyland-under-its-consumer-brand": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Whiskyland Chapter Twenty Nine source evidence",
+            "summary": "Decadent Drinks presents Whiskyland as a consumer brand and itself as the independent bottler. The exact Chapter Twenty Nine product is a 35-year-old Glenturret bottled at 41.5% ABV.",
+            "results": [
+              {
+                "title": "Whiskyland Twenty Nine Glenturret 35 Years Old",
+                "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+                "domain": "decadent-drinks.com",
+                "description": "Bottler evidence for the exact product and the Whiskyland Brand relationship.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed SMWS RW6.5 producer evidence",
+            "summary": "SMWS identifies RW6.5 as Appley ever after, a six-year-old single-cask rye whisky from Kyrö bottled at 56% ABV in 2024.",
+            "results": [
+              {
+                "title": "RW6.5 Appley ever after",
+                "url": "https://smws.com/appley-ever-after/",
+                "domain": "smws.com",
+                "description": "Producer evidence for the exact cask product and distillery.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    }
+  }
+}

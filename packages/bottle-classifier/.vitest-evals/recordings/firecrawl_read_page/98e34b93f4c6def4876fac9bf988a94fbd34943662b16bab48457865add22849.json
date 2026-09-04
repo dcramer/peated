@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-03T16:26:25.310Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+    "focus": "Verify the exact marketed product title, 2022 release wording, Double Double Oaked expression, 45.2% ABV, and Distillery Series relationship."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact marketed product title, 2022 release wording, Double Double Oaked expression, 45.2% ABV, and Distillery Series relationship.",
+    "summary": "2022 Woodford Reserve Distillery Series Double Double Oaked Bourbon\n\n2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey 375ml\n\nThe 2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey is the 90.4 proof (45.2% ABV), 375ml vintage released at the Versailles, Kentucky distillery at 10 a.m. on January 18, 2023 — the seventh Double Double Oaked release in the Distillery Series since 2015, and the final one credited to Master Distiller Chris Morris.\n\n“We are excited to once again offer one of our most-coveted annual bourbon releases,” Morris said. “This is the perfect winter bourbon with tasting notes of burnt marshmallows, cranberry and bittersweet chocolate.” Three weeks after the release, on February 6, 2023, Brown-Forman named Elizabeth McCall the brand's third Master Distiller, with Morris moving to Master Distiller Emeritus — making the 2022 vintage the closing chapter of the Morris era for this bottling.\n\nPer the official release, Double Double Oaked is made by finishing fully mature Woodford Reserve Double Oaked for an additional year in a second, heavily toasted, lightly charred, new oak barrel — two years in the second barrel in total, which turns Double Oaked's sweetness distinctly spicier. The 2023 winter release carried a two-bottle limit at the distillery, with limited quantities at select Kentucky retailers; the gift shop held no reserves and shipped nothing, keeping the January pilgrimage tradition intact. Per the series' convention, bottles carry the 2022 bottling year on the label. It was also the last vintage before the release began its march toward national availability, which arrived with the 700ml format two years later.\n\nFor collectors, this is a bookend bottle: the last Double Double Oaked of the Chris Morris era, from the annual series built, in the brand's words, on his commitment to innovation and craftsmanship.\n\nVersailles, Kentucky\n\nDistillery:\n\nWoodford Reserve Distillery (Brown-Forman)\n\nWhiskey Type:\n\nKentucky Straight Bourbon Whiskey\n\nMash Bill:\n\n72% corn, 18% rye, 10% malted barley\n\nWoodford Reserve Distillery Series — January 18, 2023 release (bottled 2022); seventh Double Double Oaked release; 2-bottle limit; select Kentucky retailers\n\nVintage:\n\n2022 (label year; released January 18, 2023)",
+    "results": [
+      {
+        "title": "2022 Woodford Reserve Double Double Oaked Bourbon 375ml - Cana Wine Company",
+        "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+        "domain": "canawineco.com",
+        "description": "2022 Woodford Reserve Distillery Series Double Double Oaked bourbon, 90.4 proof (45.2% ABV), 375ml, January 2023 release — the last credited to Chris Morris.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "98e34b93f4c6def4876fac9bf988a94fbd34943662b16bab48457865add22849",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "item": "M06",
+  "decision": "accepted_measurement_infrastructure",
+  "classifierChanged": false,
+  "productionImageExtractionChanged": false,
+  "smokeCheck": {
+    "fixtureId": "audit-image-only-extraction-does-not-overwrite-populated-fields",
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high",
+    "passed": false,
+    "scores": {
+      "aggregate": 0.6666666666666666,
+      "grounding": 1,
+      "operations": 1,
+      "findings": 0
+    },
+    "usage": {
+      "inputTokens": 23427,
+      "outputTokens": 2473,
+      "totalTokens": 25900,
+      "cachedInputTokens": 21674,
+      "cacheWriteTokens": 1744,
+      "reasoningTokens": 1961,
+      "requests": 3,
+      "toolCalls": 2,
+      "estimatedModelCostUsd": 0.00383888
+    },
+    "timeMs": 34738.499042,
+    "imageExtractionRequests": 0,
+    "proposedOperationCount": 0,
+    "findingCount": 2,
+    "failureReason": "Two cautionary findings were returned while the fixture expects none."
+  },
+  "deterministicVerification": {
+    "focusedTestsPassed": 82,
+    "packageTestsPassed": 402
+  }
+}

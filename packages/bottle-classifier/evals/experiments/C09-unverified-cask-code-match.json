@@ -1,0 +1,40 @@
+{
+  "item": "C09",
+  "decision": "accepted",
+  "classifierChanged": true,
+  "layer": "post_model_validation",
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "measurements": {
+    "recordedUnsafeMatchShapesDowngraded": 2,
+    "recordedUnsafeMatchShapesTotal": 2,
+    "savedWebRunIncorrectExistingMatchReduction": 2,
+    "savedRepeatedIncorrectExistingMatchReduction": 6,
+    "allJudgePassChange": 0,
+    "focusedTestsPassed": 46,
+    "focusedTestsTotal": 46,
+    "focusedTestSeconds": 0.46,
+    "packageTestsPassed": 414,
+    "packageTestsTotal": 414,
+    "packageTestSeconds": 10.66,
+    "runtimeFailures": 0,
+    "modelRequests": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "reasoningTokens": 0,
+    "modelCostUsd": 0
+  },
+  "fixtureScan": {
+    "uniqueCandidateCodePairs": 7,
+    "unexplainedPairs": 0
+  },
+  "initialFailedChecks": {
+    "count": 3,
+    "cause": "The first parser treated age wording as a cask code and stopped after a non-code use of Barrel.",
+    "retained": false
+  },
+  "preAcceptanceFixtureIssue": {
+    "cause": "The first fixture scan treated dotted product releases such as Elements 2.0 and Octomore 13.1 as cask codes.",
+    "retained": false
+  }
+}

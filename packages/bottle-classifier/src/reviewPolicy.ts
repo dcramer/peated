@@ -23,7 +23,9 @@ import type {
 import { BottleClassificationError } from "./error";
 import {
   candidateHasExactCaskCodeAnchor,
+  getCandidateMarketedCaskCodeAnchor,
   getExactCaskCodeAnchor,
+  getMarketedCaskCodeAnchor,
 } from "./exactCask";
 import { listMatchesExpectedValue } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
@@ -532,6 +534,53 @@ function rejectInvalidExistingMatch({
     });
   }
 
+  const candidateCaskCode = getCandidateMarketedCaskCodeAnchor(target);
+  const allowSourceProgramCode = candidateCaskCode?.includes(".") === true;
+  const sourceCaskCodes = [
+    getMarketedCaskCodeAnchor(reference.name, {
+      allowProgramCode: allowSourceProgramCode,
+    }),
+    getMarketedCaskCodeAnchor(artifacts.extractedIdentity?.cask_number, {
+      allowBareCode: true,
+    }),
+    getMarketedCaskCodeAnchor(artifacts.extractedIdentity?.edition, {
+      allowProgramCode: allowSourceProgramCode,
+    }),
+    getMarketedCaskCodeAnchor(artifacts.extractedIdentity?.expression, {
+      allowProgramCode: allowSourceProgramCode,
+    }),
+    getMarketedCaskCodeAnchor(decision.observation?.caskNumber, {
+      allowBareCode: true,
+    }),
+    getMarketedCaskCodeAnchor(decision.observation?.barrelNumber, {
+      allowBareCode: true,
+    }),
+    getMarketedCaskCodeAnchor(
+      artifacts.imageEvidence?.fieldCandidates.caskNumber?.value,
+      { allowBareCode: true },
+    ),
+    ...(artifacts.imageEvidence?.extractors.flatMap((extractor) =>
+      extractor.textSpans.map((span) =>
+        getMarketedCaskCodeAnchor(span.text, {
+          allowProgramCode: allowSourceProgramCode,
+        }),
+      ),
+    ) ?? []),
+  ].filter((code): code is string => code !== null);
+
+  if (candidateCaskCode && !sourceCaskCodes.includes(candidateCaskCode)) {
+    return createNoMatchDecision({
+      decision,
+      candidateBottleIds: decision.candidateBottleIds,
+      observation: decision.observation,
+      identityScope: decision.identityScope,
+      rationale: appendRationale(
+        decision.rationale,
+        `Server downgraded the existing-match recommendation because candidate cask code ${candidateCaskCode} was not established by the source.`,
+      ),
+    });
+  }
+
   const identityConflicts = getExistingMatchIdentityConflicts({
     referenceName: reference.name,
     targetCandidate: target,
@@ -583,11 +632,48 @@ interface ResolvedEntityChoice {
   name: string;
 }
 
+function getExactResolvedEntityChoice(
+  choice: ResolvedEntityChoice,
+  resolvedEntities: Map<number, EntityResolution>,
+): EntityResolution | null {
+  const normalizedChoiceName = normalizeEntityChoiceName(choice.name);
+  const exactMatches = Array.from(resolvedEntities.values()).filter(
+    (entity) => {
+      const wasRetrievedExactlyForChoice = entity.retrievedFor?.some(
+        ({ query, exact }) =>
+          exact === true &&
+          normalizeEntityChoiceName(query) === normalizedChoiceName,
+      );
+      if (!wasRetrievedExactlyForChoice) {
+        return false;
+      }
+
+      return [entity.name, entity.shortName, entity.reference]
+        .filter((name): name is string => Boolean(name))
+        .map(normalizeEntityChoiceName)
+        .includes(normalizedChoiceName);
+    },
+  );
+
+  return exactMatches.length === 1 ? exactMatches[0]! : null;
+}
+
 function sanitizeResolvedEntityChoice(
   choice: ResolvedEntityChoice,
   _expectedRole: "brand" | "distiller" | "bottler",
   resolvedEntities: Map<number, EntityResolution>,
 ): ResolvedEntityChoice {
+  const exactResolvedEntity = getExactResolvedEntityChoice(
+    choice,
+    resolvedEntities,
+  );
+  if (exactResolvedEntity) {
+    return {
+      id: exactResolvedEntity.entityId,
+      name: exactResolvedEntity.name,
+    };
+  }
+
   if (choice.id === null) {
     return choice;
   }
