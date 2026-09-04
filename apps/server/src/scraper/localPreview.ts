@@ -9,7 +9,6 @@ import {
   parseScrapeRules,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
-import { findScraperSourceBySiteKey } from "./definitions";
 import { scraperSystemClock, type ScraperHttpClock } from "./http";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
@@ -58,17 +57,9 @@ export async function runLocalScrapeSourcePreview(
     .where(eq(externalSites.type, parsed.site));
   if (!site) throw new Error(`External site ${parsed.site} was not found.`);
 
-  const registeredSource = findScraperSourceBySiteKey(
-    scraperRegistry,
-    parsed.site,
-  );
-  if (!registeredSource) {
-    throw new Error(`External site ${parsed.site} has no code-owned scraper.`);
-  }
-  if (registeredSource.targetKeys.length !== 1) {
-    throw new Error(
-      `External site ${parsed.site} does not use one scrape target.`,
-    );
+  const target = scraperRegistry.targets.get(parsed.site);
+  if (!target) {
+    throw new Error(`External site ${parsed.site} has no scrape target.`);
   }
   const [activeRun] = await db
     .select({ id: externalSiteRuns.id })
@@ -87,7 +78,7 @@ export async function runLocalScrapeSourcePreview(
   let preview: ScrapeSourcePreviewResult | null = null;
   const previewSource = createLocalScrapeSourcePreview({
     siteKey: parsed.site,
-    targetKey: registeredSource.targetKeys[0],
+    targetKey: target.key,
     listUrl: parsed.listUrl,
     rules,
     recordPreview: async ({ result }) => {
