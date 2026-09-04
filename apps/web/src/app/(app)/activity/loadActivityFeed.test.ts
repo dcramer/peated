@@ -9,9 +9,6 @@ import { getActivityFeedSelection, loadActivityFeed } from "./loadActivityFeed";
 type Options = Parameters<typeof loadActivityFeed>[0];
 const publicClient = {
   activity: { list: vi.fn<Options["publicClient"]["activity"]["list"]>() },
-  externalReviews: {
-    list: vi.fn<Options["publicClient"]["externalReviews"]["list"]>(),
-  },
 };
 const memberClient = {
   friends: {
@@ -22,6 +19,13 @@ const memberClient = {
   },
 };
 const rel = { nextCursor: null, prevCursor: null };
+const criticActivity = {
+  id: `critic_review:${mockExternalReview.id}`,
+  type: "critic_review" as const,
+  priority: "primary" as const,
+  createdAt: mockExternalReview.article.publishedAt!,
+  review: mockExternalReview,
+};
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -31,11 +35,7 @@ beforeEach(() => {
   });
   memberClient.activity.list.mockResolvedValue({ results: [], rel });
   publicClient.activity.list.mockResolvedValue({
-    results: [mockActivity[0]],
-    rel,
-  });
-  publicClient.externalReviews.list.mockResolvedValue({
-    results: [mockExternalReview],
+    results: [mockActivity[0], criticActivity],
     rel,
   });
 });
@@ -59,13 +59,13 @@ test("keeps Following empty when followed people have no activity", async () => 
     limit: 1,
   });
   expect(memberClient.activity.list).toHaveBeenCalledWith({
+    cursor: undefined,
     filter: "friends",
     limit: 20,
   });
   expect(feed.items).toEqual([]);
   expect(feed.note).toBeUndefined();
   expect(publicClient.activity.list).not.toHaveBeenCalled();
-  expect(publicClient.externalReviews.list).not.toHaveBeenCalled();
 });
 
 test("falls back to Everyone only when there are no accepted follows", async () => {
@@ -81,7 +81,11 @@ test("falls back to Everyone only when there are no accepted follows", async () 
   );
   expect(feed.items).toHaveLength(2);
   expect(memberClient.activity.list).not.toHaveBeenCalled();
-  expect(publicClient.externalReviews.list).toHaveBeenCalled();
+  expect(publicClient.activity.list).toHaveBeenCalledWith({
+    cursor: undefined,
+    includeCriticReviews: true,
+    limit: 20,
+  });
 });
 
 test("does not hide a failed follow lookup by showing Everyone", async () => {
@@ -104,6 +108,29 @@ test("uses public activity for Everyone even when signed in", async () => {
   expect(feed.items).toHaveLength(2);
   expect(memberClient.friends.list).not.toHaveBeenCalled();
   expect(memberClient.activity.list).not.toHaveBeenCalled();
+});
+
+test("loads the requested activity page and returns its links", async () => {
+  publicClient.activity.list.mockResolvedValue({
+    results: [],
+    rel: { nextCursor: "3:1780833600000", prevCursor: "1:1780833600000" },
+  });
+
+  const feed = await loadActivityFeed({
+    cursor: "2:1780833600000",
+    following: false,
+    publicClient,
+  });
+
+  expect(publicClient.activity.list).toHaveBeenCalledWith({
+    cursor: "2:1780833600000",
+    includeCriticReviews: true,
+    limit: 20,
+  });
+  expect(feed.rel).toEqual({
+    nextCursor: "3:1780833600000",
+    prevCursor: "1:1780833600000",
+  });
 });
 
 test("anonymous Following uses public activity and explains sign-in", async () => {

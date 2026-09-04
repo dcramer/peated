@@ -80,6 +80,8 @@ export default implement(activityListContract).handler(async function ({
     filter: input.filter,
     currentUserId: context.user?.id,
   });
+  const includeCriticReviews =
+    input.includeCriticReviews && input.filter !== "friends";
   const activityCursor = input.cursor
     ? parseActivityCursor(input.cursor)!
     : { page: 1, snapshotAt: new Date() };
@@ -88,6 +90,7 @@ export default implement(activityListContract).handler(async function ({
 
   const [totalPrimary, secondaryCountResult] = await Promise.all([
     countPrimaryActivity({
+      includeCriticReviews,
       userCondition,
       snapshotAt: activityCursor.snapshotAt,
     }),
@@ -116,6 +119,7 @@ export default implement(activityListContract).handler(async function ({
 
   const [primaryRows, collectionGroupRows] = await Promise.all([
     getPrimaryActivity({
+      includeCriticReviews,
       userCondition,
       snapshotAt: activityCursor.snapshotAt,
       limit: sourceWindow.primaryLimit,

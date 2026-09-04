@@ -9,13 +9,19 @@ export default contract
     path: "/activity",
     summary: "List activity",
     description:
-      "Get recent tastings, member reviews, and grouped collection additions",
+      "Get recent tastings, reviews, and grouped collection additions",
     operationId: "listActivity",
   })
   .input(
     z
       .object({
         filter: z.enum(["global", "friends", "local"]).default("global"),
+        includeCriticReviews: z.coerce
+          .boolean()
+          .default(false)
+          .describe(
+            "Include published critic reviews in global and local activity",
+          ),
         cursor: z
           .string()
           .max(64)
@@ -25,6 +31,10 @@ export default contract
           .optional(),
         limit: z.coerce.number().gte(1).lte(100).default(10),
       })
-      .default({ filter: "global", limit: 10 }),
+      .default({
+        filter: "global",
+        includeCriticReviews: false,
+        limit: 10,
+      }),
   )
   .output(ActivityListResponseSchema);

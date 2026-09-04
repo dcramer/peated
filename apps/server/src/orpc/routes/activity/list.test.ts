@@ -1,8 +1,12 @@
 import { db } from "@peated/server/db";
-import { collectionBottles, memberReviews } from "@peated/server/db/schema";
+import {
+  collectionBottles,
+  externalReviewArticles,
+  memberReviews,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 async function insertCollectionBottles(
@@ -441,22 +445,30 @@ test("member reviews respect public and accepted-follow visibility", async ({
     })),
   );
   const publicFeed = await routerClient.activity.list({ filter: "global" });
-  expect(publicFeed.results.map((item) => item.createdBy.id)).toEqual([
-    publicUser.id,
-  ]);
+  expect(
+    publicFeed.results.flatMap((item) =>
+      item.type === "critic_review" ? [] : [item.createdBy.id],
+    ),
+  ).toEqual([publicUser.id]);
   const friendFeed = await routerClient.activity.list(
     { filter: "friends" },
     { context: { user: defaults.user } },
   );
-  expect(friendFeed.results.map((item) => item.createdBy.id)).toEqual([
-    friend.id,
-  ]);
+  expect(
+    friendFeed.results.flatMap((item) =>
+      item.type === "critic_review" ? [] : [item.createdBy.id],
+    ),
+  ).toEqual([friend.id]);
   const signedIn = await routerClient.activity.list(
     { filter: "global" },
     { context: { user: defaults.user } },
   );
   expect(
-    signedIn.results.map((item) => item.createdBy.id).sort((a, b) => a - b),
+    signedIn.results
+      .flatMap((item) =>
+        item.type === "critic_review" ? [] : [item.createdBy.id],
+      )
+      .sort((a, b) => a - b),
   ).toEqual([friend.id, publicUser.id].sort((a, b) => a - b));
   const profile = await routerClient.users.activity.list(
     { user: friend.username },
@@ -522,4 +534,81 @@ test("pages member reviews and tasting sessions together without duplicates", as
     cursor: second.rel.prevCursor!,
   });
   expect(previous.results).toEqual(first.results);
+});
+
+test("paginates critic reviews in the global activity stream", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+  const user = await fixtures.User();
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ApprovedExternalReviewPublication({
+    externalSiteId: site.id,
+  });
+  const review = await fixtures.ExternalReview({
+    bottleId: bottle.id,
+    createdAt: new Date("2026-01-03T14:00:00Z"),
+    externalSiteId: site.id,
+    url: "https://example.com/activity-review",
+  });
+  await db
+    .update(externalReviewArticles)
+    .set({
+      contentHash: "activity-review-content",
+      publishedAt: new Date("2026-01-03T14:00:00Z"),
+    })
+    .where(eq(externalReviewArticles.id, review.articleId!));
+  const tasting = await fixtures.Tasting({
+    createdById: user.id,
+    createdAt: new Date("2026-01-03T13:00:00Z"),
+  });
+
+  const first = await routerClient.activity.list({
+    includeCriticReviews: true,
+    limit: 1,
+  });
+  expect(first.results).toMatchObject([
+    {
+      id: `critic_review:${review.id}`,
+      type: "critic_review",
+      createdAt: "2026-01-03T14:00:00.000Z",
+      review: {
+        id: review.id,
+        url: "https://example.com/activity-review",
+        bottle: { id: bottle.id },
+      },
+    },
+  ]);
+
+  const laterImport = await fixtures.ExternalReview({
+    bottleId: bottle.id,
+    createdAt: new Date("2099-01-01T00:00:00Z"),
+    externalSiteId: site.id,
+    url: "https://example.com/later-import",
+  });
+  await db
+    .update(externalReviewArticles)
+    .set({
+      contentHash: "later-import-content",
+      publishedAt: new Date("2026-01-03T15:00:00Z"),
+    })
+    .where(eq(externalReviewArticles.id, laterImport.articleId!));
+
+  const second = await routerClient.activity.list({
+    cursor: first.rel.nextCursor!,
+    includeCriticReviews: true,
+    limit: 1,
+  });
+  expect(second.results).toMatchObject([
+    {
+      type: "tasting_session",
+      tastings: [{ id: tasting.id }],
+    },
+  ]);
+  expect(second.rel.prevCursor).not.toBeNull();
+
+  const memberOnly = await routerClient.activity.list({ limit: 10 });
+  expect(memberOnly.results.map((entry) => entry.type)).toEqual([
+    "tasting_session",
+  ]);
 });

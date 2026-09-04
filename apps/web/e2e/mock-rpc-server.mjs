@@ -207,10 +207,21 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     case "activity/list":
-      sendRpcResponse(
-        response,
-        buildCommunityActivity({ following: input?.filter === "friends" }),
-      );
+      {
+        const activity = buildCommunityActivity({
+          following: input?.filter === "friends",
+          includeCriticReviews: input?.includeCriticReviews === true,
+        });
+        sendRpcResponse(response, {
+          ...activity,
+          rel: {
+            nextCursor:
+              input?.cursor === "2:1780833600000" ? null : "2:1780833600000",
+            prevCursor:
+              input?.cursor === "2:1780833600000" ? "1:1780833600000" : null,
+          },
+        });
+      }
       return true;
     case "users/activity/list":
       sendRpcResponse(

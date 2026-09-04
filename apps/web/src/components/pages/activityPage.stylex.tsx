@@ -13,12 +13,14 @@ import { RailListSection } from "./railListSection.stylex";
 export function ActivityPage({
   items,
   note,
+  pagination,
   selector,
   libraryBottles = [],
   libraryHref,
 }: {
   items: readonly CommunityFeedItem[];
   note?: string;
+  pagination?: ReactNode;
   libraryBottles?: readonly BottleListItem[];
   libraryHref?: string;
   selector: ReactNode;
@@ -74,6 +76,7 @@ export function ActivityPage({
             Tastings, reviews, and library additions will appear here.
           </EmptyState>
         )}
+        {pagination}
       </PageColumns>
     </div>
   );

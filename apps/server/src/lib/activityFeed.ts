@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import type {
   Bottle,
   Collection,
+  ExternalReview,
   MemberReview,
   Tasting,
   User,
@@ -9,15 +10,20 @@ import type {
 import {
   bottles,
   collectionBottles,
+  externalReviewArticles,
+  externalReviewPublications,
+  externalReviews,
   memberReviews,
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
+import { ExternalReviewSerializer } from "@peated/server/serializers/externalReview";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { UserSerializer } from "@peated/server/serializers/user";
@@ -233,14 +239,30 @@ function markedTastingsSql({
   `;
 }
 
-/** Counts tasting sessions and member reviews inside one activity snapshot. */
+/** Counts primary feed entries inside one activity snapshot. */
 export async function countPrimaryActivity({
+  includeCriticReviews = false,
   userCondition,
   snapshotAt,
 }: {
+  includeCriticReviews?: boolean;
   userCondition: SQL<unknown>;
   snapshotAt: Date;
 }) {
+  const criticReviewCount = includeCriticReviews
+    ? sql` + (
+        SELECT COUNT(*) FROM ${externalReviews}
+        INNER JOIN ${externalReviewArticles}
+          ON ${externalReviewArticles.id} = ${externalReviews.articleId}
+        LEFT JOIN ${externalReviewPublications}
+          ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
+        WHERE ${visibleExternalReviewWhere()}
+          AND ${externalReviews.bottleId} IS NOT NULL
+          AND ${externalReviews.createdAt} <= ${snapshotAt}
+          AND ${externalReviewArticles.publishedAt} IS NOT NULL
+          AND ${externalReviewArticles.publishedAt} <= ${snapshotAt}
+      )`
+    : sql``;
   const result = await db.execute<{ count: string }>(sql`
     SELECT (
       SELECT COALESCE(SUM(marked_tastings.is_session_start), 0)
@@ -249,15 +271,15 @@ export async function countPrimaryActivity({
       SELECT COUNT(*) FROM ${memberReviews}
       INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
       WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
-    ) AS count
+    ) ${criticReviewCount} AS count
   `);
   return Number(result.rows[0]?.count ?? 0);
 }
 
 type PrimaryActivityRow = {
-  type: "tasting_session" | "member_review";
+  type: "tasting_session" | "member_review" | "critic_review";
   id: string;
-  created_by_id: string;
+  created_by_id: string | null;
   started_at: Date | string;
   last_activity_at: Date | string;
   tasting_ids: (number | string)[];
@@ -265,15 +287,18 @@ type PrimaryActivityRow = {
 
 type PrimaryActivity =
   | (TastingSessionGroup & { type: "tasting_session" })
-  | { type: "member_review"; review: MemberReview; bottle: Bottle };
+  | { type: "member_review"; review: MemberReview; bottle: Bottle }
+  | { type: "critic_review"; review: ExternalReview };
 
-/** Pages sessions and member reviews together, without splitting a session. */
+/** Pages primary feed entries together, without splitting a tasting session. */
 export async function getPrimaryActivity({
+  includeCriticReviews = false,
   userCondition,
   snapshotAt,
   offset,
   limit,
 }: {
+  includeCriticReviews?: boolean;
   userCondition: SQL<unknown>;
   snapshotAt: Date;
   offset: number;
@@ -327,6 +352,28 @@ export async function getPrimaryActivity({
           FROM ${memberReviews}
           INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
           WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+          ${
+            includeCriticReviews
+              ? sql`
+                UNION ALL
+                SELECT 'critic_review' AS type, ${externalReviews.id} AS id,
+                  NULL::bigint AS created_by_id,
+                  ${externalReviewArticles.publishedAt} AS started_at,
+                  ${externalReviewArticles.publishedAt} AS last_activity_at,
+                  ARRAY[]::bigint[] AS tasting_ids
+                FROM ${externalReviews}
+                INNER JOIN ${externalReviewArticles}
+                  ON ${externalReviewArticles.id} = ${externalReviews.articleId}
+                LEFT JOIN ${externalReviewPublications}
+                  ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
+                WHERE ${visibleExternalReviewWhere()}
+                  AND ${externalReviews.bottleId} IS NOT NULL
+                  AND ${externalReviews.createdAt} <= ${snapshotAt}
+                  AND ${externalReviewArticles.publishedAt} IS NOT NULL
+                  AND ${externalReviewArticles.publishedAt} <= ${snapshotAt}
+              `
+              : sql``
+          }
         ) primary_activity
         ORDER BY last_activity_at DESC, id DESC, type
         OFFSET ${offset}
@@ -360,7 +407,29 @@ export async function getPrimaryActivity({
         reviewRows.map((row) => [row.review.id, row]),
       );
 
+      const criticReviewIds = result.rows
+        .filter((row) => row.type === "critic_review")
+        .map((row) => Number(row.id));
+      const criticReviewRows = criticReviewIds.length
+        ? await tx
+            .select()
+            .from(externalReviews)
+            .where(inArray(externalReviews.id, criticReviewIds))
+        : [];
+      const criticReviewsById = new Map(
+        criticReviewRows.map((review) => [review.id, review]),
+      );
+
       return result.rows.map((row): PrimaryActivity => {
+        if (row.type === "critic_review") {
+          const review = criticReviewsById.get(Number(row.id));
+          if (!review) {
+            throw new Error(
+              `Activity references missing external review ${row.id}.`,
+            );
+          }
+          return { type: "critic_review", review };
+        }
         if (row.type === "member_review") {
           const review = reviewsById.get(Number(row.id));
           if (!review)
@@ -372,7 +441,7 @@ export async function getPrimaryActivity({
         return {
           type: "tasting_session",
           id: Number(row.id),
-          createdById: Number(row.created_by_id),
+          createdById: Number(row.created_by_id!),
           startedAt: coerceActivityDate(row.started_at),
           lastActivityAt: coerceActivityDate(row.last_activity_at),
           tastings: row.tasting_ids.map((id) => {
@@ -435,29 +504,39 @@ async function serializeTastingSessionEntries(
   });
 }
 
-/** Serializes both primary sources with the same bottle and member contracts. */
+/** Serializes primary feed sources with their public API contracts. */
 export async function serializePrimaryActivityEntries(
   items: PrimaryActivity[],
   currentUser?: User | null,
 ): Promise<ActivityEntry[]> {
   const sessions = items.filter((item) => item.type === "tasting_session");
   const reviews = items.filter((item) => item.type === "member_review");
-  const [sessionEntries, serializedReviews, serializedBottles] =
-    await Promise.all([
-      serializeTastingSessionEntries(sessions, currentUser),
-      serialize(
-        MemberReviewSerializer,
-        reviews.map((item) => item.review),
-        currentUser,
-      ),
-      serialize(
-        BottleSerializer,
-        reviews.map((item) => item.bottle),
-        currentUser,
-        [],
-        { includeGroupSummary: true },
-      ),
-    ]);
+  const criticReviews = items.filter((item) => item.type === "critic_review");
+  const [
+    sessionEntries,
+    serializedReviews,
+    serializedBottles,
+    serializedCriticReviews,
+  ] = await Promise.all([
+    serializeTastingSessionEntries(sessions, currentUser),
+    serialize(
+      MemberReviewSerializer,
+      reviews.map((item) => item.review),
+      currentUser,
+    ),
+    serialize(
+      BottleSerializer,
+      reviews.map((item) => item.bottle),
+      currentUser,
+      [],
+      { includeGroupSummary: true },
+    ),
+    serialize(
+      ExternalReviewSerializer,
+      criticReviews.map((item) => item.review),
+      currentUser,
+    ),
+  ]);
   const entries = new Map(sessionEntries.map((entry) => [entry.id, entry]));
   reviews.forEach((item, index) => {
     const review = serializedReviews[index]!;
@@ -471,12 +550,25 @@ export async function serializePrimaryActivityEntries(
       review: { ...review, bottle: serializedBottles[index]! },
     });
   });
+  criticReviews.forEach((item, index) => {
+    const review = serializedCriticReviews[index]!;
+    const id = `critic_review:${review.id}`;
+    entries.set(id, {
+      id,
+      type: "critic_review",
+      priority: "primary",
+      createdAt: review.article.publishedAt!,
+      review,
+    });
+  });
   return items.map(
     (item) =>
       entries.get(
         item.type === "member_review"
           ? `member_review:${item.review.id}`
-          : `tasting_session:${item.createdById}:${item.id}`,
+          : item.type === "critic_review"
+            ? `critic_review:${item.review.id}`
+            : `tasting_session:${item.createdById}:${item.id}`,
       )!,
   );
 }
