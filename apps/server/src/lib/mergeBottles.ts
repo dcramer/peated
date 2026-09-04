@@ -12,7 +12,6 @@ import {
   bottleObservations,
   bottleReferences,
   bottles,
-  bottleSeries,
   bottlesToDistillers,
   bottleTags,
   bottleTombstones,
@@ -30,6 +29,10 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { moveBottleAliasesForMergeInTransaction } from "@peated/server/lib/bottleAliases";
+import {
+  getBottleSeriesMemberships,
+  updateBottleSeriesReleaseCounts,
+} from "@peated/server/lib/bottleSeriesReleaseCounts";
 import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
@@ -776,6 +779,10 @@ export async function mergeBottlesInTransaction(
     tx,
     requestedBottleIds,
   );
+  const seriesMembershipsBefore = await getBottleSeriesMemberships(
+    tx,
+    requestedBottleIds,
+  );
   const crossGroup = sourceGroupId !== destinationGroupId;
   const survivingSourceMembers = sourceMembers.filter(
     ({ id }) => id !== sourceBottleId,
@@ -958,6 +965,15 @@ export async function mergeBottlesInTransaction(
     requestedBottleIds,
   );
   await updateLocationBottleCounts(tx, locationsBefore, locationsAfter);
+  const seriesMembershipsAfter = await getBottleSeriesMemberships(
+    tx,
+    requestedBottleIds,
+  );
+  await updateBottleSeriesReleaseCounts(
+    tx,
+    seriesMembershipsBefore,
+    seriesMembershipsAfter,
+  );
 
   if (crossGroup && sourceSingleton) {
     await tx
@@ -980,15 +996,6 @@ export async function mergeBottlesInTransaction(
     source.seriesId,
     destination.seriesId,
   ]);
-  for (const seriesId of affectedSeriesIds) {
-    await tx
-      .update(bottleSeries)
-      .set({
-        numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${seriesId})`,
-      })
-      .where(eq(bottleSeries.id, seriesId));
-  }
-
   const auditData = {
     updateScope: "exact_merge",
     sourceBottleId,

@@ -67,7 +67,6 @@ export async function processSeries({
       description: seriesDraft.description,
       fullName,
       brandId: brand.id,
-      numReleases: 1,
       createdByActorId: actorId,
     })
     .returning();

@@ -47,6 +47,10 @@ import {
   type BottlePatch,
   type SystemBottlePatch,
 } from "@peated/server/lib/bottleSchemas";
+import {
+  getBottleSeriesMemberships,
+  updateBottleSeriesReleaseCounts,
+} from "@peated/server/lib/bottleSeriesReleaseCounts";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import {
@@ -1385,6 +1389,15 @@ export async function updateBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
+  const memberSeriesChanged =
+    sharedChanged &&
+    affectedMembers.some(
+      (member) =>
+        member.seriesId !== desiredByBottleId.get(member.id)!.seriesId,
+    );
+  const seriesMembershipsBefore = memberSeriesChanged
+    ? await getBottleSeriesMemberships(tx, affectedIds)
+    : [];
   const bottleEntityLinksChanged = affectedMembers.some((member) => {
     const desired = desiredByBottleId.get(member.id)!;
     return (
@@ -1623,12 +1636,17 @@ export async function updateBottleInTransaction(
       );
   }
 
-  const memberSeriesChanged =
-    sharedChanged &&
-    affectedMembers.some(
-      (member) =>
-        member.seriesId !== desiredByBottleId.get(member.id)!.seriesId,
+  if (memberSeriesChanged) {
+    const seriesMembershipsAfter = await getBottleSeriesMemberships(
+      tx,
+      affectedIds,
     );
+    await updateBottleSeriesReleaseCounts(
+      tx,
+      seriesMembershipsBefore,
+      seriesMembershipsAfter,
+    );
+  }
   const seriesOwnershipChanged =
     sharedChanged &&
     group.brandId !== stable.brandId &&
@@ -1647,15 +1665,6 @@ export async function updateBottleInTransaction(
           ),
         ).sort((left, right) => left - right)
       : [];
-  for (const seriesId of affectedSeriesIds) {
-    await tx
-      .update(bottleSeries)
-      .set({
-        numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${seriesId})`,
-      })
-      .where(eq(bottleSeries.id, seriesId));
-  }
-
   if (bottleEntityLinksChanged) {
     const entityLinksAfter = await getBottleEntityLinks(tx, affectedIds);
     await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);

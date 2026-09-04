@@ -688,19 +688,12 @@ async function performEntityMerge({
         await tx
           .delete(bottleSeries)
           .where(eq(bottleSeries.id, sourceSeries.id));
-        await tx
-          .update(bottleSeries)
-          .set({
-            numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${targetSeries.id})`,
-          })
-          .where(eq(bottleSeries.id, targetSeries.id));
       } else {
         await tx
           .update(bottleSeries)
           .set({
             brandId: toEntity.id,
             fullName: targetFullName,
-            numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${sourceSeries.id})`,
           })
           .where(eq(bottleSeries.id, sourceSeries.id));
       }

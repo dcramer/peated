@@ -123,11 +123,11 @@ describe("DELETE /bottles/:bottle", () => {
     ).toMatchObject({ bottleId: bottle.id, newBottleId: null });
   });
 
-  test("selects a remaining representative and recomputes group and series counts", async ({
+  test("selects a remaining representative and repairs group and series counts", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
-    const series = await fixtures.BottleSeries({ numReleases: 2 });
+    const series = await fixtures.BottleSeries({ numReleases: 0 });
     const representative = await fixtures.Bottle({
       name: "Grouped Representative",
       brandId: series.brandId,

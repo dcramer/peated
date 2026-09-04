@@ -795,6 +795,10 @@ describe("Bottle updates", () => {
       },
       exacts: [{ edition: "One" }, { edition: "Two" }],
     });
+    await db
+      .update(bottleSeries)
+      .set({ numReleases: members.length })
+      .where(eq(bottleSeries.id, oldSeries.id));
 
     const result = await updateBottle({
       bottleId: first.bottle.id,
@@ -2134,6 +2138,17 @@ describe("Bottle updates", () => {
         { seriesId },
       );
     }
+
+    await updateBottle({
+      bottleId: members[0].bottle.id,
+      input: { series: null },
+      context: contextFor(mod),
+    });
+    await expect(
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, newSeries.id),
+      }),
+    ).resolves.toMatchObject({ numReleases: 0 });
   });
 
   test("dispatches unique payloads after commit and queue failure does not undo the save", async ({
