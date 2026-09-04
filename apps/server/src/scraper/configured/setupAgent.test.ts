@@ -59,7 +59,11 @@ function reviewCandidate(
           attribute: "datetime",
           urlDateFormat: null,
         },
-        reviewItem: "article.review",
+        reviewItem: {
+          selector: "article.review",
+          includeFollowingSiblings: false,
+          endBefore: null,
+        },
         name: suggestedValue(nameSelector, null, {
           removeSuffixes: ["Review"],
         }),
@@ -303,6 +307,53 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
     },
   });
   expect(checkRules).toHaveBeenCalledOnce();
+});
+
+test("turns review headings into bounded sibling sections", async () => {
+  const base = reviewCandidate("h2");
+  const candidate = {
+    ...base,
+    rules: {
+      ...base.rules,
+      detail: {
+        ...base.rules.detail,
+        reviewItem: {
+          selector: ".entry-content > h2.review",
+          includeFollowingSiblings: true,
+          endBefore: ".entry-content > .related-posts",
+        },
+      },
+    },
+  };
+
+  const result = await runScrapeSourceSetupAgent({
+    conversationId: "scrape_source:1",
+    externalSiteRunId: 10,
+    kind: "review",
+    scrapeSourceId: 1,
+    listPages: [
+      {
+        url: "https://example.test/reviews",
+        html: '<a class="review" href="/reviews/one">Review</a>',
+      },
+    ],
+    detailPages: [],
+    request: vi.fn().mockResolvedValue(toolCallResponse("sections", candidate)),
+    checkRules: vi.fn(async () => ({
+      status: "passed" as const,
+      checked: "parsed sections",
+    })),
+  });
+
+  expect(result.rules).toMatchObject({
+    kind: "review",
+    detail: {
+      reviewItem: {
+        start: ".entry-content > h2.review",
+        endBefore: ".entry-content > .related-posts",
+      },
+    },
+  });
 });
 
 test("stops after the rule-check limit", async () => {

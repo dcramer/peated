@@ -7,6 +7,7 @@ import {
   ScrapeRulesSchema,
   ScrapeRulesV1Schema,
   ScrapeRulesV2Schema,
+  ScrapeRulesV3Schema,
   ScrapeValueSchema,
 } from "./rules";
 
@@ -38,8 +39,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesSchema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(4, rules)).toThrow(
-    "Unsupported scrape rules version: 4.",
+  expect(() => parseScrapeRules(5, rules)).toThrow(
+    "Unsupported scrape rules version: 5.",
   );
 });
 
@@ -52,7 +53,7 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(3);
+  expect(SCRAPE_RULES_VERSION).toBe(4);
 });
 
 test("loads version 2 rules only through their original contract", () => {
@@ -94,7 +95,45 @@ test("accepts bounded canonical URLs, URL dates, and score maps", () => {
     },
   });
 
+  expect(parseScrapeRules(4, rules)).toEqual(rules);
+});
+
+test("loads version 3 rules only through their original contract", () => {
+  const rules = ScrapeRulesV3Schema.parse(reviewConfig(25));
   expect(parseScrapeRules(3, rules)).toEqual(rules);
+  expect(() =>
+    parseScrapeRules(3, {
+      ...rules,
+      detail: {
+        ...rules.detail,
+        reviewItem: { start: "h2.review" },
+      },
+    }),
+  ).toThrow();
+});
+
+test("accepts bounded sibling review sections", () => {
+  const config = reviewConfig(25);
+  const rules = ScrapeRulesSchema.parse({
+    ...config,
+    detail: {
+      ...config.detail,
+      reviewItem: {
+        start: ".entry-content > h2.review",
+        endBefore: ".entry-content > .related-posts",
+      },
+    },
+  });
+
+  expect(parseScrapeRules(4, rules)).toMatchObject({
+    kind: "review",
+    detail: {
+      reviewItem: {
+        start: ".entry-content > h2.review",
+        endBefore: ".entry-content > .related-posts",
+      },
+    },
+  });
 });
 
 test.each([
