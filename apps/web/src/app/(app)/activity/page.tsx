@@ -8,7 +8,11 @@ import {
   getServerClient,
 } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
-import { getActivityFeedSelection, loadActivityFeed } from "./loadActivityFeed";
+import {
+  getActivityFeedHref,
+  getActivityFeedSelection,
+  loadActivityFeed,
+} from "./loadActivityFeed";
 
 export const metadata: Metadata = {
   title: "Activity",
@@ -77,8 +81,20 @@ export default async function Activity({
           ariaLabel="Activity feeds"
           currentHref={`/activity?feed=${selectedFeed}`}
           items={[
-            { href: "/activity?feed=following", label: "Following" },
-            { href: "/activity?feed=everyone", label: "Everyone" },
+            {
+              href: getActivityFeedHref({
+                feed: "following",
+                isLoggedIn: Boolean(user),
+              }),
+              label: "Following",
+            },
+            {
+              href: getActivityFeedHref({
+                feed: "everyone",
+                isLoggedIn: Boolean(user),
+              }),
+              label: "Everyone",
+            },
           ]}
         />
       }
