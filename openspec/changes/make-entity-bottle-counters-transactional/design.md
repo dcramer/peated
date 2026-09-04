@@ -44,7 +44,7 @@ This avoids trusting request input and handles one Entity occupying several Bott
 
 ### Update counts in the Bottle transaction
 
-Affected Entity rows are updated in ID order using `totalBottles = totalBottles + change`. The transaction fails if an Entity is missing or a decrease would make its count negative. The code does not replace a negative result with zero because that would hide an existing data problem.
+Affected Entity rows are updated in ID order using `totalBottles = totalBottles + change`. The transaction fails if an Entity is missing. If a decrease exposes an old undercount, the transaction locks that Entity and saves the exact count from the active Bottle links after the change. It does not replace a negative result with zero because other active Bottles may remain.
 
 Normal work depends only on the few affected Entities. Brief row locks make two changes to the same Entity wait their turn, so neither count is lost.
 
@@ -83,7 +83,7 @@ production. The admin-only route starts the repair through the normal worker.
 - [A production count is already wrong] → Start the admin repair job. It
   checks all counts, then locks and repairs one affected Entity at a time.
 - [Two writes change the same Entity] → Update Entity rows in ID order so both Bottle changes are counted.
-- [A decrease would take a count below zero] → Stop the Bottle transaction and repair the saved count before retrying.
+- [A decrease exposes an old undercount] → Lock and recount that Entity inside the current Bottle transaction so deletion, updates, and merges do not depend on a separate repair first.
 - [Maintenance SQL changes Bottle links directly] → Run the count check after each limited maintenance operation. Automatic database triggers remain out of scope.
 
 ## Migration Plan

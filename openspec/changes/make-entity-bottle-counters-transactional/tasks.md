@@ -1,8 +1,9 @@
 ## 1. Shared Bottle Count Code
 
 - [x] 1.1 List the Bottle write paths and define the saved Bottle links needed before and after a change.
-- [x] 1.2 Update Entity Bottle counts in the Bottle transaction, and reject missing Entities or negative counts.
+- [x] 1.2 Update Entity Bottle counts in the Bottle transaction, reject missing Entities, and prevent negative counts.
 - [x] 1.3 Add a separate way to check and repair Entity Bottle counts.
+- [x] 1.4 Repair an old undercount inside the current Bottle transaction instead of blocking a valid write.
 
 ## 2. Bottle Writes
 
@@ -26,3 +27,4 @@
 - [x] 4.4 Test the repair lock, worker retries, admin permission, and dispatch behavior.
 - [x] 4.5 Run focused tests, server and web typechecks, lint, formatting, and OpenSpec validation for the repair job.
 - [x] 4.6 Simplify count-change code, names, logs, admin copy, and matching documentation.
+- [x] 4.7 Cover addition, deletion, relationship update, and Bottle merge behavior, including low saved counts on paths that decrease.

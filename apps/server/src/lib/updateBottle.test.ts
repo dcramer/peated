@@ -17,7 +17,7 @@ import {
   createBottle,
   type BottleCreateInput,
 } from "@peated/server/lib/createBottle";
-import { repairEntityBottleCounts } from "@peated/server/lib/entityBottleCounts";
+import { repairEntityBottleCount } from "@peated/server/lib/entityBottleCounts";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -693,6 +693,33 @@ describe("Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
+  test("changes relationships when the old Entity count is too low", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const oldBrand = await fixtures.Entity({ name: "Old Count Brand" });
+    const newBrand = await fixtures.Entity({ name: "New Count Brand" });
+    const movingBottle = await fixtures.Bottle({ brandId: oldBrand.id });
+    await fixtures.Bottle({ brandId: oldBrand.id });
+    await db
+      .update(entities)
+      .set({ totalBottles: 0 })
+      .where(eq(entities.id, oldBrand.id));
+
+    await updateBottle({
+      bottleId: movingBottle.id,
+      input: { brand: newBrand.id },
+      context: contextFor(mod),
+    });
+
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, oldBrand.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, newBrand.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+  });
+
   test("migrates an exclusively used retained series when the brand changes", async ({
     fixtures,
   }) => {
@@ -1292,11 +1319,9 @@ describe("Bottle updates", () => {
     await db
       .delete(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, members[1].bottle.id));
-    await repairEntityBottleCounts([
-      oldBrand.id,
-      oldBottler.id,
-      oldDistiller.id,
-    ]);
+    for (const entityId of [oldBrand.id, oldBottler.id, oldDistiller.id]) {
+      await repairEntityBottleCount(entityId);
+    }
     resetQueueMock();
 
     const result = await updateBottle({
@@ -1386,14 +1411,16 @@ describe("Bottle updates", () => {
       bottleId: repairedMemberId,
       distillerId: oldDistiller.id,
     });
-    await repairEntityBottleCounts([
+    for (const entityId of [
       oldBrand.id,
       oldBottler.id,
       oldDistiller.id,
       newBrand.id,
       newBottler.id,
       ...newDistillers.map(({ id }) => id),
-    ]);
+    ]) {
+      await repairEntityBottleCount(entityId);
+    }
     const staleTotalBottles = 99;
     await db
       .update(bottleGroups)

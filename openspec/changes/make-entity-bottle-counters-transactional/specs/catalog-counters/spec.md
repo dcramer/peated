@@ -26,17 +26,17 @@ The system SHALL update every affected Entity's distinct active Bottle count in 
 
 ### Requirement: Safe count updates
 
-The system SHALL save Entity Bottle count changes in the Bottle transaction and SHALL reject a change that refers to a missing Entity or would produce a negative count.
+The system SHALL save Entity Bottle count changes in the Bottle transaction, SHALL reject a change that refers to a missing Entity, and SHALL repair an old undercount exposed by a valid Bottle change.
 
 #### Scenario: Concurrent Bottle creation
 
 - **WHEN** concurrent transactions add different Bottles related to the same Entity
 - **THEN** the final Entity total includes both Bottles without a lost update
 
-#### Scenario: Invalid decrease
+#### Scenario: Existing undercount
 
-- **WHEN** a change would take the saved count below zero
-- **THEN** the Bottle transaction fails without changing the Bottle or count
+- **WHEN** deleting, merging, or updating a Bottle exposes a saved Entity count that is too low for the required decrease
+- **THEN** the transaction locks that Entity, saves its exact count from the remaining active Bottle links, and completes the Bottle change
 
 ### Requirement: Separate count check
 

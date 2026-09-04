@@ -61,7 +61,8 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const { bottle: bottleId } = input;
     await db.transaction(async (tx) => {
-      // Keep new records from linking to this Bottle while it is being deleted.
+      // Bottle deletion owns this row lock so new records cannot link to the
+      // Bottle after the checks below pass.
       const [bottle] = await tx
         .select()
         .from(bottles)

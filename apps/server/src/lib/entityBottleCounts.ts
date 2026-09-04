@@ -27,25 +27,6 @@ type WrongCount = {
   actualCount: number;
 };
 
-type CountErrorCode = "missing_entity" | "negative_count";
-
-export class EntityBottleCountError extends Error {
-  constructor(
-    readonly code: CountErrorCode,
-    readonly entityId: number,
-    readonly change: number,
-  ) {
-    const reason =
-      code === "missing_entity"
-        ? "the Entity does not exist"
-        : "the Bottle count would be negative";
-    super(
-      `Cannot change the Bottle count for Entity ${entityId} by ${change}: ${reason}.`,
-    );
-    this.name = "EntityBottleCountError";
-  }
-}
-
 function uniqueSorted(values: readonly number[]): number[] {
   return Array.from(new Set(values)).sort((left, right) => left - right);
 }
@@ -117,6 +98,8 @@ export async function updateEntityBottleCounts(
   for (const [entityId, change] of Array.from(countChanges)
     .filter(([, change]) => change !== 0)
     .sort(([left], [right]) => left - right)) {
+    // Bottle writes own this count. If old data is too low, the locked recount
+    // below repairs this Entity without letting the saved count become negative.
     const [updatedEntity] = await tx
       .update(entities)
       .set({ totalBottles: sql`${entities.totalBottles} + ${change}` })
@@ -133,12 +116,15 @@ export async function updateEntityBottleCounts(
       .select({ id: entities.id })
       .from(entities)
       .where(eq(entities.id, entityId))
-      .limit(1);
-    throw new EntityBottleCountError(
-      existingEntity.length ? "negative_count" : "missing_entity",
-      entityId,
-      change,
-    );
+      .limit(1)
+      .for("update");
+    if (!existingEntity.length) {
+      throw new Error(
+        `Cannot update Bottle count: Entity ${entityId} is missing.`,
+      );
+    }
+
+    await repairExistingEntityBottleCount(tx, entityId);
   }
 }
 
@@ -219,6 +205,20 @@ async function findWrongCounts(
   }));
 }
 
+async function repairExistingEntityBottleCount(
+  tx: AnyTransaction,
+  entityId: number,
+): Promise<WrongCount | null> {
+  const [difference] = await findWrongCounts(tx, [entityId]);
+  if (!difference) return null;
+
+  await tx
+    .update(entities)
+    .set({ totalBottles: difference.actualCount })
+    .where(eq(entities.id, entityId));
+  return difference;
+}
+
 /** Checks saved Bottle counts against the Bottle links in the database. */
 export async function checkEntityBottleCounts(
   entityIds?: readonly number[],
@@ -238,26 +238,6 @@ export async function repairEntityBottleCount(
       .for("update");
     if (!entity) return null;
 
-    const [difference] = await findWrongCounts(tx, [entityId]);
-    if (!difference) return null;
-
-    await tx
-      .update(entities)
-      .set({ totalBottles: difference.actualCount })
-      .where(eq(entities.id, entityId));
-    return difference;
+    return repairExistingEntityBottleCount(tx, entityId);
   });
-}
-
-/** Repairs selected Entities one at a time so normal Bottle writes wait on one row. */
-export async function repairEntityBottleCounts(
-  entityIds: readonly number[],
-): Promise<WrongCount[]> {
-  const ids = uniqueSorted(entityIds);
-  const repaired: WrongCount[] = [];
-  for (const entityId of ids) {
-    const difference = await repairEntityBottleCount(entityId);
-    if (difference) repaired.push(difference);
-  }
-  return repaired;
 }

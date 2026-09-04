@@ -30,7 +30,7 @@ test("repairs wrong counts and is safe to run again", async ({ fixtures }) => {
 test.each([undefined, null, [], { unexpected: true }])(
   "rejects malformed input %#",
   async (input) => {
-    // SAFETY: The test deliberately passes invalid queue input through the runtime boundary.
+    // SAFETY: This test bypasses the type so the job can reject invalid queue input.
     await expect(repairEntityBottleCountsJob(input as never)).rejects.toThrow();
   },
 );

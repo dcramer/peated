@@ -1,14 +1,16 @@
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
-import { bottlesToDistillers, entities } from "@peated/server/db/schema";
-import waitError from "@peated/server/lib/test/waitError";
+import {
+  bottleTombstones,
+  bottlesToDistillers,
+  entities,
+} from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import pg from "pg";
 import {
-  EntityBottleCountError,
   checkEntityBottleCounts,
   getBottleEntityLinks,
-  repairEntityBottleCounts,
+  repairEntityBottleCount,
   updateEntityBottleCounts,
 } from "./entityBottleCounts";
 
@@ -109,22 +111,28 @@ describe("Entity Bottle counts", () => {
     ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
-  test("rejects a change that would make a count negative", async ({
+  test("repairs an old undercount when removing a Bottle link", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ totalBottles: 0 });
-    const before = [{ bottleId: 10, entityIds: [entity.id] }];
+    const removedBottle = await fixtures.Bottle({ brandId: entity.id });
+    await fixtures.Bottle({ brandId: entity.id });
+    await db
+      .update(entities)
+      .set({ totalBottles: 0 })
+      .where(eq(entities.id, entity.id));
 
-    const error = await waitError(
-      db.transaction((tx) => updateEntityBottleCounts(tx, before, [])),
-    );
-
-    expect(error).toBeInstanceOf(EntityBottleCountError);
-    expect(error).toMatchObject({
-      code: "negative_count",
-      entityId: entity.id,
-      change: -1,
+    await db.transaction(async (tx) => {
+      const before = await getBottleEntityLinks(tx, [removedBottle.id]);
+      await tx.insert(bottleTombstones).values({ bottleId: removedBottle.id });
+      const after = await getBottleEntityLinks(tx, [removedBottle.id]);
+      await updateEntityBottleCounts(tx, before, after);
     });
+
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(checkEntityBottleCounts([entity.id])).resolves.toEqual([]);
   });
 
   test("rolls back earlier changes when an Entity is missing", async ({
@@ -133,7 +141,7 @@ describe("Entity Bottle counts", () => {
     const entity = await fixtures.Entity({ totalBottles: 0 });
     const missingEntityId = 2_147_483_647;
 
-    const error = await waitError(
+    await expect(
       db.transaction((tx) =>
         updateEntityBottleCounts(
           tx,
@@ -141,14 +149,9 @@ describe("Entity Bottle counts", () => {
           [{ bottleId: 10, entityIds: [entity.id, missingEntityId] }],
         ),
       ),
+    ).rejects.toThrow(
+      `Cannot update Bottle count: Entity ${missingEntityId} is missing.`,
     );
-
-    expect(error).toBeInstanceOf(EntityBottleCountError);
-    expect(error).toMatchObject({
-      code: "missing_entity",
-      entityId: missingEntityId,
-      change: 1,
-    });
     await expect(
       db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
     ).resolves.toMatchObject({ totalBottles: 0 });
@@ -191,9 +194,11 @@ describe("Entity Bottle counts", () => {
     ).resolves.toEqual([{ entityId: wrong.id, savedCount: 8, actualCount: 1 }]);
     await expect(checkEntityBottleCounts([])).resolves.toEqual([]);
 
-    await expect(repairEntityBottleCounts([wrong.id])).resolves.toEqual([
-      { entityId: wrong.id, savedCount: 8, actualCount: 1 },
-    ]);
+    await expect(repairEntityBottleCount(wrong.id)).resolves.toEqual({
+      entityId: wrong.id,
+      savedCount: 8,
+      actualCount: 1,
+    });
     await expect(
       checkEntityBottleCounts([wrong.id, correctZero.id]),
     ).resolves.toEqual([]);
@@ -214,7 +219,7 @@ describe("Entity Bottle counts", () => {
     const writer = new Client(getPostgresConnectionConfig());
     const observer = new Client(getPostgresConnectionConfig());
     let writerCommitted = false;
-    let repair: ReturnType<typeof repairEntityBottleCounts> | null = null;
+    let repair: ReturnType<typeof repairEntityBottleCount> | null = null;
 
     await writer.connect();
     await observer.connect();
@@ -237,16 +242,18 @@ describe("Entity Bottle counts", () => {
         [target.id],
       );
 
-      repair = repairEntityBottleCounts([target.id]);
+      repair = repairEntityBottleCount(target.id);
       void repair.catch(() => undefined);
       await waitForSessionBlockedBy(observer, writerPid);
 
       await writer.query("COMMIT");
       writerCommitted = true;
 
-      await expect(repair).resolves.toEqual([
-        { entityId: target.id, savedCount: 1, actualCount: 2 },
-      ]);
+      await expect(repair).resolves.toEqual({
+        entityId: target.id,
+        savedCount: 1,
+        actualCount: 2,
+      });
     } finally {
       if (!writerCommitted) {
         await writer.query("ROLLBACK").catch(() => undefined);

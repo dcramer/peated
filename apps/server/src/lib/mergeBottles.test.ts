@@ -438,6 +438,38 @@ describe("exact Bottle merges", () => {
     });
   });
 
+  test("merges Bottles when their shared Entity count is too low", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Low Count Merge Brand" });
+    const source = await fixtures.Bottle({
+      name: "Low Count Merge Source",
+      brandId: brand.id,
+    });
+    const destination = await fixtures.Bottle({
+      name: "Low Count Merge Destination",
+      brandId: brand.id,
+    });
+    await db
+      .update(entities)
+      .set({ totalBottles: 0 })
+      .where(eq(entities.id, brand.id));
+
+    await mergeBottles({
+      sourceBottleId: source.id,
+      destinationBottleId: destination.id,
+      context: contextFor(mod),
+    });
+
+    await expect(
+      db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+    ).resolves.toBeUndefined();
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, brand.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+  });
+
   test("keeps the most recently updated member review when both Bottles were reviewed", async ({
     fixtures,
   }) => {
