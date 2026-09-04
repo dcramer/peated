@@ -44,10 +44,19 @@ subcommand
   )
   .action(async (options) => {
     const input = await readPreviewFile(options.input);
-    const result = await runLocalScrapeSourcePreview({
-      site: options.site,
-      ...input,
-      limit: options.limit,
-    });
+    const result = await runLocalScrapeSourcePreview(
+      {
+        site: options.site,
+        ...input,
+        limit: options.limit,
+      },
+      {
+        onDeferred: (nextAttemptAt) => {
+          console.error(
+            `Request controls paused the preview. Continuing after ${nextAttemptAt.toISOString()}.`,
+          );
+        },
+      },
+    );
     console.log(JSON.stringify(result, null, 2));
   });

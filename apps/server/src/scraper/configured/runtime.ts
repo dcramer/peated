@@ -25,11 +25,15 @@ import type {
 } from "../types";
 import { findLikelyDetailPages, findLikelyListPages } from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
-import type { ScrapeIssue, ScrapeSourcePreviewPage } from "./preview";
+import {
+  ScrapeSourcePreviewPageSchema,
+  type ScrapeIssue,
+  type ScrapeSourcePreviewPage,
+} from "./preview";
 import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
-  type ScrapeRules,
   parseScrapeRules,
+  type ScrapeRules,
 } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
 import {
@@ -116,6 +120,18 @@ type RecordScrapeSourcePreview = (input: {
   };
 }) => Promise<void>;
 
+const ConfiguredScrapeCursorSchema = z
+  .object({
+    listUrls: z.array(z.url()).max(SCRAPE_SOURCE_MAX_LIST_PAGES),
+    detailUrls: z.array(z.url()).max(99),
+    nextListUrl: z.url().nullable(),
+    detailIndex: z.number().int().min(0).max(99),
+    previewPages: z.array(ScrapeSourcePreviewPageSchema).max(99),
+  })
+  .strict();
+
+type ConfiguredScrapeCursor = z.infer<typeof ConfiguredScrapeCursorSchema>;
+
 function createScrapeSourceAdapter(
   input: {
     targetKey: string;
@@ -125,19 +141,24 @@ function createScrapeSourceAdapter(
     | { purpose: "collect" }
     | { purpose: "preview"; recordPreview: RecordScrapeSourcePreview }
   ),
-): ScraperAdapter<null, unknown> {
-  return async ({ session }) => {
-    const pages: ScrapeSourcePreviewPage[] = [];
+): ScraperAdapter<ConfiguredScrapeCursor, unknown> {
+  return async ({ cursor, session }) => {
+    let state: ConfiguredScrapeCursor = cursor ?? {
+      listUrls: [],
+      detailUrls: [],
+      nextListUrl: new URL(input.listUrl).toString(),
+      detailIndex: 0,
+      previewPages: [],
+    };
     try {
-      const listUrls = new Set<string>();
-      const detailUrls = new Set<string>();
-      let nextListUrl: string | null = new URL(input.listUrl).toString();
+      const listUrls = new Set(state.listUrls);
+      const detailUrls = new Set(state.detailUrls);
       while (
-        nextListUrl &&
+        state.nextListUrl &&
         listUrls.size < SCRAPE_SOURCE_MAX_LIST_PAGES &&
         detailUrls.size < input.rules.list.maxItems
       ) {
-        if (listUrls.has(nextListUrl)) {
+        if (listUrls.has(state.nextListUrl)) {
           throw new ScrapeSourceParseError([
             {
               field: "list.nextPage",
@@ -145,10 +166,10 @@ function createScrapeSourceAdapter(
             },
           ]);
         }
-        listUrls.add(nextListUrl);
+        listUrls.add(state.nextListUrl);
         const listResponse = await session.request({
           target: input.targetKey,
-          url: new URL(nextListUrl),
+          url: new URL(state.nextListUrl),
         });
         const listResult = parseScrapeList(
           input.rules,
@@ -162,10 +183,18 @@ function createScrapeSourceAdapter(
           detailUrls.add(link);
           if (detailUrls.size >= input.rules.list.maxItems) break;
         }
-        nextListUrl = listResult.nextPageUrl;
+        state = {
+          ...state,
+          listUrls: [...listUrls],
+          detailUrls: [...detailUrls],
+          nextListUrl: listResult.nextPageUrl,
+        };
+        await session.checkpoint(state);
       }
 
-      for (const link of detailUrls) {
+      while (state.detailIndex < state.detailUrls.length) {
+        const link = state.detailUrls[state.detailIndex];
+        if (!link) throw new Error("Configured scraper detail URL is missing.");
         const response = await session.request({
           target: input.targetKey,
           url: new URL(link),
@@ -187,7 +216,7 @@ function createScrapeSourceAdapter(
               : parsed.value.length,
         };
         if (input.purpose === "preview") {
-          pages.push(
+          state.previewPages.push(
             createPreviewPage(
               observation,
               parsed.kind,
@@ -197,14 +226,16 @@ function createScrapeSourceAdapter(
         } else {
           await session.emit(observation);
         }
+        state = { ...state, detailIndex: state.detailIndex + 1 };
+        await session.checkpoint(state);
       }
 
       if (input.purpose === "preview") {
         await input.recordPreview({
-          status: pages.length > 0 ? "passed" : "failed",
+          status: state.previewPages.length > 0 ? "passed" : "failed",
           result: {
             issues:
-              pages.length > 0
+              state.previewPages.length > 0
                 ? []
                 : [
                     {
@@ -212,7 +243,7 @@ function createScrapeSourceAdapter(
                       message: "No pages produced valid output.",
                     },
                   ],
-            pages,
+            pages: state.previewPages,
           },
         });
       }
@@ -223,7 +254,7 @@ function createScrapeSourceAdapter(
       ) {
         await input.recordPreview({
           status: "failed",
-          result: { issues: error.issues, pages },
+          result: { issues: error.issues, pages: state.previewPages },
         });
       }
       throw error;
@@ -238,14 +269,14 @@ export function createLocalScrapeSourcePreview(input: {
   listUrl: string;
   rules: ScrapeRules;
   recordPreview: RecordScrapeSourcePreview;
-}): ScraperSourceDefinition<null, unknown> {
+}): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
   return {
     key: `local-preview-${input.siteKey}`,
     externalSiteKey: input.siteKey,
     targetKeys: [input.targetKey],
     requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
-    cursorSchema: z.null(),
+    cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema:
       input.rules.kind === "review"
         ? ExternalReviewArticleIngestionSchema
@@ -269,7 +300,7 @@ function createScrapeSourceDefinition(input: {
   listUrl: string;
   purpose: "collect" | "preview";
   rules: ScrapeRules;
-}): ScraperSourceDefinition<null, unknown> {
+}): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
   const observationSchema =
     input.rules.kind === "review"
       ? ExternalReviewArticleIngestionSchema
@@ -327,7 +358,7 @@ function createScrapeSourceDefinition(input: {
     targetKeys: [input.targetKey],
     requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
-    cursorSchema: z.null(),
+    cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema,
     adapter,
     sink,

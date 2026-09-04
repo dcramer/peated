@@ -10,7 +10,7 @@ import {
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
 import { findScraperSourceBySiteKey } from "./definitions";
-import type { ScraperHttpClock } from "./http";
+import { scraperSystemClock, type ScraperHttpClock } from "./http";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
 import { syncScraperDefinitions } from "./syncDefinitions";
@@ -32,9 +32,11 @@ export async function runLocalScrapeSourcePreview(
     fetchImpl?: typeof fetch;
     clock?: ScraperHttpClock;
     executionToken?: string;
+    onDeferred?: (nextAttemptAt: Date) => void;
   } = {},
 ) {
   const parsed = InputSchema.parse(input);
+  const clock = options.clock ?? scraperSystemClock;
   const rules = parsed.limit
     ? {
         ...parsed.rules,
@@ -108,15 +110,26 @@ export async function runLocalScrapeSourcePreview(
   if (!run) throw new Error("Failed to create the local scraper preview run.");
 
   try {
-    await executeScraperRun(
-      { runId: run.id },
-      {
-        registry,
-        fetchImpl: options.fetchImpl,
-        clock: options.clock,
-        executionToken: options.executionToken,
-      },
-    );
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const result = await executeScraperRun(
+        { runId: run.id },
+        {
+          registry,
+          fetchImpl: options.fetchImpl,
+          clock,
+          executionToken: options.executionToken,
+        },
+      );
+      if (result.status === "completed") break;
+      if ("nextAttemptAt" in result) {
+        options.onDeferred?.(result.nextAttemptAt);
+        await clock.sleep(
+          Math.max(0, result.nextAttemptAt.getTime() - clock.now().getTime()),
+        );
+        continue;
+      }
+      throw new Error("The local scraper preview is already running.");
+    }
   } catch (error) {
     if (!preview) throw error;
   }
