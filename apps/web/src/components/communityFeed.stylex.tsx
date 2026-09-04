@@ -38,9 +38,9 @@ export type CommunityFeedItem = {
 };
 
 /**
- * Activity list for the homepage, /activity, and member profiles. Map API entries
- * with getCommunityFeedItems. Each card includes who acted and what they acted on.
- * Routes own queries, empty states, and actions.
+ * Activity and full-width tasting list shared by the homepage, activity, bottle,
+ * brand or producer, and member pages. Map API entries with getCommunityFeedItems
+ * or getTastingFeedItems. Routes own queries, empty states, and actions.
  */
 export function CommunityFeed({
   ariaLabel = "Activity",
@@ -139,6 +139,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 imageUrl={bottle.imageUrl}
                 linkArea="title"
                 metadata={bottle.metadata}
+                verticalPadding="sm"
                 end={
                   bottle.score !== undefined || bottle.ratingBand ? (
                     <div {...stylex.props(styles.facts)}>
@@ -244,7 +245,6 @@ const styles = stylex.create({
   content: {
     minWidth: 0,
     marginLeft: "38px",
-    marginTop: space.x2,
     display: "flex",
     flexDirection: "column",
     gap: space.x3,

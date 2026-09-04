@@ -35,6 +35,8 @@ export type BottleIdentityRowProps = {
   subtitle?: ReactNode;
   /** Sidebar uses a small thumbnail, a two-line name, and a footer for trailing content. */
   variant?: "standard" | "search" | "sidebar" | "compact";
+  /** Tightens vertical padding when the row is nested inside another surface. */
+  verticalPadding?: "sm" | "md";
 };
 
 /**
@@ -69,6 +71,7 @@ export function BottleIdentityRow({
   relatedReleases,
   subtitle,
   variant = "standard",
+  verticalPadding = "md",
 }: BottleIdentityRowProps) {
   const compact = variant === "compact";
   const sidebar = variant === "sidebar";
@@ -88,6 +91,7 @@ export function BottleIdentityRow({
     <div
       {...stylex.props(
         styles.row,
+        verticalPadding === "sm" && styles.smallVerticalPadding,
         variant === "search" && styles.searchRow,
         sidebar && styles.sidebarRow,
         compact && styles.compactRow,
@@ -219,6 +223,10 @@ const styles = stylex.create({
   },
   startAlignedRow: {
     alignItems: "flex-start",
+  },
+  smallVerticalPadding: {
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
   },
   searchRow: {
     paddingTop: space.x2,

@@ -26,8 +26,10 @@
 - Compose `foundationStyles` for typography instead of copying font recipes
   into components. Use Karla for metadata and labels, and reserve monospace for
   code. Page metadata goes below its title. `BottleIdentityRow` owns bottle rows;
-  `BottleVisual` owns bottle images; `CommunityFeed` owns activity on the homepage,
-  `/activity`, and member profiles.
+  `BottleVisual` owns bottle images; `CommunityFeed` owns activity and full-width
+  tasting lists on the homepage, `/activity`, bottle, brand or producer, and
+  member pages. Dedicated detail views and narrow sidebar lists keep their own
+  task-specific compositions.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.
 - `EntityIdentityRow`, `SeriesIdentityRow`, and `LocationIdentityRow` own other

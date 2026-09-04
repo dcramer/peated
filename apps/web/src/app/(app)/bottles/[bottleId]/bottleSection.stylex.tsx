@@ -5,15 +5,17 @@ import { SectionHeading } from "@peated/web/components";
 import { space } from "../../../../styles/tokens.stylex";
 
 export function BottleSection({
+  ariaLabel,
   children,
   heading,
 }: {
+  ariaLabel?: string;
   children: ReactNode;
-  heading: ReactNode;
+  heading?: ReactNode;
 }) {
   return (
-    <section {...stylex.props(styles.section)}>
-      <SectionHeading>{heading}</SectionHeading>
+    <section aria-label={ariaLabel} {...stylex.props(styles.section)}>
+      {heading ? <SectionHeading>{heading}</SectionHeading> : null}
       {children}
     </section>
   );

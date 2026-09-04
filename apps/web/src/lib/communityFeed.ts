@@ -9,6 +9,7 @@ import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
 type CriticReview = Outputs["externalReviews"]["list"]["results"][number];
 type Activity = Outputs["activity"]["list"]["results"][number];
 type Bottle = Outputs["bottles"]["list"]["results"][number];
+type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 function feedBottle(bottle: Bottle): CommunityFeedBottle {
   return {
@@ -17,6 +18,34 @@ function feedBottle(bottle: Bottle): CommunityFeedBottle {
     href: getBottleUrl(bottle),
     imageUrl: bottle.imageUrl,
   };
+}
+
+function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
+  return {
+    id,
+    kind: "tasting",
+    actor: tasting.createdBy.username,
+    actorHref: `/users/${tasting.createdBy.username}`,
+    actorImageUrl: tasting.createdBy.pictureUrl,
+    action: "tasted",
+    date: tasting.createdAt,
+    href: getTastingUrl(tasting),
+    bottles: [
+      {
+        ...feedBottle(tasting.bottle),
+        id: String(tasting.id),
+        description: getPreview(tasting.notes),
+        ratingBand: tasting.ratingBand,
+      },
+    ],
+  } satisfies CommunityFeedItem;
+}
+
+/** Maps tasting list results to the shared activity and tasting-list rows. */
+export function getTastingFeedItems(
+  tastings: readonly Tasting[],
+): CommunityFeedItem[] {
+  return tastings.map((tasting) => tastingFeedItem(tasting));
 }
 
 export function getCommunityFeedItems({
@@ -88,22 +117,9 @@ export function getCommunityFeedItems({
       actorImageUrl: entry.createdBy.pictureUrl,
     };
     if (entry.type === "tasting_session") {
-      return entry.tastings.map((tasting) => ({
-        ...actor,
-        id: `${entry.id}:${tasting.id}`,
-        kind: "tasting",
-        action: "tasted",
-        date: tasting.createdAt,
-        href: getTastingUrl(tasting),
-        bottles: [
-          {
-            ...feedBottle(tasting.bottle),
-            id: String(tasting.id),
-            description: getPreview(tasting.notes),
-            ratingBand: tasting.ratingBand,
-          },
-        ],
-      }));
+      return entry.tastings.map((tasting) =>
+        tastingFeedItem(tasting, `${entry.id}:${tasting.id}`),
+      );
     }
     if (entry.type === "member_review") {
       return [
