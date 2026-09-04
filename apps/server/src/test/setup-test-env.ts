@@ -5,7 +5,7 @@ import "error-cause/auto";
 
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { pgTable, text } from "drizzle-orm/pg-core";
 import { beforeEach, vi } from "vitest";
 import { db, type AnyDatabase } from "../db";
@@ -35,22 +35,10 @@ const pgTables = pgTable("pg_tables", {
   tablename: text("tablename").notNull(),
 });
 
-const pgClass = pgTable("pg_class", {
-  relname: text("relname").notNull(),
-  relkind: text("relkind").notNull(),
-  relnamespace: text("relnamespace").notNull(),
-});
-
-const pgNamespace = pgTable("pg_namespace", {
-  oid: text("oid").notNull(),
-  nspname: text("nspname").notNull(),
-});
-
 const schemaname = "public";
 const SAFE_TABLES = ["__drizzle_migrations"];
 const TEST_DATABASE_RESET_LOCK_ID = 287441;
 let cachedResettableTables: string | null = null;
-let cachedResettableSequences: string[] | null = null;
 
 const getResettableTables = async (
   exclude = SAFE_TABLES,
@@ -77,38 +65,14 @@ const getResettableTables = async (
   return tableNames;
 };
 
-const getResettableSequences = async (conn: AnyDatabase = db) => {
-  if (cachedResettableSequences) {
-    return cachedResettableSequences;
-  }
-
-  const sequenceRows = await conn
-    .select({ relname: pgClass.relname })
-    .from(pgClass)
-    .innerJoin(pgNamespace, eq(pgNamespace.oid, pgClass.relnamespace))
-    .where(and(eq(pgClass.relkind, "S"), eq(pgNamespace.nspname, schemaname)));
-
-  cachedResettableSequences = sequenceRows
-    .map(({ relname }) => relname)
-    .filter((relname) => !relname.startsWith("__drizzle_migrations"));
-
-  return cachedResettableSequences;
-};
-
 const clearTables = async (conn: AnyDatabase = db) => {
   const tableNames = await getResettableTables(SAFE_TABLES, conn);
   if (!tableNames.length) return;
 
-  await conn.execute(sql.raw(`TRUNCATE TABLE ${tableNames} CASCADE;`));
-
-  const sequenceNames = await getResettableSequences(conn);
-  for (const sequenceName of sequenceNames) {
-    await conn.execute(
-      sql.raw(
-        `ALTER SEQUENCE "${schemaname}"."${sequenceName}" RESTART WITH 1;`,
-      ),
-    );
-  }
+  // Test isolation owns clearing rows and their sequences before every test.
+  await conn.execute(
+    sql.raw(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`),
+  );
 };
 
 /**
