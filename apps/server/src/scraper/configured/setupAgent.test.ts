@@ -51,8 +51,14 @@ function reviewCandidate(
         nextPage: null,
       },
       detail: {
+        canonicalUrl: null,
         title: suggestedValue("h1"),
-        publishedAt: suggestedValue("time", "datetime"),
+        publishedAt: {
+          input: "selector" as const,
+          selector: "time",
+          attribute: "datetime",
+          urlDateFormat: null,
+        },
         reviewItem: "article.review",
         name: suggestedValue(nameSelector, null, {
           removeSuffixes: ["Review"],
@@ -68,10 +74,7 @@ function reviewCandidate(
   };
 }
 
-function toolCallResponse(
-  callId: string,
-  candidate: ReturnType<typeof reviewCandidate>,
-) {
+function toolCallResponse<T extends object>(callId: string, candidate: T) {
   return {
     model: "test-setup-model",
     output: [
@@ -229,6 +232,77 @@ test("returns rules only after the rule check passes", async () => {
   expect(secondRequest?.instructions).toContain(
     "Your work is complete only when check_rules accepts the rules.",
   );
+});
+
+test("accepts canonical cleanup, URL dates, and finite score maps", async () => {
+  const base = reviewCandidate("h1");
+  const candidate = {
+    ...base,
+    rules: {
+      ...base.rules,
+      detail: {
+        ...base.rules.detail,
+        canonicalUrl: suggestedValue('link[rel="canonical"]', "href", {
+          removeSuffixes: ["/"],
+        }),
+        publishedAt: {
+          input: "url_date" as const,
+          selector: null,
+          attribute: null,
+          urlDateFormat: "/yyyy/MM/*-MMddyy",
+        },
+        score: {
+          value: suggestedValue(".rating", null, {
+            removePrefixes: ["Rating:"],
+          }),
+          scale: 100,
+          map: [
+            { text: "A", value: 95 },
+            { text: "B+", value: 87 },
+          ],
+        },
+      },
+    },
+  };
+  const checkRules = vi.fn(async () => ({
+    status: "passed" as const,
+    checked: "parsed mapped review",
+  }));
+
+  const result = await runScrapeSourceSetupAgent({
+    conversationId: "scrape_source:1",
+    externalSiteRunId: 10,
+    kind: "review",
+    scrapeSourceId: 1,
+    listPages: [
+      {
+        url: "https://example.test/reviews",
+        html: '<a class="review" href="/reviews/one">Review</a>',
+      },
+    ],
+    detailPages: [],
+    request: vi.fn().mockResolvedValue(toolCallResponse("mapped", candidate)),
+    checkRules,
+  });
+
+  expect(result.rules).toMatchObject({
+    detail: {
+      canonicalUrl: {
+        selector: 'link[rel="canonical"]',
+        attribute: "href",
+        removeSuffixes: ["/"],
+      },
+      publishedAt: { urlDateFormat: "/yyyy/MM/*-MMddyy" },
+      score: {
+        scale: 100,
+        map: [
+          { text: "A", value: 95 },
+          { text: "B+", value: 87 },
+        ],
+      },
+    },
+  });
+  expect(checkRules).toHaveBeenCalledOnce();
 });
 
 test("stops after the rule-check limit", async () => {

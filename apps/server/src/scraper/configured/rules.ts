@@ -3,7 +3,8 @@ import type { JsonValue } from "@peated/server/scraper/types";
 import { z } from "zod";
 
 export const SCRAPE_RULES_VERSION_1 = 1;
-export const SCRAPE_RULES_VERSION = 2;
+export const SCRAPE_RULES_VERSION_2 = 2;
+export const SCRAPE_RULES_VERSION = 3;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -14,6 +15,7 @@ export const SCRAPE_SOURCE_MAX_ITEMS = 99;
 const SCRAPE_VALUE_MAX_LENGTH = 200;
 const SCRAPE_LITERAL_MAX_LENGTH = 100;
 const SCRAPE_LITERAL_MAX_ITEMS = 10;
+const SCRAPE_SCORE_MAP_MAX_ITEMS = 25;
 
 export const ScrapeSelectorSchema = z
   .string()
@@ -143,6 +145,99 @@ function reviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
     .strict();
 }
 
+export const ScrapeUrlDateSchema = z
+  .object({
+    urlDateFormat: z
+      .string()
+      .trim()
+      .min(1)
+      .max(SCRAPE_VALUE_MAX_LENGTH)
+      .superRefine((format, context) => {
+        const tokens: string[] = format.match(/yyyy|yy|MM|dd|\*/g) ?? [];
+        const literal = format.replaceAll(/yyyy|yy|MM|dd|\*/g, "");
+        if (!tokens.includes("yyyy") && !tokens.includes("yy")) {
+          context.addIssue({
+            code: "custom",
+            message: "URL date format requires yyyy or yy.",
+          });
+        }
+        if (!tokens.includes("MM") || !tokens.includes("dd")) {
+          context.addIssue({
+            code: "custom",
+            message: "URL date format requires MM and dd.",
+          });
+        }
+        if (/[A-Za-z0-9]/.test(literal)) {
+          context.addIssue({
+            code: "custom",
+            message: "URL date format contains an unsupported token.",
+          });
+        }
+      }),
+  })
+  .strict();
+
+const ScrapeScoreMapEntrySchema = z
+  .object({
+    text: ScrapeLiteralSchema,
+    value: z.number().nonnegative(),
+  })
+  .strict();
+
+const ScrapeScoreSchema = z
+  .object({
+    value: ScrapeValueSchema,
+    scale: z.number().positive(),
+    map: z
+      .array(ScrapeScoreMapEntrySchema)
+      .min(1)
+      .max(SCRAPE_SCORE_MAP_MAX_ITEMS)
+      .optional(),
+  })
+  .strict()
+  .superRefine((score, context) => {
+    const labels = new Set<string>();
+    for (const [index, entry] of (score.map ?? []).entries()) {
+      if (entry.value > score.scale) {
+        context.addIssue({
+          code: "custom",
+          path: ["map", index, "value"],
+          message: "Mapped score cannot exceed its scale.",
+        });
+      }
+      const label = entry.text.toLocaleLowerCase("en");
+      if (labels.has(label)) {
+        context.addIssue({
+          code: "custom",
+          path: ["map", index, "text"],
+          message: "Mapped score labels must be unique.",
+        });
+      }
+      labels.add(label);
+    }
+  });
+
+const ReviewRulesSchema = z
+  .object({
+    kind: z.literal("review"),
+    list: ListRulesSchema,
+    detail: z
+      .object({
+        canonicalUrl: ScrapeValueSchema.optional(),
+        title: ScrapeValueSchema,
+        publishedAt: z
+          .union([ScrapeValueSchema, ScrapeUrlDateSchema])
+          .optional(),
+        reviewItem: ScrapeSelectorSchema,
+        name: ScrapeValueSchema,
+        reviewerName: ScrapeValueSchema.optional(),
+        reviewText: ScrapeValueSchema.optional(),
+        score: ScrapeScoreSchema.optional(),
+      })
+      .strict(),
+  })
+  .strict();
+
 function priceRulesSchema<T extends z.ZodType, U extends z.ZodType>(
   valueSchema: T,
   listSchema: U,
@@ -172,13 +267,19 @@ export const ScrapeRulesV1Schema = z.discriminatedUnion("kind", [
   priceRulesSchema(ScrapeValueSelectorV1Schema, ListRulesV1Schema),
 ]);
 
-export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
+export const ScrapeRulesV2Schema = z.discriminatedUnion("kind", [
   reviewRulesSchema(ScrapeValueSchema, ListRulesSchema),
+  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
+]);
+
+export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
+  ReviewRulesSchema,
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
 export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV1Schema,
+  ScrapeRulesV2Schema,
   ScrapeRulesSchema,
 ]);
 
@@ -196,6 +297,9 @@ export function parseScrapeRules(
 ) {
   if (rulesVersion === SCRAPE_RULES_VERSION_1) {
     return ScrapeRulesV1Schema.parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_2) {
+    return ScrapeRulesV2Schema.parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);

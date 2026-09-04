@@ -82,13 +82,16 @@ product database. Only a revision that passes its preview can become active. An
 admin can return to any older revision that passed. Pausing a source stops
 collection but keeps its revisions and run history.
 
-Rules formats 1 and 2 support same-origin HTML list and detail pages, an item
+Rules formats 1 through 3 support same-origin HTML list and detail pages, an item
 limit, an optional next-page link, CSS selectors, and fixed date, number, price,
 and volume conversions. Version 2 also supports bounded value cleanup, fixed
 values, joined labeled text, and list-card exclusion. An `item` selector scopes
 each `detailLink`; `excludeWhen` skips that item when its selector finds text,
 optionally beginning with one of the configured literal labels. Code follows at
-most five list pages. Rules do not support
+most five list pages. Version 3 also lets review sources select and clean their
+canonical URL, read a publication date from a URL path with bounded `yyyy`, `yy`,
+`MM`, `dd`, and `*` tokens, and map up to 25 finite text grades to numeric values.
+Rules do not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
 page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
 adapter when a source needs those capabilities.
@@ -154,12 +157,12 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Set `rulesVersion` to `2` when testing version 2 operations. An omitted
+API. Set `rulesVersion` to `3` when testing current operations. An omitted
 version means version 1 so existing preview files keep their original behavior:
 
 ```json
 {
-  "rulesVersion": 2,
+  "rulesVersion": 3,
   "listUrl": "https://example.com/reviews",
   "rules": {}
 }

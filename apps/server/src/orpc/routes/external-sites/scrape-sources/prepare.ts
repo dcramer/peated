@@ -4,6 +4,7 @@ import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { prepareBourbonCultureSource } from "@peated/server/scraper/configured/prepareBourbonCulture";
 import { prepareCompassBoxSource } from "@peated/server/scraper/configured/prepareCompassBox";
 import { prepareKilchomanSource } from "@peated/server/scraper/configured/prepareKilchoman";
+import { prepareWhiskeyReviewerSource } from "@peated/server/scraper/configured/prepareWhiskeyReviewer";
 import { prepareWhiskySagaSource } from "@peated/server/scraper/configured/prepareWhiskySaga";
 import { prepareWhiskyStudySource } from "@peated/server/scraper/configured/prepareWhiskyStudy";
 import {
@@ -30,7 +31,7 @@ export default procedure
     z
       .object({
         site: ExternalSiteKeySchema.describe(
-          "The existing site's key. Currently supports bourbonculture, compassbox, kilchoman, whiskysaga, and whiskystudy.",
+          "The existing site's key. Currently supports bourbonculture, compassbox, kilchoman, whiskeyreviewer, whiskysaga, and whiskystudy.",
         ),
         apply: z
           .boolean()
@@ -64,6 +65,7 @@ export default procedure
       bourbonculture: prepareBourbonCultureSource,
       compassbox: prepareCompassBoxSource,
       kilchoman: prepareKilchomanSource,
+      whiskeyreviewer: prepareWhiskeyReviewerSource,
       whiskysaga: prepareWhiskySagaSource,
       whiskystudy: prepareWhiskyStudySource,
     }[input.site];

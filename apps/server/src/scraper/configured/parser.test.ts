@@ -6,6 +6,10 @@ import {
 } from "../adapters/bourbonCulture";
 import { parseCompassBoxProducts } from "../adapters/legacy/scrapeCompassBox";
 import { parseKilchomanProducts } from "../adapters/legacy/scrapeKilchoman";
+import {
+  discoverWhiskeyReviewerArticles,
+  parseWhiskeyReviewerArticle,
+} from "../adapters/whiskeyReviewer";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
@@ -187,6 +191,65 @@ const kilchomanRules = {
   },
 } satisfies ScrapeRules;
 
+const whiskeyReviewerRules = {
+  kind: "review",
+  list: {
+    detailLink: {
+      selector:
+        '.widget.posts-list:contains("Recent Reviews") a.post-title[href^="/"]:not([href*="?"]), .widget.posts-list:contains("Recent Reviews") a.post-title[href^="https://whiskeyreviewer.com/"]:not([href*="?"])',
+      attribute: "href",
+    },
+    maxItems: 5,
+  },
+  detail: {
+    canonicalUrl: {
+      selector: 'link[rel="canonical"]',
+      attribute: "href",
+      removeSuffixes: ["/"],
+    },
+    title: { selector: "#the-post h1.entry-title" },
+    publishedAt: { urlDateFormat: "/yyyy/MM/*-MMddyy" },
+    reviewItem: "#the-post .entry-content",
+    name: {
+      selector: "#the-post h1.entry-title",
+      removeSuffixes: ["Review", "Rview"],
+    },
+    reviewerName: {
+      selector: "p",
+      startsWith: ["By "],
+      removePrefixes: ["By "],
+    },
+    reviewText: {
+      selector:
+        'p:contains("nose"), p:contains("Nose"), p:contains("palate"), p:contains("Palate"), p:contains("finish"), p:contains("Finish")',
+      all: true,
+    },
+    score: {
+      value: {
+        selector: "#the-post .entry-content > p",
+        startsWith: ["Rating:"],
+        removePrefixes: ["Rating:"],
+      },
+      scale: 100,
+      map: [
+        { text: "A+", value: 100 },
+        { text: "A", value: 95 },
+        { text: "A-", value: 90 },
+        { text: "B+", value: 87 },
+        { text: "B", value: 83 },
+        { text: "B-", value: 80 },
+        { text: "C+", value: 77 },
+        { text: "C", value: 73 },
+        { text: "C-", value: 70 },
+        { text: "D+", value: 67 },
+        { text: "D", value: 63 },
+        { text: "D-", value: 60 },
+        { text: "F", value: 0 },
+      ],
+    },
+  },
+} satisfies ScrapeRules;
+
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
   legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
@@ -312,6 +375,28 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("matches the current Whiskey Reviewer article links", async () => {
+    const pageUrl = new URL("https://whiskeyreviewer.com/");
+    const html = await loadFixture("whiskeyreviewer", "index.html");
+    const legacyLinks = discoverWhiskeyReviewerArticles(html).map(
+      (url) => url.href,
+    );
+
+    expect(parseScrapeList(whiskeyReviewerRules, html, pageUrl)).toEqual({
+      links: [
+        "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026/",
+        "https://whiskeyreviewer.com/2026/08/example-scotch-review-080626/",
+      ],
+      nextPageUrl: null,
+      issues: [],
+    });
+    expect(
+      parseScrapeList(whiskeyReviewerRules, html, pageUrl).links.map((url) =>
+        url.replace(/\/$/u, ""),
+      ),
+    ).toEqual(legacyLinks);
+  });
+
   it("rejects a next page on another website", () => {
     const result = parseScrapeList(
       {
@@ -357,6 +442,92 @@ describe("scrape source parser", () => {
       reviewerName: "Ada",
       nativeScore: { value: 91, scale: 100, display: "91 / 100" },
     });
+  });
+
+  it.each([
+    ["is missing", "", "Required value was not found."],
+    [
+      "points to another website",
+      '<link rel="canonical" href="https://other.test/review">',
+      "Pages must stay on the source website.",
+    ],
+  ])(
+    "reports one canonical URL issue when the configured value %s",
+    (_, canonicalMarkup, message) => {
+      const result = parseScrapeDetail(
+        {
+          ...reviewConfig,
+          detail: {
+            ...reviewConfig.detail,
+            canonicalUrl: {
+              selector: 'link[rel="canonical"]',
+              attribute: "href",
+            },
+          },
+        },
+        `${canonicalMarkup}<h1>Review</h1><time datetime="2026-04-02"></time><article class="review"><h2>Example</h2></article>`,
+        new URL("https://reviews.test/review"),
+      );
+
+      expect(result.kind).toBe("review");
+      expect(result.value).toBeNull();
+      expect(
+        result.issues.filter(({ field }) => field === "detail.canonicalUrl"),
+      ).toEqual([{ field: "detail.canonicalUrl", message }]);
+    },
+  );
+
+  it("matches Whiskey Reviewer identity, URL date, grade, and evidence", async () => {
+    const pageUrl = new URL(
+      "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026/",
+    );
+    const html = await loadFixture("whiskeyreviewer", "review.html");
+    const legacy = parseWhiskeyReviewerArticle(html, pageUrl);
+    const configured = parseScrapeDetail(whiskeyReviewerRules, html, pageUrl);
+
+    expect(configured.kind).toBe("review");
+    expect(configured.issues).toEqual([]);
+    if (configured.kind !== "review" || !configured.value) {
+      throw new Error("Expected configured review output.");
+    }
+    expect(configured.value.article).toMatchObject({
+      canonicalUrl: legacy.article.canonicalUrl,
+      title: legacy.article.title,
+      publishedAt: legacy.article.publishedAt,
+    });
+    expect(configured.value.article.externalReviews[0]).toMatchObject({
+      name: legacy.article.externalReviews[0]?.name,
+      reviewerName: legacy.article.externalReviews[0]?.reviewerName,
+      nativeScore: legacy.article.externalReviews[0]?.nativeScore,
+    });
+    expect(Object.values(configured.value.externalReviewTexts)).toEqual(
+      Object.values(legacy.externalReviewTexts),
+    );
+    expect(Object.values(configured.value.externalReviewBodies)).toEqual(
+      Object.values(legacy.externalReviewBodies),
+    );
+  });
+
+  it("rejects conflicting URL dates and unmapped scores", async () => {
+    const html = (await loadFixture("whiskeyreviewer", "review.html"))
+      .replace("/2026/08/example-bourbon", "/2025/08/example-bourbon")
+      .replace("Rating: B+", "Rating: E");
+    const result = parseScrapeDetail(
+      whiskeyReviewerRules,
+      html,
+      new URL(
+        "https://whiskeyreviewer.com/2025/08/example-bourbon-review-081026/",
+      ),
+    );
+
+    expect(result).toMatchObject({ kind: "review", value: null });
+    expect(result.issues).toEqual([
+      { field: "detail.publishedAt", message: "Date is not valid." },
+      {
+        field: "detail.score",
+        message: "Score is not in the configured map.",
+      },
+    ]);
   });
 
   it("removes Whisky Study title suffixes and finds a labeled score", () => {
