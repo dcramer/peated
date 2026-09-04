@@ -6,6 +6,7 @@ import {
   BottleIdentityRow,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
+import { Card, CardPrimaryLink } from "./card.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { RATING_BANDS, TastingRating, type RatingBand } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
@@ -17,8 +18,6 @@ export type CommunityFeedBottle = Pick<
 > & {
   id: string;
   description?: string;
-  activityHref?: string;
-  activityLabel?: string;
   byline?: string;
   ratingBand?: RatingBand | null;
   score?: { value: number; scale: number };
@@ -32,6 +31,7 @@ export type CommunityFeedItem = {
   actorImageUrl?: string | null;
   action: string;
   date: string;
+  href?: string;
   bottles: readonly CommunityFeedBottle[];
   destination?: { href: string; label: string };
   more?: { href: string; label: string };
@@ -39,8 +39,8 @@ export type CommunityFeedItem = {
 
 /**
  * Activity list for the homepage, /activity, and member profiles. Map API entries
- * with getCommunityFeedItems; this component owns author context, event grouping,
- * and the standard/compact bottle choice. Routes own queries, empty states, and actions.
+ * with getCommunityFeedItems. Each card includes who acted and what they acted on.
+ * Routes own queries, empty states, and actions.
  */
 export function CommunityFeed({
   ariaLabel = "Activity",
@@ -65,121 +65,168 @@ export function CommunityFeed({
 
 function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
   return (
-    <article {...stylex.props(styles.entry)}>
-      <header {...stylex.props(styles.author)}>
-        <Avatar
-          imageUrl={item.actorImageUrl}
-          initials={item.actor.slice(0, 2).toUpperCase()}
-          size="xs"
-        />
-        <div {...stylex.props(foundationStyles.metadata, styles.context)}>
-          {item.actorHref ? (
-            <TextLink href={item.actorHref} size="inherit">
-              {item.actor}
-            </TextLink>
-          ) : (
-            <strong>{item.actor}</strong>
-          )}{" "}
-          {item.action}
-          {item.destination ? (
-            <>
-              {" "}
-              <TextLink href={item.destination.href} size="inherit">
-                {item.destination.label}
-              </TextLink>
-            </>
-          ) : null}
-          <span {...stylex.props(styles.date)}>
-            <span aria-hidden="true"> · </span>
-            <TimeSince date={item.date} />
-          </span>
-        </div>
-      </header>
-      <div
-        {...stylex.props(
-          styles.content,
-          item.kind === "collection_add" && styles.compactContent,
-        )}
+    <article>
+      <Card
+        appearance="plain"
+        linked={Boolean(item.href)}
+        padding="none"
+        {...stylex.props(styles.entry)}
       >
-        {item.bottles.map((bottle) => (
-          <div key={bottle.id} {...stylex.props(styles.bottle)}>
-            <BottleIdentityRow
-              variant={item.kind === "collection_add" ? "compact" : "standard"}
-              provenance={bottle.provenance}
-              name={bottle.name}
-              href={bottle.href}
-              imageUrl={bottle.imageUrl}
-              metadata={bottle.metadata}
-              end={
-                bottle.score !== undefined || bottle.ratingBand ? (
-                  <div {...stylex.props(styles.facts)}>
-                    {bottle.score !== undefined ? (
-                      <span
-                        role="img"
-                        aria-label={`Review score: ${bottle.score.value} out of ${bottle.score.scale}`}
-                        {...stylex.props(styles.score)}
-                      >
-                        {bottle.score.value}
-                        <span {...stylex.props(styles.scoreScale)}>
-                          /{bottle.score.scale}
-                        </span>
-                      </span>
-                    ) : null}
-                    {bottle.ratingBand ? (
-                      <>
-                        <strong {...stylex.props(styles.rating)}>
-                          {
-                            RATING_BANDS.find(
-                              (band) => band.key === bottle.ratingBand,
-                            )?.label
-                          }
-                        </strong>
-                        <TastingRating band={bottle.ratingBand} />
-                      </>
-                    ) : null}
-                  </div>
-                ) : undefined
-              }
-            />
-            {bottle.description || bottle.activityHref || bottle.byline ? (
-              <div {...stylex.props(styles.details)}>
-                {bottle.description ? (
-                  <p {...stylex.props(foundationStyles.body, styles.excerpt)}>
-                    {bottle.description}
-                  </p>
-                ) : null}
-                {bottle.byline || bottle.activityHref ? (
-                  <div
-                    {...stylex.props(foundationStyles.metadata, styles.footer)}
+        <header {...stylex.props(styles.author)}>
+          <Avatar
+            imageUrl={item.actorImageUrl}
+            initials={item.actor.slice(0, 2).toUpperCase()}
+            size="xs"
+          />
+          <div {...stylex.props(foundationStyles.metadata, styles.context)}>
+            {item.actorHref ? (
+              <TextLink href={item.actorHref} size="inherit">
+                {item.actor}
+              </TextLink>
+            ) : (
+              <strong>{item.actor}</strong>
+            )}{" "}
+            {item.href && !item.destination ? (
+              <CardPrimaryLink
+                aria-label={getActivityLinkLabel(item)}
+                href={item.href}
+                {...stylex.props(styles.activityLink)}
+              >
+                {item.action}
+              </CardPrimaryLink>
+            ) : (
+              item.action
+            )}
+            {item.destination ? (
+              <>
+                {" "}
+                {item.href === item.destination.href ? (
+                  <CardPrimaryLink
+                    aria-label={getActivityLinkLabel(item)}
+                    href={item.href}
+                    {...stylex.props(styles.activityLink)}
                   >
-                    {bottle.byline ? <span>By {bottle.byline}</span> : null}
-                    {bottle.byline && bottle.activityHref ? (
-                      <span aria-hidden="true"> · </span>
-                    ) : null}
-                    {bottle.activityHref ? (
-                      <TextLink href={bottle.activityHref} size="inherit">
-                        {bottle.activityLabel}
-                      </TextLink>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
+                    {item.destination.label}
+                  </CardPrimaryLink>
+                ) : (
+                  <TextLink href={item.destination.href} size="inherit">
+                    {item.destination.label}
+                  </TextLink>
+                )}
+              </>
             ) : null}
+            <span {...stylex.props(styles.date)}>
+              <span aria-hidden="true"> · </span>
+              <TimeSince date={item.date} />
+            </span>
           </div>
-        ))}
-        {item.more ? (
-          <TextLink href={item.more.href} size="sm">
-            {item.more.label}
-          </TextLink>
-        ) : null}
-      </div>
+        </header>
+        <div
+          {...stylex.props(
+            styles.content,
+            item.kind === "collection_add" && styles.compactContent,
+          )}
+        >
+          {item.bottles.map((bottle) => (
+            <div key={bottle.id} {...stylex.props(styles.bottle)}>
+              <BottleIdentityRow
+                variant={
+                  item.kind === "collection_add" ? "compact" : "standard"
+                }
+                provenance={bottle.provenance}
+                name={bottle.name}
+                href={bottle.href}
+                imageUrl={bottle.imageUrl}
+                linkArea="title"
+                metadata={bottle.metadata}
+                end={
+                  bottle.score !== undefined || bottle.ratingBand ? (
+                    <div {...stylex.props(styles.facts)}>
+                      {bottle.score !== undefined ? (
+                        <span
+                          role="img"
+                          aria-label={`Review score: ${bottle.score.value} out of ${bottle.score.scale}`}
+                          {...stylex.props(styles.score)}
+                        >
+                          {bottle.score.value}
+                          <span {...stylex.props(styles.scoreScale)}>
+                            /{bottle.score.scale}
+                          </span>
+                        </span>
+                      ) : null}
+                      {bottle.ratingBand ? (
+                        <>
+                          <strong {...stylex.props(styles.rating)}>
+                            {
+                              RATING_BANDS.find(
+                                (band) => band.key === bottle.ratingBand,
+                              )?.label
+                            }
+                          </strong>
+                          <TastingRating band={bottle.ratingBand} />
+                        </>
+                      ) : null}
+                    </div>
+                  ) : undefined
+                }
+              />
+              {bottle.description || bottle.byline ? (
+                <div {...stylex.props(styles.details)}>
+                  {bottle.description ? (
+                    <p {...stylex.props(foundationStyles.body, styles.excerpt)}>
+                      {bottle.description}
+                    </p>
+                  ) : null}
+                  {bottle.byline ? (
+                    <div
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.footer,
+                      )}
+                    >
+                      By {bottle.byline}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ))}
+          {item.more ? (
+            <TextLink href={item.more.href} size="sm">
+              {item.more.label}
+            </TextLink>
+          ) : null}
+        </div>
+      </Card>
     </article>
   );
 }
 
+function getActivityLinkLabel(item: CommunityFeedItem) {
+  const bottle = item.bottles[0];
+  if (item.kind === "tasting" && bottle) {
+    return `View tasting of ${bottle.name} by ${item.actor}`;
+  }
+  if (item.kind === "critic_review" && bottle) {
+    return `Read review of ${bottle.name} from ${item.actor}`;
+  }
+  if (item.kind === "member_review" && bottle) {
+    return `Read review of ${bottle.name} by ${item.actor}`;
+  }
+  return item.destination ? `View ${item.destination.label}` : item.action;
+}
+
 const MOBILE = "@media (max-width: 559px)";
 const styles = stylex.create({
-  entry: { paddingTop: space.x4, paddingBottom: space.x4 },
+  entry: {
+    width: "calc(100% + 24px)",
+    marginRight: "-12px",
+    marginLeft: "-12px",
+    paddingTop: space.x4,
+    paddingRight: "12px",
+    paddingBottom: space.x4,
+    paddingLeft: "12px",
+  },
   author: {
     display: "flex",
     alignItems: "center",
@@ -187,6 +234,12 @@ const styles = stylex.create({
     [MOBILE]: { gap: space.x2 },
   },
   context: { minWidth: 0, color: colors.inkMuted },
+  activityLink: {
+    display: "inline",
+    color: "inherit",
+    fontWeight: "inherit",
+    textDecoration: "none",
+  },
   date: { whiteSpace: "nowrap" },
   content: {
     minWidth: 0,

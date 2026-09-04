@@ -21,6 +21,8 @@ export type BottleIdentityRowProps = {
   imageUrl?: string | null;
   isLibrary?: boolean;
   layout?: "cell" | "row";
+  /** Links only the bottle title when the surrounding card is also clickable. */
+  linkArea?: "row" | "title";
   metadata?: readonly string[];
   name: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
@@ -45,8 +47,9 @@ export type BottleIdentityRowProps = {
  * All variants take the same full marketed name and own their thumbnail size.
  * The name line owns title typography so surrounding body leading cannot shift it.
  * Use layout="cell" inside an existing row/selection control. Linked cells keep
- * their hit area inside the bottle identity. Compact omits
- * provenance, metadata, subtitle, status, and related releases; end remains available.
+ * their link inside the bottle identity. Use linkArea="title" when the
+ * surrounding card is also clickable. Compact omits provenance, metadata,
+ * subtitle, status, and related releases; end remains available.
  */
 export function BottleIdentityRow({
   align = "center",
@@ -56,6 +59,7 @@ export function BottleIdentityRow({
   imageUrl,
   isLibrary = false,
   layout = "row",
+  linkArea = "row",
   metadata = [],
   name,
   onClick,
@@ -88,8 +92,11 @@ export function BottleIdentityRow({
         compact && styles.compactRow,
         !compact && align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
-        Boolean(href) && linkedRowStyles.container,
-        Boolean(href) && layout === "row" && linkedRowStyles.onGround,
+        Boolean(href) && linkArea === "row" && linkedRowStyles.container,
+        Boolean(href) &&
+          linkArea === "row" &&
+          layout === "row" &&
+          linkedRowStyles.onGround,
       )}
     >
       <BottleVisual
@@ -113,7 +120,9 @@ export function BottleIdentityRow({
                 styles.name,
                 sidebar && styles.sidebarName,
                 compact && styles.compactName,
-                linkedRowStyles.primaryLink,
+                linkArea === "row"
+                  ? linkedRowStyles.primaryLink
+                  : styles.titleLink,
               )}
             >
               <MatchedText query={query} text={name} />
@@ -282,6 +291,24 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+  },
+  titleLink: {
+    position: "relative",
+    zIndex: zIndices.localControl,
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
+    },
+    textDecorationLine: {
+      default: "none",
+      ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
+    },
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "2px",
   },
   metadata: {
     maxWidth: "100%",

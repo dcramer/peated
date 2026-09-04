@@ -6,6 +6,7 @@ import {
 import { describe, expect, test } from "vitest";
 
 import { getCommunityFeedItems } from "./communityFeed";
+import { getTastingUrl } from "./urls";
 
 const session = mockActivity.find((item) => item.type === "tasting_session")!;
 
@@ -18,6 +19,7 @@ describe("getCommunityFeedItems", () => {
 
     expect(item?.bottles[0]?.description).toBe(mockExternalReview.clip);
     expect(item?.actorHref).toBe(mockExternalReview.url);
+    expect(item?.href).toBe(mockExternalReview.url);
   });
 
   test("maps critic reviews returned as paginated activity", () => {
@@ -38,10 +40,10 @@ describe("getCommunityFeedItems", () => {
       kind: "critic_review",
       actor: mockExternalReview.site?.name,
       actorHref: mockExternalReview.url,
+      href: mockExternalReview.url,
       bottles: [
         {
           description: mockExternalReview.clip,
-          activityHref: mockExternalReview.url,
         },
       ],
     });
@@ -81,7 +83,7 @@ describe("getCommunityFeedItems", () => {
     expect(
       items.every((item) => item.bottles[0]?.metadata?.includes("Batch C923")),
     ).toBe(true);
-    expect(items.map((item) => item.bottles[0]?.activityHref)).toEqual([
+    expect(items.map((item) => item.href)).toEqual([
       mockExternalReview.url,
       `/tastings/${mockTasting.id}-example-barrel-proof`,
     ]);
@@ -112,7 +114,7 @@ describe("getCommunityFeedItems", () => {
   });
 });
 
-test("includes all four activity types, preserves groups, and omits library status", () => {
+test("includes all four activity types, makes one card per tasting, and omits library status", () => {
   const items = getCommunityFeedItems({
     activity: mockActivity,
     criticReviews: [mockExternalReview],
@@ -120,8 +122,17 @@ test("includes all four activity types, preserves groups, and omits library stat
   expect(new Set(items.map((item) => item.kind))).toEqual(
     new Set(["tasting", "critic_review", "member_review", "collection_add"]),
   );
-  expect(items.find((item) => item.id === session.id)?.bottles).toHaveLength(
-    session.tastings.length,
+  const tastings = items.filter((item) => item.kind === "tasting");
+  expect(tastings).toHaveLength(
+    mockActivity
+      .filter((item) => item.type === "tasting_session")
+      .reduce((total, item) => total + item.tastings.length, 0),
+  );
+  expect(tastings.every((item) => item.bottles.length === 1)).toBe(true);
+  expect(tastings.map((item) => item.href)).toEqual(
+    expect.arrayContaining(
+      session.tastings.map((tasting) => getTastingUrl(tasting)),
+    ),
   );
   const additions = items.filter((item) => item.kind === "collection_add");
   expect(additions.map((item) => item.bottles.length)).toEqual([1, 3]);
