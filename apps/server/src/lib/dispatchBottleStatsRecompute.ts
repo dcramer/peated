@@ -1,5 +1,5 @@
 import { logError } from "@peated/server/lib/log";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import type { UpdateBottleStatsJobArgs } from "@peated/server/worker/jobs/updateBottleStats";
 
 type BottleStatsSource = "externalReview" | "memberReview" | "tasting";

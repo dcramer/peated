@@ -50,7 +50,7 @@ import {
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import {
   EntityMergeJobInputSchema,
   isOperationEntityMergeJobInput,

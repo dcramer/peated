@@ -7,7 +7,7 @@ import {
 import { db } from "@peated/server/db";
 import { changes } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 
 export function getCatalogVerificationCreationMetadata(
   creationSource: CatalogVerificationCreationSource,

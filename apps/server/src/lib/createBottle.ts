@@ -43,7 +43,7 @@ import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {

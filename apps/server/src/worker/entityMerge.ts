@@ -1,4 +1,4 @@
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 import type { JobPayload } from "./types";
 

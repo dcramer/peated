@@ -7,7 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { getQueue } from "@peated/server/worker/client";
+import { getQueue } from "@peated/server/worker/queue";
 import { desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { ModerationAutomationResponseSchema } from "./schemas";
 

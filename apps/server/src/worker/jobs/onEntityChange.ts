@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { pushUniqueJob, runJob } from "@peated/server/worker/client";
+import { pushUniqueJob, runJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { z } from "zod";
 

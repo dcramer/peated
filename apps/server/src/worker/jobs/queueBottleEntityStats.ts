@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { notEmpty, uniq } from "@peated/server/lib/filter";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 
 async function queueEntityStats(owner: {
   brandId: number;

@@ -15,6 +15,7 @@ import {
   installInMemoryWorkerDispatch,
   resetInMemoryWorkerDispatch,
 } from "../lib/test/workerDispatch";
+import { getConnection } from "../worker/redis";
 
 process.env.DISABLE_HTTP_CACHE = "1";
 
@@ -25,10 +26,6 @@ installInMemoryWorkerDispatch();
 beforeEach(() => {
   resetInMemoryWorkerDispatch();
 });
-
-// XXX: doing this causes the module to catch and more or less all mocks to break
-// force registration of all jobs
-// import "../worker/jobs";
 
 const pgTables = pgTable("pg_tables", {
   schemaname: text("schemaname").notNull(),
@@ -107,8 +104,7 @@ beforeEach(async (ctx) => {
 beforeEach(async (ctx) => {
   // Clear rate limit keys from Redis
   try {
-    const oJobs = await import("../worker/client");
-    const redis = await oJobs.getConnection();
+    const redis = await getConnection();
     if (redis) {
       const rateLimitPrefixes = [
         "rl:*",

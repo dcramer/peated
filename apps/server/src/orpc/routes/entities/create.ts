@@ -24,7 +24,7 @@ import {
 } from "@peated/server/orpc/middleware/auth";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 
 export default implement(contract)

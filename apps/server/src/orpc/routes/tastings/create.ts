@@ -29,7 +29,7 @@ import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";

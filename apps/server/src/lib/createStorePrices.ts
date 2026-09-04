@@ -25,7 +25,7 @@ import {
   ExternalSiteKeySchema,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
+import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { z } from "zod";

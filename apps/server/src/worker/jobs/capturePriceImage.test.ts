@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { bottles, storePrices } from "@peated/server/db/schema";
 import type * as uploads from "@peated/server/lib/uploads";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
-import type * as workerClient from "@peated/server/worker/client";
+import type * as workerClient from "@peated/server/worker/dispatch";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import capturePriceImageWithServices, {

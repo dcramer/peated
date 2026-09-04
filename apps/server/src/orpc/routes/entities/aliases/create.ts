@@ -6,7 +6,7 @@ import {
 } from "@peated/server/lib/entityAliases";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 
 export default procedure

@@ -1,13 +1,13 @@
 import { context, propagation } from "@opentelemetry/api";
 import { scheduledJob, scheduler } from "@peated/server/lib/cron";
 import * as Sentry from "@sentry/node";
-import { Queue, Worker, type JobsOptions } from "bullmq";
-import IORedis from "ioredis";
+import { Worker, type JobsOptions, type Queue } from "bullmq";
 import { createHash } from "node:crypto";
 import config from "../config";
 import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo, logTelemetryError } from "../lib/log";
 import { initializeScraperRuntime } from "../scraper";
+import { runJob, type WorkerDispatch } from "./dispatch";
 import "./jobs";
 import createNextRepeatingEvents from "./jobs/createNextRepeatingEvents";
 import scheduleScrapers from "./jobs/scheduleScrapers";
@@ -16,8 +16,21 @@ import {
   buildQueuedJobData,
   parseQueuedJobData,
 } from "./payload";
+import { getQueue } from "./queue";
+import { disconnectConnection, getConnection } from "./redis";
 import registry from "./registry";
 import { type JobArgs, type JobName, type QueuedJobInput } from "./types";
+
+export {
+  configureWorkerDispatch,
+  pushJob,
+  pushUniqueJob,
+  runJob,
+  useQueueWorkerDispatch,
+} from "./dispatch";
+export type { WorkerDispatch } from "./dispatch";
+export { getQueue } from "./queue";
+export { getConnection } from "./redis";
 
 export function generateUniqIdentifier(name: string, args?: JobArgs) {
   let hash = createHash("md5");
@@ -92,86 +105,16 @@ async function pushJobToQueue(
   );
 }
 
-export type WorkerDispatch = {
-  pushJob: typeof pushJobToQueue;
-  pushUniqueJob: typeof pushUniqueJobToQueue;
-  runJob: typeof runRegisteredJob;
-};
-
-const queueDispatch: WorkerDispatch = {
+export const queueWorkerDispatch: WorkerDispatch = {
   pushJob: pushJobToQueue,
   pushUniqueJob: pushUniqueJobToQueue,
   runJob: runRegisteredJob,
 };
-let workerDispatch = queueDispatch;
-
-export function configureWorkerDispatch(dispatch: WorkerDispatch) {
-  workerDispatch = dispatch;
-}
-
-/** Restore the production Redis-backed dispatch after a test-owned override. */
-export function useQueueWorkerDispatch() {
-  workerDispatch = queueDispatch;
-}
-
-export async function runJob(jobName: JobName, args?: JobArgs) {
-  return args === undefined
-    ? await workerDispatch.runJob(jobName)
-    : await workerDispatch.runJob(jobName, args);
-}
-
-export async function pushUniqueJob(
-  jobName: JobName,
-  args?: JobArgs,
-  opts?: JobsOptions,
-) {
-  if (opts !== undefined) {
-    return await workerDispatch.pushUniqueJob(jobName, args, opts);
-  }
-  return args === undefined
-    ? await workerDispatch.pushUniqueJob(jobName)
-    : await workerDispatch.pushUniqueJob(jobName, args);
-}
-
-export async function pushJob(
-  jobName: JobName,
-  args?: JobArgs,
-  opts?: JobsOptions,
-) {
-  if (opts !== undefined) {
-    return await workerDispatch.pushJob(jobName, args, opts);
-  }
-  return args === undefined
-    ? await workerDispatch.pushJob(jobName)
-    : await workerDispatch.pushJob(jobName, args);
-}
-
-let connection: IORedis | null = null;
 const SCRAPER_JOB_LOCK_DURATION_MS = 60 * 60_000;
-
-export async function getQueue(
-  name = "default",
-  connection: Awaited<ReturnType<typeof getConnection>> | null = null,
-) {
-  return new Queue(name, {
-    connection: connection || (await getConnection()),
-  });
-}
-
-export async function getConnection() {
-  if (connection) return connection;
-
-  connection = new IORedis(config.REDIS_URL, {
-    maxRetriesPerRequest: null,
-  });
-
-  return connection;
-}
 
 export async function gracefulShutdown(signal?: string, worker?: Worker) {
   scheduler.stop();
-  if (connection) connection.disconnect();
-  connection = null;
+  disconnectConnection();
 }
 
 export type WorkerRuntime = {

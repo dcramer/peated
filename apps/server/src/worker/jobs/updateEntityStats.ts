@@ -6,7 +6,7 @@ import {
   entities,
   tastings,
 } from "@peated/server/db/schema";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";

@@ -2,7 +2,7 @@ import {
   claimStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
 } from "@peated/server/lib/priceMatching";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 
 export type StorePriceMatchRetryEnqueueResult =
   | {

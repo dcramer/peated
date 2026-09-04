@@ -1,7 +1,7 @@
 import {
   configureWorkerDispatch,
   type WorkerDispatch,
-} from "@peated/server/worker/client";
+} from "@peated/server/worker/dispatch";
 import { vi } from "vitest";
 
 export const pushJob = vi.fn<WorkerDispatch["pushJob"]>();

@@ -27,7 +27,7 @@ import {
   resolveActiveBottleIds,
   type ActiveBottleRejectionReason,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
+import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
 /** Lists unresolved, non-ignored references for bounded maintenance output. */

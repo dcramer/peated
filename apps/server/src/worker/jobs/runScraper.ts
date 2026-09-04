@@ -18,7 +18,7 @@ export type RunScraperServices = {
 const defaultServices: RunScraperServices = {
   executeRun: executeScraperRun,
   enqueueRun: async (runId, options) => {
-    const { pushJob } = await import("@peated/server/worker/client");
+    const { pushJob } = await import("@peated/server/worker/dispatch");
     await pushJob("RunScraper", { runId }, options);
   },
 };
