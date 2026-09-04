@@ -60,10 +60,11 @@ type, size, or fill. `caskNumber` is a marketed cask or barrel identifier.
 themselves decide identity. A marketed cask identifier, `singleCask`, and
 `caskStrength` may be identity evidence.
 
-The Bottle `bottler` relationship names the market-facing bottler or release
-imprint. The same Entity may also be the Brand or distillery. Ownership,
-importing, distribution, physical packing, or page hosting alone does not prove
-the relationship. Leave it empty when the evidence does not establish it.
+The Bottle `bottler` relationship names a business that independently selects
+and releases whisky made by another producer. An official Brand or distillery
+release has no bottler. A Bottler may also be the Brand, as with Compass Box.
+Ownership, importing, distribution, or physical packing alone does not prove
+this role.
 
 ## Match And Creation Rules
 

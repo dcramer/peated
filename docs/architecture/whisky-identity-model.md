@@ -133,11 +133,11 @@ edits, while Bottle remains the authority for exact reads.
 for that release. It is not a measurement of the finished whisky and does not
 affect Bottle identity, matching, or grouping.
 
-The Bottle `bottler` relationship identifies the market-facing bottler or
-release imprint named for the product.
-It may point to the same Entity as `brand` or a producing distillery; a separate
-imprint is not required. Ownership, importing, distribution, and physical
-packing alone do not establish the relationship.
+The Bottle `bottler` relationship identifies a business that independently
+selects and releases whisky made by another producer. An official Brand or
+distillery release has no bottler. A Bottler may also be the Brand, as with
+Compass Box. Ownership, importing, distribution, or physical packing alone
+does not prove this role.
 
 During an audit, do not remove a populated bottler because the same Entity fills
 another Bottle relationship or because a source omits it. Remove it only when
@@ -220,8 +220,9 @@ does not change these references. The same alias can belong to more than one
 Entity.
 
 - `brand` is the consumer-facing label brand.
-- `bottler` is the named, market-facing bottler or release imprint for the
-  product. It may equal the Brand or a producing distillery.
+- `bottler` is a business that independently selects and releases whisky made by
+  another producer. It may also be the Brand. An official Brand or distillery
+  release has no bottler.
 - `distillery` identifies the actual producer or producers.
 - `series` is a stable range or family, not a batch code or release year.
 - `edition` is the exact human-facing release descriptor shown in the
