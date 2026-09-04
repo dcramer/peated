@@ -112,7 +112,7 @@ test("loads version 3 rules only through their original contract", () => {
   ).toThrow();
 });
 
-test("accepts bounded sibling review sections", () => {
+test("accepts review sections with an end selector", () => {
   const config = reviewConfig(25);
   const rules = ScrapeRulesSchema.parse({
     ...config,

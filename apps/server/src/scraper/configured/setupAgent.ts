@@ -27,7 +27,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v11";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v12";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -181,8 +181,8 @@ const SuggestedReviewRulesSchema = z
         reviewItem: z
           .object({
             selector: ScrapeSelectorSchema,
-            includeFollowingSiblings: z.boolean(),
-            endBefore: ScrapeSelectorSchema.nullable(),
+            startsSection: z.boolean(),
+            sectionEndsBefore: ScrapeSelectorSchema.nullable(),
           })
           .strict(),
         name: SuggestedValueSelectorSchema,
@@ -288,8 +288,8 @@ const RULE_INSTRUCTIONS = [
   "Review rules must read the publisher's publication date.",
   "When a review date exists only in the canonical URL path, use url_date with a format made from yyyy, yy, MM, dd, and * tokens. Literal characters must match the path. Repeated date tokens must agree.",
   "Set canonicalUrl only when the article's stored canonical URL needs to come from page markup or bounded cleanup such as removing a trailing slash. Otherwise set it to null.",
-  "For reviews, reviewItem selector must identify either each complete review container or each sibling heading that starts a review. Its text is retained internally for later parsing. Exclude navigation, comments, related articles, and other bottles' reviews.",
-  "Set reviewItem includeFollowingSiblings to true only when each selected heading starts a review whose content continues through following siblings. With one selected heading, its parent is the complete review. With several, parsing stops before the next selected heading. Set endBefore to a sibling selector only when another element must end a section; otherwise set it to null. Use selectors local to each resulting review section for name, reviewText, writer, and score.",
+  "For reviews, reviewItem selector must identify either each complete review container or each heading that starts a review section. Its text is retained internally for later parsing. Exclude navigation, comments, related articles, and other bottles' reviews.",
+  "Set reviewItem startsSection to true only when each selected heading starts a review and the elements after it contain the rest of that review. Parsing stops before the next selected heading. When only one heading matches, its parent is the review. Set sectionEndsBefore only when another element must end the last section; otherwise set it to null. Keep selectors for name, reviewText, writer, and score inside each review section.",
   "Use reviewText for a narrower tasting-notes container when available; otherwise select the review body. This text is used for flavor matching and short clips.",
   "Include an optional field when the supplied pages clearly and consistently provide it.",
   "Pagination must add new detail-page links when the website has a next page.",
@@ -390,10 +390,10 @@ function toScrapeList(input: SuggestedListRules): ReviewRules["list"] {
 function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
   let reviewItem: ReviewRules["detail"]["reviewItem"] =
     input.detail.reviewItem.selector;
-  if (input.detail.reviewItem.includeFollowingSiblings) {
+  if (input.detail.reviewItem.startsSection) {
     reviewItem = { start: input.detail.reviewItem.selector };
-    if (input.detail.reviewItem.endBefore) {
-      reviewItem.endBefore = input.detail.reviewItem.endBefore;
+    if (input.detail.reviewItem.sectionEndsBefore) {
+      reviewItem.endBefore = input.detail.reviewItem.sectionEndsBefore;
     }
   }
   const detail: ReviewRules["detail"] = {

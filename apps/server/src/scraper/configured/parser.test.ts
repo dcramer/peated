@@ -883,7 +883,7 @@ describe("scrape source parser", () => {
     });
   });
 
-  it("stops sibling review sections at the next heading or ending selector", () => {
+  it("stops review sections at the next heading or end selector", () => {
     const result = parseScrapeDetail(
       {
         ...reviewConfig,

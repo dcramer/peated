@@ -91,9 +91,9 @@ optionally beginning with one of the configured literal labels. Code follows at
 most five list pages. Version 3 also lets review sources select and clean their
 canonical URL, read a publication date from a URL path with bounded `yyyy`, `yy`,
 `MM`, `dd`, and `*` tokens, and map up to 25 finite text grades to numeric values.
-Version 4 also lets a review heading start a section made from its following
-sibling blocks. A section stops before the next selected heading or an explicit
-ending selector. When only one heading matches, its parent is the review body.
+Version 4 also lets a heading start a review that continues through the elements
+after it. The review stops before the next selected heading or an optional end
+selector. When only one heading matches, its parent is the review body.
 Rules do not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
 page templates, infinite scrolling, or cross-origin discovery. Add a code-owned

@@ -7,12 +7,11 @@ import type { z } from "zod";
 import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
 import type {
-  ScrapeReviewSection,
   ScrapeValue,
   ScrapeValueSelectorV1,
   StoredScrapeRules,
 } from "./rules";
-import { normalizeScrapeReviewItem } from "./rules";
+import { ScrapeReviewSectionSchema, ScrapeSelectorSchema } from "./rules";
 
 export type ScrapeListResult = {
   links: string[];
@@ -33,7 +32,6 @@ export type ScrapeDetailResult =
     };
 
 type ScrapeReadableValue = ScrapeValue | ScrapeValueSelectorV1;
-type ScrapeNode = { parent?: ScrapeNode | null };
 
 function normalizeValue(value: string | undefined) {
   return value?.replaceAll(/\s+/g, " ").trim() || null;
@@ -306,31 +304,29 @@ function priceField(path: PropertyKey[]) {
 
 function selectReviewItems(
   $: ReturnType<typeof load>,
-  rule: string | ScrapeReviewSection,
+  rule: Extract<StoredScrapeRules, { kind: "review" }>["detail"]["reviewItem"],
 ) {
-  const itemRule = normalizeScrapeReviewItem(rule);
-  if (itemRule.kind === "element") {
-    return $(itemRule.selector)
+  const section = ScrapeReviewSectionSchema.safeParse(rule);
+  if (!section.success) {
+    return $(ScrapeSelectorSchema.parse(rule))
       .toArray()
       .map((element) => ({
         body: $(element),
         item: load($.html(element)),
-        nodes: [element],
       }));
   }
 
-  const starts = $(itemRule.start).toArray();
+  const starts = $(section.data.start).toArray();
   return starts.map((start) => {
     if (starts.length === 1) {
       const body = $(start).parent();
       return {
         body,
         item: load(body.html() ?? ""),
-        nodes: body.toArray(),
       };
     }
 
-    const stopSelector = [itemRule.start, itemRule.endBefore]
+    const stopSelector = [section.data.start, section.data.endBefore]
       .filter(Boolean)
       .join(", ");
     const body = $(start).add($(start).nextUntil(stopSelector));
@@ -342,7 +338,6 @@ function selectReviewItems(
           .map((element) => $.html(element))
           .join(""),
       ),
-      nodes: body.toArray(),
     };
   });
 }
@@ -418,17 +413,7 @@ function parseReviewDetail(
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
   const reviewItems = selectReviewItems($, rules.detail.reviewItem);
-  const reviewItemNodes = new Set<ScrapeNode>(
-    reviewItems.flatMap(({ nodes }) => nodes),
-  );
-  const isWithinReviewItem = (element: ScrapeNode) => {
-    let current: ScrapeNode | null = element;
-    while (current) {
-      if (reviewItemNodes.has(current)) return true;
-      current = current.parent ?? null;
-    }
-    return false;
-  };
+  const reviewNodes = reviewItems.map(({ body }) => body.add(body.find("*")));
   const readReviewValue = (
     item: ReturnType<typeof load>,
     selector: ScrapeReadableValue,
@@ -441,7 +426,8 @@ function parseReviewDetail(
     const pageBylines =
       reviewerSelector && !("value" in reviewerSelector)
         ? $(reviewerSelector.selector).filter(
-            (_, element) => !isWithinReviewItem(element),
+            (_, element) =>
+              !reviewNodes.some((nodes) => nodes.index(element) >= 0),
           )
         : null;
     // Scraper parsing shares only one explicit page byline; a review's writer stays local.

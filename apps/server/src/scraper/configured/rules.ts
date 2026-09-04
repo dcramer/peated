@@ -307,17 +307,6 @@ export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
 export type ScrapeListExclusion = z.infer<typeof ScrapeListExclusionSchema>;
-export type ScrapeReviewSection = z.infer<typeof ScrapeReviewSectionSchema>;
-
-export function normalizeScrapeReviewItem(value: string | ScrapeReviewSection) {
-  const section = ScrapeReviewSectionSchema.safeParse(value);
-  return section.success
-    ? ({ kind: "section", ...section.data } as const)
-    : ({
-        kind: "element",
-        selector: ScrapeSelectorSchema.parse(value),
-      } as const);
-}
 
 /** Parses rules only with the interpreter contract that owns their stored version. */
 export function parseScrapeRules(

@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
-import { prepareMultiReviewSource } from "./prepareMultiReviewSource";
-import type { PrepareReviewSourceInput } from "./prepareReviewSource";
+import {
+  prepareReviewSource,
+  type PrepareReviewSourceInput,
+} from "./prepareReviewSource";
 
 function normalizeKeyPart(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLocaleLowerCase("en");
@@ -10,15 +12,16 @@ function normalizeKeyPart(value: string) {
 export async function prepareWordsOfWhiskySource(
   input: PrepareReviewSourceInput,
 ) {
-  return prepareMultiReviewSource(input, {
+  return prepareReviewSource(input, {
     siteKey: "wordsofwhisky",
     siteName: "Words of Whisky",
     targetKey: "wordsofwhisky",
     origin: "https://wordsofwhisky.com",
     listUrl: "https://wordsofwhisky.com/",
+    allowsMultipleReviews: true,
     isCanonicalArticleUrl: (url) =>
       /^https:\/\/wordsofwhisky\.com\/[a-z0-9][a-z0-9-]*$/.test(url),
-    legacyReviewKey: ({ articleUrl, name, reviewerName }) => {
+    expectedReviewKey: ({ articleUrl, name, reviewerName }) => {
       const digest = createHash("sha256")
         .update(
           [articleUrl, name, reviewerName ?? ""]
