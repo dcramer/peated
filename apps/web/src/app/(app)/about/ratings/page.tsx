@@ -51,7 +51,7 @@ export default function RatingsPage() {
   return (
     <AboutPage
       currentHref="/about/ratings"
-      description="Tastings use five named ratings. Reviews keep their original scores. Bottle ratings show both without turning a tasting into an exact score."
+      description="Tastings use five named ratings. Reviews keep their original scores. Older tastings used stars; those stars map to the five current ratings."
       rail={
         <RailSection heading="Where these appear">
           <RailList ariaLabel="Rating examples">
@@ -82,6 +82,21 @@ export default function RatingsPage() {
           Pick the rating that describes the whole whisky. The same five choices
           on every tasting make bottles easier to compare.
         </AboutText>
+      </PageSection>
+
+      <PageSection heading="Old star ratings">
+        <AboutTextStack>
+          <AboutText>
+            Peated used stars before the current five ratings. We convert the
+            saved stars like this: ¼–2 becomes Mediocre; 2¼–3 becomes Good; 3¼–4
+            becomes Very good; 4¼–4½ becomes Outstanding; and 4¾–5 becomes
+            Unicorn.
+          </AboutText>
+          <AboutText>
+            A saved zero meant Not rated, so it stays unrated. We keep the
+            original stars on the tasting.
+          </AboutText>
+        </AboutTextStack>
       </PageSection>
 
       <PageSection heading="Writing a review">

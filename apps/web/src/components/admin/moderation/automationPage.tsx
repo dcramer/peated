@@ -38,17 +38,12 @@ export default function AutomationPage() {
   const cancel = useMutation(
     orpc.prices.matchQueue.cancelRetryRun.mutationOptions(),
   );
-  const repairBottleCounts = useMutation(
-    orpc.admin.repairBottleCounts.mutationOptions(),
-  );
   const activeRun = useSuspenseQuery(
     orpc.prices.matchQueue.activeRetryRun.queryOptions({
       refetchInterval: 5_000,
     }),
   );
   const [error, setError] = useState<string | null>(null);
-  const [repairNotice, setRepairNotice] = useState<string | null>(null);
-  const [repairError, setRepairError] = useState<string | null>(null);
 
   async function refresh() {
     await Promise.all([
@@ -89,17 +84,6 @@ export default function AutomationPage() {
     }
   }
 
-  async function startBottleCountRepair() {
-    setRepairNotice(null);
-    setRepairError(null);
-    try {
-      await repairBottleCounts.mutateAsync({});
-      setRepairNotice("Repair requested.");
-    } catch {
-      setRepairError("The repair could not be started. Try again.");
-    }
-  }
-
   return (
     <>
       <ModerationNav />
@@ -119,28 +103,6 @@ export default function AutomationPage() {
           <AdminStat label="Failed" value={data.counts.failed} />
           <AdminStat label="Cleared today" value={data.counts.clearedToday} />
         </AdminStatGrid>
-        <AdminSection
-          title="Bottle counts"
-          description="Check the bottle count for every brand and producer, and fix any that are wrong. You can keep editing bottles while this runs."
-          action={
-            <Button
-              disabled={repairBottleCounts.isPending}
-              loading={repairBottleCounts.isPending}
-              onClick={() => void startBottleCountRepair()}
-              size="sm"
-            >
-              Repair counts
-            </Button>
-          }
-        >
-          {repairError ? (
-            <Alert type="error">{repairError}</Alert>
-          ) : repairNotice ? (
-            <Alert type="success">{repairNotice}</Alert>
-          ) : (
-            "This checks one brand or producer at a time."
-          )}
-        </AdminSection>
         {activeRun.data.run ? (
           <AdminSection
             title={`Active listing retry · Run #${activeRun.data.run.id}`}
