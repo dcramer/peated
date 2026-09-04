@@ -54,4 +54,20 @@ describe("bottler instructions", () => {
       ]),
     );
   });
+
+  test("keeps Gordon & MacPhail as Brand and bottler", () => {
+    const instructions = buildWhiskyLabelExtractorInstructions({
+      mode: "text",
+    });
+    const start = instructions.indexOf(
+      "Input: `Gordon & MacPhail Caol Ila 12 Year First Fill Bourbon Cask`",
+    );
+    const end = instructions.indexOf("\n\nInput:", start);
+    const example = instructions.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(example).toContain('"brand": "Gordon & MacPhail"');
+    expect(example).toContain('"bottler": "Gordon & MacPhail"');
+    expect(example).toContain('"Caol Ila"');
+  });
 });

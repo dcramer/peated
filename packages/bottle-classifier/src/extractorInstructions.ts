@@ -457,7 +457,7 @@ const EXTRACTION_EXAMPLES: ExtractionExample[] = [
     input: "Gordon & MacPhail Caol Ila 12 Year First Fill Bourbon Cask",
     output: {
       brand: "Gordon & MacPhail",
-      bottler: null,
+      bottler: "Gordon & MacPhail",
       expression: null,
       series: null,
       distillery: ["Caol Ila"],
