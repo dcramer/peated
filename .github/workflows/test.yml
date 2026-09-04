@@ -232,14 +232,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Setup pnpm, Node, and dependencies
+      - name: Setup pnpm and Node
         uses: pnpm/setup@703c52620218391530e48b9e8870d5c0082e1b9b # v2.1.0
         with:
           runtime: node@24.18.0
           cache: true
-          require-lockfile: true
+          install: false
       - name: Run docker images
         run: docker compose up -d
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Run server tests
         run: pnpm --filter @peated/server test:ci -- --shard=${{ matrix.shard }}/${{ matrix.total }}
 
