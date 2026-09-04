@@ -12,6 +12,10 @@ import {
 } from "../adapters/whiskeyReviewer";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
+import {
+  discoverWordsOfWhiskyArticles,
+  parseWordsOfWhiskyArticle,
+} from "../adapters/wordsOfWhisky";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import { parseScrapeRules, type ScrapeRules } from "./rules";
 
@@ -250,6 +254,44 @@ const whiskeyReviewerRules = {
   },
 } satisfies ScrapeRules;
 
+const wordsOfWhiskyRules = {
+  kind: "review",
+  list: {
+    item: "article.category-tastingnotes",
+    detailLink: { selector: "a[href]", attribute: "href" },
+    maxItems: 20,
+  },
+  detail: {
+    canonicalUrl: {
+      selector: 'link[rel="canonical"]',
+      attribute: "href",
+      removeSuffixes: ["/"],
+    },
+    title: { selector: ".post-wrap .entry-title" },
+    publishedAt: {
+      selector: ".post-wrap time.entry-date",
+      attribute: "datetime",
+    },
+    reviewItem: { start: ".entry-content > h2" },
+    name: { selector: "h2" },
+    reviewerName: {
+      selector: ".side-author__wrap .side-meta .title",
+    },
+    reviewText: {
+      selector: "p",
+      startsWith: ["Nose:", "Palate:", "Taste:", "Finish:"],
+      all: true,
+    },
+    score: {
+      value: {
+        selector: ".lets-review-block__final-score",
+        suffix: "/10",
+      },
+      scale: 10,
+    },
+  },
+} satisfies ScrapeRules;
+
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
   legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
@@ -397,6 +439,20 @@ describe("scrape source parser", () => {
     ).toEqual(legacyLinks);
   });
 
+  it("matches the current Words of Whisky article links", async () => {
+    const pageUrl = new URL("https://wordsofwhisky.com/");
+    const html = await loadFixture("wordsofwhisky", "index.html");
+    const legacyLinks = discoverWordsOfWhiskyArticles(html).map(
+      (url) => url.href,
+    );
+
+    expect(
+      parseScrapeList(wordsOfWhiskyRules, html, pageUrl).links.map((url) =>
+        url.replace(/\/$/u, ""),
+      ),
+    ).toEqual(legacyLinks);
+  });
+
   it("rejects a next page on another website", () => {
     const result = parseScrapeList(
       {
@@ -507,6 +563,44 @@ describe("scrape source parser", () => {
       Object.values(legacy.externalReviewBodies),
     );
   });
+
+  it.each(["single-review.html", "multi-review.html"])(
+    "matches the current Words of Whisky parser for %s",
+    async (fixture) => {
+      const url = new URL(
+        fixture === "single-review.html"
+          ? "https://wordsofwhisky.com/bruichladdich-greener-still-review"
+          : "https://wordsofwhisky.com/kanosuke-dingle-meikle-toir-the-whisky-exchange",
+      );
+      const html = await loadFixture("wordsofwhisky", fixture);
+      const legacy = parseWordsOfWhiskyArticle(html, url);
+      const configured = parseScrapeDetail(wordsOfWhiskyRules, html, url);
+
+      expect(configured.kind).toBe("review");
+      expect(configured.issues).toEqual([]);
+      if (configured.kind !== "review" || !configured.value) {
+        throw new Error("Expected configured review output.");
+      }
+      expect(configured.value.article).toMatchObject({
+        canonicalUrl: legacy.article.canonicalUrl,
+        title: legacy.article.title,
+        publishedAt: legacy.article.publishedAt,
+      });
+      expect(configured.value.article.externalReviews).toMatchObject(
+        legacy.article.externalReviews.map((review) => ({
+          name: review.name,
+          reviewerName: review.reviewerName,
+          nativeScore: review.nativeScore,
+        })),
+      );
+      expect(Object.values(configured.value.externalReviewTexts)).toEqual(
+        Object.values(legacy.externalReviewTexts),
+      );
+      expect(Object.values(configured.value.externalReviewBodies)).toEqual(
+        Object.values(legacy.externalReviewBodies),
+      );
+    },
+  );
 
   it("rejects conflicting URL dates and unmapped scores", async () => {
     const html = (await loadFixture("whiskeyreviewer", "review.html"))
@@ -786,6 +880,41 @@ describe("scrape source parser", () => {
     expect(result.value.externalReviewTexts).toEqual({
       [first.sourceKey]: "Nose: vanilla.",
       [second.sourceKey]: "Palate: smoke.",
+    });
+  });
+
+  it("stops sibling review sections at the next heading or ending selector", () => {
+    const result = parseScrapeDetail(
+      {
+        ...reviewConfig,
+        detail: {
+          ...reviewConfig.detail,
+          reviewItem: {
+            start: ".reviews > h2.review",
+            endBefore: ".reviews > .related",
+          },
+          name: { selector: "h2.review" },
+          reviewText: { selector: "p.notes" },
+          score: undefined,
+        },
+      },
+      `<h1>Two reviews</h1><time datetime="2026-09-01"></time>
+      <div class="reviews">
+        <h2 class="review">First Bottle</h2><p class="notes">Nose: fruit.</p>
+        <h2 class="review">Second Bottle</h2><p class="notes">Palate: smoke.</p>
+        <div class="related">Related reviews</div>
+      </div>`,
+      new URL("https://reviews.test/sections"),
+    );
+
+    expect(result.issues).toEqual([]);
+    if (result.kind !== "review" || !result.value) {
+      throw new Error("Expected reviews");
+    }
+    const [first, second] = result.value.article.externalReviews;
+    expect(result.value.externalReviewBodies).toEqual({
+      [first.sourceKey]: "First Bottle\n\nNose: fruit.",
+      [second.sourceKey]: "Second Bottle\n\nPalate: smoke.",
     });
   });
 

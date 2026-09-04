@@ -4,7 +4,8 @@ import { z } from "zod";
 
 export const SCRAPE_RULES_VERSION_1 = 1;
 export const SCRAPE_RULES_VERSION_2 = 2;
-export const SCRAPE_RULES_VERSION = 3;
+export const SCRAPE_RULES_VERSION_3 = 3;
+export const SCRAPE_RULES_VERSION = 4;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -217,26 +218,35 @@ const ScrapeScoreSchema = z
     }
   });
 
-const ReviewRulesSchema = z
+export const ScrapeReviewSectionSchema = z
   .object({
-    kind: z.literal("review"),
-    list: ListRulesSchema,
-    detail: z
-      .object({
-        canonicalUrl: ScrapeValueSchema.optional(),
-        title: ScrapeValueSchema,
-        publishedAt: z
-          .union([ScrapeValueSchema, ScrapeUrlDateSchema])
-          .optional(),
-        reviewItem: ScrapeSelectorSchema,
-        name: ScrapeValueSchema,
-        reviewerName: ScrapeValueSchema.optional(),
-        reviewText: ScrapeValueSchema.optional(),
-        score: ScrapeScoreSchema.optional(),
-      })
-      .strict(),
+    start: ScrapeSelectorSchema,
+    endBefore: ScrapeSelectorSchema.optional(),
   })
   .strict();
+
+function currentReviewRulesSchema<T extends z.ZodType>(reviewItemSchema: T) {
+  return z
+    .object({
+      kind: z.literal("review"),
+      list: ListRulesSchema,
+      detail: z
+        .object({
+          canonicalUrl: ScrapeValueSchema.optional(),
+          title: ScrapeValueSchema,
+          publishedAt: z
+            .union([ScrapeValueSchema, ScrapeUrlDateSchema])
+            .optional(),
+          reviewItem: reviewItemSchema,
+          name: ScrapeValueSchema,
+          reviewerName: ScrapeValueSchema.optional(),
+          reviewText: ScrapeValueSchema.optional(),
+          score: ScrapeScoreSchema.optional(),
+        })
+        .strict(),
+    })
+    .strict();
+}
 
 function priceRulesSchema<T extends z.ZodType, U extends z.ZodType>(
   valueSchema: T,
@@ -272,14 +282,22 @@ export const ScrapeRulesV2Schema = z.discriminatedUnion("kind", [
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
+export const ScrapeRulesV3Schema = z.discriminatedUnion("kind", [
+  currentReviewRulesSchema(ScrapeSelectorSchema),
+  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
+]);
+
 export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
-  ReviewRulesSchema,
+  currentReviewRulesSchema(
+    z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
+  ),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
 export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV1Schema,
   ScrapeRulesV2Schema,
+  ScrapeRulesV3Schema,
   ScrapeRulesSchema,
 ]);
 
@@ -289,6 +307,17 @@ export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
 export type ScrapeListExclusion = z.infer<typeof ScrapeListExclusionSchema>;
+export type ScrapeReviewSection = z.infer<typeof ScrapeReviewSectionSchema>;
+
+export function normalizeScrapeReviewItem(value: string | ScrapeReviewSection) {
+  const section = ScrapeReviewSectionSchema.safeParse(value);
+  return section.success
+    ? ({ kind: "section", ...section.data } as const)
+    : ({
+        kind: "element",
+        selector: ScrapeSelectorSchema.parse(value),
+      } as const);
+}
 
 /** Parses rules only with the interpreter contract that owns their stored version. */
 export function parseScrapeRules(
@@ -300,6 +329,9 @@ export function parseScrapeRules(
   }
   if (rulesVersion === SCRAPE_RULES_VERSION_2) {
     return ScrapeRulesV2Schema.parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_3) {
+    return ScrapeRulesV3Schema.parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);
