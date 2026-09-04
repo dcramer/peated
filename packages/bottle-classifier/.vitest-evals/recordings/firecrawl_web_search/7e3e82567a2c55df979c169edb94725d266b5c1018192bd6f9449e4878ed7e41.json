@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:37:01.592Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Russell's Reserve Single Barrel Rye official product ABV age cask strength"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Russell's Reserve Single Barrel Rye official product ABV age cask strength",
+        "summary": "It is a non-chill filtered rye whiskey bottled at 52% ABV. And it is delicious. Russell's Reserve Single Barrel Rye. Purchase Info: $59.99 ... RUSSELL'S RESERVE SINGLE BARREL RYE Batch LL/HH271516 (August 27, 2019) MASH BILL – 51% rye, 37% corn, 12% malted barley PROOF – 104 AGE ... St.\n\nSt.\n\nSt.\n\nSt.\n\nSt.\n\nSt.\n\n# Single Barrel Bourbon\n## More to discover\n[![Russell's Reserve](https://www.russellsreserve.com/app/themes/campari-wdf/assets/images/placeholderbgtransparent.webp)\\\n\\\n**10 Year Old Bourbon**](https://www.russellsreserve.com/en-us/our-products/10-year-old-bourbon/)\n\n[![Russell's Reser",
+        "results": [
+          {
+            "title": "Russell's Reserve Single Barrel Rye - BOURBON GUY",
+            "url": "https://www.bourbonguy.com/blog/2016/6/30/russells-reserve-single-barrel-rye",
+            "domain": "bourbonguy.com",
+            "description": "It is a non-chill filtered rye whiskey bottled at 52% ABV. And it is delicious. Russell's Reserve Single Barrel Rye. Purchase Info: $59.99 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Revisiting: Russell's Reserve Single Barrel Rye - The Right Spirit",
+            "url": "https://the-right-spirit.com/2024/01/19/revisiting-russells-reserve-single-barrel-rye/",
+            "domain": "the-right-spirit.com",
+            "description": "RUSSELL'S RESERVE SINGLE BARREL RYE Batch LL/HH271516 (August 27, 2019) MASH BILL – 51% rye, 37% corn, 12% malted barley PROOF – 104 AGE ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Barrel Bourbon | Russell's Reserve",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-bourbon/",
+            "domain": "russellsreserve.com",
+            "description": "St.\n\nSt.\n\nSt.\n\nSt.\n\nSt.\n\nSt.\n\n# Single Barrel Bourbon\n## More to discover\n[![Russell's Reserve](https://www.russellsreserve.com/app/themes/campari-wdf/assets/images/placeholderbgtransparent.webp)\\\n\\\n**10 Year Old Bourbon",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Rye Review : r/bourbon - Reddit",
+            "url": "https://www.reddit.com/r/bourbon/comments/155ymoc/russells_reserve_single_barrel_rye_review/",
+            "domain": "reddit.com",
+            "description": "104 proof, $61.99+tax. 37% corn, 51% rye, 12% malted barley. Finish is a bit flat, with lingering dry oak, mint, baking spices, sweet vanilla ...Review #482 - Russell's Reserve 6 Year Rye : r/bourbon - RedditReview #229:",
+            "extraSnippets": []
+          },
+          {
+            "title": "RUSSELL'S RESERVE SINGLE BARREL RYE CASK STRENGTH ...",
+            "url": "https://www.healthyspirits.com/products/russells-reserve-single-barrel-rye-cask-strength-750ml",
+            "domain": "healthyspirits.com",
+            "description": "In stock Rating 4.180RUSSELL'S RESERVE SINGLE BARREL RYE CASK STRENGTH 750ML $89.99 Pepper, vanilla, and tobacco flavors. In stock: 9 available ・ non-chill filtered, 104-proof ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7e3e82567a2c55df979c169edb94725d266b5c1018192bd6f9449e4878ed7e41",
+    "mode": "auto"
+  }
+}

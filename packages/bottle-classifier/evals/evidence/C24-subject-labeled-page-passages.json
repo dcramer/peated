@@ -1,0 +1,189 @@
+{
+  "name": "C24 subject-labeled page passages",
+  "reviewedAt": "2026-09-04",
+  "notes": "Reviewed exact-product evidence for two Watchpost inputs and one age-stated blend comparison. The page summaries stay identical across control and treatment. Current code drops the unrecognized subjectPassages field; the treatment preserves it.",
+  "sources": [
+    "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+    "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines"
+  ],
+  "cases": {
+    "watchpost-whiskey": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Watchpost exact-product page",
+            "summary": "The exact producer product page is available. Read it to distinguish the complete Bottle from the whiskies used in the blend.",
+            "results": [
+              {
+                "title": "WATCHPOST WHISKEY",
+                "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+                "domain": "watchpostwhiskey.com",
+                "description": "Producer page for Watchpost Whiskey.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Verify the exact Watchpost product",
+            "summary": "WATCHPOST WHISKEY. AN ADVENTUROUS BLEND WITH A SENSE OF PLACE. Watchpost is an American Blended Whiskey that brings together the rich quality of 8-year-old Westland American Single Malt and the smooth, light character of grain whiskey from America’s heartland. 42.5% Alc/Vol.",
+            "subjectPassages": {
+              "wholeProduct": [
+                "WATCHPOST WHISKEY",
+                "Watchpost is an American Blended Whiskey",
+                "42.5% Alc/Vol."
+              ],
+              "components": [
+                {
+                  "name": "Westland American Single Malt",
+                  "passages": ["8-year-old Westland American Single Malt"]
+                },
+                {
+                  "name": "grain whiskey from America’s heartland",
+                  "passages": ["grain whiskey from America’s heartland"]
+                }
+              ]
+            },
+            "results": [
+              {
+                "title": "WATCHPOST WHISKEY",
+                "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+                "domain": "watchpostwhiskey.com",
+                "description": "Producer page for Watchpost Whiskey.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "image-backed-photo-creates-watchpost-whiskey": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Watchpost exact-product page",
+            "summary": "The exact producer product page is available. Read it to distinguish the complete Bottle from the whiskies used in the blend.",
+            "results": [
+              {
+                "title": "WATCHPOST WHISKEY",
+                "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+                "domain": "watchpostwhiskey.com",
+                "description": "Producer page for Watchpost Whiskey.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Verify the exact Watchpost product",
+            "summary": "WATCHPOST WHISKEY. AN ADVENTUROUS BLEND WITH A SENSE OF PLACE. Watchpost is an American Blended Whiskey that brings together the rich quality of 8-year-old Westland American Single Malt and the smooth, light character of grain whiskey from America’s heartland. 42.5% Alc/Vol.",
+            "subjectPassages": {
+              "wholeProduct": [
+                "WATCHPOST WHISKEY",
+                "Watchpost is an American Blended Whiskey",
+                "42.5% Alc/Vol."
+              ],
+              "components": [
+                {
+                  "name": "Westland American Single Malt",
+                  "passages": ["8-year-old Westland American Single Malt"]
+                },
+                {
+                  "name": "grain whiskey from America’s heartland",
+                  "passages": ["grain whiskey from America’s heartland"]
+                }
+              ]
+            },
+            "results": [
+              {
+                "title": "WATCHPOST WHISKEY",
+                "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+                "domain": "watchpostwhiskey.com",
+                "description": "Producer page for Watchpost Whiskey.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "image-backed-photo-creates-compass-box-hedonism-squared": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Compass Box Hedonism squared exact-product page",
+            "summary": "The exact retailer product page is available. Read it for the Bottle age and the grain whiskies in the blend.",
+            "results": [
+              {
+                "title": "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+                "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+                "domain": "hedonism.co.uk",
+                "description": "Exact product page for Compass Box Hedonism².",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Verify the exact Compass Box Hedonism squared product",
+            "summary": "Compass Box Hedonism² (Exclusive to Hedonism Wines). 49%. An exclusive bottling of Compass Box’s grain whisky blend Hedonism. A marriage of venerable grain whiskies from North British, Port Dundas and Girvan. The youngest whiskies in the blend are 23 years of age and the spirit is bottled at a robust 49% ABV. 1 of 648 bottles.",
+            "subjectPassages": {
+              "wholeProduct": [
+                "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+                "The youngest whiskies in the blend are 23 years of age and the spirit is bottled at a robust 49% ABV.",
+                "1 of 648 bottles"
+              ],
+              "components": [
+                {
+                  "name": "North British",
+                  "passages": ["grain whiskies from North British"]
+                },
+                {
+                  "name": "Port Dundas",
+                  "passages": ["Port Dundas"]
+                },
+                {
+                  "name": "Girvan",
+                  "passages": ["Girvan"]
+                }
+              ]
+            },
+            "results": [
+              {
+                "title": "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+                "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+                "domain": "hedonism.co.uk",
+                "description": "Exact product page for Compass Box Hedonism².",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    }
+  }
+}

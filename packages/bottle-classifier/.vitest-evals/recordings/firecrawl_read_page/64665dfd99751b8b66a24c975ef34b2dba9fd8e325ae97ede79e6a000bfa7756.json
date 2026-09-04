@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:22:57.267Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+    "focus": "official product title, exact ABV/proof, release or edition wording, age, cask strength, and distillery details"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "official product title, exact ABV/proof, release or edition wording, age, cask strength, and distillery details",
+    "summary": "2017 Limited Edition Small Batch\n\n107.3 Proof / Aged Minimum 12-15 Years",
+    "results": [
+      {
+        "title": "2017 Four Roses Limited Edition: A Perfect Year | Four Roses",
+        "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": "With a bold array of nuanced flavors, the 2017 Four Roses Limited Edition bourbon is unlike anything you've tasted. So, treat yourself the best today.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "64665dfd99751b8b66a24c975ef34b2dba9fd8e325ae97ede79e6a000bfa7756",
+    "mode": "auto"
+  }
+}

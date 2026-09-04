@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-09-04T18:27:52.641Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:bruichladdich.com Octomore 13.1 59.2 5 years 2016 official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:bruichladdich.com Octomore 13.1 59.2 5 years 2016 official",
+        "summary": "Port Charlotte heavily peated single malt scotch whisky is conceived, distilled, matured and bottled on Islay. Always un-chill filtered and colouring free. Shop ...",
+        "results": [
+          {
+            "title": "Port Charlotte | Peated Islay Single Malt Whisky - Bruichladdich Distillery",
+            "url": "https://www.bruichladdich.com/collections/port-charlotte",
+            "domain": "bruichladdich.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2687bb450123993c910ec87c1c62fade9aa82363c4895644dea47d8941c0c4ee",
+    "mode": "auto"
+  }
+}

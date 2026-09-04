@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:25:19.662Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "The Macallan Classic Cut 2021 Edition official ABV cask maturation release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "The Macallan Classic Cut 2021 Edition official ABV cask maturation release",
+        "summary": "A single malt matured in an exquisite union of oak casks, this single malt was carefully crafted by the Whisky Mastery Team to showcase the role of ... The Macallan Classic Cut - 2021 Edition Enter address for price and availability. Double Cask 12 Years Old. Limited Releases Lifestyle & Accessories Archive It was the 2021 release of the Macallan Rare Cask Black, made with some peated malt. it tastes to me like a 25-35 year old malt … mellow peat ... Free delivery 30-day returnsJun 10, 2024 · The Macallan Classic Cut - 2024 Edition has been bottled at 52.4% ABV and features notes of vanilla, t",
+        "results": [
+          {
+            "title": "The Macallan Classic Cut - 2021 Edition",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2021-edition",
+            "domain": "themacallan.com",
+            "description": "A single malt matured in an exquisite union of oak casks, this single malt was carefully crafted by the Whisky Mastery Team to showcase the role of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Classic Cut Whisky - The Macallan®",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut",
+            "domain": "themacallan.com",
+            "description": "The Macallan Classic Cut - 2021 Edition Enter address for price and availability. Double Cask 12 Years Old. Limited Releases Lifestyle & Accessories Archive",
+            "extraSnippets": []
+          },
+          {
+            "title": "If I wanted to buy one Macallan bottle, would Classic Cut be the ... - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ig41pm/if_i_wanted_to_buy_one_macallan_bottle_would/",
+            "domain": "reddit.com",
+            "description": "It was the 2021 release of the Macallan Rare Cask Black, made with some peated malt. it tastes to me like a 25-35 year old malt … mellow peat ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut 2024, Limited Edition",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/macallan-classic-cut-2024-edition",
+            "domain": "themacallan.com",
+            "description": "Free delivery 30-day returnsJun 10, 2024 · The Macallan Classic Cut - 2024 Edition has been bottled at 52.4% ABV and features notes of vanilla, tropical fruit and lemon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2021 – An unforgettable whisky journey",
+            "url": "https://whiskystack.com/en/blogs/anmeldelser/macallan-classic-cut-2021-en-uforglemmelig-whiskyrejse",
+            "domain": "whiskystack.com",
+            "description": "This batch is particularly notable for its ageing in both ex-bourbon casks and sherry-aged American oak casks, bringing a special softness and ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "49621436174ef9972ed4a887a2604e6bdb40b001026dd09ae8dd9b8bb672b27c",
+    "mode": "auto"
+  }
+}

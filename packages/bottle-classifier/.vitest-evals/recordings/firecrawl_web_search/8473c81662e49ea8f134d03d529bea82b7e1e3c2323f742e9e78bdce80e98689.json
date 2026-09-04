@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-09-04T19:39:15.142Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["site:johnniewalker.com \"Black Label Islay Origin\" 42% 12"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:johnniewalker.com \"Black Label Islay Origin\" 42% 12",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8473c81662e49ea8f134d03d529bea82b7e1e3c2323f742e9e78bdce80e98689",
+    "mode": "auto"
+  }
+}

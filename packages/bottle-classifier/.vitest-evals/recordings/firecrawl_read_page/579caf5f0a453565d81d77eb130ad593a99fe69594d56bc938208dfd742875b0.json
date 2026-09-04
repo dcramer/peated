@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:34:45.226Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://distiller.com/spirits/glenmorangie-the-cadboll-estate-15-year-batch-2",
+    "focus": "Verify the exact Batch 2 product's age, ABV, release timing, maturation, and whether Batch 2 is a marketed release edition."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact Batch 2 product's age, ABV, release timing, maturation, and whether Batch 2 is a marketed release edition.",
+    "summary": "This 15 year-old limited edition is the second batch release of Glenmorangie’s Cadboll Estate single estate whisky.\n\nIt is is matured in American oak and bottled at 43% ABV, available as of July, 2021.\n\nIt is is matured in American oak and bottled at 43% ABV, available as of July, 2021.\n\n15 Year\n\n43.0\n\nAmerican oak",
+    "results": [
+      {
+        "title": "Glenmorangie The Cadboll Estate 15 Year (Batch #2)",
+        "url": "https://distiller.com/spirits/glenmorangie-the-cadboll-estate-15-year-batch-2",
+        "domain": "distiller.com",
+        "description": "This 15 year-old limited edition is the second batch release of Glenmorangie’s Cadboll Estate single estate whisky. Made from barley grown at the...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "579caf5f0a453565d81d77eb130ad593a99fe69594d56bc938208dfd742875b0",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:35:47.616Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Elijah Craig 18-year-old Single Barrel Bourbon\" 45% ABV",
+      "\"Elijah Craig Single Barrel 18 Year\" \"45%\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig 18-year-old Single Barrel Bourbon\" 45% ABV",
+        "summary": "Rating 94%(6)Elijah Craig 18 Year Old Single Barrel Bourbon 2023 Barrel 6341 750ml Bottle ... Alcohol ABV. 45%. Alcohol °Proof. 90. Sweetness. Dry. Production Attributes. In stock Rating 4.4257Elijah Craig 18 Year Old Single Barrel Bourbon. $178.00. No reviews. Decrease quantity. Increase quantity. Add to cart. Details. Out of stock Rating 4.4243Discover Elijah Craig 18 Year Old Single Barrel Bourbon from Kentucky's Heaven Hill Distillery. Aged to perfection with 45% ABV. In stock Rating 4.4243Elijah Craig 18-Year-Old Single Barrel Bourbon is the oldest Single ... (45% ABV). Age: 18 Year. Orig",
+        "results": [
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Straight Bourbon Whiskey",
+            "url": "https://www.wine-searcher.com/find/elijah+craig+eighteen+old+single+barrel+straight+bourbon+whisky+kentucky+usa",
+            "domain": "wine-searcher.com",
+            "description": "Rating 94%(6)Elijah Craig 18 Year Old Single Barrel Bourbon 2023 Barrel 6341 750ml Bottle ... Alcohol ABV. 45%. Alcohol °Proof. 90. Sweetness. Dry. Production Attributes.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 - Taste Select Repeat",
+            "url": "https://www.tasteselectrepeat.com/products/elijah-craig-18",
+            "domain": "tasteselectrepeat.com",
+            "description": "In stock Rating 4.4257Elijah Craig 18 Year Old Single Barrel Bourbon. $178.00. No reviews. Decrease quantity. Increase quantity. Add to cart. Details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Single Barrel 18 Year Bourbon 750ml - Flagstaff Liquor",
+            "url": "https://flagstaffliquor.com/products/ec18",
+            "domain": "flagstaffliquor.com",
+            "description": "Out of stock Rating 4.4243Discover Elijah Craig 18 Year Old Single Barrel Bourbon from Kentucky's Heaven Hill Distillery. Aged to perfection with 45% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Single Barrel 18 Year Old Bottled 1990 Kentucky Straight ...",
+            "url": "https://caskcartel.com/products/elijah-craig-single-barrel-18-year-old-bottled-1990-kentucky-straight-bourbon-whiskey",
+            "domain": "caskcartel.com",
+            "description": "In stock Rating 4.4243Elijah Craig 18-Year-Old Single Barrel Bourbon is the oldest Single ... (45% ABV). Age: 18 Year. Origin: United States. Distillery: Heaven Hill ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel 45% 75cl • Price »",
+            "url": "https://www.pricerunner.com/pl/1424-3200153651/Beer-Spirits/Elijah-Craig-18-Year-Old-Single-Barrel-45-75cl-Compare-Prices",
+            "domain": "pricerunner.com",
+            "description": "£6.95 shipping, 2-5 days · Elijah Craig 18-Year-Old Single-Barrel Bourbon Whisky 700ml. £225.00. Or 3 payments of £75.00*. *Pay in 24 installments with Klarna ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Elijah Craig Single Barrel 18 Year\" \"45%\"",
+        "summary": "In stock Rating 4.2(2)Elijah Craig Single Barrel 18 Year Old Kentucky Straight Bourbon Whiskey ... Earn up to 5% back on this product with Caskers Rewards. Size750mL Proof90 (45% ABV) ... In stock 20-day deliveryA seriously special bourbon from Heaven Hill, this is Elijah Craig Single Barrel 18 Year Old. The casks used to age this expression were selected by none other ... Rating 94%(6)Elijah Craig Single Barrel 18 Year & Old Ezra Store Pick 2 Bottles Bundle. In ... 45%. Alcohol °Proof. 90. Sweetness. Dry. Production Attributes. Maturation. IMAGE: A 2021 edition of Elijah Craig Single Barrel,",
+        "results": [
+          {
+            "title": "Elijah Craig Single Barrel 18 Year Old Kentucky Straight Bourbon Whiskey",
+            "url": "https://www.caskers.com/elijah-craig-single-barrel-18-year-old-kentucky-straight-bourbon-whiskey/",
+            "domain": "caskers.com",
+            "description": "In stock Rating 4.2(2)Elijah Craig Single Barrel 18 Year Old Kentucky Straight Bourbon Whiskey ... Earn up to 5% back on this product with Caskers Rewards. Size750mL Proof90 (45% ABV) ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Single Barrel 18 Year Old - Nickolls & Perks",
+            "url": "https://nickollsandperks.com/p/elijah-craig-single-barrel-18-year-old-103345491211/",
+            "domain": "nickollsandperks.com",
+            "description": "In stock 20-day deliveryA seriously special bourbon from Heaven Hill, this is Elijah Craig Single Barrel 18 Year Old. The casks used to age this expression were selected by none other ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Straight Bourbon Whiskey",
+            "url": "https://www.wine-searcher.com/find/elijah+craig+eighteen+old+single+barrel+straight+bourbon+whisky+kentucky+usa",
+            "domain": "wine-searcher.com",
+            "description": "Rating 94%(6)Elijah Craig Single Barrel 18 Year & Old Ezra Store Pick 2 Bottles Bundle. In ... 45%. Alcohol °Proof. 90. Sweetness. Dry. Production Attributes. Maturation.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Revisiting Elijah Craig 18-Year-Old Single Barrel to Celebrate a Major ...",
+            "url": "https://www.bourbonguy.com/blog/2022/7/26/revisiting-elijah-craig-18-year-old-single-barrel-to-celebrate-a-major-cancer-milestone",
+            "domain": "bourbonguy.com",
+            "description": "IMAGE: A 2021 edition of Elijah Craig Single Barrel, 18 year old. Ten ... 45% ABV. Bottled 12-2-19. Barrel: 4809. Nose: Caramel, vanilla ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Buy Elijah Craig - Single Barrel 18 Year Old Bourbon Whisky - Flaviar",
+            "url": "https://flaviar.com/products/elijah-craig-single-barrel-18-year-old-750",
+            "domain": "flaviar.com",
+            "description": "In stock Rating 4.5(119)Elijah Craig Single Barrel 18 Year Old Bourbon starts with an aromatic bang that builds up to a fantastic palate and memorable finish. Buy Elijah Craig 18 ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f07b18ae6bab57c237bc80decd31179af7d2b7359720860042485dbc2e62c2e6",
+    "mode": "auto"
+  }
+}

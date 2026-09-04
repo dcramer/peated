@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:58:38.051Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.whiskygoodness.com/smws/10/10.258",
+    "focus": "Verify the exact SMWS 10.258 product identity, stated age, ABV, single-cask status, cask number, maturation, vintage/distillation date, and release or bottling details."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact SMWS 10.258 product identity, stated age, ABV, single-cask status, cask number, maturation, vintage/distillation date, and release or bottling details.",
+    "summary": "SMWS 10.258\n\n10.258\n\nBunnahabhain\n\nABV\n\n58.1%\n\nAge\n\n9 Years\n\nCask\n\nEx-Bourbon Hogshead, 1st Fill Ex-Px Hogshead\n\nVintage\n\n2013",
+    "results": [
+      {
+        "title": "SMWS 10.258: Quo Vadis?",
+        "url": "https://www.whiskygoodness.com/smws/10/10.258",
+        "domain": "whiskygoodness.com",
+        "description": "SMWS 10.258 'Quo Vadis?' is a Bunnahabhain single cask (Bunnahabhain, 9 Year Old, 58.1% ABV). Read our tasting review.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8778cbb7b84f16b0d4615a41f7aaf492a8de16343450ccc971621cbe103f1b1d",
+    "mode": "auto"
+  }
+}

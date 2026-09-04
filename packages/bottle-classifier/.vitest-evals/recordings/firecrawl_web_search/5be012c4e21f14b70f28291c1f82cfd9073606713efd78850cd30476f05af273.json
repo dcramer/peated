@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:45:59.855Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Glenmorangie The Cadboll Estate 15 Year Old Batch 4 ABV official",
+      "\"Glenmorangie\" \"The Cadboll Estate\" \"Batch 4\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie The Cadboll Estate 15 Year Old Batch 4 ABV official",
+        "summary": "$5 deliveryA rich, rewarding mouthful of dried fruits, vanilla, apricot, candied lemon, juicy pear, and cantaloupe, with hints of green banana and eucalyptus. Fading dried ... Out of stock Rating 4.47... Glenmorangie's soft spirit, elevating it to new levels of richness. Product Details. Category. Whiskey. Type. Single Malt. ABV. 43%. Country. Scotland. Size. ABV: 43% Age: 15-Year-Old Original SRP: ~$99. Price Paid: ~$89. Tasting Methodology: Neat, rested 20 minutes. Nose: Wonderfully balanced sweet ...Glenmorangie The Cadboll Estate 15 Year. Any good? : r/whiskeyReview #551: Glenmorangie 15 Y",
+        "results": [
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+            "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+            "domain": "whiskyadvocate.com",
+            "description": "$5 deliveryA rich, rewarding mouthful of dried fruits, vanilla, apricot, candied lemon, juicy pear, and cantaloupe, with hints of green banana and eucalyptus. Fading dried ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 15 Year The Cadboll Estate Batch 4 - Taster's Club",
+            "url": "https://tastersclub.com/products/glenmorangie-15-year-the-cadboll-estate-batch-4",
+            "domain": "tastersclub.com",
+            "description": "Out of stock Rating 4.47... Glenmorangie's soft spirit, elevating it to new levels of richness. Product Details. Category. Whiskey. Type. Single Malt. ABV. 43%. Country. Scotland. Size.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+            "domain": "reddit.com",
+            "description": "ABV: 43% Age: 15-Year-Old Original SRP: ~$99. Price Paid: ~$89. Tasting Methodology: Neat, rested 20 minutes. Nose: Wonderfully balanced sweet ...Glenmorangie The Cadboll Estate 15 Year. Any good? : r/whiskeyReview #551:",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Cadboll Estate, 2024 Batch 4 - Glenmorangie Distillery",
+            "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate",
+            "domain": "glenmorangie.com",
+            "description": "This 2024 release of the Cadboll Estate, aged for 15 years in our designer bourbon casks, magnifies the whisky's creaminess. It is uniquely silky, rich, and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 15 Year Old Cadboll Estate Batch 4 - Total Wine",
+            "url": "https://www.totalwine.com/spirits/scotch/glenmorangie-15-year-old-cadboll-estate-batch-4/p/2126251327",
+            "domain": "totalwine.com",
+            "description": "Scotland - Highland - 43% - Latest in The Cadboll Estate range, Aged 15 YO the first Cadboll Estate release to be wholly matured in our bespoke designer ex- ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Glenmorangie\" \"The Cadboll Estate\" \"Batch 4\"",
+        "summary": "Shop Glenmorangie 15 Year Old Cadboll Estate Batch 4 at the best prices ... Scotland - Highland - 43% - Latest in The Cadboll Estate range, Aged 15 YO the ... $5 deliverySingle-estate whisky made from the Cadboll Estate's 2007 harvest, matured ... Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%. Price: $100.00 ... ... Batch 4 in 2024. ... Its claim to fame is that the barley used is harvested from eight fields near the Glenmorangie distillery – The “Cadboll” ... The Cadboll Estate Batch 4, has been created with barley grown in just eight fields on our Cadboll Estate, located near th",
+        "results": [
+          {
+            "title": "Glenmorangie 15 Year Old Cadboll Estate Batch 4 - Total Wine",
+            "url": "https://www.totalwine.com/spirits/scotch/glenmorangie-15-year-old-cadboll-estate-batch-4/p/2126251327",
+            "domain": "totalwine.com",
+            "description": "Shop Glenmorangie 15 Year Old Cadboll Estate Batch 4 at the best prices ... Scotland - Highland - 43% - Latest in The Cadboll Estate range, Aged 15 YO the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%",
+            "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-4-43",
+            "domain": "whiskyadvocate.com",
+            "description": "$5 deliverySingle-estate whisky made from the Cadboll Estate's 2007 harvest, matured ... Glenmorangie The Cadboll Estate 15 year old (Batch 4), 43%. Price: $100.00 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+            "domain": "reddit.com",
+            "description": "... Batch 4 in 2024. ... Its claim to fame is that the barley used is harvested from eight fields near the Glenmorangie distillery – The “Cadboll” ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Cadboll Estate, 2024 Batch 4 - Glenmorangie Distillery",
+            "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate",
+            "domain": "glenmorangie.com",
+            "description": "The Cadboll Estate Batch 4, has been created with barley grown in just eight fields on our Cadboll Estate, located near the distillery. A true taste of our ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 15 Year The Cadboll Estate Batch 4 - Taster's Club",
+            "url": "https://tastersclub.com/products/glenmorangie-15-year-the-cadboll-estate-batch-4",
+            "domain": "tastersclub.com",
+            "description": "Out of stock Rating 4.47This exceptional single malt Scotch whisky is crafted as an ode to Glenmorangie's homeland, offering a grain-to-glass masterpiece sourced exclusively from the ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5be012c4e21f14b70f28291c1f82cfd9073606713efd78850cd30476f05af273",
+    "mode": "auto"
+  }
+}

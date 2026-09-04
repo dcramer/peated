@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T18:27:45.659Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Octomore 13.1 Bruichladdich official product 61.1% 5 year release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 Bruichladdich official product 61.1% 5 year release",
+        "summary": "Octomore 13.1 5 Year Old Single Malt. Availability: In Stock $219.99 13.1 Aged: 5 Years PPM: 137.3 59.2% ABV - 118.4 Proof 750ml Nov 4, 2022 Out of stock Rating 5.0(1)Sale price£140.00. The limited edition 2022 release is part of the Octomore series, The whisky has been aged in ex bourbon barrels for 5 years. In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ... Jul 5, 2026",
+        "results": [
+          {
+            "title": "Bruichladdich Octomore 13.1 5 Year Old Single Malt",
+            "url": "https://potomacwines.com/en-gb/product/spirits/scotch-whisky/bruichladdich-octomore-13-1-5-year-old-single-malt?limit=50",
+            "domain": "potomacwines.com",
+            "description": "Octomore 13.1 5 Year Old Single Malt. Availability: In Stock $219.99 13.1 Aged: 5 Years PPM: 137.3 59.2% ABV - 118.4 Proof 750ml",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Nov 4, 2022",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich - 5 Year Old (Octomore 13.1)",
+            "url": "https://www.stillspirit.com/en-us/products/bruichladdich-5-year-old-octomore-13-1",
+            "domain": "stillspirit.com",
+            "description": "Out of stock Rating 5.0(1)Sale price£140.00. The limited edition 2022 release is part of the Octomore series, The whisky has been aged in ex bourbon barrels for 5 years.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "Jul 5, 2026",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d7a6b5266e9bd28ddb7b17f8156d11ae40ea36e75f8250138ed919f474106e67",
+    "mode": "auto"
+  }
+}

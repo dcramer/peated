@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:50:10.365Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Ardbeg Uigeadail official product 54.2% ABV standard release"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg Uigeadail official product 54.2% ABV standard release",
+        "summary": "# Ardbeg Uigeadail\n- ABV54.2% In stock Rating 4.4702This expression combines rich peat smoke with notes of dark chocolate, dried fruits, and spices, delivering an intense yet balanced experience. Bottled at 54.2% ... Ardbeg Uigeadail 2003 „Traditional Strength“ 54.2% ABV - a blend of 1993 destilled Ardbeg and mid to end 70s sherry oak. was launched in 2003 … ... ... Official answers and ... The Uigedail is the high ABV version of the standard Ardbeg whiskies. It comes with no age statement and 54.2% ABV. Feb 27, 2025",
+        "results": [
+          {
+            "title": "Ardbeg Uigeadail | Islay Single Malt Scotch Whisky",
+            "url": "https://www.ardbeg.com/en-int/products/ardbeg-uigeadail",
+            "domain": "ardbeg.com",
+            "description": "# Ardbeg Uigeadail\n- ABV54.2%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Uigeadail Scotch Whisky 54.2% abv - The Wine House",
+            "url": "https://www.winehouse.com/product/ardbeg-uigeadail-scotch-whisky-54-2-abv-1fq6imn1rnlb9",
+            "domain": "winehouse.com",
+            "description": "In stock Rating 4.4702This expression combines rich peat smoke with notes of dark chocolate, dried fruits, and spices, delivering an intense yet balanced experience. Bottled at 54.2% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "#Review: Ardbeg Uigeadail 2003 „Traditional Strength“ 54.2% ABV",
+            "url": "https://www.reddit.com/r/whisky/comments/1m0tevq/review_ardbeg_uigeadail_2003_traditional_strength/",
+            "domain": "reddit.com",
+            "description": "Ardbeg Uigeadail 2003 „Traditional Strength“ 54.2% ABV - a blend of 1993 destilled Ardbeg and mid to end 70s sherry oak. was launched in 2003 … ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky Review/Tasting: Ardbeg Uigeadail - YouTube",
+            "url": "https://www.youtube.com/watch?v=vRhCb-VIagg",
+            "domain": "youtube.com",
+            "description": "... Official answers and ... The Uigedail is the high ABV version of the standard Ardbeg whiskies. It comes with no age statement and 54.2% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Full ABV ahead: Ardbeg Uigeadail review - The Road to Dram",
+            "url": "https://roadtodram.com/ardbeg-uigeadail-review/",
+            "domain": "roadtodram.com",
+            "description": "Feb 27, 2025",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ad9bc042c5f35e64a9e6dd6155859d79662b21f3a39ba276e8d29654c7e9e7d5",
+    "mode": "auto"
+  }
+}

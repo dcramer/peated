@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:37:32.061Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750?s=1805&igrules=true&utm=peated",
+    "focus": "Confirm the complete marketed product identity, including exact title, age statement, ABV, bottler or producer, and whether it has an edition, cask-strength, or single-cask designation."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed product identity, including exact title, age statement, ABV, bottler or producer, and whether it has an edition, cask-strength, or single-cask designation.",
+    "summary": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky 750ml Bottle\n\n750ml Bottle\n\nShieldaig Speyside Single Malt 21Yr Scotch Whisky\n\nBrand\n\n[Shieldaig](https://www.totalwine.com/spirits/brand/shieldaig)\n\nABV\n\n43%",
+    "results": [
+      {
+        "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750?igrules=true&s=1805&utm=peated",
+        "domain": "totalwine.com",
+        "description": "Shop Shieldaig Speyside Single Malt 21Yr Scotch Whisky at the best prices. Explore thousands of wines, spirits and beers, and shop online for delivery or pickup in a store near you.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e863e0e1ce2a8a6bb25c4995eddb2f09bc5555c8734883630700c2b4fbc8c04a",
+    "mode": "auto"
+  }
+}

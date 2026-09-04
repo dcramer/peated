@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:31:34.174Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+    "focus": "Confirm the complete marketed product identity: producer/brand, exact product title, stated age, ABV, and whether Triple Aged or Limited Edition is part of the product title."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed product identity: producer/brand, exact product title, stated age, ABV, and whether Triple Aged or Limited Edition is part of the product title.",
+    "summary": "CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY\n\n40%\n\nA shining example of Canadian Club craftsmanship, this Canadian whisky is aged four times longer than the industry standard.",
+    "results": [
+      {
+        "title": "Canadian Club 9 Year Old Reserve Canadian Whisky | ReserveBar",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "domain": "reservebar.com",
+        "description": "For some of the best prices on Canadian Club 9 Year Old Reserve Canadian Whisky, order from ReserveBar today, get it in under 2-hours in select states.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8f9241068fd6c9784f94e0d97ed6bc394cdbc8237267488a5266f90505643ee3",
+    "mode": "auto"
+  }
+}

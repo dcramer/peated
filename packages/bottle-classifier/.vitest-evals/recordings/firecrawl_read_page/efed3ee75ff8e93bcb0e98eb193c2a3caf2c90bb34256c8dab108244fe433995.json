@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:36:13.134Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://us.glendaloughdistillery.com/whiskey/double-barrel/",
+    "focus": "Confirm complete marketed Bottle identity: consumer brand, producer/distillery, category, stated age, ABV, and exact maturation or edition wording."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm complete marketed Bottle identity: consumer brand, producer/distillery, category, stated age, ABV, and exact maturation or edition wording.",
+    "summary": "Irish whiskey aged in two barrels\n\nGlendalough Double Barrel\n\nOur Double Barrel Irish Whiskey begins its maturation process in flame-charred ex Bourbon American oak. It is finished in Oloroso casks from Montilla, a small town found in the rolling hills of the Spanish countryside.",
+    "results": [
+      {
+        "title": "Glendalough Distillery | Double Barrel",
+        "url": "https://us.glendaloughdistillery.com/whiskey/double-barrel/",
+        "domain": "us.glendaloughdistillery.com",
+        "description": "Double Barrel",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "efed3ee75ff8e93bcb0e98eb193c2a3caf2c90bb34256c8dab108244fe433995",
+    "mode": "auto"
+  }
+}

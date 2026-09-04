@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:27:04.095Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20012012.html",
+    "focus": "Confirm exact marketed product title, distillation year, bottling or release year, ABV, age, cask or maturation wording, and whether it is official distillery bottling"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm exact marketed product title, distillation year, bottling or release year, ABV, age, cask or maturation wording, and whether it is official distillery bottling",
+    "summary": "Talisker  - 2001\n\nThe smoky, spicy and sometimes spicy character of the distillery is beautifully complemented by the maturing in an Amoroso sherry barrel with sweetness and complexity.\n\n| Details about this bottle | [Edit](https://www.whisky.com/whisky-database/bottle-search/edit.html?tx_datamintsflaschendb_flaschenedit%5Baction%5D=newaenderungsvorschlag&tx_datamintsflaschendb_flaschenedit%5Bcontroller%5D=Flaschen&tx_datamintsflaschendb_flaschenedit%5Bflasche%5D=9080&cHash=2948df494178d8fb5e91702b0392fb51) |\n| --- | --- |\n| Distillation date:  01. Jan 2001 |\n| Bottling date:  01. Jan 2012 |\n| ABV:  45.8% |\n| Bottler: [Diageo](https://www.whisky.com/whisky-database/bottler/diageo.html) |\n| Series: [Distillers Edition (Diageo)](https://www.whisky.com/whisky-database/series/distillers-edition.html) |\n| Maturing:  [Bourbon](http://www.whisky.de/whisky/wissen/herstellung00/rundherum/fasstypen/whisky-in-bourbonfaessern.html) |\n| Finish:    Amoroso |",
+    "results": [
+      {
+        "title": "Talisker - 2001 - Whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20012012.html",
+        "domain": "whisky.com",
+        "description": "This bottling of the Talisker is part of the Distillers Edition of the Classic Malts of Scotland. In this series, the whiskeys are filled after the usual maturation for another six months in processing barrels in the Iberian Peninsula. The smoky, spicy and sometimes spicy character of the distillery is beautifully complemented by the maturing in an Amoroso sherry barrel with sweetness and complexity.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7c0ac2da6346ad310c83e289d8645e567d4a97ea1b055b2894da0e01159d04b4",
+    "mode": "auto"
+  }
+}

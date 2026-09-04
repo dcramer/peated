@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:54:49.697Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Ember Ledger\" \"Batch 24\" bourbon 2024 58.0"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Ember Ledger\" \"Batch 24\" bourbon 2024 58.0",
+        "summary": "In stockAged for 4 years in new charred oak barrels,Oaked & Ember has notes of burnt caramel, mesquite, with a warming cherry wood finish. Mash Bill: 51% Heirloom Corn ... In stock Free deliveryTasting Notes: Orange marmalade, dried cherry, thick toffee, and soft oak aromatics greet you on the nose. The palate is bright and buttery with creamy baking ... Tonight we get I finally get to taste all the Stagg releases from 2024 and put it against my favorite batch of all time! Discover The Master Distillers Batch 2024 from Booker's Bourbon at James B. Beam Distilling Co. in Clermont, Kentucky. Exp",
+        "results": [
+          {
+            "title": "Oaked & Ember Straight Bourbon Whiskey – 375 mL",
+            "url": "https://wiglewhiskey.com/shop/spirits-bourbon/smoked-bourbon-375-ml/",
+            "domain": "wiglewhiskey.com",
+            "description": "In stockAged for 4 years in new charred oak barrels,Oaked & Ember has notes of burnt caramel, mesquite, with a warming cherry wood finish. Mash Bill: 51% Heirloom Corn ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ember Craft Double Barrel Custom Micro Batch Straight Bourbon ...",
+            "url": "https://seelbachs.com/products/ember-craft-double-barrel-custom-micro-batch-straight-bourbon-whiskey-limited-edition",
+            "domain": "seelbachs.com",
+            "description": "In stock Free deliveryTasting Notes: Orange marmalade, dried cherry, thick toffee, and soft oak aromatics greet you on the nose. The palate is bright and buttery with creamy baking ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2024 Stagg Blind Tasting! All 2024 Stagg releases vs Batch ... - YouTube",
+            "url": "https://www.youtube.com/watch?v=lBkRHAZu0f0",
+            "domain": "youtube.com",
+            "description": "Tonight we get I finally get to taste all the Stagg releases from 2024 and put it against my favorite batch of all time!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Master Distillers Batch 2024 | Booker's | JBBDCo. - Jim Beam Distillery",
+            "url": "https://www.beamdistilling.com/bookersbourbon/whiskies/2024-03-the-master-distillers-batch-bourbon",
+            "domain": "beamdistilling.com",
+            "description": "Discover The Master Distillers Batch 2024 from Booker's Bourbon at James B. Beam Distilling Co. in Clermont, Kentucky. Explore tasting notes today.",
+            "extraSnippets": []
+          },
+          {
+            "title": "2024 Bourbon Release Calendar",
+            "url": "https://www.breakingbourbon.com/2024-bourbon-release-calendar",
+            "domain": "breakingbourbon.com",
+            "description": "Updated Weekly: 12/31/24. Dates listed are when distilleries begin to release a product to market. Individual states will vary.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8bc199c128e222a0c06534c2928c72e50ff4b9417588927399f1302935b4f0f0",
+    "mode": "auto"
+  }
+}

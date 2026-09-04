@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:43:04.939Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Trestle Spirit of Eclipse\" \"Old Trestle Distillery\""]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Trestle Spirit of Eclipse\" \"Old Trestle Distillery\"",
+        "summary": "In stock $25 deliveryAll the best characteristics of a world class whiskey made from a world class barrel aged imperial stout and then finished in the perfectly seasoned barrels of ... In stock $37.11 deliveryOld Trestle Spirit of Eclipse is a limited, high-proof American whiskey from California's Old Trestle Distillery, bottled at 100 proof. Old Trestle Spirit of Eclipse Whiskey 750mL. Old Trestle Distillery. $207 $207.99. Quick shop. Add to cart. Old Trestle Sierra ... Old Trestle Spirit of Eclipse is a limited, high-proof American whiskey from California's Old Trestle Distillery, bottled at",
+        "results": [
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey - Don's Liquors & Wine",
+            "url": "https://www.donsliquorsandwine.com/products/old-trestle-spirit-of-eclipse-whiskey%3Fsrsltid%3DAfmBOop7B_s3xMB7rASmx9rt6SAMgFkXo1uiS3Ugr5msBBqvd08mQ74P",
+            "domain": "donsliquorsandwine.com",
+            "description": "In stock $25 deliveryAll the best characteristics of a world class whiskey made from a world class barrel aged imperial stout and then finished in the perfectly seasoned barrels of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey 750mL - Wooden Cork",
+            "url": "https://woodencork.com/products/old-trestle-spirit-of-ecpl-whiskey-750ml%3Fsrsltid%3DAfmBOoqB3hkXb6w0JBtUOIUjT-6ywSxEDnd96fP4C8ZbRpsTgzXmM0p2",
+            "domain": "woodencork.com",
+            "description": "In stock $37.11 deliveryOld Trestle Spirit of Eclipse is a limited, high-proof American whiskey from California's Old Trestle Distillery, bottled at 100 proof.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best Selling Liquors and Spirits Online | Woodencork.com Tagged ...",
+            "url": "https://woodencork.com/collections/best-seller-internal-use/old-trestle-distillery%3Fsrsltid%3DAfmBOopppW7snJhEX-gj1Fn-0awXivrdhHFu2AtJGZCO83C7OvhqCJi5",
+            "domain": "woodencork.com",
+            "description": "Old Trestle Spirit of Eclipse Whiskey 750mL. Old Trestle Distillery. $207 $207.99. Quick shop. Add to cart. Old Trestle Sierra ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey 750mL - Laker's Liquor",
+            "url": "https://lakersliquor.com/product/old-trestle-spirit-of-eclipse-whiskey-750ml/",
+            "domain": "lakersliquor.com",
+            "description": "Old Trestle Spirit of Eclipse is a limited, high-proof American whiskey from California's Old Trestle Distillery, bottled at 100 proof. Old Trestle.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey 750mL | American Whiskey",
+            "url": "https://www.wineryspirits.com/product/old-trestle-spirit-of-eclipse-whiskey-750ml/",
+            "domain": "wineryspirits.com",
+            "description": "... Old Trestle Distillery, bottled at 100 proof.Old Trestle Distillery is a ... Old Trestle Spirit of Eclipse Whiskey 750mL. American Whiskey. Old Trestle Spirit of ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f8db04ed8719388f52473d8669b85fb0ec53ed657052f77aa78ab1fe409a32ef",
+    "mode": "auto"
+  }
+}

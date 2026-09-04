@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-09-04T18:23:26.219Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["site:bruichladdich.com Octomore 13.1 61.1% 5 years 137.3 ppm"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:bruichladdich.com Octomore 13.1 61.1% 5 years 137.3 ppm",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "cccb330b987c24a8bd5a7aeb3203b63adeef10d9ec96c4926df601eff4d02d1d",
+    "mode": "auto"
+  }
+}

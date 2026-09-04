@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:31:24.424Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://highwest.com/pages/a-midwinter-nights-dram",
+    "focus": "Confirm the canonical product name, ABV, and whether the current marketed release identifies an Act and Scene edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the canonical product name, ABV, and whether the current marketed release identifies an Act and Scene edition",
+    "summary": "A MIDWINTER NIGHTS DRAM   LIMITED ENGAGEMENT   Act 10, Scene 1\n\nABV: 49.3%\n\nProof: 98.6",
+    "results": [
+      {
+        "title": "A Midwinter Nights Dram | High West Whiskey",
+        "url": "https://highwest.com/pages/a-midwinter-nights-dram",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2fa140083802e13ef674e3b8c0c1be993ee6d46c239852ecf1c8f0b7d1b563f2",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:22:41.588Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Elijah Craig \"Cask Strength\" \"Barrel Proof\" official"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig \"Cask Strength\" \"Barrel Proof\" official",
+        "summary": "ELIJAH CRAIG PRIVATE BARREL\n\nPROOF – 128.4 # Elijah Craig Barrel Proof: The Old Labels\n## **The Pirate Bottle**\nSeeing the success of the first release, Heaven Hill decided to make it official, with a new saddle-leather label, red “Barrel Proof” lettering, hand-written proofs/ABVs, and a photonegative cabin behind “Elijah Craig”. I think it's one of if not the best value in bourbon, with the batched releases carrying a 12 year age statement at cask strength. Nobody ...Review #88: Elijah Craig Barrel Proof A124, 10y9mo, 59.5% ECBP A124Review: Elijah Craig - Barrel Proof : r/bourbon - RedditMore",
+        "results": [
+          {
+            "title": "Elijah Craig Barrel Proof Private Barrel – Store Pick! - The Right Spirit",
+            "url": "https://the-right-spirit.com/2022/08/12/elijah-craig-barrel-proof-private-barrel-store-pick/",
+            "domain": "the-right-spirit.com",
+            "description": "ELIJAH CRAIG PRIVATE BARREL\n\nPROOF – 128.4",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof: The Old Labels - Whiskey in my Wedding Ring",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-old-label",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "# Elijah Craig Barrel Proof: The Old Labels\n## **The Pirate Bottle**\nSeeing the success of the first release, Heaven Hill decided to make it official, with a new saddle-leather label, red “Barrel Proof” lettering, hand-w",
+            "extraSnippets": []
+          },
+          {
+            "title": "Why I don't buy Elijah Craig Barrel Proof batches anymore : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/xjaosg/why_i_dont_buy_elijah_craig_barrel_proof_batches/",
+            "domain": "reddit.com",
+            "description": "I think it's one of if not the best value in bourbon, with the batched releases carrying a 12 year age statement at cask strength. Nobody ...Review #88: Elijah Craig Barrel Proof A124, 10y9mo, 59.5% ECBP A124Review: Elij",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Bourbon - Caskers",
+            "url": "https://www.caskers.com/elijah-craig-barrel-proof-bourbon/",
+            "domain": "caskers.com",
+            "description": "In stock Rating 4.7(4)Two time Best Small Batch Bourbon Double Gold medal winner, at the San Francisco World Spirits Competition, and an Extraordinary/Ultimate Recommendation at the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof 750ML - The Liquor Barn",
+            "url": "https://theliquorbarn.com/products/elijah-craig-barrel-proof",
+            "domain": "theliquorbarn.com",
+            "description": "In stock Rating 4.5787Elijah Craig Barrel Proof positions as a premium barrel proof ... cask strength, few bottles in the category deliver as consistently or as compellingly.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0cc5e5ada388a907d560e8585b505e43dc03d99495e96c0419d1ed7d69f80d48",
+    "mode": "auto"
+  }
+}

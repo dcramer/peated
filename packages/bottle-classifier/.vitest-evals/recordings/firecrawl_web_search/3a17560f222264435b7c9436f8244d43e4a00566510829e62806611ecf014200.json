@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-09-04T19:36:21.242Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:us.glendaloughdistillery.com/whiskey/double-barrel Glendalough Double Barrel 42% single grain"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:us.glendaloughdistillery.com/whiskey/double-barrel Glendalough Double Barrel 42% single grain",
+        "summary": "Our Double Barrel Irish Whiskey begins its maturation process in flame-charred ex Bourbon American oak. It is finished in Oloroso casks from Montilla, ...",
+        "results": [
+          {
+            "title": "Glendalough Double Barrel",
+            "url": "https://us.glendaloughdistillery.com/whiskey/double-barrel/",
+            "domain": "us.glendaloughdistillery.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3a17560f222264435b7c9436f8244d43e4a00566510829e62806611ecf014200",
+    "mode": "auto"
+  }
+}

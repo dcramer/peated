@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:46:41.565Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://woodencork.com/collections/whiskey/products/hudson-whiskey-back-room-deal-new-york-straight-rye-whiskey-finished-in-peated-scotch-barrels?utm=peated",
+    "focus": "Confirm the exact marketed product name, consumer brand, category, maturation/finish wording, ABV, age, edition, and whether Hudson is an independent bottler or producer"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product name, consumer brand, category, maturation/finish wording, ABV, age, edition, and whether Hudson is an independent bottler or producer",
+    "summary": null,
+    "results": [
+      {
+        "title": "404 Not Found – Wooden Cork",
+        "url": "https://woodencork.com/collections/whiskey/products/hudson-whiskey-back-room-deal-new-york-straight-rye-whiskey-finished-in-peated-scotch-barrels?utm=peated",
+        "domain": "woodencork.com",
+        "description": "At Wooden Cork, we have over 50 years of experience in selecting and supplying the world's most coveted liquors. Whether it's to celebrate a special occasion, give a sentimental gift or simply indulge in a fine glass of your favorite stuff, we are here to deliver the rarest and most desirable liquors. It’s easy!",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "1a5c593f1c1725ba304de5463281d9897a07c851df0e51fa0e483f37b49fb87c",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:40:44.688Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://newmake.smwsa.com/products/cask-no-41-176",
+    "focus": "Confirm the complete marketed Bottle identity for SMWS cask 41.176, including displayed product name, age, ABV, cask strength, distillery, and whether 41.176 is the marketed exact-cask release code."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed Bottle identity for SMWS cask 41.176, including displayed product name, age, ABV, cask strength, distillery, and whether 41.176 is the marketed exact-cask release code.",
+    "summary": "Cask No. 41.176\n\nBaristaliscious\n\n17 years\n\nFirst-fill Chinkapin oak barrel, HTMC\n\n60.2%",
+    "results": [
+      {
+        "title": "The Scotch Malt Whisky Society of America",
+        "url": "https://newmake.smwsa.com/products/cask-no-41-176",
+        "domain": "newmake.smwsa.com",
+        "description": "Get into the good stuff with the world’s most distinctive Scotch whisky, bottled straight from the cask.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3ef281a4bcb65255a970f51dc678291ef1cf6c4a04b76fa446712a20be36482e",
+    "mode": "auto"
+  }
+}

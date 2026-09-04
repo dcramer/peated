@@ -1,0 +1,37 @@
+{
+  "writtenAt": "2026-09-04T19:26:23.161Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["site:bruichladdich.com Octomore 13.1 59.2% 5 year 2022"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:bruichladdich.com Octomore 13.1 59.2% 5 year 2022",
+        "summary": "OCTOMORE Super-Heavily -forward single malt with notes of apricot and peach, malty digestive biscuit, and a hint of fresh grass. 100% Islay-grown barley, AGE: ... The result is a cereal-forward single malt with notes of apricot and peach, malty digestive biscuit, and a hint of fresh grass. A subtle maritime note also ...",
+        "results": [
+          {
+            "title": "Bruichladdich Islay Barley 2014",
+            "url": "https://www.bruichladdich.com/products/bruichladdich-islay-barley-2014",
+            "domain": "bruichladdich.com",
+            "description": "OCTOMORE Super-Heavily -forward single malt with notes of apricot and peach, malty digestive biscuit, and a hint of fresh grass. 100% Islay-grown barley, AGE: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Islay Barley 2014",
+            "url": "https://uk.bruichladdich.com/products/bruichladdich-islay-barley-2014",
+            "domain": "uk.bruichladdich.com",
+            "description": "The result is a cereal-forward single malt with notes of apricot and peach, malty digestive biscuit, and a hint of fresh grass. A subtle maritime note also ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b8cf81c614c939eccacb66d37c33a10df5d040e629d1284c8e388dd8055df937",
+    "mode": "auto"
+  }
+}

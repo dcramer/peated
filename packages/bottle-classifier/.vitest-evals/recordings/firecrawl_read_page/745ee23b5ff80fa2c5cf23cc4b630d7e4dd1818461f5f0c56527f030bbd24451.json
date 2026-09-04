@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:39:58.601Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.nestorliquor.com/products/elijah-craig-barrel-proof-batch-c923",
+    "focus": "Confirm the exact marketed product title, printed batch/edition wording, age statement, ABV/proof, and whether it is a 2023 release"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product title, printed batch/edition wording, age statement, ABV/proof, and whether it is a 2023 release",
+    "summary": "[Elijah Craig Barrel Proof Batch #C923 - Nestor Liquor](https://www.nestorliquor.com/cdn/shop/files/ElijahCraigBarrelProofBatch_C923Bundle.png?v=1697571835)\n\nElijah Craig Barrel Proof Batch #C923",
+    "results": [
+      {
+        "title": "Elijah Craig Barrel Proof Batch #C923",
+        "url": "https://www.nestorliquor.com/products/elijah-craig-barrel-proof-batch-c923",
+        "domain": "nestorliquor.com",
+        "description": "Unearth Elijah Craig Barrel Proof Batch #C923. Authentic, full-strength bourbon. Nestor Liquor's handpicked excellence. Dive into deep flavors today!",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "745ee23b5ff80fa2c5cf23cc4b630d7e4dd1818461f5f0c56527f030bbd24451",
+    "mode": "auto"
+  }
+}

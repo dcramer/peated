@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:42:12.482Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Laphroaig Elements L2.0 59.6% cask strength",
+      "\"Laphroaig Elements 2.0\" 59.6"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Laphroaig Elements L2.0 59.6% cask strength",
+        "summary": "Laphroaig Elements L2.0. Distillery: Laphroaig. Age: NAS. Proof: 119.2 proof (59.6%). Cost: $160 (2024). Mashbill: 100% Single Malt. Cask ...r/Scotch - Reviews #445 and #446 - Laphroaig Elements L1.0 vs. L2.0Laphroaig Elements L 2.0 - Review : r/Scotch - RedditMore results from www.reddit.com 7-day returnsElements 2.0 is a bold, non-chill filtered whisky showing the flavour impact of an extended fermentation process. The result is fruity and smoky, ... $5 deliveryLaphroaig Elements 2.0 Cask Strength ABV: 59.6% ● Price: $165 ● Style: Scotch Single Malt. This cask-strength whisky offers harmony",
+        "results": [
+          {
+            "title": "Review #266: Laphroaig Elements L2.0 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1fvc6cz/review_266_laphroaig_elements_l20/",
+            "domain": "reddit.com",
+            "description": "Laphroaig Elements L2.0. Distillery: Laphroaig. Age: NAS. Proof: 119.2 proof (59.6%). Cost: $160 (2024). Mashbill: 100% Single Malt. Cask ...r/Scotch - Reviews #445 and #446 - Laphroaig Elements L1.0 vs. L2.0Laphroaig El",
+            "extraSnippets": []
+          },
+          {
+            "title": "ELEMENTS 2.0 | Laphroaig",
+            "url": "https://www.laphroaig.com/whiskies/laphroaig-elements-2-0",
+            "domain": "laphroaig.com",
+            "description": "7-day returnsElements 2.0 is a bold, non-chill filtered whisky showing the flavour impact of an extended fermentation process. The result is fruity and smoky, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements 2.0 Cask Strength: 2024 Whisky of the Year",
+            "url": "https://whiskyadvocate.com/laphroaig-elements-2-cask-strength-whisky-of-the-year",
+            "domain": "whiskyadvocate.com",
+            "description": "$5 deliveryLaphroaig Elements 2.0 Cask Strength ABV: 59.6% ● Price: $165 ● Style: Scotch Single Malt. This cask-strength whisky offers harmony and power, carrying its ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements L 2.0 - Whisky Review",
+            "url": "https://www.whiskymonster.com/laphroaig-elements-l-2-0-whisky-review/",
+            "domain": "whiskymonster.com",
+            "description": "Rating 4.2 · Review by Koray OzdemirDec 30, 2024",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements L2.0 700ml | 2024 Whisky of the Year",
+            "url": "https://theliquorbarn.com/products/laphroaig-elements-l2-0-700ml",
+            "domain": "theliquorbarn.com",
+            "description": "Out of stock Rating 4.33Laphroaig Elements L2.0 is the 2024 Whisky of the Year. Tropical fruit, sweet smoke, and maritime peat at cask strength 59.6% ABV. Shop now.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Laphroaig Elements 2.0\" 59.6",
+        "summary": "7-day returns70cl 59.6% vol. Whiskies. ELEMENTS 2.0. Elements 2.0 is a bold, non-chill ... Is Laphroaig Elements 2.0 a limited-edition release? Yes. Laphroaig Elements ... $5 deliveryLaphroaig Elements 2.0 Cask Strength. ABV: 59.6% ○ Price: $165 ○ Style: Scotch Single Malt ○ Origin: Scotland. Buy Now. When discussing a whisky's flavor ... Scotland - 59.6% - A bold, non-chill filtered whisky from Laphroaig showing the flavor impact of an extended fermentation process. Green apples and runny honey ... Rating 8/10(1)Mar 1, 2026 · Review of Laphroaig Elements 2.0: long fermentation up to 115 hours",
+        "results": [
+          {
+            "title": "ELEMENTS 2.0 | Laphroaig",
+            "url": "https://www.laphroaig.com/whiskies/laphroaig-elements-2-0",
+            "domain": "laphroaig.com",
+            "description": "7-day returns70cl 59.6% vol. Whiskies. ELEMENTS 2.0. Elements 2.0 is a bold, non-chill ... Is Laphroaig Elements 2.0 a limited-edition release? Yes. Laphroaig Elements ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements 2.0 Cask Strength: 2024 Whisky of the Year",
+            "url": "https://whiskyadvocate.com/laphroaig-elements-2-cask-strength-whisky-of-the-year",
+            "domain": "whiskyadvocate.com",
+            "description": "$5 deliveryLaphroaig Elements 2.0 Cask Strength. ABV: 59.6% ○ Price: $165 ○ Style: Scotch Single Malt ○ Origin: Scotland. Buy Now. When discussing a whisky's flavor ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements 2.0 Single Malt Scotch | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/laphroaig-elements-20-single-malt-scotch/p/2126251861",
+            "domain": "totalwine.com",
+            "description": "Scotland - 59.6% - A bold, non-chill filtered whisky from Laphroaig showing the flavor impact of an extended fermentation process. Green apples and runny honey ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements 2.0 Review - The Whiskey Wash",
+            "url": "https://thewhiskeywash.com/whiskey-reviews/review-laphroaig-elements2-0-review-2026/",
+            "domain": "thewhiskeywash.com",
+            "description": "Rating 8/10(1)Mar 1, 2026 · Review of Laphroaig Elements 2.0: long fermentation up to 115 hours, first-fill ex-bourbon casks, 59.6% ABV. Tropical fruit, vanilla, gentle ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Elements 2.0 - Distiller",
+            "url": "https://distiller.com/spirits/laphroaig-elements-2-0",
+            "domain": "distiller.com",
+            "description": "Rating 4.6(9)Laphroaig Elements 2.0. Single Malt. Laphroaig // Islay, Scotland. RARE. Details ... Bottled without chill-filtration at 59.6% ABV, US availability begins July ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8b1a20d396279372df8d5c480b82055049885702af4f85ad4262c4d5e9a9fba5",
+    "mode": "auto"
+  }
+}

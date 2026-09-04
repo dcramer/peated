@@ -1,0 +1,37 @@
+{
+  "writtenAt": "2026-09-04T19:25:25.529Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"The Macallan Classic Cut 2021 Edition\" ABV 51.0 maturation"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Macallan Classic Cut 2021 Edition\" ABV 51.0 maturation",
+        "summary": "Buy The Macallan Classic Cut 2021 Edition, 51% ABV, 70cl. The first cask-strength limited release balancing bourbon sweetness with sherry cask depth. 90-day returnsThe Macallan Classic Cut (2021 Edition) Single Malt Whisky. £250.00. Or 3 ... ABV. 51.0 %. Volume, 70cl. Packaging, Glas Bottle. Country of Origin, Scotland.",
+        "results": [
+          {
+            "title": "The Macallan Classic Cut 2021 Edition | Just Whisky Shop – Just ...",
+            "url": "https://shop.just-whisky.co.uk/products/the-macallan-classic-cut-2021-edition-70cl-51-abv",
+            "domain": "shop.just-whisky.co.uk",
+            "description": "Buy The Macallan Classic Cut 2021 Edition, 51% ABV, 70cl. The first cask-strength limited release balancing bourbon sweetness with sherry cask depth.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Macallan Classic Cut 2021 Speyside Single Malt Scotch ...",
+            "url": "https://www.pricerunner.com/pl/1424-3213309763/Beer-Spirits/The-Macallan-Macallan-Classic-Cut-2021-Speyside-Single-Malt-Scotch-Whisky-70cl-Compare-Prices",
+            "domain": "pricerunner.com",
+            "description": "90-day returnsThe Macallan Classic Cut (2021 Edition) Single Malt Whisky. £250.00. Or 3 ... ABV. 51.0 %. Volume, 70cl. Packaging, Glas Bottle. Country of Origin, Scotland.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d708a3bc317b36bfebd0540dc765cfa9446ca2ee8ea9b64cff74a2b1ca98089f",
+    "mode": "auto"
+  }
+}

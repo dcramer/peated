@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:44:27.666Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://woodencork.com/collections/whiskey/products/basil-haydens-kentucky-straight-bourbon?utm=peated",
+    "focus": "Confirm the exact marketed product title/expression, whether it is the standard Kentucky Straight Bourbon rather than a named variant, and any stated ABV, age, distillery, or bottler details."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product title/expression, whether it is the standard Kentucky Straight Bourbon rather than a named variant, and any stated ABV, age, distillery, or bottler details.",
+    "summary": "```\n**Basil Hayden Kentucky Straight Bourbon Whiskey. Jim Beam Distillery / Beam Suntory, Clermont, Kentucky — one of the four original Small Batch Bourbon Collection expressions created by Master Distiller Booker Noe in 1992, distinguished from the other three by its high-rye mash bill that uses twice the rye grain of a standard bourbon, producing a lighter, more delicate, and more approachable style at 80 proof — named for Meredith Basil Hayden Sr., the 18th-century Kentucky distiller who pioneered the high-rye approach.**\nThe mash bill uses twice the rye of most standard Kentucky bourbons. That rye percentage creates the signature Basil Hayden character: lighter body, more delicate mouthfeel, peppermint and spice notes from the rye alongside the expected caramel and vanilla from the new charred oak, and a gentle finish that makes it one of the most approachable straight bourbons for those new to the category. Bottled at 80 proof rather than the higher proofs of the other Small Batch expressions, it is Booker Noe's explicit invitation: here is bourbon without intimidation.\n### Specs\n- **Distillery:** Jim Beam Distillery, Clermont, Kentucky (Beam Suntory)\n- **ABV:** 40% (80 Proof)\n- **Size:** 750ml\n```",
+    "results": [
+      {
+        "title": "Basil Hayden Bourbon | Small Batch Collection | High-Rye | 80 Proof | Booker Noe 1992 – Wooden Cork",
+        "url": "https://woodencork.com/collections/whiskey/products/basil-haydens-kentucky-straight-bourbon?utm=peated",
+        "domain": "woodencork.com",
+        "description": "Booker Noe's 1992 Small Batch Collection. High-rye mash bill — twice the standard rye. Named for 1796 Kentucky distiller Meredith Basil Hayden Sr. Light, spicy, 80 proof. Order online.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "71a832333a2cf85f0d86423804e0dd3eb925220ab1eaf02634cbfd34d54dce46",
+    "mode": "auto"
+  }
+}

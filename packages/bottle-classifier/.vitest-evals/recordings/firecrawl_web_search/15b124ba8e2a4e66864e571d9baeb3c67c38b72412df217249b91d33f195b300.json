@@ -1,0 +1,75 @@
+{
+  "writtenAt": "2026-09-04T19:31:41.192Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"The Exclusive Malts\" Islay \"1661\" 57.1 312",
+      "\"The Exclusive Malts\" Islay 2007 8 years 57.1% Creative Whisky Company"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Exclusive Malts\" Islay \"1661\" 57.1 312",
+        "summary": "S/A Springbank 10 Years Old 'the Exclusive Malts' ... 1661. Pessac Léognan, Mc, sdl. 1 Bottle. Per lot ... S/A Single Islay Malt 15 Years 'Mariner'. 1810.",
+        "results": [
+          {
+            "title": "[PDF] 04/12/201 5 Auction catalogue: at 12:00 hrs & 5/12/2015 at 10:00 ...",
+            "url": "https://www.sylvies.be/Downloads/veiling181.pdf",
+            "domain": "sylvies.be",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"The Exclusive Malts\" Islay 2007 8 years 57.1% Creative Whisky Company",
+        "summary": "... Distillery – 2007 – Aged 8 Years (56.2%). $194.99 Add to cart · Logo - Creative Whisky Company. The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years ( ... In stock... Creative Whisky Company. The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99. In stock. The Exclusive Malts - Islay Distillery - 2007 ... Rating. The Exclusive Malts IslayReleased 2016 · 2007 vintage · Single Malt · 8 years · 57.1% ABV. Rating. The Exclusive Malts IslaySingle Malt. Rating. Bunnahabhain 12-year-old. Bottling serie: Single Islay Malt Scotch Whisky. Bottled: 2007. Stated Age: 12",
+        "results": [
+          {
+            "title": "Creative Whisky Company | Norfolk Wine & Spirits",
+            "url": "https://norfolkwineandspirits.com/product-tag/creative-whisky-company/",
+            "domain": "norfolkwineandspirits.com",
+            "description": "... Distillery – 2007 – Aged 8 Years (56.2%). $194.99 Add to cart · Logo - Creative Whisky Company. The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years ( ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+            "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+            "domain": "norfolkwineandspirits.com",
+            "description": "In stock... Creative Whisky Company. The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%). $194.99. In stock. The Exclusive Malts - Islay Distillery - 2007 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creative Whisky Company | Peated",
+            "url": "https://peated.com/bottlers/5569",
+            "domain": "peated.com",
+            "description": "Rating. The Exclusive Malts IslayReleased 2016 · 2007 vintage · Single Malt · 8 years · 57.1% ABV. Rating. The Exclusive Malts IslaySingle Malt. Rating.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bunnahabhain Distillery – 4.583 bottlings - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/distillery/85/whiskies",
+            "domain": "whiskybase.com",
+            "description": "Bunnahabhain 12-year-old. Bottling serie: Single Islay Malt Scotch Whisky. Bottled: 2007. Stated Age: 12 years ... Bottling serie: The Exclusive Malts. Vintage: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Swipe ⏮️ . Springbank 30 for the win! . I love how respectful everyone is ...",
+            "url": "https://www.instagram.com/p/DXaaPXIkhrG/",
+            "domain": "instagram.com",
+            "description": "A rare Springbank single-cask-style bottling released by the independent bottler The Exclusive Malts. The label indicates that it was distilled ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "15b124ba8e2a4e66864e571d9baeb3c67c38b72412df217249b91d33f195b300",
+    "mode": "auto"
+  }
+}

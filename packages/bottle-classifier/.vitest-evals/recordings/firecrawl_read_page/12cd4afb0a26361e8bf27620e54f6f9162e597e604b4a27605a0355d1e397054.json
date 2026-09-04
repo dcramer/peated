@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:25:22.673Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2021-edition",
+    "focus": "Confirm the exact marketed product title, ABV, cask maturation, edition wording, and release year for the 2021 Edition"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product title, ABV, cask maturation, edition wording, and release year for the 2021 Edition",
+    "summary": "The Macallan Classic Cut - 2021 Edition\n\nClassic Cut, 2021 Edition\n\nA single malt matured in an exquisite union of oak casks, this single malt was carefully crafted by the Whisky Mastery Team to showcase the role of ex-bourbon American oak casks in our portfolio.\n\nThe Macallan Classic Cut 2021 Edition 700ml Bottle Shot",
+    "results": [
+      {
+        "title": "The Macallan Classic Cut - 2021 Edition, Limited Edition | The Macallan®",
+        "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2021-edition",
+        "domain": "themacallan.com",
+        "description": "Discover the latest addition to The Macallan Classic Cut single malt whisky annual series, 2021 Edition.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "12cd4afb0a26361e8bf27620e54f6f9162e597e604b4a27605a0355d1e397054",
+    "mode": "auto"
+  }
+}

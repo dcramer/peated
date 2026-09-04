@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:38:51.138Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+    "focus": "Confirm the marketed product name, whiskey category/style, ABV, and whether it is an official Woodford Reserve release or independent bottling."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the marketed product name, whiskey category/style, ABV, and whether it is an official Woodford Reserve release or independent bottling.",
+    "summary": "Woodford Reserve Kentucky Straight Malt Whiskey Bottle.\n\nMalt Whiskey\n\nUnlike a typical 100% malt whiskey, Woodford Reserve is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers.\n\n90.4 °\n\n[\\ \\ Kentucky Derby 150: Baccarat Edition](https://www.woodfordreserve.com/whiskey/kentucky-derby-150-baccarat-edition/)",
+    "results": [
+      {
+        "title": "Malt Whiskey - Woodford Reserve",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": "Unlike a typical 100% malt whiskey, is a Kentucky Straight Malt Whiskey crafted from 51% malt and aged in new charred oak barrels, making it the malt whiskey for bourbon drinkers. The base of 51 % malt results in a whiskey that is richly flavorful and complex and amplifies the nutty characteristics found in the […]",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6d8d52ea8b04a61762c944176d341551a8c0e367905c2dadc247bd22068ef244",
+    "mode": "auto"
+  }
+}

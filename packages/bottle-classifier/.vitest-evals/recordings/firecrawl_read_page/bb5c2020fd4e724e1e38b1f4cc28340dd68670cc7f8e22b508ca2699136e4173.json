@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:49:09.856Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.shibuiwhisky.com/grain-select",
+    "focus": "Confirm the complete marketed product identity, including product name, category, ABV, age statement, distillery or producer, and whether the maturation wording is part of the product."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed product identity, including product name, category, ABV, age statement, distillery or producer, and whether the maturation wording is part of the product.",
+    "summary": "A light & subtly sweet whisky made with 95% wheat & 5% malted barley. Matured in American Ex-Bourbon Barrels, European Oloroso Sherry Casks & finished in rare Japanese Mizunara Oak, Shibui Grain Select is the perfect whisky to be enjoyed neat, on the rocks or in your favorite cocktail.\n\nABV\n\n43%",
+    "results": [
+      {
+        "title": "Grain Select World Whisky | Shibui Whisky<br/> — Shibui Whisky",
+        "url": "https://www.shibuiwhisky.com/grain-select",
+        "domain": "shibuiwhisky.com",
+        "description": "Indulge in the harmonious blend of Scottish and Japanese grain whiskies with the Shibui Grain Select World Whisky. This light-bodied and fruitful spirit is perfect for sipping neat, on the rocks, or in your favorite cocktail., Indulge in the harmonious blend of Scottish and Japanese grain whiskies with the Shibui Grain Select World Whisky. This light-bodied and fruitful spirit is perfect for sipping neat, on the rocks, or in your favorite cocktail.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bb5c2020fd4e724e1e38b1f4cc28340dd68670cc7f8e22b508ca2699136e4173",
+    "mode": "auto"
+  }
+}

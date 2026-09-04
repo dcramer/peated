@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:24:10.202Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://smws.com/appley-ever-after/",
+    "focus": "Verify the exact product \"SMWS RW6.5 Appley ever after\": marketed name, whisky category, age, ABV or proof, release or vintage year, edition, cask or batch code, and single-cask or cask-strength status."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact product \"SMWS RW6.5 Appley ever after\": marketed name, whisky category, age, ABV or proof, release or vintage year, edition, cask or batch code, and single-cask or cask-strength status.",
+    "summary": "RW6.5\n\nAppley ever after\n\nABV 56.0%\n\nAge6 years\n\nCASK 1st fill #3 char barrel\n\nSpiritRye Whisky",
+    "results": [
+      {
+        "title": "Appley ever after",
+        "url": "https://smws.com/appley-ever-after/",
+        "domain": "smws.com",
+        "description": "Become a member of The Scotch Malt Whisky Society and discover the world's widest selection of rare and exceptional single cask whiskies.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cc7ccc721b1da0e454c522d73758498be3c0d5092be9fdee8548d3df0ba974ef",
+    "mode": "auto"
+  }
+}

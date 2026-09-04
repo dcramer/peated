@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-09-04T19:43:53.245Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:woodencork.com/collections/whiskey/products/springbank-aged-25-year-old \"Springbank\" \"25\"",
+      "Springbank Aged 25-year-old Wooden Cork product ABV edition"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:woodencork.com/collections/whiskey/products/springbank-aged-25-year-old \"Springbank\" \"25\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Springbank Aged 25-year-old Wooden Cork product ABV edition",
+        "summary": "4.58.7K · 5-day deliverySpringbank Aged 25 Year Old Springbank Aged. Wooden Cork, we offer a diverse selection of premium alcohol products ・ tequila, vodka, gin, rum, and wines ・ ... In stock $54.15 deliveryBottled at 46% ABV without chill filtration, the 2020 edition presents the full natural texture and character of the spirit, years of careful cask management, ... Rating 85%(1) Springbank's Millennium Series was a collection of six expressions from the iconic Campbeltown distillery, released in stages to celebrate ... Nose is peppery and fruity. Burnt butter porridge and pineapple. Palate i",
+        "results": [
+          {
+            "title": "All Products - Your One-Stop Online Liquor Store | Woodencork.com",
+            "url": "https://woodencork.com/collections/all/springbank",
+            "domain": "woodencork.com",
+            "description": "4.58.7K · 5-day deliverySpringbank Aged 25 Year Old Springbank Aged. Wooden Cork, we offer a diverse selection of premium alcohol products ・ tequila, vodka, gin, rum, and wines ・ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 25 Year Old Limited Edition 2020 Bottling Campbeltown ...",
+            "url": "https://www.liquoronbroadway.com/products/springbank-25-year-old-whisky",
+            "domain": "liquoronbroadway.com",
+            "description": "In stock $54.15 deliveryBottled at 46% ABV without chill filtration, the 2020 edition presents the full natural texture and character of the spirit, years of careful cask management, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 25 Year Old Reviews - Whisky Connosr",
+            "url": "https://www.connosr.com/springbank-25-year-old-whisky-reviews-198",
+            "domain": "connosr.com",
+            "description": "Rating 85%(1)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank Millennium Series 25 Year Old - YouTube",
+            "url": "https://www.youtube.com/watch?v=yVo8W6_4I6Y",
+            "domain": "youtube.com",
+            "description": "Springbank's Millennium Series was a collection of six expressions from the iconic Campbeltown distillery, released in stages to celebrate ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 196: Springbank 25 (2020 bottling) : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/lethe5/review_196_springbank_25_2020_bottling/",
+            "domain": "reddit.com",
+            "description": "Nose is peppery and fruity. Burnt butter porridge and pineapple. Palate is fresh cut apricots and bruised apples, brambles. It has leather and ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f9c4de732e581dd4a30bdd6db299e7b44aa4595d82aa19c44a9c4d4cf0fbfecb",
+    "mode": "auto"
+  }
+}

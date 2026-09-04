@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-09-04T19:47:31.459Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "site:reservebar.com/products/laphroaig-ca Laphroaig Càirdeas 2022 ReserveBar 52.2 Warehouse 1"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:reservebar.com/products/laphroaig-ca Laphroaig Càirdeas 2022 ReserveBar 52.2 Warehouse 1",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "9839f900dc7ce86444f4239649f50a0072a6fff0566e415b91fe5457edcbb0da",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:23:44.000Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Heaven's Door\" \"Bootleg Series Vol. 3\" whiskey bourbon ABV age release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Heaven's Door\" \"Bootleg Series Vol. 3\" whiskey bourbon ABV age release",
+        "summary": "Whiskey: Bob Dylan | Heaven's Door 'The Bootleg Series: Vol 3' 2021 Limited Edition. Introducing the 2022 release of The Bootleg Series by Heaven's ... THE BOOTLEG SERIES VOL. 3 BOURBON Heaven's Door The Bootleg Series Vol. III Kentucky Straight Bourbon is aged 14 years and finished in Vino de Naranja Casks ... Whiskey: Bob Dylan | Heaven's Door 'The Bootleg Series: Vol 3' 2021 Limited Edition. Introducing the 2022 release of The Bootleg Series by Heaven's Door. 99 Heaven's Door The Bootleg Series Vol. 3 13-Year. Heaven's Door The Bootleg Series Volume 3 13-Year Cask Strength Kentucky Straight",
+        "results": [
+          {
+            "title": "[BUY] Bob Dylan | Heaven's Door 'The Bootleg Series: Vol 4' 2022 ...",
+            "url": "https://caskcartel.com/es-cz/collections/featured/products/bob-dylan-heavens-door-the-bootleg-series-vol-4-2022-limited-edition-whiskey",
+            "domain": "caskcartel.com",
+            "description": "Whiskey: Bob Dylan | Heaven's Door 'The Bootleg Series: Vol 3' 2021 Limited Edition. Introducing the 2022 release of The Bootleg Series by Heaven's ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "THE BOOTLEG SERIES VOL. 3 BOURBON Heaven's Door The ...",
+            "url": "https://www.instagram.com/p/CXkgFWDsLAL/",
+            "domain": "instagram.com",
+            "description": "THE BOOTLEG SERIES VOL. 3 BOURBON Heaven's Door The Bootleg Series Vol. III Kentucky Straight Bourbon is aged 14 years and finished in Vino de Naranja Casks ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Heaven's Door 'The Bootleg Series: Vol 4' 2022 Limited Edition Whiskey",
+            "url": "https://www.goodtipsy.com/product/bob-dylan-heavens-door-the-bootleg-series-vol-4-2022-limited-edition-whiskey/",
+            "domain": "goodtipsy.com",
+            "description": "Whiskey: Bob Dylan | Heaven's Door 'The Bootleg Series: Vol 3' 2021 Limited Edition. Introducing the 2022 release of The Bootleg Series by Heaven's Door.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bourbon and Spirits Online Only Auction - Stamping Ground, KY",
+            "url": "https://www.auctionzip.com/Listings/4172226.html",
+            "domain": "auctionzip.com",
+            "description": "99 Heaven's Door The Bootleg Series Vol. 3 13-Year. Heaven's Door The Bootleg Series Volume 3 13-Year Cask Strength Kentucky Straight Bourbon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Bourbon – Grand Wine Cellar",
+            "url": "https://www.grandwinecellar.com/collections/rare-bourbon?page=1",
+            "domain": "grandwinecellar.com",
+            "description": "$999.99. Heaven's Door Bootleg Series Vol 3. Sold Out. Quick View. Heaven's Door Bootleg Series Vol 3. 0 Reviews. $999.99. Heaven's Door Bootleg Series Vol 3.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5bf75685d77dbc642a0b9a114c9d7fe16597c53d820914c4b55a8f2a5f53698b",
+    "mode": "auto"
+  }
+}

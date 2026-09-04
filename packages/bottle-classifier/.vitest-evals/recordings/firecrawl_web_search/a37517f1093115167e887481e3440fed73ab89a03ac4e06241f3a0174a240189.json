@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:42:23.718Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Pappy Van Winkle's 15 Year Old Family Reserve\" 53.5% Buffalo Trace Old Rip Van Winkle Distillery"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Pappy Van Winkle's 15 Year Old Family Reserve\" 53.5% Buffalo Trace Old Rip Van Winkle Distillery",
+        "summary": "In stock Same-day deliveryOld Rip Van Winkle Distillery Pappy Van Winkle's 15 Year Old Family Reserve Kentucky Straight Bourbon Whiskey, 750ml, 107 Proof (53.5% ABV) has 130 calories. Rating 4.8(3)2,253.31 / 1000ml. ex. sales tax. Bottle (750ml). Old Rip Van Winkle Pappy Van Winkle's 15 Year Old Family Reserve Bourbon 750ml Bottle. In stock (). BAXUS. In stock Rating 4.5257Pappy Van Winkle's 15 Year Old Family Reserve Bourbon. 12, 2024) – Old Rip Van Winkle Distillery and Buffalo ... Pappy Van Winkle's 15 Year Old Family Reserve arrived just in time for Easter. ... Buffalo Trace Distillery. Th",
+        "results": [
+          {
+            "title": "Old Rip Van Winkle Distillery Pappy Van Winkle's 15 Year Old ... - Instacart",
+            "url": "https://www.instacart.com/products/1361559-pappy-van-winkle-family-reserve-15-years-old-kentucky-straight-bourbon-whiskey-750-ml",
+            "domain": "instacart.com",
+            "description": "In stock Same-day deliveryOld Rip Van Winkle Distillery Pappy Van Winkle's 15 Year Old Family Reserve Kentucky Straight Bourbon Whiskey, 750ml, 107 Proof (53.5% ABV) has 130 calories.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Rip Van Winkle 'Pappy Van Winkle's Family Reserve' 15 Year ...",
+            "url": "https://www.wine-searcher.com/find/old+rip+van+winkel+pappy+fmly+rsrv+fifteen+straight+bourbon+whisky+kentucky+usa",
+            "domain": "wine-searcher.com",
+            "description": "Rating 4.8(3)2,253.31 / 1000ml. ex. sales tax. Bottle (750ml). Old Rip Van Winkle Pappy Van Winkle's 15 Year Old Family Reserve Bourbon 750ml Bottle. In stock (). BAXUS.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pappy van winkle's 15 year old family reserve bourbon - Epic Wine & Spirits",
+            "url": "https://epicwineandspirits.com/products/pappy-van-winkle-aged-15-years-family-reserve-bourbon-750ml",
+            "domain": "epicwineandspirits.com",
+            "description": "In stock Rating 4.5257Pappy Van Winkle's 15 Year Old Family Reserve Bourbon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "New bottle Pappy Van Winkle family reserve 23 year on the shelf now at ...",
+            "url": "https://www.facebook.com/franklinsbackyardbayou/posts/new-bottle-pappy-van-winkle-family-reserve-23-year-on-the-shelf-now-at-franklins/940238252505256/",
+            "domain": "facebook.com",
+            "description": "12, 2024) – Old Rip Van Winkle Distillery and Buffalo ... Pappy Van Winkle's 15 Year Old Family Reserve arrived just in time for Easter.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Rip Van Winkle Whiskey | Compare - Whisky Marketplace US",
+            "url": "https://www.whiskymarketplace.com/old-rip-van-winkle-whiskey",
+            "domain": "whiskymarketplace.com",
+            "description": "... Buffalo Trace Distillery. The range focuses on richly matured, small ... Core range. Pappy Van Winkle's 15 Year Old Family Reserve 53.5%. Limited ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a37517f1093115167e887481e3440fed73ab89a03ac4e06241f3a0174a240189",
+    "mode": "auto"
+  }
+}

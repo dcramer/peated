@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:37:25.773Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Shieldaig Speyside Single Malt\" \"21\" whisky Total Wine",
+      "\"Shieldaig\" \"Speyside\" \"21 Year\" single malt"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig Speyside Single Malt\" \"21\" whisky Total Wine",
+        "summary": "4.71.2KShieldaig Speyside Single Malt 12Yr Scotch Whisky · 4.3 out of 5 ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky · 4 out of 5 stars. 21 ... Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ... Glenfiddich Gran Reserva 21 Year Old Single Malt Scotch Whisky ... Shieldaig Speyside Single Malt 12Yr Scotch Whisky · 4.3 out of 5 ... Rating 4.5(4)Shieldaig Speyside Single Malt Scotch 21 year old, Scotland, 750ml Bottle. In stock (). Check with the merchant for stock availability. Win",
+        "results": [
+          {
+            "title": "Shieldaig Scotch | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/shieldaig-scotch",
+            "domain": "totalwine.com",
+            "description": "4.71.2KShieldaig Speyside Single Malt 12Yr Scotch Whisky · 4.3 out of 5 ... Shieldaig Speyside Sin Malt 30Yr Scotch Whisky · 4 out of 5 stars. 21 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750",
+            "domain": "totalwine.com",
+            "description": "Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/single-malt-whiskey",
+            "domain": "totalwine.com",
+            "description": "Glenfiddich Gran Reserva 21 Year Old Single Malt Scotch Whisky ... Shieldaig Speyside Single Malt 12Yr Scotch Whisky · 4.3 out of 5 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland",
+            "domain": "wine-searcher.com",
+            "description": "Rating 4.5(4)Shieldaig Speyside Single Malt Scotch 21 year old, Scotland, 750ml Bottle. In stock (). Check with the merchant for stock availability. Wine-Searcher is not ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Generic/store brands worth the time/taste? (US) : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/r8gnl/genericstore_brands_worth_the_timetaste_us/",
+            "domain": "reddit.com",
+            "description": "They also sell one called \"Shieldaig Speyside Single Malt\". It ... r/Scotch - Balvenie Single Barrel Traditional Oak Aged 21 Years. 24 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Shieldaig\" \"Speyside\" \"21 Year\" single malt",
+        "summary": "In stock Rating 4.546Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ... Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ... In stock Rating 4.5(4)Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml. In stock $3.99 deliveryButtery malt and cooked apricots on the nose, hints of spice and pe",
+        "results": [
+          {
+            "title": "Shieldaig 21 Year Single Malt - Cornwall Wine and Spirits",
+            "url": "https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9857b6d",
+            "domain": "cornwallwines.com",
+            "description": "In stock Rating 4.546Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750",
+            "domain": "totalwine.com",
+            "description": "Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland/1/usa-ok",
+            "domain": "wine-searcher.com",
+            "description": "In stock Rating 4.5(4)Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt 21Yr",
+            "url": "https://bansumwineandliquor.com/shop/product/shieldaig-speyside-single-malt-21yr/6249f094da0f517093d6d4fc?option-id=97cd4149534a1fc1236e6e92560589b6f82d89a5ae7a6ea39f0bad209ff5c956",
+            "domain": "bansumwineandliquor.com",
+            "description": "In stock $3.99 deliveryButtery malt and cooked apricots on the nose, hints of spice and pepper on the palate followed by waves of caramel. Toffee and lingering baking spices on the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside 21 Year Single Malt Scotch Whisky - J&J Spirit Shop",
+            "url": "https://jjspiritshop.com/shop/product/shieldaig-speyside-21-year-single-malt-scotch-whisky/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9857b6d",
+            "domain": "jjspiritshop.com",
+            "description": "In stock Rating 4.546Buy Shieldaig Speyside 21 Year Single Malt Scotch Whisky 750ml for $159.98 from J&J Spirit Shop in Sayville, NY. Free local delivery over $50.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8183ddf06b93ea72c70cf1f2872bbc97dbb2b50a437460ffe84ec97df17754a1",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:34:35.120Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Glenmorangie The Cadboll Estate Batch 2 15 year old official product ABV release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie The Cadboll Estate Batch 2 15 year old official product ABV release",
+        "summary": "# Glenmorangie The Cadboll Estate 15 year old (Batch 2), 43%\nSingle Malt Scotch\n\nThe second release using Glenmorangie's estate-grown barley. In stock Rating 4.45Glenmorangie The Cadboll Estate 15 Years Old 750ML is a 15-year-old Highland single malt Scotch whisky bottled at 43% ABV. Rated 93 points by both Whisky ... This 2024 release of the Cadboll Estate, aged for 15 years in our designer bourbon casks, magnifies the whisky's creaminess. It is uniquely silky, rich, and ... ABV: 43% Age: 15-Year-Old Original SRP: ~$99. Price Paid: ~$89. Tasting Methodology: Neat, rested 20 minutes. Nose: Won",
+        "results": [
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 year old (Batch 2), 43%",
+            "url": "https://whiskyadvocate.com/Glenmorangie-The-Cadboll-Estate-15-year-old-Batch-2-43",
+            "domain": "whiskyadvocate.com",
+            "description": "# Glenmorangie The Cadboll Estate 15 year old (Batch 2), 43%\nSingle Malt Scotch\n\nThe second release using Glenmorangie's estate-grown barley.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Cadboll Estate 15 Year Old 750ML | 93-Point Malt",
+            "url": "https://theliquorbarn.com/products/glenmorangie-the-cadboll-estate-15-years-old-750ml",
+            "domain": "theliquorbarn.com",
+            "description": "In stock Rating 4.45Glenmorangie The Cadboll Estate 15 Years Old 750ML is a 15-year-old Highland single malt Scotch whisky bottled at 43% ABV. Rated 93 points by both Whisky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Cadboll Estate, 2024 Batch 4 - Glenmorangie Distillery",
+            "url": "https://www.glenmorangie.com/en-us/pages/the-cadboll-estate",
+            "domain": "glenmorangie.com",
+            "description": "This 2024 release of the Cadboll Estate, aged for 15 years in our designer bourbon casks, magnifies the whisky's creaminess. It is uniquely silky, rich, and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #11 - Glenmorangie 15 - The Cadboll Estate : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ow8vc3/review_11_glenmorangie_15_the_cadboll_estate/",
+            "domain": "reddit.com",
+            "description": "ABV: 43% Age: 15-Year-Old Original SRP: ~$99. Price Paid: ~$89. Tasting Methodology: Neat, rested 20 minutes. Nose: Wonderfully balanced sweet ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Cadboll Estate 15 Year (Batch #2) - Distiller",
+            "url": "https://distiller.com/spirits/glenmorangie-the-cadboll-estate-15-year-batch-2",
+            "domain": "distiller.com",
+            "description": "Rating 3.9(32)It is is matured in American oak and bottled at 43% ABV, available as of July, 2021. . ... Distilled in pot stills from 100% malted barley, produced at one ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ab022ca50f5ccda4e3e8429915700410b083c4e63974a8340e8da45e3435be03",
+    "mode": "auto"
+  }
+}

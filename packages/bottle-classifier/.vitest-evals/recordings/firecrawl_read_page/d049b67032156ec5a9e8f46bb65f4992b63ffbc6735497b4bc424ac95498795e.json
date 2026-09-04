@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:24:31.325Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+    "focus": "Confirm the exact marketed product title, consumer brand, stated age, ABV, category, and any distinct edition or bottler/distillery relationship."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product title, consumer brand, stated age, ABV, category, and any distinct edition or bottler/distillery relationship.",
+    "summary": "CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY\n\nCANADIAN CLUB\n\ncanadian club 9 year old reserve canadian whisky\n\nCanadian Whiskey\n\n40%",
+    "results": [
+      {
+        "title": "Canadian Club 9 Year Old Reserve Canadian Whisky | ReserveBar",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "domain": "reservebar.com",
+        "description": "For some of the best prices on Canadian Club 9 Year Old Reserve Canadian Whisky, order from ReserveBar today, get it in under 2-hours in select states.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d049b67032156ec5a9e8f46bb65f4992b63ffbc6735497b4bc424ac95498795e",
+    "mode": "auto"
+  }
+}

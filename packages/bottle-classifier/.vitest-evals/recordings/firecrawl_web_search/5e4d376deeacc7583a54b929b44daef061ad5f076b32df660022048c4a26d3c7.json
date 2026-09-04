@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T18:30:07.395Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Canadian Club\" \"9 Year Old Reserve\" whisky",
+      "site:canadianclub.com \"9 Year Old\" Reserve Canadian Club"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club\" \"9 Year Old Reserve\" whisky",
+        "summary": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=3840&q=75)\n\n# canadian club 9 year old reserve canadian whisky\n### Size\n750 ML\n\nEngravable\n\n#### + $50\nMake it memorable with a personalized message\n\nCheck Availability\n\nCheck Availability\n\nWe're sorry, you need to add an address before checking the availability of this product.\n\nCheck Availability\n\nCheck Availability\n\n### Product Detail\nCategory\n\nSpir",
+        "results": [
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+            "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+            "domain": "reservebar.com",
+            "description": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-468",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve - Sip Whiskey",
+            "url": "https://sipwhiskey.com/products/canadian-club-9-year-old-reserve",
+            "domain": "sipwhiskey.com",
+            "description": "In stock $24.99 deliveryHand-selected and barrel-blended by our Master Blender, this reserve whisky is matured in white-oak barrels for 9 years to create a rich and smooth flavor. The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve Whisky - Taster's Club",
+            "url": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky",
+            "domain": "tastersclub.com",
+            "description": "In stock $17.99 deliveryCanadian Club 9 Year Old Reserve Whisky—aged 9 years for refined complexity with English toffee, mellow oak, and warm vanilla finish.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Canadian Club Reserve Aged 9 Year Blended ...",
+            "url": "https://www.wine-searcher.com/find/canadaclub+rsrv+aged+nine+blend+whisky+ontario+canada/0/usa-ok-y",
+            "domain": "wine-searcher.com",
+            "description": "Canadian Club - 9 Year Old Reserve Canadian Whisky. In stock (). See all 25 results. It doesn't have to end here. Become a Wine-Searcher PRO to see all 25 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club is so smooth, what is its secret? More in comments. - Reddit",
+            "url": "https://www.reddit.com/r/whiskey/comments/dr3pg5/canadian_club_is_so_smooth_what_is_its_secret/",
+            "domain": "reddit.com",
+            "description": "For experienced Canadian whisky drinkers - why is Canadian Club so smooth? ... I understand the 9 year old Reserve is available in 1.75 liter.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "site:canadianclub.com \"9 Year Old\" Reserve Canadian Club",
+        "summary": "[Skip to main content](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky#main-content)\n\n# Reserve 9 Year Old Canadian Whisky\nThink of Reserve 9 year old as the more mature, older sibling of Canadian Club 1858 with a greater Rye influence.\n\n[Ballot](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky#)\n\nShare\n\n## Tasting notes\n### Finish\n![Bottle Whisky 100% Rye Canadian Club](https://www.canadianclub.com/sites/default/files/styles/original/public/2024-05/canadian-club-bottle-whisky-100-percent-rye.png.webp?itok=Z1ISk681)\n\n![Classic 12 Whiskey Canadia",
+        "results": [
+          {
+            "title": "Reserve 9 Year Old Canadian Whisky",
+            "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+            "domain": "canadianclub.com",
+            "description": "[Skip to main content](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky#main-content)\n\n# Reserve 9 Year Old Canadian Whisky\nThink of Reserve 9 year old as the more mature, older sibling of Canadia",
+            "extraSnippets": []
+          },
+          {
+            "title": "Our Products | Canadian Club",
+            "url": "https://www.canadianclub.com/products",
+            "domain": "canadianclub.com",
+            "description": "canadian club 9 year old whisky. Whiskies. Reserve 9 Year Old Canadian Whisky. add-bag-active. Learn More. add-bag-active. Buy online. Learn More. Bottle Whisky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club: Refreshing Canadian Whiskies and Cocktails",
+            "url": "https://www.canadianclub.com/",
+            "domain": "canadianclub.com",
+            "description": "### Canadian Club® Blackberry\n[Learn more](https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky)\n\n### Reserve 9 Year Old Canadian Whisky\nThink of Reserve 9 year old as the more mature, older sibling o",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskies | Canadian Club",
+            "url": "https://www.canadianclub.com/products/whiskies",
+            "domain": "canadianclub.com",
+            "description": "canadian club 9 year old whisky. Whiskies. Reserve 9 Year Old Canadian Whisky. add-bag-active. Learn More. add-bag-active. Buy online. Learn More. Bottle Whisky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Sitemap - Canadian Club",
+            "url": "https://www.canadianclub.com/html-sitemap",
+            "domain": "canadianclub.com",
+            "description": "Reserve 9 Year Old · Whiskies-[En]. Our Cocktails. Our Cocktails · Blackberry Lemonade · CC Al Capone · CC & Apple with Fresh Lime · CC Dry with Fresh Lime · CC ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "5e4d376deeacc7583a54b929b44daef061ad5f076b32df660022048c4a26d3c7",
+    "mode": "auto"
+  }
+}

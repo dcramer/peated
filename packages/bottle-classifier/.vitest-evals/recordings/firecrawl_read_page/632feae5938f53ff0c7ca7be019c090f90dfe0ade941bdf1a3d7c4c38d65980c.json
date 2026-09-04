@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:47:37.224Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.reservebar.com/products/laphroaig-ca%CC%80irdeas-2022-islay-single-malt-scotch-whisky/GROUPING-1892623.html?utm=peated",
+    "focus": "exact product identity, including edition wording, ABV, maturation, and release year"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "exact product identity, including edition wording, ABV, maturation, and release year",
+    "summary": "LAPHROAIG 2022 CAIRDEAS ISLAY SINGLE MALT SCOTCH WHISKY\n\n750 ML\n\n53%",
+    "results": [
+      {
+        "title": "Laphroaig 2022 Cairdeas Islay Single Malt Scotch Whisky | ReserveBar",
+        "url": "https://www.reservebar.com/products/laphroaig-ca%CC%80irdeas-2022-islay-single-malt-scotch-whisky/GROUPING-1892623.html?utm=peated",
+        "domain": "reservebar.com",
+        "description": "For some of the best prices on Laphroaig 2022 Cairdeas Islay Single Malt Scotch Whisky, order from ReserveBar today, get it in under 2-hours in select states.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "632feae5938f53ff0c7ca7be019c090f90dfe0ade941bdf1a3d7c4c38d65980c",
+    "mode": "auto"
+  }
+}

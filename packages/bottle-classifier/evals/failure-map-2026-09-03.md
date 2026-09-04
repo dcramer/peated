@@ -77,9 +77,11 @@ boundaries:
 2. **Bound expensive audit work:** inspect the malformed Laphroaig and Dramfool
    traces. The latest run spent 87,044 and 49,187 tokens on those cases. Test a
    narrow stop or missing-operation check only after locating the repeated work.
-3. **List supported facts before the final draft:** test Hedonism², Willett,
-   and Proof and Wood. The check reports omissions to Luna once; it never fills
-   a field itself. Measure the added request, tokens, time, and repaired fields.
+3. **List supported facts before the final draft:** C26 first tested the
+   smaller prompt-only version on Willett and Proof and Wood. It fixed the
+   target Boolean fields, but the full suite lost accuracy and produced an
+   unsupported exact-cask creation. Do not add more field examples. Any future
+   draft check must keep source scope explicit and pass the same safety case.
 4. **Whole-product versus component facts:** test both Watchpost inputs and a
    true age-stated blend comparison case. This belongs in the web evidence contract.
 

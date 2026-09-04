@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:55:35.259Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://dramfool.com/previous-bottlings/93-octomore-jmsc",
+    "focus": "Confirm the producer's exact product title and marketed edition wording for the Dramfool Octomore Jim McEwan Signature Collection release, especially whether the edition is '9.3' or 'Release 9.3'."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the producer's exact product title and marketed edition wording for the Dramfool Octomore Jim McEwan Signature Collection release, especially whether the edition is '9.3' or 'Release 9.3'.",
+    "summary": "Bottled in January 2024 as Release 9.3 of the Jim McEwan Signature Collection, like all bottlings within the collection, it was bottled un-chill filtered, with no added colour and at natural cask strength of 63.3% (Jim would have it no other way!), it yielded only 226 bottles.",
+    "results": [
+      {
+        "title": "Octomore 9.3 11-year old 1st fill Bourbon barrel — Dramfool | Scotch Whisky | Single Cask Bottlings | Un-chill | Filtered | Cask Strength | Scotland - UK",
+        "url": "https://dramfool.com/previous-bottlings/93-octomore-jmsc",
+        "domain": "dramfool.com",
+        "description": "Octomore 9.3 11-year old 1st fill Bourbon barrel,   Octomore 9.3 11-year old 1st fill Bourbon barrel",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "73218623d24dfe18feeed5b3b53e235e7d9decfd2df6e4be4ab32a9e7e2118fb",
+    "mode": "auto"
+  }
+}

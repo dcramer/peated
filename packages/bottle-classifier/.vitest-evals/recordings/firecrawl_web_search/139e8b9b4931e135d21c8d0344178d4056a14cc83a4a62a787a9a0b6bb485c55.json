@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T18:30:59.118Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Bruichladdich Octomore 13.1 official product ABV age maturation release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Bruichladdich Octomore 13.1 official product ABV age maturation release",
+        "summary": "Age: 5 Year. Bottled March 15th, 2022. ABV: 59.2%. Cask Type: Ex-Bourbon. Peat PPM: 137.3 PPM. Barley Origin: Scottish Mainland. This young ex- ...Review #27 - Bruichladdich Octomore 13.1 : r/ScotchOctomore Series 13 Review : r/ScotchMore results from www.reddit.com 16.1 is crafted using 100% Scottish Mainland Concerto Barley, malted to 101.4 PPM and aged in cask for 5 years, with an ABV of 59.3%. Comments · Bruichladdich Octomore 13.1 Super Heavily Peated Scotch · Who Does Sherry The Best? · You're using the Dock WRONG - do THIS instead! Oct 16, 2022",
+        "results": [
+          {
+            "title": "Scotch Whisky Review #420: Octomore 13.1 - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/y5kb9r/scotch_whisky_review_420_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Age: 5 Year. Bottled March 15th, 2022. ABV: 59.2%. Cask Type: Ex-Bourbon. Peat PPM: 137.3 PPM. Barley Origin: Scottish Mainland. This young ex- ...Review #27 - Bruichladdich Octomore 13.1 : r/ScotchOctomore Series 13 Rev",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore Edition 16.1 | Bruichladdich Distillery US",
+            "url": "https://us.bruichladdich.com/products/octomore-16-1",
+            "domain": "us.bruichladdich.com",
+            "description": "16.1 is crafted using 100% Scottish Mainland Concerto Barley, malted to 101.4 PPM and aged in cask for 5 years, with an ABV of 59.3%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "Comments · Bruichladdich Octomore 13.1 Super Heavily Peated Scotch · Who Does Sherry The Best? · You're using the Dock WRONG - do THIS instead!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Distillery launches Octomore 13.4 - GreatDrams",
+            "url": "https://greatdrams.com/bruichladdich-distillery-launches-octomore-13-4/",
+            "domain": "greatdrams.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1 - Scotch & Sheen",
+            "url": "https://scotchandsheen.com/2022/10/16/octomore-13-1/",
+            "domain": "scotchandsheen.com",
+            "description": "Oct 16, 2022",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "139e8b9b4931e135d21c8d0344178d4056a14cc83a4a62a787a9a0b6bb485c55",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T18:23:22.952Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Octomore 13.1 official Bruichladdich product 61.1 5 years release 2022"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 official Bruichladdich product 61.1 5 years release 2022",
+        "summary": "Nov 4, 2022Scotch Whisky Review #420: Octomore 13.1Octomore Series 13 Review : r/ScotchMore results from www.reddit.com Out of stock Rating 5.0(1)This single malt whisky from the Bruichladdich distillery on Islay has been super heavily peated to 137.3ppm. The limited edition 2022 release is part of ... Out of stock Rating 4.98Syrupy apricot and ripe pear along with malty vanilla notes of barley flour and Crème Brulee, honey and tablet. The American oak brings coconut, almonds and ... In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ... Jul 5,",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Nov 4, 2022Scotch Whisky Review #420: Octomore 13.1Octomore Series 13 Review : r/ScotchMore results from www.reddit.com",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich - 5 Year Old (Octomore 13.1)",
+            "url": "https://www.stillspirit.com/en-us/products/bruichladdich-5-year-old-octomore-13-1",
+            "domain": "stillspirit.com",
+            "description": "Out of stock Rating 5.0(1)This single malt whisky from the Bruichladdich distillery on Islay has been super heavily peated to 137.3ppm. The limited edition 2022 release is part of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 Bourbon Cask (2022) - The Whisky Barrel",
+            "url": "https://www.thewhiskybarrel.com/products/bruichladdich-octomore-13-1-bourbon-cask-2022",
+            "domain": "thewhiskybarrel.com",
+            "description": "Out of stock Rating 4.98Syrupy apricot and ripe pear along with malty vanilla notes of barley flour and Crème Brulee, honey and tablet. The American oak brings coconut, almonds and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "Jul 5, 2026",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "cb44884439525a97823d5057c0d39f3f96dd93a66063f0d603256372c6616a86",
+    "mode": "auto"
+  }
+}

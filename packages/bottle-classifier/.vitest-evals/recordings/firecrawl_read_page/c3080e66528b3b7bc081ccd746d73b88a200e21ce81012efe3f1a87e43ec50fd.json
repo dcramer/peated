@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:52:02.379Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1810-rare-cask-release-batch-1-whisky/",
+    "focus": "Confirm the complete marketed release identity: age, vintage/distillation date, cask number, batch/edition, ABV, bottling or release year, and whether it is a distillery bottling or single-cask release."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed release identity: age, vintage/distillation date, cask number, batch/edition, ABV, bottling or release year, and whether it is a distillery bottling or single-cask release.",
+    "summary": "Glenglassaugh\n\nGlenglassaugh 35 Year Old 1978 (cask 1810) - Rare Cask Release Batch 1 70cl Whisky\n\nSingle Malt Scotch Whisky|70cl|42.9%\n\nOne of two 35 year old single malt Scotch whiskies in the first batch of Rare Cask Releases from the Glenglassaugh distillery. It was finished in a Port hogshead, before it was bottled, producing 279 bottles.\n\nGlenglassaugh 35 Year Old 1978 (cask 1810) - Rare Cask Release Batch 1",
+    "results": [
+      {
+        "title": "Glenglassaugh 35 Year Old 1978 (cask 1810) - Rare Cask Release Batch 1 70cl Whisky | Master Of Malt",
+        "url": "https://www.masterofmalt.com/whiskies/glenglassaugh/glenglassaugh-35-year-old-1978-cask-1810-rare-cask-release-batch-1-whisky/",
+        "domain": "masterofmalt.com",
+        "description": "One of two 35 year old single malt Scotch whiskies in the first batch of Rare Cask Releases from the Glenglassaugh distillery. It was finished in a Po...",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c3080e66528b3b7bc081ccd746d73b88a200e21ce81012efe3f1a87e43ec50fd",
+    "mode": "auto"
+  }
+}

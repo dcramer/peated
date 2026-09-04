@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:29:17.469Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["Woodford Reserve Double Oaked official product ABV bourbon"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Oaked official product ABV bourbon",
+        "summary": "Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character. Mar 6, 2025 ## Double Double Oaked\nThis bourbon undergoes an extended slumber in a second, custom-crafted barrel. Feb 19, 2025 USA - Kentucky - 45.2% - Woodford Reserve Double Oaked is an innovative approach to twice-barreled bourbon, showcasing a rich flavor unlike any other Kentucky ...",
+        "results": [
+          {
+            "title": "Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon (2025) Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/woodford-reserve-double-double-oaked-bourbon-2025-review/",
+            "domain": "thebourbonculture.com",
+            "description": "Mar 6, 2025",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "## Double Double Oaked\nThis bourbon undergoes an extended slumber in a second, custom-crafted barrel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Review: Worth the Hype?",
+            "url": "https://www.bourbonbanter.com/woodford-reserve-double-double-oaked-review-worth-the-hype/",
+            "domain": "bourbonbanter.com",
+            "description": "Feb 19, 2025",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Kentucky Straight Bourbon Whiskey",
+            "url": "https://www.totalwine.com/spirits/bourbon/small-batch-bourbon/woodford-reserve-double-oaked-kentucky-straight-bourbon-whiskey/p/120640750",
+            "domain": "totalwine.com",
+            "description": "USA - Kentucky - 45.2% - Woodford Reserve Double Oaked is an innovative approach to twice-barreled bourbon, showcasing a rich flavor unlike any other Kentucky ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "60943c019bb971f14bd4e222d2201d24997155713e0258e81d5e5baa7fbc970b",
+    "mode": "auto"
+  }
+}

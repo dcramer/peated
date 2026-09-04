@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:55:48.294Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "official Hibiki 21 Year Old Suntory blend Yamazaki Hakushu Chita ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "official Hibiki 21 Year Old Suntory blend Yamazaki Hakushu Chita ABV",
+        "summary": "Suntory Hibiki 21 Year Old Japanese whisky is a highly allocated blended whisky aged 21 years, offering layered fruit, honey, floral notes, and Mizunara oak ... # Hibiki Whisky\n### Hibiki 21 Years Old\n![bottle-hibiki-21-years-house-of-suntory](https://house.suntory.com/sites/default/files/styles/original/public/2026-04/bottle-hibiki-21-years-house-of-suntory.png.webp?itok=NVq7c1HR)\n\n## Serving Japanese Whisky\n[**Hibiki 21 Years Old**](https://house.suntory.com/hibiki-whisky/hibiki-21-years-old) Hibiki 21 Year Old. Region: Japan. Age: 21 Years. ABV: 43%. The Japanese Whisky industry still feels",
+        "results": [
+          {
+            "title": "Suntory Hibiki 21 Year Old Japanese Whisky - Bourbon and Bones",
+            "url": "https://www.bourbonandbones.com/selections/suntory-hibiki-21-year-old-japanese-whisky/",
+            "domain": "bourbonandbones.com",
+            "description": "Suntory Hibiki 21 Year Old Japanese whisky is a highly allocated blended whisky aged 21 years, offering layered fruit, honey, floral notes, and Mizunara oak ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki® Blended Japanese Whisky | The House of Suntory",
+            "url": "https://house.suntory.com/hibiki-whisky",
+            "domain": "house.suntory.com",
+            "description": "# Hibiki Whisky\n### Hibiki 21 Years Old\n![bottle-hibiki-21-years-house-of-suntory](https://house.suntory.com/sites/default/files/styles/original/public/2026-04/bottle-hibiki-21-years-house-of-suntory.png.webp?itok=NVq7c1",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #147 – Hibiki 21 Year Old : r/worldwhisky - Reddit",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/z43agv/review_147_hibiki_21_year_old/",
+            "domain": "reddit.com",
+            "description": "Hibiki 21 Year Old. Region: Japan. Age: 21 Years. ABV: 43%. The Japanese Whisky industry still feels like it's in a tenuous state these days ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The House of Suntory Launches Limited-Edition Hibiki 21-Year-Old ...",
+            "url": "https://www.suntoryglobalspirits.com/news/house-suntory-launches-limited-edition-hibiki-21-year-old-whisky-and-hibiki-japanese-harmony",
+            "domain": "suntoryglobalspirits.com",
+            "description": "Hibiki 21-Year-Old is bottled at 43 percent ABV. ... The portfolio includes Yamazaki, Hakushu, Chita, Kakubin, Hibiki, Suntory Whisky Toki and Ao.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Suntory Hibiki 21 Year Whisky 750ML | Mizunara Oak Blend",
+            "url": "https://theliquorbarn.com/products/suntory-hibiki-21-year-whisky-750ml",
+            "domain": "theliquorbarn.com",
+            "description": "In stock Rating 4.798Quick Facts: ABV: 43% | Origin: Japan | Age Statement: 21 Years | Distilleries: Yamazaki, Hakushu & Chita (Suntory). Production & Heritage. Hibiki 21 draws ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "346fa24a3a745aef3f3f606c5f86f4a113ac75f8e0273c92bcb39051fdd81ace",
+    "mode": "auto"
+  }
+}

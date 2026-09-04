@@ -102,6 +102,13 @@ Broad prompt changes and broad source-page reading did not hold up:
 - A narrower pair based on producer versus retailer authority made two names
   more consistent, but full accuracy stayed 10/15. It lost the only Creag Isle
   pass and changed Black Label's correct category in two runs.
+- Telling Luna to read a result after exhausting search produced no Octomore
+  gain. The unchanged version passed 9/9 focused judgments; the changed version
+  passed 7/9, cost 6.6% more, and made the median case 41.9% slower.
+- Short true, false, and unknown examples for strength and single-cask fields
+  improved focused results from 6/9 to 8/9. The full suite fell from 80/105 to
+  78/105, produced one unsupported exact-cask creation, used 5.4% more tokens,
+  and cost 3.9% more.
 
 These results favor small code checks for facts Peated already knows. Extra
 prompt text and extra model passes need a stronger measured gain.
@@ -117,11 +124,29 @@ an unsupported SMWS release year. These corrections are not classifier gains.
 
 ## What remains
 
-The clearest next problem is expensive audit work. In the latest no-web full
-run, the malformed Laphroaig audit used 87,044 tokens and 97 seconds without
-returning the required operations. A successful Dramfool audit used 49,187
-tokens and 79 seconds. Inspect their tool sequences and missing operations
-before testing a bounded audit change.
+The expensive audit traces did not support a shorter run. Dramfool corrected
+one missing target citation and passed. Laphroaig corrected two different
+rejections before recording an update. Its remaining error was choosing an
+update instead of a duplicate merge. A shorter turn limit would remove useful
+recovery rather than solve that choice.
+
+The flat-page hypothesis did not survive its first control. The unchanged
+classifier handled both Watchpost inputs correctly when it received the exact
+producer page: it left the component age off the Bottle and kept the expected
+Westland distiller. Structured Firecrawl JSON would raise each page read from
+one credit to five, so there was no target gain to justify it.
+
+The old Octomore 13.1 retrieval failure did not reproduce consistently. The
+unchanged classifier passed Octomore in all three new runs by reading a page or
+using strong search evidence. Extra page-read guidance appeared in only one
+changed run, produced no gain, and did not prevent two other failures. The
+change was reverted without a full-suite run.
+
+Paired Boolean examples also failed the broad gate. They reliably carried the
+target cask-strength and multi-barrel facts, but a full run borrowed an exact
+cask from web evidence for a source that named only a broader batch. This
+produced an unsupported Glenglassaugh creation. The schema wording was
+reverted.
 
 Other repeated problems have separate causes:
 

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:35:26.843Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+    "focus": "Confirm the complete marketed product identity, including brand, exact product name, stated age, ABV, producer or bottler, distillery, and any edition or cask details."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed product identity, including brand, exact product name, stated age, ABV, producer or bottler, distillery, and any edition or cask details.",
+    "summary": "Creag Isle 12Yr Island Single Malt Scotch Whisky 750ml Bottle\n\nSee More [Creag Isle](https://www.totalwine.com/spirits/brand/creag-isle)\n\n750ml Bottle\n\nCreag Isle 12Yr Island Single Malt Scotch Whisky\n\nIslands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Double Gold- San Francisco Spirits Competition\n\nMildFINISH is Long\n\nComplex\n\nDelicateSTYLE is Intense\n\nRich\n\nCountry\n\n[Scotland](https://www.totalwine.com/spirits/scotland/c/001068)\n\nState\n\n[Islay & Islands](https://www.totalwine.com/spirits/islay-islands/islay-islands/c/001127)\n\nBrand\n\n[Creag Isle](https://www.totalwine.com/spirits/brand/creag-isle)\n\nSpirits Type\n\n[Scotch](https://www.totalwine.com/spirits/scotch/c/000885)\n\nSpirits Style\n\n[Single Malt](https://www.totalwine.com/spirits/single-malt/single-malt/c/000887)\n\nABV\n\n42.2%",
+    "results": [
+      {
+        "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky | Total Wine & More",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+        "domain": "totalwine.com",
+        "description": "Shop Creag Isle 12Yr Island Single Malt Scotch Whisky at the best prices. Explore thousands of wines, spirits and beers, and shop online for delivery or pickup in a store near you.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3343ca7c93a756ebdf93590a4c4af864f2e8ccf766f45206b20355da9e165909",
+    "mode": "auto"
+  }
+}

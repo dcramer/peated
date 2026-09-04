@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:23:34.176Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.stillspirit.com/en-us/products/bruichladdich-5-year-old-octomore-13-1",
+    "focus": "Confirm the exact marketed product title and all identity-critical release traits: expression, age, ABV, edition, distillation or release year, cask strength, single cask, maturation, and outturn."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product title and all identity-critical release traits: expression, age, ABV, edition, distillation or release year, cask strength, single cask, maturation, and outturn.",
+    "summary": "Bruichladdich - 5 year Old (Octomore 13.1)\n\nSingle Malt\n\nIslay/70cl/59.20%\n\n5.0\n\nThis single malt whisky from the Bruichladdich distillery on Islay has been super heavily peated to 137.3ppm. The limited edition 2022 release is part of the Octomore series, famous for being some of the peatiest whiskies available. The whisky has been aged in ex bourbon barrels for 5 years.",
+    "results": [
+      {
+        "title": "Bruichladdich - 5 Year Old (Octomore 13.1)",
+        "url": "https://www.stillspirit.com/en-us/products/bruichladdich-5-year-old-octomore-13-1",
+        "domain": "stillspirit.com",
+        "description": "This single malt whisky from the Bruichladdich distillery on Islay has been super heavily peated to 137.3ppm. The limited edition 2022 release is part of the Octomore series, famous for being some of the peatiest whiskies available. The whisky has been aged in ex bourbon barrels for 5 years.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a2ba229a785b808a1ab4b1640470e115004dcb48e82358730b7e05d23ecfa93a",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:30:11.364Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+    "focus": "Confirm the complete marketed Bottle identity: product title, age, ABV, category/style, edition or batch wording, and whether the release is an official Canadian Club product with no independent bottler."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the complete marketed Bottle identity: product title, age, ABV, category/style, edition or batch wording, and whether the release is an official Canadian Club product with no independent bottler.",
+    "summary": "Reserve 9 Year Old Canadian Whisky\n\nThink of Reserve 9 year old as the more mature, older sibling of Canadian Club 1858 with a greater Rye influence. This whisky is aged for a full 9 years, bringing out the oak notes of the barrels and a spicier, more robust taste profile.",
+    "results": [
+      {
+        "title": "Reserve 9 Year Old Canadian Whisky | Canadian Club",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": "Discover the refined taste of our Reserve 9 Year Old Canadian Whisky. Aged to perfection, it embodies the excellence of Canadian Club. Order now.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "acd2c5fd3c72a257bee3b9fd882dab81834fd584609f6e7191a94663b5af176a",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T18:29:17.725Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Bruichladdich Octomore 13.1 official product 61.1% 5 year old 2022"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Bruichladdich Octomore 13.1 official product 61.1% 5 year old 2022",
+        "summary": "Nov 4, 2022 ## Bruichladdich Octomore 13...\n### Bruichladdich Octomore 13.1 5 Year Old Single Malt\nAged: 5 Years In stock Rating 4.98Octomore 5 Year Old delivers explosive peat, distilled on Islay and bottled at 59.2% in a premium 70cl bottle. A refined, robust single malt from a ... In stock Rating 5.0(6) · $25 deliverySale!35%. Bruichladdich Octomore 13.1 2022 5 year old. $744.98 $484.24. -15%. Product images are for illustrative purposes only and may differ from the ... In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ...",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "Nov 4, 2022",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 5 Year Old Single Malt",
+            "url": "https://potomacwines.com/en-gb/product/spirits/scotch-whisky/bruichladdich-octomore-13-1-5-year-old-single-malt?limit=50",
+            "domain": "potomacwines.com",
+            "description": "## Bruichladdich Octomore 13...\n### Bruichladdich Octomore 13.1 5 Year Old Single Malt\nAged: 5 Years",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1 Islay Single Malt Whisky 5 Year Old",
+            "url": "https://www.htfw.com/octomore-13-1-islay-single-malt-5-year-old-whisky",
+            "domain": "htfw.com",
+            "description": "In stock Rating 4.98Octomore 5 Year Old delivers explosive peat, distilled on Islay and bottled at 59.2% in a premium 70cl bottle. A refined, robust single malt from a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 2022 5 Year Old Whisky",
+            "url": "https://www.sendgifts.com/shop/bruichladdich-octomore-13-1-2022-5-year-old/",
+            "domain": "sendgifts.com",
+            "description": "In stock Rating 5.0(6) · $25 deliverySale!35%. Bruichladdich Octomore 13.1 2022 5 year old. $744.98 $484.24. -15%. Product images are for illustrative purposes only and may differ from the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Octomore 13.1: Single Malt Scotch - YouTube",
+            "url": "https://www.youtube.com/watch?v=axBQ1k8MGKM",
+            "domain": "youtube.com",
+            "description": "In this video I will be reviewing Octomore 13.1 single malt scotch whisky. Whisk(e)y Review Scores: ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c5a1cc208c9c81334f884da0d1478582d86849b79de7dc24a3c185d456ddf53d",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:29:46.769Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+    "focus": "Confirm the exact marketed product name, stated age, ABV, bottling or release year, bottle outturn, and whether it is an exclusive or distinct edition."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact marketed product name, stated age, ABV, bottling or release year, bottle outturn, and whether it is an exclusive or distinct edition.",
+    "summary": "Compass Box Hedonism² (Exclusive to Hedonism Wines)\n\n44 left\n\nHED46596\n\n70 cl\n\n49%\n\nThe youngest whiskies in the blend are 23 years of age and the spirit is bottled at a robust 49% ABV. Limited to 600 bottles.",
+    "results": [
+      {
+        "title": "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+        "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+        "domain": "hedonism.co.uk",
+        "description": "An exclusive bottling of Compass Box`s acclaimed grain whisky blend Hedonism. A marriage of venerable grain whiskies from North British, Port Dundas and Girvan, Hedonism² is a burlier, richer version of the classic Hedonism blend. The youngest whiskies in the blend are 23 years of age and the spirit is bottled at a rob",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bbede3f2d10a3ded8b85c2bc418148ce7e9752cbfdf72c14f7292ccb87b85071",
+    "mode": "auto"
+  }
+}

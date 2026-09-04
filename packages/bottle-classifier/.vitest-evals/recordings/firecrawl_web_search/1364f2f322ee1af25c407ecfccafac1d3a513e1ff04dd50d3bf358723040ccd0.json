@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:54:35.224Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Keel and Cooper\" \"Harbor Reserve\" bourbon 56.2%"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Keel and Cooper\" \"Harbor Reserve\" bourbon 56.2%",
+        "summary": "Can a $30 bottle be the best budget bourbon on the market? Check out the video to see. All claims made here about alcohol, whether in this ... In stock Free delivery over $149.99“Barrel Reserve Bourbon is bottled uncut at barrel proof to showcase its full character and complexity. The result is a whiskey that is both powerful and ... Welcome back to Tortured Bourbon, where Heather and B taste, argue, laugh, and torture their way through the bourbon world. Thank you so much for watching! Checkout Copper Tear Bourbon via the link below! https://www.louisianatradition.com ...",
+        "results": [
+          {
+            "title": "Episode 192: Coopers' Craft Barrel Reserve - Fantastic @ $30?",
+            "url": "https://www.youtube.com/watch?v=4lu4lqf6lYY",
+            "domain": "youtube.com",
+            "description": "Can a $30 bottle be the best budget bourbon on the market? Check out the video to see. All claims made here about alcohol, whether in this ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Barrel Reserve Bourbon - Barrel Proof - Koopers Whiskey",
+            "url": "https://www.kooperswhiskey.com/product/barrel-reserve-bourbon",
+            "domain": "kooperswhiskey.com",
+            "description": "In stock Free delivery over $149.99“Barrel Reserve Bourbon is bottled uncut at barrel proof to showcase its full character and complexity. The result is a whiskey that is both powerful and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cooper's Craft Barrel Reserve Bourbon Tasting and Review",
+            "url": "https://www.youtube.com/watch?v=4hnZyqnAsbg",
+            "domain": "youtube.com",
+            "description": "Welcome back to Tortured Bourbon, where Heather and B taste, argue, laugh, and torture their way through the bourbon world.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cooper's Craft Barrel Reserve Bourbon - Paste Magazine",
+            "url": "https://www.pastemagazine.com/drink/whiskey/coopers-craft-barrel-reserve-review",
+            "domain": "pastemagazine.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Copper Tear Reserve Louisiana Select Bourbon Review! - YouTube",
+            "url": "https://www.youtube.com/watch?v=GJIxZbj0JEc",
+            "domain": "youtube.com",
+            "description": "Thank you so much for watching! Checkout Copper Tear Bourbon via the link below! https://www.louisianatradition.com ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "1364f2f322ee1af25c407ecfccafac1d3a513e1ff04dd50d3bf358723040ccd0",
+    "mode": "auto"
+  }
+}

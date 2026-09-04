@@ -1,0 +1,82 @@
+{
+  "writtenAt": "2026-09-04T19:31:12.664Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "High West \"A Midwinter Night's Dram\" \"Act 12 Scene 9\" 49.3",
+      "High West \"Act 12, Scene 9\" 2024 49.3%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "High West \"A Midwinter Night's Dram\" \"Act 12 Scene 9\" 49.3",
+        "summary": "... Act 12, Scene 9 is a blend of straight rye ... High West A Midwinter Night's Dram is back! STATE ... A Midwinter Night's Dram High West Distillery Act 12 Scene 3 ... ... Act 12 Scene 9 about a week ago. Overall, meh ... 49.3% ALC/VOL Act Scene 750ml HIGH WEST ... HIGH WEST DISTILLERY A Midwinter Night's Dram A ...",
+        "results": [
+          {
+            "title": "Another recent pour from Park City, Utah's High West Distillery ...",
+            "url": "https://www.instagram.com/p/DSfOM-3DdHE/",
+            "domain": "instagram.com",
+            "description": "... Act 12, Scene 9 is a blend of straight rye ... High West A Midwinter Night's Dram is back! STATE ... A Midwinter Night's Dram High West Distillery Act 12 Scene 3 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bourbon__Memes | A Midwinter Night's Dram Act 13 Scene 14 ...",
+            "url": "https://www.instagram.com/p/DSNJJh_kf_I/",
+            "domain": "instagram.com",
+            "description": "... Act 12 Scene 9 about a week ago. Overall, meh ... 49.3% ALC/VOL Act Scene 750ml HIGH WEST ... HIGH WEST DISTILLERY A Midwinter Night's Dram A ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "High West \"Act 12, Scene 9\" 2024 49.3%",
+        "summary": "Act 12 Scene 5 is a limited release of High West Rendezvous Rye. High West ABV: 49.3% ABV Age: se: Huge rye spice on the nose, toffee, cracked ...Review #345 - High West A Midwinter Nights Dram Act 9 Scene 4Review 49, A Midwinter Night's Dram, Act 12, Scene 6 : r/bourbonMore results from www.reddit.com whiskeytube #bourbon #thewhiskeycove #whiskey #whisky In this video, we look at the newest release from @drinkhighwest Midwinter Nights Dram ... Act 12 Scene 3 Edition | 49.3% ABV Score: 7/10 Very Good Indeed. A Midwinter Night's Dram is a rye whiskey expression from High West Distillery ... ABV",
+        "results": [
+          {
+            "title": "High West A Midwinter Night's Dram Act 12 Scene 5 : r/bourbon - Reddit",
+            "url": "https://www.reddit.com/r/bourbon/comments/1hzog5n/review_2427_high_west_a_midwinter_nights_dram_act/",
+            "domain": "reddit.com",
+            "description": "Act 12 Scene 5 is a limited release of High West Rendezvous Rye. High West ABV: 49.3% ABV Age: se: Huge rye spice on the nose, toffee, cracked ...Review #345 - High West A Midwinter Nights Dram Act 9 Scene 4Review 49, A ",
+            "extraSnippets": []
+          },
+          {
+            "title": "How Good Is High West Midwinter Night's Dram Act 12? Four-way Blind!",
+            "url": "https://www.youtube.com/watch?v=xdVuECHce0U",
+            "domain": "youtube.com",
+            "description": "whiskeytube #bourbon #thewhiskeycove #whiskey #whisky In this video, we look at the newest release from @drinkhighwest Midwinter Nights Dram ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West Midwinter Night's Dram — Dramface",
+            "url": "https://www.dramface.com/all-reviews/2025/high-west-midwinter-nights-dram-act-12-scene-3",
+            "domain": "dramface.com",
+            "description": "Act 12 Scene 3 Edition | 49.3% ABV Score: 7/10 Very Good Indeed. A Midwinter Night's Dram is a rye whiskey expression from High West Distillery ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Midwinter Nights Dram - High West Whiskey",
+            "url": "https://highwest.com/pages/a-midwinter-nights-dram",
+            "domain": "highwest.com",
+            "description": "ABV: 49.3% Proof: 98.6. Nose Brandied cherries, fig jam, sun-dried raisins, dried orange peel, baking spice, French oak toast.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram Act 12 (All Scenes) - Distiller",
+            "url": "https://distiller.com/spirits/high-west-a-midwinter-night-s-dram-act-12-all-scenes",
+            "domain": "distiller.com",
+            "description": "Rating 4.2(53)(SRP $149.99) age NAS Cost abv 49.3 Rye Rye produced in the US must be made of at least 51% rye and it must be aged in new, charred oak barrels (no age ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ab0b92c011f4abdfcb63c43388bf2d826481a741a9d67e00064eca9d9012e43b",
+    "mode": "auto"
+  }
+}

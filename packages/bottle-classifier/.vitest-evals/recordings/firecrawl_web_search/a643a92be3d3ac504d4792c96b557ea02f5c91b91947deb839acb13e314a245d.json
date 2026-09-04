@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-09-04T18:29:19.858Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["site:bruichladdich.com Octomore 13.1 61.1%"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:bruichladdich.com Octomore 13.1 61.1%",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a643a92be3d3ac504d4792c96b557ea02f5c91b91947deb839acb13e314a245d",
+    "mode": "auto"
+  }
+}

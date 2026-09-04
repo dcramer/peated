@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:52:54.601Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Canadian Club\" \"9-year-old Reserve\" Canadian whisky",
+      "\"Canadian Club Reserve\" \"9 Year Old\" whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club\" \"9-year-old Reserve\" Canadian whisky",
+        "summary": "In stock $24.99 deliveryHand-selected and barrel-blended by our Master Blender, this reserve whisky is matured in white-oak barrels for 9 years to create a rich and smooth flavor. The ... ## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-4686-804a-b38ffe556181.jpg&w=3840&q=75)\n\n# canadian club 9 year old reserve canadian whisky\n### Size\n750 ML\n\nEngravable\n\n#### + $50\nMake it memorable with a personalized message\n\nCheck Availabili",
+        "results": [
+          {
+            "title": "Canadian Club 9 Year Old Reserve - Sip Whiskey",
+            "url": "https://sipwhiskey.com/products/canadian-club-9-year-old-reserve",
+            "domain": "sipwhiskey.com",
+            "description": "In stock $24.99 deliveryHand-selected and barrel-blended by our Master Blender, this reserve whisky is matured in white-oak barrels for 9 years to create a rich and smooth flavor. The ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve Canadian Whisky",
+            "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+            "domain": "reservebar.com",
+            "description": "## HOME/Spirits/Whiskey/Canadian Whiskey\n![CANADIAN CLUB 9 YEAR OLD RESERVE CANADIAN WHISKY](https://www.reservebar.com/_next/image?url=https%3A%2F%2Fassets.liquidcommerce.co%2Fcatalog%2Fpartner%2Fimg%2Fa0fd0087-98c1-468",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club 9 Year Old Reserve Whisky - Taster's Club",
+            "url": "https://tastersclub.com/products/canadian-club-9-year-old-reserve-whisky",
+            "domain": "tastersclub.com",
+            "description": "In stock $17.99 deliveryCanadian Club 9 Year Old Reserve Whisky—aged 9 years for refined complexity with English toffee, mellow oak, and warm vanilla finish.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Canadian Club Reserve Aged 9 Year Blended ...",
+            "url": "https://www.wine-searcher.com/find/canadaclub+rsrv+aged+nine+blend+whisky+ontario+canada/0/usa-ok-y",
+            "domain": "wine-searcher.com",
+            "description": "Canadian Club - 9 Year Old Reserve Canadian Whisky. In stock (). See all 25 results. It doesn't have to end here. Become a Wine-Searcher PRO to see all 25 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "9 Year Old Reserve Whiskey | Spec's Wines, Spirits & Finer Foods",
+            "url": "https://specsonline.com/shop/spirits/canadian-club-reserve-9yr-2/",
+            "domain": "specsonline.com",
+            "description": "30-day returns9 Year Old Reserve Whiskey ... Think of Canadian Club Reserve 9 Year Old as the original Canadian Club 1858's more refined and more mature older sibling.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Canadian Club Reserve\" \"9 Year Old\" whisky",
+        "summary": "Review: Canadian Club Reserve (9 Year Old) 85.5/100 a review by Chip Dykstra (Aka Arctic Wolf) Posted January 22, 2014 Canadian Club Whisky ... In stock Rating 3.0(3)Canadian Club Reserve 9 Year Old Blended Canadian Whiskey This reserve whisky is matured in white-oak barrels for 9 years and then barrel-blended by our ... The Afterburn 8.5/10. I am very enthusiastic about the new 9-year-old Canadian Club Reserve Whisky. The whisky appears to be as good as, if not ... Out of stock Rating 4.711Canadian Club Reserve 9yr Blended Canadian Whisky ... Think of Reserve 9 year old as the more mature, ol",
+        "results": [
+          {
+            "title": "Canadian Club Reserve 9 year - Thoughts? : r/worldwhisky - Reddit",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/27g4vo/canadian_club_reserve_9_year_thoughts/",
+            "domain": "reddit.com",
+            "description": "Review: Canadian Club Reserve (9 Year Old) 85.5/100 a review by Chip Dykstra (Aka Arctic Wolf) Posted January 22, 2014 Canadian Club Whisky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9 Year Old Blended Canadian Whiskey",
+            "url": "https://www.lukesliquors.com/product/s-11394/p-13897147/buy-canadian-club-reserve-9-year-old-blended-canadian-whiskey",
+            "domain": "lukesliquors.com",
+            "description": "In stock Rating 3.0(3)Canadian Club Reserve 9 Year Old Blended Canadian Whiskey This reserve whisky is matured in white-oak barrels for 9 years and then barrel-blended by our ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve (9 Year Old) - The Rum Howler Blog",
+            "url": "https://therumhowlerblog.com/whisky-reviews/canadian-whisky/canadian-club-reserve-9-year-old-2/",
+            "domain": "therumhowlerblog.com",
+            "description": "The Afterburn 8.5/10. I am very enthusiastic about the new 9-year-old Canadian Club Reserve Whisky. The whisky appears to be as good as, if not ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9yr Blended Canadian Whisky",
+            "url": "https://internetwines.com/products/canadian-club-reserve-9-year-old-whisky",
+            "domain": "internetwines.com",
+            "description": "Out of stock Rating 4.711Canadian Club Reserve 9yr Blended Canadian Whisky ... Think of Reserve 9 year old as the more mature, older sibling of Canadian Club 1858 with a greater Rye ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Canadian Club Reserve 9 Year 1.75L - Chili Discount Liquor",
+            "url": "https://chililiquor.com/spirits/whiskey/canadian-club-reserve-9-year-175l",
+            "domain": "chililiquor.com",
+            "description": "In stockThis whisky is aged for a full 9 years, bringing out the oak notes of the barrels and a spicier, more robust taste profile. Perfect for sipping neat or ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "585d32fef6bed243ce6b2e766062f92afc77d4fa446f7644ce0d513457443a70",
+    "mode": "auto"
+  }
+}

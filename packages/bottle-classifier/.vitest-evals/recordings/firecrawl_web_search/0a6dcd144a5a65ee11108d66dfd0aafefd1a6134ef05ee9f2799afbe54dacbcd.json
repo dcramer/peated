@@ -1,0 +1,46 @@
+{
+  "writtenAt": "2026-09-04T19:58:09.086Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Proof and Wood\" \"The Representative\" bourbon 58.0 4 year MGP"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Proof and Wood\" \"The Representative\" bourbon 58.0 4 year MGP",
+        "summary": "In stock Rating 4.6(1)Proof And Wood Straight Bourbon Whiskey “The Representative” 750ml ; Country: United States ; Region: Kentucky ; Size: 750ml ; Alcohol by Vol: 58.0%. ... bourbon ... Proof and Wood The Representative - 58.0% ABV. 1. tastings. Nulu Reserve Straight Bourbon Whiskey - Batch 9 - 4-year-old - 51.0% ABV - Cask Strength. Proof and Wood Ventures, Bardstown, KY. B1620 Tumblin' Dice ST | single barrel ... B2565 “The Representative” ST | B. 2023, 4 YR, 115.4°. 10. 20. R412. “The ...",
+        "results": [
+          {
+            "title": "Proof And Wood Straight Bourbon Whiskey \"The Representative\" 750ml",
+            "url": "https://www.saratogawine.com/product/proof-and-wood-straight-bourbon-whiskey-the-representative-750ml/",
+            "domain": "saratogawine.com",
+            "description": "In stock Rating 4.6(1)Proof And Wood Straight Bourbon Whiskey “The Representative” 750ml ; Country: United States ; Region: Kentucky ; Size: 750ml ; Alcohol by Vol: 58.0%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "MGP (Midwest Grain Products) | Peated",
+            "url": "https://peated.com/entities/32266",
+            "domain": "peated.com",
+            "description": "... bourbon ... Proof and Wood The Representative - 58.0% ABV. 1. tastings. Nulu Reserve Straight Bourbon Whiskey - Batch 9 - 4-year-old - 51.0% ABV - Cask Strength.",
+            "extraSnippets": []
+          },
+          {
+            "title": "[PDF] Whisk(e)y Book - Squarespace",
+            "url": "https://static1.squarespace.com/static/66ce9db002a66a17574ce009/t/67784cd4bde53f50b7ac8083/1735937236667/Whiskey+Book+12.15.24.pdf",
+            "domain": "static1.squarespace.com",
+            "description": "Proof and Wood Ventures, Bardstown, KY. B1620 Tumblin' Dice ST | single barrel ... B2565 “The Representative” ST | B. 2023, 4 YR, 115.4°. 10. 20. R412. “The ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0a6dcd144a5a65ee11108d66dfd0aafefd1a6134ef05ee9f2799afbe54dacbcd",
+    "mode": "auto"
+  }
+}

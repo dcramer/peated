@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-09-04T19:49:43.655Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Wild Turkey Rare Breed Rye official 112.2 proof 56.1% ABV product label"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye official 112.2 proof 56.1% ABV product label",
+        "summary": "Wild Turkey Distillery Mashbill: 51% Rye, 37% Corn, 12% Malted Barley Proof: 112.2 (56.1% ABV) Age: Price: $60 Official Website 112.2 proof, blend of four-, six-, and eight-year straight rye whiskeys) Color: amber Nose: herbal tea & lemon, sweet orange blossom, honey, ... Rating 4.8(98)Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery. Oct 4, 2024 To build on the popularity of their rye lineup, Wild Turkey has added an extension to their Barrel Proof lineup known as Rare Breed with a ...",
+        "results": [
+          {
+            "title": "Wild Turkey Rare Breed Rye Review - Whiskey in my Wedding Ring",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "Wild Turkey Distillery Mashbill: 51% Rye, 37% Corn, 12% Malted Barley Proof: 112.2 (56.1% ABV) Age: Price: $60 Official Website",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye 112.2 (2021)",
+            "url": "https://rarebird101.com/2021/06/15/wild-turkey-rare-breed-rye-112-2-2021/",
+            "domain": "rarebird101.com",
+            "description": "112.2 proof, blend of four-, six-, and eight-year straight rye whiskeys) Color: amber Nose: herbal tea & lemon, sweet orange blossom, honey, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey | Wild Turkey Bourbon",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "Rating 4.8(98)Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #393 - Wild Turkey Rare Breed Rye - Me, My Wife & Whisky",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-393-wild-turkey-rare-breed-rye",
+            "domain": "memywifeandwhisky.com",
+            "description": "Oct 4, 2024",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Review - YouTube",
+            "url": "https://www.youtube.com/watch?v=LqpYY_nIRco",
+            "domain": "youtube.com",
+            "description": "To build on the popularity of their rye lineup, Wild Turkey has added an extension to their Barrel Proof lineup known as Rare Breed with a ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "1ec18c3f0e2f20f8cc7564ce492f0301ec20a3329ee6cd7fac81d8357f6d3c27",
+    "mode": "auto"
+  }
+}

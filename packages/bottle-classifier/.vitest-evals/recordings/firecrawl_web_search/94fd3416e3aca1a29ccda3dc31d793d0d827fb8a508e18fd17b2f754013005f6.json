@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:40:58.442Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"SMWS 1.285\" \"Party in the afternoon\" 63.4 2011 11 years",
+      "\"Single Cask No. 285\" \"Society Distillery No. 1\" 63.4"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"SMWS 1.285\" \"Party in the afternoon\" 63.4 2011 11 years",
+        "summary": "Rating 86%(4)Aug 1, 2023 · SMWS notes: A scent of sweet, ripe orchard fruits filled the room with apples, pears, oranges, bananas and cherries. The Scotch Malt Whisky Society. Distillery. Glenfarclas. Country. United Kingdom. Alc. Volume. 63.4 %. Size. 700 ml. Bottled Year. Year. 2011. Age. 11 years. Afternoon tea party Vintage 08.06.2011 Stated Age 11 years old … 1.285 Number of bottles 230 Strength 63.40 %vol Size 700 ml Uncolored Non-chillfiltered Cask ... Sold out · Flavor Profile: Deep Rich & Dried Fruits · Age: 11 years · Region: Highland, Northern · Cask: First-fill American oak Oloroso",
+        "results": [
+          {
+            "title": "Glenfarclas 2011 SMWS 1.285 - Ratings and Reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/236164/glenfarclas-2011-smws-1285",
+            "domain": "whiskybase.com",
+            "description": "Rating 86%(4)Aug 1, 2023 · SMWS notes: A scent of sweet, ripe orchard fruits filled the room with apples, pears, oranges, bananas and cherries.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenfarclas 2011 SMWS 1.285 Afternoon tea party 1st Fill Ex ...",
+            "url": "https://www.spiritradar.com/whisky-db/glenfarclas-2011-smws-1.285-afternoon-tea-party-1st-fill-ex-oloroso-sherry-hogshead-finish-63.4-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "The Scotch Malt Whisky Society. Distillery. Glenfarclas. Country. United Kingdom. Alc. Volume. 63.4 %. Size. 700 ml. Bottled Year. Year. 2011. Age. 11 years.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenfarclas 2011 SMWS 1.285 - Market Value and Price Insights",
+            "url": "https://www.whiskystats.com/whisky/236164",
+            "domain": "whiskystats.com",
+            "description": "Afternoon tea party Vintage 08.06.2011 Stated Age 11 years old … 1.285 Number of bottles 230 Strength 63.40 %vol Size 700 ml Uncolored Non-chillfiltered Cask ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Cask No. 13.111 - The Scotch Malt Whisky Society of America",
+            "url": "https://smwsa.com/products/cask-no-13-111",
+            "domain": "smwsa.com",
+            "description": "Sold out · Flavor Profile: Deep Rich & Dried Fruits · Age: 11 years · Region: Highland, Northern · Cask: First-fill American oak Oloroso hogshead · ABV: 59.0%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "50th Anniversary Cask Club - Scotch Malt Whisky Society",
+            "url": "https://smws.com/50-cask-club/",
+            "domain": "smws.com",
+            "description": "The Scotch Malt Whisky Society is offering you an unmissable opportunity to create your very own personalised bottling, courtesy of our exclusive 50th ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Single Cask No. 285\" \"Society Distillery No. 1\" 63.4",
+        "summary": "The first number indicates the distillery from which the Whisky was sourced, the second number indicates the number of single casks that the Society has ... Single Cask Spirits. Hefty peat smoke! $165 Sold out Out of. Flavor Profile: Heavily Peated Age: 11 years Region: Islay Cask: First-fill American oak. ABV: 52. ... All the number codes of the Scotch Malt Whisky Society (SMWS codes). Up-to-date, categorized and easily sortable. Cask 1.246 A One Like No Other ... Barrel Lightly Peated Flavor Profile Thanks for watching the Scotch Malt Whisky Society America channel. The SMWS also remains the",
+        "results": [
+          {
+            "title": "SMWS Codes 2026: Scotch Malt Whisky Society Distillery Bottle Codes",
+            "url": "https://whiskipedia.com/smws/",
+            "domain": "whiskipedia.com",
+            "description": "The first number indicates the distillery from which the Whisky was sourced, the second number indicates the number of single casks that the Society has ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hefty peat smoke! - The Scotch Malt Whisky Society of America",
+            "url": "https://smwsa.com/products/cask-no-10-285",
+            "domain": "smwsa.com",
+            "description": "Single Cask Spirits. Hefty peat smoke! $165 Sold out Out of. Flavor Profile: Heavily Peated Age: 11 years Region: Islay Cask: First-fill American oak. ABV: 52. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS codes — Whisky Saga",
+            "url": "https://www.whiskysaga.com/smws-codes",
+            "domain": "whiskysaga.com",
+            "description": "All the number codes of the Scotch Malt Whisky Society (SMWS codes). Up-to-date, categorized and easily sortable.",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS Cask No. 1.246 A One Like No Other - YouTube",
+            "url": "https://www.youtube.com/watch?v=xiH7ddWqB4k",
+            "domain": "youtube.com",
+            "description": "Cask 1.246 A One Like No Other ... Barrel Lightly Peated Flavor Profile Thanks for watching the Scotch Malt Whisky Society America channel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Legendary bottlings: Scotch Malt Whisky Society's .1 series",
+            "url": "https://scotchwhisky.com/magazine/legendary-bottlings/26221/scotch-malt-whisky-society-s-1-series/",
+            "domain": "scotchwhisky.com",
+            "description": "The SMWS also remains the sole bottler of the Lomond single malt from Inverleven distillery, with two casks bottled as 98.1 and 98.2.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "94fd3416e3aca1a29ccda3dc31d793d0d827fb8a508e18fd17b2f754013005f6",
+    "mode": "auto"
+  }
+}

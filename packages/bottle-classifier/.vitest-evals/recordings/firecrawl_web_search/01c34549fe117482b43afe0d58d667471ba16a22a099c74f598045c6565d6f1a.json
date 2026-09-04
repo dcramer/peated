@@ -1,0 +1,58 @@
+{
+  "writtenAt": "2026-09-04T19:46:44.221Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"Hudson Whiskey Back Room Deal\" \"Peated Scotch\" rye"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Hudson Whiskey Back Room Deal\" \"Peated Scotch\" rye",
+        "summary": "Hudson Whiskey's Back Room Deal uses our ex-bourbon barrels from across the ... New York Straight Rye Whiskey finished in peated Scotch barrels; Nose ... $5 deliveryHudson Whiskey Back Room Deal Peated Scotch Barrel Finished, 46%. Price: $55.00 ○ Issue: Summer 2022 ○ Reviewer: Julia Higgins ○ Category: Rye Whiskey. Buy ... In stock Rating 4.9(2)Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished In Peated Scotch Barrels is a Rye from New York, United States. Hudson Whiskey Back Room Deal. Rye. Hudson Whiskey // New York ... peated scotch, this Back Room Deal will be up your al",
+        "results": [
+          {
+            "title": "Hudson Back Room Deal - Tuthilltown Store",
+            "url": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+            "domain": "shop.hudsonwhiskey.com",
+            "description": "Hudson Whiskey's Back Room Deal uses our ex-bourbon barrels from across the ... New York Straight Rye Whiskey finished in peated Scotch barrels; Nose ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished, 46%",
+            "url": "https://whiskyadvocate.com/Hudson-Whiskey-Back-Room-Deal-Peated-Scotch-Barrel-Finished-46",
+            "domain": "whiskyadvocate.com",
+            "description": "$5 deliveryHudson Whiskey Back Room Deal Peated Scotch Barrel Finished, 46%. Price: $55.00 ○ Issue: Summer 2022 ○ Reviewer: Julia Higgins ○ Category: Rye Whiskey. Buy ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal New York Straight Rye",
+            "url": "https://www.grandwinecellar.com/products/hudson-whiskey-back-room-deal-new-york-straight-rye-whiskey-finished-in-peated-scotch-barrels",
+            "domain": "grandwinecellar.com",
+            "description": "In stock Rating 4.9(2)Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished In Peated Scotch Barrels is a Rye from New York, United States.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal | Reviews - Distiller",
+            "url": "https://distiller.com/spirits/hudson-whiskey-back-room-deal/tastes?page=1&require_note=true&sort=lowest_rated",
+            "domain": "distiller.com",
+            "description": "Hudson Whiskey Back Room Deal. Rye. Hudson Whiskey // New York ... peated scotch, this Back Room Deal will be up your alley. So where ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal Review - WWR #204 - YouTube",
+            "url": "https://www.youtube.com/watch?v=sNkRO40qdgw",
+            "domain": "youtube.com",
+            "description": "... peated Scotch barrels. Perfect for whiskey, bourbon, and Scotch enthusiasts, this review provides a detailed look at what makes this spirit ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "01c34549fe117482b43afe0d58d667471ba16a22a099c74f598045c6565d6f1a",
+    "mode": "auto"
+  }
+}

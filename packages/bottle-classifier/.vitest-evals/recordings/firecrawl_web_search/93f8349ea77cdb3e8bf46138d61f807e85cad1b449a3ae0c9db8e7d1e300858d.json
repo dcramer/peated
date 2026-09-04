@@ -1,0 +1,30 @@
+{
+  "writtenAt": "2026-09-04T19:59:18.566Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"North Pier\" \"Ember\" \"Release 7\" whisky Aster Glen 46%"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"North Pier\" \"Ember\" \"Release 7\" whisky Aster Glen 46%",
+        "summary": "Free delivery 21-day returnsAug 10, 2026 · Middle row from left: (11) Bladnoch Ember Casks, a wonderful ... Sailing from Oban's North Pier and Tobermory on the Isle of Mull ...",
+        "results": [
+          {
+            "title": "Five legendary whiskies. One single box. From the smoky shores of Islay ...",
+            "url": "https://www.facebook.com/61566502240491/posts/five-legendary-whiskies-one-single-box-from-the-smoky-shores-of-islay-to-the-che/122217571424550074/",
+            "domain": "facebook.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "93f8349ea77cdb3e8bf46138d61f807e85cad1b449a3ae0c9db8e7d1e300858d",
+    "mode": "auto"
+  }
+}

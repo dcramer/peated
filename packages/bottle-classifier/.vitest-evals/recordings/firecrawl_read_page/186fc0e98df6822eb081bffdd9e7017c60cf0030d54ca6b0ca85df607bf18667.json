@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T19:59:22.288Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://example.com/north-pier/ember-7",
+    "focus": "product title, label wording, release or edition, ABV, brand, bottler, and distillery"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "product title, label wording, release or edition, ABV, brand, bottler, and distillery",
+    "summary": null,
+    "results": [
+      {
+        "title": "Example Domain",
+        "url": "https://example.com/north-pier/ember-7",
+        "domain": "example.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "186fc0e98df6822eb081bffdd9e7017c60cf0030d54ca6b0ca85df607bf18667",
+    "mode": "auto"
+  }
+}

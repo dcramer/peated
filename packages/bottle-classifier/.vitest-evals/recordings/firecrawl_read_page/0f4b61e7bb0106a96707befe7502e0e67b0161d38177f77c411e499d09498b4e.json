@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-04T18:29:25.641Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://potomacwines.com/en-gb/product/spirits/scotch-whisky/bruichladdich-octomore-13-1-5-year-old-single-malt?limit=50",
+    "focus": "Exact product title, age, ABV, vintage or release year, and maturation/cask details for Octomore 13.1"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Exact product title, age, ABV, vintage or release year, and maturation/cask details for Octomore 13.1",
+    "summary": "Bruichladdich Octomore 13.1 5 Year Old Single Malt\n\nEdition: 13.1\n\nAged: 5 Years\n\n59.2% ABV - 118.4 Proof",
+    "results": [
+      {
+        "title": "Bruichladdich Octomore 13.1 5 Year Old Single Malt",
+        "url": "https://potomacwines.com/en-gb/product/spirits/scotch-whisky/bruichladdich-octomore-13-1-5-year-old-single-malt?limit=50",
+        "domain": "potomacwines.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0f4b61e7bb0106a96707befe7502e0e67b0161d38177f77c411e499d09498b4e",
+    "mode": "auto"
+  }
+}

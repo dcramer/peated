@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:51:33.135Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Compass Box \"Spice Tree Extravaganza\" whisky official limited edition ABV release year",
+      "\"Spice Tree Extravaganza\" Compass Box bottle"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Compass Box \"Spice Tree Extravaganza\" whisky official limited edition ABV release year",
+        "summary": "Spice Tree Extravaganza ... 46% ABV, Natural Colour, Not Chill-Filtered. ... Ten years before this whisky we were compelled to discontinue production of one of our ... In 2016, to mark the 10th anniversary of when the first Spice Tree whisky was banned, Compass Box launched limited edition blend, The Spice Tree Extravaganza. This special edition from 2016 adds some first-fill sherry ... Compass Box Spice Tree Extravaganza. Blended malt scotch whisky. 46 ... Compass Box – Spice Tree Extravaganza. November 14, 2016 November 19 ... Like the recently-released 3 Year Old Deluxe, this limited-editio",
+        "results": [
+          {
+            "title": "Spice Tree Extravaganza - Compass Box",
+            "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+            "domain": "compassboxwhisky.com",
+            "description": "Spice Tree Extravaganza ... 46% ABV, Natural Colour, Not Chill-Filtered. ... Ten years before this whisky we were compelled to discontinue production of one of our ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Spice Tree | Scotch Whisky",
+            "url": "https://scotchwhisky.com/whiskypedia/2826/the-spice-tree/",
+            "domain": "scotchwhisky.com",
+            "description": "In 2016, to mark the 10th anniversary of when the first Spice Tree whisky was banned, Compass Box launched limited edition blend, The Spice Tree Extravaganza.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #457 - Compass Box Spice Tree Extravaganza : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/fve3lk/review_457_compass_box_spice_tree_extravaganza/",
+            "domain": "reddit.com",
+            "description": "This special edition from 2016 adds some first-fill sherry ... Compass Box Spice Tree Extravaganza. Blended malt scotch whisky. 46 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review of Compass Box - Spice Tree Extravaganza | The Scotch Noob",
+            "url": "https://scotchnoob.com/2016/11/14/compass-box-spice-tree-extravaganza/",
+            "domain": "scotchnoob.com",
+            "description": "Compass Box – Spice Tree Extravaganza. November 14, 2016 November 19 ... Like the recently-released 3 Year Old Deluxe, this limited-edition ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box 'Spice Tree Extravaganza' Limited Edition ...",
+            "url": "https://craftshack.com/products/compass-box-spice-tree-extravaganza-limited-edition-blended-malt-scotch-whisky",
+            "domain": "craftshack.com",
+            "description": "Compass Box 'Spice Tree Extravaganza' Limited Edition Blended Malt Scotch Whisky. Vendor Compass Box Whisky Co. Regular price $204.99.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Spice Tree Extravaganza\" Compass Box bottle",
+        "summary": "# Spice Tree Extravaganza\n[**Spice Tree Extravaganza**](https://www.compassboxwhisky.com/products/spice-tree-extraveganza) Rating 86%(202)Sep 3, 2020 · Explore The Spice Tree Extravaganza CB, a 3-year-old whisky bottled by Compass Box at 46.0% ABV, with ratings, reviews and bottle details. Compass Box Spice Tree Extravaganza. Blended malt scotch whisky. · Local Price: Not available in Ontario. · Barrels: Quite a complicated blend ...Review #10: Compass Box Spice Tree Extravaganza : r/Scotch - RedditCompass Box Spice Tree Extravaganza [Review] : r/ScotchMore results from www.reddit.com $5 deliv",
+        "results": [
+          {
+            "title": "Spice Tree Extravaganza - Compass Box",
+            "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+            "domain": "compassboxwhisky.com",
+            "description": "# Spice Tree Extravaganza\n[**Spice Tree Extravaganza**](https://www.compassboxwhisky.com/products/spice-tree-extraveganza)",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Spice Tree Extravaganza CB - Ratings and Reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/87242/the-spice-tree-extravaganza-cb",
+            "domain": "whiskybase.com",
+            "description": "Rating 86%(202)Sep 3, 2020 · Explore The Spice Tree Extravaganza CB, a 3-year-old whisky bottled by Compass Box at 46.0% ABV, with ratings, reviews and bottle details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #457 - Compass Box Spice Tree Extravaganza : r/Scotch - Reddit",
+            "url": "https://www.reddit.com/r/Scotch/comments/fve3lk/review_457_compass_box_spice_tree_extravaganza/",
+            "domain": "reddit.com",
+            "description": "Compass Box Spice Tree Extravaganza. Blended malt scotch whisky. · Local Price: Not available in Ontario. · Barrels: Quite a complicated blend ...Review #10: Compass Box Spice Tree Extravaganza : r/Scotch - RedditCompass",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box Spice Tree Extravaganza - Whisky Advocate",
+            "url": "https://whiskyadvocate.com/compass-box-spice-tree-extravaganza",
+            "domain": "whiskyadvocate.com",
+            "description": "$5 deliveryCompass Box Spice Tree Extravaganza. ABV: 46% ○ Price: $140 ○ Style: Blended Malt ○ Origin: Scotland. Buy Now. Following the Spice Tree recipe of 60 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box 'The Spice Tree Extravaganza' Limited Edition ...",
+            "url": "https://www.wine-searcher.com/find/compass+box+the+spice+tree+extravagant+ltd+edition+blend+malt+scotch+whisky+scotland",
+            "domain": "wine-searcher.com",
+            "description": "Rating 93%(1)Bottle (750ml). Compass Box The Spice Tree Extravaganza Limited Edition Blended Malt Scotch Whisky 750ml Bottle. In stock (). Schneiders of Capitol Hill.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "366acab4e891b7549d61bbc3b0ed74a3fed33e742718b697a82669bac988740d",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "writtenAt": "2026-09-04T19:38:48.343Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "\"Woodford Reserve Kentucky Straight Malt Whiskey\" ReserveBar",
+      "\"Woodford Reserve Kentucky Straight Malt\" official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Woodford Reserve Kentucky Straight Malt Whiskey\" ReserveBar",
+        "summary": "3.7604 · 2–6 day delivery$218.80. Add to cart · WOODFORD RESERVE KENTUCKY STRAIGHT MALT WHISKEY. 750 ML. $40.86. Add to cart ... Woodford Reserve Kentucky Straight Malt Whiskey Bottle. Malt Whiskey. A Grain-Focused Malt Whiskey. Unlike a typical 100% malt whiskey, is a Kentucky Straight ... In stock Rating 3.884For some of the best prices on Woodford Reserve Kentucky Straight Malt Whiskey, order from ReserveBar today, get it in under 2-hours in select states. 2–6 day deliveryWOODFORD RESERVE KENTUCKY STRAIGHT MALT WHISKEY · $40.87 ; OLD FORESTER 1897 BOTTLED IN BOND BOURBON WHISKY · $55.15 ; O",
+        "results": [
+          {
+            "title": "Shop The Woodford Reserve Collection | ReserveBar",
+            "url": "https://www.reservebar.com/collections/woodford-reserve",
+            "domain": "reservebar.com",
+            "description": "3.7604 · 2–6 day delivery$218.80. Add to cart · WOODFORD RESERVE KENTUCKY STRAIGHT MALT WHISKEY. 750 ML. $40.86. Add to cart ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve: Homepage",
+            "url": "https://www.woodfordreserve.com/",
+            "domain": "woodfordreserve.com",
+            "description": "Woodford Reserve Kentucky Straight Malt Whiskey Bottle. Malt Whiskey. A Grain-Focused Malt Whiskey. Unlike a typical 100% malt whiskey, is a Kentucky Straight ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Kentucky Straight Malt Whiskey - ReserveBar",
+            "url": "https://www.reservebar.com/products/woodford-reserve-kentucky-straight-malt-whiskey/GROUPING-67755",
+            "domain": "reservebar.com",
+            "description": "In stock Rating 3.884For some of the best prices on Woodford Reserve Kentucky Straight Malt Whiskey, order from ReserveBar today, get it in under 2-hours in select states.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskey Worth Knowing - ReserveBar",
+            "url": "https://www.reservebar.com/collections/whiskey-worth-knowing?page=2",
+            "domain": "reservebar.com",
+            "description": "2–6 day deliveryWOODFORD RESERVE KENTUCKY STRAIGHT MALT WHISKEY · $40.87 ; OLD FORESTER 1897 BOTTLED IN BOND BOURBON WHISKY · $55.15 ; OLD FORESTER 1910 OLD FINE WHISKY KENTUCKY ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shop The Buy Now, Twist Later Collection | ReserveBar",
+            "url": "https://www.reservebar.com/collections/pause-program",
+            "domain": "reservebar.com",
+            "description": "2–6 day deliveryWOODFORD RESERVE KENTUCKY STRAIGHT MALT WHISKEY. 750 ML. $40.86. Add to cart ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Woodford Reserve Kentucky Straight Malt\" official",
+        "summary": "Rating 3.0Jun 17, 2018 · Woodford Reserve Kentucky Straight Malt Whiskey is an enjoyable whiskey not so much for any individual piece, but for what the product delivers ... Woodford Reserve Kentucky Straight Malt Whiskey Bottle. Malt Whiskey. Unlike a typical 100% malt whiskey, Woodford Reserve is a Kentucky Straight Malt ... Review #209 - Woodford Reserve Kentucky Straight Malt Whiskey · Woodford Reserve Kentucky Straight Malt Whiskey · Price Paid: USD 34 (2022). USA- Kentucky- 45.2%- Woodford Reserve Malt Whiskey uses a 51% malt base and is aged in new charred oak barrels, making it a richly",
+        "results": [
+          {
+            "title": "Woodford Reserve Straight Malt Whiskey Review - Breaking Bourbon",
+            "url": "https://www.breakingbourbon.com/review/woodford-reserve-straight-malt-whiskey",
+            "domain": "breakingbourbon.com",
+            "description": "Rating 3.0Jun 17, 2018 · Woodford Reserve Kentucky Straight Malt Whiskey is an enjoyable whiskey not so much for any individual piece, but for what the product delivers ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Malt Whiskey - Woodford Reserve",
+            "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+            "domain": "woodfordreserve.com",
+            "description": "Woodford Reserve Kentucky Straight Malt Whiskey Bottle. Malt Whiskey. Unlike a typical 100% malt whiskey, Woodford Reserve is a Kentucky Straight Malt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #209 - Woodford Reserve Kentucky Straight Malt Whiskey",
+            "url": "https://www.reddit.com/r/bourbon/comments/1ablfpn/review_209_woodford_reserve_kentucky_straight/",
+            "domain": "reddit.com",
+            "description": "Review #209 - Woodford Reserve Kentucky Straight Malt Whiskey · Woodford Reserve Kentucky Straight Malt Whiskey · Price Paid: USD 34 (2022).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Kentucky Straight Malt Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/spirits/american-whiskey/whiskey/woodford-reserve-kentucky-straight-malt-whiskey/p/212505750",
+            "domain": "totalwine.com",
+            "description": "USA- Kentucky- 45.2%- Woodford Reserve Malt Whiskey uses a 51% malt base and is aged in new charred oak barrels, making it a richly flavorful, complex malt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Kentucky Straight Malt Whiskey - Jerry's Foods",
+            "url": "https://www.jerrysfoods.com/store/jerrys-wine-and-spirits/products/18840715-woodford-reserve-whiskey-750-ml",
+            "domain": "jerrysfoods.com",
+            "description": "Woodford Reserve Kentucky Straight Malt Whiskey uses a base of 51% malt and is aged in new charred oak barrels, making it a richly flavorful and complex ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0ebf8e8b0743b951df7e9ae3ed3ebee67b1a74d74cd957510d5c8691b50a3777",
+    "mode": "auto"
+  }
+}
