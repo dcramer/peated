@@ -95,7 +95,7 @@ export function getBottleIdentityProps(
       bottle.statedAge !== null
         ? `${bottle.statedAge} years`
         : bottle.noAgeStatement
-          ? "No age statement"
+          ? "NAS"
           : null,
       bottle.abv !== null ? `${bottle.abv.toFixed(1)}% ABV` : null,
     ].filter((value): value is string => value !== null),

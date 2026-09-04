@@ -65,7 +65,7 @@ type BooleanChoice = {
 
 const noAgeStatementChoices: BooleanChoice[] = [
   { id: "unknown", name: "Not known" },
-  { id: "yes", name: "No age statement" },
+  { id: "yes", name: "NAS" },
 ];
 
 const colorChoices: BooleanChoice[] = [

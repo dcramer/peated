@@ -28,7 +28,7 @@ const items: BottleListProps["items"] = [
   {
     href: "/bottles/2",
     id: "2",
-    metadata: ["Single Malt", "No age statement", "54.2% ABV"],
+    metadata: ["Single Malt", "NAS", "54.2% ABV"],
     name: "Ardbeg Uigeadail",
     ratings: {
       counts: {

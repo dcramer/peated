@@ -110,10 +110,11 @@ Show stated age when it is useful and is not already expressed by the visible
 name. Within a release family, an exact age override can be a meaningful
 distinction when it differs from the shared expression age.
 
-When `noAgeStatement` is true, use `No age statement` in ordinary metadata. A
-dedicated Age column can use `NAS` when it also provides the full term as an
-accessible label. Do not show both forms in the same layout. A missing
-`statedAge` with no confirmed NAS fact is unknown and must not be labeled NAS.
+When `noAgeStatement` is true, use `NAS` in metadata, forms, filters, and detail
+views. The surrounding age label or context should make its meaning clear; a
+learning-oriented surface can explain that NAS means no age statement. A
+missing `statedAge` with no confirmed NAS fact is unknown and must not be
+labeled NAS.
 
 ### Let ABV stand on its own
 

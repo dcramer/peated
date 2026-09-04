@@ -109,7 +109,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
       value:
         bottle.statedAge === null
           ? bottle.noAgeStatement
-            ? "No age statement"
+            ? "NAS"
             : null
           : `${bottle.statedAge} years`,
     },

@@ -113,6 +113,6 @@ describe("toBottleListItem", () => {
         noAgeStatement: true,
         abv: null,
       }).metadata,
-    ).toEqual(["No age statement"]);
+    ).toEqual(["NAS"]);
   });
 });

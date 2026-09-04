@@ -115,7 +115,7 @@ function validateBottleInput(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Choose an age or No age statement, not both.",
+      message: "Choose an age or NAS, not both.",
       path: ["noAgeStatement"],
     });
   }
