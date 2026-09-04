@@ -20,6 +20,7 @@ jobs:
       packages: ${{ steps.filter.outputs.packages }}
       package_tests: ${{ steps.filter.outputs.package_tests }}
       repo: ${{ steps.filter.outputs.repo }}
+      scraper_agent: ${{ steps.filter.outputs.scraper_agent }}
       server: ${{ steps.filter.outputs.server }}
       web: ${{ steps.filter.outputs.web }}
     steps:
@@ -54,6 +55,8 @@ jobs:
               - "sgconfig.yml"
               - "tools/ast-grep/**"
               - "turbo.json"
+            scraper_agent:
+              - "apps/server/src/scraper/configured/**"
             server:
               - "apps/server/**"
               - "apps/cli/**"
@@ -254,7 +257,7 @@ jobs:
     timeout-minutes: 20
     needs: changes
     if: >-
-      (github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true') &&
+      needs.changes.outputs.scraper_agent == 'true' &&
       (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:15432/test_peated_scraper

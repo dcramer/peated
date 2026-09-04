@@ -31,4 +31,12 @@ judgment that a repeatable code test cannot prove.
 - Run focused model checks while changing model behavior. Run the full suite
   once at a deliberate full-suite run.
 
+## Pull request checks
+
+- Add `trigger-evals` to run classifier model checks.
+- Add `trigger-evals-scraper` to run scraper model checks.
+- Scraper model checks also run automatically when files under
+  `apps/server/src/scraper/configured/` change in an internal pull request.
+- Ordinary `pnpm test` runs do not call a model.
+
 Exact wording or tool order can be checked when it is the product contract.
