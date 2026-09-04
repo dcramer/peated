@@ -18,7 +18,7 @@ export async function prepareBourbonCultureSource(
       /^https:\/\/thebourbonculture\.com\/whiskey-reviews\/[a-z0-9][a-z0-9-]*\/$/.test(
         url,
       ),
-    legacyReviewKey: (url) =>
-      `bourbonculture:${createHash("sha256").update(url).digest("hex")}`,
+    expectedReviewKey: ({ articleUrl }) =>
+      `bourbonculture:${createHash("sha256").update(articleUrl).digest("hex")}`,
   });
 }

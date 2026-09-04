@@ -24,10 +24,15 @@ export type PrepareReviewSourceInput = z.input<typeof InputSchema>;
 type ReviewSourceDefinition = ExistingSourceDefinition & {
   listUrl: string;
   isCanonicalArticleUrl: (url: string) => boolean;
-  legacyReviewKey: (url: string) => string;
+  allowsMultipleReviews?: true;
+  expectedReviewKey: (review: {
+    articleUrl: string;
+    name: string;
+    reviewerName: string | null;
+  }) => string;
 };
 
-/** Checks one single-review source by default; applying preserves records and leaves collection paused. */
+/** Checks existing reviews; applying keeps their IDs and leaves collection paused. */
 export async function prepareReviewSource(
   input: PrepareReviewSourceInput,
   definition: ReviewSourceDefinition,
@@ -49,6 +54,8 @@ export async function prepareReviewSource(
         id: externalReviews.id,
         articleId: externalReviews.articleId,
         sourceKey: externalReviews.sourceKey,
+        name: externalReviews.name,
+        reviewerName: externalReviews.reviewerName,
       })
       .from(externalReviews)
       .innerJoin(
@@ -63,19 +70,36 @@ export async function prepareReviewSource(
       group.push(review);
       reviewsByArticle.set(review.articleId, group);
     }
-    const changes = articles.map((article) => {
+    const changes = articles.flatMap((article) => {
       const articleReviews = reviewsByArticle.get(article.id) ?? [];
-      // Review imports own these keys. One verified review per article avoids guessing.
       if (
         !definition.isCanonicalArticleUrl(article.url) ||
-        articleReviews.length !== 1 ||
-        articleReviews[0].sourceKey !== definition.legacyReviewKey(article.url)
+        articleReviews.length === 0 ||
+        (!definition.allowsMultipleReviews && articleReviews.length !== 1)
       ) {
         throw new ScrapeSourceValidationError(
           `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
         );
       }
-      return { id: articleReviews[0].id, sourceKey: `${article.url}#review-1` };
+      // Review IDs preserve the order in which the old scraper saved the article.
+      return articleReviews
+        .toSorted((left, right) => left.id - right.id)
+        .map((review, index) => {
+          const expectedKey = definition.expectedReviewKey({
+            articleUrl: article.url,
+            name: review.name,
+            reviewerName: review.reviewerName,
+          });
+          if (review.sourceKey !== expectedKey) {
+            throw new ScrapeSourceValidationError(
+              `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
+            );
+          }
+          return {
+            id: review.id,
+            sourceKey: `${article.url}#review-${index + 1}`,
+          };
+        });
     });
 
     let scrapeSourceId: number | null = null;

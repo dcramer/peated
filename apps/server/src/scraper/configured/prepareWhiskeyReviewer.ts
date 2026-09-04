@@ -18,7 +18,7 @@ export async function prepareWhiskeyReviewerSource(
       /^https:\/\/whiskeyreviewer\.com\/\d{4}\/\d{2}\/[a-z0-9][a-z0-9-]*-\d{6}$/.test(
         url,
       ),
-    legacyReviewKey: (url) =>
-      `whiskeyreviewer:${createHash("sha256").update(url).digest("hex")}`,
+    expectedReviewKey: ({ articleUrl }) =>
+      `whiskeyreviewer:${createHash("sha256").update(articleUrl).digest("hex")}`,
   });
 }

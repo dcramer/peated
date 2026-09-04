@@ -61,8 +61,8 @@ function reviewCandidate(
         },
         reviewItem: {
           selector: "article.review",
-          includeFollowingSiblings: false,
-          endBefore: null,
+          startsSection: false,
+          sectionEndsBefore: null,
         },
         name: suggestedValue(nameSelector, null, {
           removeSuffixes: ["Review"],
@@ -309,7 +309,7 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
   expect(checkRules).toHaveBeenCalledOnce();
 });
 
-test("turns review headings into bounded sibling sections", async () => {
+test("turns review headings into sections", async () => {
   const base = reviewCandidate("h2");
   const candidate = {
     ...base,
@@ -319,8 +319,8 @@ test("turns review headings into bounded sibling sections", async () => {
         ...base.rules.detail,
         reviewItem: {
           selector: ".entry-content > h2.review",
-          includeFollowingSiblings: true,
-          endBefore: ".entry-content > .related-posts",
+          startsSection: true,
+          sectionEndsBefore: ".entry-content > .related-posts",
         },
       },
     },

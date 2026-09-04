@@ -135,9 +135,9 @@ Bottle matches, the run, and Sentry before restoring the saved schedule.
 Use the preparation endpoint with `{"site": "wordsofwhisky"}`. The check-only
 request locks and verifies every stored article and review. It accepts only the
 publisher's canonical article URLs without a trailing slash, requires at least
-one review per article, and verifies each legacy review key from its stored
-article URL, Bottle name, and writer. Applying changes only those keys to the
-version 4 positional form and adds a paused source whose list page is
+one review per article, and verifies each old review key from its stored article
+URL, Bottle name, and writer. Applying changes only those keys to the URL and
+review number used by saved rules, then adds a paused source whose list page is
 `https://wordsofwhisky.com/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
@@ -147,11 +147,11 @@ record after applying; multi-Bottle articles must keep the same review order
 and IDs.
 
 Version 4 rules must select only tasting-note articles from the homepage. On
-detail pages, use each direct `h2` Bottle heading to start a sibling review
-section. Select the canonical URL without its trailing slash, exact publication
-time, writer, Bottle name, tasting paragraphs, and score out of 10. Run the
-rules through a full local no-write preview and compare single- and multi-Bottle
-articles with the code parser before applying.
+detail pages, use each direct `h2` Bottle heading to start a review; the elements
+after it contain the rest of that review. Select the canonical URL without its
+trailing slash, exact publication time, writer, Bottle name, tasting paragraphs,
+and score out of 10. Run a full local no-write preview and compare single- and
+multi-Bottle articles with the code parser before applying.
 
 Activate only a production preview with exact output. Trigger one manual
 collection and confirm it updates the same review IDs without adding articles
