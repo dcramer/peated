@@ -25,10 +25,21 @@ pnpm cli api patch /path --input /tmp/peated-request.json
 pnpm cli api delete /path
 ```
 
+Upload a local image with optional source metadata:
+
+```bash
+pnpm cli api upload-image /bottles/123/image \
+  --file /tmp/bottle.jpg \
+  --source-url https://example.com/bottle \
+  --license "Used with permission"
+```
+
 - Omit `/v1`; the client adds it.
 - Start paths with one slash; quote query strings.
 - Validate writes against `https://api.peated.com/spec-full.json` or the owning route.
 - Put JSON bodies in temporary files.
+- Use `api upload-image` for multipart image endpoints. The CLI sets the file
+  name, media type, and multipart boundary.
 - Use `--yes` non-interactively only after explicit authorization.
 - Re-fetch after success; verify asynchronous effects separately.
 

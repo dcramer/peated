@@ -8,6 +8,7 @@ import { normalizeServerUrl } from "./config";
 export type PeatedClient = RouterClient<Router>;
 export const PeatedApiValueSchema = z.json();
 export type PeatedApiValue = z.infer<typeof PeatedApiValueSchema>;
+export type PeatedApiBody = PeatedApiValue | FormData;
 
 export function createPeatedClient({
   accessToken,
@@ -77,7 +78,7 @@ export async function requestPeatedApi({
   apiServer: string;
   method: string;
   path: string;
-  body?: PeatedApiValue;
+  body?: PeatedApiBody;
   fetch?: typeof fetch;
 }): Promise<PeatedApiValue> {
   const normalizedMethod = method.toUpperCase();
@@ -86,11 +87,18 @@ export async function requestPeatedApi({
     authorization: `Bearer ${accessToken}`,
     "user-agent": "@peated/cli (openapi/client)",
   });
-  if (body !== undefined) headers.set("content-type", "application/json");
+  if (body !== undefined && !(body instanceof FormData)) {
+    headers.set("content-type", "application/json");
+  }
   const response = await fetchImplementation(apiUrl(apiServer, path), {
     method: normalizedMethod,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body:
+      body === undefined
+        ? undefined
+        : body instanceof FormData
+          ? body
+          : JSON.stringify(body),
   });
   const parsedBody = await responseBody(response);
 

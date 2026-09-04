@@ -1,5 +1,6 @@
 import program from "@peated/cli/program";
 import { readFile } from "node:fs/promises";
+import { basename, extname } from "node:path";
 import { createInterface } from "node:readline/promises";
 import {
   PeatedApiValueSchema,
@@ -16,6 +17,33 @@ type ApiCommandOptions = {
   input?: string;
   yes?: boolean;
 };
+
+type ApiImageUploadOptions = {
+  file: string;
+  sourceUrl?: string;
+  license?: string;
+  yes?: boolean;
+};
+
+function imageContentType(path: string): string {
+  switch (extname(path).toLowerCase()) {
+    case ".jpg":
+    case ".jpeg":
+      return "image/jpeg";
+    case ".png":
+      return "image/png";
+    case ".webp":
+      return "image/webp";
+    case ".gif":
+      return "image/gif";
+    case ".avif":
+      return "image/avif";
+    default:
+      throw new Error(
+        "Unsupported image extension. Use .jpg, .jpeg, .png, .webp, .gif, or .avif.",
+      );
+  }
+}
 
 async function requireCredentials(): Promise<Credentials> {
   const credentials = await loadCredentials();
@@ -83,15 +111,54 @@ async function runApiCommand(
   console.log(JSON.stringify(result, null, 2));
 }
 
+async function runImageUploadCommand(
+  path: string,
+  options: ApiImageUploadOptions,
+): Promise<void> {
+  const credentials = await requireCredentials();
+  if (!options.yes) await confirmMutation("POST", path);
+
+  const contents = await readFile(options.file);
+  const body = new FormData();
+  body.set(
+    "file",
+    new File([contents], basename(options.file), {
+      type: imageContentType(options.file),
+    }),
+  );
+  if (options.sourceUrl !== undefined) {
+    body.set("sourceUrl", options.sourceUrl);
+  }
+  if (options.license !== undefined) body.set("license", options.license);
+
+  const result = await requestPeatedApi({
+    ...credentials,
+    method: "POST",
+    path,
+    body,
+  });
+  console.log(JSON.stringify(result, null, 2));
+}
+
 const subcommand = program
   .command("api")
-  .description("Make authenticated requests to the Peated JSON API");
+  .description("Make authenticated requests to the Peated API");
 
 subcommand
   .command("get")
   .description("Read a Peated API resource")
   .argument("<path>", "API path, such as /bottles/123")
   .action(async (path) => runApiCommand("GET", path, {}));
+
+subcommand
+  .command("upload-image")
+  .description("Upload an image to a multipart Peated API endpoint")
+  .argument("<path>", "API path, such as /bottles/123/image")
+  .requiredOption("--file <path>", "Local image file")
+  .option("--source-url <url>", "Original image source page")
+  .option("--license <license>", "Image license or reuse terms")
+  .option("--yes", "Send the mutation without an interactive confirmation")
+  .action(async (path, options) => runImageUploadCommand(path, options));
 
 for (const method of ["POST", "PUT", "PATCH", "DELETE"] as const) {
   subcommand
