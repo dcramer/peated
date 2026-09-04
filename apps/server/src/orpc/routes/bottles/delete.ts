@@ -5,7 +5,6 @@ import {
   bottleGroupDistillers,
   bottleGroups,
   bottleReferences,
-  bottleSeries,
   bottleTags,
   bottleTombstones,
   bottles,
@@ -19,6 +18,10 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import {
+  getBottleSeriesMemberships,
+  updateBottleSeriesReleaseCounts,
+} from "@peated/server/lib/bottleSeriesReleaseCounts";
 import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
@@ -150,6 +153,10 @@ export default procedure
       const locationsBefore = await getBottleProductionLocations(tx, [
         bottle.id,
       ]);
+      const seriesMembershipsBefore =
+        bottle.seriesId === null
+          ? []
+          : await getBottleSeriesMemberships(tx, [bottle.id]);
 
       const distillerRows = await tx
         .select({ distillerId: bottlesToDistillers.distillerId })
@@ -304,6 +311,7 @@ export default procedure
         bottle.id,
       ]);
       await updateLocationBottleCounts(tx, locationsBefore, locationsAfter);
+      await updateBottleSeriesReleaseCounts(tx, seriesMembershipsBefore, []);
 
       if (bottle.groupId !== null) {
         if (remainingGroupMemberIds.length === 0) {
@@ -316,15 +324,6 @@ export default procedure
         } else {
           await recomputeBottleGroupStatsInTransaction(tx, bottle.groupId);
         }
-      }
-
-      if (bottle.seriesId !== null) {
-        await tx
-          .update(bottleSeries)
-          .set({
-            numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${bottle.seriesId})`,
-          })
-          .where(eq(bottleSeries.id, bottle.seriesId));
       }
     });
 

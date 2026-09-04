@@ -8,6 +8,11 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
+  getBottleSeriesMemberships,
+  updateBottleSeriesReleaseCounts,
+} from "@peated/server/lib/bottleSeriesReleaseCounts";
+import {
+  BottleUpdateGraphError,
   finalizeBottleUpdate,
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
@@ -17,7 +22,7 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleSeriesSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
-import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -89,25 +94,53 @@ export default procedure
             message: `BottleGroup ${group.id} is incomplete and cannot be moved.`,
           });
         }
-        manifests.push(
-          await updateBottleInTransaction(tx, {
-            bottleId: group.representativeBottleId,
-            input: { series: destination.id },
-            actorId,
-            creationSource: "manual_entry",
-          }),
-        );
+        try {
+          manifests.push(
+            await updateBottleInTransaction(tx, {
+              bottleId: group.representativeBottleId,
+              input: { series: destination.id },
+              actorId,
+              creationSource: "manual_entry",
+            }),
+          );
+        } catch (error) {
+          if (!(error instanceof BottleUpdateGraphError)) throw error;
+
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} is incomplete and cannot be moved.`,
+            cause: error,
+          });
+        }
       }
+
+      const ungroupedBottleIds = (
+        await tx
+          .select({ id: bottles.id })
+          .from(bottles)
+          .where(and(eq(bottles.seriesId, source.id), isNull(bottles.groupId)))
+      ).map(({ id }) => id);
+      const membershipsBefore = await getBottleSeriesMemberships(
+        tx,
+        ungroupedBottleIds,
+      );
 
       await tx
         .update(bottles)
         .set({ seriesId: destination.id, updatedAt: new Date() })
         .where(and(eq(bottles.seriesId, source.id), isNull(bottles.groupId)));
+      const membershipsAfter = await getBottleSeriesMemberships(
+        tx,
+        ungroupedBottleIds,
+      );
+      await updateBottleSeriesReleaseCounts(
+        tx,
+        membershipsBefore,
+        membershipsAfter,
+      );
 
       await tx
         .update(bottleSeries)
         .set({
-          numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${destination.id})`,
           updatedAt: new Date(),
         })
         .where(eq(bottleSeries.id, destination.id));

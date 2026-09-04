@@ -37,5 +37,12 @@ export default procedure
         delay: 0,
       },
     );
+    await pushUniqueJob(
+      "RepairBottleSeriesReleaseCounts",
+      {},
+      {
+        delay: 0,
+      },
+    );
     return { status: "queued" };
   });

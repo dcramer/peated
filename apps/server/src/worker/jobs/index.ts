@@ -22,6 +22,7 @@ import processNotification from "./processNotification";
 import processStorePriceMatchRetryRun from "./processStorePriceMatchRetryRun";
 import reconcileStorePriceMatchProposals from "./reconcileStorePriceMatchProposals";
 import repairBottleGroupBottleCounts from "./repairBottleGroupBottleCounts";
+import repairBottleSeriesReleaseCounts from "./repairBottleSeriesReleaseCounts";
 import repairEntityBottleCounts from "./repairEntityBottleCounts";
 import repairLocationBottleCounts from "./repairLocationBottleCounts";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
@@ -55,6 +56,10 @@ registry.add("OnEntityChange", onEntityChange);
 registry.add("ProcessNotification", processNotification);
 registry.add("ProcessStorePriceMatchRetryRun", processStorePriceMatchRetryRun);
 registry.add("RepairBottleGroupBottleCounts", repairBottleGroupBottleCounts);
+registry.add(
+  "RepairBottleSeriesReleaseCounts",
+  repairBottleSeriesReleaseCounts,
+);
 registry.add("RepairEntityBottleCounts", repairEntityBottleCounts);
 registry.add("RepairLocationBottleCounts", repairLocationBottleCounts);
 registry.add(

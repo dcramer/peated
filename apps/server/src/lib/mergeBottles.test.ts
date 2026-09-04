@@ -8,6 +8,7 @@ import {
   bottleObservations,
   bottleReferences,
   bottles,
+  bottleSeries,
   bottleTags,
   bottleTombstones,
   changes,
@@ -440,11 +441,15 @@ describe("exact Bottle merges", () => {
     });
   });
 
-  test("merges Bottles when their shared Entity count is too low", async ({
+  test("merges Bottles when their shared counts are too low", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Low Count Merge Brand" });
+    const series = await fixtures.BottleSeries({
+      brandId: brand.id,
+      numReleases: 0,
+    });
     const country = await fixtures.Country({ totalBottles: 0 });
     const region = await fixtures.Region({
       countryId: country.id,
@@ -457,11 +462,13 @@ describe("exact Bottle merges", () => {
     const source = await fixtures.Bottle({
       name: "Low Count Merge Source",
       brandId: brand.id,
+      seriesId: series.id,
       distillerIds: [distillery.id],
     });
     const destination = await fixtures.Bottle({
       name: "Low Count Merge Destination",
       brandId: brand.id,
+      seriesId: series.id,
       distillerIds: [distillery.id],
     });
     await db
@@ -495,6 +502,57 @@ describe("exact Bottle merges", () => {
     await expect(
       db.query.regions.findFirst({ where: eq(regions.id, region.id) }),
     ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, series.id),
+      }),
+    ).resolves.toMatchObject({ numReleases: 1 });
+  });
+
+  test("updates only the retired Bottle's series in a cross-series merge", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Cross Series Merge Brand" });
+    const sourceSeries = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Source Range",
+      numReleases: 1,
+    });
+    const destinationSeries = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Destination Range",
+      numReleases: 1,
+    });
+    const source = await fixtures.Bottle({
+      name: "Cross Series Source",
+      brandId: brand.id,
+      seriesId: sourceSeries.id,
+    });
+    const destination = await fixtures.Bottle({
+      name: "Cross Series Destination",
+      brandId: brand.id,
+      seriesId: destinationSeries.id,
+    });
+
+    await mergeBottles({
+      sourceBottleId: source.id,
+      destinationBottleId: destination.id,
+      context: contextFor(mod),
+    });
+
+    const seriesRows = await db
+      .select({ id: bottleSeries.id, numReleases: bottleSeries.numReleases })
+      .from(bottleSeries)
+      .where(inArray(bottleSeries.id, [sourceSeries.id, destinationSeries.id]));
+    expect(
+      Object.fromEntries(
+        seriesRows.map(({ id, numReleases }) => [id, numReleases]),
+      ),
+    ).toEqual({
+      [sourceSeries.id]: 0,
+      [destinationSeries.id]: 1,
+    });
   });
 
   test("keeps the most recently updated member review when both Bottles were reviewed", async ({

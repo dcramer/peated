@@ -4,6 +4,7 @@ import {
   bottles,
   bottleSeries,
   bottleSeriesTombstones,
+  bottleTombstones,
   changes,
 } from "@peated/server/db/schema";
 import { createBottle } from "@peated/server/lib/createBottle";
@@ -167,7 +168,7 @@ describe("POST /bottle-series/:series/merge", () => {
     );
   });
 
-  test("rolls back when a BottleGroup cannot be moved", async ({
+  test("returns a conflict and rolls back when a representative is retired", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -188,18 +189,17 @@ describe("POST /bottle-series/:series/merge", () => {
         series: source.id,
       },
     });
-    const incompleteGroup = await createBottle({
+    const damagedGroup = await createBottle({
       context: { user },
       input: {
-        name: "Incomplete Bottle",
+        name: "Damaged Representative",
         brand: brand.id,
         series: source.id,
       },
     });
     await db
-      .update(bottleGroups)
-      .set({ representativeBottleId: null })
-      .where(eq(bottleGroups.id, incompleteGroup.group.id));
+      .insert(bottleTombstones)
+      .values({ bottleId: damagedGroup.bottle.id });
 
     const err = await waitError(() =>
       routerClient.bottleSeries.merge(
@@ -213,7 +213,7 @@ describe("POST /bottle-series/:series/merge", () => {
     );
 
     expect(err.message).toBe(
-      `BottleGroup ${incompleteGroup.group.id} is incomplete and cannot be moved.`,
+      `BottleGroup ${damagedGroup.group.id} is incomplete and cannot be moved.`,
     );
     expect(
       await db.query.bottleSeries.findFirst({
@@ -224,7 +224,7 @@ describe("POST /bottle-series/:series/merge", () => {
     const groups = await db.query.bottleGroups.findMany({
       where: inArray(bottleGroups.id, [
         firstGroup.group.id,
-        incompleteGroup.group.id,
+        damagedGroup.group.id,
       ]),
     });
     expect(groups).toHaveLength(2);
@@ -233,7 +233,7 @@ describe("POST /bottle-series/:series/merge", () => {
     const members = await db.query.bottles.findMany({
       where: inArray(bottles.id, [
         firstGroup.bottle.id,
-        incompleteGroup.bottle.id,
+        damagedGroup.bottle.id,
       ]),
     });
     expect(members).toHaveLength(2);

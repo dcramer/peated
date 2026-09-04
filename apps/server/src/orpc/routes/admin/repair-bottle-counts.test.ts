@@ -15,7 +15,7 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     await expect(
       routerClient.admin.repairBottleCounts({}, { context: { user: admin } }),
     ).resolves.toEqual({ status: "queued" });
-    expect(pushUniqueJob).toHaveBeenCalledTimes(3);
+    expect(pushUniqueJob).toHaveBeenCalledTimes(4);
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       1,
       "RepairEntityBottleCounts",
@@ -35,6 +35,14 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       3,
       "RepairBottleGroupBottleCounts",
+      {},
+      {
+        delay: 0,
+      },
+    );
+    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+      4,
+      "RepairBottleSeriesReleaseCounts",
       {},
       {
         delay: 0,

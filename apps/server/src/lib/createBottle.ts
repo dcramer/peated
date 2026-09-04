@@ -23,12 +23,15 @@ import {
   bottleGroupDistillers,
   bottleGroups,
   bottles,
-  bottleSeries,
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
+import {
+  getBottleSeriesMemberships,
+  updateBottleSeriesReleaseCounts,
+} from "@peated/server/lib/bottleSeriesReleaseCounts";
 import {
   getCatalogVerificationCreationMetadata,
   queueBottleCreationVerification,
@@ -301,15 +304,6 @@ async function prepareBottleCreateInTransaction(
       createdByActorId: actorId,
       tx,
     });
-
-    if (!seriesCreated && seriesId) {
-      await tx
-        .update(bottleSeries)
-        .set({
-          numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${seriesId}) + 1`,
-        })
-        .where(eq(bottleSeries.id, seriesId));
-    }
   }
 
   const distillerIds: number[] = [];
@@ -624,6 +618,12 @@ export async function createBottleInTransaction(
   const bottleResult = await insertPreparedBottleInTransaction(tx, prepared, {
     groupId: group.id,
   });
+  if (bottleResult.bottle.seriesId !== null) {
+    const seriesMemberships = await getBottleSeriesMemberships(tx, [
+      bottleResult.bottle.id,
+    ]);
+    await updateBottleSeriesReleaseCounts(tx, [], seriesMemberships);
+  }
 
   const [persistedGroup] = await tx
     .update(bottleGroups)
