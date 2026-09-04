@@ -1,5 +1,9 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { describe, expect, it } from "vitest";
+import {
+  discoverBourbonCultureArticles,
+  parseBourbonCultureArticle,
+} from "../adapters/bourbonCulture";
 import { parseCompassBoxProducts } from "../adapters/legacy/scrapeCompassBox";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
@@ -98,6 +102,48 @@ const whiskySagaRules = {
         removePrefixes: ["Score:", "Score"],
       },
       scale: 100,
+    },
+  },
+} satisfies ScrapeRules;
+
+const bourbonCultureRules = {
+  kind: "review",
+  list: {
+    detailLink: {
+      selector:
+        "h2.wp-block-heading.has-white-background-color + ul.wp-block-latest-posts a.wp-block-latest-posts__post-title[href]",
+      attribute: "href",
+    },
+    maxItems: 6,
+  },
+  detail: {
+    title: { selector: "article h1.entry-title" },
+    publishedAt: {
+      selector: "article time.entry-date",
+      attribute: "datetime",
+    },
+    reviewItem: "article .entry-content",
+    name: {
+      selector: "article h1.entry-title",
+      removeSuffixes: ["Review"],
+    },
+    reviewerName: {
+      selector: 'meta[name="author"]',
+      attribute: "content",
+    },
+    reviewText: {
+      selector: "article .entry-content p",
+      startsWith: ["Nose:", "Palate:", "Finish:"],
+      all: true,
+    },
+    score: {
+      value: {
+        selector:
+          "article .entry-content h1, article .entry-content h2, article .entry-content h3, article .entry-content h4, article .entry-content p",
+        startsWith: ["Score:"],
+        removePrefixes: ["Score:"],
+      },
+      scale: 10,
     },
   },
 } satisfies ScrapeRules;
@@ -209,6 +255,20 @@ describe("scrape source parser", () => {
     );
 
     expect(parseScrapeList(compassBoxRules, html, pageUrl)).toEqual({
+      links: legacyLinks,
+      nextPageUrl: null,
+      issues: [],
+    });
+  });
+
+  it("matches the current Bourbon Culture parser's latest review links", async () => {
+    const pageUrl = new URL("https://thebourbonculture.com/");
+    const html = await loadFixture("bourbonculture", "index.html");
+    const legacyLinks = discoverBourbonCultureArticles(html).map(
+      (url) => url.href,
+    );
+
+    expect(parseScrapeList(bourbonCultureRules, html, pageUrl)).toEqual({
       links: legacyLinks,
       nextPageUrl: null,
       issues: [],
@@ -368,6 +428,20 @@ describe("scrape source parser", () => {
 
     expectReviewFactsAndEvidenceToMatch(
       parseScrapeDetail(whiskySagaRules, html, url),
+      legacy,
+    );
+  });
+
+  it("matches the current Bourbon Culture parser facts and evidence", async () => {
+    const url = new URL(
+      "https://thebourbonculture.com/whiskey-reviews/example-bourbon-review/",
+    );
+    const html = await loadFixture("bourbonculture", "review.html");
+    const legacy = parseBourbonCultureArticle(html, url);
+    expect(legacy.article.externalReviews).toHaveLength(1);
+
+    expectReviewFactsAndEvidenceToMatch(
+      parseScrapeDetail(bourbonCultureRules, html, url),
       legacy,
     );
   });
