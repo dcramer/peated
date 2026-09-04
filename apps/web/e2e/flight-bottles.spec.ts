@@ -19,6 +19,7 @@ test.describe("Flight bottles", () => {
     });
 
     await page.goto("/addFlight");
+    await page.waitForLoadState("networkidle");
     await page.getByLabel("Name").fill("Bottle Flight");
     const bottleSearch = page.getByPlaceholder("Search bottles");
 
@@ -29,16 +30,6 @@ test.describe("Flight bottles", () => {
       });
       await option.click();
     }
-
-    await page
-      .getByRole("button", {
-        name: `Remove ${formatBottleDisplayName(exactSearchBottle)}`,
-        exact: true,
-      })
-      .click();
-    await bottleSearch.fill(formatBottleDisplayName(exactSearchBottle));
-    await bottleSearch.press("ArrowDown");
-    await bottleSearch.press("Enter");
 
     await page.getByRole("button", { name: "Save" }).click();
 

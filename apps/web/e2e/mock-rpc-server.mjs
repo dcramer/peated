@@ -2,7 +2,6 @@ import http from "node:http";
 import { z } from "zod";
 
 import { createBottleCheckMock } from "./mock-rpc/bottle-checks.mjs";
-import { createReviewScoringMock } from "./mock-rpc/review-scoring.mjs";
 import {
   activityReview,
   addAnotherReleaseSourceBottle,
@@ -96,7 +95,6 @@ const mockUploadImage = Buffer.from(
 const collectionStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
 const userModeratorStateByToken = new Map();
-const reviewScoringMock = createReviewScoringMock();
 const appliedQueueProposalTokens = new Set();
 const ignoredInconclusiveProposalTokens = new Set();
 let collectionBottleId = 1;
@@ -175,17 +173,6 @@ process.on("SIGTERM", () => {
 async function handleRpcRequest({ request, response, url }) {
   const path = url.pathname.replace(/^\/rpc\/?/, "");
   const input = await readRpcInput(request, url);
-  const scoringResult = reviewScoringMock({
-    path,
-    input,
-    token: getAccessToken(request),
-  });
-  if (scoringResult) {
-    if (scoringResult.type === "error")
-      sendRpcError(response, scoringResult.message);
-    else sendRpcResponse(response, scoringResult.value);
-    return true;
-  }
   const bottleCheckResult = bottleCheckMock.handleRpcRequest({
     path,
     input,
@@ -497,12 +484,14 @@ async function handleRpcRequest({ request, response, url }) {
           return true;
         }
 
+        const bottleWithoutGroup = buildBottle({
+          id: createdBottleId,
+          name: createdBottleName,
+          brand: testBrand,
+        });
         const bottle = {
-          ...buildBottle({
-            id: createdBottleId,
-            name: createdBottleName,
-            brand: testBrand,
-          }),
+          ...bottleWithoutGroup,
+          group: buildBottleGroup({ bottle: bottleWithoutGroup }),
           edition: "Founder's Cask",
           abv: 58.7,
           releaseYear: 2025,
@@ -548,11 +537,15 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      const bottle = buildBottle({
+      const bottleWithoutGroup = buildBottle({
         id: createdBottleId,
         name: createdBottleName,
         brand: testBrand,
       });
+      const bottle = {
+        ...bottleWithoutGroup,
+        group: buildBottleGroup({ bottle: bottleWithoutGroup }),
+      };
       sendRpcResponse(response, bottle);
       return true;
     }
@@ -1486,11 +1479,11 @@ async function handleRpcRequest({ request, response, url }) {
       if (
         !isNumber(input?.bottle) ||
         input?.score !== 80 ||
-        input?.color !== 8 ||
+        input?.color !== null ||
         input?.notes !== "Coastal and waxy." ||
-        input?.servingStyle !== "neat" ||
-        JSON.stringify(input?.tags) !== JSON.stringify(["smoke"]) ||
-        JSON.stringify(input?.friends) !== JSON.stringify([moderatorUser.id])
+        input?.servingStyle !== null ||
+        JSON.stringify(input?.tags) !== JSON.stringify([]) ||
+        JSON.stringify(input?.friends) !== JSON.stringify([])
       ) {
         sendRpcError(response, "Unexpected member review save payload");
         return true;

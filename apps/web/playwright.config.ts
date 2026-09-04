@@ -15,8 +15,8 @@ export default defineConfig({
   timeout: 45_000,
   globalTimeout: process.env.CI ? 7 * 60_000 : undefined,
   maxFailures: process.env.CI ? 2 : 0,
-  fullyParallel: true,
-  workers: 2,
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: [
@@ -69,6 +69,7 @@ export default defineConfig({
           command: `pnpm exec next dev -p ${webPort}`,
           env: {
             API_SERVER: apiServer,
+            NEXT_DIST_DIR: `.playwright/next-${webPort}`,
             PLAYWRIGHT_TEST: "1",
             SESSION_SECRET:
               process.env.SESSION_SECRET ??

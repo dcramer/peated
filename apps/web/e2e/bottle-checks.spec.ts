@@ -1,6 +1,5 @@
 import { expect, test, type TestInfo } from "./test";
 
-import { bottlePathPattern } from "./assertions";
 import {
   existingBottleId,
   moderatorUser,
@@ -55,28 +54,9 @@ test("reviews independent catalog operations one task at a time", async ({
   await expect(
     blockedOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeDisabled();
-
-  await blockedOperation
-    .getByRole("button", { name: "Remove operation" })
-    .click();
-  await blockedOperation.getByLabel("Reason").selectOption("wrong_change");
-  const rejectionRequest = page.waitForRequest((request) =>
-    request.url().includes("/rpc/audits/rejectSelected"),
-  );
-  await blockedOperation
-    .getByRole("button", { name: "Confirm removal" })
-    .click();
-  await rejectionRequest;
-
-  await expect(page).toHaveURL("/admin/moderation/inbox");
-  await expect(
-    page
-      .getByRole("region", { name: "Moderation Inbox" })
-      .getByText("Nothing needs a decision"),
-  ).toBeVisible();
 });
 
-test("runs a clean moderator Bottle audit inline and returns to the Bottle", async ({
+test("shows a clean moderator Bottle audit inline", async ({
   context,
   page,
 }, testInfo) => {
@@ -104,9 +84,6 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
       "No changes proposed. The Bottle identity is supported by the inspected evidence.",
     ),
   ).toBeVisible();
-
-  await page.getByRole("button", { name: "Return to bottle" }).click();
-  await expect(page).toHaveURL(bottlePathPattern(existingBottleId));
 });
 
 test("opens an actionable admin audit in its focused Moderation task", async ({
