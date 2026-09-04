@@ -67,12 +67,16 @@ Peated is a public record of whisky, freely accessible to everyone.
   `serialize(...)`.
 - Generate migrations with `pnpm db:generate`. Never hand-write migration SQL or
   manually edit `apps/server/migrations/meta/*`.
-- `pnpm dev*` and `pnpm cli <cmd>` load `.env.local`; backend tests load
-  `.env.test`.
+- `pnpm dev*` loads `.env.local`; backend tests load `.env.test`.
+- Direct database-backed CLI command groups are legacy. Do not add or recommend
+  them for operations. Add a protected API route and use the authenticated API
+  client instead.
 
 ## Production Access
 
 - API: `https://api.peated.com`, not `https://peated.com`.
+- Use `pnpm cli auth ...` for OAuth and `pnpm cli api ...` for production API
+  reads and writes. These are the only supported production CLI surfaces.
 - Sentry: organization/project `peated/peated` at `https://peated.sentry.io`.
   Use [Sentry CLI](https://cli.sentry.dev) (`sentry`) with target detection;
   specify `peated/peated` only if detection is wrong.

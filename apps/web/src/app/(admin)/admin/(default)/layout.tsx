@@ -19,6 +19,7 @@ const navigationGroups = [
       { href: "/admin/badges", label: "Badges" },
       { href: "/admin/events", label: "Events" },
       { href: "/admin/locations", label: "Locations" },
+      { href: "/admin/maintenance", label: "Maintenance" },
       { href: "/admin/oauth-clients", label: "OAuth clients" },
       { href: "/admin/sites", label: "Scrapers" },
       { href: "/admin/tags", label: "Tags" },

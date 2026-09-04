@@ -97,6 +97,7 @@ const pendingUploadStateByToken = new Map();
 const userModeratorStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
 const ignoredInconclusiveProposalTokens = new Set();
+const convertedOldStarRatingTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
 let releasePageReady = Promise.resolve();
@@ -560,6 +561,35 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, bottle);
       return true;
     }
+    case "admin/getOldStarRatingConversion": {
+      const token = getAccessToken(request);
+      sendRpcResponse(
+        response,
+        buildOldStarRatingReport(convertedOldStarRatingTokens.has(token)),
+      );
+      return true;
+    }
+    case "admin/convertOldStarRatings": {
+      const token = getAccessToken(request);
+      const converted = convertedOldStarRatingTokens.has(token);
+      if (
+        (input?.expectedConversions !== 232 || converted) &&
+        (input?.expectedConversions !== 0 || !converted)
+      ) {
+        sendRpcError(response, "Unexpected old star rating conversion payload");
+        return true;
+      }
+      convertedOldStarRatingTokens.add(token);
+      sendRpcResponse(response, {
+        ...buildOldStarRatingReport(converted),
+        converted: converted ? 0 : 232,
+        bottleTotalsStarted: 175,
+      });
+      return true;
+    }
+    case "admin/repairBottleCounts":
+      sendRpcResponse(response, { status: "queued" });
+      return true;
     case "admin/moderation/listTasks": {
       const token = getAccessToken(request);
       if (token.includes("queue-inconclusive")) {
@@ -2587,6 +2617,27 @@ function getBottleGroup(groupId) {
     default:
       return null;
   }
+}
+
+function buildOldStarRatingReport(converted) {
+  return {
+    oldStarRatings: 232,
+    willConvert: converted ? 0 : 232,
+    alreadyRated: converted ? 232 : 0,
+    notConverted: 0,
+    converted: 0,
+    bottles: 175,
+    bottleTotalsStarted: 0,
+    bottleTotalsFailed: 0,
+    ratings: {
+      mediocre: converted ? 0 : 6,
+      good: converted ? 0 : 27,
+      very_good: converted ? 0 : 139,
+      outstanding: converted ? 0 : 46,
+      unicorn: converted ? 0 : 14,
+    },
+    notConvertedValues: {},
+  };
 }
 
 async function readRpcInput(request, url) {
