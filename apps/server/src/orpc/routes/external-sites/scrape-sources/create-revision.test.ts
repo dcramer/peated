@@ -1,3 +1,4 @@
+import { app } from "@peated/server/app";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -73,6 +74,67 @@ describe("POST /admin/scrape-sources/:id/revisions", () => {
       author: "person",
       previewStatus: "pending",
       revision: 1,
+    });
+  });
+
+  test("saves strict union rules over HTTP", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const token = await fixtures.AuthToken({ user: admin });
+    const { source } = await createTestSource(admin.id);
+    const response = await app.request(
+      `/v1/admin/scrape-sources/${source.id}/revisions`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          listUrl: source.listUrl,
+          rules: {
+            ...reviewRules,
+            detail: {
+              ...reviewRules.detail,
+              canonicalUrl: {
+                selector: 'link[rel="canonical"]',
+                attribute: "href",
+                removeSuffixes: ["/"],
+              },
+            },
+          },
+        }),
+      },
+      {
+        incoming: {
+          socket: {
+            remoteAddress: "127.0.0.1",
+            remotePort: 12345,
+            remoteFamily: "IPv4",
+          },
+        },
+      },
+    );
+
+    expect({
+      status: response.status,
+      body: await response.json(),
+    }).toMatchObject({
+      status: 200,
+      body: {
+        active: false,
+        author: "person",
+        previewStatus: "pending",
+        revision: 1,
+        rules: {
+          detail: {
+            canonicalUrl: {
+              selector: 'link[rel="canonical"]',
+              attribute: "href",
+              removeSuffixes: ["/"],
+            },
+          },
+        },
+      },
     });
   });
 });
