@@ -1,0 +1,107 @@
+{
+  "id": "release-year-in-candidate-name",
+  "name": "release year in candidate name",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://api.peated.com/uploads/pending-uploads/pending-upload-o5klpnm5zbjknwcu8w0sm3fd.webp",
+      "imageUrl": "https://api.peated.com/uploads/pending-uploads/pending-upload-o5klpnm5zbjknwcu8w0sm3fd.webp"
+    },
+    "extractedIdentity": {
+      "brand": "Woodford Reserve",
+      "bottler": null,
+      "expression": "Double Double Oaked",
+      "series": "Distillery Series",
+      "distillery": ["Woodford Reserve"],
+      "category": "bourbon",
+      "stated_age": null,
+      "abv": 45.2,
+      "release_year": 2022,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "2022 Release"
+    },
+    "imageEvidence": {
+      "sourceImageId": "t2l6vj6tc6zixonbv54lc87o",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "gpt-5.4",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "Woodford Reserve Double Double Oaked Distillery Series Woodford Reserve 45.2% ABV 2022 release",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the uploaded bottle photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Woodford Reserve",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Double Double Oaked",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "series": {
+          "value": "Distillery Series",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Woodford Reserve"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "bourbon",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 45.2,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "releaseYear": {
+          "value": 2022,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true,
+        "reason": null
+      },
+      "conflicts": []
+    },
+    "initialCandidates": [
+      {
+        "bottleId": -194,
+        "fullName": "Woodford Reserve Double Double Oaked - 2017 Release"
+      }
+    ]
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "notes": "Contrast derived from image-backed-photo-matches-woodford-reserve-double-double-oaked-2022-release. Preserve its 2022 source and the existing 2017 candidate, with no structured release year on that candidate. This constructed catalog scenario is not an observed production miss. Held out from prompt drafting for the release-identity experiment. After experiment 01, removed an unverified calendar release-year assertion. This case checks the candidate decision; a label year alone does not establish the calendar release date. The original fixture and its unmodified scores are archived with the experiment."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "summary": "The 2017 release in the candidate name conflicts with the 2022 source identity. Create the source release rather than matching the older release despite its missing structured year.",
+    "proposedBottleNameIncludes": ["Double Double Oaked"]
+  }
+}

@@ -12,7 +12,7 @@
       "expression": "Islay Origin",
       "series": null,
       "distillery": [],
-      "category": "blend",
+      "category": "blended_malt",
       "stated_age": 12,
       "abv": null,
       "release_year": null,
@@ -29,7 +29,7 @@
       "https://api.peated.com/v1/bottles/6127",
       "https://api.peated.com/v1/bottles/13606"
     ],
-    "notes": "This promotes the existing real-world Black Label Islay Origin corpus case into the structured decision suite. The launch announcement identifies the four products as the Johnnie Walker Black Label Origin series, and the Peated catalog siblings consistently use Johnnie Walker as brand with Black Label retained in the Bottle name. Producer/distiller entity reuse is covered separately by the verified Watchpost production-miss fixture because this blend does not have one canonical distillery role."
+    "notes": "This promotes the existing real-world Black Label Islay Origin corpus case into the structured decision suite. The launch announcement identifies the four products as the Johnnie Walker Black Label Origin series and says Islay Origin is made exclusively from Islay single malts, including Lagavulin and Caol Ila. That makes it a blended malt, even though the existing Peated Bottle and local sibling fixtures use the broader blend category. The Peated catalog siblings consistently use Johnnie Walker as brand with Black Label retained in the Bottle name. Producer/distiller entity reuse is covered separately by the verified Watchpost production-miss fixture because this blended malt does not have one canonical distillery role."
   },
   "expected": {
     "status": "classified",
@@ -41,7 +41,7 @@
         "id": 1093,
         "name": "Johnnie Walker"
       },
-      "category": "blend",
+      "category": "blended_malt",
       "statedAge": 12
     },
     "proposedBottleNameIncludes": ["Black Label", "Islay Origin"],

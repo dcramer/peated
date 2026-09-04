@@ -267,6 +267,34 @@ describe("buildAgentInput", () => {
     });
     expect(input).not.toHaveProperty("phase");
   });
+
+  test("keeps exact-query provenance out of agent input", () => {
+    const input = JSON.parse(
+      buildAgentInput({
+        reference: { name: "Mars Komagatake 2022 Edition" },
+        extractedIdentity: null,
+        initialCandidates: [],
+        currentBottle: null,
+        hasExactReferenceMatch: false,
+        resolvedEntities: [
+          {
+            entityId: 1953,
+            name: "Komagatake",
+            shortName: null,
+            kind: "brand",
+            reference: "Mars Shinshu Distillery",
+            score: 1,
+            source: ["exact"],
+            retrievedFor: [{ query: "Mars Shinshu Distillery", exact: true }],
+          },
+        ],
+      }),
+    );
+
+    expect(input.localEntitySearch.results[0].retrievedFor).toEqual([
+      { query: "Mars Shinshu Distillery" },
+    ]);
+  });
 });
 
 describe("buildAuditBottleAgentInput", () => {

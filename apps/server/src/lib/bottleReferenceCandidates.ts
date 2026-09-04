@@ -258,7 +258,10 @@ export function mergeBottleCandidate(
     existing.score = candidate.score;
   }
 
-  if (!existing.reference && candidate.reference) {
+  if (
+    candidate.reference &&
+    (candidate.source.includes("exact") || !existing.reference)
+  ) {
     existing.reference = candidate.reference;
   }
 

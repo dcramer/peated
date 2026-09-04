@@ -17,6 +17,13 @@ import type { ImageBottleEvidence } from "../imageEvidence";
 
 const DEFAULT_MATCH_CANDIDATE_LIMIT = 15;
 
+function buildAgentEntityResolution(entity: EntityResolution) {
+  return {
+    ...entity,
+    retrievedFor: entity.retrievedFor?.map(({ query }) => ({ query })),
+  };
+}
+
 export function buildAgentInput({
   reference,
   extractedIdentity,
@@ -66,7 +73,7 @@ export function buildAgentInput({
         results: searchEvidence,
       },
       localEntitySearch: {
-        results: resolvedEntities,
+        results: resolvedEntities.map(buildAgentEntityResolution),
       },
       identityAnchor,
     },
@@ -120,7 +127,7 @@ export function buildAuditBottleAgentInput({
         ),
       },
       localEntitySearch: {
-        results: resolvedEntities,
+        results: resolvedEntities.map(buildAgentEntityResolution),
       },
       currentBottleContext,
       webEvidence: {

@@ -125,6 +125,57 @@ function operationKey(operation: ProposedOperation): string {
   });
 }
 
+function jsonIncludes(actual: JsonValue, required: JsonValue): boolean {
+  if (Array.isArray(required)) {
+    return stableKey(actual) === stableKey(required);
+  }
+
+  const requiredObject = z
+    .record(z.string(), JsonValueSchema)
+    .safeParse(required);
+  if (!requiredObject.success) {
+    return stableKey(actual) === stableKey(required);
+  }
+
+  const actualObject = z.record(z.string(), JsonValueSchema).safeParse(actual);
+  if (!actualObject.success) return false;
+
+  return Object.entries(requiredObject.data).every(
+    ([key, value]) =>
+      Object.hasOwn(actualObject.data, key) &&
+      jsonIncludes(actualObject.data[key]!, value),
+  );
+}
+
+export function proposedOperationIncludes(
+  actual: ProposedOperation,
+  required: ProposedOperation,
+): boolean {
+  if (actual.type !== required.type) return false;
+
+  if (actual.type === "update_bottle" && required.type === "update_bottle") {
+    return (
+      actual.input.bottleId === required.input.bottleId &&
+      jsonIncludes(
+        JsonValueSchema.parse(actual.input.patch),
+        JsonValueSchema.parse(required.input.patch),
+      )
+    );
+  }
+
+  if (actual.type === "update_entity" && required.type === "update_entity") {
+    return (
+      actual.input.entityId === required.input.entityId &&
+      jsonIncludes(
+        JsonValueSchema.parse(actual.input.patch),
+        JsonValueSchema.parse(required.input.patch),
+      )
+    );
+  }
+
+  return operationKey(actual) === operationKey(required);
+}
+
 // Finding prose may vary. Scope plus sorted typed refs is the deterministic
 // expectation signature; grounding separately verifies that those refs exist.
 function findingKey(finding: Finding): string {
@@ -334,19 +385,64 @@ export function scoreBottleCheckSemanticOutput(
     proposedOperations: ProposedOperation[];
     findings: Finding[];
   },
+  acceptedProposedOperationSets: ProposedOperation[][] = [],
 ): BottleCheckSemanticScore {
-  return {
-    operations: scoreExactSet(
-      expected.proposedOperations.map(operationKey),
+  const operationScores = [
+    expected.proposedOperations,
+    ...acceptedProposedOperationSets,
+  ].map((operationSet) =>
+    scoreExactSet(
+      operationSet.map(operationKey),
       actual.proposedOperations.map(operationKey),
       3,
     ),
+  );
+  const operations = operationScores.reduce((best, candidate) => {
+    if (candidate.score !== best.score) {
+      return candidate.score > best.score ? candidate : best;
+    }
+    if (candidate.recall !== best.recall) {
+      return candidate.recall > best.recall ? candidate : best;
+    }
+    return candidate.precision > best.precision ? candidate : best;
+  });
+
+  return {
+    operations,
     findings: scoreExactSet(
       expected.findings.map(findingKey),
       actual.findings.map(findingKey),
       2,
     ),
   };
+}
+
+export function selectBottleCheckExpectedOperations(
+  expectedOperations: ProposedOperation[],
+  acceptedProposedOperationSets: ProposedOperation[][],
+  actualOperations: ProposedOperation[],
+): ProposedOperation[] {
+  const candidates = [expectedOperations, ...acceptedProposedOperationSets];
+  const selectedScore = scoreBottleCheckSemanticOutput(
+    { proposedOperations: expectedOperations, findings: [] },
+    { proposedOperations: actualOperations, findings: [] },
+    acceptedProposedOperationSets,
+  ).operations;
+
+  return (
+    candidates.find((candidate) => {
+      const score = scoreExactSet(
+        candidate.map(operationKey),
+        actualOperations.map(operationKey),
+        3,
+      );
+      return (
+        score.score === selectedScore.score &&
+        score.recall === selectedScore.recall &&
+        score.precision === selectedScore.precision
+      );
+    }) ?? expectedOperations
+  );
 }
 
 function requiredEvidenceMatches(

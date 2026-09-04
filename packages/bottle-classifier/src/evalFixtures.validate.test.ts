@@ -165,7 +165,7 @@ describe("eval fixture validation", () => {
     });
   });
 
-  test("keeps the Pōkeno audit limited to the supported vintage repair", () => {
+  test("keeps the Pōkeno audit limited to reviewed supported repairs", () => {
     const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
       ({ id }) => id === "audit-production-pokeno-single-cask-missing-vintage",
     );
@@ -174,6 +174,17 @@ describe("eval fixture validation", () => {
     expect(fixture?.scenario).toBe("bottle_update");
     expect(fixture?.provenance.source).toBe("production_miss");
     expect(fixture?.input.audit.bottleId).toBe(45174);
+    expect(fixture?.acceptedProposedOperationSets).toMatchObject([
+      [
+        {
+          type: "update_bottle",
+          input: {
+            bottleId: 45174,
+            patch: { vintageYear: 2019, outturn: 340 },
+          },
+        },
+      ],
+    ]);
     expect(fixture?.provenance.verifiedSourceUrls).toEqual(
       expect.arrayContaining([
         "https://api.peated.com/uploads/bottles/bottle-45174-pending-upload-nh8e88y2d7atvkesunuwvo5z.webp",
@@ -358,6 +369,44 @@ describe("eval fixture validation", () => {
         "input.initialCandidates",
       ]),
     );
+  });
+
+  test("rejects an accepted audit operation set that omits a required repair", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) => id === "audit-production-pokeno-single-cask-missing-vintage",
+    );
+    expect(fixture).toBeDefined();
+    const acceptedOperation = fixture!.acceptedProposedOperationSets[0]?.[0];
+    expect(acceptedOperation?.type).toBe("update_bottle");
+    if (acceptedOperation?.type !== "update_bottle") {
+      throw new Error("Expected a Pōkeno Bottle update.");
+    }
+
+    const result = auditBottleEvalFixtureSchema.safeParse({
+      ...fixture,
+      acceptedProposedOperationSets: [
+        [
+          {
+            ...acceptedOperation,
+            input: {
+              ...acceptedOperation.input,
+              patch: { outturn: 340 },
+            },
+          },
+        ],
+      ],
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message:
+            "Each accepted operation set must include every required operation and field.",
+          path: ["acceptedProposedOperationSets", 0, 0],
+        }),
+      );
+    }
   });
 
   test("rejects production-miss local catalog fixtures without local rows", () => {

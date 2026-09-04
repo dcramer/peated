@@ -16,6 +16,7 @@ import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
   scoreBottleCheckGrounding,
   scoreBottleCheckSemanticOutput,
+  selectBottleCheckExpectedOperations,
 } from "./bottleCheckEvalScoring";
 import {
   BottleContextSchema,
@@ -50,6 +51,15 @@ import {
   recordEvalAction,
   type EvalAction,
 } from "./evalActionBreakdown";
+import {
+  findJsonSubsetDifferences,
+  formatJsonSubsetDifference,
+} from "./evalExpectationDifferences";
+import {
+  createFixedImageExtractor,
+  createFixedWebSearchExecutor,
+  loadFixedWebEvidenceCase,
+} from "./evalFixedWebEvidence";
 import type { AuditBottleEvalFixture } from "./evalFixtureSchemas";
 import {
   buildEvalHarnessMeasurements,
@@ -74,6 +84,9 @@ import {
   type AutomationTier,
 } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
+
+// Classifier evals: historical per-fixture outcomes and experiment guidance live
+// in ../evals/README.md. Baselines do not change the judges or expected outcomes.
 
 type ClassifiedBottleClassificationResult = Extract<
   BottleClassificationResult,
@@ -215,34 +228,6 @@ function getDerivedSuggestedNextStep(
     case "no_match":
       return "manual_search";
   }
-}
-
-function deepContainsSubset(actual: JsonValue, expected: JsonValue): boolean {
-  const expectedObject = z.record(z.string(), z.json()).safeParse(expected);
-  if (!expectedObject.success && !Array.isArray(expected)) {
-    return Object.is(actual, expected);
-  }
-
-  if (Array.isArray(expected)) {
-    if (!Array.isArray(actual) || actual.length < expected.length) {
-      return false;
-    }
-
-    return expected.every((value, index) =>
-      deepContainsSubset(actual[index], value),
-    );
-  }
-
-  const actualObject = z.record(z.string(), z.json()).safeParse(actual);
-  if (!actualObject.success || !expectedObject.success) {
-    return false;
-  }
-
-  const actualEntries = Object.entries(actualObject.data);
-  return Object.entries(expectedObject.data).every(([key, value]) => {
-    const actualEntry = actualEntries.find(([actualKey]) => actualKey === key);
-    return actualEntry ? deepContainsSubset(actualEntry[1], value) : false;
-  });
 }
 
 function evalTextContainsStatedAge(value: string, statedAge: number): boolean {
@@ -480,14 +465,14 @@ function evaluateDecisionContract(
     );
   }
 
-  if (
-    expected.proposedBottle !== undefined &&
-    !deepContainsSubset(
+  if (expected.proposedBottle !== undefined) {
+    const expectedBottle = z.json().parse(expected.proposedBottle);
+    const differences = findJsonSubsetDifferences(
       result.decision.proposedBottle,
-      z.json().parse(expected.proposedBottle),
-    )
-  ) {
-    failures.push("proposedBottle missing expected fields");
+      expectedBottle,
+      "proposedBottle",
+    );
+    failures.push(...differences.map(formatJsonSubsetDifference));
   }
 
   if (expected.proposedBottleNameOneOf !== undefined) {
@@ -730,22 +715,46 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
   return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
-function createEvalRuntime() {
+function createEvalRuntime(fixtureId: string) {
   const toolEvents: TranscriptEvent[] = [];
+  const fixedEvidenceFile =
+    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE;
+  const fixedEvidence = fixedEvidenceFile
+    ? loadFixedWebEvidenceCase(fixedEvidenceFile, fixtureId)
+    : null;
   const options: Pick<
     CreateBottleClassifierOptions,
-    "executeWebSearch" | "observeToolEvent"
+    | "executeWebSearch"
+    | "initialSearchEvidence"
+    | "observeReferenceAgentDecision"
+    | "observeToolEvent"
+    | "overrides"
   > = {
-    executeWebSearch: async ({ toolName, args, execute }) => {
-      const { result } = await executeWithReplay({
-        toolName,
-        args,
-        context: null,
-        execute,
-        replay: { sanitize: sanitizeWebSearchRecording },
+    initialSearchEvidence: fixedEvidence?.searchResult.evidence,
+    executeWebSearch: fixedEvidence
+      ? createFixedWebSearchExecutor(fixedEvidence)
+      : async ({ toolName, args, execute }) => {
+          const { result } = await executeWithReplay({
+            toolName,
+            args,
+            context: null,
+            execute,
+            replay: { sanitize: sanitizeWebSearchRecording },
+          });
+          assertSuccessfulWebSearchReplay(result);
+          return result;
+        },
+    overrides:
+      fixedEvidence && fixedEvidence.imageResults.length > 0
+        ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
+        : undefined,
+    observeReferenceAgentDecision: (decision) => {
+      toolEvents.push({
+        type: "message",
+        role: "assistant",
+        content: toJsonValue(decision) ?? null,
+        metadata: { phase: "agent_raw" },
       });
-      assertSuccessfulWebSearchReplay(result);
-      return result;
     },
     observeToolEvent: (event: BottleClassifierToolEvent) => {
       if (event.type === "tool_call") {
@@ -784,7 +793,7 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   name: "bottle-classifier",
   run: async ({ input }) => {
     const startedAt = performance.now();
-    const evalRuntime = createEvalRuntime();
+    const evalRuntime = createEvalRuntime(input.testCase.fixtureId);
     const {
       result: { result, modelMetadata },
       modelCalls,
@@ -881,7 +890,7 @@ const auditHarness = createHarness<AuditBottleEvalFixture, JsonValue>({
   name: "bottle-auditor",
   run: async ({ input }) => {
     const startedAt = performance.now();
-    const evalRuntime = createEvalRuntime();
+    const evalRuntime = createEvalRuntime(input.id);
     const {
       result: { result, modelMetadata },
       modelCalls,
@@ -933,6 +942,7 @@ function scoreAuditSemanticOutput(
   return scoreBottleCheckSemanticOutput(
     input.expected,
     AuditBottleResultSchema.parse(output),
+    input.acceptedProposedOperationSets,
   );
 }
 
@@ -940,6 +950,13 @@ const AuditGroundingJudge = createJudge<AuditJudgeContext>(
   "AuditGroundingJudge",
   ({ input, run }) => {
     const result = AuditBottleResultSchema.parse(run.output);
+    const expectedOperations = input.requireExpectedOperationEvidence
+      ? selectBottleCheckExpectedOperations(
+          input.expected.proposedOperations,
+          input.acceptedProposedOperationSets,
+          result.proposedOperations,
+        )
+      : undefined;
     const score = scoreBottleCheckGrounding(
       result,
       getBottleCheckSourceEvidencePaths({
@@ -947,9 +964,7 @@ const AuditGroundingJudge = createJudge<AuditJudgeContext>(
         input: input.input.audit,
         artifacts: result.artifacts,
       }),
-      input.requireExpectedOperationEvidence
-        ? input.expected.proposedOperations
-        : undefined,
+      expectedOperations,
     );
     return { score: score.score, metadata: score };
   },
@@ -1012,6 +1027,17 @@ afterAll(() => {
   }
 });
 
+const selectedFixtureIds = new Set(
+  (process.env.BOTTLE_CLASSIFIER_EVAL_FIXTURE_IDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean),
+);
+
+function isSelectedFixture(fixtureId: string) {
+  return selectedFixtureIds.size === 0 || selectedFixtureIds.has(fixtureId);
+}
+
 const SCENARIO_CONFIG: Array<{
   label: string;
   scenario: LiveClassifierEvalScenario;
@@ -1040,10 +1066,15 @@ const SCENARIO_CONFIG: Array<{
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
-  const cases = getClassifierLiveEvalCases(scenario).map((testCase) => ({
-    name: getScenarioEvalName(testCase),
-    testCase,
-  }));
+  const cases = getClassifierLiveEvalCases(scenario)
+    .filter((testCase) => isSelectedFixture(testCase.testCase.fixtureId))
+    .map((testCase) => ({
+      name: getScenarioEvalName(testCase),
+      testCase,
+    }));
+  if (cases.length === 0) {
+    continue;
+  }
 
   describeEval(
     label,
@@ -1062,27 +1093,34 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
   );
 }
 
-describeEval(
-  "bottle audits",
-  {
-    skipIf: () => !hasEvalAIGatewayCredentials,
-    harness: auditHarness,
-    judges: [
-      AuditGroundingJudge,
-      AuditOperationExpectationJudge,
-      AuditFindingExpectationJudge,
-    ],
-    judgeThreshold: 1,
-  },
-  (it) => {
-    it.for(
-      AUDIT_BOTTLE_EVAL_CASES.map((testCase) => ({
-        name: testCase.name,
-        testCase,
-      })),
-    )("$name", async ({ testCase }, { run, annotate }) => {
-      const result = await run(testCase);
-      await annotate(formatEvalUsageAnnotation(result.usage), "usage");
-    });
-  },
-);
+const selectedAuditCases = AUDIT_BOTTLE_EVAL_CASES.filter((testCase) =>
+  isSelectedFixture(testCase.id),
+).map((testCase) => ({
+  name: testCase.name,
+  testCase,
+}));
+
+if (selectedAuditCases.length > 0) {
+  describeEval(
+    "bottle audits",
+    {
+      skipIf: () => !hasEvalAIGatewayCredentials,
+      harness: auditHarness,
+      judges: [
+        AuditGroundingJudge,
+        AuditOperationExpectationJudge,
+        AuditFindingExpectationJudge,
+      ],
+      judgeThreshold: 1,
+    },
+    (it) => {
+      it.for(selectedAuditCases)(
+        "$name",
+        async ({ testCase }, { run, annotate }) => {
+          const result = await run(testCase);
+          await annotate(formatEvalUsageAnnotation(result.usage), "usage");
+        },
+      );
+    },
+  );
+}

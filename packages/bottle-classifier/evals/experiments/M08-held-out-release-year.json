@@ -1,0 +1,16 @@
+{
+  "item": "M08",
+  "decision": "accepted_measurement_correction",
+  "classifierChanged": false,
+  "fixtureId": "text-only-smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally",
+  "removedExpectation": {
+    "proposedBottle.releaseYear": 2024
+  },
+  "retainedExpectations": {
+    "proposedBottle.statedAge": 6,
+    "proposedBottle.abv": 56
+  },
+  "modelRequests": 0,
+  "modelTokens": 0,
+  "modelCostUsd": 0
+}

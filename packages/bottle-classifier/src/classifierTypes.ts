@@ -696,6 +696,9 @@ export const EntityResolutionSchema = z.object({
     .array(
       z.object({
         query: z.string().min(1),
+        // Bottle classifier owns this flag: it ties an exact result to the
+        // query that produced it. Agent input omits it so C10 stays post-model.
+        exact: z.literal(true).optional(),
       }),
     )
     .optional(),

@@ -328,6 +328,130 @@ function buildAbvMatchInput({
 }
 
 describe("finalizeBottleReferenceClassification", () => {
+  function finalizeEntityReferenceDraft(
+    resolvedEntities: Parameters<
+      typeof buildBottleClassificationArtifacts
+    >[0]["resolvedEntities"],
+  ) {
+    return finalizeBottleReferenceClassification({
+      reference: { name: "Mars Komagatake 2022 Edition" },
+      decision: {
+        action: "create_bottle",
+        rationale: "Create the supported 2022 edition.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: null,
+        proposedBottle: {
+          name: "Komagatake",
+          series: null,
+          category: "single_malt",
+          edition: "2022 Edition",
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          maturation: null,
+          caskNumber: null,
+          outturn: null,
+          abv: 50,
+          vintageYear: null,
+          releaseYear: 2022,
+          brand: { id: 1169, name: "Mars" },
+          distillers: [
+            { id: null, name: "Mars Shinshu Distillery", kind: "distillery" },
+          ],
+          bottler: null,
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({ resolvedEntities }),
+    });
+  }
+
+  test("resolves a model-chosen accepted Entity reference to its exact local id", () => {
+    const result = finalizeEntityReferenceDraft([
+      {
+        entityId: 1169,
+        name: "Mars",
+        shortName: null,
+        kind: "brand",
+        reference: null,
+        score: 1,
+        source: ["exact"],
+        retrievedFor: [{ query: "Mars", exact: true }],
+      },
+      {
+        entityId: 1953,
+        name: "Komagatake",
+        shortName: null,
+        kind: "brand",
+        reference: "Mars Shinshu Distillery",
+        score: 1,
+        source: ["exact"],
+        retrievedFor: [
+          { query: "Komagatake", exact: true },
+          { query: "Mars Shinshu Distillery", exact: true },
+        ],
+      },
+    ]);
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        brand: { id: 1169, name: "Mars" },
+        distillers: [{ id: 1953, name: "Komagatake" }],
+      },
+    });
+  });
+
+  test("does not resolve a model choice from fuzzy Entity retrieval", () => {
+    const result = finalizeEntityReferenceDraft([
+      {
+        entityId: 1953,
+        name: "Komagatake",
+        shortName: null,
+        kind: "brand",
+        reference: "Mars Shinshu Distillery",
+        score: 0.8,
+        source: ["text"],
+        retrievedFor: [{ query: "Mars Shinshu Distillery" }],
+      },
+    ]);
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        brand: { id: null, name: "Mars" },
+        distillers: [{ id: null, name: "Mars Shinshu Distillery" }],
+      },
+    });
+  });
+
+  test("does not resolve an ambiguous exact Entity choice", () => {
+    const exactResult = (entityId: number) => ({
+      entityId,
+      name: `Candidate ${entityId}`,
+      shortName: null,
+      kind: "distillery" as const,
+      reference: "Mars Shinshu Distillery",
+      score: 1,
+      source: ["exact"],
+      retrievedFor: [
+        { query: "Mars Shinshu Distillery", exact: true as const },
+      ],
+    });
+    const result = finalizeEntityReferenceDraft([
+      exactResult(1953),
+      exactResult(238555),
+    ]);
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        distillers: [{ id: null, name: "Mars Shinshu Distillery" }],
+      },
+    });
+  });
+
   test("rejects a proposed series that repeats the Brand", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
@@ -1665,5 +1789,163 @@ describe("finalizeBottleReferenceClassification", () => {
         vintageYear: 2007,
       },
     });
+  });
+});
+
+describe("unverified candidate cask codes", () => {
+  function finalizeCandidateMatch({
+    candidate,
+    referenceName,
+    extractedCaskNumber = null,
+    observationBarrelNumber = null,
+  }: {
+    candidate: BottleCandidate;
+    referenceName: string;
+    extractedCaskNumber?: string | null;
+    observationBarrelNumber?: string | null;
+  }) {
+    return finalizeBottleReferenceClassification({
+      reference: { name: referenceName },
+      decision: {
+        action: "match",
+        rationale: "The model selected the existing candidate.",
+        candidateBottleIds: [candidate.bottleId],
+        identityScope: "product",
+        referenceScope: "none",
+        observation: observationBarrelNumber
+          ? {
+              selector: null,
+              caskNumber: null,
+              barrelNumber: observationBarrelNumber,
+            }
+          : null,
+        matchedBottleId: candidate.bottleId,
+        proposedBottle: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [candidate],
+        extractedIdentity: extractedCaskNumber
+          ? {
+              brand: candidate.brand,
+              bottler: candidate.bottler,
+              expression: null,
+              series: null,
+              distillery: candidate.distillery,
+              category: candidate.category,
+              stated_age: candidate.statedAge,
+              abv: candidate.abv,
+              release_year: candidate.releaseYear,
+              vintage_year: candidate.vintageYear,
+              cask_strength: candidate.caskStrength,
+              single_cask: candidate.singleCask,
+              maturation: candidate.maturation,
+              cask_number: extractedCaskNumber,
+              outturn: candidate.outturn,
+              edition: candidate.edition,
+            }
+          : null,
+      }),
+    });
+  }
+
+  const uncodedSourceCases: Array<[string, BottleCandidate]> = [
+    [
+      "Elijah Craig 18-year-old Single Barrel Bourbon",
+      {
+        ...existingPrivateCask,
+        bottleId: 16142,
+        fullName: "Elijah Craig Single Barrel 18-year-old (No. 4040)",
+        brand: "Elijah Craig",
+        category: "bourbon",
+        statedAge: 18,
+      },
+    ],
+    [
+      "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10-year-old",
+      {
+        ...existingPrivateCask,
+        bottleId: 16442,
+        fullName:
+          "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
+        brand: "Masterson's",
+        category: "rye",
+        statedAge: 10,
+      },
+    ],
+  ];
+
+  test.each(uncodedSourceCases)(
+    "downgrades a match when %s omits the candidate's cask code",
+    (referenceName, candidate) => {
+      expect(
+        finalizeCandidateMatch({ candidate, referenceName }),
+      ).toMatchObject({
+        action: "no_match",
+        matchedBottleId: null,
+      });
+    },
+  );
+
+  test("keeps a match when the source title carries the same barrel code", () => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      fullName: "Example Single Barrel (Barrel No. 4769)",
+      caskNumber: "4769",
+    };
+
+    expect(
+      finalizeCandidateMatch({
+        candidate,
+        referenceName: "Example Single Barrel Barrel No. 4769",
+      }),
+    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
+  });
+
+  test("keeps a match when structured source extraction carries the code", () => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      fullName: "Example Single Barrel (Barrel F2-038)",
+      caskNumber: "F2-038",
+    };
+
+    expect(
+      finalizeCandidateMatch({
+        candidate,
+        referenceName: "Example Single Barrel",
+        extractedCaskNumber: "F2-038",
+      }),
+    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
+  });
+
+  test("keeps a match when the reviewed observation carries the barrel code", () => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      fullName: "Example Single Barrel (Barrel F2-038)",
+      caskNumber: "F2-038",
+    };
+
+    expect(
+      finalizeCandidateMatch({
+        candidate,
+        referenceName: "Example Single Barrel",
+        observationBarrelNumber: "F2-038",
+      }),
+    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
+  });
+
+  test.each([
+    "Example Cask Strength No. 5",
+    "Example Barrel Strength (Batch 11)",
+    "Example Single Barrel 18-year-old",
+  ])("keeps non-cask identifier match %s", (fullName) => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      fullName,
+      singleCask: fullName.includes("Single Barrel") ? true : null,
+    };
+
+    expect(
+      finalizeCandidateMatch({ candidate, referenceName: fullName }),
+    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
   });
 });

@@ -13,7 +13,7 @@
       "expression": "Hedonism²",
       "series": null,
       "distillery": [],
-      "category": "blend",
+      "category": "blended_grain",
       "stated_age": null,
       "abv": 49,
       "release_year": null,
@@ -55,7 +55,7 @@
           "sourceExtractorIndexes": [0]
         },
         "category": {
-          "value": "blend",
+          "value": "blended_grain",
           "confidence": 0.97,
           "sourceExtractorIndexes": [0]
         },
@@ -118,12 +118,13 @@
         "id": 1422,
         "name": "Compass Box"
       },
-      "category": "blend",
+      "category": "blended_grain",
       "edition": null,
       "statedAge": 23,
       "abv": 49,
       "vintageYear": null,
-      "releaseYear": 2023
+      "bottlingYear": 2023,
+      "releaseYear": null
     },
     "proposedBottleDistillerIds": [944, 1204, 1270],
     "expectedTier": "auto",

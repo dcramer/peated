@@ -1,0 +1,30 @@
+{
+  "item": "C03",
+  "decision": "stopped_control_failure_not_reproduced",
+  "classifierChanged": false,
+  "treatmentRun": false,
+  "control": {
+    "fixtureId": "audit-image-only-extraction-does-not-overwrite-populated-fields",
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high",
+    "passed": true,
+    "scores": {
+      "grounding": 1,
+      "operations": 1,
+      "findings": 1
+    },
+    "inputTokens": 15385,
+    "outputTokens": 1321,
+    "totalTokens": 16706,
+    "cachedInputTokens": 15034,
+    "cacheWriteTokens": 345,
+    "reasoningTokens": 1052,
+    "requests": 2,
+    "toolCalls": 1,
+    "rejectedProposals": 0,
+    "runtimeErrors": 0,
+    "estimatedModelCostUsd": 0.00197333,
+    "timeMs": 15932.827209
+  },
+  "reason": "The fixed control made no proposal and had no rejection or turn-limit error, so there was no repeated-rejection behavior for the treatment to improve."
+}

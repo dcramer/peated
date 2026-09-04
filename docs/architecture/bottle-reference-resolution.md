@@ -107,7 +107,7 @@ normalization output, and unresolved source text are not references.
 - A general expression reference points to the retained general Bottle for that
   expression; it does not point to BottleGroup or select a representative.
 - An ignored reference does not participate in exact matching.
-- Assignment provenance records whether the assertion came from canonical
+- The assignment source record says whether the assertion came from canonical
   creation, an accepted source, classifier review, or human review.
 
 Reference lookup and reference writes use the same identity-preserving key for a
@@ -192,7 +192,7 @@ Automation may create or assign only when:
 - duplicate Bottle and reference checks are safe;
 - required entities resolve or can be safely created;
 - observation-only detail remains outside canonical identity; and
-- the decision and evidence provenance are retained.
+- the decision and its evidence sources are retained.
 
 Conflicting identity, unsafe reference collisions, unresolved canonical fields, or
 an invalid Bottle leave the source unresolved or route it to review.
@@ -238,6 +238,8 @@ separate inventory, migration plan, and database verification.
 Deterministic coverage should prove:
 
 - exact accepted references resolve one Bottle;
+- the shared server classifier entry point returns that accepted Bottle without
+  a model call;
 - general references resolve the retained general Bottle without selecting a
   representative;
 - ignored and ambiguous references do not resolve;
@@ -256,5 +258,5 @@ Classifier and eval coverage should prove:
 - observation-only treatment of source-specific facts;
 - evidence-reviewed brand, distillery, and bottler relationships;
 - evidence-derived automation routing without numeric confidence; and
-- production-miss provenance using the real observed source and Peated DB
+- a production-miss source record using the real observed source and Peated DB
   outcome.

@@ -19,7 +19,10 @@ export function createSearchEntitiesTool(
     onResults,
   }: {
     searchEntities: (args: SearchEntitiesArgs) => Promise<EntitySearchResult[]>;
-    onResults?: (results: EntitySearchResult[]) => void;
+    onResults?: (
+      results: EntitySearchResult[],
+      args: SearchEntitiesArgs,
+    ) => void;
   } = {
     searchEntities: async () => [],
   },
@@ -39,7 +42,7 @@ export function createSearchEntitiesTool(
             results,
           });
 
-          onResults?.(parsedResults.results);
+          onResults?.(parsedResults.results, args);
           return parsedResults;
         },
       });

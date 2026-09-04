@@ -20,7 +20,7 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(resolveOpenAICompatibleConfig(env)).toMatchObject({
       apiKey: undefined,
       baseURL: "https://ai-gateway.vercel.sh/v1",
-      bottleClassifierModel: "openai/gpt-5.6-terra",
+      bottleClassifierModel: "openai/gpt-5.6-luna",
       embeddingModel: "openai/text-embedding-3-large",
       model: "openai/gpt-5.4",
     });
@@ -35,8 +35,8 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(config).toEqual({
       apiKey: "gateway-key",
       baseURL: "https://ai-gateway.vercel.sh/v1",
-      bottleClassifierModel: "openai/gpt-5.6-terra",
-      bottleClassifierReasoningEffort: "medium",
+      bottleClassifierModel: "openai/gpt-5.6-luna",
+      bottleClassifierReasoningEffort: "high",
       embeddingModel: "openai/text-embedding-3-large",
       evalModel: "openai/gpt-5.6-luna",
       evalReasoningEffort: "medium",
@@ -51,7 +51,7 @@ describe("resolveOpenAICompatibleConfig", () => {
         config.bottleClassifierModel,
         config.bottleClassifierReasoningEffort,
       ),
-    ).toEqual({ reasoning: { effort: "medium" } });
+    ).toEqual({ reasoning: { effort: "high" } });
     expect(
       getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
     ).toEqual({ reasoning: { effort: "medium" } });

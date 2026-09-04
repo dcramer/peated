@@ -118,8 +118,10 @@ function createTestClassifier({
   getBottleCandidateById,
   getBottleContext,
   runBottleClassifierAgent,
+  initialSearchEvidence,
   executeWebSearch,
   observeToolEvent,
+  observeReferenceAgentDecision,
   runPreparedBottleClassifierAgent,
 }: {
   client?: OpenAI;
@@ -143,8 +145,10 @@ function createTestClassifier({
   runBottleClassifierAgent?: (
     args: RunBottleClassifierAgentInput,
   ) => Promise<ReasoningResult>;
+  initialSearchEvidence?: CreateBottleClassifierOptions["initialSearchEvidence"];
   executeWebSearch?: CreateBottleClassifierOptions["executeWebSearch"];
   observeToolEvent?: CreateBottleClassifierOptions["observeToolEvent"];
+  observeReferenceAgentDecision?: CreateBottleClassifierOptions["observeReferenceAgentDecision"];
   runPreparedBottleClassifierAgent?: (
     preparedRun: PreparedBottleClassifierAgentRun,
   ) => Promise<BottleAgentRunResult>;
@@ -155,8 +159,10 @@ function createTestClassifier({
       model: "test-model",
       maxSearchQueries,
       firecrawlApiKey,
+      initialSearchEvidence,
       executeWebSearch,
       observeToolEvent,
+      observeReferenceAgentDecision,
       adapters: {
         searchBottles,
         searchEntities,
@@ -1315,7 +1321,7 @@ describe("createBottleClassifier", () => {
           kind: "brand",
           reference: null,
           score: 0.98,
-          source: ["entity_text"],
+          source: args.query === "Bothan" ? ["exact"] : ["entity_text"],
         },
       ],
     );
@@ -1375,6 +1381,7 @@ describe("createBottleClassifier", () => {
             retrievedFor: [
               {
                 query: "Bothan",
+                exact: true,
               },
             ],
           }),
@@ -1923,6 +1930,246 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
     if (result.status !== "classified") return;
     expect(result.decision.action).toBe("no_match");
+  });
+
+  test("reads the source page before a title-only deterministic creation", async () => {
+    const pageEvidence = createReliableSearchEvidence({
+      query: "Exact source page",
+      summary: "The exact Bottle is 12 years old and bottled at 46% ABV.",
+    });
+    const executeWebSearch = vi.fn(async () => pageEvidence);
+    const toolEvents: BottleClassifierToolEvent[] = [];
+    const runBottleClassifierAgent = vi.fn(
+      async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
+        expect(searchEvidence).toEqual([pageEvidence]);
+        expect(webSearchBudget?.tryConsumePageRead()).toBe(false);
+        return {
+          decision: noMatchAgentDecision(),
+          artifacts: {
+            extractedIdentity: null,
+            searchEvidence: searchEvidence ?? [],
+            candidates: [],
+            resolvedEntities: [],
+          },
+        };
+      },
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      firecrawlApiKey: "firecrawl-test-key",
+      runBottleClassifierAgent,
+      executeWebSearch,
+      observeToolEvent: (event) => toolEvents.push(event),
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "SMWS RW6.5 Appley ever after",
+        url: "https://smws.example/appley-ever-after",
+      },
+    });
+
+    expect(executeWebSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolName: "firecrawl_read_page",
+        args: expect.objectContaining({
+          url: "https://smws.example/appley-ever-after",
+        }),
+      }),
+    );
+    expect(
+      toolEvents.map(({ type, phase, name }) => ({ type, phase, name })),
+    ).toEqual([
+      {
+        type: "tool_call",
+        phase: "preparation",
+        name: "firecrawl_read_page",
+      },
+      {
+        type: "tool_result",
+        phase: "preparation",
+        name: "firecrawl_read_page",
+      },
+    ]);
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    expect(result.artifacts.searchEvidence).toEqual([pageEvidence]);
+  });
+
+  test("continues with a fresh page allowance when the preparation read fails", async () => {
+    const executeWebSearch = vi.fn(async () => {
+      throw new Error("temporary source-page failure");
+    });
+    const toolEvents: BottleClassifierToolEvent[] = [];
+    const runBottleClassifierAgent = vi.fn(
+      async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
+        expect(searchEvidence).toEqual([]);
+        expect(webSearchBudget?.tryConsumePageRead()).toBe(true);
+        return {
+          decision: noMatchAgentDecision(),
+          artifacts: {
+            extractedIdentity: null,
+            searchEvidence: [],
+            candidates: [],
+            resolvedEntities: [],
+          },
+        };
+      },
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      firecrawlApiKey: "firecrawl-test-key",
+      runBottleClassifierAgent,
+      executeWebSearch,
+      observeToolEvent: (event) => toolEvents.push(event),
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: {
+        name: "SMWS RW6.5 Appley ever after",
+        url: "https://smws.example/unavailable",
+      },
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    expect(result.status).toBe("classified");
+    expect(toolEvents).toHaveLength(2);
+    expect(toolEvents[1]).toMatchObject({
+      type: "tool_result",
+      phase: "preparation",
+      name: "firecrawl_read_page",
+      result: { error: "temporary source-page failure" },
+    });
+  });
+
+  test("does not read the page first for a deterministic creation with structured identity", async () => {
+    const executeWebSearch = vi.fn();
+    const runBottleClassifierAgent = vi.fn(
+      async ({ searchEvidence }): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
+        artifacts: {
+          extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+          searchEvidence: searchEvidence ?? [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      firecrawlApiKey: "firecrawl-test-key",
+      runBottleClassifierAgent,
+      executeWebSearch,
+    });
+
+    await classifier.classifyBottleReference({
+      reference: {
+        name: "SMWS RW6.5 Appley ever after",
+        url: "https://smws.example/appley-ever-after",
+      },
+      extractedIdentity: wildTurkeyRareBreedRyeIdentity,
+    });
+
+    expect(executeWebSearch).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({ searchEvidence: [] }),
+    );
+  });
+
+  test("preloads reviewed web evidence when the caller supplies it", async () => {
+    const reviewedEvidence = createReliableSearchEvidence({
+      query: "Reviewed exact Bottle evidence",
+      summary: "Reviewed producer evidence for the exact Bottle.",
+    });
+    const runBottleClassifierAgent = vi.fn(
+      async ({ searchEvidence }): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
+        artifacts: {
+          extractedIdentity: null,
+          searchEvidence: searchEvidence ?? [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: null,
+      initialSearchEvidence: [reviewedEvidence],
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Example Single Malt Whisky" },
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({ searchEvidence: [reviewedEvidence] }),
+    );
+    expect(result.artifacts.searchEvidence).toEqual([reviewedEvidence]);
+  });
+
+  test("observes the agent decision before Entity cleanup", async () => {
+    const rawDecision: BottleClassifierAgentDecisionInput = {
+      action: "create_bottle",
+      rationale: "Create the supported Bottle.",
+      candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: null,
+      proposedBottle: {
+        name: "Example",
+        series: null,
+        category: "single_malt",
+        edition: null,
+        statedAge: null,
+        caskStrength: null,
+        singleCask: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
+        abv: null,
+        vintageYear: null,
+        releaseYear: null,
+        brand: { id: 42, name: "Example alias" },
+        distillers: [],
+        bottler: null,
+      },
+    };
+    const observeReferenceAgentDecision = vi.fn();
+    const { classifier } = createTestClassifier({
+      observeReferenceAgentDecision,
+      runBottleClassifierAgent: async () => ({
+        decision: rawDecision,
+        artifacts: {
+          extractedIdentity: null,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [
+            {
+              entityId: 42,
+              name: "Example Distillery",
+              shortName: null,
+              kind: "distillery",
+              reference: null,
+              score: 1,
+              source: ["local_catalog"],
+            },
+          ],
+        },
+      }),
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Example" },
+      extractedIdentity: null,
+      initialCandidates: [],
+    });
+
+    expect(observeReferenceAgentDecision).toHaveBeenCalledWith(rawDecision);
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") return;
+    expect(result.decision.proposedBottle?.brand).toEqual({
+      id: null,
+      name: "Example alias",
+    });
   });
 
   test("does not investigate a sparse reference solely from maturation or outturn", async () => {

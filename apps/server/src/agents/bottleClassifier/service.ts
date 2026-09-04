@@ -30,6 +30,7 @@ import {
   getBottleClassifierImageInput,
   getEntityClassifierContext,
 } from "./contextAdapters";
+import { resolveExactReferenceBottleRun } from "./findExactReferenceBottleCandidate";
 
 const bottleClassifiers: Partial<
   Record<AIGatewayWorkload, ReturnType<typeof createBottleClassifier>>
@@ -139,6 +140,15 @@ async function runBottleReferenceForWorkload(
   );
 
   return await withReferenceConversation(conversationId, async () => {
+    const exactReferenceRun = await resolveExactReferenceBottleRun({
+      ...input,
+      reference,
+      conversationId,
+    });
+    if (exactReferenceRun) {
+      return exactReferenceRun;
+    }
+
     return await getBottleClassifier(workload).runBottleReference({
       ...input,
       reference,

@@ -1,0 +1,39 @@
+{
+  "experiment": "01-release-identity",
+  "status": "rejected",
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "change": "Replace compatibility step 4 with an explicit comparison of name traits, structured fields, and evidence that a trait identifies a marketed release.",
+  "hypothesis": "Fewer unsupported existing matches without losing correct matches, with acceptable time and token use.",
+  "attemptsPerCasePerVariant": 3,
+  "caseCount": 10,
+  "cases": [
+    "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+    "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+    "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+    "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+    "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+    "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+    "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+    "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+    "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+    "new bottles: release year in candidate name"
+  ],
+  "order": [
+    "control-1",
+    "treatment-1",
+    "treatment-2",
+    "control-2",
+    "control-3",
+    "treatment-3"
+  ],
+  "acceptance": {
+    "accuracy": "Fewer incorrect existing matches; higher action/ID correctness; no observed lost correct matches among the positive controls. Full-judge failures and safe abstentions remain visible.",
+    "costAndTime": "Report actual token estimate, cache use, uncached estimate, input/output/reasoning tokens, median and p95 duration. A small accuracy gain with a large increase is not an automatic win.",
+    "evidence": "Shared successful web recordings; novel requests are live and logged. Same fixtures and budgets; model responses are always fresh.",
+    "followup": "Only a promising focused result proceeds to a full-suite check. Record and revert a rejected prompt."
+  },
+  "decision": "Reverted. Lower cost and faster slow-end timing do not offset fewer correct decisions and more incorrect existing matches. No full-suite run warranted.",
+  "results": "./01-release-identity-results.json",
+  "report": "./01-release-identity.md"
+}

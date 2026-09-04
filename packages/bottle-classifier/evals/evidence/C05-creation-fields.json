@@ -1,0 +1,146 @@
+{
+  "name": "C05 creation-field evidence",
+  "reviewedAt": "2026-09-03",
+  "notes": "Reviewed source summaries from the fixture provenance and preserved label observations. The controlled comparison makes no live web request.",
+  "sources": [
+    "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+    "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+    "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+    "https://www.kentuckybourbonwhiskey.com/",
+    "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp"
+  ],
+  "cases": {
+    "store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Elijah Craig 18-Year-Old creation fields",
+            "summary": "Heaven Hill markets Elijah Craig 18-Year-Old as an ongoing 90-proof single-barrel bourbon. The source identifies an 18-year age and 45% ABV but no exact barrel number.",
+            "results": [
+              {
+                "title": "Elijah Craig 18-Year-Old Single Barrel",
+                "url": "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+                "domain": "heavenhilldistillery.com",
+                "description": "Producer evidence for age, strength, and the generic single-barrel product.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-creates-mars-komagatake-2022-edition": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Mars Komagatake 2022 Edition creation fields",
+            "summary": "Hombo identifies Single Malt Komagatake 2022 Edition as a 50% ABV annual release. Mars is the consumer brand, Komagatake is the stable expression, and Mars Shinshu is the historical name of the established Komagatake distillery.",
+            "results": [
+              {
+                "title": "MARS Single Malt Komagatake 2022 Edition",
+                "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+                "domain": "hombo.co.jp",
+                "description": "Producer evidence for expression, edition, release year, and strength.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-creates-willett-family-estate-barrel-4769": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Willett Family Estate barrel 4769 label fields",
+            "summary": "The preserved label identifies Willett Family Estate Bottled Single Barrel Bourbon, aged five years, hand bottled from barrel 4769 at 64.2% ABV. The barrel number distinguishes this exact-cask release.",
+            "results": [
+              {
+                "title": "Willett Family Estate barrel 4769 label",
+                "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg",
+                "domain": "raw.githubusercontent.com",
+                "description": "Preserved label evidence for the exact cask, age, and strength.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Midwinter Night's Dram Act 12 Scene 9 label fields",
+            "summary": "The preserved bottle label identifies High West A Midwinter Night's Dram Act 12 Scene 9 at 49.3% ABV. The local Act 12 candidate does not include the complete scene identity.",
+            "results": [
+              {
+                "title": "High West Act 12 Scene 9 label",
+                "url": "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp",
+                "domain": "api.peated.com",
+                "description": "Preserved source label for the complete edition and strength.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-creates-watchpost-whiskey": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Watchpost Whiskey creation fields",
+            "summary": "The official product identifies Watchpost Whiskey as an American blended whiskey at 42.5% ABV. Eight years describes one Westland component, not the complete blend, so the Bottle has no supported stated age.",
+            "results": [
+              {
+                "title": "Watchpost Whiskey",
+                "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+                "domain": "watchpostwhiskey.com",
+                "description": "Producer evidence for the Bottle name, category, strength, and component-age distinction.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-creates-complete-cadboll-estate-batch-2-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Source title for Cadboll Estate Batch 2",
+            "summary": "The source title identifies Glenmorangie The Cadboll Estate Batch 2 as a 15-year-old single malt. It does not supply an ABV or release year.",
+            "results": [
+              {
+                "title": "Glenmorangie The Cadboll Estate Batch 2 15-year-old",
+                "url": "https://shop.example/products/cadboll-estate-batch-2",
+                "domain": "shop.example",
+                "description": "Synthetic title evidence for the ordinary creation control.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    }
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "name": "C02 audit evidence-rule sources",
+  "reviewedAt": "2026-09-03",
+  "notes": "The summaries are reviewed paraphrases of the fixture evidence. The Harbor Ledger source is intentionally synthetic, matching its synthetic control fixture.",
+  "sources": [
+    "https://impexbev.com/single-cask-nation/",
+    "https://dramfool.com/previous-bottlings/93-octomore-jmsc",
+    "https://example.com/harbor-ledger/batch-24",
+    "https://example.com/north-pier/ember-7",
+    "https://example.com/north-pier/ember-7-label.webp"
+  ],
+  "cases": {
+    "audit-image-only-extraction-does-not-overwrite-populated-fields": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Single Cask Nation company evidence",
+            "summary": "Impex presents Single Cask Nation as an independent bottler. This company-level source does not establish a replacement or missing value for the audited Bottle.",
+            "results": [
+              {
+                "title": "Single Cask Nation",
+                "url": "https://impexbev.com/single-cask-nation/",
+                "domain": "impexbev.com",
+                "description": "Company-level evidence only; it supplies no exact Bottle field value.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/prices-wq9juag4geacz75tq1rbgy8o.webp",
+          "result": {
+            "brand": "Single Cask Nation",
+            "bottler": "Single Cask Nation",
+            "expression": "Mannochmore",
+            "distillery": ["Mannochmore"],
+            "category": "single_malt",
+            "stated_age": 17,
+            "abv": 53,
+            "release_year": 2024,
+            "vintage_year": 2007,
+            "cask_strength": true,
+            "single_cask": true,
+            "maturation": "Red Wine Barrique",
+            "cask_number": "7445",
+            "edition": "Red Wine Barrique - Cask 7445"
+          }
+        }
+      ]
+    },
+    "audit-production-dramfool-octomore-9.3-edition-wording": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Dramfool Octomore 9.3 evidence",
+            "summary": "Dramfool's exact product title and the stored structured observation identify the edition as 9.3, without the prose-only word Release.",
+            "results": [
+              {
+                "title": "Octomore 9.3 Jim McEwan Signature Collection",
+                "url": "https://dramfool.com/previous-bottlings/93-octomore-jmsc",
+                "domain": "dramfool.com",
+                "description": "Producer evidence for the exact edition wording.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/bottles-f59mvnjk2msw3hdstux4l0u9.webp",
+          "result": {
+            "brand": "Dramfool",
+            "bottler": "Dramfool",
+            "expression": "Octomore",
+            "series": "Jim McEwan Signature Collection",
+            "distillery": ["Bruichladdich"],
+            "category": "single_malt",
+            "stated_age": 11,
+            "abv": 63.3,
+            "release_year": 2024,
+            "vintage_year": 2012,
+            "cask_strength": true,
+            "single_cask": true,
+            "maturation": "1st fill Bourbon barrel",
+            "cask_number": "4355",
+            "edition": "9.3"
+          }
+        }
+      ]
+    },
+    "audit-same-release-evidence-corrects-exact-abv": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Synthetic Harbor Ledger Batch 24 control evidence",
+            "summary": "The synthetic Batch 24 factsheet and stored structured observation state 114.8 proof, or 57.4% ABV, for the same 2024 release.",
+            "results": [
+              {
+                "title": "Harbor Ledger Batch 24 factsheet",
+                "url": "https://example.com/harbor-ledger/batch-24",
+                "domain": "example.com",
+                "description": "Synthetic exact-release evidence matching the fixture observation.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "audit-single-label-and-producer-title-do-not-overwrite-edition": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Synthetic North Pier Ember 7 producer evidence",
+            "summary": "The fictional producer product title is North Pier Ember 7. It agrees with the single fictional label image on the bare edition 7, but supplies no structured Bottle observation.",
+            "results": [
+              {
+                "title": "North Pier Ember 7",
+                "url": "https://example.com/north-pier/ember-7",
+                "domain": "example.com",
+                "description": "Synthetic producer-title evidence for the isolated audit rule.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://example.com/north-pier/ember-7",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Synthetic North Pier Ember 7 producer page",
+            "summary": "The fictional producer page title is North Pier Ember 7. It contains no structured Bottle observation.",
+            "results": [
+              {
+                "title": "North Pier Ember 7",
+                "url": "https://example.com/north-pier/ember-7",
+                "domain": "example.com",
+                "description": "Synthetic producer-title evidence for the isolated audit rule.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": [
+        {
+          "url": "https://example.com/north-pier/ember-7-label.webp",
+          "result": {
+            "brand": "North Pier",
+            "expression": "Ember",
+            "distillery": ["Aster Glen Distillery"],
+            "category": "single_malt",
+            "abv": 46,
+            "release_year": 2025,
+            "cask_strength": false,
+            "single_cask": false,
+            "edition": "7"
+          }
+        }
+      ]
+    }
+  }
+}

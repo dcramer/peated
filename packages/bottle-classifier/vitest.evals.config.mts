@@ -56,6 +56,8 @@ export default defineConfig({
         "FIRECRAWL_API_KEY",
         "FIRECRAWL_API_URL",
         "BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES",
+        "BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE",
+        "BOTTLE_CLASSIFIER_EVAL_FIXTURE_IDS",
       ]),
       VITEST_EVALS_REPLAY_DIR:
         process.env.VITEST_EVALS_REPLAY_DIR ?? replayRoot,

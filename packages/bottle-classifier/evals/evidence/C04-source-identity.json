@@ -1,0 +1,124 @@
+{
+  "name": "C04 source-identity evidence",
+  "reviewedAt": "2026-09-03",
+  "notes": "Reviewed paraphrases of the producer and product evidence already recorded in each fixture's provenance.",
+  "sources": [
+    "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+    "https://www.3badge.com/wp-content/uploads/2017/04/3BBC_Mastersons-Barrel-Finish-Press-Release.pdf",
+    "https://highwest.com/pages/product-information",
+    "https://shop.example/products/penelope-batch-11",
+    "https://shop.example/products/cadboll-estate-batch-4"
+  ],
+  "cases": {
+    "store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Elijah Craig 18-Year-Old source identity",
+            "summary": "Heaven Hill markets Elijah Craig 18-Year-Old as an ongoing 90-proof single-barrel product. The source listing does not identify barrel 4040 or any other exact barrel number.",
+            "results": [
+              {
+                "title": "Elijah Craig 18-Year-Old Single Barrel",
+                "url": "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+                "domain": "heavenhilldistillery.com",
+                "description": "Producer evidence for the generic 18-year-old single-barrel product.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Masterson's French Oak Finish source identity",
+            "summary": "The producer announcement markets French Oak Finish as its own Masterson's 10-year-old rye expression. The source listing does not identify barrel F2-038 or another exact barrel code.",
+            "results": [
+              {
+                "title": "Masterson's Barrel-Finished Whiskies",
+                "url": "https://www.3badge.com/wp-content/uploads/2017/04/3BBC_Mastersons-Barrel-Finish-Press-Release.pdf",
+                "domain": "3badge.com",
+                "description": "Producer evidence that French Oak Finish is a marketed expression.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-matches-high-west-high-country-batch-23j12": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed High West High Country source identity",
+            "summary": "High West markets High Country as one ongoing 44% American single malt product and SKU. Batch No. 23J12 is visible lot information on the photographed label, not a separately marketed release.",
+            "results": [
+              {
+                "title": "High West Product Information",
+                "url": "https://highwest.com/pages/product-information",
+                "domain": "highwest.com",
+                "description": "Producer product information for the ongoing High Country product.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-matches-exact-penelope-batch-11-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Synthetic Penelope Batch 11 source identity",
+            "summary": "The synthetic retailer product title explicitly markets this Penelope Barrel Strength Bourbon as Batch 11.",
+            "results": [
+              {
+                "title": "Penelope Bourbon Barrel Strength Batch 11",
+                "url": "https://shop.example/products/penelope-batch-11",
+                "domain": "shop.example",
+                "description": "Synthetic exact-batch control evidence.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-matches-exact-cadboll-estate-batch-4-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Synthetic Cadboll Estate Batch 4 source identity",
+            "summary": "The synthetic retailer product title explicitly markets this 15-year-old Glenmorangie Cadboll Estate release as Batch 4.",
+            "results": [
+              {
+                "title": "Glenmorangie The Cadboll Estate 15-year-old Batch 4",
+                "url": "https://shop.example/products/cadboll-estate-batch-4",
+                "domain": "shop.example",
+                "description": "Synthetic exact-batch control evidence.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    }
+  }
+}

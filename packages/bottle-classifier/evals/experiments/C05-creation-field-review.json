@@ -1,0 +1,38 @@
+{
+  "item": "C05",
+  "decision": "stopped_without_treatment",
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "fixedEvidence": true,
+  "liveWebRequests": 0,
+  "controlGate": {
+    "passed": 4,
+    "cases": 6,
+    "fieldCompleteCreations": 5,
+    "incorrectExistingMatches": 0,
+    "inputTokens": 89477,
+    "outputTokens": 8072,
+    "totalTokens": 97549,
+    "cachedInputTokens": 77453,
+    "cacheWriteTokens": 11982,
+    "reasoningTokens": 5587,
+    "requests": 14,
+    "toolCalls": 8,
+    "estimatedModelCostUsd": 0.01423936,
+    "fullyUncachedModelCostUsd": 0.0275818,
+    "timeMs": 99395.852917,
+    "medianTimeMs": 13674.109292,
+    "p95TimeMs": 35639.098625,
+    "caseResults": {
+      "midwinterAct12Scene9": "pass",
+      "marsKomagatake2022": "wrong_distiller_entity_id",
+      "watchpost": "pass",
+      "willettBarrel4769": "pass",
+      "cadbollEstateBatch2": "pass",
+      "elijahCraig18YearOld": "name_omitted_age"
+    }
+  },
+  "treatmentImplemented": false,
+  "fullSuiteRun": false,
+  "reason": "Only Elijah Craig reproduced a creation-field omission. Mars carried every targeted scalar and failed on Entity reuse. The gate required at least two relevant failures before adding structured output to every answer."
+}

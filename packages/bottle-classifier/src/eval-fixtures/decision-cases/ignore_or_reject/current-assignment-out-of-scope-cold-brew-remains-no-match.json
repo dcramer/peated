@@ -1,6 +1,6 @@
 {
-  "id": "current-assignment-a-reaffirmed-bottle-match-uses-current-assignment-confidence-basis",
-  "name": "current assignment: a reaffirmed bottle match uses current-assignment confidence basis",
+  "id": "current-assignment-out-of-scope-cold-brew-remains-no-match",
+  "name": "current assignment: out-of-scope Jameson Cold Brew remains no match",
   "input": {
     "reference": {
       "name": "Jameson Cold Brew Irish Whiskey",
@@ -58,18 +58,18 @@
   "provenance": {
     "source": "curated_regression",
     "verifiedSourceUrls": [
-      "https://www.jamesonwhiskey.com/en/our-whiskey/jameson-cold-brew/",
+      "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+      "https://www.marketaccess.agriculture.gov.ie/media/marketaccess/content/Irish%20Whiskey%20Technical%20File.pdf",
+      "https://www.pernod-ricard.com/sites/default/files/inline-files/Pernod_Ricard_Norway_Produktkatalog_2.pdf",
       "https://api.peated.com/v1/bottles/13437"
     ],
-    "notes": "Jameson markets the product as Jameson Cold Brew. The reference's trailing Irish Whiskey wording describes its category rather than a reusable marketed alias, while Peated Bottle 13437 is the correct existing product assignment."
+    "notes": "Jameson says Cold Brew combines Jameson Irish Whiskey with Arabica coffee, and Pernod Ricard lists it at 30% ABV. The Irish Whiskey technical file requires at least 40% ABV. It is therefore an additive-flavor spirit outside the classifier's whisky scope. An existing Peated Bottle or current assignment does not override that scope."
   },
   "expected": {
     "status": "classified",
-    "action": "match",
+    "action": "no_match",
     "identityScope": "product",
     "referenceScope": "none",
-    "matchedBottleId": 13437,
-    "expectedTier": "auto",
-    "summary": "When the classifier reaffirms the already assigned bottle cleanly, mark confidence as current-assignment evidence instead of treating it like a new unmatched assignment."
+    "summary": "Return no_match for an additive-flavor spirit even when the reference is currently assigned to an existing Peated Bottle."
   }
 }

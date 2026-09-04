@@ -144,6 +144,34 @@
     ],
     "notes": "Observed August 3, 2026 from Audit #29 and operation #26 for production Bottle 25608. The audit correctly identified SMWS 10.258 Quo vadis? and proposed ABV 58.1%, singleCask true, and vintageYear 2013, but it also proposed edition 10.258. Because the stored shared name already begins with 10.258, applying that patch would render the code twice. The failed operation cited the older Whisky Goodness URL https://www.whiskygoodness.com/smws/10/10.258; that content now resolves under the verified canonical URL recorded above."
   },
+  "acceptedProposedOperationSets": [
+    [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 25608,
+          "patch": {
+            "abv": 58.1,
+            "singleCask": true,
+            "vintageYear": 2013,
+            "maturation": "Ex-Bourbon Hogshead, 1st Fill Ex-Px Hogshead",
+            "caskNumber": "10.258"
+          }
+        },
+        "rationale": "Exact-product evidence supports the required fields, cask 10.258, and its two-stage hogshead maturation.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 25608
+          },
+          {
+            "kind": "web_result",
+            "url": "https://smwsa.com/products/cask-no-10-258"
+          }
+        ]
+      }
+    ]
+  ],
   "expected": {
     "summary": "Bottle 25608 is SMWS 10.258 Quo vadis?; its code is already canonical in the Bottle name, while its supported ABV, single-cask flag, and 2013 vintage are missing.",
     "proposedOperations": [

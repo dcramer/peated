@@ -1,0 +1,35 @@
+{
+  "item": "C13",
+  "decision": "rejected_and_narrowed",
+  "classifierChanged": false,
+  "layer": "classifier_source_page_read",
+  "model": "gpt-5.6-luna",
+  "reasoningEffort": "high",
+  "focused": {
+    "controlCorrectAttempts": 8,
+    "treatmentCorrectAttemptsAfterM08": 11,
+    "attemptsPerVariant": 12,
+    "controlFirecrawlRequests": 8,
+    "treatmentFirecrawlRequests": 8,
+    "controlTotalTokens": 150622,
+    "treatmentTotalTokens": 120087,
+    "controlEstimatedModelCostUsd": 0.02527768,
+    "treatmentEstimatedModelCostUsd": 0.02211615,
+    "controlMedianCaseTimeMs": 14473.00175,
+    "treatmentMedianCaseTimeMs": 13548.96973
+  },
+  "fullCheckpoint": {
+    "checks": 105,
+    "rawPassed": 64,
+    "rawFailed": 41,
+    "fetchErrorFailures": 9,
+    "fetchErrorFallbackRerunPassed": 9,
+    "correctedPassed": 73,
+    "correctedFailed": 32,
+    "preparationReadAttempts": 14,
+    "usablePreparationReads": 5,
+    "failedPreparationReads": 9,
+    "savedFailuresImproved": 1,
+    "newFailuresAmongUsableReads": 0
+  }
+}

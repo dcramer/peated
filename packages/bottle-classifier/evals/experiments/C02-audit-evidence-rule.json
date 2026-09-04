@@ -1,0 +1,141 @@
+{
+  "item": "C02",
+  "decision": "rejected",
+  "classifierTreatmentReverted": true,
+  "invalidSetup": {
+    "reason": "The same audit image produced materially different extracted fields between variants, and the first fixed web source introduced a missing-field update outside the treatment question.",
+    "attempts": [
+      {
+        "name": "control_exact_product_web_evidence",
+        "inputTokens": 110238,
+        "outputTokens": 14635,
+        "reasoningTokens": 12511,
+        "estimatedModelCostUsd": 0.0242331,
+        "timeMs": 188918.957666,
+        "valid": false
+      },
+      {
+        "name": "treatment_exact_product_web_evidence",
+        "inputTokens": 82980,
+        "outputTokens": 11147,
+        "reasoningTokens": 9483,
+        "estimatedModelCostUsd": 0.01936962,
+        "timeMs": 153161.351207,
+        "valid": false
+      },
+      {
+        "name": "control_neutral_web_evidence",
+        "inputTokens": 92421,
+        "outputTokens": 17104,
+        "reasoningTokens": 15254,
+        "estimatedModelCostUsd": 0.0233733,
+        "timeMs": 206837.127958,
+        "valid": false
+      },
+      {
+        "name": "treatment_neutral_web_evidence",
+        "reportedCases": 2,
+        "erroredCasesWithMissingUsage": 1,
+        "inputTokens": 62912,
+        "outputTokens": 5172,
+        "reasoningTokens": 4041,
+        "estimatedModelCostUsd": 0.00804948,
+        "reportedCaseTimeMs": 72926.552875,
+        "erroredCaseTimeMs": 167796,
+        "valid": false
+      }
+    ],
+    "reportedUsageTotals": {
+      "inputTokens": 348551,
+      "outputTokens": 48058,
+      "reasoningTokens": 41289,
+      "estimatedModelCostUsd": 0.0750255
+    },
+    "totalReportWallTimeSeconds": 789.8
+  },
+  "controlledRetry": {
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high",
+    "repeatsPerVariant": 3,
+    "casesPerRepeat": 3,
+    "control": {
+      "passed": 6,
+      "cases": 9,
+      "inputTokens": 206650,
+      "outputTokens": 7586,
+      "totalTokens": 214236,
+      "cachedInputTokens": 200640,
+      "cacheWriteTokens": 5929,
+      "reasoningTokens": 4305,
+      "requests": 27,
+      "toolCalls": 18,
+      "rejectedProposals": 5,
+      "estimatedModelCostUsd": 0.01461445,
+      "fullyUncachedModelCostUsd": 0.0504332,
+      "timeMs": 117575.935751,
+      "medianTimeMs": 11385.086916
+    },
+    "treatment": {
+      "passed": 7,
+      "cases": 9,
+      "inputTokens": 206829,
+      "outputTokens": 7743,
+      "totalTokens": 214572,
+      "cachedInputTokens": 194549,
+      "cacheWriteTokens": 12199,
+      "reasoningTokens": 4515,
+      "requests": 27,
+      "toolCalls": 18,
+      "rejectedProposals": 4,
+      "estimatedModelCostUsd": 0.01624853,
+      "fullyUncachedModelCostUsd": 0.0506574,
+      "timeMs": 336225.115875,
+      "medianTimeMs": 13720.42775
+    },
+    "target": {
+      "control": {
+        "passed": 0,
+        "cases": 3,
+        "totalTokens": 79212,
+        "requests": 10,
+        "toolCalls": 7,
+        "rejectedProposals": 3,
+        "findings": 3,
+        "estimatedModelCostUsd": 0.00646402,
+        "timeMs": 53396.058875
+      },
+      "treatment": {
+        "passed": 1,
+        "cases": 3,
+        "totalTokens": 39530,
+        "requests": 5,
+        "toolCalls": 2,
+        "rejectedProposals": 0,
+        "findings": 2,
+        "estimatedModelCostUsd": 0.00433978,
+        "timeMs": 35900.979083
+      }
+    },
+    "supportedControls": {
+      "control": {
+        "passed": 6,
+        "cases": 6,
+        "totalTokens": 135024,
+        "rejectedProposals": 2,
+        "estimatedModelCostUsd": 0.00815043
+      },
+      "treatment": {
+        "passed": 6,
+        "cases": 6,
+        "totalTokens": 175042,
+        "rejectedProposals": 4,
+        "estimatedModelCostUsd": 0.01190875
+      }
+    },
+    "estimatedModelCostUsd": 0.03086298,
+    "timeMs": 453801.051626
+  },
+  "totalReportedModelCostUsd": 0.10588848,
+  "fullSuiteRun": false,
+  "reason": "The target stopped making rejected proposals, but supported controls did more rejected work and overall cost and median time increased without a material total-token reduction."
+}

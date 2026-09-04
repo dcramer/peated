@@ -1,0 +1,146 @@
+{
+  "name": "C06 candidate-relationship evidence",
+  "reviewedAt": "2026-09-03",
+  "notes": "Reviewed source summaries from fixture provenance. The controlled comparison makes no live web request.",
+  "sources": [
+    "https://www.3badge.com/wp-content/uploads/2017/04/3BBC_Mastersons-Barrel-Finish-Press-Release.pdf",
+    "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+    "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp",
+    "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+    "https://www.compassboxwhisky.com/products/spice-tree-extraveganza"
+  ],
+  "cases": {
+    "store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Masterson's French Oak Finish candidate relationship",
+            "summary": "The producer markets French Oak Finish as a distinct Masterson's 10-year-old rye expression. The source does not identify barrel F2-038, so the barrel-specific local row is a more specific Bottle and the plain rye row is broader.",
+            "results": [
+              {
+                "title": "Masterson's Barrel-Finished Whiskies",
+                "url": "https://www.3badge.com/wp-content/uploads/2017/04/3BBC_Mastersons-Barrel-Finish-Press-Release.pdf",
+                "domain": "3badge.com",
+                "description": "Producer evidence for the distinct French Oak Finish expression.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Elijah Craig 18-Year-Old candidate relationship",
+            "summary": "Heaven Hill markets Elijah Craig 18-Year-Old as an ongoing 90-proof single-barrel product. The source does not identify barrel 4040, so the barrel-specific row does not cover the uncoded source product.",
+            "results": [
+              {
+                "title": "Elijah Craig 18-Year-Old Single Barrel",
+                "url": "https://heavenhilldistillery.com/elijah-craig-single-barrel18.php",
+                "domain": "heavenhilldistillery.com",
+                "description": "Producer evidence for the uncoded marketed product.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Midwinter Act 12 Scene 9 candidate relationship",
+            "summary": "The preserved label identifies High West A Midwinter Night's Dram Act 12 Scene 9 at 49.3% ABV. The local Act 12 row is broader because it omits the complete scene identity.",
+            "results": [
+              {
+                "title": "High West Act 12 Scene 9 label",
+                "url": "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp",
+                "domain": "api.peated.com",
+                "description": "Preserved source label for the complete scene identity.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-requires-review-for-canadian-club-reserve-9-year-old": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Canadian Club Reserve 9 Year Old candidate relationship",
+            "summary": "Bottle 16913 is the same Canadian Club Reserve 9 Year Old product. Triple Aged is wording for that product, but the row's populated Brand is wrong and needs Bottle Review before assignment. The older Reserve row does not establish this nine-year product.",
+            "results": [
+              {
+                "title": "Canadian Club Reserve 9 Year Old",
+                "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+                "domain": "canadianclub.com",
+                "description": "Producer evidence for the same marketed nine-year product.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "image-backed-photo-requires-spice-tree-extravaganza-catalog-review": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Spice Tree Extravaganza candidate relationship",
+            "summary": "Bottle 9900 represents the same Compass Box Spice Tree Extravaganza marketed product, but its populated Brand, name, category, and age are malformed. Correct that row through Bottle Review; do not match it or create a duplicate.",
+            "results": [
+              {
+                "title": "Compass Box Spice Tree Extravaganza",
+                "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+                "domain": "compassboxwhisky.com",
+                "description": "Producer evidence for the existing row's underlying marketed product.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    },
+    "store-listing-matches-exact-penelope-batch-11-bottle": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Synthetic Penelope Batch 11 exact-match control",
+            "summary": "The synthetic retailer title explicitly identifies Penelope Barrel Strength Bourbon Batch 11, exactly matching the complete local Batch 11 Bottle.",
+            "results": [
+              {
+                "title": "Penelope Bourbon Barrel Strength Batch 11",
+                "url": "https://shop.example/products/penelope-batch-11",
+                "domain": "shop.example",
+                "description": "Synthetic exact-batch control evidence.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": []
+    }
+  }
+}

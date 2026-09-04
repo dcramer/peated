@@ -1,0 +1,1982 @@
+{
+  "date": "2026-09-03",
+  "sourceCommit": "a7f156beca2a1d0dabdd2af9c8566a39fa566664",
+  "suite": "src/classifier.eval.test.ts",
+  "casesPerRun": 102,
+  "attemptsPerCasePerRun": 1,
+  "imageExtraction": {
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high"
+  },
+  "provider": "Vercel AI Gateway",
+  "maxSearchQueries": 2,
+  "maxAgentTurns": 8,
+  "configuredTimeoutMs": 300000,
+  "outcomeLegend": {
+    "pass": "All judges passed",
+    "fail": "At least one judge failed",
+    "error": "Runtime or validation error before a scored result",
+    "timeout": "Configured test timeout; elapsed time may exceed the deadline"
+  },
+  "costBasis": "Per-call model-token estimates including reported cache usage. Same cases within each web/no-web comparison; excludes missing usage, no-model cases, Firecrawl fees, and provider adjustments. Web and no-web cost subsets differ.",
+  "evidenceSetup": "Public fixture catalog adapters. Web runs started with separate empty auto-replay directories per setting; new tool requests were live and identical requests could replay. No production catalog writes.",
+  "limitations": [
+    "One full-suite attempt per setting is not a reliable production accuracy estimate.",
+    "Model, retrieval, cache, and timing variability were uncontrolled; suites ran concurrently.",
+    "Some fixtures conflict with current policy or use strict field snapshots; preserve these measured outcomes when reviewing the rubric.",
+    "Targeted repeats were selected after inspecting failures and cannot estimate overall accuracy."
+  ],
+  "runs": {
+    "no-web/terra-medium": {
+      "model": "gpt-5.6-terra",
+      "reasoningEffort": "medium",
+      "webEnabled": false,
+      "rawReportSha256": "732b8a8a344d8e2231fb5bae26a3a7409b987193e12380ba1f275bd851c6ae28",
+      "passed": 74,
+      "failed": 28,
+      "timeouts": 0,
+      "runtimeFailures": 0,
+      "incorrectExistingMatches": 1,
+      "medianSeconds": 10.04352087,
+      "p95Seconds": 41.87651921,
+      "commonCaseTokenCostUsd": 1.25315977,
+      "commonCostCases": 99,
+      "groups": {
+        "new bottles": {
+          "passed": 23,
+          "total": 41
+        },
+        "match existing": {
+          "passed": 35,
+          "total": 39
+        },
+        "corrections": {
+          "passed": 1,
+          "total": 1
+        },
+        "ignored / no match": {
+          "passed": 9,
+          "total": 10
+        },
+        "bottle audits": {
+          "passed": 6,
+          "total": 11
+        }
+      }
+    },
+    "no-web/luna-high": {
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "webEnabled": false,
+      "rawReportSha256": "52b3f4ae7e75bfa229ec730698cae8faa37e98abf2e620fdd9c227d4082f8341",
+      "passed": 75,
+      "failed": 27,
+      "timeouts": 0,
+      "runtimeFailures": 0,
+      "incorrectExistingMatches": 1,
+      "medianSeconds": 10.94332117,
+      "p95Seconds": 26.56366338,
+      "commonCaseTokenCostUsd": 0.20338181,
+      "commonCostCases": 99,
+      "groups": {
+        "new bottles": {
+          "passed": 22,
+          "total": 41
+        },
+        "match existing": {
+          "passed": 37,
+          "total": 39
+        },
+        "corrections": {
+          "passed": 1,
+          "total": 1
+        },
+        "ignored / no match": {
+          "passed": 9,
+          "total": 10
+        },
+        "bottle audits": {
+          "passed": 6,
+          "total": 11
+        }
+      }
+    },
+    "no-web/luna-xhigh": {
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "xhigh",
+      "webEnabled": false,
+      "rawReportSha256": "46939334347d563bc9fae198421b95860950c53f66bf6c7f9e9790c7f21978b5",
+      "passed": 73,
+      "failed": 29,
+      "timeouts": 1,
+      "runtimeFailures": 1,
+      "incorrectExistingMatches": 3,
+      "medianSeconds": 14.32536242,
+      "p95Seconds": 56.51517592,
+      "commonCaseTokenCostUsd": 0.2892064,
+      "commonCostCases": 99,
+      "groups": {
+        "new bottles": {
+          "passed": 22,
+          "total": 41
+        },
+        "match existing": {
+          "passed": 35,
+          "total": 39
+        },
+        "corrections": {
+          "passed": 1,
+          "total": 1
+        },
+        "ignored / no match": {
+          "passed": 10,
+          "total": 10
+        },
+        "bottle audits": {
+          "passed": 5,
+          "total": 11
+        }
+      }
+    },
+    "web/terra-medium": {
+      "model": "gpt-5.6-terra",
+      "reasoningEffort": "medium",
+      "webEnabled": true,
+      "rawReportSha256": "64e32e790104e141b275c2fbab0415c14e78333df541fcbf63fc351f5cd02baa",
+      "passed": 76,
+      "failed": 26,
+      "timeouts": 0,
+      "runtimeFailures": 3,
+      "incorrectExistingMatches": 2,
+      "medianSeconds": 13.77058367,
+      "p95Seconds": 50.67661667,
+      "commonCaseTokenCostUsd": 1.62351985,
+      "commonCostCases": 93,
+      "groups": {
+        "new bottles": {
+          "passed": 27,
+          "total": 41
+        },
+        "match existing": {
+          "passed": 34,
+          "total": 39
+        },
+        "corrections": {
+          "passed": 1,
+          "total": 1
+        },
+        "ignored / no match": {
+          "passed": 10,
+          "total": 10
+        },
+        "bottle audits": {
+          "passed": 4,
+          "total": 11
+        }
+      },
+      "capturedSearchQueries": 75,
+      "capturedPageReads": 36
+    },
+    "web/luna-high": {
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "webEnabled": true,
+      "rawReportSha256": "932bfadb31c3d14bd1aa95bc2e465129fa19498fec98cf00dba2606c9835dffd",
+      "passed": 73,
+      "failed": 29,
+      "timeouts": 0,
+      "runtimeFailures": 1,
+      "incorrectExistingMatches": 3,
+      "medianSeconds": 19.36180496,
+      "p95Seconds": 61.00041925,
+      "commonCaseTokenCostUsd": 0.27569783,
+      "commonCostCases": 93,
+      "groups": {
+        "new bottles": {
+          "passed": 23,
+          "total": 41
+        },
+        "match existing": {
+          "passed": 34,
+          "total": 39
+        },
+        "corrections": {
+          "passed": 1,
+          "total": 1
+        },
+        "ignored / no match": {
+          "passed": 10,
+          "total": 10
+        },
+        "bottle audits": {
+          "passed": 5,
+          "total": 11
+        }
+      },
+      "capturedSearchQueries": 121,
+      "capturedPageReads": 55
+    },
+    "web/luna-xhigh": {
+      "model": "gpt-5.6-luna",
+      "reasoningEffort": "xhigh",
+      "webEnabled": true,
+      "rawReportSha256": "367bb99d4a94a7fbd8e1b96c705d56f3c7c1ca6b4b987d90e7f2132aa210da7e",
+      "passed": 73,
+      "failed": 29,
+      "timeouts": 3,
+      "runtimeFailures": 6,
+      "incorrectExistingMatches": 2,
+      "medianSeconds": 27.97222371,
+      "p95Seconds": 119.28670483,
+      "commonCaseTokenCostUsd": 0.43691262,
+      "commonCostCases": 93,
+      "groups": {
+        "new bottles": {
+          "passed": 25,
+          "total": 41
+        },
+        "match existing": {
+          "passed": 34,
+          "total": 39
+        },
+        "corrections": {
+          "passed": 1,
+          "total": 1
+        },
+        "ignored / no match": {
+          "passed": 7,
+          "total": 10
+        },
+        "bottle audits": {
+          "passed": 6,
+          "total": 11
+        }
+      },
+      "capturedSearchQueries": 105,
+      "capturedPageReads": 50
+    }
+  },
+  "cases": [
+    {
+      "fixture": "src/eval-fixtures/new-bottles/1792-single-barrel.json",
+      "fixtureSha256": "bc6bdc07c9a266635561786178a7096b0493bac0e1b48af70e65fb69d3c27380",
+      "name": "new bottles: 1792 Single Barrel",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/ardbeg-traigh-bhan-19-year-old.json",
+      "fixtureSha256": "486a477942bcedaa2d9368fce0a87a88ca7dbdb11a5f4153e00d6d87f7a461c9",
+      "name": "new bottles: Ardbeg Traigh Bhan 19-year-old",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/elijah-craig-cask-strength.json",
+      "fixtureSha256": "29ba3fb4dd76f2772dc76174f97b3725168cb4d4bb9a2713126ef79ddfbb948a",
+      "name": "new bottles: Elijah Craig Cask Strength",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "fail"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/four-roses-limited-edition-small-batch-2017.json",
+      "fixtureSha256": "c47f16a424283a61968dc9b132826bf461b944f291ce6a0bfbaab64b574aa6fd",
+      "name": "new bottles: Four Roses Limited Edition Small Batch 2017",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/four-roses-single-barrel-barrel-strength.json",
+      "fixtureSha256": "7a4a0691c5254e2cca1910cf0256eb3047292b53c404a9cab350243988366a3d",
+      "name": "new bottles: Four Roses Single Barrel Barrel Strength",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/heavens-door-bootleg-vol-3.json",
+      "fixtureSha256": "b708378036c81f46b8f1e5459993d3154dadfc297c6f78168702d456132a0e33",
+      "name": "new bottles: Heaven's Door Bootleg Vol 3 Whiskey",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/highland-park-cask-strength-no-5.json",
+      "fixtureSha256": "ccbdf8efc820e58e0974f940ace4caeedf4132a24808f059b3c1ec31d43aa5ae",
+      "name": "new bottles: Highland Park Cask Strength No. 5",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "exact Bottle identity expected one of [{\"edition\":\"No. 5\",\"releaseYear\":2024}]"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/jura-12-brand-distillery.json",
+      "fixtureSha256": "2d5a1a92b1d672e6ee0bbeb7e05075173fd036b88c92e125793a0dc820961a88",
+      "name": "new bottles: Jura 12-year-old Scotch Whisky",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/lagavulin-distillers-edition-2023.json",
+      "fixtureSha256": "a7231e88a501e4b1c058e829865b323b2acc610be793e27f518e40e609017a8b",
+      "name": "new bottles: Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/lagavulin-distillers-edition.json",
+      "fixtureSha256": "b526a0201f7bea7515aa8cbb1cfa48b390b883b49ab083b0ebe8f2dc1a483245",
+      "name": "new bottles: Lagavulin Distillers Edition",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["bottle identity expected Lagavulin Distillers Edition"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/macallan-classic-cut-2021-edition.json",
+      "fixtureSha256": "f29aecd9a4bb1a6670086576823fa63eba8decc0bad4080ecca6bcc97fba894e",
+      "name": "new bottles: The Macallan Classic Cut 2021 Edition",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/makers-mark-bourbon-brand-only.json",
+      "fixtureSha256": "92bda5eac236865c2e4c3143403f0c4ee65b680c32773feaca94ca479813c7d3",
+      "name": "new bottles: Maker's Mark Kentucky Straight Bourbon Whisky",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "bottle identity expected Maker's Mark Kentucky Straight Bourbon Whisky"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/octomore-13.1.json",
+      "fixtureSha256": "6b71357b562dfd074c83189ab0b8fd3babfc4d1f140e02df4d03c7f26a5c2b52",
+      "name": "new bottles: Octomore 13.1",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "bottle identity expected Octomore 13.1 5-year-old or Octomore 13.1"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/smws-72.123-big-moves-and-subtle-details.json",
+      "fixtureSha256": "d04dc45335d26fa95615400fba90538551000eb02b88c37c934b406cc43c132a",
+      "name": "new bottles: SMWS 72.123 Big moves and subtle details",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/talisker-2001-the-distillers-edition.json",
+      "fixtureSha256": "fee75c20b78e34f9f0068e7857257ddc6d2a8d8cc48471b40bf12d6ae40b81cd",
+      "name": "new bottles: Talisker 2001 The Distillers Edition",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "fail"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/the-whistler-bodega-cask-single-malt-irish-whiskey.json",
+      "fixtureSha256": "784573db328225952839eb7a0af54f2fa8e26942d0f502b9dd2ebd2e71c64e55",
+      "name": "new bottles: The Whistler Bodega Cask Single Malt Irish Whiskey",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "bottle identity expected The Whistler Bodega Cask or The Whistler Bodega Cask 5-year-old"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/watchpost-whiskey.json",
+      "fixtureSha256": "8f6be249adf78f3385bffe63b5589a5ad3ac4aebc6153882328047db9a0f138c",
+      "name": "new bottles: Watchpost",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["bottle identity expected Watchpost Whiskey"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/woodford-reserve-double-double-oaked.json",
+      "fixtureSha256": "b68f2724ecc54b540f40ad1724b6a3336204ee38a9615d6535ef7baf15f28dbd",
+      "name": "new bottles: Woodford Reserve Double Double Oaked",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "fail"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/new-bottles/woodford-reserve-double-oaked.json",
+      "fixtureSha256": "44668c47e073c95d7d8fce5f2b7d9870d0130d808b3ade7c970e6054978d9c04",
+      "name": "new bottles: Woodford Reserve Double Oaked",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-compass-box-hedonism-squared.json",
+      "fixtureSha256": "dea620a3f5b451ea1d986b3a16b1490b6e5dcac6514a22cd3246039e6e195f59",
+      "name": "new bottles: Compass Box Hedonism²: image-backed photo creates complete bottle",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "error"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "proposedBottle missing expected fields",
+          "proposedBottle.distillers expected ids 944, 1204, 1270 but got "
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+      "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+      "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+      "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+      "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected create_bottle but got no_match",
+          "suggestedNextStep expected confirm_create but got manual_search",
+          "proposedBottle missing expected fields"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-exclusive-malts-islay-single-cask-as-bottle.json",
+      "fixtureSha256": "8b421e9a3b27952ad0d444b74400d4b3e70177dae6f51f6d90493e0ce2cafc85",
+      "name": "new bottles: image-backed photo: creates The Exclusive Malts Islay single-cask details as a bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "error",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-mars-komagatake-2022-edition.json",
+      "fixtureSha256": "b188d8d841600504e76762f284485602cd92a0f59c3edc7eb1b237035c6565c8",
+      "name": "new bottles: Mars Komagatake: image-backed photo creates complete 2022 Edition Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle.distillers expected an id in 1953"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-watchpost-whiskey.json",
+      "fixtureSha256": "eb23f9d9c5fe41d61b6eb461b4f6ac11d260a0b5527fb1ae4d19d344a12ee0f1",
+      "name": "new bottles: Watchpost Whiskey: image-backed photo creates with existing Westland distiller",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-willett-family-estate-barrel-4769.json",
+      "fixtureSha256": "62cc874e5098845c39508de45cfcce56e38c52f1efaa1ef99ec1026a66c7ffc0",
+      "name": "new bottles: image-backed photo: creates Willett Family Estate barrel 4769 as an exact-cask bottle",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally.json",
+      "fixtureSha256": "f4c3bca20e27538734e76e48a4ed0e67bf0a3fbde5d81283eacc289cfdde8956",
+      "name": "new bottles: SMWS listing: creates an exact-cask bottle when the code is missing locally",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-complete-cadboll-estate-batch-2-bottle.json",
+      "fixtureSha256": "40e65dabaa170f615fc9e5aa2188cf5823ac916556367e5c9f7da5daa9bbd4f8",
+      "name": "new bottles: store listing: creates complete Cadboll Estate Batch 2 Bottle without parent repair",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-complete-macallan-1994-vintage-bottle.json",
+      "fixtureSha256": "8a2cae786d775a24808a5dd199231cd0b2f0dfbaf90c149d02dfd67fdd15c685",
+      "name": "new bottles: store listing: creates complete Macallan 1994 Vintage Bottle when a sibling vintage exists",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-creag-isle-12-year-old-island-single-malt.json",
+      "fixtureSha256": "8bc619dad3f75be5316637e9595fb3ef55912f6107c7260519909792ff605746",
+      "name": "new bottles: store listing: creates Creag Isle 12-year-old Island Single Malt",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+      "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+      "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "incorrectMatchBottleIds": {
+        "no-web/luna-xhigh": 16142,
+        "web/terra-medium": 16142,
+        "web/luna-high": 16142
+      },
+      "webLunaHighFailure": {
+        "action": "match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected create_bottle but got match",
+          "verifyEligible expected false",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-glendalough-double-barrel-instead-of-matching-forty-creek.json",
+      "fixtureSha256": "a214ad3500a1a2826f72eef817c98532f6f305b28293327aba9dece01ec5c63f",
+      "name": "new bottles: store listing: creates Glendalough Double Barrel instead of matching Forty Creek",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+      "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+      "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "incorrectMatchBottleIds": {
+        "no-web/luna-xhigh": 16442,
+        "web/luna-high": 16442
+      },
+      "webLunaHighFailure": {
+        "action": "match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected create_bottle but got match",
+          "matchedBottleId expected null but got 16442",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-russells-reserve-single-barrel-rye-instead-of-matching-bourbon.json",
+      "fixtureSha256": "33b9f8eed0b5793ef68e149097daa557bf179b270610a0046e9fa8b329b3cd39",
+      "name": "new bottles: store listing: creates Russell's Reserve Single Barrel Rye instead of matching bourbon",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-shieldaig-speyside-21-year-old-with-structured-age.json",
+      "fixtureSha256": "e8854c49e0abcdc3ddabdc5956021163e6a559a21c3848708877a86cd3a19eab",
+      "name": "new bottles: store listing: creates Shieldaig Speyside 21-year-old with structured age",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-shieldaig-speyside-30-year-old-with-structured-age.json",
+      "fixtureSha256": "1070f65d4f72eec88107349efec718616296eb4a04278b28cab53e537fef59d6",
+      "name": "new bottles: store listing: creates Shieldaig Speyside 30-year-old with structured age",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-whiskyland-under-its-consumer-brand.json",
+      "fixtureSha256": "b9105c7a9ac9cc847816ac6931a19aec094dde8500c7f71002cc9303e49a3c11",
+      "name": "new bottles: store listing: creates Whiskyland under its consumer Brand instead of the independent bottler",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-woodford-reserve-straight-malt-with-null-category.json",
+      "fixtureSha256": "bb686a870707cae7ec4947199bd5ceadba79925aac6bff3ad573b2b80f2dc9c4",
+      "name": "new bottles: store listing: creates Woodford Reserve Kentucky Straight Malt without forcing category",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-resolves-black-label-family-under-johnnie-walker.json",
+      "fixtureSha256": "bf870365fc4ff679a2acf55c0d0408637273c3cb97790c23cdcb74babde25796",
+      "name": "new bottles: store listing: resolves Black Label family under Johnnie Walker",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "timeout"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/text-only-listing-creates-complete-elijah-craig-batch-c923-bottle.json",
+      "fixtureSha256": "f14583c03184fe98265cf627616a2d1c59399755cc4c5183b1a6742f20518d03",
+      "name": "new bottles: text-only listing: creates complete Elijah Craig Barrel Proof Batch C923 Bottle from raw title text",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/text-only-smws-listing-creates-an-exact-cask-bottle-when-the-code-is-missing-locally.json",
+      "fixtureSha256": "b17cb46c4910f1c16c0abb93d78c92b282a69cce17f48e790f4d04f7ef4c8483",
+      "name": "new bottles: text-only SMWS listing: creates an exact-cask bottle when the code is missing locally",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["proposedBottle missing expected fields"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/current-assignment-a-reaffirmed-bottle-match-uses-current-assignment-confidence-basis.json",
+      "fixtureSha256": "4f78adc89e63cca1e565190baba44963338669231c7aac382d0720961c428ea4",
+      "name": "match existing: current assignment: a reaffirmed bottle match uses current-assignment confidence basis",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected match but got no_match",
+          "matchedBottleId expected 13437 but got null",
+          "expectedTier expected auto but got review"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+      "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+      "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-composes-smws-1-285-from-label-components.json",
+      "fixtureSha256": "17a30511739a6471312f5a33702a2c70991c7dea9adcbdb1fd5909a2c79a797c",
+      "name": "match existing: image-backed photo: composes SMWS 1.285 from separate label components",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-ardbeg-uigeadail-from-label.json",
+      "fixtureSha256": "602d73eaba9ce76079d8cc52e8465c800e0072daafcbfbb39949b1668e45865a",
+      "name": "match existing: image-backed photo: matches Ardbeg Uigeadail from label evidence",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-compass-box-rogues-banquet.json",
+      "fixtureSha256": "df5608365f227cc001e3bdff5dbe3e49836c2577c46338037f60a4fa475c5b66",
+      "name": "match existing: Rogues' Banquet: image-backed match",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-existing-exclusive-malts-islay-2007-bottle.json",
+      "fixtureSha256": "789c1eafccc08dcf79e29d8f86db34735b681b6265c745560e3e0ecdffc9db24",
+      "name": "match existing: image-backed photo: matches existing The Exclusive Malts Islay 2007 8-year-old bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+      "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+      "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "incorrectMatchBottleIds": {
+        "no-web/terra-medium": 44284,
+        "no-web/luna-high": 44284,
+        "no-web/luna-xhigh": 44284,
+        "web/terra-medium": 44284,
+        "web/luna-high": 44284,
+        "web/luna-xhigh": 44284
+      },
+      "webLunaHighFailure": {
+        "action": "match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": ["matchedBottleId expected 12825 but got 44284"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-laphroaig-elements-l2-0-bottle.json",
+      "fixtureSha256": "b9ac27ac84e6f0948a4605a1ee028e5ab677cd01f6b279047299b595e06eedf5",
+      "name": "match existing: image-backed photo: matches the existing Laphroaig Elements L2.0 Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-pappy-van-winkle-15-family-reserve.json",
+      "fixtureSha256": "06070d1afe164a6651e8a7e33f82697c34799ef64408559ef41245a28cae7185",
+      "name": "match existing: image-backed photo: matches Pappy Van Winkle's 15-year-old Family Reserve from label evidence",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-pokeno-exploration-series-totara-cask.json",
+      "fixtureSha256": "c9f57b7019570337a44bd370aa7c767c0d791fa145337e4500a9118fdfc926cb",
+      "name": "match existing: image-backed photo: matches Pokeno Exploration Series No. 1 Totara Cask from label evidence",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-smws-95-71-prepare-for-winter.json",
+      "fixtureSha256": "35f1e051c9cf223b2846fae026e579f70f45ae4e93047c7978e5cdd94415b368",
+      "name": "match existing: image-backed photo: matches SMWS 95.71 Prepare for Winter instead of tasting notes",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-trestle-spirit-of-eclipse.json",
+      "fixtureSha256": "48af627b90600f5fb5418f0862cd9a1386363ec78b756be2022c754a15096bf8",
+      "name": "match existing: image-backed photo: matches Trestle Spirit of Eclipse",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-woodford-reserve-double-double-oaked-2022-release.json",
+      "fixtureSha256": "c70d9af8b8355362eb241f4a5370aad32be28f2754850dacacf602d7b3654161",
+      "name": "match existing: image-backed photo: matches Woodford Reserve Double Double Oaked 2022 release",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+      "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+      "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-aged-springbank-25-year-old-matches-the-plain-age-statement-bottle.json",
+      "fixtureSha256": "139f910eb186b5cb807831b74da6267ca941bdb35daae4f9e5cea43144a6368a",
+      "name": "match existing: store listing: aged Springbank 25-year-old matches the plain age-statement bottle",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "create_bottle",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected match but got create_bottle",
+          "matchedBottleId expected 469 but got null"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-dropped-possessive-brand-still-matches-basil-haydens-base-bourbon.json",
+      "fixtureSha256": "7bc4ef7de2b26c038018ff040c24494ecae66835284005383afa0658b2d3f62a",
+      "name": "match existing: store listing: dropped possessive brand still matches Basil Hayden's base bourbon",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-glenlivet-caribbean-reserve-reaches-bottle-verification-confidence-when-reliable-web-evidence-confirms-the-family.json",
+      "fixtureSha256": "73faafecf08ea4364fe5992ece7bd122dbc4157ae99767032bae4d4f845cd319",
+      "name": "match existing: store listing: Glenlivet Caribbean Reserve matches the rum barrel selection bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-jameson-cold-brew-reaches-bottle-verification-confidence-from-a-clear-title-match.json",
+      "fixtureSha256": "e5c65fb0273a498cd7c548cae6810c1fc27cb320962c57ad1fd0af35d82e6a44",
+      "name": "match existing: store listing: Jameson Cold Brew reaches bottle verification confidence from a clear title match",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected match but got no_match",
+          "matchedBottleId expected 13437 but got null",
+          "expectedTier expected auto but got review"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-keeps-a-strong-local-match-when-only-a-standalone-article-differs.json",
+      "fixtureSha256": "06babbb2b5c1868b96043e84b26c40e4d48171f4dd1e8adb0597513164aaeef0",
+      "name": "match existing: store listing: keeps a strong local match when only a standalone article differs",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-cadboll-estate-batch-4-bottle.json",
+      "fixtureSha256": "b47e617839cb6f578600155a3a954eb34bb1c29d6d929a7ce1202f6239bc3c8d",
+      "name": "match existing: store listing: matches the exact flattened Cadboll Estate Batch 4 Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "timeout"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-legacy-series-chapter-two-bottle.json",
+      "fixtureSha256": "805d152220b6d974e1bb5f7c95496ea99e16376db9bc65686d046ef88d3c802a",
+      "name": "match existing: store listing: matches the exact Legacy Series Chapter Two Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-macallan-30-year-old-bottle.json",
+      "fixtureSha256": "69d3880fb5c5c2bec1a8570ac703be83ba8dfee85af6fd5e6d81e6ca7e53bf36",
+      "name": "match existing: store listing: matches the exact Macallan 30-year-old Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-exact-penelope-batch-11-bottle.json",
+      "fixtureSha256": "7758bdaf87b92e4d982727b80a9468ac0b7831184b29f1099d0ab4c485d8fd8e",
+      "name": "match existing: store listing: matches the exact Penelope Batch 11 Bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-existing-cadboll-estate-batch-4-bottle.json",
+      "fixtureSha256": "07be4aeb5916a90b2f517ecf3496b7ae514017f0720ddd3412b52bba71554776",
+      "name": "match existing: store listing: matches the existing Cadboll Estate Batch 4 Bottle through a legacy candidate",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-existing-distillers-edition-2023-bottle.json",
+      "fixtureSha256": "a940cacab79b3b1630375b6f7caa09f8fd8261a6d0b5b279758165dc4a2eb2fb",
+      "name": "match existing: store listing: matches the existing Distillers Edition 2023 Bottle through a legacy candidate",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-hudson-back-room-deal-peated-scotch-barrel-finished-as-bottle-identity.json",
+      "fixtureSha256": "0cbb1c666eb4dbc920874a6b457ced64e641e39e2061d7761cdee9ad5f82af11",
+      "name": "match existing: store listing: matches Hudson Back Room Deal Peated Scotch Barrel Finished as bottle identity",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1.json",
+      "fixtureSha256": "38a2adf5e532d3a95938292f87e4c6c5641fc5516f75dd75fa4d2eadfbc0ac31",
+      "name": "match existing: store listing: matches Laphroaig Càirdeas 2022 Warehouse 1",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+      "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+      "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "webLunaHighFailure": {
+        "action": "no_match",
+        "checks": ["ClassifierExpectationJudge"],
+        "failures": [
+          "action expected match but got no_match",
+          "matchedBottleId expected 2466 but got null"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-noisy-extracted-age-keeps-exact-marketed-age-bottle-match.json",
+      "fixtureSha256": "dd59c8bb9244841094f345edefbca1a7f54bec5bcc301a05dd7db6b56e72a74d",
+      "name": "match existing: store listing: noisy extracted age keeps the exact marketed-age Bottle match",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-plain-tomatin-12-year-old-does-not-redirect-into-the-cask-strength-family.json",
+      "fixtureSha256": "acfb805013af34399e61b23201f7f5aadbe0b32fef156c51727d1bec8008e240",
+      "name": "match existing: store listing: plain Tomatin 12-year-old does not redirect into the cask-strength family",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+      "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+      "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-unknown-category-does-not-block-shibui-grain-select.json",
+      "fixtureSha256": "12d9c2c1c0c3705c4cf9e585d01b7f171df3518dabe3fcb1bc9fd01e4262a5cd",
+      "name": "match existing: store listing: unknown category does not block Shibui Grain Select",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-uses-web-evidence-plus-local-follow-up-search-to-recover-the-right-bottle.json",
+      "fixtureSha256": "24349ab426552619d4d7d8422c120707ae41f4d0a5f021b991114b67e6f63df6",
+      "name": "match existing: store listing: uses web evidence plus local follow-up search to recover the right bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-listing-extracts-and-recovers-wild-turkey-rare-breed-rye-from-the-title.json",
+      "fixtureSha256": "83e9c837abbcad711626d3ccf0245a2da8abbec879df8b40cec00390b8c2b6fd",
+      "name": "match existing: text-only listing: extracts and recovers Wild Turkey Rare Breed Rye from the title",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-listing-keeps-a-brand-led-age-statement-match-when-the-local-bottle-name-is-distillery-qualified.json",
+      "fixtureSha256": "d7fa6518ed6706e1f4420c7778644e5b12c0e6975f10b3bb58d76d7962cb7a90",
+      "name": "match existing: text-only listing: keeps a brand-led age-statement match when the local bottle name is distillery-qualified",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-listing-strips-retailer-suffix-noise-and-matches-ardbeg-uigeadail.json",
+      "fixtureSha256": "de1e1ef6d496597988782f469af5950d4ecf566278a2caad774cfa7cf07b5489",
+      "name": "match existing: text-only listing: strips retailer suffix noise and matches Ardbeg Uigeadail",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+      "fixtureSha256": "ec1775b2ee8358ac72aa787c6736e7c406784d69521c2d01cd3d1bcc60d655b7",
+      "name": "match existing: text-only SMWS listing: matches an existing exact-cask bottle by code",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/text-only-user-entry-matches-shorthand-springbank-10.json",
+      "fixtureSha256": "a65c499d23bb73a20693b15ab65f3cc4edfb1d81c2b26144f959e76d1fe858bd",
+      "name": "match existing: text-only user entry: matches shorthand Springbank 10",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/user-entry-matches-a-shorthand-bottle-name.json",
+      "fixtureSha256": "c77c5df09c6292b76f11274896cd6ec787921a86ffff81d549d6d0f2757d8f8e",
+      "name": "match existing: user entry: matches a shorthand bottle name",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/corrections/current-assignment-a-bottle-correction-stays-review-only-even-when-the-new-match-is-highly-confident.json",
+      "fixtureSha256": "8ee3bddfe145338108e5e12512fcecf084e28e9fe4a8d6e2bb0a5b461fc3ea01",
+      "name": "corrections: current assignment: a bottle correction stays review-only even when the new match is highly confident",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/image-backed-photo-requires-review-for-springbank-open-day-may-2026-30-year-old.json",
+      "fixtureSha256": "6c0425ccee50750b6853eb659d6ec480d78251458024e38cedbc2b049db33d7f",
+      "name": "ignored / no match: image-backed photo: requires review for Springbank Open Day May 2026 30-year-old",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "fail"
+      },
+      "incorrectMatchBottleIds": {
+        "web/luna-xhigh": 44256
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/image-backed-photo-requires-spice-tree-extravaganza-catalog-review.json",
+      "fixtureSha256": "2222fc5302a4b57c550d0cea66499fb64fb9b8a00b1bb809df8359a32e98b122",
+      "name": "ignored / no match: image-backed photo: requires a separate Spice Tree Extravaganza catalog review",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-age-mismatch-rejects-incomplete-bottle-without-cask-identity.json",
+      "fixtureSha256": "fce820a538328eb3d5746a5df6c2242f5075bac23af48a9553a9124de9b6d6c8",
+      "name": "ignored / no match: store listing: age mismatch rejects an incomplete Bottle without cask identity",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "fail"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-ignores-a-bottle-multipack-even-when-the-bottle-identity-is-clear.json",
+      "fixtureSha256": "e68c32f5c3b7f6b8fb8173ee835c9b4470457230c5f08f095e9ff69cfaaa1a03",
+      "name": "ignored / no match: store listing: ignores a bottle multipack even when the bottle identity is clear",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-ignores-a-clear-non-whisky-spirit-reference.json",
+      "fixtureSha256": "60411b9666920dd81be8b2f0240039302e3d8aa2c577a23c391db28305d24022",
+      "name": "ignored / no match: store listing: ignores a clear non-whisky spirit reference",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-ignores-a-damaged-condition-sale-listing-for-an-otherwise-known-bottle.json",
+      "fixtureSha256": "c6225257d502d66f12ba5deb24330464273f21cbcfe9d7bf3d1d9123bd05b116",
+      "name": "ignored / no match: store listing: ignores a damaged-condition sale listing for an otherwise known bottle",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-a-packaging-only-gift-set-without-bottle-identity.json",
+      "fixtureSha256": "1bcdacacdf32faba8f85f8439c03debb7bf8309d36681e07c407a87fbd736353",
+      "name": "ignored / no match: store listing: rejects a packaging-only gift set without bottle identity",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-a-sampler-bundle-without-a-single-bottle-identity.json",
+      "fixtureSha256": "051ffed2ba8a95397d7e3410ef4faf6b0a6327b2e2ce7b4a5518d602efadca7c",
+      "name": "ignored / no match: store listing: rejects a sampler bundle without a single bottle identity",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-rejects-an-unsupported-novelty-flavored-whiskey-product.json",
+      "fixtureSha256": "d2ca7b431b73a7057f1dd810921b3455ecd65a85273c0b6d9a08e35022daba09",
+      "name": "ignored / no match: store listing: rejects an unsupported novelty flavored-whiskey product",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-requires-review-for-canadian-club-reserve-9-year-old.json",
+      "fixtureSha256": "fa61e61c4cad7f5ad0c1dd927e2fa4a1c62ca33fba86b2d20471e4da2cf0b0ae",
+      "name": "ignored / no match: store listing: requires review for Canadian Club Reserve 9-year-old",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "timeout"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/clean.json",
+      "fixtureSha256": "5429cf3ce8a829bc4c46422f02f29df5102cefbe81d590bd0c7fd79042fd7ccb",
+      "name": "bottle audits: audit: a well-formed Bottle needs no catalog changes",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/image-only-extraction-does-not-overwrite-populated-fields.json",
+      "fixtureSha256": "af13a4745ee857446d2ef3a198f18bfd2e6ed88a5c9f5229db2537e23b820621",
+      "name": "bottle audits: audit: one image extraction does not overwrite populated exact fields",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "error",
+        "web/luna-high": "error",
+        "web/luna-xhigh": "error"
+      },
+      "webLunaHighFailure": {
+        "action": null,
+        "checks": [],
+        "runtimeError": "BottleClassificationError: Max turns (8) exceeded"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/independent-bottler-may-equal-brand.json",
+      "fixtureSha256": "71e39743b348454347d1483e46a0dd46eaad1a1a3d985b668935dacc05ed9b91",
+      "name": "bottle audits: audit: independent bottler may use the Brand entity",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/other-batch-abv-does-not-overwrite-exact-release.json",
+      "fixtureSha256": "31210284b2a2903e1e1008e96e8ddbce66c161c38bc94064d8747beecf7c7e42",
+      "name": "bottle audits: audit: another batch does not overwrite exact ABV",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-dramfool-octomore-9.3-edition-wording.json",
+      "fixtureSha256": "f294adeb782ede4f72406031de8d10176c8d269838963ffe41fb3f7a2976519d",
+      "name": "bottle audits: audit: remove prose-only Release descriptor from Dramfool Octomore 9.3",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "fail",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-hibiki-21-missing-abv-not-bottler.json",
+      "fixtureSha256": "137c9cfa50bb761eb717714ffe502fa9feb878ee138592ea6dc5f028cc5b7292",
+      "name": "bottle audits: audit: add Hibiki 21 ABV without inventing a bottler",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "pass"
+      },
+      "webLunaHighFailure": {
+        "action": null,
+        "checks": ["AuditOperationExpectationJudge"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-laphroaig-cairdeas-2022-malformed-duplicate.json",
+      "fixtureSha256": "7040d5036f100e461d2f5848a5e1e09d8dc6bfe35ae1ac7d85e395825d6f659e",
+      "name": "bottle audits: audit: retire the malformed Laphroaig Càirdeas 2022 duplicate",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "timeout",
+        "web/terra-medium": "error",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "error"
+      },
+      "webLunaHighFailure": {
+        "action": null,
+        "checks": ["AuditOperationExpectationJudge"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-pokeno-single-cask-missing-vintage.json",
+      "fixtureSha256": "7666093a5feadb2cd152b365d3364778ec27944f4e4c8e1697ec6bce571a9266",
+      "name": "bottle audits: audit: restore Pōkeno 2019 vintage without inferring a cask number",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": null,
+        "checks": [
+          "AuditOperationExpectationJudge",
+          "AuditFindingExpectationJudge"
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-proof-and-wood-representative-retains-bottler-and-batch-abv.json",
+      "fixtureSha256": "6f6b4e3ed6daaf2164d8adc27af0d7d47e036ee01d6f294d99f55a7e42927e88",
+      "name": "bottle audits: audit: retain Proof and Wood bottler and batch ABV",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": null,
+        "checks": ["AuditOperationExpectationJudge"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/production-smws-10.258-code-already-in-name.json",
+      "fixtureSha256": "0d5b20bbf60a991ebba195532b53e1762c4bdc87fa0909b1402009994b9b2f3e",
+      "name": "bottle audits: audit: enrich SMWS 10.258 without duplicating its code as edition",
+      "outcomes": {
+        "no-web/terra-medium": "fail",
+        "no-web/luna-high": "fail",
+        "no-web/luna-xhigh": "fail",
+        "web/terra-medium": "fail",
+        "web/luna-high": "fail",
+        "web/luna-xhigh": "fail"
+      },
+      "webLunaHighFailure": {
+        "action": null,
+        "checks": ["AuditOperationExpectationJudge"]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/audit-cases/same-release-evidence-corrects-exact-abv.json",
+      "fixtureSha256": "e2ca56c9634a44b0fa8c3e34e2434bbd98404cb46f54abd98d16e0cba8a9f0fb",
+      "name": "bottle audits: audit: same-release evidence corrects exact ABV",
+      "outcomes": {
+        "no-web/terra-medium": "pass",
+        "no-web/luna-high": "pass",
+        "no-web/luna-xhigh": "pass",
+        "web/terra-medium": "pass",
+        "web/luna-high": "pass",
+        "web/luna-xhigh": "pass"
+      }
+    }
+  ],
+  "targetedRepeats": {
+    "no-web": [
+      {
+        "fixture": "src/eval-fixtures/new-bottles/talisker-2001-the-distillers-edition.json",
+        "attempts": {
+          "terra-medium": ["fail", "fail", "fail"],
+          "luna-high": ["fail", "pass", "pass"],
+          "luna-xhigh": ["pass", "pass", "pass"]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "attempts": {
+          "terra-medium": ["pass", "pass", "pass"],
+          "luna-high": ["pass", "pass", "fail"],
+          "luna-xhigh": ["fail", "fail", "pass"]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "attempts": {
+          "terra-medium": ["fail", "pass", "pass"],
+          "luna-high": ["fail", "fail", "fail"],
+          "luna-xhigh": ["fail", "fail", "fail"]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/current-assignment-a-reaffirmed-bottle-match-uses-current-assignment-confidence-basis.json",
+        "attempts": {
+          "terra-medium": ["fail", "fail", "fail"],
+          "luna-high": ["pass", "fail", "fail"],
+          "luna-xhigh": ["fail", "fail", "fail"]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-jameson-cold-brew-reaches-bottle-verification-confidence-from-a-clear-title-match.json",
+        "attempts": {
+          "terra-medium": ["fail", "fail", "fail"],
+          "luna-high": ["pass", "fail", "fail"],
+          "luna-xhigh": ["fail", "fail", "fail"]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/ignore_or_reject/store-listing-age-mismatch-rejects-incomplete-bottle-without-cask-identity.json",
+        "attempts": {
+          "terra-medium": ["fail", "fail", "fail"],
+          "luna-high": ["fail", "pass", "fail"],
+          "luna-xhigh": ["pass", "pass", "fail"]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/audit-cases/image-only-extraction-does-not-overwrite-populated-fields.json",
+        "attempts": {
+          "terra-medium": ["pass", "fail", "fail"],
+          "luna-high": ["pass", "fail", "fail"],
+          "luna-xhigh": ["fail", "fail", "fail"]
+        }
+      }
+    ],
+    "web": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "attempts": {
+          "terra-medium": [
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16142,
+              "incorrectExistingMatch": true
+            },
+            {
+              "outcome": "fail",
+              "action": "no_match",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16142,
+              "incorrectExistingMatch": true
+            }
+          ],
+          "luna-high": [
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16142,
+              "incorrectExistingMatch": true
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16142,
+              "incorrectExistingMatch": true
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16142,
+              "incorrectExistingMatch": true
+            }
+          ],
+          "luna-xhigh": [
+            {
+              "outcome": "fail",
+              "action": "no_match",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            },
+            {
+              "outcome": "fail",
+              "action": "no_match",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16142,
+              "incorrectExistingMatch": true
+            }
+          ]
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "attempts": {
+          "terra-medium": [
+            {
+              "outcome": "pass",
+              "action": "create_bottle",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            },
+            {
+              "outcome": "fail",
+              "action": "no_match",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            },
+            {
+              "outcome": "pass",
+              "action": "create_bottle",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            }
+          ],
+          "luna-high": [
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16442,
+              "incorrectExistingMatch": true
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16442,
+              "incorrectExistingMatch": true
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16442,
+              "incorrectExistingMatch": true
+            }
+          ],
+          "luna-xhigh": [
+            {
+              "outcome": "pass",
+              "action": "create_bottle",
+              "matchedBottleId": null,
+              "incorrectExistingMatch": false
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16442,
+              "incorrectExistingMatch": true
+            },
+            {
+              "outcome": "fail",
+              "action": "match",
+              "matchedBottleId": 16442,
+              "incorrectExistingMatch": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

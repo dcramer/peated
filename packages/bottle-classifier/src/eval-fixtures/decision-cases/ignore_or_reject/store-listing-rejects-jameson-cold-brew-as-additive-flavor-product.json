@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-jameson-cold-brew-reaches-bottle-verification-confidence-from-a-clear-title-match",
-  "name": "store listing: Jameson Cold Brew reaches bottle verification confidence from a clear title match",
+  "id": "store-listing-rejects-jameson-cold-brew-as-additive-flavor-product",
+  "name": "store listing: rejects Jameson Cold Brew as an additive-flavor product",
   "input": {
     "reference": {
       "name": "Jameson Cold Brew Irish Whiskey",
@@ -57,17 +57,17 @@
   "provenance": {
     "source": "curated_regression",
     "verifiedSourceUrls": [
-      "https://www.jamesonwhiskey.com/en/our-whiskey/jameson-cold-brew/",
+      "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+      "https://www.marketaccess.agriculture.gov.ie/media/marketaccess/content/Irish%20Whiskey%20Technical%20File.pdf",
+      "https://www.pernod-ricard.com/sites/default/files/inline-files/Pernod_Ricard_Norway_Produktkatalog_2.pdf",
       "https://api.peated.com/v1/bottles/13437"
     ],
-    "notes": "The producer markets Jameson Cold Brew under that concise product name, and Peated Bottle 13437 represents the same product. The store title's trailing Irish Whiskey wording is generic category context."
+    "notes": "Jameson says Cold Brew combines Jameson Irish Whiskey with Arabica coffee, and Pernod Ricard lists it at 30% ABV. The Irish Whiskey technical file requires at least 40% ABV. It is therefore an additive-flavor spirit outside the classifier's whisky scope. The existing Peated Bottle does not override that scope."
   },
   "expected": {
     "status": "classified",
-    "action": "match",
+    "action": "no_match",
     "identityScope": "product",
-    "matchedBottleId": 13437,
-    "expectedTier": "auto",
-    "summary": "Match Jameson Cold Brew from the raw title alone and mark the reviewed bottle-level match as evidence-backed."
+    "summary": "Return no_match when producer evidence establishes that a listing is an additive-flavor spirit outside the whisky catalog."
   }
 }

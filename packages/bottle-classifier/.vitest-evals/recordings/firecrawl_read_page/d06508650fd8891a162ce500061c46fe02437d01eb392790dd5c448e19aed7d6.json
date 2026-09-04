@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-09-03T16:34:06.212Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+    "focus": "Verify the exact marketed product title, release/edition wording, ABV, category, and whether the 2022 release is a distinct marketed Bottle."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Verify the exact marketed product title, release/edition wording, ABV, category, and whether the 2022 release is a distinct marketed Bottle.",
+    "summary": "2022 Woodford Reserve Distillery Series Double Double Oaked Bourbon2022 Woodford Reserve Distillery Series Double Double Oaked Bourbon Back\n\n2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey 375ml\n\nOriginal price $299.99\n\nOriginal price $299.99\n\nThe 2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey is the 90.4 proof (45.2% ABV), 375ml vintage released at the Versailles, Kentucky distillery at 10 a.m. on January 18, 2023 — the seventh Double Double Oaked release in the Distillery Series since 2015, and the final one credited to Master Distiller Chris Morris.\n\nPer the series' convention, bottles carry the 2022 bottling year on the label.\n\n375ml\n\n90.4 (45.2% ABV)\n\nOrigin:\n\nDistillery:\n\nKentucky Straight Bourbon Whiskey\n\nWoodford Reserve Distillery Series — January 18, 2023 release (bottled 2022); seventh Double Double Oaked release; 2-bottle limit; select Kentucky retailers\n\nVintage:",
+    "results": [
+      {
+        "title": "2022 Woodford Reserve Double Double Oaked Bourbon 375ml - Cana Wine Company",
+        "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+        "domain": "canawineco.com",
+        "description": "2022 Woodford Reserve Distillery Series Double Double Oaked bourbon, 90.4 proof (45.2% ABV), 375ml, January 2023 release — the last credited to Chris Morris.",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d06508650fd8891a162ce500061c46fe02437d01eb392790dd5c448e19aed7d6",
+    "mode": "auto"
+  }
+}

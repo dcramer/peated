@@ -1,0 +1,4269 @@
+{
+  "manifest": {
+    "startedAt": "2026-09-03T16:20:58.150Z",
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "imageModel": "gpt-5.6-luna",
+    "imageEffort": "high",
+    "maxSearchQueries": 2,
+    "maxTurns": 8,
+    "replayMode": "auto",
+    "evidence": "Shared successful web recordings seeded from the prior Luna high run. Novel requests live. Model responses are not replayed.",
+    "promptHashes": {
+      "control": "acd0d172d0ae9fa4d41c7b98f16cdaab93199b1cbe198b0462d45a0c20a421bd",
+      "treatment": "790c5ee9f0587d43c59215038139b9720186a2f766969c7a963420bc7de601fe"
+    },
+    "order": [
+      "control-1",
+      "treatment-1",
+      "treatment-2",
+      "control-2",
+      "control-3",
+      "treatment-3"
+    ],
+    "runs": [
+      {
+        "label": "control-1",
+        "code": 1,
+        "signal": null,
+        "elapsedSeconds": 235.424,
+        "passed": 6,
+        "cases": 10,
+        "reportSha256": "8119a69f08b0d6e8171415b7f414561a85b6106335e63059326d63c048435bbd"
+      },
+      {
+        "label": "treatment-1",
+        "code": 1,
+        "signal": null,
+        "elapsedSeconds": 259.232,
+        "passed": 5,
+        "cases": 10,
+        "reportSha256": "c6a11136df42c938a6ab18cb1aab19b689357e90e610df2846ced51f68ef1ae2"
+      },
+      {
+        "label": "treatment-2",
+        "code": 1,
+        "signal": null,
+        "elapsedSeconds": 222.704,
+        "passed": 4,
+        "cases": 10,
+        "reportSha256": "c74176a57e6b2d16d67188ad89fb52dc05174938f9a9db5e8c4911726ed76478"
+      },
+      {
+        "label": "control-2",
+        "code": 1,
+        "signal": null,
+        "elapsedSeconds": 253.652,
+        "passed": 6,
+        "cases": 10,
+        "reportSha256": "a2f0918214f17f6af03deb076c26c640a9374aa05c16f0883d6f06d5104c2689"
+      },
+      {
+        "label": "control-3",
+        "code": 1,
+        "signal": null,
+        "elapsedSeconds": 251.001,
+        "passed": 7,
+        "cases": 10,
+        "reportSha256": "711083dd928a041ece5982483d90524f7fbf80a4fdc973ae9bc02d721594290f"
+      },
+      {
+        "label": "treatment-3",
+        "code": 1,
+        "signal": null,
+        "elapsedSeconds": 212.982,
+        "passed": 4,
+        "cases": 10,
+        "reportSha256": "80808896f07c8ba7e923a981401bd778670c95f89fdbe84c2f4f30df9c49cd4c"
+      }
+    ],
+    "finishedAt": "2026-09-03T16:44:53.158Z",
+    "sourceCommit": "a7f156beca2a1d0dabdd2af9c8566a39fa566664"
+  },
+  "tokenPricesUsdPerMillion": {
+    "input": 0.2,
+    "cacheRead": 0.02,
+    "cacheWrite": 0.25,
+    "output": 1.2
+  },
+  "measurementNotes": [
+    "Model-token estimates include cache reads and writes. Firecrawl fees and provider adjustments excluded.",
+    "Reasoning tokens are included in output tokens. Cached and written tokens are included in input tokens.",
+    "A runtime failure may lack token usage; missing costs are not zero. Comparable cost totals use only paired attempts with both costs present.",
+    "Live web requests and provider cache/timing were not controlled. All model decisions were fresh."
+  ],
+  "variants": {
+    "control": {
+      "attempts": 30,
+      "passed": 19,
+      "identityDecisions": 30,
+      "correctIdentityDecisions": 21,
+      "incorrectExistingMatches": 5,
+      "runtimeErrors": 0,
+      "timeouts": 0,
+      "withCost": 30,
+      "recordedCostUsd": 0.09425095,
+      "uncachedCostUsd": 0.1961432,
+      "inputTokens": 663652,
+      "cachedInputTokens": 587220,
+      "cacheWriteTokens": 76147,
+      "outputTokens": 52844,
+      "reasoningTokens": 40020,
+      "modelCalls": 95,
+      "medianSeconds": 23.32245621,
+      "p95Seconds": 51.42807729,
+      "totalCaseSeconds": 728.67484117,
+      "searchQueries": 39,
+      "pageReads": 15
+    },
+    "treatment": {
+      "attempts": 30,
+      "passed": 13,
+      "identityDecisions": 30,
+      "correctIdentityDecisions": 18,
+      "incorrectExistingMatches": 8,
+      "runtimeErrors": 0,
+      "timeouts": 0,
+      "withCost": 30,
+      "recordedCostUsd": 0.08921453,
+      "uncachedCostUsd": 0.196689,
+      "inputTokens": 687657,
+      "cachedInputTokens": 616709,
+      "cacheWriteTokens": 70663,
+      "outputTokens": 49298,
+      "reasoningTokens": 36523,
+      "modelCalls": 95,
+      "medianSeconds": 26.21121408,
+      "p95Seconds": 42.18574617,
+      "totalCaseSeconds": 682.22731258,
+      "searchQueries": 37,
+      "pageReads": 17
+    }
+  },
+  "comparableCostPairs": 30,
+  "comparableCosts": {
+    "control": {
+      "attempts": 30,
+      "passed": 19,
+      "identityDecisions": 30,
+      "correctIdentityDecisions": 21,
+      "incorrectExistingMatches": 5,
+      "runtimeErrors": 0,
+      "timeouts": 0,
+      "withCost": 30,
+      "recordedCostUsd": 0.09425095,
+      "uncachedCostUsd": 0.1961432,
+      "inputTokens": 663652,
+      "cachedInputTokens": 587220,
+      "cacheWriteTokens": 76147,
+      "outputTokens": 52844,
+      "reasoningTokens": 40020,
+      "modelCalls": 95,
+      "medianSeconds": 23.32245621,
+      "p95Seconds": 51.42807729,
+      "totalCaseSeconds": 728.67484117,
+      "searchQueries": 39,
+      "pageReads": 15
+    },
+    "treatment": {
+      "attempts": 30,
+      "passed": 13,
+      "identityDecisions": 30,
+      "correctIdentityDecisions": 18,
+      "incorrectExistingMatches": 8,
+      "runtimeErrors": 0,
+      "timeouts": 0,
+      "withCost": 30,
+      "recordedCostUsd": 0.08921453,
+      "uncachedCostUsd": 0.196689,
+      "inputTokens": 687657,
+      "cachedInputTokens": 616709,
+      "cacheWriteTokens": 70663,
+      "outputTokens": 49298,
+      "reasoningTokens": 36523,
+      "modelCalls": 95,
+      "medianSeconds": 26.21121408,
+      "p95Seconds": 42.18574617,
+      "totalCaseSeconds": 682.22731258,
+      "searchQueries": 37,
+      "pageReads": 17
+    }
+  },
+  "byCase": [
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+      "control": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01669606,
+        "uncachedCostUsd": 0.0325672,
+        "inputTokens": 105074,
+        "cachedInputTokens": 91838,
+        "cacheWriteTokens": 13194,
+        "outputTokens": 9627,
+        "reasoningTokens": 7692,
+        "modelCalls": 14,
+        "medianSeconds": 35.40076713,
+        "p95Seconds": 51.42807729,
+        "totalCaseSeconds": 115.54143475,
+        "searchQueries": 6,
+        "pageReads": 2,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 2,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01371114,
+        "uncachedCostUsd": 0.0310662,
+        "inputTokens": 112539,
+        "cachedInputTokens": 99912,
+        "cacheWriteTokens": 12582,
+        "outputTokens": 7132,
+        "reasoningTokens": 5133,
+        "modelCalls": 15,
+        "medianSeconds": 30.72906767,
+        "p95Seconds": 32.50467363,
+        "totalCaseSeconds": 89.44495538,
+        "searchQueries": 5,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": ["proposedBottle missing expected fields"]
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+      "control": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.0112783,
+        "uncachedCostUsd": 0.0237002,
+        "inputTokens": 85483,
+        "cachedInputTokens": 72585,
+        "cacheWriteTokens": 12868,
+        "outputTokens": 5503,
+        "reasoningTokens": 3890,
+        "modelCalls": 10,
+        "medianSeconds": 23.32245621,
+        "p95Seconds": 28.34105075,
+        "totalCaseSeconds": 72.65981217,
+        "searchQueries": 6,
+        "pageReads": 1,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 2,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01720261,
+        "uncachedCostUsd": 0.032758,
+        "inputTokens": 114008,
+        "cachedInputTokens": 92408,
+        "cacheWriteTokens": 21561,
+        "outputTokens": 8297,
+        "reasoningTokens": 6468,
+        "modelCalls": 13,
+        "medianSeconds": 35.33453121,
+        "p95Seconds": 45.31838217,
+        "totalCaseSeconds": 115.28391742,
+        "searchQueries": 8,
+        "pageReads": 1,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          },
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": [
+              "suggestedNextStep expected confirm_create but got manual_search"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+      "control": {
+        "attempts": 3,
+        "passed": 1,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01178445,
+        "uncachedCostUsd": 0.024879,
+        "inputTokens": 81903,
+        "cachedInputTokens": 74730,
+        "cacheWriteTokens": 7137,
+        "outputTokens": 7082,
+        "reasoningTokens": 5212,
+        "modelCalls": 12,
+        "medianSeconds": 33.62294646,
+        "p95Seconds": 36.37638238,
+        "totalCaseSeconds": 96.16556383,
+        "searchQueries": 6,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": ["proposedBottle missing expected fields"]
+          },
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": ["proposedBottle missing expected fields"]
+          },
+          {
+            "status": "passed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.0112879,
+        "uncachedCostUsd": 0.0246088,
+        "inputTokens": 82988,
+        "cachedInputTokens": 75950,
+        "cacheWriteTokens": 7002,
+        "outputTokens": 6676,
+        "reasoningTokens": 4783,
+        "modelCalls": 12,
+        "medianSeconds": 30.40144658,
+        "p95Seconds": 36.65651438,
+        "totalCaseSeconds": 93.31713496,
+        "searchQueries": 6,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": ["proposedBottle missing expected fields"]
+          },
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": ["proposedBottle missing expected fields"]
+          },
+          {
+            "status": "failed",
+            "action": "create_bottle",
+            "bottleId": null,
+            "failures": ["proposedBottle missing expected fields"]
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+      "control": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 1,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01378644,
+        "uncachedCostUsd": 0.0240064,
+        "inputTokens": 75938,
+        "cachedInputTokens": 60937,
+        "cacheWriteTokens": 14974,
+        "outputTokens": 7349,
+        "reasoningTokens": 6216,
+        "modelCalls": 9,
+        "medianSeconds": 34.54447862,
+        "p95Seconds": 37.00019921,
+        "totalCaseSeconds": 92.45095358,
+        "searchQueries": 8,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected create_bottle but got no_match",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include 18-year-old",
+              "proposedBottle.name expected to include Single Barrel"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16142,
+            "failures": [
+              "action expected create_bottle but got match",
+              "verifyEligible expected false",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include 18-year-old",
+              "proposedBottle.name expected to include Single Barrel"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected create_bottle but got no_match",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include 18-year-old",
+              "proposedBottle.name expected to include Single Barrel"
+            ]
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 2,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01414919,
+        "uncachedCostUsd": 0.0312592,
+        "inputTokens": 112052,
+        "cachedInputTokens": 98742,
+        "cacheWriteTokens": 13271,
+        "outputTokens": 7374,
+        "reasoningTokens": 5837,
+        "modelCalls": 13,
+        "medianSeconds": 33.18558204,
+        "p95Seconds": 38.83319029,
+        "totalCaseSeconds": 100.07969433,
+        "searchQueries": 6,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16142,
+            "failures": [
+              "action expected create_bottle but got match",
+              "verifyEligible expected false",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include 18-year-old",
+              "proposedBottle.name expected to include Single Barrel"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16142,
+            "failures": [
+              "action expected create_bottle but got match",
+              "verifyEligible expected false",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include 18-year-old",
+              "proposedBottle.name expected to include Single Barrel"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected create_bottle but got no_match",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include 18-year-old",
+              "proposedBottle.name expected to include Single Barrel"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+      "control": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 1,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01478248,
+        "uncachedCostUsd": 0.031012,
+        "inputTokens": 106424,
+        "cachedInputTokens": 93689,
+        "cacheWriteTokens": 12690,
+        "outputTokens": 8106,
+        "reasoningTokens": 6322,
+        "modelCalls": 15,
+        "medianSeconds": 42.62497221,
+        "p95Seconds": 54.92445363,
+        "totalCaseSeconds": 128.196781,
+        "searchQueries": 6,
+        "pageReads": 4,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16442,
+            "failures": [
+              "action expected create_bottle but got match",
+              "matchedBottleId expected null but got 16442",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include French Oak"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected create_bottle but got no_match",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include French Oak"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected create_bottle but got no_match",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include French Oak"
+            ]
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 3,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00931773,
+        "uncachedCostUsd": 0.0228086,
+        "inputTokens": 83977,
+        "cachedInputTokens": 76904,
+        "cacheWriteTokens": 7037,
+        "outputTokens": 5011,
+        "reasoningTokens": 3630,
+        "modelCalls": 12,
+        "medianSeconds": 22.24000417,
+        "p95Seconds": 35.50585367,
+        "totalCaseSeconds": 79.77386308,
+        "searchQueries": 6,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16442,
+            "failures": [
+              "action expected create_bottle but got match",
+              "matchedBottleId expected null but got 16442",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include French Oak"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16442,
+            "failures": [
+              "action expected create_bottle but got match",
+              "matchedBottleId expected null but got 16442",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include French Oak"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 16442,
+            "failures": [
+              "action expected create_bottle but got match",
+              "matchedBottleId expected null but got 16442",
+              "proposedBottle missing expected fields",
+              "proposedBottle.name expected to include French Oak"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+      "control": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00330763,
+        "uncachedCostUsd": 0.0081702,
+        "inputTokens": 28569,
+        "cachedInputTokens": 27349,
+        "cacheWriteTokens": 1205,
+        "outputTokens": 2047,
+        "reasoningTokens": 1400,
+        "modelCalls": 5,
+        "medianSeconds": 11.46491617,
+        "p95Seconds": 15.51215858,
+        "totalCaseSeconds": 33.45553379,
+        "searchQueries": 0,
+        "pageReads": 2,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 650,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 650,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 650,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00254031,
+        "uncachedCostUsd": 0.006477,
+        "inputTokens": 23067,
+        "cachedInputTokens": 22128,
+        "cacheWriteTokens": 927,
+        "outputTokens": 1553,
+        "reasoningTokens": 997,
+        "modelCalls": 4,
+        "medianSeconds": 6.68685717,
+        "p95Seconds": 14.02644737,
+        "totalCaseSeconds": 26.26027571,
+        "searchQueries": 0,
+        "pageReads": 1,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 650,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 650,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 650,
+            "failures": []
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+      "control": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 3,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00392618,
+        "uncachedCostUsd": 0.0094258,
+        "inputTokens": 32963,
+        "cachedInputTokens": 31074,
+        "cacheWriteTokens": 1874,
+        "outputTokens": 2361,
+        "reasoningTokens": 1629,
+        "modelCalls": 5,
+        "medianSeconds": 9.50241092,
+        "p95Seconds": 11.14740271,
+        "totalCaseSeconds": 28.2447995,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 44284,
+            "failures": ["matchedBottleId expected 12825 but got 44284"]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 44284,
+            "failures": ["matchedBottleId expected 12825 but got 44284"]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 44284,
+            "failures": ["matchedBottleId expected 12825 but got 44284"]
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 3,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00397485,
+        "uncachedCostUsd": 0.0094366,
+        "inputTokens": 33449,
+        "cachedInputTokens": 31015,
+        "cacheWriteTokens": 2419,
+        "outputTokens": 2289,
+        "reasoningTokens": 1542,
+        "modelCalls": 5,
+        "medianSeconds": 10.25059083,
+        "p95Seconds": 11.92543017,
+        "totalCaseSeconds": 28.34950154,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 44284,
+            "failures": ["matchedBottleId expected 12825 but got 44284"]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 44284,
+            "failures": ["matchedBottleId expected 12825 but got 44284"]
+          },
+          {
+            "status": "failed",
+            "action": "match",
+            "bottleId": 44284,
+            "failures": ["matchedBottleId expected 12825 but got 44284"]
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+      "control": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.0017958,
+        "uncachedCostUsd": 0.0046416,
+        "inputTokens": 16578,
+        "cachedInputTokens": 15975,
+        "cacheWriteTokens": 594,
+        "outputTokens": 1105,
+        "reasoningTokens": 622,
+        "modelCalls": 3,
+        "medianSeconds": 5.94812833,
+        "p95Seconds": 6.80582858,
+        "totalCaseSeconds": 18.20573483,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 43260,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 43260,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 43260,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00179436,
+        "uncachedCostUsd": 0.004692,
+        "inputTokens": 16866,
+        "cachedInputTokens": 16263,
+        "cacheWriteTokens": 594,
+        "outputTokens": 1099,
+        "reasoningTokens": 608,
+        "modelCalls": 3,
+        "medianSeconds": 5.21937762,
+        "p95Seconds": 6.47030488,
+        "totalCaseSeconds": 16.308485,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 43260,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 43260,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 43260,
+            "failures": []
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+      "control": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01435055,
+        "uncachedCostUsd": 0.0304984,
+        "inputTokens": 103376,
+        "cachedInputTokens": 92670,
+        "cacheWriteTokens": 10655,
+        "outputTokens": 8186,
+        "reasoningTokens": 6251,
+        "modelCalls": 17,
+        "medianSeconds": 41.689582,
+        "p95Seconds": 50.79380454,
+        "totalCaseSeconds": 118.28913612,
+        "searchQueries": 7,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 2466,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 2466,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 2466,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 0,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 0,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.01337266,
+        "uncachedCostUsd": 0.0288714,
+        "inputTokens": 92331,
+        "cachedInputTokens": 87448,
+        "cacheWriteTokens": 4838,
+        "outputTokens": 8671,
+        "reasoningTokens": 6743,
+        "modelCalls": 15,
+        "medianSeconds": 38.6831415,
+        "p95Seconds": 42.18574617,
+        "totalCaseSeconds": 117.04159708,
+        "searchQueries": 6,
+        "pageReads": 3,
+        "outcomes": [
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected match but got no_match",
+              "matchedBottleId expected 2466 but got null"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected match but got no_match",
+              "matchedBottleId expected 2466 but got null"
+            ]
+          },
+          {
+            "status": "failed",
+            "action": "no_match",
+            "bottleId": null,
+            "failures": [
+              "action expected match but got no_match",
+              "matchedBottleId expected 2466 but got null"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+      "control": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00254306,
+        "uncachedCostUsd": 0.0072424,
+        "inputTokens": 27344,
+        "cachedInputTokens": 26373,
+        "cacheWriteTokens": 956,
+        "outputTokens": 1478,
+        "reasoningTokens": 786,
+        "modelCalls": 5,
+        "medianSeconds": 8.3267865,
+        "p95Seconds": 11.11802233,
+        "totalCaseSeconds": 25.46509158,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 630,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 630,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 630,
+            "failures": []
+          }
+        ]
+      },
+      "treatment": {
+        "attempts": 3,
+        "passed": 3,
+        "identityDecisions": 3,
+        "correctIdentityDecisions": 3,
+        "incorrectExistingMatches": 0,
+        "runtimeErrors": 0,
+        "timeouts": 0,
+        "withCost": 3,
+        "recordedCostUsd": 0.00186378,
+        "uncachedCostUsd": 0.0047112,
+        "inputTokens": 16380,
+        "cachedInputTokens": 15939,
+        "cacheWriteTokens": 432,
+        "outputTokens": 1196,
+        "reasoningTokens": 782,
+        "modelCalls": 3,
+        "medianSeconds": 5.63103704,
+        "p95Seconds": 5.81123371,
+        "totalCaseSeconds": 16.36788808,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "outcomes": [
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 630,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 630,
+            "failures": []
+          },
+          {
+            "status": "passed",
+            "action": "match",
+            "bottleId": 630,
+            "failures": []
+          }
+        ]
+      }
+    }
+  ],
+  "runs": {
+    "control-1": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 51.42807729,
+        "inputTokens": 38308,
+        "cachedInputTokens": 29678,
+        "cacheWriteTokens": 8615,
+        "outputTokens": 4440,
+        "reasoningTokens": 3777,
+        "modelCalls": 5,
+        "costUsd": 0.00807831,
+        "uncachedCostUsd": 0.0129896,
+        "toolCalls": 4,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, a rye whiskey blend finished in Port barrels, at 49.3% ABV, specifically marketed as Act 10 Scene 4. Focused web evidence confirms Act 10, Scene 4 at 49.3%. Local Bottle -3 represents Act 10 without the distinct Scene 4 edition, while Bottle 43397 is an unqualified family expression; neither is the exact marketed release.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 10 Scene 4",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": false,
+          "maturation": "finished in Port barrels",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": 1750,
+            "name": "High West"
+          },
+          "distillers": [
+            {
+              "id": 1750,
+              "name": "High West"
+            }
+          ],
+          "bottler": {
+            "id": 1750,
+            "name": "High West"
+          }
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 20.99630521,
+        "inputTokens": 25457,
+        "cachedInputTokens": 15822,
+        "cacheWriteTokens": 9626,
+        "outputTokens": 1679,
+        "reasoningTokens": 1171,
+        "modelCalls": 3,
+        "costUsd": 0.00473954,
+        "uncachedCostUsd": 0.0071062,
+        "toolCalls": 2,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West A Midwinter Night's Dram, Act 12 Scene 9, at 49.3% ABV. Local candidates represent Act 12 without the marketed Scene 9 edition, so they are not safe exact targets. No inspected local Bottle represents the complete marketed release; create a separate Bottle using only the supported label traits.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 12 Scene 9",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": null,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "High West",
+            "kind": "brand"
+          },
+          "distillers": [],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+        "fixtureSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+        "name": "new bottles: release year in candidate name",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 33.62294646,
+        "inputTokens": 27233,
+        "cachedInputTokens": 24212,
+        "cacheWriteTokens": 3009,
+        "outputTokens": 2448,
+        "reasoningTokens": 1814,
+        "modelCalls": 4,
+        "costUsd": 0.00417649,
+        "uncachedCostUsd": 0.0083842,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.releaseYear",
+            "expected": 2022,
+            "actual": 2023
+          }
+        ],
+        "failures": ["proposedBottle missing expected fields"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies the Woodford Reserve Distillery Series Double Double Oaked bourbon as the 2022 release at 45.2% ABV. Exact-product evidence confirms it was bottled in 2022 and released on January 18, 2023, so those year fields are kept distinct. The only local candidate is a separate 2017 release and cannot represent this Bottle. No inspected local candidate matches the complete 2022 identity, so a new Bottle is proposed.",
+        "proposedBottle": {
+          "name": "Double Double Oaked",
+          "series": {
+            "id": null,
+            "name": "Distillery Series"
+          },
+          "category": "bourbon",
+          "edition": "2022 Release",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished in a second, custom-crafted barrel",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 45.2,
+          "vintageYear": null,
+          "bottlingYear": 2022,
+          "releaseYear": 2023,
+          "releaseMonth": 1,
+          "releaseDay": 18,
+          "brand": {
+            "id": null,
+            "name": "Woodford Reserve",
+            "kind": "brand"
+          },
+          "distillers": [
+            {
+              "id": null,
+              "name": "Woodford Reserve",
+              "kind": "distillery"
+            }
+          ],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+        "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 34.54447862,
+        "inputTokens": 33868,
+        "cachedInputTokens": 29463,
+        "cacheWriteTokens": 4393,
+        "outputTokens": 2764,
+        "reasoningTokens": 2266,
+        "modelCalls": 4,
+        "costUsd": 0.00500671,
+        "uncachedCostUsd": 0.0100904,
+        "toolCalls": 3,
+        "searchQueries": 4,
+        "pageReads": 0,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Elijah Craig",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "bourbon",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 18,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.abv",
+            "expected": 45,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.singleCask",
+            "expected": true,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got no_match",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source supports Elijah Craig 18-year-old Single Barrel bourbon at 45% ABV, but it does not establish which separately marketed release or cask is represented. Bottle 16142 is specifically No. 4040 and cannot safely absorb a generic reference lacking that marker. No supported exact create draft can be made without risking a duplicate or hybrid release.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+        "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16442,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 30.64735517,
+        "inputTokens": 36765,
+        "cachedInputTokens": 33385,
+        "cacheWriteTokens": 3365,
+        "outputTokens": 1995,
+        "reasoningTokens": 1473,
+        "modelCalls": 5,
+        "costUsd": 0.00390595,
+        "uncachedCostUsd": 0.009747,
+        "toolCalls": 4,
+        "searchQueries": 2,
+        "pageReads": 2,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Masterson's",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "rye",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 10,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "matchedBottleId expected null but got 16442",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Masterson's 10-year-old straight rye whiskey finished in French oak. Bottle 16442 is the exact local French Oak Finish expression; its Barrel F2-038 wording is consistent with the focused web result identifying the 10-year French Oak Finish release. The other candidates are the un-finished standard rye or separately batched releases.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+        "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+        "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 650,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 650,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 11.46491617,
+        "inputTokens": 11472,
+        "cachedInputTokens": 10534,
+        "cacheWriteTokens": 932,
+        "outputTokens": 848,
+        "reasoningTokens": 605,
+        "modelCalls": 2,
+        "costUsd": 0.00146248,
+        "uncachedCostUsd": 0.003312,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS product page identifies Cask No. 41.176 as “Baristaliscious,” a 17-year-old whisky bottled at 60.2% ABV. Its Dailuaine single-malt identity and exact-cask code match Bottle 650; the candidate's missing ABV and cask-number fields are omissions, not conflicts. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+        "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+        "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 44284,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 12825,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 11.14740271,
+        "inputTokens": 13293,
+        "cachedInputTokens": 11413,
+        "cacheWriteTokens": 1874,
+        "outputTokens": 905,
+        "reasoningTokens": 614,
+        "modelCalls": 2,
+        "costUsd": 0.00178396,
+        "uncachedCostUsd": 0.0037446,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": ["matchedBottleId expected 12825 but got 44284"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West High Country American Single Malt Whiskey, 44% ABV, Batch No. 23J12. Existing Bottle 44284 matches the complete marketed release on brand, expression, category, ABV, and batch edition. The broader High West High Country candidate lacks the decisive batch edition and is not the exact target.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+        "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+        "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 43260,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 43260,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 5.94812833,
+        "inputTokens": 5526,
+        "cachedInputTokens": 4929,
+        "cacheWriteTokens": 594,
+        "outputTokens": 402,
+        "reasoningTokens": 229,
+        "modelCalls": 1,
+        "costUsd": 0.00073008,
+        "uncachedCostUsd": 0.0015876,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS product reference identifies the exact-cask release RW6.5, “Appley ever after.” Existing Bottle 43260 matches the complete marketed identity: SMWS / The Scotch Malt Whisky Society, Kyrö rye, 6 years old, 56% ABV, single cask, and 2024 release. The exact-cask code is the decisive identity anchor. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+        "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+        "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 2466,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 2466,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 25.80574958,
+        "inputTokens": 30600,
+        "cachedInputTokens": 22567,
+        "cacheWriteTokens": 8018,
+        "outputTokens": 1860,
+        "reasoningTokens": 1297,
+        "modelCalls": 5,
+        "costUsd": 0.00469084,
+        "uncachedCostUsd": 0.008352,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official Glenmorangie product page identifies The Quinta Ruban as a 14-year-old single malt at 46.0% ABV, matured in port casks. Existing Bottle 2466 matches the brand, expression, category, and stated age; its missing ABV and distillery enrichment do not conflict. The catalog title's 4th Edition qualifier is not populated as a conflicting edition field.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+        "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+        "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 630,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 630,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 6.02028275,
+        "inputTokens": 5364,
+        "cachedInputTokens": 4929,
+        "cacheWriteTokens": 432,
+        "outputTokens": 379,
+        "reasoningTokens": 237,
+        "modelCalls": 1,
+        "costUsd": 0.00066198,
+        "uncachedCostUsd": 0.0015276,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The source identifies the marketed product as Ardbeg Uigeadail single malt at 54.2% ABV. Existing Bottle 630 matches the brand, expression, category, distillery, and ABV; the 750ml volume is packaging metadata and does not distinguish the Bottle.",
+        "proposedBottle": null
+      }
+    ],
+    "treatment-1": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 32.50467363,
+        "inputTokens": 28675,
+        "cachedInputTokens": 20124,
+        "cacheWriteTokens": 8539,
+        "outputTokens": 2878,
+        "reasoningTokens": 2257,
+        "modelCalls": 4,
+        "costUsd": 0.00599323,
+        "uncachedCostUsd": 0.0091886,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, Act 10 Scene 4, at 49.3% ABV. Focused web evidence confirms Act 10, Scene 4 as the marketed release and supports the 2022 release year. Local Bottle -3 represents Act 10 without the decisive Scene 4 edition, while Bottle 43397 is an unqualified expression, so neither is the exact complete Bottle. The proposed Bottle preserves the supported Port-barrel finish, rye category, High West brand, bottler, distillery, edition, ABV, and release year.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 10 Scene 4",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "finished in Port barrels",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": 1750,
+            "name": "High West"
+          },
+          "distillers": [
+            {
+              "id": 1750,
+              "name": "High West"
+            }
+          ],
+          "bottler": {
+            "id": 1750,
+            "name": "High West"
+          }
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 45.31838217,
+        "inputTokens": 35303,
+        "cachedInputTokens": 25562,
+        "cacheWriteTokens": 9729,
+        "outputTokens": 3548,
+        "reasoningTokens": 2975,
+        "modelCalls": 4,
+        "costUsd": 0.00720349,
+        "uncachedCostUsd": 0.0113182,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West A Midwinter Night's Dram, Act 12 Scene 9, at 49.3% ABV. Local candidates represent Act 12 generally and omit the marketed Scene 9 release trait; related web evidence confirms that Act/Scene variants are separately identified releases. No inspected local Bottle represents this complete identity, so a distinct Bottle should be created.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": null,
+          "category": "rye",
+          "edition": "Act 12 Scene 9",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": null,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "High West",
+            "kind": "brand"
+          },
+          "distillers": [],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+        "fixtureSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+        "name": "new bottles: release year in candidate name",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 26.259174,
+        "inputTokens": 27919,
+        "cachedInputTokens": 24626,
+        "cacheWriteTokens": 3281,
+        "outputTokens": 1865,
+        "reasoningTokens": 1252,
+        "modelCalls": 4,
+        "costUsd": 0.00355317,
+        "uncachedCostUsd": 0.0078218,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.releaseYear",
+            "expected": 2022,
+            "actual": 2023
+          }
+        ],
+        "failures": ["proposedBottle missing expected fields"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source is the 2022 bottling of Woodford Reserve Double Double Oaked from the Distillery Series, bottled at 45.2% ABV and released on January 18, 2023. The only local candidate is the distinct 2017 Release, so no existing Bottle safely represents this product. Create a separate Bottle.",
+        "proposedBottle": {
+          "name": "Double Double Oaked",
+          "series": {
+            "id": null,
+            "name": "Distillery Series"
+          },
+          "category": "bourbon",
+          "edition": "2022 Release",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished in a second, heavily toasted, lightly charred new oak barrel for an additional year",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 45.2,
+          "vintageYear": null,
+          "bottlingYear": 2022,
+          "releaseYear": 2023,
+          "releaseMonth": 1,
+          "releaseDay": 18,
+          "brand": {
+            "id": null,
+            "name": "Woodford Reserve",
+            "kind": "brand"
+          },
+          "distillers": [
+            {
+              "id": null,
+              "name": "Woodford Reserve Distillery",
+              "kind": "distillery"
+            }
+          ],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+        "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16142,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 38.83319029,
+        "inputTokens": 34553,
+        "cachedInputTokens": 24898,
+        "cacheWriteTokens": 9643,
+        "outputTokens": 3017,
+        "reasoningTokens": 2589,
+        "modelCalls": 4,
+        "costUsd": 0.00653151,
+        "uncachedCostUsd": 0.010531,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Elijah Craig",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "bourbon",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 18,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.abv",
+            "expected": 45,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.singleCask",
+            "expected": true,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "verifyEligible expected false",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Elijah Craig 18-year-old Single Barrel Bourbon at 45% ABV. Candidate 16142 has the matching brand, bourbon category, 18-year age statement, and single-cask expression; its No. 4040 release identifier and 45% ABV are corroborated by Whisky Advocate and the Peated bottle page. The candidate's missing structured ABV is enrichment, not a conflict.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+        "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16442,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 35.50585367,
+        "inputTokens": 27369,
+        "cachedInputTokens": 24831,
+        "cacheWriteTokens": 2526,
+        "outputTokens": 2148,
+        "reasoningTokens": 1685,
+        "modelCalls": 4,
+        "costUsd": 0.00370812,
+        "uncachedCostUsd": 0.0080514,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Masterson's",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "rye",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 10,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "matchedBottleId expected null but got 16442",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Masterson's 10-year-old straight rye finished in French oak. Web evidence confirms the 10-year age, French-oak finishing, and 90 proof (45% ABV). Bottle 16442 is the exact matching marketed expression; its stored “Barrel F2-038” suffix is not supported as a distinct marketed release and its structured cask field is null. The other candidates lack the French-oak finish or represent batch-specific variants.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+        "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+        "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 650,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 650,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 14.02644737,
+        "inputTokens": 11659,
+        "cachedInputTokens": 10726,
+        "cacheWriteTokens": 927,
+        "outputTokens": 658,
+        "reasoningTokens": 399,
+        "modelCalls": 2,
+        "costUsd": 0.00123707,
+        "uncachedCostUsd": 0.0031214,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The producer page identifies SMWS Cask 41.176 as “Baristaliscious,” a 17-year-old, 60.2% single-cask Dailuaine whisky. Existing Bottle 650 is the same marketed exact-cask release, with matching SMWS code, expression, distillery, age, and single-cask status. Its missing ABV and maturation fields are enrichment gaps and do not prevent a safe match. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+        "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+        "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 44284,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 12825,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 10.25059083,
+        "inputTokens": 13485,
+        "cachedInputTokens": 11605,
+        "cacheWriteTokens": 1874,
+        "outputTokens": 920,
+        "reasoningTokens": 631,
+        "modelCalls": 2,
+        "costUsd": 0.0018058,
+        "uncachedCostUsd": 0.003801,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": ["matchedBottleId expected 12825 but got 44284"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable label identifies High West High Country American Single Malt Whiskey, 44% ABV, Batch No. 23J12. Inspected Bottle 44284 matches the brand, expression, category, ABV, and marketed batch edition exactly. Bottle 12825 is the broader unbatched expression and is not the exact release.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+        "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+        "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 43260,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 43260,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 5.21937762,
+        "inputTokens": 5622,
+        "cachedInputTokens": 5025,
+        "cacheWriteTokens": 594,
+        "outputTokens": 355,
+        "reasoningTokens": 183,
+        "modelCalls": 1,
+        "costUsd": 0.0006756,
+        "uncachedCostUsd": 0.0015504,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS product identity and exact-cask code RW6.5 identify the same marketed release as inspected Bottle 43260. Its populated brand relationship, Kyrö distillery, rye category, six-year age, single-cask status, 56% ABV, and 2024 release year are consistent; the missing stored edition field does not conflict with the exact-cask identity. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+        "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+        "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 2466,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 42.18574617,
+        "inputTokens": 30479,
+        "cachedInputTokens": 28477,
+        "cacheWriteTokens": 1987,
+        "outputTokens": 3332,
+        "reasoningTokens": 2700,
+        "modelCalls": 5,
+        "costUsd": 0.00506769,
+        "uncachedCostUsd": 0.0100942,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [
+          "action expected match but got no_match",
+          "matchedBottleId expected 2466 but got null"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The official Glenmorangie page supports a 14-year-old single malt at 46.0% ABV matured in port casks, but it does not identify the edition. Candidate 2466 is specifically the 4th Edition, and therefore cannot be assumed to represent the source release. Creating a generic Bottle would risk conflating distinct marketed editions.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+        "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+        "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 630,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 630,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 5.81123371,
+        "inputTokens": 5460,
+        "cachedInputTokens": 5025,
+        "cacheWriteTokens": 432,
+        "outputTokens": 362,
+        "reasoningTokens": 228,
+        "modelCalls": 1,
+        "costUsd": 0.0006435,
+        "uncachedCostUsd": 0.0015264,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The source identifies the complete marketed product as Ardbeg Uigeadail, a single malt at 54.2% ABV. Existing Bottle 630 has the same brand, expression, category, distillery, and ABV, with no conflicting release traits. The retailer URL is not reusable as a global alias.",
+        "proposedBottle": null
+      }
+    ],
+    "treatment-2": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 30.72906767,
+        "inputTokens": 39096,
+        "cachedInputTokens": 36715,
+        "cacheWriteTokens": 2366,
+        "outputTokens": 2393,
+        "reasoningTokens": 1750,
+        "modelCalls": 5,
+        "costUsd": 0.0042004,
+        "uncachedCostUsd": 0.0106908,
+        "toolCalls": 4,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.edition",
+            "expected": "Act 10 Scene 4",
+            "actual": "Act 10, Scene 4"
+          }
+        ],
+        "failures": ["proposedBottle missing expected fields"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, Act 10 Scene 4, at 49.3% ABV. Focused web results independently identify Act 10, Scene 4 as the marketed release. Local Bottle -3 represents Act 10 without Scene 4, while Bottle 43397 is an unqualified expression and neither is safe for this exact release.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 10, Scene 4",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished in Port barrels",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": 1750,
+            "name": "High West"
+          },
+          "distillers": [
+            {
+              "id": 1750,
+              "name": "High West"
+            }
+          ],
+          "bottler": {
+            "id": 1750,
+            "name": "High West"
+          }
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 35.33453121,
+        "inputTokens": 34801,
+        "cachedInputTokens": 33582,
+        "cacheWriteTokens": 1207,
+        "outputTokens": 1959,
+        "reasoningTokens": 1437,
+        "modelCalls": 4,
+        "costUsd": 0.00332659,
+        "uncachedCostUsd": 0.009311,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West A Midwinter Night's Dram, Act 12 Scene 9, at 49.3% ABV. Existing Act 12 candidates omit the marketed Scene 9 edition and therefore do not represent the complete release; no exact local candidate was found. Create a separate product-level Bottle without unsupported release-year or cask details.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 12 Scene 9",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": null,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "High West",
+            "kind": "brand"
+          },
+          "distillers": [],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+        "fixtureSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+        "name": "new bottles: release year in candidate name",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 30.40144658,
+        "inputTokens": 27687,
+        "cachedInputTokens": 25765,
+        "cacheWriteTokens": 1910,
+        "outputTokens": 2154,
+        "reasoningTokens": 1517,
+        "modelCalls": 4,
+        "costUsd": 0.00358,
+        "uncachedCostUsd": 0.0081222,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.releaseYear",
+            "expected": 2022,
+            "actual": 2023
+          }
+        ],
+        "failures": ["proposedBottle missing expected fields"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The image identifies Woodford Reserve Double Double Oaked from the Distillery Series at 45.2% ABV with a 2022 release designation. Focused exact-product evidence confirms this is the 2022 bottling, released in January 2023, and distinguishes it from the existing 2017 release candidate (Bottle -194). No local Bottle represents the 2022 product, so a separate Bottle is proposed. The 2022 label year is recorded as bottlingYear, while the documented January 2023 availability is recorded as releaseYear.",
+        "proposedBottle": {
+          "name": "Double Double Oaked",
+          "series": {
+            "id": null,
+            "name": "Distillery Series"
+          },
+          "category": "bourbon",
+          "edition": "2022 Release",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 45.2,
+          "vintageYear": null,
+          "bottlingYear": 2022,
+          "releaseYear": 2023,
+          "releaseMonth": 1,
+          "releaseDay": 18,
+          "brand": {
+            "id": null,
+            "name": "Woodford Reserve",
+            "kind": "brand"
+          },
+          "distillers": [
+            {
+              "id": null,
+              "name": "Woodford Reserve",
+              "kind": "brand"
+            }
+          ],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+        "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16142,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 33.18558204,
+        "inputTokens": 44210,
+        "cachedInputTokens": 41991,
+        "cacheWriteTokens": 2204,
+        "outputTokens": 2299,
+        "reasoningTokens": 1725,
+        "modelCalls": 5,
+        "costUsd": 0.00415262,
+        "uncachedCostUsd": 0.0116008,
+        "toolCalls": 4,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Elijah Craig",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "bourbon",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 18,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.abv",
+            "expected": 45,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.singleCask",
+            "expected": true,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "verifyEligible expected false",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The official Elijah Craig page confirms this is the 18-Year-Old Single Barrel Kentucky Straight Bourbon Whiskey at 90 proof (45% ABV). It states that the barrel number is handwritten on the label, so no specific cask is established as the marketed Bottle identity. Existing Bottle 16142 matches the brand, expression, 18-year age, bourbon category, and single-cask status; its parenthetical No. 4040 does not create a conflicting release trait.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+        "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16442,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 22.24000417,
+        "inputTokens": 27684,
+        "cachedInputTokens": 25372,
+        "cacheWriteTokens": 2300,
+        "outputTokens": 1265,
+        "reasoningTokens": 800,
+        "modelCalls": 4,
+        "costUsd": 0.00260284,
+        "uncachedCostUsd": 0.0070548,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Masterson's",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "rye",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 10,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "matchedBottleId expected null but got 16442",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Masterson's 10-year-old straight rye whiskey finished in French oak. Bottle 16442 is the exact local product, named Masterson's 10-year-old Straight Rye French Oak Finish, and its Barrel F2-038 detail is corroborated by focused web evidence for this release. The other candidates are the unqualified rye or distinct batch releases and do not represent the complete French-oak-finished product.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+        "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+        "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 650,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 650,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 6.68685717,
+        "inputTokens": 5704,
+        "cachedInputTokens": 5701,
+        "cacheWriteTokens": 0,
+        "outputTokens": 418,
+        "reasoningTokens": 270,
+        "modelCalls": 1,
+        "costUsd": 0.00061622,
+        "uncachedCostUsd": 0.0016424,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The SMWS exact-cask code 41.176 deterministically identifies the marketed Bottle. Candidate 650 matches the SMWS code, Dailuaine distillery, single-malt category, and single-cask identity; its stored expression and 17-year age provide compatible enrichment rather than a conflict. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+        "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+        "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 44284,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 12825,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 11.92543017,
+        "inputTokens": 13491,
+        "cachedInputTokens": 12940,
+        "cacheWriteTokens": 545,
+        "outputTokens": 860,
+        "reasoningTokens": 563,
+        "modelCalls": 2,
+        "costUsd": 0.00142825,
+        "uncachedCostUsd": 0.0037302,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": ["matchedBottleId expected 12825 but got 44284"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable label identifies High West High Country American Single Malt Whiskey, 44% ABV, Batch No. 23J12. Inspected Bottle 44284 matches the brand, expression, category, ABV, and marketed batch edition exactly. The candidate's missing distillery relationship is enrichment only and does not conflict with the source.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+        "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+        "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 43260,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 43260,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 6.47030488,
+        "inputTokens": 5622,
+        "cachedInputTokens": 5619,
+        "cacheWriteTokens": 0,
+        "outputTokens": 319,
+        "reasoningTokens": 164,
+        "modelCalls": 1,
+        "costUsd": 0.00049578,
+        "uncachedCostUsd": 0.0015072,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The SMWS release is deterministically identified by the marketed exact-cask code RW6.5. The inspected candidate matches the complete product identity: SMWS, Kyrö rye, six years old, single cask, 56% ABV, released in 2024, with the same marketed title. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+        "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+        "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 2466,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 36.17270942,
+        "inputTokens": 31135,
+        "cachedInputTokens": 29871,
+        "cacheWriteTokens": 1249,
+        "outputTokens": 1965,
+        "reasoningTokens": 1329,
+        "modelCalls": 5,
+        "costUsd": 0.00327067,
+        "uncachedCostUsd": 0.008585,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [
+          "action expected match but got no_match",
+          "matchedBottleId expected 2466 but got null"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The official Glenmorangie page confirms a 14-year-old single malt at 46.0% ABV, matured in bourbon and Portuguese port casks. Local Bottle 2466 is a plausible base-product candidate but is specifically labeled 4th Edition, an identity trait not established by the source. Do not match or create a duplicate until the release relationship is resolved.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+        "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+        "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 630,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 630,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 5.63103704,
+        "inputTokens": 5460,
+        "cachedInputTokens": 5457,
+        "cacheWriteTokens": 0,
+        "outputTokens": 452,
+        "reasoningTokens": 306,
+        "modelCalls": 1,
+        "costUsd": 0.00065214,
+        "uncachedCostUsd": 0.0016344,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The source identifies the marketed product as Ardbeg Uigeadail, a single malt at 54.2% ABV. Candidate 630 has the same brand, expression, category, distillery, and ABV, with no conflicting release traits. The retailer URL does not establish a reusable global alias.",
+        "proposedBottle": null
+      }
+    ],
+    "control-2": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 28.71259033,
+        "inputTokens": 28285,
+        "cachedInputTokens": 26119,
+        "cacheWriteTokens": 2154,
+        "outputTokens": 2286,
+        "reasoningTokens": 1683,
+        "modelCalls": 4,
+        "costUsd": 0.00380648,
+        "uncachedCostUsd": 0.0084002,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, Act 10 Scene 4, at 49.3% ABV, as a blend of straight rye whiskeys finished in Port barrels and bottled by High West Distillery. The 2022 release is supported by the local candidate and focused web evidence. Existing candidate -3 represents the broader Act 10 release and omits the marketed Scene 4 edition, while candidate 43397 is underspecified; neither is safe for assignment.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 10 Scene 4",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "finished in Port barrels",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": 1750,
+            "name": "High West"
+          },
+          "distillers": [
+            {
+              "id": 1750,
+              "name": "High West"
+            }
+          ],
+          "bottler": {
+            "id": 1750,
+            "name": "High West"
+          }
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 28.34105075,
+        "inputTokens": 34930,
+        "cachedInputTokens": 33119,
+        "cacheWriteTokens": 1799,
+        "outputTokens": 1911,
+        "reasoningTokens": 1326,
+        "modelCalls": 4,
+        "costUsd": 0.00340773,
+        "uncachedCostUsd": 0.0092792,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, Act 12 Scene 9, at 49.3% ABV. Focused web evidence confirms that Act 12 scene numbers are marketed release distinctions, including Act 12 Scene 9. The existing Act 12 candidates omit the scene designation and therefore do not represent this complete release exactly; no inspected local Bottle matches the full identity.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 12 Scene 9",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": null,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "High West",
+            "kind": "brand"
+          },
+          "distillers": [],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+        "fixtureSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+        "name": "new bottles: release year in candidate name",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 36.37638238,
+        "inputTokens": 27455,
+        "cachedInputTokens": 25297,
+        "cacheWriteTokens": 2146,
+        "outputTokens": 2791,
+        "reasoningTokens": 2184,
+        "modelCalls": 4,
+        "costUsd": 0.00439404,
+        "uncachedCostUsd": 0.0088402,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.releaseYear",
+            "expected": 2022,
+            "actual": 2023
+          }
+        ],
+        "failures": ["proposedBottle missing expected fields"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source image identifies the Woodford Reserve Distillery Series Double Double Oaked bourbon at 45.2% ABV with a 2022 release designation. Exact-product web evidence confirms the 2022 bottling, 90.4 proof, 375ml Distillery Series release, and that it became available in January 2023. The only local candidate is a distinct 2017 release and does not represent this Bottle, so a separate Bottle is proposed.",
+        "proposedBottle": {
+          "name": "Double Double Oaked",
+          "series": {
+            "id": null,
+            "name": "Distillery Series"
+          },
+          "category": "bourbon",
+          "edition": "2022 Release",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished an additional year in its second barrel",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 45.2,
+          "vintageYear": null,
+          "bottlingYear": 2022,
+          "releaseYear": 2023,
+          "releaseMonth": 1,
+          "releaseDay": 18,
+          "brand": {
+            "id": null,
+            "name": "Woodford Reserve",
+            "kind": "brand"
+          },
+          "distillers": [
+            {
+              "id": null,
+              "name": "Woodford Reserve Distillery",
+              "kind": "distillery"
+            }
+          ],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+        "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16142,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 20.90627575,
+        "inputTokens": 25620,
+        "cachedInputTokens": 16436,
+        "cacheWriteTokens": 9175,
+        "outputTokens": 1409,
+        "reasoningTokens": 1052,
+        "modelCalls": 3,
+        "costUsd": 0.00431507,
+        "uncachedCostUsd": 0.0068148,
+        "toolCalls": 2,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Elijah Craig",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "bourbon",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 18,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.abv",
+            "expected": 45,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.singleCask",
+            "expected": true,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "verifyEligible expected false",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Elijah Craig Single Barrel Bourbon, aged 18 years, at 45% ABV (90 proof). Focused web evidence confirms this exact 18-year-old single-barrel expression and the No. 4040 release represented by the inspected local candidate. Candidate 16142 matches the brand, expression, category, age, and single-cask status; its missing ABV is enrichment rather than a conflict.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+        "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 54.92445363,
+        "inputTokens": 42450,
+        "cachedInputTokens": 34393,
+        "cacheWriteTokens": 8039,
+        "outputTokens": 3941,
+        "reasoningTokens": 3181,
+        "modelCalls": 6,
+        "costUsd": 0.00743041,
+        "uncachedCostUsd": 0.0132192,
+        "toolCalls": 5,
+        "searchQueries": 3,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Masterson's",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "rye",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 10,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got no_match",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source supports Masterson's 10-year-old rye with a French oak barrel finish, but does not identify a cask, batch, ABV, or separate edition. Bottle 16442 is the closest candidate but includes an unverified Barrel F2-038 designation; Bottle 44029 lacks the French oak finish, and the batch candidates are unsupported by the source. No safe exact existing target or supported creation decision can be made without Bottle Review.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+        "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+        "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 650,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 650,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 15.51215858,
+        "inputTokens": 11489,
+        "cachedInputTokens": 11210,
+        "cacheWriteTokens": 273,
+        "outputTokens": 735,
+        "reasoningTokens": 476,
+        "modelCalls": 2,
+        "costUsd": 0.00117565,
+        "uncachedCostUsd": 0.0031798,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS product page identifies Cask No. 41.176 as Baristaliscious, a 17-year-old Dailuaine single malt bottled at 60.2% ABV. The exact SMWS cask code anchors the marketed bottle identity, and candidate 650 matches the brand, bottler, distillery, category, single-cask status, and expression. Its missing age, ABV, and cask-number enrichment are not conflicts. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+        "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+        "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 44284,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 12825,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 7.59498587,
+        "inputTokens": 6377,
+        "cachedInputTokens": 6374,
+        "cacheWriteTokens": 0,
+        "outputTokens": 665,
+        "reasoningTokens": 516,
+        "modelCalls": 1,
+        "costUsd": 0.00092608,
+        "uncachedCostUsd": 0.0020734,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": ["matchedBottleId expected 12825 but got 44284"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable label identifies High West High Country American Single Malt Whiskey, 44% ABV, Batch No. 23J12. Existing Bottle 44284 matches the brand, expression, category, ABV, and marketed batch edition exactly. Missing distillery enrichment on the candidate is not a conflict.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+        "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+        "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 43260,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 43260,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 5.45177792,
+        "inputTokens": 5526,
+        "cachedInputTokens": 5523,
+        "cacheWriteTokens": 0,
+        "outputTokens": 434,
+        "reasoningTokens": 277,
+        "modelCalls": 1,
+        "costUsd": 0.00063186,
+        "uncachedCostUsd": 0.001626,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS reference identifies the exact-cask release RW6.5, and the inspected local candidate matches the complete marketed identity: SMWS, Kyrö rye, six years old, single cask, 56% ABV, and 2024 release. The exact-cask code anchors the assignment. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+        "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+        "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 2466,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 2466,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 41.689582,
+        "inputTokens": 30701,
+        "cachedInputTokens": 28902,
+        "cacheWriteTokens": 1784,
+        "outputTokens": 2511,
+        "reasoningTokens": 1922,
+        "modelCalls": 5,
+        "costUsd": 0.00404024,
+        "uncachedCostUsd": 0.0091534,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official Glenmorangie product page identifies The Quinta Ruban as a 14-year-old single malt matured in bourbon and Portuguese port casks at 46% ABV. Candidate 2466 matches the brand, expression, category, and stated age; its missing ABV and maturation fields are enrichment gaps, not conflicts. The catalog display's “4th Edition” is not stored as a canonical edition field and does not establish a distinct conflicting marketed product here.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+        "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+        "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 630,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 630,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 11.11802233,
+        "inputTokens": 10991,
+        "cachedInputTokens": 10722,
+        "cacheWriteTokens": 263,
+        "outputTokens": 521,
+        "reasoningTokens": 244,
+        "modelCalls": 2,
+        "costUsd": 0.00090659,
+        "uncachedCostUsd": 0.0028234,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The source identifies the complete marketed product as Ardbeg Uigeadail, a single malt at 54.2% ABV. Inspected Bottle 630 matches the brand, expression, distillery, category, and ABV, with no conflicting release traits.",
+        "proposedBottle": null
+      }
+    ],
+    "control-3": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 35.40076713,
+        "inputTokens": 38481,
+        "cachedInputTokens": 36041,
+        "cacheWriteTokens": 2425,
+        "outputTokens": 2901,
+        "reasoningTokens": 2232,
+        "modelCalls": 5,
+        "costUsd": 0.00481127,
+        "uncachedCostUsd": 0.0111774,
+        "toolCalls": 4,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, Act 10 Scene 4, at 49.3% ABV, bottled by High West Distillery, and finished in Port barrels. Local candidate -3 represents Act 10 but omits the marketed Scene 4 distinction; candidate 43397 is a generic expression and does not represent this release. Create a separate Bottle for the exact marketed release.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 10 Scene 4",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "A blend of straight rye whiskeys finished in Port barrels",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": 1750,
+            "name": "High West"
+          },
+          "distillers": [],
+          "bottler": {
+            "id": null,
+            "name": "High West Distillery",
+            "kind": "bottler"
+          }
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 23.32245621,
+        "inputTokens": 25096,
+        "cachedInputTokens": 23644,
+        "cacheWriteTokens": 1443,
+        "outputTokens": 1913,
+        "reasoningTokens": 1393,
+        "modelCalls": 3,
+        "costUsd": 0.00313103,
+        "uncachedCostUsd": 0.0073148,
+        "toolCalls": 2,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West A Midwinter Night's Dram, Act 12 Scene 9, at 49.3% ABV. The inspected local candidates represent Act 12 without the marketed Scene 9 edition and therefore are too broad to match this complete release. Focused web evidence also corroborates Act 12 Scene 9 as a distinct release. No supported release year, distillery, bottler, age, or strength designation is available from the evidence.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 12 Scene 9",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": null,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "High West",
+            "kind": "brand"
+          },
+          "distillers": [],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+        "fixtureSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+        "name": "new bottles: release year in candidate name",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 26.166235,
+        "inputTokens": 27215,
+        "cachedInputTokens": 25221,
+        "cacheWriteTokens": 1982,
+        "outputTokens": 1843,
+        "reasoningTokens": 1214,
+        "modelCalls": 4,
+        "costUsd": 0.00321392,
+        "uncachedCostUsd": 0.0076546,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies Woodford Reserve Double Double Oaked from the Distillery Series as a 2022 release at 45.2% ABV. Focused web evidence corroborates the product expression, annual Distillery Series context, 90.4 proof/45.2% ABV, and second-barrel maturation. The only local candidate is explicitly a 2017 release and is a distinct marketed Bottle, so it is not safe to match. No local candidate represents the complete 2022 identity.",
+        "proposedBottle": {
+          "name": "Double Double Oaked",
+          "series": {
+            "id": null,
+            "name": "Distillery Series"
+          },
+          "category": "bourbon",
+          "edition": "2022 Release",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished in a second, custom-crafted barrel",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 45.2,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "Woodford Reserve",
+            "kind": "brand"
+          },
+          "distillers": [
+            {
+              "id": null,
+              "name": "Woodford Reserve",
+              "kind": "distillery"
+            }
+          ],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+        "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 37.00019921,
+        "inputTokens": 16450,
+        "cachedInputTokens": 15038,
+        "cacheWriteTokens": 1406,
+        "outputTokens": 3176,
+        "reasoningTokens": 2898,
+        "modelCalls": 2,
+        "costUsd": 0.00446466,
+        "uncachedCostUsd": 0.0071012,
+        "toolCalls": 1,
+        "searchQueries": 2,
+        "pageReads": 0,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Elijah Craig",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "bourbon",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 18,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.abv",
+            "expected": 45,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.singleCask",
+            "expected": true,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got no_match",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source supports Elijah Craig 18-Year-Old Single Barrel Bourbon at 45% ABV and product-level scope. Candidate 16142 matches the age, category, and single-barrel traits but is labeled with the additional cask identifier No. 4040, which the source does not establish. No safe exact existing Bottle or supported separate creation can be selected.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+        "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 42.62497221,
+        "inputTokens": 27209,
+        "cachedInputTokens": 25911,
+        "cacheWriteTokens": 1286,
+        "outputTokens": 2170,
+        "reasoningTokens": 1668,
+        "modelCalls": 4,
+        "costUsd": 0.00344612,
+        "uncachedCostUsd": 0.0080458,
+        "toolCalls": 3,
+        "searchQueries": 1,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Masterson's",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "rye",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 10,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got no_match",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Masterson's 10-year-old straight rye whiskey finished in French oak, bottled at 90 proof (45% ABV). No source evidence establishes Barrel F2-038, so Bottle 16442 is not safe to assign without review; the other local candidates do not represent the complete marketed expression. Creating a duplicate is also unsupported while the plausible malformed candidate remains unresolved.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+        "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+        "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 650,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 650,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 6.47845904,
+        "inputTokens": 5608,
+        "cachedInputTokens": 5605,
+        "cacheWriteTokens": 0,
+        "outputTokens": 464,
+        "reasoningTokens": 319,
+        "modelCalls": 1,
+        "costUsd": 0.0006695,
+        "uncachedCostUsd": 0.0016784,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS reference identifies exact cask 41.176, and the inspected local candidate is SMWS 41.176 Baristaliscious from Dailuaine, matching the exact-cask identity. Missing stored age-related enrichment does not conflict with the source identity. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+        "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+        "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 44284,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 12825,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 9.50241092,
+        "inputTokens": 13293,
+        "cachedInputTokens": 13287,
+        "cacheWriteTokens": 0,
+        "outputTokens": 791,
+        "reasoningTokens": 499,
+        "modelCalls": 2,
+        "costUsd": 0.00121614,
+        "uncachedCostUsd": 0.0036078,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": ["matchedBottleId expected 12825 but got 44284"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West High Country American Single Malt Whiskey, Batch No. 23J12, at 44% ABV. Inspected local Bottle 44284 has the same brand, expression, category, marketed batch edition, and ABV. The batch is a release identifier, so the generic High West High Country candidate is too broad.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+        "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+        "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 43260,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 43260,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 6.80582858,
+        "inputTokens": 5526,
+        "cachedInputTokens": 5523,
+        "cacheWriteTokens": 0,
+        "outputTokens": 269,
+        "reasoningTokens": 116,
+        "modelCalls": 1,
+        "costUsd": 0.00043386,
+        "uncachedCostUsd": 0.001428,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The SMWS exact-cask code RW6.5 deterministically identifies the marketed release, and the inspected local candidate matches the complete identity: Kyrö rye, six years old, 56% ABV, single cask, released in 2024, titled “Appley ever after.” Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+        "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+        "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 2466,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 2466,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 50.79380454,
+        "inputTokens": 42075,
+        "cachedInputTokens": 41201,
+        "cacheWriteTokens": 853,
+        "outputTokens": 3815,
+        "reasoningTokens": 3032,
+        "modelCalls": 7,
+        "costUsd": 0.00561947,
+        "uncachedCostUsd": 0.012993,
+        "toolCalls": 5,
+        "searchQueries": 3,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official Glenmorangie product page identifies The Quinta Ruban as a 14-year-old single malt with 46.0% ABV, matured in port casks. Existing Bottle 2466 matches the brand, expression, age, category, and bottler relationship; its missing ABV and distillery fields are enrichment gaps rather than conflicts. The catalog name's unstructured “4th Edition” wording is not sufficient to establish a distinct marketed edition.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+        "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+        "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 630,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 630,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 8.3267865,
+        "inputTokens": 10989,
+        "cachedInputTokens": 10722,
+        "cacheWriteTokens": 261,
+        "outputTokens": 578,
+        "reasoningTokens": 305,
+        "modelCalls": 2,
+        "costUsd": 0.00097449,
+        "uncachedCostUsd": 0.0028914,
+        "toolCalls": 1,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The source identifies the standard Ardbeg Uigeadail single malt expression at 54.2% ABV. Inspected local candidate 630 matches the brand, expression, distillery, category, and ABV, with no conflicting marketed release traits.",
+        "proposedBottle": null
+      }
+    ],
+    "treatment-3": [
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-10-scene-4-bottle.json",
+        "fixtureSha256": "b6f34358e90d022b21e555973adec8f0442eae242da7e25b9dd9c17c6a572bbb",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 10 Scene 4 Bottle",
+        "status": "passed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 26.21121408,
+        "inputTokens": 44768,
+        "cachedInputTokens": 43073,
+        "cacheWriteTokens": 1677,
+        "outputTokens": 1861,
+        "reasoningTokens": 1126,
+        "modelCalls": 6,
+        "costUsd": 0.00351751,
+        "uncachedCostUsd": 0.0111868,
+        "toolCalls": 5,
+        "searchQueries": 1,
+        "pageReads": 2,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The readable label identifies High West A Midwinter Night's Dram, Act 10 Scene 4, at 49.3% ABV. Public product evidence independently confirms the exact Act 10 Scene 4 release. Local candidate -3 represents the broader Act 10 release without the marketed Scene 4 distinction, while candidate 43397 is an unqualified expression, so neither is safe for assignment. Create the complete distinct marketed Bottle using High West for the brand, bottler, and distillery relationships.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 10 Scene 4",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished in Port barrels",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2022,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": 1750,
+            "name": "High West"
+          },
+          "distillers": [
+            {
+              "id": 1750,
+              "name": "High West"
+            }
+          ],
+          "bottler": {
+            "id": 1750,
+            "name": "High West"
+          }
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/image-backed-photo-creates-complete-high-west-midwinter-act-12-scene-9-bottle.json",
+        "fixtureSha256": "98b9c20dc9b237b4d188462bd6750d4f2bfbe19cdf7bae381c2ada6f990a7d4f",
+        "name": "new bottles: image-backed photo: creates complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 34.63100404,
+        "inputTokens": 43904,
+        "cachedInputTokens": 33264,
+        "cacheWriteTokens": 10625,
+        "outputTokens": 2790,
+        "reasoningTokens": 2056,
+        "modelCalls": 5,
+        "costUsd": 0.00667253,
+        "uncachedCostUsd": 0.0121288,
+        "toolCalls": 4,
+        "searchQueries": 4,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [
+          "suggestedNextStep expected confirm_create but got manual_search"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable bottle label identifies High West A Midwinter Night's Dram, Act 12 Scene 9, at 49.3% ABV. The existing Act 12 candidates do not include the specific Scene 9 release descriptor, which distinguishes this marketed release, so creating a complete exact Bottle is safer than assigning a broader candidate.",
+        "proposedBottle": {
+          "name": "A Midwinter Night's Dram",
+          "series": {
+            "id": null,
+            "name": "A Midwinter Night's Dram"
+          },
+          "category": "rye",
+          "edition": "Act 12 Scene 9",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": null,
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 49.3,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": 2024,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "High West",
+            "kind": "brand"
+          },
+          "distillers": [],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json",
+        "fixtureSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+        "name": "new bottles: release year in candidate name",
+        "status": "failed",
+        "action": "create_bottle",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 36.65651438,
+        "inputTokens": 27382,
+        "cachedInputTokens": 25559,
+        "cacheWriteTokens": 1811,
+        "outputTokens": 2657,
+        "reasoningTokens": 2014,
+        "modelCalls": 4,
+        "costUsd": 0.00415473,
+        "uncachedCostUsd": 0.0086648,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.releaseYear",
+            "expected": 2022,
+            "actual": null
+          }
+        ],
+        "failures": ["proposedBottle missing expected fields"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The submitted label identifies the Woodford Reserve Distillery Series Double Double Oaked 2022 Release at 45.2% ABV. Focused product evidence confirms the 90.4-proof, 45.2% ABV Double Double Oaked release and its Distillery Series placement. The only local candidate is explicitly a 2017 Release and therefore represents a different marketed Bottle. The public listing describes availability in January 2023, so the printed 2022 Release wording is retained as the edition while releaseYear is left null.",
+        "proposedBottle": {
+          "name": "Double Double Oaked",
+          "series": {
+            "id": null,
+            "name": "Distillery Series"
+          },
+          "category": "bourbon",
+          "edition": "2022 Release",
+          "statedAge": null,
+          "caskStrength": null,
+          "singleCask": null,
+          "maturation": "Finished in a second, deeply toasted and lightly charred custom-crafted barrel.",
+          "caskNumber": null,
+          "outturn": null,
+          "abv": 45.2,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "releaseYear": null,
+          "releaseMonth": null,
+          "releaseDay": null,
+          "brand": {
+            "id": null,
+            "name": "Woodford Reserve",
+            "kind": "brand"
+          },
+          "distillers": [
+            {
+              "id": null,
+              "name": "Woodford Reserve",
+              "kind": "distillery"
+            }
+          ],
+          "bottler": null
+        }
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-elijah-craig-18-single-barrel-when-local-candidate-is-barrel-specific.json",
+        "fixtureSha256": "2d4b5dbe7121a9ea503a371d6b5a6eae28b21aaf03261a63d719b77dcf29f7a1",
+        "name": "new bottles: store listing: creates Elijah Craig 18-year-old Single Barrel when the local candidate is barrel-specific",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 28.060922,
+        "inputTokens": 33289,
+        "cachedInputTokens": 31853,
+        "cacheWriteTokens": 1424,
+        "outputTokens": 2058,
+        "reasoningTokens": 1523,
+        "modelCalls": 4,
+        "costUsd": 0.00346506,
+        "uncachedCostUsd": 0.0091274,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Elijah Craig",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "bourbon",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 18,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.abv",
+            "expected": 45,
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.singleCask",
+            "expected": true,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got no_match",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include 18-year-old",
+          "proposedBottle.name expected to include Single Barrel"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The complete source identity is Elijah Craig 18-Year-Old Single Barrel Kentucky Straight Bourbon, 18 years old, 45% ABV, and single cask. Product evidence indicates that individual barrel numbers distinguish separately bottled releases. The only plausible local candidate is specifically No. 4040, while the source gives no barrel number, so matching would risk assigning the wrong exact cask. A generic creation is also unsupported because the marketed product is bottled by individual barrel.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/new_bottles/store-listing-creates-mastersons-french-oak-finish-instead-of-matching-plain-rye-or-barrel-specific-bottle.json",
+        "fixtureSha256": "caca474114f4ea58673f0a10e2f183899efb0c9c7716f4418cb0473e07059f01",
+        "name": "new bottles: store listing: creates Masterson's French Oak Finish instead of matching plain rye sibling",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 16442,
+        "expectedAction": "create_bottle",
+        "expectedMatchedBottleId": null,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 22.02800525,
+        "inputTokens": 28924,
+        "cachedInputTokens": 26701,
+        "cacheWriteTokens": 2211,
+        "outputTokens": 1598,
+        "reasoningTokens": 1145,
+        "modelCalls": 4,
+        "costUsd": 0.00300677,
+        "uncachedCostUsd": 0.0077024,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [
+          {
+            "field": "proposedBottle.brand.name",
+            "expected": "Masterson's",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.category",
+            "expected": "rye",
+            "actual": null
+          },
+          {
+            "field": "proposedBottle.statedAge",
+            "expected": 10,
+            "actual": null
+          }
+        ],
+        "failures": [
+          "action expected create_bottle but got match",
+          "matchedBottleId expected null but got 16442",
+          "proposedBottle missing expected fields",
+          "proposedBottle.name expected to include French Oak"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source identifies Masterson's 10-year-old straight rye with a French-oak barrel finish. Focused web evidence confirms this exact marketed expression, including its 45% ABV/90 proof presentation; the local candidate 16442 is the only candidate matching the French Oak finish and age. Its F2-038 barrel designation is additional candidate detail and does not conflict with the source listing, which omits that detail.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-listing-matches-an-existing-exact-cask-bottle-from-image-first-extraction.json",
+        "fixtureSha256": "6112447d4db8e898169a1614f6d2cf80f2eb477b5e119359f3f224f75bde9d5c",
+        "name": "match existing: image-backed listing: matches an existing exact-cask bottle from image-first extraction",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 650,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 650,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 5.54697117,
+        "inputTokens": 5704,
+        "cachedInputTokens": 5701,
+        "cacheWriteTokens": 0,
+        "outputTokens": 477,
+        "reasoningTokens": 328,
+        "modelCalls": 1,
+        "costUsd": 0.00068702,
+        "uncachedCostUsd": 0.0017132,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "SMWS cask code 41.176 is the marketed exact-cask identity. The inspected local candidate is SMWS 41.176, a Dailuaine single malt bottled by The Scotch Malt Whisky Society, and its additional 17-year field is compatible with the source's missing age field. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/image-backed-photo-matches-high-west-high-country-batch-23j12.json",
+        "fixtureSha256": "b8a387d859ea0e7ba65eb81fbb3ee0d783115e6a64123d095121979bbb72d64f",
+        "name": "match existing: High West High Country: image-backed photo matches Batch No. 23J12",
+        "status": "failed",
+        "action": "match",
+        "matchedBottleId": 44284,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 12825,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": true,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 6.17348054,
+        "inputTokens": 6473,
+        "cachedInputTokens": 6470,
+        "cacheWriteTokens": 0,
+        "outputTokens": 509,
+        "reasoningTokens": 348,
+        "modelCalls": 1,
+        "costUsd": 0.0007408,
+        "uncachedCostUsd": 0.0019054,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": ["matchedBottleId expected 12825 but got 44284"],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The readable label identifies High West High Country American Single Malt Whiskey, Batch No. 23J12, at 44% ABV. Existing Bottle 44284 has the same brand, expression, category, edition, and ABV, making it the exact marketed Bottle. The candidate's missing distillery enrichment does not conflict with the source evidence.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/smws-listing-matches-an-existing-exact-cask-bottle-by-code.json",
+        "fixtureSha256": "fea34b62eaa073ee319f722a17890e0308ee029fbdfb125ba587ab0ffafe590b",
+        "name": "match existing: SMWS listing: matches an existing exact-cask bottle by code",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 43260,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 43260,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 4.6188025,
+        "inputTokens": 5622,
+        "cachedInputTokens": 5619,
+        "cacheWriteTokens": 0,
+        "outputTokens": 425,
+        "reasoningTokens": 261,
+        "modelCalls": 1,
+        "costUsd": 0.00062298,
+        "uncachedCostUsd": 0.0016344,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The official SMWS reference identifies the exact-cask release RW6.5, “Appley ever after.” The inspected local candidate 43260 matches the complete identity, including SMWS branding, Kyrö rye, six-year age, 56% ABV, 2024 release, single-cask status, and the exact-cask code. Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-matches-quinta-ruban-14-despite-stored-edition-suffix.json",
+        "fixtureSha256": "b4988f0c2c773978404fa943d0fe99ed98710d6837abae1754f44127a618aa34",
+        "name": "match existing: store listing: matches Quinta Ruban 14 despite the stored edition suffix",
+        "status": "failed",
+        "action": "no_match",
+        "matchedBottleId": null,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 2466,
+        "correctIdentityDecision": false,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 38.6831415,
+        "inputTokens": 30717,
+        "cachedInputTokens": 29100,
+        "cacheWriteTokens": 1602,
+        "outputTokens": 3374,
+        "reasoningTokens": 2714,
+        "modelCalls": 5,
+        "costUsd": 0.0050343,
+        "uncachedCostUsd": 0.0101922,
+        "toolCalls": 3,
+        "searchQueries": 2,
+        "pageReads": 1,
+        "fieldDifferences": [],
+        "failures": [
+          "action expected match but got no_match",
+          "matchedBottleId expected 2466 but got null"
+        ],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 0
+          }
+        ],
+        "rationale": "The source is a Glenmorangie single malt, Quinta Ruban, aged 14 years; the official page confirms 46.0% ABV and maturation in bourbon and Portuguese port casks. Candidate 2466 matches the core expression and age but is specifically named as the 4th Edition, an identity-critical release distinction not established by the source. No safe exact assignment or separate creation is supported.",
+        "proposedBottle": null
+      },
+      {
+        "fixture": "src/eval-fixtures/decision-cases/match_existing/store-listing-strips-retailer-suffix-noise-and-matches-the-canonical-bottle.json",
+        "fixtureSha256": "d970d3b43bfa38c6b19fcd2e7e438c7cbef9e71d75547b42d8202a1eae935e33",
+        "name": "match existing: store listing: strips retailer suffix noise and matches the canonical bottle",
+        "status": "passed",
+        "action": "match",
+        "matchedBottleId": 630,
+        "expectedAction": "match",
+        "expectedMatchedBottleId": 630,
+        "correctIdentityDecision": true,
+        "incorrectExistingMatch": false,
+        "runtimeError": false,
+        "timedOut": false,
+        "durationSeconds": 4.92561733,
+        "inputTokens": 5460,
+        "cachedInputTokens": 5457,
+        "cacheWriteTokens": 0,
+        "outputTokens": 382,
+        "reasoningTokens": 248,
+        "modelCalls": 1,
+        "costUsd": 0.00056814,
+        "uncachedCostUsd": 0.0015504,
+        "toolCalls": 0,
+        "searchQueries": 0,
+        "pageReads": 0,
+        "fieldDifferences": [],
+        "failures": [],
+        "checks": [
+          {
+            "name": "ClassifierExpectationJudge",
+            "score": 1
+          }
+        ],
+        "rationale": "The source identifies the marketed product as Ardbeg Uigeadail, a single malt at 54.2% ABV. Existing Bottle 630 has the same brand, expression, distillery, category, and ABV, with no conflicting release traits. The retailer URL is not treated as a reusable global alias.",
+        "proposedBottle": null
+      }
+    ]
+  },
+  "fixtureSnapshots": {
+    "src/eval-fixtures/decision-cases/new_bottles/release-year-in-candidate-name.json": "evals/experiments/fixtures/01-release-year-in-candidate-name.json"
+  },
+  "fixtureReview": {
+    "date": "2026-09-03",
+    "change": "Removed the added fixture's unverified calendar releaseYear assertion after the experiment. Kept action and identityScope expectations. No original scores were changed.",
+    "snapshotSha256": "2a0de97b1c98a4172282fb895a5f9aa80d890c7b42141636275e154a53b0aa1e",
+    "correctCandidateDecisionsInOriginalAttempts": 6
+  },
+  "replayEvidence": [
+    ".vitest-evals/recordings/firecrawl_web_search/698f7f00c26e4cb99147d5ab39b2ad3210d983bf3bf051197627e8e11a265c8a.json",
+    ".vitest-evals/recordings/firecrawl_read_page/679a57ed069f8f56246a0ce3740b3a97f05045980ad308ba96ace785a63fee1a.json",
+    ".vitest-evals/recordings/firecrawl_web_search/a6576d0d290f9b5901c72be06a6b43d411f334e69ecacd71e34d5ffef7d4f6ae.json",
+    ".vitest-evals/recordings/firecrawl_read_page/98e34b93f4c6def4876fac9bf988a94fbd34943662b16bab48457865add22849.json",
+    ".vitest-evals/recordings/firecrawl_web_search/f1707bef5ef6d7fe6a04dc34a4820573121603ff909376d94fe0ebb2c393c53c.json",
+    ".vitest-evals/recordings/firecrawl_read_page/a3d44647a2d58c8ced3b60a91a5fc8219ecbc811079539ab3a3ecf07cc37da2c.json",
+    ".vitest-evals/recordings/firecrawl_web_search/bcbb303e498407f3148382b92839ac6852286d933bf87eaa151d5d9226dbf57b.json",
+    ".vitest-evals/recordings/firecrawl_read_page/d06508650fd8891a162ce500061c46fe02437d01eb392790dd5c448e19aed7d6.json",
+    ".vitest-evals/recordings/firecrawl_read_page/f600ee73e74927724cebb79de073bd04fe6ce6644a711d6a7a0a4da87b93f186.json",
+    ".vitest-evals/recordings/firecrawl_web_search/f6c281da44750bc695ad91196c056c57e5f630813ba0f813853b8e258302f7ec.json",
+    ".vitest-evals/recordings/firecrawl_read_page/7d180727cc5f06d22764e04e7d0809c7eea0987578a0cd956c855bb29b54aa76.json"
+  ]
+}

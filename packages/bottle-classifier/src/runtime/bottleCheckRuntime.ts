@@ -47,7 +47,11 @@ import {
   createBottleContextLoader,
 } from "./bottleCheckContext";
 import { findUnsupportedPopulatedBottlePatchField } from "./bottlePatchEvidence";
-import { mergeBottleCandidate, mergeResolvedEntity } from "./candidates";
+import {
+  buildEntityRetrievalRecord,
+  mergeBottleCandidate,
+  mergeResolvedEntity,
+} from "./candidates";
 
 export type BottleClassifierDataSource = {
   findInitialCandidates?: (args: {
@@ -87,14 +91,14 @@ const RawRunItemSchema = z.object({
 export type BottleClassifierToolEvent =
   | {
       type: "tool_call";
-      phase: "agent";
+      phase: "agent" | "preparation";
       id: string;
       name: string;
       arguments: JsonValue;
     }
   | {
       type: "tool_result";
-      phase: "agent";
+      phase: "agent" | "preparation";
       toolCallId: string;
       name: string;
       result: JsonValue;
@@ -442,9 +446,14 @@ export function createBottleCheckTools({
       ? [
           createSearchEntitiesTool({
             searchEntities: dataSource.searchEntities,
-            onResults: (results) => {
+            onResults: (results, args) => {
               for (const result of results) {
-                mergeResolvedEntity(state.resolvedEntities, result);
+                mergeResolvedEntity(state.resolvedEntities, {
+                  ...result,
+                  retrievedFor: [
+                    buildEntityRetrievalRecord(args.query, result.source),
+                  ],
+                });
               }
             },
           }),

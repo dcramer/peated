@@ -69,6 +69,10 @@ the relationship. Leave it empty when the evidence does not establish it.
 
 False matches are worse than `no_match` or reviewed creation.
 
+- A product made by combining whisky with added flavor is outside the whisky
+  catalog. Return `no_match` even when Peated already has a Bottle for it. A
+  flavor-adjacent word in a name is not enough to apply this rule; require
+  product evidence that establishes the addition.
 - Match only when the candidate covers the complete observed Bottle and no
   populated identity field conflicts.
 - A missing candidate field is compatible when evidence identifies the same
@@ -80,7 +84,7 @@ False matches are worse than `no_match` or reviewed creation.
 - Reuse Entities from established Bottle relationships. Name overlap does not
   override local evidence that distinguishes a Brand from its distillery.
 - Create only when source text, a label or image, local catalog evidence, a
-  verified identity anchor, or reliable web evidence supports the missing
+  verified identifier, or reliable web evidence supports the missing
   Bottle.
 - Do not create an identity by combining uncertain facts from different
   products, batches, or releases.
@@ -121,7 +125,7 @@ During an audit:
 - Change a populated age, ABV, year, cask, outturn, or similar fact only with
   evidence for that exact Bottle. Other batches show variation, not a
   correction.
-- One public label image may fill a missing scalar fact. Replacing a populated
+- One public label image may fill a missing single-value fact. Replacing a populated
   fact requires a matching structured Bottle observation or two distinct label
   images whose structured extractions agree.
 - An unstructured web result may inform review but cannot authorize a factual
@@ -140,6 +144,8 @@ Deterministic code may handle:
 - impossible states and direct conflicts on populated fields;
 - the code-derived automation tier, `deriveAutomationTier`;
 - exact stored-reference lookup; and
+- the unique accepted Entity Reference for an Entity name already selected by
+  the model; and
 - verified closed identifiers such as SMWS bottle codes.
 
 It must not decide whisky-family meaning from brand prefixes, years, batch-like
@@ -182,7 +188,7 @@ Code may:
 - parse exact codes such as `95.71`, `RW6.5`, or `G15.1`;
 - compose a code only when both separately labeled parts are present, such as
   `Distillery No. 1` and `Cask No. 285` becoming `1.285`;
-- use the code as an identity anchor and derive rough distillery or category
+- use the code as a verified identity fact and derive rough distillery or category
   context from the curated code table; and
 - keep a visible subtitle in a proposed display name.
 
@@ -199,8 +205,14 @@ too specific, and semantic match or creation.
 
 Its catalog and web tools are read-only. It may inspect local Bottles and
 Entities, run focused web searches, and read a promising page. When web tools
-are unavailable, the runtime does not silently substitute another model or
+are unavailable, the classifier does not silently substitute another model or
 provider.
+
+For a title-derived deterministic creation with a source URL and no supplied
+web evidence, the classifier may read that exact page before the agent runs. This
+fills supported creation facts after local code has settled Bottle identity. It
+does not run for structured input or a deterministic match. A failed or empty
+read is recorded and classification continues with a fresh page-read allowance.
 
 Ignored input does not run the agent. An exact stored reference may use the
 preflight above. All other reference decisions use one bounded agent loop.

@@ -13,9 +13,9 @@ This package owns:
 - the public classification, extraction, and audit contracts;
 - the model prompts, read-only tool loop, and result validation;
 - pure Bottle identity and automation-tier helpers;
-- classifier fixtures, unit tests, and live evals.
+- classifier test cases, unit tests, and live evals.
 
-Server code injects database, local-search, and web adapters. It owns saved
+Server code supplies database, local-search, and web functions. It owns saved
 workflow state and any resulting database changes. This package must not import
 `apps/server`.
 
@@ -61,7 +61,7 @@ import {
 `normalizeBottleReferenceKey` is the safe helper for exact reference keys.
 `normalizeBottleInput` performs wider display-name cleanup and structured fact
 extraction; do not use it for an exact-reference decision. The old helper name
-is fully removed, and legacy scraper adapters now call `normalizeBottleInput`.
+is fully removed, and legacy scraper integrations now call `normalizeBottleInput`.
 See
 [Bottle Reference Normalization](../../docs/architecture/bottle-reference-normalization.md).
 
@@ -76,41 +76,44 @@ Other supported subpaths include:
 - `priceMatchingEvidence`
 - `smws`
 
-Server adapters may use only the explicit `internal/*` exports. These are not
+Server integrations may use only the explicit `internal/*` exports. These are not
 general package API.
 
 ## File Map
 
 - [`src/classifier.ts`](./src/classifier.ts) — public classifier factory
 - [`src/contract.ts`](./src/contract.ts) — public request and result schemas
-- [`src/classifierRuntime.ts`](./src/classifierRuntime.ts) — runtime and tool loop
+- [`src/classifierRuntime.ts`](./src/classifierRuntime.ts) — classifier and tool loop
 - [`src/reviewPolicy.ts`](./src/reviewPolicy.ts) — final validation
 - [`src/instructions.ts`](./src/instructions.ts) — classifier prompts
 - [`src/extractor.ts`](./src/extractor.ts) — label extraction
 - [`src/normalize.ts`](./src/normalize.ts) — normalization helpers
-- [`src/bottleIdentity.ts`](./src/bottleIdentity.ts) — canonical Bottle identity
+- [`src/bottleIdentity.ts`](./src/bottleIdentity.ts) — stable Bottle identity
 - [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts) — creation draft cleanup
 - [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts) — evidence checks and `deriveAutomationTier`
 - [`src/smws.ts`](./src/smws.ts) — SMWS code handling
 - [`src/eval-fixtures/`](./src/eval-fixtures) — file-backed eval cases
 - [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts) — live eval runner
+- [`evals/README.md`](./evals/README.md) — historical baselines and accuracy experiments
 
 ## Configuration
 
 The server and eval runner read these settings:
 
-| Setting                                    | Purpose                                      | Default           |
-| ------------------------------------------ | -------------------------------------------- | ----------------- |
-| `AI_GATEWAY_API_KEY`                       | Required hosted model access                 | none              |
-| `BOTTLE_CLASSIFIER_MODEL`                  | Reference and audit model                    | `gpt-5.6-terra`   |
-| `BOTTLE_CLASSIFIER_REASONING_EFFORT`       | Classifier reasoning effort                  | `medium`          |
-| `OPENAI_IMAGE_EXTRACTION_MODEL`            | Label extraction model                       | `gpt-5.6-luna`    |
-| `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT` | Label extraction reasoning effort            | `high`            |
-| `OPENAI_EVAL_MODEL`                        | Eval judge model                             | `gpt-5.6-luna`    |
-| `OPENAI_EVAL_REASONING_EFFORT`             | Eval judge reasoning effort                  | `medium`          |
-| `FIRECRAWL_API_KEY`                        | Optional web search and page reading         | none              |
-| `FIRECRAWL_API_URL`                        | Optional Firecrawl endpoint override         | provider default  |
-| `VITEST_EVALS_REPLAY_DIR`                  | Optional replay recording directory override | package directory |
+| Setting                                      | Purpose                                          | Default           |
+| -------------------------------------------- | ------------------------------------------------ | ----------------- |
+| `AI_GATEWAY_API_KEY`                         | Required hosted model access                     | none              |
+| `BOTTLE_CLASSIFIER_MODEL`                    | Reference and audit model                        | `gpt-5.6-luna`    |
+| `BOTTLE_CLASSIFIER_REASONING_EFFORT`         | Classifier reasoning effort                      | `high`            |
+| `OPENAI_IMAGE_EXTRACTION_MODEL`              | Label extraction model                           | `gpt-5.6-luna`    |
+| `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT`   | Label extraction reasoning effort                | `high`            |
+| `OPENAI_EVAL_MODEL`                          | Eval judge model                                 | `gpt-5.6-luna`    |
+| `OPENAI_EVAL_REASONING_EFFORT`               | Eval judge reasoning effort                      | `medium`          |
+| `FIRECRAWL_API_KEY`                          | Optional web search and page reading             | none              |
+| `FIRECRAWL_API_URL`                          | Optional Firecrawl endpoint override             | provider default  |
+| `VITEST_EVALS_REPLAY_DIR`                    | Optional replay recording directory override     | package directory |
+| `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` | Reviewed test case evidence for controlled evals | none              |
+| `BOTTLE_CLASSIFIER_EVAL_FIXTURE_IDS`         | Comma-separated exact test case IDs to run       | all               |
 
 Model calls use Vercel AI Gateway. Without Firecrawl, the classifier has no web
 tools. The eval config loads the repo-root `.env.local`; shell values take
@@ -130,7 +133,7 @@ pnpm evals:classifier
 pnpm evals:classifier:flaky
 pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
 
-# Manual classifier smoke checks through server adapters and the local database
+# Manual classifier smoke checks through server integrations and the local database
 pnpm cli classifier run "Ardbeg Uigeadail"
 pnpm cli classifier run --image /tmp/bottle.jpg
 pnpm cli classifier run --input-file /tmp/classifier-input.json

@@ -1,0 +1,138 @@
+{
+  "item": "M02",
+  "decision": "accepted_measurement_correction",
+  "classifierChanged": false,
+  "policyCorrection": {
+    "modelCalls": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "estimatedCostUsd": 0,
+    "modelTimeMs": 0
+  },
+  "historicalRescore": [
+    {
+      "setting": "no-web/terra-medium",
+      "recordedPassed": 74,
+      "correctedPassed": 76,
+      "total": 102
+    },
+    {
+      "setting": "no-web/luna-high",
+      "recordedPassed": 75,
+      "correctedPassed": 73,
+      "total": 102
+    },
+    {
+      "setting": "no-web/luna-xhigh",
+      "recordedPassed": 73,
+      "correctedPassed": 75,
+      "total": 102
+    },
+    {
+      "setting": "web/terra-medium",
+      "recordedPassed": 76,
+      "correctedPassed": 78,
+      "total": 102
+    },
+    {
+      "setting": "web/luna-high",
+      "recordedPassed": 73,
+      "correctedPassed": 75,
+      "total": 102
+    },
+    {
+      "setting": "web/luna-xhigh",
+      "recordedPassed": 73,
+      "correctedPassed": 75,
+      "total": 102
+    }
+  ],
+  "currentAssignmentControl": {
+    "fixtureId": "current-assignment-reaffirmed-in-scope-whisky-uses-current-assignment-confidence-basis",
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high",
+    "maxSearchQueries": 0,
+    "attempts": [
+      {
+        "label": "setup",
+        "fullPass": false,
+        "currentAssignmentBehaviorPass": true,
+        "action": "match",
+        "matchedBottleId": 630,
+        "derivedTier": "auto",
+        "failure": "referenceScope expected none but got global_alias",
+        "durationMs": 10254.783583,
+        "inputTokens": 11283,
+        "cachedInputTokens": 6119,
+        "cacheWriteTokens": 5158,
+        "outputTokens": 675,
+        "reasoningTokens": 408,
+        "modelCalls": 2,
+        "estimatedCostUsd": 0.00222308,
+        "estimatedCostWithoutCachingUsd": 0.0030666,
+        "webSearches": 0,
+        "pageReads": 0
+      },
+      {
+        "label": "repeat-1",
+        "fullPass": true,
+        "currentAssignmentBehaviorPass": true,
+        "action": "match",
+        "matchedBottleId": 630,
+        "derivedTier": "auto",
+        "failure": null,
+        "durationMs": 10479.049959,
+        "inputTokens": 11283,
+        "cachedInputTokens": 11277,
+        "cacheWriteTokens": 0,
+        "outputTokens": 707,
+        "reasoningTokens": 428,
+        "modelCalls": 2,
+        "estimatedCostUsd": 0.00107514,
+        "estimatedCostWithoutCachingUsd": 0.003105,
+        "webSearches": 0,
+        "pageReads": 0
+      },
+      {
+        "label": "repeat-2",
+        "fullPass": true,
+        "currentAssignmentBehaviorPass": true,
+        "action": "match",
+        "matchedBottleId": 630,
+        "derivedTier": "auto",
+        "failure": null,
+        "durationMs": 11336.726667,
+        "inputTokens": 11283,
+        "cachedInputTokens": 11277,
+        "cacheWriteTokens": 0,
+        "outputTokens": 804,
+        "reasoningTokens": 509,
+        "modelCalls": 2,
+        "estimatedCostUsd": 0.00119154,
+        "estimatedCostWithoutCachingUsd": 0.0032214,
+        "webSearches": 0,
+        "pageReads": 0
+      },
+      {
+        "label": "repeat-3",
+        "fullPass": true,
+        "currentAssignmentBehaviorPass": true,
+        "action": "match",
+        "matchedBottleId": 630,
+        "derivedTier": "auto",
+        "failure": null,
+        "durationMs": 9384.839708,
+        "inputTokens": 11283,
+        "cachedInputTokens": 11277,
+        "cacheWriteTokens": 0,
+        "outputTokens": 652,
+        "reasoningTokens": 368,
+        "modelCalls": 2,
+        "estimatedCostUsd": 0.00100914,
+        "estimatedCostWithoutCachingUsd": 0.003039,
+        "webSearches": 0,
+        "pageReads": 0
+      }
+    ]
+  }
+}
