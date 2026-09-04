@@ -18,10 +18,10 @@
     "test:ci": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest run --coverage --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"; else dotenv -e .env.test -- vitest run --coverage --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"; fi' --"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "^10.6.0",
     "@google-cloud/storage": "^7.19.0",
     "@googlemaps/google-maps-services-js": "^3.4.2",
-    "@hono/node-server": "^1.19.13",
+    "@hono/node-server": "^2.1.1",
     "@logtape/hono": "catalog:",
     "@logtape/logtape": "catalog:",
     "@logtape/redaction": "catalog:",
@@ -64,7 +64,7 @@
     "openai": "^6.27.0",
     "pg": "catalog:",
     "react": "catalog:",
-    "sharp": "^0.33.5",
+    "sharp": "^0.35.4",
     "toad-scheduler": "^3.0.1",
     "tsx": "catalog:",
     "typescript": "catalog:",
