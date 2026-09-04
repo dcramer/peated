@@ -9,6 +9,8 @@ import {
   scrapeSourceRuns,
   scrapeSources,
   scrapeTargets,
+  storePriceHistories,
+  storePrices,
   type User,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -63,6 +65,15 @@ function prepareWhiskySaga(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareCompassBox(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "compassbox", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 const registry = createScraperRegistry({
@@ -95,6 +106,16 @@ const whiskySagaRegistry = createScraperRegistry({
     {
       ...scraperRegistry.sources.get("whiskysaga")!,
       externalSiteKey: "whiskysaga",
+    },
+  ],
+});
+
+const compassBoxRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("compassbox")!],
+  sources: [
+    {
+      ...scraperRegistry.sources.get("compassbox")!,
+      externalSiteKey: "compassbox",
     },
   ],
 });
@@ -256,6 +277,25 @@ async function setupWhiskySagaMigration(bottleId: number | null = null) {
     completedAt: new Date(),
   });
   return { site, article, review };
+}
+
+async function setupCompassBoxMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "compassbox",
+      name: "Compass Box",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(compassBoxRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
 }
 
 describe("POST /admin/scrape-sources/prepare", () => {
@@ -512,6 +552,120 @@ describe("POST /admin/scrape-sources/prepare", () => {
         createdById: admin.id,
       }),
     ]);
+  });
+
+  test("prepares Compass Box without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupCompassBoxMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Compass Box Orchard House",
+      price: 4500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.compassboxwhisky.com/products/orchard-house",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Compass Box Hedonism",
+      price: 8500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.compassboxwhisky.com/products/hedonism",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    await db.update(scrapeTargets).set({
+      blockedUntil: new Date(Date.now() + 60_000),
+      windowRequestCount: 3,
+    });
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareCompassBox()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareCompassBox({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    // A later definition sync must not reclaim the transferred target.
+    await syncScraperDefinitions(compassBoxRegistry);
+    await syncScraperDefinitions(
+      createScraperRegistry({ targets: [], sources: [] }),
+    );
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://www.compassboxwhisky.com/collections",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareCompassBox({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Compass Box is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Compass Box price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupCompassBoxMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Compass Box Orchard House",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/products/orchard-house",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareCompassBox({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Compass Box price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("refuses Compass Box without stored prices", async () => {
+    await setupCompassBoxMigration();
+
+    await expect(prepareCompassBox({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Compass Box has no stored prices to verify.",
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
   test("refuses an unexpected The Whisky Study article URL", async () => {
