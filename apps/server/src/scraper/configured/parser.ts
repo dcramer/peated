@@ -308,6 +308,14 @@ function parseReviewDetail(
 ): ScrapeDetailResult {
   const $ = load(html);
   const issues: ScrapeIssue[] = [];
+  const parsedArticleFieldIssues = new Set<string>();
+  const reportArticleFieldIssue = (
+    field: "detail.canonicalUrl" | "detail.publishedAt",
+    message: string,
+  ) => {
+    parsedArticleFieldIssues.add(field);
+    issues.push({ field, message });
+  };
   let canonicalUrl: URL | null = pageUrl;
   const canonicalUrlRule =
     "canonicalUrl" in rules.detail ? rules.detail.canonicalUrl : undefined;
@@ -315,19 +323,19 @@ function parseReviewDetail(
     const canonicalUrlText = readValue($, canonicalUrlRule);
     if (!canonicalUrlText) {
       canonicalUrl = null;
-      issues.push({
-        field: "detail.canonicalUrl",
-        message: "Required value was not found.",
-      });
+      reportArticleFieldIssue(
+        "detail.canonicalUrl",
+        "Required value was not found.",
+      );
     } else {
       try {
         canonicalUrl = new URL(absoluteHttpUrl(canonicalUrlText, pageUrl));
       } catch (error) {
         canonicalUrl = null;
-        issues.push({
-          field: "detail.canonicalUrl",
-          message: error instanceof Error ? error.message : "URL is not valid.",
-        });
+        reportArticleFieldIssue(
+          "detail.canonicalUrl",
+          error instanceof Error ? error.message : "URL is not valid.",
+        );
       }
     }
   }
@@ -347,12 +355,12 @@ function parseReviewDetail(
     !publishedAtRule ||
     (!publishedAtText && !("urlDateFormat" in publishedAtRule))
   ) {
-    issues.push({
-      field: "detail.publishedAt",
-      message: "Required value was not found.",
-    });
+    reportArticleFieldIssue(
+      "detail.publishedAt",
+      "Required value was not found.",
+    );
   } else if (!publishedAt) {
-    issues.push({ field: "detail.publishedAt", message: "Date is not valid." });
+    reportArticleFieldIssue("detail.publishedAt", "Date is not valid.");
   }
   const externalReviews: Array<{
     sourceKey: string;
@@ -475,7 +483,7 @@ function parseReviewDetail(
   if (!result.success) {
     issues.push(
       ...validationIssues(result.error, reviewField).filter(
-        ({ field }) => field !== "detail.publishedAt",
+        ({ field }) => !parsedArticleFieldIssues.has(field),
       ),
     );
     return { kind: "review", value: null, issues };

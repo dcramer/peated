@@ -444,6 +444,39 @@ describe("scrape source parser", () => {
     });
   });
 
+  it.each([
+    ["is missing", "", "Required value was not found."],
+    [
+      "points to another website",
+      '<link rel="canonical" href="https://other.test/review">',
+      "Pages must stay on the source website.",
+    ],
+  ])(
+    "reports one canonical URL issue when the configured value %s",
+    (_, canonicalMarkup, message) => {
+      const result = parseScrapeDetail(
+        {
+          ...reviewConfig,
+          detail: {
+            ...reviewConfig.detail,
+            canonicalUrl: {
+              selector: 'link[rel="canonical"]',
+              attribute: "href",
+            },
+          },
+        },
+        `${canonicalMarkup}<h1>Review</h1><time datetime="2026-04-02"></time><article class="review"><h2>Example</h2></article>`,
+        new URL("https://reviews.test/review"),
+      );
+
+      expect(result.kind).toBe("review");
+      expect(result.value).toBeNull();
+      expect(
+        result.issues.filter(({ field }) => field === "detail.canonicalUrl"),
+      ).toEqual([{ field: "detail.canonicalUrl", message }]);
+    },
+  );
+
   it("matches Whiskey Reviewer identity, URL date, grade, and evidence", async () => {
     const pageUrl = new URL(
       "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026/",
