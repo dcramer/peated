@@ -5,14 +5,9 @@ import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import {
-  ButtonLink,
-  CursorPager,
-  EmptyState,
-  ItemList,
-  ItemListItem,
-} from "@peated/web/components";
-import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
+import { ButtonLink, CursorPager, EmptyState } from "@peated/web/components";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
@@ -45,13 +40,10 @@ export function EntityTastingListClient({
       {...stylex.props(styles.content)}
     >
       {tastingList.results.length ? (
-        <ItemList ariaLabel={`${entityName} tasting records`}>
-          {tastingList.results.map((tasting) => (
-            <ItemListItem key={tasting.id}>
-              <TastingRecordEntry tasting={tasting} />
-            </ItemListItem>
-          ))}
-        </ItemList>
+        <CommunityFeed
+          ariaLabel={`${entityName} tastings`}
+          items={getTastingFeedItems(tastingList.results)}
+        />
       ) : (
         <EmptyState
           action={

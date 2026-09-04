@@ -1,12 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type {
-  BottleListItem,
-  CriticReviewProps,
-  FactListItem,
-  TastingEntryProps,
-} from "..";
+import type { BottleListItem, CriticReviewProps, FactListItem } from "..";
 import {
   AppLink,
   BottleVisual,
@@ -19,10 +14,10 @@ import {
   LoadingList,
   LoadingPlaceholder,
   SectionHeading,
-  TastingEntry,
 } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
+import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 
 const NARROW = "@media (max-width: 759px)";
@@ -48,7 +43,7 @@ export type BottleOverviewProps = {
   recommendations?: readonly BottleListItem[];
   railSections?: ReactNode;
   tastingCount?: number;
-  tastings?: readonly TastingEntryProps[];
+  tastings?: readonly CommunityFeedItem[];
 };
 
 /** Composes bottle facts, image, reviews, and tastings, with its flavor profile above related bottles. */
@@ -109,13 +104,7 @@ export function BottleOverview({
           {tastings.length ? (
             <section {...stylex.props(styles.section)}>
               <SectionHeading>Tastings</SectionHeading>
-              <ItemList ariaLabel="Bottle tastings">
-                {tastings.map((tasting, index) => (
-                  <ItemListItem key={`${tasting.author}-${index}`}>
-                    <TastingEntry {...tasting} />
-                  </ItemListItem>
-                ))}
-              </ItemList>
+              <CommunityFeed ariaLabel="Bottle tastings" items={tastings} />
               {moreTastingsHref &&
               tastingCount !== undefined &&
               tastingCount > tastings.length ? (

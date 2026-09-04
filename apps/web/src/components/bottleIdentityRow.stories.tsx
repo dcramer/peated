@@ -23,7 +23,6 @@ import { SearchResults } from "./searchResults.stylex";
 import { SectionHeading } from "./sectionHeading.stylex";
 import { SelectedBottleSummary } from "./selectedBottleSummary.stylex";
 import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
-import { TastingEntry } from "./tastingEntry.stylex";
 
 const bottleActions = {
   groupsFor: () => [
@@ -216,10 +215,8 @@ export const RowLayouts: Story = {
             variant="sidebar"
           />
         </StoryCanvas>
-        <section aria-label="Activity">
-          <SectionHeading level={3}>
-            Activity on the homepage and activity page
-          </SectionHeading>
+        <section aria-label="Activity and tastings">
+          <SectionHeading level={3}>Activity and tasting lists</SectionHeading>
           <CommunityFeed
             items={[
               {
@@ -238,20 +235,20 @@ export const RowLayouts: Story = {
                 ],
                 href: "https://example.com/review",
               },
-            ]}
-          />
-        </section>
-        <section aria-label="Tasting">
-          <SectionHeading level={3}>Tasting</SectionHeading>
-          <TastingEntry
-            author="j.macleod"
-            date="August 24"
-            members={[
               {
-                href: args.href,
-                bottle: args,
-                imageUrl: args.imageUrl,
-                ratingBand: "outstanding",
+                actor: "j.macleod",
+                action: "tasted",
+                kind: "tasting",
+                date: "2026-08-24T12:00:00.000Z",
+                id: "tasting",
+                bottles: [
+                  {
+                    ...args,
+                    id: "tasting-bottle",
+                    ratingBand: "outstanding",
+                  },
+                ],
+                href: "/tastings/42",
               },
             ]}
           />

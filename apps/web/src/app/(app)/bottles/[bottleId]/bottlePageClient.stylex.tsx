@@ -1,7 +1,5 @@
 "use client";
 
-import { getTastingEntryMember } from "@peated/web/components/tastingRecordEntry";
-
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
@@ -24,14 +22,12 @@ import {
   type FactListItem,
   type PageTabItem,
   type RowMenuItem,
-  type TastingEntryProps,
 } from "@peated/web/components";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
 import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
-import TimeSince from "@peated/web/components/timeSince";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -40,6 +36,7 @@ import {
 } from "@peated/web/lib/addBottle";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
+import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { selectOtherSeriesBottles } from "@peated/web/lib/seriesBottleRail";
@@ -55,7 +52,6 @@ import { bottleOverviewQueries } from "./bottleOverviewQueries";
 
 type Bottle = Outputs["bottles"]["details"];
 type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
-type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 const BottlePageContext = createContext<Bottle | null>(null);
 
@@ -180,18 +176,6 @@ function getCriticReview(
     nativeScore: externalReview.nativeScore,
     reviewerName: externalReview.reviewerName ?? undefined,
     summary: externalReview.clip ?? undefined,
-  };
-}
-
-function getTasting(tasting: Tasting, bottle: Bottle): TastingEntryProps {
-  const member = getTastingEntryMember({ ...tasting, bottle });
-
-  return {
-    author: tasting.createdBy.username,
-    authorHref: `/users/${tasting.createdBy.username}`,
-    authorId: tasting.createdBy.id,
-    date: <TimeSince date={tasting.createdAt} />,
-    members: [member],
   };
 }
 
@@ -472,9 +456,7 @@ export function BottleOverviewClient() {
     externalReviewsQuery.data?.results
       .map(getCriticReview)
       .filter((review): review is CriticReviewProps => review !== null) ?? [];
-  const tastings =
-    tastingsQuery.data?.results.map((tasting) => getTasting(tasting, bottle)) ??
-    [];
+  const tastings = getTastingFeedItems(tastingsQuery.data?.results ?? []);
   const recommendations =
     recommendationsQuery.data?.results.map((recommendation) =>
       toBottleListItem(recommendation, { includeRatings: true }),

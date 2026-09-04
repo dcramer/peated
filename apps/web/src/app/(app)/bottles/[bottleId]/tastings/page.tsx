@@ -2,14 +2,13 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
-  ItemList,
-  ItemListItem,
   LoadingList,
 } from "@peated/web/components";
-import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
+import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { getBottleUrl } from "@peated/web/lib/urls";
@@ -29,7 +28,7 @@ export default async function BottleTastingsPage(props: {
   const cursor = Number(searchParams.cursor ?? 1) || 1;
 
   return (
-    <BottleSection heading="Tastings">
+    <BottleSection ariaLabel="Bottle tastings">
       <Suspense
         key={`${id}:${cursor}`}
         fallback={<LoadingList label="Loading tastings" />}
@@ -63,13 +62,10 @@ async function TastingResults({
   return (
     <>
       {tastingList.results.length ? (
-        <ItemList ariaLabel="Bottle tasting records">
-          {tastingList.results.map((tasting) => (
-            <ItemListItem key={tasting.id}>
-              <TastingRecordEntry tasting={tasting} />
-            </ItemListItem>
-          ))}
-        </ItemList>
+        <CommunityFeed
+          ariaLabel="Bottle tastings"
+          items={getTastingFeedItems(tastingList.results)}
+        />
       ) : (
         <EmptyState
           action={

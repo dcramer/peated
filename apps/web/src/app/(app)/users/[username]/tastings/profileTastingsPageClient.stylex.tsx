@@ -8,15 +8,15 @@ import {
   ButtonLink,
   CursorPager,
   EmptyState,
-  ItemList,
   ItemListItem,
   LoadingList,
   LocationIdentityRow,
   RailList,
   SectionError,
 } from "@peated/web/components";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
-import { TastingRecordEntry } from "@peated/web/components/tastingRecordEntry";
+import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useProfile } from "../profileContext";
@@ -50,13 +50,10 @@ export function ProfileTastingsPageClient() {
             {isCurrentUser ? "your" : "their"} tastings again.
           </SectionError>
         ) : tastingQuery.data.results.length ? (
-          <ItemList ariaLabel={`${user.username}'s tasting records`}>
-            {tastingQuery.data.results.map((tasting) => (
-              <ItemListItem key={tasting.id}>
-                <TastingRecordEntry showAvatar={false} tasting={tasting} />
-              </ItemListItem>
-            ))}
-          </ItemList>
+          <CommunityFeed
+            ariaLabel={`${user.username}'s tastings`}
+            items={getTastingFeedItems(tastingQuery.data.results)}
+          />
         ) : (
           <EmptyState
             action={

@@ -5,7 +5,7 @@ import {
 } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, test } from "vitest";
 
-import { getCommunityFeedItems } from "./communityFeed";
+import { getCommunityFeedItems, getTastingFeedItems } from "./communityFeed";
 import { getTastingUrl } from "./urls";
 
 const session = mockActivity.find((item) => item.type === "tasting_session")!;
@@ -111,6 +111,30 @@ describe("getCommunityFeedItems", () => {
       undefined,
     ]);
     expect(items[2]?.bottles[0]?.ratingBand).toBe(mockTasting.ratingBand);
+  });
+});
+
+describe("getTastingFeedItems", () => {
+  test("maps direct tasting results to the same feed shape as activity", () => {
+    const [item] = getTastingFeedItems([mockTasting]);
+
+    expect(item).toMatchObject({
+      id: String(mockTasting.id),
+      kind: "tasting",
+      actor: mockTasting.createdBy.username,
+      actorHref: `/users/${mockTasting.createdBy.username}`,
+      actorImageUrl: mockTasting.createdBy.pictureUrl,
+      action: "tasted",
+      date: mockTasting.createdAt,
+      href: getTastingUrl(mockTasting),
+      bottles: [
+        {
+          id: String(mockTasting.id),
+          description: mockTasting.notes,
+          ratingBand: mockTasting.ratingBand,
+        },
+      ],
+    });
   });
 });
 
