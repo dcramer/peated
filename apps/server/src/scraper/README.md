@@ -150,10 +150,21 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Omit `--limit` for a full acceptance preview. A bounded preview is useful
-while editing rules; the complete rules still need a full local acceptance run
-before production activation. If request controls pause a run, the command
-prints the next eligible time and resumes from its saved page automatically.
+API. Set `rulesVersion` to `2` when testing version 2 operations. An omitted
+version means version 1 so existing preview files keep their original behavior:
+
+```json
+{
+  "rulesVersion": 2,
+  "listUrl": "https://example.com/reviews",
+  "rules": {}
+}
+```
+
+Omit `--limit` for a full acceptance preview. A bounded preview is useful while
+editing rules; the complete rules still need a full local acceptance run before
+production activation. If request controls pause a run, the command prints the
+next eligible time and resumes from its saved page automatically.
 
 ## Source acceptance rules
 

@@ -319,6 +319,7 @@ export function ScraperParsingEditor({
                       {revision.author === "ai"
                         ? "Created with AI"
                         : "Created by a person"}
+                      {` · Rules v${revision.rulesVersion}`}
                     </span>
                   </span>
                 }

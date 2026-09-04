@@ -15,15 +15,17 @@ import {
   ScrapeAttributeSchema,
   ScrapeRulesSchema,
   ScrapeSelectorSchema,
+  ScrapeValueSchema,
   type ScrapeRules,
-  type ScrapeValueSelector,
+  type ScrapeValue,
+  type ScrapeValueSelectorV1,
 } from "./rules";
 import {
   ScrapeSourceSetupError,
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v8";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v9";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -49,10 +51,51 @@ export function suggestionRequestLimit(samplePageCount: number) {
 // The AI API requires every field. Null means that the suggested rule omits it.
 const SuggestedValueSelectorSchema = z
   .object({
-    selector: ScrapeSelectorSchema,
+    input: z.enum(["selector", "fixed"]),
+    selector: ScrapeSelectorSchema.nullable(),
     attribute: ScrapeAttributeSchema.nullable(),
+    value: z.string().trim().min(1).max(200).nullable(),
+    startsWith: z.array(z.string().trim().min(1).max(100)).max(10).nullable(),
+    all: z.boolean(),
+    removePrefixes: z
+      .array(z.string().trim().min(1).max(100))
+      .max(10)
+      .nullable(),
+    removeSuffixes: z
+      .array(z.string().trim().min(1).max(100))
+      .max(10)
+      .nullable(),
+    prefix: z.string().min(1).max(200).nullable(),
+    suffix: z.string().min(1).max(200).nullable(),
   })
-  .strict();
+  .strict()
+  .superRefine((rule, context) => {
+    if (rule.input === "selector" && (!rule.selector || rule.value !== null)) {
+      context.addIssue({
+        code: "custom",
+        message: "A selector input requires selector and no fixed value.",
+      });
+    }
+    if (
+      rule.input === "fixed" &&
+      (rule.value === null ||
+        rule.selector !== null ||
+        rule.attribute !== null ||
+        rule.startsWith !== null ||
+        rule.all)
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "A fixed input requires value and no selector.",
+      });
+    }
+    if (rule.attribute !== null && (rule.startsWith !== null || rule.all)) {
+      context.addIssue({
+        code: "custom",
+        message: "Attribute selectors cannot filter or join text.",
+      });
+    }
+  });
 
 const SuggestedLinkSelectorSchema = z
   .object({
@@ -130,6 +173,18 @@ type SuggestedReviewRules = z.infer<typeof SuggestedReviewRulesSchema>;
 type SuggestedPriceRules = z.infer<typeof SuggestedPriceRulesSchema>;
 type ReviewRules = Extract<ScrapeRules, { kind: "review" }>;
 type PriceRules = Extract<ScrapeRules, { kind: "price" }>;
+type ScrapeCleanupOperations = {
+  removePrefixes?: string[];
+  removeSuffixes?: string[];
+  prefix?: string;
+  suffix?: string;
+};
+type ScrapeSelectorCandidate = ScrapeCleanupOperations & {
+  selector: string | null;
+  attribute?: string;
+  startsWith?: string[];
+  all?: true;
+};
 
 type SetupAgentCheckResult<T> =
   | { status: "passed"; checked: T }
@@ -175,6 +230,10 @@ const RULE_INSTRUCTIONS = [
   'Set list nextPage to an anchor selector with the "href" attribute when the list has a next-page link. Otherwise set it to null.',
   'Use "src" for image URLs and "datetime" for machine-readable time values when those attributes exist.',
   "Use an attribute whenever the required value is stored in that attribute instead of visible text.",
+  'For every detail value, set input to "selector" with selector and optional attribute, or set input to "fixed" with value. Set the unused selector, attribute, or value fields to null.',
+  "For visible text, startsWith can keep elements beginning with one of up to 10 literal labels and all can join the matches in document order. Attribute selectors cannot use startsWith or all.",
+  "After reading a value, removePrefixes and removeSuffixes can remove the first matching literal beginning or ending, then prefix and suffix can add literal text. Matching is case-insensitive. Set unused lists, prefix, and suffix to null and all to false.",
+  "Use fixed values only for a fact that is stable and unambiguous across the selected source pages.",
   "Use only fields allowed by check_rules.",
   "The listPages are the main page and likely list pages from the same website.",
   "The detailPages are optional examples of review or product pages.",
@@ -185,38 +244,66 @@ const RULE_INSTRUCTIONS = [
   "</rules>",
 ].join("\n");
 
-function toScrapeValueSelector(
-  value: SuggestedValueSelector,
-): ScrapeValueSelector {
-  return value.attribute === null
-    ? { selector: value.selector }
-    : { attribute: value.attribute, selector: value.selector };
+function cleanupOperations(value: SuggestedValueSelector) {
+  const operations: ScrapeCleanupOperations = {};
+  if (value.removePrefixes?.length) {
+    operations.removePrefixes = value.removePrefixes;
+  }
+  if (value.removeSuffixes?.length) {
+    operations.removeSuffixes = value.removeSuffixes;
+  }
+  if (value.prefix !== null) operations.prefix = value.prefix;
+  if (value.suffix !== null) operations.suffix = value.suffix;
+  return operations;
+}
+
+function toScrapeValue(value: SuggestedValueSelector): ScrapeValue {
+  if (value.input === "fixed") {
+    return ScrapeValueSchema.parse({
+      value: value.value,
+      ...cleanupOperations(value),
+    });
+  }
+  const rule: ScrapeSelectorCandidate = {
+    selector: value.selector,
+    ...cleanupOperations(value),
+  };
+  if (value.attribute !== null) rule.attribute = value.attribute;
+  if (value.startsWith?.length) rule.startsWith = value.startsWith;
+  if (value.all) rule.all = true;
+  return ScrapeValueSchema.parse(rule);
+}
+
+function toScrapeLinkSelector(
+  value: z.infer<typeof SuggestedLinkSelectorSchema>,
+): ScrapeValueSelectorV1 {
+  return { attribute: value.attribute, selector: value.selector };
 }
 
 function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
   const detail: ReviewRules["detail"] = {
-    title: toScrapeValueSelector(input.detail.title),
-    publishedAt: toScrapeValueSelector(input.detail.publishedAt),
+    title: toScrapeValue(input.detail.title),
+    publishedAt: toScrapeValue(input.detail.publishedAt),
     reviewItem: input.detail.reviewItem,
-    name: toScrapeValueSelector(input.detail.name),
+    name: toScrapeValue(input.detail.name),
   };
   const list: ReviewRules["list"] = {
-    detailLink: toScrapeValueSelector(input.list.detailLink),
+    detailLink: toScrapeLinkSelector(input.list.detailLink),
     maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
   };
   if (input.list.nextPage !== null) {
-    list.nextPage = toScrapeValueSelector(input.list.nextPage);
+    list.nextPage = toScrapeLinkSelector(input.list.nextPage);
   }
   if (input.detail.reviewerName !== null) {
-    detail.reviewerName = toScrapeValueSelector(input.detail.reviewerName);
+    detail.reviewerName = toScrapeValue(input.detail.reviewerName);
   }
   if (input.detail.reviewText !== null) {
-    detail.reviewText = toScrapeValueSelector(input.detail.reviewText);
+    detail.reviewText = toScrapeValue(input.detail.reviewText);
   }
   if (input.detail.score !== null) {
     detail.score = {
       scale: input.detail.score.scale,
-      value: toScrapeValueSelector(input.detail.score.value),
+      value: toScrapeValue(input.detail.score.value),
     };
   }
   return ScrapeRulesSchema.parse({ kind: input.kind, list, detail });
@@ -224,31 +311,29 @@ function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
 
 function toPriceRules(input: SuggestedPriceRules): ScrapeRules {
   const detail: PriceRules["detail"] = {
-    name: toScrapeValueSelector(input.detail.name),
-    price: toScrapeValueSelector(input.detail.price),
+    name: toScrapeValue(input.detail.name),
+    price: toScrapeValue(input.detail.price),
     currency: input.detail.currency,
-    volume: toScrapeValueSelector(input.detail.volume),
+    volume: toScrapeValue(input.detail.volume),
   };
   const list: PriceRules["list"] = {
-    detailLink: toScrapeValueSelector(input.list.detailLink),
+    detailLink: toScrapeLinkSelector(input.list.detailLink),
     maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
   };
   if (input.list.nextPage !== null) {
-    list.nextPage = toScrapeValueSelector(input.list.nextPage);
+    list.nextPage = toScrapeLinkSelector(input.list.nextPage);
   }
   if (input.detail.url !== null) {
-    detail.url = toScrapeValueSelector(input.detail.url);
+    detail.url = toScrapeValue(input.detail.url);
   }
   if (input.detail.externalProductId !== null) {
-    detail.externalProductId = toScrapeValueSelector(
-      input.detail.externalProductId,
-    );
+    detail.externalProductId = toScrapeValue(input.detail.externalProductId);
   }
   if (input.detail.imageUrl !== null) {
-    detail.imageUrl = toScrapeValueSelector(input.detail.imageUrl);
+    detail.imageUrl = toScrapeValue(input.detail.imageUrl);
   }
   if (input.detail.barcode !== null) {
-    detail.barcode = toScrapeValueSelector(input.detail.barcode);
+    detail.barcode = toScrapeValue(input.detail.barcode);
   }
   return ScrapeRulesSchema.parse({ kind: input.kind, list, detail });
 }

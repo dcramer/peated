@@ -34,7 +34,7 @@ test("previews configured rules through the runtime without product writes", asy
         <article>
           <h1>Example Whisky</h1>
           <time datetime="2026-09-01"></time>
-          <div class="review"><p>Tasting notes.</p><strong>88</strong></div>
+          <div class="review"><h2>Example Whisky Review</h2><p>Tasting notes.</p><strong>88</strong></div>
         </article>
       `);
     }
@@ -45,6 +45,7 @@ test("previews configured rules through the runtime without product writes", asy
     {
       site: "whiskystudy",
       listUrl: "https://thewhiskystudy.com/reviews-3",
+      rulesVersion: 2,
       rules: {
         kind: "review",
         list: {
@@ -55,7 +56,7 @@ test("previews configured rules through the runtime without product writes", asy
           title: { selector: "h1" },
           publishedAt: { selector: "time", attribute: "datetime" },
           reviewItem: ".review",
-          name: { selector: "h1" },
+          name: { selector: "h2", removeSuffixes: ["Review"] },
           reviewText: { selector: "p" },
           score: { value: { selector: "strong" }, scale: 100 },
         },

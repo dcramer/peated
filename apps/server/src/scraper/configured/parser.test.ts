@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
+import { parseScrapeRules } from "./rules";
 
 const reviewConfig = {
   kind: "review" as const,
@@ -95,6 +96,168 @@ describe("scrape source parser", () => {
       name: "Example 12 Year",
       reviewerName: "Ada",
       nativeScore: { value: 91, scale: 100, display: "91 / 100" },
+    });
+  });
+
+  it("removes Whisky Study title suffixes and finds a labeled score", () => {
+    const result = parseScrapeDetail(
+      {
+        ...reviewConfig,
+        detail: {
+          ...reviewConfig.detail,
+          name: {
+            selector: "h2",
+            removeSuffixes: ["Shelf Review", "Review"],
+          },
+          score: {
+            value: {
+              selector: "p, strong",
+              startsWith: ["Score"],
+              removePrefixes: ["Score:"],
+              suffix: "/100",
+            },
+            scale: 100,
+          },
+        },
+      },
+      '<h1>Reviews</h1><time datetime="2026-04-02"></time><article class="review"><h2>Aberfeldy 18 Year Shelf Review</h2><p>Price: $120</p><strong>Score: 90</strong></article>',
+      new URL("https://reviews.test/aberfeldy"),
+    );
+
+    expect(result).toMatchObject({
+      kind: "review",
+      issues: [],
+      value: {
+        article: {
+          externalReviews: [
+            {
+              name: "Aberfeldy 18 Year",
+              nativeScore: { value: 90, display: "90/100" },
+            },
+          ],
+        },
+      },
+    });
+  });
+
+  it("joins only Whisky Saga tasting sections in document order", () => {
+    const result = parseScrapeDetail(
+      {
+        ...reviewConfig,
+        detail: {
+          ...reviewConfig.detail,
+          reviewText: {
+            selector: ".body p",
+            startsWith: ["Nose:", "Palate:", "Taste:", "Finish:"],
+            all: true,
+          },
+          score: {
+            value: {
+              selector: ".body p",
+              startsWith: ["Score"],
+              removePrefixes: ["Score"],
+            },
+            scale: 100,
+          },
+        },
+      },
+      '<h1>Review</h1><time datetime="2026-04-02"></time><article class="review"><h2>Port Ellen</h2><div class="body"><p>An introduction.</p><p>Nose: smoke.</p><p>Price: high.</p><p>Palate: citrus.</p><p>Finish: long.</p><p>Score 90/100</p></div></article>',
+      new URL("https://reviews.test/port-ellen"),
+    );
+    if (result.kind !== "review" || !result.value)
+      throw new Error("Expected review output.");
+    expect(Object.values(result.value.externalReviewTexts)).toEqual([
+      "Nose: smoke. Palate: citrus. Finish: long.",
+    ]);
+    expect(result.value.article.externalReviews[0]?.nativeScore).toMatchObject({
+      value: 90,
+      display: "90/100",
+    });
+  });
+
+  it("uses fixed values and literal prefixes before price validation", () => {
+    const result = parseScrapeDetail(
+      {
+        kind: "price",
+        list: {
+          detailLink: { selector: "a.product", attribute: "href" },
+          maxItems: 10,
+        },
+        detail: {
+          name: { selector: "h1", prefix: "Kilchoman " },
+          price: { selector: ".price" },
+          currency: "gbp",
+          volume: { value: "700 ml" },
+        },
+      },
+      '<h1>Machir Bay</h1><span class="price">£49.95</span>',
+      new URL("https://store.test/products/machir-bay"),
+    );
+    expect(result).toMatchObject({
+      kind: "price",
+      issues: [],
+      value: [{ name: "Kilchoman Machir Bay", price: 4995, volume: 700 }],
+    });
+  });
+
+  it("reports joined values over the element bound", () => {
+    const result = parseScrapeDetail(
+      {
+        ...reviewConfig,
+        detail: {
+          ...reviewConfig.detail,
+          reviewText: { selector: ".body p", all: true },
+        },
+      },
+      `<h1>Review</h1><time datetime="2026-04-02"></time><article class="review"><h2>Bottle</h2><div class="body">${Array.from({ length: 101 }, () => "<p>Nose: smoke.</p>").join("")}</div></article>`,
+      new URL("https://reviews.test/too-many"),
+    );
+    expect(result).toMatchObject({
+      kind: "review",
+      issues: [
+        {
+          field: "detail.reviewItem",
+          message: "Value matched more than 100 elements.",
+        },
+      ],
+    });
+  });
+
+  it("treats values emptied by literal cleanup as missing", () => {
+    const result = parseScrapeDetail(
+      {
+        ...reviewConfig,
+        detail: {
+          ...reviewConfig.detail,
+          name: { selector: "h2", removeSuffixes: ["Review"] },
+        },
+      },
+      '<h1>Reviews</h1><time datetime="2026-04-02"></time><article class="review"><h2>Review</h2></article>',
+      new URL("https://reviews.test/empty-name"),
+    );
+    expect(result.issues).toContainEqual({
+      field: "detail.name",
+      message: "Required value was not found.",
+    });
+  });
+
+  it("keeps version 1 parsing output unchanged", () => {
+    const rules = parseScrapeRules(1, reviewConfig);
+    const result = parseScrapeDetail(
+      rules,
+      '<h1>Spring reviews</h1><time datetime="2026-04-02"></time><article class="review"><h2>Example 12 Year</h2><span class="score">91 / 100</span><div class="body">Rich and balanced.</div></article>',
+      new URL("https://reviews.test/spring"),
+    );
+    expect(result).toMatchObject({
+      kind: "review",
+      issues: [],
+      value: {
+        article: {
+          externalReviews: [
+            { name: "Example 12 Year", nativeScore: { value: 91 } },
+          ],
+        },
+      },
     });
   });
 

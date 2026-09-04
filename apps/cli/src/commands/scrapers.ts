@@ -1,5 +1,4 @@
 import program from "@peated/cli/program";
-import { ScrapeRulesSchema } from "@peated/server/scraper/configured/rules";
 import { runLocalScrapeSourcePreview } from "@peated/server/scraper/localPreview";
 import { readFile } from "node:fs/promises";
 import { z } from "zod";
@@ -7,9 +6,16 @@ import { z } from "zod";
 const PreviewFileSchema = z
   .object({
     listUrl: z.url(),
-    rules: ScrapeRulesSchema,
+    rulesVersion: z.number().int().positive().default(1),
+    rules: z.json(),
   })
   .strict();
+
+type PreviewFileInput = z.input<typeof PreviewFileSchema>;
+
+export function parsePreviewInput(value: PreviewFileInput) {
+  return PreviewFileSchema.parse(value);
+}
 
 export function parsePreviewLimit(value: string) {
   const limit = Number(value);
@@ -22,7 +28,7 @@ export function parsePreviewLimit(value: string) {
 async function readPreviewFile(path: string) {
   const contents = await readFile(path, "utf8");
   try {
-    return PreviewFileSchema.parse(JSON.parse(contents));
+    return parsePreviewInput(JSON.parse(contents));
   } catch {
     throw new Error(`Invalid scraper preview file: ${path}`);
   }

@@ -6,7 +6,11 @@ import { createHash } from "node:crypto";
 import type { z } from "zod";
 import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
-import type { ScrapeRules, ScrapeValueSelector } from "./rules";
+import type {
+  ScrapeValue,
+  ScrapeValueSelectorV1,
+  StoredScrapeRules,
+} from "./rules";
 
 export type ScrapeListResult = {
   links: string[];
@@ -26,16 +30,69 @@ export type ScrapeDetailResult =
       issues: ScrapeIssue[];
     };
 
-function readValue(
-  root: ReturnType<typeof load>,
-  selector: ScrapeValueSelector,
-) {
-  const element = root(selector.selector).first();
-  const raw = selector.attribute
-    ? element.attr(selector.attribute)
-    : element.text();
-  const value = raw?.replaceAll(/\s+/g, " ").trim();
-  return value || null;
+type ScrapeReadableValue = ScrapeValue | ScrapeValueSelectorV1;
+
+function normalizeValue(value: string | undefined) {
+  return value?.replaceAll(/\s+/g, " ").trim() || null;
+}
+
+function cleanValue(value: string | null, rule: ScrapeReadableValue) {
+  if (!value) return null;
+  let result = value;
+  if ("removePrefixes" in rule && rule.removePrefixes) {
+    const normalized = result.toLowerCase();
+    const prefix = rule.removePrefixes.find((candidate) =>
+      normalized.startsWith(candidate.toLowerCase()),
+    );
+    if (prefix) result = result.slice(prefix.length).trim();
+  }
+  if ("removeSuffixes" in rule && rule.removeSuffixes) {
+    const normalized = result.toLowerCase();
+    const suffix = rule.removeSuffixes.find((candidate) =>
+      normalized.endsWith(candidate.toLowerCase()),
+    );
+    if (suffix) result = result.slice(0, -suffix.length).trim();
+  }
+  if (!result) return null;
+  if ("prefix" in rule && rule.prefix) result = `${rule.prefix}${result}`;
+  if ("suffix" in rule && rule.suffix) result = `${result}${rule.suffix}`;
+  return normalizeValue(result);
+}
+
+function readValue(root: ReturnType<typeof load>, rule: ScrapeReadableValue) {
+  if ("value" in rule) return cleanValue(normalizeValue(rule.value), rule);
+
+  if ("attribute" in rule && rule.attribute) {
+    return cleanValue(
+      normalizeValue(root(rule.selector).first().attr(rule.attribute)),
+      rule,
+    );
+  }
+
+  const values: string[] = [];
+  const startsWith =
+    "startsWith" in rule
+      ? rule.startsWith?.map((value) => value.toLowerCase())
+      : undefined;
+  root(rule.selector).each((_, element) => {
+    const value = normalizeValue(root(element).text());
+    if (!value) return;
+    if (
+      startsWith &&
+      !startsWith.some((prefix) => value.toLowerCase().startsWith(prefix))
+    ) {
+      return;
+    }
+    values.push(value);
+    if (!("all" in rule && rule.all) || values.length > 100) return false;
+  });
+  if (values.length > 100) {
+    throw new Error("Value matched more than 100 elements.");
+  }
+  return cleanValue(
+    normalizeValue("all" in rule && rule.all ? values.join(" ") : values[0]),
+    rule,
+  );
 }
 
 function absoluteHttpUrl(value: string, baseUrl: URL) {
@@ -51,7 +108,7 @@ function absoluteHttpUrl(value: string, baseUrl: URL) {
 }
 
 export function parseScrapeList(
-  rules: ScrapeRules,
+  rules: StoredScrapeRules,
   html: string,
   pageUrl: URL,
 ): ScrapeListResult {
@@ -181,7 +238,7 @@ function priceField(path: PropertyKey[]) {
 }
 
 function parseReviewDetail(
-  rules: Extract<ScrapeRules, { kind: "review" }>,
+  rules: Extract<StoredScrapeRules, { kind: "review" }>,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
@@ -212,28 +269,34 @@ function parseReviewDetail(
   const reviewItems = $(rules.detail.reviewItem).toArray();
   const readReviewValue = (
     item: ReturnType<typeof load>,
-    selector: ScrapeValueSelector,
+    selector: ScrapeReadableValue,
   ) =>
     readValue(item, selector) ??
     (reviewItems.length === 1 ? readValue($, selector) : null);
 
   try {
     const reviewerSelector = rules.detail.reviewerName;
-    const pageBylines = reviewerSelector
-      ? $(reviewerSelector.selector).filter(
-          (_, element) =>
-            $(element).closest(rules.detail.reviewItem).length === 0,
-        )
-      : null;
-    // Scraper parsing shares only one explicit page byline; a review's writer stays local.
-    const pageReviewerText =
-      reviewerSelector && pageBylines?.length === 1
-        ? reviewerSelector.attribute
-          ? pageBylines.attr(reviewerSelector.attribute)
-          : pageBylines.text()
+    const pageBylines =
+      reviewerSelector && !("value" in reviewerSelector)
+        ? $(reviewerSelector.selector).filter(
+            (_, element) =>
+              $(element).closest(rules.detail.reviewItem).length === 0,
+          )
         : null;
+    // Scraper parsing shares only one explicit page byline; a review's writer stays local.
     const pageReviewerName =
-      pageReviewerText?.replaceAll(/\s+/g, " ").trim() || null;
+      reviewerSelector && "value" in reviewerSelector
+        ? readValue($, reviewerSelector)
+        : reviewerSelector && pageBylines?.length === 1
+          ? cleanValue(
+              normalizeValue(
+                "attribute" in reviewerSelector && reviewerSelector.attribute
+                  ? pageBylines.attr(reviewerSelector.attribute)
+                  : pageBylines.text(),
+              ),
+              reviewerSelector,
+            )
+          : null;
     reviewItems.forEach((element, index) => {
       const item = load($.html(element));
       const name = readReviewValue(item, rules.detail.name);
@@ -311,7 +374,7 @@ function parseReviewDetail(
 }
 
 function parseStorePriceDetail(
-  rules: Extract<ScrapeRules, { kind: "price" }>,
+  rules: Extract<StoredScrapeRules, { kind: "price" }>,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
@@ -349,7 +412,7 @@ function parseStorePriceDetail(
 }
 
 export function parseScrapeDetail(
-  rules: ScrapeRules,
+  rules: StoredScrapeRules,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
