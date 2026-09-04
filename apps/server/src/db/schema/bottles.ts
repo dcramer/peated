@@ -222,7 +222,7 @@ export const bottles = pgTable(
     // Keep this until the CLI backfill copies its year, month, and day.
     // TODO(catalog): Drop this column after the backfill.
     legacyReleaseDate: date("release_date"),
-    maturation: text("maturation"),
+    maturation: varchar("maturation", { length: 1000 }),
     caskNumber: varchar("cask_number", { length: 255 }),
     outturn: integer("outturn"),
 
