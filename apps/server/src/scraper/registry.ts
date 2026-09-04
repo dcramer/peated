@@ -1,10 +1,5 @@
 import { z } from "zod";
 import {
-  bourbonCultureAdapter,
-  BourbonCultureCursorSchema,
-  BourbonCultureObservationSchema,
-} from "./adapters/bourbonCulture";
-import {
   dramfaceAdapter,
   DramfaceCursorSchema,
   DramfaceObservationSchema,
@@ -18,7 +13,6 @@ import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeBruichladdich from "./adapters/legacy/scrapeBruichladdich";
 import scrapeCadenheads from "./adapters/legacy/scrapeCadenheads";
-import scrapeCompassBox from "./adapters/legacy/scrapeCompassBox";
 import scrapeDecadentDrinks from "./adapters/legacy/scrapeDecadentDrinks";
 import scrapeDouglasLaing from "./adapters/legacy/scrapeDouglasLaing";
 import scrapeDramfool from "./adapters/legacy/scrapeDramfool";
@@ -27,7 +21,6 @@ import scrapeFineDrams from "./adapters/legacy/scrapeFineDrams";
 import scrapeGlenAllachie from "./adapters/legacy/scrapeGlenAllachie";
 import scrapeGordonMacphail from "./adapters/legacy/scrapeGordonMacphail";
 import scrapeHealthySpirits from "./adapters/legacy/scrapeHealthySpirits";
-import scrapeKilchoman from "./adapters/legacy/scrapeKilchoman";
 import scrapeMasterOfMalt from "./adapters/legacy/scrapeMasterOfMalt";
 import scrapeMissionLiquor from "./adapters/legacy/scrapeMissionLiquor";
 import scrapeNcnean from "./adapters/legacy/scrapeNcnean";
@@ -50,11 +43,6 @@ import {
   StorePriceBatchSchema,
 } from "./adapters/legacyPrice";
 import {
-  whiskeyReviewerAdapter,
-  WhiskeyReviewerCursorSchema,
-  WhiskeyReviewerObservationSchema,
-} from "./adapters/whiskeyReviewer";
-import {
   whiskyAdvocateAdapter,
   WhiskyAdvocateCursorSchema,
   WhiskyAdvocateObservationSchema,
@@ -69,16 +57,6 @@ import {
   WhiskyNotesCursorSchema,
   WhiskyNotesObservationSchema,
 } from "./adapters/whiskyNotes";
-import {
-  whiskySagaAdapter,
-  WhiskySagaCursorSchema,
-  WhiskySagaObservationSchema,
-} from "./adapters/whiskySaga";
-import {
-  whiskyStudyAdapter,
-  WhiskyStudyCursorSchema,
-  WhiskyStudyObservationSchema,
-} from "./adapters/whiskyStudy";
 import {
   wordsOfWhiskyAdapter,
   WordsOfWhiskyCursorSchema,
@@ -119,11 +97,6 @@ const legacyPriceSources = [
     scrape: scrapeCadenheads,
   },
   {
-    type: "compassbox",
-    origin: "https://www.compassboxwhisky.com",
-    scrape: scrapeCompassBox,
-  },
-  {
     type: "decadentdrinks",
     origin: "https://decadent-drinks.com",
     scrape: scrapeDecadentDrinks,
@@ -158,11 +131,6 @@ const legacyPriceSources = [
     type: "healthyspirits",
     origin: "https://us-vir5-storefront-api.ecwid.com",
     scrape: scrapeHealthySpirits,
-  },
-  {
-    type: "kilchoman",
-    origin: "https://www.kilchomandistillery.com",
-    scrape: scrapeKilchoman,
   },
   {
     type: "missionliquor",
@@ -287,6 +255,15 @@ export const scraperRegistry = createScraperRegistry({
       ],
     }),
     defineScrapeTarget({
+      key: "compassbox",
+      origins: [
+        {
+          origin: "https://www.compassboxwhisky.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "dramface",
       minimumSpacingMs: 2_500,
       requestsPerWindow: 25,
@@ -304,6 +281,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://www.fredminnick.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "kilchoman",
+      origins: [
+        {
+          origin: "https://www.kilchomandistillery.com",
           robots: { mode: "enforce" },
         },
       ],
@@ -409,18 +395,8 @@ export const scraperRegistry = createScraperRegistry({
         sink: bottleObservationSink,
       }),
     ),
-    // TODO(scraper-source-migration): Remove these HTML review definitions as
-    // each publisher activates a database-managed parsing revision.
-    defineScraperSource({
-      key: "bourbonculture",
-      externalSiteKey: "bourbonculture",
-      targetKeys: ["bourbonculture"],
-      requestLimit: 7,
-      cursorSchema: BourbonCultureCursorSchema,
-      observationSchema: BourbonCultureObservationSchema,
-      adapter: bourbonCultureAdapter,
-      sink: externalReviewSink,
-    }),
+    // TODO(scraper-source-migration): Remove each remaining HTML review
+    // definition after its publisher activates database-managed rules.
     defineScraperSource({
       key: "dramface",
       externalSiteKey: "dramface",
@@ -439,16 +415,6 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: FredMinnickCursorSchema,
       observationSchema: FredMinnickObservationSchema,
       adapter: fredMinnickAdapter,
-      sink: externalReviewSink,
-    }),
-    defineScraperSource({
-      key: "whiskeyreviewer",
-      externalSiteKey: "whiskeyreviewer",
-      targetKeys: ["whiskeyreviewer"],
-      requestLimit: 6,
-      cursorSchema: WhiskeyReviewerCursorSchema,
-      observationSchema: WhiskeyReviewerObservationSchema,
-      adapter: whiskeyReviewerAdapter,
       sink: externalReviewSink,
     }),
     defineScraperSource({
@@ -484,27 +450,6 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: WhiskyfunCursorSchema,
       observationSchema: WhiskyfunObservationSchema,
       adapter: whiskyfunAdapter,
-      sink: externalReviewSink,
-    }),
-    defineScraperSource({
-      key: "whiskysaga",
-      externalSiteKey: "whiskysaga",
-      targetKeys: ["whiskysaga"],
-      requestLimit: 22,
-      resumeFromLastRun: true,
-      cursorSchema: WhiskySagaCursorSchema,
-      observationSchema: WhiskySagaObservationSchema,
-      adapter: whiskySagaAdapter,
-      sink: externalReviewSink,
-    }),
-    defineScraperSource({
-      key: "whiskystudy",
-      externalSiteKey: "whiskystudy",
-      targetKeys: ["whiskystudy"],
-      requestLimit: 22,
-      cursorSchema: WhiskyStudyCursorSchema,
-      observationSchema: WhiskyStudyObservationSchema,
-      adapter: whiskyStudyAdapter,
       sink: externalReviewSink,
     }),
     defineScraperSource({
