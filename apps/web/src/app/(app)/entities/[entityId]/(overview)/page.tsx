@@ -13,10 +13,7 @@ import type { Metadata } from "next";
 
 import { EntityOverviewClient } from "../entityOverviewClient.stylex";
 import { entityOverviewQueries } from "../entityOverviewQueries";
-import {
-  entityHasBottleCatalog,
-  getEntityRelationshipOwnerIds,
-} from "../entityPageData";
+import { entityHasBottleCatalog } from "../entityPageData";
 
 export async function generateMetadata(props: {
   params: Promise<{ entityId: string }>;
@@ -34,8 +31,6 @@ export default async function EntityPage(props: {
   const queryClient = getQueryClient();
   const { client } = await getPublicPageServerClient();
   const orpc = createTanstackQueryUtils(client);
-  const { operatedOwnerId, siblingOwnerId } =
-    getEntityRelationshipOwnerIds(entity);
   const prefetches = [
     queryClient.prefetchQuery(entityOverviewQueries.events(orpc, entity)),
   ];
@@ -59,13 +54,21 @@ export default async function EntityPage(props: {
     );
   }
 
-  if (operatedOwnerId) {
+  if (entity.kind === "company") {
     prefetches.push(
-      queryClient.prefetchQuery(entityOverviewQueries.operated(orpc, entity)),
+      queryClient.prefetchQuery(
+        entityOverviewQueries.companyBrands(orpc, entity),
+      ),
+      queryClient.prefetchQuery(
+        entityOverviewQueries.companyDistilleries(orpc, entity),
+      ),
+      queryClient.prefetchQuery(
+        entityOverviewQueries.companyBottlersAndCompanies(orpc, entity),
+      ),
     );
   }
 
-  if (siblingOwnerId) {
+  if (entity.ownerId) {
     prefetches.push(
       queryClient.prefetchQuery(entityOverviewQueries.siblings(orpc, entity)),
     );

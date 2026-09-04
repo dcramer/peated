@@ -5,7 +5,6 @@ import {
   getDistilleryBottleView,
   getEntityClassification,
   getEntityCurrentHref,
-  getEntityRelationshipOwnerIds,
   getEntityTabs,
 } from "./entityPageData";
 
@@ -42,21 +41,6 @@ describe("getDistilleryBottleView", () => {
 describe("getEntityClassification", () => {
   it("uses the entity kind", () => {
     expect(getEntityClassification({ kind: "distillery" })).toBe("Distillery");
-  });
-});
-
-describe("getEntityRelationshipOwnerIds", () => {
-  it("keeps a company's operated entities separate from its siblings", () => {
-    expect(
-      getEntityRelationshipOwnerIds({
-        id: 10,
-        kind: "company",
-        ownerId: 42,
-      }),
-    ).toEqual({
-      operatedOwnerId: 10,
-      siblingOwnerId: 42,
-    });
   });
 });
 

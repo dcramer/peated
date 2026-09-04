@@ -1,10 +1,6 @@
 import type { ORPCQueryUtils } from "@peated/web/lib/orpc/context";
 
-import {
-  entityHasBottleCatalog,
-  getEntityRelationshipOwnerIds,
-  type Entity,
-} from "./entityPageData";
+import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 
 /** Keeps server prefetches and client reads on the same query keys. */
 export const entityOverviewQueries = {
@@ -18,18 +14,47 @@ export const entityOverviewQueries = {
     orpc.entities.events.list.queryOptions({
       input: { entity: entity.id },
     }),
-  operated: (orpc: ORPCQueryUtils, entity: Entity) => {
-    const { operatedOwnerId } = getEntityRelationshipOwnerIds(entity);
+  companyBrands: (orpc: ORPCQueryUtils, entity: Entity) => {
+    const companyId = entity.kind === "company" ? entity.id : undefined;
+
+    return {
+      ...orpc.brands.list.queryOptions({
+        input: {
+          limit: 4,
+          owner: companyId,
+          sort: "-bottles",
+        },
+      }),
+      enabled: Boolean(companyId),
+    };
+  },
+  companyDistilleries: (orpc: ORPCQueryUtils, entity: Entity) => {
+    const companyId = entity.kind === "company" ? entity.id : undefined;
+
+    return {
+      ...orpc.distilleries.list.queryOptions({
+        input: {
+          limit: 4,
+          owner: companyId,
+          sort: "-bottles",
+        },
+      }),
+      enabled: Boolean(companyId),
+    };
+  },
+  companyBottlersAndCompanies: (orpc: ORPCQueryUtils, entity: Entity) => {
+    const companyId = entity.kind === "company" ? entity.id : undefined;
 
     return {
       ...orpc.entities.list.queryOptions({
         input: {
-          limit: 5,
-          owner: operatedOwnerId ?? undefined,
+          kinds: ["bottler", "company"],
+          limit: 4,
+          owner: companyId,
           sort: "-bottles",
         },
       }),
-      enabled: Boolean(operatedOwnerId),
+      enabled: Boolean(companyId),
     };
   },
   popularBottles: (orpc: ORPCQueryUtils, entity: Entity) => ({
@@ -54,20 +79,16 @@ export const entityOverviewQueries = {
     }),
     enabled: entityHasBottleCatalog(entity),
   }),
-  siblings: (orpc: ORPCQueryUtils, entity: Entity) => {
-    const { siblingOwnerId } = getEntityRelationshipOwnerIds(entity);
-
-    return {
-      ...orpc.entities.list.queryOptions({
-        input: {
-          kinds:
-            entity.kind === "company" ? undefined : ["distillery", "bottler"],
-          limit: 5,
-          owner: siblingOwnerId ?? undefined,
-          sort: "-bottles",
-        },
-      }),
-      enabled: Boolean(siblingOwnerId),
-    };
-  },
+  siblings: (orpc: ORPCQueryUtils, entity: Entity) => ({
+    ...orpc.entities.list.queryOptions({
+      input: {
+        kinds:
+          entity.kind === "company" ? undefined : ["distillery", "bottler"],
+        limit: 5,
+        owner: entity.ownerId ?? undefined,
+        sort: "-bottles",
+      },
+    }),
+    enabled: Boolean(entity.ownerId),
+  }),
 };
