@@ -255,6 +255,19 @@ and cases with different Bottle names from the failure that led to it.
       wrong Bottle once. See
       [C20 results](./C20-catalog-is-not-product-evidence.md).
 
+- [x] **C21 — Show both sides of stable Bottle naming.** **Rejected and
+      reverted.** One positive and one negative fictional example fixed Black
+      Label but newly removed producer-marketed `Whiskey` from Woodford Reserve.
+      Full accuracy stayed 3/5, total tokens rose 2.4%, and median time rose
+      24.3%. See [C21 results](./C21-stable-name-examples.md).
+
+- [x] **C22 — Contrast producer and retailer name authority.** **Rejected and
+      reverted.** The narrower pair kept Woodford Reserve and Black Label names
+      more consistently, but full accuracy stayed 10/15. Creag Isle lost its
+      one pass and Black Label's category fell from 3/3 to 1/3. Tokens and cost
+      fell, while median time rose. See
+      [C22 results](./C22-source-authority-name-examples.md).
+
 ## Current stopping point
 
 C09 and C10 improve checks after Luna, while C11 removes model work for Bottle

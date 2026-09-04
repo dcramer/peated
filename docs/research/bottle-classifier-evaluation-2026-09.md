@@ -1,7 +1,7 @@
 # Bottle classifier evaluation, September 2026
 
 This study compared model settings, corrected unreliable checks, reviewed
-specific failures, and tested twenty classifier changes. The detailed run
+specific failures, and tested twenty-two classifier changes. The detailed run
 records live under
 [`packages/bottle-classifier/evals`](../../packages/bottle-classifier/evals/README.md).
 
@@ -97,6 +97,11 @@ Broad prompt changes and broad source-page reading did not hold up:
   web-enabled run created a duplicate; the result was correct only 2/3.
 - Telling Luna that catalog data is not product evidence was also correct only
   2/3 and selected the wrong Bottle once.
+- A positive and negative Bottle-name pair fixed one name but stripped a word
+  from a different producer-backed name. Full accuracy stayed 3/5.
+- A narrower pair based on producer versus retailer authority made two names
+  more consistent, but full accuracy stayed 10/15. It lost the only Creag Isle
+  pass and changed Black Label's correct category in two runs.
 
 These results favor small code checks for facts Peated already knows. Extra
 prompt text and extra model passes need a stronger measured gain.
@@ -120,6 +125,8 @@ before testing a bounded audit change.
 
 Other repeated problems have separate causes:
 
+- stable Bottle naming still varies, but two general example pairs did not
+  improve complete results safely;
 - some web passages mix whole-product facts with component facts;
 - changing catalog state can make a historical wrong-candidate case obsolete;
 - changing retailer pages can disagree with an older expected release; and

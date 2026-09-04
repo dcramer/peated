@@ -60,6 +60,8 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C18: Observed batch or lot field](./C18-observed-batch-lot-field.md)            | Carry a visible package code separately from marketed Bottle identity                | Rejected: wrong Bottle selected 3/3 times                                      |
 | [C19: Exclude observed lot candidate](./C19-exclude-observed-lot-candidate.md)   | Remove a candidate whose edition is explicitly a package-only code                   | Rejected: web result was correct 2/3 and created a duplicate once              |
 | [C20: Catalog is not product evidence](./C20-catalog-is-not-product-evidence.md) | Stop catalog data from proving a marketed edition                                    | Rejected: web result was correct 2/3 and selected the wrong Bottle once        |
+| [C21: Stable Bottle name examples](./C21-stable-name-examples.md)                | Show one kept and one removed type-word example                                      | Rejected: fixed one name, regressed another, and added tokens and median time  |
+| [C22: Source-authority name examples](./C22-source-authority-name-examples.md)   | Contrast producer-kept wording with a retailer-only type suffix                      | Rejected: same full accuracy with Creag Isle and category regressions          |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections

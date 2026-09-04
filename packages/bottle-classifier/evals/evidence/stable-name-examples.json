@@ -1,0 +1,119 @@
+{
+  "name": "Stable Bottle name examples reviewed evidence",
+  "reviewedAt": "2026-09-04",
+  "notes": "Reviewed source summaries for a controlled prompt comparison. Each summary preserves the source title and product facts without stating the expected Peated Bottle name.",
+  "sources": [
+    "https://www.russellsreserve.com/our-products/single-barrel-rye/",
+    "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+    "https://www.makersmark.com/en-us/bourbons/makers-mark",
+    "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+    "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html"
+  ],
+  "cases": {
+    "store-listing-creates-russells-reserve-single-barrel-rye-instead-of-matching-bourbon": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Russell's Reserve producer evidence",
+            "summary": "The producer page heading is `Single Barrel Rye`. It describes a Kentucky straight rye whiskey bottled one barrel at a time at 104 proof.",
+            "results": [
+              {
+                "title": "Russell's Reserve Single Barrel Rye Whiskey",
+                "url": "https://www.russellsreserve.com/our-products/single-barrel-rye/",
+                "domain": "russellsreserve.com",
+                "description": "Producer product page for Single Barrel Rye at 104 proof.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      }
+    },
+    "store-listing-creates-creag-isle-12-year-old-island-single-malt": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Creag Isle product evidence",
+            "summary": "The reviewed retailer title is `Creag Isle 12YO Island Single Malt Scotch Whisky`. It identifies a 12-year-old Scotch single malt.",
+            "results": [
+              {
+                "title": "Creag Isle 12YO Island Single Malt Scotch Whisky",
+                "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+                "domain": "totalwine.com",
+                "description": "Reviewed retailer product title for Creag Isle 12YO.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      }
+    },
+    "store-listing-creates-woodford-reserve-straight-malt-with-null-category": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Woodford Reserve producer evidence",
+            "summary": "The producer identifies the product as `Kentucky Straight Malt Whiskey`, made with 51% malt and bottled at 90.4 proof.",
+            "results": [
+              {
+                "title": "Malt Whiskey - Woodford Reserve",
+                "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+                "domain": "woodfordreserve.com",
+                "description": "Producer product page for Kentucky Straight Malt Whiskey.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      }
+    },
+    "makers-mark-bourbon-brand-only": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Maker's Mark producer evidence",
+            "summary": "The producer product heading is `Maker's Mark Kentucky Straight Bourbon`. It lists the product at 90 proof.",
+            "results": [
+              {
+                "title": "Maker's Mark: Kentucky Straight Bourbon",
+                "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+                "domain": "makersmark.com",
+                "description": "Producer product page headed Kentucky Straight Bourbon.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      }
+    },
+    "store-listing-resolves-black-label-family-under-johnnie-walker": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Johnnie Walker Black Label Islay Origin producer evidence",
+            "summary": "Johnnie Walker's launch release names `Black Label Islay Origin` as one of four 12-year-old Origin Series products. It says Islay Origin is made exclusively with single malts from Islay.",
+            "results": [
+              {
+                "title": "Explore the Flavours of Scotland With the Johnnie Walker Black Label Origin Series",
+                "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+                "domain": "prnewswire.com",
+                "description": "Producer launch evidence for Black Label Islay Origin.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
+        "errors": []
+      }
+    }
+  }
+}

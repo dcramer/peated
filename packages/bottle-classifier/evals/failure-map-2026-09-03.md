@@ -69,6 +69,11 @@ boundaries:
 1. **Stable product name check:** test Russell's Reserve and Creag Isle with
    exact source titles and accepted references. Include deliberately short
    producer names and category words that are part of marketed identity.
+   C21's broad positive/negative pair was rejected after it fixed Black Label
+   but stripped producer-marketed `Whiskey` from Woodford Reserve.
+   C22 protected that producer wording, but full accuracy stayed flat while
+   Creag Isle and Black Label's category regressed. Do not add more general
+   naming examples from these cases.
 2. **Bound expensive audit work:** inspect the malformed Laphroaig and Dramfool
    traces. The latest run spent 87,044 and 49,187 tokens on those cases. Test a
    narrow stop or missing-operation check only after locating the repeated work.
