@@ -134,7 +134,7 @@ export async function enqueueStorePriceMatchRetryRunJob({
   delayMs?: number;
   runId: number;
 }) {
-  const { pushJob } = await import("@peated/server/worker/client");
+  const { pushJob } = await import("@peated/server/worker/dispatch");
 
   await pushJob(
     "ProcessStorePriceMatchRetryRun",

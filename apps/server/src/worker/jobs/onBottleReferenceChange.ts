@@ -1,5 +1,5 @@
 import { syncBottleReferenceConsumersForReferenceChange } from "@peated/server/lib/bottleReferences";
-import { runJob } from "@peated/server/worker/client";
+import { runJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 

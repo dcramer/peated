@@ -33,7 +33,7 @@ import {
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
 import { EntityInputFields } from "@peated/server/schemas/entities";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { asc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 

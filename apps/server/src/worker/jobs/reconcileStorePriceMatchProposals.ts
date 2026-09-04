@@ -4,7 +4,7 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { logError, logInfo } from "@peated/server/lib/log";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { desc, eq, sql } from "drizzle-orm";
 
 type ReconcileStorePriceMatchProposalsArgs = {

@@ -16,7 +16,7 @@ import {
   ExternalSiteKeySchema,
   REVIEW_SCORING_CONFIG_KEY,
 } from "@peated/server/schemas";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 

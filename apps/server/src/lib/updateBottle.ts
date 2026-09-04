@@ -53,7 +53,7 @@ import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
 import { EntityChoiceInputSchema } from "@peated/server/schemas";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 

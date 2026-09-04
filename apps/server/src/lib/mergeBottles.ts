@@ -35,7 +35,7 @@ import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
 import type { Context } from "@peated/server/orpc/context";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 

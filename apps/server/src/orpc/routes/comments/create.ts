@@ -15,7 +15,7 @@ import {
 import { CommentInputSchema, CommentSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 

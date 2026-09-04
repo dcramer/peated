@@ -13,7 +13,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 
 export default procedure

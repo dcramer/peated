@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { base } from "..";
-import { getConnection } from "../../worker/client";
+import { getConnection } from "../../worker/redis";
 import type { Context } from "../context";
 
 interface RateLimitOptions {

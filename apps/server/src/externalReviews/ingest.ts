@@ -7,7 +7,7 @@ import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalRev
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 

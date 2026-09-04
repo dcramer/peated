@@ -82,7 +82,7 @@ import {
   StorePriceBottleRepairDraftSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
 import type { z } from "zod";

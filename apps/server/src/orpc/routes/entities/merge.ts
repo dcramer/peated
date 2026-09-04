@@ -5,7 +5,7 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import { EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { pushJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
