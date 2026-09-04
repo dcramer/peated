@@ -48,6 +48,11 @@ The system SHALL save every BottleSeries release-total change in the same transa
 - **WHEN** one BottleSeries is merged into another
 - **THEN** the surviving BottleSeries total matches all Bottles moved to it before the retired BottleSeries is removed
 
+#### Scenario: BottleSeries merge finds an invalid representative
+
+- **WHEN** a source BottleGroup has a missing or retired representative Bottle
+- **THEN** the merge reports a conflict and commits no BottleSeries, BottleGroup, or Bottle changes
+
 #### Scenario: Entity merge changes BottleSeries ownership
 
 - **WHEN** an Entity merge moves or combines BottleSeries rows

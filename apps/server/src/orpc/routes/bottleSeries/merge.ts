@@ -12,6 +12,7 @@ import {
   updateBottleSeriesReleaseCounts,
 } from "@peated/server/lib/bottleSeriesReleaseCounts";
 import {
+  BottleUpdateGraphError,
   finalizeBottleUpdate,
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
@@ -93,14 +94,23 @@ export default procedure
             message: `BottleGroup ${group.id} is incomplete and cannot be moved.`,
           });
         }
-        manifests.push(
-          await updateBottleInTransaction(tx, {
-            bottleId: group.representativeBottleId,
-            input: { series: destination.id },
-            actorId,
-            creationSource: "manual_entry",
-          }),
-        );
+        try {
+          manifests.push(
+            await updateBottleInTransaction(tx, {
+              bottleId: group.representativeBottleId,
+              input: { series: destination.id },
+              actorId,
+              creationSource: "manual_entry",
+            }),
+          );
+        } catch (error) {
+          if (!(error instanceof BottleUpdateGraphError)) throw error;
+
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} is incomplete and cannot be moved.`,
+            cause: error,
+          });
+        }
       }
 
       const ungroupedBottleIds = (
