@@ -41,6 +41,15 @@ the classifier instructions or production default.
 reviewed image extractions. Controlled audit versions receive the same parsed
 label fields and make no live image-model request for a reviewed image.
 
+[M09](./experiments/M09-whistler-release-ambiguity.md) changes the name-only
+Whistler Bodega Cask case to require review because producer and exact-product
+evidence disagree on ABV. Its rescore leaves the historical snapshots unchanged.
+
+[M10](./experiments/M10-woodford-release-ambiguity.md) changes the name-only
+Woodford Reserve Double Double Oaked case to require review because the
+producer markets separate yearly releases. Its rescore also leaves the
+historical snapshots unchanged.
+
 ## With web evidence
 
 All settings used Luna high for image extraction, at most two search queries,

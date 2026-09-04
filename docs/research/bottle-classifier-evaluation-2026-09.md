@@ -106,21 +106,25 @@ Broad prompt changes and broad source-page reading did not hold up:
   gain. The unchanged version passed 9/9 focused judgments; the changed version
   passed 7/9, cost 6.6% more, and made the median case 41.9% slower.
 - Short true, false, and unknown examples for strength and single-cask fields
-  improved focused results from 6/9 to 8/9. The full suite fell from 80/105 to
-  78/105, produced one unsupported exact-cask creation, used 5.4% more tokens,
-  and cost 3.9% more.
+  improved focused results from 6/9 to 8/9, while focused cost rose 31.5% and
+  time rose 5.5%. A later broad run returned 78/105 beside a saved 80/105 run.
+  Correcting ambiguous Whistler and Woodford expectations makes the scores
+  78/105 and 80/105, but the runs used different source revisions and still
+  cannot measure the examples. The later run did contain an unsupported
+  exact-cask creation.
 
 These results favor small code checks for facts Peated already knows. Extra
 prompt text and extra model passes need a stronger measured gain.
 
 ## Corrections to the checks
 
-Eight measurement changes make later comparisons more trustworthy. They show
+Ten measurement changes make later comparisons more trustworthy. They show
 the exact field that failed, keep an expected `null` distinct from an omitted
 value, allow reviewed audit outcomes without accepting unrelated edits, and
 give compared versions the same reviewed web and image evidence. We also fixed
-expectations for Jameson Cold Brew, several product names and categories, and
-an unsupported SMWS release year. These corrections are not classifier gains.
+expectations for Jameson Cold Brew, several product names and categories, an
+unsupported SMWS release year, and two name-only sources that cannot identify a
+complete release. These corrections are not classifier gains.
 
 ## What remains
 
@@ -142,11 +146,13 @@ using strong search evidence. Extra page-read guidance appeared in only one
 changed run, produced no gain, and did not prevent two other failures. The
 change was reverted without a full-suite run.
 
-Paired Boolean examples also failed the broad gate. They reliably carried the
-target cask-strength and multi-barrel facts, but a full run borrowed an exact
-cask from web evidence for a source that named only a broader batch. This
-produced an unsupported Glenglassaugh creation. The schema wording was
-reverted.
+Paired Boolean examples remain inconclusive. They reliably carried the target
+cask-strength and multi-barrel facts in focused runs, but used more money and
+time. A broad run borrowed an exact cask from web evidence for a source that
+named only a broader batch, producing an unsupported Glenglassaugh creation.
+Its saved control came from different code, so that output cannot be assigned
+to the examples. The schema wording was reverted pending a same-revision
+comparison.
 
 Other repeated problems have separate causes:
 

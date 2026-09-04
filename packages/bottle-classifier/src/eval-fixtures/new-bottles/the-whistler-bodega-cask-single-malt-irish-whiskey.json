@@ -6,11 +6,19 @@
     "The Whistler Bodega Cask",
     "The Whistler Bodega Cask 5-year-old"
   ],
-  "summary": "Create the corrected 5-year-old The Whistler Bodega Cask single malt when the source clearly says single malt and producer evidence confirms the age. Do not force a wrong existing match to the stale blend record.",
+  "summary": "Require review for The Whistler Bodega Cask when the observed source has no ABV. The producer page shows 86 proof while other exact-product evidence shows 46% ABV, so the name alone cannot identify the observed version.",
   "peatedBottleIds": [12953],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+      "https://thewhiskeywash.com/irish-whiskey/whiskey-review-the-whistler-bodega-cask-irish-single-malt/"
+    ],
+    "notes": "Reviewed September 4, 2026. The current producer page identifies a 5-year-old Bodega Cask Single Malt at 86 proof. A 2021 exact-product review identifies the same marketed name at 92 proof / 46% ABV. Because this fixture supplies only the product name, it cannot establish which version was observed."
+  },
   "expected": {
-    "handlingStrategy": "classifier_required",
-    "classifierExpectation": "bottle",
+    "handlingStrategy": "block_if_uncertain",
+    "classifierExpectation": "review_required",
     "exactBottleIdentity": null
   }
 }

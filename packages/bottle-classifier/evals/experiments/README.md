@@ -65,7 +65,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C23: Audit early stop](./C23-audit-early-stop.md)                                   | Stop after repeated rejected audit work                                              | Rejected: later turns corrected distinct rejections and were useful            |
 | [C24: Subject-labeled page passages](./C24-subject-labeled-page-passages.md)         | Sort exact page passages into whole-product and component evidence                   | Stopped: exact producer page made both targets pass without the change         |
 | [C25: Page read after search exhaustion](./C25-page-read-after-search-exhaustion.md) | Tell Luna when its page-read allowance remains after search is exhausted             | Rejected: no target gain, two lost judgments, and 6.6% higher cost             |
-| [C26: Single-cask examples](./C26-single-cask-examples.md)                           | Explain true, false, and unknown values beside the output field                      | Rejected: focused gain failed full accuracy, safety, tokens, and cost          |
+| [C26: Single-cask examples](./C26-single-cask-examples.md)                           | Explain true, false, and unknown values beside the output field                      | Inconclusive: focused gain cost more; broad runs used different code           |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections
@@ -73,13 +73,15 @@ below make comparisons more accurate and repeatable.
 
 ## Measurement changes
 
-| Item                                                           | Decision                                                       |                                           Model cost |
-| -------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------: |
-| [M01: Exact field failures](./M01-exact-field-failures.md)     | Accepted: clearer failures, unchanged scores                   |                                                   $0 |
-| [M02: Cold Brew policy conflict](./M02-policy-conflicts.md)    | Accepted: two expectations corrected; classifier unchanged     | $0 correction; $0.005499 including the initial check |
-| [M03: Names and categories](./M03-names-and-categories.md)     | Accepted: verified test case corrections; classifier unchanged |          $0 correction; $0.039408 focused validation |
-| [M06: Fixed image extraction](./M06-fixed-image-extraction.md) | Accepted: controlled audit input; classifier unchanged         |                                $0.003839 smoke check |
-| [M07: Null vs. missing](./M07-null-vs-missing.md)              | Accepted: correct explicit-null scoring; classifier unchanged  |                                                   $0 |
-| [M04: Supported audit extras](./M04-supported-audit-extras.md) | Accepted: exact reviewed operation sets; classifier unchanged  |                                                   $0 |
-| [M05: Fixed web evidence](./M05-fixed-evidence.md)             | Accepted: controlled evidence lane; classifier unchanged       |                       $0.014501 total Luna high work |
-| [M08: Held-out release year](./M08-held-out-release-year.md)   | Accepted: removed an unsupported held-out SMWS year            |                                                   $0 |
+| Item                                                                   | Decision                                                       |                                           Model cost |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------: |
+| [M01: Exact field failures](./M01-exact-field-failures.md)             | Accepted: clearer failures, unchanged scores                   |                                                   $0 |
+| [M02: Cold Brew policy conflict](./M02-policy-conflicts.md)            | Accepted: two expectations corrected; classifier unchanged     | $0 correction; $0.005499 including the initial check |
+| [M03: Names and categories](./M03-names-and-categories.md)             | Accepted: verified test case corrections; classifier unchanged |          $0 correction; $0.039408 focused validation |
+| [M06: Fixed image extraction](./M06-fixed-image-extraction.md)         | Accepted: controlled audit input; classifier unchanged         |                                $0.003839 smoke check |
+| [M07: Null vs. missing](./M07-null-vs-missing.md)                      | Accepted: correct explicit-null scoring; classifier unchanged  |                                                   $0 |
+| [M04: Supported audit extras](./M04-supported-audit-extras.md)         | Accepted: exact reviewed operation sets; classifier unchanged  |                                                   $0 |
+| [M05: Fixed web evidence](./M05-fixed-evidence.md)                     | Accepted: controlled evidence lane; classifier unchanged       |                       $0.014501 total Luna high work |
+| [M08: Held-out release year](./M08-held-out-release-year.md)           | Accepted: removed an unsupported held-out SMWS year            |                                                   $0 |
+| [M09: Whistler release ambiguity](./M09-whistler-release-ambiguity.md) | Accepted: name-only source now requires review                 |                                                   $0 |
+| [M10: Woodford release ambiguity](./M10-woodford-release-ambiguity.md) | Accepted: name-only source now requires review                 |                                                   $0 |

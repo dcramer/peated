@@ -74,6 +74,18 @@ Do these before using the suite to judge more classifier changes.
       the real Peated Bottle is deliberately absent. Age 6 and 56% ABV remain
       required. See [M08 results](./M08-held-out-release-year.md).
 
+- [x] **M09 — Require review for an ambiguous Whistler source.** **Accepted as
+      a measurement correction.** The name-only input cannot distinguish the
+      producer's 86-proof Bodega Cask from exact-product evidence for a 46%
+      version. The safer `no_match` result is now correct. See
+      [M09 results](./M09-whistler-release-ambiguity.md).
+
+- [x] **M10 — Require review for name-only Double Double Oaked.** **Accepted as
+      a measurement correction.** Woodford Reserve has marketed separate yearly
+      releases under this name. A source without a year, label, or URL does not
+      identify a complete Bottle. See
+      [M10 results](./M10-woodford-release-ambiguity.md).
+
 ## Improve the classifier
 
 Test these one at a time, in this order. Each needs cases that must keep working
@@ -285,10 +297,13 @@ and cases with different Bottle names from the failure that led to it.
       median case 41.9% slower. See
       [C25 results](./C25-page-read-after-search-exhaustion.md).
 
-- [x] **C26 — Explain true, false, and unknown single-cask values.** **Rejected
-      and reverted.** Focused passes improved from 6/9 to 8/9, but the full
-      suite fell from 80/105 to 78/105, produced one unsupported creation, and
-      cost 3.9% more. See [C26 results](./C26-single-cask-examples.md).
+- [x] **C26 — Explain true, false, and unknown single-cask values.**
+      **Inconclusive and reverted.** Focused passes improved from 6/9 to 8/9,
+      while cost rose 31.5% and time rose 5.5%. The broad comparison used a
+      saved control from a different source commit. After correcting two
+      ambiguous expectations, the observed runs score 78/105 and 80/105, but
+      the comparison still does not isolate the examples. See
+      [C26 results](./C26-single-cask-examples.md).
 
 ## Current stopping point
 
@@ -311,10 +326,12 @@ evidence shape. C25 found that the old Octomore retrieval failure no longer
 reproduces consistently: the unchanged classifier passed all three runs. Its
 extra page-read guidance produced no gain and failed two judgments.
 
-C26 showed why even short positive and negative examples need broad checks.
-They made the intended Boolean fields more reliable in the focused set, but
-the full suite lost two passes and produced an unsupported exact-cask
-creation. The descriptions were reverted.
+C26 made the intended Boolean fields more reliable in the focused set, but at
+higher cost and time. Its broad check used a saved control from different code,
+so the apparent two-pass loss and unsupported exact-cask creation cannot be
+assigned to the examples. The unsafe output is still a valid failure. The
+descriptions were reverted until a same-revision comparison can establish a
+net gain.
 
 ## Completion rule
 
