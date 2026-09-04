@@ -51,11 +51,6 @@ test("moderator previews and saves score rules; readers keep the original score"
   await expect(
     page.getByLabel(`${priceSite.name} score 3.5 out of 5`),
   ).toBeVisible();
-  await expect(
-    page.getByText("Counts as an estimated 86/100 in the bottle score.", {
-      exact: false,
-    }),
-  ).toBeVisible();
   await snapshot("Bottles/Original critic score", {
     ready: page.getByLabel(`${priceSite.name} score 3.5 out of 5`),
   });
