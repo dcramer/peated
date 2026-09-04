@@ -1,9 +1,11 @@
 # Classifier eval baselines
 
-The current 105-case Luna high starting point and the findings from the first
-fourteen experiments are summarized in the dated
+The [current 105-case Luna high baseline](./baselines/2026-09-03-luna-high-current.json)
+pins the source commit, test-case hashes, run settings, aggregate results, and
+raw report hash. The findings from the first fourteen experiments are summarized
+in the dated
 [research record](../../../docs/research/bottle-classifier-evaluation-2026-09.md).
-The baseline below is the earlier model-comparison snapshot.
+The comparison below is the earlier six-model-setting snapshot.
 
 The [2026-09-03 baseline](./baselines/2026-09-03.json) records all 102 test cases
 across six full-suite runs, plus targeted repeats. It includes model settings,

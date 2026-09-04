@@ -7,8 +7,10 @@ records live under
 
 ## Current measured baseline
 
-The classifier now uses `gpt-5.6-luna` with high reasoning effort. The latest
-live web run checked 105 cases:
+The classifier now uses `gpt-5.6-luna` with high reasoning effort. The
+[recorded baseline](../../packages/bottle-classifier/evals/baselines/2026-09-03-luna-high-current.json)
+pins the source commit, test-case hashes, run settings, and raw report hash. The
+latest live web run checked 105 cases:
 
 | Measure                             | Result    |
 | ----------------------------------- | --------- |
