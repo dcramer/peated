@@ -7,6 +7,7 @@ import { prepareKilchomanSource } from "@peated/server/scraper/configured/prepar
 import { prepareWhiskeyReviewerSource } from "@peated/server/scraper/configured/prepareWhiskeyReviewer";
 import { prepareWhiskySagaSource } from "@peated/server/scraper/configured/prepareWhiskySaga";
 import { prepareWhiskyStudySource } from "@peated/server/scraper/configured/prepareWhiskyStudy";
+import { prepareWordsOfWhiskySource } from "@peated/server/scraper/configured/prepareWordsOfWhisky";
 import {
   ScrapeSourceConflictError,
   ScrapeSourceNotFoundError,
@@ -31,7 +32,7 @@ export default procedure
     z
       .object({
         site: ExternalSiteKeySchema.describe(
-          "The existing site's key. Currently supports bourbonculture, compassbox, kilchoman, whiskeyreviewer, whiskysaga, and whiskystudy.",
+          "The existing site's key. Currently supports bourbonculture, compassbox, kilchoman, whiskeyreviewer, whiskysaga, whiskystudy, and wordsofwhisky.",
         ),
         apply: z
           .boolean()
@@ -68,6 +69,7 @@ export default procedure
       whiskeyreviewer: prepareWhiskeyReviewerSource,
       whiskysaga: prepareWhiskySagaSource,
       whiskystudy: prepareWhiskyStudySource,
+      wordsofwhisky: prepareWordsOfWhiskySource,
     }[input.site];
     if (!prepareSource) {
       throw errors.BAD_REQUEST({

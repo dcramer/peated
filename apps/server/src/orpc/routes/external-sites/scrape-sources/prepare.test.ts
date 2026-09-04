@@ -78,6 +78,15 @@ function prepareWhiskeyReviewer(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareWordsOfWhisky(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "wordsofwhisky", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareCompassBox(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "compassbox", ...input },
@@ -106,7 +115,8 @@ function codeOwnedSource(
     | "kilchoman"
     | "whiskeyreviewer"
     | "whiskysaga"
-    | "whiskystudy",
+    | "whiskystudy"
+    | "wordsofwhisky",
 ) {
   return defineScraperSource({
     key,
@@ -143,6 +153,13 @@ const whiskeyReviewerCanonicalUrl =
 const whiskeyReviewerRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("whiskeyreviewer")!],
   sources: [codeOwnedSource("whiskeyreviewer")],
+});
+
+const wordsOfWhiskyCanonicalUrl =
+  "https://wordsofwhisky.com/example-multi-bottle-review";
+const wordsOfWhiskyRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("wordsofwhisky")!],
+  sources: [codeOwnedSource("wordsofwhisky")],
 });
 
 const compassBoxRegistry = createScraperRegistry({
@@ -365,6 +382,86 @@ async function setupWhiskeyReviewerMigration(bottleId: number | null = null) {
     completedAt: new Date(),
   });
   return { site, article, review };
+}
+
+function wordsOfWhiskyReviewKey(name: string, reviewerName: string | null) {
+  const digest = createHash("sha256")
+    .update(
+      [wordsOfWhiskyCanonicalUrl, name, reviewerName ?? ""]
+        .map((value) =>
+          value.replaceAll(/\s+/g, " ").trim().toLocaleLowerCase("en"),
+        )
+        .join("\n"),
+    )
+    .digest("hex");
+  return `wordsofwhisky:${digest}`;
+}
+
+async function setupWordsOfWhiskyMigration(bottleIds: [number, number]) {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "wordsofwhisky",
+      name: "Words of Whisky",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(wordsOfWhiskyRegistry);
+  const [article] = await db
+    .insert(externalReviewArticles)
+    .values({
+      externalSiteId: site.id,
+      canonicalUrl: wordsOfWhiskyCanonicalUrl,
+      title: "Two Example Whiskies",
+      publishedAt: new Date("2026-08-19"),
+    })
+    .returning();
+  const reviewerName = "Example Writer";
+  const reviews = await db
+    .insert(externalReviews)
+    .values([
+      {
+        articleId: article.id,
+        sourceKey: wordsOfWhiskyReviewKey("First Example", reviewerName),
+        name: "First Example",
+        reviewerName,
+        bottleId: bottleIds[0],
+        hidden: true,
+        nativeScoreValue: 8.7,
+        nativeScoreScale: 10,
+        nativeScoreDisplay: "8.7/10",
+      },
+      {
+        articleId: article.id,
+        sourceKey: wordsOfWhiskyReviewKey("Second Example", reviewerName),
+        name: "Second Example",
+        reviewerName,
+        bottleId: bottleIds[1],
+        hidden: false,
+        nativeScoreValue: 9,
+        nativeScoreScale: 10,
+        nativeScoreDisplay: "9/10",
+      },
+    ])
+    .returning();
+  await db.insert(externalReviewBodies).values(
+    reviews.map((review) => ({
+      externalReviewId: review.id,
+      body: `Stored body for ${review.name}.`,
+      fetchedAt: new Date(),
+    })),
+  );
+  await db.insert(externalReviewPublications).values({
+    externalSiteId: site.id,
+    approvedAt: new Date(),
+  });
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return { site, article, reviews };
 }
 
 async function setupCompassBoxMigration() {
@@ -715,6 +812,89 @@ describe("POST /admin/scrape-sources/prepare", () => {
         createdById: admin.id,
       }),
     ]);
+  });
+
+  test("prepares Words of Whisky without replacing multi-review records", async ({
+    fixtures,
+  }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { site, article, reviews } = await setupWordsOfWhiskyMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+    const bodies = await db.select().from(externalReviewBodies);
+    const publications = await db.select().from(externalReviewPublications);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareWordsOfWhisky()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      reviewCount: 2,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(externalReviews)).toEqual(reviews);
+
+    const applied = await prepareWordsOfWhisky({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      reviewCount: 2,
+      applied: true,
+    });
+    await syncScraperDefinitions(wordsOfWhiskyRegistry);
+    expect(await db.select().from(externalReviewArticles)).toEqual([article]);
+    expect(await db.select().from(externalReviews)).toEqual([
+      { ...reviews[0], sourceKey: `${wordsOfWhiskyCanonicalUrl}#review-1` },
+      { ...reviews[1], sourceKey: `${wordsOfWhiskyCanonicalUrl}#review-2` },
+    ]);
+    expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
+    expect(await db.select().from(externalReviewPublications)).toEqual(
+      publications,
+    );
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "review",
+        listUrl: "https://wordsofwhisky.com/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("refuses an unknown Words of Whisky review key", async ({
+    fixtures,
+  }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { reviews } = await setupWordsOfWhiskyMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+    await db
+      .update(externalReviews)
+      .set({ sourceKey: "unexpected" })
+      .where(eq(externalReviews.id, reviews[1].id));
+    const before = await db.select().from(externalReviews);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareWordsOfWhisky({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining(
+        "Check the URL and review records for Words of Whisky article",
+      ),
+    });
+    expect(await db.select().from(externalReviews)).toEqual(before);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
   test("prepares Compass Box without replacing prices or Bottle matches", async ({
