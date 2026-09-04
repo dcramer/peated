@@ -33,13 +33,21 @@ function suggestedValue(
   };
 }
 
-function reviewCandidate(nameSelector: string) {
+function reviewCandidate(
+  nameSelector: string,
+  listOptions: {
+    item?: string;
+    excludeWhen?: { selector: string; startsWith: string[] | null };
+  } = {},
+) {
   return {
     listPageUrl: "https://example.test/reviews",
     rules: {
       kind: "review" as const,
       list: {
+        item: listOptions.item ?? null,
         detailLink: { selector: "a.review", attribute: "href" as const },
+        excludeWhen: listOptions.excludeWhen ?? null,
         nextPage: null,
       },
       detail: {
@@ -136,7 +144,13 @@ test("returns rules only after the rule check passes", async () => {
     .fn()
     .mockResolvedValueOnce(toolCallResponse("first", reviewCandidate(".bad")))
     .mockResolvedValueOnce(
-      toolCallResponse("second", reviewCandidate(".bottle-name")),
+      toolCallResponse(
+        "second",
+        reviewCandidate(".bottle-name", {
+          item: ".product-card",
+          excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+        }),
+      ),
     );
   const checkRules = vi.fn(async ({ rules }) => {
     if (rules.kind !== "review") throw new Error("Expected review rules.");
@@ -186,7 +200,11 @@ test("returns rules only after the rule check passes", async () => {
   expect(result.model).toBe("test-setup-model");
   expect(result.rules).toMatchObject({
     kind: "review",
-    list: { maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS },
+    list: {
+      item: ".product-card",
+      excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+      maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
+    },
     detail: {
       name: { selector: ".bottle-name", removeSuffixes: ["Review"] },
       reviewText: {

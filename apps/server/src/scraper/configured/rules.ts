@@ -79,7 +79,7 @@ export const ScrapeValueSchema = z.union([
   ScrapeFixedValueSchema,
 ]);
 
-const ListRulesSchema = z
+const ListRulesV1Schema = z
   .object({
     detailLink: ScrapeValueSelectorV1Schema,
     nextPage: ScrapeValueSelectorV1Schema.optional(),
@@ -92,11 +92,36 @@ const ListRulesSchema = z
   })
   .strict();
 
-function reviewRulesSchema<T extends z.ZodType>(valueSchema: T) {
+export const ScrapeListExclusionSchema = z
+  .object({
+    selector: ScrapeSelectorSchema,
+    startsWith: ScrapeLiteralListSchema.optional(),
+  })
+  .strict();
+
+const ListRulesSchema = ListRulesV1Schema.extend({
+  item: ScrapeSelectorSchema.optional(),
+  excludeWhen: ScrapeListExclusionSchema.optional(),
+})
+  .strict()
+  .superRefine((rules, context) => {
+    if (rules.excludeWhen && !rules.item) {
+      context.addIssue({
+        code: "custom",
+        path: ["excludeWhen"],
+        message: "List exclusion requires an item selector.",
+      });
+    }
+  });
+
+function reviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
+  valueSchema: T,
+  listSchema: U,
+) {
   return z
     .object({
       kind: z.literal("review"),
-      list: ListRulesSchema,
+      list: listSchema,
       detail: z
         .object({
           title: valueSchema,
@@ -118,11 +143,14 @@ function reviewRulesSchema<T extends z.ZodType>(valueSchema: T) {
     .strict();
 }
 
-function priceRulesSchema<T extends z.ZodType>(valueSchema: T) {
+function priceRulesSchema<T extends z.ZodType, U extends z.ZodType>(
+  valueSchema: T,
+  listSchema: U,
+) {
   return z
     .object({
       kind: z.literal("price"),
-      list: ListRulesSchema,
+      list: listSchema,
       detail: z
         .object({
           name: valueSchema,
@@ -140,13 +168,13 @@ function priceRulesSchema<T extends z.ZodType>(valueSchema: T) {
 }
 
 export const ScrapeRulesV1Schema = z.discriminatedUnion("kind", [
-  reviewRulesSchema(ScrapeValueSelectorV1Schema),
-  priceRulesSchema(ScrapeValueSelectorV1Schema),
+  reviewRulesSchema(ScrapeValueSelectorV1Schema, ListRulesV1Schema),
+  priceRulesSchema(ScrapeValueSelectorV1Schema, ListRulesV1Schema),
 ]);
 
 export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
-  reviewRulesSchema(ScrapeValueSchema),
-  priceRulesSchema(ScrapeValueSchema),
+  reviewRulesSchema(ScrapeValueSchema, ListRulesSchema),
+  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
 export const StoredScrapeRulesSchema = z.union([
@@ -159,6 +187,7 @@ export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
+export type ScrapeListExclusion = z.infer<typeof ScrapeListExclusionSchema>;
 
 /** Parses rules only with the interpreter contract that owns their stored version. */
 export function parseScrapeRules(

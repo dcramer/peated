@@ -45,7 +45,38 @@ test("rejects rules for an unsupported stored format", () => {
 test("loads old rules only through the version 1 contract", () => {
   const rules = ScrapeRulesV1Schema.parse(reviewConfig(25));
   expect(parseScrapeRules(1, rules)).toEqual(rules);
+  expect(() =>
+    parseScrapeRules(1, {
+      ...rules,
+      list: { ...rules.list, item: ".card" },
+    }),
+  ).toThrow();
   expect(SCRAPE_RULES_VERSION).toBe(2);
+});
+
+test("accepts bounded list-card exclusion only with an item selector", () => {
+  expect(
+    ScrapeRulesSchema.parse({
+      ...reviewConfig(25),
+      list: {
+        ...reviewConfig(25).list,
+        item: ".product-card",
+        excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+      },
+    }).list,
+  ).toMatchObject({
+    item: ".product-card",
+    excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+  });
+  expect(() =>
+    ScrapeRulesSchema.parse({
+      ...reviewConfig(25),
+      list: {
+        ...reviewConfig(25).list,
+        excludeWhen: { selector: ".badge" },
+      },
+    }),
+  ).toThrow("List exclusion requires an item selector.");
 });
 
 test("accepts bounded selector and fixed value operations", () => {

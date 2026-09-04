@@ -116,21 +116,30 @@ export function parseScrapeList(
   const links = new Set<string>();
   try {
     const $ = load(html);
-    for (const element of $(rules.list.detailLink.selector).toArray()) {
-      const raw = rules.list.detailLink.attribute
-        ? $(element).attr(rules.list.detailLink.attribute)
-        : $(element).text();
-      if (!raw?.trim()) continue;
-      try {
-        links.add(absoluteHttpUrl(raw.trim(), pageUrl));
-      } catch (error) {
-        issues.push({
-          field: "list.detailLink",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Unable to parse selector.",
-        });
+    const itemSelector = "item" in rules.list ? rules.list.item : undefined;
+    const excludeWhen =
+      "excludeWhen" in rules.list ? rules.list.excludeWhen : undefined;
+    const items = itemSelector ? $(itemSelector).toArray() : [null];
+    for (const itemElement of items) {
+      const item = itemElement ? load($.html(itemElement)) : $;
+      if (excludeWhen && readValue(item, excludeWhen)) continue;
+      for (const element of item(rules.list.detailLink.selector).toArray()) {
+        const raw = rules.list.detailLink.attribute
+          ? item(element).attr(rules.list.detailLink.attribute)
+          : item(element).text();
+        if (!raw?.trim()) continue;
+        try {
+          links.add(absoluteHttpUrl(raw.trim(), pageUrl));
+        } catch (error) {
+          issues.push({
+            field: "list.detailLink",
+            message:
+              error instanceof Error
+                ? error.message
+                : "Unable to parse selector.",
+          });
+        }
+        if (links.size >= rules.list.maxItems) break;
       }
       if (links.size >= rules.list.maxItems) break;
     }

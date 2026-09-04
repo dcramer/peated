@@ -10,6 +10,8 @@ repeatable gaps:
   labels so clips and tags keep the same evidence as the code adapter.
 - Small price sources commonly publish a fixed 700 ml size or omit a producer
   prefix from each product heading.
+- Compass Box marks sold-out products inside each card, so a safe selector
+  cannot exclude their links without the unsupported relational `:has` syntax.
 
 The revision table already stores `rulesVersion`, so new behavior can be added
 without changing saved version 1 revisions. Preview and collection already use
@@ -31,8 +33,7 @@ the same parser and network controls.
 - Arbitrary regular expressions, JavaScript, templates, or per-source plugins.
 - Cross-origin requests, authentication, browser rendering, JSON APIs, or
   changing request policy.
-- General product filtering beyond CSS selectors and bounded text-prefix
-  selection.
+- General product filtering beyond a bounded list-item text exclusion.
 - Migrating a source whose complete local and production previews do not match
   its stored coverage and identity.
 
@@ -84,6 +85,18 @@ AI setup receives the same schema and plain-language operation order. It must
 prefer source text and use fixed values only when the source makes that fact
 stable and unambiguous, such as a shop that sells only 700 ml bottles in the
 selected list.
+
+### Scope optional exclusion to one list item
+
+Version 2 list rules can set an `item` CSS selector. When present, the detail
+link selector is evaluated independently inside each item. An optional
+`excludeWhen` selector can skip that item when it finds non-empty text,
+optionally limited to text beginning with one of the same bounded literal
+prefixes used by value rules.
+
+This makes a card-local fact such as `Sold out` usable without admitting
+relational CSS, regular expressions, or cross-item state. `excludeWhen` is
+invalid without `item`; version 1 retains its original global link selection.
 
 ### Put the rules version in local preview input
 

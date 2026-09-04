@@ -1,5 +1,6 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { describe, expect, it } from "vitest";
+import { parseCompassBoxProducts } from "../adapters/legacy/scrapeCompassBox";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
@@ -101,6 +102,22 @@ const whiskySagaRules = {
   },
 } satisfies ScrapeRules;
 
+const compassBoxRules = {
+  kind: "price",
+  list: {
+    item: ".card-wrapper.product-card-wrapper",
+    detailLink: { selector: ".card__heading a[href]", attribute: "href" },
+    excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+    maxItems: 99,
+  },
+  detail: {
+    name: { selector: "h1", prefix: "Compass Box " },
+    price: { selector: ".price" },
+    currency: "gbp",
+    volume: { value: "700 ml" },
+  },
+} satisfies ScrapeRules;
+
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
   legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
@@ -159,6 +176,41 @@ describe("scrape source parser", () => {
     expect(result).toEqual({
       links: ["https://reviews.test/one"],
       nextPageUrl: "https://reviews.test/archive?page=2",
+      issues: [],
+    });
+  });
+
+  it("excludes unavailable list cards with bounded text matching", () => {
+    const result = parseScrapeList(
+      {
+        ...reviewConfig,
+        list: {
+          ...reviewConfig.list,
+          item: ".product-card",
+          excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+        },
+      },
+      '<article class="product-card"><span class="badge">New</span><a class="review" href="/one">One</a></article><article class="product-card"><span class="badge">SOLD OUT</span><a class="review" href="/two">Two</a></article><article class="product-card"><a class="review" href="/three">Three</a></article>',
+      new URL("https://reviews.test/archive"),
+    );
+
+    expect(result).toEqual({
+      links: ["https://reviews.test/one", "https://reviews.test/three"],
+      nextPageUrl: null,
+      issues: [],
+    });
+  });
+
+  it("matches the current Compass Box parser's available product links", async () => {
+    const pageUrl = new URL("https://www.compassboxwhisky.com/collections");
+    const html = await loadFixture("compassbox", "bottle-list.html");
+    const legacyLinks = parseCompassBoxProducts(html, pageUrl.toString()).map(
+      ({ url }) => url,
+    );
+
+    expect(parseScrapeList(compassBoxRules, html, pageUrl)).toEqual({
+      links: legacyLinks,
+      nextPageUrl: null,
       issues: [],
     });
   });

@@ -16,6 +16,7 @@ import {
   ScrapeRulesSchema,
   ScrapeSelectorSchema,
   ScrapeValueSchema,
+  type ScrapeListExclusion,
   type ScrapeRules,
   type ScrapeValue,
   type ScrapeValueSelectorV1,
@@ -25,7 +26,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v9";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v10";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -104,12 +105,30 @@ const SuggestedLinkSelectorSchema = z
   })
   .strict();
 
-const SuggestedListRulesSchema = z
+const SuggestedListExclusionSchema = z
   .object({
-    detailLink: SuggestedLinkSelectorSchema,
-    nextPage: SuggestedLinkSelectorSchema.nullable(),
+    selector: ScrapeSelectorSchema,
+    startsWith: z.array(z.string().trim().min(1).max(100)).max(10).nullable(),
   })
   .strict();
+
+const SuggestedListRulesSchema = z
+  .object({
+    item: ScrapeSelectorSchema.nullable(),
+    detailLink: SuggestedLinkSelectorSchema,
+    excludeWhen: SuggestedListExclusionSchema.nullable(),
+    nextPage: SuggestedLinkSelectorSchema.nullable(),
+  })
+  .strict()
+  .superRefine((rules, context) => {
+    if (rules.excludeWhen && !rules.item) {
+      context.addIssue({
+        code: "custom",
+        path: ["excludeWhen"],
+        message: "List exclusion requires an item selector.",
+      });
+    }
+  });
 
 const SuggestedReviewRulesSchema = z
   .object({
@@ -169,6 +188,7 @@ const SuggestedPriceRevisionSchema = z
   .strict();
 
 type SuggestedValueSelector = z.infer<typeof SuggestedValueSelectorSchema>;
+type SuggestedListRules = z.infer<typeof SuggestedListRulesSchema>;
 type SuggestedReviewRules = z.infer<typeof SuggestedReviewRulesSchema>;
 type SuggestedPriceRules = z.infer<typeof SuggestedPriceRulesSchema>;
 type ReviewRules = Extract<ScrapeRules, { kind: "review" }>;
@@ -226,7 +246,9 @@ const RULE_INSTRUCTIONS = [
   "</success_criteria>",
   "<rules>",
   "Use short, stable CSS selectors.",
+  "When list items need independent checks, set list item to their shared container selector. Otherwise set it to null.",
   'The list detailLink must select anchor elements and use the "href" attribute.',
+  "Set list excludeWhen to a selector inside each list item, with optional startsWith labels, only when a matching value means that item must be skipped. Otherwise set it to null.",
   'Set list nextPage to an anchor selector with the "href" attribute when the list has a next-page link. Otherwise set it to null.',
   'Use "src" for image URLs and "datetime" for machine-readable time values when those attributes exist.',
   "Use an attribute whenever the required value is stored in that attribute instead of visible text.",
@@ -280,6 +302,27 @@ function toScrapeLinkSelector(
   return { attribute: value.attribute, selector: value.selector };
 }
 
+function toScrapeList(input: SuggestedListRules): ReviewRules["list"] {
+  const list: ReviewRules["list"] = {
+    detailLink: toScrapeLinkSelector(input.detailLink),
+    maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
+  };
+  if (input.item !== null) list.item = input.item;
+  if (input.excludeWhen !== null) {
+    const excludeWhen: ScrapeListExclusion = {
+      selector: input.excludeWhen.selector,
+    };
+    if (input.excludeWhen.startsWith?.length) {
+      excludeWhen.startsWith = input.excludeWhen.startsWith;
+    }
+    list.excludeWhen = excludeWhen;
+  }
+  if (input.nextPage !== null) {
+    list.nextPage = toScrapeLinkSelector(input.nextPage);
+  }
+  return list;
+}
+
 function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
   const detail: ReviewRules["detail"] = {
     title: toScrapeValue(input.detail.title),
@@ -287,13 +330,7 @@ function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
     reviewItem: input.detail.reviewItem,
     name: toScrapeValue(input.detail.name),
   };
-  const list: ReviewRules["list"] = {
-    detailLink: toScrapeLinkSelector(input.list.detailLink),
-    maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
-  };
-  if (input.list.nextPage !== null) {
-    list.nextPage = toScrapeLinkSelector(input.list.nextPage);
-  }
+  const list = toScrapeList(input.list);
   if (input.detail.reviewerName !== null) {
     detail.reviewerName = toScrapeValue(input.detail.reviewerName);
   }
@@ -316,13 +353,7 @@ function toPriceRules(input: SuggestedPriceRules): ScrapeRules {
     currency: input.detail.currency,
     volume: toScrapeValue(input.detail.volume),
   };
-  const list: PriceRules["list"] = {
-    detailLink: toScrapeLinkSelector(input.list.detailLink),
-    maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
-  };
-  if (input.list.nextPage !== null) {
-    list.nextPage = toScrapeLinkSelector(input.list.nextPage);
-  }
+  const list = toScrapeList(input.list);
   if (input.detail.url !== null) {
     detail.url = toScrapeValue(input.detail.url);
   }

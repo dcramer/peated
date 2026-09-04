@@ -46,6 +46,24 @@ text-prefix filtering or multi-element joining.
 - **WHEN** more than 100 elements remain after selector and prefix filtering
 - **THEN** parsing reports a bounded value error instead of reading or storing a partial joined value
 
+### Requirement: List items can exclude unavailable entries
+
+The system SHALL let a version 2 list rule scope its detail-link selector to a
+CSS-selected item. It SHALL optionally skip an item when a selector inside that
+item finds normalized text, limited when configured to a bounded list of
+case-insensitive literal prefixes. An exclusion rule MUST require an item
+selector. Version 1 list selection MUST remain unchanged.
+
+#### Scenario: A product card is sold out
+
+- **WHEN** a list item contains a badge beginning with `Sold out` and `excludeWhen` selects badges with that literal prefix
+- **THEN** the parser skips that item's detail link and continues with the remaining cards in document order
+
+#### Scenario: An exclusion has no item scope
+
+- **WHEN** a version 2 list rule supplies `excludeWhen` without an `item` selector
+- **THEN** strict rule validation rejects the complete revision
+
 ### Requirement: Value rules can apply literal cleanup
 
 The system SHALL let a version 2 value remove the first matching literal from

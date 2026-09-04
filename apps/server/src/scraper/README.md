@@ -82,9 +82,13 @@ product database. Only a revision that passes its preview can become active. An
 admin can return to any older revision that passed. Pausing a source stops
 collection but keeps its revisions and run history.
 
-Rules format 1 supports same-origin HTML list and detail pages, an item limit,
-an optional next-page link, CSS selectors, and fixed date, number, price, and
-volume conversions. Code follows at most five list pages. It does not support
+Rules formats 1 and 2 support same-origin HTML list and detail pages, an item
+limit, an optional next-page link, CSS selectors, and fixed date, number, price,
+and volume conversions. Version 2 also supports bounded value cleanup, fixed
+values, joined labeled text, and list-card exclusion. An `item` selector scopes
+each `detailLink`; `excludeWhen` skips that item when its selector finds text,
+optionally beginning with one of the configured literal labels. Code follows at
+most five list pages. Rules do not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
 page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
 adapter when a source needs those capabilities.
