@@ -5,7 +5,8 @@ import { z } from "zod";
 export const SCRAPE_RULES_VERSION_1 = 1;
 export const SCRAPE_RULES_VERSION_2 = 2;
 export const SCRAPE_RULES_VERSION_3 = 3;
-export const SCRAPE_RULES_VERSION = 4;
+export const SCRAPE_RULES_VERSION_4 = 4;
+export const SCRAPE_RULES_VERSION = 5;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -218,6 +219,10 @@ const ScrapeScoreSchema = z
     }
   });
 
+const ScrapeScoreWithFirstReviewSchema = ScrapeScoreSchema.safeExtend({
+  firstReviewFallback: ScrapeValueSchema.optional(),
+});
+
 export const ScrapeReviewSectionSchema = z
   .object({
     start: ScrapeSelectorSchema,
@@ -225,7 +230,10 @@ export const ScrapeReviewSectionSchema = z
   })
   .strict();
 
-function currentReviewRulesSchema<T extends z.ZodType>(reviewItemSchema: T) {
+function currentReviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
+  reviewItemSchema: T,
+  scoreSchema: U,
+) {
   return z
     .object({
       kind: z.literal("review"),
@@ -241,7 +249,7 @@ function currentReviewRulesSchema<T extends z.ZodType>(reviewItemSchema: T) {
           name: ScrapeValueSchema,
           reviewerName: ScrapeValueSchema.optional(),
           reviewText: ScrapeValueSchema.optional(),
-          score: ScrapeScoreSchema.optional(),
+          score: scoreSchema.optional(),
         })
         .strict(),
     })
@@ -283,13 +291,22 @@ export const ScrapeRulesV2Schema = z.discriminatedUnion("kind", [
 ]);
 
 export const ScrapeRulesV3Schema = z.discriminatedUnion("kind", [
-  currentReviewRulesSchema(ScrapeSelectorSchema),
+  currentReviewRulesSchema(ScrapeSelectorSchema, ScrapeScoreSchema),
+  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
+]);
+
+export const ScrapeRulesV4Schema = z.discriminatedUnion("kind", [
+  currentReviewRulesSchema(
+    z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
+    ScrapeScoreSchema,
+  ),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
 export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
   currentReviewRulesSchema(
     z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
+    ScrapeScoreWithFirstReviewSchema,
   ),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
@@ -298,6 +315,7 @@ export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV1Schema,
   ScrapeRulesV2Schema,
   ScrapeRulesV3Schema,
+  ScrapeRulesV4Schema,
   ScrapeRulesSchema,
 ]);
 
@@ -321,6 +339,9 @@ export function parseScrapeRules(
   }
   if (rulesVersion === SCRAPE_RULES_VERSION_3) {
     return ScrapeRulesV3Schema.parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_4) {
+    return ScrapeRulesV4Schema.parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);

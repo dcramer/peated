@@ -259,6 +259,7 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
           value: suggestedValue(".rating", null, {
             removePrefixes: ["Rating:"],
           }),
+          firstReviewFallback: suggestedValue(".article-rating"),
           scale: 100,
           map: [
             { text: "A", value: 95 },
@@ -299,6 +300,7 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
       publishedAt: { urlDateFormat: "/yyyy/MM/*-MMddyy" },
       score: {
         scale: 100,
+        firstReviewFallback: { selector: ".article-rating" },
         map: [
           { text: "A", value: 95 },
           { text: "B+", value: 87 },

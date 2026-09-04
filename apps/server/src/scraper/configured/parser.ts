@@ -319,10 +319,24 @@ function selectReviewItems(
   const starts = $(section.data.start).toArray();
   return starts.map((start) => {
     if (starts.length === 1) {
-      const body = $(start).parent();
+      const parent = $(start).parent();
+      if (!section.data.endBefore) {
+        return {
+          body: parent,
+          item: load(parent.html() ?? ""),
+        };
+      }
+      const body = $($(start).prevAll().toArray().reverse())
+        .add(start)
+        .add($(start).nextUntil(section.data.endBefore));
       return {
         body,
-        item: load(body.html() ?? ""),
+        item: load(
+          body
+            .toArray()
+            .map((element) => $.html(element))
+            .join(""),
+        ),
       };
     }
 
@@ -459,8 +473,18 @@ function parseReviewDetail(
       const reviewerName = reviewerSelector
         ? (readValue(item, reviewerSelector) ?? pageReviewerName)
         : null;
-      const scoreText = rules.detail.score
-        ? readReviewValue(item, rules.detail.score.value)
+      const scoreRule = rules.detail.score;
+      const firstReviewFallback =
+        scoreRule &&
+        "firstReviewFallback" in scoreRule &&
+        scoreRule.firstReviewFallback;
+      const scoreText = scoreRule
+        ? (readValue(item, scoreRule.value) ??
+          (index === 0 && firstReviewFallback
+            ? readValue($, firstReviewFallback)
+            : reviewItems.length === 1
+              ? readValue($, scoreRule.value)
+              : null))
         : null;
       const scoreMap =
         rules.detail.score && "map" in rules.detail.score
