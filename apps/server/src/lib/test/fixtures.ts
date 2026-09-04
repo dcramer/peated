@@ -146,7 +146,7 @@ export const User = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.User> => {
   if (!data.username)
-    data.username = `${faker.internet.userName().toLowerCase()}${faker.number.int(
+    data.username = `${faker.internet.username().toLowerCase()}${faker.number.int(
       10000,
     )}`;
 
