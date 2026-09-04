@@ -17,6 +17,7 @@ import {
   createScrapeSourceSuggestionRun,
 } from "./runs";
 import { createSiteWithScrapeSource } from "./service";
+import { AI_INSTRUCTIONS_VERSION } from "./setupAgent";
 
 const SITE_ORIGIN = "https://price-fixture.test";
 const HOME_URL = `${SITE_ORIGIN}/`;
@@ -196,7 +197,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         .from(scrapeSourceRevisions)
         .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
       expect(suggestedRevision).toMatchObject({
-        aiInstructionsVersion: "scrape-source-v7",
+        aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
         author: "ai",
         listUrl: LIST_URL,
         previewStatus: "pending",
