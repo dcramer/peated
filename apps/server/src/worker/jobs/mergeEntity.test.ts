@@ -11,6 +11,7 @@ import {
   bottleSeries,
   bottleTombstones,
   changes,
+  countries,
   entities,
   entityAliases,
   entityEvents,
@@ -18,6 +19,7 @@ import {
   entityImages,
   entityReferences,
   entityTombstones,
+  regions,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   type User,
@@ -515,6 +517,58 @@ test("merge A into B", async ({ fixtures }) => {
     .from(entityTombstones)
     .where(eq(entityTombstones.entityId, entityA.id));
   expect(tombstone.newEntityId).toEqual(newEntityB.id);
+});
+
+test("moves Bottle counts when merged Distilleries have different locations", async ({
+  fixtures,
+}) => {
+  const sourceCountry = await fixtures.Country({ totalBottles: 0 });
+  const sourceRegion = await fixtures.Region({
+    countryId: sourceCountry.id,
+    totalBottles: 0,
+  });
+  const destinationCountry = await fixtures.Country({ totalBottles: 0 });
+  const destinationRegion = await fixtures.Region({
+    countryId: destinationCountry.id,
+    totalBottles: 0,
+  });
+  const source = await fixtures.Entity({
+    kind: "distillery",
+    countryId: sourceCountry.id,
+    regionId: sourceRegion.id,
+  });
+  const destination = await fixtures.Entity({
+    kind: "distillery",
+    countryId: destinationCountry.id,
+    regionId: destinationRegion.id,
+  });
+  await fixtures.Bottle({ distillerIds: [source.id] });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  await expect(
+    db.query.countries.findFirst({
+      where: eq(countries.id, sourceCountry.id),
+    }),
+  ).resolves.toMatchObject({ totalBottles: 0 });
+  await expect(
+    db.query.regions.findFirst({
+      where: eq(regions.id, sourceRegion.id),
+    }),
+  ).resolves.toMatchObject({ totalBottles: 0 });
+  await expect(
+    db.query.countries.findFirst({
+      where: eq(countries.id, destinationCountry.id),
+    }),
+  ).resolves.toMatchObject({ totalBottles: 1 });
+  await expect(
+    db.query.regions.findFirst({
+      where: eq(regions.id, destinationRegion.id),
+    }),
+  ).resolves.toMatchObject({ totalBottles: 1 });
 });
 
 test("moves and deduplicates display aliases", async ({ fixtures }) => {

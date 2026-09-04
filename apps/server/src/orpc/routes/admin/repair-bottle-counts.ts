@@ -8,9 +8,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/admin/catalog/repair-bottle-counts",
-    summary: "Repair brand and producer bottle counts",
+    summary: "Repair saved bottle counts",
     description:
-      "Check saved bottle totals for brands and producers, and fix any that are wrong. Requires administrator privileges.",
+      "Check saved bottle totals for brands, producers, countries, and regions, and fix any that are wrong. Requires administrator privileges.",
     operationId: "repairEntityBottleCounts",
   })
   .input(z.object({}).strict().default({}))
@@ -18,6 +18,13 @@ export default procedure
   .handler(async () => {
     await pushUniqueJob(
       "RepairEntityBottleCounts",
+      {},
+      {
+        delay: 0,
+      },
+    );
+    await pushUniqueJob(
+      "RepairLocationBottleCounts",
       {},
       {
         delay: 0,

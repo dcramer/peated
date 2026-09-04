@@ -8,10 +8,12 @@ import {
   bottleSeries,
   bottles,
   collectionBottles,
+  countries,
   entities,
   externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
+  regions,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -145,12 +147,35 @@ describe("DELETE /bottles/:bottle", () => {
   }) => {
     const user = await fixtures.User({ admin: true });
     const brand = await fixtures.Entity();
-    const removedBottle = await fixtures.Bottle({ brandId: brand.id });
-    await fixtures.Bottle({ brandId: brand.id });
+    const country = await fixtures.Country({ totalBottles: 0 });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      totalBottles: 0,
+    });
+    const distillery = await fixtures.Entity({
+      countryId: country.id,
+      regionId: region.id,
+    });
+    const removedBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+    });
     await db
       .update(entities)
       .set({ totalBottles: 0 })
       .where(eq(entities.id, brand.id));
+    await db
+      .update(countries)
+      .set({ totalBottles: 0 })
+      .where(eq(countries.id, country.id));
+    await db
+      .update(regions)
+      .set({ totalBottles: 0 })
+      .where(eq(regions.id, region.id));
 
     await routerClient.bottles.delete(
       { bottle: removedBottle.id },
@@ -164,6 +189,12 @@ describe("DELETE /bottles/:bottle", () => {
     ).resolves.toBeUndefined();
     await expect(
       db.query.entities.findFirst({ where: eq(entities.id, brand.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, country.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, region.id) }),
     ).resolves.toMatchObject({ totalBottles: 1 });
   });
 

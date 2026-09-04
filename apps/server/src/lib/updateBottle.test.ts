@@ -9,7 +9,9 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  countries,
   entities,
+  regions,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { materializeBottleForGroup } from "@peated/server/lib/bottleIdentity";
@@ -691,6 +693,58 @@ describe("Bottle updates", () => {
       }),
     ).resolves.toMatchObject({ changed: false });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
+  test("moves production-location Bottle counts with Distillery links", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const oldCountry = await fixtures.Country({ totalBottles: 0 });
+    const oldRegion = await fixtures.Region({
+      countryId: oldCountry.id,
+      totalBottles: 0,
+    });
+    const newCountry = await fixtures.Country({ totalBottles: 0 });
+    const newRegion = await fixtures.Region({
+      countryId: newCountry.id,
+      totalBottles: 0,
+    });
+    const oldDistillery = await fixtures.Entity({
+      countryId: oldCountry.id,
+      regionId: oldRegion.id,
+    });
+    const newDistillery = await fixtures.Entity({
+      countryId: newCountry.id,
+      regionId: newRegion.id,
+    });
+    const { first } = await createGroup({
+      user: mod,
+      stable: {
+        name: "Location Change",
+        brand: (await fixtures.Entity()).id,
+        distillers: [oldDistillery.id],
+      },
+      exacts: [{ edition: "One" }],
+    });
+
+    await updateBottle({
+      bottleId: first.bottle.id,
+      input: { distillers: [newDistillery.id] },
+      context: contextFor(mod),
+    });
+
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, oldCountry.id) }),
+    ).resolves.toMatchObject({ totalBottles: 0 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, oldRegion.id) }),
+    ).resolves.toMatchObject({ totalBottles: 0 });
+    await expect(
+      db.query.countries.findFirst({ where: eq(countries.id, newCountry.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, newRegion.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
   test("changes relationships when the old Entity count is too low", async ({

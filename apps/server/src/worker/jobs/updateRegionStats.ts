@@ -6,7 +6,6 @@ import {
   entities,
   regions,
 } from "@peated/server/db/schema";
-import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -37,17 +36,6 @@ export default async function updateRegionStats(input: JobPayload) {
             FROM ${bottleTombstones}
             WHERE ${bottleTombstones.bottleId} = ${bottles.id}
           )
-      )`,
-      totalBottles: sql<string>`(
-        SELECT COUNT(*)
-        FROM ${bottles}
-        WHERE ${bottleProducedIn({ regionId: regions.id })}
-        AND ${bottles.groupId} IS NOT NULL
-        AND NOT EXISTS (
-          SELECT 1
-          FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
       )`,
     })
     .where(eq(regions.id, regionId));

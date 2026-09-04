@@ -23,6 +23,10 @@ import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
 } from "@peated/server/lib/entityBottleCounts";
+import {
+  getBottleProductionLocations,
+  updateLocationBottleCounts,
+} from "@peated/server/lib/locationBottleCounts";
 import { logInfo } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { procedure } from "@peated/server/orpc";
@@ -76,6 +80,9 @@ export default procedure
       }
 
       const entityLinksBefore = await getBottleEntityLinks(tx, [bottle.id]);
+      const locationsBefore = await getBottleProductionLocations(tx, [
+        bottle.id,
+      ]);
 
       const distillerRows = await tx
         .select({ distillerId: bottlesToDistillers.distillerId })
@@ -256,6 +263,10 @@ export default procedure
 
       const entityLinksAfter = await getBottleEntityLinks(tx, [bottle.id]);
       await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);
+      const locationsAfter = await getBottleProductionLocations(tx, [
+        bottle.id,
+      ]);
+      await updateLocationBottleCounts(tx, locationsBefore, locationsAfter);
 
       if (bottle.groupId !== null) {
         if (remainingGroupMemberIds.length === 0) {

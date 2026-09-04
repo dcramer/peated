@@ -34,6 +34,10 @@ import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
 } from "@peated/server/lib/entityBottleCounts";
+import {
+  getBottleProductionLocations,
+  updateLocationBottleCounts,
+} from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
@@ -768,6 +772,10 @@ export async function mergeBottlesInTransaction(
     throw new BottleMergeGraphError("invalid_catalog_graph", sourceBottleId);
   }
   const entityLinksBefore = await getBottleEntityLinks(tx, requestedBottleIds);
+  const locationsBefore = await getBottleProductionLocations(
+    tx,
+    requestedBottleIds,
+  );
   const crossGroup = sourceGroupId !== destinationGroupId;
   const survivingSourceMembers = sourceMembers.filter(
     ({ id }) => id !== sourceBottleId,
@@ -945,6 +953,11 @@ export async function mergeBottlesInTransaction(
 
   const entityLinksAfter = await getBottleEntityLinks(tx, requestedBottleIds);
   await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);
+  const locationsAfter = await getBottleProductionLocations(
+    tx,
+    requestedBottleIds,
+  );
+  await updateLocationBottleCounts(tx, locationsBefore, locationsAfter);
 
   if (crossGroup && sourceSingleton) {
     await tx

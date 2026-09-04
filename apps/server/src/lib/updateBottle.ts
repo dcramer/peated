@@ -54,6 +54,10 @@ import {
   updateEntityBottleCounts,
 } from "@peated/server/lib/entityBottleCounts";
 import { formatBottleName } from "@peated/server/lib/format";
+import {
+  getBottleProductionLocations,
+  updateLocationBottleCounts,
+} from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
 import { EntityChoiceInputSchema } from "@peated/server/schemas";
@@ -1397,6 +1401,9 @@ export async function updateBottleInTransaction(
   const entityLinksBefore = bottleEntityLinksChanged
     ? await getBottleEntityLinks(tx, affectedIds)
     : [];
+  const locationsBefore = groupDistillersChanged
+    ? await getBottleProductionLocations(tx, affectedIds)
+    : [];
 
   if (invalidateGeneratedDetails) {
     for (const member of affectedMembers) {
@@ -1657,6 +1664,10 @@ export async function updateBottleInTransaction(
         changedEntityIds.add(entityId);
       }
     }
+  }
+  if (groupDistillersChanged) {
+    const locationsAfter = await getBottleProductionLocations(tx, affectedIds);
+    await updateLocationBottleCounts(tx, locationsBefore, locationsAfter);
   }
 
   return {
