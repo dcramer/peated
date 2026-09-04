@@ -7,6 +7,10 @@ type EntityTabSource = Pick<
   Entity,
   "id" | "kind" | "name" | "shortName" | "totalBottles" | "totalTastings"
 >;
+export type CompanyPageCounts = {
+  bottles: number;
+  portfolio: number;
+};
 const entityKindPresentation = {
   bottler: {
     bottleSectionLabel: "Bottles",
@@ -66,15 +70,28 @@ export function getEntityLocationLabel(entity: Entity) {
 
 export function getEntityTabs(
   entity: EntityTabSource,
+  companyCounts?: CompanyPageCounts,
 ): [PageTabItem, ...PageTabItem[]] {
   const baseUrl = getEntityUrl(entity);
   const tabs: [PageTabItem, ...PageTabItem[]] = [
     { href: baseUrl, label: "Overview" },
   ];
 
-  if (entityHasBottleCatalog(entity) || entity.totalBottles > 0) {
+  if (entity.kind === "company" && companyCounts?.portfolio) {
     tabs.push({
-      count: entity.totalBottles,
+      count: companyCounts.portfolio,
+      href: `${baseUrl}/portfolio`,
+      label: "Portfolio",
+    });
+  }
+
+  const totalBottles =
+    entity.kind === "company"
+      ? (companyCounts?.bottles ?? entity.totalBottles)
+      : entity.totalBottles;
+  if (entityHasBottleCatalog(entity) || totalBottles > 0) {
+    tabs.push({
+      count: totalBottles,
       href: `${baseUrl}/bottles`,
       label: "Bottles",
     });

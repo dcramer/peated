@@ -1,5 +1,9 @@
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
-import { getEntityPage } from "@peated/web/lib/entityPage.server";
+import {
+  getCompanyPageCounts,
+  getEntityPage,
+} from "@peated/web/lib/entityPage.server";
+import { logError } from "@peated/web/lib/log";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
@@ -23,6 +27,14 @@ export default async function EntityLayout(props: {
 }) {
   const { entityId } = await props.params;
   const canonicalEntity = await getEntityPage(parseCatalogRouteId(entityId));
+  let companyCounts;
+  if (canonicalEntity.kind === "company") {
+    try {
+      companyCounts = await getCompanyPageCounts(canonicalEntity.id);
+    } catch (error) {
+      logError(error, { context: "company_page_counts" });
+    }
+  }
   const session = await getSession();
   // EntityLayout reuses public details; only members need a second read for following state.
   let entity = canonicalEntity;
@@ -54,7 +66,10 @@ export default async function EntityLayout(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <EntityPageFrameClient initialEntity={entity}>
+      <EntityPageFrameClient
+        companyCounts={companyCounts}
+        initialEntity={entity}
+      >
         {props.children}
       </EntityPageFrameClient>
     </>

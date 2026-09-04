@@ -13,6 +13,7 @@ import follow from "./follow";
 import images from "./images";
 import list from "./list";
 import merge from "./merge";
+import portfolio from "./portfolio";
 import references from "./references";
 import resolve from "./resolve";
 import unfollow from "./unfollow";
@@ -27,6 +28,7 @@ export default base.tag("entities").router({
   update,
   delete: delete_,
   merge,
+  portfolio,
   aliases,
   references,
   resolve,

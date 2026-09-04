@@ -7,13 +7,14 @@ import {
   LoadingList,
   RailList,
   SectionError,
+  TextLink,
 } from "@peated/web/components";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { type Entity } from "./entityPageData";
 
-type ListItem = Outputs["entities"]["list"]["results"][number];
+type ListItem = Outputs["entities"]["portfolio"]["previews"]["brands"][number];
 
 const sectionCopy = {
   brands: {
@@ -26,10 +27,20 @@ const sectionCopy = {
     heading: "Distilleries",
     loadingLabel: "Loading distilleries",
   },
-  operates: {
-    errorHeading: "Could not load bottlers and companies",
-    heading: "Operates",
-    loadingLabel: "Loading bottlers and companies",
+  bottlers: {
+    errorHeading: "Could not load bottlers",
+    heading: "Bottlers",
+    loadingLabel: "Loading bottlers",
+  },
+  groupCompanies: {
+    errorHeading: "Could not load companies in this group",
+    heading: "Companies in this group",
+    loadingLabel: "Loading companies in this group",
+  },
+  portfolio: {
+    errorHeading: "Could not load whisky portfolio",
+    heading: "Whisky portfolio",
+    loadingLabel: "Loading whisky portfolio",
   },
 } as const;
 
@@ -38,17 +49,21 @@ type CompanySection = keyof typeof sectionCopy;
 export function CompanyOwnedList({
   company,
   error,
+  href,
   items,
   pending,
   retry,
   section,
+  total,
 }: {
   company: Entity;
   error: boolean;
+  href?: string;
   items?: ListItem[];
   pending: boolean;
   retry: () => void;
   section: CompanySection;
+  total?: number;
 }) {
   if (company.kind !== "company") return null;
 
@@ -76,7 +91,14 @@ export function CompanyOwnedList({
   if (!shownItems.length) return null;
 
   return (
-    <PageSection heading={heading}>
+    <PageSection
+      heading={heading}
+      intro={
+        href && total && total > shownItems.length ? (
+          <TextLink href={href}>View all {total.toLocaleString()}</TextLink>
+        ) : undefined
+      }
+    >
       <RailList ariaLabel={`${company.name} ${heading.toLowerCase()}`}>
         {shownItems.map((item) => (
           <ItemListItem key={item.id}>

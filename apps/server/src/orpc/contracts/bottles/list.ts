@@ -24,6 +24,14 @@ export const BottleListInputSchema = z.object({
   brand: z.coerce.number().nullish(),
   distiller: z.coerce.number().nullish(),
   bottler: z.coerce.number().nullish(),
+  company: z.coerce
+    .number()
+    .int()
+    .positive()
+    .nullish()
+    .describe(
+      "Filter by a Company and the brands, distilleries, or bottlers below it",
+    ),
   entity: z.coerce.number().nullish(),
   country: z.coerce
     .string()

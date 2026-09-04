@@ -15,6 +15,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
+import { companyBottleEntityIds } from "@peated/server/lib/companyPortfolio";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { bottlesForDistilleryView } from "@peated/server/lib/distilleryBottleView";
 import {
@@ -234,6 +235,34 @@ export default implement(bottleListContract).handler(async function ({
   if (rest.bottler) {
     where.push(eq(bottles.bottlerId, rest.bottler));
   }
+  if (rest.company) {
+    if (rest.entity) {
+      throw errors.BAD_REQUEST({
+        message: "Choose either a Company or an Entity.",
+      });
+    }
+    const [company] = await db
+      .select({ kind: entities.kind })
+      .from(entities)
+      .where(eq(entities.id, rest.company))
+      .limit(1);
+    if (company?.kind !== "company") {
+      throw errors.BAD_REQUEST({ message: "Choose a Company." });
+    }
+
+    const companyEntityIds = companyBottleEntityIds(rest.company);
+    where.push(
+      or(
+        sql`${bottles.brandId} IN (${companyEntityIds})`,
+        sql`${bottles.bottlerId} IN (${companyEntityIds})`,
+        sql`EXISTS(
+          SELECT FROM ${bottlesToDistillers}
+          WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+            AND ${bottlesToDistillers.distillerId} IN (${companyEntityIds})
+        )`,
+      ),
+    );
+  }
   if (rest.distilleryView) {
     if (!rest.entity) {
       throw errors.BAD_REQUEST({
@@ -311,7 +340,7 @@ export default implement(bottleListContract).handler(async function ({
       }
       break;
     case "brand":
-      if (!rest.entity) {
+      if (!rest.entity && !rest.company) {
         throw errors.BAD_REQUEST({
           message: "Cannot sort by brand without entity filter.",
         });

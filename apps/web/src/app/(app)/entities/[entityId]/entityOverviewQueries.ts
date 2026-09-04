@@ -14,44 +14,14 @@ export const entityOverviewQueries = {
     orpc.entities.events.list.queryOptions({
       input: { entity: entity.id },
     }),
-  companyBrands: (orpc: ORPCQueryUtils, entity: Entity) => {
+  companyPortfolio: (orpc: ORPCQueryUtils, entity: Entity) => {
     const companyId = entity.kind === "company" ? entity.id : undefined;
 
     return {
-      ...orpc.brands.list.queryOptions({
+      ...orpc.entities.portfolio.queryOptions({
         input: {
-          limit: 4,
-          owner: companyId,
-          sort: "-bottles",
-        },
-      }),
-      enabled: Boolean(companyId),
-    };
-  },
-  companyDistilleries: (orpc: ORPCQueryUtils, entity: Entity) => {
-    const companyId = entity.kind === "company" ? entity.id : undefined;
-
-    return {
-      ...orpc.distilleries.list.queryOptions({
-        input: {
-          limit: 4,
-          owner: companyId,
-          sort: "-bottles",
-        },
-      }),
-      enabled: Boolean(companyId),
-    };
-  },
-  companyBottlersAndCompanies: (orpc: ORPCQueryUtils, entity: Entity) => {
-    const companyId = entity.kind === "company" ? entity.id : undefined;
-
-    return {
-      ...orpc.entities.list.queryOptions({
-        input: {
-          kinds: ["bottler", "company"],
-          limit: 4,
-          owner: companyId,
-          sort: "-bottles",
+          company: companyId ?? entity.id,
+          limit: 1,
         },
       }),
       enabled: Boolean(companyId),

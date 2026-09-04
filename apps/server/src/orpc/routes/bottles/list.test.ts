@@ -290,6 +290,142 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
+  test("lists each active Bottle once through a complete Company portfolio", async ({
+    fixtures,
+  }) => {
+    const company = await fixtures.Entity({
+      kind: "company",
+      name: "Complete Portfolio Company",
+    });
+    const group = await fixtures.Entity({
+      kind: "company",
+      name: "Nested Portfolio Company",
+      ownerId: company.id,
+    });
+    const brand = await fixtures.Entity({
+      kind: "brand",
+      name: "Nested Portfolio Brand",
+      ownerId: group.id,
+    });
+    const distillery = await fixtures.Entity({
+      kind: "distillery",
+      name: "Nested Portfolio Distillery",
+      ownerId: brand.id,
+    });
+    const bottler = await fixtures.Entity({
+      kind: "bottler",
+      name: "Nested Portfolio Bottler",
+      ownerId: group.id,
+    });
+    const outsideBrand = await fixtures.Entity({
+      kind: "brand",
+      name: "Outside Portfolio Brand",
+    });
+
+    const brandBottle = await fixtures.Bottle({
+      name: "Brand Match",
+      brandId: brand.id,
+    });
+    const distilleryBottle = await fixtures.Bottle({
+      name: "Distillery Match",
+      brandId: outsideBrand.id,
+      distillerIds: [distillery.id],
+    });
+    const bottlerBottle = await fixtures.Bottle({
+      name: "Bottler Match",
+      brandId: outsideBrand.id,
+      bottlerId: bottler.id,
+    });
+    const severalMatches = await fixtures.Bottle({
+      name: "Several Matches",
+      brandId: brand.id,
+      bottlerId: bottler.id,
+      distillerIds: [distillery.id],
+    });
+    const nestedCompanyBottle = await fixtures.Bottle({
+      name: "Nested Company Match",
+      brandId: group.id,
+    });
+    const directCompanyBottle = await fixtures.Bottle({
+      name: "Direct Company Match",
+      brandId: company.id,
+    });
+    const retiredBottle = await fixtures.Bottle({
+      name: "Retired Match",
+      brandId: brand.id,
+    });
+    const replacement = await fixtures.Bottle({
+      name: "Unrelated Replacement",
+      brandId: outsideBrand.id,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredBottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const result = await routerClient.bottles.list({
+      company: company.id,
+      sort: "-tastings",
+      limit: 2,
+    });
+    const secondPage = await routerClient.bottles.list({
+      company: company.id,
+      sort: "-tastings",
+      cursor: 2,
+      limit: 2,
+    });
+    const thirdPage = await routerClient.bottles.list({
+      company: company.id,
+      sort: "-tastings",
+      cursor: 3,
+      limit: 2,
+    });
+
+    expect(result.total).toBe(6);
+    expect(result.results.map(({ id }) => id)).toEqual([
+      brandBottle.id,
+      distilleryBottle.id,
+    ]);
+    expect(result.rel.nextCursor).toBe(2);
+    expect(secondPage.results.map(({ id }) => id)).toEqual([
+      bottlerBottle.id,
+      severalMatches.id,
+    ]);
+    expect(thirdPage.results.map(({ id }) => id)).toEqual([
+      nestedCompanyBottle.id,
+      directCompanyBottle.id,
+    ]);
+    expect(
+      new Set(
+        [...result.results, ...secondPage.results, ...thirdPage.results].map(
+          ({ id }) => id,
+        ),
+      ),
+    ).toEqual(
+      new Set([
+        brandBottle.id,
+        distilleryBottle.id,
+        bottlerBottle.id,
+        severalMatches.id,
+        nestedCompanyBottle.id,
+        directCompanyBottle.id,
+      ]),
+    );
+  });
+
+  test("requires the Company filter to identify a Company", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ kind: "brand" });
+
+    await expect(
+      routerClient.bottles.list({ company: brand.id }),
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Choose a Company.",
+    });
+  });
+
   test("separates distillery releases from other bottlings", async ({
     fixtures,
   }) => {

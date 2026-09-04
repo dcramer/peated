@@ -32,10 +32,13 @@ import {
   mockJohnnieWalkerEntity,
   mockLaphroaigEntity,
   mockNotifications,
+  mockPernodRicardEntity,
   mockPublicUserDetails,
   mockRegion,
   mockRegions,
+  mockSparseCompanyEntity,
   mockStats,
+  mockSuntoryGlobalSpiritsEntity,
   mockTaliskerEntity,
   mockTasting,
   mockUser,
@@ -126,6 +129,61 @@ describe("mock oRPC router", () => {
       mockEntity,
       mockJohnnieWalkerEntity,
     ]);
+    const nestedPortfolio = await anonymousClient.entities.portfolio({
+      company: mockPernodRicardEntity.id,
+      sort: "name",
+    });
+    expect(nestedPortfolio.results.map(({ name }) => name)).toEqual([
+      "Midleton",
+      "Redbreast",
+    ]);
+    expect(nestedPortfolio.groupCompanies.results).toEqual([
+      mockIrishDistillersEntity,
+    ]);
+    expect(
+      nestedPortfolio.results[0]?.ownershipPath.map(({ name }) => name),
+    ).toEqual(["Pernod Ricard", "Irish Distillers"]);
+    await expect(
+      anonymousClient.entities.portfolio({
+        company: mockSuntoryGlobalSpiritsEntity.id,
+      }),
+    ).resolves.toMatchObject({
+      results: [expect.objectContaining({ name: "Laphroaig" })],
+      total: 1,
+      totals: { all: 1, distilleries: 1 },
+    });
+    const companyBottles = await anonymousClient.bottles.list({
+      company: mockSuntoryGlobalSpiritsEntity.id,
+      sort: "-release",
+    });
+    expect(companyBottles.results.map(({ brand }) => brand.name)).toEqual([
+      "Laphroaig",
+      "Laphroaig",
+    ]);
+    const nestedCompanyBottles = await anonymousClient.bottles.list({
+      company: mockPernodRicardEntity.id,
+    });
+    expect(nestedCompanyBottles.results.map(({ brand }) => brand.name)).toEqual(
+      ["Redbreast"],
+    );
+    await expect(
+      anonymousClient.bottles.list({
+        company: mockPernodRicardEntity.id,
+        entity: mockLaphroaigEntity.id,
+      }),
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Choose either a Company or an Entity.",
+    });
+    await expect(
+      anonymousClient.entities.portfolio({
+        company: mockSparseCompanyEntity.id,
+      }),
+    ).resolves.toMatchObject({
+      results: [],
+      total: 0,
+      totals: { all: 0 },
+    });
     const laphroaigReleases = await anonymousClient.bottles.list({
       entity: mockLaphroaigEntity.id,
       sort: "-release",

@@ -3,6 +3,7 @@ import {
   includesQuery,
   mockBottleFor,
   mockBottles,
+  mockEntities,
   mockFlightBottleIds,
   mockPage,
 } from "@peated/server/orpc/mock/fixtures";
@@ -10,6 +11,18 @@ import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 type MockBottle = (typeof mockBottles)[number];
 type BottleAgeBand = (typeof BOTTLE_AGE_BAND_LIST)[number];
+
+function isInCompanyBottleScope(entityId: number, companyId: number) {
+  let entity = mockEntities.find(({ id }) => id === entityId);
+
+  const visited = new Set<number>();
+  while (entity && !visited.has(entity.id)) {
+    if (entity.id === companyId) return true;
+    visited.add(entity.id);
+    entity = mockEntities.find(({ id }) => id === entity?.ownerId);
+  }
+  return false;
+}
 
 function matchesDistilleryView(
   bottle: MockBottle,
@@ -60,6 +73,17 @@ export default mockOS.bottles.list.handler(
     if (input.filter === "following" && !context.user) {
       throw errors.UNAUTHORIZED();
     }
+    if (input.company != null && input.entity != null) {
+      throw errors.BAD_REQUEST({
+        message: "Choose either a Company or an Entity.",
+      });
+    }
+    if (
+      input.company != null &&
+      mockEntities.find(({ id }) => id === input.company)?.kind !== "company"
+    ) {
+      throw errors.BAD_REQUEST({ message: "Choose a Company." });
+    }
 
     const flightBottleIds = input.flight
       ? mockFlightBottleIds.get(input.flight)
@@ -75,6 +99,13 @@ export default mockOS.bottles.list.handler(
       (input.distiller == null ||
         bottle.distillers.some((entity) => entity.id === input.distiller)) &&
       (input.bottler == null || bottle.bottler?.id === input.bottler) &&
+      (input.company == null ||
+        isInCompanyBottleScope(bottle.brand.id, input.company) ||
+        (bottle.bottler !== null &&
+          isInCompanyBottleScope(bottle.bottler.id, input.company)) ||
+        bottle.distillers.some((entity) =>
+          isInCompanyBottleScope(entity.id, input.company!),
+        )) &&
       (input.entity == null ||
         (input.distilleryView
           ? matchesDistilleryView(bottle, input.entity, input.distilleryView)

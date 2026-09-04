@@ -24,6 +24,7 @@ export type EntityCatalogItem = EntityListItem & {
   createBottleHref?: string;
   id: number;
   isFollowing: boolean;
+  ownerPath?: string;
   totalBottles: number;
   totalTastings: number;
 };
@@ -201,6 +202,15 @@ function EntityCatalogTable({
       width: "count",
     },
   ];
+
+  if (items.some((item) => item.ownerPath)) {
+    columns.splice(1, 0, {
+      cell: (item) => item.ownerPath ?? "",
+      header: "Part of",
+      key: "owner",
+      priority: "secondary",
+    });
+  }
 
   if (onToggleFollowing || items.some((item) => item.createBottleHref)) {
     columns.push({

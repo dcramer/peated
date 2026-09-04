@@ -1,6 +1,8 @@
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  EntityCatalogList,
   getEntityRowActionGroups,
   type EntityCatalogItem,
 } from "./entityCatalog.stylex";
@@ -65,5 +67,29 @@ describe("getEntityRowActionGroups", () => {
       disabled: false,
       label: "Follow",
     });
+  });
+});
+
+describe("EntityCatalogList", () => {
+  it("shows recorded owner paths when the caller supplies them", () => {
+    const html = renderToStaticMarkup(
+      <EntityCatalogList
+        items={[
+          {
+            ...item,
+            ownerPath: "Suntory Global Spirits › Jim Beam",
+          },
+        ]}
+        noun="result"
+        onSortChange={() => undefined}
+        page={1}
+        sort="-bottles"
+        sortOptions={[{ label: "Most bottles", value: "-bottles" }]}
+        total={1}
+      />,
+    );
+
+    expect(html).toContain("Part of");
+    expect(html).toContain("Suntory Global Spirits › Jim Beam");
   });
 });

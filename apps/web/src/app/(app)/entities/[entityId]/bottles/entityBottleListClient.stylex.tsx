@@ -67,6 +67,7 @@ export function EntityBottleListClient({
         "age",
         "brand",
         "bottler",
+        "company",
         "cursor",
         "distiller",
         "entity",
@@ -74,8 +75,9 @@ export function EntityBottleListClient({
         "series",
       ],
       overrides: {
+        company: entityKind === "company" ? entityId : undefined,
         distilleryView,
-        entity: entityId,
+        entity: entityKind === "company" ? undefined : entityId,
         limit: 25,
       },
     }),

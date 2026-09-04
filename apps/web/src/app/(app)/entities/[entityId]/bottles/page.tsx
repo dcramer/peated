@@ -25,7 +25,11 @@ export default async function EntityBottlesPage(props: {
   const { entityId } = await props.params;
   const searchParams = await props.searchParams;
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
-  if (!entityHasBottleCatalog(entity) && entity.totalBottles === 0) {
+  if (
+    entity.kind !== "company" &&
+    !entityHasBottleCatalog(entity) &&
+    entity.totalBottles === 0
+  ) {
     redirect(getEntityUrl(entity));
   }
 
@@ -40,6 +44,7 @@ export default async function EntityBottlesPage(props: {
         "age",
         "brand",
         "bottler",
+        "company",
         "cursor",
         "distiller",
         "entity",
@@ -47,13 +52,17 @@ export default async function EntityBottlesPage(props: {
         "series",
       ],
       overrides: {
+        company: entity.kind === "company" ? entity.id : undefined,
         distilleryView,
-        entity: entity.id,
+        entity: entity.kind === "company" ? undefined : entity.id,
         limit: 25,
       },
     }),
   );
   let bottleList = await getPageBottleList(queryParams);
+  if (entity.kind === "company" && bottleList.total === 0) {
+    redirect(getEntityUrl(entity));
+  }
 
   if (
     entity.kind === "distillery" &&

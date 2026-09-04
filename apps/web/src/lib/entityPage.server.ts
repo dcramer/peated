@@ -11,3 +11,18 @@ async function loadEntityPage(entityId: number) {
 }
 
 export const getEntityPage = cache(loadEntityPage);
+
+async function loadCompanyPageCounts(company: number) {
+  const { client } = await getAnonymousServerClient();
+  const [portfolio, bottles] = await Promise.all([
+    client.entities.portfolio({ company, limit: 1 }),
+    client.bottles.list({ company, limit: 1 }),
+  ]);
+
+  return {
+    bottles: bottles.total,
+    portfolio: portfolio.totals.all,
+  };
+}
+
+export const getCompanyPageCounts = cache(loadCompanyPageCounts);

@@ -45,32 +45,47 @@ describe("getEntityClassification", () => {
 });
 
 describe("getEntityTabs", () => {
-  it("keeps company bottles with stored counts but omits tastings", () => {
+  it("uses computed Company portfolio and Bottle totals", () => {
     expect(
-      getEntityTabs({
-        id: 5558,
-        kind: "company",
-        name: "Diageo",
-        shortName: null,
-        totalBottles: 10,
-        totalTastings: 20,
-      }),
+      getEntityTabs(
+        {
+          id: 5558,
+          kind: "company",
+          name: "Diageo",
+          shortName: null,
+          totalBottles: 10,
+          totalTastings: 20,
+        },
+        { bottles: 400, portfolio: 62 },
+      ),
     ).toEqual([
       { href: "/companies/5558-diageo", label: "Overview" },
-      { href: "/companies/5558-diageo/bottles", label: "Bottles", count: 10 },
+      {
+        href: "/companies/5558-diageo/portfolio",
+        label: "Portfolio",
+        count: 62,
+      },
+      {
+        href: "/companies/5558-diageo/bottles",
+        label: "Bottles",
+        count: 400,
+      },
     ]);
   });
 
   it("omits the bottle tab for companies with no bottles", () => {
     expect(
-      getEntityTabs({
-        id: 5558,
-        kind: "company",
-        name: "Diageo",
-        shortName: null,
-        totalBottles: 0,
-        totalTastings: 0,
-      }),
+      getEntityTabs(
+        {
+          id: 5558,
+          kind: "company",
+          name: "Diageo",
+          shortName: null,
+          totalBottles: 0,
+          totalTastings: 0,
+        },
+        { bottles: 0, portfolio: 0 },
+      ),
     ).toEqual([{ href: "/companies/5558-diageo", label: "Overview" }]);
   });
 

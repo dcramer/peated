@@ -57,13 +57,7 @@ export default async function EntityPage(props: {
   if (entity.kind === "company") {
     prefetches.push(
       queryClient.prefetchQuery(
-        entityOverviewQueries.companyBrands(orpc, entity),
-      ),
-      queryClient.prefetchQuery(
-        entityOverviewQueries.companyDistilleries(orpc, entity),
-      ),
-      queryClient.prefetchQuery(
-        entityOverviewQueries.companyBottlersAndCompanies(orpc, entity),
+        entityOverviewQueries.companyPortfolio(orpc, entity),
       ),
     );
   }
