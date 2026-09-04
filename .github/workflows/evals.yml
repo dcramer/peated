@@ -2,6 +2,7 @@ name: Evals
 
 permissions:
   contents: read
+  pull-requests: read
 
 on:
   pull_request:
@@ -31,9 +32,18 @@ jobs:
       scraper_requested: ${{ steps.gate.outputs.scraper_requested }}
       scraper_should_run: ${{ steps.gate.outputs.scraper_should_run }}
     steps:
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: changes
+        with:
+          filters: |
+            scraper_agent:
+              - "apps/server/src/scraper/configured/**"
+
       - id: gate
         env:
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+          INTERNAL_PR: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+          SCRAPER_AGENT_CHANGED: ${{ steps.changes.outputs.scraper_agent }}
         run: |
           set -euo pipefail
 
@@ -47,6 +57,9 @@ jobs:
 
           scraper_requested=false
           if jq -e --arg label_name "$scraper_label" '.pull_request.labels[]?.name | select(. == $label_name)' "$GITHUB_EVENT_PATH" >/dev/null; then
+            scraper_requested=true
+          fi
+          if [[ "$SCRAPER_AGENT_CHANGED" == "true" && "$INTERNAL_PR" == "true" ]]; then
             scraper_requested=true
           fi
 
@@ -80,6 +93,7 @@ jobs:
             echo "- classifier requested: $classifier_requested"
             echo "- classifier will run: $classifier_should_run"
             echo "- scraper label: $scraper_label"
+            echo "- scraper code changed: $SCRAPER_AGENT_CHANGED"
             echo "- scraper requested: $scraper_requested"
             echo "- scraper will run: $scraper_should_run"
             echo "- gateway_ready: $gateway_ready"
@@ -87,7 +101,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
           if [[ "$classifier_requested" == "true" || "$scraper_requested" == "true" ]] && [[ "$gateway_ready" != "true" ]]; then
-            echo "::error::Eval labels require AI_GATEWAY_API_KEY."
+            echo "::error::Requested model checks require AI_GATEWAY_API_KEY."
             exit 1
           fi
 
