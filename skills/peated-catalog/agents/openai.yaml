@@ -1,0 +1,4 @@
+interface:
+  display_name: "Peated Catalog"
+  short_description: "Catalog and repair Peated Bottle records"
+  default_prompt: "Use $peated-catalog to catalog a clearly defined whisky release set in Peated."

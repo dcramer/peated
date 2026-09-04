@@ -1,0 +1,4 @@
+interface:
+  display_name: "Peated Scraper Queue"
+  short_description: "Review scraped retailer Bottle matches"
+  default_prompt: "Use $peated-scraper-queue to moderate the actionable scraper queue."
