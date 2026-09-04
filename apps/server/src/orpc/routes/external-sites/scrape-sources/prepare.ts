@@ -2,6 +2,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { prepareBourbonCultureSource } from "@peated/server/scraper/configured/prepareBourbonCulture";
+import { prepareWhiskySagaSource } from "@peated/server/scraper/configured/prepareWhiskySaga";
 import { prepareWhiskyStudySource } from "@peated/server/scraper/configured/prepareWhiskyStudy";
 import {
   ScrapeSourceConflictError,
@@ -27,7 +28,7 @@ export default procedure
     z
       .object({
         site: ExternalSiteKeySchema.describe(
-          "The existing site's key. Currently supports bourbonculture and whiskystudy.",
+          "The existing site's key. Currently supports bourbonculture, whiskysaga, and whiskystudy.",
         ),
         apply: z
           .boolean()
@@ -54,16 +55,17 @@ export default procedure
       .strict(),
   )
   .handler(async ({ input, context, errors }) => {
-    if (!["bourbonculture", "whiskystudy"].includes(input.site)) {
+    const prepareSource = {
+      bourbonculture: prepareBourbonCultureSource,
+      whiskysaga: prepareWhiskySagaSource,
+      whiskystudy: prepareWhiskyStudySource,
+    }[input.site];
+    if (!prepareSource) {
       throw errors.BAD_REQUEST({
         message: "This scraper cannot move to saved rules yet.",
       });
     }
     try {
-      const prepareSource =
-        input.site === "bourbonculture"
-          ? prepareBourbonCultureSource
-          : prepareWhiskyStudySource;
       return await prepareSource({
         apply: input.apply,
         createdById: context.user.id,
