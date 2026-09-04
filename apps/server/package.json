@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit",
     "test": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest run \"$@\"; else dotenv -e .env.test -- vitest run \"$@\"; fi' --",
     "test:watch": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest watch \"$@\"; else dotenv -e .env.test -- vitest watch \"$@\"; fi' --",
-    "test:ci": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest run --coverage --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"; else dotenv -e .env.test -- vitest run --coverage --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"; fi' --"
+    "test:ci": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; if [ -f .env.test.local ]; then dotenv -e .env.test -e .env.test.local -- vitest run --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"; else dotenv -e .env.test -- vitest run --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"; fi' --"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
@@ -42,7 +42,6 @@
     "@sentry/node": "catalog:",
     "@simplewebauthn/server": "^13.3.0",
     "@sindresorhus/slugify": "^2.2.1",
-    "@vitest/coverage-v8": "catalog:",
     "axios": "~1.19.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.40.3",
