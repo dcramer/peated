@@ -1,5 +1,4 @@
 import { sealData } from "iron-session";
-import { INFINITE_CACHE } from "next/dist/lib/constants";
 import { workAsyncStorage } from "next/dist/server/app-render/work-async-storage.external";
 import { workUnitAsyncStorage } from "next/dist/server/app-render/work-unit-async-storage.external";
 import { createRequestStoreForAPI } from "next/dist/server/async-storage/request-store";
@@ -27,7 +26,6 @@ export async function withNextRequest<T>(
     { tags: [], expirationsByCacheKind: new Map() },
     undefined,
     undefined,
-    undefined,
   );
   const work = createWorkStore({
     page: "/test",
@@ -36,16 +34,12 @@ export async function withNextRequest<T>(
     previouslyRevalidatedTags: [],
     renderOpts: {
       cacheComponents: false,
-      cacheLifeProfiles: {
-        default: { stale: 0, revalidate: 900, expire: INFINITE_CACHE },
-      },
       supportsDynamicResponse: true,
       isDraftMode: false,
       isBuildTimePrerendering: false,
-      staticPageGenerationTimeout: 60,
-      validationLevel: "warning",
+      shouldWaitOnAllReady: false,
       assetPrefix: "",
-      experimental: { authInterrupts: false, useCacheTimeout: 0 },
+      experimental: { authInterrupts: false },
       waitUntil: undefined,
       onClose: (callback) => queueMicrotask(callback),
       onAfterTaskError: undefined,
