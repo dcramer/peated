@@ -61,6 +61,30 @@ function expectBottleResponse(schema: any) {
 }
 
 describe("Published OpenAPI metadata", () => {
+  it("marks the legacy Bottle flavor profile as deprecated", async () => {
+    const spec = await generateSpec();
+
+    expect(spec.components?.schemas?.Bottle).toMatchObject({
+      properties: {
+        flavorProfile: {
+          deprecated: true,
+        },
+      },
+    });
+    for (const request of [
+      getJsonRequestSchema(spec.paths?.["/bottles"]?.post),
+      getJsonRequestSchema(spec.paths?.["/bottles/{bottle}"]?.patch),
+    ]) {
+      expect(request).toMatchObject({
+        properties: {
+          flavorProfile: {
+            deprecated: true,
+          },
+        },
+      });
+    }
+  });
+
   it("publishes internal tools only in the full catalog and keeps member operations public", async () => {
     const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);

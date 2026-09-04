@@ -1,3 +1,4 @@
+import { JSON_SCHEMA_REGISTRY } from "@orpc/zod/zod4";
 import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
@@ -157,9 +158,25 @@ export const BottleImageSourceUrlSchema =
 export const BottleImageLicenseSchema = ImageLicenseSchema.optional().describe(
   "License or reuse terms for the bottle image",
 );
-const BottleFlavorProfileSchema = FlavorProfileEnum.nullable()
-  .default(null)
-  .describe("Primary flavor characteristics of the whisky");
+const DeprecatedBottleFlavorProfileValueSchema =
+  FlavorProfileEnum.nullable().meta({
+    deprecated: true,
+    description:
+      "Deprecated legacy Bottle classification. Preserve existing values for compatibility, but do not set it for new or updated Bottles.",
+  });
+JSON_SCHEMA_REGISTRY.add(DeprecatedBottleFlavorProfileValueSchema, {
+  deprecated: true,
+  description: DeprecatedBottleFlavorProfileValueSchema.description,
+});
+const BottleFlavorProfileSchema =
+  DeprecatedBottleFlavorProfileValueSchema.default(null).meta({
+    deprecated: true,
+    description: DeprecatedBottleFlavorProfileValueSchema.description,
+  });
+JSON_SCHEMA_REGISTRY.add(BottleFlavorProfileSchema, {
+  deprecated: true,
+  description: BottleFlavorProfileSchema.description,
+});
 const BottleTastingNotesSchema = z
   .object({
     nose: z.string().describe("Aroma characteristics of the whisky"),
