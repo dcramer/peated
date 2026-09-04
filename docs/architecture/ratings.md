@@ -40,12 +40,12 @@ tasting. Repeat tastings by one member count as separate experiences. The UI
 shows band names, ranges, and raw counts. It does not turn bands into stars,
 percentages, or five-point values.
 
-Old tastings can still have `legacySimpleRating` or `legacyStarRating`. These
-fields are read-only and do not affect rating totals. The one-time conversion
-uses `legacyStarRating` only when the tasting does not have one of today's
-ratings. It keeps both old values on the record.
+Historical tastings can still have `legacySimpleRating` or `legacyStarRating`.
+These fields are read-only and do not affect rating totals. Peated used
+`legacyStarRating` to recover today's ratings while keeping both old values on
+the record.
 
-### Converting old star ratings
+### Old star rating conversion
 
 The first tasting form used quarter-star steps. The conversion follows the old
 Pass, Sip, and Savor ranges, then splits them into today's five ratings:
@@ -58,27 +58,10 @@ Pass, Sip, and Savor ranges, then splits them into today's five ratings:
 | 4.25–4.50 | Outstanding |
 | 4.75–5.00 | Unicorn     |
 
-Zero meant Not rated in the old form. The conversion also skips values outside
-0–5 and values that are not quarter-star steps. It never replaces a rating
-someone has already chosen.
-
-The conversion lives on Admin → Maintenance. It does not run during deployment.
-The page loads a preview before it offers the conversion. It shows how many old
-ratings exist, how many will convert, how many already have a current rating,
-which values will be skipped, and how many Bottle totals need an update.
-
-Choose **Convert tastings** and confirm the exact preview count. The server
-checks that count again before it saves anything. If the count changed, it saves
-nothing and the administrator must load a new preview. After a successful
-conversion, Peated updates the rating totals for each affected Bottle and
-BottleGroup, then the page reloads the preview. It must say there is nothing left
-to convert. If any rating-total updates could not start, the page reports how
-many failed. Use the refresh action to try them again without changing any
-tastings.
-
-After production is verified, remove the completed repair from the Maintenance
-page along with its API requests and conversion code. Keep the Maintenance page
-for future one-off repairs and keep this mapping as the record of what changed.
+Zero meant Not rated in the old form, so it stayed unrated. Values outside 0–5
+and values that were not quarter-star steps also stayed unrated. The conversion
+did not replace ratings people had already chosen. The original star and simple
+rating values remain on each tasting as a record of what changed.
 
 ## Public tasting pages
 

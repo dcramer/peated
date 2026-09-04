@@ -87,7 +87,7 @@ export default function RatingsPage() {
       <PageSection heading="Old star ratings">
         <AboutTextStack>
           <AboutText>
-            Peated used stars before the current five ratings. We convert the
+            Peated used stars before the current five ratings. We converted the
             saved stars like this: ¼–2 becomes Mediocre; 2¼–3 becomes Good; 3¼–4
             becomes Very good; 4¼–4½ becomes Outstanding; and 4¾–5 becomes
             Unicorn.
