@@ -1,12 +1,16 @@
 import { db } from "@peated/server/db";
-import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
+import {
+  externalSiteRuns,
+  externalSites,
+  externalSiteScrapeTargets,
+} from "@peated/server/db/schema";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { ScrapeSourcePreviewResult } from "./configured/preview";
 import {
-  SCRAPE_SOURCE_MAX_LIST_PAGES,
   parseScrapeRules,
+  SCRAPE_SOURCE_MAX_LIST_PAGES,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
 import { scraperSystemClock, type ScraperHttpClock } from "./http";
@@ -61,6 +65,23 @@ export async function runLocalScrapeSourcePreview(
   if (!target) {
     throw new Error(`External site ${parsed.site} has no scrape target.`);
   }
+  // Local previews still need coordinator authorization after the legacy
+  // source registration is removed. Production migrations own their mapping.
+  await db
+    .insert(externalSiteScrapeTargets)
+    .values({
+      externalSiteId: site.id,
+      targetKey: target.key,
+      managedBy: "code",
+    })
+    .onConflictDoUpdate({
+      target: [
+        externalSiteScrapeTargets.externalSiteId,
+        externalSiteScrapeTargets.targetKey,
+      ],
+      set: { active: true, updatedAt: new Date() },
+      setWhere: eq(externalSiteScrapeTargets.managedBy, "code"),
+    });
   const [activeRun] = await db
     .select({ id: externalSiteRuns.id })
     .from(externalSiteRuns)
