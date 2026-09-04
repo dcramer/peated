@@ -65,6 +65,15 @@ function prepareWhiskySaga(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareWhiskeyReviewer(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "whiskeyreviewer", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareCompassBox(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "compassbox", ...input },
@@ -115,6 +124,18 @@ const whiskySagaRegistry = createScraperRegistry({
     {
       ...scraperRegistry.sources.get("whiskysaga")!,
       externalSiteKey: "whiskysaga",
+    },
+  ],
+});
+
+const whiskeyReviewerCanonicalUrl =
+  "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026";
+const whiskeyReviewerRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("whiskeyreviewer")!],
+  sources: [
+    {
+      ...scraperRegistry.sources.get("whiskeyreviewer")!,
+      externalSiteKey: "whiskeyreviewer",
     },
   ],
 });
@@ -278,6 +299,59 @@ async function setupWhiskySagaMigration(bottleId: number | null = null) {
       nativeScoreDisplay: "89/100",
       clip: "An existing clip.",
       tags: ["orchard fruit"],
+    })
+    .returning();
+  await db.insert(externalReviewBodies).values({
+    externalReviewId: review.id,
+    body: "Synthetic old review body.",
+    fetchedAt: new Date(),
+  });
+  await db.insert(externalReviewPublications).values({
+    externalSiteId: site.id,
+    approvedAt: null,
+  });
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return { site, article, review };
+}
+
+async function setupWhiskeyReviewerMigration(bottleId: number | null = null) {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "whiskeyreviewer",
+      name: "The Whiskey Reviewer",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(whiskeyReviewerRegistry);
+  const [article] = await db
+    .insert(externalReviewArticles)
+    .values({
+      externalSiteId: site.id,
+      canonicalUrl: whiskeyReviewerCanonicalUrl,
+      title: "Example Bourbon Review",
+      publishedAt: new Date("2026-08-10"),
+    })
+    .returning();
+  const [review] = await db
+    .insert(externalReviews)
+    .values({
+      articleId: article.id,
+      sourceKey: `whiskeyreviewer:${createHash("sha256").update(whiskeyReviewerCanonicalUrl).digest("hex")}`,
+      name: "Example Bourbon",
+      bottleId,
+      hidden: true,
+      reviewerName: "Rowan Hill",
+      nativeScoreValue: 87,
+      nativeScoreScale: 100,
+      nativeScoreDisplay: "B+",
+      clip: "An existing clip.",
+      tags: ["vanilla"],
     })
     .returning();
   await db.insert(externalReviewBodies).values({
@@ -592,6 +666,62 @@ describe("POST /admin/scrape-sources/prepare", () => {
     ]);
   });
 
+  test("prepares The Whiskey Reviewer without replacing its records", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const { site, article, review } = await setupWhiskeyReviewerMigration(
+      bottle.id,
+    );
+    const bodies = await db.select().from(externalReviewBodies);
+    const publications = await db.select().from(externalReviewPublications);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareWhiskeyReviewer()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      reviewCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(externalReviews)).toEqual([review]);
+
+    const applied = await prepareWhiskeyReviewer({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      reviewCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(whiskeyReviewerRegistry);
+    expect(await db.select().from(externalReviewArticles)).toEqual([article]);
+    expect(await db.select().from(externalReviews)).toEqual([
+      {
+        ...review,
+        sourceKey: `${whiskeyReviewerCanonicalUrl}#review-1`,
+      },
+    ]);
+    expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
+    expect(await db.select().from(externalReviewPublications)).toEqual(
+      publications,
+    );
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "review",
+        listUrl: "https://whiskeyreviewer.com/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
   test("prepares Compass Box without replacing prices or Bottle matches", async ({
     fixtures,
   }) => {
@@ -827,6 +957,28 @@ describe("POST /admin/scrape-sources/prepare", () => {
         "Check the URL and review records for The Whisky Study article",
       ),
     });
+    expect(await db.select().from(externalReviews)).toEqual(reviews);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("refuses an unexpected The Whiskey Reviewer article URL", async () => {
+    const { article } = await setupWhiskeyReviewerMigration();
+    await db
+      .update(externalReviewArticles)
+      .set({ canonicalUrl: `${whiskeyReviewerCanonicalUrl}/` })
+      .where(eq(externalReviewArticles.id, article.id));
+    const reviews = await db.select().from(externalReviews);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareWhiskeyReviewer({ apply: true })).rejects.toMatchObject(
+      {
+        code: "BAD_REQUEST",
+        message: expect.stringContaining(
+          "Check the URL and review records for The Whiskey Reviewer article",
+        ),
+      },
+    );
     expect(await db.select().from(externalReviews)).toEqual(reviews);
     expect(await db.select().from(scrapeTargets)).toEqual(targets);
     expect(await db.select().from(scrapeSources)).toEqual([]);

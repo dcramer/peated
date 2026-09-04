@@ -15,6 +15,7 @@ import {
   ScrapeAttributeSchema,
   ScrapeRulesSchema,
   ScrapeSelectorSchema,
+  ScrapeUrlDateSchema,
   ScrapeValueSchema,
   type ScrapeListExclusion,
   type ScrapeRules,
@@ -26,7 +27,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v10";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v11";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -105,6 +106,44 @@ const SuggestedLinkSelectorSchema = z
   })
   .strict();
 
+const SuggestedPublishedAtSchema = z
+  .object({
+    input: z.enum(["selector", "url_date"]),
+    selector: ScrapeSelectorSchema.nullable(),
+    attribute: ScrapeAttributeSchema.nullable(),
+    urlDateFormat: z.string().trim().min(1).max(200).nullable(),
+  })
+  .strict()
+  .superRefine((rule, context) => {
+    if (
+      rule.input === "selector" &&
+      (!rule.selector || rule.urlDateFormat !== null)
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "A date selector requires selector and no URL date format.",
+      });
+    }
+    if (
+      rule.input === "url_date" &&
+      (rule.urlDateFormat === null ||
+        rule.selector !== null ||
+        rule.attribute !== null)
+    ) {
+      context.addIssue({
+        code: "custom",
+        message: "A URL date requires its format and no selector.",
+      });
+    }
+  });
+
+const SuggestedScoreMapEntrySchema = z
+  .object({
+    text: z.string().trim().min(1).max(100),
+    value: z.number().nonnegative(),
+  })
+  .strict();
+
 const SuggestedListExclusionSchema = z
   .object({
     selector: ScrapeSelectorSchema,
@@ -136,8 +175,9 @@ const SuggestedReviewRulesSchema = z
     list: SuggestedListRulesSchema,
     detail: z
       .object({
+        canonicalUrl: SuggestedValueSelectorSchema.nullable(),
         title: SuggestedValueSelectorSchema,
-        publishedAt: SuggestedValueSelectorSchema,
+        publishedAt: SuggestedPublishedAtSchema,
         reviewItem: ScrapeSelectorSchema,
         name: SuggestedValueSelectorSchema,
         reviewerName: SuggestedValueSelectorSchema.nullable(),
@@ -146,6 +186,7 @@ const SuggestedReviewRulesSchema = z
           .object({
             value: SuggestedValueSelectorSchema,
             scale: z.number().positive(),
+            map: z.array(SuggestedScoreMapEntrySchema).max(25).nullable(),
           })
           .strict()
           .nullable(),
@@ -239,6 +280,8 @@ const RULE_INSTRUCTIONS = [
   "Identify the content and attributes that represent each output field.",
   "Selectors must match the same field across the supplied detail pages.",
   "Review rules must read the publisher's publication date.",
+  "When a review date exists only in the canonical URL path, use url_date with a format made from yyyy, yy, MM, dd, and * tokens. Literal characters must match the path. Repeated date tokens must agree.",
+  "Set canonicalUrl only when the article's stored canonical URL needs to come from page markup or bounded cleanup such as removing a trailing slash. Otherwise set it to null.",
   "For reviews, reviewItem must select the complete content container for each reviewed bottle, including its introduction, tasting notes, and conclusion. Its text is retained internally for later parsing. Exclude navigation, comments, related articles, and other bottles' reviews.",
   "Use reviewText for a narrower tasting-notes container when available; otherwise select the review body. This text is used for flavor matching and short clips.",
   "Include an optional field when the supplied pages clearly and consistently provide it.",
@@ -256,6 +299,7 @@ const RULE_INSTRUCTIONS = [
   "For visible text, startsWith can keep elements beginning with one of up to 10 literal labels and all can join the matches in document order. Attribute selectors cannot use startsWith or all.",
   "After reading a value, removePrefixes and removeSuffixes can remove the first matching literal beginning or ending, then prefix and suffix can add literal text. Matching is case-insensitive. Set unused lists, prefix, and suffix to null and all to false.",
   "Use fixed values only for a fact that is stable and unambiguous across the selected source pages.",
+  "For a numeric score, set score map to null. For a publisher's finite text grades, map every accepted label to its numeric value on the declared scale.",
   "Use only fields allowed by check_rules.",
   "The listPages are the main page and likely list pages from the same website.",
   "The detailPages are optional examples of review or product pages.",
@@ -296,6 +340,19 @@ function toScrapeValue(value: SuggestedValueSelector): ScrapeValue {
   return ScrapeValueSchema.parse(rule);
 }
 
+function toPublishedAt(
+  value: z.infer<typeof SuggestedPublishedAtSchema>,
+): ReviewRules["detail"]["publishedAt"] {
+  if (value.input === "url_date") {
+    return ScrapeUrlDateSchema.parse({ urlDateFormat: value.urlDateFormat });
+  }
+  const rule: ScrapeSelectorCandidate = {
+    selector: value.selector,
+  };
+  if (value.attribute !== null) rule.attribute = value.attribute;
+  return ScrapeValueSchema.parse(rule);
+}
+
 function toScrapeLinkSelector(
   value: z.infer<typeof SuggestedLinkSelectorSchema>,
 ): ScrapeValueSelectorV1 {
@@ -326,11 +383,14 @@ function toScrapeList(input: SuggestedListRules): ReviewRules["list"] {
 function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
   const detail: ReviewRules["detail"] = {
     title: toScrapeValue(input.detail.title),
-    publishedAt: toScrapeValue(input.detail.publishedAt),
+    publishedAt: toPublishedAt(input.detail.publishedAt),
     reviewItem: input.detail.reviewItem,
     name: toScrapeValue(input.detail.name),
   };
   const list = toScrapeList(input.list);
+  if (input.detail.canonicalUrl !== null) {
+    detail.canonicalUrl = toScrapeValue(input.detail.canonicalUrl);
+  }
   if (input.detail.reviewerName !== null) {
     detail.reviewerName = toScrapeValue(input.detail.reviewerName);
   }
@@ -342,6 +402,9 @@ function toReviewRules(input: SuggestedReviewRules): ScrapeRules {
       scale: input.detail.score.scale,
       value: toScrapeValue(input.detail.score.value),
     };
+    if (input.detail.score.map?.length) {
+      detail.score.map = input.detail.score.map;
+    }
   }
   return ScrapeRulesSchema.parse({ kind: input.kind, list, detail });
 }

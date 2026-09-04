@@ -6,6 +6,7 @@ import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   ScrapeRulesSchema,
   ScrapeRulesV1Schema,
+  ScrapeRulesV2Schema,
   ScrapeValueSchema,
 } from "./rules";
 
@@ -37,8 +38,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesSchema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(3, rules)).toThrow(
-    "Unsupported scrape rules version: 3.",
+  expect(() => parseScrapeRules(4, rules)).toThrow(
+    "Unsupported scrape rules version: 4.",
   );
 });
 
@@ -51,7 +52,86 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(2);
+  expect(SCRAPE_RULES_VERSION).toBe(3);
+});
+
+test("loads version 2 rules only through their original contract", () => {
+  const rules = ScrapeRulesV2Schema.parse(reviewConfig(25));
+  expect(parseScrapeRules(2, rules)).toEqual(rules);
+  expect(() =>
+    parseScrapeRules(2, {
+      ...rules,
+      detail: {
+        ...rules.detail,
+        canonicalUrl: {
+          selector: 'link[rel="canonical"]',
+          attribute: "href",
+        },
+      },
+    }),
+  ).toThrow();
+});
+
+test("accepts bounded canonical URLs, URL dates, and score maps", () => {
+  const rules = ScrapeRulesSchema.parse({
+    ...reviewConfig(25),
+    detail: {
+      ...reviewConfig(25).detail,
+      canonicalUrl: {
+        selector: 'link[rel="canonical"]',
+        attribute: "href",
+        removeSuffixes: ["/"],
+      },
+      publishedAt: { urlDateFormat: "/yyyy/MM/*-MMddyy" },
+      score: {
+        value: { selector: ".rating", removePrefixes: ["Rating:"] },
+        scale: 100,
+        map: [
+          { text: "A", value: 95 },
+          { text: "B+", value: 87 },
+        ],
+      },
+    },
+  });
+
+  expect(parseScrapeRules(3, rules)).toEqual(rules);
+});
+
+test.each([
+  ["missing URL year", "/reviews/MM/dd/*"],
+  ["missing URL month", "/reviews/yyyy/dd/*"],
+  ["missing URL day", "/reviews/yyyy/MM/*"],
+  ["unknown URL token", "/reviews/yyyy/MM/DD/*"],
+])("rejects invalid URL date formats: %s", (_, urlDateFormat) => {
+  expect(() =>
+    ScrapeRulesSchema.parse({
+      ...reviewConfig(25),
+      detail: {
+        ...reviewConfig(25).detail,
+        publishedAt: { urlDateFormat },
+      },
+    }),
+  ).toThrow();
+});
+
+test("rejects duplicate or out-of-range score mappings", () => {
+  const config = reviewConfig(25);
+  expect(() =>
+    ScrapeRulesSchema.parse({
+      ...config,
+      detail: {
+        ...config.detail,
+        score: {
+          value: { selector: ".rating" },
+          scale: 10,
+          map: [
+            { text: "A", value: 9 },
+            { text: "a", value: 11 },
+          ],
+        },
+      },
+    }),
+  ).toThrow();
 });
 
 test("accepts bounded list-card exclusion only with an item selector", () => {

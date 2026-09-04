@@ -75,7 +75,9 @@ function readValue(root: ReturnType<typeof load>, rule: ScrapeReadableValue) {
       ? rule.startsWith?.map((value) => value.toLowerCase())
       : undefined;
   root(rule.selector).each((_, element) => {
-    const value = normalizeValue(root(element).text());
+    const selected = root(element).clone();
+    selected.find("br").replaceWith(" ");
+    const value = normalizeValue(selected.text());
     if (!value) return;
     if (
       startsWith &&
@@ -183,6 +185,58 @@ function parseDate(value: string | null) {
   return Number.isFinite(timestamp) ? new Date(timestamp) : null;
 }
 
+function parseDateFromUrl(url: URL, format: string) {
+  // Rules v3 owns this token grammar; literals are escaped so saved rules cannot run regex code.
+  const tokens: string[] = [];
+  let pattern = "^";
+  let offset = 0;
+  for (const match of format.matchAll(/yyyy|yy|MM|dd|\*/g)) {
+    const index = match.index;
+    pattern += format
+      .slice(offset, index)
+      .replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const token = match[0];
+    if (token === "*") {
+      pattern += "[^/?#]*";
+    } else {
+      tokens.push(token);
+      pattern += token === "yyyy" ? "(\\d{4})" : "(\\d{2})";
+    }
+    offset = index + token.length;
+  }
+  pattern += format.slice(offset).replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  pattern += "$";
+
+  const match = new RegExp(pattern, "u").exec(url.pathname);
+  if (!match) return null;
+  const values = new Map<string, number>();
+  for (const [index, token] of tokens.entries()) {
+    const value = Number(match[index + 1]);
+    const prior = values.get(token);
+    if (prior !== undefined && prior !== value) return null;
+    values.set(token, value);
+  }
+  const fullYear = values.get("yyyy");
+  const shortYear = values.get("yy");
+  if (
+    fullYear !== undefined &&
+    shortYear !== undefined &&
+    fullYear % 100 !== shortYear
+  ) {
+    return null;
+  }
+  const year = fullYear ?? (shortYear === undefined ? null : 2000 + shortYear);
+  const month = values.get("MM");
+  const day = values.get("dd");
+  if (year === null || month === undefined || day === undefined) return null;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+    ? date
+    : null;
+}
+
 function parseNumber(value: string | null) {
   if (!value) return null;
   const match = value.replaceAll(",", "").match(/-?\d+(?:\.\d+)?/);
@@ -221,6 +275,7 @@ function validationIssues(
 
 function reviewField(path: PropertyKey[]) {
   if (path[0] !== "article") return "detail";
+  if (path[1] === "canonicalUrl") return "detail.canonicalUrl";
   if (path[1] === "title") return "detail.title";
   if (path[1] === "publishedAt") return "detail.publishedAt";
   if (path[1] !== "externalReviews") return "detail";
@@ -253,12 +308,45 @@ function parseReviewDetail(
 ): ScrapeDetailResult {
   const $ = load(html);
   const issues: ScrapeIssue[] = [];
+  let canonicalUrl: URL | null = pageUrl;
+  const canonicalUrlRule =
+    "canonicalUrl" in rules.detail ? rules.detail.canonicalUrl : undefined;
+  if (canonicalUrlRule) {
+    const canonicalUrlText = readValue($, canonicalUrlRule);
+    if (!canonicalUrlText) {
+      canonicalUrl = null;
+      issues.push({
+        field: "detail.canonicalUrl",
+        message: "Required value was not found.",
+      });
+    } else {
+      try {
+        canonicalUrl = new URL(absoluteHttpUrl(canonicalUrlText, pageUrl));
+      } catch (error) {
+        canonicalUrl = null;
+        issues.push({
+          field: "detail.canonicalUrl",
+          message: error instanceof Error ? error.message : "URL is not valid.",
+        });
+      }
+    }
+  }
   const title = readValue($, rules.detail.title);
-  const publishedAtText = rules.detail.publishedAt
-    ? readValue($, rules.detail.publishedAt)
-    : null;
-  const publishedAt = parseDate(publishedAtText);
-  if (!publishedAtText) {
+  const publishedAtRule = rules.detail.publishedAt;
+  const publishedAtText =
+    publishedAtRule && !("urlDateFormat" in publishedAtRule)
+      ? readValue($, publishedAtRule)
+      : null;
+  const publishedAt =
+    publishedAtRule && "urlDateFormat" in publishedAtRule
+      ? canonicalUrl
+        ? parseDateFromUrl(canonicalUrl, publishedAtRule.urlDateFormat)
+        : null
+      : parseDate(publishedAtText);
+  if (
+    !publishedAtRule ||
+    (!publishedAtText && !("urlDateFormat" in publishedAtRule))
+  ) {
     issues.push({
       field: "detail.publishedAt",
       message: "Required value was not found.",
@@ -316,7 +404,7 @@ function parseReviewDetail(
         });
         return;
       }
-      const sourceKey = `${pageUrl.toString()}#review-${index + 1}`;
+      const sourceKey = `${canonicalUrl?.toString() ?? pageUrl.toString()}#review-${index + 1}`;
       const body = readReviewBody($(element));
       if (body) externalReviewBodies[sourceKey] = body;
       const reviewerName = reviewerSelector
@@ -325,11 +413,24 @@ function parseReviewDetail(
       const scoreText = rules.detail.score
         ? readReviewValue(item, rules.detail.score.value)
         : null;
-      const scoreValue = parseNumber(scoreText);
+      const scoreMap =
+        rules.detail.score && "map" in rules.detail.score
+          ? rules.detail.score.map
+          : undefined;
+      const mappedScore = scoreMap?.find(
+        (entry) =>
+          entry.text.toLocaleLowerCase("en") ===
+          scoreText?.toLocaleLowerCase("en"),
+      )?.value;
+      const scoreValue = scoreMap
+        ? (mappedScore ?? null)
+        : parseNumber(scoreText);
       if (scoreText && scoreValue === null) {
         issues.push({
           field: "detail.score",
-          message: "Score is not a number.",
+          message: scoreMap
+            ? "Score is not in the configured map."
+            : "Score is not a number.",
         });
       }
       externalReviews.push({
@@ -361,7 +462,7 @@ function parseReviewDetail(
 
   const result = ExternalReviewArticleIngestionSchema.safeParse({
     article: {
-      canonicalUrl: pageUrl.toString(),
+      canonicalUrl: canonicalUrl?.toString() ?? null,
       title,
       issue: null,
       publishedAt,

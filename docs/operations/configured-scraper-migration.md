@@ -107,6 +107,29 @@ same review IDs recorded before applying without adding duplicate articles or
 reviews. Check the run and Sentry before restoring the saved schedule.
 Preparation must not change the source's publication setting.
 
+## The Whiskey Reviewer
+
+Use the preparation endpoint with `{"site": "whiskeyreviewer"}`. The check-only
+request verifies that each stored article has one review, uses the expected
+dated Whiskey Reviewer URL without a trailing slash, and still has the key
+written by the code scraper. Applying changes those review keys in place and
+adds a paused source whose list page is `https://whiskeyreviewer.com/`.
+
+Before applying, save the same review and run records and stop the
+`whiskeyreviewer` schedule. Version 3 rules must select only the five links in
+the Recent Reviews widget. They must read and remove the ending slash from the
+canonical link, derive the publication date from the dated URL, remove `Review`
+or the publisher's known `Rview` typo from the Bottle name, and map every
+publisher letter grade from A+ through F to its existing 100-point value. Run a
+full local no-write preview and compare all five current names, writers, dates,
+grade displays, selected tasting evidence, and review bodies with the code
+scraper.
+
+After applying, save and preview the reviewed version 3 revision. Activate only
+exact output, trigger one manual collection, and confirm that it updates the
+same article and review IDs without adding trailing-slash duplicates. Check
+Bottle matches, the run, and Sentry before restoring the saved schedule.
+
 ## Compass Box
 
 Use the same preparation endpoint with `{"site": "compassbox"}`. The check-only
@@ -163,9 +186,9 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture, Compass
-Box, Kilchoman, Whisky Saga, and The Whisky Study. Other sites are rejected
-without changing records. Add each site's conversion behind this route as its
-existing records are reviewed.
+Box, Kilchoman, The Whiskey Reviewer, Whisky Saga, and The Whisky Study. Other
+sites are rejected without changing records. Add each site's conversion behind
+this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
