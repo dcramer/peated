@@ -296,6 +296,13 @@ export function buildBottle({
     memberScoreCount: 0,
     externalScoreCount: 0,
     scoreCount: 0,
+    reviewScoreBandCounts: {
+      mediocre: 0,
+      good: 0,
+      very_good: 0,
+      outstanding: 0,
+      unicorn: 0,
+    },
     tastingBandCounts: {
       mediocre: 0,
       good: 0,
@@ -507,6 +514,13 @@ export function buildBottleGroup({
     memberScoreCount: bottle.memberScoreCount,
     externalScoreCount: bottle.externalScoreCount,
     scoreCount: bottle.scoreCount,
+    reviewScoreBandCounts: {
+      mediocre: 0,
+      good: 0,
+      very_good: 0,
+      outstanding: 0,
+      unicorn: 0,
+    },
     tastingBandCounts: bottle.tastingBandCounts,
     totalTastings: bottle.totalTastings,
     totalBottles: 1,

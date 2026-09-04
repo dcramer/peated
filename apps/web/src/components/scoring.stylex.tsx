@@ -1,198 +1,40 @@
+import { RATING_BANDS as SERVER_RATING_BANDS } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import { useId } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
+import { SectionHeading } from "./sectionHeading.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
-export const RATING_BANDS = [
-  {
-    key: "mediocre",
-    label: "Mediocre",
-    range: "under 80",
-    shortRange: "–79",
-    min: 0,
-    max: 79,
-  },
-  {
-    key: "good",
-    label: "Good",
-    range: "80–84",
-    shortRange: "80–84",
-    min: 80,
-    max: 84,
-  },
-  {
-    key: "very_good",
-    label: "Very good",
-    range: "85–89",
-    shortRange: "85–89",
-    min: 85,
-    max: 89,
-  },
-  {
-    key: "outstanding",
-    label: "Outstanding",
-    range: "90–94",
-    shortRange: "90–94",
-    min: 90,
-    max: 94,
-  },
-  {
-    key: "unicorn",
-    label: "Unicorn",
-    range: "95 and up",
-    shortRange: "95+",
-    min: 95,
-    max: 100,
-  },
-] as const;
+export const RATING_BANDS = SERVER_RATING_BANDS.map((band) => ({
+  key: band.id,
+  label: band.label,
+  range: `${band.min}–${band.max}`,
+  min: band.min,
+  max: band.max,
+}));
 
-export type RatingBand = (typeof RATING_BANDS)[number]["key"];
-export type TastingRatingCounts = Partial<Record<RatingBand, number>>;
-
-export type ReviewScoreProps = {
-  /** Number of eligible member and external review scores in the median. */
-  count: number;
-  /** Highest eligible review score in the pool. */
-  high?: number | null;
-  /** Lowest eligible review score in the pool. */
-  low?: number | null;
-  /** Whole-number median of eligible review scores. */
-  median?: number | null;
-  /** Optional caller-owned action when the median is withheld. */
-  contributionAction?: ReactNode;
-};
-
-/** Shows the median of eligible member and external review scores. */
-export function ReviewScore({
-  contributionAction,
-  count,
-  high = null,
-  low = null,
-  median = null,
-}: ReviewScoreProps) {
-  const hasScore = median !== null && count > 0;
-  const hasRange = count > 1 && low !== null && high !== null;
-
-  return (
-    <div
-      data-state={hasScore ? "populated" : "withheld"}
-      {...stylex.props(styles.score)}
-    >
-      <div
-        {...stylex.props(foundationStyles.fieldLabel, styles.reviewScoreLabel)}
-      >
-        Score
-      </div>
-      {hasScore ? (
-        <>
-          <div {...stylex.props(styles.scoreHeading)}>
-            <strong {...stylex.props(styles.scoreValue)}>{median}</strong>
-            <span
-              {...stylex.props(foundationStyles.metadata, styles.scoreMetadata)}
-            >
-              / 100
-              {count > 1
-                ? ` · median of ${formatCount(count)} ${countNoun(count)}`
-                : null}
-            </span>
-          </div>
-          <div aria-hidden="true" {...stylex.props(styles.scoreTrack)}>
-            {hasRange ? (
-              <span {...stylex.props(styles.scoreRange(low, high))} />
-            ) : null}
-            <span {...stylex.props(styles.scoreTick(median))} />
-          </div>
-          {hasRange ? (
-            <div
-              {...stylex.props(foundationStyles.metadata, styles.scoreCaption)}
-            >
-              low {low} · median {median} · high {high}
-            </div>
-          ) : null}
-        </>
-      ) : (
-        <div {...stylex.props(foundationStyles.body, styles.scoreEmpty)}>
-          <span>
-            {count === 0
-              ? "No review scores yet."
-              : `${formatCount(count)} ${countNoun(count)} so far.`}
-          </span>
-          {contributionAction}
-        </div>
-      )}
-    </div>
-  );
-}
+export type RatingBand = (typeof SERVER_RATING_BANDS)[number]["id"];
+export type RatingCounts = Partial<Record<RatingBand, number>>;
+export type TastingRatingCounts = RatingCounts;
 
 export type TastingRatingDistributionProps = {
-  counts?: TastingRatingCounts;
+  counts?: RatingCounts;
   showCounts?: boolean;
 };
 
-/** Shows aggregate tasting ratings as five fixed bins. */
+/** Shows ratings grouped into Peated's five fixed ranges. */
 export function TastingRatingDistribution({
   counts = {},
   showCounts = false,
 }: TastingRatingDistributionProps) {
-  const bins = getTastingRatingBins(counts);
-  const total = bins.reduce((sum, bin) => sum + bin.count, 0);
-  const shares = getTastingRatingShares(bins);
-  const label = bins
-    .map((bin) => `${bin.label} ${formatCount(bin.count)}`)
-    .join(", ");
-
-  return (
-    <div
-      aria-label={label}
-      data-state={total === 0 ? "empty" : "populated"}
-      role="img"
-      {...stylex.props(styles.tastingRatingDistribution)}
-    >
-      <div
-        {...stylex.props(
-          styles.tastingRatingTrack,
-          total === 0 && styles.emptyTastingRatingTrack,
-        )}
-      >
-        {total > 0
-          ? bins.map((bin, index) => (
-              <span
-                key={bin.key}
-                {...stylex.props(
-                  styles.tastingRatingSegment(shares[index] ?? 0),
-                  bandFillStyles[bin.fill],
-                )}
-              />
-            ))
-          : null}
-      </div>
-      {showCounts && total > 0 ? (
-        <div
-          {...stylex.props(
-            foundationStyles.metadata,
-            styles.tastingRatingLabels,
-          )}
-        >
-          {bins.map((bin, index) => (
-            <span
-              key={bin.key}
-              title={formatCount(bin.count)}
-              {...stylex.props(styles.tastingRatingLabel(shares[index] ?? 0))}
-            >
-              {formatCount(bin.count)}
-            </span>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
+  return <RatingDistribution counts={counts} showCounts={showCounts} />;
 }
 
 export type TastingRatingProps = {
-  /** One canonical tasting rating. */
+  /** One tasting rating. */
   band: RatingBand;
 };
 
@@ -225,96 +67,268 @@ export function TastingRating({ band }: TastingRatingProps) {
   );
 }
 
-export type BottleRatingsProps = {
-  /** Tasting rating counts in the fixed five-band order. */
-  counts?: TastingRatingCounts;
-  /** Highest eligible score in the median pool. */
-  high?: number | null;
-  /** Lowest eligible score in the median pool. */
-  low?: number | null;
-  /** Published median score. Keep this empty when the sample is withheld. */
+export type BottleRatingSummaryProps = {
+  /** Critic review scores included in the bottle score. */
+  externalScoreCount?: number;
+  /** Member review scores included in the bottle score. */
+  memberScoreCount?: number;
+  /** Median of the included member and critic review scores. */
   median?: number | null;
-  /** Number of eligible scores in the median pool. */
+  /** Included review scores grouped into the five rating ranges. */
+  reviewCounts?: RatingCounts;
+  /** Tastings grouped into the five rating ranges. */
+  tastingCounts?: RatingCounts;
+};
+
+/**
+ * Shows one bottle rating, its exact review score or tasting range, and how
+ * reviews and tastings are spread across the five ratings.
+ */
+export function BottleRatingSummary({
+  externalScoreCount = 0,
+  memberScoreCount = 0,
+  median = null,
+  reviewCounts = {},
+  tastingCounts = {},
+}: BottleRatingSummaryProps) {
+  const headingId = useId();
+  const rating = getBottleRating({
+    median,
+    scoreCount: memberScoreCount + externalScoreCount,
+    tastingCounts,
+  });
+  if (!rating) return null;
+
+  const combinedCounts = combineRatingCounts(reviewCounts, tastingCounts);
+  const sources = formatSources({
+    externalScoreCount,
+    memberScoreCount,
+    tastingCount: totalRatings(tastingCounts),
+  });
+
+  return (
+    <section aria-labelledby={headingId}>
+      <SectionHeading id={headingId}>Bottle rating</SectionHeading>
+      <div {...stylex.props(styles.summaryHeadline)}>
+        <strong {...stylex.props(styles.summaryLabel)}>{rating.label}</strong>
+        <span {...stylex.props(styles.summaryValueGroup)}>
+          <strong {...stylex.props(styles.summaryValue)}>{rating.value}</strong>
+          {rating.exact ? (
+            <span
+              {...stylex.props(foundationStyles.metadata, styles.summaryScale)}
+            >
+              / 100
+            </span>
+          ) : null}
+        </span>
+      </div>
+      {sources ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.sources)}>
+          {sources}
+        </p>
+      ) : null}
+      <div {...stylex.props(styles.distributionGroup)}>
+        <div
+          {...stylex.props(
+            foundationStyles.fieldLabel,
+            styles.distributionLabel,
+          )}
+        >
+          How people rated
+        </div>
+        <RatingDistribution counts={combinedCounts} />
+      </div>
+    </section>
+  );
+}
+
+export type BottleRatingsProps = Pick<
+  BottleRatingSummaryProps,
+  "median" | "reviewCounts" | "tastingCounts"
+> & {
+  /** Number of included member and critic review scores. */
   scoreCount?: number;
 };
 
-/** Combines available tasting ratings and the published review score for one bottle row. */
+/** Compact, trailing rating summary for one bottle row. */
 export function BottleRatings({
-  counts = {},
-  high = null,
-  low = null,
   median = null,
+  reviewCounts = {},
   scoreCount = 0,
+  tastingCounts = {},
 }: BottleRatingsProps) {
-  const bandCounts = RATING_BANDS.map((band) => counts[band.key] ?? 0);
-  const tastingCount = bandCounts.reduce((sum, count) => sum + count, 0);
-  const maxBandCount = Math.max(...bandCounts, 0);
-  const sampleHeight = getRatingSampleHeight(tastingCount);
-  const hasRange = low !== null && high !== null;
-  if (tastingCount === 0 && median === null) return null;
+  const rating = getBottleRating({ median, scoreCount, tastingCounts });
+  if (!rating) return null;
 
-  const label = [
-    median === null
-      ? "No published score"
-      : `Median score ${median} from ${formatCount(scoreCount)} ${countNoun(scoreCount)}`,
-    `Tasting ratings: ${RATING_BANDS.map((band, index) => `${band.label} ${formatCount(bandCounts[index] ?? 0)}`).join(", ")}`,
-    hasRange ? `Score range ${low} to ${high}` : null,
-  ]
-    .filter(Boolean)
-    .join(". ");
+  const combinedCounts = combineRatingCounts(reviewCounts, tastingCounts);
+  const label = `${rating.label}, ${rating.value}${rating.exact ? " out of 100" : " range"}. ${formatRatingCounts(combinedCounts)}`;
 
   return (
     <span
       aria-label={label}
-      data-state="populated"
       role="img"
       title={label}
       {...stylex.props(styles.bottleRatings)}
     >
-      <span aria-hidden="true" {...stylex.props(styles.ratingPlot)}>
-        <span {...stylex.props(styles.ratingBars)}>
-          {bandCounts.map((count, index) => (
-            <span
-              key={RATING_BANDS[index]?.key}
-              {...stylex.props(styles.ratingTrack)}
-            >
-              {count > 0 ? (
-                <span
-                  {...stylex.props(
-                    styles.ratingBar(
-                      getRatingBarHeight(count, maxBandCount, sampleHeight),
-                    ),
-                  )}
-                />
-              ) : null}
-            </span>
-          ))}
-        </span>
-        <span {...stylex.props(styles.ratingBaseline)} />
-        <span {...stylex.props(styles.ratingRangeSlot)}>
-          {hasRange ? (
-            <span {...stylex.props(styles.ratingRange(low, high))}>
-              <span {...stylex.props(styles.ratingRangeStart)} />
-              <span {...stylex.props(styles.ratingRangeEnd)} />
-            </span>
-          ) : null}
-        </span>
+      <span aria-hidden="true" {...stylex.props(styles.compactCopy)}>
+        <span {...stylex.props(styles.compactLabel)}>{rating.label}</span>
+        <span {...stylex.props(styles.compactValue)}>{rating.value}</span>
       </span>
-      <strong {...stylex.props(styles.ratingMedian)}>
-        {median === null ? null : median}
-      </strong>
+      <span aria-hidden="true" {...stylex.props(styles.compactDistribution)}>
+        <RatingDistribution compact counts={combinedCounts} />
+      </span>
     </span>
   );
 }
 
+type BottleRating = { exact: boolean; label: string; value: string };
 type BandFill = 1 | 2 | 3 | 4 | 5;
-type TastingRatingBin = {
+type RatingBin = {
   count: number;
   fill: BandFill;
-  key: string;
+  key: RatingBand;
   label: string;
-  range: string;
 };
+
+function getBottleRating({
+  median,
+  scoreCount,
+  tastingCounts,
+}: {
+  median: number | null;
+  scoreCount: number;
+  tastingCounts: RatingCounts;
+}): BottleRating | null {
+  if (median !== null && scoreCount > 0) {
+    const band = RATING_BANDS.find(
+      (candidate) => median >= candidate.min && median <= candidate.max,
+    );
+    if (band) return { exact: true, label: band.label, value: `${median}` };
+  }
+
+  const band = getMedianTastingBand(tastingCounts);
+  return band ? { exact: false, label: band.label, value: band.range } : null;
+}
+
+function getMedianTastingBand(counts: RatingCounts) {
+  const total = totalRatings(counts);
+  if (total === 0) return null;
+
+  const middle = Math.ceil(total / 2);
+  let seen = 0;
+  for (const band of RATING_BANDS) {
+    seen += counts[band.key] ?? 0;
+    if (seen >= middle) return band;
+  }
+  return null;
+}
+
+function combineRatingCounts(...counts: RatingCounts[]) {
+  const total = (key: RatingBand) =>
+    counts.reduce((sum, group) => sum + (group[key] ?? 0), 0);
+  return {
+    mediocre: total("mediocre"),
+    good: total("good"),
+    very_good: total("very_good"),
+    outstanding: total("outstanding"),
+    unicorn: total("unicorn"),
+  };
+}
+
+function totalRatings(counts: RatingCounts) {
+  return RATING_BANDS.reduce(
+    (total, band) => total + (counts[band.key] ?? 0),
+    0,
+  );
+}
+
+function formatSources({
+  externalScoreCount,
+  memberScoreCount,
+  tastingCount,
+}: {
+  externalScoreCount: number;
+  memberScoreCount: number;
+  tastingCount: number;
+}) {
+  const parts = [
+    memberScoreCount > 0 ? "Member reviews" : null,
+    externalScoreCount > 0 ? "Critic reviews" : null,
+    tastingCount > 0 ? "Tastings" : null,
+  ].filter((part): part is string => part !== null);
+  return parts.length ? parts.join(" · ") : null;
+}
+
+function formatRatingCounts(counts: RatingCounts) {
+  return RATING_BANDS.map(
+    (band) => `${band.label} ${counts[band.key] ?? 0}`,
+  ).join(", ");
+}
+
+function RatingDistribution({
+  compact = false,
+  counts,
+  showCounts = false,
+}: {
+  compact?: boolean;
+  counts: RatingCounts;
+  showCounts?: boolean;
+}) {
+  const bins = getRatingBins(counts);
+  const total = bins.reduce((sum, bin) => sum + bin.count, 0);
+  const shares = bins.map((bin) =>
+    total === 0 ? 0 : (bin.count / total) * 100,
+  );
+
+  return (
+    <span
+      aria-label={formatRatingCounts(counts)}
+      data-state={total === 0 ? "empty" : "populated"}
+      role="img"
+      {...stylex.props(styles.ratingDistribution)}
+    >
+      <span
+        {...stylex.props(
+          styles.ratingDistributionTrack,
+          compact && styles.compactRatingDistributionTrack,
+          total === 0 && styles.emptyRatingDistributionTrack,
+        )}
+      >
+        {total > 0
+          ? bins.map((bin, index) => (
+              <span
+                key={bin.key}
+                {...stylex.props(
+                  styles.ratingDistributionSegment(shares[index] ?? 0),
+                  bandFillStyles[bin.fill],
+                )}
+              />
+            ))
+          : null}
+      </span>
+      {showCounts && total > 0 ? (
+        <span
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.ratingDistributionCounts,
+          )}
+        >
+          {bins.map((bin, index) => (
+            <span
+              key={bin.key}
+              title={`${bin.count}`}
+              {...stylex.props(
+                styles.ratingDistributionCount(shares[index] ?? 0),
+              )}
+            >
+              {bin.count.toLocaleString("en-US")}
+            </span>
+          ))}
+        </span>
+      ) : null}
+    </span>
+  );
+}
 
 function bandFillForKey(key: RatingBand): BandFill {
   if (key === "mediocre") return 1;
@@ -324,116 +338,57 @@ function bandFillForKey(key: RatingBand): BandFill {
   return 5;
 }
 
-function getTastingRatingBins(counts: TastingRatingCounts): TastingRatingBin[] {
+function getRatingBins(counts: RatingCounts): RatingBin[] {
   return RATING_BANDS.map((band) => ({
     count: counts[band.key] ?? 0,
     fill: bandFillForKey(band.key),
     key: band.key,
     label: band.label,
-    range: band.shortRange,
   }));
 }
 
-function getTastingRatingShares(bins: readonly TastingRatingBin[]) {
-  const total = bins.reduce((sum, bin) => sum + bin.count, 0);
-  if (total === 0) return bins.map(() => 0);
-  return bins.map((bin) => (bin.count / total) * 100);
-}
-
-function clampPoint(value: number) {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(100, Math.max(0, Math.round(value)));
-}
-
-function clampRatingPoint(value: number) {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(100, Math.max(75, value));
-}
-
-function getRatingSampleHeight(total: number) {
-  if (total <= 0) return 0;
-  return Math.min(100, 30 + Math.log10(total + 1) * 27);
-}
-
-function getRatingBarHeight(count: number, maxCount: number, sample: number) {
-  if (count <= 0 || maxCount <= 0) return 0;
-  return Math.max(12, (count / maxCount) * sample);
-}
-
-function formatCount(count: number) {
-  return count.toLocaleString("en-US");
-}
-
-function countNoun(count: number) {
-  return count === 1 ? "score" : "scores";
-}
-
 const styles = stylex.create({
-  score: {
-    width: "100%",
-  },
-  reviewScoreLabel: {
-    color: colors.inkMuted,
-  },
-  scoreHeading: {
+  summaryHeadline: {
     display: "flex",
     alignItems: "baseline",
-    columnGap: space.x2,
-    rowGap: space.x1,
-    marginTop: space.x1,
-    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: space.x3,
+    marginTop: space.x3,
   },
-  scoreValue: {
+  summaryLabel: {
+    minWidth: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "56px",
+    fontSize: "24px",
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    lineHeight: 1.05,
+  },
+  summaryValueGroup: {
+    display: "inline-flex",
+    flexShrink: 0,
+    alignItems: "baseline",
+    gap: space.x1,
+  },
+  summaryValue: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "48px",
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.045em",
     lineHeight: 0.9,
   },
-  scoreTrack: {
-    position: "relative",
-    height: "8px",
-    marginTop: "12px",
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.inset,
-  },
-  scoreRange: (low: number, high: number) => ({
-    position: "absolute",
-    top: 0,
-    right: `${100 - clampPoint(high)}%`,
-    bottom: 0,
-    left: `${clampPoint(low)}%`,
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.dataRange,
-  }),
-  scoreTick: (median: number) => ({
-    position: "absolute",
-    top: "-3px",
-    left: `calc(${clampPoint(median)}% - 1px)`,
-    width: "2px",
-    height: "14px",
-    backgroundColor: colors.ink,
-  }),
-  scoreCaption: {
-    marginTop: "8px",
-    color: colors.inkMuted,
-    fontVariantNumeric: "tabular-nums",
-  },
-  scoreEmpty: {
-    display: "flex",
-    alignItems: "baseline",
-    columnGap: space.x2,
-    rowGap: space.x1,
+  summaryScale: { color: colors.inkMuted },
+  sources: {
     marginTop: space.x2,
-    color: colors.ink,
-    flexWrap: "wrap",
+    marginBottom: 0,
+    color: colors.inkMuted,
   },
-  tastingRatingDistribution: {
-    width: "100%",
-  },
-  tastingRatingTrack: {
+  distributionGroup: { marginTop: space.x4 },
+  distributionLabel: { marginBottom: space.x2, color: colors.inkMuted },
+  ratingDistribution: { display: "block", width: "100%" },
+  ratingDistributionTrack: {
     display: "flex",
     height: "10px",
     alignItems: "center",
@@ -441,44 +396,26 @@ const styles = stylex.create({
     overflow: "hidden",
     borderRadius: controlMetrics.radiusSmall,
   },
-  emptyTastingRatingTrack: {
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.bandTrack,
-  },
-  tastingRatingSegment: (share: number) => ({
+  emptyRatingDistributionTrack: { backgroundColor: colors.bandTrack },
+  compactRatingDistributionTrack: { height: "4px" },
+  ratingDistributionSegment: (share: number) => ({
     boxSizing: "border-box",
-    minWidth: "5px",
+    minWidth: "3px",
     height: "100%",
     flexBasis: 0,
     flexGrow: share,
     borderRightWidth: "1px",
     borderRightStyle: "solid",
     borderRightColor: colors.ground,
-    borderRadius: 0,
   }),
-  band1Fill: {
-    backgroundColor: colors.band1,
-  },
-  band2Fill: {
-    backgroundColor: colors.band2,
-  },
-  band3Fill: {
-    backgroundColor: colors.band3,
-  },
-  band4Fill: {
-    backgroundColor: colors.band4,
-  },
-  band5Fill: {
-    backgroundColor: colors.band5,
-  },
-  tastingRatingLabels: {
+  ratingDistributionCounts: {
     display: "flex",
     gap: "2px",
     marginTop: "5px",
     color: colors.inkMuted,
     fontVariantNumeric: "tabular-nums",
   },
-  tastingRatingLabel: (share: number) => ({
+  ratingDistributionCount: (share: number) => ({
     minWidth: 0,
     overflow: "hidden",
     flexBasis: 0,
@@ -486,11 +423,7 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   }),
-  tastingRating: {
-    display: "inline-flex",
-    flexShrink: 0,
-    gap: "2px",
-  },
+  tastingRating: { display: "inline-flex", flexShrink: 0, gap: "2px" },
   tastingRatingCell: {
     position: "relative",
     display: "inline-block",
@@ -502,111 +435,56 @@ const styles = stylex.create({
   },
   bottleRatings: {
     display: "inline-flex",
-    width: "152px",
+    width: "92px",
     minWidth: 0,
     flexShrink: 0,
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: space.x2,
-    [COMPACT]: {
-      width: "104px",
-      gap: space.x1,
-    },
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: space.x1,
+    textAlign: "right",
+    [COMPACT]: { width: "80px" },
   },
-  ratingPlot: {
+  compactCopy: {
     display: "flex",
-    width: "108px",
+    width: "100%",
     minWidth: 0,
     flexDirection: "column",
-    [COMPACT]: {
-      width: "68px",
-    },
-  },
-  ratingBars: {
-    display: "grid",
-    height: "20px",
-    gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-    alignItems: "end",
-    gap: "3px",
-    [COMPACT]: {
-      height: "16px",
-      gap: "2px",
-    },
-  },
-  ratingTrack: {
-    position: "relative",
-    display: "flex",
-    height: "100%",
     alignItems: "flex-end",
-    borderTopLeftRadius: controlMetrics.radiusSmall,
-    borderTopRightRadius: controlMetrics.radiusSmall,
-    backgroundImage: `linear-gradient(to top, ${colors.ratingTrack} 1px, transparent 1px)`,
+    justifyContent: "flex-end",
+    gap: "2px",
   },
-  ratingBar: (height: number) => ({
-    display: "block",
+  compactLabel: {
     width: "100%",
-    height: `${height}%`,
-    minHeight: "2px",
-    borderTopLeftRadius: controlMetrics.radiusSmall,
-    borderTopRightRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.ratingFill,
-  }),
-  ratingBaseline: {
-    display: "block",
-    height: "1px",
-    backgroundColor: colors.ratingTrack,
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "12px",
+    fontWeight: 600,
+    lineHeight: 1.15,
+    textAlign: "right",
+    whiteSpace: "nowrap",
   },
-  ratingRangeSlot: {
-    position: "relative",
-    display: "block",
-    height: "6px",
-  },
-  ratingRange: (low: number, high: number) => ({
-    position: "absolute",
-    top: "2px",
-    right: `${100 - ((clampRatingPoint(high) - 75) / 25) * 100}%`,
-    left: `${((clampRatingPoint(low) - 75) / 25) * 100}%`,
-    height: "1px",
-    backgroundColor: colors.inkMuted,
-  }),
-  ratingRangeStart: {
-    position: "absolute",
-    top: "-1px",
-    left: 0,
-    width: "1px",
-    height: "3px",
-    backgroundColor: colors.inkMuted,
-  },
-  ratingRangeEnd: {
-    position: "absolute",
-    top: "-1px",
-    right: 0,
-    width: "1px",
-    height: "3px",
-    backgroundColor: colors.inkMuted,
-  },
-  ratingMedian: {
-    display: "block",
-    width: "36px",
-    minHeight: "22px",
+  compactValue: {
     flexShrink: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "18px",
+    fontSize: "20px",
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.03em",
-    lineHeight: 1.1,
-    textAlign: "right",
-    [COMPACT]: {
-      width: "32px",
-      fontSize: "16px",
-    },
+    lineHeight: 1,
+    [COMPACT]: { fontSize: "18px" },
   },
-  scoreMetadata: {
-    color: colors.inkMuted,
+  compactDistribution: {
+    display: "block",
+    width: "100%",
   },
+  band1Fill: { backgroundColor: colors.band1 },
+  band2Fill: { backgroundColor: colors.band2 },
+  band3Fill: { backgroundColor: colors.band3 },
+  band4Fill: { backgroundColor: colors.band4 },
+  band5Fill: { backgroundColor: colors.band5 },
 });
+
 const bandFillStyles = {
   1: styles.band1Fill,
   2: styles.band2Fill,

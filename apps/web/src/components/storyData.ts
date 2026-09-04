@@ -61,14 +61,22 @@ export const searchResultGroups = [
         href: "/bottles/872",
         id: "bottle-872",
         ratings: {
-          bands: {
+          median: 88,
+          reviewCounts: {
+            good: 2,
+            mediocre: 1,
+            outstanding: 6,
+            unicorn: 1,
+            very_good: 8,
+          },
+          scoreCount: 18,
+          tastingCounts: {
             good: 8,
             mediocre: 3,
             outstanding: 19,
             unicorn: 6,
             very_good: 12,
           },
-          score: { count: 48, value: 88 },
         },
         bottle: {
           provenance: [{ name: "Single Malt" }],
@@ -81,14 +89,22 @@ export const searchResultGroups = [
         href: "/bottles/1188",
         id: "bottle-1188",
         ratings: {
-          bands: {
+          median: 91,
+          reviewCounts: {
+            good: 1,
+            mediocre: 0,
+            outstanding: 7,
+            unicorn: 2,
+            very_good: 4,
+          },
+          scoreCount: 14,
+          tastingCounts: {
             good: 3,
             mediocre: 1,
             outstanding: 8,
             unicorn: 2,
             very_good: 4,
           },
-          score: { count: 26, value: 91 },
         },
         bottle: {
           provenance: [{ name: "Single Malt" }],

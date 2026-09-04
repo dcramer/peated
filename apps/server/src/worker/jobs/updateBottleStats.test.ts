@@ -60,6 +60,13 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     totalTastings: 3,
     medianScore: null,
     memberScoreCount: 0,
+    reviewScoreBandCounts: {
+      mediocre: 0,
+      good: 0,
+      very_good: 0,
+      outstanding: 0,
+      unicorn: 0,
+    },
     tastingBandCounts: { good: 1, outstanding: 1 },
   });
   await expect(
@@ -70,6 +77,13 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     totalTastings: 3,
     medianScore: null,
     memberScoreCount: 0,
+    reviewScoreBandCounts: {
+      mediocre: 0,
+      good: 0,
+      very_good: 0,
+      outstanding: 0,
+      unicorn: 0,
+    },
     tastingBandCounts: { good: 1, outstanding: 1 },
   });
 

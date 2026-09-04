@@ -7,17 +7,22 @@ const meta = {
   title: "Components/Ratings/Bottle Ratings",
   component: BottleRatings,
   args: {
-    counts: {
-      good: 34,
-      mediocre: 12,
-      outstanding: 178,
-      unicorn: 92,
-      very_good: 96,
-    },
-    high: 97,
-    low: 78,
     median: 91,
-    scoreCount: 84,
+    reviewCounts: {
+      good: 0,
+      mediocre: 0,
+      outstanding: 4,
+      unicorn: 0,
+      very_good: 1,
+    },
+    scoreCount: 5,
+    tastingCounts: {
+      good: 1,
+      mediocre: 0,
+      outstanding: 5,
+      unicorn: 2,
+      very_good: 2,
+    },
   },
   decorators: [
     (Story) => (
@@ -26,6 +31,14 @@ const meta = {
       </StoryCanvas>
     ),
   ],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use at the end of a bottle row. It shows the middle review score when one exists. With tastings only, it shows the middle tasting's full range. The bar includes member reviews, critic reviews, and tastings. Bottles with no ratings show nothing.",
+      },
+    },
+  },
 } satisfies Meta<typeof BottleRatings>;
 
 export default meta;
@@ -36,19 +49,13 @@ export const Overview: Story = {
     <StoryStack>
       <BottleRatings {...args} />
       <BottleRatings
-        counts={{
-          good: 8,
-          mediocre: 10,
-          outstanding: 9,
-          unicorn: 2,
-          very_good: 17,
-        }}
-        high={93}
-        low={76}
         median={86}
-        scoreCount={18}
+        reviewCounts={{ good: 1, outstanding: 1, very_good: 3 }}
+        scoreCount={5}
       />
-      <BottleRatings counts={{ outstanding: 2, unicorn: 1, very_good: 4 }} />
+      <BottleRatings
+        tastingCounts={{ outstanding: 2, unicorn: 1, very_good: 4 }}
+      />
       <BottleRatings />
     </StoryStack>
   ),

@@ -7,7 +7,7 @@ const CatalogIdentitySchemaVersion = z
   .literal(CATALOG_IDENTITY_SCHEMA_VERSION)
   .describe("Version of the catalog identity result contract");
 
-const TastingBandCountsSchema = z.object({
+const RatingBandCountsSchema = z.object({
   mediocre: z.number().int().gte(0),
   good: z.number().int().gte(0),
   very_good: z.number().int().gte(0),
@@ -41,7 +41,8 @@ export const BottleGroupV1Fields = {
   memberScoreCount: z.number().int().gte(0),
   externalScoreCount: z.number().int().gte(0),
   scoreCount: z.number().int().gte(0),
-  tastingBandCounts: TastingBandCountsSchema,
+  reviewScoreBandCounts: RatingBandCountsSchema,
+  tastingBandCounts: RatingBandCountsSchema,
   totalTastings: z.number().int().gte(0),
   totalBottles: z.number().int().gte(1),
   createdByActorId: z.number().int().positive(),
@@ -92,7 +93,8 @@ export const BottleV1Fields = {
   memberScoreCount: z.number().int().gte(0),
   externalScoreCount: z.number().int().gte(0),
   scoreCount: z.number().int().gte(0),
-  tastingBandCounts: TastingBandCountsSchema,
+  reviewScoreBandCounts: RatingBandCountsSchema,
+  tastingBandCounts: RatingBandCountsSchema,
   totalTastings: z.number().int().gte(0),
   createdByActorId: z.number().int().positive(),
   createdAt: z.string().datetime(),

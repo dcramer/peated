@@ -179,11 +179,10 @@ function bottleItem(
     id: `bottle-${bottle.id}`,
     ratings: showRatings
       ? {
-          score:
-            bottle.medianScore === null || bottle.scoreCount === 0
-              ? undefined
-              : { count: bottle.scoreCount, value: bottle.medianScore },
-          bands: bottle.tastingBandCounts,
+          median: bottle.medianScore,
+          reviewCounts: bottle.reviewScoreBandCounts,
+          scoreCount: bottle.scoreCount,
+          tastingCounts: bottle.tastingBandCounts,
         }
       : undefined,
     title: identity.name,

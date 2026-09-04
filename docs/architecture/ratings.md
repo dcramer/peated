@@ -137,6 +137,8 @@ Bottle and BottleGroup summaries store:
 
 - `medianScore`, `minScore`, and `maxScore`
 - `memberScoreCount` and `externalScoreCount`
+- `reviewScoreBandCounts`, with each included member and external review score
+  counted in its matching tasting band
 - `tastingBandCounts`, with one count for each tasting band
 
 The shipped `avg_rating` and `rating_stats` SQL columns remain for historical
@@ -146,6 +148,14 @@ data. Application code calls them `legacySimpleRatingAverage` and
 `scoreCount` is the sum of the two score counts in the API. The score and range
 stay `null` when no counted scores exist. The median uses the lower middle value
 when the count is even.
+
+Bottle presentation derives one rating from these saved summaries. When a
+review median exists, its matching band supplies the label and the median stays
+visible as the exact score. Otherwise, the lower-middle tasting band supplies
+the label and the UI shows that band's range rather than inventing a point
+score. The visible distribution adds `reviewScoreBandCounts` and
+`tastingBandCounts` by band. Individual external reviews still show their
+original score and scale.
 
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
 active members. They exclude retired Bottles.
@@ -158,6 +168,10 @@ changes. Large publication changes queue work in batches.
 Run `pnpm cli bottles fix-stats [bottleIds...]` to rebuild active Bottle and
 BottleGroup summaries. The command also checks each stored external score count
 against the shared external-review rule.
+
+Migration 0268 starts existing review score ranges at zero. Run the command
+once after deploying that migration to fill the ranges for existing Bottles and
+BottleGroups.
 
 ## Recommendations
 

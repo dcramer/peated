@@ -51,7 +51,7 @@ export default function RatingsPage() {
   return (
     <AboutPage
       currentHref="/about/ratings"
-      description="A tasting takes one of five ratings. A member review takes a whole number out of 100. Neither is ever converted into the other."
+      description="Tastings use five named ratings. Reviews keep their original scores. Bottle ratings show both without turning a tasting into an exact score."
       rail={
         <RailSection heading="Where these appear">
           <RailList ariaLabel="Rating examples">
@@ -79,9 +79,8 @@ export default function RatingsPage() {
           items={RATING_BANDS}
         />
         <AboutText>
-          Pick the label that describes the whole whisky. The vocabulary is
-          fixed on purpose. Five labels stay comparable across many tastings in
-          a way that free-form numbers do not.
+          Pick the rating that describes the whole whisky. The same five choices
+          on every tasting make bottles easier to compare.
         </AboutText>
       </PageSection>
 
@@ -114,22 +113,26 @@ export default function RatingsPage() {
       <PageSection heading="How a bottle score is worked out">
         <AboutTextStack>
           <AboutText>
-            We line up the included review scores from lowest to highest and
-            take the middle one. This is the median. With two middle scores, we
-            use the lower one. The count tells you how many scores went in;
-            tasting ratings are kept separate.
+            We put the review scores in order and use the middle one. With an
+            even number of scores, we use the lower of the middle two. The word
+            beside the score matches its range. A score of 91 is Outstanding.
           </AboutText>
           <AboutText>
             Review sites use different scales. We keep each original score and
-            link to its review. When a site's scoring guide makes the scales
-            comparable, Peated can estimate a score out of 100.
+            link to its review. When a site's scoring guide gives us enough
+            information, Peated also works out a score out of 100.
           </AboutText>
           <AboutText>
-            Each review says whether its score is included. Reviews without a
-            usable score or a saved comparison are left out, so the score count
-            can be smaller than the review count. Existing whole-number scores
-            out of 100 count unless the site is excluded or its saved settings
-            say otherwise.
+            Each critic review says whether its score is used. Reviews without a
+            usable score or a saved comparison are left out. Whole-number scores
+            out of 100 are used unless the site is excluded or its saved
+            settings say otherwise.
+          </AboutText>
+          <AboutText>
+            On a bottle page, the bar groups member and critic scores with
+            tastings in the same five ranges. If a bottle has tastings but no
+            review score, its middle tasting sets the rating. Peated shows the
+            full range instead of an exact score.
           </AboutText>
         </AboutTextStack>
       </PageSection>

@@ -410,24 +410,21 @@ export function BottlePageFrameClient({
               <BottleLibraryAction bottle={bottle} />
             </>
           }
-          bands={
-            Object.values(bottle.tastingBandCounts).some((count) => count > 0)
-              ? { counts: bottle.tastingBandCounts, showCounts: true }
-              : null
-          }
           brand={bottle.brand.shortName || bottle.brand.name}
           brandHref={getEntityUrl(bottle.brand)}
           metadata={getBottleDistillers(bottle)}
           menu={<BottleActions bottle={bottle} />}
           name={formatBottleDisplayName(bottle, { includeBrand: false })}
-          score={
-            bottle.scoreCount === 0
+          rating={
+            bottle.scoreCount === 0 &&
+            !Object.values(bottle.tastingBandCounts).some((count) => count > 0)
               ? null
               : {
-                  count: bottle.scoreCount,
-                  high: bottle.maxScore,
-                  low: bottle.minScore,
+                  externalScoreCount: bottle.externalScoreCount,
+                  memberScoreCount: bottle.memberScoreCount,
                   median: bottle.medianScore,
+                  reviewCounts: bottle.reviewScoreBandCounts,
+                  tastingCounts: bottle.tastingBandCounts,
                 }
           }
         />

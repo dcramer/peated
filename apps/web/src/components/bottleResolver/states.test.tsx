@@ -67,6 +67,13 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
     memberScoreCount: 0,
     externalScoreCount: 0,
     scoreCount: 0,
+    reviewScoreBandCounts: {
+      mediocre: 0,
+      good: 0,
+      very_good: 0,
+      outstanding: 0,
+      unicorn: 0,
+    },
     tastingBandCounts: {
       mediocre: 0,
       good: 0,

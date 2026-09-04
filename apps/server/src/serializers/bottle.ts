@@ -297,6 +297,7 @@ export const BottleSerializer = serializer({
       memberScoreCount: item.memberScoreCount,
       externalScoreCount: item.externalScoreCount,
       scoreCount: item.memberScoreCount + item.externalScoreCount,
+      reviewScoreBandCounts: item.reviewScoreBandCounts,
       tastingBandCounts: item.tastingBandCounts,
       totalTastings: item.totalTastings,
 

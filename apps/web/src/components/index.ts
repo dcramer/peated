@@ -211,16 +211,17 @@ export type {
   ScopedSearchProps,
 } from "./scopedSearch.stylex";
 export {
+  BottleRatingSummary,
   BottleRatings,
   RATING_BANDS,
-  ReviewScore,
   TastingRating,
   TastingRatingDistribution,
 } from "./scoring.stylex";
 export type {
+  BottleRatingSummaryProps,
   BottleRatingsProps,
   RatingBand,
-  ReviewScoreProps,
+  RatingCounts,
   TastingRatingCounts,
   TastingRatingDistributionProps,
   TastingRatingProps,

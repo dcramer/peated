@@ -4,9 +4,9 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { BottleRatings, ReviewScore } from "./scoring.stylex";
+import { BottleRatingSummary, BottleRatings } from "./scoring.stylex";
 
-describe("ReviewScore", () => {
+describe("Bottle ratings", () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -21,35 +21,59 @@ describe("ReviewScore", () => {
     container.remove();
   });
 
-  it("shows a score when there is one review", () => {
+  it("keeps the rating name aligned with the exact review median", () => {
     act(() =>
-      root.render(<ReviewScore count={1} high={92} low={92} median={92} />),
+      root.render(
+        <BottleRatingSummary
+          externalScoreCount={2}
+          memberScoreCount={3}
+          median={91}
+          reviewCounts={{ outstanding: 4, very_good: 1 }}
+          tastingCounts={{ outstanding: 2, unicorn: 1 }}
+        />,
+      ),
     );
 
-    expect(container.textContent).toContain("92");
-    expect(container.textContent).toContain("/ 100");
-    expect(container.textContent).not.toContain("median of 1 score");
-    expect(container.textContent).not.toContain("Only 1 score so far");
-    expect(container.textContent).not.toContain("low 92");
+    expect(container.textContent).toContain("Outstanding");
+    expect(container.textContent).toContain("91");
+    expect(container.textContent).toContain("Member reviews");
+    expect(container.textContent).toContain("Critic reviews");
+    expect(container.textContent).toContain("Tastings");
+    expect(container.textContent).not.toContain("3 member reviews");
+    expect(
+      container.querySelector('[role="img"]')?.getAttribute("aria-label"),
+    ).toContain("Outstanding 6");
   });
 
-  it("explains the median when several scores contribute", () => {
+  it("uses the middle tasting rating without inventing an exact score", () => {
     act(() =>
-      root.render(<ReviewScore count={3} high={94} low={88} median={92} />),
+      root.render(
+        <BottleRatings
+          tastingCounts={{ outstanding: 1, unicorn: 1, very_good: 1 }}
+        />,
+      ),
     );
 
-    expect(container.textContent).toContain("median of 3 scores");
+    expect(container.firstElementChild?.getAttribute("aria-label")).toContain(
+      "Outstanding, 90–94 range",
+    );
   });
 
-  it("omits Bottle ratings when there is nothing to show", () => {
+  it("uses the lower middle tasting rating when the count is even", () => {
+    act(() =>
+      root.render(
+        <BottleRatings tastingCounts={{ outstanding: 1, unicorn: 1 }} />,
+      ),
+    );
+
+    expect(container.firstElementChild?.getAttribute("aria-label")).toContain(
+      "Outstanding, 90–94 range",
+    );
+  });
+
+  it("omits a bottle rating when there is nothing to show", () => {
     act(() => root.render(<BottleRatings />));
 
     expect(container.innerHTML).toBe("");
-  });
-
-  it("shows Bottle ratings when tasting ratings exist", () => {
-    act(() => root.render(<BottleRatings counts={{ very_good: 2 }} />));
-
-    expect(container.querySelector('[data-state="populated"]')).not.toBeNull();
   });
 });

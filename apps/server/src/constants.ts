@@ -319,7 +319,9 @@ export const RATING_BANDS = [
 
 export type RatingBand = (typeof RATING_BANDS)[number];
 export type RatingBandId = RatingBand["id"];
-export type TastingBandCounts = Record<RatingBandId, number>;
+export type RatingBandCounts = Record<RatingBandId, number>;
+export type TastingBandCounts = RatingBandCounts;
+export type ReviewScoreBandCounts = RatingBandCounts;
 
 export const RATING_BAND_IDS = [
   RATING_BANDS[0].id,
@@ -336,6 +338,14 @@ export const EMPTY_TASTING_BAND_COUNTS = {
   outstanding: 0,
   unicorn: 0,
 } satisfies TastingBandCounts;
+
+export const EMPTY_REVIEW_SCORE_BAND_COUNTS = {
+  mediocre: 0,
+  good: 0,
+  very_good: 0,
+  outstanding: 0,
+  unicorn: 0,
+} satisfies ReviewScoreBandCounts;
 
 export function getRatingBand(score: number): RatingBand | undefined {
   return RATING_BANDS.find((band) => score >= band.min && score <= band.max);

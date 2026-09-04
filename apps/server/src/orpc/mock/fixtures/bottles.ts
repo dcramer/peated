@@ -1,3 +1,4 @@
+import { getRatingBand } from "@peated/server/constants";
 import type { MockOutputs } from "../contract";
 import { mockBottleGroup } from "./bottle-groups";
 import { mockImageUrls, timestamp } from "./constants";
@@ -25,6 +26,15 @@ type User = MockOutputs["auth"]["login"]["user"];
 
 function scoreSummary(medianScore: number, scoreCount: number) {
   const externalScoreCount = Math.min(4, scoreCount);
+  const reviewScoreBandCounts = {
+    mediocre: 0,
+    good: 0,
+    very_good: 0,
+    outstanding: 0,
+    unicorn: 0,
+  };
+  const rating = getRatingBand(medianScore);
+  if (rating) reviewScoreBandCounts[rating.id] = scoreCount;
   return {
     medianScore,
     minScore: Math.max(0, medianScore - 8),
@@ -32,6 +42,7 @@ function scoreSummary(medianScore: number, scoreCount: number) {
     memberScoreCount: scoreCount - externalScoreCount,
     externalScoreCount,
     scoreCount,
+    reviewScoreBandCounts,
     tastingBandCounts: {
       mediocre: 2,
       good: 8,

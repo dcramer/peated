@@ -1,0 +1,2 @@
+ALTER TABLE "bottle_group" ADD COLUMN "review_score_band_counts" jsonb DEFAULT '{"mediocre":0,"good":0,"very_good":0,"outstanding":0,"unicorn":0}'::jsonb NOT NULL;
+ALTER TABLE "bottle" ADD COLUMN "review_score_band_counts" jsonb DEFAULT '{"mediocre":0,"good":0,"very_good":0,"outstanding":0,"unicorn":0}'::jsonb NOT NULL;

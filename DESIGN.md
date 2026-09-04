@@ -373,6 +373,10 @@ JSDoc.
   component.
 - Keep data tracks visible against every hover and selected state.
 - Do not add decorative axis labels to compact distributions.
+- Bottle rating summaries use one label from the fixed rating ranges. Show an
+  exact review median beside that label when available; for tastings alone,
+  show the full range. Compact rows use a small right-aligned label, value, and
+  distribution without counts. Omit the whole summary when no rating exists.
 
 ### Storybook
 

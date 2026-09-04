@@ -1,5 +1,6 @@
 import {
   BottleIdentityRow,
+  BottleRatings,
   CursorPager,
   EmptyState,
   ItemList,
@@ -84,18 +85,19 @@ async function ReleaseResults({
     <>
       {bottleList.results.length ? (
         <ItemList ariaLabel="Bottle releases">
-          {bottleList.results.map((bottle) => (
-            <ItemListItem key={bottle.id}>
-              <BottleIdentityRow
-                {...toBottleListItem(bottle)}
-                end={
-                  bottle.medianScore !== null && bottle.scoreCount >= 20
-                    ? `${bottle.medianScore} / 100`
-                    : undefined
-                }
-              />
-            </ItemListItem>
-          ))}
+          {bottleList.results.map((bottle) => {
+            const { ratings, ...identity } = toBottleListItem(bottle, {
+              includeRatings: true,
+            });
+            return (
+              <ItemListItem key={bottle.id}>
+                <BottleIdentityRow
+                  {...identity}
+                  end={ratings ? <BottleRatings {...ratings} /> : undefined}
+                />
+              </ItemListItem>
+            );
+          })}
         </ItemList>
       ) : (
         <EmptyState heading="No releases found">

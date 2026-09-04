@@ -255,6 +255,7 @@ function bottleColumns() {
       sql<number>`${bottles.memberScoreCount} + ${bottles.externalScoreCount}`.mapWith(
         Number,
       ),
+    reviewScoreBandCounts: bottles.reviewScoreBandCounts,
     tastingBandCounts: bottles.tastingBandCounts,
     brand: {
       name: entities.name,

@@ -1,38 +1,34 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
-import { SectionHeading } from "../sectionHeading.stylex";
 
-import type { ReviewScoreProps, TastingRatingDistributionProps } from "..";
-import { AppLink, ReviewScore, TastingRatingDistribution } from "..";
+import type { BottleRatingSummaryProps } from "..";
+import { AppLink, BottleRatingSummary } from "..";
 import { colors, effects, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
 const NARROW = "@media (max-width: 900px)";
-const PHONE = "@media (max-width: 480px)";
 
 export type BottlePageHeaderProps = {
   actions?: ReactNode;
-  bands?: TastingRatingDistributionProps | null;
   brand: string;
   brandHref?: string;
   metadata?: ReactNode;
   menu?: ReactNode;
   name: string;
-  score?: ReviewScoreProps | null;
+  rating?: BottleRatingSummaryProps | null;
 };
 
 /** Presents a bottle's catalog identity, member actions, and community ratings. */
 export function BottlePageHeader({
   actions,
-  bands,
   brand,
   brandHref,
   metadata,
   menu,
   name,
-  score,
+  rating,
 }: BottlePageHeaderProps) {
-  const hasRatings = Boolean(score || bands);
+  const hasRatings = Boolean(rating);
 
   return (
     <div {...stylex.props(styles.root, hasRatings && styles.rootWithRatings)}>
@@ -58,25 +54,9 @@ export function BottlePageHeader({
           </>
         }
       />
-      {hasRatings ? (
-        <div aria-label="Community ratings" {...stylex.props(styles.ratings)}>
-          {score ? (
-            <section {...stylex.props(styles.rating)}>
-              <div {...stylex.props(styles.ratingContent)}>
-                <ReviewScore {...score} />
-              </div>
-            </section>
-          ) : null}
-          {bands ? (
-            <section {...stylex.props(styles.rating)}>
-              <div {...stylex.props(styles.ratingLabel)}>
-                <SectionHeading>Tasting ratings</SectionHeading>
-              </div>
-              <div {...stylex.props(styles.ratingContent)}>
-                <TastingRatingDistribution {...bands} />
-              </div>
-            </section>
-          ) : null}
+      {rating ? (
+        <div {...stylex.props(styles.ratings)}>
+          <BottleRatingSummary {...rating} />
         </div>
       ) : null}
     </div>
@@ -121,27 +101,8 @@ const styles = stylex.create({
     minWidth: 0,
     gridColumn: { default: "2", [NARROW]: "1" },
     gridRow: { default: "1", [NARROW]: "auto" },
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [NARROW]: "repeat(2, minmax(0, 1fr))",
-      [PHONE]: "minmax(0, 1fr)",
-    },
-    gap: space.x4,
+    gridTemplateColumns: "minmax(0, 1fr)",
     paddingTop: { default: space.x4, [NARROW]: 0 },
     paddingBottom: { default: space.x4, [NARROW]: 0 },
-  },
-  rating: {
-    display: { default: "block", [PHONE]: "grid" },
-    minWidth: 0,
-    gridTemplateColumns: {
-      default: "none",
-      [PHONE]: "minmax(78px, 1fr) minmax(0, 2fr)",
-    },
-    alignItems: "start",
-    gap: { default: 0, [PHONE]: space.x3 },
-  },
-  ratingLabel: { marginBottom: { default: space.x2, [PHONE]: 0 } },
-  ratingContent: {
-    minWidth: 0,
   },
 });

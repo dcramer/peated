@@ -78,6 +78,13 @@ describe("Bottle statistics recomputation", () => {
       maxScore: 99,
       memberScoreCount: 20,
       externalScoreCount: 0,
+      reviewScoreBandCounts: {
+        mediocre: 0,
+        good: 5,
+        very_good: 5,
+        outstanding: 5,
+        unicorn: 5,
+      },
       tastingBandCounts: {
         mediocre: 1,
         good: 1,
@@ -117,6 +124,7 @@ describe("Bottle statistics recomputation", () => {
       maxScore: 92,
       memberScoreCount: 1,
       externalScoreCount: 0,
+      reviewScoreBandCounts: { outstanding: 1 },
     });
   });
 
@@ -168,6 +176,7 @@ describe("Bottle statistics recomputation", () => {
       medianScore: 90,
       minScore: 90,
       maxScore: 90,
+      reviewScoreBandCounts: { outstanding: 1 },
     });
   });
 
@@ -203,6 +212,13 @@ describe("Bottle statistics recomputation", () => {
       medianScore: 89,
       minScore: 80,
       maxScore: 100,
+      reviewScoreBandCounts: {
+        mediocre: 0,
+        good: 5,
+        very_good: 5,
+        outstanding: 5,
+        unicorn: 5,
+      },
     });
   });
 

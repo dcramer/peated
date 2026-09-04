@@ -52,6 +52,7 @@ const BottleResultSchema = BottleSchema.pick({
   imageUrl: true,
   medianScore: true,
   scoreCount: true,
+  reviewScoreBandCounts: true,
   tastingBandCounts: true,
 }).extend({
   brand: EntitySchema.pick({ name: true, shortName: true }),

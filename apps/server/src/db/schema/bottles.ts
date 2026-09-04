@@ -27,7 +27,9 @@ import type {
   ProposedBottle,
 } from "@peated/bottle-classifier/internal/types";
 import {
+  EMPTY_REVIEW_SCORE_BAND_COUNTS,
   EMPTY_TASTING_BAND_COUNTS,
+  type ReviewScoreBandCounts,
   type TastingBandCounts,
 } from "../../constants";
 import { tsvector } from "../columns";
@@ -252,6 +254,10 @@ export const bottles = pgTable(
     externalScoreCount: bigint("external_score_count", { mode: "number" })
       .default(0)
       .notNull(),
+    reviewScoreBandCounts: jsonb("review_score_band_counts")
+      .default(EMPTY_REVIEW_SCORE_BAND_COUNTS)
+      .notNull()
+      .$type<ReviewScoreBandCounts>(),
     tastingBandCounts: jsonb("tasting_band_counts")
       .default(EMPTY_TASTING_BAND_COUNTS)
       .notNull()
@@ -412,6 +418,10 @@ export const bottleGroups = pgTable(
     externalScoreCount: bigint("external_score_count", { mode: "number" })
       .default(0)
       .notNull(),
+    reviewScoreBandCounts: jsonb("review_score_band_counts")
+      .default(EMPTY_REVIEW_SCORE_BAND_COUNTS)
+      .notNull()
+      .$type<ReviewScoreBandCounts>(),
     tastingBandCounts: jsonb("tasting_band_counts")
       .default(EMPTY_TASTING_BAND_COUNTS)
       .notNull()
