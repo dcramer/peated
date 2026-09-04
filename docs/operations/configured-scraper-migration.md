@@ -130,6 +130,29 @@ preview. Activate only exact output, trigger one manual collection, and confirm
 that it updates the same price IDs and Bottle matches. Check the run and Sentry
 before restoring the saved schedule.
 
+## Kilchoman
+
+Use the preparation endpoint with `{"site": "kilchoman"}`. The check-only
+request locks and inventories every stored price without changing it. It reports
+the total, visible, and Bottle-matched price counts. It stops if a price does not
+use the expected Kilchoman product URL, null external product ID, `Kilchoman`
+name prefix, GBP currency, or 700 ml volume. Applying transfers the existing
+request settings to administrator ownership and adds a paused price source whose
+list page is `https://www.kilchomandistillery.com/whisky-shop/`. It does not
+update price rows or history.
+
+Before applying, stop the `kilchoman` schedule and wait for active runs. Save
+the same price and run records listed for Compass Box. Run the version 2 rules
+through the local no-write preview without an item limit. Compare every current
+product with the code scraper. The list rules must omit sold-out products and
+gift packs; the detail rules must keep the `Kilchoman` name prefix, GBP price,
+700 ml volume, canonical product URL, and product image.
+
+After applying, save the reviewed version 2 revision and run its production
+preview. Activate only exact output, trigger one manual collection, and confirm
+that it updates the same price IDs and Bottle matches. Check the run and Sentry
+before restoring the saved schedule.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -140,9 +163,9 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture, Compass
-Box, and The Whisky Study. Other sites are rejected without changing records.
-Add each site's conversion behind this route as its existing records are
-reviewed.
+Box, Kilchoman, Whisky Saga, and The Whisky Study. Other sites are rejected
+without changing records. Add each site's conversion behind this route as its
+existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
