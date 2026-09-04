@@ -158,6 +158,37 @@ collection and confirm it updates the same review IDs without adding articles
 or reviews. Check Bottle matches, review bodies, the run, and Sentry before
 restoring the saved daily schedule. Preparation must not change publication.
 
+## WhiskyNotes
+
+Use the preparation endpoint with `{"site": "whiskynotes"}`. The check-only
+request locks and verifies every stored article and review. It accepts only
+dated WhiskyNotes article URLs with their trailing slash, requires at least one
+review per article, and checks each old review key against the article URL and
+Bottle name. Applying changes only those keys to the URL and review number used
+by saved rules, then adds a paused source whose list page is
+`https://www.whiskynotes.be/`.
+
+Before applying, save article URLs, review IDs and order, Bottle matches,
+visibility, scores, writers, publication settings, stored-body counts, and the
+current schedule. Stop the schedule and wait for active runs. Compare every
+record after applying; multi-Bottle articles must keep the same review order
+and IDs.
+
+Version 5 rules must select up to 20 whisky review articles from the current
+archive page and exclude the publisher's other spirits, bars, visits, and news
+categories. On detail pages, each proof or strength heading starts a review.
+Stop before related articles. Read each section's Bottle name, writer, text, and
+score out of 100. The first review may use the separate page score only when its
+section has none. Run a full local no-write check with
+`pnpm cli scrapers preview --site whiskynotes --input <revision.json>` and
+compare single- and multi-Bottle articles with the code parser before applying.
+
+Activate only a production preview with exact output. Trigger one manual
+collection through `POST /v1/external-sites/whiskynotes/trigger` and confirm it
+updates the same review IDs without adding articles or reviews. Check Bottle
+matches, review bodies, the run, and Sentry before restoring the saved daily
+schedule. Preparation must not change publication.
+
 ## Compass Box
 
 Use the same preparation endpoint with `{"site": "compassbox"}`. The check-only
