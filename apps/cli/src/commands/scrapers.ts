@@ -1,6 +1,6 @@
 import program from "@peated/cli/program";
-import { runLocalScrapeSourcePreview } from "@peated/server/scraper";
 import { ScrapeRulesSchema } from "@peated/server/scraper/configured/rules";
+import { runLocalScrapeSourcePreview } from "@peated/server/scraper/localPreview";
 import { readFile } from "node:fs/promises";
 import { z } from "zod";
 

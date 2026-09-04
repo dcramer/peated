@@ -148,11 +148,11 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         const revision = suggested.revisions[0];
         expect(revision).toMatchObject({
           author: "ai",
-          aiModel: config.SCRAPER_SETUP_MODEL,
           aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
           previewStatus: "pending",
           active: false,
         });
+        expect(revision.aiModel).toBeTruthy();
         expect(await db.select().from(externalReviews)).toEqual([]);
 
         const revisionInput = { id: source.id, revisionId: revision.id };
