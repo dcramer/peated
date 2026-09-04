@@ -20,11 +20,11 @@ evidence because their text is not globally unique.
 
 ## Unsafe existing matches
 
-| Case                                   | Exact failure                                                                                                                               | Owning layer            | Specific action                                                                                                                                                                                               |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Elijah Craig 18-year-old Single Barrel | Luna matched uncoded source product to barrel 4040 because the candidate's code exists only in `fullName`; it repeated this 3/3 times.      | Final validation        | **C09 accepted:** parse explicit cask codes in candidate names and downgrade when the source does not establish the same code.                                                                                |
-| Masterson's French Oak Finish          | Luna said barrel F2-038 was unstructured and matched it anyway; it repeated this 3/3 times.                                                 | Final validation        | **C09 accepted:** the same cask-code guard blocks this assignment.                                                                                                                                            |
-| High West High Country                 | Image extraction put ordinary lot `Batch No. 23J12` in `edition`; Luna therefore preferred the batch-specific row over the ongoing product. | Image evidence contract | Test a separate observed-code field. A printed batch or lot code should enter `edition` only after product evidence says it defines a marketed release. Do not solve this with a brand example in the prompt. |
+| Case                                   | Exact failure                                                                                                                               | Owning layer             | Specific action                                                                                                                                                                                                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Elijah Craig 18-year-old Single Barrel | Luna matched uncoded source product to barrel 4040 because the candidate's code exists only in `fullName`; it repeated this 3/3 times.      | Final validation         | **C09 accepted:** parse explicit cask codes in candidate names and downgrade when the source does not establish the same code.                                                                                                                                                                          |
+| Masterson's French Oak Finish          | Luna said barrel F2-038 was unstructured and matched it anyway; it repeated this 3/3 times.                                                 | Final validation         | **C09 accepted:** the same cask-code guard blocks this assignment.                                                                                                                                                                                                                                      |
+| High West High Country                 | Image extraction put ordinary lot `Batch No. 23J12` in `edition`; Luna therefore preferred the batch-specific row over the ongoing product. | Historical catalog state | C17 through C20 were rejected. Extraction and candidate filtering did not produce a reliable web-enabled result. Bottle 44284 is now retired, its URL resolves to 12825, and production candidate queries exclude tombstoned Bottles. Model current catalog state before another classifier experiment. |
 
 ## Creation decisions and fields
 
@@ -69,13 +69,14 @@ boundaries:
 1. **Stable product name check:** test Russell's Reserve and Creag Isle with
    exact source titles and accepted references. Include deliberately short
    producer names and category words that are part of marketed identity.
-2. **List supported facts before the final draft:** test Hedonism², Willett,
+2. **Bound expensive audit work:** inspect the malformed Laphroaig and Dramfool
+   traces. The latest run spent 87,044 and 49,187 tokens on those cases. Test a
+   narrow stop or missing-operation check only after locating the repeated work.
+3. **List supported facts before the final draft:** test Hedonism², Willett,
    and Proof and Wood. The check reports omissions to Luna once; it never fills
    a field itself. Measure the added request, tokens, time, and repaired fields.
-3. **Whole-product versus component facts:** test both Watchpost inputs and a
+4. **Whole-product versus component facts:** test both Watchpost inputs and a
    true age-stated blend comparison case. This belongs in the web evidence contract.
-4. **Observed code versus marketed edition:** test High Country with real
-   marketed batch releases as comparison cases.
 
 Expectation reviews for Highland Park, Lagavulin, Whistler, Quinta Ruban,
 Hibiki, and Pōkeno should happen before spending model tokens on those cases.
