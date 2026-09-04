@@ -1,5 +1,6 @@
 import type { RatingBandId } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import type { Bottle } from "@peated/server/db/schema";
 import {
   bottleGroups,
@@ -10,11 +11,36 @@ import {
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
+import pg from "pg";
 import {
   BottleGroupStatsIntegrityError,
+  checkBottleGroupBottleCounts,
   recomputeBottleGroupStats,
   recomputeBottleGroupStatsInTransaction,
+  repairBottleGroupBottleCount,
 } from "./recomputeBottleGroupStats";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  observer: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2_000;
+  while (Date.now() < deadline) {
+    const result = await observer.query<{ pid: number }>(
+      `SELECT pid
+       FROM pg_stat_activity
+       WHERE $1 = ANY(pg_blocking_pids(pid))
+       LIMIT 1`,
+      [blockerPid],
+    );
+    if (result.rows.length) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for the BottleGroup repair lock.");
+}
 
 function requireGroupId(groupId: number | null): number {
   if (groupId === null) throw new Error("Missing BottleGroup fixture");
@@ -157,5 +183,118 @@ describe("BottleGroup statistics recomputation", () => {
         where: eq(bottleGroups.id, requireGroupId(onlyMember.groupId)),
       }),
     ).resolves.toEqual(before);
+  });
+
+  test("finds and repairs wrong Bottle totals", async ({ fixtures }) => {
+    const wrong = await fixtures.Bottle();
+    const correct = await fixtures.Bottle();
+    const [emptyGroup] = await db
+      .insert(bottleGroups)
+      .values({
+        name: "Empty Group",
+        fullName: "Empty Group",
+        brandId: wrong.brandId,
+        createdByActorId: wrong.createdByActorId,
+        totalBottles: 4,
+      })
+      .returning();
+    if (!emptyGroup) throw new Error("Unable to create empty BottleGroup");
+    await db
+      .update(bottleGroups)
+      .set({ totalBottles: 9 })
+      .where(eq(bottleGroups.id, wrong.groupId));
+
+    const groupIds = [wrong.groupId, correct.groupId, emptyGroup.id];
+    await expect(checkBottleGroupBottleCounts(groupIds)).resolves.toEqual([
+      {
+        groupId: wrong.groupId,
+        savedCount: 9,
+        actualCount: 1,
+      },
+      {
+        groupId: emptyGroup.id,
+        savedCount: 4,
+        actualCount: 0,
+      },
+    ]);
+    await expect(checkBottleGroupBottleCounts([])).resolves.toEqual([]);
+
+    await expect(repairBottleGroupBottleCount(wrong.groupId)).resolves.toEqual({
+      groupId: wrong.groupId,
+      savedCount: 9,
+      actualCount: 1,
+    });
+    await expect(repairBottleGroupBottleCount(emptyGroup.id)).resolves.toEqual({
+      groupId: emptyGroup.id,
+      savedCount: 4,
+      actualCount: 0,
+    });
+    await expect(
+      repairBottleGroupBottleCount(wrong.groupId),
+    ).resolves.toBeNull();
+    await expect(repairBottleGroupBottleCount(999_999)).resolves.toBeNull();
+    await expect(checkBottleGroupBottleCounts(groupIds)).resolves.toEqual([]);
+  });
+
+  test("recounts after an earlier member change commits", async ({
+    fixtures,
+  }) => {
+    const first = await fixtures.Bottle();
+    const retired = await fixtures.BottleGroupMember({
+      groupId: first.groupId,
+    });
+    const writer = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let writerCommitted = false;
+    let repair: ReturnType<typeof repairBottleGroupBottleCount> | null = null;
+
+    await writer.connect();
+    await observer.connect();
+    try {
+      await writer.query("BEGIN");
+      const writerPid = (
+        await writer.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]?.pid;
+      if (!writerPid) throw new Error("Unable to load Bottle writer pid.");
+
+      await writer.query(
+        "SELECT id FROM bottle_group WHERE id = $1 FOR UPDATE",
+        [first.groupId],
+      );
+      await writer.query(
+        "INSERT INTO bottle_tombstone (bottle_id) VALUES ($1)",
+        [retired.id],
+      );
+      await writer.query(
+        "UPDATE bottle_group SET total_bottles = 7 WHERE id = $1",
+        [first.groupId],
+      );
+
+      repair = repairBottleGroupBottleCount(first.groupId);
+      void repair.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, writerPid);
+
+      await writer.query("COMMIT");
+      writerCommitted = true;
+
+      await expect(repair).resolves.toEqual({
+        groupId: first.groupId,
+        savedCount: 7,
+        actualCount: 1,
+      });
+    } finally {
+      if (!writerCommitted) {
+        await writer.query("ROLLBACK").catch(() => undefined);
+      }
+      if (repair) await repair.catch(() => undefined);
+      await writer.end();
+      await observer.end();
+    }
+
+    await expect(
+      db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.groupId),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 });

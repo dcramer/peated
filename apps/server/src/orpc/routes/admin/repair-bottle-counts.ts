@@ -10,7 +10,7 @@ export default procedure
     path: "/admin/catalog/repair-bottle-counts",
     summary: "Repair saved bottle counts",
     description:
-      "Check saved bottle totals for brands, producers, countries, and regions, and fix any that are wrong. Requires administrator privileges.",
+      "Check saved bottle totals and fix any that are wrong. Requires administrator privileges.",
     operationId: "repairEntityBottleCounts",
   })
   .input(z.object({}).strict().default({}))
@@ -25,6 +25,13 @@ export default procedure
     );
     await pushUniqueJob(
       "RepairLocationBottleCounts",
+      {},
+      {
+        delay: 0,
+      },
+    );
+    await pushUniqueJob(
+      "RepairBottleGroupBottleCounts",
       {},
       {
         delay: 0,
