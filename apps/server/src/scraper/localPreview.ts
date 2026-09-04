@@ -1,15 +1,18 @@
 import { db } from "@peated/server/db";
-import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
+import {
+  externalSiteRuns,
+  externalSites,
+  externalSiteScrapeTargets,
+} from "@peated/server/db/schema";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { ScrapeSourcePreviewResult } from "./configured/preview";
 import {
-  SCRAPE_SOURCE_MAX_LIST_PAGES,
   parseScrapeRules,
+  SCRAPE_SOURCE_MAX_LIST_PAGES,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
-import { findScraperSourceBySiteKey } from "./definitions";
 import { scraperSystemClock, type ScraperHttpClock } from "./http";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
@@ -58,18 +61,27 @@ export async function runLocalScrapeSourcePreview(
     .where(eq(externalSites.type, parsed.site));
   if (!site) throw new Error(`External site ${parsed.site} was not found.`);
 
-  const registeredSource = findScraperSourceBySiteKey(
-    scraperRegistry,
-    parsed.site,
-  );
-  if (!registeredSource) {
-    throw new Error(`External site ${parsed.site} has no code-owned scraper.`);
+  const target = scraperRegistry.targets.get(parsed.site);
+  if (!target) {
+    throw new Error(`External site ${parsed.site} has no scrape target.`);
   }
-  if (registeredSource.targetKeys.length !== 1) {
-    throw new Error(
-      `External site ${parsed.site} does not use one scrape target.`,
-    );
-  }
+  // Local previews still need coordinator authorization after the legacy
+  // source registration is removed. Production migrations own their mapping.
+  await db
+    .insert(externalSiteScrapeTargets)
+    .values({
+      externalSiteId: site.id,
+      targetKey: target.key,
+      managedBy: "code",
+    })
+    .onConflictDoUpdate({
+      target: [
+        externalSiteScrapeTargets.externalSiteId,
+        externalSiteScrapeTargets.targetKey,
+      ],
+      set: { active: true, updatedAt: new Date() },
+      setWhere: eq(externalSiteScrapeTargets.managedBy, "code"),
+    });
   const [activeRun] = await db
     .select({ id: externalSiteRuns.id })
     .from(externalSiteRuns)
@@ -87,7 +99,7 @@ export async function runLocalScrapeSourcePreview(
   let preview: ScrapeSourcePreviewResult | null = null;
   const previewSource = createLocalScrapeSourcePreview({
     siteKey: parsed.site,
-    targetKey: registeredSource.targetKeys[0],
+    targetKey: target.key,
     listUrl: parsed.listUrl,
     rules,
     recordPreview: async ({ result }) => {

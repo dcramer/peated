@@ -24,7 +24,10 @@ import {
   recordScrapeSourcePreview,
   ScrapeSourceValidationError,
 } from "@peated/server/scraper/configured/service";
-import { createScraperRegistry } from "@peated/server/scraper/definitions";
+import {
+  createScraperRegistry,
+  defineScraperSource,
+} from "@peated/server/scraper/definitions";
 import { createScraperLifecycle } from "@peated/server/scraper/lifecycle";
 import { scraperRegistry } from "@peated/server/scraper/registry";
 import { executeScraperRun } from "@peated/server/scraper/runs";
@@ -32,6 +35,7 @@ import { syncScraperDefinitions } from "@peated/server/scraper/syncDefinitions";
 import { eq } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { beforeEach, describe, vi } from "vitest";
+import { z } from "zod";
 
 let admin: User;
 beforeEach(async ({ fixtures }) => {
@@ -94,70 +98,61 @@ function prepareKilchoman(input: { apply?: boolean } = {}) {
 
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
+
+function codeOwnedSource(
+  key:
+    | "bourbonculture"
+    | "compassbox"
+    | "kilchoman"
+    | "whiskeyreviewer"
+    | "whiskysaga"
+    | "whiskystudy",
+) {
+  return defineScraperSource({
+    key,
+    externalSiteKey: key,
+    targetKeys: [key],
+    cursorSchema: z.null(),
+    observationSchema: z.unknown(),
+    adapter: async () => {},
+    sink: async () => {},
+  });
+}
+
 const registry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("bourbonculture")!],
-  sources: [
-    {
-      ...scraperRegistry.sources.get("bourbonculture")!,
-      externalSiteKey: "bourbonculture",
-    },
-  ],
+  sources: [codeOwnedSource("bourbonculture")],
 });
 
 const whiskyStudyCanonicalUrl =
   "https://thewhiskystudy.com/reviews-3/example-scotch-review";
 const whiskyStudyRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("whiskystudy")!],
-  sources: [
-    {
-      ...scraperRegistry.sources.get("whiskystudy")!,
-      externalSiteKey: "whiskystudy",
-    },
-  ],
+  sources: [codeOwnedSource("whiskystudy")],
 });
 
 const whiskySagaCanonicalUrl =
   "https://www.whiskysaga.com/blog/example-scotch-review";
 const whiskySagaRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("whiskysaga")!],
-  sources: [
-    {
-      ...scraperRegistry.sources.get("whiskysaga")!,
-      externalSiteKey: "whiskysaga",
-    },
-  ],
+  sources: [codeOwnedSource("whiskysaga")],
 });
 
 const whiskeyReviewerCanonicalUrl =
   "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026";
 const whiskeyReviewerRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("whiskeyreviewer")!],
-  sources: [
-    {
-      ...scraperRegistry.sources.get("whiskeyreviewer")!,
-      externalSiteKey: "whiskeyreviewer",
-    },
-  ],
+  sources: [codeOwnedSource("whiskeyreviewer")],
 });
 
 const compassBoxRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("compassbox")!],
-  sources: [
-    {
-      ...scraperRegistry.sources.get("compassbox")!,
-      externalSiteKey: "compassbox",
-    },
-  ],
+  sources: [codeOwnedSource("compassbox")],
 });
 
 const kilchomanRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("kilchoman")!],
-  sources: [
-    {
-      ...scraperRegistry.sources.get("kilchoman")!,
-      externalSiteKey: "kilchoman",
-    },
-  ],
+  sources: [codeOwnedSource("kilchoman")],
 });
 
 async function setupMigration(bottleId: number | null = null) {

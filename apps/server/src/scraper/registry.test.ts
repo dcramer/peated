@@ -1,8 +1,4 @@
-import {
-  EXTERNAL_SITE_DEFINITIONS,
-  isExternalReviewSiteKey,
-  REGISTERED_EXTERNAL_SITE_KEY_LIST,
-} from "@peated/server/constants";
+import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
@@ -24,13 +20,11 @@ import { executeScraperRun } from "./runs";
 import { externalReviewSink } from "./sinks/externalReviews";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
-const migratedSources = [
+const registeredSources = [
   "astorwines",
   "berrybrosrudd",
   "bruichladdich",
-  "bourbonculture",
   "cadenheads",
-  "compassbox",
   "decadentdrinks",
   "douglaslaing",
   "dramface",
@@ -41,7 +35,6 @@ const migratedSources = [
   "glenallachie",
   "gordonmacphail",
   "healthyspirits",
-  "kilchoman",
   "masterofmalt",
   "missionliquor",
   "ncnean",
@@ -52,15 +45,30 @@ const migratedSources = [
   "singlecasknation",
   "thompsonbros",
   "totalwine",
-  "whiskeyreviewer",
   "whiskyadvocate",
   "whiskyfun",
   "whiskynotes",
-  "whiskysaga",
-  "whiskystudy",
   "whiskyworld",
   "woodencork",
   "wordsofwhisky",
+];
+
+const registeredReviewSources = [
+  "dramface",
+  "fredminnick",
+  "whiskyadvocate",
+  "whiskyfun",
+  "whiskynotes",
+  "wordsofwhisky",
+];
+
+const configuredSources = [
+  "bourbonculture",
+  "compassbox",
+  "kilchoman",
+  "whiskeyreviewer",
+  "whiskysaga",
+  "whiskystudy",
 ];
 
 type RuntimeTestClock = ScraperHttpClock & { advanceTo(value: Date): void };
@@ -79,9 +87,9 @@ function runtimeClock(): RuntimeTestClock {
   };
 }
 
-test("registers every scraper source with explicit target ownership", () => {
+test("registers each code-owned scraper source with explicit target ownership", () => {
   expect([...scraperRegistry.sources.keys()].sort()).toEqual(
-    migratedSources.sort(),
+    registeredSources.sort(),
   );
   for (const source of scraperRegistry.sources.values()) {
     expect(source.targetKeys).toEqual([source.externalSiteKey]);
@@ -106,7 +114,7 @@ test("registers every scraper source with explicit target ownership", () => {
     requestsPerWindow: 10,
     windowMs: 3_600_000,
   });
-  expect(scraperRegistry.sources.get("bourbonculture")?.requestLimit).toBe(7);
+  expect(scraperRegistry.targets.get("compassbox")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.dramface.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("dramface")).toMatchObject({
     minimumSpacingMs: 2_500,
@@ -127,7 +135,7 @@ test("registers every scraper source with explicit target ownership", () => {
     requestsPerWindow: 10,
     windowMs: 3_600_000,
   });
-  expect(scraperRegistry.sources.get("whiskeyreviewer")?.requestLimit).toBe(6);
+  expect(scraperRegistry.targets.get("kilchoman")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.runEvery).toBeNull();
   expect(scraperRegistry.targets.get("whiskyadvocate")).toMatchObject({
     minimumSpacingMs: 2_500,
@@ -164,17 +172,12 @@ test("registers every scraper source with explicit target ownership", () => {
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
-  expect(scraperRegistry.sources.get("whiskysaga")?.requestLimit).toBe(22);
-  expect(scraperRegistry.sources.get("whiskysaga")?.resumeFromLastRun).toBe(
-    true,
-  );
   expect(EXTERNAL_SITE_DEFINITIONS.whiskystudy.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskystudy")).toMatchObject({
     minimumSpacingMs: 2_500,
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
-  expect(scraperRegistry.sources.get("whiskystudy")?.requestLimit).toBe(22);
   expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("wordsofwhisky")).toMatchObject({
     minimumSpacingMs: 2_500,
@@ -182,15 +185,21 @@ test("registers every scraper source with explicit target ownership", () => {
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("wordsofwhisky")?.requestLimit).toBe(25);
-  for (const type of REGISTERED_EXTERNAL_SITE_KEY_LIST.filter(
-    isExternalReviewSiteKey,
-  )) {
+  for (const type of registeredReviewSources) {
     const source = scraperRegistry.sources.get(type);
     expect(source, `${type} is not registered`).toBeDefined();
     expect(source?.observationSchema).toBe(
       ExternalReviewArticleIngestionSchema,
     );
     expect(source?.sink).toBe(externalReviewSink);
+  }
+  for (const type of configuredSources) {
+    expect(scraperRegistry.sources.has(type), `${type} is configured`).toBe(
+      false,
+    );
+    expect(scraperRegistry.targets.has(type), `${type} keeps its target`).toBe(
+      true,
+    );
   }
 });
 
