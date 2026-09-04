@@ -13,6 +13,7 @@ import {
   changes,
   collectionBottles,
   collections,
+  entities,
   externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
@@ -242,6 +243,16 @@ describe("exact Bottle merges", () => {
         where: eq(bottleGroups.id, sourceGroupId),
       }),
     ).toBeUndefined();
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, source.brandId),
+      }),
+    ).toMatchObject({ totalBottles: 0 });
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, destination.brandId),
+      }),
+    ).toMatchObject({ totalBottles: 1 });
 
     expect(
       await db

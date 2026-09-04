@@ -12,7 +12,6 @@ import {
   bottlesToDistillers,
   changes,
   collectionBottles,
-  entities,
   externalReviews,
   flightBottles,
   storePriceMatchProposals,
@@ -20,12 +19,15 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { notEmpty } from "@peated/server/lib/filter";
+import {
+  getBottleEntityLinks,
+  updateEntityBottleCounts,
+} from "@peated/server/lib/entityBottleCounts";
 import { logInfo } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { and, asc, eq, gt, inArray, or, sql, type SQL } from "drizzle-orm";
+import { asc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
 function formatReferenceTypes(referenceTypes: string[]) {
@@ -59,8 +61,7 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const { bottle: bottleId } = input;
     await db.transaction(async (tx) => {
-      // Lock the Bottle before checking references so new consumers cannot race
-      // the irreversible catalog retirement.
+      // Keep new records from linking to this Bottle while it is being deleted.
       const [bottle] = await tx
         .select()
         .from(bottles)
@@ -72,6 +73,8 @@ export default procedure
           message: "Bottle not found.",
         });
       }
+
+      const entityLinksBefore = await getBottleEntityLinks(tx, [bottle.id]);
 
       const distillerRows = await tx
         .select({ distillerId: bottlesToDistillers.distillerId })
@@ -180,20 +183,6 @@ export default procedure
           distillerIds,
         },
       });
-      await tx
-        .update(entities)
-        .set({ totalBottles: sql`${entities.totalBottles} - 1` })
-        .where(
-          and(
-            inArray(
-              entities.id,
-              Array.from(
-                new Set([bottle.brandId, ...distillerIds, bottle.bottlerId]),
-              ).filter(notEmpty),
-            ),
-            gt(entities.totalBottles, 0),
-          ),
-        );
       await tx.delete(bottleTags).where(eq(bottleTags.bottleId, bottle.id));
       await tx
         .delete(bottleFlavorProfiles)
@@ -263,6 +252,9 @@ export default procedure
         .delete(bottleAliases)
         .where(eq(bottleAliases.bottleId, bottle.id));
       await tx.delete(bottles).where(eq(bottles.id, bottle.id));
+
+      const entityLinksAfter = await getBottleEntityLinks(tx, [bottle.id]);
+      await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);
 
       if (bottle.groupId !== null) {
         if (remainingGroupMemberIds.length === 0) {

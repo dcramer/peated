@@ -1111,7 +1111,7 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
   });
 });
 
-test("fans merged Bottle relationships through every BottleGroup member", async ({
+test("updates every Bottle in the merged BottleGroup", async ({
   defaults,
   fixtures,
 }) => {
@@ -1198,6 +1198,11 @@ test("fans merged Bottle relationships through every BottleGroup member", async 
     targetSeries!.id,
     targetSeries!.id,
   ]);
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, destinationEntity.id),
+    }),
+  ).toMatchObject({ totalBottles: 2 });
   expect(
     await db.query.changes.findFirst({
       where: and(

@@ -17,6 +17,7 @@ import {
   createBottle,
   type BottleCreateInput,
 } from "@peated/server/lib/createBottle";
+import { repairEntityBottleCounts } from "@peated/server/lib/entityBottleCounts";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -662,6 +663,20 @@ describe("Bottle updates", () => {
     expect(observedCommittedOwners).toBe(true);
     expect(ownerEntityIds).toEqual(expectedOwnerEntityIds);
     expect(new Set(ownerEntityIds).size).toBe(ownerEntityIds.length);
+    expect(
+      await db
+        .select({ id: entities.id, totalBottles: entities.totalBottles })
+        .from(entities)
+        .where(inArray(entities.id, expectedOwnerEntityIds))
+        .orderBy(asc(entities.id)),
+    ).toEqual(
+      expectedOwnerEntityIds.map((id) => ({
+        id,
+        totalBottles: [newBrand.id, newBottler.id, newDistiller.id].includes(id)
+          ? 1
+          : 0,
+      })),
+    );
 
     resetQueueMock();
     await expect(
@@ -1277,6 +1292,11 @@ describe("Bottle updates", () => {
     await db
       .delete(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, members[1].bottle.id));
+    await repairEntityBottleCounts([
+      oldBrand.id,
+      oldBottler.id,
+      oldDistiller.id,
+    ]);
     resetQueueMock();
 
     const result = await updateBottle({
@@ -1366,6 +1386,14 @@ describe("Bottle updates", () => {
       bottleId: repairedMemberId,
       distillerId: oldDistiller.id,
     });
+    await repairEntityBottleCounts([
+      oldBrand.id,
+      oldBottler.id,
+      oldDistiller.id,
+      newBrand.id,
+      newBottler.id,
+      ...newDistillers.map(({ id }) => id),
+    ]);
     const staleTotalBottles = 99;
     await db
       .update(bottleGroups)

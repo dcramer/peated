@@ -32,7 +32,7 @@ async function getEntity(entityId: number) {
   return entity;
 }
 
-test("counts direct active Bottles and tastings for every Entity association", async ({
+test("preserves the Bottle total and counts tastings for every Entity association", async ({
   fixtures,
 }) => {
   const entity = await fixtures.Entity({ name: "Direct Bottle Entity" });
@@ -48,11 +48,15 @@ test("counts direct active Bottles and tastings for every Entity association", a
     name: "Ungrouped Legacy Bottle",
     brandId: entity.id,
   });
+  await db
+    .update(entities)
+    .set({ totalBottles: 7 })
+    .where(eq(entities.id, entity.id));
 
   await updateEntityStats({ entityId: entity.id });
 
   expect(await getEntity(entity.id)).toMatchObject({
-    totalBottles: 3,
+    totalBottles: 7,
     totalTastings: 3,
   });
 });
@@ -122,6 +126,10 @@ test("excludes Bottle-tombstoned members and their tastings", async ({
     bottleId: retiredBottle.id,
     newBottleId: destination.id,
   });
+  await db
+    .update(entities)
+    .set({ totalBottles: 1 })
+    .where(eq(entities.id, entity.id));
 
   await updateEntityStats({ entityId: entity.id });
 

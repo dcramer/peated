@@ -8,6 +8,7 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  entities,
   type User,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -20,7 +21,7 @@ import {
   createOrReuseBottleInTransaction,
 } from "@peated/server/lib/createBottle";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { vi } from "vitest";
 
 function contextFor(user: User) {
@@ -109,6 +110,17 @@ describe("Bottle creation", () => {
     expect(bottleDistillers.map(({ distillerId }) => distillerId)).toEqual([
       distiller.id,
     ]);
+    expect(
+      await db
+        .select({ id: entities.id, totalBottles: entities.totalBottles })
+        .from(entities)
+        .where(inArray(entities.id, [brand.id, bottler.id, distiller.id]))
+        .orderBy(entities.id),
+    ).toEqual(
+      [brand.id, bottler.id, distiller.id]
+        .sort((left, right) => left - right)
+        .map((id) => ({ id, totalBottles: 1 })),
+    );
 
     const [change] = await db
       .select()

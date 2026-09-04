@@ -1,7 +1,6 @@
 /**
  * Owns exact-Bottle duplicate merges. The selected destination remains the
- * complete authoritative Bottle; consumer identity never passes through a
- * BottleGroup or another catalog target.
+ * complete Bottle. Related records move straight to that Bottle.
  */
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
@@ -31,6 +30,10 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { moveBottleAliasesForMergeInTransaction } from "@peated/server/lib/bottleAliases";
+import {
+  getBottleEntityLinks,
+  updateEntityBottleCounts,
+} from "@peated/server/lib/entityBottleCounts";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
@@ -764,6 +767,7 @@ export async function mergeBottlesInTransaction(
   ) {
     throw new BottleMergeGraphError("invalid_catalog_graph", sourceBottleId);
   }
+  const entityLinksBefore = await getBottleEntityLinks(tx, requestedBottleIds);
   const crossGroup = sourceGroupId !== destinationGroupId;
   const survivingSourceMembers = sourceMembers.filter(
     ({ id }) => id !== sourceBottleId,
@@ -938,6 +942,9 @@ export async function mergeBottlesInTransaction(
     .delete(bottlesToDistillers)
     .where(eq(bottlesToDistillers.bottleId, sourceBottleId));
   await tx.delete(bottles).where(eq(bottles.id, sourceBottleId));
+
+  const entityLinksAfter = await getBottleEntityLinks(tx, requestedBottleIds);
+  await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);
 
   if (crossGroup && sourceSingleton) {
     await tx
