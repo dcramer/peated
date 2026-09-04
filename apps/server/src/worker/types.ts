@@ -22,6 +22,7 @@ export type JobName =
   | "OnEntityChange"
   | "ProcessStorePriceMatchRetryRun"
   | "ProcessNotification"
+  | "RepairEntityBottleCounts"
   | "ReconcileStorePriceMatchProposals"
   | "ResolveStorePriceBottle"
   | "RunScraper"

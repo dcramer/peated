@@ -35,6 +35,10 @@ import {
   queueEntityCreationVerification,
 } from "@peated/server/lib/catalogVerification";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
+import {
+  getBottleEntityLinks,
+  updateEntityBottleCounts,
+} from "@peated/server/lib/entityBottleCounts";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
@@ -622,6 +626,11 @@ export async function createBottleInTransaction(
     .set({ representativeBottleId: bottleResult.bottle.id })
     .where(eq(bottleGroups.id, group.id))
     .returning();
+
+  const bottleEntityLinks = await getBottleEntityLinks(tx, [
+    bottleResult.bottle.id,
+  ]);
+  await updateEntityBottleCounts(tx, [], bottleEntityLinks);
 
   return {
     ...bottleResult,

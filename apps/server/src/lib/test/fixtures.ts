@@ -51,6 +51,10 @@ import { getUserActorByIdForDatabase } from "../actors";
 import { createAccessToken, generatePasswordHash } from "../auth";
 import { materializeBottleForGroup } from "../bottleIdentity";
 import { mapRows } from "../db";
+import {
+  getBottleEntityLinks,
+  updateEntityBottleCounts,
+} from "../entityBottleCounts";
 import { formatBottleName } from "../format";
 import { choose, random, sample } from "../rand";
 import {
@@ -577,7 +581,7 @@ async function createBottleFixture(
         })
       : await Entity(
           {
-            totalBottles: 1,
+            totalBottles: 0,
           },
           tx,
         );
@@ -713,6 +717,9 @@ async function createBottleFixture(
         });
       }
     }
+
+    const bottleEntityLinks = await getBottleEntityLinks(tx, [bottle.id]);
+    await updateEntityBottleCounts(tx, [], bottleEntityLinks);
 
     await tx
       .insert(bottleReferences)

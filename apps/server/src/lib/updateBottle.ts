@@ -49,6 +49,10 @@ import {
 } from "@peated/server/lib/bottleSchemas";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
+import {
+  getBottleEntityLinks,
+  updateEntityBottleCounts,
+} from "@peated/server/lib/entityBottleCounts";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
@@ -153,9 +157,7 @@ export class BottleUpdateExpectedStateError extends Error {
 
 export class BottleUpdateExpectedBottleStateError extends Error {
   constructor(readonly bottleId: number) {
-    super(
-      `Bottle ${bottleId} exact content or membership changed before update.`,
-    );
+    super(`Bottle ${bottleId} details or links changed before the update.`);
     this.name = "BottleUpdateExpectedBottleStateError";
   }
 }
@@ -1062,7 +1064,7 @@ export async function lockBottleUpdateDependencies(
         .from(entities)
         .where(inArray(entities.id, entityIds))
         .orderBy(asc(entities.id))
-        .for("share")
+        .for("key share")
     : [];
 
   const [discoveredBottle] = await tx
@@ -1379,6 +1381,22 @@ export async function updateBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
+  const bottleEntityLinksChanged = affectedMembers.some((member) => {
+    const desired = desiredByBottleId.get(member.id)!;
+    return (
+      member.brandId !== desired.brandId ||
+      member.bottlerId !== desired.bottlerId ||
+      !sameValues(
+        bottleDistillers.get(member.id) ?? [],
+        sharedChanged
+          ? stable.distillerIds
+          : (bottleDistillers.get(member.id) ?? []),
+      )
+    );
+  });
+  const entityLinksBefore = bottleEntityLinksChanged
+    ? await getBottleEntityLinks(tx, affectedIds)
+    : [];
 
   if (invalidateGeneratedDetails) {
     for (const member of affectedMembers) {
@@ -1629,6 +1647,16 @@ export async function updateBottleInTransaction(
         numReleases: sql`(SELECT COUNT(*) FROM ${bottles} WHERE ${bottles.seriesId} = ${seriesId})`,
       })
       .where(eq(bottleSeries.id, seriesId));
+  }
+
+  if (bottleEntityLinksChanged) {
+    const entityLinksAfter = await getBottleEntityLinks(tx, affectedIds);
+    await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);
+    for (const links of [...entityLinksBefore, ...entityLinksAfter]) {
+      for (const entityId of links.entityIds) {
+        changedEntityIds.add(entityId);
+      }
+    }
   }
 
   return {

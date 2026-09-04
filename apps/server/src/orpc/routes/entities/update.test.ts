@@ -454,6 +454,10 @@ describe("PATCH /entities/:entity", () => {
     const otherBottle = await fixtures.Bottle({
       distillerIds: [entity.id],
     });
+    const [entityBeforeUpdate] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
 
     const modUser = await fixtures.User({ mod: true });
     const data = await routerClient.entities.update(
@@ -471,9 +475,9 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(omit(entity, "shortName", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "shortName", "searchVector", "updatedAt"),
-    );
+    expect(
+      omit(entityBeforeUpdate, "shortName", "searchVector", "updatedAt"),
+    ).toEqual(omit(newEntity, "shortName", "searchVector", "updatedAt"));
     expect(newEntity.shortName).toBe("F");
 
     const [newBottle] = await db

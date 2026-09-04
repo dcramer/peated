@@ -8,6 +8,7 @@ import {
   bottleSeries,
   bottles,
   collectionBottles,
+  entities,
   externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
@@ -132,6 +133,38 @@ describe("DELETE /bottles/:bottle", () => {
         where: eq(bottleSeries.id, series.id),
       }),
     ).toMatchObject({ numReleases: 1 });
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, representative.brandId),
+      }),
+    ).toMatchObject({ totalBottles: 1 });
+  });
+
+  test("deletes a Bottle when its Entity count is too low", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity();
+    const removedBottle = await fixtures.Bottle({ brandId: brand.id });
+    await fixtures.Bottle({ brandId: brand.id });
+    await db
+      .update(entities)
+      .set({ totalBottles: 0 })
+      .where(eq(entities.id, brand.id));
+
+    await routerClient.bottles.delete(
+      { bottle: removedBottle.id },
+      { context: { user } },
+    );
+
+    await expect(
+      db.query.bottles.findFirst({
+        where: eq(bottles.id, removedBottle.id),
+      }),
+    ).resolves.toBeUndefined();
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, brand.id) }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
   test("blocks delete when the bottle is used in tastings", async ({

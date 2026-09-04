@@ -31,25 +31,6 @@ export default async (input: JobPayload) => {
     await tx
       .update(entities)
       .set({
-        totalBottles: sql<string>`(
-          SELECT COUNT(*)
-          FROM ${bottles}
-          WHERE (
-            ${bottles.brandId} = ${entities.id}
-            OR ${bottles.bottlerId} = ${entities.id}
-            OR EXISTS(
-              SELECT FROM ${bottlesToDistillers}
-              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-              AND ${bottlesToDistillers.distillerId} = ${entities.id}
-            )
-          )
-          AND NOT EXISTS (
-            SELECT 1
-            FROM ${bottleTombstones}
-            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-          )
-          AND ${bottles.groupId} IS NOT NULL
-        )`,
         totalTastings: sql<string>`(
           SELECT COUNT(*)
           FROM ${tastings}
