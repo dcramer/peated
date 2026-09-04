@@ -53,16 +53,28 @@ async function runRegisteredJob(jobName: JobName, args?: JobArgs) {
   return await jobFn(args, buildJobContext(activeContext));
 }
 
+export function buildUniqueJobOptions(
+  jobName: JobName,
+  args?: JobArgs,
+  opts?: JobsOptions,
+): JobsOptions {
+  // Worker queue rule: a unique ID only deduplicates unfinished work. Remove
+  // completed jobs so a later data change can queue the same work again.
+  return {
+    delay: 5000,
+    removeOnComplete: true,
+    removeOnFail: false,
+    ...(opts || {}),
+    jobId: generateUniqIdentifier(jobName, args),
+  };
+}
+
 async function pushUniqueJobToQueue(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
 ) {
-  opts = {
-    delay: 5000,
-    ...(opts || {}),
-    jobId: generateUniqIdentifier(jobName, args),
-  };
+  opts = buildUniqueJobOptions(jobName, args, opts);
 
   return await pushJobToQueue(jobName, args, opts);
 }

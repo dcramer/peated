@@ -1,6 +1,6 @@
 # Production Bottler Identity Inventory
 
-Observed 2026-09-03 against `https://api.peated.com` through read-only public API requests. No production data was changed.
+Initial inventory observed 2026-09-03 against `https://api.peated.com`. The approved production corrections and verification results are recorded below.
 
 ## Suntory E1383
 
@@ -45,6 +45,7 @@ Together, this evidence establishes that the 213 Bottles below are official Sunt
 - B51796 / group 24756: Hakushu Distillery 12-year-old
 - B51793 / group 24753: Hakushu Distillery 12-year-old From the Barrel
 - B51794 / group 24754: Hakushu Distillery 15-year-old From the Barrel
+- B3789 / group 11400: Hakushu Distillery 18-year-old
 - B51795 / group 24755: Hakushu Distillery 20-year-old From the Barrel
 - B17154 / group 15430: Hakushu Distillery 25-year-old
 - B51791 / group 24751: Hakushu Distillery 8-year-old From the Barrel
@@ -114,6 +115,7 @@ Together, this evidence establishes that the 213 Bottles below are official Sunt
 - B51889 / group 24849: Hibiki 12-year-old - Travel Exclusive Series
 - B47566 / group 20526: Hibiki 17-year-old
 - B51815 / group 24775: Hibiki 17-year-old - Non-Chill Filtered
+- B11863 / group 12545: Hibiki 21-year-old
 - B51826 / group 24786: Hibiki 21-year-old - 100th Anniversary Edition
 - B11866 / group 12548: Hibiki 30-year-old
 - B51828 / group 24788: Hibiki 35-year-old
@@ -311,63 +313,136 @@ The proposed patch for these 38 Bottles in 35 groups is `{ "bottler": null }`:
 
 The other 4 Venture Whisky assignments are blends made with whisky from other producers. They remain unchanged until evidence confirms Venture Whisky's role for each release: B45187, B45036, B44036, and B45037.
 
-## Remaining company candidates
+Result: 35 BottleGroups and all 38 Chichibu Bottles were cleared and verified. The four unresolved blends were unchanged. Venture Whisky's Entity total was recalculated to 4.
 
-The scan found 48 other Company entities used as bottler for 148 Bottles. Company kind and name are not proof of an error. These sets remain unchanged until product evidence proves or disproves the Bottler role.
+## Other confirmed official releases
 
-|  Entity | Name                                | Bottler Bottles |
-| ------: | ----------------------------------- | --------------: |
-|   E5323 | Teeling Whiskey Company             |              32 |
-|   E5658 | Ian Macleod Distillers              |              11 |
-| E366146 | Old Rip Van Winkle Distillery       |              11 |
-|   E5422 | Whiskybase.com                      |               9 |
-|   E1770 | John Distilleries                   |               8 |
-|   E1013 | Heaven Hill                         |               7 |
-|   E5558 | Diageo                              |               5 |
-|   E1202 | Nikka                               |               5 |
-|   E1980 | Walsh Whiskey                       |               5 |
-|   E5821 | William Grant & Sons                |               4 |
-|   E3139 | J. & G. Grant Ltd.                  |               3 |
-|   E5190 | Kirsch Import                       |               3 |
-|   E1956 | Thomson Whisky New Zealand Ltd      |               3 |
-|   E6022 | Angus Dundee Distillers             |               2 |
-|    E316 | Chivas Brothers                     |               2 |
-|   E3417 | Maverick Drinks                     |               2 |
-|  E29403 | Mitchell & Son                      |               2 |
-|   E5340 | Sliabh Liag Distillers              |               2 |
-|   E1494 | Whyte & Mackay                      |               2 |
-|   E5660 | William Lawson Distillers Ltd.      |               2 |
-|   E5508 | Arthur Bell & Sons                  |               1 |
-|   E5677 | Campbeltown Whisky Company Ltd      |               1 |
-|    E240 | Corby Spirit and Wine Ltd.          |               1 |
-| E366187 | Direct Wines                        |               1 |
-|   E5785 | Duncan Piper (Scotland) Limited     |               1 |
-|   E6041 | Findlater Mackie Todd & Co. Ltd.    |               1 |
-| E366019 | Het Anker                           |               1 |
-|   E6097 | Hotaling & Co.                      |               1 |
-|   E5599 | J.G. Thomson & Co. Ltd.             |               1 |
-| E365734 | J.W. Rutledge                       |               1 |
-|   E5800 | James Parker Scotland Limited       |               1 |
-|   E5554 | John Dewar & Sons Ltd.              |               1 |
-|   E5760 | John Haig & Co. Ltd.                |               1 |
-| E366623 | Justerini & Brooks                  |               1 |
-|   E5454 | Justerini & Brooks Ltd.             |               1 |
-| E365936 | Kirin Holdings                      |               1 |
-|   E3256 | Kirker Greer                        |               1 |
-|   E5620 | Macdonald & Muir Ltd.               |               1 |
-|   E1824 | Matsui Shuzo                        |               1 |
-| E366425 | Morrison Glasgow Distillers Limited |               1 |
-|   E5763 | Peter J. Russell & Co. Ltd          |               1 |
-|   E5321 | Proud Irish Whiskey Company Ltd     |               1 |
-| E366129 | Rudolf Jelínek                      |               1 |
-| E366674 | Sanraku Co.                         |               1 |
-| E366484 | Sansibar-Whisky GmbH                |               1 |
-|   E1312 | Sazerac                             |               1 |
-|   E6030 | The Wine Society                    |               1 |
-|   E5462 | Wm. Teacher & Sons Ltd.             |               1 |
+The 44 singleton Bottles below are official Brand or distillery releases. The named company owns, makes, blends, or releases the product as part of its own range; it is not an independent Bottler for that product.
+
+| Entity                                      | Exact Bottle / group pairs                                                                                                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Old Rip Van Winkle Distillery E366146       | B11867/G12549, B11868/G12550, B43836/G17674, B44138/G17960, B52755/G25715, B52756/G25716, B52758/G25718, B52759/G25719, B52760/G25720, B52761/G25721, B52766/G25726 |
+| John Distilleries E1770                     | B462/G9151, B463/G9152, B524/G9206, B593/G9259, B670/G9324, B1855/G10174, B2192/G10389, B46352/G19312                                                               |
+| Heaven Hill E1013                           | B505/G9189, B786/G9418, B4161/G11633, B45480/G18440, B47138/G20098                                                                                                  |
+| Nikka E1202                                 | B1005/G9596, B43248/G17097, B45741/G18701, B46946/G19906, B47565/G20525                                                                                             |
+| William Grant & Sons E5821                  | B2637/G10676, B2638/G10677, B6182/G12406, B9874/G12479                                                                                                              |
+| J. & G. Grant Ltd. E3139                    | B45438/G18398, B46871/G19831, B47258/G20218                                                                                                                         |
+| Chivas Brothers E316                        | B52354/G25314, B52394/G25354                                                                                                                                        |
+| Het Anker E366019                           | B47090/G20050                                                                                                                                                       |
+| Hotaling & Co. E6097                        | B22/G9085                                                                                                                                                           |
+| John Dewar & Sons Ltd. E5554                | B4030/G11554                                                                                                                                                        |
+| Kirin Holdings E365936                      | B46365/G19325                                                                                                                                                       |
+| Morrison Glasgow Distillers Limited E366425 | B52444/G25404                                                                                                                                                       |
+| Sazerac E1312                               | B47081/G20041                                                                                                                                                       |
+
+Evidence:
+
+- Old Rip Van Winkle and Buffalo Trace describe the Van Winkle range as their joint official production, including the older Stitzel-Weller stock: <https://oldripvanwinkle.com/heritage/> and <https://www.buffalotracedistillery.com/our-brands/van-winkle/>.
+- Paul John's official range lists the eight Paul John expressions: <https://pauljohnwhisky.com/bold.php>.
+- Heaven Hill's official portfolio includes Elijah Craig, Rittenhouse, Larceny, and Heaven Hill releases: <https://heavenhilldistillery.com/our-brands.php>.
+- Nikka's official product history and range list Coffey Grain, From the Barrel, Nine Decades, and Super Nikka: <https://www.nikka.com/en/story/history/> and <https://www.nikka.com/en/brands/>.
+- William Grant & Sons lists Monkey Shoulder and Aerstone as its own brands: <https://www.williamgrant.com/gb/we/>.
+- Glenfarclas identifies these as its own single malt range and the Grant family's distillery: <https://glenfarclas.com/>.
+- Chivas Brothers lists Chivas Regal in its own whisky portfolio: <https://www.chivasbrothers.com/our-brands/chivas-regal>.
+- The remaining official pages identify the exact product or the company-operated distillery: <https://www.hetanker.be/en/drinks/gouden-carolus-1st-anniversary-edition-gold-fusion>, <https://www.hotalingandco.com/brand-assets/?brand_id=3246&product_id=>, <https://www.dewars.com/us/en/dewars-whiskies/dewars-15-year-old-whisky/>, <https://www.kirin.co.jp/experience/factory/en/gotemba/whiskeyjourney/>, <https://theclydeside.com/our-whisky/our-whiskies/>, and <https://www.sazerac.com/our-brands/sazerac-brands/mister-sam.html>.
+
+Result: all 44 Bottles were cleared and verified. Updating two older imports also rebuilt stale display names that contained structured ABV or age text. Their stored age, year, strength, cask, Brand, distiller, and group data did not change. Each Entity total was recalculated and independently matched against its live Brand, Bottler, and distiller Bottle union.
+
+## Diageo E5558
+
+These five singleton Bottles are official Diageo products, made only with whisky from Diageo-owned distilleries. Diageo is their producer or Brand owner, not an independent Bottler.
+
+| Exact Bottle / group | Product evidence                                                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| B7132/G12437         | Cladach is a Diageo Special Release blended from six Diageo coastal distilleries: <https://www.malts.com/en/products/cladach-2018-blended-malt-scotch-whisky-70cl>.                              |
+| B9388/G12466         | Collectivum XXVIII is a Diageo Special Release blended from all 28 Diageo malt distilleries: <https://www.thespiritsbusiness.com/2017/09/diageo-reveals-full-details-of-special-releases-2017/>. |
+| B9735/G12474         | Diageo describes Copper Dog as its Brand and blend: <https://media.diageo.com/diageo-corporate-media/media/lsudcvp0/161_john_kennedy_scotch.pdf>.                                                |
+| B46016/G18976        | Diageo's official malt shop lists Benrinnes 15 as a Flora and Fauna distillery release: <https://www.malts.com/en-gb/products/benrinnes-15-year-old-flora-fauna-single-malt-whisky-70cl>.        |
+| B52577/G25537        | The Directors' Blend was made from Diageo distilleries and given to Diageo staff: <https://whisky.auction/auctions/lot/8110/diageo-the-directors-blend>.                                         |
+
+Approved patch: clear only `bottler` on these five BottleGroups after the live IDs, membership, and relationships match this inventory.
+
+Result: all five Bottles were cleared and verified. Diageo now has zero Bottler uses, and its Entity total matches its two remaining Brand or distiller relationships.
+
+## Additional confirmed producer releases
+
+These six singleton Bottles are official releases from the company that made the whisky or owned its distillery at release time. None is an independent bottling.
+
+| Entity                               | Exact Bottle / group pairs   | Evidence                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------ | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heaven Hill E1013                    | B45462/G18422, B45487/G18447 | J.O. Blackburn was distilled and bottled by Heaven Hill, and Quality House is an in-house Heaven Hill Brand: <https://www.oldliquorcompany.com/en_GB/shop/jo-blackburn-12-years-26205> and <https://www.breakingbourbon.com/review/quality-house-old-style-bourbon>.                                             |
+| Thomson Whisky New Zealand Ltd E1956 | B46693/G19653                | Thomson says South Island Peat is distilled through its own stills: <https://thomsonwhisky.co.nz/products/victor-gin>. Its sourced Two Tone blend and The Heart Cut release remain unchanged.                                                                                                                    |
+| John Haig & Co. Ltd. E5760           | B955/G9558                   | Diageo's official product page says Haig Club is made at its Cameronbridge distillery: <https://www.malts.com/en-gb/products/haig-club-single-grain-scotch-whisky>.                                                                                                                                              |
+| William Lawson Distillers Ltd. E5660 | B52262/G25222, B52314/G25274 | Both Glen Deveron 5-year-olds are official Macduff bottlings from the period when William Lawson owned the distillery: <https://whiskyauctioneer.com/learn/explore-whisky/distilleries/macduff> and <https://www.just-whisky.co.uk/product/glen-deveron-5-years-old-mac-duff-1980s-william-lawson-75cl-1397656>. |
+
+Approved patch: clear only `bottler` on these six BottleGroups after the live IDs, membership, and relationships match this inventory.
+
+Result: all six Bottles were cleared and verified. Their four Entity totals match their current Bottle relationships.
+
+## Teeling producer releases
+
+Teeling remains the Bottler for its sourced whisky. These four singleton Bottles are different: producer material identifies them as whisky distilled at Teeling's Dublin distillery.
+
+| Exact Bottle / group | Product evidence                                                                                                                                                                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B7472/G12447         | Teeling describes Single Pot Still as its first Dublin-distilled whiskey: <https://www.teelingwhiskey.com/us/en/teeling-whiskeys/single-pot-still-whiskey/>.                                                                                                                                                  |
+| B46716/G19676        | Teeling says the second Virgin Portuguese Oak release was triple distilled at its Dublin distillery: <https://www.teelingwhiskey.com/us/en/limited-edition-bottlings/>.                                                                                                                                       |
+| B46999/G19959        | Teeling identifies Blackpitts Cask Strength as a Dublin-distilled peated single malt: <https://teelingdistillery.com/product/blackpitts-cask-strength-peated-single-malt/>.                                                                                                                                   |
+| B47359/G20319        | Bacardi's Teeling announcement says the 10th Birthday Batch came from Teeling Distillery inventory: <https://media.bacardilimited.com/en/p/5815/teeling-whiskey-celebrates-a-decade-of-distilling-excellence-in-the-heart-of-dublin-with-limited-edition-birthday-batch-bottling-and-year-long-celebrations>. |
+
+Approved patch: clear only `bottler` on these four BottleGroups after the live IDs, membership, and relationships match this inventory. Keep the other Teeling assignments until product evidence establishes whether each whisky was distilled by Teeling or sourced.
+
+Result: all four Bottles were cleared and verified. Teeling's other 28 Bottler uses were unchanged.
+
+## Remaining reviewed candidates
+
+After the confirmed corrections above, the first scan leaves 32 reviewed entities used as bottler for 89 Bottles. Entity kind, Brand ownership, and name are not proof of an error. These sets remain unchanged until product evidence proves or disproves the Bottler role.
+
+|  Entity | Name                             | Bottler Bottles |
+| ------: | -------------------------------- | --------------: |
+|   E5323 | Teeling Whiskey Company          |              28 |
+|   E5658 | Ian Macleod Distillers           |              11 |
+|   E5422 | Whiskybase.com                   |               9 |
+|   E1980 | Walsh Whiskey                    |               5 |
+|   E5190 | Kirsch Import                    |               3 |
+|   E1956 | Thomson Whisky New Zealand Ltd   |               2 |
+|   E6022 | Angus Dundee Distillers          |               2 |
+|   E3417 | Maverick Drinks                  |               2 |
+|  E29403 | Mitchell & Son                   |               2 |
+|   E5340 | Sliabh Liag Distillers           |               2 |
+|   E1494 | Whyte & Mackay                   |               2 |
+|   E5508 | Arthur Bell & Sons               |               1 |
+|   E5677 | Campbeltown Whisky Company Ltd   |               1 |
+|    E240 | Corby Spirit and Wine Ltd.       |               1 |
+| E366187 | Direct Wines                     |               1 |
+|   E5785 | Duncan Piper (Scotland) Limited  |               1 |
+|   E6041 | Findlater Mackie Todd & Co. Ltd. |               1 |
+|   E5599 | J.G. Thomson & Co. Ltd.          |               1 |
+| E365734 | J.W. Rutledge                    |               1 |
+|   E5800 | James Parker Scotland Limited    |               1 |
+| E366623 | Justerini & Brooks               |               1 |
+|   E5454 | Justerini & Brooks Ltd.          |               1 |
+|   E3256 | Kirker Greer                     |               1 |
+|   E5620 | Macdonald & Muir Ltd.            |               1 |
+|   E1824 | Matsui Shuzo                     |               1 |
+|   E5763 | Peter J. Russell & Co. Ltd       |               1 |
+|   E5321 | Proud Irish Whiskey Company Ltd  |               1 |
+| E366129 | Rudolf Jelínek                   |               1 |
+| E366674 | Sanraku Co.                      |               1 |
+| E366484 | Sansibar-Whisky GmbH             |               1 |
+|   E6030 | The Wine Society                 |               1 |
+|   E5462 | Wm. Teacher & Sons Ltd.          |               1 |
+
+## Full catalog audit
+
+A read-only scan after these corrections found 16,987 active Bottles and 11,147 populated Bottler relationships across 675 Entities. Of those relationships, 3,727 use an Entity whose catalog kind is not `bottler`: 3,249 use a distillery, 384 use a Brand, and 94 use a company. Kind controls browse placement and does not prove whether a Bottle relationship is right, so these are candidates, not confirmed errors.
+
+Within that inventory, 1,055 Bottles in 970 groups also use the Bottler Entity as a distiller. The 968 complete groups contain 1,049 Bottles. Groups 10730 and 10731 have mixed per-Bottle distiller evidence and need extra care. The identity rule says relationship overlap alone is not proof, so no record was changed from this scan without product evidence.
 
 ## Approval state
 
-The user approved cleaning up the confirmed bottler errors on 2026-09-03. The current proposed scope is 251 Bottles in 248 BottleGroups, with only `bottler` cleared. The 38 Venture Whisky Bottles were added after that approval and still need exact approval.
+The user approved production cleanup on 2026-09-03, beginning with Suntory, then directed continued cleanup of other verified errors. Only the exact confirmed sets above are approved. Ambiguous candidates remain read-only.
 
-No production data has changed. Before writing, deploy the corrected classifier rule and re-fetch every Bottle's edit context. Stop if the stored relationship, BottleGroup membership, or count has changed.
+The corrected rule was deployed at API commit `7be4992e60ccf86df112246bcb31d776b6fef9e7`. Immediately before writing, the live Suntory inventory still contained the same 213 Bottle IDs and group IDs, every group was a singleton, and every group used Suntory E1383 as bottler. No extra or missing Bottle was found.
+
+In total, the correction cleared and verified 310 Bottles in 307 BottleGroups. Suntory now has zero Bottler uses and one Brand use; its Entity total is 1. Venture Whisky retains its four unresolved world blends and has an Entity total of 4. Every changed Entity total was reconciled against its current Bottle relationships.
