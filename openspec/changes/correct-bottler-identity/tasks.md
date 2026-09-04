@@ -13,10 +13,10 @@
 
 - [x] 3.1 Build a read-only manifest of every active Bottle and BottleGroup using Suntory E1383 as bottler, with current identity and proposed status.
 - [x] 3.2 Identify other bounded candidate sets where an owner, official producer, distributor, or house mark may be incorrectly assigned as bottler; leave evidence-ambiguous rows unresolved.
-- [ ] 3.3 Record the exact approved production changes after the corrected classifier rule is deployed.
+- [x] 3.3 Record the exact approved production changes after the corrected classifier rule is deployed.
 
 ## 4. Production Correction
 
-- [ ] 4.1 Immediately re-read each approved BottleGroup and stop on identity, membership, or bottler drift.
-- [ ] 4.2 Clear confirmed unsupported bottler assignments in small explicit-ID batches.
-- [ ] 4.3 Re-fetch every changed Bottle and group, verify unrelated identity fields, and reconcile Bottle and Entity counts.
+- [x] 4.1 Immediately re-read each approved BottleGroup and stop on identity, membership, or bottler drift.
+- [x] 4.2 Clear confirmed unsupported bottler assignments in small explicit-ID batches.
+- [x] 4.3 Re-fetch every changed Bottle and group, verify unrelated identity fields, and reconcile Bottle and Entity counts.
