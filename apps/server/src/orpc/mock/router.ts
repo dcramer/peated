@@ -30,6 +30,7 @@ import entityDetails from "./routes/entities/details";
 import entityEventList from "./routes/entities/events/list";
 import entityFlavorProfile from "./routes/entities/flavor-profile";
 import entityList from "./routes/entities/list";
+import entityPortfolio from "./routes/entities/portfolio";
 import entityResolve from "./routes/entities/resolve";
 import eventList from "./routes/events/list";
 import externalReviewList from "./routes/externalReviews/list";
@@ -125,6 +126,7 @@ export const mockRouter = mockOS.router({
       list: entityEventList,
     },
     list: entityList,
+    portfolio: entityPortfolio,
     resolve: entityResolve,
   },
   events: {

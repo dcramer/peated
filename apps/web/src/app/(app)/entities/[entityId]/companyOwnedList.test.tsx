@@ -17,17 +17,36 @@ const company = {
 } satisfies Entity;
 
 function render(
-  section: "brands" | "distilleries" | "operates",
+  section:
+    | "brands"
+    | "bottlers"
+    | "distilleries"
+    | "groupCompanies"
+    | "portfolio",
   items?: ListItems,
+  total?: number,
 ) {
+  const kind =
+    section === "brands"
+      ? "brand"
+      : section === "distilleries"
+        ? "distillery"
+        : section === "bottlers"
+          ? "bottler"
+          : undefined;
+
   return renderToStaticMarkup(
     <CompanyOwnedList
       company={company}
       error={false}
+      href={
+        kind ? `/companies/1-example-company/portfolio?kind=${kind}` : undefined
+      }
       items={items}
       pending={false}
       retry={() => undefined}
       section={section}
+      total={total}
     />,
   );
 }
@@ -49,11 +68,18 @@ describe("CompanyOwnedList", () => {
       "/distillers/2-lagavulin",
     ],
     [
-      "operates",
-      "Operates",
+      "bottlers",
+      "Bottlers",
       "bottler",
       "Elixir Distillers",
       "/bottlers/2-elixir-distillers",
+    ],
+    [
+      "groupCompanies",
+      "Companies in this group",
+      "company",
+      "Suntory Global Spirits",
+      "/companies/2-suntory-global-spirits",
     ],
   ] as const)(
     "shows the %s group with its own heading",
@@ -75,7 +101,7 @@ describe("CompanyOwnedList", () => {
   );
 
   test("keeps bottle counts out of owned entity rows", () => {
-    const html = render("operates", [
+    const html = render("bottlers", [
       {
         ...mockEntity,
         id: 2,
@@ -86,17 +112,55 @@ describe("CompanyOwnedList", () => {
       },
     ]);
 
-    expect(html).toContain("Operates");
+    expect(html).toContain("Bottlers");
     expect(html).toContain("The Scotch Malt Whisky Society");
     expect(html).toContain('href="/bottlers/2-the-scotch-malt-whisky-society"');
     expect(html).toContain("Bottler · Islay, Scotland");
     expect(html).not.toContain("3,499 bottles");
   });
 
-  test.each(["brands", "distilleries", "operates"] as const)(
-    "does not render an empty %s section",
-    (section) => {
-      expect(render(section, [])).toBe("");
-    },
-  );
+  test("links truncated previews to the complete filtered portfolio", () => {
+    const html = render(
+      "brands",
+      [
+        {
+          ...mockEntity,
+          id: 2,
+          kind: "brand",
+          name: "Portfolio Brand",
+        },
+      ],
+      12,
+    );
+
+    expect(html).toContain("View all 12");
+    expect(html).toContain(
+      'href="/companies/1-example-company/portfolio?kind=brand"',
+    );
+  });
+
+  test("keeps a failed portfolio request local to its section", () => {
+    const html = renderToStaticMarkup(
+      <CompanyOwnedList
+        company={company}
+        error
+        pending={false}
+        retry={() => undefined}
+        section="portfolio"
+      />,
+    );
+
+    expect(html).toContain("Could not load whisky portfolio");
+    expect(html).toContain("Try again");
+  });
+
+  test.each([
+    "brands",
+    "bottlers",
+    "distilleries",
+    "groupCompanies",
+    "portfolio",
+  ] as const)("does not render an empty %s section", (section) => {
+    expect(render(section, [])).toBe("");
+  });
 });

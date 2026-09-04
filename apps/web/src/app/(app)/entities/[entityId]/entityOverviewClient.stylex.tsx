@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { CompanyOwnedList } from "./companyOwnedList";
 import { EntityBottleOverview } from "./entityBottleOverview";
@@ -36,12 +37,8 @@ export function EntityOverviewClient() {
   const releaseListQuery = useQuery(
     entityOverviewQueries.releases(orpc, entity),
   );
-  const brandList = useQuery(entityOverviewQueries.companyBrands(orpc, entity));
-  const distilleryList = useQuery(
-    entityOverviewQueries.companyDistilleries(orpc, entity),
-  );
-  const bottlerAndCompanyList = useQuery(
-    entityOverviewQueries.companyBottlersAndCompanies(orpc, entity),
+  const companyPortfolioQuery = useQuery(
+    entityOverviewQueries.companyPortfolio(orpc, entity),
   );
   const siblingListQuery = useQuery(
     entityOverviewQueries.siblings(orpc, entity),
@@ -56,30 +53,48 @@ export function EntityOverviewClient() {
       }
       catalogSections={
         <>
-          <CompanyOwnedList
-            company={entity}
-            error={Boolean(distilleryList.error)}
-            items={distilleryList.data?.results}
-            pending={distilleryList.isPending}
-            retry={() => void distilleryList.refetch()}
-            section="distilleries"
-          />
-          <CompanyOwnedList
-            company={entity}
-            error={Boolean(brandList.error)}
-            items={brandList.data?.results}
-            pending={brandList.isPending}
-            retry={() => void brandList.refetch()}
-            section="brands"
-          />
-          <CompanyOwnedList
-            company={entity}
-            error={Boolean(bottlerAndCompanyList.error)}
-            items={bottlerAndCompanyList.data?.results}
-            pending={bottlerAndCompanyList.isPending}
-            retry={() => void bottlerAndCompanyList.refetch()}
-            section="operates"
-          />
+          {companyPortfolioQuery.isPending || companyPortfolioQuery.error ? (
+            <CompanyOwnedList
+              company={entity}
+              error={Boolean(companyPortfolioQuery.error)}
+              pending={companyPortfolioQuery.isPending}
+              retry={() => void companyPortfolioQuery.refetch()}
+              section="portfolio"
+            />
+          ) : (
+            <>
+              <CompanyOwnedList
+                company={entity}
+                error={false}
+                href={`${getEntityUrl(entity)}/portfolio?kind=brand`}
+                items={companyPortfolioQuery.data?.previews.brands}
+                pending={false}
+                retry={() => void companyPortfolioQuery.refetch()}
+                section="brands"
+                total={companyPortfolioQuery.data?.totals.brands}
+              />
+              <CompanyOwnedList
+                company={entity}
+                error={false}
+                href={`${getEntityUrl(entity)}/portfolio?kind=distillery`}
+                items={companyPortfolioQuery.data?.previews.distilleries}
+                pending={false}
+                retry={() => void companyPortfolioQuery.refetch()}
+                section="distilleries"
+                total={companyPortfolioQuery.data?.totals.distilleries}
+              />
+              <CompanyOwnedList
+                company={entity}
+                error={false}
+                href={`${getEntityUrl(entity)}/portfolio?kind=bottler`}
+                items={companyPortfolioQuery.data?.previews.bottlers}
+                pending={false}
+                retry={() => void companyPortfolioQuery.refetch()}
+                section="bottlers"
+                total={companyPortfolioQuery.data?.totals.bottlers}
+              />
+            </>
+          )}
           <EntityReleaseOverview
             entity={entity}
             error={Boolean(releaseListQuery.error)}
@@ -119,6 +134,15 @@ export function EntityOverviewClient() {
       }
       relationships={
         <>
+          <CompanyOwnedList
+            company={entity}
+            error={false}
+            items={companyPortfolioQuery.data?.groupCompanies.results}
+            pending={false}
+            retry={() => void companyPortfolioQuery.refetch()}
+            section="groupCompanies"
+            total={companyPortfolioQuery.data?.groupCompanies.total}
+          />
           <EntityMap entity={entity} />
           {entity.kind === "distillery" ? (
             <div {...stylex.props(styles.flavorProfile)}>

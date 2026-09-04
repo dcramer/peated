@@ -29,6 +29,7 @@ import {
   getEntityCurrentHref,
   getEntityPresentation,
   getEntityTabs,
+  type CompanyPageCounts,
   type Entity,
 } from "./entityPageData";
 
@@ -145,9 +146,11 @@ function EntityActions({ entity }: { entity: Entity }) {
 
 export function EntityPageFrameClient({
   children,
+  companyCounts,
   initialEntity,
 }: {
   children: ReactNode;
+  companyCounts?: CompanyPageCounts;
   initialEntity: Entity;
 }) {
   const orpc = useORPC();
@@ -214,7 +217,7 @@ export function EntityPageFrameClient({
           <PageTabs
             ariaLabel={`${entity.name} sections`}
             currentHref={currentHref}
-            items={getEntityTabs(entity)}
+            items={getEntityTabs(entity, companyCounts)}
           />
         </div>
 

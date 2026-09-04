@@ -30,6 +30,7 @@ import entityDetails from "@peated/server/orpc/contracts/entities/details";
 import entityEventList from "@peated/server/orpc/contracts/entities/events/list";
 import entityFlavorProfile from "@peated/server/orpc/contracts/entities/flavor-profile";
 import entityList from "@peated/server/orpc/contracts/entities/list";
+import entityPortfolio from "@peated/server/orpc/contracts/entities/portfolio";
 import entityResolve from "@peated/server/orpc/contracts/entities/resolve";
 import eventList from "@peated/server/orpc/contracts/events/list";
 import externalReviewList from "@peated/server/orpc/contracts/externalReviews/list";
@@ -125,6 +126,7 @@ export const mockContract = {
       list: entityEventList,
     },
     list: entityList,
+    portfolio: entityPortfolio,
     resolve: entityResolve,
   },
   events: {

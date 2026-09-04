@@ -13,6 +13,7 @@ export const BOTTLE_CATALOG_QUERY_FIELDS = [
   "brand",
   "bottler",
   "category",
+  "company",
   "cursor",
   "distiller",
   "entity",

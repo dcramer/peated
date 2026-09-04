@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Suntory company page directions</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ground: #101210;
+        --surface: #1b1e1a;
+        --inset: #292d27;
+        --ink: #e8eae3;
+        --muted: rgb(232 234 227 / 0.68);
+        --hairline: rgb(232 234 227 / 0.1);
+        --rule: rgb(232 234 227 / 0.16);
+        --accent: #d9922f;
+        --display: "Space Grotesk", "Arial Narrow", sans-serif;
+        --reading: Karla, system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font: 15px/1.5 var(--reading);
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:hover,
+      a:focus-visible,
+      button:focus-visible {
+        color: var(--accent);
+        outline: none;
+      }
+      .direction-bar {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        display: grid;
+        grid-template-columns: minmax(210px, 0.7fr) minmax(0, 1.3fr);
+        gap: 24px;
+        padding: 16px max(24px, calc((100vw - 1180px) / 2));
+        border-bottom: 1px solid var(--rule);
+        background: rgb(16 18 16 / 0.96);
+        backdrop-filter: blur(12px);
+      }
+      .direction-bar__eyebrow {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .direction-bar__title {
+        margin-top: 2px;
+        font: 700 17px/1.25 var(--display);
+      }
+      .direction-picker {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-end;
+      }
+      .direction-button {
+        min-height: 38px;
+        padding: 7px 12px;
+        border: 1px solid var(--rule);
+        border-radius: 3px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .direction-button[aria-pressed="true"] {
+        border-color: var(--accent);
+        background: rgb(217 146 47 / 0.1);
+        color: var(--ink);
+      }
+      .direction-note {
+        grid-column: 1 / -1;
+        margin: -8px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .site-header {
+        border-bottom: 1px solid var(--rule);
+      }
+      .site-header__inner,
+      main {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+      .site-header__inner {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+      .logo {
+        font: 700 21px/1 var(--display);
+        letter-spacing: -0.04em;
+      }
+      .search {
+        width: min(520px, 50vw);
+        height: 38px;
+        padding: 0 12px;
+        border: 0;
+        border-radius: 3px;
+        background: var(--inset);
+        color: var(--ink);
+      }
+      .header {
+        padding: 46px 0 24px;
+      }
+      h1,
+      h2 {
+        font-family: var(--display);
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(44px, 7vw, 68px);
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+      }
+      .kind {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .description {
+        max-width: 710px;
+        margin: 18px 0 0;
+        line-height: 1.65;
+      }
+      .tabs {
+        display: flex;
+        gap: 28px;
+        min-height: 46px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-bottom: 2px solid transparent;
+        font-weight: 700;
+      }
+      .tab.active {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .count {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .overview {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 336px;
+        gap: 48px;
+        align-items: start;
+      }
+      .facts {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        padding: 24px 0 0;
+      }
+      .fact dt {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .fact dd {
+        margin: 2px 0 0;
+      }
+      .section {
+        padding-top: 34px;
+      }
+      .section-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 11px;
+      }
+      h2 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+      }
+      .section-action {
+        flex: none;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .rows {
+        border-top: 1px solid var(--hairline);
+      }
+      .row {
+        min-height: 66px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 20px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+      .row__name {
+        display: block;
+        font: 700 17px/1.25 var(--display);
+        letter-spacing: -0.02em;
+      }
+      .row__meta,
+      .row__path,
+      .section-intro {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .row__path {
+        max-width: 230px;
+        text-align: right;
+      }
+      .section-intro {
+        max-width: 600px;
+        margin: -2px 0 14px;
+      }
+      .sidebar {
+        padding-top: 24px;
+      }
+      .image-placeholder {
+        aspect-ratio: 8 / 5;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--hairline);
+        border-radius: 3px;
+        background: repeating-linear-gradient(
+          45deg,
+          var(--surface),
+          var(--surface) 10px,
+          var(--ground) 10px,
+          var(--ground) 20px
+        );
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .sidebar .row {
+        min-height: 58px;
+        display: block;
+      }
+      .sidebar .row__name {
+        font-size: 15px;
+      }
+      .ownership-note {
+        margin: 22px 0 48px;
+        padding-top: 14px;
+        border-top: 1px solid var(--hairline);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .variant {
+        display: none;
+      }
+      body[data-variant="minimal"] .variant--minimal,
+      body[data-variant="categorized"] .variant--categorized,
+      body[data-variant="combined"] .variant--combined {
+        display: block;
+      }
+      body[data-variant="minimal"] .portfolio-tab {
+        display: none;
+      }
+      @media (max-width: 820px) {
+        .direction-bar {
+          position: static;
+          display: block;
+          padding: 16px 20px;
+        }
+        .direction-picker {
+          justify-content: flex-start;
+          margin-top: 12px;
+          overflow-x: auto;
+        }
+        .direction-button {
+          flex: none;
+        }
+        .direction-note {
+          margin-top: 10px;
+        }
+        .site-header__inner,
+        main {
+          width: min(100% - 32px, 600px);
+        }
+        .site-header__inner {
+          gap: 16px;
+        }
+        .search {
+          flex: 1;
+          width: auto;
+        }
+        .header {
+          padding-top: 32px;
+        }
+        .tabs {
+          gap: 20px;
+          overflow-x: auto;
+        }
+        .overview {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
+        .sidebar {
+          width: 100%;
+          order: -1;
+        }
+        .image-placeholder {
+          margin-top: 8px;
+        }
+        .facts {
+          grid-template-columns: 1fr 1fr;
+        }
+        .row {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 3px;
+        }
+        .row__path {
+          max-width: none;
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body data-variant="categorized">
+    <section class="direction-bar" aria-label="Design direction picker">
+      <div>
+        <span class="direction-bar__eyebrow">Company page study</span>
+        <div class="direction-bar__title">
+          Choose how the portfolio is grouped
+        </div>
+      </div>
+      <div class="direction-picker">
+        <button
+          class="direction-button"
+          data-choose="minimal"
+          aria-pressed="false"
+        >
+          A · Minimal
+        </button>
+        <button
+          class="direction-button"
+          data-choose="categorized"
+          aria-pressed="true"
+        >
+          B · Categorized
+        </button>
+        <button
+          class="direction-button"
+          data-choose="combined"
+          aria-pressed="false"
+        >
+          C · Combined
+        </button>
+      </div>
+      <p class="direction-note" id="direction-note">
+        Recommended — familiar sections, complete descendant counts, and direct
+        companies in the same group kept separate.
+      </p>
+    </section>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="logo" href="#">Peated</a>
+        <input
+          class="search"
+          aria-label="Search"
+          placeholder="bottles, series, distillers, brands…"
+        />
+      </div>
+    </header>
+
+    <main>
+      <header class="header">
+        <h1>Suntory</h1>
+        <div class="kind">Company</div>
+        <p class="description">
+          Suntory is a Japanese drinks company founded by Shinjiro Torii in
+          1899. Its whisky portfolio includes Yamazaki, Hakushu, Hibiki, Toki,
+          and Kakubin.
+        </p>
+      </header>
+
+      <nav class="tabs" aria-label="Suntory sections">
+        <a class="tab active" href="#">Overview</a>
+        <a class="tab portfolio-tab" href="#"
+          >Portfolio <span class="count">55</span></a
+        >
+        <a class="tab" href="#">Bottles</a>
+      </nav>
+
+      <div class="overview">
+        <div class="main">
+          <dl class="facts">
+            <div class="fact">
+              <dt>Region</dt>
+              <dd>Japan</dd>
+            </div>
+            <div class="fact">
+              <dt>Established</dt>
+              <dd>1899</dd>
+            </div>
+            <div class="fact">
+              <dt>Website</dt>
+              <dd><a href="#">suntory.com</a></dd>
+            </div>
+          </dl>
+
+          <div class="variant variant--minimal">
+            <section class="section">
+              <div class="section-heading">
+                <h2>Brands</h2>
+                <a class="section-action" href="#">View all 37</a>
+              </div>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Jim Beam</span
+                    ><span class="row__meta">Brand · United States</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Maker’s Mark</span
+                    ><span class="row__meta">Brand · United States</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Hibiki</span
+                    ><span class="row__meta">Brand · Japan</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Canadian Club</span
+                    ><span class="row__meta">Brand · Canada</span></span
+                  ></a
+                >
+              </div>
+            </section>
+            <section class="section">
+              <div class="section-heading">
+                <h2>Distilleries</h2>
+                <a class="section-action" href="#">View all 14</a>
+              </div>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Yamazaki</span
+                    ><span class="row__meta"
+                      >Distillery · Osaka, Japan</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Laphroaig</span
+                    ><span class="row__meta"
+                      >Distillery · Islay, Scotland</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Bowmore</span
+                    ><span class="row__meta"
+                      >Distillery · Islay, Scotland</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Hakushu</span
+                    ><span class="row__meta">Distillery · Japan</span></span
+                  ></a
+                >
+              </div>
+            </section>
+            <section class="section">
+              <div class="section-heading">
+                <h2>Operates</h2>
+                <a class="section-action" href="#">View all 9</a>
+              </div>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Suntory Global Spirits</span
+                    ><span class="row__meta"
+                      >Company · United States</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Morrison Bowmore Distillers</span
+                    ><span class="row__meta">Company · Scotland</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Jim Beam</span
+                    ><span class="row__meta"
+                      >Company · United States</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Bellows &amp; Company</span
+                    ><span class="row__meta"
+                      >Company · United States</span
+                    ></span
+                  ></a
+                >
+              </div>
+            </section>
+          </div>
+
+          <div class="variant variant--categorized">
+            <section class="section">
+              <div class="section-heading">
+                <h2>Brands <span class="count">37</span></h2>
+                <a class="section-action" href="#">View all</a>
+              </div>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Jim Beam</span
+                    ><span class="row__meta">Brand · United States</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Maker’s Mark</span
+                    ><span class="row__meta">Brand · United States</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Hibiki</span
+                    ><span class="row__meta">Brand · Japan</span></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Canadian Club</span
+                    ><span class="row__meta">Brand · Canada</span></span
+                  ></a
+                >
+              </div>
+            </section>
+            <section class="section">
+              <div class="section-heading">
+                <h2>Distilleries <span class="count">14</span></h2>
+                <a class="section-action" href="#">View all</a>
+              </div>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Yamazaki</span
+                    ><span class="row__meta"
+                      >Distillery · Osaka, Japan</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Laphroaig</span
+                    ><span class="row__meta"
+                      >Distillery · Islay, Scotland</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Bowmore</span
+                    ><span class="row__meta"
+                      >Distillery · Islay, Scotland</span
+                    ></span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Hakushu</span
+                    ><span class="row__meta">Distillery · Japan</span></span
+                  ></a
+                >
+              </div>
+            </section>
+            <section class="section">
+              <div class="section-heading">
+                <h2>Bottlers <span class="count">4</span></h2>
+                <a class="section-action" href="#">View all</a>
+              </div>
+              <p class="section-intro">
+                Shown only when the company has recorded bottlers.
+              </p>
+            </section>
+          </div>
+
+          <div class="variant variant--combined">
+            <section class="section">
+              <div class="section-heading">
+                <h2>Whisky portfolio</h2>
+                <a class="section-action" href="#">View all 55</a>
+              </div>
+              <p class="section-intro">
+                Brands, distilleries, and bottlers in one list, ordered by
+                catalog activity.
+              </p>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Jim Beam</span
+                    ><span class="row__meta">Brand · United States</span></span
+                  ><span class="row__path">via Suntory Global Spirits</span></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Yamazaki</span
+                    ><span class="row__meta"
+                      >Distillery · Osaka, Japan</span
+                    ></span
+                  ><span class="row__path">via Suntory Global Spirits</span></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Laphroaig</span
+                    ><span class="row__meta"
+                      >Distillery · Islay, Scotland</span
+                    ></span
+                  ><span class="row__path">via Suntory Global Spirits</span></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Hibiki</span
+                    ><span class="row__meta">Brand · Japan</span></span
+                  ><span class="row__path">via Suntory Global Spirits</span></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Bowmore</span
+                    ><span class="row__meta"
+                      >Distillery · Islay, Scotland</span
+                    ></span
+                  ><span class="row__path"
+                    >via Morrison Bowmore Distillers</span
+                  ></a
+                >
+                <a class="row" href="#"
+                  ><span
+                    ><span class="row__name">Maker’s Mark</span
+                    ><span class="row__meta">Brand · United States</span></span
+                  ><span class="row__path">via Suntory Global Spirits</span></a
+                >
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="image-placeholder">No company image</div>
+          <div class="variant variant--categorized variant--combined">
+            <section class="section">
+              <div class="section-heading">
+                <h2>Companies in this group</h2>
+              </div>
+              <div class="rows">
+                <a class="row" href="#"
+                  ><span class="row__name">Suntory Global Spirits</span
+                  ><span class="row__meta">Company · United States</span></a
+                >
+                <a class="row" href="#"
+                  ><span class="row__name">Bellows &amp; Company</span
+                  ><span class="row__meta">Company · United States</span></a
+                >
+              </div>
+            </section>
+            <p class="ownership-note">
+              Portfolio sections follow every recorded “Part of” link. Group
+              companies lists only Suntory’s direct company relationships.
+            </p>
+          </div>
+          <div class="variant variant--minimal">
+            <p class="ownership-note">
+              The current sections are unchanged visually; only their queries
+              and totals become recursive.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <script>
+      const descriptions = {
+        minimal:
+          "Smallest change — the current Brands, Distilleries, and Operates sections simply include every descendant.",
+        categorized:
+          "Recommended — familiar sections, complete descendant counts, and directly owned companies kept separate.",
+        combined:
+          "Most compact — one mixed portfolio list makes indirect ownership explicit, but is harder to scan by type.",
+      };
+      for (const button of document.querySelectorAll("[data-choose]")) {
+        button.addEventListener("click", () => {
+          const variant = button.dataset.choose;
+          document.body.dataset.variant = variant;
+          document.querySelector("#direction-note").textContent =
+            descriptions[variant];
+          for (const peer of document.querySelectorAll("[data-choose]")) {
+            peer.setAttribute("aria-pressed", String(peer === button));
+          }
+          localStorage.setItem("company-page-variant", variant);
+        });
+      }
+      const saved = localStorage.getItem("company-page-variant");
+      if (saved && descriptions[saved]) {
+        document.querySelector(`[data-choose="${saved}"]`).click();
+      }
+    </script>
+  </body>
+</html>

@@ -115,6 +115,16 @@ export const mockSuntoryGlobalSpiritsEntity = {
     "A spirits company based in New York. Its Scotch whisky distilleries include Laphroaig and Bowmore.",
 } satisfies Entity;
 
+export const mockSparseCompanyEntity = {
+  ...entityDefaults,
+  id: 9224,
+  peatedId: "E9224",
+  name: "Example Holdings",
+  kind: "company",
+  country: mockCountries[2],
+  description: "A company with no recorded whisky portfolio.",
+} satisfies Entity;
+
 export const mockEntity = {
   ...entityDefaults,
   id: 9201,
@@ -472,6 +482,7 @@ export const mockEntities: Entity[] = [
     totalBottles: 1,
     totalTastings: 56,
   },
+  mockSparseCompanyEntity,
 ];
 
 const followedEntityIds = new Set([9201, 9207, 9208]);
