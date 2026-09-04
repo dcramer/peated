@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleBarcodes,
   bottleFlavorProfiles,
@@ -21,7 +22,30 @@ import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
+import pg from "pg";
 import { describe, expect, test } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  observer: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2_000;
+  while (Date.now() < deadline) {
+    const result = await observer.query<{ pid: number }>(
+      `SELECT pid
+       FROM pg_stat_activity
+       WHERE $1 = ANY(pg_blocking_pids(pid))
+       LIMIT 1`,
+      [blockerPid],
+    );
+    if (result.rows.length) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for Bottle deletion.");
+}
 
 async function loadGroupedBottleGraph(groupId: number) {
   const members = await db
@@ -118,6 +142,10 @@ describe("DELETE /bottles/:bottle", () => {
     const before = await loadGroupedBottleGraph(groupId);
     expect(before.group[0]?.representativeBottleId).toBe(representative.id);
     expect(before.members).toHaveLength(2);
+    await db
+      .update(bottleGroups)
+      .set({ totalBottles: 99 })
+      .where(eq(bottleGroups.id, groupId));
 
     await routerClient.bottles.delete(
       { bottle: representative.id },
@@ -140,6 +168,64 @@ describe("DELETE /bottles/:bottle", () => {
         where: eq(entities.id, representative.brandId),
       }),
     ).toMatchObject({ totalBottles: 1 });
+  });
+
+  test("waits for group statistics before locking member Bottles", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle();
+    await fixtures.BottleGroupMember({ groupId: bottle.groupId });
+    const statistics = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let statisticsCommitted = false;
+    let deletion: ReturnType<typeof routerClient.bottles.delete> | null = null;
+
+    await statistics.connect();
+    await observer.connect();
+    try {
+      await statistics.query("BEGIN");
+      const statisticsPid = (
+        await statistics.query<{ pid: number }>(
+          "SELECT pg_backend_pid() AS pid",
+        )
+      ).rows[0]?.pid;
+      if (!statisticsPid) {
+        throw new Error("Unable to load BottleGroup statistics pid.");
+      }
+      await statistics.query(
+        "SELECT id FROM bottle_group WHERE id = $1 FOR UPDATE",
+        [bottle.groupId],
+      );
+
+      deletion = routerClient.bottles.delete(
+        { bottle: bottle.id },
+        { context: { user } },
+      );
+      void deletion.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, statisticsPid);
+
+      await statistics.query(
+        "SELECT id FROM bottle WHERE group_id = $1 ORDER BY id FOR SHARE NOWAIT",
+        [bottle.groupId],
+      );
+      await statistics.query("COMMIT");
+      statisticsCommitted = true;
+      await expect(deletion).resolves.toEqual({});
+    } finally {
+      if (!statisticsCommitted) {
+        await statistics.query("ROLLBACK").catch(() => undefined);
+      }
+      if (deletion) await deletion.catch(() => undefined);
+      await statistics.end();
+      await observer.end();
+    }
+
+    await expect(
+      db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, bottle.groupId),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
   test("deletes a Bottle when its Entity count is too low", async ({

@@ -122,7 +122,7 @@ export default function MaintenancePage() {
 
         <AdminSection
           title="Bottle counts"
-          description="Check Bottle counts for brands, producers, countries, and regions, and fix any that are wrong. Bottle editing can continue while this runs."
+          description="Check saved Bottle counts and fix any that are wrong. Bottle editing can continue while this runs."
         >
           <div {...stylex.props(styles.sectionContent)}>
             <div {...stylex.props(styles.actionRow)}>

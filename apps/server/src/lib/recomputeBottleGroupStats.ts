@@ -1,4 +1,4 @@
-import { db, type AnyTransaction } from "@peated/server/db";
+import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type { BottleGroup } from "@peated/server/db/schema";
 import {
   bottleGroups,
@@ -6,7 +6,7 @@ import {
   bottleTombstones,
 } from "@peated/server/db/schema";
 import { aggregateBottleActivityStatsInTransaction } from "@peated/server/lib/recomputeBottleActivityStats";
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, eq, inArray, sql } from "drizzle-orm";
 
 export type BottleGroupStatsIntegrityErrorCode =
   | "not_found"
@@ -36,6 +36,75 @@ export type BottleGroupStatsResult = Pick<
   | "tastingBandCounts"
   | "updatedAt"
 >;
+
+export type WrongBottleGroupBottleCount = {
+  groupId: number;
+  savedCount: number;
+  actualCount: number;
+};
+
+type BottleCountQueryRow = {
+  groupId: number | string;
+  savedCount: number | string;
+  actualCount: number | string;
+};
+
+function uniqueSorted(values: readonly number[]): number[] {
+  return Array.from(new Set(values)).sort((left, right) => left - right);
+}
+
+async function findWrongBottleCounts(
+  database: AnyDatabase,
+  groupIds?: readonly number[],
+): Promise<WrongBottleGroupBottleCount[]> {
+  const ids = groupIds === undefined ? undefined : uniqueSorted(groupIds);
+  if (ids?.length === 0) return [];
+  const groupFilter = ids ? inArray(bottleGroups.id, ids) : sql`TRUE`;
+  const bottleFilter = ids ? inArray(bottles.groupId, ids) : sql`TRUE`;
+
+  const result = await database.execute<BottleCountQueryRow>(sql`
+    WITH active_counts AS (
+      SELECT ${bottles.groupId} AS group_id, COUNT(*) AS total
+      FROM ${bottles}
+      WHERE ${bottles.groupId} IS NOT NULL
+        AND ${bottleFilter}
+        AND NOT EXISTS (
+          SELECT 1 FROM ${bottleTombstones}
+          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+        )
+      GROUP BY ${bottles.groupId}
+    )
+    SELECT
+      ${bottleGroups.id} AS "groupId",
+      ${bottleGroups.totalBottles} AS "savedCount",
+      COALESCE(active_counts.total, 0) AS "actualCount"
+    FROM ${bottleGroups}
+    LEFT JOIN active_counts ON active_counts.group_id = ${bottleGroups.id}
+    WHERE ${groupFilter}
+      AND ${bottleGroups.totalBottles} <> COALESCE(active_counts.total, 0)
+    ORDER BY ${bottleGroups.id}
+  `);
+
+  return result.rows.map((row) => ({
+    groupId: Number(row.groupId),
+    savedCount: Number(row.savedCount),
+    actualCount: Number(row.actualCount),
+  }));
+}
+
+async function repairExistingBottleCount(
+  tx: AnyTransaction,
+  groupId: number,
+): Promise<WrongBottleGroupBottleCount | null> {
+  const [difference] = await findWrongBottleCounts(tx, [groupId]);
+  if (!difference) return null;
+
+  await tx
+    .update(bottleGroups)
+    .set({ totalBottles: difference.actualCount })
+    .where(eq(bottleGroups.id, groupId));
+  return difference;
+}
 
 /** Recomputes one active group from direct activity on its member Bottles. */
 export async function recomputeBottleGroupStatsInTransaction(
@@ -116,4 +185,27 @@ export async function recomputeBottleGroupStats(
   return await db.transaction((tx) =>
     recomputeBottleGroupStatsInTransaction(tx, groupId),
   );
+}
+
+/** Checks saved BottleGroup totals against their active member Bottles. */
+export async function checkBottleGroupBottleCounts(
+  groupIds?: readonly number[],
+): Promise<WrongBottleGroupBottleCount[]> {
+  return findWrongBottleCounts(db, groupIds);
+}
+
+/** Locks and rechecks one BottleGroup before repairing only its Bottle total. */
+export async function repairBottleGroupBottleCount(
+  groupId: number,
+): Promise<WrongBottleGroupBottleCount | null> {
+  return db.transaction(async (tx) => {
+    const [group] = await tx
+      .select({ id: bottleGroups.id })
+      .from(bottleGroups)
+      .where(eq(bottleGroups.id, groupId))
+      .for("update");
+    if (!group) return null;
+
+    return repairExistingBottleCount(tx, groupId);
+  });
 }

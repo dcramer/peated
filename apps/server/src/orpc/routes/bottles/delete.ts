@@ -65,18 +65,85 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const { bottle: bottleId } = input;
     await db.transaction(async (tx) => {
-      // Bottle deletion owns this row lock so new records cannot link to the
-      // Bottle after the checks below pass.
-      const [bottle] = await tx
-        .select()
+      const [discoveredBottle] = await tx
+        .select({ id: bottles.id, groupId: bottles.groupId })
         .from(bottles)
         .where(eq(bottles.id, bottleId))
-        .limit(1)
-        .for("update");
-      if (!bottle) {
+        .limit(1);
+      if (!discoveredBottle) {
         throw errors.NOT_FOUND({
           message: "Bottle not found.",
         });
+      }
+
+      let bottle: typeof bottles.$inferSelect | undefined;
+      let remainingGroupMemberIds: number[] = [];
+      let groupRepresentativeBottleId: number | null = null;
+      if (discoveredBottle.groupId === null) {
+        [bottle] = await tx
+          .select()
+          .from(bottles)
+          .where(eq(bottles.id, bottleId))
+          .limit(1)
+          .for("update");
+        if (!bottle) {
+          throw errors.NOT_FOUND({
+            message: "Bottle not found.",
+          });
+        }
+        if (bottle.groupId !== null) {
+          throw errors.CONFLICT({
+            message: `Bottle ${bottle.id} changed groups before deletion.`,
+          });
+        }
+      } else {
+        // BottleGroup writes own this order: lock the group, then all members
+        // by ID. Statistics and repair use the same order.
+        const [group] = await tx
+          .select({
+            id: bottleGroups.id,
+            representativeBottleId: bottleGroups.representativeBottleId,
+          })
+          .from(bottleGroups)
+          .where(eq(bottleGroups.id, discoveredBottle.groupId))
+          .limit(1)
+          .for("update");
+        if (!group) {
+          const currentBottle = await tx.query.bottles.findFirst({
+            columns: { id: true },
+            where: eq(bottles.id, bottleId),
+          });
+          if (!currentBottle) {
+            throw errors.NOT_FOUND({ message: "Bottle not found." });
+          }
+          throw errors.CONFLICT({
+            message: `Bottle ${bottleId} belongs to a missing BottleGroup.`,
+          });
+        }
+
+        const groupMembers = await tx
+          .select()
+          .from(bottles)
+          .where(eq(bottles.groupId, group.id))
+          .orderBy(asc(bottles.id))
+          .for("update");
+        bottle = groupMembers.find(({ id }) => id === bottleId);
+        if (!bottle) {
+          const currentBottle = await tx.query.bottles.findFirst({
+            columns: { groupId: true },
+            where: eq(bottles.id, bottleId),
+          });
+          if (!currentBottle) {
+            throw errors.NOT_FOUND({ message: "Bottle not found." });
+          }
+          throw errors.CONFLICT({
+            message: `Bottle ${bottleId} changed groups before deletion.`,
+          });
+        }
+        remainingGroupMemberIds = groupMembers
+          .map(({ id }) => id)
+          .filter((id) => id !== bottleId);
+        groupRepresentativeBottleId = group.representativeBottleId;
       }
 
       const entityLinksBefore = await getBottleEntityLinks(tx, [bottle.id]);
@@ -119,36 +186,6 @@ export default procedure
         throw errors.BAD_REQUEST({
           message: `Cannot delete bottle while it is used in ${formatReferenceTypes(blockingReferences)}.`,
         });
-      }
-
-      let remainingGroupMemberIds: number[] = [];
-      let groupRepresentativeBottleId: number | null = null;
-      if (bottle.groupId !== null) {
-        const [group] = await tx
-          .select({
-            id: bottleGroups.id,
-            representativeBottleId: bottleGroups.representativeBottleId,
-          })
-          .from(bottleGroups)
-          .where(eq(bottleGroups.id, bottle.groupId))
-          .limit(1)
-          .for("update");
-        if (!group) {
-          throw errors.CONFLICT({
-            message: `Bottle ${bottle.id} belongs to a missing BottleGroup.`,
-          });
-        }
-
-        const groupMembers = await tx
-          .select({ id: bottles.id })
-          .from(bottles)
-          .where(eq(bottles.groupId, group.id))
-          .orderBy(asc(bottles.id))
-          .for("update");
-        remainingGroupMemberIds = groupMembers
-          .map(({ id }) => id)
-          .filter((id) => id !== bottle.id);
-        groupRepresentativeBottleId = group.representativeBottleId;
       }
 
       const actorId = (await getUserActorForDatabase(tx, context.user)).id;
