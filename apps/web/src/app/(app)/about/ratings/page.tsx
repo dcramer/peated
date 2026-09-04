@@ -3,7 +3,6 @@ import {
   RailList,
   RailListItem,
   RATING_BANDS,
-  TastingRating,
   type DataTableColumn,
 } from "@peated/web/components";
 import {
@@ -37,13 +36,6 @@ const bandColumns: DataTableColumn<(typeof RATING_BANDS)[number]>[] = [
     cell: (band) => band.range,
     header: "Range",
     key: "range",
-  },
-  {
-    align: "right",
-    cell: (band) => <TastingRating band={band.key} />,
-    header: "Marker",
-    key: "marker",
-    priority: "secondary",
   },
 ];
 

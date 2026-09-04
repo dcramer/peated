@@ -1,8 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 import { Avatar } from "./avatar.stylex";
+import { ReviewScore } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
 
 export type CriticReviewProps = {
@@ -51,16 +52,10 @@ export function CriticReview({
                 </p>
               ) : null}
               {hasScore ? (
-                <span
-                  aria-label={`${publication} score ${nativeScore.value} out of ${nativeScore.scale}`}
-                  role="img"
-                  {...stylex.props(styles.rating)}
-                >
-                  {nativeScore.value}
-                  <span {...stylex.props(styles.ratingScale)}>
-                    /{nativeScore.scale}
-                  </span>
-                </span>
+                <ReviewScore
+                  scale={nativeScore.scale}
+                  score={nativeScore.value}
+                />
               ) : null}
             </div>
           ) : null}
@@ -115,26 +110,6 @@ const styles = stylex.create({
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: space.x4,
-  },
-  rating: {
-    flexShrink: 0,
-    marginLeft: "auto",
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "32px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.045em",
-    lineHeight: 1,
-    whiteSpace: "nowrap",
-    [MOBILE]: { fontSize: "26px" },
-  },
-  ratingScale: {
-    color: colors.inkMuted,
-    fontSize: "12px",
-    fontWeight: 400,
-    letterSpacing: "normal",
-    marginLeft: "3px",
   },
   summary: {
     maxWidth: "54ch",

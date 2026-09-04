@@ -36,33 +36,97 @@ export function TastingRatingDistribution({
 export type TastingRatingProps = {
   /** One tasting rating. */
   band: RatingBand;
+  size?: "sm" | "md" | "lg";
 };
 
-/** Shows one tasting rating as five cells. */
-export function TastingRating({ band }: TastingRatingProps) {
+/** Shows one tasting's named rating and range, never a five-point score. */
+export function TastingRating({ band, size = "md" }: TastingRatingProps) {
   const selectedBand = RATING_BANDS.find((candidate) => candidate.key === band);
-  const label = `${selectedBand?.label ?? "Unknown"} rating`;
+  const label = selectedBand?.label ?? "Unknown";
+  const range = selectedBand?.range ?? "Unknown";
 
   return (
-    <span
-      aria-label={label}
-      role="img"
-      title={label}
-      {...stylex.props(styles.tastingRating)}
-    >
-      {RATING_BANDS.map((candidate) => {
-        const selected = candidate.key === band;
+    <span {...stylex.props(styles.ratingLockup)}>
+      <span {...stylex.props(styles.visuallyHidden)}>
+        {label} rating, {range} range
+      </span>
+      <span
+        aria-hidden="true"
+        {...stylex.props(
+          styles.ratingLabel,
+          size === "sm" && styles.smallRatingLabel,
+          size === "lg" && styles.largeRatingLabel,
+        )}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden="true"
+        {...stylex.props(
+          styles.tastingRatingRange,
+          size === "sm" && styles.smallTastingRatingRange,
+          size === "lg" && styles.largeTastingRatingRange,
+        )}
+      >
+        {range} range
+      </span>
+    </span>
+  );
+}
 
-        return (
-          <span
-            key={candidate.key}
-            {...stylex.props(
-              styles.tastingRatingCell,
-              selected && bandFillStyles[bandFillForKey(candidate.key)],
-            )}
-          />
-        );
-      })}
+export type ReviewScoreProps = {
+  /** The original score shown by the review. */
+  score: number;
+  /** The original scoring scale. Only 100-point scores use Peated's rating names. */
+  scale?: number;
+  size?: "sm" | "md" | "lg";
+};
+
+/** Shows an exact review score and names its Peated rating on a 100-point scale. */
+export function ReviewScore({
+  score,
+  scale = 100,
+  size = "md",
+}: ReviewScoreProps) {
+  const rating = scale === 100 ? getRatingBandForScore(score) : undefined;
+  const accessibleLabel = rating
+    ? `${rating.label} review score, ${score} out of ${scale}`
+    : `Review score, ${score} out of ${scale}`;
+
+  return (
+    <span {...stylex.props(styles.ratingLockup, styles.reviewScore)}>
+      <span {...stylex.props(styles.visuallyHidden)}>{accessibleLabel}</span>
+      {rating ? (
+        <span
+          aria-hidden="true"
+          {...stylex.props(
+            styles.ratingLabel,
+            size === "sm" && styles.smallRatingLabel,
+            size === "lg" && styles.largeRatingLabel,
+          )}
+        >
+          {rating.label}
+        </span>
+      ) : null}
+      <span aria-hidden="true" {...stylex.props(styles.reviewScoreValueGroup)}>
+        <strong
+          {...stylex.props(
+            styles.reviewScoreValue,
+            size === "sm" && styles.smallReviewScoreValue,
+            size === "lg" && styles.largeReviewScoreValue,
+          )}
+        >
+          {score}
+        </strong>
+        <span
+          {...stylex.props(
+            styles.reviewScoreScale,
+            size === "sm" && styles.smallReviewScoreScale,
+          )}
+        >
+          /{scale}
+        </span>
+      </span>
     </span>
   );
 }
@@ -200,14 +264,18 @@ function getBottleRating({
   tastingCounts: RatingCounts;
 }): BottleRating | null {
   if (median !== null && scoreCount > 0) {
-    const band = RATING_BANDS.find(
-      (candidate) => median >= candidate.min && median <= candidate.max,
-    );
+    const band = getRatingBandForScore(median);
     if (band) return { exact: true, label: band.label, value: `${median}` };
   }
 
   const band = getMedianTastingBand(tastingCounts);
   return band ? { exact: false, label: band.label, value: band.range } : null;
+}
+
+function getRatingBandForScore(score: number) {
+  return RATING_BANDS.find(
+    (candidate) => score >= candidate.min && score <= candidate.max,
+  );
 }
 
 function getMedianTastingBand(counts: RatingCounts) {
@@ -423,15 +491,84 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   }),
-  tastingRating: { display: "inline-flex", flexShrink: 0, gap: "2px" },
-  tastingRatingCell: {
-    position: "relative",
-    display: "inline-block",
-    width: "12px",
-    height: "8px",
+  ratingLockup: {
+    display: "inline-flex",
     flexShrink: 0,
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.bandTrack,
+    alignItems: "flex-end",
+    flexDirection: "column",
+    gap: "2px",
+    whiteSpace: "nowrap",
+  },
+  ratingLabel: {
+    color: colors.accentDeep,
+    fontFamily: fonts.display,
+    fontSize: "16px",
+    fontWeight: 700,
+    letterSpacing: "-0.025em",
+    lineHeight: 1.2,
+  },
+  smallRatingLabel: {
+    fontSize: "13px",
+    lineHeight: 1.2,
+  },
+  largeRatingLabel: {
+    fontSize: "20px",
+    lineHeight: 1.1,
+  },
+  tastingRatingRange: {
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 400,
+    letterSpacing: "normal",
+    lineHeight: 1.3,
+  },
+  smallTastingRatingRange: { fontSize: "12px" },
+  largeTastingRatingRange: { fontSize: "15px" },
+  reviewScore: { marginLeft: "auto" },
+  reviewScoreValueGroup: {
+    display: "inline-flex",
+    alignItems: "baseline",
+    color: colors.ink,
+    fontFamily: fonts.display,
+  },
+  reviewScoreValue: {
+    fontSize: "32px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 700,
+    letterSpacing: "-0.045em",
+    lineHeight: 0.9,
+    [COMPACT]: { fontSize: "26px" },
+  },
+  smallReviewScoreValue: {
+    fontSize: "18px",
+    [COMPACT]: { fontSize: "18px" },
+  },
+  largeReviewScoreValue: {
+    fontSize: "40px",
+    [COMPACT]: { fontSize: "36px" },
+  },
+  reviewScoreScale: {
+    marginLeft: "3px",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "13px",
+    fontWeight: 400,
+    letterSpacing: "normal",
+    lineHeight: 1.45,
+  },
+  smallReviewScoreScale: { fontSize: "12px" },
+  visuallyHidden: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    padding: 0,
+    margin: "-1px",
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
   },
   bottleRatings: {
     display: "inline-flex",
