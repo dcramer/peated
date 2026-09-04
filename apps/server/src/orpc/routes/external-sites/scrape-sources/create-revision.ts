@@ -14,6 +14,14 @@ import { serialize } from "@peated/server/serializers";
 import { ScrapeSourceRevisionSerializer } from "@peated/server/serializers/scrapeSource";
 import { z } from "zod";
 
+// The OpenAPI boundary owns number coercion, but its experimental coercion
+// cannot safely inspect unions of strict object shapes. Keep scraper rules
+// intact here; the inner schema still performs their full validation.
+const ScrapeRulesInputSchema = z.preprocess(
+  (value) => value,
+  ScrapeRulesSchema,
+);
+
 export default procedure
   .use(requireAdmin)
   .route({
@@ -29,7 +37,7 @@ export default procedure
       .object({
         id: z.number().int().positive(),
         listUrl: ScrapeSourceUrlSchema,
-        rules: ScrapeRulesSchema,
+        rules: ScrapeRulesInputSchema,
       })
       .strict(),
   )
