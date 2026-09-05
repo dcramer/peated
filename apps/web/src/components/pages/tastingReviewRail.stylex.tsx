@@ -98,6 +98,7 @@ export function TastingReviewRail({
             </div>
           ),
           href: getTastingUrl(tasting),
+          imageFit: tasting.imageUrl ? "cover" : "contain",
           imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
         }))}
         moreHref={`/users/${author.username}/tastings`}

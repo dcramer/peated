@@ -19,6 +19,7 @@ export type TastingEntryMember = {
   comments?: number;
   hasToasted?: boolean;
   href?: string;
+  imageFit?: BottleIdentityRowProps["imageFit"];
   imageUrl?: string | null;
   notes?: string;
   notesHref?: string;
@@ -107,6 +108,7 @@ export function TastingEntry({
                   <BottleIdentityRow
                     {...member.bottle}
                     href={member.href}
+                    imageFit={member.imageFit}
                     imageUrl={member.imageUrl}
                   />
                 </div>

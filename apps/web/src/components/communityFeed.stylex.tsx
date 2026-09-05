@@ -14,7 +14,7 @@ import TimeSince from "./timeSince";
 
 export type CommunityFeedBottle = Pick<
   BottleIdentityRowProps,
-  "provenance" | "href" | "imageUrl" | "metadata" | "name"
+  "provenance" | "href" | "imageFit" | "imageUrl" | "metadata" | "name"
 > & {
   id: string;
   description?: string;
@@ -134,6 +134,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 provenance={bottle.provenance}
                 name={bottle.name}
                 href={bottle.href}
+                imageFit={bottle.imageFit}
                 imageUrl={bottle.imageUrl}
                 linkArea="title"
                 metadata={bottle.metadata}
