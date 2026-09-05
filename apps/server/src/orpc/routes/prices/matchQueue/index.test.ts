@@ -550,6 +550,42 @@ describe("price match queue", () => {
     expect(candidates).toEqual([]);
   });
 
+  test("treats historical extracted categories as unknown", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const price = await fixtures.StorePrice({
+      name: "Historical Category Listing",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+        extractedLabel: {
+          expression: "Historical Category",
+          category: "historical_category",
+        },
+      })
+      .returning();
+
+    const [listResult, detailsResult] = await Promise.all([
+      routerClient.prices.matchQueue.list({}, { context: { user } }),
+      routerClient.prices.matchQueue.details(
+        { proposal: proposal.id },
+        { context: { user } },
+      ),
+    ]);
+    const listItem = listResult.results.find((item) => item.id === proposal.id);
+
+    expect(listItem?.extractedLabel).toMatchObject({
+      expression: "Historical Category",
+      category: null,
+    });
+    expect(detailsResult.extractedLabel).toEqual(listItem?.extractedLabel);
+  });
+
   test("serializes persisted BottleGroup sibling cask evidence", async ({
     fixtures,
   }) => {

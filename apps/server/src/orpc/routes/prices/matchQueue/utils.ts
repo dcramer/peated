@@ -39,6 +39,7 @@ type QueueRow = {
 
 const StoredValueSchema = z.json().catch(null);
 type StoredValue = z.infer<typeof StoredValueSchema>;
+const StoredObjectSchema = z.record(z.string(), z.json());
 
 const AutomationIssuePathSchema = z
   .union([z.string(), z.array(z.string())])
@@ -84,6 +85,37 @@ function normalizeStoredPriceMatchCandidates(
   }
 
   return normalized;
+}
+
+/**
+ * Stored classifier snapshots can predate the current category list. Keep the
+ * remaining extracted evidence, but expose an unrecognized category as unknown.
+ */
+function normalizeStoredExtractedLabel(
+  value: StoredValue,
+  proposalId: number,
+): ReturnType<typeof ExtractedBottleDetailsSchema.parse> {
+  const parsed = ExtractedBottleDetailsSchema.safeParse(value);
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  const hasOnlyInvalidCategory = parsed.error.issues.every(
+    (issue) => issue.path[0] === "category",
+  );
+  const storedObject = StoredObjectSchema.safeParse(value);
+  if (hasOnlyInvalidCategory && storedObject.success) {
+    const normalized = ExtractedBottleDetailsSchema.parse({
+      ...storedObject.data,
+      category: null,
+    });
+    logWarn("Discarded invalid price-match extracted category evidence", {
+      extra: { proposalId },
+    });
+    return normalized;
+  }
+
+  return ExtractedBottleDetailsSchema.parse(value);
 }
 
 function normalizeStoredProposedBottle(
@@ -250,7 +282,10 @@ export function serializeProposal(
     proposal.id,
   );
   const extractedLabel = proposal.extractedLabel
-    ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
+    ? normalizeStoredExtractedLabel(
+        StoredValueSchema.parse(proposal.extractedLabel),
+        proposal.id,
+      )
     : null;
   const normalizedProposedBottle = proposal.proposedBottle
     ? normalizeStoredProposedBottle(
