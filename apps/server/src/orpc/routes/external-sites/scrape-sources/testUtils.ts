@@ -1,3 +1,4 @@
+import type { ScrapeRules } from "@peated/server/scraper/configured/rules";
 import {
   createScrapeSourceRevision,
   createSiteWithScrapeSource,
@@ -5,16 +6,51 @@ import {
 
 export const reviewRules = {
   kind: "review" as const,
-  list: {
-    detailLink: { selector: "a.review", attribute: "href" as const },
-    maxItems: 5,
+  articles: {
+    oneArticlePer: "li",
+    link: "a.review",
+    skipWhen: null,
+    nextPage: null,
+    limit: 5,
   },
-  detail: {
-    title: { selector: "h1" },
-    reviewItem: "article.review",
-    name: { selector: "h2" },
+  article: {
+    canonicalUrl: null,
+    title: {
+      try: [
+        {
+          get: "text" as const,
+          selector: "h1",
+          take: "first" as const,
+          startsWith: null,
+          clean: null,
+        },
+      ],
+    },
+    publishedDate: {
+      try: [{ get: "fixed" as const, value: "2026-01-01", clean: null }],
+    },
+    reviews: {
+      inside: "body",
+      oneReviewPer: "element" as const,
+      selector: "article.review",
+      name: {
+        try: [
+          {
+            get: "text" as const,
+            from: "review" as const,
+            selector: "h2",
+            take: "first" as const,
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      reviewer: null,
+      tastingNotes: null,
+      score: null,
+    },
   },
-};
+} satisfies ScrapeRules;
 
 export async function createTestSource(
   createdById: number,

@@ -6,7 +6,8 @@ export const SCRAPE_RULES_VERSION_1 = 1;
 export const SCRAPE_RULES_VERSION_2 = 2;
 export const SCRAPE_RULES_VERSION_3 = 3;
 export const SCRAPE_RULES_VERSION_4 = 4;
-export const SCRAPE_RULES_VERSION = 5;
+export const SCRAPE_RULES_VERSION_5 = 5;
+export const SCRAPE_RULES_VERSION = 6;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -147,35 +148,37 @@ function reviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
     .strict();
 }
 
+const ScrapeUrlDateFormatSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(SCRAPE_VALUE_MAX_LENGTH)
+  .superRefine((format, context) => {
+    const tokens: string[] = format.match(/yyyy|yy|MM|dd|\*/g) ?? [];
+    const literal = format.replaceAll(/yyyy|yy|MM|dd|\*/g, "");
+    if (!tokens.includes("yyyy") && !tokens.includes("yy")) {
+      context.addIssue({
+        code: "custom",
+        message: "URL date format requires yyyy or yy.",
+      });
+    }
+    if (!tokens.includes("MM") || !tokens.includes("dd")) {
+      context.addIssue({
+        code: "custom",
+        message: "URL date format requires MM and dd.",
+      });
+    }
+    if (/[A-Za-z0-9]/.test(literal)) {
+      context.addIssue({
+        code: "custom",
+        message: "URL date format contains an unsupported token.",
+      });
+    }
+  });
+
 export const ScrapeUrlDateSchema = z
   .object({
-    urlDateFormat: z
-      .string()
-      .trim()
-      .min(1)
-      .max(SCRAPE_VALUE_MAX_LENGTH)
-      .superRefine((format, context) => {
-        const tokens: string[] = format.match(/yyyy|yy|MM|dd|\*/g) ?? [];
-        const literal = format.replaceAll(/yyyy|yy|MM|dd|\*/g, "");
-        if (!tokens.includes("yyyy") && !tokens.includes("yy")) {
-          context.addIssue({
-            code: "custom",
-            message: "URL date format requires yyyy or yy.",
-          });
-        }
-        if (!tokens.includes("MM") || !tokens.includes("dd")) {
-          context.addIssue({
-            code: "custom",
-            message: "URL date format requires MM and dd.",
-          });
-        }
-        if (/[A-Za-z0-9]/.test(literal)) {
-          context.addIssue({
-            code: "custom",
-            message: "URL date format contains an unsupported token.",
-          });
-        }
-      }),
+    urlDateFormat: ScrapeUrlDateFormatSchema,
   })
   .strict();
 
@@ -230,7 +233,7 @@ export const ScrapeReviewSectionSchema = z
   })
   .strict();
 
-function currentReviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
+function legacyReviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
   reviewItemSchema: T,
   scoreSchema: U,
 ) {
@@ -291,24 +294,237 @@ export const ScrapeRulesV2Schema = z.discriminatedUnion("kind", [
 ]);
 
 export const ScrapeRulesV3Schema = z.discriminatedUnion("kind", [
-  currentReviewRulesSchema(ScrapeSelectorSchema, ScrapeScoreSchema),
+  legacyReviewRulesSchema(ScrapeSelectorSchema, ScrapeScoreSchema),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
 export const ScrapeRulesV4Schema = z.discriminatedUnion("kind", [
-  currentReviewRulesSchema(
+  legacyReviewRulesSchema(
     z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
     ScrapeScoreSchema,
   ),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
-export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
-  currentReviewRulesSchema(
+export const ScrapeRulesV5Schema = z.discriminatedUnion("kind", [
+  legacyReviewRulesSchema(
     z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
     ScrapeScoreWithFirstReviewSchema,
   ),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
+]);
+
+const ScrapeCleanupV6Schema = z
+  .object({
+    removeStart: ScrapeLiteralListSchema.nullable(),
+    removeEnd: ScrapeLiteralListSchema.nullable(),
+    addStart: z.string().min(1).max(SCRAPE_VALUE_MAX_LENGTH).nullable(),
+    addEnd: z.string().min(1).max(SCRAPE_VALUE_MAX_LENGTH).nullable(),
+  })
+  .strict();
+
+const ScrapeTextReadV6Schema = z
+  .object({
+    get: z.literal("text"),
+    selector: ScrapeSelectorSchema,
+    take: z.enum(["first", "all"]),
+    startsWith: ScrapeLiteralListSchema.nullable(),
+    clean: ScrapeCleanupV6Schema.nullable(),
+  })
+  .strict();
+
+const ScrapeAttributeReadV6Schema = z
+  .object({
+    get: z.literal("attribute"),
+    selector: ScrapeSelectorSchema,
+    attribute: ScrapeAttributeSchema,
+    clean: ScrapeCleanupV6Schema.nullable(),
+  })
+  .strict();
+
+const ScrapeFixedReadV6Schema = z
+  .object({
+    get: z.literal("fixed"),
+    value: z.string().trim().min(1).max(SCRAPE_VALUE_MAX_LENGTH),
+    clean: ScrapeCleanupV6Schema.nullable(),
+  })
+  .strict();
+
+const ScrapeDateFromUrlV6Schema = z
+  .object({
+    get: z.literal("dateFromUrl"),
+    format: ScrapeUrlDateFormatSchema,
+  })
+  .strict();
+
+export const ScrapePageReadSchema = z.union([
+  ScrapeTextReadV6Schema,
+  ScrapeAttributeReadV6Schema,
+  ScrapeFixedReadV6Schema,
+]);
+
+const ReviewUseSchema = z.enum(["firstReview", "everyReview"]);
+const ScrapeReviewReadSchema = z.union([
+  ScrapeTextReadV6Schema.extend({ from: z.literal("review") }).strict(),
+  ScrapeAttributeReadV6Schema.extend({ from: z.literal("review") }).strict(),
+  ScrapeTextReadV6Schema.extend({
+    from: z.literal("article"),
+    useFor: ReviewUseSchema,
+  }).strict(),
+  ScrapeAttributeReadV6Schema.extend({
+    from: z.literal("article"),
+    useFor: ReviewUseSchema,
+  }).strict(),
+  ScrapeFixedReadV6Schema,
+]);
+const ScrapeReviewTrySchema = z.array(ScrapeReviewReadSchema).min(1).max(3);
+
+export const ScrapePageFieldSchema = z
+  .object({
+    try: z.array(ScrapePageReadSchema).min(1).max(3),
+  })
+  .strict();
+
+export const ScrapeReviewFieldSchema = z
+  .object({
+    try: ScrapeReviewTrySchema,
+  })
+  .strict();
+
+const ScrapeDateFieldV6Schema = z
+  .object({
+    try: z
+      .array(z.union([ScrapePageReadSchema, ScrapeDateFromUrlV6Schema]))
+      .min(1)
+      .max(3),
+  })
+  .strict();
+
+const ScrapeSkipV6Schema = z
+  .object({
+    selector: ScrapeSelectorSchema,
+    startsWith: ScrapeLiteralListSchema.nullable(),
+  })
+  .strict();
+
+const ScrapeScoreV6Schema = z
+  .object({
+    try: ScrapeReviewTrySchema,
+    scale: z.number().positive(),
+    map: z
+      .array(ScrapeScoreMapEntrySchema)
+      .min(1)
+      .max(SCRAPE_SCORE_MAP_MAX_ITEMS)
+      .nullable(),
+  })
+  .strict()
+  .superRefine((score, context) => {
+    const labels = new Set<string>();
+    for (const [index, entry] of (score.map ?? []).entries()) {
+      if (entry.value > score.scale) {
+        context.addIssue({
+          code: "custom",
+          path: ["map", index, "value"],
+          message: "Mapped score cannot exceed its scale.",
+        });
+      }
+      const label = entry.text.toLocaleLowerCase("en");
+      if (labels.has(label)) {
+        context.addIssue({
+          code: "custom",
+          path: ["map", index, "text"],
+          message: "Mapped score labels must be unique.",
+        });
+      }
+      labels.add(label);
+    }
+  });
+
+const scrapeReviewFieldsV6 = {
+  name: ScrapeReviewFieldSchema,
+  reviewer: ScrapeReviewFieldSchema.nullable(),
+  tastingNotes: ScrapeReviewFieldSchema.nullable(),
+  score: ScrapeScoreV6Schema.nullable(),
+};
+
+const ScrapeReviewGroupsV6Schema = z.union([
+  z
+    .object({
+      inside: ScrapeSelectorSchema,
+      oneReviewPer: z.literal("element"),
+      selector: ScrapeSelectorSchema,
+      ...scrapeReviewFieldsV6,
+    })
+    .strict(),
+  z
+    .object({
+      inside: ScrapeSelectorSchema,
+      oneReviewPer: z.literal("heading"),
+      selector: ScrapeSelectorSchema,
+      stopBefore: ScrapeSelectorSchema.nullable(),
+      whenOnlyOneReview: z.enum(["startAtHeading", "useWholeArea"]),
+      ...scrapeReviewFieldsV6,
+    })
+    .strict(),
+]);
+
+const ScrapeArticlesV6Schema = z
+  .object({
+    oneArticlePer: ScrapeSelectorSchema,
+    link: ScrapeSelectorSchema,
+    skipWhen: ScrapeSkipV6Schema.nullable(),
+    nextPage: ScrapeSelectorSchema.nullable(),
+    limit: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS),
+  })
+  .strict();
+
+const ScrapeProductsV6Schema = z
+  .object({
+    oneProductPer: ScrapeSelectorSchema,
+    link: ScrapeSelectorSchema,
+    skipWhen: ScrapeSkipV6Schema.nullable(),
+    nextPage: ScrapeSelectorSchema.nullable(),
+    limit: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS),
+  })
+  .strict();
+
+export const ScrapeReviewRulesSchema = z
+  .object({
+    kind: z.literal("review"),
+    articles: ScrapeArticlesV6Schema,
+    article: z
+      .object({
+        canonicalUrl: ScrapePageFieldSchema.nullable(),
+        title: ScrapePageFieldSchema,
+        publishedDate: ScrapeDateFieldV6Schema,
+        reviews: ScrapeReviewGroupsV6Schema,
+      })
+      .strict(),
+  })
+  .strict();
+
+export const ScrapePriceRulesSchema = z
+  .object({
+    kind: z.literal("price"),
+    products: ScrapeProductsV6Schema,
+    product: z
+      .object({
+        name: ScrapePageFieldSchema,
+        price: ScrapePageFieldSchema,
+        currency: z.enum(CURRENCY_LIST),
+        volume: ScrapePageFieldSchema,
+        url: ScrapePageFieldSchema.nullable(),
+        externalProductId: ScrapePageFieldSchema.nullable(),
+        imageUrl: ScrapePageFieldSchema.nullable(),
+        barcode: ScrapePageFieldSchema.nullable(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
+  ScrapeReviewRulesSchema,
+  ScrapePriceRulesSchema,
 ]);
 
 export const StoredScrapeRulesSchema = z.union([
@@ -316,12 +532,17 @@ export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV2Schema,
   ScrapeRulesV3Schema,
   ScrapeRulesV4Schema,
+  ScrapeRulesV5Schema,
   ScrapeRulesSchema,
 ]);
 
 export type ScrapeRulesV1 = z.infer<typeof ScrapeRulesV1Schema>;
+export type ScrapeRulesV5 = z.infer<typeof ScrapeRulesV5Schema>;
 export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
+export type ScrapePageRead = z.infer<typeof ScrapePageReadSchema>;
+export type ScrapePageField = z.infer<typeof ScrapePageFieldSchema>;
+export type ScrapeReviewField = z.infer<typeof ScrapeReviewFieldSchema>;
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
 export type ScrapeListExclusion = z.infer<typeof ScrapeListExclusionSchema>;
@@ -343,8 +564,31 @@ export function parseScrapeRules(
   if (rulesVersion === SCRAPE_RULES_VERSION_4) {
     return ScrapeRulesV4Schema.parse(rules);
   }
+  if (rulesVersion === SCRAPE_RULES_VERSION_5) {
+    return ScrapeRulesV5Schema.parse(rules);
+  }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);
   }
   throw new Error(`Unsupported scrape rules version: ${rulesVersion}.`);
+}
+
+export function scrapeRulesLimit(rules: StoredScrapeRules) {
+  if ("articles" in rules) return rules.articles.limit;
+  if ("products" in rules) return rules.products.limit;
+  return rules.list.maxItems;
+}
+
+export function withScrapeRulesLimit(
+  rules: StoredScrapeRules,
+  requestedLimit: number,
+): StoredScrapeRules {
+  const limit = Math.min(scrapeRulesLimit(rules), requestedLimit);
+  if ("articles" in rules) {
+    return { ...rules, articles: { ...rules.articles, limit } };
+  }
+  if ("products" in rules) {
+    return { ...rules, products: { ...rules.products, limit } };
+  }
+  return { ...rules, list: { ...rules.list, maxItems: limit } };
 }

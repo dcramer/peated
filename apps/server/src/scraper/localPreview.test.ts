@@ -45,20 +45,88 @@ test("previews configured rules through the runtime without product writes", asy
     {
       site: "whiskystudy",
       listUrl: "https://thewhiskystudy.com/reviews-3",
-      rulesVersion: 2,
+      rulesVersion: 6,
       rules: {
         kind: "review",
-        list: {
-          detailLink: { selector: "a.review", attribute: "href" },
-          maxItems: 20,
+        articles: {
+          oneArticlePer: "body",
+          link: "a.review",
+          skipWhen: null,
+          nextPage: null,
+          limit: 20,
         },
-        detail: {
-          title: { selector: "h1" },
-          publishedAt: { selector: "time", attribute: "datetime" },
-          reviewItem: ".review",
-          name: { selector: "h2", removeSuffixes: ["Review"] },
-          reviewText: { selector: "p" },
-          score: { value: { selector: "strong" }, scale: 100 },
+        article: {
+          canonicalUrl: null,
+          title: {
+            try: [
+              {
+                get: "text",
+                selector: "h1",
+                take: "first",
+                startsWith: null,
+                clean: null,
+              },
+            ],
+          },
+          publishedDate: {
+            try: [
+              {
+                get: "attribute",
+                selector: "time",
+                attribute: "datetime",
+                clean: null,
+              },
+            ],
+          },
+          reviews: {
+            inside: "article",
+            oneReviewPer: "element",
+            selector: ".review",
+            name: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: "h2",
+                  take: "first",
+                  startsWith: null,
+                  clean: {
+                    removeStart: null,
+                    removeEnd: ["Review"],
+                    addStart: null,
+                    addEnd: null,
+                  },
+                },
+              ],
+            },
+            reviewer: null,
+            tastingNotes: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: "p",
+                  take: "first",
+                  startsWith: null,
+                  clean: null,
+                },
+              ],
+            },
+            score: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: "strong",
+                  take: "first",
+                  startsWith: null,
+                  clean: null,
+                },
+              ],
+              scale: 100,
+              map: null,
+            },
+          },
         },
       },
       limit: 1,

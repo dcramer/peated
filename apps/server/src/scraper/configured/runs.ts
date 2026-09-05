@@ -6,7 +6,11 @@ import {
   scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { SCRAPE_SOURCE_MAX_LIST_PAGES, parseScrapeRules } from "./rules";
+import {
+  SCRAPE_SOURCE_MAX_LIST_PAGES,
+  parseScrapeRules,
+  scrapeRulesLimit,
+} from "./rules";
 import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
@@ -64,7 +68,7 @@ export async function createPinnedScrapeSourceRun(
       externalSiteId: source.externalSiteId,
       trigger: input.trigger,
       requestedById: input.requestedById,
-      requestLimit: rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
+      requestLimit: scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     })
     .returning();
   if (!run) throw new Error("Failed to create source run.");

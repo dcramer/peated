@@ -93,12 +93,22 @@ describe("POST /admin/scrape-sources/:id/revisions", () => {
           listUrl: source.listUrl,
           rules: {
             ...reviewRules,
-            detail: {
-              ...reviewRules.detail,
+            article: {
+              ...reviewRules.article,
               canonicalUrl: {
-                selector: 'link[rel="canonical"]',
-                attribute: "href",
-                removeSuffixes: ["/"],
+                try: [
+                  {
+                    get: "attribute",
+                    selector: 'link[rel="canonical"]',
+                    attribute: "href",
+                    clean: {
+                      removeStart: null,
+                      removeEnd: ["/"],
+                      addStart: null,
+                      addEnd: null,
+                    },
+                  },
+                ],
               },
             },
           },
@@ -126,11 +136,21 @@ describe("POST /admin/scrape-sources/:id/revisions", () => {
         previewStatus: "pending",
         revision: 1,
         rules: {
-          detail: {
+          article: {
             canonicalUrl: {
-              selector: 'link[rel="canonical"]',
-              attribute: "href",
-              removeSuffixes: ["/"],
+              try: [
+                {
+                  get: "attribute",
+                  selector: 'link[rel="canonical"]',
+                  attribute: "href",
+                  clean: {
+                    removeStart: null,
+                    removeEnd: ["/"],
+                    addStart: null,
+                    addEnd: null,
+                  },
+                },
+              ],
             },
           },
         },
