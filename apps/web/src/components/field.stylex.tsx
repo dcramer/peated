@@ -194,7 +194,7 @@ const styles = stylex.create({
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
-    rowGap: "7px",
+    rowGap: space.x2,
   },
   fieldset: {
     margin: 0,
@@ -215,7 +215,7 @@ const styles = stylex.create({
     columnGap: space.x2,
   },
   label: {
-    color: colors.ink,
+    color: colors.accentDeep,
   },
   required: {
     color: colors.accentDeep,
@@ -228,16 +228,10 @@ const styles = stylex.create({
   control: {
     boxSizing: "border-box",
     width: "100%",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: {
-      default: colors.sectionRule,
-      ":hover": colors.inkMuted,
-      ":focus": colors.accent,
-    },
+    borderWidth: 0,
     borderRadius: controlMetrics.radius,
     outline: "none",
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.ink,
     opacity: {
       default: 1,
@@ -245,7 +239,7 @@ const styles = stylex.create({
     },
     boxShadow: {
       default: "none",
-      ":focus": `inset 0 0 0 1px ${colors.accent}`,
+      ":focus": `inset 0 0 0 2px ${colors.accent}`,
     },
     "::placeholder": {
       color: colors.inkMuted,
@@ -278,7 +272,6 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
   invalid: {
-    borderColor: colors.critical,
     boxShadow: {
       default: effects.errorRing,
       ":focus-visible": effects.errorRing,

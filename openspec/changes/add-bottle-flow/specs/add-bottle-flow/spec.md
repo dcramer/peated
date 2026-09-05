@@ -185,3 +185,45 @@ The system SHALL preserve existing bottle-scoped tasting deep links while user-f
 
 - **WHEN** the bottle-scoped tasting route renders visible tasting copy
 - **THEN** the copy uses Log a tasting
+
+### Requirement: Existing Bottle review during manual creation
+
+The system SHALL surface advisory existing Bottle candidates while preserving
+manual Bottle creation as the member's primary task.
+
+#### Scenario: Unseen candidates appear during entry
+
+- **WHEN** the manual creation matcher returns one or more Bottle ids the member has not reviewed in the current form session
+- **THEN** the form shows a compact review notice without leaving the current numbered step
+- **AND** the notice count includes only unseen Bottle ids
+
+#### Scenario: Reviewed candidates repeat or reorder
+
+- **WHEN** matcher results contain only Bottle ids the member already reviewed in the current form session
+- **THEN** the form does not ask the member to review them again
+- **AND** changes to result ordering do not make those Bottles unseen
+
+#### Scenario: New candidate appears after review
+
+- **WHEN** a later matcher result contains a Bottle id that was not in a completed review
+- **THEN** the form identifies that Bottle as new
+- **AND** offers review again using only unseen candidates
+
+#### Scenario: Final creation has unseen candidates
+
+- **WHEN** the member reaches the final manual creation action with unseen candidates
+- **THEN** the system requires candidate review before creating the Bottle
+- **AND** the review is an unnumbered view that preserves the final numbered step and all entered data
+
+#### Scenario: Compare the draft with existing Bottles
+
+- **WHEN** candidate review opens
+- **THEN** the system keeps the draft Bottle visible
+- **AND** lists only unseen existing Bottles using the standard Bottle identity row
+- **AND** lets the member use an existing Bottle or add the draft as a new Bottle
+
+#### Scenario: Matcher receives the Bottle draft
+
+- **WHEN** Bottle facts change during manual creation
+- **THEN** the matcher receives the normalized Bottle draft
+- **AND** the server decides which facts affect candidate discovery and ranking

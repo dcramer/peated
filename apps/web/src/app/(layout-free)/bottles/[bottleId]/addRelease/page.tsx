@@ -86,6 +86,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
 
   return (
     <BottleForm
+      mode="create"
       title="Add a similar bottle"
       saveLabel="Add a bottle"
       returnTo={returnTo}

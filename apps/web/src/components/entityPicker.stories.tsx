@@ -58,6 +58,18 @@ export const WithCreateHandoff: Story = {
   ),
 };
 
+export const LoadingAndFailure: Story = {
+  render: (args) => (
+    <StoryStack>
+      <ControlledEntityPicker {...args} loading />
+      <ControlledEntityPicker
+        {...args}
+        searchError="Unable to search distilleries. Keep typing or try again."
+      />
+    </StoryStack>
+  ),
+};
+
 function ControlledEntityPicker(
   props: React.ComponentProps<typeof EntityPicker>,
 ) {

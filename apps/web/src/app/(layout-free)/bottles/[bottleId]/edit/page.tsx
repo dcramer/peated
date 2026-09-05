@@ -51,6 +51,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
 
   return (
     <BottleForm
+      mode="edit"
       onSubmit={async (value, meta) => {
         const { image } = value;
         const updatedBottle = await bottleUpdateMutation.mutateAsync({

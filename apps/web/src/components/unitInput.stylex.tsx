@@ -58,22 +58,15 @@ const styles = stylex.create({
     width: "100%",
     height: controlMetrics.controlHeightLarge,
     alignItems: "center",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: {
-      default: colors.fieldRule,
-      ":hover": colors.inkMuted,
-      ":focus-within": colors.accent,
-    },
+    borderWidth: 0,
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     boxShadow: {
       default: "none",
-      ":focus-within": `inset 0 0 0 1px ${colors.accent}`,
+      ":focus-within": `inset 0 0 0 2px ${colors.accent}`,
     },
   },
   invalid: {
-    borderColor: colors.critical,
     boxShadow: {
       default: effects.errorRing,
       ":focus-within": effects.errorRing,

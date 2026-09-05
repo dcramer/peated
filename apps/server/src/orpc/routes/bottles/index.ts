@@ -4,6 +4,7 @@ import applyBrandRepairGroup from "./apply-brand-repair-group";
 import brandRepairCandidates from "./brand-repair-candidates";
 import brandRepairGroups from "./brand-repair-groups";
 import create from "./create";
+import createCandidates from "./create-candidates";
 import delete_ from "./delete";
 import details from "./details";
 import editContext from "./edit-context";
@@ -25,6 +26,7 @@ export default base.tag("bottles").router({
   flavorProfile,
   list,
   create,
+  createCandidates,
   update,
   editContext,
   brandRepairCandidates,

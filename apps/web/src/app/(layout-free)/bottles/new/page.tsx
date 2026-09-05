@@ -236,6 +236,21 @@ function CreateBottleForm() {
 
   return (
     <BottleForm
+      mode="create"
+      onUseExistingBottle={(bottle) => {
+        if (returnAction === "view" || !returnAction) {
+          router.replace(getBottleUrl(bottle));
+          return;
+        }
+        router.replace(
+          getAddBottleHref({
+            bottleId: bottle.id,
+            pendingImageId,
+            pendingImageUrl,
+            intent: returnAction,
+          }),
+        );
+      }}
       onSubmit={async ({ image, imageSourceUrl, imageLicense, ...data }) => {
         const createdBottle = proposalId
           ? await proposalBottleCreateMutation.mutateAsync({

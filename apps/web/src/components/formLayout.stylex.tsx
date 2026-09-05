@@ -1,6 +1,8 @@
+"use client";
+
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown } from "lucide-react";
-import type { HTMLAttributes, ReactNode } from "react";
+import { useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -10,8 +12,52 @@ export function FormStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.stack)}>{children}</div>;
 }
 
-export function FormGrid({ children }: { children: ReactNode }) {
-  return <div {...stylex.props(styles.grid)}>{children}</div>;
+export function FormGrid({
+  children,
+  compactOnMobile = false,
+}: {
+  children: ReactNode;
+  compactOnMobile?: boolean;
+}) {
+  return (
+    <div
+      {...stylex.props(
+        styles.grid,
+        compactOnMobile && styles.compactMobileGrid,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** Keeps supporting context in wider layouts without crowding a short mobile step. */
+export function FormDesktopOnly({ children }: { children: ReactNode }) {
+  return <div {...stylex.props(styles.desktopOnly)}>{children}</div>;
+}
+
+/** Groups a short form step and announces it when Back or Continue changes the fields. */
+export function FormStep({
+  children,
+  title,
+}: {
+  children: ReactNode;
+  title: string;
+}) {
+  const heading = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    heading.current?.focus({ preventScroll: true });
+  }, []);
+
+  return (
+    <section aria-label={title} {...stylex.props(styles.formStep)}>
+      <h2 ref={heading} tabIndex={-1} {...stylex.props(styles.hiddenHeading)}>
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
 }
 
 export type FormSectionProps = Omit<
@@ -57,15 +103,33 @@ export function FormActions({ children }: { children: ReactNode }) {
 }
 
 export type FormStepsProps = {
+  compactOnMobile?: boolean;
   currentStep: number;
   steps: readonly string[];
 };
 
 /** Shows the full sequence for a form that moves through a few clear steps. */
-export function FormSteps({ currentStep, steps }: FormStepsProps) {
+export function FormSteps({
+  compactOnMobile = false,
+  currentStep,
+  steps,
+}: FormStepsProps) {
   return (
     <nav aria-label="Form progress" {...stylex.props(styles.steps)}>
-      <ol {...stylex.props(styles.stepList)}>
+      {compactOnMobile ? (
+        <p {...stylex.props(foundationStyles.interactive, styles.compactStep)}>
+          <span {...stylex.props(styles.compactStepCount)}>
+            Step {currentStep + 1} of {steps.length}
+          </span>
+          <span>{steps[currentStep]}</span>
+        </p>
+      ) : null}
+      <ol
+        {...stylex.props(
+          styles.stepList,
+          compactOnMobile && styles.fullStepsWithCompactMobile,
+        )}
+      >
         {steps.map((step, index) => (
           <li
             aria-current={index === currentStep ? "step" : undefined}
@@ -191,6 +255,35 @@ const styles = stylex.create({
     },
     gap: space.x6,
   },
+  compactMobileGrid: {
+    "@media (max-width: 559px)": {
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+      columnGap: space.x3,
+      rowGap: space.x4,
+    },
+  },
+  desktopOnly: {
+    minWidth: 0,
+    "@media (max-width: 559px)": { display: "none" },
+  },
+  formStep: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: {
+      default: space.x6,
+      "@media (max-width: 559px)": space.x4,
+    },
+  },
+  hiddenHeading: {
+    position: "absolute",
+    width: "1px",
+    height: "1px",
+    margin: 0,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+  },
   section: {
     boxSizing: "border-box",
     display: "flex",
@@ -237,12 +330,27 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
   steps: { minWidth: 0 },
+  compactStep: {
+    display: {
+      default: "none",
+      "@media (max-width: 559px)": "flex",
+    },
+    minHeight: "44px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
+    margin: 0,
+  },
+  compactStepCount: { color: colors.inkMuted },
   stepList: {
     display: "flex",
     minWidth: 0,
     margin: 0,
     padding: 0,
     listStyle: "none",
+  },
+  fullStepsWithCompactMobile: {
+    "@media (max-width: 559px)": { display: "none" },
   },
   step: {
     position: "relative",

@@ -261,16 +261,10 @@ const styles = stylex.create({
     appearance: "none",
     paddingRight: "38px",
     paddingLeft: "13px",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: {
-      default: colors.fieldRule,
-      ":hover": colors.inkMuted,
-      ":focus": colors.accent,
-    },
+    borderWidth: 0,
     borderRadius: controlMetrics.radius,
     outline: "none",
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.ink,
     cursor: {
       default: "pointer",
@@ -278,7 +272,7 @@ const styles = stylex.create({
     },
     boxShadow: {
       default: "none",
-      ":focus": `inset 0 0 0 1px ${colors.accent}`,
+      ":focus": `inset 0 0 0 2px ${colors.accent}`,
     },
   },
   selectIcon: {
@@ -289,7 +283,6 @@ const styles = stylex.create({
     pointerEvents: "none",
   },
   invalid: {
-    borderColor: colors.critical,
     boxShadow: {
       default: effects.errorRing,
       ":focus-visible": effects.errorRing,
@@ -327,7 +320,7 @@ const styles = stylex.create({
     width: "44px",
     height: "24px",
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     boxShadow: `inset 0 0 0 2px ${colors.fieldRule}`,
     transitionProperty: "background-color",
     transitionDuration: "120ms",
