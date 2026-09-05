@@ -33,7 +33,6 @@ const registeredSources = [
   "finedrams",
   "fredminnick",
   "glenallachie",
-  "gordonmacphail",
   "healthyspirits",
   "masterofmalt",
   "missionliquor",
@@ -65,6 +64,7 @@ const registeredReviewSources = [
 const configuredSources = [
   "bourbonculture",
   "compassbox",
+  "gordonmacphail",
   "kilchoman",
   "whiskeyreviewer",
   "whiskysaga",

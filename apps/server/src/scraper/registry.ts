@@ -19,7 +19,6 @@ import scrapeDramfool from "./adapters/legacy/scrapeDramfool";
 import scrapeEdradour from "./adapters/legacy/scrapeEdradour";
 import scrapeFineDrams from "./adapters/legacy/scrapeFineDrams";
 import scrapeGlenAllachie from "./adapters/legacy/scrapeGlenAllachie";
-import scrapeGordonMacphail from "./adapters/legacy/scrapeGordonMacphail";
 import scrapeHealthySpirits from "./adapters/legacy/scrapeHealthySpirits";
 import scrapeMasterOfMalt from "./adapters/legacy/scrapeMasterOfMalt";
 import scrapeMissionLiquor from "./adapters/legacy/scrapeMissionLiquor";
@@ -121,11 +120,6 @@ const legacyPriceSources = [
     type: "glenallachie",
     origin: "https://shop.theglenallachie.com",
     scrape: scrapeGlenAllachie,
-  },
-  {
-    type: "gordonmacphail",
-    origin: "https://shop.gordonandmacphail.com",
-    scrape: scrapeGordonMacphail,
   },
   {
     type: "healthyspirits",
@@ -259,6 +253,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://www.compassboxwhisky.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "gordonmacphail",
+      origins: [
+        {
+          origin: "https://shop.gordonandmacphail.com",
           robots: { mode: "enforce" },
         },
       ],
