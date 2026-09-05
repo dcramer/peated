@@ -6,6 +6,7 @@ export * from "./bottleOperationResults";
 export * from "./bottles";
 export * from "./bottleSeries";
 export * from "./catalogIdentity";
+export * from "./catalogListings";
 export * from "./changes";
 export * from "./collections";
 export * from "./comments";

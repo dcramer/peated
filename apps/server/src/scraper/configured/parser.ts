@@ -1,6 +1,9 @@
 import type { ExternalReviewArticleIngestion } from "@peated/server/externalReviews/observation";
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
-import { StorePriceInputSchema } from "@peated/server/schemas";
+import {
+  CatalogListingInputSchema,
+  StorePriceInputSchema,
+} from "@peated/server/schemas";
 import { load } from "cheerio";
 import { createHash } from "node:crypto";
 import type { z } from "zod";
@@ -33,11 +36,17 @@ export type ScrapeDetailResult =
       kind: "price";
       value: z.infer<typeof StorePriceInputSchema>[];
       issues: ScrapeIssue[];
+    }
+  | {
+      kind: "catalog";
+      value: z.infer<typeof CatalogListingInputSchema>[];
+      issues: ScrapeIssue[];
     };
 
 type ScrapeReadableValue = ScrapeValue | ScrapeValueSelectorV1;
 type ReviewRulesV6 = Extract<ScrapeRules, { kind: "review" }>;
 type PriceRulesV6 = Extract<ScrapeRules, { kind: "price" }>;
+type CatalogRulesV7 = Extract<ScrapeRules, { kind: "catalog" }>;
 type LegacyReviewRules = Exclude<
   Extract<StoredScrapeRules, { kind: "review" }>,
   ReviewRulesV6
@@ -1083,6 +1092,55 @@ function parsePriceDetailV6(
   return { kind: "price", value: [result.data], issues: [] };
 }
 
+function parseCatalogDetailV7(
+  rules: CatalogRulesV7,
+  html: string,
+  pageUrl: URL,
+): ScrapeDetailResult {
+  const $ = load(html);
+  let url = pageUrl.toString();
+  if (rules.product.url) {
+    const value = readPageField($, rules.product.url);
+    if (value) url = absoluteHttpUrl(value, pageUrl);
+  }
+  const readOptional = (field: ScrapePageField | null) =>
+    field ? readPageField($, field) : null;
+  const sourceBottleIdentity = {
+    stated_age: parseNumber(readOptional(rules.product.statedAge)),
+    abv: parseNumber(readOptional(rules.product.abv)),
+    release_year: parseNumber(readOptional(rules.product.releaseYear)),
+    edition: readOptional(rules.product.edition),
+  };
+  const listing = {
+    name: readPageField($, rules.product.name),
+    url,
+    externalProductId:
+      readOptional(rules.product.externalProductId) ?? undefined,
+    imageUrl: readOptional(rules.product.imageUrl) ?? undefined,
+    volume: parseVolume(readOptional(rules.product.volume)),
+    sourceBottleIdentity: Object.values(sourceBottleIdentity).some(
+      (value) => value !== null,
+    )
+      ? sourceBottleIdentity
+      : undefined,
+  };
+  const result = CatalogListingInputSchema.safeParse(listing);
+  if (!result.success) {
+    return {
+      kind: "catalog",
+      value: [],
+      issues: validationIssues(result.error, (path) =>
+        path[0] === "sourceBottleIdentity" && path[1]
+          ? `product.${String(path[1])}`
+          : path[0]
+            ? `product.${String(path[0])}`
+            : "product",
+      ),
+    };
+  }
+  return { kind: "catalog", value: [result.data], issues: [] };
+}
+
 export function parseScrapeDetail(
   rules: StoredScrapeRules,
   html: string,
@@ -1095,32 +1153,36 @@ export function parseScrapeDetail(
     if (rules.kind === "price" && "product" in rules) {
       return parsePriceDetailV6(rules, html, pageUrl);
     }
+    if (rules.kind === "catalog") {
+      return parseCatalogDetailV7(rules, html, pageUrl);
+    }
     return rules.kind === "review"
       ? parseReviewDetail(rules, html, pageUrl)
       : parseStorePriceDetail(rules, html, pageUrl);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to parse selector.";
-    return rules.kind === "review"
-      ? {
-          kind: "review",
-          value: null,
-          issues: [
-            {
-              field: "article" in rules ? "article" : "detail",
-              message,
-            },
-          ],
-        }
-      : {
-          kind: "price",
-          value: [],
-          issues: [
-            {
-              field: "product" in rules ? "product" : "detail",
-              message,
-            },
-          ],
-        };
+    if (rules.kind === "review") {
+      return {
+        kind: "review",
+        value: null,
+        issues: [
+          {
+            field: "article" in rules ? "article" : "detail",
+            message,
+          },
+        ],
+      };
+    }
+    return {
+      kind: rules.kind,
+      value: [],
+      issues: [
+        {
+          field: "product" in rules ? "product" : "detail",
+          message,
+        },
+      ],
+    };
   }
 }

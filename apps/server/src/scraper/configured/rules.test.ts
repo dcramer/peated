@@ -10,6 +10,7 @@ import {
   ScrapeRulesV3Schema,
   ScrapeRulesV4Schema,
   ScrapeRulesV5Schema,
+  ScrapeRulesV6Schema,
   ScrapeValueSchema,
 } from "./rules";
 
@@ -93,8 +94,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesV5Schema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(7, rules)).toThrow(
-    "Unsupported scrape rules version: 7.",
+  expect(() => parseScrapeRules(8, rules)).toThrow(
+    "Unsupported scrape rules version: 8.",
   );
 });
 
@@ -107,7 +108,46 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(6);
+  expect(SCRAPE_RULES_VERSION).toBe(7);
+});
+
+test("adds catalog rules only in version 7", () => {
+  const field = (selector: string) => ({
+    try: [
+      {
+        get: "text" as const,
+        selector,
+        take: "first" as const,
+        startsWith: null,
+        clean: null,
+      },
+    ],
+  });
+  const rules = ScrapeRulesSchema.parse({
+    kind: "catalog",
+    products: {
+      oneProductPer: "article.product",
+      link: "a[href]",
+      skipWhen: null,
+      nextPage: null,
+      limit: 25,
+    },
+    product: {
+      name: field("h1"),
+      url: null,
+      externalProductId: null,
+      imageUrl: null,
+      volume: field(".volume"),
+      abv: field(".abv"),
+      statedAge: null,
+      edition: null,
+      releaseYear: null,
+    },
+  });
+
+  expect(parseScrapeRules(7, rules)).toEqual(rules);
+  expect(() => ScrapeRulesV6Schema.parse(rules)).toThrow();
+  expect(() => parseScrapeRules(6, rules)).toThrow();
 });
 
 test("loads version 2 rules only through their original contract", () => {

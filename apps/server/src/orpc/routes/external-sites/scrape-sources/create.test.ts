@@ -39,6 +39,25 @@ describe("POST /admin/scrape-sources", () => {
     expect(pushJob).toHaveBeenCalledOnce();
   });
 
+  test("creates an official catalog source", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const source = await routerClient.externalSites.scrapeSources.create(
+      {
+        name: "Official Catalog",
+        kind: "catalog",
+        websiteUrl: "https://official-catalog.example/whisky",
+      },
+      { context: { user: admin } },
+    );
+
+    expect(source).toMatchObject({
+      enabled: false,
+      kind: "catalog",
+      listUrl: "https://official-catalog.example/whisky",
+      setup: expect.objectContaining({ status: "queued" }),
+    });
+  });
+
   test("rejects sample pages on another website", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const error = await waitError(() =>

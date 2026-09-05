@@ -96,6 +96,33 @@ function reviewCandidate(
   };
 }
 
+function catalogCandidate() {
+  return {
+    listPageUrl: "https://example.test/whisky",
+    rules: {
+      kind: "catalog" as const,
+      products: {
+        oneProductPer: "article.product",
+        link: "a[href]",
+        skipWhen: null,
+        nextPage: null,
+        limit: 25,
+      },
+      product: {
+        name: pageField("h1"),
+        url: null,
+        externalProductId: null,
+        imageUrl: null,
+        volume: null,
+        abv: pageField(".abv"),
+        statedAge: null,
+        edition: null,
+        releaseYear: null,
+      },
+    },
+  };
+}
+
 function toolCallResponse<T extends object>(callId: string, candidate: T) {
   return {
     model: "test-setup-model",
@@ -268,6 +295,39 @@ test("returns rules only after the rule check passes", async () => {
   expect(JSON.stringify(secondRequest?.input)).toContain("North Coast 12");
   expect(secondRequest?.instructions).toContain(
     "Your work is complete only when check_rules accepts the rules.",
+  );
+});
+
+test("accepts catalog rules without price or review fields", async () => {
+  const request = vi
+    .fn()
+    .mockResolvedValue(toolCallResponse("catalog", catalogCandidate()));
+  const result = await runScrapeSourceSetupAgent({
+    conversationId: "scrape_source:2",
+    externalSiteRunId: 11,
+    kind: "catalog",
+    scrapeSourceId: 2,
+    listPages: [
+      {
+        url: "https://example.test/whisky",
+        html: '<article class="product"><a href="/whisky/one">One</a></article>',
+      },
+    ],
+    detailPages: [],
+    request,
+    checkRules: async () => ({
+      status: "passed" as const,
+      checked: "parsed catalog",
+    }),
+  });
+
+  expect(result.checked).toBe("parsed catalog");
+  expect(result.rules).toMatchObject({
+    kind: "catalog",
+    product: { name: pageField("h1"), abv: pageField(".abv") },
+  });
+  expect(request.mock.calls[0]?.[0].instructions).toContain(
+    "Catalog sources do not require a review, price, currency, or volume.",
   );
 });
 

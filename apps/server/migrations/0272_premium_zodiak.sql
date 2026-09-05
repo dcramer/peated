@@ -1,0 +1,1 @@
+ALTER TABLE "catalog_listing" ADD CONSTRAINT "catalog_listing_volume_check" CHECK ("catalog_listing"."volume" IS NULL OR "catalog_listing"."volume" > 0);

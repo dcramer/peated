@@ -214,7 +214,7 @@ export function ScraperParsingEditor({
       </AdminSection>
       {latest ? (
         <AdminSection
-          title={`How Peated reads ${source.kind === "review" ? "reviews" : "store prices"}`}
+          title={`How Peated reads ${source.kind === "review" ? "reviews" : source.kind === "catalog" ? "catalog products" : "store prices"}`}
           description={
             activeRevision && source.enabled
               ? `Version ${activeRevision.revision} is active.`

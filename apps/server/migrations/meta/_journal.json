@@ -1898,6 +1898,20 @@
       "when": 1788569946413,
       "tag": "0270_expand-tasting-note-vocabulary",
       "breakpoints": false
+    },
+    {
+      "idx": 271,
+      "version": "7",
+      "when": 1788634638802,
+      "tag": "0271_open_lifeguard",
+      "breakpoints": false
+    },
+    {
+      "idx": 272,
+      "version": "7",
+      "when": 1788636910775,
+      "tag": "0272_premium_zodiak",
+      "breakpoints": false
     }
   ]
 }

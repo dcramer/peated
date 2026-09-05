@@ -10,6 +10,7 @@ import { z } from "zod";
 import { MAX_LIKELY_LIST_PAGES } from "./discovery";
 import type { ScrapeIssue } from "./preview";
 import {
+  ScrapeCatalogRulesSchema,
   ScrapePriceRulesSchema,
   ScrapeReviewRulesSchema,
   type ScrapeRules,
@@ -19,7 +20,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v14";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v15";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -56,6 +57,13 @@ const SuggestedPriceRevisionSchema = z
   })
   .strict();
 
+const SuggestedCatalogRevisionSchema = z
+  .object({
+    listPageUrl: z.string().trim().min(1).max(2_000),
+    rules: ScrapeCatalogRulesSchema,
+  })
+  .strict();
+
 type SetupAgentCheckResult<T> =
   | { status: "passed"; checked: T }
   | {
@@ -77,7 +85,7 @@ type SetupAgentModelResponse = {
 
 const RULE_INSTRUCTIONS = [
   "<purpose>",
-  "Build reliable HTML parsing rules for one review or price website.",
+  "Build reliable HTML parsing rules for one review, price, or official product catalog website.",
   "Your work is complete only when check_rules accepts the rules.",
   "</purpose>",
   "<tool>",
@@ -97,6 +105,8 @@ const RULE_INSTRUCTIONS = [
   "When a date exists only in the article URL, use dateFromUrl with a format made from yyyy, yy, MM, dd, and * tokens.",
   "Set canonicalUrl only when page markup provides a preferred article URL or needs simple cleanup. Otherwise set it to null.",
   "Include an optional field only when the supplied pages clearly and consistently provide it.",
+  "For catalog sources, collect only the displayed name, preferred product page URL, stable product ID, image URL, volume, ABV, age, edition, and release year fields offered by the catalog schema.",
+  "Catalog sources do not require a review, price, currency, or volume. Do not select descriptions or tasting-note prose.",
   "A nextPage selector must add new article or product links.",
   "</success_criteria>",
   "<rules>",
@@ -120,9 +130,9 @@ const RULE_INSTRUCTIONS = [
 ].join("\n");
 
 function suggestionSchema(kind: ScrapeRules["kind"]) {
-  return kind === "review"
-    ? SuggestedReviewRevisionSchema
-    : SuggestedPriceRevisionSchema;
+  if (kind === "review") return SuggestedReviewRevisionSchema;
+  if (kind === "catalog") return SuggestedCatalogRevisionSchema;
+  return SuggestedPriceRevisionSchema;
 }
 
 function createCheckRulesTool(kind: ScrapeRules["kind"]) {
@@ -164,6 +174,13 @@ function parseCandidate(kind: ScrapeRules["kind"], argumentsJson: string) {
   const value: unknown = JSON.parse(argumentsJson);
   if (kind === "review") {
     const suggestion = SuggestedReviewRevisionSchema.parse(value);
+    return {
+      listPageUrl: suggestion.listPageUrl,
+      rules: suggestion.rules,
+    };
+  }
+  if (kind === "catalog") {
+    const suggestion = SuggestedCatalogRevisionSchema.parse(value);
     return {
       listPageUrl: suggestion.listPageUrl,
       rules: suggestion.rules,

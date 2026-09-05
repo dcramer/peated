@@ -14,6 +14,17 @@ const LIST_PAGE_WORDS = {
     "product",
     "products",
   ],
+  catalog: [
+    "whisky",
+    "whiskey",
+    "range",
+    "ranges",
+    "catalog",
+    "collection",
+    "collections",
+    "product",
+    "products",
+  ],
 } as const satisfies Record<ScrapeSourceKind, readonly string[]>;
 
 const NON_DETAIL_WORDS = new Set([

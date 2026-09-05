@@ -40,7 +40,7 @@ function PreviewPage({ page }: { page: Page }) {
             ))}
           </ul>
         </div>
-      ) : (
+      ) : page.kind === "price" ? (
         <ul {...stylex.props(styles.items)}>
           {page.products.map((product, index) => (
             <li key={`${product.url}-${index}`}>
@@ -52,6 +52,43 @@ function PreviewPage({ page }: { page: Page }) {
               · {product.volume} ml
             </li>
           ))}
+        </ul>
+      ) : (
+        <ul {...stylex.props(styles.items)}>
+          {page.products.map((product, index) => {
+            const facts = [
+              product.volume === null ? null : `${product.volume} ml`,
+              product.sourceBottleIdentity?.abv !== null &&
+              product.sourceBottleIdentity?.abv !== undefined
+                ? `${product.sourceBottleIdentity.abv}% ABV`
+                : null,
+              product.sourceBottleIdentity?.stated_age !== null &&
+              product.sourceBottleIdentity?.stated_age !== undefined
+                ? `${product.sourceBottleIdentity.stated_age} years`
+                : null,
+              product.sourceBottleIdentity?.edition ?? null,
+              product.sourceBottleIdentity?.release_year !== null &&
+              product.sourceBottleIdentity?.release_year !== undefined
+                ? `Released ${product.sourceBottleIdentity.release_year}`
+                : null,
+              product.externalProductId
+                ? `Product ID ${product.externalProductId}`
+                : null,
+            ].filter(Boolean);
+            return (
+              <li key={`${product.url}-${index}`}>
+                <a
+                  href={product.url}
+                  rel="noreferrer"
+                  target="_blank"
+                  {...stylex.props(styles.link)}
+                >
+                  {product.name}
+                </a>
+                {facts.length > 0 ? ` · ${facts.join(" · ")}` : ""}
+              </li>
+            );
+          })}
         </ul>
       )}
     </article>

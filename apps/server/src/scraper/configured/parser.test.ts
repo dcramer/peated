@@ -1299,6 +1299,124 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("parses a catalog product without a review or price", () => {
+    const field = (selector: string, attribute?: string) => ({
+      try: [
+        attribute
+          ? {
+              get: "attribute" as const,
+              selector,
+              attribute,
+              clean: null,
+            }
+          : {
+              get: "text" as const,
+              selector,
+              take: "first" as const,
+              startsWith: null,
+              clean: null,
+            },
+      ],
+    });
+    const result = parseScrapeDetail(
+      {
+        kind: "catalog",
+        products: {
+          oneProductPer: "article.product",
+          link: "a[href]",
+          skipWhen: null,
+          nextPage: null,
+          limit: 25,
+        },
+        product: {
+          name: field("h1"),
+          url: field('link[rel="canonical"]', "href"),
+          externalProductId: field("[data-product-id]", "data-product-id"),
+          imageUrl: field('meta[property="og:image"]', "content"),
+          volume: field(".volume"),
+          abv: field(".abv"),
+          statedAge: field(".age"),
+          edition: field(".edition"),
+          releaseYear: field(".release-year"),
+        },
+      },
+      `<link rel="canonical" href="/whisky/example">
+       <meta property="og:image" content="https://cdn.example.com/example.jpg">
+       <main data-product-id="official-42">
+         <h1>Example Official Release</h1>
+         <span class="volume">70 cl</span>
+         <span class="abv">46% ABV</span>
+         <span class="age">12 years old</span>
+         <span class="edition">Autumn Edition</span>
+         <span class="release-year">Released 2026</span>
+         <p class="description">Long producer description is not retained.</p>
+       </main>`,
+      new URL("https://distillery.test/whisky/example?region=us"),
+    );
+
+    expect(result).toMatchObject({
+      kind: "catalog",
+      issues: [],
+      value: [
+        {
+          externalProductId: "official-42",
+          name: "Example Official Release",
+          url: "https://distillery.test/whisky/example",
+          imageUrl: "https://cdn.example.com/example.jpg",
+          volume: 700,
+          sourceBottleIdentity: {
+            stated_age: 12,
+            abv: 46,
+            edition: "Autumn Edition",
+            release_year: 2026,
+          },
+        },
+      ],
+    });
+    expect(JSON.stringify(result)).not.toContain("producer description");
+  });
+
+  it("reports a missing catalog product name", () => {
+    const result = parseScrapeDetail(
+      {
+        kind: "catalog",
+        products: {
+          oneProductPer: "article.product",
+          link: "a[href]",
+          skipWhen: null,
+          nextPage: null,
+          limit: 25,
+        },
+        product: {
+          name: {
+            try: [
+              {
+                get: "text",
+                selector: "h1",
+                take: "first",
+                startsWith: null,
+                clean: null,
+              },
+            ],
+          },
+          url: null,
+          externalProductId: null,
+          imageUrl: null,
+          volume: null,
+          abv: null,
+          statedAge: null,
+          edition: null,
+          releaseYear: null,
+        },
+      },
+      "<main><p>No title</p></main>",
+      new URL("https://distillery.test/whisky/missing"),
+    );
+
+    expect(result).toMatchObject({ kind: "catalog", value: [] });
+    expect(result.issues.map(({ field }) => field)).toEqual(["product.name"]);
+  });
+
   it("converts liters to milliliters", () => {
     const result = parseScrapeDetail(
       {

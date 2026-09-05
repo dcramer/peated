@@ -1,4 +1,5 @@
 import { base } from "@peated/server/orpc";
+import catalogListings from "./catalog-listings";
 import config from "./config";
 import details from "./details";
 import { healthDetails, healthList } from "./health";
@@ -21,6 +22,7 @@ export default base.tag("sites").router({
   details,
   triggerJob,
   config,
+  catalogListings,
   scrapeSources,
   reviewPublication,
   reviewScoring,
