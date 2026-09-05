@@ -135,7 +135,7 @@ export function TastingReviewDetail({
                     ? " and "
                     : ", "
                   : null}
-                <TextLink href={`/users/${friend.username}`} size="inherit">
+                <TextLink href={`/users/${friend.username}`}>
                   {friend.username}
                 </TextLink>
               </span>

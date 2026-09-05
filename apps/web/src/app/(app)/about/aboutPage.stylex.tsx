@@ -57,11 +57,7 @@ export function AboutText({ children }: { children: ReactNode }) {
 }
 
 export function AboutLink({ children, ...props }: TextLinkProps) {
-  return (
-    <TextLink {...props} size="inherit">
-      {children}
-    </TextLink>
-  );
+  return <TextLink {...props}>{children}</TextLink>;
 }
 
 export function AboutTextStack({ children }: { children: ReactNode }) {

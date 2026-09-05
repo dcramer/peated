@@ -4,12 +4,12 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import {
-  AppLink,
   FactList,
   type FactListItem,
   LoadingList,
   LoadingPlaceholder,
   SectionHeading,
+  TextLink,
 } from "@peated/web/components";
 import {
   PageColumns,
@@ -47,7 +47,9 @@ export function ProfileActivitySection({
     <section aria-label="Recent activity">
       <div {...stylex.props(styles.sectionHeader)}>
         <SectionHeading>Recent activity</SectionHeading>
-        <AppLink href={`/users/${username}/activity`}>View all</AppLink>
+        <TextLink href={`/users/${username}/activity`} size="sm">
+          View all
+        </TextLink>
       </div>
       {children}
     </section>

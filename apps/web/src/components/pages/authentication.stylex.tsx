@@ -177,7 +177,7 @@ export function AuthenticationDivider({ label }: { label?: string }) {
 type AuthenticationLinkProps = TextLinkProps;
 
 export function AuthenticationLink(props: AuthenticationLinkProps) {
-  return <TextLink {...props} size="inherit" />;
+  return <TextLink {...props} />;
 }
 
 export function AuthenticationTextButton({

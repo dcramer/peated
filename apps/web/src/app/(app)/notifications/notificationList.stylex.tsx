@@ -145,7 +145,7 @@ export function NotificationList({
                     {...stylex.props(foundationStyles.metadata, styles.message)}
                   >
                     {from ? (
-                      <TextLink href={`/users/${from.username}`} size="inherit">
+                      <TextLink href={`/users/${from.username}`}>
                         {from.username}
                       </TextLink>
                     ) : null}{" "}
@@ -153,7 +153,6 @@ export function NotificationList({
                       <TextLink
                         href={href}
                         onClick={() => markRead(notification.id)}
-                        size="inherit"
                       >
                         {getNotificationMessage(notification)}
                       </TextLink>

@@ -80,11 +80,7 @@ export function ContentList({ children }: { children: ReactNode }) {
 }
 
 export function ContentLink({ children, ...props }: TextLinkProps) {
-  return (
-    <TextLink {...props} size="inherit">
-      {children}
-    </TextLink>
-  );
+  return <TextLink {...props}>{children}</TextLink>;
 }
 
 const styles = stylex.create({

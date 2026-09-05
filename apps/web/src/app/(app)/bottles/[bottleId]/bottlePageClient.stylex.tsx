@@ -9,7 +9,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
-  AppLink,
   Button,
   ButtonLink,
   EmptyState,
@@ -18,6 +17,7 @@ import {
   PageTabs,
   RowMenu,
   SectionError,
+  TextLink,
   type CriticReviewProps,
   type FactListItem,
   type PageTabItem,
@@ -73,9 +73,9 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     {
       label: "Series",
       value: bottle.series ? (
-        <AppLink href={getBottleSeriesUrl(bottle.series)}>
+        <TextLink href={getBottleSeriesUrl(bottle.series)}>
           {bottle.series.name}
-        </AppLink>
+        </TextLink>
       ) : null,
     },
     {

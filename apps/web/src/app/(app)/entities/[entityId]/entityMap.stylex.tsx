@@ -47,7 +47,7 @@ export function EntityMap({ entity }: { entity: Entity }) {
           <span {...stylex.props(foundationStyles.code, styles.coordinates)}>
             {coordinateLabel}
           </span>
-          <TextLink href={mapHref} rel="noreferrer" target="_blank">
+          <TextLink href={mapHref} rel="noreferrer" size="sm" target="_blank">
             Open in map →
           </TextLink>
         </div>

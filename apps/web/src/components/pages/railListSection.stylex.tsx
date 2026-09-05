@@ -41,7 +41,9 @@ export function RailListSection({
       ) : null}
       {action ? (
         "href" in action ? (
-          <TextLink href={action.href}>{action.label}</TextLink>
+          <TextLink href={action.href} size="sm">
+            {action.label}
+          </TextLink>
         ) : (
           <button
             aria-controls={action.ariaControls}

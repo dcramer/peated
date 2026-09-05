@@ -10,16 +10,19 @@ export type TextLinkProps = Omit<
   "href" | "className" | "style"
 > & {
   href: string;
-  size?: "inherit" | "sm";
+  size?: "sm";
   truncate?: boolean;
   tone?: "accent" | "muted";
 };
 
-/** Shared inline link. Use muted for supporting references; its underline stays visible. */
+/**
+ * Shared inline link. Typography inherits by default; use `sm` for a compact
+ * standalone action. Muted supporting references keep a visible underline.
+ */
 export function TextLink({
   children,
   href,
-  size = "sm",
+  size,
   truncate = false,
   tone = "accent",
   ...props

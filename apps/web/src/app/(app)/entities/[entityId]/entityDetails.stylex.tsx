@@ -15,14 +15,13 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
         <>
           <TextLink
             href={`/locations/${entity.country.slug}/regions/${entity.region.slug}`}
-            size="inherit"
           >
             {entity.region.name}
           </TextLink>
           <span>, </span>
         </>
       ) : null}
-      <TextLink href={`/locations/${entity.country.slug}`} size="inherit">
+      <TextLink href={`/locations/${entity.country.slug}`}>
         {entity.country.name}
       </TextLink>
     </>
@@ -34,7 +33,7 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     {
       label: "Part of",
       value: entity.owner ? (
-        <TextLink href={getEntityUrl(entity.owner)} size="inherit">
+        <TextLink href={getEntityUrl(entity.owner)}>
           {entity.owner.name}
         </TextLink>
       ) : null,
@@ -42,12 +41,7 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
     {
       label: "Website",
       value: entity.website ? (
-        <TextLink
-          href={entity.website}
-          rel="noreferrer"
-          size="inherit"
-          target="_blank"
-        >
+        <TextLink href={entity.website} rel="noreferrer" target="_blank">
           {parseDomain(entity.website)}
         </TextLink>
       ) : null,

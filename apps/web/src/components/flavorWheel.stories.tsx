@@ -14,7 +14,7 @@ const meta = {
   args: {
     profile,
     footer: (
-      <TextLink href="/about/tasting-wheel" tone="muted">
+      <TextLink href="/about/tasting-wheel" size="sm" tone="muted">
         About the tasting wheel
       </TextLink>
     ),

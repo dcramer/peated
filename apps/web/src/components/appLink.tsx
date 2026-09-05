@@ -1,4 +1,3 @@
-import { foundationStyles } from "@peated/web/styles/foundations.stylex";
 import * as stylex from "@stylexjs/stylex";
 import NextLink from "next/link";
 import {
@@ -19,9 +18,10 @@ export function isInternalAppHref(href: string) {
 
 /**
  * Uses client navigation for app routes and native anchors for other targets.
- * A bare link gets the shared text-link interaction treatment. Composite
- * components replace it by supplying their own class. Use TextLink for inline
- * text because its API also owns typography and truncation.
+ * A bare link gets the shared text-link interaction treatment and inherits its
+ * surrounding typography. Composite components replace that treatment by
+ * supplying their own class. Use TextLink for inline text because its API also
+ * owns tone, compact sizing, and truncation.
  */
 export const AppLink = forwardRef(function AppLink(
   {
@@ -37,7 +37,7 @@ export const AppLink = forwardRef(function AppLink(
 ) {
   const fallbackProps = className
     ? undefined
-    : stylex.props(textLinkStyles.link, foundationStyles.interactiveSmall);
+    : stylex.props(textLinkStyles.link);
   const linkProps = {
     ...props,
     className: className ?? fallbackProps?.className,

@@ -28,18 +28,9 @@ export function BottleCatalogNavigation({
       {scope === "following" ? (
         <p {...stylex.props(foundationStyles.body, styles.scopeHelp)}>
           Bottles from distillers, brands, and bottlers you follow. See followed{" "}
-          <TextLink href="/distillers?filter=following" size="inherit">
-            distillers
-          </TextLink>
-          ,{" "}
-          <TextLink href="/brands?filter=following" size="inherit">
-            brands
-          </TextLink>
-          , or{" "}
-          <TextLink href="/bottlers?filter=following" size="inherit">
-            bottlers
-          </TextLink>
-          .
+          <TextLink href="/distillers?filter=following">distillers</TextLink>,{" "}
+          <TextLink href="/brands?filter=following">brands</TextLink>, or{" "}
+          <TextLink href="/bottlers?filter=following">bottlers</TextLink>.
         </p>
       ) : null}
     </div>
