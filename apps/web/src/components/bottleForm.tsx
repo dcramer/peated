@@ -436,7 +436,6 @@ export default function BottleForm({
   const brandResults = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
-        kinds: ["brand"],
         limit: 25,
         query: debouncedBrandQuery,
         sort: debouncedBrandQuery ? "rank" : "name",
@@ -447,7 +446,6 @@ export default function BottleForm({
   const bottlerResults = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
-        kinds: ["bottler"],
         limit: 25,
         query: debouncedBottlerQuery,
         sort: debouncedBottlerQuery ? "rank" : "name",
@@ -458,7 +456,6 @@ export default function BottleForm({
   const distillerResults = useQuery({
     ...orpc.entities.list.queryOptions({
       input: {
-        kinds: ["distillery"],
         limit: 25,
         query: debouncedDistillerQuery,
         sort: debouncedDistillerQuery ? "rank" : "name",

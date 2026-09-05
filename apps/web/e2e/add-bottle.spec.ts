@@ -7,6 +7,7 @@ import {
   existingBottle,
   testAccessToken,
   testBrand,
+  testOwnedEntity,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 import { expect, type Page, test, type TestInfo } from "./test";
@@ -129,6 +130,25 @@ test.describe("Add Bottle", () => {
     await page.getByRole("button", { name: "Add to Library" }).click();
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+  });
+
+  test("offers an Entity with a different kind as the Brand", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "cross-kind-brand"),
+    });
+    await page.goto("/bottles/new?returnAction=view");
+
+    await page.getByPlaceholder("Laphroaig").fill(testOwnedEntity.name);
+    await page
+      .getByRole("option", { name: new RegExp(testOwnedEntity.name) })
+      .click();
+
+    await expect(
+      page.getByText(testOwnedEntity.name, { exact: true }),
     ).toBeVisible();
   });
 
