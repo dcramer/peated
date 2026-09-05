@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { ButtonLink } from "@peated/web/components";
+import { ButtonLink, LoadingPlaceholder } from "@peated/web/components";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, space } from "../../../styles/tokens.stylex";
 import type { EventRegion, EventRegionOption } from "./eventRegionData";
@@ -66,6 +66,32 @@ export function EventRegionFilter({
   );
 }
 
+/** Keeps the region controls and summary stable while event options load. */
+export function EventRegionFilterLoading() {
+  return (
+    <section
+      aria-busy="true"
+      aria-label="Loading event regions"
+      role="status"
+      {...stylex.props(styles.root)}
+    >
+      <div aria-hidden="true" {...stylex.props(styles.row)}>
+        <span {...stylex.props(styles.loadingLabel)}>
+          <LoadingPlaceholder preset="metadata" />
+        </span>
+        <div {...stylex.props(styles.options)}>
+          {[0, 1, 2].map((delay) => (
+            <span key={delay} {...stylex.props(styles.loadingControl)} />
+          ))}
+        </div>
+      </div>
+      <div aria-hidden="true" {...stylex.props(styles.loadingSummary)}>
+        <LoadingPlaceholder delay={1} preset="metadata" />
+      </div>
+    </section>
+  );
+}
+
 const styles = stylex.create({
   root: {
     paddingTop: space.x4,
@@ -98,5 +124,18 @@ const styles = stylex.create({
   summary: {
     marginTop: space.x3,
     color: colors.inkMuted,
+  },
+  loadingLabel: { width: "96px" },
+  loadingControl: {
+    display: "block",
+    width: "104px",
+    height: "34px",
+    borderRadius: "3px",
+    backgroundColor: colors.surface,
+  },
+  loadingSummary: {
+    width: "260px",
+    maxWidth: "100%",
+    marginTop: space.x3,
   },
 });

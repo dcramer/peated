@@ -3,9 +3,13 @@ import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
-import { cache } from "react";
+import { cache, Suspense } from "react";
 
-import { BadgePage } from "./badgePage.stylex";
+import {
+  BadgeLeaderboard,
+  BadgeLeaderboardLoading,
+  BadgePageFrame,
+} from "./badgePage.stylex";
 
 const getBadge = cache(async (badgeId: number) => {
   const { client } = await getServerClient();
@@ -33,12 +37,30 @@ export default async function BadgeDetailsPage(props: {
     numericFields: ["cursor", "limit"],
     overrides: { badge: Number(badgeId) },
   });
-  const page = Number(input.cursor ?? 1) || 1;
-  const { client } = await getServerClient();
-  const [badge, awardList] = await Promise.all([
-    getBadge(Number(badgeId)),
-    client.badges.userList(input),
-  ]);
+  const badge = await getBadge(Number(badgeId));
 
-  return <BadgePage awardList={awardList} badge={badge} page={page} />;
+  return (
+    <BadgePageFrame badge={badge}>
+      <Suspense
+        key={String(input.cursor ?? 1)}
+        fallback={<BadgeLeaderboardLoading />}
+      >
+        <BadgeResults badge={badge} input={input} />
+      </Suspense>
+    </BadgePageFrame>
+  );
+}
+
+async function BadgeResults({
+  badge,
+  input,
+}: {
+  badge: Awaited<ReturnType<typeof getBadge>>;
+  input: ReturnType<typeof getApiQueryParams>;
+}) {
+  const { client } = await getServerClient();
+  const awardList = await client.badges.userList(input);
+  const page = Number(input.cursor ?? 1) || 1;
+
+  return <BadgeLeaderboard awardList={awardList} badge={badge} page={page} />;
 }

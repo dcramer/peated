@@ -48,7 +48,7 @@ export default async function BottleReleasesPage(props: {
     <BottleSection heading="Releases">
       <Suspense
         key={`${anchorId}:${cursor}`}
-        fallback={<LoadingList label="Loading releases" />}
+        fallback={<ReleaseResultsLoading />}
       >
         <ReleaseResults
           anchorId={anchorId}
@@ -58,6 +58,10 @@ export default async function BottleReleasesPage(props: {
       </Suspense>
     </BottleSection>
   );
+}
+
+function ReleaseResultsLoading() {
+  return <LoadingList label="Loading releases" />;
 }
 
 async function ReleaseResults({

@@ -29,14 +29,15 @@ export default async function BottleTastingsPage(props: {
 
   return (
     <BottleSection ariaLabel="Bottle tastings">
-      <Suspense
-        key={`${id}:${cursor}`}
-        fallback={<LoadingList label="Loading tastings" />}
-      >
+      <Suspense key={`${id}:${cursor}`} fallback={<TastingResultsLoading />}>
         <TastingResults id={id} cursor={cursor} searchParams={searchParams} />
       </Suspense>
     </BottleSection>
   );
+}
+
+function TastingResultsLoading() {
+  return <LoadingList label="Loading tastings" />;
 }
 
 async function TastingResults({

@@ -1,10 +1,16 @@
 import type { Event } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 
-import { ButtonLink, TextLink } from "@peated/web/components";
+import {
+  ButtonLink,
+  LoadingPlaceholder,
+  TextLink,
+} from "@peated/web/components";
 import DateRange from "@peated/web/components/dateRange";
 import { foundationStyles } from "../../../styles/foundations.stylex";
-import { colors, space } from "../../../styles/tokens.stylex";
+import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
+
+const loadingRows = [0, 1, 2, 3] as const;
 
 export function EventList({ events }: { events: Event[] }) {
   return (
@@ -57,6 +63,31 @@ export function EventList({ events }: { events: Event[] }) {
   );
 }
 
+export function EventListLoading() {
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Loading events"
+      role="status"
+      {...stylex.props(styles.list)}
+    >
+      {loadingRows.slice(0, 3).map((delay) => (
+        <div aria-hidden="true" key={delay} {...stylex.props(styles.event)}>
+          <LoadingPlaceholder delay={delay} preset="metadata" />
+          <div {...stylex.props(styles.loadingDetails)}>
+            <LoadingPlaceholder delay={delay} preset="text" />
+            <LoadingPlaceholder
+              delay={loadingRows[(delay + 1) % loadingRows.length]}
+              preset="metadata"
+            />
+          </div>
+          <span {...stylex.props(styles.loadingAction)} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const NARROW = "@media (max-width: 639px)";
 
 const styles = stylex.create({
@@ -93,4 +124,17 @@ const styles = stylex.create({
     color: colors.inkMuted,
   },
   action: { whiteSpace: "nowrap" },
+  loadingDetails: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x1,
+  },
+  loadingAction: {
+    display: "block",
+    width: "112px",
+    height: "34px",
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
 });

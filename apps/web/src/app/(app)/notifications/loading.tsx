@@ -1,5 +1,5 @@
-import { LoadingList } from "@peated/web/components";
+import { NotificationListLoading } from "./notificationList.stylex";
 
 export default function NotificationsLoading() {
-  return <LoadingList label="Loading notifications" rows={4} />;
+  return <NotificationListLoading />;
 }

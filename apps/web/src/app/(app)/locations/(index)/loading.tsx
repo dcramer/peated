@@ -1,5 +1,13 @@
-import { LoadingList } from "@peated/web/components";
+import { CardGrid, LocationCardLoading } from "@peated/web/components";
 
 export default function Loading() {
-  return <LoadingList label="Loading locations" rows={4} />;
+  return (
+    <div aria-busy="true" aria-label="Loading locations" role="status">
+      <CardGrid>
+        {([0, 1, 2, 3] as const).map((delay) => (
+          <LocationCardLoading delay={delay} key={delay} />
+        ))}
+      </CardGrid>
+    </div>
+  );
 }

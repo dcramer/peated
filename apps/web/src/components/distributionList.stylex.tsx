@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, space } from "../styles/tokens.stylex";
+import { LoadingPlaceholder } from "./feedback.stylex";
 
 export type DistributionListItem = {
   count: number;
@@ -40,6 +41,27 @@ export function DistributionList({
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Reserves distribution labels and bars while category counts stream. */
+export function DistributionListLoading() {
+  return (
+    <div aria-busy="true" aria-label="Loading bottle categories" role="status">
+      <ul {...stylex.props(styles.list)}>
+        {([0, 1, 2, 3] as const).map((delay) => (
+          <li aria-hidden="true" key={delay} {...stylex.props(styles.item)}>
+            <div {...stylex.props(styles.copy)}>
+              <LoadingPlaceholder delay={delay} preset="metadata" />
+              <span {...stylex.props(styles.loadingCount)}>
+                <LoadingPlaceholder delay={delay} preset="metadata" />
+              </span>
+            </div>
+            <div {...stylex.props(styles.track)} />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -84,4 +106,5 @@ const styles = stylex.create({
     height: "100%",
     backgroundColor: colors.dataAccent,
   },
+  loadingCount: { width: "44px", flexShrink: 0 },
 });

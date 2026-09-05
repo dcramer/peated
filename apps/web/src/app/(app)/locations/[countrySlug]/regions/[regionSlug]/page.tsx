@@ -4,8 +4,20 @@ import { getRegionMap } from "@peated/web/lib/locationMap";
 import { getRegionPage } from "@peated/web/lib/locationPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getRegionSeoMetadata } from "@peated/web/lib/seoMetadata";
+import { Suspense } from "react";
 
-import { LocationOverview } from "../../../locationOverview.stylex";
+import {
+  LocationCategoriesLoading,
+  LocationCategoriesSection,
+  LocationDistilleriesLoading,
+  LocationDistilleriesSection,
+  LocationLatestReleasesSection,
+  LocationMapSection,
+  LocationOtherRegionsLoading,
+  LocationOtherRegionsSection,
+  LocationOverviewFrame,
+  LocationReleasesLoading,
+} from "../../../locationOverview.stylex";
 import {
   getLocationCategoryItems,
   getLocationDistilleries,
@@ -25,36 +37,8 @@ export default async function RegionOverviewPage(props: {
   params: Promise<{ countrySlug: string; regionSlug: string }>;
 }) {
   const { countrySlug, regionSlug } = await props.params;
-  const { client } = await getPublicPageServerClient();
-  const [region, categories, latestReleases, distilleries, regions] =
-    await Promise.all([
-      getRegionPage(countrySlug, regionSlug),
-      client.regions.categories({ country: countrySlug, region: regionSlug }),
-      client.bottles.list({
-        country: countrySlug,
-        region: regionSlug,
-        limit: 5,
-        sort: "-release",
-      }),
-      client.distilleries.list({
-        country: countrySlug,
-        region: regionSlug,
-        limit: 5,
-        sort: "-bottles",
-      }),
-      client.regions.list({
-        country: countrySlug,
-        hasBottles: true,
-        limit: 6,
-        sort: "-bottles",
-      }),
-    ]);
+  const region = await getRegionPage(countrySlug, regionSlug);
   const rootHref = `/locations/${countrySlug}/regions/${regionSlug}`;
-  const otherRegions = getLocationRegions(
-    regions.results
-      .filter((candidate) => candidate.slug !== regionSlug)
-      .slice(0, 5),
-  );
 
   return (
     <>
@@ -64,23 +48,152 @@ export default async function RegionOverviewPage(props: {
           __html: serializeRegionStructuredData(region),
         }}
       />
-      <LocationOverview
-        categories={getLocationCategoryItems(categories.results)}
-        distilleries={getLocationDistilleries(distilleries.results)}
-        distillersHref={`${rootHref}/distillers`}
-        flavorProfile={
-          <FlavorProfileSection
-            scope={{ kind: "region", country: countrySlug, region: regionSlug }}
-          />
+      <LocationOverviewFrame
+        rail={
+          <>
+            <LocationMapSection
+              visual={getRegionMap(countrySlug, regionSlug)}
+            />
+            <FlavorProfileSection
+              scope={{
+                kind: "region",
+                country: countrySlug,
+                region: regionSlug,
+              }}
+            />
+            {region.totalBottles ? (
+              <Suspense fallback={<LocationCategoriesLoading />}>
+                <RegionCategories
+                  countrySlug={countrySlug}
+                  regionSlug={regionSlug}
+                />
+              </Suspense>
+            ) : null}
+            <Suspense fallback={<LocationOtherRegionsLoading />}>
+              <OtherRegions countrySlug={countrySlug} regionSlug={regionSlug} />
+            </Suspense>
+          </>
         }
-        latestReleases={getLocationLatestReleases(latestReleases.results)}
-        otherRegions={otherRegions}
-        otherRegionsHref={`/locations/${countrySlug}/regions`}
-        releasesHref={`${rootHref}/bottles?sort=-release`}
         totalBottles={region.totalBottles}
         totalDistillers={region.totalDistillers}
-        visual={getRegionMap(region.country.slug, region.slug)}
-      />
+      >
+        {region.totalDistillers ? (
+          <Suspense fallback={<LocationDistilleriesLoading />}>
+            <RegionDistilleries
+              countrySlug={countrySlug}
+              href={`${rootHref}/distillers`}
+              regionSlug={regionSlug}
+              total={region.totalDistillers}
+            />
+          </Suspense>
+        ) : null}
+        {region.totalBottles ? (
+          <Suspense fallback={<LocationReleasesLoading />}>
+            <RegionLatestReleases
+              countrySlug={countrySlug}
+              href={`${rootHref}/bottles?sort=-release`}
+              regionSlug={regionSlug}
+            />
+          </Suspense>
+        ) : null}
+      </LocationOverviewFrame>
     </>
+  );
+}
+
+async function RegionCategories({
+  countrySlug,
+  regionSlug,
+}: {
+  countrySlug: string;
+  regionSlug: string;
+}) {
+  const { client } = await getPublicPageServerClient();
+  const categories = await client.regions.categories({
+    country: countrySlug,
+    region: regionSlug,
+  });
+  return (
+    <LocationCategoriesSection
+      categories={getLocationCategoryItems(categories.results)}
+    />
+  );
+}
+
+async function OtherRegions({
+  countrySlug,
+  regionSlug,
+}: {
+  countrySlug: string;
+  regionSlug: string;
+}) {
+  const { client } = await getPublicPageServerClient();
+  const regions = await client.regions.list({
+    country: countrySlug,
+    hasBottles: true,
+    limit: 6,
+    sort: "-bottles",
+  });
+  const otherRegions = getLocationRegions(
+    regions.results
+      .filter((candidate) => candidate.slug !== regionSlug)
+      .slice(0, 5),
+  );
+  return (
+    <LocationOtherRegionsSection
+      href={`/locations/${countrySlug}/regions`}
+      regions={otherRegions}
+    />
+  );
+}
+
+async function RegionDistilleries({
+  countrySlug,
+  href,
+  regionSlug,
+  total,
+}: {
+  countrySlug: string;
+  href: string;
+  regionSlug: string;
+  total: number;
+}) {
+  const { client } = await getPublicPageServerClient();
+  const distilleries = await client.distilleries.list({
+    country: countrySlug,
+    region: regionSlug,
+    limit: 5,
+    sort: "-bottles",
+  });
+  return (
+    <LocationDistilleriesSection
+      distilleries={getLocationDistilleries(distilleries.results)}
+      href={href}
+      total={total}
+    />
+  );
+}
+
+async function RegionLatestReleases({
+  countrySlug,
+  href,
+  regionSlug,
+}: {
+  countrySlug: string;
+  href: string;
+  regionSlug: string;
+}) {
+  const { client } = await getPublicPageServerClient();
+  const releases = await client.bottles.list({
+    country: countrySlug,
+    region: regionSlug,
+    limit: 5,
+    sort: "-release",
+  });
+  return (
+    <LocationLatestReleasesSection
+      href={href}
+      releases={getLocationLatestReleases(releases.results)}
+    />
   );
 }

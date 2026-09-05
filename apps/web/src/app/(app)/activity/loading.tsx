@@ -9,7 +9,7 @@ import { getActivityFeedSelection } from "./loadActivityFeed";
 
 export default function ActivityLoading() {
   return (
-    <Suspense fallback={<ActivityLoadingPage selectedFeed="everyone" />}>
+    <Suspense fallback={<ActivityPageLoading selectedFeed="everyone" />}>
       <ActivityLoadingSelection />
     </Suspense>
   );
@@ -21,10 +21,10 @@ function ActivityLoadingSelection() {
     searchParams.get("feed") ?? undefined,
   );
 
-  return <ActivityLoadingPage selectedFeed={selectedFeed} />;
+  return <ActivityPageLoading selectedFeed={selectedFeed} />;
 }
 
-function ActivityLoadingPage({
+function ActivityPageLoading({
   selectedFeed,
 }: {
   selectedFeed: "everyone" | "following";

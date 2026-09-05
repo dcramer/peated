@@ -5,13 +5,15 @@ import type { Friend } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import {
+  Avatar,
   CursorPager,
   EmptyState,
   ItemList,
   ItemRow,
+  LoadingPlaceholder,
   MemberAvatar,
   RowMenu,
 } from "@peated/web/components";
@@ -20,11 +22,31 @@ import { Search } from "@peated/web/components/search/search.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { space } from "../../../styles/tokens.stylex";
+import { colors, space } from "../../../styles/tokens.stylex";
 
 type FriendList = Outputs["friends"]["list"];
 
-export function FriendsPageClient({
+export function FriendsPageFrame({ children }: { children: ReactNode }) {
+  return (
+    <div>
+      <PageHeader
+        description="The people whose tasting records you follow."
+        title="Friends"
+      />
+      <div {...stylex.props(styles.search)}>
+        <Search
+          initialScope="members"
+          placement="page"
+          placeholder="Find a member by username"
+          scopeValues={["members"]}
+        />
+      </div>
+      <div {...stylex.props(styles.list)}>{children}</div>
+    </div>
+  );
+}
+
+export function FriendsListClient({
   initialFriendList,
 }: {
   initialFriendList: FriendList;
@@ -43,46 +65,50 @@ export function FriendsPageClient({
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
 
   return (
-    <div>
-      <PageHeader
-        description="The people whose tasting records you follow."
-        title="Friends"
-      />
-      <div {...stylex.props(styles.search)}>
-        <Search
-          initialScope="members"
-          placement="page"
-          placeholder="Find a member by username"
-          scopeValues={["members"]}
-        />
-      </div>
-      <div {...stylex.props(styles.list)}>
-        {friendList.results.length ? (
-          <ItemList ariaLabel="Friends">
-            {friendList.results.map((friend) => (
-              <FriendRow friend={friend} key={friend.id} />
-            ))}
-          </ItemList>
-        ) : (
-          <EmptyState heading="No friends yet">
-            Search for a member to start following their tasting record.
-          </EmptyState>
+    <>
+      {friendList.results.length ? (
+        <ItemList ariaLabel="Friends">
+          {friendList.results.map((friend) => (
+            <FriendRow friend={friend} key={friend.id} />
+          ))}
+        </ItemList>
+      ) : (
+        <EmptyState heading="No friends yet">
+          Search for a member to start following their tasting record.
+        </EmptyState>
+      )}
+      <CursorPager
+        ariaLabel="Friend pages"
+        nextHref={getCursorHref(
+          pathname,
+          searchParams,
+          friendList.rel.nextCursor,
         )}
-        <CursorPager
-          ariaLabel="Friend pages"
-          nextHref={getCursorHref(
-            pathname,
-            searchParams,
-            friendList.rel.nextCursor,
-          )}
-          page={page}
-          previousHref={getCursorHref(
-            pathname,
-            searchParams,
-            friendList.rel.prevCursor,
-          )}
-        />
-      </div>
+        page={page}
+        previousHref={getCursorHref(
+          pathname,
+          searchParams,
+          friendList.rel.prevCursor,
+        )}
+      />
+    </>
+  );
+}
+
+export function FriendsListLoading() {
+  return (
+    <div aria-busy="true" aria-label="Loading friends" role="status">
+      <ItemList ariaLabel="Loading friends">
+        {([0, 1, 2, 3] as const).map((delay) => (
+          <ItemRow
+            action={<span {...stylex.props(styles.loadingAction)} />}
+            key={delay}
+            leading={<Avatar initials="" />}
+            metadata={<LoadingPlaceholder delay={delay} preset="metadata" />}
+            title={<LoadingPlaceholder delay={delay} preset="text" />}
+          />
+        ))}
+      </ItemList>
     </div>
   );
 }
@@ -133,4 +159,11 @@ function FriendRow({ friend }: { friend: Friend }) {
 const styles = stylex.create({
   search: { maxWidth: "720px", marginTop: space.x6 },
   list: { maxWidth: "880px", marginTop: space.x6 },
+  loadingAction: {
+    display: "block",
+    width: "32px",
+    height: "32px",
+    borderRadius: "3px",
+    backgroundColor: colors.surface,
+  },
 });

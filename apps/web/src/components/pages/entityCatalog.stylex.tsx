@@ -303,7 +303,7 @@ export function EntityCatalogFilters({
 }
 
 export function EntityCatalogLoading({ title }: { title: string }) {
-  return <CatalogPageLoading title={title} />;
+  return <CatalogPageLoading title={title} variant="entity" />;
 }
 
 const styles = stylex.create({

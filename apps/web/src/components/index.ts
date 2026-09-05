@@ -63,7 +63,10 @@ export { CriticReview } from "./criticReview.stylex";
 export type { CriticReviewProps } from "./criticReview.stylex";
 export { DataTable } from "./dataTable.stylex";
 export type { DataTableColumn, DataTableProps } from "./dataTable.stylex";
-export { DistributionList } from "./distributionList.stylex";
+export {
+  DistributionList,
+  DistributionListLoading,
+} from "./distributionList.stylex";
 export type { DistributionListItem } from "./distributionList.stylex";
 export { EntityIdentityRow } from "./entityIdentityRow.stylex";
 export type {
@@ -172,7 +175,7 @@ export type {
   ListToolbarProps,
   RailListItemProps,
 } from "./lists.stylex";
-export { LocationCard } from "./locationCard.stylex";
+export { LocationCard, LocationCardLoading } from "./locationCard.stylex";
 export type { LocationCardProps } from "./locationCard.stylex";
 export { LocationIdentityRow } from "./locationIdentityRow.stylex";
 export type { LocationIdentityRowProps } from "./locationIdentityRow.stylex";
@@ -180,6 +183,7 @@ export {
   LocationPreviewCard,
   LocationPreviewGrid,
   RegionPreviewGrid,
+  RegionPreviewGridLoading,
 } from "./locationPreviewCard.stylex";
 export type {
   LocationPreviewCardProps,
