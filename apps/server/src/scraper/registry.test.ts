@@ -1,9 +1,6 @@
 import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
-  externalReviewArticles,
-  externalReviewPublications,
-  externalReviews,
   externalSiteRuns,
   externalSites,
   storePrices,
@@ -46,10 +43,8 @@ const registeredSources = [
   "totalwine",
   "whiskyadvocate",
   "whiskyfun",
-  "whiskynotes",
   "whiskyworld",
   "woodencork",
-  "wordsofwhisky",
 ];
 
 const registeredReviewSources = [
@@ -57,8 +52,6 @@ const registeredReviewSources = [
   "fredminnick",
   "whiskyadvocate",
   "whiskyfun",
-  "whiskynotes",
-  "wordsofwhisky",
 ];
 
 const configuredSources = [
@@ -69,6 +62,8 @@ const configuredSources = [
   "whiskeyreviewer",
   "whiskysaga",
   "whiskystudy",
+  "whiskynotes",
+  "wordsofwhisky",
 ];
 
 type RuntimeTestClock = ScraperHttpClock & { advanceTo(value: Date): void };
@@ -152,10 +147,6 @@ test("registers each code-owned scraper source with explicit target ownership", 
     requestsPerWindow: 30,
     windowMs: 3_600_000,
   });
-  expect(scraperRegistry.sources.get("whiskynotes")?.requestLimit).toBe(30);
-  expect(scraperRegistry.sources.get("whiskynotes")?.resumeFromLastRun).toBe(
-    true,
-  );
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskyfun")).toMatchObject({
     minimumSpacingMs: 2_500,
@@ -184,7 +175,6 @@ test("registers each code-owned scraper source with explicit target ownership", 
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
-  expect(scraperRegistry.sources.get("wordsofwhisky")?.requestLimit).toBe(25);
   for (const type of registeredReviewSources) {
     const source = scraperRegistry.sources.get(type);
     expect(source, `${type} is not registered`).toBeDefined();
@@ -259,98 +249,6 @@ test("runs Bruichladdich through the production runtime with fixture parity", as
     itemCount: 4,
     cursor: { sequence: 1, page: 1 },
   });
-});
-
-test("runs the bounded WhiskyNotes adapter through the production runtime", async ({
-  fixtures,
-}) => {
-  await syncExternalSites();
-  await syncScraperDefinitions(scraperRegistry);
-  const [site] = await db
-    .select()
-    .from(externalSites)
-    .where(eq(externalSites.type, "whiskynotes"));
-  if (!site) throw new Error("Expected synchronized WhiskyNotes site.");
-  await db
-    .update(externalReviewPublications)
-    .set({
-      approvedAt: null,
-    })
-    .where(eq(externalReviewPublications.externalSiteId, site.id));
-  await fixtures.Bottle({ name: "Kanekou Okinawa Whisky" });
-  await fixtures.Bottle({ name: "Ben Nevis 30 yo 1996" });
-  await fixtures.Bottle({ name: "Bowmore 20 yo 2005" });
-  const [run] = await db
-    .insert(externalSiteRuns)
-    .values({
-      externalSiteId: site.id,
-      trigger: "manual",
-      requestLimit: 30,
-    })
-    .returning();
-  if (!run) throw new Error("Expected run.");
-  const archive = (await loadFixture("whiskynotes", "archive.html")).replace(
-    /<link rel="next"[^>]+>/,
-    "",
-  );
-  const singleReview = await loadFixture("whiskynotes", "single-review.html");
-  const multiReview = await loadFixture("whiskynotes", "multi-review.html");
-  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
-    const url = new URL(input instanceof Request ? input.url : input);
-    if (url.pathname === "/robots.txt") {
-      return new Response("User-agent: *\nDisallow:");
-    }
-    if (url.pathname === "/") return new Response(archive);
-    if (url.pathname.includes("kanekou-okinawa-whisky")) {
-      return new Response(singleReview);
-    }
-    if (url.pathname.includes("bowmore-2005-ben-nevis")) {
-      return new Response(multiReview);
-    }
-    return new Response(null, { status: 404 });
-  });
-
-  const clock = runtimeClock();
-  let result = null;
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    result = await executeScraperRun(
-      { runId: run.id },
-      {
-        registry: scraperRegistry,
-        fetchImpl,
-        clock,
-        executionToken: "whiskynotes-owner",
-      },
-    );
-    if (result.status === "completed") break;
-    if (result.status === "deferred" || result.status === "not_ready") {
-      clock.advanceTo(result.nextAttemptAt);
-      continue;
-    }
-    throw new Error(`Unexpected scraper result: ${result.status}`);
-  }
-  expect(result).toEqual({ status: "completed" });
-
-  expect(
-    await db
-      .select()
-      .from(externalReviewArticles)
-      .where(eq(externalReviewArticles.externalSiteId, site.id)),
-  ).toHaveLength(2);
-  expect(await db.select().from(externalReviews)).toHaveLength(4);
-  expect(
-    await db
-      .select()
-      .from(externalSiteRuns)
-      .where(eq(externalSiteRuns.id, run.id)),
-  ).toMatchObject([
-    {
-      status: "succeeded",
-      requestCount: 4,
-      emittedItemCount: 4,
-      itemCount: 4,
-    },
-  ]);
 });
 
 test("dispatches migrated sources to the isolated scraper job", async ({
