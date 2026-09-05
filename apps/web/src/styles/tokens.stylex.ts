@@ -161,7 +161,7 @@ export const darkColorTheme = stylex.createTheme(colors, {
 });
 
 export const fonts = stylex.defineVars({
-  display: '"Space Grotesk Variable", sans-serif',
+  display: '"Hanken Grotesk Variable", sans-serif',
   reading: '"Karla Variable", sans-serif',
   data: '"IBM Plex Mono", monospace',
 });
