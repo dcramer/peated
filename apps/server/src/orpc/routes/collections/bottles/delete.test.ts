@@ -40,6 +40,14 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       },
       { context: { user: defaults.user } },
     );
+    await routerClient.collections.bottles.delete(
+      {
+        user: "me",
+        collection: collection.id,
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
 
     expect(
       await db.query.collectionBottles.findFirst({
@@ -88,6 +96,37 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         where: eq(collectionBottles.collectionId, collection.id),
       }),
     ).toMatchObject([{ bottleId: retained.id }]);
+  });
+
+  test("repairs an old zero count while removing a Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const removed = await fixtures.Bottle();
+    const retained = await fixtures.Bottle();
+    const collection = await fixtures.Collection({
+      createdById: defaults.user.id,
+      totalBottles: 0,
+    });
+    await db.insert(collectionBottles).values([
+      { collectionId: collection.id, bottleId: removed.id },
+      { collectionId: collection.id, bottleId: retained.id },
+    ]);
+
+    await routerClient.collections.bottles.delete(
+      {
+        user: "me",
+        collection: collection.id,
+        bottle: removed.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    await expect(
+      db.query.collections.findFirst({
+        where: eq(collections.id, collection.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
   test("rejects the removed target input", async ({ defaults, fixtures }) => {

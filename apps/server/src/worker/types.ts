@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// TODO: how can we automate registration here without importing the job code?
 export type JobName =
   | "CapturePriceImage"
   | "CleanupPendingUploads"
@@ -24,6 +23,7 @@ export type JobName =
   | "ProcessNotification"
   | "RepairBottleGroupBottleCounts"
   | "RepairBottleSeriesReleaseCounts"
+  | "RepairCollectionBottleCounts"
   | "RepairEntityBottleCounts"
   | "RepairLocationBottleCounts"
   | "ReconcileStorePriceMatchProposals"

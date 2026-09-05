@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { updateCollectionBottleCounts } from "@peated/server/lib/collectionBottleCounts";
 import {
   getReservedCollection,
   isReservedCollectionSlug,
@@ -11,7 +12,7 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default implement(collectionBottleDeleteContract)
@@ -68,14 +69,11 @@ export default implement(collectionBottleDeleteContract)
         )
         .returning();
 
-      if (deleted.length) {
-        await tx
-          .update(collections)
-          .set({
-            totalBottles: sql`${collections.totalBottles} - ${deleted.length}`,
-          })
-          .where(eq(collections.id, collection.id));
-      }
+      await updateCollectionBottleCounts(
+        tx,
+        deleted.map(({ collectionId }) => collectionId),
+        [],
+      );
     });
 
     return {};

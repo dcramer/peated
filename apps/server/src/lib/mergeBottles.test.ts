@@ -73,8 +73,10 @@ describe("exact Bottle merges", () => {
     const destinationGroupId = destination.groupId!;
     const user = await fixtures.User();
     const externalSite = await fixtures.ExternalSite();
-    const collectionWithCollision = await fixtures.Collection();
-    const collectionToMove = await fixtures.Collection();
+    const collectionWithCollision = await fixtures.Collection({
+      totalBottles: 2,
+    });
+    const collectionToMove = await fixtures.Collection({ totalBottles: 1 });
     const flightWithCollision = await fixtures.Flight();
     const sourceAlias = await fixtures.BottleReference({
       bottleId: source.id,
@@ -327,6 +329,16 @@ describe("exact Bottle merges", () => {
         .from(collectionBottles)
         .where(eq(collectionBottles.collectionId, collectionToMove.id)),
     ).toEqual([expect.objectContaining({ bottleId: destination.id })]);
+    await expect(
+      db.query.collections.findFirst({
+        where: eq(collections.id, collectionWithCollision.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
+    await expect(
+      db.query.collections.findFirst({
+        where: eq(collections.id, collectionToMove.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
     expect(
       await db
         .select()
@@ -654,7 +666,7 @@ describe("exact Bottle merges", () => {
     const destination = await fixtures.Bottle({
       name: "Membership Destination",
     });
-    const collection = await fixtures.Collection({ totalBottles: 2 });
+    const collection = await fixtures.Collection({ totalBottles: 0 });
     const flight = await fixtures.Flight();
 
     await db.insert(collectionBottles).values([

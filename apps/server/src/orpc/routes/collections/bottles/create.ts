@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import type { CollectionBottle } from "@peated/server/db/schema";
 import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { updateCollectionBottleCounts } from "@peated/server/lib/collectionBottleCounts";
 import {
   getReservedCollection,
   isReservedCollectionSlug,
@@ -18,7 +19,7 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import {
   findCollectionBottleEntry,
@@ -154,12 +155,7 @@ export default implement(collectionBottleCreateContract)
       if (!collectionBottle) {
         collectionBottle = await findMembership();
       } else {
-        await tx
-          .update(collections)
-          .set({
-            totalBottles: sql`${collections.totalBottles} + 1`,
-          })
-          .where(eq(collections.id, collection.id));
+        await updateCollectionBottleCounts(tx, [], [collection.id]);
       }
 
       return collectionBottle
@@ -181,15 +177,15 @@ export default implement(collectionBottleCreateContract)
         }
 
         await db.transaction(async (tx) => {
-          await tx
+          const deleted = await tx
             .delete(collectionBottles)
-            .where(eq(collectionBottles.id, collectionBottle.id));
-          await tx
-            .update(collections)
-            .set({
-              totalBottles: sql`${collections.totalBottles} - 1`,
-            })
-            .where(eq(collections.id, collection.id));
+            .where(eq(collectionBottles.id, collectionBottle.id))
+            .returning({ collectionId: collectionBottles.collectionId });
+          await updateCollectionBottleCounts(
+            tx,
+            deleted.map(({ collectionId }) => collectionId),
+            [],
+          );
         });
       };
 

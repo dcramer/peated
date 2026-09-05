@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottles, collectionBottles } from "@peated/server/db/schema";
+import {
+  bottles,
+  collectionBottles,
+  collections,
+} from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
@@ -27,6 +31,7 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
     const libraryCollection = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
+      totalBottles: 1,
     });
     const [entry] = await db
       .insert(collectionBottles)
@@ -70,6 +75,11 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
       /^\/uploads\/collection-bottles\/collection_bottle-\d+-pending-upload-.+\.webp$/,
     );
     expect(canonicalBottle?.imageUrl).toBe("/uploads/bottles/canonical.webp");
+    await expect(
+      db.query.collections.findFirst({
+        where: eq(collections.id, libraryCollection.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
   test("returns the Bottle after replacing its entry image", async ({
