@@ -21,7 +21,6 @@ const registeredSources = [
   "astorwines",
   "berrybrosrudd",
   "bruichladdich",
-  "cadenheads",
   "decadentdrinks",
   "douglaslaing",
   "dramface",
@@ -56,6 +55,7 @@ const registeredReviewSources = [
 
 const configuredSources = [
   "bourbonculture",
+  "cadenheads",
   "compassbox",
   "gordonmacphail",
   "kilchoman",

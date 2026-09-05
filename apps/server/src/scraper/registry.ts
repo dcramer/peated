@@ -12,7 +12,6 @@ import {
 import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeBruichladdich from "./adapters/legacy/scrapeBruichladdich";
-import scrapeCadenheads from "./adapters/legacy/scrapeCadenheads";
 import scrapeDecadentDrinks from "./adapters/legacy/scrapeDecadentDrinks";
 import scrapeDouglasLaing from "./adapters/legacy/scrapeDouglasLaing";
 import scrapeDramfool from "./adapters/legacy/scrapeDramfool";
@@ -79,11 +78,6 @@ const legacyPriceSources = [
     type: "bruichladdich",
     origin: "https://www.bruichladdich.com",
     scrape: scrapeBruichladdich,
-  },
-  {
-    type: "cadenheads",
-    origin: "https://www.cadenhead.shop",
-    scrape: scrapeCadenheads,
   },
   {
     type: "decadentdrinks",
@@ -234,6 +228,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://thebourbonculture.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "cadenheads",
+      origins: [
+        {
+          origin: "https://www.cadenhead.shop",
           robots: { mode: "enforce" },
         },
       ],
