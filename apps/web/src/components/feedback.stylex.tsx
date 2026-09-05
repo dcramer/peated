@@ -273,16 +273,18 @@ type LoadingRowCount = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 export type LoadingListProps = {
   label?: string;
   rows?: LoadingRowCount;
-  variant?: "standard" | "sidebar";
+  variant?: "bottleAction" | "sidebar" | "standard" | "text";
 };
 
-/** Reserves standard or compact sidebar row geometry while a list loads. */
+/** Reserves common list-row shapes while records load. */
 export function LoadingList({
   label = "Loading records",
   rows = 3,
   variant = "standard",
 }: LoadingListProps) {
   const sidebar = variant === "sidebar";
+  const text = variant === "text";
+  const bottleAction = variant === "bottleAction";
   return (
     <div
       aria-busy="true"
@@ -297,12 +299,15 @@ export function LoadingList({
           {...stylex.props(
             styles.loadingRow,
             sidebar && styles.loadingSidebarRow,
+            text && styles.loadingTextRow,
           )}
         >
-          <LoadingPlaceholder
-            delay={getPlaceholderDelay(index)}
-            preset={sidebar ? "smallThumbnail" : "thumbnail"}
-          />
+          {!text ? (
+            <LoadingPlaceholder
+              delay={getPlaceholderDelay(index)}
+              preset={sidebar ? "smallThumbnail" : "thumbnail"}
+            />
+          ) : null}
           <span {...stylex.props(styles.loadingCopy)}>
             <LoadingPlaceholder
               delay={getPlaceholderDelay(index + 1)}
@@ -312,18 +317,22 @@ export function LoadingList({
               delay={getPlaceholderDelay(index + 1)}
               preset={sidebar ? "metadata" : "text"}
             />
-            {!sidebar ? (
+            {!sidebar && !text ? (
               <LoadingPlaceholder
                 delay={getPlaceholderDelay(index + 2)}
                 preset="metadata"
               />
             ) : null}
           </span>
-          {!sidebar ? (
-            <LoadingPlaceholder
-              delay={getPlaceholderDelay(index + 3)}
-              preset="score"
-            />
+          {!sidebar && !text ? (
+            bottleAction ? (
+              <span {...stylex.props(styles.loadingAction)} />
+            ) : (
+              <LoadingPlaceholder
+                delay={getPlaceholderDelay(index + 3)}
+                preset="score"
+              />
+            )
           ) : null}
         </div>
       ))}
@@ -509,6 +518,15 @@ const styles = stylex.create({
     gridTemplateColumns: "auto minmax(0, 1fr)",
     paddingTop: space.x2,
     paddingBottom: space.x2,
+  },
+  loadingTextRow: {
+    gridTemplateColumns: "minmax(0, 1fr)",
+  },
+  loadingAction: {
+    width: "112px",
+    height: controlMetrics.controlHeightSmall,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
   },
   loadingCopy: {
     display: "flex",

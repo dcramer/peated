@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { type LocationMap, needsRegionMapCredit } from "../lib/locationMap";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
-import { CardLink } from "./card.stylex";
+import { Card, CardLink } from "./card.stylex";
+import { LoadingPlaceholder } from "./feedback.stylex";
 import { LocationMapIcon } from "./locationMapIcon";
 import { RegionMapCredit } from "./locationMapIcon/credit.stylex";
 
@@ -116,6 +117,43 @@ export function RegionPreviewGrid({ regions }: RegionPreviewGridProps) {
   );
 }
 
+/** Matches the fixed-height regional cards at each responsive grid width. */
+export function RegionPreviewGridLoading() {
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Loading regions"
+      role="status"
+      {...stylex.props(styles.regionGrid)}
+    >
+      <div {...stylex.props(styles.grid)}>
+        {loadingCards.map((delay) => (
+          <Card
+            aria-hidden="true"
+            key={delay}
+            padding="none"
+            {...stylex.props(styles.card, styles.cardWithDescription)}
+          >
+            <span {...stylex.props(styles.loadingVisual)} />
+            <span {...stylex.props(styles.loadingName)}>
+              <LoadingPlaceholder delay={delay} preset="text" />
+            </span>
+            <span {...stylex.props(styles.loadingCount)}>
+              <LoadingPlaceholder delay={delay} preset="metadata" />
+            </span>
+            <span {...stylex.props(styles.loadingDescription)}>
+              <LoadingPlaceholder delay={delay} preset="text" />
+              <LoadingPlaceholder delay={delay} preset="metadata" />
+            </span>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const loadingCards = [0, 1, 2, 3] as const;
+
 const styles = stylex.create({
   card: {
     display: "grid",
@@ -196,6 +234,24 @@ const styles = stylex.create({
     },
   },
   regionGrid: {
+    marginTop: space.x2,
+  },
+  loadingVisual: {
+    gridRow: 1,
+    minHeight: 0,
+    marginTop: space.x2,
+    marginRight: space.x3,
+    marginBottom: space.x4,
+    marginLeft: space.x3,
+    backgroundColor: colors.inset,
+  },
+  loadingName: { gridRow: 2, width: "80%" },
+  loadingCount: { gridRow: 3, width: "64%", marginTop: space.x1 },
+  loadingDescription: {
+    gridRow: 4,
+    display: "flex",
+    flexDirection: "column",
+    gap: space.x2,
     marginTop: space.x2,
   },
 });

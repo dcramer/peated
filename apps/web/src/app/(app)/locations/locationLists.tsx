@@ -4,6 +4,7 @@ import {
   CursorPager,
   DataTable,
   EmptyState,
+  LoadingPlaceholder,
   type DataTableColumn,
 } from "@peated/web/components";
 import { getEntityUrl } from "@peated/web/lib/urls";
@@ -59,6 +60,57 @@ export function LocationTable({
       getKey={(item) => item.slug}
       items={items}
     />
+  );
+}
+
+const loadingRows = [
+  { delay: 0, key: 0 },
+  { delay: 1, key: 1 },
+  { delay: 2, key: 2 },
+  { delay: 3, key: 3 },
+  { delay: 0, key: 4 },
+] as const;
+export function LocationTableLoading({
+  kind,
+}: {
+  kind: "distilleries" | "locations" | "regions";
+}) {
+  const label = `Loading ${kind}`;
+  const columns: DataTableColumn<(typeof loadingRows)[number]>[] = [
+    {
+      cell: ({ delay }) => <LoadingPlaceholder delay={delay} preset="text" />,
+      header: kind === "distilleries" ? "Distiller" : "Location",
+      key: "name",
+    },
+    {
+      align: "right",
+      cell: ({ delay }) => (
+        <LoadingPlaceholder delay={delay} preset="metadata" />
+      ),
+      header: "Bottles",
+      key: "bottles",
+      priority: "secondary",
+    },
+    {
+      align: "right",
+      cell: ({ delay }) => (
+        <LoadingPlaceholder delay={delay} preset="metadata" />
+      ),
+      header: kind === "distilleries" ? "Tastings" : "Distillers",
+      key: "third",
+      priority: "secondary",
+    },
+  ];
+
+  return (
+    <div aria-busy="true" aria-label={label} role="status">
+      <DataTable
+        caption={label}
+        columns={columns}
+        getKey={({ key }) => key}
+        items={loadingRows}
+      />
+    </div>
   );
 }
 

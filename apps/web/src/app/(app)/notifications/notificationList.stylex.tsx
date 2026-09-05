@@ -14,6 +14,7 @@ import {
   IconButton,
   ItemList,
   ItemListItem,
+  LoadingPlaceholder,
   TextLink,
 } from "@peated/web/components";
 import { Avatar } from "@peated/web/components/avatar.stylex";
@@ -222,6 +223,28 @@ export function NotificationList({
   );
 }
 
+/** Matches notification rows while the unread page streams. */
+export function NotificationListLoading() {
+  return (
+    <div aria-busy="true" aria-label="Loading notifications" role="status">
+      <ItemList ariaLabel="Loading notifications">
+        {([0, 1, 2, 3] as const).map((delay) => (
+          <ItemListItem key={delay}>
+            <div aria-hidden="true" {...stylex.props(styles.row)}>
+              <Avatar initials="" />
+              <div {...stylex.props(styles.copy, styles.loadingCopy)}>
+                <LoadingPlaceholder delay={delay} preset="text" />
+                <LoadingPlaceholder delay={delay} preset="metadata" />
+              </div>
+              <span {...stylex.props(styles.loadingAction)} />
+            </div>
+          </ItemListItem>
+        ))}
+      </ItemList>
+    </div>
+  );
+}
+
 function getNotificationHref(notification: Notification) {
   switch (notification.type) {
     case "friend_request":
@@ -281,5 +304,13 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.inset,
     color: colors.inkMuted,
+  },
+  loadingCopy: { display: "flex", flexDirection: "column", gap: space.x2 },
+  loadingAction: {
+    width: "32px",
+    height: "32px",
+    flexShrink: 0,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
   },
 });

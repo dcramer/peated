@@ -6,8 +6,9 @@ import {
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { UpdateList } from "./updateList.stylex";
+import { UpdateList, UpdateListLoading } from "./updateList.stylex";
 
 export const metadata: Metadata = { title: "Updates" };
 
@@ -18,26 +19,36 @@ export default async function UpdatesPage(props: {
   const input = getApiQueryParams(searchParams, {
     numericFields: ["cursor", "limit"],
   });
-  const page = Number(input.cursor ?? 1) || 1;
-  const { client } = await getAnonymousServerClient();
-  const changeList = await client.changes.list(input);
 
   return (
     <div>
       <PageHeader title="Updates" />
       <PageSection heading="Recent changes">
-        {changeList.results.length ? (
-          <UpdateList
-            changes={changeList.results}
-            page={page}
-            rel={changeList.rel}
-          />
-        ) : (
-          <EmptyState heading="No recent updates">
-            There are no database changes to show.
-          </EmptyState>
-        )}
+        <Suspense
+          key={String(input.cursor ?? 1)}
+          fallback={<UpdateListLoading />}
+        >
+          <UpdateResults input={input} />
+        </Suspense>
       </PageSection>
     </div>
+  );
+}
+
+async function UpdateResults({
+  input,
+}: {
+  input: ReturnType<typeof getApiQueryParams>;
+}) {
+  const page = Number(input.cursor ?? 1) || 1;
+  const { client } = await getAnonymousServerClient();
+  const changeList = await client.changes.list(input);
+
+  return changeList.results.length ? (
+    <UpdateList changes={changeList.results} page={page} rel={changeList.rel} />
+  ) : (
+    <EmptyState heading="No recent updates">
+      There are no database changes to show.
+    </EmptyState>
   );
 }

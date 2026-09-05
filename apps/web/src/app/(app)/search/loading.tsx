@@ -1,11 +1,14 @@
-import { LoadingList } from "@peated/web/components";
-import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
+import { Suspense } from "react";
+
+import {
+  SearchLoadingSelection,
+  SearchPageLoading,
+} from "./searchPageClient.stylex";
 
 export default function Loading() {
   return (
-    <>
-      <PageHeader title="Search" />
-      <LoadingList label="Loading search results" rows={4} />
-    </>
+    <Suspense fallback={<SearchPageLoading />}>
+      <SearchLoadingSelection />
+    </Suspense>
   );
 }

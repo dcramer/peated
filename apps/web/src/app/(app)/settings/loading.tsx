@@ -1,5 +1,5 @@
-import { LoadingList } from "@peated/web/components";
+import { SettingsContentLoading } from "./settingsPageFrame.stylex";
 
 export default function SettingsLoading() {
-  return <LoadingList label="Loading settings" rows={2} />;
+  return <SettingsContentLoading />;
 }

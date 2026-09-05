@@ -1,5 +1,12 @@
-import { LoadingList } from "@peated/web/components";
+import {
+  FriendsListLoading,
+  FriendsPageFrame,
+} from "./friendsPageClient.stylex";
 
 export default function FriendsLoading() {
-  return <LoadingList label="Loading friends" rows={4} />;
+  return (
+    <FriendsPageFrame>
+      <FriendsListLoading />
+    </FriendsPageFrame>
+  );
 }

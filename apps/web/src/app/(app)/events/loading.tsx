@@ -1,11 +1,14 @@
-import { LoadingList } from "@peated/web/components";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
+import { EventResultsLoading } from "./eventResultsLoading";
 
 export default function Loading() {
   return (
-    <>
-      <PageHeader title="Whisky events" />
-      <LoadingList label="Loading events" rows={4} />
-    </>
+    <div>
+      <PageHeader
+        description="Major whisky festivals and shows, with dates and official websites."
+        title="Whisky events"
+      />
+      <EventResultsLoading />
+    </div>
   );
 }

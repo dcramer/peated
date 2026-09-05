@@ -28,6 +28,7 @@ function TrackPageView({ siteId, includedDomains }: Props) {
   return null;
 }
 
+/* oxlint-disable anti-slop/require-suspense-loading -- Page tracking renders nothing. */
 export default function Fathom(props: Props) {
   return (
     <Suspense fallback={null}>
@@ -35,3 +36,4 @@ export default function Fathom(props: Props) {
     </Suspense>
   );
 }
+/* oxlint-enable anti-slop/require-suspense-loading */

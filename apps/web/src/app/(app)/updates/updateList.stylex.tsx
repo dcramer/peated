@@ -5,10 +5,18 @@ import {
   CursorPager,
   ItemList,
   ItemRow,
+  LoadingPlaceholder,
   TextLink,
 } from "@peated/web/components";
 import TimeSince from "@peated/web/components/timeSince";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
+
+const loadingRows = [
+  { description: 2, metadata: 1, title: 0 },
+  { description: 3, metadata: 2, title: 1 },
+  { description: 0, metadata: 3, title: 2 },
+  { description: 1, metadata: 0, title: 3 },
+] as const;
 
 function changeVerb(type: Change["type"]) {
   switch (type) {
@@ -73,5 +81,27 @@ export function UpdateList({
         previousHref={getCursorHref("/updates", {}, rel.prevCursor)}
       />
     </>
+  );
+}
+
+export function UpdateListLoading() {
+  return (
+    <div aria-busy="true" aria-label="Loading database updates" role="status">
+      <ItemList ariaLabel="Loading database updates">
+        {loadingRows.map((delay, index) => (
+          <ItemRow
+            description={
+              <LoadingPlaceholder delay={delay.description} preset="text" />
+            }
+            key={index}
+            leading={<Avatar initials="" />}
+            metadata={
+              <LoadingPlaceholder delay={delay.metadata} preset="metadata" />
+            }
+            title={<LoadingPlaceholder delay={delay.title} preset="text" />}
+          />
+        ))}
+      </ItemList>
+    </div>
   );
 }

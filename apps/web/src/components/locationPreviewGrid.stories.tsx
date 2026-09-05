@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { getRegionMap } from "../lib/locationMap";
-import { LocationPreviewGrid } from "./locationPreviewCard.stylex";
+import {
+  LocationPreviewGrid,
+  RegionPreviewGridLoading,
+} from "./locationPreviewCard.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
@@ -51,4 +54,8 @@ export const WithoutDescriptions: Story = {
   args: {
     showDescriptions: false,
   },
+};
+
+export const Loading: Story = {
+  render: () => <RegionPreviewGridLoading />,
 };

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { LocationCard } from "./locationCard.stylex";
+import { LocationCard, LocationCardLoading } from "./locationCard.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
 const meta = {
@@ -28,3 +28,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {};
+
+export const Loading: Story = {
+  render: () => <LocationCardLoading />,
+};

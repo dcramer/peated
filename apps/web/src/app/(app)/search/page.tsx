@@ -78,14 +78,12 @@ export default async function SearchPage(props: {
   const [stats, initialResponse] = await Promise.all([
     getPublicStats(),
     query
-      ? client
-          .search({
-            includeFacets: databaseSearch,
-            limit: searchLimit,
-            query,
-            scopes: [...searchScopes],
-          })
-          .catch(() => undefined)
+      ? client.search({
+          includeFacets: databaseSearch,
+          limit: searchLimit,
+          query,
+          scopes: [...searchScopes],
+        })
       : undefined,
   ]);
 

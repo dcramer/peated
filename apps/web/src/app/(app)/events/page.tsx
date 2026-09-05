@@ -6,10 +6,12 @@ import {
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import dayjs from "dayjs";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { EventList } from "./eventList.stylex";
 import { getEventRegionPageState } from "./eventRegionData";
 import { EventRegionFilter } from "./eventRegionFilter.stylex";
+import { EventResultsLoading } from "./eventResultsLoading";
 
 export const metadata: Metadata = {
   title: "Whisky events",
@@ -22,19 +24,10 @@ export default async function EventsPage({
 }: {
   searchParams: Promise<{ region?: string | string[] }>;
 }) {
-  const [{ client }, params] = await Promise.all([
-    getAnonymousServerClient(),
-    searchParams,
-  ]);
-  const eventList = await client.events.list({
-    limit: 100,
-    onlyUpcoming: true,
-    sort: "date",
-  });
-  const regionState = getEventRegionPageState(eventList.results, params.region);
-  const monthGroups = Map.groupBy(regionState.results, (event) =>
-    dayjs(event.dateStart).format("YYYY-MM"),
-  );
+  const params = await searchParams;
+  const region = Array.isArray(params.region)
+    ? params.region[0]
+    : params.region;
 
   return (
     <div>
@@ -42,6 +35,27 @@ export default async function EventsPage({
         description="Major whisky festivals and shows, with dates and official websites."
         title="Whisky events"
       />
+      <Suspense key={region ?? "all"} fallback={<EventResultsLoading />}>
+        <EventResults region={region} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function EventResults({ region }: { region?: string }) {
+  const { client } = await getAnonymousServerClient();
+  const eventList = await client.events.list({
+    limit: 100,
+    onlyUpcoming: true,
+    sort: "date",
+  });
+  const regionState = getEventRegionPageState(eventList.results, region);
+  const monthGroups = Map.groupBy(regionState.results, (event) =>
+    dayjs(event.dateStart).format("YYYY-MM"),
+  );
+
+  return (
+    <>
       {eventList.results.length ? (
         <EventRegionFilter
           options={regionState.options}
@@ -81,6 +95,6 @@ export default async function EventsPage({
           </EmptyState>
         </PageSection>
       )}
-    </div>
+    </>
   );
 }

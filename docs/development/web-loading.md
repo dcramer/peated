@@ -14,6 +14,17 @@ For independently loading server content, put the asynchronous read inside a
 component beneath `Suspense`. Awaiting the read before returning the boundary
 prevents that boundary from streaming its fallback.
 
+Keep fixed headings, navigation, controls, and actions outside `Suspense`. Wrap
+only the part that must wait. If separate parts can load on their own, give each
+part its own `Suspense` block.
+
+Every `Suspense` block that replaces visible content uses one named loading
+component whose name ends in `Loading`. Keep that loading component beside the
+component whose layout it copies when practical. Route `loading.tsx` files and
+`Suspense` fallbacks reuse these components instead of drawing their own
+placeholders. A block that never renders anything may use `null`, with a narrow
+lint exception that explains why.
+
 When a new query should replace the results with skeletons, key the results
 boundary using the normalized inputs that identify those results. Keep controls
 outside that boundary. Do not key the whole page: that also resets controls,
