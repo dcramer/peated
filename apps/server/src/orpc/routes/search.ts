@@ -66,35 +66,34 @@ type SeriesRow = Omit<SeriesResult, "peatedId" | "brand"> & {
   brand: Omit<SeriesResult["brand"], "peatedId">;
 };
 type RegionRow = RegionResult & { totalBottles: number };
-type ScopeTotals = NonNullable<SearchOutput["scopeTotals"]>;
 type GroupRows =
   | {
       type: "bottles";
-      total: number;
+      hasMore: boolean;
       results: BottleRow[];
       exactMatch: boolean;
     }
   | {
       type: "series";
-      total: number;
+      hasMore: boolean;
       results: SeriesRow[];
       exactMatch: boolean;
     }
   | {
       type: EntitySearchScope;
-      total: number;
+      hasMore: boolean;
       results: EntityRow[];
       exactMatch: boolean;
     }
   | {
       type: "regions";
-      total: number;
+      hasMore: boolean;
       results: RegionRow[];
       exactMatch: boolean;
     }
   | {
       type: "members";
-      total: number;
+      hasMore: boolean;
       results: MemberResult[];
       exactMatch: boolean;
     };
@@ -121,7 +120,6 @@ type SearchRows = {
   query: string;
   exact: ExactRow;
   groups: GroupRows[];
-  scopeTotals: ScopeTotals | null;
   nearest: NearestRow[];
 };
 
@@ -129,7 +127,6 @@ type SearchInput = {
   query: string;
   scopes: SearchScope[];
   limit: number;
-  includeFacets: boolean;
 };
 
 function normalizeText(value: string) {
@@ -205,21 +202,23 @@ function visibleMemberWhere(context: Context) {
 }
 
 function exactBottleReferenceMatch(query: string) {
-  return sql`${bottles.id} IN (
+  return sql`${bottles.id} = (
     SELECT ${bottleReferences.bottleId}
     FROM ${bottleReferences}
     WHERE LOWER(${bottleReferences.name}) = ${query.toLowerCase().trim()}
       AND ${bottleReferences.ignored} IS NOT TRUE
       AND ${bottleReferences.bottleId} IS NOT NULL
+    LIMIT 1
   )`;
 }
 
 function exactEntityReferenceMatch(query: string) {
-  return sql`${entities.id} IN (
+  return sql`${entities.id} = (
     SELECT ${entityReferences.entityId}
     FROM ${entityReferences}
     WHERE LOWER(${entityReferences.name}) = ${query.toLowerCase().trim()}
       AND ${entityReferences.entityId} IS NOT NULL
+    LIMIT 1
   )`;
 }
 
@@ -317,38 +316,12 @@ function entityScopeWhere(scope: EntitySearchScope) {
   return eq(entities.kind, ENTITY_KIND_BY_SEARCH_SCOPE[scope]);
 }
 
-async function countRows(
-  database: AnyDatabase,
-  table:
-    | typeof bottles
-    | typeof bottleSeries
-    | typeof entities
-    | typeof regions
-    | typeof users,
-  where: SQL<unknown> | undefined,
-) {
-  const query = database.select({ total: sql<string>`COUNT(*)` });
-  let row: { total: string } | undefined;
-  if (table === bottles) {
-    [row] = await query.from(bottles).where(where);
-  } else if (table === bottleSeries) {
-    [row] = await query.from(bottleSeries).where(where);
-  } else if (table === entities) {
-    [row] = await query.from(entities).where(where);
-  } else if (table === regions) {
-    [row] = await query.from(regions).where(where);
-  } else {
-    [row] = await query.from(users).where(where);
-  }
-  return Number(row?.total ?? 0);
-}
-
 async function searchSeries(
   database: AnyDatabase,
   query: string,
   limit: number,
-): Promise<{ total: number; results: SeriesRow[]; exactMatch: boolean }> {
-  if (!query) return { total: 0, results: [], exactMatch: false };
+): Promise<{ hasMore: boolean; results: SeriesRow[]; exactMatch: boolean }> {
+  if (!query) return { hasMore: false, results: [], exactMatch: false };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
   const where = or(
@@ -363,18 +336,15 @@ async function searchSeries(
     .select({
       ...seriesColumns(),
       searchRank: rank,
-      searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(bottleSeries)
     .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
     .where(where)
-    .limit(limit)
+    .limit(limit + 1)
     .orderBy(rank, sql`${bottleSeries.numReleases} DESC`, asc(bottleSeries.id));
   return {
-    total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(
-      ({ searchRank: _, searchTotal: __, ...result }) => result,
-    ),
+    hasMore: rows.length > limit,
+    results: rows.slice(0, limit).map(({ searchRank: _, ...result }) => result),
     exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
@@ -383,8 +353,8 @@ async function searchBottles(
   database: AnyDatabase,
   query: string,
   limit: number,
-): Promise<{ total: number; results: BottleRow[]; exactMatch: boolean }> {
-  if (!query) return { total: 0, results: [], exactMatch: false };
+): Promise<{ hasMore: boolean; results: BottleRow[]; exactMatch: boolean }> {
+  if (!query) return { hasMore: false, results: [], exactMatch: false };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
   const referenceMatch = exactBottleReferenceMatch(query);
@@ -405,20 +375,17 @@ async function searchBottles(
     .select({
       ...bottleColumns(),
       searchRank: rank,
-      searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(bottles)
     .innerJoin(entities, eq(bottles.brandId, entities.id))
     .leftJoin(bottleSeries, eq(bottles.seriesId, bottleSeries.id))
     .leftJoin(bottleGroups, eq(bottles.groupId, bottleGroups.id))
     .where(where)
-    .limit(limit)
+    .limit(limit + 1)
     .orderBy(rank, sql`${bottleRatingCount()} DESC`, asc(bottles.id));
   return {
-    total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(
-      ({ searchRank: _, searchTotal: __, ...result }) => result,
-    ),
+    hasMore: rows.length > limit,
+    results: rows.slice(0, limit).map(({ searchRank: _, ...result }) => result),
     exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
@@ -429,8 +396,8 @@ async function searchEntities(
   scope: EntitySearchScope,
   query: string,
   limit: number,
-): Promise<{ total: number; results: EntityRow[]; exactMatch: boolean }> {
-  if (!query) return { total: 0, results: [], exactMatch: false };
+): Promise<{ hasMore: boolean; results: EntityRow[]; exactMatch: boolean }> {
+  if (!query) return { hasMore: false, results: [], exactMatch: false };
   const textQuery = plainTextSearchQuery(query);
   const prefixQuery = prefixTextSearchQuery(query);
   const referenceMatch = exactEntityReferenceMatch(query);
@@ -451,18 +418,15 @@ async function searchEntities(
     .select({
       ...entityColumns(context),
       searchRank: rank,
-      searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(entities)
     .leftJoin(regions, eq(entities.regionId, regions.id))
     .where(where)
-    .limit(limit)
+    .limit(limit + 1)
     .orderBy(rank, sql`${entities.totalTastings} DESC`, asc(entities.id));
   return {
-    total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(
-      ({ searchRank: _, searchTotal: __, ...result }) => result,
-    ),
+    hasMore: rows.length > limit,
+    results: rows.slice(0, limit).map(({ searchRank: _, ...result }) => result),
     exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
@@ -471,8 +435,8 @@ async function searchRegions(
   database: AnyDatabase,
   query: string,
   limit: number,
-): Promise<{ total: number; results: RegionRow[]; exactMatch: boolean }> {
-  if (!query) return { total: 0, results: [], exactMatch: false };
+): Promise<{ hasMore: boolean; results: RegionRow[]; exactMatch: boolean }> {
+  if (!query) return { hasMore: false, results: [], exactMatch: false };
   const normalizedQuery = normalizeText(query);
   const name = sql`LOWER(unaccent(${regions.name}))`;
   const where = like(name, `%${escapeLike(normalizedQuery)}%`);
@@ -481,18 +445,15 @@ async function searchRegions(
     .select({
       ...regionColumns(),
       searchRank: rank,
-      searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(regions)
     .innerJoin(countries, eq(regions.countryId, countries.id))
     .where(where)
-    .limit(limit)
+    .limit(limit + 1)
     .orderBy(rank, sql`${regions.totalBottles} DESC`, asc(regions.id));
   return {
-    total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map(
-      ({ searchRank: _, searchTotal: __, ...result }) => result,
-    ),
+    hasMore: rows.length > limit,
+    results: rows.slice(0, limit).map(({ searchRank: _, ...result }) => result),
     exactMatch: Number(rows[0]?.searchRank) === 0,
   };
 }
@@ -502,9 +463,9 @@ async function searchMembers(
   context: Context,
   query: string,
   limit: number,
-): Promise<{ total: number; results: MemberResult[]; exactMatch: boolean }> {
+): Promise<{ hasMore: boolean; results: MemberResult[]; exactMatch: boolean }> {
   if (!context.user || !query) {
-    return { total: 0, results: [], exactMatch: false };
+    return { hasMore: false, results: [], exactMatch: false };
   }
   const normalizedQuery = normalizeText(query.replace(/^@/, ""));
   const username = sql`LOWER(unaccent(${users.username}))`;
@@ -525,53 +486,21 @@ async function searchMembers(
       },
       totalTastings: publicTastingCount,
       searchRank: rank,
-      searchTotal: sql<number>`COUNT(*) OVER()`,
     })
     .from(users)
     .leftJoin(tastings, eq(tastings.createdById, users.id))
     .where(where)
     .groupBy(users.id)
-    .limit(limit)
+    .limit(limit + 1)
     .orderBy(rank, sql`${publicTastingCount} DESC`, asc(users.id));
   return {
-    total: Number(rows[0]?.searchTotal ?? 0),
-    results: rows.map((row) => ({
+    hasMore: rows.length > limit,
+    results: rows.slice(0, limit).map((row) => ({
       member: row.member,
       totalTastings: Number(row.totalTastings),
     })),
     exactMatch: Number(rows[0]?.searchRank) === 0,
   };
-}
-
-async function getScopeTotals(
-  database: AnyDatabase,
-  context: Context,
-): Promise<ScopeTotals> {
-  const totals: ScopeTotals = {
-    bottles: await countRows(database, bottles, activeBottleWhere()),
-    series: await countRows(database, bottleSeries, undefined),
-    distilleries: await countRows(
-      database,
-      entities,
-      entityScopeWhere("distilleries"),
-    ),
-    brands: await countRows(database, entities, entityScopeWhere("brands")),
-    bottlers: await countRows(database, entities, entityScopeWhere("bottlers")),
-    companies: await countRows(
-      database,
-      entities,
-      entityScopeWhere("companies"),
-    ),
-    regions: await countRows(database, regions, undefined),
-  };
-  if (context.user) {
-    totals.members = await countRows(
-      database,
-      users,
-      visibleMemberWhere(context),
-    );
-  }
-  return totals;
 }
 
 function entityMatchesScopes(entity: EntityRow, scopes: SearchScope[]) {
@@ -741,12 +670,11 @@ async function findNearest(
   const normalizedQuery = normalizeText(query.replace(/^@/, ""));
   if (!normalizedQuery) return [];
   const prefix = normalizedQuery.slice(0, Math.min(3, normalizedQuery.length));
-  const groups: GroupRows[] = [];
-  for (const scope of scopes) {
-    groups.push(
-      await traceSearchGroup(database, context, scope, prefix, 10, true),
-    );
-  }
+  const groups = await Promise.all(
+    scopes.map((scope) =>
+      traceSearchGroup(database, context, scope, prefix, 10, true),
+    ),
+  );
 
   const nearest: NearestRow[] = [];
   const seen = new Set<string>();
@@ -857,72 +785,41 @@ async function readSearchRows(
     (scope) =>
       input.scopes.includes(scope) && (scope !== "members" || !!context.user),
   );
-  return db.transaction(
-    async (tx) => {
-      // Scope totals are search facets. Each total scans one complete scope,
-      // so callers must request them explicitly.
-      const scopeTotals = input.includeFacets
-        ? await Sentry.startSpan(
-            {
-              name: "search.scope_totals",
-              op: "function",
-              attributes: { "search.authenticated": !!context.user },
-            },
-            () => getScopeTotals(tx, context),
-          )
-        : null;
-      const exact = await Sentry.startSpan(
-        { name: "search.resolve_exact", op: "function" },
-        () => findExact(tx, context, input.query, scopes),
-      );
-      if (parsePeatedId(input.query)) {
-        return {
-          query: input.query,
-          exact,
-          groups: [],
-          scopeTotals,
-          nearest: [],
-        };
-      }
-
-      const groups: GroupRows[] = [];
-      for (const scope of scopes) {
-        groups.push(
-          await traceSearchGroup(
-            tx,
-            context,
-            scope,
-            input.query,
-            input.limit,
-            false,
-          ),
-        );
-      }
-      // Exact name matches own the first group position across search scopes.
-      groups.sort(
-        (left, right) => Number(right.exactMatch) - Number(left.exactMatch),
-      );
-      const matchTotal = groups.reduce(
-        (total, group) => total + group.total,
-        0,
-      );
-      const nearest =
-        input.query && matchTotal === 0
-          ? await Sentry.startSpan(
-              { name: "search.nearest", op: "function" },
-              () => findNearest(tx, context, scopes, input.query),
-            )
-          : [];
-      return {
-        query: input.query,
-        exact: null,
-        groups,
-        scopeTotals,
-        nearest,
-      };
-    },
-    { accessMode: "read only", isolationLevel: "repeatable read" },
+  const exact = await Sentry.startSpan(
+    { name: "search.resolve_exact", op: "function" },
+    () => findExact(db, context, input.query, scopes),
   );
+  if (parsePeatedId(input.query)) {
+    return {
+      query: input.query,
+      exact,
+      groups: [],
+      nearest: [],
+    };
+  }
+
+  const groups = await Promise.all(
+    scopes.map((scope) =>
+      traceSearchGroup(db, context, scope, input.query, input.limit, false),
+    ),
+  );
+  // Exact name matches own the first group position across search scopes.
+  groups.sort(
+    (left, right) => Number(right.exactMatch) - Number(left.exactMatch),
+  );
+  const hasMatches = groups.some((group) => group.results.length > 0);
+  const nearest =
+    input.query && !hasMatches
+      ? await Sentry.startSpan({ name: "search.nearest", op: "function" }, () =>
+          findNearest(db, context, scopes, input.query),
+        )
+      : [];
+  return {
+    query: input.query,
+    exact: null,
+    groups,
+    nearest,
+  };
 }
 
 function bottleResult(row: BottleRow, includeGroup = false): BottleResult {
@@ -965,13 +862,13 @@ function serializeGroup(group: GroupRows) {
     case "bottles":
       return {
         type: group.type,
-        total: group.total,
+        hasMore: group.hasMore,
         results: group.results.map((row) => bottleResult(row, true)),
       };
     case "series":
       return {
         type: group.type,
-        total: group.total,
+        hasMore: group.hasMore,
         results: group.results.map(seriesResult),
       };
     case "distilleries":
@@ -981,13 +878,13 @@ function serializeGroup(group: GroupRows) {
     case "regions":
       return {
         type: group.type,
-        total: group.total,
+        hasMore: group.hasMore,
         results: group.results,
       };
     case "members":
       return {
         type: group.type,
-        total: group.total,
+        hasMore: group.hasMore,
         results: group.results.map(memberResult),
       };
   }
@@ -1035,7 +932,6 @@ function serializeSearch(rows: SearchRows) {
     query: rows.query,
     exact,
     groups,
-    scopeTotals: rows.scopeTotals,
     nearest,
   });
 }

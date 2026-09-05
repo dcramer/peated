@@ -50,12 +50,12 @@ export default mockOS.search.handler(async ({ input, context }) => {
   if (input.scopes.includes("bottles")) {
     groups.push({
       type: "bottles",
-      total: bottles.length,
+      hasMore: bottles.length > input.limit,
       results: bottles.slice(0, input.limit),
     });
   }
   if (input.scopes.includes("series")) {
-    groups.push({ type: "series", total: 0, results: [] });
+    groups.push({ type: "series", hasMore: false, results: [] });
   }
   for (const scope of [
     "distilleries",
@@ -67,7 +67,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
       const results = entitiesByScope[scope];
       groups.push({
         type: scope,
-        total: results.length,
+        hasMore: results.length > input.limit,
         results: results.slice(0, input.limit),
       });
     }
@@ -75,7 +75,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
   if (input.scopes.includes("regions")) {
     groups.push({
       type: "regions",
-      total: regions.length,
+      hasMore: regions.length > input.limit,
       results: regions.slice(0, input.limit),
     });
   }
@@ -97,7 +97,7 @@ export default mockOS.search.handler(async ({ input, context }) => {
   if (context.user && input.scopes.includes("members")) {
     groups.push({
       type: "members",
-      total: members.length,
+      hasMore: members.length > input.limit,
       results: members.slice(0, input.limit),
     });
   }
@@ -134,23 +134,6 @@ export default mockOS.search.handler(async ({ input, context }) => {
       ),
   );
 
-  const scopeTotals: MockOutputs["search"]["scopeTotals"] = input.includeFacets
-    ? {
-        bottles: mockBottles.length,
-        series: 0,
-        distilleries: mockEntities.filter(
-          (entity) => entity.kind === "distillery",
-        ).length,
-        brands: mockEntities.filter((entity) => entity.kind === "brand").length,
-        bottlers: mockEntities.filter((entity) => entity.kind === "bottler")
-          .length,
-        companies: mockEntities.filter((entity) => entity.kind === "company")
-          .length,
-        regions: mockRegions.length,
-      }
-    : null;
-  if (context.user && scopeTotals) scopeTotals.members = 3;
-
   return SearchOutputSchema.parse({
     query: input.query,
     exact:
@@ -160,7 +143,6 @@ export default mockOS.search.handler(async ({ input, context }) => {
           ? { type: "entity", ref: exactEntity }
           : null,
     groups,
-    scopeTotals,
     nearest: [],
   });
 });

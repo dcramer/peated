@@ -97,10 +97,10 @@ describe("mock oRPC router", () => {
       ref: { id: mockEntity.id, name: mockEntity.name },
     });
     expect(search.groups).toMatchObject([
-      { type: "bottles", total: 3 },
+      { type: "bottles", hasMore: false },
       {
         type: "distilleries",
-        total: 1,
+        hasMore: false,
         results: [{ id: mockEntity.id, name: mockEntity.name }],
       },
     ]);
@@ -710,7 +710,6 @@ describe("mock oRPC router", () => {
 
   it("returns no results when the fixed data does not match", async () => {
     const results = await anonymousClient.search({
-      includeFacets: true,
       query: "Ardbeg",
       scopes: ["bottles", "distilleries", "members"],
     });
@@ -719,38 +718,22 @@ describe("mock oRPC router", () => {
       query: "Ardbeg",
       exact: null,
       groups: [
-        { type: "bottles", total: 0, results: [] },
-        { type: "distilleries", total: 0, results: [] },
+        { type: "bottles", hasMore: false, results: [] },
+        { type: "distilleries", hasMore: false, results: [] },
       ],
-      scopeTotals: {
-        bottles: mockBottles.length,
-        series: 0,
-        distilleries: mockEntities.filter(
-          (entity) => entity.kind === "distillery",
-        ).length,
-        brands: mockEntities.filter((entity) => entity.kind === "brand").length,
-        bottlers: mockEntities.filter((entity) => entity.kind === "bottler")
-          .length,
-        companies: mockEntities.filter((entity) => entity.kind === "company")
-          .length,
-        regions: mockRegions.length,
-      },
       nearest: [],
     });
   });
 
   it("shows member search results only after sign-in", async () => {
     const anonymousResults = await anonymousClient.search({
-      includeFacets: true,
       query: mockUser.username,
       scopes: ["members"],
     });
     expect(anonymousResults.groups).toEqual([]);
-    expect(anonymousResults.scopeTotals?.members).toBeUndefined();
 
     await expect(
       authenticatedClient.search({
-        includeFacets: true,
         query: mockUser.username,
         scopes: ["members"],
       }),
@@ -758,7 +741,7 @@ describe("mock oRPC router", () => {
       groups: [
         {
           type: "members",
-          total: 1,
+          hasMore: false,
           results: [
             {
               member: {
@@ -771,9 +754,6 @@ describe("mock oRPC router", () => {
           ],
         },
       ],
-      scopeTotals: {
-        members: 3,
-      },
     });
   });
 
