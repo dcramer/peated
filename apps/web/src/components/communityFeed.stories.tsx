@@ -20,7 +20,7 @@ function withStoryImages(items: readonly CommunityFeedItem[]) {
     bottles: item.bottles.map((bottle, bottleIndex) => ({
       ...bottle,
       imageUrl:
-        item.kind === "collection_add"
+        item.kind === "collection_add" || itemIndex === 1
           ? null
           : (itemIndex + bottleIndex) % 2
             ? PortraitBottleImage.src

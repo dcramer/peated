@@ -1,10 +1,8 @@
 import { RATING_BANDS as SERVER_RATING_BANDS } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
-import { SectionHeading } from "./sectionHeading.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -138,24 +136,20 @@ export type BottleRatingSummaryProps = {
   memberScoreCount?: number;
   /** Median of the included member and critic review scores. */
   median?: number | null;
-  /** Included review scores grouped into the five rating ranges. */
-  reviewCounts?: RatingCounts;
   /** Tastings grouped into the five rating ranges. */
   tastingCounts?: RatingCounts;
 };
 
 /**
- * Shows one bottle rating, its exact review score or tasting range, and how
- * reviews and tastings are spread across the five ratings.
+ * Shows one bottle rating as an exact review score or tasting range with its
+ * matching name.
  */
 export function BottleRatingSummary({
   externalScoreCount = 0,
   memberScoreCount = 0,
   median = null,
-  reviewCounts = {},
   tastingCounts = {},
 }: BottleRatingSummaryProps) {
-  const headingId = useId();
   const rating = getBottleRating({
     median,
     scoreCount: memberScoreCount + externalScoreCount,
@@ -163,18 +157,9 @@ export function BottleRatingSummary({
   });
   if (!rating) return null;
 
-  const combinedCounts = combineRatingCounts(reviewCounts, tastingCounts);
-  const sources = formatSources({
-    externalScoreCount,
-    memberScoreCount,
-    tastingCount: totalRatings(tastingCounts),
-  });
-
   return (
-    <section aria-labelledby={headingId}>
-      <SectionHeading id={headingId}>Bottle rating</SectionHeading>
+    <section aria-label="Bottle rating">
       <div {...stylex.props(styles.summaryHeadline)}>
-        <strong {...stylex.props(styles.summaryLabel)}>{rating.label}</strong>
         <span {...stylex.props(styles.summaryValueGroup)}>
           <strong {...stylex.props(styles.summaryValue)}>{rating.value}</strong>
           {rating.exact ? (
@@ -185,22 +170,7 @@ export function BottleRatingSummary({
             </span>
           ) : null}
         </span>
-      </div>
-      {sources ? (
-        <p {...stylex.props(foundationStyles.metadata, styles.sources)}>
-          {sources}
-        </p>
-      ) : null}
-      <div {...stylex.props(styles.distributionGroup)}>
-        <div
-          {...stylex.props(
-            foundationStyles.fieldLabel,
-            styles.distributionLabel,
-          )}
-        >
-          How people rated
-        </div>
-        <RatingDistribution counts={combinedCounts} />
+        <strong {...stylex.props(styles.summaryLabel)}>{rating.label}</strong>
       </div>
     </section>
   );
@@ -208,8 +178,10 @@ export function BottleRatingSummary({
 
 export type BottleRatingsProps = Pick<
   BottleRatingSummaryProps,
-  "median" | "reviewCounts" | "tastingCounts"
+  "median" | "tastingCounts"
 > & {
+  /** Included review scores grouped into the five rating ranges. */
+  reviewCounts?: RatingCounts;
   /** Number of included member and critic review scores. */
   scoreCount?: number;
 };
@@ -310,23 +282,6 @@ function totalRatings(counts: RatingCounts) {
   );
 }
 
-function formatSources({
-  externalScoreCount,
-  memberScoreCount,
-  tastingCount,
-}: {
-  externalScoreCount: number;
-  memberScoreCount: number;
-  tastingCount: number;
-}) {
-  const parts = [
-    memberScoreCount > 0 ? "Member reviews" : null,
-    externalScoreCount > 0 ? "Critic reviews" : null,
-    tastingCount > 0 ? "Tastings" : null,
-  ].filter((part): part is string => part !== null);
-  return parts.length ? parts.join(" · ") : null;
-}
-
 function formatRatingCounts(counts: RatingCounts) {
   return RATING_BANDS.map(
     (band) => `${band.label} ${counts[band.key] ?? 0}`,
@@ -418,10 +373,9 @@ function getRatingBins(counts: RatingCounts): RatingBin[] {
 const styles = stylex.create({
   summaryHeadline: {
     display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x3,
-    marginTop: space.x3,
+    alignItems: "flex-end",
+    flexDirection: "column",
+    gap: space.x1,
   },
   summaryLabel: {
     minWidth: 0,
@@ -431,6 +385,7 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: "-0.03em",
     lineHeight: 1.05,
+    whiteSpace: "nowrap",
   },
   summaryValueGroup: {
     display: "inline-flex",
@@ -448,13 +403,6 @@ const styles = stylex.create({
     lineHeight: 0.9,
   },
   summaryScale: { color: colors.inkMuted },
-  sources: {
-    marginTop: space.x2,
-    marginBottom: 0,
-    color: colors.inkMuted,
-  },
-  distributionGroup: { marginTop: space.x4 },
-  distributionLabel: { marginBottom: space.x2, color: colors.inkMuted },
   ratingDistribution: { display: "block", width: "100%" },
   ratingDistributionTrack: {
     display: "flex",
