@@ -1,7 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { ButtonLink, EmptyState, TextLink, type BottleListItem } from "..";
+import {
+  ButtonLink,
+  EmptyState,
+  LoadingList,
+  TextLink,
+  type BottleListItem,
+} from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
@@ -15,10 +21,12 @@ export function ActivityPage({
   note,
   pagination,
   selector,
+  loading = false,
   libraryBottles = [],
   libraryHref,
 }: {
   items: readonly CommunityFeedItem[];
+  loading?: boolean;
   note?: string;
   pagination?: ReactNode;
   libraryBottles?: readonly BottleListItem[];
@@ -69,7 +77,9 @@ export function ActivityPage({
             {note}
           </p>
         ) : null}
-        {items.length ? (
+        {loading ? (
+          <LoadingList label="Loading activity" rows={4} />
+        ) : items.length ? (
           <CommunityFeed ariaLabel="Latest activity" items={items} limit={20} />
         ) : (
           <EmptyState heading="Nothing here yet">

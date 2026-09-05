@@ -176,10 +176,7 @@ const styles = stylex.create({
     minWidth: 0,
   },
   body: {
-    paddingTop: "20px",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
+    paddingTop: space.x4,
   },
   recordHeader: {
     display: "flex",
@@ -210,9 +207,6 @@ const styles = stylex.create({
   facts: {
     minWidth: 0,
     marginTop: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
   recordNotes: {
     maxWidth: "62ch",

@@ -232,7 +232,11 @@ export function AuthenticationDetails({
 const styles = stylex.create({
   shell: {
     display: "grid",
+    width: "100%",
+    maxWidth: "1320px",
     minHeight: "100dvh",
+    marginRight: "auto",
+    marginLeft: "auto",
     gridTemplateColumns: "minmax(0, 1fr) 520px",
     backgroundColor: colors.ground,
     [NARROW]: {

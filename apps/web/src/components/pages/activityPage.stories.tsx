@@ -74,6 +74,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {};
 
+export const Loading: Story = {
+  args: {
+    items: [],
+    libraryBottles: [],
+    loading: true,
+    pagination: undefined,
+  },
+};
+
 export const NoFollows: Story = {
   args: {
     note: "You're not following anyone yet. Showing everyone's activity.",
