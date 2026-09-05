@@ -36,6 +36,47 @@ const fullDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
   year: "numeric",
 });
+
+function TastingReviewDetailLayout({
+  author,
+  children,
+  loadingLabel,
+  metadata,
+  rating,
+  title,
+}: {
+  author: ReactNode;
+  children: ReactNode;
+  loadingLabel?: string;
+  metadata: ReactNode;
+  rating: ReactNode;
+  title: ReactNode;
+}) {
+  const content = (
+    <>
+      <PageHeader metadata={metadata} title={title} />
+      <div {...stylex.props(styles.body)}>
+        <header {...stylex.props(styles.recordHeader)}>
+          <div {...stylex.props(styles.authorLine)}>{author}</div>
+          {rating}
+        </header>
+        {children}
+      </div>
+    </>
+  );
+
+  return (
+    <article
+      aria-busy={loadingLabel ? "true" : undefined}
+      aria-label={loadingLabel}
+      role={loadingLabel ? "status" : undefined}
+      {...stylex.props(styles.detail)}
+    >
+      {loadingLabel ? <div aria-hidden="true">{content}</div> : content}
+    </article>
+  );
+}
+
 export function TastingReviewDetail({
   author,
   bottle,
@@ -74,157 +115,139 @@ export function TastingReviewDetail({
   ].filter((fact): fact is { label: string; value: string } => fact !== null);
 
   return (
-    <article {...stylex.props(styles.detail)}>
-      <PageHeader
-        metadata={
-          menu ? (
-            <div {...stylex.props(styles.metadataRow)}>
-              <span>{metadata}</span>
-              {menu}
-            </div>
-          ) : (
-            metadata
-          )
-        }
-        title={bottleTitle}
+    <TastingReviewDetailLayout
+      author={
+        <>
+          <MemberAvatar
+            pictureUrl={author.pictureUrl}
+            size="sm"
+            username={author.username}
+          />
+          <div {...stylex.props(styles.authorCopy)}>
+            <TextLink href={`/users/${author.username}`}>
+              {author.username}
+            </TextLink>
+            <span
+              {...stylex.props(
+                foundationStyles.metadata,
+                styles.authorMetadata,
+              )}
+            >
+              {rating.kind === "review" ? "Member review" : "Tasting note"}
+            </span>
+          </div>
+        </>
+      }
+      metadata={
+        menu ? (
+          <div {...stylex.props(styles.metadataRow)}>
+            <span>{metadata}</span>
+            {menu}
+          </div>
+        ) : (
+          metadata
+        )
+      }
+      rating={
+        rating.kind === "review" ? (
+          <ReviewScore score={rating.score} size="lg" />
+        ) : rating.ratingBand ? (
+          <TastingRating band={rating.ratingBand} size="lg" />
+        ) : (
+          <span {...stylex.props(foundationStyles.metadata, styles.unrated)}>
+            Not rated
+          </span>
+        )
+      }
+      title={bottleTitle}
+    >
+      <TastingReviewBottleSummary
+        bottle={bottle}
+        photoUrl={photoUrl}
+        placement="mobile"
       />
 
-      <div {...stylex.props(styles.body)}>
-        <header {...stylex.props(styles.recordHeader)}>
-          <div {...stylex.props(styles.authorLine)}>
-            <MemberAvatar
-              pictureUrl={author.pictureUrl}
-              size="sm"
-              username={author.username}
-            />
-            <div {...stylex.props(styles.authorCopy)}>
-              <TextLink href={`/users/${author.username}`}>
-                {author.username}
+      {facts.length ? (
+        <div {...stylex.props(styles.facts)}>
+          <FactList facts={facts} layout="grid" />
+        </div>
+      ) : null}
+
+      {notes ? <RecordNotes notes={notes} /> : null}
+
+      {tags.length ? (
+        <div {...stylex.props(styles.tags)}>
+          {tags.map((tag, index) => (
+            <Chip
+              key={`${tag}-${index}`}
+              variant={index < 2 ? "tinted" : "neutral"}
+            >
+              {tag}
+            </Chip>
+          ))}
+        </div>
+      ) : null}
+
+      {friends.length ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.friends)}>
+          {rating.kind === "review" ? "Shared with " : "Poured with "}
+          {friends.map((friend, index) => (
+            <span key={friend.id}>
+              {index > 0
+                ? index === friends.length - 1
+                  ? " and "
+                  : ", "
+                : null}
+              <TextLink href={`/users/${friend.username}`}>
+                {friend.username}
               </TextLink>
-              <span
-                {...stylex.props(
-                  foundationStyles.metadata,
-                  styles.authorMetadata,
-                )}
-              >
-                {rating.kind === "review" ? "Member review" : "Tasting note"}
-              </span>
-            </div>
-          </div>
-
-          {rating.kind === "review" ? (
-            <ReviewScore score={rating.score} size="lg" />
-          ) : rating.ratingBand ? (
-            <TastingRating band={rating.ratingBand} size="lg" />
-          ) : (
-            <span {...stylex.props(foundationStyles.metadata, styles.unrated)}>
-              Not rated
             </span>
-          )}
-        </header>
+          ))}
+        </p>
+      ) : null}
 
-        <TastingReviewBottleSummary
-          bottle={bottle}
-          photoUrl={photoUrl}
-          placement="mobile"
-        />
-
-        {facts.length ? (
-          <div {...stylex.props(styles.facts)}>
-            <FactList facts={facts} layout="grid" />
-          </div>
-        ) : null}
-
-        {notes ? <RecordNotes notes={notes} /> : null}
-
-        {tags.length ? (
-          <div {...stylex.props(styles.tags)}>
-            {tags.map((tag, index) => (
-              <Chip
-                key={`${tag}-${index}`}
-                variant={index < 2 ? "tinted" : "neutral"}
-              >
-                {tag}
-              </Chip>
-            ))}
-          </div>
-        ) : null}
-
-        {friends.length ? (
-          <p {...stylex.props(foundationStyles.metadata, styles.friends)}>
-            {rating.kind === "review" ? "Shared with " : "Poured with "}
-            {friends.map((friend, index) => (
-              <span key={friend.id}>
-                {index > 0
-                  ? index === friends.length - 1
-                    ? " and "
-                    : ", "
-                  : null}
-                <TextLink href={`/users/${friend.username}`}>
-                  {friend.username}
-                </TextLink>
-              </span>
-            ))}
-          </p>
-        ) : null}
-
-        {footer ? (
-          <footer {...stylex.props(styles.footer)}>{footer}</footer>
-        ) : null}
-      </div>
-    </article>
+      {footer ? (
+        <footer {...stylex.props(styles.footer)}>{footer}</footer>
+      ) : null}
+    </TastingReviewDetailLayout>
   );
 }
 
 /** Reserves the shared review and tasting detail layout while data loads. */
 export function TastingReviewDetailLoading({ label }: { label: string }) {
   return (
-    <article
-      aria-busy="true"
-      aria-label={label}
-      role="status"
-      {...stylex.props(styles.detail)}
+    <TastingReviewDetailLayout
+      author={
+        <>
+          <span {...stylex.props(styles.loadingAvatar)} />
+          <div {...stylex.props(styles.authorCopy, styles.loadingAuthor)}>
+            <LoadingPlaceholder preset="text" />
+            <LoadingPlaceholder delay={1} preset="metadata" />
+          </div>
+        </>
+      }
+      loadingLabel={label}
+      metadata={<LoadingPlaceholder preset="pageMetadata" />}
+      rating={<LoadingPlaceholder delay={2} preset="score" />}
+      title={<LoadingPlaceholder preset="recordTitle" />}
     >
-      <div aria-hidden="true">
-        <PageHeader
-          metadata={<LoadingPlaceholder preset="pageMetadata" />}
-          title={<LoadingPlaceholder preset="recordTitle" />}
-        />
+      <TastingReviewBottleSummaryLoading placement="mobile" />
 
-        <div {...stylex.props(styles.body)}>
-          <header {...stylex.props(styles.recordHeader)}>
-            <div {...stylex.props(styles.authorLine)}>
-              <span {...stylex.props(styles.loadingAvatar)} />
-              <div {...stylex.props(styles.authorCopy, styles.loadingAuthor)}>
-                <LoadingPlaceholder preset="text" />
-                <LoadingPlaceholder delay={1} preset="metadata" />
-              </div>
-            </div>
-            <LoadingPlaceholder delay={2} preset="score" />
-          </header>
-
-          <TastingReviewBottleSummaryLoading placement="mobile" />
-
-          <div {...stylex.props(styles.loadingFacts)}>
-            {Array.from({ length: 2 }, (_, index) => (
-              <span key={index} {...stylex.props(styles.loadingFact)}>
-                <LoadingPlaceholder
-                  delay={index === 0 ? 1 : 2}
-                  preset="metadata"
-                />
-                <LoadingPlaceholder delay={index === 0 ? 2 : 3} preset="text" />
-              </span>
-            ))}
-          </div>
-
-          <div {...stylex.props(styles.loadingNotes)}>
-            <LoadingPlaceholder delay={1} preset="text" />
-            <LoadingPlaceholder delay={2} preset="text" />
-            <LoadingPlaceholder delay={3} preset="text" />
-          </div>
-        </div>
+      <div {...stylex.props(styles.loadingFacts)}>
+        {Array.from({ length: 2 }, (_, index) => (
+          <span key={index} {...stylex.props(styles.loadingFact)}>
+            <LoadingPlaceholder delay={index === 0 ? 1 : 2} preset="metadata" />
+            <LoadingPlaceholder delay={index === 0 ? 2 : 3} preset="text" />
+          </span>
+        ))}
       </div>
-    </article>
+
+      <div {...stylex.props(styles.loadingNotes)}>
+        <LoadingPlaceholder delay={1} preset="text" />
+        <LoadingPlaceholder delay={2} preset="text" />
+        <LoadingPlaceholder delay={3} preset="text" />
+      </div>
+    </TastingReviewDetailLayout>
   );
 }
 

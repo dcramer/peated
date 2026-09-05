@@ -7,20 +7,20 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
+import { ButtonLink, SectionError } from "@peated/web/components";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import {
   HomeActivityFeed,
+  HomeActivityFeedLoading,
   HomeContributionPrompt,
   HomeDistilleries,
+  HomeDistilleriesLoading,
   HomeLatestReleases,
-  HomeModuleLoading,
+  HomeLatestReleasesLoading,
   HomeOrigins,
   HomeOriginsLoading,
 } from "@peated/web/components/pages/homeBrowse.stylex";
 import { HomePage } from "@peated/web/components/pages/homePage.stylex";
-import { HomeSectionLoading } from "@peated/web/components/pages/homeSummary.stylex";
-import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
@@ -33,8 +33,11 @@ import {
   publicHomeQueries,
 } from "@peated/web/lib/orpc/homeQueries";
 import { getEntityUrl } from "@peated/web/lib/urls";
-import { space } from "../../../../styles/tokens.stylex";
 import { HomeEventCallout } from "./homeEventCallout.stylex";
+import {
+  PublicHomeContentLayout,
+  PublicHomeSecondaryRail,
+} from "./publicHomeLayout.stylex";
 
 export function PublicHome({
   content,
@@ -77,7 +80,7 @@ export function PublicHomeContent() {
     nextEvent && isEventWithinDays(nextEvent, 30) ? nextEvent : null;
 
   return (
-    <PageColumns
+    <PublicHomeContentLayout
       rail={
         <>
           {upcomingEvent ? (
@@ -88,7 +91,7 @@ export function PublicHomeContent() {
               />
             </div>
           ) : null}
-          <div {...stylex.props(styles.secondaryRail)}>
+          <PublicHomeSecondaryRail>
             <Distilleries totalDistilleries={stats.data?.distilleries} />
             <HomeContributionPrompt
               primaryAction={
@@ -106,56 +109,24 @@ export function PublicHomeContent() {
                 </ButtonLink>
               }
             />
-          </div>
+          </PublicHomeSecondaryRail>
         </>
       }
-      railBehavior="stack"
     >
-      <div {...stylex.props(styles.sections)}>
-        {upcomingEvent ? (
-          <div {...stylex.props(styles.mobileEvent)}>
-            <HomeEventCallout
-              event={upcomingEvent}
-              headingId="upcoming-event-mobile"
-            />
-          </div>
-        ) : null}
-        <LatestReleases />
-        <Activity />
-        <div {...stylex.props(styles.desktopOnly)}>
-          <Origins />
+      {upcomingEvent ? (
+        <div {...stylex.props(styles.mobileEvent)}>
+          <HomeEventCallout
+            event={upcomingEvent}
+            headingId="upcoming-event-mobile"
+          />
         </div>
+      ) : null}
+      <LatestReleases />
+      <Activity />
+      <div {...stylex.props(styles.desktopOnly)}>
+        <Origins />
       </div>
-    </PageColumns>
-  );
-}
-
-/** Keeps the home sections in place while their server data loads. */
-export function PublicHomeContentLoading() {
-  return (
-    <PageColumns
-      rail={
-        <HomeModuleLoading
-          label="Loading distilleries"
-          rows={5}
-          title="Distilleries"
-          variant="sidebar"
-        />
-      }
-      railBehavior="stack"
-    >
-      <div {...stylex.props(styles.sections)}>
-        <HomeModuleLoading
-          label="Loading recent releases"
-          rows={5}
-          title="Recent releases"
-        />
-        <HomeModuleLoading label="Loading activity" rows={3} title="Activity" />
-        <div {...stylex.props(styles.desktopOnly)}>
-          <HomeOriginsLoading />
-        </div>
-      </div>
-    </PageColumns>
+    </PublicHomeContentLayout>
   );
 }
 
@@ -178,11 +149,7 @@ function LatestReleases() {
     !useFollowedReleases &&
     (globalReleases.isPending || (Boolean(user) && followedReleases.isPending))
   ) {
-    return (
-      <HomeSectionLoading>
-        <LoadingList label="Loading recent releases" rows={4} />
-      </HomeSectionLoading>
-    );
+    return <HomeLatestReleasesLoading />;
   }
 
   if (!releases) {
@@ -225,11 +192,7 @@ function Activity() {
   const activity = useQuery(publicHomeQueries.memberActivity(orpc));
 
   if (activity.isPending && externalReviews.isPending) {
-    return (
-      <HomeSectionLoading>
-        <LoadingList label="Loading activity" rows={3} />
-      </HomeSectionLoading>
-    );
+    return <HomeActivityFeedLoading />;
   }
 
   if (activity.error && externalReviews.error) {
@@ -267,11 +230,7 @@ function Origins() {
   const regions = useQuery(publicHomeQueries.regions(orpc));
 
   if (countries.isPending || regions.isPending) {
-    return (
-      <HomeSectionLoading>
-        <LoadingList label="Loading whisky origins" rows={3} />
-      </HomeSectionLoading>
-    );
+    return <HomeOriginsLoading />;
   }
 
   if (countries.error && regions.error) {
@@ -330,11 +289,7 @@ function Distilleries({ totalDistilleries }: { totalDistilleries?: number }) {
   const distilleries = useQuery(publicHomeQueries.distilleries(orpc));
 
   if (distilleries.isPending) {
-    return (
-      <HomeSectionLoading>
-        <LoadingList label="Loading distilleries" rows={3} />
-      </HomeSectionLoading>
-    );
+    return <HomeDistilleriesLoading />;
   }
 
   if (distilleries.error) {
@@ -374,16 +329,5 @@ const styles = stylex.create({
     [NARROW]: {
       display: "block",
     },
-  },
-  secondaryRail: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x12,
-  },
-  sections: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x12,
   },
 });

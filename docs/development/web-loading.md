@@ -49,6 +49,38 @@ Keep wrappers, grids, spacing, and responsive rules in that shared layout. Write
 separate skeleton markup only when sharing it would make a small component
 harder to understand.
 
+A typical component has this shape:
+
+```tsx
+function BottleResultsLayout({ children }: { children: ReactNode }) {
+  return (
+    <section>
+      <SectionHeading>Bottles</SectionHeading>
+      <div {...stylex.props(styles.rows)}>{children}</div>
+    </section>
+  );
+}
+
+export function BottleResults({ bottles }: BottleResultsProps) {
+  return (
+    <BottleResultsLayout>
+      <BottleList ariaLabel="Bottles" items={bottles} />
+    </BottleResultsLayout>
+  );
+}
+
+export function BottleResultsLoading() {
+  return (
+    <BottleResultsLayout>
+      <LoadingList label="Loading bottles" rows={5} />
+    </BottleResultsLayout>
+  );
+}
+```
+
+The public loading component stays explicit, while the private layout keeps the
+finished and loading structures together.
+
 Shimmer From Structure demonstrates this goal by measuring finished markup in
 the browser. Peated's route fallbacks must also render in the first server HTML,
 so we share the React structure directly instead of waiting for browser

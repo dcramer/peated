@@ -1,6 +1,7 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
 import { BottleList, BottleVisual, LoadingList } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
@@ -16,6 +17,28 @@ export type TastingReviewBottleSummaryProps = {
   placement: "desktop" | "mobile";
 };
 
+function TastingReviewBottleSummaryLayout({
+  bottle,
+  image,
+  placement,
+}: {
+  bottle: ReactNode;
+  image?: ReactNode;
+  placement: "desktop" | "mobile";
+}) {
+  return (
+    <div
+      {...stylex.props(
+        styles.media,
+        placement === "desktop" ? styles.desktop : styles.mobile,
+      )}
+    >
+      {image ? <figure {...stylex.props(styles.photo)}>{image}</figure> : null}
+      {bottle}
+    </div>
+  );
+}
+
 /** Uses the tasting or review photo when present; otherwise uses the Bottle image. */
 export function TastingReviewBottleSummary({
   bottle,
@@ -26,28 +49,25 @@ export function TastingReviewBottleSummary({
   const imageUrl = photoUrl ?? bottle.imageUrl;
 
   return (
-    <div
-      {...stylex.props(
-        styles.media,
-        placement === "desktop" ? styles.desktop : styles.mobile,
-      )}
-    >
-      {imageUrl ? (
-        <figure {...stylex.props(styles.photo)}>
+    <TastingReviewBottleSummaryLayout
+      bottle={
+        <BottleList
+          ariaLabel="Bottle"
+          items={[{ ...toBottleListItem(bottle), variant: "sidebar" }]}
+        />
+      }
+      image={
+        imageUrl ? (
           <BottleVisual
             expandable
             imageUrl={imageUrl}
             label={`${bottleName} image`}
             size="xl"
           />
-        </figure>
-      ) : null}
-
-      <BottleList
-        ariaLabel="Bottle"
-        items={[{ ...toBottleListItem(bottle), variant: "sidebar" }]}
-      />
-    </div>
+        ) : undefined
+      }
+      placement={placement}
+    />
   );
 }
 
@@ -58,15 +78,11 @@ export function TastingReviewBottleSummaryLoading({
   placement: "desktop" | "mobile";
 }) {
   return (
-    <div
-      {...stylex.props(
-        styles.media,
-        placement === "desktop" ? styles.desktop : styles.mobile,
-      )}
-    >
-      <span {...stylex.props(styles.loadingPhoto)} />
-      <LoadingList label="Loading bottle" rows={1} variant="sidebar" />
-    </div>
+    <TastingReviewBottleSummaryLayout
+      bottle={<LoadingList label="Loading bottle" rows={1} variant="sidebar" />}
+      image={<span {...stylex.props(styles.loadingPhoto)} />}
+      placement={placement}
+    />
   );
 }
 
@@ -102,13 +118,7 @@ const styles = stylex.create({
   loadingPhoto: {
     display: "block",
     width: "100%",
-    maxWidth: {
-      default: "100%",
-      [NARROW]: "440px",
-    },
     aspectRatio: "4 / 5",
-    marginRight: "auto",
-    marginLeft: "auto",
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.surface,
   },

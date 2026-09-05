@@ -15,10 +15,8 @@ import { getSession } from "@peated/web/lib/session.server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Suspense } from "react";
 
-import {
-  PublicHomeContent,
-  PublicHomeContentLoading,
-} from "./_components/home/publicHome.stylex";
+import { PublicHomeContent } from "./_components/home/publicHome.stylex";
+import { PublicHomeContentLoading } from "./_components/home/publicHomeLayout.stylex";
 import { loadPublicHomeLocations } from "./homeLocations.server";
 import { HomePageClient } from "./homePageClient";
 
