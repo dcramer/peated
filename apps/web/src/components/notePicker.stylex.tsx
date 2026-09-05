@@ -157,7 +157,7 @@ export function NotePickerField({
       </div>
 
       {suggestionsOpen ? (
-        <FloatingPanel {...stylex.props(styles.suggestionOverlay)}>
+        <FloatingPanel style={styles.suggestionOverlay}>
           <div id={listboxId} role="listbox">
             {matches.length ? (
               matches.map((note, index) => (
@@ -420,19 +420,13 @@ const styles = stylex.create({
     paddingRight: space.x1,
     paddingBottom: space.x1,
     paddingLeft: space.x2,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: {
-      default: colors.sectionRule,
-      ":hover": colors.inkMuted,
-      ":focus-within": colors.accent,
-    },
+    borderWidth: 0,
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     flexWrap: "wrap",
     boxShadow: {
       default: "none",
-      ":focus-within": `inset 0 0 0 1px ${colors.accent}`,
+      ":focus-within": `inset 0 0 0 2px ${colors.accent}`,
     },
   },
   fieldInput: {
@@ -593,20 +587,14 @@ const styles = stylex.create({
     height: controlMetrics.controlHeight,
     paddingRight: space.x3,
     paddingLeft: space.x3,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: {
-      default: colors.sectionRule,
-      ":hover": colors.inkMuted,
-      ":focus": colors.accent,
-    },
+    borderWidth: 0,
     borderRadius: controlMetrics.radius,
     outline: "none",
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.ink,
     boxShadow: {
       default: "none",
-      ":focus": `inset 0 0 0 1px ${colors.accent}`,
+      ":focus": `inset 0 0 0 2px ${colors.accent}`,
     },
     "::placeholder": {
       color: colors.inkMuted,

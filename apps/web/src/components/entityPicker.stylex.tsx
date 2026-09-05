@@ -24,6 +24,7 @@ export type EntityPickerProps = {
   options: readonly EntityPickerOption[];
   placeholder?: string;
   required?: boolean;
+  searchError?: ReactNode;
   value: EntityPickerOption | null;
 };
 
@@ -58,6 +59,7 @@ export function EntityPicker({
   options,
   placeholder,
   required = false,
+  searchError,
   value,
 }: EntityPickerProps) {
   const copy = kind
@@ -109,6 +111,7 @@ export function EntityPicker({
       options={options.map(toPickerOption)}
       placeholder={placeholder ?? `Search ${copy.plural}`}
       required={required}
+      searchError={searchError}
       value={value ? toPickerOption(value) : null}
     />
   );

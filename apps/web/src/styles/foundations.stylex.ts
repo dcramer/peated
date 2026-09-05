@@ -1,13 +1,17 @@
 import * as stylex from "@stylexjs/stylex";
 import { colors, fonts } from "./tokens.stylex";
 
+const DARK = "@media (prefers-color-scheme: dark)";
+
 /** Web typography roles. Components compose these with layout, color, and emphasis. */
 export const foundationStyles = stylex.create({
+  documentRoot: {
+    colorScheme: { default: "light", [DARK]: "dark" },
+  },
   document: {
     boxSizing: "border-box",
     margin: 0,
     minHeight: "100dvh",
-    colorScheme: "light dark",
     backgroundColor: colors.ground,
     color: colors.ink,
     fontFamily: fonts.reading,

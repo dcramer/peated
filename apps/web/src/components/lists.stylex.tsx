@@ -310,7 +310,7 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     outline: "none",
     backgroundImage: "none",
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.ink,
     fontWeight: 600,
     cursor: "pointer",

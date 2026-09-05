@@ -110,6 +110,32 @@ const bottleCheckMock = createBottleCheckMock({
   testUser,
 });
 
+const visualCreateCandidates = [
+  exactSearchBottle,
+  {
+    ...exactSearchBottle,
+    id: 9313,
+    peatedId: "B9313",
+    fullName: `${testBrand.name} 21-year-old Kogei Collection - 2024 Release`,
+    edition: "Kogei Collection",
+    abv: 50.5,
+    vintageYear: 2003,
+    releaseYear: 2024,
+    caskNumber: null,
+  },
+  {
+    ...exactSearchBottle,
+    id: 9314,
+    peatedId: "B9314",
+    fullName: `${testBrand.name} 21-year-old Kogei Collection - Mizunara Cask`,
+    edition: "Kogei Collection - Mizunara Cask",
+    abv: 52.1,
+    vintageYear: 2001,
+    releaseYear: 2022,
+    caskNumber: null,
+  },
+];
+
 const server = http.createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
     response.writeHead(204, corsHeaders).end();
@@ -232,13 +258,6 @@ async function handleRpcRequest({ request, response, url }) {
       );
       return true;
     case "entities/list":
-      if (input?.query === testBrand.name) {
-        sendRpcResponse(response, {
-          ...emptyList,
-          results: [testBrand],
-        });
-        return true;
-      }
       if (input?.owner === testOwner.id) {
         sendRpcResponse(response, {
           ...emptyList,
@@ -246,7 +265,28 @@ async function handleRpcRequest({ request, response, url }) {
         });
         return true;
       }
-      return false;
+      {
+        const query = String(input?.query ?? "")
+          .trim()
+          .toLowerCase();
+        const kinds = Array.isArray(input?.kinds) ? input.kinds : null;
+        const results = [
+          testBrand,
+          testOwnedEntity,
+          testBottler,
+          testOwner,
+        ].filter(
+          (entity) =>
+            (!kinds || kinds.includes(entity.kind)) &&
+            (!query || entity.name.toLowerCase().includes(query)),
+        );
+        sendRpcResponse(response, {
+          ...emptyList,
+          total: results.length,
+          results,
+        });
+      }
+      return true;
     case "entities/details":
       if (
         [testBrand, testBottler, testOwnedEntity, testOwner].some(
@@ -535,6 +575,26 @@ async function handleRpcRequest({ request, response, url }) {
           id: createdBottleId,
         };
         sendRpcResponse(response, bottle);
+        return true;
+      }
+
+      if (getAccessToken(request).includes("distinct-release")) {
+        const brandId = isJsonObject(input?.brand)
+          ? input.brand.id
+          : input?.brand;
+        if (input?.name !== "21-year-old" || brandId !== testBrand.id) {
+          sendRpcError(response, "Unexpected distinct Bottle create payload");
+          return true;
+        }
+        const bottleWithoutGroup = buildBottle({
+          id: createdBottleId,
+          name: input.name,
+          brand: testBrand,
+        });
+        sendRpcResponse(response, {
+          ...bottleWithoutGroup,
+          group: buildBottleGroup({ bottle: bottleWithoutGroup }),
+        });
         return true;
       }
 
@@ -977,6 +1037,19 @@ async function handleRpcRequest({ request, response, url }) {
         rel: { nextCursor: null, prevCursor: null },
       });
       return true;
+    case "bottles/createCandidates": {
+      const results = input?.name?.includes("21-year-old")
+        ? input.name.includes("Kogei Collection")
+          ? visualCreateCandidates
+          : [exactSearchBottle]
+        : [];
+      sendRpcResponse(response, {
+        results:
+          input?.category === "single_malt" ? [...results].reverse() : results,
+        rel: { nextCursor: null, prevCursor: null },
+      });
+      return true;
+    }
     case "bottles/suggestedTags":
       if (![createdBottleId, existingBottleId].includes(input?.bottle)) {
         sendRpcError(response, "Unexpected suggested tags payload");

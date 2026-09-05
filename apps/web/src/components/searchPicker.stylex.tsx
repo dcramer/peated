@@ -26,6 +26,10 @@ import { IconButton } from "./button.stylex";
 import { Chip } from "./chip.stylex";
 import { FloatingPanel } from "./feedback.stylex";
 import { ValidationMessage } from "./field.stylex";
+import {
+  SeriesIdentityRow,
+  type SeriesIdentityRowProps,
+} from "./seriesIdentityRow.stylex";
 import { useListboxNavigation } from "./useListboxNavigation";
 
 export type SearchPickerOption = {
@@ -35,6 +39,7 @@ export type SearchPickerOption = {
     BottleIdentityRowProps,
     "name" | "provenance" | "metadata" | "imageUrl"
   >;
+  series?: Pick<SeriesIdentityRowProps, "brand" | "name">;
   detail?: string;
   id: number | string;
   label: string;
@@ -55,6 +60,7 @@ export type SearchPickerProps = {
   options: readonly SearchPickerOption[];
   placeholder: string;
   required?: boolean;
+  searchError?: ReactNode;
   value: readonly SearchPickerOption[];
 };
 
@@ -94,6 +100,7 @@ export function SearchPicker({
   options,
   placeholder,
   required = false,
+  searchError,
   value,
 }: SearchPickerProps) {
   return (
@@ -112,6 +119,7 @@ export function SearchPicker({
       options={options}
       placeholder={placeholder}
       required={required}
+      searchError={searchError}
       selectionMode="multiple"
       value={value}
     />
@@ -133,6 +141,7 @@ function PickerControl({
   options,
   placeholder,
   required = false,
+  searchError,
   selectionMode,
   value,
 }: SearchPickerProps & { selectionMode: "multiple" | "single" }) {
@@ -219,6 +228,8 @@ function PickerControl({
                 layout="cell"
                 variant="search"
               />
+            ) : value[0].series ? (
+              <SeriesIdentityRow {...value[0].series} layout="cell" />
             ) : (
               <>
                 <span
@@ -300,6 +311,25 @@ function PickerControl({
                   }
                 />
               </div>
+            ) : option.series ? (
+              <div key={option.id} {...stylex.props(styles.selectedIdentity)}>
+                <SeriesIdentityRow
+                  {...option.series}
+                  layout="cell"
+                  end={
+                    <IconButton
+                      disabled={disabled}
+                      icon={<X aria-hidden="true" size={16} />}
+                      label={`Remove ${option.label}`}
+                      onClick={() =>
+                        onChange(value.filter((item) => item.id !== option.id))
+                      }
+                      size="sm"
+                      variant="text"
+                    />
+                  }
+                />
+              </div>
             ) : (
               <Chip
                 aria-label={`Remove ${option.label}`}
@@ -351,7 +381,7 @@ function PickerControl({
             )}
           />
           {isOpen && !disabled ? (
-            <FloatingPanel {...stylex.props(styles.overlay)}>
+            <FloatingPanel style={styles.overlay}>
               <div
                 aria-label={`${label} results`}
                 id={listboxId}
@@ -365,6 +395,13 @@ function PickerControl({
                   >
                     Searching…
                   </p>
+                ) : searchError ? (
+                  <p
+                    role="alert"
+                    {...stylex.props(foundationStyles.body, styles.empty)}
+                  >
+                    {searchError}
+                  </p>
                 ) : availableOptions.length ? (
                   availableOptions.map((option, index) => (
                     <button
@@ -377,8 +414,9 @@ function PickerControl({
                       type="button"
                       {...stylex.props(
                         styles.result,
-                        Boolean(option.bottle || option.entity) &&
-                          styles.identityResult,
+                        Boolean(
+                          option.bottle || option.entity || option.series,
+                        ) && styles.identityResult,
                         index === activeIndex && styles.activeResult,
                       )}
                     >
@@ -394,6 +432,12 @@ function PickerControl({
                           layout="cell"
                           query={query}
                           variant="search"
+                        />
+                      ) : option.series ? (
+                        <SeriesIdentityRow
+                          {...option.series}
+                          layout="cell"
+                          query={query}
                         />
                       ) : (
                         <>
@@ -488,7 +532,7 @@ const styles = stylex.create({
     justifyContent: "space-between",
     columnGap: space.x4,
   },
-  label: { color: colors.inkMuted },
+  label: { color: colors.accentDeep },
   required: { color: colors.accentDeep },
   selected: { display: "flex", gap: space.x2, flexWrap: "wrap" },
   selectedIdentity: { width: "100%", minWidth: 0 },
@@ -503,6 +547,10 @@ const styles = stylex.create({
     paddingLeft: "14px",
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.inset,
+    boxShadow: {
+      default: "none",
+      ":focus-within": `inset 0 0 0 2px ${colors.accent}`,
+    },
   },
   selectedCopy: {
     display: "flex",
@@ -563,7 +611,7 @@ const styles = stylex.create({
     color: colors.ink,
     boxShadow: {
       default: "none",
-      ":focus-visible": effects.focusRing,
+      ":focus": `inset 0 0 0 2px ${colors.accent}`,
     },
     "::placeholder": { color: colors.inkMuted, opacity: 1 },
     "::-webkit-search-cancel-button": { appearance: "none" },

@@ -92,7 +92,7 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="en">
+    <html lang="en" {...stylex.props(foundationStyles.documentRoot)}>
       <body {...stylex.props(foundationStyles.document)}>
         <Providers
           session={{

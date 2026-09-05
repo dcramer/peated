@@ -75,3 +75,12 @@
 - [x] 10.4 Run focused image extraction evals and final classifier evals for the five scan-backed cases.
 - [x] 10.5 Audit review policy downgrades surfaced by those evals and remove or narrow gates only after the classifier result is proven correct.
 - [x] 10.6 Run targeted classifier tests, eval fixture validation, typecheck, and commit intentional eval replay recordings.
+
+## 11. Manual Creation Duplicate Review
+
+- [x] 11.1 Send the normalized Bottle draft to candidate matching and rank with additional distinguishing Bottle facts.
+- [x] 11.2 Track reviewed candidates by Bottle id and show review only for unseen ids.
+- [x] 11.3 Keep the draft Bottle visible in an unnumbered review view and use clear existing-versus-new actions.
+- [x] 11.4 Make unseen candidates a conditional final creation gate without adding a numbered step.
+- [x] 11.5 Add focused matcher and browser coverage for repeated, reordered, and newly surfaced candidate ids.
+- [x] 11.6 Verify the creation and candidate-review flow at desktop and mobile widths in light and dark mode.

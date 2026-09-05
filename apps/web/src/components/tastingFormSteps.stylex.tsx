@@ -2,17 +2,12 @@
 
 import * as stylex from "@stylexjs/stylex";
 import { Camera, Users } from "lucide-react";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentProps,
-  type ReactNode,
-} from "react";
+import { useState, type ComponentProps } from "react";
 
 import { space } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { Field, FieldGroup, Textarea, ValidationMessage } from "./field.stylex";
+import { FormStep } from "./formLayout.stylex";
 import { MemberPicker, type MemberPickerProps } from "./memberPicker.stylex";
 import { NotePickerField } from "./notePicker.stylex";
 import { Slideout } from "./slideout.stylex";
@@ -29,30 +24,6 @@ import {
   type ServingStyleInputProps,
 } from "./tastingInputs.stylex";
 
-/** Groups a short form step and announces it when Back or Continue changes the fields. */
-function TastingFormStep({
-  children,
-  title,
-}: {
-  children: ReactNode;
-  title: string;
-}) {
-  const heading = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    heading.current?.focus({ preventScroll: true });
-  }, []);
-
-  return (
-    <section aria-label={title} {...stylex.props(styles.step)}>
-      <h2 ref={heading} tabIndex={-1} {...stylex.props(styles.hiddenHeading)}>
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
-
 /** Captures a member's words before asking for flavors, serving details, or a rating. */
 export function TastingNotesStep({
   notes,
@@ -68,7 +39,7 @@ export function TastingNotesStep({
   label?: string;
 }) {
   return (
-    <TastingFormStep title="Notes">
+    <FormStep title="Notes">
       <Field
         error={notesError}
         errorId={`${notes.id}-error`}
@@ -87,7 +58,7 @@ export function TastingNotesStep({
       <Field error={flavorsError} htmlFor={flavors.id} label="Flavors" optional>
         <NotePickerField {...flavors} />
       </Field>
-    </TastingFormStep>
+    </FormStep>
   );
 }
 
@@ -125,7 +96,7 @@ export function TastingPourStep({
   }
 
   return (
-    <TastingFormStep title="The pour">
+    <FormStep title="The pour">
       <FieldGroup error={servingError} label="Serving style" optional>
         <ServingStyleInput {...serving} />
       </FieldGroup>
@@ -173,7 +144,7 @@ export function TastingPourStep({
           <MemberPicker {...friends} />
         )}
       </Slideout>
-    </TastingFormStep>
+    </FormStep>
   );
 }
 
@@ -183,11 +154,11 @@ export function TastingRatingStep({
   ...props
 }: RatingBandInputProps & { error?: string }) {
   return (
-    <TastingFormStep title="Rating">
+    <FormStep title="Rating">
       <FieldGroup error={error} label="How was it?" required={props.required}>
         <RatingBandInput {...props} />
       </FieldGroup>
-    </TastingFormStep>
+    </FormStep>
   );
 }
 
@@ -197,29 +168,14 @@ export function MemberReviewScoreStep({
   ...props
 }: ReviewScoreInputProps & { error?: string }) {
   return (
-    <TastingFormStep title="Score">
+    <FormStep title="Score">
       <ReviewScoreInput {...props} invalid={Boolean(error)} />
       {error ? <ValidationMessage>{error}</ValidationMessage> : null}
-    </TastingFormStep>
+    </FormStep>
   );
 }
 
 const styles = stylex.create({
-  step: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x3,
-  },
-  hiddenHeading: {
-    position: "absolute",
-    width: "1px",
-    height: "1px",
-    margin: 0,
-    overflow: "hidden",
-    clip: "rect(0, 0, 0, 0)",
-    whiteSpace: "nowrap",
-  },
   attachments: {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",

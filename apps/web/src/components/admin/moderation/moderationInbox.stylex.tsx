@@ -310,7 +310,7 @@ const styles = stylex.create({
     borderColor: colors.fieldRule,
     borderRadius: controlMetrics.radius,
     outline: "none",
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.ink,
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
     "::placeholder": { color: colors.inkMuted },

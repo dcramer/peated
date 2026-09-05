@@ -728,7 +728,7 @@ const styles = stylex.create({
     rowGap: space.x1,
     overflow: "hidden",
     borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     cursor: "pointer",
     boxShadow: {
       default: `inset 0 0 0 1px ${colors.fieldRule}`,
@@ -803,7 +803,7 @@ const styles = stylex.create({
     justifyContent: "center",
     columnGap: space.x2,
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.inkMuted,
     fontWeight: 600,
     cursor: "pointer",

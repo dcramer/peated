@@ -85,7 +85,7 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     color: colors.inkMuted,
     fontWeight: 600,
     cursor: "pointer",

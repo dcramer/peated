@@ -1,3 +1,4 @@
+import type { CompiledStyles } from "@stylexjs/stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { HTMLAttributes, ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
@@ -19,11 +20,16 @@ export type FloatingPanelProps = Omit<
   "className" | "style"
 > & {
   children: ReactNode;
+  style?: CompiledStyles;
 };
 
-export function FloatingPanel({ children, ...props }: FloatingPanelProps) {
+export function FloatingPanel({
+  children,
+  style,
+  ...props
+}: FloatingPanelProps) {
   return (
-    <div {...props} {...stylex.props(styles.overlay)}>
+    <div {...props} {...stylex.props(styles.overlay, style)}>
       {children}
     </div>
   );

@@ -213,7 +213,7 @@ const styles = stylex.create({
     height: "34px",
     placeItems: "center",
     borderRadius: controlMetrics.radius,
-    backgroundColor: colors.fieldBackground,
+    backgroundColor: colors.inset,
     boxShadow: `inset 0 0 0 1px ${colors.sectionRule}`,
     pointerEvents: "none",
   },

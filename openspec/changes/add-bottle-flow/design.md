@@ -112,6 +112,30 @@ The control should be unchecked unless product decides the scan suitability and 
 
 After adding to Library, show an Add to your Library flow with the saved entry and image. Primary action: Add another to Library. Secondary action: View Library. Add another to Library clears resolver state and starts a fresh Library-intent flow, even when the user entered with another intent and chose Library as a secondary outcome.
 
+### Manual creation reviews unseen existing Bottles
+
+The manual Add a bottle form checks for existing Bottles in the background once
+Brand and Bottle name are available. Later Bottle facts refresh the candidate
+ranking without interrupting data entry. The form sends its normalized Bottle
+draft so the server owns which facts affect discovery and ranking.
+
+Track reviewed candidates by stable Bottle id for the lifetime of the form. A
+candidate becomes reviewed only after the member explicitly rejects the review
+set or chooses an existing Bottle. Result ordering and repeated appearances do
+not make a reviewed Bottle new again. Do not persist this state across a page
+reload.
+
+During data entry, a compact notice below the Bottle preview offers review when
+the current results contain unseen Bottle ids. The notice disappears after
+review and returns only for newly surfaced ids. Duplicate review is not a
+numbered form step. On the final step, the primary action changes from Add a
+bottle to review the unseen Bottles before creation can continue.
+
+The review view keeps the draft Bottle visible for comparison and lists only
+the unseen existing Bottles using `BottleIdentityRow`. Choosing an existing
+Bottle leaves manual creation. Rejecting the review from the final save boundary
+uses Add as a new bottle and continues the pending submission.
+
 ## Risks / Trade-offs
 
 - Pending upload semantics may conflict with existing attached/cleanup behavior. -> Update helper tests first and keep expiry/ownership checks authoritative.
