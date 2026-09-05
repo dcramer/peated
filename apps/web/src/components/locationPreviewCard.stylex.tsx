@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
 import { type LocationMap, needsRegionMapCredit } from "../lib/locationMap";
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -32,6 +33,44 @@ export type RegionPreviewGridProps = {
   regions: readonly LocationPreviewItem[];
 };
 
+function LocationPreviewCardLayout({
+  count,
+  description,
+  name,
+  nameTitle,
+  visual,
+}: {
+  count: ReactNode;
+  description?: ReactNode;
+  name: ReactNode;
+  nameTitle?: string;
+  visual?: ReactNode;
+}) {
+  return (
+    <>
+      {visual ? (
+        <span aria-hidden="true" {...stylex.props(styles.visual)}>
+          {visual}
+        </span>
+      ) : null}
+      <strong
+        title={nameTitle}
+        {...stylex.props(foundationStyles.compactRowTitle, styles.name)}
+      >
+        {name}
+      </strong>
+      <span {...stylex.props(foundationStyles.metadata, styles.count)}>
+        {count}
+      </span>
+      {description ? (
+        <span {...stylex.props(foundationStyles.metadata, styles.description)}>
+          {description}
+        </span>
+      ) : null}
+    </>
+  );
+}
+
 /** Equal-height location links with optional maps and three-line descriptions. */
 export function LocationPreviewCard({
   description,
@@ -51,33 +90,26 @@ export function LocationPreviewCard({
         showDescription ? styles.cardWithDescription : styles.compactCard,
       )}
     >
-      {visual ? (
-        <span aria-hidden="true" {...stylex.props(styles.visual)}>
-          {visual.kind === "count" ? (
-            <span {...stylex.props(styles.countVisual)}>+{visual.value}</span>
-          ) : (
-            <LocationMapIcon
-              visual={visual}
-              {...stylex.props(styles.mapIcon)}
-            />
-          )}
-        </span>
-      ) : null}
-      <strong
-        title={name}
-        {...stylex.props(foundationStyles.compactRowTitle, styles.name)}
-      >
-        {name}
-      </strong>
-      <span {...stylex.props(foundationStyles.metadata, styles.count)}>
-        {totalBottles.toLocaleString("en-US")}{" "}
-        {totalBottles === 1 ? "bottle" : "bottles"}
-      </span>
-      {showDescription && description ? (
-        <span {...stylex.props(foundationStyles.metadata, styles.description)}>
-          {description}
-        </span>
-      ) : null}
+      <LocationPreviewCardLayout
+        count={`${totalBottles.toLocaleString("en-US")} ${
+          totalBottles === 1 ? "bottle" : "bottles"
+        }`}
+        description={showDescription ? description : undefined}
+        name={name}
+        nameTitle={name}
+        visual={
+          visual ? (
+            visual.kind === "count" ? (
+              <span {...stylex.props(styles.countVisual)}>+{visual.value}</span>
+            ) : (
+              <LocationMapIcon
+                visual={visual}
+                {...stylex.props(styles.mapIcon)}
+              />
+            )
+          ) : undefined
+        }
+      />
     </CardLink>
   );
 }
@@ -103,52 +135,94 @@ export function LocationPreviewGrid({
 /** Shows region cards and credits any map artwork used by the cards. */
 export function RegionPreviewGrid({ regions }: RegionPreviewGridProps) {
   return (
+    <RegionPreviewGridLayout
+      credit={
+        regions.some(
+          ({ visual }) =>
+            visual?.kind !== "count" && needsRegionMapCredit(visual),
+        ) ? (
+          <RegionMapCredit />
+        ) : undefined
+      }
+    >
+      <LocationPreviewGrid locations={regions} />
+    </RegionPreviewGridLayout>
+  );
+}
+
+function RegionPreviewGridLayout({
+  children,
+  credit,
+}: {
+  children: ReactNode;
+  credit?: ReactNode;
+}) {
+  return (
     <>
-      <div {...stylex.props(styles.regionGrid)}>
-        <LocationPreviewGrid locations={regions} />
-      </div>
-      {regions.some(
-        ({ visual }) =>
-          visual?.kind !== "count" && needsRegionMapCredit(visual),
-      ) ? (
-        <RegionMapCredit />
-      ) : null}
+      <div {...stylex.props(styles.regionGrid)}>{children}</div>
+      {credit}
     </>
+  );
+}
+
+/** Matches location cards at each responsive grid width while they load. */
+export function LocationPreviewGridLoading({
+  label = "Loading locations",
+  showDescriptions = true,
+}: {
+  label?: string;
+  showDescriptions?: boolean;
+}) {
+  return (
+    <div
+      aria-busy="true"
+      aria-label={label}
+      role="status"
+      {...stylex.props(styles.grid)}
+    >
+      {loadingCards.map((delay) => (
+        <Card
+          aria-hidden="true"
+          key={delay}
+          padding="none"
+          {...stylex.props(
+            styles.card,
+            showDescriptions ? styles.cardWithDescription : styles.compactCard,
+          )}
+        >
+          <LocationPreviewCardLayout
+            count={
+              <span {...stylex.props(styles.loadingCount)}>
+                <LoadingPlaceholder delay={delay} preset="metadata" />
+              </span>
+            }
+            description={
+              showDescriptions ? (
+                <span {...stylex.props(styles.loadingDescription)}>
+                  <LoadingPlaceholder delay={delay} preset="text" />
+                  <LoadingPlaceholder delay={delay} preset="metadata" />
+                </span>
+              ) : undefined
+            }
+            name={
+              <span {...stylex.props(styles.loadingName)}>
+                <LoadingPlaceholder delay={delay} preset="text" />
+              </span>
+            }
+            visual={<span {...stylex.props(styles.loadingVisual)} />}
+          />
+        </Card>
+      ))}
+    </div>
   );
 }
 
 /** Matches the fixed-height regional cards at each responsive grid width. */
 export function RegionPreviewGridLoading() {
   return (
-    <div
-      aria-busy="true"
-      aria-label="Loading regions"
-      role="status"
-      {...stylex.props(styles.regionGrid)}
-    >
-      <div {...stylex.props(styles.grid)}>
-        {loadingCards.map((delay) => (
-          <Card
-            aria-hidden="true"
-            key={delay}
-            padding="none"
-            {...stylex.props(styles.card, styles.cardWithDescription)}
-          >
-            <span {...stylex.props(styles.loadingVisual)} />
-            <span {...stylex.props(styles.loadingName)}>
-              <LoadingPlaceholder delay={delay} preset="text" />
-            </span>
-            <span {...stylex.props(styles.loadingCount)}>
-              <LoadingPlaceholder delay={delay} preset="metadata" />
-            </span>
-            <span {...stylex.props(styles.loadingDescription)}>
-              <LoadingPlaceholder delay={delay} preset="text" />
-              <LoadingPlaceholder delay={delay} preset="metadata" />
-            </span>
-          </Card>
-        ))}
-      </div>
-    </div>
+    <RegionPreviewGridLayout>
+      <LocationPreviewGridLoading label="Loading regions" />
+    </RegionPreviewGridLayout>
   );
 }
 
@@ -237,21 +311,16 @@ const styles = stylex.create({
     marginTop: space.x2,
   },
   loadingVisual: {
-    gridRow: 1,
-    minHeight: 0,
-    marginTop: space.x2,
-    marginRight: space.x3,
-    marginBottom: space.x4,
-    marginLeft: space.x3,
+    display: "block",
+    width: "100%",
+    height: "100%",
     backgroundColor: colors.inset,
   },
-  loadingName: { gridRow: 2, width: "80%" },
-  loadingCount: { gridRow: 3, width: "64%", marginTop: space.x1 },
+  loadingName: { display: "block", width: "80%" },
+  loadingCount: { display: "block", width: "64%" },
   loadingDescription: {
-    gridRow: 4,
     display: "flex",
     flexDirection: "column",
     gap: space.x2,
-    marginTop: space.x2,
   },
 });

@@ -81,9 +81,20 @@ async function captureStory(page: Page, story: Story, output: string) {
   }, story.id);
   await page.evaluate(async () => {
     await document.fonts.ready;
-    await Promise.all(
-      Array.from(document.images, (image) => image.decode().catch(() => {})),
+    const imagesReady = Promise.all(
+      Array.from(document.images, (image) => {
+        // A lazy image below the viewport may never start loading. Do not let it
+        // hold every Storybook screenshot open until the test times out.
+        if (image.loading === "lazy" && !image.complete) {
+          return Promise.resolve();
+        }
+        return image.decode().catch(() => {});
+      }),
     );
+    await Promise.race([
+      imagesReady,
+      new Promise((resolve) => window.setTimeout(resolve, 5_000)),
+    ]);
     await new Promise((resolve) => requestAnimationFrame(resolve));
   });
 

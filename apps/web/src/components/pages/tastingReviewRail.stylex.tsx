@@ -1,14 +1,24 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
-import { RailList, RailListItem, TastingRating } from "@peated/web/components";
+import {
+  type BottleListItem,
+  LoadingList,
+  RailList,
+  RailListItem,
+  TastingRating,
+} from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 import { RailListSection } from "./railListSection.stylex";
-import { TastingReviewBottleSummary } from "./tastingReviewBottleSummary.stylex";
+import {
+  TastingReviewBottleSummary,
+  TastingReviewBottleSummaryLoading,
+} from "./tastingReviewBottleSummary.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
 type Member = Outputs["tastings"]["details"]["createdBy"];
@@ -22,6 +32,41 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
   year: "numeric",
 });
+
+function TastingReviewRailLayout({
+  bottle,
+  memberContent,
+  memberHeading,
+  memberItems,
+  memberMoreHref,
+  memberMoreLabel,
+  reviewContent,
+}: {
+  bottle: ReactNode;
+  memberContent?: ReactNode;
+  memberHeading: string;
+  memberItems?: readonly BottleListItem[];
+  memberMoreHref?: string;
+  memberMoreLabel?: string;
+  reviewContent: ReactNode;
+}) {
+  return (
+    <>
+      {bottle}
+      <BottleRailSection
+        heading={memberHeading}
+        items={memberItems}
+        moreHref={memberMoreHref}
+        moreLabel={memberMoreLabel}
+      >
+        {memberContent}
+      </BottleRailSection>
+      <RailListSection heading="Other reviews of this bottle">
+        {reviewContent}
+      </RailListSection>
+    </>
+  );
+}
 
 export function TastingReviewRail({
   author,
@@ -54,49 +99,48 @@ export function TastingReviewRail({
   );
 
   return (
-    <>
-      <TastingReviewBottleSummary
-        bottle={bottle}
-        photoUrl={photoUrl}
-        placement="desktop"
-      />
-
-      <BottleRailSection
-        heading={`More from ${author.username}`}
-        items={moreFromMember.map((tasting) => ({
-          ...toBottleListItem(tasting.bottle),
-          id: String(tasting.id),
-          provenance: [],
-          metadata: [],
-          end: (
-            <div {...stylex.props(styles.tastingMeta)}>
-              {tasting.ratingBand ? (
-                <TastingRating band={tasting.ratingBand} size="sm" />
-              ) : null}
-              <time
-                dateTime={tasting.createdAt}
-                {...stylex.props(foundationStyles.metadata, styles.tastingDate)}
-              >
-                {dateFormatter.format(new Date(tasting.createdAt))}
-              </time>
-            </div>
-          ),
-          href: getTastingUrl(tasting),
-          imageFit: tasting.imageUrl ? "cover" : "contain",
-          imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
-        }))}
-        moreHref={`/users/${author.username}/tastings`}
-        moreLabel="See all tastings"
-      >
-        {!moreFromMember.length ? (
+    <TastingReviewRailLayout
+      bottle={
+        <TastingReviewBottleSummary
+          bottle={bottle}
+          photoUrl={photoUrl}
+          placement="desktop"
+        />
+      }
+      memberContent={
+        !moreFromMember.length ? (
           <p {...stylex.props(foundationStyles.metadata, styles.empty)}>
             No other public tastings yet.
           </p>
-        ) : null}
-      </BottleRailSection>
-
-      <RailListSection heading="Other reviews of this bottle">
-        {otherMemberReviews.length || otherExternalReviews.length ? (
+        ) : undefined
+      }
+      memberHeading={`More from ${author.username}`}
+      memberItems={moreFromMember.map((tasting) => ({
+        ...toBottleListItem(tasting.bottle),
+        id: String(tasting.id),
+        provenance: [],
+        metadata: [],
+        end: (
+          <div {...stylex.props(styles.tastingMeta)}>
+            {tasting.ratingBand ? (
+              <TastingRating band={tasting.ratingBand} size="sm" />
+            ) : null}
+            <time
+              dateTime={tasting.createdAt}
+              {...stylex.props(foundationStyles.metadata, styles.tastingDate)}
+            >
+              {dateFormatter.format(new Date(tasting.createdAt))}
+            </time>
+          </div>
+        ),
+        href: getTastingUrl(tasting),
+        imageFit: tasting.imageUrl ? "cover" : "contain",
+        imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
+      }))}
+      memberMoreHref={`/users/${author.username}/tastings`}
+      memberMoreLabel="See all tastings"
+      reviewContent={
+        otherMemberReviews.length || otherExternalReviews.length ? (
           <RailList ariaLabel="Other reviews of this bottle">
             {otherMemberReviews.map((review) => (
               <RailListItem
@@ -129,9 +173,29 @@ export function TastingReviewRail({
           <p {...stylex.props(foundationStyles.metadata, styles.empty)}>
             No other reviews yet.
           </p>
-        )}
-      </RailListSection>
-    </>
+        )
+      }
+    />
+  );
+}
+
+/** Reserves the shared review and tasting side column while data loads. */
+export function TastingReviewRailLoading() {
+  return (
+    <TastingReviewRailLayout
+      bottle={<TastingReviewBottleSummaryLoading placement="desktop" />}
+      memberContent={
+        <LoadingList
+          label="Loading member tastings"
+          rows={3}
+          variant="sidebar"
+        />
+      }
+      memberHeading="More from this member"
+      reviewContent={
+        <LoadingList label="Loading other reviews" rows={3} variant="text" />
+      }
+    />
   );
 }
 

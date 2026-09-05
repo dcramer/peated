@@ -3,21 +3,24 @@ import type { ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 import { TextLink } from "../textLink.stylex";
 
-import {
-  BottleList,
-  type BottleListItem,
-  EntityIdentityRow,
-  type EntityListItem,
-  ItemList,
-  ItemListItem,
-  LocationPreviewGrid,
-  type LocationPreviewItem,
-  RegionPreviewGrid,
-} from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
+import { BottleList, type BottleListItem } from "../bottleList.stylex";
+import {
+  EntityIdentityRow,
+  type EntityListItem,
+} from "../entityIdentityRow.stylex";
+import { LoadingList } from "../feedback.stylex";
+import { ItemList, ItemListItem } from "../itemList.stylex";
+import {
+  LocationPreviewGrid,
+  LocationPreviewGridLoading,
+  type LocationPreviewItem,
+  RegionPreviewGrid,
+  RegionPreviewGridLoading,
+} from "../locationPreviewCard.stylex";
 
-function HomeModuleHeading({
+function HomeSectionHeading({
   action,
   detail,
   title,
@@ -41,6 +44,25 @@ function HomeModuleHeading({
   );
 }
 
+function HomeListSectionLayout({
+  action,
+  children,
+  detail,
+  title,
+}: {
+  action?: ReactNode;
+  children: ReactNode;
+  detail?: ReactNode;
+  title: ReactNode;
+}) {
+  return (
+    <section {...stylex.props(styles.section)}>
+      <HomeSectionHeading action={action} detail={detail} title={title} />
+      <div {...stylex.props(styles.rows)}>{children}</div>
+    </section>
+  );
+}
+
 /** Shows bottles with published median scores in API rank order. */
 export function HomeHighestRated({
   bottles,
@@ -50,20 +72,17 @@ export function HomeHighestRated({
   totalRated: number;
 }) {
   return (
-    <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading
-        action={
-          <TextLink href="/bottles?sort=-score&minScore=0" size="sm">
-            All {totalRated.toLocaleString("en-US")} rated{" "}
-            <span aria-hidden="true">→</span>
-          </TextLink>
-        }
-        title="Bottles to try"
-      />
-      <div {...stylex.props(styles.rows)}>
-        <BottleList ariaLabel="Bottles to try" items={bottles} />
-      </div>
-    </section>
+    <HomeListSectionLayout
+      action={
+        <TextLink href="/bottles?sort=-score&minScore=0" size="sm">
+          All {totalRated.toLocaleString("en-US")} rated{" "}
+          <span aria-hidden="true">→</span>
+        </TextLink>
+      }
+      title="Bottles to try"
+    >
+      <BottleList ariaLabel="Bottles to try" items={bottles} />
+    </HomeListSectionLayout>
   );
 }
 
@@ -78,34 +97,84 @@ export function HomeLatestReleases({
   title: string;
 }) {
   return (
-    <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading
-        action={
-          <TextLink href={seeAllHref} size="sm">
-            View all <span aria-hidden="true">→</span>
-          </TextLink>
-        }
-        title={title}
-      />
-      <div {...stylex.props(styles.rows)}>
-        <BottleList ariaLabel={title} items={bottles} />
-      </div>
-    </section>
+    <HomeListSectionLayout
+      action={
+        <TextLink href={seeAllHref} size="sm">
+          View all <span aria-hidden="true">→</span>
+        </TextLink>
+      }
+      title={title}
+    >
+      <BottleList ariaLabel={title} items={bottles} />
+    </HomeListSectionLayout>
   );
 }
 
 export function HomeActivityFeed({ children }: { children: ReactNode }) {
   return (
+    <HomeListSectionLayout
+      action={
+        <TextLink href="/activity" size="sm">
+          View all <span aria-hidden="true">→</span>
+        </TextLink>
+      }
+      title="Activity"
+    >
+      {children}
+    </HomeListSectionLayout>
+  );
+}
+
+function HomeOriginsLayout({
+  countries,
+  regions,
+}: {
+  countries: ReactNode;
+  regions?: ReactNode;
+}) {
+  return (
     <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading
+      <HomeSectionHeading
         action={
-          <TextLink href="/activity" size="sm">
-            View all <span aria-hidden="true">→</span>
+          <TextLink href="/locations" size="sm">
+            Open the map <span aria-hidden="true">→</span>
           </TextLink>
         }
-        title="Activity"
+        title="Browse by origin"
       />
-      <div {...stylex.props(styles.rows)}>{children}</div>
+      <p {...stylex.props(foundationStyles.body, styles.originIntro)}>
+        Mostly Scotch, a good deal of American, and a growing amount of
+        everything else.
+      </p>
+      <div {...stylex.props(styles.countryGrid)}>{countries}</div>
+      {regions ? (
+        <>
+          <div {...stylex.props(styles.regionHeading)}>
+            <SectionHeading level={3}>By region</SectionHeading>
+          </div>
+          {regions}
+        </>
+      ) : null}
+    </section>
+  );
+}
+
+function HomeDistilleriesLayout({
+  children,
+  linkLabel,
+}: {
+  children: ReactNode;
+  linkLabel: ReactNode;
+}) {
+  return (
+    <section {...stylex.props(styles.section)}>
+      <HomeSectionHeading title="Distilleries" />
+      <div {...stylex.props(styles.distilleries)}>{children}</div>
+      <div {...stylex.props(styles.distilleryLink)}>
+        <TextLink href="/distillers">
+          {linkLabel} <span aria-hidden="true">→</span>
+        </TextLink>
+      </div>
     </section>
   );
 }
@@ -137,34 +206,17 @@ export function HomeOrigins({
   ];
 
   return (
-    <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading
-        action={
-          <TextLink href="/locations" size="sm">
-            Open the map <span aria-hidden="true">→</span>
-          </TextLink>
-        }
-        title="Browse by origin"
-      />
-      <p {...stylex.props(foundationStyles.body, styles.originIntro)}>
-        Mostly Scotch, a good deal of American, and a growing amount of
-        everything else.
-      </p>
-      <div {...stylex.props(styles.countryGrid)}>
+    <HomeOriginsLayout
+      countries={
         <LocationPreviewGrid
           locations={countryLocations}
           showDescriptions={false}
         />
-      </div>
-      {regions.length ? (
-        <>
-          <div {...stylex.props(styles.regionHeading)}>
-            <SectionHeading level={3}>By region</SectionHeading>
-          </div>
-          <RegionPreviewGrid regions={regions} />
-        </>
-      ) : null}
-    </section>
+      }
+      regions={
+        regions.length ? <RegionPreviewGrid regions={regions} /> : undefined
+      }
+    />
   );
 }
 
@@ -176,26 +228,21 @@ export function HomeDistilleries({
   totalDistilleries?: number;
 }) {
   return (
-    <section {...stylex.props(styles.section)}>
-      <HomeModuleHeading title="Distilleries" />
-      <div {...stylex.props(styles.distilleries)}>
-        <ItemList ariaLabel="Distilleries">
-          {distilleries.map((distillery) => (
-            <ItemListItem key={distillery.href}>
-              <EntityIdentityRow {...distillery} />
-            </ItemListItem>
-          ))}
-        </ItemList>
-      </div>
-      <div {...stylex.props(styles.distilleryLink)}>
-        <TextLink href="/distillers">
-          {totalDistilleries === undefined
-            ? "View all distilleries"
-            : `View ${totalDistilleries.toLocaleString("en-US")} distilleries`}{" "}
-          <span aria-hidden="true">→</span>
-        </TextLink>
-      </div>
-    </section>
+    <HomeDistilleriesLayout
+      linkLabel={
+        totalDistilleries === undefined
+          ? "View all distilleries"
+          : `View ${totalDistilleries.toLocaleString("en-US")} distilleries`
+      }
+    >
+      <ItemList ariaLabel="Distilleries">
+        {distilleries.map((distillery) => (
+          <ItemListItem key={distillery.href}>
+            <EntityIdentityRow {...distillery} />
+          </ItemListItem>
+        ))}
+      </ItemList>
+    </HomeDistilleriesLayout>
   );
 }
 
@@ -218,6 +265,62 @@ export function HomeContributionPrompt({
         {secondaryAction}
       </div>
     </section>
+  );
+}
+
+/** Keeps the recent releases heading and link visible while its rows load. */
+export function HomeLatestReleasesLoading() {
+  return (
+    <HomeListSectionLayout
+      action={
+        <TextLink href="/bottles?sort=-release" size="sm">
+          View all <span aria-hidden="true">→</span>
+        </TextLink>
+      }
+      title="Recent releases"
+    >
+      <LoadingList label="Loading recent releases" rows={5} />
+    </HomeListSectionLayout>
+  );
+}
+
+/** Keeps the activity heading and link visible while its rows load. */
+export function HomeActivityFeedLoading() {
+  return (
+    <HomeListSectionLayout
+      action={
+        <TextLink href="/activity" size="sm">
+          View all <span aria-hidden="true">→</span>
+        </TextLink>
+      }
+      title="Activity"
+    >
+      <LoadingList label="Loading activity" rows={3} />
+    </HomeListSectionLayout>
+  );
+}
+
+/** Keeps the distillery section and link visible while its rows load. */
+export function HomeDistilleriesLoading() {
+  return (
+    <HomeDistilleriesLayout linkLabel="View all distilleries">
+      <LoadingList label="Loading distilleries" rows={5} variant="sidebar" />
+    </HomeDistilleriesLayout>
+  );
+}
+
+/** Reserves the normally visible country and Scottish region card grids. */
+export function HomeOriginsLoading() {
+  return (
+    <HomeOriginsLayout
+      countries={
+        <LocationPreviewGridLoading
+          label="Loading countries"
+          showDescriptions={false}
+        />
+      }
+      regions={<RegionPreviewGridLoading />}
+    />
   );
 }
 

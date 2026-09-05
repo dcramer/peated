@@ -146,6 +146,9 @@ export function Notice({
 type PlaceholderPreset =
   | "heading"
   | "metadata"
+  | "pageMetadata"
+  | "pageTitle"
+  | "recordTitle"
   | "score"
   | "text"
   | "smallThumbnail"
@@ -556,6 +559,18 @@ const styles = stylex.create({
     width: "40%",
     height: "13px",
   },
+  pageMetadata: {
+    width: "180px",
+    height: "13px",
+  },
+  pageTitle: {
+    width: "min(520px, calc(100vw - 40px))",
+    height: "clamp(38px, 5vw, 64px)",
+  },
+  recordTitle: {
+    width: "min(680px, calc(100vw - 40px))",
+    height: "clamp(76px, 9.5vw, 137px)",
+  },
   thumbnail: {
     width: bottleThumbnailMetrics.width,
     height: bottleThumbnailMetrics.height,
@@ -592,6 +607,9 @@ const noticeStatusTones = {
 const presets = {
   heading: styles.heading,
   metadata: styles.metadata,
+  pageMetadata: styles.pageMetadata,
+  pageTitle: styles.pageTitle,
+  recordTitle: styles.recordTitle,
   score: styles.score,
   text: styles.text,
   thumbnail: styles.thumbnail,
