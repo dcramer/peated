@@ -17,7 +17,6 @@ import {
   bottleTombstones,
   changes,
   collectionBottles,
-  collections,
   externalReviews,
   flightBottles,
   incomingBottleDecisionLogs,
@@ -33,6 +32,7 @@ import {
   getBottleSeriesMemberships,
   updateBottleSeriesReleaseCounts,
 } from "@peated/server/lib/bottleSeriesReleaseCounts";
+import { updateCollectionBottleCounts } from "@peated/server/lib/collectionBottleCounts";
 import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
@@ -187,7 +187,8 @@ async function consolidateCollectionMemberships(
     else rowsByCollectionId.set(row.collectionId, [row]);
   }
 
-  const changedCollectionIds = new Set<number>();
+  const collectionIdsBefore = rows.map(({ collectionId }) => collectionId);
+  const collectionIdsAfter: number[] = [];
   let moved = 0;
   let collapsed = 0;
 
@@ -199,6 +200,7 @@ async function consolidateCollectionMemberships(
       ...collectionRows.filter(({ bottleId }) => bottleId === sourceBottleId),
     ];
     const survivor = preferredRows[0]!;
+    collectionIdsAfter.push(survivor.collectionId);
     const imageUrl = survivor.imageUrl?.trim()
       ? survivor.imageUrl
       : (preferredRows.find(({ imageUrl }) => imageUrl?.trim())?.imageUrl ??
@@ -209,7 +211,6 @@ async function consolidateCollectionMemberships(
       await tx
         .delete(collectionBottles)
         .where(eq(collectionBottles.id, row.id));
-      changedCollectionIds.add(row.collectionId);
       collapsed += 1;
     }
 
@@ -220,14 +221,11 @@ async function consolidateCollectionMemberships(
     if (survivor.bottleId === sourceBottleId) moved += 1;
   }
 
-  for (const collectionId of changedCollectionIds) {
-    await tx
-      .update(collections)
-      .set({
-        totalBottles: sql`(SELECT COUNT(*) FROM ${collectionBottles} WHERE ${collectionBottles.collectionId} = ${collectionId})`,
-      })
-      .where(eq(collections.id, collectionId));
-  }
+  await updateCollectionBottleCounts(
+    tx,
+    collectionIdsBefore,
+    collectionIdsAfter,
+  );
   return { moved, collapsed };
 }
 

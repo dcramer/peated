@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles, collections } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -27,6 +27,7 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
     const libraryCollection = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
+      totalBottles: 1,
     });
     const [entry] = await db
       .insert(collectionBottles)
@@ -67,6 +68,11 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
     expect(cleared.id).toBe(entry.id);
     expect(cleared.status).toBeNull();
     expect(row.status).toBeNull();
+    await expect(
+      db.query.collections.findFirst({
+        where: eq(collections.id, libraryCollection.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 1 });
   });
 
   test("rejects updates by non-owner", async ({ defaults, fixtures }) => {

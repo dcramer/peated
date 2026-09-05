@@ -11,7 +11,7 @@ export default procedure
     summary: "Repair saved bottle counts",
     description:
       "Check saved bottle totals and fix any that are wrong. Requires administrator privileges.",
-    operationId: "repairEntityBottleCounts",
+    operationId: "repairBottleCounts",
   })
   .input(z.object({}).strict().default({}))
   .output(z.object({ status: z.literal("queued") }).strict())
@@ -39,6 +39,13 @@ export default procedure
     );
     await pushUniqueJob(
       "RepairBottleSeriesReleaseCounts",
+      {},
+      {
+        delay: 0,
+      },
+    );
+    await pushUniqueJob(
+      "RepairCollectionBottleCounts",
       {},
       {
         delay: 0,
