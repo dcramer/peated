@@ -4,9 +4,14 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { BottleRatingSummary, BottleRatings } from "./scoring.stylex";
+import {
+  BottleRatingSummary,
+  BottleRatings,
+  ReviewScore,
+  TastingRating,
+} from "./scoring.stylex";
 
-describe("Bottle ratings", () => {
+describe("Ratings", () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -75,5 +80,27 @@ describe("Bottle ratings", () => {
     act(() => root.render(<BottleRatings />));
 
     expect(container.innerHTML).toBe("");
+  });
+
+  it("shows a tasting's named rating and range instead of a five-point mark", () => {
+    act(() => root.render(<TastingRating band="very_good" />));
+
+    expect(container.textContent).toContain("Very good");
+    expect(container.textContent).toContain("85–89 range");
+    expect(container.querySelector('[role="img"]')).toBeNull();
+  });
+
+  it("names an exact review score on a 100-point scale", () => {
+    act(() => root.render(<ReviewScore score={92} />));
+
+    expect(container.textContent).toContain("Outstanding");
+    expect(container.textContent).toContain("92/100");
+  });
+
+  it("keeps a critic's non-100 score without assigning a Peated rating", () => {
+    act(() => root.render(<ReviewScore scale={10} score={8} />));
+
+    expect(container.textContent).not.toContain("Good");
+    expect(container.textContent).toContain("8/10");
   });
 });

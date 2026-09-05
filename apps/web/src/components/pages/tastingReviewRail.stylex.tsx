@@ -87,7 +87,7 @@ export function TastingReviewRail({
           end: (
             <div {...stylex.props(styles.tastingMeta)}>
               {tasting.ratingBand ? (
-                <TastingRating band={tasting.ratingBand} />
+                <TastingRating band={tasting.ratingBand} size="sm" />
               ) : null}
               <time
                 dateTime={tasting.createdAt}

@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, fonts, space } from "../styles/tokens.stylex";
+import { colors, space } from "../styles/tokens.stylex";
 import { Avatar } from "./avatar.stylex";
 import {
   BottleIdentityRow,
@@ -8,7 +8,7 @@ import {
 } from "./bottleIdentityRow.stylex";
 import { Card, CardPrimaryLink } from "./card.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
-import { RATING_BANDS, TastingRating, type RatingBand } from "./scoring.stylex";
+import { ReviewScore, TastingRating, type RatingBand } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
 import TimeSince from "./timeSince";
 
@@ -144,28 +144,13 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                   bottle.score !== undefined || bottle.ratingBand ? (
                     <div {...stylex.props(styles.facts)}>
                       {bottle.score !== undefined ? (
-                        <span
-                          role="img"
-                          aria-label={`Review score: ${bottle.score.value} out of ${bottle.score.scale}`}
-                          {...stylex.props(styles.score)}
-                        >
-                          {bottle.score.value}
-                          <span {...stylex.props(styles.scoreScale)}>
-                            /{bottle.score.scale}
-                          </span>
-                        </span>
+                        <ReviewScore
+                          scale={bottle.score.scale}
+                          score={bottle.score.value}
+                        />
                       ) : null}
                       {bottle.ratingBand ? (
-                        <>
-                          <strong {...stylex.props(styles.rating)}>
-                            {
-                              RATING_BANDS.find(
-                                (band) => band.key === bottle.ratingBand,
-                              )?.label
-                            }
-                          </strong>
-                          <TastingRating band={bottle.ratingBand} />
-                        </>
+                        <TastingRating band={bottle.ratingBand} />
                       ) : null}
                     </div>
                   ) : undefined
@@ -262,33 +247,6 @@ const styles = stylex.create({
     alignItems: "flex-end",
     flexDirection: "column",
     gap: space.x2,
-  },
-  rating: {
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "15px",
-    fontWeight: 700,
-    lineHeight: 1.2,
-    textAlign: "right",
-    [MOBILE]: { fontSize: "13px" },
-  },
-  score: {
-    color: colors.ink,
-    fontFamily: fonts.display,
-    fontSize: "32px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.045em",
-    lineHeight: 1,
-    whiteSpace: "nowrap",
-    [MOBILE]: { fontSize: "26px" },
-  },
-  scoreScale: {
-    color: colors.inkMuted,
-    fontSize: "13px",
-    fontWeight: 400,
-    letterSpacing: "normal",
-    marginLeft: "3px",
   },
   excerpt: {
     marginTop: 0,

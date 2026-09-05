@@ -8,13 +8,13 @@ import {
   Chip,
   FactList,
   MemberAvatar,
-  RATING_BANDS,
+  ReviewScore,
   TastingRating,
   TextLink,
   type RatingBand,
 } from "@peated/web/components";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
@@ -56,10 +56,6 @@ export function TastingReviewDetail({
 }) {
   const bottleName = formatBottleDisplayName(bottle);
   const bottleTitle = bottleName.replaceAll(" - ", "\u00a0- ");
-  const ratingBand =
-    rating.kind === "tasting" && rating.ratingBand
-      ? RATING_BANDS.find((item) => item.key === rating.ratingBand)
-      : undefined;
   const facts = [
     servingStyle
       ? { label: "Serving", value: formatServingStyle(servingStyle) }
@@ -98,31 +94,9 @@ export function TastingReviewDetail({
           </div>
 
           {rating.kind === "review" ? (
-            <div {...stylex.props(styles.reviewScore)}>
-              <strong {...stylex.props(styles.reviewScoreValue)}>
-                {rating.score}
-              </strong>
-              <span
-                {...stylex.props(
-                  foundationStyles.metadata,
-                  styles.reviewScoreScale,
-                )}
-              >
-                /100
-              </span>
-            </div>
-          ) : rating.ratingBand && ratingBand ? (
-            <div {...stylex.props(styles.tastingRatingSummary)}>
-              <TastingRating band={rating.ratingBand} />
-              <span
-                {...stylex.props(
-                  foundationStyles.metadata,
-                  styles.tastingRatingCaption,
-                )}
-              >
-                {ratingBand.label} · {ratingBand.range}
-              </span>
-            </div>
+            <ReviewScore score={rating.score} size="lg" />
+          ) : rating.ratingBand ? (
+            <TastingRating band={rating.ratingBand} size="lg" />
           ) : (
             <span {...stylex.props(foundationStyles.metadata, styles.unrated)}>
               Not rated
@@ -227,33 +201,6 @@ const styles = stylex.create({
     gap: "2px",
   },
   authorMetadata: {
-    color: colors.inkMuted,
-  },
-  reviewScore: {
-    display: "flex",
-    flexShrink: 0,
-    alignItems: "baseline",
-    color: colors.ink,
-    fontFamily: fonts.display,
-  },
-  reviewScoreValue: {
-    fontSize: "40px",
-    fontVariantNumeric: "tabular-nums",
-    fontWeight: 700,
-    letterSpacing: "-0.045em",
-    lineHeight: 0.9,
-  },
-  reviewScoreScale: {
-    color: colors.inkMuted,
-  },
-  tastingRatingSummary: {
-    display: "flex",
-    flexShrink: 0,
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: space.x1,
-  },
-  tastingRatingCaption: {
     color: colors.inkMuted,
   },
   unrated: {

@@ -20,6 +20,9 @@ export const Overview: Story = {
           <TastingRating band={band.key} key={band.key} />
         ))}
       </StoryRow>
+      <StoryRow>
+        <TastingRating band="very_good" size="lg" />
+      </StoryRow>
     </StoryStack>
   ),
 };
