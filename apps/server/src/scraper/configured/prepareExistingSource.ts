@@ -91,7 +91,6 @@ export async function inspectExistingSource(
   if (
     siteTargets.length !== 1 ||
     siteTargets[0].targetKey !== definition.targetKey ||
-    !siteTargets[0].active ||
     siteTargets[0].managedBy !== "code" ||
     targetSites.length !== 1 ||
     targetSites[0].externalSiteId !== site.id ||
@@ -123,7 +122,7 @@ export async function createPreparedSource(
 ) {
   await tx
     .update(externalSiteScrapeTargets)
-    .set({ managedBy: "admin", updatedAt: new Date() })
+    .set({ managedBy: "admin", active: true, updatedAt: new Date() })
     .where(
       and(
         eq(externalSiteScrapeTargets.externalSiteId, input.externalSiteId),

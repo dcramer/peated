@@ -6,6 +6,7 @@ import {
   externalReviews,
   externalSiteRuns,
   externalSites,
+  externalSiteScrapeTargets,
   scrapeSourceRuns,
   scrapeSources,
   scrapeTargets,
@@ -1122,6 +1123,22 @@ describe("POST /admin/scrape-sources/prepare", () => {
     const prices = await db.select().from(storePrices);
     const histories = await db.select().from(storePriceHistories);
     const runs = await db.select().from(externalSiteRuns);
+    // Retiring a code source leaves its request target in place but makes the
+    // site link inactive until saved rules take ownership.
+    await syncScraperDefinitions(
+      createScraperRegistry({
+        targets: [scraperRegistry.targets.get("compassbox")!],
+        sources: [],
+      }),
+    );
+    expect(await db.select().from(externalSiteScrapeTargets)).toEqual([
+      expect.objectContaining({
+        externalSiteId: site.id,
+        targetKey: "compassbox",
+        managedBy: "code",
+        active: false,
+      }),
+    ]);
     await db.update(scrapeTargets).set({
       blockedUntil: new Date(Date.now() + 60_000),
       windowRequestCount: 3,
@@ -1158,6 +1175,14 @@ describe("POST /admin/scrape-sources/prepare", () => {
     expect(await db.select().from(externalSiteRuns)).toEqual(runs);
     expect(await db.select().from(scrapeTargets)).toEqual([
       { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(externalSiteScrapeTargets)).toEqual([
+      expect.objectContaining({
+        externalSiteId: site.id,
+        targetKey: "compassbox",
+        managedBy: "admin",
+        active: true,
+      }),
     ]);
     expect(await db.select().from(scrapeSources)).toEqual([
       expect.objectContaining({
