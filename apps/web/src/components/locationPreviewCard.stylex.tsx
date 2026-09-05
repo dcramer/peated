@@ -117,37 +117,55 @@ export function RegionPreviewGrid({ regions }: RegionPreviewGridProps) {
   );
 }
 
-/** Matches the fixed-height regional cards at each responsive grid width. */
-export function RegionPreviewGridLoading() {
+/** Matches location cards at each responsive grid width while they load. */
+export function LocationPreviewGridLoading({
+  label = "Loading locations",
+  showDescriptions = true,
+}: {
+  label?: string;
+  showDescriptions?: boolean;
+}) {
   return (
     <div
       aria-busy="true"
-      aria-label="Loading regions"
+      aria-label={label}
       role="status"
-      {...stylex.props(styles.regionGrid)}
+      {...stylex.props(styles.grid)}
     >
-      <div {...stylex.props(styles.grid)}>
-        {loadingCards.map((delay) => (
-          <Card
-            aria-hidden="true"
-            key={delay}
-            padding="none"
-            {...stylex.props(styles.card, styles.cardWithDescription)}
-          >
-            <span {...stylex.props(styles.loadingVisual)} />
-            <span {...stylex.props(styles.loadingName)}>
-              <LoadingPlaceholder delay={delay} preset="text" />
-            </span>
-            <span {...stylex.props(styles.loadingCount)}>
-              <LoadingPlaceholder delay={delay} preset="metadata" />
-            </span>
+      {loadingCards.map((delay) => (
+        <Card
+          aria-hidden="true"
+          key={delay}
+          padding="none"
+          {...stylex.props(
+            styles.card,
+            showDescriptions ? styles.cardWithDescription : styles.compactCard,
+          )}
+        >
+          <span {...stylex.props(styles.loadingVisual)} />
+          <span {...stylex.props(styles.loadingName)}>
+            <LoadingPlaceholder delay={delay} preset="text" />
+          </span>
+          <span {...stylex.props(styles.loadingCount)}>
+            <LoadingPlaceholder delay={delay} preset="metadata" />
+          </span>
+          {showDescriptions ? (
             <span {...stylex.props(styles.loadingDescription)}>
               <LoadingPlaceholder delay={delay} preset="text" />
               <LoadingPlaceholder delay={delay} preset="metadata" />
             </span>
-          </Card>
-        ))}
-      </div>
+          ) : null}
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+/** Matches the fixed-height regional cards at each responsive grid width. */
+export function RegionPreviewGridLoading() {
+  return (
+    <div {...stylex.props(styles.regionGrid)}>
+      <LocationPreviewGridLoading label="Loading regions" />
     </div>
   );
 }

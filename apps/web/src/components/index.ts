@@ -183,6 +183,7 @@ export type { LocationIdentityRowProps } from "./locationIdentityRow.stylex";
 export {
   LocationPreviewCard,
   LocationPreviewGrid,
+  LocationPreviewGridLoading,
   RegionPreviewGrid,
   RegionPreviewGridLoading,
 } from "./locationPreviewCard.stylex";

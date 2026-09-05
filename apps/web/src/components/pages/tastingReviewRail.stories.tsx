@@ -7,7 +7,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import * as stylex from "@stylexjs/stylex";
 
 import { space } from "../../styles/tokens.stylex";
-import { TastingReviewRail } from "./tastingReviewRail.stylex";
+import {
+  TastingReviewRail,
+  TastingReviewRailLoading,
+} from "./tastingReviewRail.stylex";
 
 const longNameBottle = {
   ...mockBottle,
@@ -77,6 +80,10 @@ export const BottleImage: Story = {
 
 export const WithoutImage: Story = {
   args: { bottle: mockBottle, photoUrl: null },
+};
+
+export const Loading: Story = {
+  render: () => <TastingReviewRailLoading />,
 };
 
 export const Empty: Story = {

@@ -2,9 +2,9 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
-import { BottleList, BottleVisual } from "@peated/web/components";
+import { BottleList, BottleVisual, LoadingList } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import { space } from "../../styles/tokens.stylex";
+import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 
@@ -51,6 +51,25 @@ export function TastingReviewBottleSummary({
   );
 }
 
+/** Reserves the image and Bottle row used by tasting and review pages. */
+export function TastingReviewBottleSummaryLoading({
+  placement,
+}: {
+  placement: "desktop" | "mobile";
+}) {
+  return (
+    <div
+      {...stylex.props(
+        styles.media,
+        placement === "desktop" ? styles.desktop : styles.mobile,
+      )}
+    >
+      <span {...stylex.props(styles.loadingPhoto)} />
+      <LoadingList label="Loading bottle" rows={1} variant="sidebar" />
+    </div>
+  );
+}
+
 const styles = stylex.create({
   media: {
     minWidth: 0,
@@ -79,5 +98,18 @@ const styles = stylex.create({
     marginRight: "auto",
     marginBottom: 0,
     marginLeft: "auto",
+  },
+  loadingPhoto: {
+    display: "block",
+    width: "100%",
+    maxWidth: {
+      default: "100%",
+      [NARROW]: "440px",
+    },
+    aspectRatio: "4 / 5",
+    marginRight: "auto",
+    marginLeft: "auto",
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.surface,
   },
 });

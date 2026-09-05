@@ -5,6 +5,7 @@ import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { ButtonLink, LoadingList, SectionError } from "@peated/web/components";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
@@ -13,7 +14,9 @@ import {
   HomeContributionPrompt,
   HomeDistilleries,
   HomeLatestReleases,
+  HomeModuleLoading,
   HomeOrigins,
+  HomeOriginsLoading,
 } from "@peated/web/components/pages/homeBrowse.stylex";
 import { HomePage } from "@peated/web/components/pages/homePage.stylex";
 import { HomeSectionLoading } from "@peated/web/components/pages/homeSummary.stylex";
@@ -34,73 +37,17 @@ import { space } from "../../../../styles/tokens.stylex";
 import { HomeEventCallout } from "./homeEventCallout.stylex";
 
 export function PublicHome({
+  content,
   searchPlaceholder,
 }: {
+  content: ReactNode;
   searchPlaceholder: string;
 }) {
-  const orpc = useORPC();
   const router = useRouter();
-  const { user } = useAuth();
-  const stats = useQuery(publicHomeQueries.stats(orpc));
-  const events = useQuery(publicHomeQueries.events(orpc));
-  const nextEvent = events.data?.results[0];
-  const upcomingEvent =
-    nextEvent && isEventWithinDays(nextEvent, 30) ? nextEvent : null;
 
   return (
     <HomePage
-      content={
-        <PageColumns
-          rail={
-            <>
-              {upcomingEvent ? (
-                <div {...stylex.props(styles.desktopOnly)}>
-                  <HomeEventCallout
-                    event={upcomingEvent}
-                    headingId="upcoming-event-desktop"
-                  />
-                </div>
-              ) : null}
-              <div {...stylex.props(styles.secondaryRail)}>
-                <Distilleries totalDistilleries={stats.data?.distilleries} />
-                <HomeContributionPrompt
-                  primaryAction={
-                    <ButtonLink
-                      href={user ? "/addBottle?intent=catalog" : "/register"}
-                      size="sm"
-                      variant="accent"
-                    >
-                      {user ? "Add a bottle" : "Create an account"}
-                    </ButtonLink>
-                  }
-                  secondaryAction={
-                    <ButtonLink href="/bottles" size="sm" variant="text">
-                      Or keep browsing
-                    </ButtonLink>
-                  }
-                />
-              </div>
-            </>
-          }
-          railBehavior="stack"
-        >
-          <div {...stylex.props(styles.sections)}>
-            {upcomingEvent ? (
-              <div {...stylex.props(styles.mobileEvent)}>
-                <HomeEventCallout
-                  event={upcomingEvent}
-                  headingId="upcoming-event-mobile"
-                />
-              </div>
-            ) : null}
-            <LatestReleases />
-            <Activity />
-            <div {...stylex.props(styles.desktopOnly)}>
-              <Origins />
-            </div>
-          </div>
-        </PageColumns>
-      }
+      content={content}
       description="Browse whisky bottles, including single casks, with critic scores and tasting notes. No account needed."
       search={
         <Search
@@ -117,6 +64,98 @@ export function PublicHome({
       }
       title="A record of whisky, bottle by bottle."
     />
+  );
+}
+
+export function PublicHomeContent() {
+  const orpc = useORPC();
+  const { user } = useAuth();
+  const stats = useQuery(publicHomeQueries.stats(orpc));
+  const events = useQuery(publicHomeQueries.events(orpc));
+  const nextEvent = events.data?.results[0];
+  const upcomingEvent =
+    nextEvent && isEventWithinDays(nextEvent, 30) ? nextEvent : null;
+
+  return (
+    <PageColumns
+      rail={
+        <>
+          {upcomingEvent ? (
+            <div {...stylex.props(styles.desktopOnly)}>
+              <HomeEventCallout
+                event={upcomingEvent}
+                headingId="upcoming-event-desktop"
+              />
+            </div>
+          ) : null}
+          <div {...stylex.props(styles.secondaryRail)}>
+            <Distilleries totalDistilleries={stats.data?.distilleries} />
+            <HomeContributionPrompt
+              primaryAction={
+                <ButtonLink
+                  href={user ? "/addBottle?intent=catalog" : "/register"}
+                  size="sm"
+                  variant="accent"
+                >
+                  {user ? "Add a bottle" : "Create an account"}
+                </ButtonLink>
+              }
+              secondaryAction={
+                <ButtonLink href="/bottles" size="sm" variant="text">
+                  Or keep browsing
+                </ButtonLink>
+              }
+            />
+          </div>
+        </>
+      }
+      railBehavior="stack"
+    >
+      <div {...stylex.props(styles.sections)}>
+        {upcomingEvent ? (
+          <div {...stylex.props(styles.mobileEvent)}>
+            <HomeEventCallout
+              event={upcomingEvent}
+              headingId="upcoming-event-mobile"
+            />
+          </div>
+        ) : null}
+        <LatestReleases />
+        <Activity />
+        <div {...stylex.props(styles.desktopOnly)}>
+          <Origins />
+        </div>
+      </div>
+    </PageColumns>
+  );
+}
+
+/** Keeps the home sections in place while their server data loads. */
+export function PublicHomeContentLoading() {
+  return (
+    <PageColumns
+      rail={
+        <HomeModuleLoading
+          label="Loading distilleries"
+          rows={5}
+          title="Distilleries"
+          variant="sidebar"
+        />
+      }
+      railBehavior="stack"
+    >
+      <div {...stylex.props(styles.sections)}>
+        <HomeModuleLoading
+          label="Loading recent releases"
+          rows={5}
+          title="Recent releases"
+        />
+        <HomeModuleLoading label="Loading activity" rows={3} title="Activity" />
+        <div {...stylex.props(styles.desktopOnly)}>
+          <HomeOriginsLoading />
+        </div>
+      </div>
+    </PageColumns>
   );
 }
 

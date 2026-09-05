@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import {
   Chip,
   FactList,
+  LoadingPlaceholder,
   MemberAvatar,
   ReviewScore,
   TastingRating,
@@ -16,7 +17,10 @@ import {
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
-import { TastingReviewBottleSummary } from "./tastingReviewBottleSummary.stylex";
+import {
+  TastingReviewBottleSummary,
+  TastingReviewBottleSummaryLoading,
+} from "./tastingReviewBottleSummary.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
 type Member = Outputs["tastings"]["details"]["createdBy"];
@@ -172,6 +176,58 @@ export function TastingReviewDetail({
   );
 }
 
+/** Reserves the shared review and tasting detail layout while data loads. */
+export function TastingReviewDetailLoading({ label }: { label: string }) {
+  return (
+    <article
+      aria-busy="true"
+      aria-label={label}
+      role="status"
+      {...stylex.props(styles.detail)}
+    >
+      <div aria-hidden="true">
+        <PageHeader
+          metadata={<LoadingPlaceholder preset="pageMetadata" />}
+          title={<LoadingPlaceholder preset="recordTitle" />}
+        />
+
+        <div {...stylex.props(styles.body)}>
+          <header {...stylex.props(styles.recordHeader)}>
+            <div {...stylex.props(styles.authorLine)}>
+              <span {...stylex.props(styles.loadingAvatar)} />
+              <div {...stylex.props(styles.authorCopy, styles.loadingAuthor)}>
+                <LoadingPlaceholder preset="text" />
+                <LoadingPlaceholder delay={1} preset="metadata" />
+              </div>
+            </div>
+            <LoadingPlaceholder delay={2} preset="score" />
+          </header>
+
+          <TastingReviewBottleSummaryLoading placement="mobile" />
+
+          <div {...stylex.props(styles.loadingFacts)}>
+            {Array.from({ length: 2 }, (_, index) => (
+              <span key={index} {...stylex.props(styles.loadingFact)}>
+                <LoadingPlaceholder
+                  delay={index === 0 ? 1 : 2}
+                  preset="metadata"
+                />
+                <LoadingPlaceholder delay={index === 0 ? 2 : 3} preset="text" />
+              </span>
+            ))}
+          </div>
+
+          <div {...stylex.props(styles.loadingNotes)}>
+            <LoadingPlaceholder delay={1} preset="text" />
+            <LoadingPlaceholder delay={2} preset="text" />
+            <LoadingPlaceholder delay={3} preset="text" />
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function RecordNotes({ notes }: { notes: string }) {
   const paragraphs = notes.split(/\n\s*\n/).filter(Boolean);
 
@@ -269,5 +325,36 @@ const styles = stylex.create({
     borderTopWidth: "1px",
     borderTopStyle: "solid",
     borderTopColor: colors.hairline,
+  },
+  loadingAvatar: {
+    width: "32px",
+    height: "32px",
+    flexShrink: 0,
+    borderRadius: "50%",
+    backgroundColor: colors.surface,
+  },
+  loadingAuthor: {
+    width: "160px",
+  },
+  loadingFacts: {
+    display: "grid",
+    maxWidth: "440px",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: space.x4,
+    marginTop: space.x3,
+  },
+  loadingFact: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x1,
+  },
+  loadingNotes: {
+    display: "flex",
+    maxWidth: "62ch",
+    minHeight: "116px",
+    flexDirection: "column",
+    gap: space.x3,
+    marginTop: space.x6,
   },
 });

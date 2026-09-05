@@ -4,11 +4,26 @@ Use Next.js loading boundaries for route data and React transitions for feedback
 while navigating. Keep the page header, filters, and navigation available while
 the results change. The URL owns committed filters and pagination.
 
+This guide is the source of truth for loading views and skeletons in the web
+app. A loading view is what appears while data is pending. A skeleton is the
+part of that view that reserves the shape and space of the expected content.
+
+## Choose the Loading Pattern
+
+| Situation                                                         | Use                                                                                   |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Most of one route waits, but its parent layout should remain      | A route-specific `loading.tsx` that reuses the page's named loading component         |
+| One section can load without blocking the rest of the page        | `Suspense` around that section, with its stable heading and controls outside          |
+| Useful results are already visible during a sort or filter change | Keep those results and show pending feedback instead of replacing them with skeletons |
+| The waiting code never renders visible content                    | `fallback={null}` with a local lint exception that explains why                       |
+
 ## Route Loading
 
 Place `loading.tsx` below the layout that should remain visible. A segment's
 loading file covers its page and nested segments, not its own layout. Keep
 fallbacks free of data fetching and reuse the existing loading components.
+Do not add a catch-all loading file to a route group that contains unrelated
+page layouts. Static pages and redirect-only routes do not need skeletons.
 
 For independently loading server content, put the asynchronous read inside a
 component beneath `Suspense`. Awaiting the read before returning the boundary
@@ -18,12 +33,56 @@ Keep fixed headings, navigation, controls, and actions outside `Suspense`. Wrap
 only the part that must wait. If separate parts can load on their own, give each
 part its own `Suspense` block.
 
-Every `Suspense` block that replaces visible content uses one named loading
-component whose name ends in `Loading`. Keep that loading component beside the
-component whose layout it copies when practical. Route `loading.tsx` files and
-`Suspense` fallbacks reuse these components instead of drawing their own
-placeholders. A block that never renders anything may use `null`, with a narrow
-lint exception that explains why.
+## Loading Component Ownership
+
+Every `Suspense` block that replaces visible content uses one named component
+whose name ends in `Loading`, such as `BottleListLoading`. Put it in the same
+file as the component whose layout it copies whenever practical. The component
+owns its loading layout; route `loading.tsx` files and other boundaries import
+and reuse it instead of drawing their own placeholders.
+
+The `Loading` name does not mean we should maintain a second copy of the
+component. Our target is to derive the loading view from the finished component.
+Both share the same internal layout, while the loading component supplies
+representative rows and replaces changing text and media with placeholders.
+Keep wrappers, grids, spacing, and responsive rules in that shared layout. Write
+separate skeleton markup only when sharing it would make a small component
+harder to understand.
+
+Shimmer From Structure demonstrates this goal by measuring finished markup in
+the browser. Peated's route fallbacks must also render in the first server HTML,
+so we share the React structure directly instead of waiting for browser
+measurement.
+
+The
+[require-suspense-loading lint rule](../../tools/oxlint/anti-slop/rules/require-suspense-loading.ts)
+requires every React `Suspense` block to have an explicit fallback made from one
+named component ending in `Loading`. A block that never renders anything may
+use `null` only with a local lint exception that explains why. Lint checks the
+fallback's name and shape. It cannot tell whether the loading component is
+beside its owner or whether both layouts line up; code review and browser review
+enforce those parts.
+
+## Match the Finished Layout
+
+Copy the usual finished structure, spacing, row count, image size, and text
+height closely enough that loading content can be replaced without moving the
+page. Keep real headings and controls visible when they do not depend on the
+pending data. Do not replace a whole page when only one section has to wait.
+Give shared or page-sized loading components a Storybook state beside the
+finished state so they can be compared directly. Review route behavior in the
+app, not only in Storybook.
+
+Use representative data for the usual result. Match its normal list length and
+text wrapping. Give images, charts, and other late-loading media an explicit
+size or aspect ratio. Change content at the leaves of the shared structure;
+do not rebuild the surrounding layout from placeholder-only containers.
+
+For optional sections, copy the result people normally see. Show the section in
+the loading view when its data is normally present, and omit it when absence is
+normal. Do not weaken the usual loading layout to account for an exceptional
+empty response. When possible, add optional content after stable content so its
+appearance does not move what is already on screen.
 
 When a new query should replace the results with skeletons, key the results
 boundary using the normalized inputs that identify those results. Keep controls
@@ -86,18 +145,25 @@ make a loading state appear.
 
 ## Verification
 
-Extend the browser workflow that owns the interaction. Hold its navigation
-response to verify immediate feedback, the selected control value, retained
-content, and focus; release it and verify the final URL and results. Include
-rapid changes and Back/Forward when changing URL-state handling.
+Review every changed route in a browser:
 
-Check streaming fallbacks with a delayed upstream response, rather than
-buffering the whole Next.js response. Review skeleton geometry and pending
-feedback in a browser, including empty results, narrow screens, both color
-schemes, and reduced motion. Do not add appearance assertions.
+- Delay its data response so the loading view remains visible.
+- Compare the loading and finished layouts at desktop and phone widths.
+- Check the usual result first, then empty and error states that the route
+  supports.
+- Measure layout movement when the loading view changes content already visible
+  on screen.
+- Check both color schemes and reduced motion when the changed feedback uses
+  color or animation.
+
+For navigation changes, also verify immediate feedback, the selected control
+value, retained content, focus, the final URL, and the final results. Include
+rapid changes and Back/Forward when changing URL state. Do not add appearance
+assertions to deterministic tests; browser review owns appearance.
 
 ## References
 
+- [Shimmer From Structure](https://shimmer-from-structure-docs.vercel.app/docs/how-this-works)
 - [Next.js loading files](https://nextjs.org/docs/app/api-reference/file-conventions/loading)
 - [Next.js search and pagination](https://nextjs.org/learn/dashboard-app/adding-search-and-pagination)
 - [Next.js link status](https://nextjs.org/docs/app/api-reference/functions/use-link-status)
