@@ -1891,6 +1891,13 @@
       "when": 1788543049863,
       "tag": "0269_useful_shiver_man",
       "breakpoints": false
+    },
+    {
+      "idx": 270,
+      "version": "7",
+      "when": 1788569946413,
+      "tag": "0270_expand-tasting-note-vocabulary",
+      "breakpoints": false
     }
   ]
 }
