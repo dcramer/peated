@@ -172,6 +172,15 @@ export const ModerationAutomationResponseSchema = z
         clearedToday: z.number().int().min(0),
       })
       .strict(),
+    listingAutomation: z
+      .object({
+        sampleSize: z.number().int().min(0).max(100),
+        automatic: z.number().int().min(0),
+        manual: z.number().int().min(0),
+        failed: z.number().int().min(0),
+        rate: z.number().int().min(0).max(100).nullable(),
+      })
+      .strict(),
     needsAttention: z.array(AutomationItemSchema),
     recentRuns: z.array(AutomationItemSchema),
   })

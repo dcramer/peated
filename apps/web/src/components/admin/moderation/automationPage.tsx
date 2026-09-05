@@ -103,6 +103,31 @@ export default function AutomationPage() {
           <AdminStat label="Failed" value={data.counts.failed} />
           <AdminStat label="Cleared today" value={data.counts.clearedToday} />
         </AdminStatGrid>
+        <AdminSection
+          title="Listing decisions"
+          description={
+            data.listingAutomation.sampleSize
+              ? `Last ${data.listingAutomation.sampleSize} completed checks`
+              : "No completed checks"
+          }
+        >
+          <AdminStatGrid>
+            <AdminStat
+              label="Automatic rate"
+              value={
+                data.listingAutomation.rate === null
+                  ? "—"
+                  : `${data.listingAutomation.rate}%`
+              }
+            />
+            <AdminStat
+              label="Automatic"
+              value={data.listingAutomation.automatic}
+            />
+            <AdminStat label="Manual" value={data.listingAutomation.manual} />
+            <AdminStat label="Failed" value={data.listingAutomation.failed} />
+          </AdminStatGrid>
+        </AdminSection>
         {activeRun.data.run ? (
           <AdminSection
             title={`Active listing retry · Run #${activeRun.data.run.id}`}

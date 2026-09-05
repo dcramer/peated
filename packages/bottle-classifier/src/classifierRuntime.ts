@@ -57,6 +57,7 @@ import {
 import {
   finalizeBottleReferenceClassification,
   getAutoIgnoreBottleReferenceReason,
+  getPreExtractionAutoIgnoreBottleReferenceReason,
 } from "./reviewPolicy";
 import {
   buildAgentInput,
@@ -1004,6 +1005,24 @@ export function createBottleClassifier(
     candidateExpansion: CandidateExpansionMode;
     allowAutoIgnore?: boolean;
   }) => {
+    const preExtractionAutoIgnoreReason =
+      suppliedExtractedIdentity === undefined && allowAutoIgnore
+        ? getPreExtractionAutoIgnoreBottleReferenceReason(reference.name)
+        : null;
+    if (preExtractionAutoIgnoreReason) {
+      return {
+        artifacts: buildBottleClassificationArtifacts({
+          extractedIdentity: null,
+          extractedIdentitySource: null,
+          imageEvidence: imageEvidence ?? null,
+          searchEvidence: options.initialSearchEvidence ?? [],
+        }),
+        autoIgnoreReason: preExtractionAutoIgnoreReason,
+        deterministicDecision: null,
+        webSearchBudget: createBottleWebSearchBudget(options.maxSearchQueries),
+      };
+    }
+
     const deterministicIdentitySeed = getDeterministicIdentitySeed(reference);
     const extractedReference =
       suppliedExtractedIdentity !== undefined

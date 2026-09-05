@@ -66,6 +66,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C24: Subject-labeled page passages](./C24-subject-labeled-page-passages.md)         | Sort exact page passages into whole-product and component evidence                   | Stopped: exact producer page made both targets pass without the change         |
 | [C25: Page read after search exhaustion](./C25-page-read-after-search-exhaustion.md) | Tell Luna when its page-read allowance remains after search is exhausted             | Rejected: no target gain, two lost judgments, and 6.6% higher cost             |
 | [C26: Single-cask examples](./C26-single-cask-examples.md)                           | Explain true, false, and unknown values beside the output field                      | Inconclusive: focused gain cost more; broad runs used different code           |
+| [C27: Multi-item preflight](./C27-multi-item-preflight.md)                           | Ignore explicit multi-item titles before text extraction                             | Accepted: ten more sampled listings recognized with zero model work            |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections

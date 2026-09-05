@@ -305,6 +305,14 @@ and cases with different Bottle names from the failure that led to it.
       the comparison still does not isolate the examples. See
       [C26 results](./C26-single-cask-examples.md).
 
+- [x] **C27 — Ignore explicit multi-item listings before extraction.**
+      **Accepted.** Numeric bottle counts and structural pack or set names now
+      close before text extraction. A read-only production keyword sample rose
+      from 16/37 to 26/37 recognized listings, adding ten cases. Each recognized
+      title now uses zero model tokens and $0 in model cost. `Bottled in Bond`
+      and `The Gifted Horse` remain negative controls. See
+      [C27 results](./C27-multi-item-preflight.md).
+
 ## Current stopping point
 
 C09 and C10 improve checks after Luna, while C11 removes model work for Bottle
@@ -332,6 +340,28 @@ so the apparent two-pass loss and unsupported exact-cask creation cannot be
 assigned to the examples. The unsafe output is still a valid failure. The
 descriptions were reverted until a same-revision comparison can establish a
 net gain.
+
+## Reach 80% automatic moderation
+
+These items use completed classifier attempts as the denominator. Automatic
+ignores, matches, and creations count; failures and decisions made by a person
+do not.
+
+- [x] **Q01 — Measure the real rate.** The Automation page now reports the last
+      100 completed listing checks, including ignored listings and failures.
+- [x] **Q02 — Remove obvious work before model calls.** C27 moves explicit
+      multi-item and damaged-condition names before text extraction.
+- [ ] **Q03 — Recover provider-budget failures in a bounded run.** Restore
+      production model capacity, retry 100 errored listings with full evidence,
+      and record automatic, review, and failed counts before retrying more.
+- [ ] **Q04 — Recheck stale creation proposals with Luna.** Run 100 older Terra
+      creation proposals through the current full path. Review every automatic
+      creation and record cost, tokens, time, and the resulting automatic rate.
+- [ ] **C28 — Allow supported creation while omitting unsupported optional
+      facts.** Require the proposed identity to have an externally supported
+      difference from every nearby candidate. Drop any optional field without
+      support before writing. Compare with cases where ABV, year, or edition is
+      the only fact that prevents a duplicate.
 
 ## Completion rule
 
