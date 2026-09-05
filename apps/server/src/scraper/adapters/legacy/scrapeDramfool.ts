@@ -1,33 +1,15 @@
 import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { ALLOWED_VOLUMES } from "@peated/server/constants";
-import { absoluteUrl } from "@peated/server/lib/urls";
 import { GtinSchema } from "@peated/server/schemas";
+import { load as cheerio } from "cheerio";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl } from "../../legacy/scraper";
-import type { JsonValue } from "../../types";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "dramfool";
 const STORE_ORIGIN = "https://dramfool.com";
-const CATALOG_URL = `${STORE_ORIGIN}/shop?format=json`;
-
-const DramfoolCatalogSchema = z
-  .object({
-    items: z.array(z.json()),
-  })
-  .catchall(z.json());
-
-const DramfoolProductSchema = z
-  .object({
-    id: z.string().trim().min(1).optional(),
-    title: z.string().trim().min(1),
-    fullUrl: z.string().trim().min(1),
-    assetUrl: z.string().nullish(),
-    productType: z.number().int(),
-    variants: z.array(z.json()),
-  })
-  .catchall(z.json());
+const SHOP_URL = `${STORE_ORIGIN}/shop`;
 
 const MoneySchema = z
   .object({
@@ -39,6 +21,7 @@ const MoneySchema = z
 const DramfoolVariantSchema = z
   .object({
     id: z.string().trim().min(1).optional(),
+    sku: z.string().trim().min(1).optional(),
     barcode: z.string().trim().min(1).nullish(),
     attributes: z.record(z.string(), z.string()),
     priceMoney: MoneySchema,
@@ -48,11 +31,6 @@ const DramfoolVariantSchema = z
     qtyInStock: z.number(),
   })
   .catchall(z.json());
-
-function getRawName(input: JsonValue): string | null {
-  const parsed = z.object({ title: z.string() }).safeParse(input);
-  return parsed.success ? parsed.data.title : null;
-}
 
 function parsePrice(value: string): number | null {
   const match = value.match(/^(\d+)(?:\.(\d{1,2}))?$/);
@@ -83,134 +61,191 @@ function getSize(attributes: Record<string, string>): string | null {
   );
 }
 
-function getProductUrl(path: string): string | null {
-  const url = absoluteUrl(STORE_ORIGIN, path);
+function getProductUrl(value: string): string | null {
   try {
-    return new URL(url).origin === STORE_ORIGIN ? url : null;
+    const url = new URL(value, STORE_ORIGIN);
+    if (
+      url.protocol !== "https:" ||
+      url.origin !== STORE_ORIGIN ||
+      url.username ||
+      url.password ||
+      !url.pathname.startsWith("/shop/")
+    ) {
+      return null;
+    }
+
+    url.search = "";
+    url.hash = "";
+    return url.toString();
   } catch {
     return null;
   }
 }
 
-function getImageUrl(value: string | null | undefined): string | null {
+function getImageUrl(value: string | undefined): string | null {
   if (!value) return null;
-  return z.string().url().safeParse(value).success ? value : null;
+
+  try {
+    const url = new URL(value, STORE_ORIGIN);
+    return url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
-function parseDramfoolProducts(input: JsonValue): StorePrice[] {
-  const payload = DramfoolCatalogSchema.parse(input);
+export function parseDramfoolProductLinks(html: string): string[] {
+  const $ = cheerio(html);
+  const links = new Set<string>();
+
+  $(".ProductList-item.post-type-store-item > a.ProductList-item-link").each(
+    (_, element) => {
+      const href = $(element).attr("href");
+      if (!href) return;
+
+      const url = getProductUrl(href);
+      if (url) links.add(url);
+    },
+  );
+
+  return [...links];
+}
+
+export function parseDramfoolProductPage(
+  html: string,
+  productUrl: string,
+): StorePrice[] {
+  const $ = cheerio(html);
+  if (!$('.sqs-add-to-cart-button[data-product-type="1"]').length) return [];
+  const availability = $('meta[property="product:availability"]')
+    .attr("content")
+    ?.toLowerCase();
+
+  const rawName = $(".ProductItem-details-title").first().text().trim();
+  if (!rawName) {
+    logScrapeWarning(SITE, "Unable to identify product name", { productUrl });
+    return [];
+  }
+
+  const variantsRaw = $(".product-variants[data-variants]")
+    .first()
+    .attr("data-variants");
+  if (!variantsRaw) {
+    if (availability === "outofstock") return [];
+
+    logScrapeWarning(SITE, "Unable to identify product variants", { rawName });
+    return [];
+  }
+
+  let variants: unknown;
+  try {
+    variants = JSON.parse(variantsRaw);
+  } catch {
+    logScrapeWarning(SITE, "Invalid product variants", { rawName });
+    return [];
+  }
+  if (!Array.isArray(variants)) {
+    logScrapeWarning(SITE, "Invalid product variants", { rawName });
+    return [];
+  }
+
+  const imageValue = $(".ProductItem-gallery-slides-item-image")
+    .first()
+    .attr("data-src");
+  const imageUrl = getImageUrl(imageValue);
+  if (imageValue && !imageUrl) {
+    logScrapeWarning(SITE, "Invalid product image URL", { rawName });
+  }
+
+  const rawProductId = $("article.ProductItem").first().attr("data-item-id");
+  const productId = rawProductId?.trim() || undefined;
+  const normalizedName = /\bdramfool\b/i.test(rawName)
+    ? rawName
+    : `Dramfool ${rawName}`;
+  const { name } = normalizeBottleInput({ name: normalizedName });
   const products: StorePrice[] = [];
 
-  for (const productInput of payload.items) {
-    const productResult = DramfoolProductSchema.safeParse(productInput);
-    if (!productResult.success) {
-      logScrapeWarning(SITE, "Invalid product record", {
-        rawName: getRawName(productInput),
-      });
+  for (const variantInput of variants) {
+    const variantResult = DramfoolVariantSchema.safeParse(variantInput);
+    if (!variantResult.success) {
+      logScrapeWarning(SITE, "Invalid product variant", { rawName });
       continue;
     }
 
-    const product = productResult.data;
-    if (product.productType !== 1) continue;
+    const variant = variantResult.data;
+    if (!variant.unlimited && variant.qtyInStock <= 0) continue;
 
-    const productUrl = getProductUrl(product.fullUrl);
-    if (!productUrl) {
-      logScrapeWarning(SITE, "Invalid product URL", {
-        rawName: product.title,
-        productUrl: product.fullUrl,
-      });
-      continue;
-    }
-
-    const imageUrl = getImageUrl(product.assetUrl);
-    if (product.assetUrl && !imageUrl) {
-      logScrapeWarning(SITE, "Invalid product image URL", {
-        rawName: product.title,
-      });
-    }
-
-    for (const variantInput of product.variants) {
-      const variantResult = DramfoolVariantSchema.safeParse(variantInput);
-      if (!variantResult.success) {
-        logScrapeWarning(SITE, "Invalid product variant", {
-          rawName: product.title,
-        });
-        continue;
-      }
-
-      const variant = variantResult.data;
-      if (!variant.unlimited && variant.qtyInStock <= 0) continue;
-
-      const size = getSize(variant.attributes);
-      const volume = size ? parseVolume(size) : null;
-      if (volume === null || !ALLOWED_VOLUMES.includes(volume)) {
-        logScrapeWarning(SITE, "Invalid product size", {
-          rawName: product.title,
-          size,
-          volume,
-        });
-        continue;
-      }
-
-      const money = variant.onSale
-        ? variant.salePriceMoney
-        : variant.priceMoney;
-      const price = money?.currency === "GBP" ? parsePrice(money.value) : null;
-      if (price === null) {
-        logScrapeWarning(SITE, "Invalid product price", {
-          rawName: product.title,
-          currency: money?.currency ?? null,
-          price: money?.value ?? null,
-        });
-        continue;
-      }
-
-      const rawName = /\bdramfool\b/i.test(product.title)
-        ? product.title
-        : `Dramfool ${product.title}`;
-      const { name } = normalizeBottleInput({ name: rawName });
-      const externalProductId = variant.id ?? product.id;
-      const barcode = GtinSchema.safeParse(variant.barcode);
-      const listing: StorePrice = {
-        name,
-        price,
-        currency: "gbp" as const,
+    const size = getSize(variant.attributes);
+    const volume = size ? parseVolume(size) : null;
+    if (volume === null || !ALLOWED_VOLUMES.includes(volume)) {
+      logScrapeWarning(SITE, "Invalid product size", {
+        rawName,
+        size,
         volume,
-        url: productUrl,
-        imageUrl,
-      };
-      if (externalProductId) {
-        listing.externalProductId = String(externalProductId);
-      }
-      if (barcode.success) listing.barcode = barcode.data;
-
-      logScrapedProduct(SITE, listing);
-      products.push(listing);
+      });
+      continue;
     }
+
+    const money = variant.onSale ? variant.salePriceMoney : variant.priceMoney;
+    const price = money?.currency === "GBP" ? parsePrice(money.value) : null;
+    if (price === null) {
+      logScrapeWarning(SITE, "Invalid product price", {
+        rawName,
+        currency: money?.currency ?? null,
+        price: money?.value ?? null,
+      });
+      continue;
+    }
+
+    const externalProductId = variant.id ?? variant.sku;
+    const barcode = GtinSchema.safeParse(variant.barcode);
+    const listing: StorePrice = {
+      name,
+      price,
+      currency: "gbp",
+      volume,
+      url: productUrl,
+      imageUrl,
+    };
+    if (externalProductId) listing.externalProductId = externalProductId;
+    if (barcode.success) listing.barcode = barcode.data;
+
+    products.push(listing);
   }
+
+  if (products.length === 1 && !products[0].externalProductId && productId) {
+    products[0].externalProductId = productId;
+  }
+  const productIds = new Set(
+    products.flatMap(({ externalProductId }) =>
+      externalProductId ? [externalProductId] : [],
+    ),
+  );
+  if (products.length > 1 && productIds.size !== products.length) {
+    logScrapeWarning(SITE, "Product variants need unique identifiers", {
+      rawName,
+    });
+    return [];
+  }
+
+  for (const product of products) logScrapedProduct(SITE, product);
 
   return products;
 }
 
 export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
-  const page = Number.parseInt(
-    new URL(url).searchParams.get("page") ?? "1",
-    10,
-  );
-  if (page > 1) return;
-
-  const data = await getUrl(url);
-  const products = parseDramfoolProducts(JSON.parse(data));
-  await Promise.all(products.map(cb));
+  const listHtml = await getUrl(url);
+  const productUrls = parseDramfoolProductLinks(listHtml);
+  for (const productUrl of productUrls) {
+    const html = await getUrl(productUrl);
+    for (const product of parseDramfoolProductPage(html, productUrl)) {
+      await cb(product);
+    }
+  }
+  return { hasNextPage: false };
 }
 
 export default async function scrapeDramfool({
   dryRun = false,
 }: { dryRun?: boolean } = {}) {
-  return await scrapePrices(
-    SITE,
-    (page) => `${CATALOG_URL}&page=${page}`,
-    scrapeProducts,
-    { dryRun },
-  );
+  return await scrapePrices(SITE, () => SHOP_URL, scrapeProducts, { dryRun });
 }

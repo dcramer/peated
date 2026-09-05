@@ -26,7 +26,7 @@ import {
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
-import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 
@@ -109,11 +109,12 @@ function getStorePriceIdentityCondition({
   const urlCondition = eq(storePrices.url, url);
   return externalProductId
     ? or(
-        urlCondition,
         and(
           eq(storePrices.externalSiteId, externalSiteId),
           eq(storePrices.externalProductId, externalProductId),
         ),
+        // A shared product-page URL may only upgrade a legacy row with no source ID.
+        and(urlCondition, isNull(storePrices.externalProductId)),
       )!
     : urlCondition;
 }
