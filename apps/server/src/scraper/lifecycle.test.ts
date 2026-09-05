@@ -99,11 +99,8 @@ test("opted-in source resumes the last successful run cursor", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "whiskynotes" });
-  const successfulCursor = {
-    page: 5,
-    processedArticleUrls: ["https://www.whiskynotes.be/2026/world/example/"],
-  };
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const successfulCursor = { processedIssues: ["Summer 2026"] };
   await db.insert(externalSiteRuns).values([
     {
       externalSiteId: site.id,
@@ -116,7 +113,7 @@ test("opted-in source resumes the last successful run cursor", async ({
       externalSiteId: site.id,
       trigger: "scheduled",
       status: "failed",
-      cursor: { page: 8, processedArticleUrls: [] },
+      cursor: { processedIssues: ["Fall 2026"] },
       completedAt: new Date("2026-08-21T00:00:00Z"),
     },
   ]);
@@ -127,12 +124,7 @@ test("opted-in source resumes the last successful run cursor", async ({
     enqueue: async () => undefined,
   });
 
-  expect(run.cursor).toEqual({
-    ...successfulCursor,
-    checksReviewDates: false,
-    currentArticleUrls: [],
-    historyComplete: false,
-  });
+  expect(run.cursor).toEqual(successfulCursor);
 });
 
 test("active run prevents overlap", async ({ fixtures }) => {
