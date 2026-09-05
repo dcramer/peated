@@ -142,6 +142,15 @@ function prepareKilchoman(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareNorthStar(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "northstarspirits", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 
@@ -153,6 +162,7 @@ function codeOwnedSource(
     | "compassbox"
     | "gordonmacphail"
     | "kilchoman"
+    | "northstarspirits"
     | "whiskeyreviewer"
     | "whiskynotes"
     | "whiskysaga"
@@ -233,6 +243,11 @@ const gordonMacphailRegistry = createScraperRegistry({
 const kilchomanRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("kilchoman")!],
   sources: [codeOwnedSource("kilchoman")],
+});
+
+const northStarRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("northstarspirits")!],
+  sources: [codeOwnedSource("northstarspirits")],
 });
 
 async function setupMigration(bottleId: number | null = null) {
@@ -690,6 +705,25 @@ async function setupKilchomanMigration() {
     })
     .returning();
   await syncScraperDefinitions(kilchomanRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupNorthStarMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "northstarspirits",
+      name: "North Star",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(northStarRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1715,6 +1749,105 @@ describe("POST /admin/scrape-sources/prepare", () => {
       code: "BAD_REQUEST",
       message: "Kilchoman has no stored prices to verify.",
     });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares North Star without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupNorthStarMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "11471377727829",
+      name: "The Speyside Connection",
+      price: 6999,
+      currency: "gbp",
+      volume: 700,
+      url: "https://northstarspirits.com/products/speyside-connection",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "9887521767765",
+      name: "Caol Ila Sherry Octave",
+      price: 5700,
+      currency: "gbp",
+      volume: 500,
+      url: "https://northstarspirits.com/products/caol-ila-sherry-octave",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareNorthStar()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareNorthStar({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(northStarRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://northstarspirits.com/collections/shop",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareNorthStar({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "North Star is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected North Star price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupNorthStarMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "not-a-number",
+      name: "Unknown release",
+      currency: "gbp",
+      volume: 700,
+      url: "https://northstarspirits.com/products/unknown-release",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareNorthStar({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check North Star price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
