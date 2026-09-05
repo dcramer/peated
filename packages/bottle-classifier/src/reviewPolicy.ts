@@ -49,7 +49,9 @@ const MULTI_ITEM_REFERENCE_PATTERNS = [
   GIFT_SET_PACKAGING_KEYWORDS,
   /\bbundle\b/i,
   /\b(?:sampler|tasting|variety)\s+(?:pack|set|bundle)\b/i,
+  /\b(?:dual|duo|trio|trilogy|combo)\s+(?:pack|set|bundle|collection)\b/i,
   /\b\d+\s*(?:-|x)?\s*pack\b/i,
+  /\b\d+\s+bottles?\b/i,
   /\b(?:pack|set|case)\s+of\s+\d+\b/i,
   /\b\d+\s*x\s*\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/i,
 ] as const;
@@ -896,6 +898,30 @@ export function shouldAutoIgnoreBottleReference(
   );
 }
 
+export function getPreExtractionAutoIgnoreBottleReferenceReason(
+  referenceName: string,
+): string | null {
+  const normalizedName = normalizeString(referenceName).toLowerCase();
+
+  if (
+    MULTI_ITEM_REFERENCE_PATTERNS.some((pattern) =>
+      pattern.test(normalizedName),
+    )
+  ) {
+    return "Reference is a bundle or multi-bottle listing, not a single bottle listing.";
+  }
+
+  if (
+    NON_STANDARD_CONDITION_REFERENCE_PATTERNS.some((pattern) =>
+      pattern.test(normalizedName),
+    )
+  ) {
+    return "Reference describes a damaged or non-standard sale-condition bottle, not a standard bottle listing.";
+  }
+
+  return null;
+}
+
 export function getAutoIgnoreBottleReferenceReason(
   referenceName: string,
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"],
@@ -920,23 +946,7 @@ export function getAutoIgnoreBottleReferenceReason(
     }
   }
 
-  if (
-    MULTI_ITEM_REFERENCE_PATTERNS.some((pattern) =>
-      pattern.test(normalizedName),
-    )
-  ) {
-    return "Reference is a bundle or multi-bottle listing, not a single bottle listing.";
-  }
-
-  if (
-    NON_STANDARD_CONDITION_REFERENCE_PATTERNS.some((pattern) =>
-      pattern.test(normalizedName),
-    )
-  ) {
-    return "Reference describes a damaged or non-standard sale-condition bottle, not a standard bottle listing.";
-  }
-
-  return null;
+  return getPreExtractionAutoIgnoreBottleReferenceReason(referenceName);
 }
 
 export function finalizeBottleReferenceClassification({

@@ -39,7 +39,7 @@ not just the pass count.
 
 ## Changes we kept
 
-Six changes solved a specific problem without adding broad instructions:
+Seven changes solved a specific problem without adding broad instructions:
 
 1. **Reject an unsupported cask-specific match.** Luna repeatedly matched a
    general product to a Bottle whose cask code appeared only in the candidate
@@ -71,6 +71,11 @@ Six changes solved a specific problem without adding broad instructions:
    `rawLabelText`. It now passes that text through so a visible code is not lost
    merely because it was omitted from a structured identity field. This adds no
    model work and does not decide what the code means.
+7. **Close explicit multi-item listings before extraction.** Numeric bottle
+   counts and structural names such as a combo pack or trilogy set now bypass
+   text extraction as well as Luna. A selected production keyword sample rose
+   from 16/37 to 26/37 recognized listings. The ten added cases use zero model
+   tokens, but they are too few to materially change the whole queue alone.
 
 These rules contain no product names from the test cases. They rely on accepted
 Peated references, exact identifiers, and the source URL already supplied with
@@ -115,6 +120,34 @@ Broad prompt changes and broad source-page reading did not hold up:
 
 These results favor small code checks for facts Peated already knows. Extra
 prompt text and extra model passes need a stronger measured gain.
+
+## Production moderation snapshot
+
+A read-only snapshot on September 4, 2026 found 12,738 actionable listing
+proposals. About 64% were errors, 30% proposed a new Bottle, and 6% were
+inconclusive. Existing matches and corrections together were below 1%.
+
+Provider budget limits caused 99 of 100 oldest sampled errors and 96 of 100
+newest sampled errors. Four other recent errors reached the eight-turn limit.
+The first work needed for an 80% automatic rate is therefore operational:
+restore provider capacity, then retry the failed listings under the current
+Luna configuration. Classifier wording cannot resolve an input that never gets
+a model response.
+
+The 100 most recent completed listing decisions in moderation history were 47
+automatic and 53 manual. That history excludes ignored listings, so it is not
+the true incoming automation rate. The Automation page now calculates the rate
+from the last 100 completed classifier attempts, including automatic ignores
+and failures.
+
+The recent creation sample also points to a narrower follow-up. Twenty-one of
+100 queued creation records had no stored blocker but still had an older
+`automationEligible: false` result; all were Terra runs from August 14. In the
+same sample, unsupported ABV was the most common individual evidence gap. A
+safe experiment must prove that supported facts separate the proposed Bottle
+from every nearby candidate and must omit any unsupported optional field before
+automatic creation. Simply removing the evidence blocker would risk duplicate
+or inaccurate Bottles.
 
 ## Corrections to the checks
 

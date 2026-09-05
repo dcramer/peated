@@ -2,14 +2,58 @@ import { db } from "@peated/server/db";
 import {
   bottleOperations,
   incomingBottleDecisionLogs,
+  storePriceMatchAttempts,
   storePriceMatchProposals,
   storePriceMatchRetryRuns,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { getQueue } from "@peated/server/worker/queue";
-import { desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import { ModerationAutomationResponseSchema } from "./schemas";
+
+const LISTING_AUTOMATION_SAMPLE_SIZE = 100;
+
+type CompletedListingAttempt = Pick<
+  typeof storePriceMatchAttempts.$inferSelect,
+  "automationEligible" | "finalStatus" | "initialStatus"
+>;
+
+export function summarizeListingAutomation(
+  attempts: CompletedListingAttempt[],
+) {
+  let automatic = 0;
+  let failed = 0;
+
+  for (const attempt of attempts) {
+    if (attempt.finalStatus === "errored") {
+      failed += 1;
+      continue;
+    }
+
+    if (
+      (attempt.finalStatus === "approved" ||
+        attempt.finalStatus === "ignored") &&
+      (attempt.initialStatus === "verified" ||
+        attempt.initialStatus === "ignored" ||
+        attempt.automationEligible)
+    ) {
+      automatic += 1;
+    }
+  }
+
+  const manual = attempts.length - automatic - failed;
+  return {
+    sampleSize: attempts.length,
+    automatic,
+    manual,
+    failed,
+    rate:
+      attempts.length > 0
+        ? Math.round((automatic / attempts.length) * 100)
+        : null,
+  };
+}
 
 export type ModerationQueueCountLoader = () => Promise<{
   active?: number;
@@ -47,6 +91,7 @@ export function createModerationAutomationProcedure(
         proposalCounts,
         operationCounts,
         decisionCounts,
+        recentListingAttempts,
         retryCounts,
         recentRetryRuns,
         failedRetries,
@@ -67,6 +112,16 @@ export function createModerationAutomationProcedure(
           .select({ count: sql<number>`count(*)::int` })
           .from(incomingBottleDecisionLogs)
           .where(gte(incomingBottleDecisionLogs.createdAt, startOfToday)),
+        db
+          .select({
+            automationEligible: storePriceMatchAttempts.automationEligible,
+            finalStatus: storePriceMatchAttempts.finalStatus,
+            initialStatus: storePriceMatchAttempts.initialStatus,
+          })
+          .from(storePriceMatchAttempts)
+          .where(isNotNull(storePriceMatchAttempts.finalStatus))
+          .orderBy(desc(storePriceMatchAttempts.id))
+          .limit(LISTING_AUTOMATION_SAMPLE_SIZE),
         db
           .select({
             processing: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} IN ('pending', 'running'))::int`,
@@ -111,6 +166,7 @@ export function createModerationAutomationProcedure(
             (operationCounts[0]?.clearedToday ?? 0) +
             (retryCounts[0]?.completedToday ?? 0),
         },
+        listingAutomation: summarizeListingAutomation(recentListingAttempts),
         needsAttention: [
           ...failedOperations.map((operation) => ({
             key: `operation:${operation.id}`,

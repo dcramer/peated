@@ -9,6 +9,7 @@ import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
 import { routerClient } from "@peated/server/orpc/router";
 import {
   createModerationAutomationProcedure,
+  summarizeListingAutomation,
   type ModerationQueueCountLoader,
 } from "@peated/server/orpc/routes/admin/moderation/automation";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -151,5 +152,43 @@ describe("admin moderation automation", () => {
         status: "failed",
       }),
     );
+  });
+
+  test("reports automatic, manual, and failed listing checks", () => {
+    const attempts = [
+      {
+        initialStatus: "ignored" as const,
+        finalStatus: "ignored" as const,
+        automationEligible: false,
+      },
+      {
+        initialStatus: "verified" as const,
+        finalStatus: "approved" as const,
+        automationEligible: false,
+      },
+      {
+        initialStatus: "pending_review" as const,
+        finalStatus: "approved" as const,
+        automationEligible: true,
+      },
+      {
+        initialStatus: "pending_review" as const,
+        finalStatus: "approved" as const,
+        automationEligible: false,
+      },
+      {
+        initialStatus: "errored" as const,
+        finalStatus: "errored" as const,
+        automationEligible: false,
+      },
+    ];
+
+    expect(summarizeListingAutomation(attempts)).toEqual({
+      sampleSize: 5,
+      automatic: 3,
+      manual: 1,
+      failed: 1,
+      rate: 60,
+    });
   });
 });

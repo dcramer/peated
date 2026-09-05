@@ -1151,11 +1151,14 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
-  test("auto ignores multi-pack listings even when extraction finds a bottle identity", async () => {
+  test("auto ignores multi-pack listings before extracting bottle identity", async () => {
     const runBottleClassifierAgent = vi.fn();
     const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
+    const extractFromText = vi.fn(async () =>
+      Promise.resolve(buffaloTraceStraightBourbonIdentity),
+    );
     const { classifier } = createTestClassifier({
-      extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      extractFromText,
       searchBottles,
       runBottleClassifierAgent,
     });
@@ -1171,18 +1174,90 @@ describe("createBottleClassifier", () => {
       reason:
         "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
       artifacts: {
-        extractedIdentity: buffaloTraceStraightBourbonIdentity,
+        extractedIdentity: null,
       },
     });
+    expect(extractFromText).not.toHaveBeenCalled();
     expect(searchBottles).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
-  test("auto ignores bundle listings even when extraction finds a bottle identity", async () => {
+  test.each([
+    "Buffalo Trace Full Collection - 8 Bottles",
+    "Buffalo Trace and Eagle Rare Combo Pack",
+    "Buffalo Trace Trilogy Set",
+  ])("auto ignores explicit multi-bottle listing %s", async (name) => {
     const runBottleClassifierAgent = vi.fn();
     const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
+    const extractFromText = vi.fn(async () =>
+      Promise.resolve(buffaloTraceStraightBourbonIdentity),
+    );
     const { classifier } = createTestClassifier({
-      extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      extractFromText,
+      searchBottles,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name },
+    });
+
+    expect(result).toMatchObject({
+      status: "ignored",
+      reason:
+        "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+    });
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(searchBottles).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    "Garrison Brothers Bottled in Bond Bourbon",
+    "Orphan Barrel The Gifted Horse",
+  ])(
+    "does not treat nearby product wording as a multi-item listing: %s",
+    async (name) => {
+      const runBottleClassifierAgent = vi.fn(
+        async (): Promise<ReasoningResult> => ({
+          decision: {
+            action: "no_match",
+            rationale: "No matching Bottle was found.",
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: null,
+            candidateBottleIds: [],
+            proposedBottle: null,
+          },
+          artifacts: {
+            extractedIdentity: buffaloTraceStraightBourbonIdentity,
+            searchEvidence: [],
+            candidates: [],
+            resolvedEntities: [],
+          },
+        }),
+      );
+      const { classifier } = createTestClassifier({
+        extractedIdentity: buffaloTraceStraightBourbonIdentity,
+        runBottleClassifierAgent,
+      });
+
+      await classifier.classifyBottleReference({
+        reference: { name },
+      });
+
+      expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    },
+  );
+
+  test("auto ignores bundle listings before extracting bottle identity", async () => {
+    const runBottleClassifierAgent = vi.fn();
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
+    const extractFromText = vi.fn(async () =>
+      Promise.resolve(buffaloTraceStraightBourbonIdentity),
+    );
+    const { classifier } = createTestClassifier({
+      extractFromText,
       searchBottles,
       runBottleClassifierAgent,
     });
@@ -1198,18 +1273,22 @@ describe("createBottleClassifier", () => {
       reason:
         "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
       artifacts: {
-        extractedIdentity: buffaloTraceStraightBourbonIdentity,
+        extractedIdentity: null,
       },
     });
+    expect(extractFromText).not.toHaveBeenCalled();
     expect(searchBottles).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
-  test("auto ignores damaged-condition listings even when extraction finds a bottle identity", async () => {
+  test("auto ignores damaged-condition listings before extracting bottle identity", async () => {
     const runBottleClassifierAgent = vi.fn();
     const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
+    const extractFromText = vi.fn(async () =>
+      Promise.resolve(blantonsOriginalIdentity),
+    );
     const { classifier } = createTestClassifier({
-      extractedIdentity: blantonsOriginalIdentity,
+      extractFromText,
       searchBottles,
       runBottleClassifierAgent,
     });
@@ -1225,9 +1304,10 @@ describe("createBottleClassifier", () => {
       reason:
         "Reference describes a damaged or non-standard sale-condition bottle, not a standard bottle listing.",
       artifacts: {
-        extractedIdentity: blantonsOriginalIdentity,
+        extractedIdentity: null,
       },
     });
+    expect(extractFromText).not.toHaveBeenCalled();
     expect(searchBottles).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
