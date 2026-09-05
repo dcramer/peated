@@ -286,6 +286,31 @@ the output matches exactly. Trigger one manual collection and confirm that it
 updates the same price IDs and Bottle links. Check the run and Sentry before
 restoring the saved schedule.
 
+## Nc'nean
+
+Use the preparation endpoint with `{"site": "ncnean"}`. The check-only
+request examines every saved price without changing it. It accepts current
+prices with a numeric shop product ID and historical prices without one. Every
+row must still use an Nc'nean product URL and name, GBP, and a 700 ml bottle.
+Applying moves the site's request limits to a saved-rule price source with
+collection turned off. Its shop page is `https://ncnean.com/collections/all`.
+
+Before applying, stop the `ncnean` schedule and wait for active collection to
+finish. Save the existing price IDs, product IDs, URLs, Bottle links, hidden
+states, histories, request limits, and run history. Run the candidate version 7
+rules through the full local no-write preview. The collection includes gifts,
+miniatures, botanical spirit, merchandise, and sold-out products; exclude them
+without listing individual whisky names. Product pages must provide the exact
+displayed name, current bottle-only GBP price, 700 ml volume, product URL,
+product ID, and image. Products with several available variants must select the
+bottle without a gift tube or be left out when the price and size cannot be
+paired safely.
+
+After applying, save and preview the reviewed rules. Activate only exact
+output, trigger one manual collection, and confirm that it updates the same
+price IDs and Bottle links without reviving historical rows. Check the run and
+Sentry before restoring the weekly schedule.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -296,10 +321,10 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture,
-Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, North
-Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study, and
-Words of Whisky. Other sites are rejected without changing records. Add each
-site's conversion behind this route as its existing records are reviewed.
+Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, Nc'nean,
+North Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study,
+and Words of Whisky. Other sites are rejected without changing records. Add
+each site's conversion behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
