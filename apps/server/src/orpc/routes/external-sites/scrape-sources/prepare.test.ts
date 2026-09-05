@@ -115,6 +115,15 @@ function prepareCadenheads(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareBruichladdich(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "bruichladdich", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareGordonMacphail(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "gordonmacphail", ...input },
@@ -139,6 +148,7 @@ const canonicalUrl =
 function codeOwnedSource(
   key:
     | "bourbonculture"
+    | "bruichladdich"
     | "cadenheads"
     | "compassbox"
     | "gordonmacphail"
@@ -208,6 +218,11 @@ const compassBoxRegistry = createScraperRegistry({
 const cadenheadsRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("cadenheads")!],
   sources: [codeOwnedSource("cadenheads")],
+});
+
+const bruichladdichRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("bruichladdich")!],
+  sources: [codeOwnedSource("bruichladdich")],
 });
 
 const gordonMacphailRegistry = createScraperRegistry({
@@ -618,6 +633,25 @@ async function setupCadenheadsMigration() {
     })
     .returning();
   await syncScraperDefinitions(cadenheadsRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupBruichladdichMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "bruichladdich",
+      name: "Bruichladdich",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(bruichladdichRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1388,6 +1422,98 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await expect(prepareCadenheads({ apply: true })).rejects.toMatchObject({
       code: "BAD_REQUEST",
       message: expect.stringContaining("Check Cadenhead's price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Bruichladdich without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupBruichladdichMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "8468808368301",
+      name: "Bruichladdich The Classic Laddie 10 Aged Years",
+      price: 4600,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.bruichladdich.com/products/bruichladdich-the-classic-laddie",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "7420351381677",
+      name: "Bruichladdich Black Art Edition 11",
+      price: 39500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.bruichladdich.com/products/bruichladdich-black-art-edition-11",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareBruichladdich()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareBruichladdich({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(bruichladdichRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl:
+          "https://www.bruichladdich.com/collections/all?filter.v.availability=1",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("refuses an unexpected Bruichladdich price", async ({ fixtures }) => {
+    const site = await setupBruichladdichMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "not-a-number",
+      name: "Unknown release",
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.bruichladdich.com/products/unknown-release",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+
+    await expect(prepareBruichladdich({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Bruichladdich price"),
     });
     expect(await db.select().from(storePrices)).toEqual(prices);
     expect(await db.select().from(scrapeSources)).toEqual([]);

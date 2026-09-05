@@ -332,6 +332,51 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
+  test("keeps a stored product ID when a URL-matched listing omits it", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({
+      type: "bruichladdich",
+    });
+    const bottle = await fixtures.Bottle();
+    const existing = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "8468808368301",
+      bottleId: bottle.id,
+      name: "Bruichladdich The Classic Laddie 10 Aged Years",
+      price: 4600,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.bruichladdich.com/products/bruichladdich-the-classic-laddie",
+    });
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          name: existing.name,
+          price: 4700,
+          currency: existing.currency,
+          volume: existing.volume,
+          url: existing.url,
+        },
+      ],
+    });
+
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject([
+      {
+        id: existing.id,
+        externalProductId: existing.externalProductId,
+        bottleId: bottle.id,
+        price: 4700,
+      },
+    ]);
+  });
+
   test("reuses an exact Bottle assignment for unchanged source identity", async ({
     fixtures,
   }) => {
