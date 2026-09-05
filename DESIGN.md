@@ -35,31 +35,31 @@ colors:
   section-rule-dark: "rgb(232 234 227 / 0.16)"
 typography:
   page-title:
-    fontFamily: Space Grotesk
+    fontFamily: Hanken Grotesk
     fontSize: 72px
     fontWeight: 700
     lineHeight: 0.95
-    letterSpacing: -0.05em
+    letterSpacing: -0.045em
   compact-page-title:
-    fontFamily: Space Grotesk
+    fontFamily: Hanken Grotesk
     fontSize: 40px
     fontWeight: 700
     lineHeight: 1.1
     letterSpacing: -0.04em
   section-heading:
-    fontFamily: Space Grotesk
+    fontFamily: Hanken Grotesk
     fontSize: 20px
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: -0.025em
   row-title:
-    fontFamily: Space Grotesk
+    fontFamily: Hanken Grotesk
     fontSize: 18px
     fontWeight: 700
     lineHeight: 1.25
     letterSpacing: -0.025em
   compact-row-title:
-    fontFamily: Space Grotesk
+    fontFamily: Hanken Grotesk
     fontSize: 15px
     fontWeight: 700
     lineHeight: 1.25
@@ -227,7 +227,7 @@ sentiment poles.
 
 ## Typography
 
-- **Space Grotesk** is the display face for names, headings, and meaningful
+- **Hanken Grotesk** is the display face for names, headings, and meaningful
   figures.
 - **Karla** is the reading face for prose, labels, and member input.
 - **IBM Plex Mono** is available for rare values that must align as code-like
@@ -244,7 +244,7 @@ sentiment poles.
 
 | Role                | Family  | Weight | Size and line height | Tracking |
 | ------------------- | ------- | ------ | -------------------- | -------- |
-| Page title          | Display | 700    | 40–72px / 0.95       | -0.05em  |
+| Page title          | Display | 700    | 40–72px / 0.95       | -0.045em |
 | Compact page title  | Display | 700    | 32–40px / 1.1        | -0.04em  |
 | Section heading     | Display | 700    | 20px / 1.2           | -0.025em |
 | Row title           | Display | 700    | 18px / 1.25          | -0.025em |

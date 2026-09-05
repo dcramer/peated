@@ -25,8 +25,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
     "@fontsource-variable/karla": "^5.3.0",
-    "@fontsource-variable/space-grotesk": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@headlessui/react": "^2.2.10",
     "@hookform/resolvers": "^5.4.0",

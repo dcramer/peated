@@ -21,7 +21,7 @@ export const foundationStyles = stylex.create({
     fontFamily: fonts.display,
     fontSize: "clamp(40px, 5vw, 72px)",
     fontWeight: 700,
-    letterSpacing: "-0.05em",
+    letterSpacing: "-0.045em",
     lineHeight: 0.95,
   },
   pageTitleCompact: {
