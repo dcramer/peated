@@ -22,21 +22,30 @@ user gives.
 ## Work
 
 1. Name the target and environment. Resolve stored IDs with read-only API calls.
-2. For a full catalog, build a release list from sources outside Peated, fetch
-   every page of Peated results, and compare both lists. Prefer producer pages,
-   labels, and release announcements. Use exact archive or auction records for
-   historical gaps.
-3. Track every release and Peated record as `create`, `update`, `merge`,
+2. Before deciding what to change, build a list of current and past releases
+   from sources outside Peated. Fetch every page of Peated results and compare
+   the lists. The producer's current range does not define the catalog. Search
+   every period and product family, including discontinued, one-off, and
+   country-specific releases.
+3. Use specialist catalogs, collector lists, old sites, and auction archives to
+   find past releases. Verify each release and fact with producer pages,
+   announcements from the time, readable labels, or exact auction records. If a
+   search fails, try other names, languages, archives, and kinds of sources.
+4. Track every release and Peated record as `create`, `update`, `merge`,
    `no change`, `unresolved`, or `out of scope`. Save the source for each change.
-4. Review all fields, Series, the target Entity, images, aliases, and import
+   Check each existing Bottle and possible missing release. Do not mark old
+   records `unresolved` as a group because there are many or no current producer
+   page exists. For each unresolved item, record the unanswered question and
+   the sources or searches tried.
+5. Review all fields, Series, the target Entity, images, aliases, and import
    references required by Catalog Maintenance.
-5. Before writing, state the target and action counts. A direct catalog request
+6. Before writing, state the target and action counts. A direct catalog request
    allows supported creates and updates within that target. Ask before merges,
    deletes, uncertain identity changes, or work outside it.
-6. Check the live OpenAPI schema. Re-fetch each record before changing it. Use
+7. Check the live OpenAPI schema. Re-fetch each record before changing it. Use
    exact IDs and send only supported fields. Stop if the record changed or the
    API returns a conflict or validation error.
-7. Re-fetch every changed record. Check shared edits, images, aliases,
+8. Re-fetch every changed record. Check shared edits, images, aliases,
    references, and redirects when they apply.
 
 ## Rules
@@ -54,6 +63,7 @@ user gives.
   reuse terms, then inspect the stored image.
 - Merge only proven copies of the same marketed release.
 
-Do not stop after a sample. Finish every item in the target or list why it is
-unresolved. Report the environment, sources and years covered, counts by status,
-changed IDs, checks performed, and unresolved items.
+Completing one family or the current range does not complete the catalog.
+Continue through every period and product family until each item has a final
+status. Report the environment, sources and years covered, counts by status,
+changed IDs, checks performed, and unresolved questions.
