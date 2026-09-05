@@ -40,7 +40,7 @@
     "@sentry/core": "catalog:",
     "@sentry/hono": "catalog:",
     "@sentry/node": "catalog:",
-    "@simplewebauthn/server": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.2",
     "@sindresorhus/slugify": "^2.2.1",
     "axios": "~1.19.0",
     "bcrypt": "^6.0.0",
