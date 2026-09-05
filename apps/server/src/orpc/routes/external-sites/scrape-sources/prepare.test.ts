@@ -106,6 +106,15 @@ function prepareCompassBox(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareCadenheads(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "cadenheads", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareGordonMacphail(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "gordonmacphail", ...input },
@@ -130,6 +139,7 @@ const canonicalUrl =
 function codeOwnedSource(
   key:
     | "bourbonculture"
+    | "cadenheads"
     | "compassbox"
     | "gordonmacphail"
     | "kilchoman"
@@ -193,6 +203,11 @@ const whiskyNotesRegistry = createScraperRegistry({
 const compassBoxRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("compassbox")!],
   sources: [codeOwnedSource("compassbox")],
+});
+
+const cadenheadsRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("cadenheads")!],
+  sources: [codeOwnedSource("cadenheads")],
 });
 
 const gordonMacphailRegistry = createScraperRegistry({
@@ -584,6 +599,25 @@ async function setupCompassBoxMigration() {
     })
     .returning();
   await syncScraperDefinitions(compassBoxRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupCadenheadsMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "cadenheads",
+      name: "Cadenheads",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(cadenheadsRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1265,6 +1299,97 @@ describe("POST /admin/scrape-sources/prepare", () => {
       code: "BAD_REQUEST",
       message: "Compass Box has no stored prices to verify.",
     });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Cadenhead's without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupCadenheadsMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "5996",
+      name: "Cadenhead's 7-Stars Blend 46%",
+      price: 4000,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.cadenhead.shop/product/cadenheads-7-stars-blend-46/",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Older Cadenhead's release",
+      price: 6500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.cadenhead.shop/product/older-cadenheads-release/",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareCadenheads()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareCadenheads({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(cadenheadsRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://www.cadenhead.shop/product-category/whisky/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("refuses an unexpected Cadenhead's price", async ({ fixtures }) => {
+    const site = await setupCadenheadsMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "not-a-number",
+      name: "Unknown release",
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.cadenhead.shop/product/unknown-release/",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+
+    await expect(prepareCadenheads({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Cadenhead's price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
