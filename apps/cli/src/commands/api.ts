@@ -19,7 +19,10 @@ type ApiCommandOptions = {
 };
 
 type ApiImageUploadOptions = {
+  caption?: string;
   file: string;
+  idempotencyKey?: string;
+  primary?: boolean;
   sourceUrl?: string;
   license?: string;
   yes?: boolean;
@@ -126,10 +129,17 @@ async function runImageUploadCommand(
       type: imageContentType(options.file),
     }),
   );
+  if (options.caption !== undefined) body.set("caption", options.caption);
   if (options.sourceUrl !== undefined) {
     body.set("sourceUrl", options.sourceUrl);
   }
   if (options.license !== undefined) body.set("license", options.license);
+  if (options.primary !== undefined) {
+    body.set("isPrimary", String(options.primary));
+  }
+  if (options.idempotencyKey !== undefined) {
+    body.set("idempotencyKey", options.idempotencyKey);
+  }
 
   const result = await requestPeatedApi({
     ...credentials,
@@ -155,8 +165,11 @@ subcommand
   .description("Upload an image to a multipart Peated API endpoint")
   .argument("<path>", "API path, such as /bottles/123/image")
   .requiredOption("--file <path>", "Local image file")
+  .option("--caption <caption>", "Image caption")
   .option("--source-url <url>", "Original image source page")
   .option("--license <license>", "Image license or reuse terms")
+  .option("--primary", "Make this the primary Entity image")
+  .option("--idempotency-key <key>", "Idempotency key for the upload")
   .option("--yes", "Send the mutation without an interactive confirmation")
   .action(async (path, options) => runImageUploadCommand(path, options));
 
