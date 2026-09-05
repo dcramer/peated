@@ -106,6 +106,15 @@ function prepareCompassBox(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareGordonMacphail(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "gordonmacphail", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareKilchoman(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "kilchoman", ...input },
@@ -122,6 +131,7 @@ function codeOwnedSource(
   key:
     | "bourbonculture"
     | "compassbox"
+    | "gordonmacphail"
     | "kilchoman"
     | "whiskeyreviewer"
     | "whiskynotes"
@@ -183,6 +193,11 @@ const whiskyNotesRegistry = createScraperRegistry({
 const compassBoxRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("compassbox")!],
   sources: [codeOwnedSource("compassbox")],
+});
+
+const gordonMacphailRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("gordonmacphail")!],
+  sources: [codeOwnedSource("gordonmacphail")],
 });
 
 const kilchomanRegistry = createScraperRegistry({
@@ -569,6 +584,25 @@ async function setupCompassBoxMigration() {
     })
     .returning();
   await syncScraperDefinitions(compassBoxRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupGordonMacphailMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "gordonmacphail",
+      name: "Gordon Macphail",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(gordonMacphailRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1231,6 +1265,99 @@ describe("POST /admin/scrape-sources/prepare", () => {
       code: "BAD_REQUEST",
       message: "Compass Box has no stored prices to verify.",
     });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Gordon & MacPhail without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupGordonMacphailMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "15278344929666",
+      name: "CC CASK STRENGTH GLENTURRET 2007 59.8% - 70cl",
+      price: 16000,
+      currency: "gbp",
+      volume: 700,
+      url: "https://shop.gordonandmacphail.com/products/cc-cask-strength-glenturret-2007-59-8-70cl",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "6631010533443",
+      name: "Distillery Labels Linkwood 15-year-old 46%",
+      price: 8999,
+      currency: "gbp",
+      volume: 700,
+      url: "https://shop.gordonandmacphail.com/products/distillery-labels-linkwood-15-years-old-46",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareGordonMacphail()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareGordonMacphail({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(gordonMacphailRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://shop.gordonandmacphail.com/collections/all",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("refuses an unexpected Gordon & MacPhail price", async ({
+    fixtures,
+  }) => {
+    const site = await setupGordonMacphailMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Unknown product",
+      currency: "gbp",
+      volume: 700,
+      url: "https://shop.gordonandmacphail.com/products/unknown-product",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+
+    await expect(prepareGordonMacphail({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Gordon & MacPhail price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
