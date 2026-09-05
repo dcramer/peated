@@ -26,6 +26,7 @@ export function TastingDetail({ tasting }: { tasting: Tasting }) {
       }
       friends={tasting.friends}
       notes={tasting.notes}
+      photoUrl={tasting.imageUrl}
       rating={{ kind: "tasting", ratingBand: tasting.ratingBand }}
       servingStyle={tasting.servingStyle}
       tags={tasting.tags}

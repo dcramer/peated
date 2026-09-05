@@ -17,6 +17,7 @@ export function ReviewDetail({ review }: { review: Review }) {
       createdAt={review.createdAt}
       friends={review.friends}
       notes={review.notes}
+      photoUrl={review.imageUrl}
       rating={{ kind: "review", score: review.score }}
       servingStyle={review.servingStyle}
       tags={review.tags}
