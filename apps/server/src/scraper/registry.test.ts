@@ -1,26 +1,12 @@
 import { EXTERNAL_SITE_DEFINITIONS } from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import {
-  externalSiteRuns,
-  externalSites,
-  storePrices,
-} from "@peated/server/db/schema";
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
-import { syncExternalSites } from "@peated/server/lib/externalSites";
-import { loadFixture } from "@peated/server/lib/test/fixtures";
-import { eq } from "drizzle-orm";
-import { vi } from "vitest";
-import type { ScraperHttpClock } from "./http";
 import { createScraperLifecycle } from "./lifecycle";
 import { scraperRegistry } from "./registry";
-import { executeScraperRun } from "./runs";
 import { externalReviewSink } from "./sinks/externalReviews";
-import { syncScraperDefinitions } from "./syncDefinitions";
 
 const registeredSources = [
   "astorwines",
   "berrybrosrudd",
-  "bruichladdich",
   "decadentdrinks",
   "douglaslaing",
   "dramface",
@@ -55,6 +41,7 @@ const registeredReviewSources = [
 
 const configuredSources = [
   "bourbonculture",
+  "bruichladdich",
   "cadenheads",
   "compassbox",
   "gordonmacphail",
@@ -65,22 +52,6 @@ const configuredSources = [
   "whiskynotes",
   "wordsofwhisky",
 ];
-
-type RuntimeTestClock = ScraperHttpClock & { advanceTo(value: Date): void };
-
-function runtimeClock(): RuntimeTestClock {
-  let now = new Date("2026-08-18T12:00:00Z");
-  return {
-    now: () => now,
-    sleep: async (milliseconds) => {
-      now = new Date(now.getTime() + milliseconds);
-    },
-    random: () => 0,
-    advanceTo: (value) => {
-      now = value;
-    },
-  };
-}
 
 test("registers each code-owned scraper source with explicit target ownership", () => {
   expect([...scraperRegistry.sources.keys()].sort()).toEqual(
@@ -109,6 +80,7 @@ test("registers each code-owned scraper source with explicit target ownership", 
     requestsPerWindow: 10,
     windowMs: 3_600_000,
   });
+  expect(scraperRegistry.targets.get("bruichladdich")).toBeDefined();
   expect(scraperRegistry.targets.get("compassbox")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.dramface.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("dramface")).toMatchObject({
@@ -193,69 +165,11 @@ test("registers each code-owned scraper source with explicit target ownership", 
   }
 });
 
-test("runs Bruichladdich through the production runtime with fixture parity", async () => {
-  await syncExternalSites();
-  await syncScraperDefinitions(scraperRegistry);
-  const [site] = await db
-    .select()
-    .from(externalSites)
-    .where(eq(externalSites.type, "bruichladdich"));
-  if (!site) throw new Error("Expected synchronized site.");
-  const [run] = await db
-    .insert(externalSiteRuns)
-    .values({
-      externalSiteId: site.id,
-      trigger: "manual",
-      requestLimit: 100,
-    })
-    .returning();
-  if (!run) throw new Error("Expected run.");
-  const fixture = await loadFixture("bruichladdich", "bottle-list.json");
-  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
-    const url = new URL(input instanceof Request ? input.url : input);
-    if (url.pathname === "/robots.txt") {
-      return new Response(null, { status: 404 });
-    }
-    if (url.searchParams.get("page") === "1") return new Response(fixture);
-    return new Response(JSON.stringify({ products: [] }));
-  });
-
-  await expect(
-    executeScraperRun(
-      { runId: run.id },
-      {
-        registry: scraperRegistry,
-        fetchImpl,
-        clock: runtimeClock(),
-        executionToken: "owner",
-      },
-    ),
-  ).resolves.toEqual({ status: "completed" });
-
-  expect(
-    await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id)),
-  ).toHaveLength(4);
-  const [storedRun] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(storedRun).toMatchObject({
-    status: "succeeded",
-    requestCount: 3,
-    emittedItemCount: 4,
-    itemCount: 4,
-    cursor: { sequence: 1, page: 1 },
-  });
-});
-
-test("dispatches migrated sources to the isolated scraper job", async ({
+test("dispatches code-owned sources to the isolated scraper job", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "bruichladdich" });
+  const site = await fixtures.ExternalSite({ type: "edradour" });
   const enqueue = vi.fn(async () => undefined);
 
   const run = await createScraperLifecycle({

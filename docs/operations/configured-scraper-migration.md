@@ -260,6 +260,32 @@ preview. Activate only exact output, trigger one manual collection, and confirm
 that it updates the same price IDs and Bottle matches. Check the run and Sentry
 before restoring the saved schedule.
 
+## North Star
+
+Use the preparation endpoint with `{"site": "northstarspirits"}`. The check-only
+request examines every saved price without changing it. It reports the total,
+the number shown on Peated, and the number linked to Bottles. It stops if a price
+does not use the expected North Star product URL, numeric product ID published
+by the shop, non-empty name, GBP currency, or supported bottle size. Applying
+moves the site's request limits to a saved-rule price source with collection
+turned off. Its shop page is `https://northstarspirits.com/collections/shop`.
+It does not update saved prices or their history.
+
+Before applying, stop the `northstarspirits` schedule and wait for queued or
+running collection to finish.
+Save the same price and run records listed for Compass Box. Run the candidate
+rules through the local preview, which does not save prices. Do not set a product
+limit. The shop currently mixes whisky with gin and liqueur, so the shop-page
+rules must exclude both non-whisky products. The product-page rules must read
+the exact product name, current GBP price, published bottle size, product URL,
+product ID, and image. Compare every listing with the code scraper, including
+sale prices and any supported size other than 700 ml.
+
+After applying, save and preview the reviewed rules. Activate them only after
+the output matches exactly. Trigger one manual collection and confirm that it
+updates the same price IDs and Bottle links. Check the run and Sentry before
+restoring the saved schedule.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -270,10 +296,10 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture,
-Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, The
-Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study, and Words of
-Whisky. Other sites are rejected without changing records. Add each site's
-conversion behind this route as its existing records are reviewed.
+Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, North
+Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study, and
+Words of Whisky. Other sites are rejected without changing records. Add each
+site's conversion behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
