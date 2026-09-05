@@ -16,6 +16,7 @@ import {
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
+import { TastingReviewBottleSummary } from "./tastingReviewBottleSummary.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
 type Member = Outputs["tastings"]["details"]["createdBy"];
@@ -39,6 +40,7 @@ export function TastingReviewDetail({
   footer,
   friends,
   notes,
+  photoUrl,
   rating,
   servingStyle,
   tags,
@@ -50,6 +52,7 @@ export function TastingReviewDetail({
   footer?: ReactNode;
   friends: readonly Member[];
   notes?: string | null;
+  photoUrl?: string | null;
   rating: Rating;
   servingStyle?: ServingStyle;
   tags: readonly string[];
@@ -103,6 +106,12 @@ export function TastingReviewDetail({
             </span>
           )}
         </header>
+
+        <TastingReviewBottleSummary
+          bottle={bottle}
+          photoUrl={photoUrl}
+          placement="mobile"
+        />
 
         {facts.length ? (
           <div {...stylex.props(styles.facts)}>

@@ -1,9 +1,11 @@
-import { mockTasting } from "@peated/server/orpc/mock/fixtures";
+import { mockTastings } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ButtonLink } from "../button.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { TastingReviewDetail } from "./tastingReviewDetail.stylex";
+
+const photoTasting = mockTastings[6]!;
 
 const meta = {
   title: "Pages/Tasting and Review Detail",
@@ -16,20 +18,21 @@ const meta = {
     ),
   ],
   args: {
-    author: mockTasting.createdBy,
-    bottle: mockTasting.bottle,
-    color: mockTasting.color,
-    createdAt: mockTasting.createdAt,
+    author: photoTasting.createdBy,
+    bottle: photoTasting.bottle,
+    color: photoTasting.color,
+    createdAt: photoTasting.createdAt,
     footer: (
       <ButtonLink href="/login" size="sm" variant="tonal">
         Toast
       </ButtonLink>
     ),
-    friends: mockTasting.friends,
-    notes: mockTasting.notes,
-    rating: { kind: "tasting", ratingBand: mockTasting.ratingBand },
-    servingStyle: mockTasting.servingStyle,
-    tags: mockTasting.tags,
+    friends: photoTasting.friends,
+    notes: photoTasting.notes,
+    photoUrl: photoTasting.imageUrl,
+    rating: { kind: "tasting", ratingBand: photoTasting.ratingBand },
+    servingStyle: photoTasting.servingStyle,
+    tags: photoTasting.tags,
   },
   argTypes: {
     footer: { control: false },

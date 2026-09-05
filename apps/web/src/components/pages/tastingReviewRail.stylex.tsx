@@ -1,19 +1,14 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
-import {
-  BottleVisual,
-  RailList,
-  RailListItem,
-  TastingRating,
-} from "@peated/web/components";
+import { RailList, RailListItem, TastingRating } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 import { RailListSection } from "./railListSection.stylex";
+import { TastingReviewBottleSummary } from "./tastingReviewBottleSummary.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
 type Member = Outputs["tastings"]["details"]["createdBy"];
@@ -47,7 +42,6 @@ export function TastingReviewRail({
   memberReviews: readonly MemberReview[];
   memberTastings: readonly Tasting[];
 }) {
-  const bottleName = formatBottleDisplayName(bottle);
   const moreFromMember = memberTastings
     .filter((tasting) => tasting.id !== currentTastingId)
     .slice(0, 4);
@@ -61,20 +55,10 @@ export function TastingReviewRail({
 
   return (
     <>
-      {photoUrl ? (
-        <figure {...stylex.props(styles.photo)}>
-          <BottleVisual
-            expandable
-            imageUrl={photoUrl}
-            label={`${bottleName} photo`}
-            size="xl"
-          />
-        </figure>
-      ) : null}
-
-      <BottleRailSection
-        heading="This bottle"
-        items={[toBottleListItem(bottle)]}
+      <TastingReviewBottleSummary
+        bottle={bottle}
+        photoUrl={photoUrl}
+        placement="desktop"
       />
 
       <BottleRailSection
@@ -166,10 +150,6 @@ const styles = stylex.create({
   tastingDate: {
     color: colors.inkMuted,
     whiteSpace: "nowrap",
-  },
-  photo: {
-    minWidth: 0,
-    margin: 0,
   },
   empty: {
     margin: 0,
