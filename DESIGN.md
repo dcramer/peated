@@ -365,11 +365,13 @@ JSDoc.
 - Standard three-line catalog, search, selection, and loading rows share one
   thumbnail size. Activity keeps the same identity with an image one full size
   larger in wide feed columns so the whisky anchors each entry, then returns to
-  the standard row size in sidebars and on mobile. The space stays consistent
-  for square and portrait photos. Each photo keeps its original proportions,
-  and its white frame fits the photo instead of filling unused space. Keep the
-  full bottle visible; never crop it to an avatar square. Single-line library
-  additions use smaller thumbnails.
+  the standard row size in sidebars and on mobile. Only real photos use the
+  larger activity space; the missing-photo glyph stays at the standard visual
+  size within that column. The space stays consistent for square and portrait
+  photos, including small source files. Each photo keeps its original
+  proportions, and its white frame fits the photo instead of filling unused
+  space. Keep the full bottle visible; never crop it to an avatar square.
+  Single-line library additions use smaller thumbnails.
   Sidebar bottle lists use the shared sidebar variant with smaller thumbnails,
   compact titles limited to two lines, and trailing details below the identity.
   Recent tastings show their date and rating as supporting details.
@@ -381,7 +383,10 @@ JSDoc.
 - Bottle rating summaries use one label from the fixed rating ranges. Show an
   exact review median beside that label when available; for tastings alone,
   show the full range. Compact rows use a small right-aligned label, value, and
-  distribution without counts. Omit the whole summary when no rating exists.
+  distribution without counts. In bottle headers, show the value first and its
+  label underneath; keep the section's accessible name without repeating
+  “Bottle rating” on screen. Do not add source labels or the compact
+  distribution there. Omit the whole summary when no rating exists.
 
 ### Storybook
 

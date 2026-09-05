@@ -172,9 +172,10 @@ Bottle presentation derives one rating from these saved summaries. When a
 review median exists, its matching band supplies the label and the median stays
 visible as the exact score. Otherwise, the lower-middle tasting band supplies
 the label and the UI shows that band's range rather than inventing a point
-score. The visible distribution adds `reviewScoreBandCounts` and
-`tastingBandCounts` by band. Individual external reviews still show their
-original score and scale.
+score. The bottle header keeps this summary short and leaves the rating
+breakdown with the review and tasting lists. Compact bottle rows add
+`reviewScoreBandCounts` and `tastingBandCounts` by band for their distribution.
+Individual external reviews still show their original score and scale.
 
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
 active members. They exclude retired Bottles.

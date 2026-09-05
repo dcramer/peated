@@ -81,7 +81,10 @@ export function BottleVisual({
             maskImage: `url("${bottleIconUrl}")`,
             WebkitMaskImage: `url("${bottleIconUrl}")`,
           }}
-          {...stylex.props(styles.fallbackAsset)}
+          {...stylex.props(
+            styles.fallbackAsset,
+            size === "activity" && styles.activityFallbackAsset,
+          )}
         />
       )}
     </span>
@@ -183,7 +186,7 @@ const styles = stylex.create({
   },
   activityImage: {
     width: "auto",
-    height: "auto",
+    height: "100%",
     borderRadius: controlMetrics.radiusSmall,
     backgroundColor: colors.imageBackground,
     boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
@@ -219,6 +222,10 @@ const styles = stylex.create({
     WebkitMaskPosition: "center",
     WebkitMaskRepeat: "no-repeat",
     WebkitMaskSize: "contain",
+  },
+  activityFallbackAsset: {
+    width: `calc(${bottleThumbnailMetrics.width} - ${space.x4})`,
+    height: `calc(${bottleThumbnailMetrics.height} - ${space.x4})`,
   },
 });
 

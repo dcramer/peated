@@ -10,7 +10,6 @@ const meta = {
     externalScoreCount: 2,
     memberScoreCount: 3,
     median: 91,
-    reviewCounts: { outstanding: 4, very_good: 1 },
     tastingCounts: { good: 1, outstanding: 5, unicorn: 2, very_good: 2 },
   },
   decorators: [
@@ -24,7 +23,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use once in a bottle header. The rating name always matches the middle review score. With tastings only, it shows the middle tasting's full range instead of an exact score.",
+          "Use once in a bottle header. The large value comes first, with its rating name underneath. With tastings only, it shows the middle tasting's full range instead of an exact score. Keep detailed rating breakdowns with the reviews and tastings.",
       },
     },
   },
@@ -37,11 +36,7 @@ export const Overview: Story = {
   render: (args) => (
     <StoryStack>
       <BottleRatingSummary {...args} />
-      <BottleRatingSummary
-        externalScoreCount={2}
-        median={86}
-        reviewCounts={{ good: 1, outstanding: 1 }}
-      />
+      <BottleRatingSummary externalScoreCount={2} median={86} />
       <BottleRatingSummary
         tastingCounts={{ outstanding: 2, unicorn: 1, very_good: 4 }}
       />

@@ -26,14 +26,13 @@ describe("Ratings", () => {
     container.remove();
   });
 
-  it("keeps the rating name aligned with the exact review median", () => {
+  it("puts the exact review median before its rating name", () => {
     act(() =>
       root.render(
         <BottleRatingSummary
           externalScoreCount={2}
           memberScoreCount={3}
           median={91}
-          reviewCounts={{ outstanding: 4, very_good: 1 }}
           tastingCounts={{ outstanding: 2, unicorn: 1 }}
         />,
       ),
@@ -41,13 +40,13 @@ describe("Ratings", () => {
 
     expect(container.textContent).toContain("Outstanding");
     expect(container.textContent).toContain("91");
-    expect(container.textContent).toContain("Member reviews");
-    expect(container.textContent).toContain("Critic reviews");
-    expect(container.textContent).toContain("Tastings");
-    expect(container.textContent).not.toContain("3 member reviews");
-    expect(
-      container.querySelector('[role="img"]')?.getAttribute("aria-label"),
-    ).toContain("Outstanding 6");
+    expect(container.textContent ?? "").toMatch(/91.*Outstanding/);
+    expect(container.textContent).not.toContain("Bottle rating");
+    expect(container.textContent).not.toContain("Tastings");
+    expect(container.querySelector("section")?.getAttribute("aria-label")).toBe(
+      "Bottle rating",
+    );
+    expect(container.querySelector('[role="img"]')).toBeNull();
   });
 
   it("uses the middle tasting rating without inventing an exact score", () => {

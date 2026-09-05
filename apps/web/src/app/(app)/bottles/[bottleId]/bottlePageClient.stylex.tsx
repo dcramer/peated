@@ -407,7 +407,6 @@ export function BottlePageFrameClient({
                   externalScoreCount: bottle.externalScoreCount,
                   memberScoreCount: bottle.memberScoreCount,
                   median: bottle.medianScore,
-                  reviewCounts: bottle.reviewScoreBandCounts,
                   tastingCounts: bottle.tastingBandCounts,
                 }
           }

@@ -38,13 +38,6 @@ const meta = {
       externalScoreCount: 2,
       memberScoreCount: 3,
       median: 91,
-      reviewCounts: {
-        good: 0,
-        mediocre: 0,
-        outstanding: 4,
-        unicorn: 0,
-        very_good: 1,
-      },
       tastingCounts: {
         good: 8,
         mediocre: 3,
@@ -71,6 +64,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const TastingOnly: Story = {
+  args: {
+    brand: "New Riff",
+    brandHref: "/entities/1697",
+    metadata: "New Riff Distilling",
+    name: "6-year-old Malted Rye",
+    rating: {
+      tastingCounts: { very_good: 2 },
+    },
+  },
+};
 
 export const LongName: Story = {
   args: {
