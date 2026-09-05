@@ -162,8 +162,6 @@ const styles = stylex.create({
       [NARROW_FEED]: bottleThumbnailMetrics.height,
     },
     padding: 0,
-    backgroundColor: "transparent",
-    boxShadow: "none",
   },
   activityFallbackVisual: {
     backgroundColor: colors.inset,
