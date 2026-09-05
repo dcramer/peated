@@ -146,6 +146,61 @@ test("uses variant stock when page availability says out of stock", () => {
   expect(parseDramfoolProductPage(html, firstProductUrl)).toHaveLength(1);
 });
 
+test("keeps variants with distinct store identifiers", () => {
+  const html = productHtml({
+    title: "Dramfool Glenallachie 11",
+    itemId: "shared-product-id",
+    variants: [
+      {
+        sku: "500ml-sku",
+        attributes: { Size: "50cl" },
+        priceMoney: { currency: "GBP", value: "75.00" },
+        onSale: false,
+        unlimited: false,
+        qtyInStock: 1,
+      },
+      {
+        sku: "700ml-sku",
+        attributes: { Size: "70cl" },
+        priceMoney: { currency: "GBP", value: "100.00" },
+        onSale: false,
+        unlimited: false,
+        qtyInStock: 1,
+      },
+    ],
+  });
+
+  expect(parseDramfoolProductPage(html, firstProductUrl)).toMatchObject([
+    { externalProductId: "500ml-sku", url: firstProductUrl, volume: 500 },
+    { externalProductId: "700ml-sku", url: firstProductUrl, volume: 700 },
+  ]);
+});
+
+test("rejects multiple variants without distinct store identifiers", () => {
+  const html = productHtml({
+    title: "Dramfool Glenallachie 11",
+    itemId: "shared-product-id",
+    variants: [
+      {
+        attributes: { Size: "50cl" },
+        priceMoney: { currency: "GBP", value: "75.00" },
+        onSale: false,
+        unlimited: false,
+        qtyInStock: 1,
+      },
+      {
+        attributes: { Size: "70cl" },
+        priceMoney: { currency: "GBP", value: "100.00" },
+        onSale: false,
+        unlimited: false,
+        qtyInStock: 1,
+      },
+    ],
+  });
+
+  expect(parseDramfoolProductPage(html, firstProductUrl)).toEqual([]);
+});
+
 test("ignores non-physical products", () => {
   const html = productHtml({
     title: "Dramfool Tasting Ticket",

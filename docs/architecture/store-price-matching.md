@@ -22,7 +22,8 @@ Read these identity rules first:
 
 The source item is identified by its site and strongest stable product ID. Use
 the product URL only when the source has no stable ID. Never use the display
-title as the source identity.
+title as the source identity. Variants with distinct product IDs may share one
+product page URL.
 
 Each row stores a fingerprint of Bottle-related source facts. An unchanged
 fingerprint keeps a reviewed assignment. A changed fingerprint clears an

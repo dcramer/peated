@@ -21,6 +21,7 @@ const MoneySchema = z
 const DramfoolVariantSchema = z
   .object({
     id: z.string().trim().min(1).optional(),
+    sku: z.string().trim().min(1).optional(),
     barcode: z.string().trim().min(1).nullish(),
     attributes: z.record(z.string(), z.string()),
     priceMoney: MoneySchema,
@@ -195,7 +196,7 @@ export function parseDramfoolProductPage(
       continue;
     }
 
-    const externalProductId = variant.id ?? productId;
+    const externalProductId = variant.id ?? variant.sku;
     const barcode = GtinSchema.safeParse(variant.barcode);
     const listing: StorePrice = {
       name,
@@ -208,9 +209,25 @@ export function parseDramfoolProductPage(
     if (externalProductId) listing.externalProductId = externalProductId;
     if (barcode.success) listing.barcode = barcode.data;
 
-    logScrapedProduct(SITE, listing);
     products.push(listing);
   }
+
+  if (products.length === 1 && !products[0].externalProductId && productId) {
+    products[0].externalProductId = productId;
+  }
+  const productIds = new Set(
+    products.flatMap(({ externalProductId }) =>
+      externalProductId ? [externalProductId] : [],
+    ),
+  );
+  if (products.length > 1 && productIds.size !== products.length) {
+    logScrapeWarning(SITE, "Product variants need unique identifiers", {
+      rawName,
+    });
+    return [];
+  }
+
+  for (const product of products) logScrapedProduct(SITE, product);
 
   return products;
 }
