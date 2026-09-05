@@ -78,6 +78,18 @@
           "price": "33.00"
         }
       ]
+    },
+    {
+      "title": "Campbeltown Amaretto SOOP Liqueur",
+      "handle": "campbeltown-amaretto-soop-liqueur",
+      "body_html": "<p>An amaretto liqueur made with Scotch whisky.</p>",
+      "images": [],
+      "variants": [
+        {
+          "available": true,
+          "price": "29.00"
+        }
+      ]
     }
   ]
 }
