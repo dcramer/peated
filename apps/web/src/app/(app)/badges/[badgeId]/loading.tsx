@@ -12,7 +12,7 @@ export default function BadgeLoading() {
       <PageHeader
         description={<LoadingPlaceholder preset="metadata" />}
         identity={<BadgeImageLoading />}
-        title={<LoadingPlaceholder preset="heading" />}
+        title={<LoadingPlaceholder preset="pageTitle" />}
       />
       <PageSection heading="Leaderboard">
         <BadgeLeaderboardLoading />

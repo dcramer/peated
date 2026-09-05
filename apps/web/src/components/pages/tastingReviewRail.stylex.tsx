@@ -1,14 +1,22 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
-import { RailList, RailListItem, TastingRating } from "@peated/web/components";
+import {
+  LoadingList,
+  RailList,
+  RailListItem,
+  TastingRating,
+} from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 import { RailListSection } from "./railListSection.stylex";
-import { TastingReviewBottleSummary } from "./tastingReviewBottleSummary.stylex";
+import {
+  TastingReviewBottleSummary,
+  TastingReviewBottleSummaryLoading,
+} from "./tastingReviewBottleSummary.stylex";
 
 type Bottle = Outputs["tastings"]["details"]["bottle"];
 type Member = Outputs["tastings"]["details"]["createdBy"];
@@ -130,6 +138,25 @@ export function TastingReviewRail({
             No other reviews yet.
           </p>
         )}
+      </RailListSection>
+    </>
+  );
+}
+
+/** Reserves the shared review and tasting side column while data loads. */
+export function TastingReviewRailLoading() {
+  return (
+    <>
+      <TastingReviewBottleSummaryLoading placement="desktop" />
+      <BottleRailSection heading="More from this member">
+        <LoadingList
+          label="Loading member tastings"
+          rows={3}
+          variant="sidebar"
+        />
+      </BottleRailSection>
+      <RailListSection heading="Other reviews of this bottle">
+        <LoadingList label="Loading other reviews" rows={3} variant="text" />
       </RailListSection>
     </>
   );

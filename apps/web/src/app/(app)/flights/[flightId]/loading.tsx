@@ -19,7 +19,7 @@ export default function Loading() {
           </Button>
         }
         description={<LoadingPlaceholder preset="text" />}
-        metadata={<LoadingPlaceholder preset="metadata" />}
+        metadata={<LoadingPlaceholder preset="pageMetadata" />}
         menu={
           <IconButton
             aria-hidden="true"
@@ -30,7 +30,7 @@ export default function Loading() {
             variant="tonal"
           />
         }
-        title={<LoadingPlaceholder preset="heading" />}
+        title={<LoadingPlaceholder preset="pageTitle" />}
       />
       <PageSection heading="Bottles">
         <LoadingList
