@@ -3,7 +3,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ButtonLink } from "../button.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
-import { TastingReviewDetail } from "./tastingReviewDetail.stylex";
+import {
+  TastingReviewDetail,
+  TastingReviewDetailLoading,
+} from "./tastingReviewDetail.stylex";
 
 const photoTasting = mockTastings[6]!;
 
@@ -43,6 +46,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Overview: Story = {};
+
+export const Loading: Story = {
+  render: () => <TastingReviewDetailLoading label="Loading tasting details" />,
+};
 
 export const WithoutNotes: Story = {
   args: {

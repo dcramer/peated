@@ -13,18 +13,34 @@ import { getPublicStats } from "@peated/web/lib/publicStats.server";
 import { homeMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { Suspense } from "react";
 
+import {
+  PublicHomeContent,
+  PublicHomeContentLoading,
+} from "./_components/home/publicHome.stylex";
 import { loadPublicHomeLocations } from "./homeLocations.server";
 import { HomePageClient } from "./homePageClient";
 
 export const metadata = homeMetadata;
 
-export default async function Page() {
-  const session = await getSession();
+export default function Page() {
   // Playwright screenshots require stable copy. Production keeps rotating hints.
   const searchPlaceholder = getHomeSearchPlaceholder(
     process.env.PLAYWRIGHT_TEST ? () => 0 : undefined,
   );
+
+  return (
+    <HomePageClient searchPlaceholder={searchPlaceholder}>
+      <Suspense fallback={<PublicHomeContentLoading />}>
+        <HomeContent />
+      </Suspense>
+    </HomePageClient>
+  );
+}
+
+async function HomeContent() {
+  const session = await getSession();
   const queryClient = getQueryClient();
   const { client } = session.user
     ? await getServerClient()
@@ -48,7 +64,7 @@ export default async function Page() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <HomePageClient searchPlaceholder={searchPlaceholder} />
+      <PublicHomeContent />
     </HydrationBoundary>
   );
 }

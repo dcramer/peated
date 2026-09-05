@@ -10,12 +10,16 @@ import {
   type EntityListItem,
   ItemList,
   ItemListItem,
+  LoadingList,
   LocationPreviewGrid,
+  LocationPreviewGridLoading,
   type LocationPreviewItem,
   RegionPreviewGrid,
+  RegionPreviewGridLoading,
 } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
+import type { LoadingListProps } from "../feedback.stylex";
 
 function HomeModuleHeading({
   action,
@@ -217,6 +221,48 @@ export function HomeContributionPrompt({
         {primaryAction}
         {secondaryAction}
       </div>
+    </section>
+  );
+}
+
+/** Reserves a home list section using the same heading and row geometry. */
+export function HomeModuleLoading({
+  label,
+  rows,
+  title,
+  variant,
+}: Pick<LoadingListProps, "label" | "rows" | "variant"> & {
+  title: string;
+}) {
+  return (
+    <section {...stylex.props(styles.section)}>
+      <HomeModuleHeading title={title} />
+      <div {...stylex.props(styles.rows)}>
+        <LoadingList label={label} rows={rows} variant={variant} />
+      </div>
+    </section>
+  );
+}
+
+/** Reserves the normally visible country and Scottish region card grids. */
+export function HomeOriginsLoading() {
+  return (
+    <section {...stylex.props(styles.section)}>
+      <HomeModuleHeading title="Browse by origin" />
+      <p {...stylex.props(foundationStyles.body, styles.originIntro)}>
+        Mostly Scotch, a good deal of American, and a growing amount of
+        everything else.
+      </p>
+      <div {...stylex.props(styles.countryGrid)}>
+        <LocationPreviewGridLoading
+          label="Loading countries"
+          showDescriptions={false}
+        />
+      </div>
+      <div {...stylex.props(styles.regionHeading)}>
+        <SectionHeading level={3}>By region</SectionHeading>
+      </div>
+      <RegionPreviewGridLoading />
     </section>
   );
 }

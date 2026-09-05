@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { getRegionMap } from "../lib/locationMap";
 import {
   LocationPreviewGrid,
+  LocationPreviewGridLoading,
   RegionPreviewGridLoading,
 } from "./locationPreviewCard.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
@@ -58,4 +59,13 @@ export const WithoutDescriptions: Story = {
 
 export const Loading: Story = {
   render: () => <RegionPreviewGridLoading />,
+};
+
+export const CompactLoading: Story = {
+  render: () => (
+    <LocationPreviewGridLoading
+      label="Loading countries"
+      showDescriptions={false}
+    />
+  ),
 };
