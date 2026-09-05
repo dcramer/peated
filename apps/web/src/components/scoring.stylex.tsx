@@ -39,14 +39,22 @@ export type TastingRatingProps = {
   size?: "sm" | "md" | "lg";
 };
 
-/** Shows one tasting's named rating and range, never a five-point score. */
+/**
+ * Shows one tasting's named rating and range, never a five-point score.
+ * Small ratings keep the label and range inline for compact metadata rows.
+ */
 export function TastingRating({ band, size = "md" }: TastingRatingProps) {
   const selectedBand = RATING_BANDS.find((candidate) => candidate.key === band);
   const label = selectedBand?.label ?? "Unknown";
   const range = selectedBand?.range ?? "Unknown";
 
   return (
-    <span {...stylex.props(styles.ratingLockup)}>
+    <span
+      {...stylex.props(
+        styles.ratingLayout,
+        size === "sm" && styles.smallRatingLayout,
+      )}
+    >
       <span {...stylex.props(styles.visuallyHidden)}>
         {label} rating, {range} range
       </span>
@@ -64,7 +72,6 @@ export function TastingRating({ band, size = "md" }: TastingRatingProps) {
         aria-hidden="true"
         {...stylex.props(
           styles.tastingRatingRange,
-          size === "sm" && styles.smallTastingRatingRange,
           size === "lg" && styles.largeTastingRatingRange,
         )}
       >
@@ -94,7 +101,7 @@ export function ReviewScore({
     : `Review score, ${score} out of ${scale}`;
 
   return (
-    <span {...stylex.props(styles.ratingLockup, styles.reviewScore)}>
+    <span {...stylex.props(styles.ratingLayout, styles.reviewScore)}>
       <span {...stylex.props(styles.visuallyHidden)}>{accessibleLabel}</span>
       {rating ? (
         <span
@@ -118,14 +125,7 @@ export function ReviewScore({
         >
           {score}
         </strong>
-        <span
-          {...stylex.props(
-            styles.reviewScoreScale,
-            size === "sm" && styles.smallReviewScoreScale,
-          )}
-        >
-          /{scale}
-        </span>
+        <span {...stylex.props(styles.reviewScoreScale)}>/{scale}</span>
       </span>
     </span>
   );
@@ -491,13 +491,18 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   }),
-  ratingLockup: {
+  ratingLayout: {
     display: "inline-flex",
     flexShrink: 0,
     alignItems: "flex-end",
     flexDirection: "column",
     gap: "2px",
     whiteSpace: "nowrap",
+  },
+  smallRatingLayout: {
+    alignItems: "baseline",
+    flexDirection: "row",
+    gap: space.x1,
   },
   ratingLabel: {
     color: colors.accentDeep,
@@ -524,7 +529,6 @@ const styles = stylex.create({
     letterSpacing: "normal",
     lineHeight: 1.3,
   },
-  smallTastingRatingRange: { fontSize: "12px" },
   largeTastingRatingRange: { fontSize: "15px" },
   reviewScore: { marginLeft: "auto" },
   reviewScoreValueGroup: {
@@ -558,7 +562,6 @@ const styles = stylex.create({
     letterSpacing: "normal",
     lineHeight: 1.45,
   },
-  smallReviewScoreScale: { fontSize: "12px" },
   visuallyHidden: {
     position: "absolute",
     width: "1px",

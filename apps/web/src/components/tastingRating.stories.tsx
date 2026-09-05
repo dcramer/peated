@@ -21,6 +21,7 @@ export const Overview: Story = {
         ))}
       </StoryRow>
       <StoryRow>
+        <TastingRating band="very_good" size="sm" />
         <TastingRating band="very_good" size="lg" />
       </StoryRow>
     </StoryStack>

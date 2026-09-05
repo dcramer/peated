@@ -13,7 +13,10 @@ const meta = {
     size: "md",
   },
   argTypes: {
-    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
+    size: {
+      control: "inline-radio",
+      options: ["xs", "sm", "md", "activity", "lg", "xl"],
+    },
   },
   decorators: [
     (Story) => (
@@ -32,6 +35,7 @@ const meta = {
 | xs | Single-line library additions (24 × 32px). |
 | sm | Two-line sidebar rails (32 × 46px). |
 | md (default) | Standard rows, search, and selection (48 × 64px; 42 × 58px on mobile). |
+| activity | Tastings and reviews in the community feed. Uses a 96px square space in wide feed columns, the usual 48 × 64px space in a desktop sidebar, and 42 × 58px on mobile. The frame fits the photo without changing its shape. |
 | lg | Detail media (132 × 176px; 80 × 120px on mobile). |
 | xl | Full-width detail media with a 4:5 frame. |
 

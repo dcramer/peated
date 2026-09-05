@@ -9,9 +9,11 @@ import {
 import { ImageViewer } from "./imageViewer.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
+const NARROW_FEED = "@container (max-width: 559px)";
+const ACTIVITY_SIZE = "96px";
 const bottleIconUrl = "/assets/bottle.svg";
 
-export type BottleVisualSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type BottleVisualSize = "xs" | "sm" | "md" | "activity" | "lg" | "xl";
 
 export type BottleVisualProps = {
   expandable?: boolean;
@@ -23,8 +25,9 @@ export type BottleVisualProps = {
 /**
  * Shows a bottle image or Peated's bottle glyph when no image exists.
  * BottleIdentityRow chooses its own size. Use this primitive directly only when
- * composing another layout: sm for sidebar rows, md for standard rows, lg/xl
- * for detail media. Omit label beside visible bottle text; expandable needs a label.
+ * composing another layout: sm for sidebar rows, md for standard rows, activity
+ * for feed rows, and lg/xl for detail media. Omit label beside visible bottle
+ * text; expandable needs a label.
  * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
  * Row images load near the viewport; lg/xl detail images load immediately.
  */
@@ -55,7 +58,11 @@ export function BottleVisual({
             alt=""
             src={imageUrl}
             loading={loading}
-            {...stylex.props(styles.image, expandableImagePaddingStyles[size])}
+            {...stylex.props(
+              styles.image,
+              expandableImagePaddingStyles[size],
+              size === "activity" && styles.activityImage,
+            )}
           />
         </ImageViewer>
       ) : imageUrl ? (
@@ -63,7 +70,10 @@ export function BottleVisual({
           alt=""
           src={imageUrl}
           loading={loading}
-          {...stylex.props(styles.image)}
+          {...stylex.props(
+            styles.image,
+            size === "activity" && styles.activityImage,
+          )}
         />
       ) : (
         <span
@@ -121,6 +131,32 @@ const styles = stylex.create({
     maxHeight: bottleThumbnailMetrics.height,
     padding: space.x2,
   },
+  visualActivity: {
+    width: {
+      default: ACTIVITY_SIZE,
+      [COMPACT]: bottleThumbnailMetrics.width,
+      [NARROW_FEED]: bottleThumbnailMetrics.width,
+    },
+    maxWidth: {
+      default: ACTIVITY_SIZE,
+      [COMPACT]: bottleThumbnailMetrics.width,
+      [NARROW_FEED]: bottleThumbnailMetrics.width,
+    },
+    height: {
+      default: ACTIVITY_SIZE,
+      [COMPACT]: bottleThumbnailMetrics.height,
+      [NARROW_FEED]: bottleThumbnailMetrics.height,
+    },
+    maxHeight: {
+      default: ACTIVITY_SIZE,
+      [COMPACT]: bottleThumbnailMetrics.height,
+      [NARROW_FEED]: bottleThumbnailMetrics.height,
+    },
+    alignItems: "flex-start",
+    padding: 0,
+    backgroundColor: "transparent",
+    boxShadow: "none",
+  },
   visualLarge: {
     width: { default: "132px", [COMPACT]: "80px" },
     maxWidth: { default: "132px", [COMPACT]: "80px" },
@@ -145,6 +181,13 @@ const styles = stylex.create({
     minHeight: 0,
     objectFit: "contain",
   },
+  activityImage: {
+    width: "auto",
+    height: "auto",
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.imageBackground,
+    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
+  },
   expandableImageExtraSmall: {
     padding: "2px",
   },
@@ -153,6 +196,9 @@ const styles = stylex.create({
   },
   expandableImageMedium: {
     padding: space.x2,
+  },
+  expandableImageActivity: {
+    padding: 0,
   },
   expandableImageLarge: {
     padding: { default: space.x2, [COMPACT]: space.x1 },
@@ -180,6 +226,7 @@ const visualSizeStyles = {
   xs: styles.visualExtraSmall,
   sm: styles.visualSmall,
   md: styles.visualMedium,
+  activity: styles.visualActivity,
   lg: styles.visualLarge,
   xl: styles.visualExtraLarge,
 } satisfies Record<BottleVisualSize, stylex.StyleXStyles>;
@@ -188,6 +235,7 @@ const expandableImagePaddingStyles = {
   xs: styles.expandableImageExtraSmall,
   sm: styles.expandableImageSmall,
   md: styles.expandableImageMedium,
+  activity: styles.expandableImageActivity,
   lg: styles.expandableImageLarge,
   xl: styles.expandableImageExtraLarge,
 } satisfies Record<BottleVisualSize, stylex.StyleXStyles>;

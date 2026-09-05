@@ -33,15 +33,18 @@ export type BottleIdentityRowProps = {
     href: string;
   };
   subtitle?: ReactNode;
+  /** Activity-only review text or byline shown beside the bottle image. */
+  activityDetails?: ReactNode;
   /** Sidebar uses a small thumbnail, a two-line name, and a footer for trailing content. */
-  variant?: "standard" | "search" | "sidebar" | "compact";
+  variant?: "standard" | "activity" | "search" | "sidebar" | "compact";
   /** Tightens vertical padding when the row is nested inside another surface. */
   verticalPadding?: "sm" | "md";
 };
 
 /**
  * Bottle identity for lists and activity. Standard shows name, provenance, then
- * release facts; search tightens the title and spacing for typeahead results;
+ * release facts; activity keeps that identity with a larger feed thumbnail;
+ * search tightens the title and spacing for typeahead results;
  * sidebar uses compact titles and small thumbnails; compact shows one regular-weight
  * name line for dense lists of library additions. Sidebar names use two lines with
  * the full name in title.
@@ -52,7 +55,8 @@ export type BottleIdentityRowProps = {
  * Use layout="cell" inside an existing row/selection control. Linked cells keep
  * their link inside the bottle identity. Use linkArea="title" when the
  * surrounding card is also clickable. Compact omits provenance, metadata,
- * subtitle, status, and related releases; end remains available.
+ * subtitle, status, and related releases; end remains available. Activity may
+ * add review text below the bottle details without forcing it beneath the image.
  */
 export function BottleIdentityRow({
   align = "center",
@@ -70,12 +74,14 @@ export function BottleIdentityRow({
   provenance = [],
   relatedReleases,
   subtitle,
+  activityDetails,
   variant = "standard",
   verticalPadding = "md",
 }: BottleIdentityRowProps) {
   const compact = variant === "compact";
+  const activity = variant === "activity";
   const sidebar = variant === "sidebar";
-  const compactTitle = variant !== "standard";
+  const compactTitle = variant !== "standard" && !activity;
   const trailingContent = end ? (
     <div
       {...stylex.props(
@@ -87,11 +93,107 @@ export function BottleIdentityRow({
       {end}
     </div>
   ) : null;
+  const bottleDetails = (
+    <div {...stylex.props(styles.copy)}>
+      <div
+        {...stylex.props(
+          foundationStyles.rowTitle,
+          compactTitle && foundationStyles.compactRowTitle,
+          styles.nameLine,
+        )}
+      >
+        {href ? (
+          <AppLink
+            href={href}
+            onClick={onClick}
+            title={name}
+            {...stylex.props(
+              styles.name,
+              sidebar && styles.sidebarName,
+              compact && styles.compactName,
+              linkArea === "row"
+                ? linkedRowStyles.primaryLink
+                : styles.titleLink,
+            )}
+          >
+            <MatchedText query={query} text={name} />
+          </AppLink>
+        ) : (
+          <span
+            title={name}
+            {...stylex.props(
+              styles.name,
+              sidebar && styles.sidebarName,
+              compact && styles.compactName,
+            )}
+          >
+            <MatchedText query={query} text={name} />
+          </span>
+        )}
+        {!compact && !sidebar && isLibrary ? (
+          <MemberStatus kind="library" />
+        ) : null}
+        {!compact && !sidebar && hasTasted ? (
+          <MemberStatus kind="tasted" />
+        ) : null}
+      </div>
+      {!compact && provenance.length ? (
+        <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
+          <Join divider=" · ">
+            {provenance.map((item, index) =>
+              item.href ? (
+                <TextLink href={item.href} key={index} size="inherit">
+                  {item.name}
+                </TextLink>
+              ) : (
+                <span key={index}>{item.name}</span>
+              ),
+            )}
+          </Join>
+        </div>
+      ) : null}
+      {!compact && subtitle ? (
+        <div
+          title={getTextTitle(subtitle)}
+          {...stylex.props(foundationStyles.metadata, styles.subtitle)}
+        >
+          {subtitle}
+        </div>
+      ) : null}
+      {!compact && metadata.length ? (
+        <div
+          title={metadata.join(" · ")}
+          {...stylex.props(foundationStyles.metadata, styles.metadata)}
+        >
+          {metadata.map((item, index) => (
+            <span key={`${item}-${index}`}>
+              {index ? <span aria-hidden="true"> · </span> : null}
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      {!compact && relatedReleases && relatedReleases.count > 1 ? (
+        <AppLink
+          href={relatedReleases.href}
+          {...stylex.props(
+            foundationStyles.interactiveSmall,
+            styles.relatedReleases,
+            linkedRowStyles.nestedAction,
+          )}
+        >
+          {relatedReleases.count.toLocaleString("en-US")} related releases
+        </AppLink>
+      ) : null}
+      {sidebar ? trailingContent : null}
+    </div>
+  );
   return (
     <div
       {...stylex.props(
         styles.row,
         verticalPadding === "sm" && styles.smallVerticalPadding,
+        activity && styles.activityRow,
         variant === "search" && styles.searchRow,
         sidebar && styles.sidebarRow,
         compact && styles.compactRow,
@@ -106,102 +208,24 @@ export function BottleIdentityRow({
     >
       <BottleVisual
         imageUrl={imageUrl}
-        size={compact ? "xs" : sidebar ? "sm" : "md"}
+        size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}
       />
-      <div {...stylex.props(styles.copy)}>
-        <div
-          {...stylex.props(
-            foundationStyles.rowTitle,
-            compactTitle && foundationStyles.compactRowTitle,
-            styles.nameLine,
-          )}
-        >
-          {href ? (
-            <AppLink
-              href={href}
-              onClick={onClick}
-              title={name}
-              {...stylex.props(
-                styles.name,
-                sidebar && styles.sidebarName,
-                compact && styles.compactName,
-                linkArea === "row"
-                  ? linkedRowStyles.primaryLink
-                  : styles.titleLink,
-              )}
-            >
-              <MatchedText query={query} text={name} />
-            </AppLink>
-          ) : (
-            <span
-              title={name}
-              {...stylex.props(
-                styles.name,
-                sidebar && styles.sidebarName,
-                compact && styles.compactName,
-              )}
-            >
-              <MatchedText query={query} text={name} />
-            </span>
-          )}
-          {!compact && !sidebar && isLibrary ? (
-            <MemberStatus kind="library" />
-          ) : null}
-          {!compact && !sidebar && hasTasted ? (
-            <MemberStatus kind="tasted" />
+      {activity ? (
+        <div {...stylex.props(styles.activityBody)}>
+          <div {...stylex.props(styles.activitySummary)}>
+            {bottleDetails}
+            {trailingContent}
+          </div>
+          {activityDetails ? (
+            <div {...stylex.props(styles.activityDetails)}>
+              {activityDetails}
+            </div>
           ) : null}
         </div>
-        {!compact && provenance.length ? (
-          <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
-            <Join divider=" · ">
-              {provenance.map((item, index) =>
-                item.href ? (
-                  <TextLink href={item.href} key={index} size="inherit">
-                    {item.name}
-                  </TextLink>
-                ) : (
-                  <span key={index}>{item.name}</span>
-                ),
-              )}
-            </Join>
-          </div>
-        ) : null}
-        {!compact && subtitle ? (
-          <div
-            title={getTextTitle(subtitle)}
-            {...stylex.props(foundationStyles.metadata, styles.subtitle)}
-          >
-            {subtitle}
-          </div>
-        ) : null}
-        {!compact && metadata.length ? (
-          <div
-            title={metadata.join(" · ")}
-            {...stylex.props(foundationStyles.metadata, styles.metadata)}
-          >
-            {metadata.map((item, index) => (
-              <span key={`${item}-${index}`}>
-                {index ? <span aria-hidden="true"> · </span> : null}
-                {item}
-              </span>
-            ))}
-          </div>
-        ) : null}
-        {!compact && relatedReleases && relatedReleases.count > 1 ? (
-          <AppLink
-            href={relatedReleases.href}
-            {...stylex.props(
-              foundationStyles.interactiveSmall,
-              styles.relatedReleases,
-              linkedRowStyles.nestedAction,
-            )}
-          >
-            {relatedReleases.count.toLocaleString("en-US")} related releases
-          </AppLink>
-        ) : null}
-        {sidebar ? trailingContent : null}
-      </div>
-      {!sidebar ? trailingContent : null}
+      ) : (
+        bottleDetails
+      )}
+      {!activity && !sidebar ? trailingContent : null}
     </div>
   );
 }
@@ -227,6 +251,26 @@ const styles = stylex.create({
   smallVerticalPadding: {
     paddingTop: space.x2,
     paddingBottom: space.x2,
+  },
+  activityRow: {
+    alignItems: "flex-start",
+    paddingTop: space.x1,
+    paddingBottom: 0,
+  },
+  activityBody: {
+    display: "flex",
+    minWidth: 0,
+    flex: 1,
+    flexDirection: "column",
+  },
+  activitySummary: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "flex-start",
+    gap: space.x3,
+  },
+  activityDetails: {
+    marginTop: space.x3,
   },
   searchRow: {
     paddingTop: space.x2,
