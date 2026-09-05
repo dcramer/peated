@@ -80,9 +80,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
           />
           <div {...stylex.props(foundationStyles.metadata, styles.context)}>
             {item.actorHref ? (
-              <TextLink href={item.actorHref} size="inherit">
-                {item.actor}
-              </TextLink>
+              <TextLink href={item.actorHref}>{item.actor}</TextLink>
             ) : (
               <strong>{item.actor}</strong>
             )}{" "}
@@ -109,7 +107,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                     {item.destination.label}
                   </CardPrimaryLink>
                 ) : (
-                  <TextLink href={item.destination.href} size="inherit">
+                  <TextLink href={item.destination.href}>
                     {item.destination.label}
                   </TextLink>
                 )}

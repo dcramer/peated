@@ -68,7 +68,7 @@ export function BottleCheckSubject({
 }) {
   if (check.bottleId) {
     return (
-      <TextLink href={`/bottles/${check.bottleId}`} size="inherit">
+      <TextLink href={`/bottles/${check.bottleId}`}>
         Bottle #{check.bottleId}
       </TextLink>
     );

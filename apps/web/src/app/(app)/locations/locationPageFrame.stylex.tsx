@@ -69,9 +69,7 @@ export function LocationPageFrame({
           description={description}
           parent={
             country ? (
-              <TextLink href={country.href} size="inherit">
-                {country.name}
-              </TextLink>
+              <TextLink href={country.href}>{country.name}</TextLink>
             ) : undefined
           }
           title={location.name}

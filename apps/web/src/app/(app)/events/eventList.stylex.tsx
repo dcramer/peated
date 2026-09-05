@@ -24,7 +24,6 @@ export function EventList({ events }: { events: Event[] }) {
                   <TextLink
                     href={event.website}
                     rel="noreferrer"
-                    size="inherit"
                     target="_blank"
                   >
                     {event.name}

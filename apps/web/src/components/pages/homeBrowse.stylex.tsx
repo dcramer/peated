@@ -53,7 +53,7 @@ export function HomeHighestRated({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <TextLink href="/bottles?sort=-score&minScore=0">
+          <TextLink href="/bottles?sort=-score&minScore=0" size="sm">
             All {totalRated.toLocaleString("en-US")} rated{" "}
             <span aria-hidden="true">→</span>
           </TextLink>
@@ -81,7 +81,7 @@ export function HomeLatestReleases({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <TextLink href={seeAllHref}>
+          <TextLink href={seeAllHref} size="sm">
             View all <span aria-hidden="true">→</span>
           </TextLink>
         }
@@ -99,7 +99,7 @@ export function HomeActivityFeed({ children }: { children: ReactNode }) {
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <TextLink href="/activity">
+          <TextLink href="/activity" size="sm">
             View all <span aria-hidden="true">→</span>
           </TextLink>
         }
@@ -140,7 +140,7 @@ export function HomeOrigins({
     <section {...stylex.props(styles.section)}>
       <HomeModuleHeading
         action={
-          <TextLink href="/locations">
+          <TextLink href="/locations" size="sm">
             Open the map <span aria-hidden="true">→</span>
           </TextLink>
         }

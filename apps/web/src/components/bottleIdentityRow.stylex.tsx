@@ -142,7 +142,7 @@ export function BottleIdentityRow({
           <Join divider=" · ">
             {provenance.map((item, index) =>
               item.href ? (
-                <TextLink href={item.href} key={index} size="inherit">
+                <TextLink href={item.href} key={index}>
                   {item.name}
                 </TextLink>
               ) : (

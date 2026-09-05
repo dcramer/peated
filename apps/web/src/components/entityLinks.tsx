@@ -21,7 +21,7 @@ export function EntityLinks({
   return (
     <Join divider=", ">
       {entities.map((entity) => (
-        <TextLink href={getEntityUrl(entity)} key={entity.id} size="inherit">
+        <TextLink href={getEntityUrl(entity)} key={entity.id}>
           {entity.name}
         </TextLink>
       ))}

@@ -391,9 +391,7 @@ export function ReviewScoringForm({ settings, onPreview, onSave }: Props) {
                   key: "review",
                   header: "Review",
                   cell: (sample) => (
-                    <TextLink href={sample.url} size="inherit">
-                      {sample.name}
-                    </TextLink>
+                    <TextLink href={sample.url}>{sample.name}</TextLink>
                   ),
                 },
                 {

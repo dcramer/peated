@@ -15,6 +15,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+export const Overview: Story = {
+  render: (args) => (
+    <StoryStack>
+      <p>
+        Body copy with an <TextLink {...args}>inherited-size link</TextLink>.
+      </p>
+      <TextLink href="#compact" size="sm">
+        Compact standalone action
+      </TextLink>
+      <TextLink href="/about/tasting-wheel" tone="muted">
+        Muted supporting reference
+      </TextLink>
+    </StoryStack>
+  ),
+};
+
 export const InteractionStates: Story = {
   render: (args) => (
     <StoryStack>
@@ -31,13 +47,6 @@ export const InteractionStates: Story = {
       <TextLink href="/about/tasting-wheel" tone="muted">
         About the tasting wheel
       </TextLink>
-      <p>
-        Body copy with an{" "}
-        <TextLink href="#inherited" size="inherit">
-          inherited-size link
-        </TextLink>
-        .
-      </p>
     </StoryStack>
   ),
   parameters: {

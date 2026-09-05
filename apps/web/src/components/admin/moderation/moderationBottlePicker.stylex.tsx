@@ -161,12 +161,7 @@ export default function ModerationBottlePicker({
               <>
                 {" "}
                 Source:{" "}
-                <TextLink
-                  href={source}
-                  rel="noreferrer"
-                  size="inherit"
-                  target="_blank"
-                >
+                <TextLink href={source} rel="noreferrer" target="_blank">
                   {source}
                 </TextLink>
                 .

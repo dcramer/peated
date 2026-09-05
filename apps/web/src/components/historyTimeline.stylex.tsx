@@ -67,7 +67,6 @@ export function HistoryTimeline({ events, summary }: HistoryTimelineProps) {
                   <TextLink
                     href={event.source.href}
                     rel="noreferrer"
-                    size="inherit"
                     target="_blank"
                   >
                     {event.source.label ?? "Source"}

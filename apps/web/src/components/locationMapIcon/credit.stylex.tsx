@@ -9,17 +9,11 @@ export function RegionMapCredit() {
   return (
     <p {...stylex.props(foundationStyles.metadata, styles.credit)}>
       Maps adapted from{" "}
-      <TextLink
-        href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg"
-        size="inherit"
-      >
+      <TextLink href="https://commons.wikimedia.org/wiki/File:Scotch_regions.svg">
         Briangotts and Interiot
       </TextLink>
       {" · "}
-      <TextLink
-        href="https://creativecommons.org/licenses/by-sa/3.0/"
-        size="inherit"
-      >
+      <TextLink href="https://creativecommons.org/licenses/by-sa/3.0/">
         CC BY-SA 3.0
       </TextLink>
     </p>

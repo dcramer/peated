@@ -65,9 +65,7 @@ export function CriticReview({
               {byline ? <span>{byline}</span> : null}
               {byline && href ? <span aria-hidden="true"> · </span> : null}
               {href ? (
-                <TextLink href={href} size="inherit">
-                  Read at {publication} ↗
-                </TextLink>
+                <TextLink href={href}>Read at {publication} ↗</TextLink>
               ) : null}
             </div>
           ) : null}
