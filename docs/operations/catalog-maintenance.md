@@ -214,6 +214,27 @@ pnpm cli api get '/bottles/123/aliases'
 pnpm cli api get '/bottle-references?bottle=123&limit=100'
 ```
 
+When evidence proves an existing Bottle reference is wrong, correct it by its
+stable reference ID. First read `GET /bottle-references/789`, then include its
+current `bottleId` and `ignored` values as `expectedBottle` and
+`expectedIgnored`. Set `bottle` to the verified replacement, or to `null` when
+the name is ambiguous. Set `ignored` to `true` only for an unassigned name that
+automated maintenance should not reconsider. The server rejects stale state and
+preserves consumers assigned to another Bottle.
+
+```json
+{
+  "expectedBottle": 123,
+  "expectedIgnored": false,
+  "bottle": 456,
+  "ignored": false
+}
+```
+
+Send that body with `PATCH /bottle-references/789`. Re-fetch the reference and
+both Bottle reference lists after the write. Also verify exact-name prices and
+reviews when any exist.
+
 Follow `rel.nextCursor` until every page is loaded. Before a write, check the
 live [full OpenAPI specification](https://api.peated.com/spec-full.json). Do not
 rely on a stale checkout or an old request shape.

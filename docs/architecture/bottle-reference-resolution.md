@@ -127,6 +127,18 @@ customer search. It does not resolve ingestion or move existing consumers. The
 same alias text can belong to more than one Bottle. Bottle details show these
 names as “Also known as.”
 
+A moderator may correct an accepted reference by its stable reference ID. The
+write must include the Bottle ID and ignored state observed before the
+correction, including `null` for an unresolved reference. A stale value fails
+instead of overwriting another decision. Reassignment moves exact-name prices
+and reviews still using the observed Bottle, plus unresolved exact-name
+consumers. Unassignment moves only exact-name consumers still using the
+observed Bottle back to `null`. An intentionally ambiguous or invalid reference
+may also be marked ignored so automated maintenance does not reconsider it.
+Consumers assigned to any other Bottle stay unchanged. An ignored reference
+cannot remain assigned, and a current Bottle full name cannot be reassigned or
+unassigned.
+
 ## Resolution Pipeline
 
 All source-reference workflows follow the same conceptual pipeline:
@@ -238,6 +250,8 @@ separate inventory, migration plan, and database verification.
 Deterministic coverage should prove:
 
 - exact accepted references resolve one Bottle;
+- moderator corrections reject stale state, preserve unrelated assignments,
+  and protect current Bottle names;
 - the shared server classifier entry point returns that accepted Bottle without
   a model call;
 - general references resolve the retained general Bottle without selecting a

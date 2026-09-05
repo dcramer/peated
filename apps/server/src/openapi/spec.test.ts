@@ -555,6 +555,12 @@ describe("OpenAPI generation ($ref reuse)", () => {
     const upsertRequest = getJsonRequestSchema(
       spec.paths?.["/bottle-references"]?.put,
     );
+    const updateRequest = getJsonRequestSchema(
+      spec.paths?.["/bottle-references/{reference}"]?.patch,
+    );
+    const detailsResponse = getJsonResponseSchema(
+      spec.paths?.["/bottle-references/{reference}"]?.get,
+    );
 
     expect(Object.keys(listItem?.properties ?? {})).toEqual([
       "id",
@@ -578,6 +584,34 @@ describe("OpenAPI generation ($ref reuse)", () => {
     ]);
     expect(upsertRequest?.required).toEqual(["bottle", "name"]);
     expect(JSON.stringify(upsertRequest)).not.toContain("target");
+    expect(Object.keys(updateRequest?.properties ?? {})).toEqual([
+      "expectedBottle",
+      "expectedIgnored",
+      "bottle",
+      "ignored",
+    ]);
+    expect(updateRequest?.required).toEqual([
+      "expectedBottle",
+      "expectedIgnored",
+      "bottle",
+      "ignored",
+    ]);
+    expect(Object.keys(detailsResponse?.properties ?? {})).toEqual([
+      "id",
+      "name",
+      "createdAt",
+      "bottleId",
+      "ignored",
+      "assignmentSource",
+      "assignedByActorId",
+    ]);
+    expect(
+      spec.paths?.["/bottle-references/{reference}"]?.patch?.parameters,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "reference", in: "path" }),
+      ]),
+    );
   });
 
   it("publishes Bottle aliases as display records owned by one Bottle", async () => {

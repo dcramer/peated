@@ -140,6 +140,33 @@ export class BottleReferenceIdentityChangedError extends Error {
   }
 }
 
+export class BottleReferenceNotFoundError extends Error {
+  constructor(readonly referenceId: number) {
+    super(`Bottle reference ${referenceId} was not found.`);
+    this.name = "BottleReferenceNotFoundError";
+  }
+}
+
+export class StaleBottleReferenceCorrectionError extends Error {
+  constructor(
+    readonly referenceId: number,
+    readonly expectedBottleId: number | null,
+    readonly actualBottleId: number | null,
+    readonly expectedIgnored: boolean,
+    readonly actualIgnored: boolean,
+  ) {
+    super(`Bottle reference ${referenceId} changed before it was corrected.`);
+    this.name = "StaleBottleReferenceCorrectionError";
+  }
+}
+
+export class CanonicalBottleReferenceCorrectionError extends Error {
+  constructor(readonly referenceId: number) {
+    super("A Bottle's current full name cannot be reassigned or unassigned.");
+    this.name = "CanonicalBottleReferenceCorrectionError";
+  }
+}
+
 export type BottleReferenceReviewIdentitySnapshot = Pick<
   typeof externalReviews.$inferSelect,
   "id" | "name" | "bottleId"
@@ -859,4 +886,199 @@ export async function assignBottleReference(
   await finalizeBottleReferenceAssignment(result, contexts);
 
   return result;
+}
+
+export type BottleReferenceCorrectionInput = {
+  referenceId: number;
+  expectedBottleId: number | null;
+  expectedIgnored: boolean;
+  bottleId: number | null;
+  ignored: boolean;
+  assignedByActorId: number;
+};
+
+export type BottleReferenceCorrectionResult = {
+  id: number;
+  name: string;
+  createdAt: Date;
+  bottleId: number | null;
+  ignored: boolean;
+  assignmentSource: BottleReferenceAssignmentSource;
+  assignedByActorId: number;
+};
+
+/** Corrects one accepted reference and only consumers that still use its old identity. */
+export async function correctBottleReference(
+  {
+    referenceId,
+    expectedBottleId,
+    expectedIgnored,
+    bottleId,
+    ignored,
+    assignedByActorId,
+  }: BottleReferenceCorrectionInput,
+  contexts?: SentryLogContexts,
+): Promise<BottleReferenceCorrectionResult> {
+  const result = await db.transaction(async (tx) => {
+    if (bottleId !== null) {
+      await lockActiveBottleInTransaction(tx, bottleId);
+    }
+
+    const [reference] = await tx
+      .select({
+        id: bottleReferences.id,
+        name: bottleReferences.name,
+        createdAt: bottleReferences.createdAt,
+        bottleId: bottleReferences.bottleId,
+        ignored: bottleReferences.ignored,
+        assignmentSource: bottleReferences.assignmentSource,
+        assignedByActorId: bottleReferences.assignedByActorId,
+      })
+      .from(bottleReferences)
+      .where(eq(bottleReferences.id, referenceId))
+      .limit(1)
+      .for("update");
+    if (!reference) {
+      throw new BottleReferenceNotFoundError(referenceId);
+    }
+
+    const currentIgnored = reference.ignored === true;
+    if (
+      reference.bottleId !== expectedBottleId ||
+      currentIgnored !== expectedIgnored
+    ) {
+      throw new StaleBottleReferenceCorrectionError(
+        referenceId,
+        expectedBottleId,
+        reference.bottleId,
+        expectedIgnored,
+        currentIgnored,
+      );
+    }
+    if (reference.bottleId === bottleId && currentIgnored === ignored) {
+      return {
+        reference: {
+          id: reference.id,
+          name: reference.name,
+          createdAt: reference.createdAt,
+          bottleId: reference.bottleId,
+          ignored: currentIgnored,
+          assignmentSource: reference.assignmentSource,
+          assignedByActorId: reference.assignedByActorId,
+        },
+        previousBottleId: reference.bottleId,
+        changed: false,
+      };
+    }
+
+    if (reference.bottleId !== null) {
+      const sourceBottle = await tx.query.bottles.findFirst({
+        where: eq(bottles.id, reference.bottleId),
+        columns: { fullName: true },
+      });
+      if (
+        sourceBottle?.fullName.toLowerCase() === reference.name.toLowerCase()
+      ) {
+        throw new CanonicalBottleReferenceCorrectionError(referenceId);
+      }
+    }
+
+    const previousBottleId = reference.bottleId;
+    const lookupName = reference.name.toLowerCase();
+    const priorPriceIdentity =
+      previousBottleId === null
+        ? isNull(storePrices.bottleId)
+        : or(
+            isNull(storePrices.bottleId),
+            eq(storePrices.bottleId, previousBottleId),
+          );
+    const priorReviewIdentity =
+      previousBottleId === null
+        ? isNull(externalReviews.bottleId)
+        : or(
+            isNull(externalReviews.bottleId),
+            eq(externalReviews.bottleId, previousBottleId),
+          );
+
+    await tx
+      .update(storePrices)
+      .set({ bottleId })
+      .where(
+        and(
+          eq(sql`LOWER(${storePrices.name})`, lookupName),
+          bottleId === null && previousBottleId !== null
+            ? eq(storePrices.bottleId, previousBottleId)
+            : priorPriceIdentity,
+        ),
+      );
+    await tx
+      .update(externalReviews)
+      .set({ bottleId })
+      .where(
+        and(
+          eq(sql`LOWER(${externalReviews.name})`, lookupName),
+          bottleId === null && previousBottleId !== null
+            ? eq(externalReviews.bottleId, previousBottleId)
+            : priorReviewIdentity,
+        ),
+      );
+
+    const [updatedReference] = await tx
+      .update(bottleReferences)
+      .set({
+        bottleId,
+        ignored,
+        embedding: null,
+        assignmentSource: "human_approved",
+        assignedByActorId,
+        reviewedAt: null,
+        reviewedByActorId: null,
+      })
+      .where(eq(bottleReferences.id, reference.id))
+      .returning({
+        id: bottleReferences.id,
+        name: bottleReferences.name,
+        createdAt: bottleReferences.createdAt,
+        bottleId: bottleReferences.bottleId,
+        ignored: bottleReferences.ignored,
+        assignmentSource: bottleReferences.assignmentSource,
+        assignedByActorId: bottleReferences.assignedByActorId,
+      });
+    if (!updatedReference) {
+      throw new FailedToSaveBottleReferenceError();
+    }
+
+    return {
+      reference: {
+        ...updatedReference,
+        ignored: updatedReference.ignored === true,
+      },
+      previousBottleId,
+      changed: true,
+    };
+  });
+
+  if (result.changed) {
+    try {
+      await pushJob("IndexBottleReference", { name: result.reference.name });
+    } catch (err) {
+      logError(err, contexts);
+    }
+
+    for (const changedBottleId of new Set(
+      [result.previousBottleId, result.reference.bottleId].filter(
+        (value): value is number => value !== null,
+      ),
+    )) {
+      try {
+        await pushUniqueJob("IndexBottleSearchVectors", {
+          bottleId: changedBottleId,
+        });
+      } catch (err) {
+        logError(err, contexts);
+      }
+    }
+  }
+
+  return result.reference;
 }
