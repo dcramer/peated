@@ -177,6 +177,78 @@ test("parses supplied detail pages with the production parser", async () => {
   ]);
 });
 
+test("checks catalog detail pages without returning publisher prose", async () => {
+  const textField = (selector: string) => ({
+    try: [
+      {
+        get: "text" as const,
+        selector,
+        take: "first" as const,
+        startsWith: null,
+        clean: null,
+      },
+    ],
+  });
+  const rules = {
+    kind: "catalog",
+    products: {
+      oneProductPer: "article.product",
+      link: "a[href]",
+      skipWhen: null,
+      nextPage: null,
+      limit: 10,
+    },
+    product: {
+      name: textField("h1"),
+      url: null,
+      externalProductId: null,
+      imageUrl: null,
+      volume: null,
+      abv: textField(".abv"),
+      statedAge: null,
+      edition: null,
+      releaseYear: null,
+    },
+  } as const satisfies ScrapeRules;
+  const detailPages = await checkDetailPages({
+    rules,
+    listPage: {
+      url: "https://example.test/whisky",
+      html: '<article class="product"><a href="/whisky/one">One</a></article>',
+      links: ["https://example.test/whisky/one"],
+      firstPageLinks: ["https://example.test/whisky/one"],
+      nextPageUrl: null,
+      nextPage: null,
+    },
+    suppliedPages: [
+      {
+        url: "https://example.test/whisky/one",
+        html: '<h1>Official Release</h1><span class="abv">46%</span><p class="description">Publisher prose.</p>',
+      },
+    ],
+    loadPage: async () => {
+      throw new Error("A supplied detail page must not be fetched again.");
+    },
+  });
+
+  expect(detailPages).toMatchObject([
+    {
+      output: {
+        kind: "catalog",
+        products: [
+          {
+            name: "Official Release",
+            sourceBottleIdentity: { abv: 46 },
+          },
+        ],
+      },
+    },
+  ]);
+  expect(JSON.stringify(detailPages.map(({ output }) => output))).not.toContain(
+    "Publisher prose",
+  );
+});
+
 test("keeps complete review text in the checked output", async () => {
   const reviewText = "Long review sentence. ".repeat(100);
   const detailPages = await checkDetailPages({

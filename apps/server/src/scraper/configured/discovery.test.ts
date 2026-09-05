@@ -37,6 +37,16 @@ test("uses store terms only for price sources", () => {
   ).toEqual(["https://example.test/collections/whisky"]);
 });
 
+test("uses producer range terms for catalog sources", () => {
+  expect(
+    findLikelyListPages({
+      kind: "catalog",
+      pageUrl: new URL("https://example.test/"),
+      html: '<a href="/news">News</a><a href="/our-whisky/range">Our whisky range</a>',
+    }),
+  ).toEqual(["https://example.test/our-whisky/range"]);
+});
+
 test("limits detail pages found in list-page cards", () => {
   const result = findLikelyDetailPages({
     kind: "review",

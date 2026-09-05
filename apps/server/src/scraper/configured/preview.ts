@@ -1,3 +1,4 @@
+import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
@@ -54,9 +55,29 @@ const PricePageSchema = z
   })
   .strict();
 
+const CatalogPageSchema = z
+  .object({
+    kind: z.literal("catalog"),
+    url: z.url(),
+    products: z.array(
+      z
+        .object({
+          externalProductId: z.string().nullable(),
+          name: z.string(),
+          url: z.url(),
+          imageUrl: z.url().nullable(),
+          volume: z.number().int().positive().nullable(),
+          sourceBottleIdentity: BottleExtractedDetailsSchema.nullable(),
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+
 export const ScrapeSourcePreviewPageSchema = z.discriminatedUnion("kind", [
   ReviewPageSchema,
   PricePageSchema,
+  CatalogPageSchema,
 ]);
 
 export const ScrapeSourcePreviewResultSchema = z

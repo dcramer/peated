@@ -9,10 +9,14 @@ import {
   scrapeTargets,
 } from "@peated/server/db/schema";
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
-import { StorePriceInputSchema } from "@peated/server/schemas";
+import {
+  CatalogListingInputSchema,
+  StorePriceInputSchema,
+} from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { ScraperHttpStatusError } from "../http";
+import { catalogListingSink } from "../sinks/catalogListings";
 import { externalReviewSink } from "../sinks/externalReviews";
 import { createStorePriceSink } from "../sinks/storePrices";
 import type {
@@ -77,7 +81,7 @@ function registryForSource(
 
 function createPreviewPage(
   observation: ScraperObservation<unknown>,
-  kind: "review" | "price",
+  kind: "review" | "price" | "catalog",
   url: string,
 ): ScrapeSourcePreviewPage {
   if (kind === "review") {
@@ -92,6 +96,23 @@ function createPreviewPage(
         reviewerName: review.reviewerName ?? null,
         nativeScore: review.nativeScore ?? null,
       })),
+    };
+  }
+  if (kind === "catalog") {
+    return {
+      kind,
+      url,
+      products: z
+        .array(CatalogListingInputSchema)
+        .parse(observation.value)
+        .map((product) => ({
+          externalProductId: product.externalProductId ?? null,
+          name: product.name,
+          url: product.url,
+          imageUrl: product.imageUrl ?? null,
+          volume: product.volume ?? null,
+          sourceBottleIdentity: product.sourceBottleIdentity ?? null,
+        })),
     };
   }
   return {
@@ -144,6 +165,12 @@ const ConfiguredScrapeCursorSchema = z
   .strict();
 
 type ConfiguredScrapeCursor = z.infer<typeof ConfiguredScrapeCursorSchema>;
+
+function observationSchemaForRules(rules: StoredScrapeRules) {
+  if (rules.kind === "review") return ExternalReviewArticleIngestionSchema;
+  if (rules.kind === "catalog") return z.array(CatalogListingInputSchema);
+  return z.array(StorePriceInputSchema);
+}
 
 function createScrapeSourceAdapter(
   input: {
@@ -290,10 +317,7 @@ export function createLocalScrapeSourcePreview(input: {
     requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
-    observationSchema:
-      input.rules.kind === "review"
-        ? ExternalReviewArticleIngestionSchema
-        : z.array(StorePriceInputSchema),
+    observationSchema: observationSchemaForRules(input.rules),
     adapter: createScrapeSourceAdapter({
       targetKey: input.targetKey,
       listUrl: input.listUrl,
@@ -314,10 +338,7 @@ function createScrapeSourceDefinition(input: {
   purpose: "collect" | "preview";
   rules: StoredScrapeRules;
 }): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
-  const observationSchema =
-    input.rules.kind === "review"
-      ? ExternalReviewArticleIngestionSchema
-      : z.array(StorePriceInputSchema);
+  const observationSchema = observationSchemaForRules(input.rules);
   const sink: ScraperSink<unknown> =
     input.purpose === "preview"
       ? async () => {}
@@ -333,15 +354,29 @@ function createScrapeSourceDefinition(input: {
               },
             });
           }
-        : async ({ externalSiteId, observation }) => {
-            await createStorePriceSink(input.siteKey)({
-              externalSiteId,
-              observation: {
-                ...observation,
-                value: z.array(StorePriceInputSchema).parse(observation.value),
-              },
-            });
-          };
+        : input.rules.kind === "catalog"
+          ? async ({ externalSiteId, observation }) => {
+              await catalogListingSink({
+                externalSiteId,
+                observation: {
+                  ...observation,
+                  value: z
+                    .array(CatalogListingInputSchema)
+                    .parse(observation.value),
+                },
+              });
+            }
+          : async ({ externalSiteId, observation }) => {
+              await createStorePriceSink(input.siteKey)({
+                externalSiteId,
+                observation: {
+                  ...observation,
+                  value: z
+                    .array(StorePriceInputSchema)
+                    .parse(observation.value),
+                },
+              });
+            };
 
   const adapter =
     input.purpose === "preview"

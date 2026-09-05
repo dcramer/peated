@@ -1,12 +1,20 @@
 import { db } from "@peated/server/db";
 import {
+  bottleGroups,
+  bottleObservations,
+  bottleReferences,
+  bottleSeries,
+  bottles,
+  catalogListings,
   externalReviewArticles,
   externalReviewBodies,
+  externalReviews,
   externalSiteRuns,
   scrapeOrigins,
   scrapeSourceRevisions,
   scrapeSourceRuns,
   scrapeTargets,
+  storePrices,
   users,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -119,6 +127,124 @@ function reviewRules(titleSelector = "h1", paginate = false) {
   } as const satisfies ScrapeRules;
 }
 
+function catalogRules() {
+  const field = (selector: string, attribute?: string) => ({
+    try: [
+      attribute
+        ? {
+            get: "attribute" as const,
+            selector,
+            attribute,
+            clean: null,
+          }
+        : {
+            get: "text" as const,
+            selector,
+            take: "first" as const,
+            startsWith: null,
+            clean: null,
+          },
+    ],
+  });
+  return {
+    kind: "catalog",
+    products: {
+      oneProductPer: "article.product",
+      link: "a[href]",
+      skipWhen: null,
+      nextPage: null,
+      limit: 5,
+    },
+    product: {
+      name: field("h1"),
+      url: null,
+      externalProductId: field("[data-product-id]", "data-product-id"),
+      imageUrl: null,
+      volume: field(".volume"),
+      abv: field(".abv"),
+      statedAge: null,
+      edition: null,
+      releaseYear: null,
+    },
+  } as const satisfies ScrapeRules;
+}
+
+async function setupCatalogSource() {
+  const [user] = await db
+    .insert(users)
+    .values({
+      username: "catalog-admin",
+      email: "catalog-admin@example.com",
+      admin: true,
+    })
+    .returning();
+  if (!user) throw new Error("Failed to create user.");
+  const { site, source } = await createSiteWithScrapeSource({
+    name: "Official Catalog",
+    kind: "catalog",
+    websiteUrl: "https://catalog.example/whisky",
+    createdById: user.id,
+  });
+  const revision = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    author: "person",
+    createdById: user.id,
+    rules: catalogRules(),
+  });
+  await db
+    .update(scrapeOrigins)
+    .set({
+      robotsMode: "not_applicable",
+      robotsRationale: "Reserved test origin has no network operator.",
+    })
+    .where(eq(scrapeOrigins.origin, "https://catalog.example"));
+  return { revision, site, source, user };
+}
+
+function catalogFetch(name = "Official Release") {
+  return vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/whisky") {
+      return new Response(
+        '<article class="product"><a href="/whisky/release">Release</a></article>',
+      );
+    }
+    if (url.pathname === "/whisky/release") {
+      return new Response(
+        `<main data-product-id="official-1"><h1>${name}</h1><span class="volume">70 cl</span><span class="abv">46% ABV</span><p class="description">Publisher prose.</p></main>`,
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  });
+}
+
+function catalogProductsFetch(
+  products: Array<{ id: string; name: string; slug: string }>,
+) {
+  return vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/whisky") {
+      return new Response(
+        products
+          .map(
+            ({ name, slug }) =>
+              `<article class="product"><a href="/whisky/${slug}">${name}</a></article>`,
+          )
+          .join(""),
+      );
+    }
+    const product = products.find(
+      ({ slug }) => url.pathname === `/whisky/${slug}`,
+    );
+    if (product) {
+      return new Response(
+        `<main data-product-id="${product.id}"><h1>${product.name}</h1><span class="volume">70 cl</span><span class="abv">46% ABV</span></main>`,
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  });
+}
+
 async function setupSource(titleSelector = "h1", paginate = false) {
   const [user] = await db
     .insert(users)
@@ -213,6 +339,176 @@ test("runs preview through the normal request controls without product writes", 
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, pinned.run.id));
   expect(run).toMatchObject({ status: "succeeded", emittedItemCount: 0 });
+});
+
+test("previews an official catalog without writing listings", async () => {
+  const { revision, site, source, user } = await setupCatalogSource();
+  const pinned = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: site.id,
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+    requestedById: user.id,
+    trigger: "manual",
+    purpose: "preview",
+  });
+
+  await expect(
+    executeScraperRun(
+      { runId: pinned.run.id },
+      {
+        registry: createScraperRegistry({ targets: [], sources: [] }),
+        fetchImpl: catalogFetch(),
+        clock: fixedClock(),
+        executionToken: "catalog-preview-owner",
+      },
+    ),
+  ).resolves.toEqual({ status: "completed" });
+
+  const [storedRevision] = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision?.previewResult).toMatchObject({
+    issues: [],
+    pages: [
+      {
+        kind: "catalog",
+        products: [
+          {
+            externalProductId: "official-1",
+            name: "Official Release",
+            volume: 700,
+          },
+        ],
+      },
+    ],
+  });
+  expect(JSON.stringify(storedRevision?.previewResult)).not.toContain(
+    "Publisher prose",
+  );
+  expect(await db.select().from(catalogListings)).toHaveLength(0);
+  expect(await db.select().from(bottles)).toHaveLength(0);
+  expect(await db.select().from(bottleGroups)).toHaveLength(0);
+  expect(await db.select().from(bottleSeries)).toHaveLength(0);
+  expect(await db.select().from(bottleReferences)).toHaveLength(0);
+  expect(await db.select().from(bottleObservations)).toHaveLength(0);
+  expect(await db.select().from(externalReviewArticles)).toHaveLength(0);
+  expect(await db.select().from(externalReviews)).toHaveLength(0);
+  expect(await db.select().from(externalReviewBodies)).toHaveLength(0);
+  expect(await db.select().from(storePrices)).toHaveLength(0);
+});
+
+test("collects and updates only catalog listings", async () => {
+  const { revision, site, source, user } = await setupCatalogSource();
+  await recordScrapeSourcePreview({
+    revisionId: revision.id,
+    status: "passed",
+    result: { issues: [], pages: [] },
+  });
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+  });
+
+  for (const [index, name] of [
+    "Official Release",
+    "Updated Official Release",
+  ].entries()) {
+    const pinned = await createPinnedScrapeSourceRun(db, {
+      externalSiteId: site.id,
+      requestedById: user.id,
+      trigger: "manual",
+      purpose: "collect",
+    });
+    await expect(
+      executeScraperRun(
+        { runId: pinned.run.id },
+        {
+          registry: createScraperRegistry({ targets: [], sources: [] }),
+          fetchImpl: catalogFetch(name),
+          clock: fixedClock(),
+          executionToken: `catalog-collection-owner-${index}`,
+        },
+      ),
+    ).resolves.toEqual({ status: "completed" });
+  }
+
+  const collectedListings = await db.select().from(catalogListings);
+  expect(collectedListings).toMatchObject([
+    {
+      externalSiteId: site.id,
+      externalProductId: "official-1",
+      name: "Updated Official Release",
+      volume: 700,
+    },
+  ]);
+  expect(JSON.stringify(collectedListings)).not.toContain("Publisher prose");
+  expect(await db.select().from(bottles)).toHaveLength(0);
+  expect(await db.select().from(bottleGroups)).toHaveLength(0);
+  expect(await db.select().from(bottleSeries)).toHaveLength(0);
+  expect(await db.select().from(bottleReferences)).toHaveLength(0);
+  expect(await db.select().from(bottleObservations)).toHaveLength(0);
+  expect(await db.select().from(externalReviewArticles)).toHaveLength(0);
+  expect(await db.select().from(externalReviews)).toHaveLength(0);
+  expect(await db.select().from(externalReviewBodies)).toHaveLength(0);
+  expect(await db.select().from(storePrices)).toHaveLength(0);
+});
+
+test("keeps a catalog product that is absent from a later run", async () => {
+  const { revision, site, source, user } = await setupCatalogSource();
+  await recordScrapeSourcePreview({
+    revisionId: revision.id,
+    status: "passed",
+    result: { issues: [], pages: [] },
+  });
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+  });
+
+  const runCatalog = async (
+    products: Array<{ id: string; name: string; slug: string }>,
+    executionToken: string,
+  ) => {
+    const pinned = await createPinnedScrapeSourceRun(db, {
+      externalSiteId: site.id,
+      requestedById: user.id,
+      trigger: "manual",
+      purpose: "collect",
+    });
+    await executeScraperRun(
+      { runId: pinned.run.id },
+      {
+        registry: createScraperRegistry({ targets: [], sources: [] }),
+        fetchImpl: catalogProductsFetch(products),
+        clock: fixedClock(),
+        executionToken,
+      },
+    );
+  };
+
+  const firstProducts = [
+    { id: "official-1", name: "Current Release", slug: "current" },
+    { id: "official-2", name: "Older Release", slug: "older" },
+  ];
+  await runCatalog(firstProducts, "catalog-full-run");
+  const [olderBefore] = await db
+    .select()
+    .from(catalogListings)
+    .where(eq(catalogListings.externalProductId, "official-2"));
+  if (!olderBefore) throw new Error("Older catalog product was not collected.");
+
+  await runCatalog([firstProducts[0]!], "catalog-later-run");
+  const listings = await db
+    .select()
+    .from(catalogListings)
+    .where(eq(catalogListings.externalSiteId, site.id));
+  const olderAfter = listings.find(
+    ({ externalProductId }) => externalProductId === "official-2",
+  );
+
+  expect(listings).toHaveLength(2);
+  expect(olderAfter?.lastSeenAt).toEqual(olderBefore.lastSeenAt);
 });
 
 test("follows a bounded next-page selector", async () => {

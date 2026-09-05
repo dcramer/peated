@@ -21,6 +21,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
+import {
+  parseScrapeSourceKind,
+  SCRAPE_SOURCE_KIND_OPTIONS,
+  type ScrapeSourceKind,
+} from "../scrapeSourceKinds";
 
 export default function Page() {
   const router = useRouter();
@@ -29,7 +34,7 @@ export default function Page() {
     orpc.externalSites.scrapeSources.create.mutationOptions(),
   );
   const [error, setError] = useState<string>();
-  const [kind, setKind] = useState<"review" | "price">("review");
+  const [kind, setKind] = useState<ScrapeSourceKind>("review");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -74,7 +79,7 @@ export default function Page() {
             name="websiteUrl"
             type="url"
             label="Website"
-            helpText="Start with the site's main page. Peated will look for a review or shop page."
+            helpText="Start with the site's main page. Peated will look for reviews, a shop, or the producer's product catalog."
             placeholder="https://example.com"
             required
           />
@@ -83,12 +88,9 @@ export default function Page() {
             name="kind"
             value={kind}
             onChange={(event) =>
-              setKind(event.target.value === "price" ? "price" : "review")
+              setKind(parseScrapeSourceKind(event.target.value))
             }
-            options={[
-              { label: "Reviews", value: "review" },
-              { label: "Store prices", value: "price" },
-            ]}
+            options={[...SCRAPE_SOURCE_KIND_OPTIONS]}
           />
           <AdminTextareaField
             name="sampleUrls"

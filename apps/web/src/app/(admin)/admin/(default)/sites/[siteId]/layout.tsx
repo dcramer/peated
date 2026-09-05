@@ -85,6 +85,11 @@ export default function Layout({
       },
     }),
   );
+  const { data: catalogCoverage } = useSuspenseQuery(
+    orpc.externalSites.catalogListings.coverage.queryOptions({
+      input: { site: ExternalSiteKeySchema.parse(siteId) },
+    }),
+  );
   const root = `/admin/sites/${site.type}`;
 
   return (
@@ -120,6 +125,11 @@ export default function Layout({
           label="Prices"
           value={`${site.priceListings.matched.toLocaleString("en-US")} / ${site.priceListings.total.toLocaleString("en-US")}`}
         />
+        <AdminStat
+          label="Catalog products"
+          value={catalogCoverage.total.toLocaleString("en-US")}
+          detail={`${catalogCoverage.withProductId.toLocaleString("en-US")} with product IDs · ${catalogCoverage.withImage.toLocaleString("en-US")} with images · ${catalogCoverage.withVolume.toLocaleString("en-US")} with volume · ${catalogCoverage.withBottleDetails.toLocaleString("en-US")} with bottle details`}
+        />
       </AdminStatGrid>
       <PageTabs
         ariaLabel="Scraper"
@@ -129,6 +139,7 @@ export default function Layout({
           { href: `${root}/runs`, label: "Runs" },
           { href: `${root}/prices`, label: "Prices" },
           { href: `${root}/reviews`, label: "Reviews" },
+          { href: `${root}/catalog`, label: "Catalog" },
         ]}
       />
       {children}

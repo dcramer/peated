@@ -7,9 +7,10 @@ export const SCRAPE_RULES_VERSION_2 = 2;
 export const SCRAPE_RULES_VERSION_3 = 3;
 export const SCRAPE_RULES_VERSION_4 = 4;
 export const SCRAPE_RULES_VERSION_5 = 5;
-export const SCRAPE_RULES_VERSION = 6;
+export const SCRAPE_RULES_VERSION_6 = 6;
+export const SCRAPE_RULES_VERSION = 7;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
-export const SCRAPE_SOURCE_KIND_LIST = ["review", "price"] as const;
+export const SCRAPE_SOURCE_KIND_LIST = ["review", "price", "catalog"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
 export const SCRAPE_SOURCE_MAX_LIST_PAGES = 5;
 export const SCRAPE_SOURCE_DEFAULT_MAX_ITEMS = 25;
@@ -522,9 +523,35 @@ export const ScrapePriceRulesSchema = z
   })
   .strict();
 
+export const ScrapeRulesV6Schema = z.discriminatedUnion("kind", [
+  ScrapeReviewRulesSchema,
+  ScrapePriceRulesSchema,
+]);
+
+export const ScrapeCatalogRulesSchema = z
+  .object({
+    kind: z.literal("catalog"),
+    products: ScrapeProductsV6Schema,
+    product: z
+      .object({
+        name: ScrapePageFieldSchema,
+        url: ScrapePageFieldSchema.nullable(),
+        externalProductId: ScrapePageFieldSchema.nullable(),
+        imageUrl: ScrapePageFieldSchema.nullable(),
+        volume: ScrapePageFieldSchema.nullable(),
+        abv: ScrapePageFieldSchema.nullable(),
+        statedAge: ScrapePageFieldSchema.nullable(),
+        edition: ScrapePageFieldSchema.nullable(),
+        releaseYear: ScrapePageFieldSchema.nullable(),
+      })
+      .strict(),
+  })
+  .strict();
+
 export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
   ScrapeReviewRulesSchema,
   ScrapePriceRulesSchema,
+  ScrapeCatalogRulesSchema,
 ]);
 
 export const StoredScrapeRulesSchema = z.union([
@@ -533,6 +560,7 @@ export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV3Schema,
   ScrapeRulesV4Schema,
   ScrapeRulesV5Schema,
+  ScrapeRulesV6Schema,
   ScrapeRulesSchema,
 ]);
 
@@ -566,6 +594,9 @@ export function parseScrapeRules(
   }
   if (rulesVersion === SCRAPE_RULES_VERSION_5) {
     return ScrapeRulesV5Schema.parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_6) {
+    return ScrapeRulesV6Schema.parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);

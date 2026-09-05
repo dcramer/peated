@@ -20,7 +20,7 @@ export default procedure
     path: "/admin/scrape-sources",
     summary: "List scrape sources",
     description:
-      "List configured price and review sources with their parsing-rule revisions and latest setup status. Requires administrator privileges.",
+      "List review, price, and official catalog sources with their saved rules and latest setup status. Requires administrator privileges.",
     operationId: "listScrapeSources",
   })
   .input(z.object({ site: ExternalSiteKeySchema.optional() }).strict())

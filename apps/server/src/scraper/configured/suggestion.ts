@@ -1,3 +1,4 @@
+import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSources } from "@peated/server/db/schema";
@@ -55,6 +56,17 @@ type CheckedDetailPage = AiPage & {
           url: string;
           imageUrl: string | null;
           barcode: string | null;
+        }>;
+      }
+    | {
+        kind: "catalog";
+        products: Array<{
+          externalProductId: string | null;
+          name: string;
+          url: string;
+          imageUrl: string | null;
+          volume: number | null;
+          sourceBottleIdentity: BottleExtractedDetails | null;
         }>;
       };
 };
@@ -188,6 +200,22 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
           body:
             value.externalReviewBodies[review.sourceKey]?.slice(0, 50_000) ??
             null,
+        })),
+      },
+    };
+  }
+  if (parsed.kind === "catalog") {
+    return {
+      ...page,
+      output: {
+        kind: "catalog",
+        products: parsed.value.map((product) => ({
+          externalProductId: product.externalProductId ?? null,
+          name: product.name,
+          url: product.url,
+          imageUrl: product.imageUrl ?? null,
+          volume: product.volume ?? null,
+          sourceBottleIdentity: product.sourceBottleIdentity ?? null,
         })),
       },
     };

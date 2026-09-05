@@ -20,7 +20,7 @@ export default procedure
     path: "/admin/scrape-sources",
     summary: "Create a scrape source",
     description:
-      "Register a website as a price or review source and queue AI suggestions for its parsing rules. Requires administrator privileges.",
+      "Register a website as a review, price, or official catalog source and queue AI suggestions for its parsing rules. Requires administrator privileges.",
     operationId: "createScrapeSource",
   })
   .input(ScrapeSourceCreateSchema)
