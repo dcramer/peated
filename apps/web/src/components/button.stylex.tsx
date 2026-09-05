@@ -256,8 +256,14 @@ const styles = stylex.create({
     padding: 0,
   },
   controlSmall: {
+    position: "relative",
     height: controlMetrics.controlHeightSmall,
     fontSize: "13px",
+    "::after": {
+      position: "absolute",
+      inset: "-2px",
+      content: '""',
+    },
   },
   controlMedium: {
     height: controlMetrics.controlHeight,

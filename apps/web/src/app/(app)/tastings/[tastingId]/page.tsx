@@ -2,6 +2,7 @@ import {
   PageColumns,
   PageSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getTastingPage } from "@peated/web/lib/tastingPage.server";
 import {
@@ -27,11 +28,13 @@ export default async function TastingPage(props: {
   const tasting = await getTastingPage(tastingId);
   const structuredData = serializeTastingStructuredData(tasting);
   const { client } = await getPublicPageServerClient();
-  const [memberTastings, memberReviews, externalReviews] = await Promise.all([
-    client.tastings.list({ user: tasting.createdBy.id, limit: 5 }),
-    client.memberReviews.list({ bottle: tasting.bottle.id, limit: 4 }),
-    client.externalReviews.list({ bottle: tasting.bottle.id, limit: 4 }),
-  ]);
+  const [currentUser, memberTastings, memberReviews, externalReviews] =
+    await Promise.all([
+      getCurrentUser(),
+      client.tastings.list({ user: tasting.createdBy.id, limit: 5 }),
+      client.memberReviews.list({ bottle: tasting.bottle.id, limit: 4 }),
+      client.externalReviews.list({ bottle: tasting.bottle.id, limit: 4 }),
+    ]);
 
   return (
     <PageColumns
@@ -51,7 +54,13 @@ export default async function TastingPage(props: {
           dangerouslySetInnerHTML={{ __html: structuredData }}
         />
       )}
-      <TastingDetail tasting={tasting} />
+      <TastingDetail
+        canManage={
+          currentUser?.id === tasting.createdBy.id ||
+          Boolean(currentUser?.admin)
+        }
+        tasting={tasting}
+      />
       <div id="comments">
         <PageSection heading="Comments">
           <TastingComments tastingId={tasting.id} />

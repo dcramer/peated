@@ -204,7 +204,7 @@ export const controlMetrics = stylex.defineVars({
   controlHeightSmall: {
     default: "34px",
     [COARSE_POINTER]: "44px",
-    [NARROW]: "44px",
+    [NARROW]: "40px",
   },
   controlHeight: {
     default: "40px",

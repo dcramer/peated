@@ -4,12 +4,20 @@ import { TastingToastSummary } from "@peated/web/components";
 import { TastingReviewDetail } from "@peated/web/components/pages/tastingReviewDetail.stylex";
 import { TastingReviewRail } from "@peated/web/components/pages/tastingReviewRail.stylex";
 
+import { TastingActions } from "./tastingActions";
+
 type Tasting = Outputs["tastings"]["details"];
 type TastingList = Outputs["tastings"]["list"]["results"];
 type MemberReviewList = Outputs["memberReviews"]["list"]["results"];
 type ExternalReviewList = Outputs["externalReviews"]["list"]["results"];
 
-export function TastingDetail({ tasting }: { tasting: Tasting }) {
+export function TastingDetail({
+  canManage,
+  tasting,
+}: {
+  canManage: boolean;
+  tasting: Tasting;
+}) {
   return (
     <TastingReviewDetail
       author={tasting.createdBy}
@@ -25,6 +33,7 @@ export function TastingDetail({ tasting }: { tasting: Tasting }) {
         />
       }
       friends={tasting.friends}
+      menu={canManage ? <TastingActions tasting={tasting} /> : undefined}
       notes={tasting.notes}
       photoUrl={tasting.imageUrl}
       rating={{ kind: "tasting", ratingBand: tasting.ratingBand }}
