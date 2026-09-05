@@ -39,6 +39,7 @@ export function TastingReviewDetail({
   createdAt,
   footer,
   friends,
+  menu,
   notes,
   photoUrl,
   rating,
@@ -51,6 +52,7 @@ export function TastingReviewDetail({
   createdAt: string;
   footer?: ReactNode;
   friends: readonly Member[];
+  menu?: ReactNode;
   notes?: string | null;
   photoUrl?: string | null;
   rating: Rating;
@@ -59,6 +61,7 @@ export function TastingReviewDetail({
 }) {
   const bottleName = formatBottleDisplayName(bottle);
   const bottleTitle = bottleName.replaceAll(" - ", "\u00a0- ");
+  const metadata = `${rating.kind === "review" ? "Review" : "Tasting"} · ${fullDateFormatter.format(new Date(createdAt))}`;
   const facts = [
     servingStyle
       ? { label: "Serving", value: formatServingStyle(servingStyle) }
@@ -69,7 +72,16 @@ export function TastingReviewDetail({
   return (
     <article {...stylex.props(styles.detail)}>
       <PageHeader
-        metadata={`${rating.kind === "review" ? "Review" : "Tasting"} · ${fullDateFormatter.format(new Date(createdAt))}`}
+        metadata={
+          menu ? (
+            <div {...stylex.props(styles.metadataRow)}>
+              <span>{metadata}</span>
+              {menu}
+            </div>
+          ) : (
+            metadata
+          )
+        }
         title={bottleTitle}
       />
 
@@ -186,6 +198,12 @@ const styles = stylex.create({
   },
   body: {
     paddingTop: space.x4,
+  },
+  metadataRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: space.x3,
   },
   recordHeader: {
     display: "flex",

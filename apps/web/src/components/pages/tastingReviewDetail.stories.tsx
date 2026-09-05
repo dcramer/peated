@@ -2,6 +2,7 @@ import { mockTastings } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ButtonLink } from "../button.stylex";
+import { RowMenu } from "../rowMenu.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { TastingReviewDetail } from "./tastingReviewDetail.stylex";
 
@@ -28,6 +29,16 @@ const meta = {
       </ButtonLink>
     ),
     friends: photoTasting.friends,
+    menu: (
+      <RowMenu
+        groups={[
+          [{ href: "/tastings/1/edit", label: "Edit tasting" }],
+          [{ label: "Delete tasting", onSelect: () => undefined }],
+        ]}
+        label="Tasting"
+        triggerVariant="text"
+      />
+    ),
     notes: photoTasting.notes,
     photoUrl: photoTasting.imageUrl,
     rating: { kind: "tasting", ratingBand: photoTasting.ratingBand },
@@ -36,6 +47,7 @@ const meta = {
   },
   argTypes: {
     footer: { control: false },
+    menu: { control: false },
   },
 } satisfies Meta<typeof TastingReviewDetail>;
 
