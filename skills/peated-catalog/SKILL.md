@@ -47,6 +47,21 @@ user gives.
    API returns a conflict or validation error.
 8. Re-fetch every changed record. Check shared edits, images, aliases,
    references, and redirects when they apply.
+9. Before reporting completion, update the dated catalog research records under
+   `docs/research/`. Add or revise the target in
+   `catalog-research-examples-*` with the exact source pages that worked and a
+   short note about their useful coverage or limits. Add to
+   `catalog-research-sources-*` only when the task found a reusable search path,
+   source combination, access or license limit, or recurring trap that is not
+   already recorded. Use a record dated for the research instead of rewriting
+   an older snapshot.
+
+For the research record, keep exact links, what each source established, the
+years, markets, and release families covered, material conflicts or page errors,
+searches tried for unresolved gaps, and image source and reuse findings when
+they will help later work. Distinguish leads from evidence and do not claim that
+a source is complete unless it proves that. Do not keep raw API replies,
+downloaded images, tokens, request files, or other temporary working data.
 
 ## Rules
 
@@ -66,4 +81,5 @@ user gives.
 Completing one family or the current range does not complete the catalog.
 Continue through every period and product family until each item has a final
 status. Report the environment, sources and years covered, counts by status,
-changed IDs, checks performed, and unresolved questions.
+changed IDs, checks performed, research records changed, and unresolved
+questions.
