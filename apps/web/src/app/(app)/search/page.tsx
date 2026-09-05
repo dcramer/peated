@@ -70,7 +70,11 @@ export default async function SearchPage(props: {
       ? "all"
       : requestedScope;
   const searchScopes = databaseSearch
-    ? apiScopes.filter((scope) => Boolean(session.user) || scope !== "members")
+    ? selectedScope === "all"
+      ? apiScopes.filter(
+          (scope) => Boolean(session.user) || scope !== "members",
+        )
+      : [selectedScope]
     : memberSearch
       ? (["members"] as const)
       : (["bottles"] as const);
@@ -79,7 +83,6 @@ export default async function SearchPage(props: {
     getPublicStats(),
     query
       ? client.search({
-          includeFacets: databaseSearch,
           limit: searchLimit,
           query,
           scopes: [...searchScopes],

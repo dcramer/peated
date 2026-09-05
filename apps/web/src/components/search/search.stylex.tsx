@@ -82,14 +82,11 @@ type MemberSearchResult = Extract<
 export type SearchScope = (typeof searchScopes)[number]["value"];
 
 type SearchSnapshot = {
-  count: number;
   emptyText?: string;
   groups: SearchResultGroup[];
   hasExact: boolean;
   query: string;
   scope: SearchScope;
-  scopeCounts: Record<SearchScope, number>;
-  scopeTotals: SearchResponse["scopeTotals"];
 };
 
 export type SearchProps = {
@@ -116,7 +113,6 @@ export type SearchProps = {
 };
 
 const SEARCH_DEBOUNCE_MS = 140;
-const SEARCH_INDICATOR_FLOOR_MS = 250;
 
 function getDefaultContributionHref(query: string) {
   return getCreateBottleHref({ query });
@@ -135,12 +131,6 @@ function recentSearchGroups(searches: readonly string[]): SearchResultGroup[] {
       label: "Recent searches",
     },
   ];
-}
-
-function waitForSearchIndicator() {
-  return new Promise<void>((resolve) => {
-    window.setTimeout(resolve, SEARCH_INDICATOR_FLOOR_MS);
-  });
 }
 
 function isSearchScope(value: string): value is SearchScope {
@@ -303,7 +293,6 @@ function resultGroups(
         id: "exact",
         items: [exactItem(response.exact, bottleOptions)],
         label: "Exact match",
-        total: 1,
       },
     ];
   }
@@ -318,10 +307,9 @@ function resultGroups(
         items,
         label: getGroupLabel(group.type),
         moreHref:
-          showMoreLinks && group.total > items.length
+          showMoreLinks && group.hasMore
             ? getMoreHref(query, group.type)
             : undefined,
-        total: group.total,
       },
     ];
   });
@@ -353,27 +341,6 @@ function exactMatchesScope(exact: SearchExact, scope: SearchScope) {
   );
 }
 
-function getResultCount(response: SearchResponse, scope: SearchScope) {
-  if (response.exact && exactMatchesScope(response.exact, scope)) return 1;
-  return response.groups.reduce(
-    (total, group) =>
-      total + (groupMatchesScope(group.type, scope) ? group.total : 0),
-    0,
-  );
-}
-
-function getResultScopeTotals(response: SearchResponse) {
-  return {
-    all: getResultCount(response, "all"),
-    bottles: getResultCount(response, "bottles"),
-    series: getResultCount(response, "series"),
-    distilleries: getResultCount(response, "distilleries"),
-    brands: getResultCount(response, "brands"),
-    bottlers: getResultCount(response, "bottlers"),
-    members: getResultCount(response, "members"),
-  } satisfies Record<SearchScope, number>;
-}
-
 function getSearchSnapshot(
   response: SearchResponse,
   query: string,
@@ -381,23 +348,25 @@ function getSearchSnapshot(
   bottleOptions: BottleItemOptions,
   showMoreLinks: boolean,
 ): SearchSnapshot {
-  const count = getResultCount(response, scope);
+  const hasResults = Boolean(
+    (response.exact && exactMatchesScope(response.exact, scope)) ||
+    response.groups.some(
+      (group) =>
+        groupMatchesScope(group.type, scope) && group.results.length > 0,
+    ),
+  );
   return {
-    count,
-    emptyText:
-      count > 0
-        ? undefined
-        : response.nearest.length
-          ? `No exact matches for “${query}”.`
-          : `Nothing matches “${query}”.`,
+    emptyText: hasResults
+      ? undefined
+      : response.nearest.length
+        ? `No exact matches for “${query}”.`
+        : `Nothing matches “${query}”.`,
     groups: resultGroups(response, query, bottleOptions, showMoreLinks, scope),
     hasExact: Boolean(
       response.exact && exactMatchesScope(response.exact, scope),
     ),
     query,
     scope,
-    scopeCounts: getResultScopeTotals(response),
-    scopeTotals: response.scopeTotals,
   };
 }
 
@@ -423,18 +392,6 @@ function nearestItem(nearest: SearchNearest, bottleOptions: BottleItemOptions) {
     case "members":
       return memberItem(nearest.result);
   }
-}
-
-function getScopeCount(
-  scope: SearchScope,
-  totals: SearchResponse["scopeTotals"] | undefined,
-) {
-  if (!totals) return undefined;
-  if (scope !== "all") return totals[scope];
-  return Object.values(totals).reduce<number>(
-    (total, count) => total + (count ?? 0),
-    0,
-  );
 }
 
 export function Search({
@@ -490,6 +447,7 @@ export function Search({
   const [status, setStatus] = useState<"error" | "ready" | "searching">(
     initialQuery.trim() && !initialSnapshot ? "searching" : "ready",
   );
+  const activeRequest = useRef<AbortController | undefined>(undefined);
   const latestRequest = useRef(0);
   const initialSearchStarted = useRef(Boolean(initialSnapshot));
   const previousInitialQuery = useRef(initialQuery);
@@ -504,45 +462,36 @@ export function Search({
     snapshot?.query === query.trim() && snapshot.scope === effectiveScope
       ? snapshot
       : undefined;
-  const availableScopes = availableScopeDefinitions.map((option) => ({
-    ...option,
-    count: getScopeCount(option.value, currentSnapshot?.scopeTotals),
-  }));
+  const availableScopes = availableScopeDefinitions;
   const availableScopeFacets = currentSnapshot
-    ? availableScopeDefinitions.map((option) => ({
-        ...option,
-        count: currentSnapshot.scopeCounts[option.value],
-      }))
+    ? availableScopeDefinitions
     : undefined;
 
   const runSearch = useCallback(
     async (nextQuery: string, nextScope: SearchScope) => {
       const requestId = latestRequest.current + 1;
       latestRequest.current = requestId;
+      activeRequest.current?.abort();
       const trimmedQuery = nextQuery.trim();
       if (!trimmedQuery) {
+        activeRequest.current = undefined;
         setSnapshot(undefined);
         setStatus("ready");
         return;
       }
 
+      const request = new AbortController();
+      activeRequest.current = request;
       setStatus("searching");
-      const indicatorFloor = waitForSearchIndicator();
       try {
-        const [response] = await Promise.all([
-          orpc.search.call({
-            includeFacets: placement === "database",
+        const response = await orpc.search.call(
+          {
             limit: placement === "database" && nextScope !== "all" ? 50 : limit,
             query: trimmedQuery,
-            scopes: [
-              ...getApiScopes(
-                placement === "database" ? "all" : nextScope,
-                Boolean(user),
-              ),
-            ],
-          }),
-          indicatorFloor,
-        ]);
+            scopes: [...getApiScopes(nextScope, Boolean(user))],
+          },
+          { signal: request.signal },
+        );
         if (latestRequest.current !== requestId) return;
         setSnapshot(
           getSearchSnapshot(
@@ -555,16 +504,26 @@ export function Search({
         );
         setStatus("ready");
       } catch {
-        await indicatorFloor;
+        if (request.signal.aborted) return;
         if (latestRequest.current !== requestId) return;
         setStatus("error");
+      } finally {
+        if (activeRequest.current === request) {
+          activeRequest.current = undefined;
+        }
       }
     },
     [getBottleHref, limit, orpc, placement, showBottleRatings, user],
   );
   const debouncedSearch = useDebounceCallback(runSearch, SEARCH_DEBOUNCE_MS);
 
-  useEffect(() => () => debouncedSearch.cancel(), [debouncedSearch]);
+  useEffect(
+    () => () => {
+      debouncedSearch.cancel();
+      activeRequest.current?.abort();
+    },
+    [debouncedSearch],
+  );
 
   useEffect(() => {
     if (placement !== "database") return;
@@ -599,6 +558,7 @@ export function Search({
     setQuery(nextQuery);
     // Invalidate the current request before the next debounced request starts.
     latestRequest.current += 1;
+    activeRequest.current?.abort();
     if (!nextQuery.trim()) {
       debouncedSearch.cancel();
       setSnapshot(undefined);
@@ -670,7 +630,6 @@ export function Search({
       placement={placement}
       placeholder={placeholder}
       query={query}
-      resultCount={currentSnapshot?.count}
       resultQuery={snapshot?.query}
       scope={effectiveScope}
       scopeFacets={availableScopeFacets}

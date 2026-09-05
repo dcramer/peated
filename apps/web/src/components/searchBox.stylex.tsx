@@ -49,7 +49,6 @@ export type SearchBoxProps = Pick<
   placeholder?: string;
   placement?: "database" | "overlay" | "page";
   query: string;
-  resultCount?: number;
   resultQuery?: string;
   scope: string;
   scopeFacets?: readonly ScopedSearchOption[];
@@ -77,7 +76,6 @@ export function SearchBox({
   placeholder = "bottles, distillers, brands…",
   placement = "overlay",
   query,
-  resultCount,
   resultQuery = query,
   scope,
   scopeFacets,
@@ -331,18 +329,6 @@ export function SearchBox({
                   </FilterPanel>
                 </div>
               ) : null}
-              {status === "ready" && resultCount !== undefined ? (
-                <p
-                  aria-live="polite"
-                  {...stylex.props(
-                    foundationStyles.rowTitle,
-                    styles.databaseCount,
-                  )}
-                >
-                  {resultCount.toLocaleString("en-US")}{" "}
-                  {resultCount === 1 ? "result" : "results"}
-                </p>
-              ) : null}
               {expanded ? (
                 <SearchResults
                   activeId={typeaheadNavigation ? activeId : undefined}
@@ -459,17 +445,6 @@ const styles = stylex.create({
   databaseSearchControl: {
     minWidth: 0,
     flex: 1,
-  },
-  databaseCount: {
-    marginTop: space.x4,
-    marginRight: 0,
-    marginBottom: 0,
-    marginLeft: 0,
-    paddingBottom: space.x3,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    color: colors.ink,
   },
   databaseFacets: {
     minWidth: 0,

@@ -111,42 +111,42 @@ const MemberResultSchema = z.object({
 const GroupSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("bottles"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(BottleResultSchema),
   }),
   z.object({
     type: z.literal("series"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(SeriesResultSchema),
   }),
   z.object({
     type: z.literal("distilleries"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("brands"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("bottlers"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("companies"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(EntityResultSchema),
   }),
   z.object({
     type: z.literal("regions"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(RegionResultSchema),
   }),
   z.object({
     type: z.literal("members"),
-    total: z.number().int().nonnegative(),
+    hasMore: z.boolean(),
     results: z.array(MemberResultSchema),
   }),
 ]);
@@ -170,22 +170,10 @@ const NearestSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("members"), result: MemberResultSchema }),
 ]);
 
-export const ScopeTotalsSchema = z.object({
-  bottles: z.number().int().nonnegative(),
-  series: z.number().int().nonnegative(),
-  distilleries: z.number().int().nonnegative(),
-  brands: z.number().int().nonnegative(),
-  bottlers: z.number().int().nonnegative(),
-  companies: z.number().int().nonnegative(),
-  regions: z.number().int().nonnegative(),
-  members: z.number().int().nonnegative().optional(),
-});
-
 export const SearchOutputSchema = z.object({
   query: z.string(),
   exact: ExactSchema,
   groups: z.array(GroupSchema),
-  scopeTotals: ScopeTotalsSchema.nullable(),
   nearest: z.array(NearestSchema).max(3),
 });
 
@@ -209,10 +197,6 @@ export default contract
           .array(z.enum(SEARCH_SCOPE_LIST))
           .default([...SEARCH_SCOPE_LIST]),
         limit: z.coerce.number().gte(1).lte(50).default(3),
-        includeFacets: z.coerce
-          .boolean()
-          .default(false)
-          .describe("Compute totals for each searchable scope"),
       })
       .strict(),
   )

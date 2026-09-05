@@ -510,20 +510,10 @@ async function handleRpcRequest({ request, response, url }) {
             ? exactSearchBottle
             : existingBottle,
       );
-      const scopeTotals = {
-        bottles: 1,
-        distilleries: 0,
-        brands: 0,
-        bottlers: 0,
-        companies: 0,
-        regions: 0,
-      };
-      if (getAccessToken(request)) scopeTotals.members = 0;
       sendRpcResponse(response, {
         query: input.query ?? "",
         exact: null,
-        groups: [{ type: "bottles", total: 1, results: [bottle] }],
-        scopeTotals,
+        groups: [{ type: "bottles", hasMore: false, results: [bottle] }],
         nearest: [],
       });
       return true;

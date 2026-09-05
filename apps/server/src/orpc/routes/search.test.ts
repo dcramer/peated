@@ -38,7 +38,7 @@ describe("GET /search", () => {
     });
   });
 
-  test("returns independently capped groups with exact totals", async ({
+  test("returns independently capped groups and indicates more results", async ({
     fixtures,
   }) => {
     const bottles = await Promise.all(
@@ -92,18 +92,22 @@ describe("GET /search", () => {
     expect(data.groups).toMatchObject([
       {
         type: "bottles",
-        total: 4,
+        hasMore: true,
         results: [{ id: bottles[0]!.id }, { id: bottles[1]!.id }],
       },
-      { type: "distilleries", total: 1, results: [{ id: distiller.id }] },
-      { type: "brands", total: 1, results: [{ id: brand.id }] },
-      { type: "bottlers", total: 1, results: [{ id: bottler.id }] },
-      { type: "companies", total: 1, results: [{ id: company.id }] },
-      { type: "regions", total: 1, results: [{ id: region.id }] },
+      {
+        type: "distilleries",
+        hasMore: false,
+        results: [{ id: distiller.id }],
+      },
+      { type: "brands", hasMore: false, results: [{ id: brand.id }] },
+      { type: "bottlers", hasMore: false, results: [{ id: bottler.id }] },
+      { type: "companies", hasMore: false, results: [{ id: company.id }] },
+      { type: "regions", hasMore: false, results: [{ id: region.id }] },
     ]);
   });
 
-  test("finds Series with Brand context and exact totals", async ({
+  test("finds Series with Brand context and indicates more results", async ({
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Dramfool" });
@@ -131,7 +135,7 @@ describe("GET /search", () => {
     expect(data.groups).toMatchObject([
       {
         type: "series",
-        total: 2,
+        hasMore: true,
         results: [
           {
             id: first.id,
@@ -166,7 +170,11 @@ describe("GET /search", () => {
     });
 
     expect(data.groups).toMatchObject([
-      { type: "distilleries", total: 1, results: [{ id: distiller.id }] },
+      {
+        type: "distilleries",
+        hasMore: false,
+        results: [{ id: distiller.id }],
+      },
     ]);
   });
 
@@ -193,39 +201,6 @@ describe("GET /search", () => {
     ]);
   });
 
-  test("returns searchable scope totals", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Population Bottle" });
-    await fixtures.Entity({
-      name: "Population Bottler",
-      kind: "bottler",
-    });
-    await fixtures.Entity({
-      name: "Population Company",
-      type: [],
-      kind: "company",
-    });
-
-    const data = await routerClient.search({
-      includeFacets: true,
-      query: "no-population-match",
-      scopes: ["bottles", "bottlers", "companies"],
-    });
-
-    expect(data.scopeTotals?.bottles).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals?.bottlers).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals?.companies).toBeGreaterThanOrEqual(1);
-    expect(data.scopeTotals?.members).toBeUndefined();
-  });
-
-  test("does not include scope facets by default", async () => {
-    const data = await routerClient.search({
-      query: "no-facet-match",
-      scopes: ["brands"],
-    });
-
-    expect(data.scopeTotals).toBeNull();
-  });
-
   test("keeps member search authenticated and hides unsearchable profiles", async ({
     defaults,
     fixtures,
@@ -244,21 +219,16 @@ describe("GET /search", () => {
     const [anonymous, authenticated] = await Promise.all([
       routerClient.search({ query: "memberneedle", scopes: ["members"] }),
       routerClient.search(
-        {
-          includeFacets: true,
-          query: "memberneedle",
-          scopes: ["members"],
-        },
+        { query: "memberneedle", scopes: ["members"] },
         { context: { user: defaults.user } },
       ),
     ]);
 
     expect(anonymous.groups).toEqual([]);
-    expect(anonymous.scopeTotals).toBeNull();
     expect(authenticated.groups).toMatchObject([
       {
         type: "members",
-        total: 1,
+        hasMore: false,
         results: [{ member: { id: publicMember.id }, totalTastings: 2 }],
       },
     ]);
@@ -287,7 +257,7 @@ describe("GET /search", () => {
     expect(data.groups).toMatchObject([
       {
         type: "members",
-        total: 1,
+        hasMore: false,
         results: [{ member: { id: privateMember.id }, totalTastings: 0 }],
       },
     ]);
@@ -402,7 +372,7 @@ describe("GET /search", () => {
     });
 
     expect(data.groups).toMatchObject([
-      { type: "bottles", total: 0, results: [] },
+      { type: "bottles", hasMore: false, results: [] },
     ]);
     expect(data.nearest).toMatchObject([
       { type: "bottles", result: { id: bottle.id } },
@@ -485,10 +455,14 @@ describe("GET /search", () => {
     ]);
 
     expect(aliasSearch.groups).toMatchObject([
-      { type: "bottles", total: 1, results: [{ id: retainedBottle.id }] },
+      {
+        type: "bottles",
+        hasMore: false,
+        results: [{ id: retainedBottle.id }],
+      },
     ]);
     expect(legacySearch.groups).toMatchObject([
-      { type: "bottles", total: 0, results: [] },
+      { type: "bottles", hasMore: false, results: [] },
     ]);
   });
 
@@ -508,7 +482,7 @@ describe("GET /search", () => {
     });
 
     expect(data.groups).toMatchObject([
-      { type: "brands", total: 1, results: [{ id: entity.id }] },
+      { type: "brands", hasMore: false, results: [{ id: entity.id }] },
     ]);
   });
 
@@ -531,7 +505,7 @@ describe("GET /search", () => {
     });
 
     expect(data.groups).toMatchObject([
-      { type: "brands", total: 1, results: [{ id: entity.id }] },
+      { type: "brands", hasMore: false, results: [{ id: entity.id }] },
     ]);
   });
 
