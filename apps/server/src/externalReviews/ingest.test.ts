@@ -318,24 +318,41 @@ test.for<[string, string[]]>([
   ["Finish: no shortage of vanilla, smoke-free.", ["vanilla"]],
   ["Palate: shared alias.", []],
   ["Palate: oak.", ["oak"]],
+  [
+    "Nose: toasted marshmallow and salt-water taffy.",
+    ["saltwater taffy", "toasted marshmallow"],
+  ],
+  ["Finish: vanilla taffy.", ["saltwater taffy", "vanilla"]],
+  ["Palate: creme brulee and candyfloss.", ["cotton candy", "crème brûlée"]],
+  ["Nose: no dill pickle, but spearmint remains.", ["spearmint"]],
 ])(
   "extracts review tags from %s",
   async ([reviewText, expected], { fixtures }) => {
-    await db
-      .insert(tags)
-      .values(
-        [
-          { name: "apple", synonyms: ["apples"] },
-          { name: "vanilla", synonyms: ["shared alias"] },
-          { name: "cinnamon", synonyms: ["shared alias", "oak"] },
-          { name: "smoke", synonyms: ["smoky"] },
-          { name: "oak" },
-          { name: "chocolate" },
-          { name: "dark chocolate" },
-          { name: "orange" },
-          { name: "orange peel" },
-        ].map((tag) => ({ ...tag, tagCategory: "sweet" as const })),
-      );
+    await db.insert(tags).values(
+      [
+        { name: "apple", synonyms: ["apples"] },
+        { name: "vanilla", synonyms: ["shared alias"] },
+        { name: "cinnamon", synonyms: ["shared alias", "oak"] },
+        { name: "smoke", synonyms: ["smoky"] },
+        { name: "oak" },
+        { name: "chocolate" },
+        { name: "dark chocolate" },
+        { name: "orange" },
+        { name: "orange peel" },
+        { name: "toasted marshmallow" },
+        {
+          name: "saltwater taffy",
+          synonyms: ["salt water taffy", "taffy"],
+        },
+        {
+          name: "crème brûlée",
+          synonyms: ["creme brulee", "creme brûlée", "crème brulee"],
+        },
+        { name: "cotton candy", synonyms: ["candy floss", "candyfloss"] },
+        { name: "dill pickle", synonyms: ["dill pickles"] },
+        { name: "spearmint" },
+      ].map((tag) => ({ ...tag, tagCategory: "sweet" as const })),
+    );
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
     await ingestExternalReviewArticle({
       externalSiteId: site.id,
