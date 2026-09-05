@@ -1,6 +1,6 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { z } from "zod";
-import { expect, type Request, test, type TestInfo } from "./test";
+import { expect, type Page, type Request, test, type TestInfo } from "./test";
 
 import { bottlePathPattern } from "./assertions";
 import {
@@ -172,13 +172,18 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByText(testBrand.name, { exact: true }).first(),
     ).toBeVisible();
-    await expect(page.getByLabel("Age statement")).toHaveValue(
-      String(anotherReleaseSourceBottle.statedAge),
+    await continueBottleForm(page, 2);
+    await expect(
+      page.getByRole("spinbutton", { name: "Age statement", exact: true }),
+    ).toHaveValue(String(anotherReleaseSourceBottle.statedAge));
+    await expect(
+      page.getByLabel("Edition or batch", { exact: true }),
+    ).toHaveValue("First Fill Oloroso");
+    await continueBottleForm(page);
+    await expect(page.getByLabel("Release year", { exact: true })).toHaveValue(
+      "2026",
     );
-    await expect(page.getByLabel("Edition or batch")).toHaveValue(
-      "First Fill Oloroso",
-    );
-    await expect(page.getByLabel("Release year")).toHaveValue("2026");
+    await continueBottleForm(page, 3);
 
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
@@ -232,7 +237,11 @@ test.describe("unified Bottle workflows", () => {
     await expect(page.getByLabel("Bottle name", { exact: true })).toHaveValue(
       unifiedBottleEditContext.shared.name,
     );
-    await expect(page.getByLabel("Age statement")).toHaveValue(
+    const ageStatement = page.getByRole("spinbutton", {
+      name: "Age statement",
+      exact: true,
+    });
+    await expect(ageStatement).toHaveValue(
       String(unifiedBottleEditContext.exact.statedAge),
     );
     await expect(page.getByLabel("Shared Stated Age")).toHaveCount(0);
@@ -261,8 +270,8 @@ test.describe("unified Bottle workflows", () => {
 
     await page.getByLabel("Edition or batch").fill("Cask 43");
     await expect(page.getByLabel("Edition or batch")).toHaveValue("Cask 43");
-    await page.getByLabel("Age statement").fill("22");
-    await expect(page.getByLabel("Age statement")).toHaveValue("22");
+    await ageStatement.fill("22");
+    await expect(ageStatement).toHaveValue("22");
 
     const updateRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/update"),
@@ -332,6 +341,12 @@ function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
     `w${testInfo.workerIndex}`,
     `r${testInfo.retry}`,
   ].join("-");
+}
+
+async function continueBottleForm(page: Page, count = 1) {
+  for (let step = 0; step < count; step += 1) {
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+  }
 }
 
 const mockApiServer =
