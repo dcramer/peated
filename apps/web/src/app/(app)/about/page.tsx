@@ -1,9 +1,4 @@
-import {
-  FactList,
-  RailList,
-  RailListItem,
-  SummaryStrip,
-} from "@peated/web/components";
+import { FactList, RailList, RailListItem } from "@peated/web/components";
 import {
   PageSection,
   RailSection,
@@ -59,10 +54,6 @@ export default async function AboutRoute() {
           </RailSection>
           <RailSection heading="Reference">
             <RailList ariaLabel="Peated reference pages">
-              <RailListItem
-                href="/bottlers/4263/codes"
-                title="SMWS distillery codes"
-              />
               <RailListItem href="/updates" title="Recent changes" />
               <RailListItem href="/terms" title="Terms" />
             </RailList>
@@ -71,22 +62,6 @@ export default async function AboutRoute() {
       }
       title="About Peated"
     >
-      {stats ? (
-        <SummaryStrip
-          cells={[
-            { label: "Bottles", value: stats.bottles.toLocaleString() },
-            {
-              label: "Distilleries",
-              value: stats.distilleries.toLocaleString(),
-            },
-            { label: "Brands", value: stats.brands.toLocaleString() },
-            {
-              label: "Tastings",
-              value: stats.tastings.toLocaleString(),
-            },
-          ]}
-        />
-      ) : null}
       <PageSection heading="Why Peated exists">
         <AboutTextStack>
           <AboutText>
@@ -119,6 +94,20 @@ export default async function AboutRoute() {
       <PageSection heading="What Peated holds">
         <FactList
           facts={[
+            ...(stats
+              ? [
+                  { label: "Bottles", value: stats.bottles.toLocaleString() },
+                  {
+                    label: "Distilleries",
+                    value: stats.distilleries.toLocaleString(),
+                  },
+                  { label: "Brands", value: stats.brands.toLocaleString() },
+                  {
+                    label: "Tastings",
+                    value: stats.tastings.toLocaleString(),
+                  },
+                ]
+              : []),
             { label: "Started", value: "2023" },
             { label: "Maintained by", value: "Members" },
             { label: "Source code license", value: "Apache 2.0" },
