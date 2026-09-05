@@ -4,12 +4,30 @@ import {
   mockTastings,
 } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import PortraitBottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg";
+import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import {
   getCommunityFeedItems,
   getTastingFeedItems,
 } from "../lib/communityFeed";
-import { CommunityFeed } from "./communityFeed.stylex";
+import { CommunityFeed, type CommunityFeedItem } from "./communityFeed.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
+
+function withStoryImages(items: readonly CommunityFeedItem[]) {
+  return items.map((item, itemIndex) => ({
+    ...item,
+    actorImageUrl: null,
+    bottles: item.bottles.map((bottle, bottleIndex) => ({
+      ...bottle,
+      imageUrl:
+        item.kind === "collection_add"
+          ? null
+          : (itemIndex + bottleIndex) % 2
+            ? PortraitBottleImage.src
+            : BottleImage.src,
+    })),
+  }));
+}
 
 const meta = {
   title: "Components/Reviews & Tastings/Community Feed",
@@ -30,10 +48,12 @@ const meta = {
     ),
   ],
   args: {
-    items: getCommunityFeedItems({
-      activity: mockActivity,
-      criticReviews: [mockExternalReview],
-    }),
+    items: withStoryImages(
+      getCommunityFeedItems({
+        activity: mockActivity,
+        criticReviews: [mockExternalReview],
+      }),
+    ),
   },
 } satisfies Meta<typeof CommunityFeed>;
 export default meta;
@@ -42,14 +62,33 @@ export const Overview: Story = {};
 export const TastingList: Story = {
   args: {
     ariaLabel: "Tastings",
-    items: getTastingFeedItems(mockTastings.slice(0, 3)),
+    items: withStoryImages(getTastingFeedItems(mockTastings.slice(0, 3))),
+  },
+};
+export const NarrowColumn: Story = {
+  decorators: [
+    (Story) => (
+      <StoryCanvas width="compact">
+        <Story />
+      </StoryCanvas>
+    ),
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A narrow desktop column, such as a sidebar, keeps the usual activity image size even when the screen itself is wide.",
+      },
+    },
   },
 };
 export const WithoutCriticByline: Story = {
   args: {
-    items: getCommunityFeedItems({
-      activity: [],
-      criticReviews: [{ ...mockExternalReview, reviewerName: null }],
-    }),
+    items: withStoryImages(
+      getCommunityFeedItems({
+        activity: [],
+        criticReviews: [{ ...mockExternalReview, reviewerName: null }],
+      }),
+    ),
   },
 };

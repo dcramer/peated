@@ -362,12 +362,17 @@ JSDoc.
 
 - Put catalog images on a white canvas with a complete frame. Do not assume
   source images have useful transparency.
-- Standard three-line rows share one thumbnail size across bottle lists,
-  activity, search, selection, and loading states. Keep the full bottle visible;
-  never crop it to an avatar square. Single-line library additions use smaller
-  thumbnails. Sidebar bottle lists use the shared sidebar variant with smaller
-  thumbnails, compact titles limited to two lines, and trailing details below
-  the identity. Recent tastings show their date and rating as supporting details.
+- Standard three-line catalog, search, selection, and loading rows share one
+  thumbnail size. Activity keeps the same identity with an image one full size
+  larger in wide feed columns so the whisky anchors each entry, then returns to
+  the standard row size in sidebars and on mobile. The space stays consistent
+  for square and portrait photos. Each photo keeps its original proportions,
+  and its white frame fits the photo instead of filling unused space. Keep the
+  full bottle visible; never crop it to an avatar square. Single-line library
+  additions use smaller thumbnails.
+  Sidebar bottle lists use the shared sidebar variant with smaller thumbnails,
+  compact titles limited to two lines, and trailing details below the identity.
+  Recent tastings show their date and rating as supporting details.
 - State precise values. Do not replace known numbers with vague labels.
 - Do not invent data, rankings, totals, ranges, or derived values in a visual
   component.

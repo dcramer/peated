@@ -131,7 +131,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
             <div key={bottle.id} {...stylex.props(styles.bottle)}>
               <BottleIdentityRow
                 variant={
-                  item.kind === "collection_add" ? "compact" : "standard"
+                  item.kind === "collection_add" ? "compact" : "activity"
                 }
                 provenance={bottle.provenance}
                 name={bottle.name}
@@ -140,6 +140,33 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 linkArea="title"
                 metadata={bottle.metadata}
                 verticalPadding="sm"
+                activityDetails={
+                  bottle.description || bottle.byline ? (
+                    <>
+                      {bottle.description ? (
+                        <p
+                          {...stylex.props(
+                            foundationStyles.body,
+                            styles.excerpt,
+                            Boolean(bottle.byline) && styles.excerptWithFooter,
+                          )}
+                        >
+                          {bottle.description}
+                        </p>
+                      ) : null}
+                      {bottle.byline ? (
+                        <div
+                          {...stylex.props(
+                            foundationStyles.metadata,
+                            styles.footer,
+                          )}
+                        >
+                          By {bottle.byline}
+                        </div>
+                      ) : null}
+                    </>
+                  ) : undefined
+                }
                 end={
                   bottle.score !== undefined || bottle.ratingBand ? (
                     <div {...stylex.props(styles.facts)}>
@@ -156,25 +183,6 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                   ) : undefined
                 }
               />
-              {bottle.description || bottle.byline ? (
-                <div {...stylex.props(styles.details)}>
-                  {bottle.description ? (
-                    <p {...stylex.props(foundationStyles.body, styles.excerpt)}>
-                      {bottle.description}
-                    </p>
-                  ) : null}
-                  {bottle.byline ? (
-                    <div
-                      {...stylex.props(
-                        foundationStyles.metadata,
-                        styles.footer,
-                      )}
-                    >
-                      By {bottle.byline}
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
             </div>
           ))}
           {item.more ? (
@@ -205,6 +213,10 @@ function getActivityLinkLabel(item: CommunityFeedItem) {
 const MOBILE = "@media (max-width: 559px)";
 const styles = stylex.create({
   entry: {
+    containerType: "inline-size",
+    display: "grid",
+    gridTemplateColumns: "auto minmax(0, 1fr)",
+    columnGap: { default: space.x3, [MOBILE]: space.x2 },
     width: "calc(100% + 24px)",
     marginRight: "-12px",
     marginLeft: "-12px",
@@ -214,10 +226,10 @@ const styles = stylex.create({
     paddingLeft: "12px",
   },
   author: {
-    display: "flex",
+    display: "grid",
+    gridColumn: "1 / -1",
+    gridTemplateColumns: "subgrid",
     alignItems: "center",
-    gap: space.x3,
-    [MOBILE]: { gap: space.x2 },
   },
   context: { minWidth: 0, color: colors.inkMuted },
   activityLink: {
@@ -229,18 +241,14 @@ const styles = stylex.create({
   date: { whiteSpace: "nowrap" },
   content: {
     minWidth: 0,
-    marginLeft: "38px",
     display: "flex",
+    gridColumn: "2",
     flexDirection: "column",
     gap: space.x3,
-    [MOBILE]: { marginLeft: "34px" },
+    [MOBILE]: { gridColumn: "1 / -1" },
   },
   bottle: { minWidth: 0 },
   compactContent: { gap: 0 },
-  details: {
-    marginLeft: "60px",
-    ["@media (max-width: 639px)"]: { marginLeft: "54px" },
-  },
   facts: {
     display: "flex",
     flexShrink: 0,
@@ -250,8 +258,9 @@ const styles = stylex.create({
   },
   excerpt: {
     marginTop: 0,
-    marginBottom: space.x2,
+    marginBottom: 0,
     color: colors.ink,
   },
+  excerptWithFooter: { marginBottom: space.x2 },
   footer: { color: colors.inkMuted },
 });

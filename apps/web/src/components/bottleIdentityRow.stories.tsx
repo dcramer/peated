@@ -56,7 +56,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "inline-radio",
-      options: ["standard", "search", "sidebar", "compact"],
+      options: ["standard", "activity", "search", "sidebar", "compact"],
     },
   },
   args: {
@@ -72,6 +72,7 @@ const meta = {
 | Variant | Use | Content |
 | --- | --- | --- |
 | standard (default) | Catalog, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
+| activity | Community feed tastings and reviews | Top-aligned identity with a 96px square space in wide feed columns, the usual 48 × 64px space in a desktop sidebar, and 42 × 58px on mobile. The frame fits the photo without changing its shape. |
 | search | Typeahead results | Standard identity and thumbnail, 15px compact title, and 8px vertical padding. |
 | sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
 | compact | Single or grouped library additions | One regular-weight name line, 24 × 32px thumbnail, and a 44px hit area. |
@@ -180,7 +181,7 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail.",
       },
     },
   },

@@ -54,7 +54,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The sidebar used by tasting and review pages, shown at its 336px desktop width. Long names retain a full accessible label and title, with a two-line visual limit. Dates and optional ratings sit below the name. Includes long names, missing images, and an unrated tasting using fixture data.",
+          "The sidebar used by tasting and review pages, shown at its 336px desktop width. Long names retain a full accessible label and title, with a two-line visual limit. Dates and optional ratings share one line below the name. Includes long names, missing images, and an unrated tasting using fixture data.",
       },
     },
   },
