@@ -44,9 +44,10 @@ function extractVolume(title: string, bodyHtml: string | null): number {
   }
 }
 
-function isExplicitlyNonWhisky(title: string, bodyHtml: string | null) {
-  const text = `${title} ${bodyHtml ?? ""}`;
-  return /\bgin\b/i.test(title) && !/\bwhisk(?:y|ey)\b/i.test(text);
+function isExplicitlyNonWhisky(title: string) {
+  return (
+    /\b(?:gin|liqueur)\b/i.test(title) && !/\bwhisk(?:y|ey)\b/i.test(title)
+  );
 }
 
 function parseNorthStarProducts(
@@ -57,7 +58,7 @@ function parseNorthStarProducts(
   const products: StorePrice[] = [];
 
   for (const product of payload.products) {
-    if (isExplicitlyNonWhisky(product.title, product.body_html ?? null)) {
+    if (isExplicitlyNonWhisky(product.title)) {
       logScrapeWarning(SITE, "Unsupported non-whisky product", {
         rawName: product.title,
       });
