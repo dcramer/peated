@@ -52,16 +52,6 @@ import {
   WhiskyfunObservationSchema,
 } from "./adapters/whiskyfun";
 import {
-  whiskyNotesAdapter,
-  WhiskyNotesCursorSchema,
-  WhiskyNotesObservationSchema,
-} from "./adapters/whiskyNotes";
-import {
-  wordsOfWhiskyAdapter,
-  WordsOfWhiskyCursorSchema,
-  WordsOfWhiskyObservationSchema,
-} from "./adapters/wordsOfWhisky";
-import {
   createScraperRegistry,
   defineScraperSource,
   defineScrapeTarget,
@@ -434,17 +424,6 @@ export const scraperRegistry = createScraperRegistry({
       sink: externalReviewSink,
     }),
     defineScraperSource({
-      key: "whiskynotes",
-      externalSiteKey: "whiskynotes",
-      targetKeys: ["whiskynotes"],
-      requestLimit: 30,
-      resumeFromLastRun: true,
-      cursorSchema: WhiskyNotesCursorSchema,
-      observationSchema: WhiskyNotesObservationSchema,
-      adapter: whiskyNotesAdapter,
-      sink: externalReviewSink,
-    }),
-    defineScraperSource({
       key: "whiskyfun",
       externalSiteKey: "whiskyfun",
       targetKeys: ["whiskyfun"],
@@ -453,16 +432,6 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: WhiskyfunCursorSchema,
       observationSchema: WhiskyfunObservationSchema,
       adapter: whiskyfunAdapter,
-      sink: externalReviewSink,
-    }),
-    defineScraperSource({
-      key: "wordsofwhisky",
-      externalSiteKey: "wordsofwhisky",
-      targetKeys: ["wordsofwhisky"],
-      requestLimit: 25,
-      cursorSchema: WordsOfWhiskyCursorSchema,
-      observationSchema: WordsOfWhiskyObservationSchema,
-      adapter: wordsOfWhiskyAdapter,
       sink: externalReviewSink,
     }),
   ],
