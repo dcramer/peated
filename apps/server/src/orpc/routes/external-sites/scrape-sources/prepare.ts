@@ -2,6 +2,7 @@ import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { prepareBourbonCultureSource } from "@peated/server/scraper/configured/prepareBourbonCulture";
+import { prepareBruichladdichSource } from "@peated/server/scraper/configured/prepareBruichladdich";
 import { prepareCadenheadsSource } from "@peated/server/scraper/configured/prepareCadenheads";
 import { prepareCompassBoxSource } from "@peated/server/scraper/configured/prepareCompassBox";
 import { prepareGordonMacphailSource } from "@peated/server/scraper/configured/prepareGordonMacphail";
@@ -35,7 +36,7 @@ export default procedure
     z
       .object({
         site: ExternalSiteKeySchema.describe(
-          "The existing site's key. Currently supports bourbonculture, cadenheads, compassbox, gordonmacphail, kilchoman, whiskeyreviewer, whiskynotes, whiskysaga, whiskystudy, and wordsofwhisky.",
+          "The existing site's key. Currently supports bourbonculture, bruichladdich, cadenheads, compassbox, gordonmacphail, kilchoman, whiskeyreviewer, whiskynotes, whiskysaga, whiskystudy, and wordsofwhisky.",
         ),
         apply: z
           .boolean()
@@ -67,6 +68,7 @@ export default procedure
   .handler(async ({ input, context, errors }) => {
     const prepareSource = {
       bourbonculture: prepareBourbonCultureSource,
+      bruichladdich: prepareBruichladdichSource,
       cadenheads: prepareCadenheadsSource,
       compassbox: prepareCompassBoxSource,
       gordonmacphail: prepareGordonMacphailSource,

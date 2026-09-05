@@ -212,6 +212,31 @@ preview. Activate only exact output, trigger one manual collection, and confirm
 that it updates the same price IDs and Bottle matches. Check the run and Sentry
 before restoring the saved schedule.
 
+## Bruichladdich
+
+Use the preparation endpoint with `{"site": "bruichladdich"}`. The check-only
+request inventories every stored price and stops if a row does not have the
+expected Bruichladdich product URL, numeric Shopify product ID, name, GBP
+currency, or 700 ml volume. Applying transfers the request settings and adds a
+paused source for
+`https://www.bruichladdich.com/collections/all?filter.v.availability=1`. It does
+not change price rows or history.
+
+Before applying, stop the `bruichladdich` schedule and wait for active runs.
+Save the same price and run records listed for Compass Box. Run the version 6
+rules through the local no-write preview without an item limit. The list rules
+must exclude Accessories, Clothing, and Glassware. The detail rules must read
+the product name, active 70 cl variant's GBP price and volume, product URL, and
+image. Keep the `Bruichladdich` prefix on The Biodynamic Project.
+
+Do not save the visible Shopify variant ID as `externalProductId`. Existing
+rows use Shopify product IDs, which are different. Leave that rule empty so
+collection finds each existing row by its exact product URL and keeps its
+stored product ID. After applying, save and preview the reviewed revision.
+Activate only exact output, trigger one manual collection, and confirm that it
+updates the same price IDs and Bottle matches before restoring the schedule.
+Check the run and Sentry.
+
 ## Kilchoman
 
 Use the preparation endpoint with `{"site": "kilchoman"}`. The check-only
@@ -244,9 +269,10 @@ handles reviews added after the switch. Do not delete source or run history.
 
 ## Other sources
 
-The preparation API is shared. It currently supports Bourbon Culture, Compass
-Box, Kilchoman, The Whiskey Reviewer, Whisky Saga, The Whisky Study, and Words
-of Whisky. Other sites are rejected without changing records. Add each site's
+The preparation API is shared. It currently supports Bourbon Culture,
+Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, The
+Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study, and Words of
+Whisky. Other sites are rejected without changing records. Add each site's
 conversion behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
