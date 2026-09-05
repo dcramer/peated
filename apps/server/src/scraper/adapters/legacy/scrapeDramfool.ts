@@ -118,7 +118,6 @@ export function parseDramfoolProductPage(
   const availability = $('meta[property="product:availability"]')
     .attr("content")
     ?.toLowerCase();
-  if (availability === "outofstock") return [];
 
   const rawName = $(".ProductItem-details-title").first().text().trim();
   if (!rawName) {
@@ -130,6 +129,8 @@ export function parseDramfoolProductPage(
     .first()
     .attr("data-variants");
   if (!variantsRaw) {
+    if (availability === "outofstock") return [];
+
     logScrapeWarning(SITE, "Unable to identify product variants", { rawName });
     return [];
   }

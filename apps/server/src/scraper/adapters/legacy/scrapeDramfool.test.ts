@@ -28,14 +28,17 @@ function productHtml({
   itemId,
   imageUrl,
   productType = 1,
+  availability,
 }: {
   title: string;
   variants: unknown[];
   itemId?: string;
   imageUrl?: string;
   productType?: number;
+  availability?: string;
 }) {
   return `
+    ${availability ? `<meta property="product:availability" content="${availability}">` : ""}
     <article class="ProductItem"${itemId ? ` data-item-id="${itemId}"` : ""}>
       <h1 class="ProductItem-details-title">${title}</h1>
       ${imageUrl ? `<img class="ProductItem-gallery-slides-item-image" data-src="${imageUrl}">` : ""}
@@ -123,6 +126,24 @@ test("reads purchasable full-bottle variants from product HTML", () => {
       volume: 700,
     },
   ]);
+});
+
+test("uses variant stock when page availability says out of stock", () => {
+  const html = productHtml({
+    title: "Dramfool Glenallachie 11",
+    availability: "outofstock",
+    variants: [
+      {
+        attributes: { Size: "70cl" },
+        priceMoney: { currency: "GBP", value: "100.00" },
+        onSale: false,
+        unlimited: false,
+        qtyInStock: 1,
+      },
+    ],
+  });
+
+  expect(parseDramfoolProductPage(html, firstProductUrl)).toHaveLength(1);
 });
 
 test("ignores non-physical products", () => {
