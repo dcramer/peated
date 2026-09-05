@@ -540,7 +540,7 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
-  test("does not converge conflicting retailer product IDs", async ({
+  test("updates one variant without changing another at the same URL", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -556,27 +556,35 @@ describe("POST /external-sites/:site/prices", () => {
       url,
     });
 
-    await expect(
-      createStorePricesAsPeated({
-        site: site.type,
-        prices: [
-          {
-            externalProductId: "retailer-sku-1",
-            name: "Reused Retailer URL",
-            price: 7_500,
-            currency: "usd",
-            volume: 750,
-            url,
-          },
-        ],
-      }),
-    ).rejects.toThrow("already assigned to another source product");
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          externalProductId: "retailer-sku-1",
+          name: "Reused Retailer URL",
+          price: 7_500,
+          currency: "usd",
+          volume: 750,
+          url,
+        },
+      ],
+    });
 
     const prices = await db.query.storePrices.findMany({
       where: eq(storePrices.externalSiteId, site.id),
+      orderBy: storePrices.externalProductId,
     });
-    expect(prices).toHaveLength(2);
-    expect(prices.every((price) => price.hidden === false)).toBe(true);
+    expect(prices).toMatchObject([
+      {
+        externalProductId: "retailer-sku-1",
+        hidden: false,
+        price: 7_500,
+      },
+      {
+        externalProductId: "retailer-sku-2",
+        hidden: false,
+      },
+    ]);
   });
 
   test("keeps distinct generic listings instead of merging by title and volume", async ({

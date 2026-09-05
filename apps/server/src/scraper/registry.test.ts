@@ -92,7 +92,7 @@ test("registers each code-owned scraper source with explicit target ownership", 
   }
   expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(true);
   expect(EXTERNAL_SITE_DEFINITIONS.astorwines.runEvery).toBeNull();
-  expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBe(10080);
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
   expect(
