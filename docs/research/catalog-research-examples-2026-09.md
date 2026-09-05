@@ -28,6 +28,133 @@ Sources found in earlier Peated catalog tasks. Recheck each site before use.
 | Suntory and Yamazaki | [Essence](https://www.suntory.co.jp/whisky/essence/), [Hibiki](https://www.suntory.co.jp/whisky/hibiki/portfolio/), [Hakushu](https://www.suntory.co.jp/whisky/hakushu/lineup/), [global news](https://www.suntoryglobalspirits.com/news), Whisky Auctioneer                                                                                                                                       | Japanese pages listed more than global pages                               |
 | Wolves Whiskey       | [Producer archive](https://wolveswhiskeyca.com/collections/archive), Shopify product data, [TTB COLA](https://www.ttbonline.gov/colasonline/publicSearchColasBasic.do), PR Newswire, venue shops                                                                                                                                                                                                   | Venue releases and collaborations were missing from the main archive       |
 
+## Ardbeg — September 5, 2026
+
+The production review started with 204 active Bottles whose Brand was Ardbeg.
+The final inventory contains 304 active records: 303 evidence-supported Bottle
+identities and one unresolved legacy Airigh Nam Beist record. Six proven
+duplicate records were merged; a seventh candidate was left unresolved because
+its exact annual release could not be established.
+The review covered the current and historical distillery range, Committee and
+Ardbeg Day/Fèis Ìle releases, named release Series, annual batches, vintage and
+single-cask distillery bottlings, country and travel releases, private and
+embassy bottlings, house releases, and older age-stated labels. It does not
+claim that every private or embassy single cask ever made has a surviving public
+record; those were added only when exact evidence identified the release.
+
+- The producer [shop](https://www.ardbeg.com/en-gb/Shop/) established the current
+  range, and the producer [history](https://www.ardbeg.com/en-gb/pages/history)
+  established the 1815 founding, The Glenmorangie Company's 1997 purchase and
+  reopening, and release landmarks through 2026. The current shop does not
+  document most discontinued or market-specific Bottles. The stored Entity
+  description now follows that wording. The public API verifies the description
+  text but currently returns `descriptionSrc` as null, so the source attribution
+  is also preserved here rather than claimed as API-verified metadata.
+- Geert Bero's Ardbeg Collection lists for [single casks](https://ardbeg.eu/ardbeg_coll.php?t=Single+cask)
+  and [Committee bottlings](https://ardbeg.eu/ardbeg_coll.php?t=Committee+bottlings),
+  the Ardbeg Project [release chronology](https://www.ardbegproject.com/history.shtml),
+  and its [Fèis Ìle list](https://www.ardbegproject.com/feis.shtml) exposed the
+  historical release families, exact cask numbers, intended markets, dates, and
+  outturns. These collector sources contain occasional spelling, date, and
+  transcription errors, so their facts were checked against producer material,
+  labels, or exact auction records before writing.
+- The Whiskybase [Ardbeg Brand list](https://www.whiskybase.com/whiskies/brand/81362/whiskies)
+  and [distillery list](https://www.whiskybase.com/whiskies/distillery/6/ardbeg.)
+  were used as broad gap finders, not as proof of completeness or as authority
+  when exact sources disagreed. The lists include independent bottlings,
+  packaging versions, samples, and records whose “bottled” year is not a public
+  release year.
+- Country and exact-release evidence included Ardbeg Japan's retrospective for
+  the [2003 Ten Cask Strength](https://www.ardbegjp.com/products/ardbeg-10y-cask-strength),
+  the exact [Japan release listing](https://www.amshop.de/en/Ardbeg-Ten-Single-Islay-Malt-Scotch-Whisky-2003-Special-Japan-Release-Limited-Edition-Cask-Strength-57-8-.html),
+  and [auction confirmation](https://www.ravenel.com/en/cata/lotsIn/112fad01-64bf-4fdf-aa91-2a73f3c12ea2).
+  Together they support the 2003 market, 57.8% strength, and 900-bottle outturn.
+- Conflicting facts were left unknown or resolved with the most exact evidence.
+  For [The Awakening](https://whiskyauctioneer.com/learn/explore-whisky/bottles/ardbeg-1975-awakening-38-year-old),
+  the exact bottle record supports 49.7%, a 2014 bottling, and 200 bottles, while
+  the dated [2023 release report](https://whiskyexperts.net/neu-ardbeg-the-awakening-38yo/)
+  explains why its release year is 2023. For Mór, the exact
+  [auction record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/ardbeg-mor-10-year-old-45-litre-0),
+  [retailer record](https://www.htfw.com/ardbeg-mor-2nd-edition-single-malt-scotch-2000-10-year-old-whisky-4-5-litre-rehoboam),
+  and [retailer archive](https://www.thewhiskyexchange.com/p/8929/ardbeg-10-year-old-mor)
+  disagree on bottling year, vintage, and coloring. The stable name is therefore
+  “Mór”; release year 2008 is retained, while disputed vintage, bottling year,
+  and natural-color claims remain empty.
+- Sources disagree on whether Ardbeg Guaranteed 30-year-old was released in 1996
+  or 1997. Two exact auction records support 1996
+  ([Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/ardbeg-guaranteed-30-year-old)
+  and [Whisky.Auction](https://whisky.auction/auctions/lot/11550/ardbeg-30-year-old));
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/62/ardbeg-30-year-old)
+  reports 1997 and an [archived retailer listing](https://www.whisky-online.com/products/ardbeg-guaranteed-30-year-old-bottled-1996)
+  acknowledges both dates. The stored release year remains 1996 and the conflict
+  stays recorded here.
+- “Seasmoke” remains an unresolved marketed-release lead. The available
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/297641/ardbeg-seasmoke)
+  and [TTB-label report](https://whiskyexperts.net/ttb-neuheit-ardbeg-seasmoke/)
+  show a proposed label but do not prove a public release, and the producer's
+  current Committee collection does not list it. No Bottle was created.
+- Badger Juice is offered as a small-batch house dram on the
+  [producer's bar page](https://www.ardbeghouse.com/pages/the-islay-bar), with
+  outside coverage describing it as a house-cask pour rather than a marketed
+  bottle ([Master of Malt](https://www.masterofmalt.com/blog/post/inside-ardbeg-house-islays-new-whisky-hotel/)).
+  Badger Juice batches, eight Duty Paid Samples, the Eureka and Supernova
+  samples, and the Story of Peat miniature were treated as 13 out-of-scope leads,
+  not separate Bottle identities.
+- The action count was 106 created records, of which 105 are net new identities
+  and one was merged as a duplicate; 83 distinct Bottle records updated,
+  comprising 78 pre-existing and five newly created records; six BottleSeries
+  created; three BottleSeries updated; five exact import references reassigned;
+  one generic import reference ignored; one ambiguous reference unassigned; and
+  five duplicate-source references moved automatically to their survivors. Of
+  the 204 starting records, the final work-list statuses are 121 supported
+  records requiring no change, 77 supported updates, five merges, and one
+  unresolved record, B18251. B18251 received a safe shared-fact repair but its
+  annual identity remains unresolved. Six duplicate records were merged in
+  total, including one created during this review.
+- The final production verification fetched 304 of 304 unique Ardbeg Brand
+  records. All are `single_malt`; all have Brand and distiller E0028, and none
+  has an explicit bottler. Sixty-six records have an image and 238 do not.
+  Auction, retailer, collector, and Whiskybase images were useful identity
+  evidence but did not carry reusable rights, so none were copied. The Entity
+  photo uses the
+  [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Ardbeg_distillery.jpg)
+  under CC BY-SA 4.0. Duplicate Entity image 167 was deleted after visual
+  comparison; existing image 23 remains as the primary image with its caption,
+  source, and license intact.
+- The duplicate decisions use release identity, not tasting counts. The
+  [Committee release archive](https://whiskyauctioneer.com/learn/explore-whisky/series/ardbeg-committee-releases)
+  identifies 8-year-old For Discussion as the 50.8% 2021–2022 Committee release;
+  exact records identify [Blaaack](https://whiskyauctioneer.com/learn/explore-whisky/bottles/ardbeg-blaaack-1)
+  as the 50.7% 2020 Committee release,
+  [Dark Cove](https://whiskyauctioneer.com/learn/explore-whisky/bottles/ardbeg-dark-cove-2)
+  as the 55% 2016 Committee release, and
+  [Supernova SN2014](https://whiskyauctioneer.com/learn/explore-whisky/bottles/ardbeg-supernova-sn2014-0)
+  as the 55% 2014 Committee release with 3,000 bottles. The less complete source
+  records have the same marketed names and no conflicting age, year, strength,
+  edition, or cask fact.
+- The two old Airigh Nam Beist records are underspecified and cannot substitute
+  for the exact annual releases. Their import references are
+  “Ardbeg Airigh Nam Beist” and the misspelled “Ardbeg Airidh Nam Beist 1990
+  Vintage.” The [vintage inventory](https://ardbeg.eu/ardbeg_coll.php?t=vintages)
+  shows that the 2006, 2007, and 2008 releases all used the 1990 vintage, so the
+  latter reference does not identify one annual release. B18251 was therefore
+  not merged into B1170. Its spelling, distiller, and common 46% ABV were
+  corrected, and its unsupported generated description was cleared. Ambiguous
+  reference 3368 was unassigned without being ignored. The exact annual records
+  remain B53525, B53526, and B53527, while stronger evidence is still needed to
+  assign or retire B18251.
+- B53614 and B5127 are exact copies of the same single-cask release. Both store
+  age 31, 54.2% ABV, 1975 vintage, 2006 bottling and release years, cask 1375,
+  and an outturn of 522. The [single-cask inventory](https://ardbeg.eu/ardbeg_coll.php?t=Single+cask)
+  independently confirms every one of those identity facts.
+- After explicit approval, B1598 was merged into B46094, B13383 and B2292 into
+  B1926, B16071 into B3659, B16590 into B45002, and B53614 into B5127. Every old
+  ID resolves to its intended survivor; source references moved; survivor facts,
+  images, and aliases were checked; and the retired IDs no longer appear in the
+  Brand inventory. Activity and singleton checks were used only to verify
+  preservation, not as identity evidence. The proposed B18251-to-B1170 merge was
+  skipped because the exact marketed release remains ambiguous.
+
 ## Bruichladdich — September 5, 2026
 
 The production review covered the 198 active Bottles attached to Bruichladdich
