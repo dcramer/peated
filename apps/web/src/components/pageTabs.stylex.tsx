@@ -20,10 +20,17 @@ export type PageTabsProps = {
   ariaLabel: string;
   currentHref: string;
   items: readonly [PageTabItem, ...PageTabItem[]];
+  /** Overrides Next's automatic prefetch behavior for every tab. */
+  prefetch?: boolean | null;
 };
 
 /** Shows peer destinations within one page or section. */
-export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
+export function PageTabs({
+  ariaLabel,
+  currentHref,
+  items,
+  prefetch,
+}: PageTabsProps) {
   return (
     <nav aria-label={ariaLabel} {...stylex.props(styles.tabs)}>
       {items.map((item) => {
@@ -34,6 +41,7 @@ export function PageTabs({ ariaLabel, currentHref, items }: PageTabsProps) {
             aria-current={current ? "page" : undefined}
             href={item.href}
             key={item.href}
+            prefetch={prefetch}
             {...stylex.props(
               foundationStyles.interactive,
               styles.tab,

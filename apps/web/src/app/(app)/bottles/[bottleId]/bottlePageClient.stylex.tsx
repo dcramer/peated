@@ -427,6 +427,7 @@ export function BottlePageFrameClient({
             ariaLabel="Bottle sections"
             currentHref={currentHref}
             items={getTabs(bottle)}
+            prefetch
           />
         </div>
         <div {...stylex.props(styles.overview)}>{children}</div>
