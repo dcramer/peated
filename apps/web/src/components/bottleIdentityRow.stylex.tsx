@@ -4,7 +4,7 @@ import type { MouseEventHandler, ReactNode } from "react";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { BottleVisual } from "./bottleVisual.stylex";
+import { BottleVisual, type BottleVisualFit } from "./bottleVisual.stylex";
 import Join from "./join";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MatchedText } from "./matchedText.stylex";
@@ -18,6 +18,7 @@ export type BottleIdentityRowProps = {
   end?: ReactNode;
   hasTasted?: boolean;
   href?: string;
+  imageFit?: BottleVisualFit;
   imageUrl?: string | null;
   isLibrary?: boolean;
   layout?: "cell" | "row";
@@ -63,6 +64,7 @@ export function BottleIdentityRow({
   end,
   hasTasted = false,
   href,
+  imageFit,
   imageUrl,
   isLibrary = false,
   layout = "row",
@@ -207,6 +209,7 @@ export function BottleIdentityRow({
       )}
     >
       <BottleVisual
+        fit={imageFit}
         imageUrl={imageUrl}
         size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}
       />

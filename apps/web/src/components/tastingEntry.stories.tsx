@@ -16,6 +16,7 @@ const meta = {
     members: [
       {
         href: "/bottles/lagavulin-16",
+        imageFit: "cover",
         imageUrl: BottleImage.src,
         bottle: {
           name: "Lagavulin 16-year-old",

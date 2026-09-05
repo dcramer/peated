@@ -4,8 +4,8 @@ import {
   mockTastings,
 } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import PortraitBottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg";
-import BottleImage from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
+import OblongTastingPhoto from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/exclusive-malts-islay-2007.jpg";
+import SquareTastingPhoto from "../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-spice-tree-extravaganza.webp";
 import {
   getCommunityFeedItems,
   getTastingFeedItems,
@@ -13,20 +13,32 @@ import {
 import { CommunityFeed, type CommunityFeedItem } from "./communityFeed.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
 
-function withStoryImages(items: readonly CommunityFeedItem[]) {
-  return items.map((item, itemIndex) => ({
-    ...item,
-    actorImageUrl: null,
-    bottles: item.bottles.map((bottle, bottleIndex) => ({
-      ...bottle,
-      imageUrl:
-        item.kind === "collection_add" || itemIndex === 1
-          ? null
-          : (itemIndex + bottleIndex) % 2
-            ? PortraitBottleImage.src
-            : BottleImage.src,
-    })),
-  }));
+const tastingPhotos = [
+  SquareTastingPhoto.src,
+  OblongTastingPhoto.src,
+  null,
+] as const;
+
+function withStoryImages(
+  items: readonly CommunityFeedItem[],
+): CommunityFeedItem[] {
+  return items.map((item, itemIndex) => {
+    const tastingPhoto = tastingPhotos[itemIndex % tastingPhotos.length];
+    return {
+      ...item,
+      actorImageUrl: null,
+      bottles: item.bottles.map((bottle) => ({
+        ...bottle,
+        imageFit: item.kind === "tasting" && tastingPhoto ? "cover" : "contain",
+        imageUrl:
+          item.kind === "collection_add"
+            ? null
+            : item.kind === "tasting"
+              ? tastingPhoto
+              : SquareTastingPhoto.src,
+      })),
+    };
+  });
 }
 
 const meta = {
@@ -63,6 +75,14 @@ export const TastingList: Story = {
   args: {
     ariaLabel: "Tastings",
     items: withStoryImages(getTastingFeedItems(mockTastings.slice(0, 3))),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Covers a square tasting photo and an oblong tasting photo, then shows the framed missing-image state.",
+      },
+    },
   },
 };
 export const NarrowColumn: Story = {

@@ -72,7 +72,7 @@ const meta = {
 | Variant | Use | Content |
 | --- | --- | --- |
 | standard (default) | Catalog, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
-| activity | Community feed tastings and reviews | Top-aligned identity with a 96px square space in wide feed columns, the usual 48 × 64px space in a desktop sidebar, and 42 × 58px on mobile. The frame fits the photo without changing its shape. |
+| activity | Community feed tastings and reviews | Top-aligned identity with a framed 96px square in wide feed columns, the usual 48 × 64px frame in a desktop sidebar, and 42 × 58px on mobile. Personal-photo thumbnails cover the frame; catalog images contain the full bottle. |
 | search | Typeahead results | Standard identity and thumbnail, 15px compact title, and 8px vertical padding. |
 | sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
 | compact | Single or grouped library additions | One regular-weight name line, 24 × 32px thumbnail, and a 44px hit area. |

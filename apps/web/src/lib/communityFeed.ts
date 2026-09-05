@@ -35,6 +35,8 @@ function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
         ...feedBottle(tasting.bottle),
         id: String(tasting.id),
         description: getPreview(tasting.notes),
+        imageFit: tasting.imageUrl ? "cover" : "contain",
+        imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
         ratingBand: tasting.ratingBand,
       },
     ],

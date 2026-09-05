@@ -136,6 +136,25 @@ describe("getTastingFeedItems", () => {
       ],
     });
   });
+
+  test("covers a tasting photo and contains the catalog fallback", () => {
+    const photoUrl = "https://images.peated.com/tasting.jpg";
+    const [withPhoto] = getTastingFeedItems([
+      { ...mockTasting, imageUrl: photoUrl },
+    ]);
+    const [withoutPhoto] = getTastingFeedItems([
+      { ...mockTasting, imageUrl: null },
+    ]);
+
+    expect(withPhoto?.bottles[0]).toMatchObject({
+      imageFit: "cover",
+      imageUrl: photoUrl,
+    });
+    expect(withoutPhoto?.bottles[0]).toMatchObject({
+      imageFit: "contain",
+      imageUrl: mockTasting.bottle.imageUrl,
+    });
+  });
 });
 
 test("includes all four activity types, makes one card per tasting, and omits library status", () => {

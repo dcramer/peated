@@ -22,6 +22,7 @@ export { BottleList } from "./bottleList.stylex";
 export type { BottleListItem, BottleListProps } from "./bottleList.stylex";
 export { BottleVisual } from "./bottleVisual.stylex";
 export type {
+  BottleVisualFit,
   BottleVisualProps,
   BottleVisualSize,
 } from "./bottleVisual.stylex";

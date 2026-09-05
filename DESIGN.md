@@ -366,11 +366,11 @@ JSDoc.
   thumbnail size. Activity keeps the same identity with an image one full size
   larger in wide feed columns so the whisky anchors each entry, then returns to
   the standard row size in sidebars and on mobile. Only real photos use the
-  larger activity space; the missing-photo glyph stays at the standard visual
-  size within that column. The space stays consistent for square and portrait
-  photos, including small source files. Each photo keeps its original
-  proportions, and its white frame fits the photo instead of filling unused
-  space. Keep the full bottle visible; never crop it to an avatar square.
+  larger activity space. Personal tasting photos cover that thumbnail frame;
+  catalog images contain the full bottle on a white canvas. Never crop a catalog
+  bottle image to an avatar square. Missing images use a neutral frame and keep
+  the bottle glyph at the standard visual size. The frame stays consistent for
+  square and portrait sources, including small files.
   Single-line library additions use smaller thumbnails.
   Sidebar bottle lists use the shared sidebar variant with smaller thumbnails,
   compact titles limited to two lines, and trailing details below the identity.

@@ -14,9 +14,12 @@ const ACTIVITY_SIZE = "96px";
 const bottleIconUrl = "/assets/bottle.svg";
 
 export type BottleVisualSize = "xs" | "sm" | "md" | "activity" | "lg" | "xl";
+export type BottleVisualFit = "contain" | "cover";
 
 export type BottleVisualProps = {
   expandable?: boolean;
+  /** Cover is for personal-photo thumbnails; catalog bottle images stay contained. */
+  fit?: BottleVisualFit;
   imageUrl?: string | null;
   label?: string;
   size?: BottleVisualSize;
@@ -27,12 +30,13 @@ export type BottleVisualProps = {
  * BottleIdentityRow chooses its own size. Use this primitive directly only when
  * composing another layout: sm for sidebar rows, md for standard rows, activity
  * for feed rows, and lg/xl for detail media. Omit label beside visible bottle
- * text; expandable needs a label.
+ * text; expandable needs a label. Use cover only for personal-photo thumbnails.
  * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
  * Row images load near the viewport; lg/xl detail images load immediately.
  */
 export function BottleVisual({
   expandable = false,
+  fit = "contain",
   imageUrl,
   label,
   size = "md",
@@ -47,8 +51,10 @@ export function BottleVisual({
       role={label && !hasExpandableImage ? "img" : undefined}
       {...stylex.props(
         styles.visual,
-        Boolean(imageUrl) && styles.imageVisual,
         visualSizeStyles[size],
+        Boolean(imageUrl) && styles.imageVisual,
+        Boolean(imageUrl) && fit === "cover" && styles.coverVisual,
+        !imageUrl && size === "activity" && styles.activityFallbackVisual,
         hasExpandableImage && styles.expandableVisual,
       )}
     >
@@ -61,7 +67,7 @@ export function BottleVisual({
             {...stylex.props(
               styles.image,
               expandableImagePaddingStyles[size],
-              size === "activity" && styles.activityImage,
+              fit === "cover" && styles.coverImage,
             )}
           />
         </ImageViewer>
@@ -70,10 +76,7 @@ export function BottleVisual({
           alt=""
           src={imageUrl}
           loading={loading}
-          {...stylex.props(
-            styles.image,
-            size === "activity" && styles.activityImage,
-          )}
+          {...stylex.props(styles.image, fit === "cover" && styles.coverImage)}
         />
       ) : (
         <span
@@ -111,6 +114,9 @@ const styles = stylex.create({
     boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
   },
   expandableVisual: {
+    padding: 0,
+  },
+  coverVisual: {
     padding: 0,
   },
   visualExtraSmall: {
@@ -155,10 +161,10 @@ const styles = stylex.create({
       [COMPACT]: bottleThumbnailMetrics.height,
       [NARROW_FEED]: bottleThumbnailMetrics.height,
     },
-    alignItems: "flex-start",
     padding: 0,
-    backgroundColor: "transparent",
-    boxShadow: "none",
+  },
+  activityFallbackVisual: {
+    backgroundColor: colors.inset,
   },
   visualLarge: {
     width: { default: "132px", [COMPACT]: "80px" },
@@ -184,12 +190,9 @@ const styles = stylex.create({
     minHeight: 0,
     objectFit: "contain",
   },
-  activityImage: {
-    width: "auto",
-    height: "100%",
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.imageBackground,
-    boxShadow: `inset 0 0 0 1px ${colors.hairline}`,
+  coverImage: {
+    padding: 0,
+    objectFit: "cover",
   },
   expandableImageExtraSmall: {
     padding: "2px",
