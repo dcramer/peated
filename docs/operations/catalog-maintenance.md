@@ -45,6 +45,9 @@ because every release has a record.
    pages, contemporary announcements, specialist archives, and exact auction
    records as needed. Current producer pages rarely prove the historical set is
    complete. Do not treat Peated or any single convenient source as complete.
+   The dated [Catalog Research Sources](../research/catalog-research-sources-2026-09.md)
+   record lists productive archive entrances, source combinations, and traps
+   found in earlier catalog sessions.
 3. Record what time period, markets, release families, and source archives the
    inventory covers. If no source proves the full set, state the coverage limit
    and keep plausible missing releases unresolved instead of silently excluding

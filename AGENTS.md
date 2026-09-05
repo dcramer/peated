@@ -143,6 +143,8 @@ behavior; research cannot override them.
 - `docs/README.md` — Document placement.
 - `docs/research/entity-image-source-audit-2026-08.md` — Dated image source checks.
 - `docs/research/external-review-source-audit-2026-08.md` — Dated review source checks.
+- `docs/research/catalog-research-sources-2026-09.md` — Catalog source patterns from prior operations.
+- `docs/research/catalog-research-examples-2026-09.md` — Sources that worked for past catalog targets.
 
 ### Operate Peated
 
