@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import type { ScrapeRules } from "./rules";
 import {
   checkDetailPages,
   checkListPage,
@@ -6,19 +7,70 @@ import {
 } from "./suggestion";
 
 const reviewRules = {
-  kind: "review" as const,
-  list: {
-    detailLink: { selector: "a.review", attribute: "href" },
-    maxItems: 10,
+  kind: "review",
+  articles: {
+    oneArticlePer: "body",
+    link: "a.review",
+    skipWhen: null,
+    nextPage: null,
+    limit: 10,
   },
-  detail: {
-    title: { selector: "h1" },
-    publishedAt: { selector: "time", attribute: "datetime" },
-    reviewItem: "article.review",
-    name: { selector: "h2" },
-    reviewText: { selector: ".body" },
+  article: {
+    canonicalUrl: null,
+    title: {
+      try: [
+        {
+          get: "text",
+          selector: "h1",
+          take: "first",
+          startsWith: null,
+          clean: null,
+        },
+      ],
+    },
+    publishedDate: {
+      try: [
+        {
+          get: "attribute",
+          selector: "time",
+          attribute: "datetime",
+          clean: null,
+        },
+      ],
+    },
+    reviews: {
+      inside: "body",
+      oneReviewPer: "element",
+      selector: "article.review",
+      name: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: "h2",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      reviewer: null,
+      tastingNotes: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: ".body",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      score: null,
+    },
   },
-};
+} as const satisfies ScrapeRules;
 
 test("validates the selected list page and returns its detail links", () => {
   const page = checkListPage({
@@ -50,9 +102,9 @@ test("validates the selected list page and returns its detail links", () => {
 test("checks that pagination adds detail links", async () => {
   const rules = {
     ...reviewRules,
-    list: {
-      ...reviewRules.list,
-      nextPage: { selector: "a.next", attribute: "href" },
+    articles: {
+      ...reviewRules.articles,
+      nextPage: "a.next",
     },
   };
   const firstPage = checkListPage({
@@ -172,5 +224,7 @@ test("rejects suggested rules that do not parse a detail page", async () => {
         html: "<main>Unrelated page</main>",
       }),
     }),
-  ).rejects.toThrow("The proposed rules did not read a detail page.");
+  ).rejects.toThrow(
+    "The proposed rules did not read an article or product page.",
+  );
 });

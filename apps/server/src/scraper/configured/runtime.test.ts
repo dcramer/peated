@@ -51,6 +51,74 @@ function controllableClock() {
   };
 }
 
+function reviewRules(titleSelector = "h1", paginate = false) {
+  return {
+    kind: "review",
+    articles: {
+      oneArticlePer: "body",
+      link: "a.review",
+      skipWhen: null,
+      nextPage: paginate ? "a.next" : null,
+      limit: 5,
+    },
+    article: {
+      canonicalUrl: null,
+      title: {
+        try: [
+          {
+            get: "text",
+            selector: titleSelector,
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      publishedDate: {
+        try: [
+          {
+            get: "attribute",
+            selector: "time",
+            attribute: "datetime",
+            clean: null,
+          },
+        ],
+      },
+      reviews: {
+        inside: "body",
+        oneReviewPer: "element",
+        selector: "article.review",
+        name: {
+          try: [
+            {
+              get: "text",
+              from: "review",
+              selector: "h2",
+              take: "first",
+              startsWith: null,
+              clean: null,
+            },
+          ],
+        },
+        reviewer: null,
+        tastingNotes: {
+          try: [
+            {
+              get: "text",
+              from: "review",
+              selector: ".body",
+              take: "first",
+              startsWith: null,
+              clean: null,
+            },
+          ],
+        },
+        score: null,
+      },
+    },
+  } as const satisfies ScrapeRules;
+}
+
 async function setupSource(titleSelector = "h1", paginate = false) {
   const [user] = await db
     .insert(users)
@@ -63,28 +131,11 @@ async function setupSource(titleSelector = "h1", paginate = false) {
     websiteUrl: "https://preview.example/archive",
     createdById: user.id,
   });
-  const list: Extract<ScrapeRules, { kind: "review" }>["list"] = {
-    detailLink: { selector: "a.review", attribute: "href" },
-    maxItems: 5,
-  };
-  if (paginate) {
-    list.nextPage = { selector: "a.next", attribute: "href" };
-  }
   const revision = await createScrapeSourceRevision({
     scrapeSourceId: source.id,
     author: "person",
     createdById: user.id,
-    rules: {
-      kind: "review",
-      list,
-      detail: {
-        title: { selector: titleSelector },
-        publishedAt: { selector: "time", attribute: "datetime" },
-        reviewItem: "article.review",
-        name: { selector: "h2" },
-        reviewText: { selector: ".body" },
-      },
-    },
+    rules: reviewRules(titleSelector, paginate),
   });
   await db
     .update(scrapeOrigins)
@@ -275,7 +326,7 @@ test("stores safe validation issues when a selector stops matching", async () =>
   expect(storedRevision).toMatchObject({ previewStatus: "failed" });
   expect(storedRevision?.previewResult).toMatchObject({
     pages: [],
-    issues: [expect.objectContaining({ field: "detail.title" })],
+    issues: [expect.objectContaining({ field: "article.title" })],
   });
 });
 
@@ -341,18 +392,7 @@ test("a resumed suggestion run reuses its saved revision", async () => {
     aiModel: "test-model",
     aiInstructionsVersion: "test-instructions",
     createdById: user.id,
-    rules: {
-      kind: "review",
-      list: {
-        detailLink: { selector: "a.review", attribute: "href" },
-        maxItems: 5,
-      },
-      detail: {
-        title: { selector: "h1" },
-        reviewItem: "article.review",
-        name: { selector: "h2" },
-      },
-    },
+    rules: reviewRules(),
   });
   await db
     .update(scrapeSourceRuns)

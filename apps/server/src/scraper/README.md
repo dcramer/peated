@@ -82,21 +82,31 @@ product database. Only a revision that passes its preview can become active. An
 admin can return to any older revision that passed. Pausing a source stops
 collection but keeps its revisions and run history.
 
-Rules formats 1 through 5 support same-origin HTML list and detail pages, an item
-limit, an optional next-page link, CSS selectors, and fixed date, number, price,
-and volume conversions. Version 2 also supports bounded value cleanup, fixed
-values, joined labeled text, and list-card exclusion. An `item` selector scopes
-each `detailLink`; `excludeWhen` skips that item when its selector finds text,
-optionally beginning with one of the configured literal labels. Code follows at
-most five list pages. Version 3 also lets review sources select and clean their
-canonical URL, read a publication date from a URL path with bounded `yyyy`, `yy`,
-`MM`, `dd`, and `*` tokens, and map up to 25 finite text grades to numeric values.
-Version 4 also lets a heading start a review that continues through the elements
-after it. The review stops before the next selected heading or an optional end
-selector. When only one heading matches without an end selector, its parent is
-the review body.
-Version 5 also lets the first review use a score stored outside its section when
-the section itself has no score.
+Rule versions 1 through 5 remain supported so saved sources keep working. New
+sources use version 6. A review source has `articles` for finding article links
+and `article` for reading an article. A price source uses `products` and
+`product` in the same way. `oneArticlePer` or `oneProductPer` identifies each
+result on the list page. `link` finds its link, `skipWhen` can leave out a
+result, and `nextPage` can continue to the next list page. Links must stay on
+the source website. Code follows at most five list pages and stops at `limit`.
+
+Each field has an ordered `try` list. A read can get text, get an attribute, or
+use a fixed value. The parser uses the first non-empty result. Reads can remove
+known text from the start or end and add known text when needed. Publication
+dates can also come from a URL path with bounded `yyyy`, `yy`, `MM`, `dd`, and
+`*` parts. Scores can map up to 25 written grades to numbers.
+
+For reviews, `article.reviews.inside` identifies the part of the article that
+contains reviews. `oneReviewPer: "element"` means each selected element is one
+review. `oneReviewPer: "heading"` means each selected heading starts a review;
+`stopBefore` can mark where the reviews end. A single heading must say whether
+to start at that heading or use the whole review area. A field read states
+whether it reads inside the review or from the article, and an article-level
+read states whether it applies to the first review or every review. This keeps
+names, writers, and scores from leaking between reviews.
+
+The setup agent submits this same rule shape, and the saved revision and parser
+use it directly. There is no setup-only translation step.
 Rules do not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
 page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
@@ -120,12 +130,11 @@ HTML copies so large page headers do not crowd out links and article content.
 It keeps the page structure and attributes used by selectors. Rule checks and
 collection still parse the original fetched HTML.
 
-For reviews, `reviewItem` selects the full body to save internally; optional
-`reviewText` selects tasting notes for tags and clips. [External Reviews](../../../../docs/features/external-reviews.md)
-defines what is saved, who can read it, and when it is deleted.
-Each review keeps its own writer when selected. One unambiguous byline outside
-the review sections can supply the article's writer for the remaining reviews.
-Names and scores stay inside their own sections on multi-review pages.
+For reviews, each selected review is the full body saved internally. Optional
+`tastingNotes` reads narrower text for tags and clips. [External Reviews](../../../../docs/features/external-reviews.md)
+defines what is saved, who can read it, and when it is deleted. Each review can
+read its own writer. An article-level writer is used only when the rules
+explicitly apply it to the first review or every review.
 
 Setup traces may record the complete model instructions, public website input,
 model output, and rule-check arguments and results. They must not include
@@ -153,7 +162,7 @@ label. Fork pull requests run the ordinary tests without secrets.
 live AI service, including the full creation scenarios. Normal test runs exclude
 these checks. The `trigger-evals` label runs the broader eval suite in CI.
 
-Before saving a migration candidate, run its revision input through the local
+Before saving replacement rules, run the revision input through the local
 runtime. The command uses `.env.local`, the registered target, robots policy,
 request controls, production parser, and validators. It records the local run
 for inspection but uses a no-op sink, so it does not write reviews or prices:
@@ -163,14 +172,67 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Set `rulesVersion` to `5` when testing current operations. An omitted
+API. Set `rulesVersion` to `6` when testing current operations. An omitted
 version means version 1 so existing preview files keep their original behavior:
 
 ```json
 {
-  "rulesVersion": 5,
+  "rulesVersion": 6,
   "listUrl": "https://example.com/reviews",
-  "rules": {}
+  "rules": {
+    "kind": "review",
+    "articles": {
+      "oneArticlePer": "article",
+      "link": "a[href]",
+      "skipWhen": null,
+      "nextPage": null,
+      "limit": 3
+    },
+    "article": {
+      "canonicalUrl": null,
+      "title": {
+        "try": [
+          {
+            "get": "text",
+            "selector": "h1",
+            "take": "first",
+            "startsWith": null,
+            "clean": null
+          }
+        ]
+      },
+      "publishedDate": {
+        "try": [
+          {
+            "get": "attribute",
+            "selector": "time",
+            "attribute": "datetime",
+            "clean": null
+          }
+        ]
+      },
+      "reviews": {
+        "inside": "main",
+        "oneReviewPer": "element",
+        "selector": "article.review",
+        "name": {
+          "try": [
+            {
+              "get": "text",
+              "from": "review",
+              "selector": "h2",
+              "take": "first",
+              "startsWith": null,
+              "clean": null
+            }
+          ]
+        },
+        "reviewer": null,
+        "tastingNotes": null,
+        "score": null
+      }
+    }
+  }
 }
 ```
 

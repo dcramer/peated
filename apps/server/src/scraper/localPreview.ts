@@ -11,6 +11,8 @@ import type { ScrapeSourcePreviewResult } from "./configured/preview";
 import {
   parseScrapeRules,
   SCRAPE_SOURCE_MAX_LIST_PAGES,
+  scrapeRulesLimit,
+  withScrapeRulesLimit,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
 import { scraperSystemClock, type ScraperHttpClock } from "./http";
@@ -43,13 +45,7 @@ export async function runLocalScrapeSourcePreview(
   const clock = options.clock ?? scraperSystemClock;
   const parsedRules = parseScrapeRules(parsed.rulesVersion, parsed.rules);
   const rules = parsed.limit
-    ? {
-        ...parsedRules,
-        list: {
-          ...parsedRules.list,
-          maxItems: Math.min(parsedRules.list.maxItems, parsed.limit),
-        },
-      }
+    ? withScrapeRulesLimit(parsedRules, parsed.limit)
     : parsedRules;
 
   await syncExternalSites();
@@ -118,7 +114,7 @@ export async function runLocalScrapeSourcePreview(
     .values({
       externalSiteId: site.id,
       trigger: "manual",
-      requestLimit: rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
+      requestLimit: scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     })
     .returning();
   if (!run) throw new Error("Failed to create the local scraper preview run.");

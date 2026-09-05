@@ -67,10 +67,10 @@ body and its date. Deleting a review also deletes its body. Existing reviews get
 bodies on their next import when text is available.
 
 Scrapers select each bottle's full review, including its introduction and
-conclusion. For configurable sources, the setup model selects this with
-`reviewItem`; older rules that select only tasting notes may need updating.
-Optional `reviewText` selects narrower text for tags and clips. Articles with
-several reviews save each review's own section.
+conclusion. For configurable sources, `article.reviews` defines each full
+review. Optional `tastingNotes` reads narrower text for tags and clips. Older
+rules that select only tasting notes may need updating. Articles with several
+reviews save each review's own section.
 
 Scrapers remove HTML, scripts, forms, navigation, and comments, and keep paragraph
 breaks. The saved body is not cut to the clip input limit; fetch limits still

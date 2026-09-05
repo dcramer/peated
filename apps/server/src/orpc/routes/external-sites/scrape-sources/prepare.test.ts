@@ -1442,17 +1442,80 @@ describe("POST /admin/scrape-sources/prepare", () => {
       createdById: admin.id,
       rules: {
         kind: "review",
-        list: {
-          detailLink: { selector: "a.review", attribute: "href" },
-          maxItems: 6,
+        articles: {
+          oneArticlePer: "body",
+          link: "a.review",
+          skipWhen: null,
+          nextPage: null,
+          limit: 6,
         },
-        detail: {
-          title: { selector: "h1" },
-          publishedAt: { selector: "time", attribute: "datetime" },
-          reviewItem: ".entry-content",
-          name: { selector: "h2.name" },
-          reviewerName: { selector: ".author" },
-          score: { value: { selector: ".score" }, scale: 10 },
+        article: {
+          canonicalUrl: null,
+          title: {
+            try: [
+              {
+                get: "text",
+                selector: "h1",
+                take: "first",
+                startsWith: null,
+                clean: null,
+              },
+            ],
+          },
+          publishedDate: {
+            try: [
+              {
+                get: "attribute",
+                selector: "time",
+                attribute: "datetime",
+                clean: null,
+              },
+            ],
+          },
+          reviews: {
+            inside: "body",
+            oneReviewPer: "element",
+            selector: ".entry-content",
+            name: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: "h2.name",
+                  take: "first",
+                  startsWith: null,
+                  clean: null,
+                },
+              ],
+            },
+            reviewer: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: ".author",
+                  take: "first",
+                  startsWith: null,
+                  clean: null,
+                },
+              ],
+            },
+            tastingNotes: null,
+            score: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: ".score",
+                  take: "first",
+                  startsWith: null,
+                  clean: null,
+                },
+              ],
+              scale: 10,
+              map: null,
+            },
+          },
         },
       },
     });

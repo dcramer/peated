@@ -10,6 +10,7 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
+import type { ScrapeRules } from "./rules";
 import { createPinnedScrapeSourceRun } from "./runs";
 import {
   activateScrapeSourceRevision,
@@ -23,17 +24,52 @@ import {
 } from "./service";
 
 const rules = {
-  kind: "review" as const,
-  list: {
-    detailLink: { selector: "a.review", attribute: "href" },
-    maxItems: 99,
+  kind: "review",
+  articles: {
+    oneArticlePer: "body",
+    link: "a.review",
+    skipWhen: null,
+    nextPage: null,
+    limit: 99,
   },
-  detail: {
-    title: { selector: "h1" },
-    reviewItem: "article.review",
-    name: { selector: "h2" },
+  article: {
+    canonicalUrl: null,
+    title: {
+      try: [
+        {
+          get: "text",
+          selector: "h1",
+          take: "first",
+          startsWith: null,
+          clean: null,
+        },
+      ],
+    },
+    publishedDate: {
+      try: [{ get: "fixed", value: "2026-01-01", clean: null }],
+    },
+    reviews: {
+      inside: "body",
+      oneReviewPer: "element",
+      selector: "article.review",
+      name: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: "h2",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      reviewer: null,
+      tastingNotes: null,
+      score: null,
+    },
   },
-};
+} as const satisfies ScrapeRules;
 
 async function createUser() {
   const [user] = await db
@@ -130,7 +166,20 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     listUrl: "https://versioned.example/new-archive",
     rules: {
       ...rules,
-      detail: { ...rules.detail, title: { selector: "main h1" } },
+      article: {
+        ...rules.article,
+        title: {
+          try: [
+            {
+              get: "text",
+              selector: "main h1",
+              take: "first",
+              startsWith: null,
+              clean: null,
+            },
+          ],
+        },
+      },
     },
     author: "person",
     createdById: user.id,
@@ -185,7 +234,7 @@ test("database constraints keep source and revision identity valid", async () =>
     createdById: user.id,
   });
   expect(first.revision).toBe(1);
-  expect(first.rulesVersion).toBe(5);
+  expect(first.rulesVersion).toBe(6);
 
   await expect(
     db.insert(scrapeSources).values({

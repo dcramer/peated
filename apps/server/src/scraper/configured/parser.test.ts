@@ -21,7 +21,11 @@ import {
   parseWordsOfWhiskyArticle,
 } from "../adapters/wordsOfWhisky";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
-import { parseScrapeRules, type ScrapeRules } from "./rules";
+import {
+  parseScrapeRules,
+  type ScrapeRules,
+  type ScrapeRulesV5,
+} from "./rules";
 
 const reviewConfig = {
   kind: "review" as const,
@@ -80,7 +84,7 @@ const whiskyStudyRules = {
       scale: 100,
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const whiskySagaRules = {
   kind: "review",
@@ -117,7 +121,7 @@ const whiskySagaRules = {
       scale: 100,
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const bourbonCultureRules = {
   kind: "review",
@@ -159,7 +163,7 @@ const bourbonCultureRules = {
       scale: 10,
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const compassBoxRules = {
   kind: "price",
@@ -175,7 +179,7 @@ const compassBoxRules = {
     currency: "gbp",
     volume: { value: "700 ml" },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const kilchomanRules = {
   kind: "price",
@@ -197,7 +201,7 @@ const kilchomanRules = {
       attribute: "content",
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const whiskeyReviewerRules = {
   kind: "review",
@@ -256,7 +260,7 @@ const whiskeyReviewerRules = {
       ],
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const wordsOfWhiskyRules = {
   kind: "review",
@@ -294,7 +298,7 @@ const wordsOfWhiskyRules = {
       scale: 10,
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
 
 const whiskyNotesRules = {
   kind: "review",
@@ -336,7 +340,149 @@ const whiskyNotesRules = {
       scale: 100,
     },
   },
-} satisfies ScrapeRules;
+} satisfies ScrapeRulesV5;
+
+function pageText(selector: string) {
+  return {
+    try: [
+      {
+        get: "text" as const,
+        selector,
+        take: "first" as const,
+        startsWith: null,
+        clean: null,
+      },
+    ],
+  };
+}
+
+function pageAttribute(selector: string, attribute: string) {
+  return {
+    try: [
+      {
+        get: "attribute" as const,
+        selector,
+        attribute,
+        clean: null,
+      },
+    ],
+  };
+}
+
+function reviewText(selector: string, take: "first" | "all" = "first") {
+  return {
+    try: [
+      {
+        get: "text" as const,
+        from: "review" as const,
+        selector,
+        take,
+        startsWith: null,
+        clean: null,
+      },
+    ],
+  };
+}
+
+const currentReviewRules = {
+  kind: "review",
+  articles: {
+    oneArticlePer: "article.card",
+    link: "a[href]",
+    skipWhen: { selector: ".skip", startsWith: null },
+    nextPage: "a.next",
+    limit: 20,
+  },
+  article: {
+    canonicalUrl: null,
+    title: {
+      try: [
+        {
+          get: "text",
+          selector: "h1.missing",
+          take: "first",
+          startsWith: null,
+          clean: null,
+        },
+        {
+          get: "text",
+          selector: "h1.title",
+          take: "first",
+          startsWith: null,
+          clean: null,
+        },
+      ],
+    },
+    publishedDate: {
+      try: [
+        {
+          get: "attribute",
+          selector: "time",
+          attribute: "datetime",
+          clean: null,
+        },
+      ],
+    },
+    reviews: {
+      inside: ".entry-content",
+      oneReviewPer: "heading",
+      selector: "h2.review",
+      stopBefore: ".related",
+      whenOnlyOneReview: "useWholeArea",
+      name: reviewText("h2.review"),
+      reviewer: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: ".writer",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+          {
+            get: "text",
+            from: "article",
+            useFor: "everyReview",
+            selector: ".byline",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      tastingNotes: reviewText("p.note", "all"),
+      score: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: ".score",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+          {
+            get: "text",
+            from: "article",
+            useFor: "firstReview",
+            selector: ".page-score",
+            take: "first",
+            startsWith: null,
+            clean: {
+              removeStart: null,
+              removeEnd: null,
+              addStart: null,
+              addEnd: "/100",
+            },
+          },
+        ],
+        scale: 100,
+        map: null,
+      },
+    },
+  },
+} as const satisfies ScrapeRules;
 
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
@@ -1222,6 +1368,189 @@ describe("scrape source parser", () => {
           message: "The selector did not find any detail links.",
         },
       ],
+    });
+  });
+
+  it("reads version 6 article links inside each result", () => {
+    const result = parseScrapeList(
+      currentReviewRules,
+      `<main>
+        <article class="card"><a href="/one">One</a></article>
+        <article class="card"><span class="skip">News</span><a href="/news">News</a></article>
+        <article class="card"><a href="/two">Two</a></article>
+        <a class="next" href="/page/2">Next</a>
+      </main>`,
+      new URL("https://reviews.test/"),
+    );
+
+    expect(result).toEqual({
+      links: ["https://reviews.test/one", "https://reviews.test/two"],
+      nextPageUrl: "https://reviews.test/page/2",
+      issues: [],
+    });
+  });
+
+  it("reads version 6 heading reviews and explicit article values", () => {
+    const result = parseScrapeDetail(
+      currentReviewRules,
+      `<article>
+        <h1 class="title">Two autumn reviews</h1>
+        <time datetime="2026-09-01"></time>
+        <span class="byline">Example Writer</span>
+        <span class="page-score">91</span>
+        <div class="entry-content">
+          <p>Article introduction.</p>
+          <h2 class="review">North Coast 12</h2>
+          <p class="note">Nose: orange.</p>
+          <h2 class="review">Harbor Malt 18</h2>
+          <span class="writer">Second Writer</span>
+          <p class="note">Finish: oak.</p>
+          <span class="score">88/100</span>
+          <aside class="related">Related reviews</aside>
+        </div>
+      </article>`,
+      new URL("https://reviews.test/autumn"),
+    );
+
+    expect(result.issues).toEqual([]);
+    expect(result.kind).toBe("review");
+    if (result.kind !== "review" || !result.value) {
+      throw new Error("Expected parsed reviews.");
+    }
+    expect(result.value.article.externalReviews).toMatchObject([
+      {
+        name: "North Coast 12",
+        reviewerName: "Example Writer",
+        nativeScore: { value: 91, scale: 100, display: "91/100" },
+      },
+      {
+        name: "Harbor Malt 18",
+        reviewerName: "Second Writer",
+        nativeScore: { value: 88, scale: 100, display: "88/100" },
+      },
+    ]);
+    expect(Object.values(result.value.externalReviewBodies)[0]).not.toContain(
+      "Article introduction.",
+    );
+    expect(Object.values(result.value.externalReviewBodies)[1]).not.toContain(
+      "Related reviews",
+    );
+  });
+
+  it("can keep the full article area for one version 6 review", () => {
+    const result = parseScrapeDetail(
+      currentReviewRules,
+      `<article>
+        <h1 class="title">One autumn review</h1>
+        <time datetime="2026-09-01"></time>
+        <span class="byline">Example Writer</span>
+        <span class="page-score">91</span>
+        <div class="entry-content">
+          <p>Article introduction.</p>
+          <h2 class="review">North Coast 12</h2>
+          <p class="note">Nose: orange.</p>
+          <aside class="related">Related reviews</aside>
+        </div>
+      </article>`,
+      new URL("https://reviews.test/autumn"),
+    );
+
+    expect(result.issues).toEqual([]);
+    expect(result.kind).toBe("review");
+    if (result.kind !== "review" || !result.value) {
+      throw new Error("Expected a parsed review.");
+    }
+    const body = Object.values(result.value.externalReviewBodies)[0];
+    expect(body).toContain("Article introduction.");
+    expect(body).toContain("Nose: orange.");
+    expect(body).not.toContain("Related reviews");
+  });
+
+  it("reports a version 6 review area that is not unique", () => {
+    const result = parseScrapeDetail(
+      currentReviewRules,
+      `<h1 class="title">Reviews</h1>
+       <time datetime="2026-09-01"></time>
+       <div class="entry-content"><h2 class="review">One</h2></div>
+       <div class="entry-content"><h2 class="review">Two</h2></div>`,
+      new URL("https://reviews.test/autumn"),
+    );
+
+    expect(result).toMatchObject({
+      kind: "review",
+      value: null,
+      issues: [
+        {
+          field: "article.reviews.inside",
+          message: "The review area must match exactly once.",
+        },
+      ],
+    });
+  });
+
+  it("reads a version 6 product page", () => {
+    const rules = {
+      kind: "price",
+      products: {
+        oneProductPer: "article.product",
+        link: "a[href]",
+        skipWhen: null,
+        nextPage: null,
+        limit: 20,
+      },
+      product: {
+        name: pageText("h1"),
+        price: {
+          try: [
+            {
+              get: "text",
+              selector: ".sale-price",
+              take: "first",
+              startsWith: null,
+              clean: null,
+            },
+            {
+              get: "text",
+              selector: ".price",
+              take: "first",
+              startsWith: null,
+              clean: null,
+            },
+          ],
+        },
+        currency: "usd",
+        volume: pageText(".volume"),
+        url: null,
+        externalProductId: pageText(".sku"),
+        imageUrl: pageAttribute("img.bottle", "src"),
+        barcode: null,
+      },
+    } as const satisfies ScrapeRules;
+
+    expect(
+      parseScrapeDetail(
+        rules,
+        `<h1>Coastal Malt</h1>
+         <span class="price">$84.99</span>
+         <span class="volume">70 cl</span>
+         <span class="sku">COASTAL-70</span>
+         <img class="bottle" src="https://store.test/images/coastal.jpg">`,
+        new URL("https://store.test/products/coastal"),
+      ),
+    ).toEqual({
+      kind: "price",
+      value: [
+        {
+          name: "Coastal Malt",
+          price: 8499,
+          currency: "usd",
+          volume: 700,
+          url: "https://store.test/products/coastal",
+          externalProductId: "COASTAL-70",
+          imageUrl: "https://store.test/images/coastal.jpg",
+        },
+      ],
+      issues: [],
     });
   });
 });

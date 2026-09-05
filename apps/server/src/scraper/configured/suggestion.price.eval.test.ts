@@ -206,8 +206,8 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(suggestedRevision.aiModel).toBeTruthy();
       expect(suggestedRevision.rules).toMatchObject({
         kind: "price",
-        list: { nextPage: expect.any(Object) },
-        detail: {
+        products: { nextPage: expect.any(String) },
+        product: {
           externalProductId: expect.any(Object),
           imageUrl: expect.any(Object),
         },

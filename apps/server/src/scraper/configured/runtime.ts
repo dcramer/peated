@@ -33,6 +33,7 @@ import {
 import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   parseScrapeRules,
+  scrapeRulesLimit,
   type StoredScrapeRules,
 } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
@@ -120,6 +121,18 @@ type RecordScrapeSourcePreview = (input: {
   };
 }) => Promise<void>;
 
+function linkField(rules: StoredScrapeRules) {
+  if ("articles" in rules) return "articles.link";
+  if ("products" in rules) return "products.link";
+  return "list.detailLink";
+}
+
+function nextPageField(rules: StoredScrapeRules) {
+  if ("articles" in rules) return "articles.nextPage";
+  if ("products" in rules) return "products.nextPage";
+  return "list.nextPage";
+}
+
 const ConfiguredScrapeCursorSchema = z
   .object({
     listUrls: z.array(z.url()).max(SCRAPE_SOURCE_MAX_LIST_PAGES),
@@ -156,12 +169,12 @@ function createScrapeSourceAdapter(
       while (
         state.nextListUrl &&
         listUrls.size < SCRAPE_SOURCE_MAX_LIST_PAGES &&
-        detailUrls.size < input.rules.list.maxItems
+        detailUrls.size < scrapeRulesLimit(input.rules)
       ) {
         if (listUrls.has(state.nextListUrl)) {
           throw new ScrapeSourceParseError([
             {
-              field: "list.nextPage",
+              field: nextPageField(input.rules),
               message: "Pagination returned a page that was already read.",
             },
           ]);
@@ -181,7 +194,7 @@ function createScrapeSourceAdapter(
         }
         for (const link of listResult.links) {
           detailUrls.add(link);
-          if (detailUrls.size >= input.rules.list.maxItems) break;
+          if (detailUrls.size >= scrapeRulesLimit(input.rules)) break;
         }
         state = {
           ...state,
@@ -239,7 +252,7 @@ function createScrapeSourceAdapter(
                 ? []
                 : [
                     {
-                      field: "list.detailLink",
+                      field: linkField(input.rules),
                       message: "No pages produced valid output.",
                     },
                   ],
@@ -274,7 +287,7 @@ export function createLocalScrapeSourcePreview(input: {
     key: `local-preview-${input.siteKey}`,
     externalSiteKey: input.siteKey,
     targetKeys: [input.targetKey],
-    requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
+    requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema:
@@ -356,7 +369,7 @@ function createScrapeSourceDefinition(input: {
     key: `source-${input.scrapeSourceId}`,
     externalSiteKey: input.siteKey,
     targetKeys: [input.targetKey],
-    requestLimit: input.rules.list.maxItems + SCRAPE_SOURCE_MAX_LIST_PAGES,
+    requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema,

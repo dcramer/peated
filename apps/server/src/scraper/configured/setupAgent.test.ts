@@ -1,36 +1,51 @@
 import { load } from "cheerio";
 import { expect, test, vi } from "vitest";
-import { SCRAPE_SOURCE_DEFAULT_MAX_ITEMS } from "./rules";
 import {
   prepareAiPages,
   runScrapeSourceSetupAgent,
   suggestionRequestLimit,
 } from "./setupAgent";
 
-function suggestedValue(
+function text(
   selector: string,
-  attribute: string | null = null,
   operations: {
     startsWith?: string[];
-    all?: boolean;
-    removePrefixes?: string[];
-    removeSuffixes?: string[];
-    prefix?: string;
-    suffix?: string;
+    take?: "first" | "all";
+    removeStart?: string[];
+    removeEnd?: string[];
+    addStart?: string;
+    addEnd?: string;
   } = {},
 ) {
   return {
-    input: "selector" as const,
+    get: "text" as const,
     selector,
-    attribute,
-    value: null,
+    take: operations.take ?? ("first" as const),
     startsWith: operations.startsWith ?? null,
-    all: operations.all ?? false,
-    removePrefixes: operations.removePrefixes ?? null,
-    removeSuffixes: operations.removeSuffixes ?? null,
-    prefix: operations.prefix ?? null,
-    suffix: operations.suffix ?? null,
+    clean:
+      operations.removeStart ||
+      operations.removeEnd ||
+      operations.addStart ||
+      operations.addEnd
+        ? {
+            removeStart: operations.removeStart ?? null,
+            removeEnd: operations.removeEnd ?? null,
+            addStart: operations.addStart ?? null,
+            addEnd: operations.addEnd ?? null,
+          }
+        : null,
   };
+}
+
+function pageField(selector: string) {
+  return { try: [text(selector)] };
+}
+
+function reviewField(
+  selector: string,
+  operations: Parameters<typeof text>[1] = {},
+) {
+  return { try: [{ ...text(selector, operations), from: "review" as const }] };
 }
 
 function reviewCandidate(
@@ -44,35 +59,38 @@ function reviewCandidate(
     listPageUrl: "https://example.test/reviews",
     rules: {
       kind: "review" as const,
-      list: {
-        item: listOptions.item ?? null,
-        detailLink: { selector: "a.review", attribute: "href" as const },
-        excludeWhen: listOptions.excludeWhen ?? null,
+      articles: {
+        oneArticlePer: listOptions.item ?? "body",
+        link: "a.review",
+        skipWhen: listOptions.excludeWhen ?? null,
         nextPage: null,
+        limit: 25,
       },
-      detail: {
+      article: {
         canonicalUrl: null,
-        title: suggestedValue("h1"),
-        publishedAt: {
-          input: "selector" as const,
-          selector: "time",
-          attribute: "datetime",
-          urlDateFormat: null,
+        title: pageField("h1"),
+        publishedDate: {
+          try: [
+            {
+              get: "attribute" as const,
+              selector: "time",
+              attribute: "datetime",
+              clean: null,
+            },
+          ],
         },
-        reviewItem: {
+        reviews: {
+          inside: "body",
+          oneReviewPer: "element" as const,
           selector: "article.review",
-          startsSection: false,
-          sectionEndsBefore: null,
+          name: reviewField(nameSelector, { removeEnd: ["Review"] }),
+          reviewer: null,
+          tastingNotes: reviewField(".body p", {
+            startsWith: ["Nose:", "Finish:"],
+            take: "all",
+          }),
+          score: null,
         },
-        name: suggestedValue(nameSelector, null, {
-          removeSuffixes: ["Review"],
-        }),
-        reviewerName: null,
-        reviewText: suggestedValue(".body p", null, {
-          startsWith: ["Nose:", "Finish:"],
-          all: true,
-        }),
-        score: null,
       },
     },
   };
@@ -162,16 +180,16 @@ test("returns rules only after the rule check passes", async () => {
   const checkRules = vi.fn(async ({ rules }) => {
     if (rules.kind !== "review") throw new Error("Expected review rules.");
     if (
-      "selector" in rules.detail.name &&
-      rules.detail.name.selector === ".bad"
+      rules.article.reviews.name.try[0]?.get === "text" &&
+      rules.article.reviews.name.try[0].selector === ".bad"
     ) {
       return {
         status: "failed" as const,
         feedback: {
-          message: "The proposed rules did not read a detail page.",
+          message: "The proposed rules did not read an article page.",
           issues: [
             {
-              field: "detail.name",
+              field: "article.reviews.name",
               message: "The selector did not find an item name.",
             },
           ],
@@ -207,17 +225,30 @@ test("returns rules only after the rule check passes", async () => {
   expect(result.model).toBe("test-setup-model");
   expect(result.rules).toMatchObject({
     kind: "review",
-    list: {
-      item: ".product-card",
-      excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
-      maxItems: SCRAPE_SOURCE_DEFAULT_MAX_ITEMS,
+    articles: {
+      oneArticlePer: ".product-card",
+      skipWhen: { selector: ".badge", startsWith: ["Sold out"] },
+      limit: 25,
     },
-    detail: {
-      name: { selector: ".bottle-name", removeSuffixes: ["Review"] },
-      reviewText: {
-        selector: ".body p",
-        startsWith: ["Nose:", "Finish:"],
-        all: true,
+    article: {
+      reviews: {
+        name: {
+          try: [
+            expect.objectContaining({
+              selector: ".bottle-name",
+              clean: expect.objectContaining({ removeEnd: ["Review"] }),
+            }),
+          ],
+        },
+        tastingNotes: {
+          try: [
+            expect.objectContaining({
+              selector: ".body p",
+              startsWith: ["Nose:", "Finish:"],
+              take: "all",
+            }),
+          ],
+        },
       },
     },
   });
@@ -231,7 +262,9 @@ test("returns rules only after the rule check passes", async () => {
   });
   expect(JSON.stringify(firstRequest?.tools[0])).not.toContain('"oneOf"');
   const secondRequest = request.mock.calls[1]?.[0];
-  expect(JSON.stringify(secondRequest?.input)).toContain("detail.name");
+  expect(JSON.stringify(secondRequest?.input)).toContain(
+    "article.reviews.name",
+  );
   expect(JSON.stringify(secondRequest?.input)).toContain("North Coast 12");
   expect(secondRequest?.instructions).toContain(
     "Your work is complete only when check_rules accepts the rules.",
@@ -244,27 +277,51 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
     ...base,
     rules: {
       ...base.rules,
-      detail: {
-        ...base.rules.detail,
-        canonicalUrl: suggestedValue('link[rel="canonical"]', "href", {
-          removeSuffixes: ["/"],
-        }),
-        publishedAt: {
-          input: "url_date" as const,
-          selector: null,
-          attribute: null,
-          urlDateFormat: "/yyyy/MM/*-MMddyy",
-        },
-        score: {
-          value: suggestedValue(".rating", null, {
-            removePrefixes: ["Rating:"],
-          }),
-          firstReviewFallback: suggestedValue(".article-rating"),
-          scale: 100,
-          map: [
-            { text: "A", value: 95 },
-            { text: "B+", value: 87 },
+      article: {
+        ...base.rules.article,
+        canonicalUrl: {
+          try: [
+            {
+              get: "attribute" as const,
+              selector: 'link[rel="canonical"]',
+              attribute: "href",
+              clean: {
+                removeStart: null,
+                removeEnd: ["/"],
+                addStart: null,
+                addEnd: null,
+              },
+            },
           ],
+        },
+        publishedDate: {
+          try: [
+            {
+              get: "dateFromUrl" as const,
+              format: "/yyyy/MM/*-MMddyy",
+            },
+          ],
+        },
+        reviews: {
+          ...base.rules.article.reviews,
+          score: {
+            try: [
+              {
+                ...text(".rating", { removeStart: ["Rating:"] }),
+                from: "review" as const,
+              },
+              {
+                ...text(".article-rating"),
+                from: "article" as const,
+                useFor: "firstReview" as const,
+              },
+            ],
+            scale: 100,
+            map: [
+              { text: "A", value: 95 },
+              { text: "B+", value: 87 },
+            ],
+          },
         },
       },
     },
@@ -291,20 +348,34 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
   });
 
   expect(result.rules).toMatchObject({
-    detail: {
+    article: {
       canonicalUrl: {
-        selector: 'link[rel="canonical"]',
-        attribute: "href",
-        removeSuffixes: ["/"],
-      },
-      publishedAt: { urlDateFormat: "/yyyy/MM/*-MMddyy" },
-      score: {
-        scale: 100,
-        firstReviewFallback: { selector: ".article-rating" },
-        map: [
-          { text: "A", value: 95 },
-          { text: "B+", value: 87 },
+        try: [
+          expect.objectContaining({
+            selector: 'link[rel="canonical"]',
+            attribute: "href",
+            clean: expect.objectContaining({ removeEnd: ["/"] }),
+          }),
         ],
+      },
+      publishedDate: {
+        try: [{ get: "dateFromUrl", format: "/yyyy/MM/*-MMddyy" }],
+      },
+      reviews: {
+        score: expect.objectContaining({
+          scale: 100,
+          try: expect.arrayContaining([
+            expect.objectContaining({
+              from: "article",
+              useFor: "firstReview",
+              selector: ".article-rating",
+            }),
+          ]),
+          map: [
+            { text: "A", value: 95 },
+            { text: "B+", value: 87 },
+          ],
+        }),
       },
     },
   });
@@ -317,12 +388,15 @@ test("turns review headings into sections", async () => {
     ...base,
     rules: {
       ...base.rules,
-      detail: {
-        ...base.rules.detail,
-        reviewItem: {
+      article: {
+        ...base.rules.article,
+        reviews: {
+          ...base.rules.article.reviews,
+          inside: ".entry-content",
+          oneReviewPer: "heading" as const,
           selector: ".entry-content > h2.review",
-          startsSection: true,
-          sectionEndsBefore: ".entry-content > .related-posts",
+          stopBefore: ".entry-content > .related-posts",
+          whenOnlyOneReview: "useWholeArea" as const,
         },
       },
     },
@@ -349,10 +423,12 @@ test("turns review headings into sections", async () => {
 
   expect(result.rules).toMatchObject({
     kind: "review",
-    detail: {
-      reviewItem: {
-        start: ".entry-content > h2.review",
-        endBefore: ".entry-content > .related-posts",
+    article: {
+      reviews: {
+        oneReviewPer: "heading",
+        selector: ".entry-content > h2.review",
+        stopBefore: ".entry-content > .related-posts",
+        whenOnlyOneReview: "useWholeArea",
       },
     },
   });
@@ -379,7 +455,10 @@ test("stops after the rule-check limit", async () => {
         feedback: {
           message: "The rules still fail.",
           issues: [
-            { field: "detail.name", message: "No item name was found." },
+            {
+              field: "article.reviews.name",
+              message: "No item name was found.",
+            },
           ],
         },
         inspectedPages: [],

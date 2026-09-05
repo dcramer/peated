@@ -59,6 +59,14 @@ type CheckedDetailPage = AiPage & {
       };
 };
 
+function linkField(rules: ScrapeRules) {
+  return rules.kind === "review" ? "articles.link" : "products.link";
+}
+
+function nextPageField(rules: ScrapeRules) {
+  return rules.kind === "review" ? "articles.nextPage" : "products.nextPage";
+}
+
 export function checkListPage(input: {
   listPageUrl: string;
   rules: ScrapeRules;
@@ -91,8 +99,8 @@ export function checkListPage(input: {
         ? result.issues
         : [
             {
-              field: "list.detailLink",
-              message: "The selector did not find any detail links.",
+              field: linkField(input.rules),
+              message: "The selector did not find any page links.",
             },
           ],
     );
@@ -117,7 +125,7 @@ export async function checkNextListPage(input: {
       "The proposed next page repeats the list page.",
       [
         {
-          field: "list.nextPage",
+          field: nextPageField(input.rules),
           message: "Select a link to a different list page.",
         },
       ],
@@ -136,10 +144,10 @@ export async function checkNextListPage(input: {
   for (const link of result.links) links.add(link);
   if (links.size === firstPageLinkCount) {
     throw new ScrapeSourceSetupError(
-      "The proposed next page did not add any detail pages.",
+      "The proposed next page did not add any new pages.",
       [
         {
-          field: "list.nextPage",
+          field: nextPageField(input.rules),
           message: "Select the link to the next page of results.",
         },
       ],
@@ -160,7 +168,7 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
   const parsed = parseScrapeDetail(rules, page.html, new URL(page.url));
   if (parsed.issues.length > 0 || !parsed.value) {
     throw new ScrapeSourceSetupError(
-      "The proposed rules did not read a detail page.",
+      "The proposed rules did not read an article or product page.",
       parsed.issues,
     );
   }
@@ -222,11 +230,11 @@ export async function checkDetailPages(input: {
   }
   if (pages.length === 0) {
     throw new ScrapeSourceSetupError(
-      "The proposed rules did not find a detail page.",
+      "The proposed rules did not find an article or product page.",
       [
         {
-          field: "list.detailLink",
-          message: "The selector did not find a usable detail page.",
+          field: linkField(input.rules),
+          message: "The selector did not find a usable page.",
         },
       ],
     );
