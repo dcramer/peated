@@ -11,10 +11,10 @@ import {
   serializeCollectionAddEntries,
   serializePrimaryActivityEntries,
 } from "@peated/server/lib/activityFeed";
+import { viewerVisibleUserCondition } from "@peated/server/lib/activityVisibility";
 import { implement } from "@peated/server/orpc";
 import activityListContract from "@peated/server/orpc/contracts/activity/list";
-import type { SQL } from "drizzle-orm";
-import { eq, or, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 // Main activity is read-time composition over authoritative source tables. The
 // route owns visibility filtering; shared helpers own entry shaping/throttling.
@@ -38,20 +38,7 @@ function visibleActivityUserCondition({
     )`;
   }
 
-  const visibleUsers: SQL<unknown>[] = [eq(users.private, false)];
-  if (currentUserId) {
-    visibleUsers.push(
-      eq(users.id, currentUserId),
-      sql`${users.id} IN (
-        SELECT ${follows.toUserId}
-        FROM ${follows}
-        WHERE ${follows.fromUserId} = ${currentUserId}
-          AND ${follows.status} = 'following'
-      )`,
-    );
-  }
-
-  return or(...visibleUsers)!;
+  return viewerVisibleUserCondition(currentUserId);
 }
 
 export default implement(activityListContract).handler(async function ({

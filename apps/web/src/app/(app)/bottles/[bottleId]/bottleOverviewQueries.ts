@@ -6,13 +6,9 @@ export const bottleOverviewQueries = {
     orpc.bottles.recommendations.queryOptions({
       input: { bottle: bottleId, limit: 3 },
     }),
-  reviews: (orpc: ORPCQueryUtils, bottleId: number) =>
-    orpc.externalReviews.list.queryOptions({
-      input: { bottle: bottleId, limit: 3, sort: "recent" },
-    }),
-  memberReviews: (orpc: ORPCQueryUtils, bottleId: number) =>
-    orpc.memberReviews.list.queryOptions({
-      input: { bottle: bottleId, limit: 3 },
+  reviewsAndTastings: (orpc: ORPCQueryUtils, bottleId: number) =>
+    orpc.activity.reviewsAndTastings.queryOptions({
+      input: { bottle: bottleId, limit: 6 },
     }),
   series: (orpc: ORPCQueryUtils, seriesId?: number) => ({
     ...orpc.bottles.list.queryOptions({
@@ -20,8 +16,4 @@ export const bottleOverviewQueries = {
     }),
     enabled: Boolean(seriesId),
   }),
-  tastings: (orpc: ORPCQueryUtils, bottleId: number) =>
-    orpc.tastings.list.queryOptions({
-      input: { bottle: bottleId, limit: 3 },
-    }),
 };

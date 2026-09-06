@@ -1,7 +1,8 @@
 import { db } from "@peated/server/db";
-import { users } from "@peated/server/db/schema";
+import { memberReviews, tastings, users } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { generatePasswordHash } from "@peated/server/lib/auth";
+import { dispatchBottleStatsRecomputes } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -10,7 +11,7 @@ import {
 import { UserInputSchema, UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -97,6 +98,23 @@ export default procedure
         throw errors.INTERNAL_SERVER_ERROR({
           message: "Unable to update user.",
         });
+      }
+
+      if (data.private !== undefined) {
+        const affected = await db.execute<{ bottleId: number | string }>(sql`
+          SELECT ${tastings.bottleId} AS "bottleId"
+          FROM ${tastings}
+          WHERE ${tastings.createdById} = ${user.id}
+          UNION
+          SELECT ${memberReviews.bottleId} AS "bottleId"
+          FROM ${memberReviews}
+          WHERE ${memberReviews.createdById} = ${user.id}
+        `);
+        await dispatchBottleStatsRecomputes(
+          "userPrivacy",
+          user.id,
+          affected.rows.map(({ bottleId }) => Number(bottleId)),
+        );
       }
 
       return await serialize(UserSerializer, newUser, context.user);

@@ -1,5 +1,6 @@
 import { mockOS } from "./implementer";
 import activityList from "./routes/activity/list";
+import reviewsAndTastings from "./routes/activity/reviews-and-tastings";
 import login from "./routes/auth/login";
 import badgeDetails from "./routes/badges/details";
 import badgeUserList from "./routes/badges/user-list";
@@ -73,6 +74,7 @@ export const mockRouter = mockOS.router({
   stats,
   activity: {
     list: activityList,
+    reviewsAndTastings,
   },
   auth: {
     login,

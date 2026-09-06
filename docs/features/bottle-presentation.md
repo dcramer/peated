@@ -142,11 +142,12 @@ token. The conflict belongs in verification or moderation workflows.
 ## Tasting-note flavor profile
 
 Bottle overview pages show a flavor-category wheel below the bottle image. Each
-category measures its occurrence in that exact Bottle's public tastings with
-recognized notes. Each tasting counts once per category; repeat tastings remain
-separate observations. Private tastings and suggested tags are excluded, even
-for signed-in authors. Do not combine sibling releases or use summed tag counts
-as category counts.
+category measures its occurrence in that exact Bottle's public tastings, member
+reviews, and external reviews with recognized notes. Each record counts once per
+category; repeat tastings remain separate observations. Private member content,
+unpublished external reviews, and suggested tags are excluded, even for signed-in
+authors. Do not combine sibling releases or use summed tag counts as category
+counts.
 
 Distillery and region wheels instead count each active Bottle once per category.
 Both show commonality, not intensity. Keep category positions fixed. Hovering or

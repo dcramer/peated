@@ -59,7 +59,9 @@ export default mockOS.entities.portfolio.handler(
             result = left.name.localeCompare(right.name);
             break;
           case "tastings":
-            result = left.totalTastings - right.totalTastings;
+            result =
+              left.publicReviewAndTastingCount -
+              right.publicReviewAndTastingCount;
             break;
           case "bottles":
           default:

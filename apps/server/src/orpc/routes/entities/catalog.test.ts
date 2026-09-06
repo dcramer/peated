@@ -38,6 +38,7 @@ describe("GET /entities/:entity/catalog", () => {
       distillerIds: [entity.id],
       category: "bourbon",
       totalTastings: 3,
+      publicReviewAndTastingCount: 3,
       medianScore: 87,
     });
     await fixtures.Bottle({
@@ -47,6 +48,7 @@ describe("GET /entities/:entity/catalog", () => {
       distillerIds: [sourceA.id, sourceB.id],
       category: "blend",
       totalTastings: 2,
+      publicReviewAndTastingCount: 2,
     });
     await fixtures.Bottle({
       name: "Distilled Release",
@@ -55,6 +57,7 @@ describe("GET /entities/:entity/catalog", () => {
       distillerIds: [entity.id],
       category: "single_malt",
       totalTastings: 1,
+      publicReviewAndTastingCount: 1,
     });
     await fixtures.Bottle({
       name: "Unrelated Release",
@@ -123,18 +126,21 @@ describe("GET /entities/:entity/catalog", () => {
           id: expect.any(Number),
           fullName: "Summary Entity Overlapping Roles",
           totalTastings: 3,
+          publicReviewAndTastingCount: 3,
           medianScore: 87,
         },
         {
           id: expect.any(Number),
           fullName: "Alpha Brand Bottled Release",
           totalTastings: 2,
+          publicReviewAndTastingCount: 2,
           medianScore: null,
         },
         {
           id: expect.any(Number),
           fullName: "Beta Brand Distilled Release",
           totalTastings: 1,
+          publicReviewAndTastingCount: 1,
           medianScore: null,
         },
       ],

@@ -129,7 +129,7 @@ describe("POST /tastings", () => {
     ).toEqual({ bottleId: selectedBottle.id });
   });
 
-  test("accounts tags against the selected Bottle", async ({
+  test("queues tag summary work for the selected Bottle", async ({
     defaults,
     fixtures,
   }) => {
@@ -146,7 +146,12 @@ describe("POST /tastings", () => {
         where: (tags, { and, eq }) =>
           and(eq(tags.bottleId, bottle.id), eq(tags.tag, "caramel")),
       }),
-    ).toMatchObject({ count: 1 });
+    ).toBeUndefined();
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
   });
 
   test("validates Flight membership by Bottle", async ({
@@ -192,7 +197,7 @@ describe("POST /tastings", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
   });
 
-  test("rolls back the Tasting when a tag aggregate write fails", async ({
+  test("does not mutate the cached tag summary inline", async ({
     defaults,
     fixtures,
   }) => {
@@ -204,12 +209,10 @@ describe("POST /tastings", () => {
       count: 2_147_483_647,
     });
 
-    await expect(
-      routerClient.tastings.create(
-        { bottle: bottle.id, tags: ["caramel"] },
-        { context: { user: defaults.user } },
-      ),
-    ).rejects.toThrow("integer out of range");
+    await routerClient.tastings.create(
+      { bottle: bottle.id, tags: ["caramel"] },
+      { context: { user: defaults.user } },
+    );
 
     expect(
       await db.query.tastings.findFirst({
@@ -219,7 +222,7 @@ describe("POST /tastings", () => {
             eq(tastings.createdById, defaults.user.id),
           ),
       }),
-    ).toBeUndefined();
+    ).toBeDefined();
     expect(
       await db.query.bottleTags.findFirst({
         where: (bottleTags, { and, eq }) =>

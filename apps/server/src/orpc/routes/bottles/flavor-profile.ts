@@ -1,6 +1,11 @@
 import { TAG_CATEGORIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { tags, tastings, users } from "@peated/server/db/schema";
+import {
+  bottleNoteCategories,
+  bottles,
+  bottleTags,
+  tags,
+} from "@peated/server/db/schema";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -16,38 +21,39 @@ export default implement(flavorProfileContract).handler(
       return await db.transaction(async (tx) => {
         await resolveActiveBottleIds(tx, [input.bottle]);
 
-        // Bottle flavor profiles are public: this route excludes private notes,
-        // even for their author, and counts each tasting once per category.
+        // Bottle flavor profiles are public. Each public review or tasting
+        // counts once per category, regardless of repeated notes in it.
         const result = await tx.execute<BottleFlavorProfile>(sql`
-        WITH public_notes AS MATERIALIZED (
-          SELECT DISTINCT ${tastings.id} AS tasting_id,
-            ${tags.name} AS name, ${tags.tagCategory} AS category
-          FROM ${tastings}
-          INNER JOIN ${users} ON ${users.id} = ${tastings.createdById}
-            AND ${users.private} = FALSE
-          CROSS JOIN LATERAL unnest(${tastings.tags}) AS note(name)
-          INNER JOIN ${tags} ON ${tags.name} = note.name
-          WHERE ${tastings.bottleId} = ${input.bottle}
-        ), category_counts AS (
-          SELECT category, COUNT(DISTINCT tasting_id)::integer AS tasting_count
-          FROM public_notes GROUP BY category
+        WITH category_counts AS (
+          SELECT ${bottleNoteCategories.category} AS category,
+            ${bottleNoteCategories.count} AS review_and_tasting_count
+          FROM ${bottleNoteCategories}
+          WHERE ${bottleNoteCategories.bottleId} = ${input.bottle}
         ), ranked_notes AS (
-          SELECT category, name, COUNT(*)::integer AS tasting_count,
+          SELECT ${tags.tagCategory} AS category, ${bottleTags.tag} AS name,
+            ${bottleTags.count} AS review_and_tasting_count,
             ROW_NUMBER() OVER (
-              PARTITION BY category ORDER BY COUNT(*) DESC, name ASC
+              PARTITION BY ${tags.tagCategory}
+              ORDER BY ${bottleTags.count} DESC, ${bottleTags.tag} ASC
             ) AS rank
-          FROM public_notes GROUP BY category, name
+          FROM ${bottleTags}
+          INNER JOIN ${tags} ON ${tags.name} = ${bottleTags.tag}
+          WHERE ${bottleTags.bottleId} = ${input.bottle}
         )
         SELECT
-          (SELECT COUNT(DISTINCT tasting_id)::integer FROM public_notes) AS "notedTastings",
+          ${bottles.notedReviewAndTastingCount}::integer
+            AS "notedReviewAndTastingCount",
+          ${bottles.notedReviewAndTastingCount}::integer AS "notedTastings",
           COALESCE((
             SELECT jsonb_agg(jsonb_build_object(
               'category', category_counts.category,
-              'tastingCount', category_counts.tasting_count,
+              'reviewAndTastingCount', category_counts.review_and_tasting_count,
+              'tastingCount', category_counts.review_and_tasting_count,
               'notes', (
                 SELECT jsonb_agg(jsonb_build_object(
                   'name', ranked_notes.name,
-                  'tastingCount', ranked_notes.tasting_count
+                  'reviewAndTastingCount', ranked_notes.review_and_tasting_count,
+                  'tastingCount', ranked_notes.review_and_tasting_count
                 ) ORDER BY ranked_notes.rank)
                 FROM ranked_notes
                 WHERE ranked_notes.category = category_counts.category
@@ -55,6 +61,8 @@ export default implement(flavorProfileContract).handler(
               )
             )) FROM category_counts
           ), '[]'::jsonb) AS categories
+        FROM ${bottles}
+        WHERE ${bottles.id} = ${input.bottle}
       `);
         const profile = result.rows[0];
         if (!profile)
@@ -66,6 +74,7 @@ export default implement(flavorProfileContract).handler(
             (category) =>
               profile.categories.find((item) => item.category === category) ?? {
                 category,
+                reviewAndTastingCount: 0,
                 tastingCount: 0,
                 notes: [],
               },

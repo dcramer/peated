@@ -62,9 +62,9 @@ function bottleOrderBy(sort: BottleGroupBottleSort): SQL<unknown>[] {
     case "-score":
       return [sql`${bottles.medianScore} DESC NULLS LAST`, asc(bottles.id)];
     case "tastings":
-      return [asc(bottles.totalTastings), asc(bottles.id)];
+      return [asc(bottles.publicReviewAndTastingCount), asc(bottles.id)];
     case "-tastings":
-      return [desc(bottles.totalTastings), asc(bottles.id)];
+      return [desc(bottles.publicReviewAndTastingCount), asc(bottles.id)];
     case "releaseYear":
       return [sql`${bottles.releaseYear} ASC NULLS FIRST`, asc(bottles.id)];
     case "-releaseYear":

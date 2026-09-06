@@ -1,16 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type { BottleListItem, CriticReviewProps, FactListItem } from "..";
+import type { BottleListItem, FactListItem } from "..";
 import {
   AppLink,
   BottleVisual,
-  CriticReview,
   FactList,
   hasVisibleFacts,
   ImageAttribution,
-  ItemList,
-  ItemListItem,
   LoadingList,
   LoadingPlaceholder,
   SectionHeading,
@@ -31,38 +28,32 @@ export type BottleOverviewImage = {
 };
 
 export type BottleOverviewProps = {
-  criticReviewDetail?: string;
-  criticReviews?: readonly CriticReviewProps[];
   declaredFacts: readonly [FactListItem, ...FactListItem[]];
   flavorProfile?: ReactNode;
   image: BottleOverviewImage;
   mainState?: ReactNode;
-  memberReviews?: readonly CommunityFeedItem[];
-  moreTastingsHref?: string;
+  moreReviewsAndTastingsHref?: string;
   recommendationHeading?: string;
   recommendationState?: ReactNode;
   recommendations?: readonly BottleListItem[];
   railSections?: ReactNode;
-  tastingCount?: number;
-  tastings?: readonly CommunityFeedItem[];
+  reviewAndTastingCount?: number;
+  reviewsAndTastings?: readonly CommunityFeedItem[];
 };
 
 /** Composes bottle facts, image, reviews, and tastings, with its flavor profile above related bottles. */
 export function BottleOverview({
-  criticReviewDetail,
-  criticReviews = [],
   declaredFacts,
   flavorProfile,
   image,
   mainState,
-  memberReviews = [],
-  moreTastingsHref,
+  moreReviewsAndTastingsHref,
   recommendationHeading = "If you liked this",
   recommendationState,
   recommendations = [],
   railSections,
-  tastingCount,
-  tastings = [],
+  reviewAndTastingCount,
+  reviewsAndTastings = [],
 }: BottleOverviewProps) {
   const hasDeclaredFacts = hasVisibleFacts(declaredFacts);
 
@@ -76,66 +67,31 @@ export function BottleOverview({
         ) : null}
 
         <div {...stylex.props(styles.content)}>
-          {criticReviews.length ? (
+          {reviewsAndTastings.length ? (
             <section {...stylex.props(styles.section)}>
-              <div {...stylex.props(styles.sectionHeader)}>
-                <SectionHeading>Critic reviews</SectionHeading>
-                {criticReviewDetail ? (
-                  <span
-                    {...stylex.props(
-                      foundationStyles.metadata,
-                      styles.sectionDetail,
-                    )}
-                  >
-                    {criticReviewDetail}
-                  </span>
-                ) : null}
-              </div>
-              <ItemList ariaLabel="Critic reviews">
-                {criticReviews.map((review, index) => (
-                  <ItemListItem
-                    key={`${review.publication}-${review.publishedAt ?? index}`}
-                  >
-                    <CriticReview {...review} />
-                  </ItemListItem>
-                ))}
-              </ItemList>
-            </section>
-          ) : null}
-
-          {memberReviews.length ? (
-            <section {...stylex.props(styles.section)}>
-              <SectionHeading>Member reviews</SectionHeading>
+              <SectionHeading>Reviews & tastings</SectionHeading>
               <CommunityFeed
-                ariaLabel="Bottle member reviews"
-                items={memberReviews}
+                ariaLabel="Bottle reviews and tastings"
+                items={reviewsAndTastings}
               />
-            </section>
-          ) : null}
-
-          {tastings.length ? (
-            <section {...stylex.props(styles.section)}>
-              <SectionHeading>Tastings</SectionHeading>
-              <CommunityFeed ariaLabel="Bottle tastings" items={tastings} />
-              {moreTastingsHref &&
-              tastingCount !== undefined &&
-              tastingCount > tastings.length ? (
+              {moreReviewsAndTastingsHref &&
+              reviewAndTastingCount !== undefined &&
+              reviewAndTastingCount > reviewsAndTastings.length ? (
                 <AppLink
-                  href={moreTastingsHref}
+                  href={moreReviewsAndTastingsHref}
                   {...stylex.props(
                     foundationStyles.interactiveSmall,
                     styles.moreLink,
                   )}
                 >
-                  Show all {tastingCount.toLocaleString("en-US")} tastings →
+                  Show all {reviewAndTastingCount.toLocaleString("en-US")}{" "}
+                  reviews & tastings →
                 </AppLink>
               ) : null}
             </section>
           ) : null}
 
-          {!criticReviews.length && !memberReviews.length && !tastings.length
-            ? mainState
-            : null}
+          {!reviewsAndTastings.length ? mainState : null}
         </div>
       </div>
 

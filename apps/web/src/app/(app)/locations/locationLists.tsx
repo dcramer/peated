@@ -96,7 +96,7 @@ export function LocationTableLoading({
       cell: ({ delay }) => (
         <LoadingPlaceholder delay={delay} preset="metadata" />
       ),
-      header: kind === "distilleries" ? "Tastings" : "Distillers",
+      header: kind === "distilleries" ? "Reviews & tastings" : "Distillers",
       key: "third",
       priority: "secondary",
     },
@@ -129,8 +129,8 @@ const distillerColumns: DataTableColumn<Entity>[] = [
   },
   {
     align: "right",
-    cell: (item) => item.totalTastings.toLocaleString("en-US"),
-    header: "Tastings",
+    cell: (item) => item.publicReviewAndTastingCount.toLocaleString("en-US"),
+    header: "Reviews & tastings",
     key: "tastings",
     priority: "secondary",
   },

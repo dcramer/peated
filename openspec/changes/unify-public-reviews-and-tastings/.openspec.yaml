@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-09-06
+goal: "Implement issue #1133 by unifying public tastings, member reviews, and
+  critic reviews through cached bottle and entity summaries plus combined public
+  feeds."

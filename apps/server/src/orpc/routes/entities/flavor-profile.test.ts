@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottleTombstones, tastings } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  memberReviews,
+  tastings,
+} from "@peated/server/db/schema";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /entities/{entity}/flavor-profile", () => {
@@ -52,6 +57,9 @@ describe("GET /entities/{entity}/flavor-profile", () => {
         tags: ["unclassified-note"],
       },
     ]);
+    for (const bottle of [first, second, empty, unknown, privateOnly]) {
+      await recomputeBottleStats(bottle.id);
+    }
 
     const result = await routerClient.entities.flavorProfile(
       { entity: distillery.id },
@@ -113,6 +121,9 @@ describe("GET /entities/{entity}/flavor-profile", () => {
         tags: ["smoke"],
       })),
     );
+    for (const bottle of [active, brandOnly, bottlerOnly]) {
+      await recomputeBottleStats(bottle.id);
+    }
 
     const result = await routerClient.entities.flavorProfile({
       entity: distillery.id,
@@ -122,6 +133,41 @@ describe("GET /entities/{entity}/flavor-profile", () => {
     expect(
       result.categories.find((item) => item.category === "smoke")?.bottleCount,
     ).toBe(1);
+  });
+
+  test("includes bottles noted by reviews when no tasting has notes", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const distillery = await fixtures.Entity({ kind: "distillery" });
+    const memberBottle = await fixtures.Bottle({
+      distillerIds: [distillery.id],
+    });
+    const criticBottle = await fixtures.Bottle({
+      distillerIds: [distillery.id],
+    });
+    await fixtures.Tag({ name: "smoke", tagCategory: "smoke" });
+    await db.insert(memberReviews).values({
+      bottleId: memberBottle.id,
+      createdById: defaults.user.id,
+      score: 88,
+      tags: ["smoke"],
+    });
+    await fixtures.ExternalReview({
+      bottleId: criticBottle.id,
+      tags: ["smoke"],
+    });
+    await recomputeBottleStats(memberBottle.id);
+    await recomputeBottleStats(criticBottle.id);
+
+    const result = await routerClient.entities.flavorProfile({
+      entity: distillery.id,
+    });
+
+    expect(result.notedBottles).toBe(2);
+    expect(
+      result.categories.find((item) => item.category === "smoke")?.bottleCount,
+    ).toBe(2);
   });
 
   test("returns an empty profile for a distillery without bottles", async ({

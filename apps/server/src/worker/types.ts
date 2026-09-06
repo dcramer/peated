@@ -22,6 +22,7 @@ export type JobName =
   | "ProcessStorePriceMatchRetryRun"
   | "ProcessNotification"
   | "RepairBottleGroupBottleCounts"
+  | "RepairBottleStats"
   | "RepairBottleSeriesReleaseCounts"
   | "RepairCollectionBottleCounts"
   | "RepairEntityBottleCounts"

@@ -22,7 +22,7 @@ const entries: EntityCatalogItem[] = [
     location: "Islay, Scotland",
     isFollowing: true,
     totalBottles: 207,
-    totalTastings: 22,
+    publicReviewAndTastingCount: 22,
     createBottleHref: "/bottles/new?distiller=1129",
   },
   {
@@ -33,7 +33,7 @@ const entries: EntityCatalogItem[] = [
     location: "Osaka, Japan",
     isFollowing: false,
     totalBottles: 162,
-    totalTastings: 13,
+    publicReviewAndTastingCount: 13,
   },
   {
     id: 3,
@@ -42,7 +42,7 @@ const entries: EntityCatalogItem[] = [
     kind: "company",
     isFollowing: false,
     totalBottles: 0,
-    totalTastings: 0,
+    publicReviewAndTastingCount: 0,
   },
 ];
 const meta = {

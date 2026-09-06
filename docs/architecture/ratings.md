@@ -18,10 +18,9 @@ An external review can also have one short generated clip and matched tasting
 tags. Its full body is saved for internal parsing, following
 [External Reviews](../features/external-reviews.md).
 
-TODO(ratings): Revisit shared storage for member and external reviews, and how
-tastings and both review types feed flavor wheels. Measure bottle, distillery,
-and region queries before choosing shared queries or saved totals. Preserve
-source attribution and privacy and publication rules.
+Tastings, member reviews, and external reviews use the same tasting-note
+vocabulary. Public flavor summaries combine their tags while preserving each
+source's privacy and publication rules.
 
 ## Tasting bands
 
@@ -162,9 +161,25 @@ Bottle and BottleGroup summaries store:
 
 - `medianScore`, `minScore`, and `maxScore`
 - `memberScoreCount` and `externalScoreCount`
+- `publicReviewAndTastingCount`, the number of public tastings, public member
+  reviews, and published visible external reviews
+- `notedReviewAndTastingCount`, the number of those records with at least one
+  recognized tasting-note tag
 - `reviewScoreBandCounts`, with each included member and external review score
   counted in its matching tasting band
 - `tastingBandCounts`, with one count for each tasting band
+
+`bottle_tag` saves the combined count for each recognized note on one exact
+Bottle. `bottle_note_category` saves the combined count for each flavor
+category. A source record counts at most once for a note and once for a
+category, even when the saved tag array repeats a note or contains several
+notes from the same category. Tag synonyms resolve to their canonical tag.
+
+These public note summaries exclude private members' tastings and reviews.
+They also exclude hidden or unpublished external reviews. Rating eligibility
+is separate: an eligible untagged score can affect rating summaries without
+affecting flavor summaries, and a published tagged external review can affect
+flavor summaries even when it has no usable score.
 
 The shipped `avg_rating` and `rating_stats` SQL columns remain for historical
 data. Application code calls them `legacySimpleRatingAverage` and
@@ -189,20 +204,46 @@ breakdown with the review and tasting lists. Compact bottle rows add
 Individual external reviews still show their original score and scale.
 
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
-active members. They exclude retired Bottles.
+active members. They exclude retired Bottles. Entity combined counts sum the
+active Bottle summaries that use that Entity as Brand, Bottler, or Distiller.
+
+Public Bottle, Entity, flavor, tag, and catalog reads use these saved summaries.
+This keeps request work proportional to the matching Bottles and tags instead
+of scanning all three source tables. The compatibility sort value `tastings`
+orders public catalogs by `publicReviewAndTastingCount`; `totalTastings` keeps
+its tasting-only meaning for source-specific features.
 
 Writes queue the existing Bottle summary job after the database change
 finishes. This includes member review writes, tasting band changes, external
 review imports, moderation changes, assignments, and review publication
 changes. Large publication changes queue work in batches.
 
-Use **Bottle counts** on Admin → Maintenance to rebuild active Bottle and
-BottleGroup summaries. The repair also checks each saved external score count
-against the shared external-review rule.
+Use **Bottle counts** on Admin → Maintenance to rebuild active Bottle,
+BottleGroup, and Entity summaries. The repair queues active Bottles in bounded,
+resumable pages and also checks each saved external score count against the
+shared external-review rule.
 
 Migration 0268 starts existing review score ranges at zero. After deploying
 that migration, run the repair once to fill the ranges for existing Bottles and
 BottleGroups.
+
+Migration 0276 adds the combined public counts and note-category cache. Run the
+same repair after deploying it to backfill those summaries before relying on
+the new public ordering and flavor reads.
+
+## Public reviews-and-tastings lists
+
+Public Bottle and Entity lists interleave tastings, member reviews, and critic
+reviews in one chronological feed. They use a snapshot and a stable event-time,
+source-kind, and ID cursor so a page does not repeat records while a reader
+moves forward. The existing `/tastings` page URLs remain valid, but combined
+pages and controls are labeled “Reviews & tastings.”
+
+Unlike anonymous summaries, row lists are viewer-aware. A signed-in member can
+see private member activity when they are the author or an accepted follower.
+That private activity never changes the public combined counts, tag rankings,
+or flavor charts. Profiles, recommendations, badges, comments, flights,
+notifications, and moderation keep their source-specific rules.
 
 ## Recommendations
 

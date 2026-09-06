@@ -133,7 +133,7 @@ export async function listEntities({
               ts_rank(${entities.searchVector}, ${textQuery}),
               ts_rank(${entities.searchVector}, ${prefixQuery}) * 0.5
             ) DESC`
-        : desc(entities.totalTastings);
+        : desc(entities.publicReviewAndTastingCount);
       break;
     case "name":
       orderBy = asc(entities.name);
@@ -154,11 +154,11 @@ export async function listEntities({
       orderBy = desc(entities.totalBottles);
       break;
     case "tastings":
-      orderBy = asc(entities.totalTastings);
+      orderBy = asc(entities.publicReviewAndTastingCount);
       break;
     case "-tastings":
     default:
-      orderBy = desc(entities.totalTastings);
+      orderBy = desc(entities.publicReviewAndTastingCount);
   }
 
   const [results, [totalRow]] = await Promise.all([

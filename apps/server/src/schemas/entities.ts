@@ -129,6 +129,12 @@ export const EntitySchema = z.object({
     .number()
     .readonly()
     .describe("Total number of tastings for bottles from this entity"),
+  publicReviewAndTastingCount: z
+    .number()
+    .int()
+    .gte(0)
+    .readonly()
+    .describe("Total public reviews and tastings for this entity's bottles"),
   totalBottles: z
     .number()
     .readonly()

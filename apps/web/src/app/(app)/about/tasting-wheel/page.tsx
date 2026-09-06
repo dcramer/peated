@@ -47,10 +47,10 @@ export default function TastingWheelPage() {
               still, or the cask to put a name to it.
             </AboutText>
             <AboutText>
-              On a bottle page, a larger slice means more public tastings
-              mention that category. On distillery and region pages, it means
-              more bottles have those notes. Neither tells you how strong a
-              flavor tastes, and your notes don&apos;t have to match anyone
+              On a bottle page, a larger slice means more public reviews and
+              tastings mention that category. On distillery and region pages, it
+              means more bottles have those notes. Neither tells you how strong
+              a flavor tastes, and your notes don&apos;t have to match anyone
               else&apos;s.
             </AboutText>
           </AboutTextStack>

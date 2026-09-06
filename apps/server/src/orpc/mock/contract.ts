@@ -1,5 +1,6 @@
 import type { InferContractRouterOutputs } from "@orpc/contract";
 import activityList from "@peated/server/orpc/contracts/activity/list";
+import reviewsAndTastings from "@peated/server/orpc/contracts/activity/reviews-and-tastings";
 import login from "@peated/server/orpc/contracts/auth/login";
 import badgeDetails from "@peated/server/orpc/contracts/badges/details";
 import badgeUserList from "@peated/server/orpc/contracts/badges/user-list";
@@ -73,6 +74,7 @@ export const mockContract = {
   stats,
   activity: {
     list: activityList,
+    reviewsAndTastings,
   },
   auth: {
     login,

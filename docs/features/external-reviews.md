@@ -61,9 +61,10 @@ comparisons to other bottles, and metaphors can be misread. Plurals need their
 own synonyms. A missing match does not mean a flavor is absent.
 
 Tags are saved in `review.tags` using the same array type as tastings and member
-reviews. The review API returns them as `extractedTags`. They stay separate from
-community tasting counts and Bottle flavor profiles. Matching makes no model
-requests and works when clips are disabled.
+reviews. The review API returns them as `extractedTags`. Published reviews feed
+the same public Bottle, distillery, and region flavor summaries as public member
+reviews and tastings. Matching makes no model requests and works when clips are
+disabled.
 
 Importing a review with text again replaces its tags, even when nothing matches.
 Imports without text keep previous tags. Existing reviews gain tags on their

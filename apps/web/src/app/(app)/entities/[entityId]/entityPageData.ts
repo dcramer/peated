@@ -5,7 +5,12 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 export type Entity = Outputs["entities"]["details"];
 type EntityTabSource = Pick<
   Entity,
-  "id" | "kind" | "name" | "shortName" | "totalBottles" | "totalTastings"
+  | "id"
+  | "kind"
+  | "name"
+  | "shortName"
+  | "totalBottles"
+  | "publicReviewAndTastingCount"
 >;
 export type CompanyPageCounts = {
   bottles: number;
@@ -99,9 +104,9 @@ export function getEntityTabs(
 
   if (entityHasBottleCatalog(entity)) {
     tabs.push({
-      count: entity.totalTastings,
+      count: entity.publicReviewAndTastingCount,
       href: `${baseUrl}/tastings`,
-      label: "Tastings",
+      label: "Reviews & tastings",
     });
   }
 

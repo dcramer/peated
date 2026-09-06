@@ -186,7 +186,8 @@ export const testBrand = {
   region: null,
   address: null,
   location: null,
-  totalTastings: 0,
+  totalTastings: 1,
+  publicReviewAndTastingCount: 3,
   totalBottles: 1,
   isFollowing: false,
   createdAt: timestamp,
@@ -254,6 +255,8 @@ export function buildBottle({
   brand = testBrand,
   imageUrl = null,
   totalTastings = 0,
+  publicReviewAndTastingCount = /** @type {number | undefined} */ (undefined),
+  notedReviewAndTastingCount = /** @type {number | undefined} */ (undefined),
   people = 0,
   hasTasted = false,
 } = {}) {
@@ -311,6 +314,8 @@ export function buildBottle({
       unicorn: 0,
     },
     totalTastings,
+    publicReviewAndTastingCount: publicReviewAndTastingCount ?? totalTastings,
+    notedReviewAndTastingCount: notedReviewAndTastingCount ?? totalTastings,
     people,
     lastPrice: null,
     aliases: [],
@@ -324,7 +329,11 @@ export function buildBottle({
   };
 }
 
-const existingBottleWithoutGroup = buildBottle();
+const existingBottleWithoutGroup = buildBottle({
+  totalTastings: 1,
+  publicReviewAndTastingCount: 3,
+  notedReviewAndTastingCount: 3,
+});
 export const existingBottle = {
   ...existingBottleWithoutGroup,
   group: buildBottleGroup({ bottle: existingBottleWithoutGroup }),
@@ -523,6 +532,8 @@ export function buildBottleGroup({
     },
     tastingBandCounts: bottle.tastingBandCounts,
     totalTastings: bottle.totalTastings,
+    publicReviewAndTastingCount: bottle.publicReviewAndTastingCount,
+    notedReviewAndTastingCount: bottle.notedReviewAndTastingCount,
     totalBottles: 1,
     createdByActorId: testUser.id,
     createdAt: bottle.createdAt,

@@ -36,7 +36,12 @@ import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
 import { actors } from "./actors";
 import { entities } from "./entities";
-import { categoryEnum, contentSourceEnum, flavorProfileEnum } from "./enums";
+import {
+  categoryEnum,
+  contentSourceEnum,
+  flavorProfileEnum,
+  tagCategoryEnum,
+} from "./enums";
 import { externalSites } from "./externalSites";
 import { users } from "./users";
 
@@ -271,6 +276,16 @@ export const bottles = pgTable(
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),
+    publicReviewAndTastingCount: bigint("public_review_and_tasting_count", {
+      mode: "number",
+    })
+      .default(0)
+      .notNull(),
+    notedReviewAndTastingCount: bigint("noted_review_and_tasting_count", {
+      mode: "number",
+    })
+      .default(0)
+      .notNull(),
     // Retained legacy compatibility state; new reads use BottleGroup totals.
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
@@ -293,6 +308,9 @@ export const bottles = pgTable(
     index("bottle_created_by_actor_idx").on(table.createdByActorId),
     index("bottle_category_idx").on(table.category),
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
+    index("bottle_public_activity_count_idx").on(
+      table.publicReviewAndTastingCount,
+    ),
     index("bottle_release_sort_idx").using(
       "btree",
       table.releaseYear.desc().nullsLast(),
@@ -433,6 +451,16 @@ export const bottleGroups = pgTable(
       .notNull()
       .$type<RatingStats>(),
     totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
+    publicReviewAndTastingCount: bigint("public_review_and_tasting_count", {
+      mode: "number",
+    })
+      .default(0)
+      .notNull(),
+    notedReviewAndTastingCount: bigint("noted_review_and_tasting_count", {
+      mode: "number",
+    })
       .default(0)
       .notNull(),
     totalBottles: bigint("total_bottles", { mode: "number" })
@@ -759,7 +787,10 @@ export const bottleTags = pgTable(
     tag: varchar("tag", { length: 64 }).notNull(),
     count: integer("count").default(0).notNull(),
   },
-  (table) => [primaryKey({ columns: [table.bottleId, table.tag] })],
+  (table) => [
+    primaryKey({ columns: [table.bottleId, table.tag] }),
+    index("bottle_tag_tag_idx").on(table.tag),
+  ],
 );
 
 export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
@@ -771,6 +802,34 @@ export const bottleTagsRelations = relations(bottleTags, ({ one }) => ({
 
 export type BottleTag = typeof bottleTags.$inferSelect;
 export type NewBottleTag = typeof bottleTags.$inferInsert;
+
+export const bottleNoteCategories = pgTable(
+  "bottle_note_category",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
+    category: tagCategoryEnum("category").notNull(),
+    count: integer("count").default(0).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.bottleId, table.category] }),
+    index("bottle_note_category_category_idx").on(table.category),
+  ],
+);
+
+export const bottleNoteCategoriesRelations = relations(
+  bottleNoteCategories,
+  ({ one }) => ({
+    bottle: one(bottles, {
+      fields: [bottleNoteCategories.bottleId],
+      references: [bottles.id],
+    }),
+  }),
+);
+
+export type BottleNoteCategory = typeof bottleNoteCategories.$inferSelect;
+export type NewBottleNoteCategory = typeof bottleNoteCategories.$inferInsert;
 
 export const bottleReferences = pgTable(
   "bottle_reference",

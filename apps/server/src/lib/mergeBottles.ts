@@ -9,6 +9,7 @@ import {
   bottleFlavorProfiles,
   bottleGroupDistillers,
   bottleGroups,
+  bottleNoteCategories,
   bottleObservations,
   bottleReferences,
   bottles,
@@ -597,6 +598,15 @@ export async function lockBottleMergeDependencies(
     .for("update");
   await tx
     .select()
+    .from(bottleNoteCategories)
+    .where(inArray(bottleNoteCategories.bottleId, bottleIds))
+    .orderBy(
+      asc(bottleNoteCategories.bottleId),
+      asc(bottleNoteCategories.category),
+    )
+    .for("update");
+  await tx
+    .select()
     .from(bottleFlavorProfiles)
     .where(inArray(bottleFlavorProfiles.bottleId, bottleIds))
     .orderBy(
@@ -873,29 +883,11 @@ export async function mergeBottlesInTransaction(
     destination.fullName,
   );
 
-  const sourceTags = await tx
-    .select()
-    .from(bottleTags)
-    .where(eq(bottleTags.bottleId, sourceBottleId))
-    .for("update");
   const sourceFlavorProfiles = await tx
     .select()
     .from(bottleFlavorProfiles)
     .where(eq(bottleFlavorProfiles.bottleId, sourceBottleId))
     .for("update");
-  for (const tag of sourceTags) {
-    await tx
-      .insert(bottleTags)
-      .values({
-        bottleId: destinationBottleId,
-        tag: tag.tag,
-        count: tag.count,
-      })
-      .onConflictDoUpdate({
-        target: [bottleTags.bottleId, bottleTags.tag],
-        set: { count: sql<number>`${bottleTags.count} + ${tag.count}` },
-      });
-  }
   for (const profile of sourceFlavorProfiles) {
     await tx
       .insert(bottleFlavorProfiles)
@@ -948,6 +940,9 @@ export async function mergeBottlesInTransaction(
   }
 
   await tx.delete(bottleTags).where(eq(bottleTags.bottleId, sourceBottleId));
+  await tx
+    .delete(bottleNoteCategories)
+    .where(eq(bottleNoteCategories.bottleId, sourceBottleId));
   await tx
     .delete(bottleFlavorProfiles)
     .where(eq(bottleFlavorProfiles.bottleId, sourceBottleId));

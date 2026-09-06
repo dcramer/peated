@@ -23,7 +23,7 @@ type CompanyPortfolio = Outputs["entities"]["portfolio"];
 
 const sortOptions = [
   { label: "Most bottles", value: "-bottles" },
-  { label: "Most tasted", value: "-tastings" },
+  { label: "Most reviews & tastings", value: "-tastings" },
   { label: "Name", value: "name" },
 ] as const;
 

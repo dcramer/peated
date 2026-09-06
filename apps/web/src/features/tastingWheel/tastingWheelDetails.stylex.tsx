@@ -121,7 +121,7 @@ function TastingWheelDetails({
       <section aria-busy={query.isPending}>
         <SectionHeading level={3}>Bottles with these notes</SectionHeading>
         <p {...stylex.props(foundationStyles.body, styles.explanation)}>
-          Ordered by how often people mention these notes in their public
+          Ordered by how often these notes appear in public reviews and
           tastings.
         </p>
         <div aria-live="polite">
@@ -143,7 +143,7 @@ function TastingWheelDetails({
             />
           ) : (
             <p {...stylex.props(styles.status)}>
-              No bottles have recorded tastings for{" "}
+              No bottles have recorded notes for{" "}
               {selection.note ?? `this category`} yet. Try another note.
             </p>
           )}

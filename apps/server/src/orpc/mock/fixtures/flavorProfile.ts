@@ -25,23 +25,25 @@ export const mockFlavorProfile: FlavorProfile = {
 };
 
 export const mockBottleFlavorProfile: BottleFlavorProfile = {
+  notedReviewAndTastingCount: 12,
   notedTastings: 12,
   categories: TAG_CATEGORIES.map((category, index) => ({
     category,
+    reviewAndTastingCount: [4, 5, 1, 10, 3, 0, 6, 2, 4][index]!,
     tastingCount: [4, 5, 1, 10, 3, 0, 6, 2, 4][index]!,
     notes: [
-      [{ name: "malt", tastingCount: 4 }],
-      [{ name: "lemon zest", tastingCount: 5 }],
-      [{ name: "heather", tastingCount: 1 }],
+      [{ name: "malt", reviewAndTastingCount: 4, tastingCount: 4 }],
+      [{ name: "lemon zest", reviewAndTastingCount: 5, tastingCount: 5 }],
+      [{ name: "heather", reviewAndTastingCount: 1, tastingCount: 1 }],
       [
-        { name: "peat", tastingCount: 8 },
-        { name: "bonfire", tastingCount: 6 },
+        { name: "peat", reviewAndTastingCount: 8, tastingCount: 8 },
+        { name: "bonfire", reviewAndTastingCount: 6, tastingCount: 6 },
       ],
-      [{ name: "leather", tastingCount: 3 }],
+      [{ name: "leather", reviewAndTastingCount: 3, tastingCount: 3 }],
       [],
-      [{ name: "honey", tastingCount: 6 }],
-      [{ name: "clove", tastingCount: 2 }],
-      [{ name: "oak", tastingCount: 4 }],
+      [{ name: "honey", reviewAndTastingCount: 6, tastingCount: 6 }],
+      [{ name: "clove", reviewAndTastingCount: 2, tastingCount: 2 }],
+      [{ name: "oak", reviewAndTastingCount: 4, tastingCount: 4 }],
     ][index]!,
   })),
 };

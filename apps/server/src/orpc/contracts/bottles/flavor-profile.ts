@@ -8,7 +8,7 @@ export default contract
     path: "/bottles/{bottle}/flavor-profile",
     summary: "Get a bottle flavor profile",
     description:
-      "Count public tastings of one active Bottle with each tasting-note category. Each tasting counts once per category. Only tastings with recognized notes enter the denominator; private and suggested notes are excluded.",
+      "Count how many public reviews and tastings of one active bottle mention each tasting-note category. Each review or tasting counts once per category. Private entries and suggested notes are excluded.",
     spec: (spec) => ({ ...spec, operationId: "getBottleFlavorProfile" }),
   })
   .input(z.object({ bottle: z.coerce.number().int().positive() }))
