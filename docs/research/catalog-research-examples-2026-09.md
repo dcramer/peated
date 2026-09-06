@@ -829,14 +829,22 @@ completion record.
   [`5P70139`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1995-owners-cask-5p70139-tsmwta)
   and
   [`5P70206`](https://www.sothebys.com/en/buy/auction/2020/distilled-whisky-moutai/shan-qi-yamazaki-the-owners-cask-suntory-single).
-  A second exact-source pass adds 12 more supported Owner's Casks: `2C3091`,
+  A second exact-source pass adds 11 more supported Owner's Casks: `2C3091`,
   `2Q70654`, `4M70122`,
   [`5J3020`](https://whisky.auction/auctions/lot/89944/yamazaki-1995-the-owner-s-cask-5j3020),
   `5P70005`, `AW70162`,
   [`AX70019`](https://spink.com/lot/SFW30000087), `AX70048`, `BX60181`,
-  `BX70277`, `CO60242`, and `DV70209`. The exact catalog and label evidence
+  `BX70277`, and `CO60242`. The exact catalog and label evidence
   prevents misleading shortened auction titles from overriding The Owner's Cask
-  branding. All 71 candidate Owner's
+  branding. A 1997–1999 follow-up adds
+  [`BX70201`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai-3/shan-qiyamazaki-the-owners-cask-bx70201-for-45th),
+  [`DS65845`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1999-owners-cask-ds65845-gres-club-35th-anniversary),
+  [`DV70368`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1999-owners-cask-dv70368),
+  [`DS70272`](https://ravenel.com/en/auCal/lotsIn/0819bc00-4a84-4ab5-9b89-d4028efc04b3/3f474ebf-3e3a-486f-9414-6515ca9aa8ce),
+  and
+  [`DU65110`](https://www.theraremalt.com/products/yamazaki-1999-2010-naganoya-owners-cask-du65110).
+  Exact Sotheby's evidence instead places `DV70209` outside this family and in
+  the official single-cask work list. All 75 candidate Owner's
   Cask records remain unwritten because that durable bulk write requires
   explicit approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
@@ -876,8 +884,15 @@ completion record.
   [Whisky Auctioneer's `CU70095` record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1998-suntory-single-cask),
   and the
   [Bonhams `CV70093` catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160518%20S-23344-0-1%20Fine%20%26%20Rare%20Wine%2C%20Cognac%20and%20Whisky%20%5B168%5D.pdf).
-  Collector-only `CV70092` remains a lead because no exact primary auction
-  record was found in this pass.
+  The 1997–1999 pass adds official single-cask releases `BR70150`, `BR70188`,
+  `BX70276`, `DV70209`, `DQ70030`, `DQ70039`, `DR70114`, `DS60735`, `DS60875`,
+  `DU65301`, and `DX70502`. A visible label and exact
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20161118%20S-23354-0-1%20Fine%20%26%20Rare%20Wine%2C%20Cognac%20and%20Single%20Malt%20Whisky%20%5B196%5D.pdf)
+  settle `DX70502` as Suntory Single Cask Whisky despite another auction index
+  calling it Owner's Cask. Exact Sotheby's evidence similarly settles `DV70209`
+  at 54%, correcting the collector index's 56% transcription. Collector-only
+  `CV70092` remains a lead because no exact primary auction record was found in
+  this pass.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
