@@ -532,10 +532,10 @@ relationships, or existing images were changed.
 ## Yamazaki — September 6, 2026
 
 The full production review is in progress. It started from 107 Bottles attached
-to the Yamazaki Brand (`E0493`) and currently has 148. The modern producer range,
+to the Yamazaki Brand (`E0493`) and currently has 152. The modern producer range,
 named component-whisky releases, existing historical single casks, all original
 Brand pages, and the pre-write set of 169 Yamazaki-distilled records were
-inventoried. Production now reports 208 Yamazaki-distilled records. Older private
+inventoried. Production now reports 212 Yamazaki-distilled records. Older private
 and single-cask releases still require individual evidence, so this is not yet a
 completion record.
 
@@ -615,6 +615,18 @@ completion record.
   Kita. Its label identifies both casks, `3D3003` and `3D3006`, so `B54445`
   stores one multi-cask release rather than two single-cask Bottles. It was
   duplicate-checked and re-fetched with no bottler.
+- The producer-backed [Genmu and Ka archive](https://u-b.jp/whisky/) establishes
+  three multi-cask 2012 releases at 48%: Genmu Premium Black Edition, with 227
+  bottles (`B54446`); Ka “Yoki Hi Yoki Hito,” with 210 bottles (`B54448`); and
+  the separately documented
+  [Genmu Premium Red Edition](https://jwhisky.jp/en/genmu/), with 40 bottles
+  (`B54447`). The archive describes their component casks but not one simple
+  maturation statement, so that field remains unknown. An exact
+  [Spink lot](https://spink.com/lot/SFW42000080) also established the
+  1993-vintage, 2006-bottled, 55% Suntory Single Malt Whisky – Daikichi's Choice
+  (`B54449`), matured in sherry butts with an outturn of 1,548. Its release year
+  remains unknown because the anniversary evidence conflicts with its stated
+  bottling year. All four records were duplicate-checked and re-fetched.
 - The [2022 Tsukuriwake announcement](https://www.prnewswire.com/news-releases/from-the-birthplace-of-japanese-whisky-the-house-of-suntory-introduces-2022-limited-edition-yamazaki-tsukuriwake-selection-301548951.html)
   and [Whisky Auctioneer's release guide](https://whiskyauctioneer.com/learn/explore-whisky/series/yamazaki-tsukuriwake-selection-2022-editions)
   bounded the named component-whisky range. Series `S0674` now contains the five
@@ -622,11 +634,11 @@ completion record.
   18-year-old is `B54095`; the unqualified core Mizunara 18-year-old `B47537`
   was corrected to the 2025 release proven by its assigned import references and
   exact Whiskyfun review.
-- All 148 current Yamazaki Brand Bottles now have Yamazaki as Brand and
+- All 152 current Yamazaki Brand Bottles now have Yamazaki as Brand and
   distiller with no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
   original two-page Brand inventory was re-fetched with zero remaining non-null
-  bottlers. The 39 later creates were individually verified with no bottler.
+  bottlers. The 43 later creates were individually verified with no bottler.
 - Exact Whisky Auctioneer records for the [8- and 10-year-old set](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-8-10-year-old-suntory-pure-malt-box-set),
   [12-year-old sherry release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-12-year-old-suntory-pure-malt),
   two [15-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt)
@@ -689,5 +701,5 @@ completion record.
   4028mdk09. `B2276` now uses
   [The Yamazaki Single Malt Whisky Aged 12 years.JPG](https://commons.wikimedia.org/wiki/File:The_Yamazaki_Single_Malt_Whisky_Aged_12_years.JPG)
   under `CC BY-SA 3.0` with credit to Look Sharp!. Both stored WebP transforms
-  were visually checked. Brand image coverage remains 7 of 148 because these
+  were visually checked. Brand image coverage remains 7 of 152 because these
   were licensed replacements, not newly covered records.
