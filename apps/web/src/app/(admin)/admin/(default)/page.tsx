@@ -4,8 +4,9 @@ import {
   AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
+  AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
-import ScraperActivity from "@peated/web/components/admin/scraperActivity";
+import ScraperActivity from "@peated/web/components/admin/scraperActivity.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -18,7 +19,13 @@ export default function Page() {
       <AdminBreadcrumbs
         items={[{ label: "Overview", href: "/admin", current: true }]}
       />
-      <AdminPageHeader title="Admin" />
+      <AdminPageHeader
+        title="Scraper activity"
+        metadata="Last 30 days"
+        actions={
+          <AdminTextLink href="/admin/sites">Manage scrapers</AdminTextLink>
+        }
+      />
       <ScraperActivity data={data} />
     </AdminPage>
   );
