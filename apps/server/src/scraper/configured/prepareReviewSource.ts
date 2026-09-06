@@ -26,13 +26,15 @@ type ReviewSourceDefinition = ExistingSourceDefinition & {
   listUrl: string;
   isCanonicalArticleUrl: (url: string) => boolean;
   allowsMultipleReviews?: true;
-  oldReviewKeyIsValid: (review: {
-    sourceKey: string | null;
-    articleUrl: string;
-    name: string;
-    reviewerName: string | null;
-  }) => boolean;
 };
+
+function isOldReviewKey(siteKey: string, sourceKey: string | null) {
+  const prefix = `${siteKey}:`;
+  return (
+    sourceKey?.startsWith(prefix) === true &&
+    /^[a-f0-9]{64}$/.test(sourceKey.slice(prefix.length))
+  );
+}
 
 /** Checks existing reviews; applying keeps their IDs and leaves collection paused. */
 export async function prepareReviewSource(
@@ -88,13 +90,7 @@ export async function prepareReviewSource(
       return articleReviews
         .toSorted((left, right) => left.id - right.id)
         .map((review) => {
-          const oldReview = {
-            sourceKey: review.sourceKey,
-            articleUrl: article.url,
-            name: review.name,
-            reviewerName: review.reviewerName,
-          };
-          if (!definition.oldReviewKeyIsValid(oldReview)) {
+          if (!isOldReviewKey(definition.siteKey, review.sourceKey)) {
             throw new ScrapeSourceValidationError(
               `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
             );

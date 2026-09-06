@@ -89,9 +89,9 @@ and current publisher access checks.
 Use the same process for The Whisky Study with `{"site": "whiskystudy"}`.
 The check-only request verifies that every stored article uses the expected
 `https://thewhiskystudy.com/reviews-3/...` URL without a trailing slash, has
-exactly one review, and still has the key written by the code scraper. Applying
-the preparation changes those review keys in place and adds a paused source
-whose list page is `https://thewhiskystudy.com/reviews-3`.
+exactly one review, and has an old The Whisky Study key. Applying changes those
+review keys in place and adds a paused source whose list page is
+`https://thewhiskystudy.com/reviews-3`.
 
 Before applying, save the same records and stop the `whiskystudy` schedule as
 described above. Compare all stored records after applying. Keep the existing
@@ -112,9 +112,9 @@ Preparation must not change the source's publication setting.
 
 Use the preparation endpoint with `{"site": "whiskeyreviewer"}`. The check-only
 request verifies that each stored article has one review, uses the expected
-dated Whiskey Reviewer URL without a trailing slash, and still has the key
-written by the code scraper. Applying changes those review keys in place and
-adds a paused source whose list page is `https://whiskeyreviewer.com/`.
+dated Whiskey Reviewer URL without a trailing slash, and has an old Whiskey
+Reviewer key. Applying changes those review keys in place and adds a paused
+source whose list page is `https://whiskeyreviewer.com/`.
 
 Before applying, save the same review and run records and stop the
 `whiskeyreviewer` schedule. Version 3 rules must select only the five links in
@@ -136,10 +136,9 @@ Bottle matches, the run, and Sentry before restoring the saved schedule.
 Use the preparation endpoint with `{"site": "wordsofwhisky"}`. The check-only
 request locks and verifies every stored article and review. It accepts only the
 publisher's canonical article URLs without a trailing slash, requires at least
-one review per article, and verifies each old review key from its stored article
-URL, Bottle name, and writer. Applying replaces only those keys with the saved
-parser's Bottle name and writer keys, then adds a paused source whose list page
-is `https://wordsofwhisky.com/`.
+one review per article, and checks that each old key belongs to Words of Whisky.
+Applying replaces only those keys with the saved parser's Bottle name and writer
+keys, then adds a paused source whose list page is `https://wordsofwhisky.com/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
 visibility, scores, writers, publication settings, stored-body counts, and the
@@ -164,9 +163,9 @@ restoring the saved daily schedule. Preparation must not change publication.
 Use the preparation endpoint with `{"site": "whiskynotes"}`. The check-only
 request locks and verifies every stored article and review. It accepts only
 dated WhiskyNotes article URLs with their trailing slash, requires at least one
-review per article, and checks each old review key against the article URL and
-Bottle name. Applying replaces only those keys with the saved parser's Bottle
-name and writer keys, then adds a paused source whose list page is
+review per article, and checks that each old key belongs to WhiskyNotes.
+Applying replaces only those keys with the saved parser's Bottle name and
+writer keys, then adds a paused source whose list page is
 `https://www.whiskynotes.be/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,

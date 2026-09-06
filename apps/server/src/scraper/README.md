@@ -115,10 +115,9 @@ whether it reads inside the review or from the article, and an article-level
 read states whether it applies to the first review or every review. This keeps
 names, writers, and scores from leaking between reviews.
 
-The parser identifies a review from its normalized Bottle name and writer, so
-adding or moving another review on the page does not attach an existing Bottle
-match to the wrong review. Repeated reviews with the same name and writer stay
-distinct. This is automatic and is not part of the saved rules.
+The parser uses a review's Bottle name and writer to keep it matched when other
+reviews are added or moved. Repeated reviews with the same name and writer stay
+separate. This is automatic and is not part of the saved rules.
 
 The setup agent submits this same rule shape, and the saved revision and parser
 use it directly. There is no setup-only translation step.

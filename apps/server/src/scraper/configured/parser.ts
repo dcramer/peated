@@ -1093,7 +1093,7 @@ function parseSavedReviewDetail(
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
   const reviewKeyCounts = new Map<string, number>();
-  const useStableReviewKeys = usesCurrentReviewRules(rules);
+  const keysUseNameAndWriter = usesCurrentReviewRules(rules);
   const reviewItems = selectSavedReviewItems($, rules.article.reviews);
   if (!reviewItems) {
     issues.push({
@@ -1130,7 +1130,7 @@ function parseSavedReviewDetail(
     const firstReviewKey = reviewSourceKey(name, reviewerName);
     const repeatedReviewNumber = (reviewKeyCounts.get(firstReviewKey) ?? 0) + 1;
     reviewKeyCounts.set(firstReviewKey, repeatedReviewNumber);
-    const sourceKey = useStableReviewKeys
+    const sourceKey = keysUseNameAndWriter
       ? reviewSourceKey(name, reviewerName, repeatedReviewNumber)
       : `${canonicalUrl?.toString() ?? pageUrl.toString()}#review-${index + 1}`;
     const scoreRule = rules.article.reviews.score;

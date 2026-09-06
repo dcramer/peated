@@ -1694,7 +1694,7 @@ describe("scrape source parser", () => {
     );
   });
 
-  it("keeps version 8 review keys when reviews move", () => {
+  it("keeps reviews matched when they move", () => {
     const parseKeys = (reviews: string) => {
       const result = parseScrapeDetail(
         currentReviewRules,
@@ -1726,7 +1726,7 @@ describe("scrape source parser", () => {
     );
   });
 
-  it("gives repeated version 8 reviews distinct keys", () => {
+  it("keeps repeated reviews separate", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
       `<article>
