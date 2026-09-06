@@ -164,17 +164,16 @@ restoring the saved daily schedule. Preparation must not change publication.
 Use the preparation endpoint with `{"site": "dramface"}`. The check-only
 request locks and verifies every stored article and review. It accepts only
 dated Dramface article URLs without a trailing slash and verifies each old
-review key from its article URL, Bottle name, and writer. Applying changes only
-those keys to the URL and review number used by saved rules, then adds a paused
-source whose list page is `https://www.dramface.com/all-reviews`.
+review key belongs to Dramface. Applying replaces only those keys with the
+saved parser's Bottle name and writer keys, then adds a paused source whose list
+page is `https://www.dramface.com/all-reviews`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
 visibility, scores, writers, publication settings, stored-body counts, and the
 current schedule. Stop the schedule and wait for active runs. Compare every
 record after applying; multi-Bottle and multi-writer articles must keep the
-same review order and IDs. Preparation stops if repeated reviews have the same
-Bottle name and writer because the old fallback key also used page text that
-is not stored.
+same review order and IDs. Repeated reviews with the same Bottle name and writer
+keep separate keys in their original order.
 
 Version 8 rules must select up to 20 articles from the current review page. On
 detail pages, match `Review` headings to split the shared article area into

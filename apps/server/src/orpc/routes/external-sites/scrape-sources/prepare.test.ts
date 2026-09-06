@@ -1294,8 +1294,14 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await syncScraperDefinitions(dramfaceRegistry);
     expect(await db.select().from(externalReviewArticles)).toEqual([article]);
     expect(await db.select().from(externalReviews)).toEqual([
-      { ...reviews[0], sourceKey: `${dramfaceCanonicalUrl}#review-1` },
-      { ...reviews[1], sourceKey: `${dramfaceCanonicalUrl}#review-2` },
+      {
+        ...reviews[0],
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName),
+      },
+      {
+        ...reviews[1],
+        sourceKey: reviewSourceKey(reviews[1].name, reviews[1].reviewerName),
+      },
     ]);
     expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
     expect(await db.select().from(externalReviewPublications)).toEqual(
@@ -1314,6 +1320,39 @@ describe("POST /admin/scrape-sources/prepare", () => {
         enabled: false,
         createdById: admin.id,
       }),
+    ]);
+  });
+
+  test("prepares repeated Dramface review identities", async ({ fixtures }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { reviews } = await setupDramfaceMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+    await db
+      .update(externalReviews)
+      .set({
+        name: reviews[0].name,
+        reviewerName: reviews[0].reviewerName,
+        sourceKey: `dramface:${"a".repeat(64)}`,
+      })
+      .where(eq(externalReviews.id, reviews[1].id));
+
+    await expect(prepareDramface({ apply: true })).resolves.toMatchObject({
+      reviewCount: 2,
+      applied: true,
+    });
+    expect(
+      await db
+        .select({ sourceKey: externalReviews.sourceKey })
+        .from(externalReviews)
+        .orderBy(externalReviews.id),
+    ).toEqual([
+      { sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName) },
+      {
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName, 2),
+      },
     ]);
   });
 
