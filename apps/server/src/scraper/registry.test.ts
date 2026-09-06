@@ -69,11 +69,11 @@ test("registers each built-in scraper source with its target", () => {
     expect(scraperRegistry.targets.get(source.targetKeys[0])).toBeDefined();
   }
   expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(true);
-  expect(EXTERNAL_SITE_DEFINITIONS.astorwines.runEvery).toBeNull();
-  expect(EXTERNAL_SITE_DEFINITIONS.berrybrosrudd.runEvery).toBeNull();
-  expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBe(10080);
+  expect(EXTERNAL_SITE_DEFINITIONS.astorwines.initialRunEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.berrybrosrudd.initialRunEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.dramfool.initialRunEvery).toBe(10080);
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskyworld.runEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyworld.initialRunEvery).toBeNull();
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
   expect(
     scraperRegistry.targets.get("smws")?.origins.map(({ origin }) => origin),
@@ -83,38 +83,38 @@ test("registers each built-in scraper source with its target", () => {
     "content-type",
   ]);
   expectHourlyLimit("smws", 80);
-  expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.initialRunEvery).toBe(1440);
   expectHourlyLimit("bourbonculture", 10);
   expect(scraperRegistry.targets.get("bruichladdich")).toBeDefined();
   expect(scraperRegistry.targets.get("compassbox")).toBeDefined();
-  expect(EXTERNAL_SITE_DEFINITIONS.dramface.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.dramface.initialRunEvery).toBe(1440);
   expectHourlyLimit("dramface", 25);
   expect(scraperRegistry.sources.get("dramface")?.requestLimit).toBe(30);
-  expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.initialRunEvery).toBe(1440);
   expectHourlyLimit("fredminnick", 10);
   expect(scraperRegistry.sources.get("fredminnick")?.requestLimit).toBe(9);
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskeyreviewer", 10);
   expect(scraperRegistry.targets.get("kilchoman")).toBeDefined();
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.runEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.initialRunEvery).toBeNull();
   expectHourlyLimit("whiskyadvocate", 20);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.requestLimit).toBe(30);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.resumeFromLastRun).toBe(
     true,
   );
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskynotes", 30);
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskyfun", 25);
   expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
   expect(scraperRegistry.sources.get("whiskyfun")?.resumeFromLastRun).toBe(
     true,
   );
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskysaga", 25);
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskystudy.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskystudy.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskystudy", 25);
-  expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.runEvery).toBe(1440);
+  expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.initialRunEvery).toBe(1440);
   expectHourlyLimit("wordsofwhisky", 25);
   for (const type of registeredReviewSources) {
     const source = scraperRegistry.sources.get(type);

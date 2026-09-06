@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { expect, test } from "vitest";
 import { syncExternalSites } from "./externalSites";
 
-test("syncs code-owned external-site definitions", async () => {
+test("adds missing sites without replacing existing schedules", async () => {
   const nextRunAt = new Date("2026-08-14T12:00:00Z");
   const [existing] = await db
     .insert(externalSites)
@@ -40,7 +40,10 @@ test("syncs code-owned external-site definitions", async () => {
     .select()
     .from(externalSites)
     .where(eq(externalSites.type, "finedrams"));
-  expect(fineDrams).toMatchObject(EXTERNAL_SITE_DEFINITIONS.finedrams);
+  expect(fineDrams).toMatchObject({
+    name: EXTERNAL_SITE_DEFINITIONS.finedrams.name,
+    runEvery: EXTERNAL_SITE_DEFINITIONS.finedrams.initialRunEvery,
+  });
 
   const publications = await db.select().from(externalReviewPublications);
   expect(publications).toHaveLength(10);

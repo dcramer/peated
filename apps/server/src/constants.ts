@@ -63,93 +63,95 @@ export const SERVING_STYLE_LIST = ["neat", "rocks", "splash"] as const;
 export const RESERVED_COLLECTION_SLUGS = ["default", "library"] as const;
 export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
 
+// `initialRunEvery` applies only when a site is first added. Change an existing
+// schedule through the admin API.
 export const EXTERNAL_SITE_DEFINITIONS = {
   // Astor stays manual-only while its non-browser catalog behavior is checked.
-  astorwines: { name: "Astor Wines", runEvery: null },
+  astorwines: { name: "Astor Wines", initialRunEvery: null },
   // Berry Bros. & Rudd does not run automatically because robots.txt does not
   // allow its search page.
-  berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: null },
-  bruichladdich: { name: "Bruichladdich", runEvery: 10080 },
-  cadenheads: { name: "Cadenheads", runEvery: 10080 },
-  compassbox: { name: "Compass Box", runEvery: 10080 },
-  decadentdrinks: { name: "Decadent Drinks", runEvery: 10080 },
-  douglaslaing: { name: "Douglas Laing", runEvery: 10080 },
-  dramfool: { name: "Dramfool", runEvery: 10080 },
-  edradour: { name: "Edradour", runEvery: 10080 },
-  finedrams: { name: "Fine Drams", runEvery: 10080 },
-  glenallachie: { name: "The GlenAllachie", runEvery: 10080 },
-  gordonmacphail: { name: "Gordon Macphail", runEvery: 10080 },
-  healthyspirits: { name: "Healthy Spirits", runEvery: 10080 },
-  kilchoman: { name: "Kilchoman", runEvery: 10080 },
-  masterofmalt: { name: "Master of Malt", runEvery: 10080 },
-  missionliquor: { name: "Mission Liquor", runEvery: 10080 },
-  ncnean: { name: "Nc'nean", runEvery: 10080 },
-  northstarspirits: { name: "North Star", runEvery: 10080 },
-  reservebar: { name: "ReserveBar", runEvery: 10080 },
-  singlecasknation: { name: "Single Cask Nation", runEvery: 10080 },
-  smws: { name: "The Scotch Malt Whisky Society", runEvery: 10080 },
+  berrybrosrudd: { name: "Berry Bros. & Rudd", initialRunEvery: null },
+  bruichladdich: { name: "Bruichladdich", initialRunEvery: 10080 },
+  cadenheads: { name: "Cadenheads", initialRunEvery: 10080 },
+  compassbox: { name: "Compass Box", initialRunEvery: 10080 },
+  decadentdrinks: { name: "Decadent Drinks", initialRunEvery: 10080 },
+  douglaslaing: { name: "Douglas Laing", initialRunEvery: 10080 },
+  dramfool: { name: "Dramfool", initialRunEvery: 10080 },
+  edradour: { name: "Edradour", initialRunEvery: 10080 },
+  finedrams: { name: "Fine Drams", initialRunEvery: 10080 },
+  glenallachie: { name: "The GlenAllachie", initialRunEvery: 10080 },
+  gordonmacphail: { name: "Gordon Macphail", initialRunEvery: 10080 },
+  healthyspirits: { name: "Healthy Spirits", initialRunEvery: 10080 },
+  kilchoman: { name: "Kilchoman", initialRunEvery: 10080 },
+  masterofmalt: { name: "Master of Malt", initialRunEvery: 10080 },
+  missionliquor: { name: "Mission Liquor", initialRunEvery: 10080 },
+  ncnean: { name: "Nc'nean", initialRunEvery: 10080 },
+  northstarspirits: { name: "North Star", initialRunEvery: 10080 },
+  reservebar: { name: "ReserveBar", initialRunEvery: 10080 },
+  singlecasknation: { name: "Single Cask Nation", initialRunEvery: 10080 },
+  smws: { name: "The Scotch Malt Whisky Society", initialRunEvery: 10080 },
   smwsa: {
     name: "The Scotch Malt Whisky Society (America)",
-    runEvery: 10080,
+    initialRunEvery: 10080,
   },
-  thompsonbros: { name: "Thompson Bros.", runEvery: 10080 },
+  thompsonbros: { name: "Thompson Bros.", initialRunEvery: 10080 },
   // Total Wine requires an interactive human-verification challenge. Its
   // traffic target remains disabled while existing data stays visible.
-  totalwine: { name: "Total Wines", runEvery: null },
-  woodencork: { name: "Wooden Cork", runEvery: 10080 },
+  totalwine: { name: "Total Wines", initialRunEvery: null },
+  woodencork: { name: "Wooden Cork", initialRunEvery: 10080 },
   bourbonculture: {
     name: "Bourbon Culture",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   dramface: {
     name: "Dramface",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   fredminnick: {
     name: "Fred Minnick",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   whiskeyreviewer: {
     name: "The Whiskey Reviewer",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   whiskyadvocate: {
     name: "Whisky Advocate",
-    runEvery: null,
+    initialRunEvery: null,
     content: "reviews",
   },
   whiskyfun: {
     name: "Whiskyfun",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   whiskysaga: {
     name: "Whisky Saga",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   whiskystudy: {
     name: "The Whisky Study",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   whiskynotes: {
     name: "WhiskyNotes",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   wordsofwhisky: {
     name: "Words of Whisky",
-    runEvery: 1440,
+    initialRunEvery: 1440,
     content: "reviews",
   },
   // WhiskyWorld does not run automatically because the site blocks our
   // robots.txt check.
-  whiskyworld: { name: "The Whisky World", runEvery: null },
+  whiskyworld: { name: "The Whisky World", initialRunEvery: null },
 } as const;
 
 type RegisteredExternalSiteKey = keyof typeof EXTERNAL_SITE_DEFINITIONS;

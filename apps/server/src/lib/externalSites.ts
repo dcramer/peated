@@ -17,7 +17,7 @@ export class ExternalSiteNotFoundError extends Error {
   }
 }
 
-/** Keeps durable foreign-key rows aligned with the code-owned scraper list. */
+/** Adds missing site rows without replacing schedules changed by an admin. */
 export async function syncExternalSites() {
   await db.transaction(async (tx) => {
     for (const [key, definition] of Object.entries(EXTERNAL_SITE_DEFINITIONS)) {
@@ -27,7 +27,7 @@ export async function syncExternalSites() {
         .values({
           type: siteKey,
           name: definition.name,
-          runEvery: definition.runEvery,
+          runEvery: definition.initialRunEvery,
         })
         .onConflictDoUpdate({
           target: externalSites.type,
