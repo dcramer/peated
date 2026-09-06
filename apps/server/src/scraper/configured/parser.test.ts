@@ -4,6 +4,7 @@ import {
   discoverBourbonCultureArticles,
   parseBourbonCultureArticle,
 } from "../adapters/bourbonCulture";
+import { parseDramfaceArticle } from "../adapters/dramface";
 import { parseCompassBoxProducts } from "../adapters/legacy/scrapeCompassBox";
 import { parseKilchomanProducts } from "../adapters/legacy/scrapeKilchoman";
 import {
@@ -349,8 +350,9 @@ function pageText(selector: string) {
         get: "text" as const,
         selector,
         take: "first" as const,
-        startsWith: null,
-        clean: null,
+        match: null,
+        addStart: null,
+        addEnd: null,
       },
     ],
   };
@@ -363,7 +365,9 @@ function pageAttribute(selector: string, attribute: string) {
         get: "attribute" as const,
         selector,
         attribute,
-        clean: null,
+        match: null,
+        addStart: null,
+        addEnd: null,
       },
     ],
   };
@@ -377,8 +381,9 @@ function reviewText(selector: string, take: "first" | "all" = "first") {
         from: "review" as const,
         selector,
         take,
-        startsWith: null,
-        clean: null,
+        match: null,
+        addStart: null,
+        addEnd: null,
       },
     ],
   };
@@ -389,7 +394,7 @@ const currentReviewRules = {
   articles: {
     oneArticlePer: "article.card",
     link: "a[href]",
-    skipWhen: { selector: ".skip", startsWith: null },
+    skipWhen: { selector: ".skip", match: null },
     nextPage: "a.next",
     limit: 20,
   },
@@ -401,15 +406,17 @@ const currentReviewRules = {
           get: "text",
           selector: "h1.missing",
           take: "first",
-          startsWith: null,
-          clean: null,
+          match: null,
+          addStart: null,
+          addEnd: null,
         },
         {
           get: "text",
           selector: "h1.title",
           take: "first",
-          startsWith: null,
-          clean: null,
+          match: null,
+          addStart: null,
+          addEnd: null,
         },
       ],
     },
@@ -419,15 +426,17 @@ const currentReviewRules = {
           get: "attribute",
           selector: "time",
           attribute: "datetime",
-          clean: null,
+          match: null,
+          addStart: null,
+          addEnd: null,
         },
       ],
     },
     reviews: {
       inside: ".entry-content",
-      oneReviewPer: "heading",
-      selector: "h2.review",
-      stopBefore: ".related",
+      oneReviewPer: "section",
+      startsAt: { selector: "h2.review", match: null },
+      stopBefore: { selector: ".related", match: null },
       whenOnlyOneReview: "useWholeArea",
       name: reviewText("h2.review"),
       reviewer: {
@@ -437,8 +446,9 @@ const currentReviewRules = {
             from: "review",
             selector: ".writer",
             take: "first",
-            startsWith: null,
-            clean: null,
+            match: null,
+            addStart: null,
+            addEnd: null,
           },
           {
             get: "text",
@@ -446,8 +456,9 @@ const currentReviewRules = {
             useFor: "everyReview",
             selector: ".byline",
             take: "first",
-            startsWith: null,
-            clean: null,
+            match: null,
+            addStart: null,
+            addEnd: null,
           },
         ],
       },
@@ -459,8 +470,9 @@ const currentReviewRules = {
             from: "review",
             selector: ".score",
             take: "first",
-            startsWith: null,
-            clean: null,
+            match: null,
+            addStart: null,
+            addEnd: null,
           },
           {
             get: "text",
@@ -468,16 +480,99 @@ const currentReviewRules = {
             useFor: "firstReview",
             selector: ".page-score",
             take: "first",
-            startsWith: null,
-            clean: {
-              removeStart: null,
-              removeEnd: null,
-              addStart: null,
-              addEnd: "/100",
-            },
+            match: null,
+            addStart: null,
+            addEnd: "/100",
           },
         ],
         scale: 100,
+        map: null,
+      },
+    },
+  },
+} as const satisfies ScrapeRules;
+
+const dramfaceSavedRules = {
+  kind: "review",
+  articles: {
+    oneArticlePer: "article.blog-basic-grid--container",
+    link: "h1.blog-title a[href]",
+    skipWhen: null,
+    nextPage: null,
+    limit: 20,
+  },
+  article: {
+    canonicalUrl: pageAttribute('link[rel="canonical"]', "href"),
+    title: pageText(".blog-item-title"),
+    publishedDate: pageText("time.dt-published"),
+    reviews: {
+      inside: "article",
+      oneReviewPer: "section",
+      startsAt: {
+        selector: "h3",
+        match: ["Review", "Review {anything}"],
+      },
+      stopBefore: { selector: "h3", match: ["Latest Reviews"] },
+      whenOnlyOneReview: "useWholeArea",
+      name: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: "p.sqsrte-large",
+            take: "first",
+            match: ["{value}{line}{anything}"],
+            addStart: null,
+            addEnd: null,
+          },
+          {
+            get: "text",
+            from: "review",
+            selector: "p.sqsrte-large",
+            take: "first",
+            match: null,
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+      },
+      reviewer: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: "h3",
+            take: "first",
+            match: ["Review {anything} - {value}"],
+            addStart: null,
+            addEnd: null,
+          },
+          {
+            get: "text",
+            from: "article",
+            useFor: "everyReview",
+            selector: ".blog-author-name",
+            take: "first",
+            match: null,
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+      },
+      tastingNotes: null,
+      score: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: "h2, p",
+            take: "first",
+            match: ["Score: {value}/10", "Score: {value} / 10"],
+            addStart: null,
+            addEnd: "/10",
+          },
+        ],
+        scale: 10,
         map: null,
       },
     },
@@ -657,6 +752,46 @@ describe("scrape source parser", () => {
       nextPageUrl: "https://www.whiskynotes.be/page/2/",
       issues: [],
     });
+  });
+
+  it.each([
+    [
+      "single-review.html",
+      "https://www.dramface.com/all-reviews/2026/springbank-12-cask-strength-2026",
+    ],
+    [
+      "multi-bottle.html",
+      "https://www.dramface.com/all-reviews/2026/impex-duo-isle-of-raasay-ardmore",
+    ],
+    [
+      "multi-writer.html",
+      "https://www.dramface.com/all-reviews/2026/ben-nevis-7yo-bedford-park",
+    ],
+  ])("matches Dramface review facts for %s", async (fixture, url) => {
+    const html = await loadFixture("dramface", fixture);
+    const pageUrl = new URL(url);
+    const legacy = parseDramfaceArticle(html, pageUrl);
+    const configured = parseScrapeDetail(dramfaceSavedRules, html, pageUrl);
+
+    expect(configured.kind).toBe("review");
+    expect(configured.issues).toEqual([]);
+    if (configured.kind !== "review" || !configured.value) {
+      throw new Error("Expected configured Dramface reviews.");
+    }
+    expect(configured.value.article).toMatchObject({
+      canonicalUrl: legacy.article.canonicalUrl,
+      title: legacy.article.title,
+    });
+    expect(
+      configured.value.article.publishedAt.toISOString().slice(0, 10),
+    ).toBe(legacy.article.publishedAt.toISOString().slice(0, 10));
+    expect(configured.value.article.externalReviews).toMatchObject(
+      legacy.article.externalReviews.map((review) => ({
+        name: review.name,
+        reviewerName: review.reviewerName,
+        nativeScore: review.nativeScore,
+      })),
+    );
   });
 
   it("rejects a next page on another website", () => {
@@ -1307,14 +1442,17 @@ describe("scrape source parser", () => {
               get: "attribute" as const,
               selector,
               attribute,
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             }
           : {
               get: "text" as const,
               selector,
               take: "first" as const,
-              startsWith: null,
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             },
       ],
     });
@@ -1394,8 +1532,9 @@ describe("scrape source parser", () => {
                 get: "text",
                 selector: "h1",
                 take: "first",
-                startsWith: null,
-                clean: null,
+                match: null,
+                addStart: null,
+                addEnd: null,
               },
             ],
           },
@@ -1489,7 +1628,7 @@ describe("scrape source parser", () => {
     });
   });
 
-  it("reads version 6 article links inside each result", () => {
+  it("reads version 8 article links inside each result", () => {
     const result = parseScrapeList(
       currentReviewRules,
       `<main>
@@ -1508,7 +1647,7 @@ describe("scrape source parser", () => {
     });
   });
 
-  it("reads version 6 heading reviews and explicit article values", () => {
+  it("reads version 8 review sections and explicit article values", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
       `<article>
@@ -1517,14 +1656,14 @@ describe("scrape source parser", () => {
         <span class="byline">Example Writer</span>
         <span class="page-score">91</span>
         <div class="entry-content">
-          <p>Article introduction.</p>
-          <h2 class="review">North Coast 12</h2>
-          <p class="note">Nose: orange.</p>
-          <h2 class="review">Harbor Malt 18</h2>
-          <span class="writer">Second Writer</span>
-          <p class="note">Finish: oak.</p>
-          <span class="score">88/100</span>
-          <aside class="related">Related reviews</aside>
+          <div class="layout-block"><p>Article introduction.</p></div>
+          <div class="layout-block"><h2 class="review">North Coast 12</h2></div>
+          <div class="layout-block"><p class="note">Nose: orange.</p></div>
+          <div class="layout-block"><h2 class="review">Harbor Malt 18</h2></div>
+          <div class="layout-block"><span class="writer">Second Writer</span></div>
+          <div class="layout-block"><p class="note">Finish: oak.</p></div>
+          <div class="layout-block"><span class="score">88/100</span></div>
+          <div class="layout-block"><aside class="related">Related reviews</aside></div>
         </div>
       </article>`,
       new URL("https://reviews.test/autumn"),
@@ -1555,7 +1694,7 @@ describe("scrape source parser", () => {
     );
   });
 
-  it("can keep the full article area for one version 6 review", () => {
+  it("can keep the full article area for one version 8 review", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
       `<article>
@@ -1584,7 +1723,7 @@ describe("scrape source parser", () => {
     expect(body).not.toContain("Related reviews");
   });
 
-  it("reports a version 6 review area that is not unique", () => {
+  it("reports a version 8 review area that is not unique", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
       `<h1 class="title">Reviews</h1>
@@ -1606,7 +1745,7 @@ describe("scrape source parser", () => {
     });
   });
 
-  it("reads a version 6 product page", () => {
+  it("reads a version 8 product page", () => {
     const rules = {
       kind: "price",
       products: {
@@ -1624,15 +1763,17 @@ describe("scrape source parser", () => {
               get: "text",
               selector: ".sale-price",
               take: "first",
-              startsWith: null,
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             },
             {
               get: "text",
               selector: ".price",
               take: "first",
-              startsWith: null,
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             },
           ],
         },

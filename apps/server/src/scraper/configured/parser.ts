@@ -10,15 +10,16 @@ import type { z } from "zod";
 import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
 import type {
-  ScrapePageField,
   ScrapePageRead,
-  ScrapeReviewField,
-  ScrapeRules,
   ScrapeValue,
   ScrapeValueSelectorV1,
+  StoredScrapePageField,
+  StoredScrapePageRead,
+  StoredScrapeReviewField,
   StoredScrapeRules,
 } from "./rules";
 import { ScrapeReviewSectionSchema, ScrapeSelectorSchema } from "./rules";
+import { matchFirstText } from "./textTemplate";
 
 export type ScrapeListResult = {
   links: string[];
@@ -44,20 +45,45 @@ export type ScrapeDetailResult =
     };
 
 type ScrapeReadableValue = ScrapeValue | ScrapeValueSelectorV1;
-type ReviewRulesV6 = Extract<ScrapeRules, { kind: "review" }>;
-type PriceRulesV6 = Extract<ScrapeRules, { kind: "price" }>;
-type CatalogRulesV7 = Extract<ScrapeRules, { kind: "catalog" }>;
+type SavedReviewRules = Extract<
+  StoredScrapeRules,
+  { kind: "review"; article: unknown }
+>;
+type SavedPriceRules = Extract<
+  StoredScrapeRules,
+  { kind: "price"; product: unknown }
+>;
+type SavedCatalogRules = Extract<StoredScrapeRules, { kind: "catalog" }>;
+type SavedRules = Extract<
+  StoredScrapeRules,
+  { articles: unknown } | { products: unknown }
+>;
 type LegacyReviewRules = Exclude<
   Extract<StoredScrapeRules, { kind: "review" }>,
-  ReviewRulesV6
+  SavedReviewRules
 >;
 type LegacyPriceRules = Exclude<
   Extract<StoredScrapeRules, { kind: "price" }>,
-  PriceRulesV6
+  SavedPriceRules
 >;
+type ScrapePageReadV6 = Extract<StoredScrapePageRead, { clean: unknown }>;
 
 function normalizeValue(value: string | undefined) {
   return value?.replaceAll(/\s+/g, " ").trim() || null;
+}
+
+const TEXT_LINE_BREAK = "\uE000";
+
+function readText(element: ReturnType<ReturnType<typeof load>>) {
+  const selected = element.clone();
+  selected.find("br").replaceWith(TEXT_LINE_BREAK);
+  return selected
+    .text()
+    .split(TEXT_LINE_BREAK)
+    .map((line) => line.replaceAll(/\s+/gu, " ").trim())
+    .join("\n")
+    .replaceAll(/\n+/gu, "\n")
+    .trim();
 }
 
 function cleanValue(value: string | null, rule: ScrapeReadableValue) {
@@ -121,7 +147,10 @@ function readValue(root: ReturnType<typeof load>, rule: ScrapeReadableValue) {
   );
 }
 
-function cleanPageValue(value: string | null, clean: ScrapePageRead["clean"]) {
+function cleanPageValue(
+  value: string | null,
+  clean: ScrapePageReadV6["clean"],
+) {
   if (!value) return null;
   let result = value;
   if (clean?.removeStart) {
@@ -144,7 +173,10 @@ function cleanPageValue(value: string | null, clean: ScrapePageRead["clean"]) {
   return normalizeValue(result);
 }
 
-function readPageValue(root: ReturnType<typeof load>, rule: ScrapePageRead) {
+function readPageValueV6(
+  root: ReturnType<typeof load>,
+  rule: ScrapePageReadV6,
+) {
   if (rule.get === "fixed") {
     return cleanPageValue(normalizeValue(rule.value), rule.clean);
   }
@@ -184,7 +216,54 @@ function readPageValue(root: ReturnType<typeof load>, rule: ScrapePageRead) {
   );
 }
 
-function readPageField(root: ReturnType<typeof load>, field: ScrapePageField) {
+function addToValue(value: string | null, rule: ScrapePageRead) {
+  if (!value) return null;
+  let result = value;
+  if (rule.addStart) result = `${rule.addStart}${result}`;
+  if (rule.addEnd) result = `${result}${rule.addEnd}`;
+  return normalizeValue(result);
+}
+
+function readPageValueV8(root: ReturnType<typeof load>, rule: ScrapePageRead) {
+  if (rule.get === "fixed") {
+    return addToValue(normalizeValue(rule.value), rule);
+  }
+  if (rule.get === "attribute") {
+    const raw = normalizeValue(
+      root(rule.selector).first().attr(rule.attribute),
+    );
+    return addToValue(matchFirstText(raw ?? "", rule.match), rule);
+  }
+
+  const values: string[] = [];
+  root(rule.selector).each((_, element) => {
+    const value = matchFirstText(readText(root(element)), rule.match);
+    if (!value) return;
+    values.push(value);
+    if (rule.take === "first" || values.length > 100) return false;
+  });
+  if (values.length > 100) {
+    throw new Error("Value matched more than 100 elements.");
+  }
+  return addToValue(
+    normalizeValue(rule.take === "all" ? values.join(" ") : values[0]),
+    rule,
+  );
+}
+
+function readPageValue(
+  root: ReturnType<typeof load>,
+  rule: StoredScrapePageRead,
+) {
+  return "clean" in rule
+    ? readPageValueV6(root, rule)
+    : readPageValueV8(root, rule);
+}
+
+function readPageField(
+  root: ReturnType<typeof load>,
+  field: StoredScrapePageField,
+) {
   for (const rule of field.try) {
     const value = readPageValue(root, rule);
     if (value) return value;
@@ -210,7 +289,7 @@ export function parseScrapeList(
   pageUrl: URL,
 ): ScrapeListResult {
   if ("articles" in rules || "products" in rules) {
-    return parseListV6(rules, html, pageUrl);
+    return parseSavedList(rules, html, pageUrl);
   }
   const issues: ScrapeIssue[] = [];
   const links = new Set<string>();
@@ -277,8 +356,8 @@ export function parseScrapeList(
   return { links: [...links], nextPageUrl, issues };
 }
 
-function parseListV6(
-  rules: ScrapeRules,
+function parseSavedList(
+  rules: SavedRules,
   html: string,
   pageUrl: URL,
 ): ScrapeListResult {
@@ -295,17 +374,24 @@ function parseListV6(
     for (const itemElement of $(itemSelector).toArray()) {
       const item = load($.html(itemElement));
       if (list.skipWhen) {
-        const matches = item(list.skipWhen.selector).toArray();
-        const startsWith = list.skipWhen.startsWith?.map((value) =>
-          value.toLocaleLowerCase("en"),
-        );
+        const skipWhen = list.skipWhen;
+        const matches = item(skipWhen.selector).toArray();
         const shouldSkip = matches.some((element) => {
-          if (!startsWith) return true;
-          const text = normalizeValue(item(element).text())?.toLocaleLowerCase(
-            "en",
-          );
+          if ("startsWith" in skipWhen) {
+            const text = normalizeValue(item(element).text());
+            if (!text) return false;
+            const startsWith = skipWhen.startsWith?.map((value) =>
+              value.toLocaleLowerCase("en"),
+            );
+            return (
+              !startsWith ||
+              startsWith.some((prefix) =>
+                text.toLocaleLowerCase("en").startsWith(prefix),
+              )
+            );
+          }
           return Boolean(
-            text && startsWith.some((prefix) => text.startsWith(prefix)),
+            matchFirstText(readText(item(element)), skipWhen.match),
           );
         });
         if (shouldSkip) continue;
@@ -777,7 +863,7 @@ function parseStorePriceDetail(
   return { kind: "price", value: [result.data], issues: [] };
 }
 
-function reviewFieldV6(path: PropertyKey[]) {
+function savedReviewField(path: PropertyKey[]) {
   if (path[0] !== "article") return "article";
   if (path[1] === "canonicalUrl") return "article.canonicalUrl";
   if (path[1] === "title") return "article.title";
@@ -789,10 +875,10 @@ function reviewFieldV6(path: PropertyKey[]) {
   return "article.reviews";
 }
 
-function readReviewFieldV6(
+function readSavedReviewField(
   page: ReturnType<typeof load>,
   review: ReturnType<typeof load>,
-  field: ScrapeReviewField,
+  field: StoredScrapeReviewField,
   index: number,
 ) {
   for (const rule of field.try) {
@@ -813,9 +899,9 @@ function readReviewFieldV6(
   return null;
 }
 
-function selectReviewItemsV6(
+function selectSavedReviewItems(
   $: ReturnType<typeof load>,
-  rules: ReviewRulesV6["article"]["reviews"],
+  rules: SavedReviewRules["article"]["reviews"],
 ) {
   const areas = $(rules.inside).toArray();
   if (areas.length !== 1) {
@@ -831,6 +917,63 @@ function selectReviewItemsV6(
         body: $(element),
         item: load($.html(element)),
       }));
+  }
+
+  if (rules.oneReviewPer === "section") {
+    const starts = area
+      .find(rules.startsAt.selector)
+      .filter((_, element) =>
+        Boolean(matchFirstText(readText($(element)), rules.startsAt.match)),
+      )
+      .toArray();
+    const stops = rules.stopBefore
+      ? area
+          .find(rules.stopBefore.selector)
+          .filter((_, element) =>
+            Boolean(
+              matchFirstText(
+                readText($(element)),
+                rules.stopBefore?.match ?? null,
+              ),
+            ),
+          )
+          .toArray()
+      : [];
+    const children = area.contents().toArray();
+    const childIndex = (element: (typeof starts)[number]) => {
+      const directChild = $(element)
+        .parents()
+        .toArray()
+        .find((ancestor) => ancestor.parent === areaElement);
+      return children.indexOf(directChild ?? element);
+    };
+    const startsAt = starts.map(childIndex);
+    if (
+      startsAt.some(
+        (start, index) => start < 0 || start === startsAt[index - 1],
+      )
+    ) {
+      throw new Error(
+        "Each review start must be in a separate part of the review area.",
+      );
+    }
+    const stopsAt = stops.map(childIndex).filter((index) => index >= 0);
+    return starts.map((_, index) => {
+      const start = startsAt[index]!;
+      const nextReview = startsAt[index + 1] ?? children.length;
+      const nextStop = stopsAt.find((stop) => stop > start) ?? children.length;
+      const end = Math.min(nextReview, nextStop);
+      const includeFrom =
+        starts.length === 1 && rules.whenOnlyOneReview === "useWholeArea"
+          ? 0
+          : start;
+      const bodyNodes = children.slice(includeFrom, end);
+      const body = $(bodyNodes);
+      return {
+        body,
+        item: load(bodyNodes.map((element) => $.html(element)).join("")),
+      };
+    });
   }
 
   const headings = area.find(rules.selector).toArray();
@@ -868,7 +1011,7 @@ function selectReviewItemsV6(
 
 function readPublishedDate(
   $: ReturnType<typeof load>,
-  field: ReviewRulesV6["article"]["publishedDate"],
+  field: SavedReviewRules["article"]["publishedDate"],
   pageUrl: URL,
 ) {
   for (const rule of field.try) {
@@ -884,8 +1027,8 @@ function readPublishedDate(
   return null;
 }
 
-function parseReviewDetailV6(
-  rules: ReviewRulesV6,
+function parseSavedReviewDetail(
+  rules: SavedReviewRules,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
@@ -940,7 +1083,7 @@ function parseReviewDetailV6(
   }> = [];
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
-  const reviewItems = selectReviewItemsV6($, rules.article.reviews);
+  const reviewItems = selectSavedReviewItems($, rules.article.reviews);
   if (!reviewItems) {
     issues.push({
       field: "article.reviews.inside",
@@ -948,13 +1091,21 @@ function parseReviewDetailV6(
     });
   } else if (reviewItems.length === 0) {
     issues.push({
-      field: "article.reviews.selector",
+      field:
+        rules.article.reviews.oneReviewPer === "section"
+          ? "article.reviews.startsAt"
+          : "article.reviews.selector",
       message: "No reviews were found.",
     });
   }
 
   reviewItems?.forEach(({ body, item }, index) => {
-    const name = readReviewFieldV6($, item, rules.article.reviews.name, index);
+    const name = readSavedReviewField(
+      $,
+      item,
+      rules.article.reviews.name,
+      index,
+    );
     if (!name) {
       issues.push({
         field: "article.reviews.name",
@@ -964,11 +1115,11 @@ function parseReviewDetailV6(
     }
     const sourceKey = `${canonicalUrl?.toString() ?? pageUrl.toString()}#review-${index + 1}`;
     const reviewerName = rules.article.reviews.reviewer
-      ? readReviewFieldV6($, item, rules.article.reviews.reviewer, index)
+      ? readSavedReviewField($, item, rules.article.reviews.reviewer, index)
       : null;
     const scoreRule = rules.article.reviews.score;
     const scoreText = scoreRule
-      ? readReviewFieldV6($, item, scoreRule, index)
+      ? readSavedReviewField($, item, scoreRule, index)
       : null;
     const mappedScore = scoreRule?.map?.find(
       (entry) =>
@@ -1010,7 +1161,7 @@ function parseReviewDetailV6(
           : null,
     });
     if (rules.article.reviews.tastingNotes) {
-      const value = readReviewFieldV6(
+      const value = readSavedReviewField(
         $,
         item,
         rules.article.reviews.tastingNotes,
@@ -1035,7 +1186,7 @@ function parseReviewDetailV6(
   if (!result.success) {
     const reportedFields = new Set(issues.map(({ field }) => field));
     issues.push(
-      ...validationIssues(result.error, reviewFieldV6).filter(
+      ...validationIssues(result.error, savedReviewField).filter(
         ({ field }) =>
           ![...reportedFields].some(
             (reportedField) =>
@@ -1052,8 +1203,8 @@ function parseReviewDetailV6(
   };
 }
 
-function parsePriceDetailV6(
-  rules: PriceRulesV6,
+function parseSavedPriceDetail(
+  rules: SavedPriceRules,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
@@ -1092,8 +1243,8 @@ function parsePriceDetailV6(
   return { kind: "price", value: [result.data], issues: [] };
 }
 
-function parseCatalogDetailV7(
-  rules: CatalogRulesV7,
+function parseSavedCatalogDetail(
+  rules: SavedCatalogRules,
   html: string,
   pageUrl: URL,
 ): ScrapeDetailResult {
@@ -1103,7 +1254,7 @@ function parseCatalogDetailV7(
     const value = readPageField($, rules.product.url);
     if (value) url = absoluteHttpUrl(value, pageUrl);
   }
-  const readOptional = (field: ScrapePageField | null) =>
+  const readOptional = (field: StoredScrapePageField | null) =>
     field ? readPageField($, field) : null;
   const sourceBottleIdentity = {
     stated_age: parseNumber(readOptional(rules.product.statedAge)),
@@ -1148,13 +1299,13 @@ export function parseScrapeDetail(
 ): ScrapeDetailResult {
   try {
     if (rules.kind === "review" && "article" in rules) {
-      return parseReviewDetailV6(rules, html, pageUrl);
+      return parseSavedReviewDetail(rules, html, pageUrl);
     }
     if (rules.kind === "price" && "product" in rules) {
-      return parsePriceDetailV6(rules, html, pageUrl);
+      return parseSavedPriceDetail(rules, html, pageUrl);
     }
     if (rules.kind === "catalog") {
-      return parseCatalogDetailV7(rules, html, pageUrl);
+      return parseSavedCatalogDetail(rules, html, pageUrl);
     }
     return rules.kind === "review"
       ? parseReviewDetail(rules, html, pageUrl)

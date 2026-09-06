@@ -84,8 +84,8 @@ product database. Only a revision that passes its preview can become active. An
 admin can return to any older revision that passed. Pausing a source stops
 collection but keeps its revisions and run history.
 
-Rule versions 1 through 5 remain supported so saved sources keep working. New
-sources use version 6. A review source has `articles` for finding article links
+Older rule versions remain supported so saved sources keep working. New
+sources use version 8. A review source has `articles` for finding article links
 and `article` for reading an article. A price source uses `products` and
 `product` in the same way. `oneArticlePer` or `oneProductPer` identifies each
 result on the list page. `link` finds its link, `skipWhen` can leave out a
@@ -93,16 +93,24 @@ result, and `nextPage` can continue to the next list page. Links must stay on
 the source website. Code follows at most five list pages and stops at `limit`.
 
 Each field has an ordered `try` list. A read can get text, get an attribute, or
-use a fixed value. The parser uses the first non-empty result. Reads can remove
-known text from the start or end and add known text when needed. Publication
-dates can also come from a URL path with bounded `yyyy`, `yy`, `MM`, `dd`, and
-`*` parts. Scores can map up to 25 written grades to numbers.
+use a fixed value. The parser uses the first non-empty result. A read can match
+the selected text against up to three templates. Templates contain normal text
+and three placeholders: `{anything}` ignores changing text, `{value}` keeps the
+wanted text, and `{line}` matches an HTML line break. For example,
+`Score: {value}/10` returns the score and
+`Review {anything} - {value}` returns the writer. Matching ignores letter case.
+List filters and review starts use the same templates. `addStart` and `addEnd`
+can add known text after a match. Publication dates can also come from a URL
+path with bounded `yyyy`, `yy`, `MM`, `dd`, and `*` parts. Scores can map up to
+25 written grades to numbers.
 
 For reviews, `article.reviews.inside` identifies the part of the article that
 contains reviews. `oneReviewPer: "element"` means each selected element is one
-review. `oneReviewPer: "heading"` means each selected heading starts a review;
-`stopBefore` can mark where the reviews end. A single heading must say whether
-to start at that heading or use the whole review area. A field read states
+review. `oneReviewPer: "section"` means each matching `startsAt` label starts a
+review; `stopBefore` can mark where the reviews end. `inside` must select the
+closest single area shared by every review start. This also works when layout
+elements wrap the labels and review content. A single section must say whether
+to start at its label or use the whole review area. A field read states
 whether it reads inside the review or from the article, and an article-level
 read states whether it applies to the first review or every review. This keeps
 names, writers, and scores from leaking between reviews.
@@ -174,12 +182,12 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Set `rulesVersion` to `6` when testing current operations. An omitted
+API. Set `rulesVersion` to `8` when testing current operations. An omitted
 version means version 1 so existing preview files keep their original behavior:
 
 ```json
 {
-  "rulesVersion": 6,
+  "rulesVersion": 8,
   "listUrl": "https://example.com/reviews",
   "rules": {
     "kind": "review",
@@ -198,8 +206,9 @@ version means version 1 so existing preview files keep their original behavior:
             "get": "text",
             "selector": "h1",
             "take": "first",
-            "startsWith": null,
-            "clean": null
+            "match": null,
+            "addStart": null,
+            "addEnd": null
           }
         ]
       },
@@ -209,7 +218,9 @@ version means version 1 so existing preview files keep their original behavior:
             "get": "attribute",
             "selector": "time",
             "attribute": "datetime",
-            "clean": null
+            "match": null,
+            "addStart": null,
+            "addEnd": null
           }
         ]
       },
@@ -224,8 +235,9 @@ version means version 1 so existing preview files keep their original behavior:
               "from": "review",
               "selector": "h2",
               "take": "first",
-              "startsWith": null,
-              "clean": null
+              "match": null,
+              "addStart": null,
+              "addEnd": null
             }
           ]
         },
