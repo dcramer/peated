@@ -26,7 +26,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shows the reviews, prices, and bottles handled by scrapers, followed by daily work and recent problems.",
+          "Shows scraper totals, 30-day charts for saved items and requests, exact daily details, and recent problems.",
       },
     },
   },
