@@ -16,7 +16,5 @@ export async function prepareDramfaceSource(input: PrepareReviewSourceInput) {
       /^https:\/\/www\.dramface\.com\/all-reviews\/\d{4}\/[a-z0-9][a-z0-9-]*$/.test(
         url,
       ),
-    oldReviewKeyIsValid: ({ sourceKey }) =>
-      /^dramface:[a-f0-9]{64}$/.test(sourceKey ?? ""),
   });
 }

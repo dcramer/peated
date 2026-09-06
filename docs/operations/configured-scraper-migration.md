@@ -164,9 +164,9 @@ restoring the saved daily schedule. Preparation must not change publication.
 Use the preparation endpoint with `{"site": "dramface"}`. The check-only
 request locks and verifies every stored article and review. It accepts only
 dated Dramface article URLs without a trailing slash and verifies each old
-review key belongs to Dramface. Applying replaces only those keys with the
-saved parser's Bottle name and writer keys, then adds a paused source whose list
-page is `https://www.dramface.com/all-reviews`.
+review key belongs to Dramface. Applying changes only those keys so each review
+stays matched by its Bottle name and writer, then adds a paused source whose
+list page is `https://www.dramface.com/all-reviews`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
 visibility, scores, writers, publication settings, stored-body counts, and the
