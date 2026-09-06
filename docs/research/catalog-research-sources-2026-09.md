@@ -21,19 +21,20 @@ sites that worked for each producer or range.
 
 ## Best Places To Search
 
-| Place                            | Good for                                   | Watch for                                        |
-| -------------------------------- | ------------------------------------------ | ------------------------------------------------ |
-| Producer product archive         | Names, ranges, facts, images               | Current pages omit old releases                  |
-| Producer news                    | Launch dates and new ranges                | Later articles may shorten details               |
-| Producer PDF or menu             | Dense lists, batches, casks, strengths     | Menu date is not release date                    |
-| Sitemap or public shop data      | Sold-out and hidden product pages          | Check terms; remove bundles and package variants |
-| Country distributor              | Market-only releases and official images   | Covers one market only                           |
-| Government label database        | Label art, proof, age, applicant           | Approval does not prove release                  |
-| Whisky catalog or collector list | Large historical lists                     | Use as a lead; check the exact Bottle            |
-| Exact auction lot                | Front/back labels, cask, ABV, bottle count | Seller titles and auction dates can mislead      |
-| Old retailer page                | Discontinued and exclusive Bottles         | Listing date is not always release date          |
-| Whisky review or news article    | Dated proof and old names                  | Secondary source; check conflicts                |
-| Wikimedia Commons file page      | Reusable distillery images and license     | Exact Bottle images are rare                     |
+| Place                              | Good for                                   | Watch for                                                 |
+| ---------------------------------- | ------------------------------------------ | --------------------------------------------------------- |
+| Producer product archive           | Names, ranges, facts, images               | Current pages omit old releases                           |
+| Producer news                      | Launch dates and new ranges                | Later articles may shorten details                        |
+| Producer PDF or menu               | Dense lists, batches, casks, strengths     | Menu date is not release date                             |
+| Sitemap or public shop data        | Sold-out and hidden product pages          | Check terms; remove bundles and package variants          |
+| Country distributor                | Market-only releases and official images   | Covers one market only                                    |
+| Government label database          | Label art, proof, age, applicant           | Approval does not prove release                           |
+| Whisky catalog or collector list   | Large historical lists                     | Use as a lead; check the exact Bottle                     |
+| Exact auction lot                  | Front/back labels, cask, ABV, bottle count | Seller titles and auction dates can mislead               |
+| Old retailer page                  | Discontinued and exclusive Bottles         | Listing date is not always release date                   |
+| Whisky review or news article      | Dated proof and old names                  | Secondary source; check conflicts                         |
+| Wikimedia Commons file page        | Reusable distillery images and license     | Exact Bottle images are rare                              |
+| Openverse or Flickr license search | Reusable user Bottle photos                | Verify the live source, creator, license, and exact label |
 
 ## Pages Worth Trying
 
