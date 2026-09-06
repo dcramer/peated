@@ -204,7 +204,7 @@ export const scraperRegistry = createScraperRegistry({
           source.type === "smws"
             ? {
                 rationale:
-                  "The official weekly SMWS archive sync uses public batch APIs and about 74 requests with two-second spacing.",
+                  "The official weekly SMWS archive sync uses public batch APIs and needs about 74 requests, paced across one hour.",
               }
             : undefined,
         origins: source.origins,

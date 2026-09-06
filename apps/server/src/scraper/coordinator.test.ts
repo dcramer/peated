@@ -197,7 +197,7 @@ test("expires crashed leases without allowing stale release to clear a successor
   expect(target?.leaseToken).toBe("successor");
 });
 
-test("enforces spacing, fixed-window quota, and the run budget", async () => {
+test("spreads requests across the window and enforces the run budget", async () => {
   await db.insert(scrapeTargets).values({
     ...baseTarget,
     minimumSpacingMs: 1_000,
@@ -226,7 +226,7 @@ test("enforces spacing, fixed-window quota, and the run budget", async () => {
     }),
   ).toMatchObject({ granted: false, reason: "target_spacing" });
 
-  const secondAt = new Date("2026-08-18T12:00:01Z");
+  const secondAt = new Date("2026-08-18T12:30:00Z");
   const second = await acquireScrapePermit({
     runId: run.id,
     targetKey: baseTarget.key,
@@ -239,19 +239,23 @@ test("enforces spacing, fixed-window quota, and the run budget", async () => {
     token: second.token,
     now: secondAt,
   });
+  await db
+    .update(scrapeTargets)
+    .set({ nextRequestAt: null })
+    .where(eq(scrapeTargets.key, baseTarget.key));
   const otherRun = await createRun({ siteKey: "whiskyworld" });
   expect(
     await acquireScrapePermit({
       runId: otherRun.id,
       targetKey: baseTarget.key,
-      now: new Date("2026-08-18T12:00:02Z"),
+      now: new Date("2026-08-18T12:30:01Z"),
     }),
   ).toMatchObject({ granted: false, reason: "target_quota" });
   expect(
     await acquireScrapePermit({
       runId: run.id,
       targetKey: baseTarget.key,
-      now: new Date("2026-08-18T12:00:02Z"),
+      now: new Date("2026-08-18T12:30:01Z"),
     }),
   ).toMatchObject({ granted: false, reason: "run_budget" });
 });

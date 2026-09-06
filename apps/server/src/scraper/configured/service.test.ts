@@ -100,6 +100,7 @@ test("creates a site and its admin-owned request rows", async () => {
       key: "reviews-example",
       managedBy: "admin",
       enabled: true,
+      minimumSpacingMs: 60_000,
     }),
   ]);
   expect(await db.select().from(scrapeOrigins)).toEqual([

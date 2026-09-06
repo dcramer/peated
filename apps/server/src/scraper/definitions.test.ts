@@ -33,7 +33,7 @@ test("applies conservative target and run defaults", () => {
 
   expect(target).toMatchObject({
     enabled: true,
-    minimumSpacingMs: 2_000,
+    minimumSpacingMs: 60_000,
     requestsPerWindow: 60,
     windowMs: 3_600_000,
     timeoutMs: 30_000,
@@ -75,11 +75,22 @@ test("accepts stricter policies without an exception", () => {
   expect(
     defineScrapeTarget({
       key: "slow-operator",
-      minimumSpacingMs: 5_000,
+      minimumSpacingMs: 120_000,
       requestsPerWindow: 50,
       origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
     }),
-  ).toMatchObject({ minimumSpacingMs: 5_000, requestsPerWindow: 50 });
+  ).toMatchObject({ minimumSpacingMs: 120_000, requestsPerWindow: 50 });
+});
+
+test("spreads a request allowance across its full window", () => {
+  const target = defineScrapeTarget({
+    key: "slow-operator",
+    minimumSpacingMs: 1_000,
+    requestsPerWindow: 10,
+    origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
+  });
+
+  expect(target.minimumSpacingMs).toBe(6 * 60_000);
 });
 
 test("requires a rationale for a less restrictive policy", () => {
@@ -87,6 +98,7 @@ test("requires a rationale for a less restrictive policy", () => {
     defineScrapeTarget({
       key: "fast-operator",
       minimumSpacingMs: 1_000,
+      requestsPerWindow: 3_600,
       origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
     }),
   ).toThrow(/requires a rationale/);
@@ -95,6 +107,7 @@ test("requires a rationale for a less restrictive policy", () => {
     defineScrapeTarget({
       key: "fast-operator",
       minimumSpacingMs: 1_000,
+      requestsPerWindow: 3_600,
       policyException: {
         rationale: "The provider explicitly documents this request cadence.",
       },

@@ -5,6 +5,7 @@ import {
   scrapeOrigins,
 } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
+import { getRequestSpacingMs } from "../definitions";
 import type { ScrapeOriginDefinition, ScrapeTargetDefinition } from "../types";
 
 function toOrigin(origin: ScrapeOrigin): ScrapeOriginDefinition {
@@ -40,7 +41,7 @@ export async function loadScrapeSourceTarget(
   return {
     key: target.key,
     enabled: target.enabled,
-    minimumSpacingMs: target.minimumSpacingMs,
+    minimumSpacingMs: getRequestSpacingMs(target),
     requestsPerWindow: target.requestsPerWindow,
     windowMs: target.windowMs,
     timeoutMs: target.timeoutMs,

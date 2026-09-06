@@ -61,9 +61,10 @@ bridge dependency when converting it to a native adapter, then move it out of
 Use the same target for multiple sources only when they share a remote
 operator's capacity. Use multiple exact origins under that target when one
 operator intentionally serves an integration from several hosts. Never infer
-this grouping from a registrable domain. Stricter limits need no exception;
-less restrictive spacing, window, or quota requires a reviewed rationale in
-the code-owned definition.
+this grouping from a registrable domain. The runtime spreads every request
+allowance across its full window: 60 requests per hour means at most one
+request per minute. A longer minimum delay slows that rate further. A faster
+rate requires a reviewed rationale in the code-owned definition.
 
 ## Scrape sources
 

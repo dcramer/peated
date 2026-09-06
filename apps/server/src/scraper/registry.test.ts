@@ -76,12 +76,12 @@ test("registers each code-owned scraper source with explicit target ownership", 
   ).toEqual(["https://api.smws.com", "https://smws.com"]);
   expect(scraperRegistry.targets.get("smws")).toMatchObject({
     allowedRequestHeaders: ["authorization", "content-type"],
-    minimumSpacingMs: 2_000,
+    minimumSpacingMs: 45_000,
     requestsPerWindow: 80,
   });
   expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("bourbonculture")).toMatchObject({
-    minimumSpacingMs: 5_000,
+    minimumSpacingMs: 360_000,
     requestsPerWindow: 10,
     windowMs: 3_600_000,
   });
@@ -89,28 +89,28 @@ test("registers each code-owned scraper source with explicit target ownership", 
   expect(scraperRegistry.targets.get("compassbox")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.dramface.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("dramface")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 144_000,
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("dramface")?.requestLimit).toBe(30);
   expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("fredminnick")).toMatchObject({
-    minimumSpacingMs: 30_000,
+    minimumSpacingMs: 360_000,
     requestsPerWindow: 10,
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.sources.get("fredminnick")?.requestLimit).toBe(9);
   expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskeyreviewer")).toMatchObject({
-    minimumSpacingMs: 5_000,
+    minimumSpacingMs: 360_000,
     requestsPerWindow: 10,
     windowMs: 3_600_000,
   });
   expect(scraperRegistry.targets.get("kilchoman")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.runEvery).toBeNull();
   expect(scraperRegistry.targets.get("whiskyadvocate")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 180_000,
     requestsPerWindow: 20,
     windowMs: 3_600_000,
   });
@@ -120,13 +120,13 @@ test("registers each code-owned scraper source with explicit target ownership", 
   );
   expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskynotes")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 120_000,
     requestsPerWindow: 30,
     windowMs: 3_600_000,
   });
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskyfun")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 144_000,
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
@@ -136,19 +136,19 @@ test("registers each code-owned scraper source with explicit target ownership", 
   );
   expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskysaga")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 144_000,
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
   expect(EXTERNAL_SITE_DEFINITIONS.whiskystudy.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("whiskystudy")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 144_000,
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });
   expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.runEvery).toBe(1440);
   expect(scraperRegistry.targets.get("wordsofwhisky")).toMatchObject({
-    minimumSpacingMs: 2_500,
+    minimumSpacingMs: 144_000,
     requestsPerWindow: 25,
     windowMs: 3_600_000,
   });

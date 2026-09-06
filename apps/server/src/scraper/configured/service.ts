@@ -18,7 +18,10 @@ import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
 import slugify from "@sindresorhus/slugify";
 import { and, desc, eq, max } from "drizzle-orm";
 import { z } from "zod";
-import { DEFAULT_SCRAPER_REQUEST_POLICY } from "../definitions";
+import {
+  DEFAULT_SCRAPER_REQUEST_POLICY,
+  getRequestSpacingMs,
+} from "../definitions";
 import type { ScrapeSourcePreviewResult } from "./preview";
 import {
   SCRAPE_RULES_VERSION,
@@ -90,7 +93,7 @@ export async function createSiteWithScrapeSource(
         key,
         managedBy: "admin",
         enabled: true,
-        minimumSpacingMs: DEFAULT_SCRAPER_REQUEST_POLICY.minimumSpacingMs,
+        minimumSpacingMs: getRequestSpacingMs(DEFAULT_SCRAPER_REQUEST_POLICY),
         requestsPerWindow: DEFAULT_SCRAPER_REQUEST_POLICY.requestsPerWindow,
         windowMs: DEFAULT_SCRAPER_REQUEST_POLICY.windowMs,
         timeoutMs: DEFAULT_SCRAPER_REQUEST_POLICY.timeoutMs,

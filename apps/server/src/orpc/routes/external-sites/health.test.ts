@@ -112,6 +112,7 @@ test("health list reports source inventory, runtime, and latest execution", asyn
         {
           key: "decadentdrinks",
           enabled: true,
+          minimumSpacingMs: 12_000,
           origins: [
             {
               origin: "https://decadent-drinks.com",

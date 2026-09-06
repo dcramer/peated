@@ -117,7 +117,9 @@ async function setupRuntime({
 }
 
 test("waits for the target spacing before the next request", async () => {
-  const { registry, run } = await setupRuntime({ minimumSpacingMs: 5_000 });
+  const { registry, run } = await setupRuntime({
+    minimumSpacingMs: 120_000,
+  });
   const clock = clockAt();
   const fetchImpl = vi
     .fn<typeof fetch>()
@@ -137,7 +139,7 @@ test("waits for the target spacing before the next request", async () => {
   await requestScraperUrl(input);
   await requestScraperUrl(input);
 
-  expect(clock.sleepSpy).toHaveBeenCalledWith(5_000);
+  expect(clock.sleepSpy).toHaveBeenCalledWith(120_000);
   expect(fetchImpl).toHaveBeenCalledTimes(2);
 });
 

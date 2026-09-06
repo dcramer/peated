@@ -26,6 +26,18 @@ export const DEFAULT_SCRAPER_REQUEST_POLICY = Object.freeze({
   maxRetries: 2,
 });
 
+export function getRequestSpacingMs(
+  target: Pick<
+    ScrapeTargetDefinition,
+    "minimumSpacingMs" | "requestsPerWindow" | "windowMs"
+  >,
+) {
+  return Math.max(
+    target.minimumSpacingMs,
+    Math.ceil(target.windowMs / target.requestsPerWindow),
+  );
+}
+
 const DefinitionKeySchema = z
   .string()
   .min(1)
@@ -125,11 +137,8 @@ const TargetDefinitionSchema = z
   .strict()
   .superRefine((target, context) => {
     const isLessRestrictive =
-      target.minimumSpacingMs <
-        DEFAULT_SCRAPER_REQUEST_POLICY.minimumSpacingMs ||
-      target.requestsPerWindow >
-        DEFAULT_SCRAPER_REQUEST_POLICY.requestsPerWindow ||
-      target.windowMs < DEFAULT_SCRAPER_REQUEST_POLICY.windowMs;
+      getRequestSpacingMs(target) <
+      getRequestSpacingMs(DEFAULT_SCRAPER_REQUEST_POLICY);
     if (isLessRestrictive && !target.policyException) {
       context.addIssue({
         code: "custom",
@@ -198,7 +207,11 @@ export function defineScrapeTarget(
       >
     >,
 ): ScrapeTargetDefinition {
-  return TargetDefinitionSchema.parse(input);
+  const target = TargetDefinitionSchema.parse(input);
+  return {
+    ...target,
+    minimumSpacingMs: getRequestSpacingMs(target),
+  };
 }
 
 export function defineScraperSource<TCursor, TObservation>(
