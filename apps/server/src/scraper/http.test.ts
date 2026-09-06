@@ -50,14 +50,14 @@ function clockAt(value = "2026-08-18T12:00:00Z") {
 async function setupRuntime({
   origins = ["https://example.com"],
   requestLimit = 20,
-  minimumSpacingMs,
+  requestsPerHour,
   maxRetries = 2,
   maxResponseBytes = 10 * 1024 * 1024,
   allowedRequestHeaders = [],
 }: {
   origins?: [string, ...string[]];
   requestLimit?: number;
-  minimumSpacingMs?: number;
+  requestsPerHour?: number;
   maxRetries?: number;
   maxResponseBytes?: number;
   allowedRequestHeaders?: string[];
@@ -75,7 +75,7 @@ async function setupRuntime({
     targets: [
       defineScrapeTarget({
         key: "operator",
-        minimumSpacingMs,
+        requestsPerHour,
         maxRetries,
         maxResponseBytes,
         allowedRequestHeaders,
@@ -116,9 +116,9 @@ async function setupRuntime({
   return { registry, run };
 }
 
-test("waits for the target spacing before the next request", async () => {
+test("spaces requests from the hourly limit", async () => {
   const { registry, run } = await setupRuntime({
-    minimumSpacingMs: 120_000,
+    requestsPerHour: 30,
   });
   const clock = clockAt();
   const fetchImpl = vi

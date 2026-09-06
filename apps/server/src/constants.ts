@@ -66,7 +66,8 @@ export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
 export const EXTERNAL_SITE_DEFINITIONS = {
   // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", runEvery: null },
-  // Berry Bros. & Rudd stays manual-only because robots.txt disallows its search page.
+  // Berry Bros. & Rudd does not run automatically because robots.txt does not
+  // allow its search page.
   berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: null },
   bruichladdich: { name: "Bruichladdich", runEvery: 10080 },
   cadenheads: { name: "Cadenheads", runEvery: 10080 },
@@ -146,7 +147,8 @@ export const EXTERNAL_SITE_DEFINITIONS = {
     runEvery: 1440,
     content: "reviews",
   },
-  // WhiskyWorld stays manual-only because the site returns 403 for robots.txt.
+  // WhiskyWorld does not run automatically because the site blocks our
+  // robots.txt check.
   whiskyworld: { name: "The Whisky World", runEvery: null },
 } as const;
 

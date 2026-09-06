@@ -58,19 +58,20 @@ active scraper session; new sources must not use it. Remove a legacy source's
 bridge dependency when converting it to a native adapter, then move it out of
 `adapters/legacy/`.
 
-Use the same target for multiple sources only when they share a remote
-operator's capacity. Use multiple exact origins under that target when one
-operator intentionally serves an integration from several hosts. Never infer
-this grouping from a registrable domain. The runtime spreads every request
-allowance across its full window: 60 requests per hour means at most one
-request per minute. A longer minimum delay slows that rate further. A faster
-rate requires a reviewed rationale in the code-owned definition.
+Give sources the same target only when the same organization runs them and they
+must share one request limit. A target may list several web addresses when that
+organization uses more than one host. Do not group sites from their domain
+names alone.
+
+Set `requestsPerHour` for each target. The scraper waits between requests so
+they fill the hour evenly: 60 per hour means one request per minute. A value
+above 60 needs a short reason.
 
 ## Scrape sources
 
 Admins can add a review or store-price source in Admin → Scrapers. These
-sources use the same run, request, robots, limit, retry, validation, and sink
-boundaries as code-owned sources.
+sources use the same runs, requests, robots.txt checks, limits, retries,
+validation, and saving code as built-in sources.
 
 To replace an existing scraper, follow
 [Move an existing scraper to saved rules](../../../../docs/operations/configured-scraper-migration.md).
@@ -110,8 +111,8 @@ The setup agent submits this same rule shape, and the saved revision and parser
 use it directly. There is no setup-only translation step.
 Rules do not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
-page templates, infinite scrolling, or cross-origin discovery. Add a code-owned
-adapter when a source needs those capabilities.
+page templates, infinite scrolling, or links to another website. Add a built-in
+adapter when a source needs one of those features.
 
 Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or

@@ -133,8 +133,8 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
           },
           context,
         );
-        // This origin is owned by the test. Keep pacing enabled without making
-        // the live-model suite wait a minute between fixture requests.
+        // The test controls this local site. One request per second keeps the
+        // check quick while still testing the wait between requests.
         await db
           .update(scrapeTargets)
           .set({ minimumSpacingMs: 1_000, requestsPerWindow: 3_600 })

@@ -16,17 +16,25 @@ export class ScraperTargetDisabledError extends Error {
   }
 }
 
-export const DEFAULT_SCRAPER_REQUEST_POLICY = Object.freeze({
-  minimumSpacingMs: 2_000,
-  requestsPerWindow: 60,
-  windowMs: 60 * 60_000,
+export const DEFAULT_SCRAPER_SETTINGS = Object.freeze({
+  requestsPerHour: 60,
   requestLimit: 100,
   timeoutMs: 30_000,
   maxResponseBytes: 10 * 1024 * 1024,
   maxRetries: 2,
 });
 
-export function getRequestSpacingMs(
+const ONE_HOUR_MS = 60 * 60_000;
+
+export function getHourlyRequestSettings(requestsPerHour: number) {
+  return {
+    minimumSpacingMs: Math.ceil(ONE_HOUR_MS / requestsPerHour),
+    requestsPerWindow: requestsPerHour,
+    windowMs: ONE_HOUR_MS,
+  };
+}
+
+export function getRequestDelayMs(
   target: Pick<
     ScrapeTargetDefinition,
     "minimumSpacingMs" | "requestsPerWindow" | "windowMs"
@@ -44,7 +52,7 @@ const DefinitionKeySchema = z
   .max(64)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
-const RationaleSchema = z.string().trim().min(10).max(500);
+const ReasonSchema = z.string().trim().min(10).max(500);
 const HeaderNameSchema = z
   .string()
   .trim()
@@ -63,7 +71,7 @@ const RobotsPolicySchema = z.discriminatedUnion("mode", [
   z
     .object({
       mode: z.literal("not_applicable"),
-      rationale: RationaleSchema,
+      rationale: ReasonSchema,
     })
     .strict(),
 ]);
@@ -94,56 +102,43 @@ const TargetDefinitionSchema = z
   .object({
     key: DefinitionKeySchema,
     enabled: z.boolean().default(true),
-    minimumSpacingMs: z
-      .number()
-      .int()
-      .nonnegative()
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.minimumSpacingMs),
-    requestsPerWindow: z
+    requestsPerHour: z
       .number()
       .int()
       .positive()
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.requestsPerWindow),
-    windowMs: z
-      .number()
-      .int()
-      .positive()
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.windowMs),
+      .default(DEFAULT_SCRAPER_SETTINGS.requestsPerHour),
     timeoutMs: z
       .number()
       .int()
       .positive()
-      .max(DEFAULT_SCRAPER_REQUEST_POLICY.timeoutMs)
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.timeoutMs),
+      .max(DEFAULT_SCRAPER_SETTINGS.timeoutMs)
+      .default(DEFAULT_SCRAPER_SETTINGS.timeoutMs),
     maxResponseBytes: z
       .number()
       .int()
       .positive()
-      .max(DEFAULT_SCRAPER_REQUEST_POLICY.maxResponseBytes)
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.maxResponseBytes),
+      .max(DEFAULT_SCRAPER_SETTINGS.maxResponseBytes)
+      .default(DEFAULT_SCRAPER_SETTINGS.maxResponseBytes),
     maxRetries: z
       .number()
       .int()
       .min(0)
-      .max(DEFAULT_SCRAPER_REQUEST_POLICY.maxRetries)
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.maxRetries),
+      .max(DEFAULT_SCRAPER_SETTINGS.maxRetries)
+      .default(DEFAULT_SCRAPER_SETTINGS.maxRetries),
     allowedRequestHeaders: z.array(HeaderNameSchema).default([]),
-    policyException: z
-      .object({ rationale: RationaleSchema })
-      .strict()
-      .optional(),
+    fasterRateReason: ReasonSchema.optional(),
     origins: z.tuple([OriginSchema], OriginSchema),
   })
   .strict()
   .superRefine((target, context) => {
-    const isLessRestrictive =
-      getRequestSpacingMs(target) <
-      getRequestSpacingMs(DEFAULT_SCRAPER_REQUEST_POLICY);
-    if (isLessRestrictive && !target.policyException) {
+    if (
+      target.requestsPerHour > DEFAULT_SCRAPER_SETTINGS.requestsPerHour &&
+      !target.fasterRateReason
+    ) {
       context.addIssue({
         code: "custom",
-        message: "A less restrictive target policy requires a rationale.",
-        path: ["policyException"],
+        message: "A higher hourly request limit requires a reason.",
+        path: ["fasterRateReason"],
       });
     }
   });
@@ -164,8 +159,8 @@ const SourceDefinitionSchema = z
       .number()
       .int()
       .positive()
-      .max(DEFAULT_SCRAPER_REQUEST_POLICY.requestLimit)
-      .default(DEFAULT_SCRAPER_REQUEST_POLICY.requestLimit),
+      .max(DEFAULT_SCRAPER_SETTINGS.requestLimit)
+      .default(DEFAULT_SCRAPER_SETTINGS.requestLimit),
     resumeFromLastRun: z.boolean().default(false),
     cursorSchema: ZodSchemaSchema,
     observationSchema: ZodSchemaSchema,
@@ -174,7 +169,7 @@ const SourceDefinitionSchema = z
   })
   .strict();
 
-export type CodeOwnedScraperSourceDefinition<
+export type BuiltInScraperSourceDefinition<
   TCursor = any,
   TObservation = any,
 > = Omit<ScraperSourceDefinition<TCursor, TObservation>, "externalSiteKey"> & {
@@ -182,47 +177,28 @@ export type CodeOwnedScraperSourceDefinition<
 };
 
 export function defineScrapeTarget(
-  input: Omit<
-    ScrapeTargetDefinition,
-    | "enabled"
-    | "minimumSpacingMs"
-    | "requestsPerWindow"
-    | "windowMs"
-    | "timeoutMs"
-    | "maxResponseBytes"
-    | "maxRetries"
-    | "allowedRequestHeaders"
-  > &
-    Partial<
-      Pick<
-        ScrapeTargetDefinition,
-        | "enabled"
-        | "minimumSpacingMs"
-        | "requestsPerWindow"
-        | "windowMs"
-        | "timeoutMs"
-        | "maxResponseBytes"
-        | "maxRetries"
-        | "allowedRequestHeaders"
-      >
-    >,
+  input: z.input<typeof TargetDefinitionSchema>,
 ): ScrapeTargetDefinition {
-  const target = TargetDefinitionSchema.parse(input);
+  const {
+    requestsPerHour,
+    fasterRateReason: _,
+    ...target
+  } = TargetDefinitionSchema.parse(input);
   return {
     ...target,
-    minimumSpacingMs: getRequestSpacingMs(target),
+    ...getHourlyRequestSettings(requestsPerHour),
   };
 }
 
 export function defineScraperSource<TCursor, TObservation>(
   input: Omit<
-    CodeOwnedScraperSourceDefinition<TCursor, TObservation>,
+    BuiltInScraperSourceDefinition<TCursor, TObservation>,
     "requestLimit" | "resumeFromLastRun"
   > & {
     requestLimit?: number;
     resumeFromLastRun?: boolean;
   },
-): CodeOwnedScraperSourceDefinition<TCursor, TObservation> {
+): BuiltInScraperSourceDefinition<TCursor, TObservation> {
   const parsed = SourceDefinitionSchema.parse(input);
   return {
     ...input,
@@ -233,12 +209,11 @@ export function defineScraperSource<TCursor, TObservation>(
 
 export function createScraperRegistry(input: {
   targets: readonly ScrapeTargetDefinition[];
-  sources: readonly CodeOwnedScraperSourceDefinition[];
+  sources: readonly BuiltInScraperSourceDefinition[];
 }): ScraperRegistry {
   const targets = new Map<string, ScrapeTargetDefinition>();
   const originOwners = new Map<string, string>();
-  for (const value of input.targets) {
-    const target = defineScrapeTarget(value);
+  for (const target of input.targets) {
     if (targets.has(target.key)) {
       throw new Error(`Duplicate scraper target: ${target.key}`);
     }
@@ -314,7 +289,7 @@ export function findScraperSourceBySiteKey(
   );
 }
 
-/** Disabled code-owned targets cannot create or execute durable scraper work. */
+/** A disabled built-in target cannot start or continue a scrape. */
 export function requireEnabledScraperTargets(
   registry: ScraperRegistry,
   source: ScraperSourceDefinition,

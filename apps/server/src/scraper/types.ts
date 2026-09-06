@@ -84,7 +84,6 @@ export type ScrapeTargetDefinition = {
   maxResponseBytes: number;
   maxRetries: number;
   allowedRequestHeaders: readonly string[];
-  policyException?: { rationale: string };
   origins: readonly [ScrapeOriginDefinition, ...ScrapeOriginDefinition[]];
 };
 

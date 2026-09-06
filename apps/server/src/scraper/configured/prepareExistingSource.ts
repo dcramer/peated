@@ -21,7 +21,7 @@ export type ExistingSourceDefinition = {
   origin: string;
 };
 
-/** Locks and checks one code-owned source before its records are inspected. */
+/** Locks and checks one built-in source before reading its records. */
 export async function inspectExistingSource(
   tx: AnyTransaction,
   definition: ExistingSourceDefinition,

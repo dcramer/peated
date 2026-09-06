@@ -14,8 +14,7 @@ async function applyScraperDefinitions(
 ) {
   const now = new Date();
 
-  // Definitions are code-owned. Rows are retained but made inactive when a
-  // definition disappears so coordination history is never silently deleted.
+  // Keep rows for removed registry entries so their run history is not lost.
   await tx
     .update(externalSiteScrapeTargets)
     .set({ active: false, updatedAt: now })
