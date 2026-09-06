@@ -532,11 +532,12 @@ relationships, or existing images were changed.
 ## Yamazaki — September 6, 2026
 
 The full production review is in progress. It started from 107 Bottles attached
-to the Yamazaki Brand (`E0493`) and currently has 109. The modern producer range,
-named component-whisky releases, existing historical single casks, all Brand
-pages, and all 169 Yamazaki-distilled records have been inventoried. Older
-private and single-cask releases still require individual evidence, so this is
-not yet a completion record.
+to the Yamazaki Brand (`E0493`) and currently has 124. The modern producer range,
+named component-whisky releases, existing historical single casks, all original
+Brand pages, and the pre-write set of 169 Yamazaki-distilled records were
+inventoried. Production now reports 184 Yamazaki-distilled records. Older private
+and single-cask releases still require individual evidence, so this is not yet a
+completion record.
 
 - The producer's [Japanese product range](https://www.suntory.co.jp/whisky/yamazaki/product/)
   confirmed the no-age-statement, 12-, 18-, and 25-year-old core releases. The
@@ -549,6 +550,27 @@ not yet a completion record.
   `S0073`. Suntory's
   [2024 Tsukuriwake announcement](https://www.suntoryglobalspirits.com/news/house-suntory-announces-launch-its-groundbreaking-2024-tsukuriwake-series)
   established the separate 2024 edition now stored as `B54095`.
+- An exact [The Century auction record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1960-century-40-year-old)
+  established the 1960 vintage, 40-year age, 2000 bottling and release, 43% ABV,
+  Mizunara cask `ZD0550`, and 300-bottle outturn now stored as `B54128`. An
+  exact [Tokyo Kaikan Special Single Malt record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-special-single-malt)
+  established the 2022, 48%, 300-bottle multi-vintage release now stored as
+  `B54138`. Both were duplicate-checked and re-fetched after creation. Auction
+  photography established identity but did not provide reusable image terms.
+- Whisky Auctioneer's exact records established four more historical and
+  market-specific releases: the inaugural 1984, 43%
+  [Suntory Pure Malt](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-suntory-pure-malt)
+  now stored as `B54178`; the 2023, 48%
+  [Club Yamana 55th Anniversary](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-club-yamana-55th-anniversary?v=5243131)
+  as `B54181`; the 2013, 48%, 300-bottle
+  [AEON release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-suntory-single-malt)
+  as `B54184`; and the 2013, 50%
+  [Mizunara Cask Strength](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-mizunara-cask-strength)
+  for the Tokyo International Bar Show and Whisky Live Tokyo as `B54185`.
+  Suntory's [distillery history](https://www.suntory.co.jp/factory/blog-d/000127.html)
+  independently gives March 14, 1984 as the original Yamazaki launch date.
+  All four records were duplicate-checked and re-fetched after creation; their
+  auction photos did not state reusable terms.
 - The [2022 Tsukuriwake announcement](https://www.prnewswire.com/news-releases/from-the-birthplace-of-japanese-whisky-the-house-of-suntory-introduces-2022-limited-edition-yamazaki-tsukuriwake-selection-301548951.html)
   and [Whisky Auctioneer's release guide](https://whiskyauctioneer.com/learn/explore-whisky/series/yamazaki-tsukuriwake-selection-2022-editions)
   bounded the named component-whisky range. Series `S0674` now contains the five
@@ -556,10 +578,24 @@ not yet a completion record.
   18-year-old is `B54095`; the unqualified core Mizunara 18-year-old `B47537`
   was corrected to the 2025 release proven by its assigned import references and
   exact Whiskyfun review.
-- All 109 current Yamazaki Brand Bottles now have Yamazaki as Brand and
+- All 124 current Yamazaki Brand Bottles now have Yamazaki as Brand and
   distiller with no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
-  two-page Brand inventory was re-fetched with zero remaining non-null bottlers.
+  original two-page Brand inventory was re-fetched with zero remaining non-null
+  bottlers. The 15 later creates were individually verified with no bottler.
+- Exact Whisky Auctioneer records for the [8- and 10-year-old set](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-8-10-year-old-suntory-pure-malt-box-set),
+  [12-year-old sherry release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-12-year-old-suntory-pure-malt),
+  two [15-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt)
+  [strengths](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt-0),
+  [20-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-20-year-old-suntory-pure-malt),
+  [54%](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-suntory-pure-malt),
+  [58%](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-suntory-pure-malt-0),
+  and [56% Sherry Cask](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-sherry-cask-suntory-pure-malt)
+  releases bounded the Taru-Dashi Genshu family. Package sizes were collapsed
+  when age, strength, and marketed whisky matched. Series `S0682` now contains
+  the nine distinct Bottles `B54150`–`B54156`, `B54163`, and `B54164`; the Series
+  and every member were re-fetched with the expected facts and no bottler. No
+  reusable exact image source was found.
 - [Whisky Auctioneer's Cask of Yamazaki guide](https://whiskyauctioneer.com/learn/explore-whisky/series/cask-yamazaki)
   matches the 13 cask-numbered releases already in production, but it does not
   establish that they are the complete historical range. Collector indexes for
@@ -589,5 +625,5 @@ not yet a completion record.
   4028mdk09. `B2276` now uses
   [The Yamazaki Single Malt Whisky Aged 12 years.JPG](https://commons.wikimedia.org/wiki/File:The_Yamazaki_Single_Malt_Whisky_Aged_12_years.JPG)
   under `CC BY-SA 3.0` with credit to Look Sharp!. Both stored WebP transforms
-  were visually checked. Brand image coverage remains 7 of 109 because these
+  were visually checked. Brand image coverage remains 7 of 124 because these
   were licensed replacements, not newly covered records.
