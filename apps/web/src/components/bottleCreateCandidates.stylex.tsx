@@ -11,10 +11,12 @@ export type BottleCreateCandidate =
 
 export function BottleCreateCandidateSummary({
   count,
+  loading = false,
   newSinceReview = false,
   onReview,
 }: {
   count: number;
+  loading?: boolean;
   newSinceReview?: boolean;
   onReview: () => void;
 }) {
@@ -22,7 +24,7 @@ export function BottleCreateCandidateSummary({
     count === 1 ? "bottle" : "bottles"
   }`;
   return (
-    <div {...stylex.props(styles.summary)}>
+    <div aria-busy={loading || undefined} {...stylex.props(styles.summary)}>
       <p
         aria-live="polite"
         role="status"
@@ -32,6 +34,7 @@ export function BottleCreateCandidateSummary({
       </p>
       <Button
         aria-label={`Review ${bottleCount} that may match this one`}
+        disabled={loading}
         onClick={onReview}
         size="sm"
         type="button"

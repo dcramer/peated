@@ -97,6 +97,11 @@ export const EntryNotices: Story = {
         newSinceReview
         onReview={() => undefined}
       />
+      <BottleCreateCandidateSummary
+        count={2}
+        loading
+        onReview={() => undefined}
+      />
     </StoryStack>
   ),
 };
