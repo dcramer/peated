@@ -25,6 +25,8 @@ headers prove it.
   The endpoint sends `no-store` to avoid an extra HTTP cache lifetime.
 - `homeLocations.server.ts` caches the homepage country and region lists
   for one hour. Visitors and members use the same public data.
+- `homeActivity.server.ts` caches the homepage community activity and critic
+  review pools for five minutes. Shared reads always use an anonymous client.
 - `publicCatalog.server.ts` caches anonymous entity summaries and first-page
   entity/series bottle lists for five minutes. Keys include entity, series,
   distillery view, sort, and limit. Members, searches, extra filters, later

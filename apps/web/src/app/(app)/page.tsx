@@ -17,6 +17,7 @@ import { Suspense } from "react";
 
 import { PublicHomeContent } from "./_components/home/publicHome.stylex";
 import { PublicHomeContentLoading } from "./_components/home/publicHomeLayout.stylex";
+import { loadPublicHomeActivity } from "./homeActivity.server";
 import { loadPublicHomeLocations } from "./homeLocations.server";
 import { HomePageClient } from "./homePageClient";
 
@@ -51,8 +52,7 @@ async function HomeContent() {
       queryFn: getPublicStats,
     }),
     queryClient.prefetchQuery(publicHomeQueries.events(orpc)),
-    queryClient.prefetchQuery(publicHomeQueries.memberActivity(orpc)),
-    queryClient.prefetchQuery(publicHomeQueries.recentReviews(orpc)),
+    loadPublicHomeActivity(queryClient, orpc),
     queryClient.prefetchQuery(publicHomeQueries.releases(orpc)),
     loadPublicHomeLocations(queryClient, orpc),
     ...(session.user

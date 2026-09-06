@@ -33,6 +33,7 @@ import {
   publicHomeQueries,
 } from "@peated/web/lib/orpc/homeQueries";
 import { getEntityUrl } from "@peated/web/lib/urls";
+import { selectHomeActivityItems } from "./homeActivity";
 import { HomeEventCallout } from "./homeEventCallout.stylex";
 import {
   PublicHomeContentLayout,
@@ -188,20 +189,20 @@ function LatestReleases() {
 
 function Activity() {
   const orpc = useORPC();
-  const externalReviews = useQuery(publicHomeQueries.recentReviews(orpc));
-  const activity = useQuery(publicHomeQueries.memberActivity(orpc));
+  const communityActivity = useQuery(publicHomeQueries.communityActivity(orpc));
+  const criticReviews = useQuery(publicHomeQueries.criticReviews(orpc));
 
-  if (activity.isPending && externalReviews.isPending) {
+  if (communityActivity.isPending && criticReviews.isPending) {
     return <HomeActivityFeedLoading />;
   }
 
-  if (activity.error && externalReviews.error) {
+  if (communityActivity.error && criticReviews.error) {
     return (
       <SectionError
         heading="Activity is unavailable"
         onRetry={() => {
-          void activity.refetch();
-          void externalReviews.refetch();
+          void communityActivity.refetch();
+          void criticReviews.refetch();
         }}
       >
         We couldn't load the latest activity. The rest of the database is still
@@ -210,16 +211,16 @@ function Activity() {
     );
   }
 
-  const memberActivity = activity.data?.results ?? [];
-  const criticReviews = externalReviews.data?.results ?? [];
-  const items = getCommunityFeedItems({
-    criticReviews,
-    activity: memberActivity,
-  });
+  const items = selectHomeActivityItems(
+    getCommunityFeedItems({
+      criticReviews: criticReviews.data?.results ?? [],
+      activity: communityActivity.data?.results ?? [],
+    }),
+  );
 
   return items.length ? (
     <HomeActivityFeed>
-      <CommunityFeed ariaLabel="Recent activity" items={items} limit={3} />
+      <CommunityFeed ariaLabel="Recent activity" items={items} />
     </HomeActivityFeed>
   ) : null;
 }
