@@ -15,6 +15,14 @@ import {
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 export default mockOS.search.handler(async ({ input, context }) => {
+  if (input.suggestions === "only") {
+    return SearchOutputSchema.parse({
+      query: input.query,
+      exact: null,
+      groups: [],
+      nearest: [],
+    });
+  }
   const groups: MockOutputs["search"]["groups"] = [];
   const entities = mockEntities.map((entity) =>
     mockEntityFor(Boolean(context.user), entity),

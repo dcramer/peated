@@ -127,6 +127,7 @@ type SearchInput = {
   query: string;
   scopes: SearchScope[];
   limit: number;
+  suggestions: "exclude" | "include" | "only";
 };
 
 function normalizeText(value: string) {
@@ -785,6 +786,21 @@ async function readSearchRows(
     (scope) =>
       input.scopes.includes(scope) && (scope !== "members" || !!context.user),
   );
+  if (input.suggestions === "only") {
+    const nearest =
+      input.query && !parsePeatedId(input.query)
+        ? await Sentry.startSpan(
+            { name: "search.nearest", op: "function" },
+            () => findNearest(db, context, scopes, input.query),
+          )
+        : [];
+    return {
+      query: input.query,
+      exact: null,
+      groups: [],
+      nearest,
+    };
+  }
   const exact = await Sentry.startSpan(
     { name: "search.resolve_exact", op: "function" },
     () => findExact(db, context, input.query, scopes),
@@ -809,7 +825,7 @@ async function readSearchRows(
   );
   const hasMatches = groups.some((group) => group.results.length > 0);
   const nearest =
-    input.query && !hasMatches
+    input.suggestions === "include" && input.query && !hasMatches
       ? await Sentry.startSpan({ name: "search.nearest", op: "function" }, () =>
           findNearest(db, context, scopes, input.query),
         )

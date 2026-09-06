@@ -379,6 +379,39 @@ describe("GET /search", () => {
     ]);
   });
 
+  test("can return an empty result without waiting for possible matches", async ({
+    fixtures,
+  }) => {
+    await fixtures.Bottle({ name: "Laphroaig" });
+
+    const data = await routerClient.search({
+      query: "Laphroaigg",
+      scopes: ["bottles"],
+      suggestions: "exclude",
+    });
+
+    expect(data.groups).toMatchObject([
+      { type: "bottles", hasMore: false, results: [] },
+    ]);
+    expect(data.nearest).toEqual([]);
+  });
+
+  test("can return only possible matches", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({ name: "Laphroaig" });
+
+    const data = await routerClient.search({
+      query: "Laphroaigg",
+      scopes: ["bottles"],
+      suggestions: "only",
+    });
+
+    expect(data.exact).toBeNull();
+    expect(data.groups).toEqual([]);
+    expect(data.nearest).toMatchObject([
+      { type: "bottles", result: { id: bottle.id } },
+    ]);
+  });
+
   test("resolves Bottle, Entity, and Series Peated ID tombstones directly", async ({
     fixtures,
   }) => {

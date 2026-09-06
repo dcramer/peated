@@ -86,6 +86,7 @@ export default async function SearchPage(props: {
           limit: searchLimit,
           query,
           scopes: [...searchScopes],
+          suggestions: "exclude",
         })
       : undefined,
   ]);

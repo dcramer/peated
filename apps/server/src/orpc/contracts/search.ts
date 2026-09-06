@@ -197,6 +197,12 @@ export default contract
           .array(z.enum(SEARCH_SCOPE_LIST))
           .default([...SEARCH_SCOPE_LIST]),
         limit: z.coerce.number().gte(1).lte(50).default(3),
+        suggestions: z
+          .enum(["include", "exclude", "only"])
+          .default("include")
+          .describe(
+            "Include possible matches after an empty result, leave them out, or return only possible matches",
+          ),
       })
       .strict(),
   )

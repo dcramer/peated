@@ -341,6 +341,16 @@ function exactMatchesScope(exact: SearchExact, scope: SearchScope) {
   );
 }
 
+function hasSearchResults(response: SearchResponse, scope: SearchScope) {
+  return Boolean(
+    (response.exact && exactMatchesScope(response.exact, scope)) ||
+    response.groups.some(
+      (group) =>
+        groupMatchesScope(group.type, scope) && group.results.length > 0,
+    ),
+  );
+}
+
 function getSearchSnapshot(
   response: SearchResponse,
   query: string,
@@ -348,13 +358,7 @@ function getSearchSnapshot(
   bottleOptions: BottleItemOptions,
   showMoreLinks: boolean,
 ): SearchSnapshot {
-  const hasResults = Boolean(
-    (response.exact && exactMatchesScope(response.exact, scope)) ||
-    response.groups.some(
-      (group) =>
-        groupMatchesScope(group.type, scope) && group.results.length > 0,
-    ),
-  );
+  const hasResults = hasSearchResults(response, scope);
   return {
     emptyText: hasResults
       ? undefined
@@ -450,6 +454,7 @@ export function Search({
   const activeRequest = useRef<AbortController | undefined>(undefined);
   const latestRequest = useRef(0);
   const initialSearchStarted = useRef(Boolean(initialSnapshot));
+  const initialSuggestionsStarted = useRef(false);
   const previousInitialQuery = useRef(initialQuery);
   const previousInitialScope = useRef(initialScope);
   const effectiveScope = availableScopeDefinitions.some(
@@ -466,6 +471,35 @@ export function Search({
   const availableScopeFacets = currentSnapshot
     ? availableScopeDefinitions
     : undefined;
+
+  const loadSuggestions = useCallback(
+    async (
+      nextQuery: string,
+      nextScope: SearchScope,
+      requestId: number,
+      request: AbortController,
+    ) => {
+      const response = await orpc.search.call(
+        {
+          query: nextQuery,
+          scopes: [...getApiScopes(nextScope, Boolean(user))],
+          suggestions: "only",
+        },
+        { signal: request.signal },
+      );
+      if (latestRequest.current !== requestId) return;
+      setSnapshot(
+        getSearchSnapshot(
+          response,
+          nextQuery,
+          nextScope,
+          { getBottleHref, showRatings: showBottleRatings },
+          placement === "database" || placement === "overlay",
+        ),
+      );
+    },
+    [getBottleHref, orpc, placement, showBottleRatings, user],
+  );
 
   const runSearch = useCallback(
     async (nextQuery: string, nextScope: SearchScope) => {
@@ -489,6 +523,7 @@ export function Search({
             limit: placement === "database" && nextScope !== "all" ? 50 : limit,
             query: trimmedQuery,
             scopes: [...getApiScopes(nextScope, Boolean(user))],
+            suggestions: "exclude",
           },
           { signal: request.signal },
         );
@@ -503,6 +538,14 @@ export function Search({
           ),
         );
         setStatus("ready");
+        if (!hasSearchResults(response, nextScope)) {
+          try {
+            await loadSuggestions(trimmedQuery, nextScope, requestId, request);
+          } catch {
+            // Search owns possible matches as optional help. A failure must not
+            // replace a completed empty result with an error.
+          }
+        }
       } catch {
         if (request.signal.aborted) return;
         if (latestRequest.current !== requestId) return;
@@ -513,7 +556,15 @@ export function Search({
         }
       }
     },
-    [getBottleHref, limit, orpc, placement, showBottleRatings, user],
+    [
+      getBottleHref,
+      limit,
+      loadSuggestions,
+      orpc,
+      placement,
+      showBottleRatings,
+      user,
+    ],
   );
   const debouncedSearch = useDebounceCallback(runSearch, SEARCH_DEBOUNCE_MS);
 
@@ -537,6 +588,43 @@ export function Search({
     initialSearchStarted.current = true;
     void runSearch(initialQuery, effectiveScope);
   }, [effectiveScope, initialQuery, runSearch]);
+
+  useEffect(() => {
+    if (
+      initialSuggestionsStarted.current ||
+      !initialResponse ||
+      !initialSnapshot ||
+      initialResponse.nearest.length ||
+      hasSearchResults(initialResponse, resolvedInitialScope)
+    ) {
+      return;
+    }
+    initialSuggestionsStarted.current = true;
+    const requestId = latestRequest.current + 1;
+    latestRequest.current = requestId;
+    const request = new AbortController();
+    activeRequest.current = request;
+    void loadSuggestions(
+      initialQuery.trim(),
+      resolvedInitialScope,
+      requestId,
+      request,
+    )
+      .catch(() => {
+        // The initial empty result is already complete without possible matches.
+      })
+      .finally(() => {
+        if (activeRequest.current === request) {
+          activeRequest.current = undefined;
+        }
+      });
+  }, [
+    initialQuery,
+    initialResponse,
+    initialSnapshot,
+    loadSuggestions,
+    resolvedInitialScope,
+  ]);
 
   useEffect(() => {
     if (previousInitialQuery.current === initialQuery) return;
