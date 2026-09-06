@@ -21,6 +21,12 @@ test("extracts one value while ignoring changing text", () => {
   ).toBe("Glen Example 12 Year");
 });
 
+test("ignores formatting spaces around a line break", () => {
+  expect(
+    matchText("Glen Example 12 Year\n£85", "{value} {line} {anything}"),
+  ).toBe("Glen Example 12 Year");
+});
+
 test("tries alternative matches in order", () => {
   expect(matchFirstText("Review", ["Review {anything}", "Review"])).toBe(
     "Review",

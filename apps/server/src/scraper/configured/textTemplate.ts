@@ -53,9 +53,9 @@ export function matchText(text: string, template: string) {
     .join("\n")
     .replaceAll(/\n+/gu, "\n")
     .trim();
-  const normalizedTemplate = ScrapeTextTemplateSchema.parse(
-    template,
-  ).replaceAll(/\s+/gu, " ");
+  const normalizedTemplate = ScrapeTextTemplateSchema.parse(template)
+    .replaceAll(/\s+/gu, " ")
+    .replaceAll(/\s*\{line\}\s*/gu, "{line}");
   let pattern = "^";
   let offset = 0;
   for (const match of normalizedTemplate.matchAll(TOKEN)) {
