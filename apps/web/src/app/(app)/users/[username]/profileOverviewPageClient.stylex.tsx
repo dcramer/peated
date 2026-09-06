@@ -74,7 +74,7 @@ export function ProfileOverviewPageClient({
   const activity = getCommunityFeedItems({
     activity: initialActivityList.results,
     criticReviews: [],
-  }).slice(0, 3);
+  }).slice(0, 10);
 
   return (
     <ProfileOverviewLayout
