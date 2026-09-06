@@ -4,6 +4,17 @@ Peated stores facts about external whisky reviews and links readers to the
 publisher's article. It can generate a short review clip, but does not republish
 the article body, complete tasting notes, conclusion, or images.
 
+## Active Critics
+
+Peated presents the review site as the critic. A writer's name remains an
+optional byline on that site's review; it is not a separate critic identity.
+
+The Activity sidebar shows up to 5 active critics. Peated chooses the order.
+It currently takes each site's newest public review linked to a Bottle that has
+not been deleted, then orders the sites by publication date. Reviews do not
+qualify when they are hidden, unpublished, missing a date, or missing a Bottle
+match. Each site links to the original review used to place it.
+
 ## Publication
 
 Every source starts unpublished. Collection and Bottle matching can run while

@@ -11,6 +11,10 @@ import {
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";
+import {
+  ActiveCriticRailSection,
+  type ActiveCriticRailItem,
+} from "./activeCriticRailSection.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 import { PageColumns, PageHeader } from "./pageLayout.stylex";
 import { RailListSection } from "./railListSection.stylex";
@@ -22,6 +26,7 @@ export function ActivityPage({
   pagination,
   selector,
   loading = false,
+  activeCritics = [],
   libraryBottles = [],
   libraryHref,
 }: {
@@ -29,6 +34,7 @@ export function ActivityPage({
   loading?: boolean;
   note?: string;
   pagination?: ReactNode;
+  activeCritics?: readonly ActiveCriticRailItem[];
   libraryBottles?: readonly BottleListItem[];
   libraryHref?: string;
   selector: ReactNode;
@@ -59,6 +65,7 @@ export function ActivityPage({
                 </ButtonLink>
               </div>
             </RailListSection>
+            <ActiveCriticRailSection items={activeCritics} />
             {libraryBottles.length ? (
               <BottleRailSection
                 heading="From your library"

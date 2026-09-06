@@ -33,6 +33,7 @@ import entityList from "./routes/entities/list";
 import entityPortfolio from "./routes/entities/portfolio";
 import entityResolve from "./routes/entities/resolve";
 import eventList from "./routes/events/list";
+import externalReviewActiveCritics from "./routes/externalReviews/active-critics";
 import externalReviewList from "./routes/externalReviews/list";
 import flightDetails from "./routes/flights/details";
 import flightList from "./routes/flights/list";
@@ -158,6 +159,7 @@ export const mockRouter = mockOS.router({
     list: regionList,
   },
   externalReviews: {
+    activeCritics: externalReviewActiveCritics,
     list: externalReviewList,
   },
   smws: {

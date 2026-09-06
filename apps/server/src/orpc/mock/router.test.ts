@@ -79,6 +79,25 @@ describe("mock oRPC router", () => {
         },
       ],
     });
+    const activeCritics = await anonymousClient.externalReviews.activeCritics({
+      limit: 3,
+    });
+    expect(activeCritics).toHaveLength(3);
+    expect(new Set(activeCritics.map((critic) => critic.site.type)).size).toBe(
+      3,
+    );
+    expect(activeCritics[0]).toEqual({
+      site: {
+        type: mockExternalReview.site!.type,
+        name: mockExternalReview.site!.name,
+        imageUrl: mockExternalReview.site!.imageUrl,
+      },
+      latestReview: {
+        bottleName: mockExternalReview.bottle!.fullName,
+        publishedAt: mockExternalReview.article.publishedAt!,
+        url: mockExternalReview.url,
+      },
+    });
 
     const bottles = await anonymousClient.bottles.list({ query: "Lagavulin" });
     expect(bottles.results).toHaveLength(3);

@@ -33,6 +33,7 @@ import entityList from "@peated/server/orpc/contracts/entities/list";
 import entityPortfolio from "@peated/server/orpc/contracts/entities/portfolio";
 import entityResolve from "@peated/server/orpc/contracts/entities/resolve";
 import eventList from "@peated/server/orpc/contracts/events/list";
+import externalReviewActiveCritics from "@peated/server/orpc/contracts/externalReviews/active-critics";
 import externalReviewList from "@peated/server/orpc/contracts/externalReviews/list";
 import flightDetails from "@peated/server/orpc/contracts/flights/details";
 import flightList from "@peated/server/orpc/contracts/flights/list";
@@ -158,6 +159,7 @@ export const mockContract = {
     list: regionList,
   },
   externalReviews: {
+    activeCritics: externalReviewActiveCritics,
     list: externalReviewList,
   },
   smws: {
