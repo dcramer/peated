@@ -500,6 +500,7 @@ approved all twelve exact matches. The final queue counts for both
   identity. Its stored image showed the standard no-age Timorous Beastie and was
   removed after explicit deletion approval. No replacement was uploaded because
   the exact Batch #1 sources did not state reusable image rights.
+
 ## Yamazaki Bottle images — September 5, 2026
 
 The production image review covered all 107 Bottles attached to the Yamazaki
@@ -532,10 +533,10 @@ relationships, or existing images were changed.
 ## Yamazaki — September 6, 2026
 
 The full production review is in progress. It started from 107 Bottles attached
-to the Yamazaki Brand (`E0493`) and currently has 152. The modern producer range,
+to the Yamazaki Brand (`E0493`) and currently has 161. The modern producer range,
 named component-whisky releases, existing historical single casks, all original
 Brand pages, and the pre-write set of 169 Yamazaki-distilled records were
-inventoried. Production now reports 212 Yamazaki-distilled records. Older private
+inventoried. Production now reports 221 Yamazaki-distilled records. Older private
 and single-cask releases still require individual evidence, so this is not yet a
 completion record.
 
@@ -627,6 +628,41 @@ completion record.
   (`B54449`), matured in sherry butts with an outturn of 1,548. Its release year
   remains unknown because the anniversary evidence conflicts with its stated
   bottling year. All four records were duplicate-checked and re-fetched.
+- Exact Spink and Bonhams auction records established two limited no-age-statement
+  releases: the 1989, 43%, 300-bottle
+  [Age Unknown](https://spink.com/lot/SFW48000145) (`B54458`) and the 1994,
+  43%, 300-bottle
+  [Age Unknown – Henkotsu Nankotsu](https://www.spink.com/lot/SFW52000236)
+  (`B54459`). An exact
+  [Bonhams catalog](https://images3.bonhams.com/original?src=Images%2Flive%2F2020-08%2F04%2FS-26252-0-1.pdf)
+  establishes the 1994-vintage, 2006-bottled, 61% sherry-butt Wago – Kansha
+  50-nen Aoki Chieko (`B54462`), while an exact
+  [Spink lot](https://spink.com/lot/SFW38000137) establishes the 1986-vintage,
+  2006-bottled, 50% Suntory Single Malt Whisky – Korinbo Daiwa 20th Anniversary
+  (`B54463`). The anniversary describes the store, not the whisky's age, so no
+  age was inferred.
+- The producer-backed [Hitomi record](https://jwhisky.jp/en/hitomi/) and an exact
+  [Bonhams catalog](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-04%2F17%2FS-28686-0-3.pdf)
+  establish the 2012, 59%, 420-bottle Hitomi (`B54461`) assembled from sherry
+  butt and Mizunara cask `1S70427`. The multi-cask release is explicitly stored
+  as not single-cask. Exact auction records also establish three Suntory Single
+  Cask Whisky releases: the 1998-vintage, 2013-bottled, 54% sherry butt
+  [`CM70012`](https://www.sothebys.com/en/buy/auction/2023/fine-rare-whisky-the-inaugural-singapore-auction/shan-qi-yamazaki-single-cask-cm70012-54-0-abv-1998-4)
+  (`B54465`); the 1998-vintage, 2011-bottled, 61% sherry butt
+  [`CU70062`](https://www.sothebys.com/en/buy/auction/2024/fine-rare-whisky/shan-qi-yamazaki-single-cask-cu70062-61-0-abv-1998)
+  for JR Osaka Mitsukoshi Isetan (`B54466`); and the 1999-vintage, 2012-bottled,
+  58% puncheon
+  [`DQ70032`](https://whisky.auction/auctions/lot/45462/yamazaki-1999) for the
+  Tokyo International Bar Show and Whisky Live Tokyo 2012 (`B54467`). Multiple
+  exact label-level sources, including an exact
+  [Spink lot](https://spink.com/lot/SFW61000025), support 58% for `DQ70032`; a
+  conflicting Sotheby's description says 54%, so the corroborated label value
+  was stored and no age was inferred.
+- A Bonhams catalog and the
+  [Spink SFW61 catalog](https://storage.spink.com/source/Auto_Catalogue/SFW61.pdf?v=2)
+  establish the 43%, sherry-butt 12-year-old – Watami Founder's Choice
+  (`B54468`). All nine records in these three bullets were duplicate-checked and
+  re-fetched with Yamazaki as Brand and distiller and no explicit bottler.
 - The [2022 Tsukuriwake announcement](https://www.prnewswire.com/news-releases/from-the-birthplace-of-japanese-whisky-the-house-of-suntory-introduces-2022-limited-edition-yamazaki-tsukuriwake-selection-301548951.html)
   and [Whisky Auctioneer's release guide](https://whiskyauctioneer.com/learn/explore-whisky/series/yamazaki-tsukuriwake-selection-2022-editions)
   bounded the named component-whisky range. Series `S0674` now contains the five
@@ -634,11 +670,11 @@ completion record.
   18-year-old is `B54095`; the unqualified core Mizunara 18-year-old `B47537`
   was corrected to the 2025 release proven by its assigned import references and
   exact Whiskyfun review.
-- All 152 current Yamazaki Brand Bottles now have Yamazaki as Brand and
+- All 161 current Yamazaki Brand Bottles now have Yamazaki as Brand and
   distiller with no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
   original two-page Brand inventory was re-fetched with zero remaining non-null
-  bottlers. The 43 later creates were individually verified with no bottler.
+  bottlers. The 52 later creates were individually verified with no bottler.
 - Exact Whisky Auctioneer records for the [8- and 10-year-old set](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-8-10-year-old-suntory-pure-malt-box-set),
   [12-year-old sherry release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-12-year-old-suntory-pure-malt),
   two [15-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt)
@@ -690,6 +726,15 @@ completion record.
   staged for source-by-source verification. They were not written because that
   durable bulk write still requires explicit approval. Empty destination Series
   `S0676` has been created.
+- A complete pass through the Bonhams S-26252 catalog prevented several false
+  creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
+  2016 25-year-old Limited Edition is a presentation variant of the core whisky;
+  and ceramic Age Unknown and Shichishichijukai lots do not prove distinct
+  marketed whisky. Cask `CW70207` is an exact, distinct 1998 hogshead bottled in
+  2010 at 54%, but the available catalog does not establish the producer's
+  stable product name, so it remains an unwritten lead. The Yamazaki Hizō lot
+  is held for the same identity reason. No separate Bottle was created from
+  packaging alone or with an invented name.
 - [Whisky Auctioneer's Suntory Vintage Malts guide](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-vintage-malts)
   describes two 2004–2005 batches. All 19 Yamazaki releases it lists are already
   present. The guide and its exact Bottle records are useful evidence, but its
@@ -701,5 +746,5 @@ completion record.
   4028mdk09. `B2276` now uses
   [The Yamazaki Single Malt Whisky Aged 12 years.JPG](https://commons.wikimedia.org/wiki/File:The_Yamazaki_Single_Malt_Whisky_Aged_12_years.JPG)
   under `CC BY-SA 3.0` with credit to Look Sharp!. Both stored WebP transforms
-  were visually checked. Brand image coverage remains 7 of 152 because these
+  were visually checked. Brand image coverage remains 7 of 161 because these
   were licensed replacements, not newly covered records.
