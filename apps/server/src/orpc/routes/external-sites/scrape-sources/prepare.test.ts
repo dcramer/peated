@@ -1948,7 +1948,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
         id: applied.scrapeSourceId,
         externalSiteId: site.id,
         kind: "price",
-        listUrl: "https://ncnean.com/collections/all",
+        listUrl: "https://ncnean.com/collections/all/whiskies",
         enabled: false,
         createdById: admin.id,
       }),

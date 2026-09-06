@@ -293,18 +293,18 @@ request examines every saved price without changing it. It accepts current
 prices with a numeric shop product ID and historical prices without one. Every
 row must still use an Nc'nean product URL and name, GBP, and a 700 ml bottle.
 Applying moves the site's request limits to a saved-rule price source with
-collection turned off. Its shop page is `https://ncnean.com/collections/all`.
+collection turned off. Use its whisky-filtered shop page at
+`https://ncnean.com/collections/all/whiskies`.
 
 Before applying, stop the `ncnean` schedule and wait for active collection to
 finish. Save the existing price IDs, product IDs, URLs, Bottle links, hidden
 states, histories, request limits, and run history. Run the candidate version 7
-rules through the full local no-write preview. The collection includes gifts,
-miniatures, botanical spirit, merchandise, and sold-out products; exclude them
-without listing individual whisky names. Product pages must provide the exact
-displayed name, current bottle-only GBP price, 700 ml volume, product URL,
-product ID, and image. Products with several available variants must select the
-bottle without a gift tube or be left out when the price and size cannot be
-paired safely.
+rules through the full local no-write preview. Use the whisky-filtered collection
+instead of filtering the broader catalog product by product, then exclude its
+miniatures and sold-out gift pack. Product pages must provide the exact displayed
+name, current bottle-only GBP price, 700 ml volume, product URL, product ID, and
+image. Products with several available variants must select the bottle without a
+gift tube or be left out when the price and size cannot be paired safely.
 
 After applying, save and preview the reviewed rules. Activate only exact
 output, trigger one manual collection, and confirm that it updates the same

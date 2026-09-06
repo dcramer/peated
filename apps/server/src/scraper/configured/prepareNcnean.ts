@@ -10,7 +10,7 @@ export async function prepareNcneanSource(input: PreparePriceSourceInput) {
     siteName: "Nc'nean",
     targetKey: "ncnean",
     origin: "https://ncnean.com",
-    listUrl: "https://ncnean.com/collections/all",
+    listUrl: "https://ncnean.com/collections/all/whiskies",
     isExpectedPrice: (price) =>
       /^https:\/\/ncnean\.com\/products\/[a-z0-9][a-z0-9-]*$/.test(price.url) &&
       (price.externalProductId === null ||
