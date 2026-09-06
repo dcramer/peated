@@ -13,6 +13,7 @@ import {
   LoadingPlaceholder,
   RailList,
   TastingRatingDistribution,
+  Timestamp,
   type FactListItem,
   type TastingRatingCounts,
 } from "@peated/web/components";
@@ -60,7 +61,10 @@ export function ProfileOverviewPageClient({
           label: "Catalog changes",
           value: formatCount(user.stats.contributions),
         },
-        { label: "Joined", value: formatJoinDate(user.createdAt) },
+        {
+          label: "Joined",
+          value: <Timestamp date={user.createdAt} format="monthYear" />,
+        },
       ]
     : [
         { label: "Tastings", value: formatCount(user.stats.tastings) },
@@ -203,14 +207,6 @@ function getProducerGroups(
     });
   }
   return groups;
-}
-
-function formatJoinDate(createdAt: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    timeZone: "UTC",
-    year: "numeric",
-  }).format(new Date(createdAt));
 }
 
 function formatCount(count: number) {

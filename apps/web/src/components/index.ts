@@ -298,6 +298,8 @@ export type {
 export { TastingToastSummary } from "./tastingToastButton.stylex";
 export { TextLink } from "./textLink.stylex";
 export type { TextLinkProps } from "./textLink.stylex";
+export { Timestamp } from "./timestamp";
+export type { TimestampFormat, TimestampProps } from "./timestamp";
 export { UnitInput } from "./unitInput.stylex";
 export type { UnitInputProps } from "./unitInput.stylex";
 export { WorkflowLoading, WorkflowScreen } from "./workflowScreen.stylex";

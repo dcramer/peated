@@ -60,11 +60,6 @@ const BottlePageContext = createContext<Bottle | null>(null);
 
 const PHONE = "@media (max-width: 480px)";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-
 function getBottleDistillers(bottle: Bottle) {
   return bottle.distillers.length ? (
     <EntityLinks entities={bottle.distillers} />
@@ -173,9 +168,7 @@ function getCriticReview(
   return {
     href: externalReview.url,
     publication: externalReview.site.name,
-    publishedAt: externalReview.article.publishedAt
-      ? dateFormatter.format(new Date(externalReview.article.publishedAt))
-      : undefined,
+    publishedAt: externalReview.article.publishedAt ?? undefined,
     nativeScore: externalReview.nativeScore,
     reviewerName: externalReview.reviewerName ?? undefined,
     summary: externalReview.clip ?? undefined,

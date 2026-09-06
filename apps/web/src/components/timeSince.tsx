@@ -2,27 +2,24 @@
 
 import dayjs from "dayjs";
 import DayJsRelativeTime from "dayjs/plugin/relativeTime";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
+
+import { formatTimestamp, useViewerTimeZone } from "./timestamp";
 
 dayjs.extend(DayJsRelativeTime);
 
-const absoluteDateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
+type TimeSinceProps = Omit<ComponentProps<"time">, "children" | "dateTime"> & {
+  date: string | Date;
+};
 
-export default function TimeSince({
-  date,
-  ...props
-}: { date: string | Date } & React.ComponentProps<"time">) {
+export default function TimeSince({ date, title, ...props }: TimeSinceProps) {
   const dateTime = date instanceof Date ? date.toISOString() : date;
+  const timeZone = useViewerTimeZone();
 
-  // Keep the server and first client render identical. Relative time starts
-  // after hydration because it depends on the browser's current clock.
+  // Keep initial page output stable. Relative time starts after the page loads
+  // because it depends on the browser's current clock.
   const [value, setValue] = useState(() =>
-    dateTime ? absoluteDateFormatter.format(new Date(dateTime)) : "",
+    dateTime ? formatTimestamp(dateTime, "date", "UTC") : "",
   );
 
   useEffect(() => {
@@ -37,7 +34,11 @@ export default function TimeSince({
 
   if (!dateTime) return null;
   return (
-    <time dateTime={dateTime} {...props}>
+    <time
+      dateTime={dateTime}
+      title={title ?? formatTimestamp(dateTime, "dateTime", timeZone)}
+      {...props}
+    >
       {value}
     </time>
   );

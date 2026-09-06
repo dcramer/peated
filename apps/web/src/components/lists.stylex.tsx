@@ -13,6 +13,7 @@ import {
 import { AppLink } from "./appLink";
 import { ButtonLink, IconButton } from "./button.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
+import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -188,7 +189,7 @@ export type RailListItemProps = {
   end?: ReactNode;
   href?: string;
   leading?: ReactNode;
-  metadata?: string;
+  metadata?: ReactNode;
   title: string;
 };
 
@@ -230,7 +231,7 @@ export function RailListItem({
           )}
           {metadata ? (
             <span
-              title={metadata}
+              title={getTextTitle(metadata)}
               {...stylex.props(foundationStyles.metadata, styles.railMetadata)}
             >
               {metadata}

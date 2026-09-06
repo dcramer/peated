@@ -8,6 +8,7 @@ import {
   RailList,
   RailListItem,
   TastingRating,
+  Timestamp,
 } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getMemberReviewUrl, getTastingUrl } from "@peated/web/lib/urls";
@@ -25,13 +26,6 @@ type Member = Outputs["tastings"]["details"]["createdBy"];
 type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 type ExternalReview = Outputs["externalReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
 
 function TastingReviewRailLayout({
   bottle,
@@ -125,12 +119,11 @@ export function TastingReviewRail({
             {tasting.ratingBand ? (
               <TastingRating band={tasting.ratingBand} size="sm" />
             ) : null}
-            <time
-              dateTime={tasting.createdAt}
+            <Timestamp
+              date={tasting.createdAt}
+              format="date"
               {...stylex.props(foundationStyles.metadata, styles.tastingDate)}
-            >
-              {dateFormatter.format(new Date(tasting.createdAt))}
-            </time>
+            />
           </div>
         ),
         href: getTastingUrl(tasting),
@@ -147,7 +140,12 @@ export function TastingReviewRail({
                 key={`member-${review.id}`}
                 end={`${review.score}/100`}
                 href={getMemberReviewUrl(review)}
-                metadata={`Member · ${dateFormatter.format(new Date(review.updatedAt))}`}
+                metadata={
+                  <>
+                    Member <span aria-hidden="true">· </span>
+                    <Timestamp date={review.updatedAt} format="date" />
+                  </>
+                }
                 title={review.createdBy.username}
               />
             ))}
@@ -161,9 +159,17 @@ export function TastingReviewRail({
                 }
                 href={review.url}
                 metadata={
-                  review.reviewerName
-                    ? `${review.reviewerName} · ${formatPublishedDate(review)}`
-                    : formatPublishedDate(review)
+                  <>
+                    {review.reviewerName ? (
+                      <>
+                        {review.reviewerName} <span aria-hidden="true">· </span>
+                      </>
+                    ) : null}
+                    <Timestamp
+                      date={review.article.publishedAt ?? review.createdAt}
+                      format="date"
+                    />
+                  </>
                 }
                 title={review.site?.name ?? review.article.title ?? review.name}
               />
@@ -197,11 +203,6 @@ export function TastingReviewRailLoading() {
       }
     />
   );
-}
-
-function formatPublishedDate(review: ExternalReview) {
-  const date = review.article.publishedAt ?? review.createdAt;
-  return dateFormatter.format(new Date(date));
 }
 
 const styles = stylex.create({
