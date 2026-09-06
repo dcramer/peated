@@ -101,6 +101,8 @@ let collectionBottleId = 1;
 let pendingUploadId = 1;
 let releasePageReady = Promise.resolve();
 let releasePage = () => {};
+let searchSuggestionsReady = Promise.resolve();
+let releaseSearchSuggestions = () => {};
 
 const bottleCheckMock = createBottleCheckMock({
   exactMatchedBottleId,
@@ -163,6 +165,24 @@ const server = http.createServer(async (request, response) => {
     url.pathname === "/__test/release-pages/resume"
   ) {
     releasePage();
+    response.writeHead(204, corsHeaders).end();
+    return;
+  }
+  if (
+    request.method === "POST" &&
+    url.pathname === "/__test/search-suggestions/hold"
+  ) {
+    searchSuggestionsReady = new Promise((resolve) => {
+      releaseSearchSuggestions = resolve;
+    });
+    response.writeHead(204, corsHeaders).end();
+    return;
+  }
+  if (
+    request.method === "POST" &&
+    url.pathname === "/__test/search-suggestions/resume"
+  ) {
+    releaseSearchSuggestions();
     response.writeHead(204, corsHeaders).end();
     return;
   }
@@ -510,6 +530,25 @@ async function handleRpcRequest({ request, response, url }) {
             ? exactSearchBottle
             : existingBottle,
       );
+      if (input?.query === "playwright typo") {
+        if (input?.suggestions === "only") {
+          await searchSuggestionsReady;
+          sendRpcResponse(response, {
+            query: input.query,
+            exact: null,
+            groups: [],
+            nearest: [{ type: "bottles", result: bottle }],
+          });
+          return true;
+        }
+        sendRpcResponse(response, {
+          query: input.query,
+          exact: null,
+          groups: [{ type: "bottles", hasMore: false, results: [] }],
+          nearest: [],
+        });
+        return true;
+      }
       sendRpcResponse(response, {
         query: input.query ?? "",
         exact: null,
