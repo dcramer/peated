@@ -138,7 +138,7 @@ const styles = stylex.create({
     maxWidth: bottleThumbnailMetrics.width,
     height: bottleThumbnailMetrics.height,
     maxHeight: bottleThumbnailMetrics.height,
-    padding: space.x2,
+    padding: space.x1,
   },
   visualActivity: {
     width: {
@@ -201,7 +201,7 @@ const styles = stylex.create({
     padding: space.x1,
   },
   expandableImageMedium: {
-    padding: space.x2,
+    padding: space.x1,
   },
   expandableImageActivity: {
     padding: 0,
