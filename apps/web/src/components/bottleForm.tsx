@@ -55,7 +55,7 @@ import {
 } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { WandSparkles } from "lucide-react";
 import {
   useEffect,
@@ -604,6 +604,7 @@ export default function BottleForm({
       input: debouncedCandidateInput,
     }),
     enabled: candidateEnabled,
+    placeholderData: keepPreviousData,
     staleTime: 5 * 60_000,
   });
   const candidateInputPending =
@@ -854,11 +855,12 @@ export default function BottleForm({
               ) : null}
               {isCreate &&
               onUseExistingBottle &&
+              candidateEnabled &&
               candidateResults.isSuccess &&
-              !candidateCheckLoading &&
               hasUnreviewedCandidates ? (
                 <BottleCreateCandidateSummary
                   count={unreviewedCandidates.length}
+                  loading={candidateCheckLoading}
                   newSinceReview={reviewedCandidateIds.size > 0}
                   onReview={() => openCandidateReview()}
                 />

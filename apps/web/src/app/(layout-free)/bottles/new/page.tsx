@@ -13,10 +13,13 @@ import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getBottleUrl } from "@peated/web/lib/urls";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { mergeCreateBottleInitialData } from "./createBottleInitialData";
+import {
+  applyLeadingBrandMatch,
+  getLeadingEntityPrefixes,
+  mergeCreateBottleInitialData,
+} from "./createBottleInitialData";
 
 type ReturnAction = "catalog" | "choose" | "library" | "tasting" | "view";
 
@@ -106,15 +109,12 @@ function CreateBottleForm() {
   const releaseYear = prefill.releaseYear ?? null;
   const category = prefill.category ?? null;
   const canReviewProposal = !!(user?.mod || user?.admin);
+  const leadingEntityPrefixes =
+    !brand && !brandName && !proposalId ? getLeadingEntityPrefixes(name) : [];
 
   if (proposalId && user && !canReviewProposal) {
     redirect("/errors/unauthorized");
   }
-
-  const needsToLoad = Boolean(
-    distiller || brand || bottler || series || proposalId,
-  );
-  const [loading, setLoading] = useState<boolean>(needsToLoad);
 
   const initialFormData: BottleFormInitialData = { name };
   if (pendingImageUrl) initialFormData.imageUrl = pendingImageUrl;
@@ -141,9 +141,6 @@ function CreateBottleForm() {
   if (prefill.maturation) initialFormData.maturation = prefill.maturation;
   if (prefill.caskNumber) initialFormData.caskNumber = prefill.caskNumber;
   if (prefill.outturn) initialFormData.outturn = prefill.outturn;
-
-  const [initialData, setInitialData] =
-    useState<BottleFormInitialData>(initialFormData);
 
   const distillerQuery = useQuery({
     ...orpc.entities.details.queryOptions({
@@ -175,44 +172,43 @@ function CreateBottleForm() {
     }),
     enabled: !!proposalId && canReviewProposal,
   });
-
-  useEffect(() => {
-    if (
-      loading &&
-      !distillerQuery.isLoading &&
-      !brandQuery.isLoading &&
-      !bottlerQuery.isLoading &&
-      !seriesQuery.isLoading &&
-      (!proposalId || !proposalQuery.isLoading)
-    ) {
-      const proposalData = proposalQuery.data?.proposedBottle;
-      setInitialData((initialData) =>
-        mergeCreateBottleInitialData({
-          initialData,
-          proposalData,
-          proposalImageUrl: proposalQuery.data?.price.imageUrl,
-          distiller: distillerQuery.data,
-          brand: brandQuery.data,
-          bottler: bottlerQuery.data,
-          series: seriesQuery.data,
-        }),
-      );
-      setLoading(false);
-    }
-  }, [
-    loading,
-    proposalId,
-    proposalQuery.isLoading,
-    proposalQuery.data,
-    distillerQuery.isLoading,
-    distillerQuery.data,
-    brandQuery.isLoading,
-    brandQuery.data,
-    bottlerQuery.isLoading,
-    bottlerQuery.data,
-    seriesQuery.isLoading,
-    seriesQuery.data,
-  ]);
+  const leadingEntityQueries = useQueries({
+    queries: leadingEntityPrefixes.map((prefix) => ({
+      ...orpc.entities.list.queryOptions({
+        input: {
+          limit: 2,
+          name: prefix,
+          query: "",
+          sort: "rank",
+        },
+      }),
+      staleTime: 5 * 60_000,
+    })),
+  });
+  const leadingEntityQueriesLoading = leadingEntityQueries.some(
+    (query) => query.isLoading,
+  );
+  const leadingEntityMatches = leadingEntityPrefixes.map((prefix, index) => ({
+    prefix,
+    results: leadingEntityQueries[index]?.data?.results ?? [],
+  }));
+  const loading = Boolean(
+    distillerQuery.isLoading ||
+    brandQuery.isLoading ||
+    bottlerQuery.isLoading ||
+    seriesQuery.isLoading ||
+    leadingEntityQueriesLoading ||
+    (proposalId && proposalQuery.isLoading),
+  );
+  const initialData = mergeCreateBottleInitialData({
+    initialData: applyLeadingBrandMatch(initialFormData, leadingEntityMatches),
+    proposalData: proposalQuery.data?.proposedBottle,
+    proposalImageUrl: proposalQuery.data?.price.imageUrl,
+    distiller: distillerQuery.data,
+    brand: brandQuery.data,
+    bottler: bottlerQuery.data,
+    series: seriesQuery.data,
+  });
 
   const bottleCreateMutation = useMutation(
     orpc.bottles.create.mutationOptions(),
