@@ -3856,15 +3856,30 @@ describe("price match queue", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
+    const price = await fixtures.StorePrice({
+      name: "Cancel Retry Run",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+      })
+      .returning();
     const [run] = await db
       .insert(storePriceMatchRetryRuns)
       .values({
         createdById: user.id,
-        matchedCount: 3,
-        processedCount: 1,
+        matchedCount: 1,
         status: "running",
       })
       .returning();
+    await db.insert(storePriceMatchRetryRunItems).values({
+      priceId: price.id,
+      proposalId: proposal!.id,
+      runId: run!.id,
+    });
 
     const details = await routerClient.prices.matchQueue.retryRunDetails(
       { run: run!.id },
@@ -3878,12 +3893,20 @@ describe("price match queue", () => {
       { run: run!.id },
       { context: { user } },
     );
+    const activeAfterCancel =
+      await routerClient.prices.matchQueue.activeRetryRun(undefined, {
+        context: { user },
+      });
+    const replacement = await routerClient.prices.matchQueue.retryAll(
+      { kind: "errored", query: "Cancel Retry Run" },
+      { context: { user } },
+    );
 
     expect(details).toMatchObject({
       id: run!.id,
-      matchedCount: 3,
-      pendingCount: 2,
-      progress: 33,
+      matchedCount: 1,
+      pendingCount: 1,
+      progress: 0,
       status: "running",
     });
     expect(active.run).toMatchObject({
@@ -3892,9 +3915,21 @@ describe("price match queue", () => {
     });
     expect(canceled).toMatchObject({
       cancelRequestedAt: expect.any(String),
+      completedAt: expect.any(String),
       id: run!.id,
-      status: "running",
+      pendingCount: 0,
+      processedCount: 1,
+      skippedCount: 1,
+      status: "canceled",
     });
+    expect(activeAfterCancel).toEqual({ run: null });
+    expect(replacement).toMatchObject({
+      id: expect.any(Number),
+      matchedCount: 1,
+      pendingCount: 1,
+      status: "pending",
+    });
+    expect(replacement.id).not.toBe(run!.id);
   });
 
   test("clears the processing lease if retry enqueue fails", async ({

@@ -4,7 +4,10 @@ import {
   storePriceMatchRetryRunItems,
   storePriceMatchRetryRuns,
 } from "@peated/server/db/schema";
-import { processStorePriceMatchRetryRun } from "@peated/server/lib/storePriceMatchRetryRuns";
+import {
+  cancelStorePriceMatchRetryRun,
+  processStorePriceMatchRetryRun,
+} from "@peated/server/lib/storePriceMatchRetryRuns";
 import { eq } from "drizzle-orm";
 import { describe, expect, test, vi } from "vitest";
 
@@ -153,5 +156,75 @@ describe("store price match retry runs", () => {
       skippedCount: 1,
       status: "canceled",
     });
+  });
+
+  test("does not let in-flight work revive a canceled retry run", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({
+      name: "Retry Run In Flight Cancel",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+      })
+      .returning();
+    const [run] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({
+        matchedCount: 1,
+        status: "running",
+      })
+      .returning();
+    const [item] = await db
+      .insert(storePriceMatchRetryRunItems)
+      .values({
+        priceId: price.id,
+        proposalId: proposal!.id,
+        runId: run!.id,
+      })
+      .returning();
+
+    let finishResolution!: (value: NonNullable<typeof proposal>) => void;
+    const resolveProposal = vi.fn(
+      () =>
+        new Promise<NonNullable<typeof proposal>>((resolve) => {
+          finishResolution = resolve;
+        }),
+    );
+    const enqueueNext = vi.fn(async () => undefined);
+    const processing = processStorePriceMatchRetryRun({
+      enqueueNext,
+      resolveProposal,
+      runId: run!.id,
+    });
+
+    await vi.waitFor(() => expect(resolveProposal).toHaveBeenCalledOnce());
+    await cancelStorePriceMatchRetryRun(run!.id);
+    finishResolution(proposal!);
+    await processing;
+
+    const [updatedRun, updatedItem] = await Promise.all([
+      db.query.storePriceMatchRetryRuns.findFirst({
+        where: eq(storePriceMatchRetryRuns.id, run!.id),
+      }),
+      db.query.storePriceMatchRetryRunItems.findFirst({
+        where: eq(storePriceMatchRetryRunItems.id, item!.id),
+      }),
+    ]);
+    expect(updatedRun).toMatchObject({
+      processedCount: 1,
+      reviewableCount: 0,
+      skippedCount: 1,
+      status: "canceled",
+    });
+    expect(updatedItem).toMatchObject({
+      resultStatus: null,
+      status: "skipped",
+    });
+    expect(enqueueNext).not.toHaveBeenCalled();
   });
 });

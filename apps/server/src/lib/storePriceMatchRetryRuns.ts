@@ -14,7 +14,7 @@ import {
   releaseStorePriceMatchProposalProcessingLease,
 } from "@peated/server/lib/priceMatchingProcessingLease";
 import { resolveStorePriceMatchProposal } from "@peated/server/lib/priceMatchingProposals";
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, exists, inArray, sql } from "drizzle-orm";
 
 export const STORE_PRICE_MATCH_RETRY_RUN_TERMINAL_STATUSES = [
   "completed",
@@ -204,7 +204,7 @@ async function markRetryRunItemCompleted({
   const counter = getFinishedCounter(resultStatus);
 
   await db.transaction(async (tx) => {
-    await tx
+    const [updatedItem] = await tx
       .update(storePriceMatchRetryRunItems)
       .set({
         completedAt: sql`NOW()`,
@@ -212,7 +212,15 @@ async function markRetryRunItemCompleted({
         status: "completed",
         updatedAt: sql`NOW()`,
       })
-      .where(eq(storePriceMatchRetryRunItems.id, item.id));
+      .where(
+        and(
+          eq(storePriceMatchRetryRunItems.id, item.id),
+          eq(storePriceMatchRetryRunItems.status, "processing"),
+        ),
+      )
+      .returning({ id: storePriceMatchRetryRunItems.id });
+
+    if (!updatedItem) return;
 
     await tx
       .update(storePriceMatchRetryRuns)
@@ -221,7 +229,12 @@ async function markRetryRunItemCompleted({
         processedCount: sql`${storePriceMatchRetryRuns.processedCount} + 1`,
         updatedAt: sql`NOW()`,
       })
-      .where(eq(storePriceMatchRetryRuns.id, item.runId));
+      .where(
+        and(
+          eq(storePriceMatchRetryRuns.id, item.runId),
+          inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+        ),
+      );
   });
 }
 
@@ -233,7 +246,7 @@ async function markRetryRunItemSkipped({
   item: StorePriceMatchRetryRunItem;
 }) {
   await db.transaction(async (tx) => {
-    await tx
+    const [updatedItem] = await tx
       .update(storePriceMatchRetryRunItems)
       .set({
         completedAt: sql`NOW()`,
@@ -241,7 +254,15 @@ async function markRetryRunItemSkipped({
         status: "skipped",
         updatedAt: sql`NOW()`,
       })
-      .where(eq(storePriceMatchRetryRunItems.id, item.id));
+      .where(
+        and(
+          eq(storePriceMatchRetryRunItems.id, item.id),
+          eq(storePriceMatchRetryRunItems.status, "processing"),
+        ),
+      )
+      .returning({ id: storePriceMatchRetryRunItems.id });
+
+    if (!updatedItem) return;
 
     await tx
       .update(storePriceMatchRetryRuns)
@@ -250,7 +271,12 @@ async function markRetryRunItemSkipped({
         skippedCount: sql`${storePriceMatchRetryRuns.skippedCount} + 1`,
         updatedAt: sql`NOW()`,
       })
-      .where(eq(storePriceMatchRetryRuns.id, item.runId));
+      .where(
+        and(
+          eq(storePriceMatchRetryRuns.id, item.runId),
+          inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+        ),
+      );
   });
 }
 
@@ -262,7 +288,7 @@ async function markRetryRunItemFailed({
   item: StorePriceMatchRetryRunItem;
 }) {
   await db.transaction(async (tx) => {
-    await tx
+    const [updatedItem] = await tx
       .update(storePriceMatchRetryRunItems)
       .set({
         completedAt: sql`NOW()`,
@@ -270,7 +296,15 @@ async function markRetryRunItemFailed({
         status: "failed",
         updatedAt: sql`NOW()`,
       })
-      .where(eq(storePriceMatchRetryRunItems.id, item.id));
+      .where(
+        and(
+          eq(storePriceMatchRetryRunItems.id, item.id),
+          eq(storePriceMatchRetryRunItems.status, "processing"),
+        ),
+      )
+      .returning({ id: storePriceMatchRetryRunItems.id });
+
+    if (!updatedItem) return;
 
     await tx
       .update(storePriceMatchRetryRuns)
@@ -279,42 +313,78 @@ async function markRetryRunItemFailed({
         processedCount: sql`${storePriceMatchRetryRuns.processedCount} + 1`,
         updatedAt: sql`NOW()`,
       })
-      .where(eq(storePriceMatchRetryRuns.id, item.runId));
+      .where(
+        and(
+          eq(storePriceMatchRetryRuns.id, item.runId),
+          inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+        ),
+      );
   });
 }
 
-async function cancelRetryRun(runId: number) {
-  const skippedItems = await db
-    .update(storePriceMatchRetryRunItems)
-    .set({
-      completedAt: sql`NOW()`,
-      error: "Retry run canceled.",
-      status: "skipped",
-      updatedAt: sql`NOW()`,
-    })
-    .where(
-      and(
-        eq(storePriceMatchRetryRunItems.runId, runId),
-        inArray(storePriceMatchRetryRunItems.status, ["pending", "processing"]),
-      ),
-    )
-    .returning({
-      id: storePriceMatchRetryRunItems.id,
-    });
+export async function cancelStorePriceMatchRetryRun(runId: number) {
+  return await db.transaction(async (tx) => {
+    const skippedItems = await tx
+      .update(storePriceMatchRetryRunItems)
+      .set({
+        completedAt: sql`NOW()`,
+        error: "Retry run canceled.",
+        status: "skipped",
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          eq(storePriceMatchRetryRunItems.runId, runId),
+          inArray(storePriceMatchRetryRunItems.status, [
+            "pending",
+            "processing",
+          ]),
+          exists(
+            tx
+              .select({ id: storePriceMatchRetryRuns.id })
+              .from(storePriceMatchRetryRuns)
+              .where(
+                and(
+                  eq(storePriceMatchRetryRuns.id, runId),
+                  inArray(storePriceMatchRetryRuns.status, [
+                    "pending",
+                    "running",
+                  ]),
+                ),
+              ),
+          ),
+        ),
+      )
+      .returning({
+        id: storePriceMatchRetryRunItems.id,
+      });
 
-  const [run] = await db
-    .update(storePriceMatchRetryRuns)
-    .set({
-      completedAt: sql`NOW()`,
-      processedCount: sql`${storePriceMatchRetryRuns.processedCount} + ${skippedItems.length}`,
-      skippedCount: sql`${storePriceMatchRetryRuns.skippedCount} + ${skippedItems.length}`,
-      status: "canceled",
-      updatedAt: sql`NOW()`,
-    })
-    .where(eq(storePriceMatchRetryRuns.id, runId))
-    .returning();
+    const [run] = await tx
+      .update(storePriceMatchRetryRuns)
+      .set({
+        cancelRequestedAt: sql`COALESCE(${storePriceMatchRetryRuns.cancelRequestedAt}, NOW())`,
+        completedAt: sql`NOW()`,
+        processedCount: sql`${storePriceMatchRetryRuns.processedCount} + ${skippedItems.length}`,
+        skippedCount: sql`${storePriceMatchRetryRuns.skippedCount} + ${skippedItems.length}`,
+        status: "canceled",
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          eq(storePriceMatchRetryRuns.id, runId),
+          inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+        ),
+      )
+      .returning();
 
-  return run ?? null;
+    if (run) return run;
+
+    return (
+      (await tx.query.storePriceMatchRetryRuns.findFirst({
+        where: eq(storePriceMatchRetryRuns.id, runId),
+      })) ?? null
+    );
+  });
 }
 
 async function completeRetryRunIfDone(runId: number) {
@@ -341,10 +411,21 @@ async function completeRetryRunIfDone(runId: number) {
       status: "completed",
       updatedAt: sql`NOW()`,
     })
-    .where(eq(storePriceMatchRetryRuns.id, runId))
+    .where(
+      and(
+        eq(storePriceMatchRetryRuns.id, runId),
+        inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+      ),
+    )
     .returning();
 
-  return run ?? null;
+  if (run) return run;
+
+  return (
+    (await db.query.storePriceMatchRetryRuns.findFirst({
+      where: eq(storePriceMatchRetryRuns.id, runId),
+    })) ?? null
+  );
 }
 
 async function processRetryRunItem({
@@ -413,7 +494,7 @@ export async function processStorePriceMatchRetryRun({
   }
 
   if (existingRun.cancelRequestedAt) {
-    return await cancelRetryRun(runId);
+    return await cancelStorePriceMatchRetryRun(runId);
   }
 
   await db
@@ -436,7 +517,7 @@ export async function processStorePriceMatchRetryRun({
     });
 
     if (!currentRun || currentRun.cancelRequestedAt) {
-      return await cancelRetryRun(runId);
+      return await cancelStorePriceMatchRetryRun(runId);
     }
 
     await processRetryRunItem({
