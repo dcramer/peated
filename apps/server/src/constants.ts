@@ -146,7 +146,8 @@ export const EXTERNAL_SITE_DEFINITIONS = {
     runEvery: 1440,
     content: "reviews",
   },
-  whiskyworld: { name: "The Whisky World", runEvery: 10080 },
+  // WhiskyWorld stays manual-only because the site returns 403 for robots.txt.
+  whiskyworld: { name: "The Whisky World", runEvery: null },
 } as const;
 
 type RegisteredExternalSiteKey = keyof typeof EXTERNAL_SITE_DEFINITIONS;

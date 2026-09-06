@@ -66,6 +66,10 @@ test("registers each code-owned scraper source with explicit target ownership", 
   expect(EXTERNAL_SITE_DEFINITIONS.berrybrosrudd.runEvery).toBeNull();
   expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBe(10080);
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyworld.runEvery).toBeNull();
+  expect(scraperRegistry.targets.get("whiskyworld")?.minimumSpacingMs).toBe(
+    60_000,
+  );
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
   expect(
     scraperRegistry.targets.get("smws")?.origins.map(({ origin }) => origin),

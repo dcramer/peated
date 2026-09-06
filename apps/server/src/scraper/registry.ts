@@ -145,6 +145,7 @@ const legacyPriceSources = [
   {
     type: "whiskyworld",
     origin: "https://www.thewhiskyworld.com",
+    minimumSpacingMs: 60_000,
     scrape: scrapeWhiskyWorld,
   },
   {
@@ -188,6 +189,8 @@ export const scraperRegistry = createScraperRegistry({
           "allowedRequestHeaders" in source
             ? source.allowedRequestHeaders
             : undefined,
+        minimumSpacingMs:
+          "minimumSpacingMs" in source ? source.minimumSpacingMs : undefined,
         origins: [{ origin: source.origin, robots: { mode: "enforce" } }],
       }),
     ),
