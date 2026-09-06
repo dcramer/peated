@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 153 new Owner's Cask
+  one correction rather than a duplicate create. The 166 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1115,6 +1115,31 @@ completion record.
   do not settle their producer-stable Bottle names. This raises the staged sets
   to 153 new Owner's Casks and 47 evidence-backed non-Owner releases without
   inventing names or copying bottling years into `releaseYear`.
+- The 1996 reconciliation adds 13 more evidence-backed Owner's Casks:
+  `AP70025`, `AP70041`, `AS70039`, `AS70110`, `AS70127`, `AS70128`,
+  `AW70052`, `AW70059`, `AW70063`, `AW70165`, `AX70004`, `AX70035`, and
+  `AX70047`. Exact examples include Whisky Auctioneer's photographed
+  [Orient Chemical Industries `AP70025`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1996-owners-cask-ap70025-orient-chemical-industries-0),
+  the Bonhams catalog entry for 557-bottle sherry butt
+  [`AP70041`](https://images2.bonhams.com/original?src=Images%2Flive%2F2018-10%2F26%2FS-24779-0-1.pdf),
+  Whiskyfun's exact entries for Kawachiya barrel `AS70127` and Yoshitomi
+  hogshead `AW70162`, and Scotch Whisky Auctions' exact 378-bottle sherry butt
+  [`AX70047`](https://www.scotchwhiskyauctions.com/auctions/229-the-180th-auction/878618-yamazaki-1996-the-owners-cask-ax70047/).
+  The same label-level review corrects four misleading Owner's Cask index
+  entries. Photographed labels identify `AS70126`, `AW70029`, and `AW70054` as
+  `Suntory Single Cask Whisky`, while an Acker catalog photograph identifies
+  400-bottle sherry butt `AX70050` as `The Single Cask`. These four, Isetan
+  barrel `AS70121`, Isetan sherry butts `AX70051` and `AX70052`, and the
+  distinct 54% 2012 `KIZUNA Charity` release are staged outside the Owner's
+  Cask Series. A
+  [contemporary KIZUNA project report](https://nonjatta.blogspot.com/2012/04/kawachi-kizuna-charity-project.html)
+  establishes its 1996 white-oak barrel, 54% strength, and 126-bottle outturn,
+  but not its cask number. The collector assignment `AX70023` is withheld
+  because exact Sotheby's and Bonhams records assign that cask to the separate
+  59% sherry-butt `Black Legend`. The exact 1996 WhiskyLIVE cask `AX70012` and
+  one uncoded 60% 2008 release remain leads until their producer-stable names
+  can be settled. The staged totals are now 166 new Owner's Casks and 55
+  evidence-backed non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
