@@ -415,6 +415,46 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, testSeries);
       return true;
+    case "bottleSeries/flavorProfile":
+      sendRpcResponse(response, {
+        totalBottles: 3,
+        notedBottles: 2,
+        categories: [
+          {
+            category: "cereal",
+            bottleCount: 1,
+            notes: [{ name: "malt", bottleCount: 1 }],
+          },
+          {
+            category: "fruit",
+            bottleCount: 1,
+            notes: [{ name: "citrus", bottleCount: 1 }],
+          },
+          { category: "floral", bottleCount: 0, notes: [] },
+          {
+            category: "smoke",
+            bottleCount: 2,
+            notes: [
+              { name: "smoke", bottleCount: 2 },
+              { name: "ash", bottleCount: 1 },
+            ],
+          },
+          { category: "earthy", bottleCount: 0, notes: [] },
+          { category: "sulfur", bottleCount: 0, notes: [] },
+          {
+            category: "sweet",
+            bottleCount: 1,
+            notes: [{ name: "vanilla", bottleCount: 1 }],
+          },
+          { category: "spice", bottleCount: 0, notes: [] },
+          {
+            category: "wood",
+            bottleCount: 1,
+            notes: [{ name: "oak", bottleCount: 1 }],
+          },
+        ],
+      });
+      return true;
     case "bottleSeries/list":
       sendRpcResponse(response, {
         ...emptyList,

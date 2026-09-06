@@ -11,7 +11,6 @@ import {
   ItemListItem,
   LoadingList,
   LoadingPlaceholder,
-  PeatedId,
   RailList,
   TextLink,
 } from "@peated/web/components";
@@ -21,6 +20,7 @@ import {
   PageHeader,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { RailListSection } from "@peated/web/components/pages/railListSection.stylex";
+import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
@@ -56,7 +56,6 @@ export function SeriesPageFrame({
               <Markdown content={initialSeries.description} />
             ) : undefined
           }
-          identity={<PeatedId id={initialSeries.peatedId} />}
           parent={
             <TextLink href={getEntityUrl(initialSeries.brand)}>
               {initialSeries.brand.name}
@@ -68,8 +67,16 @@ export function SeriesPageFrame({
         />
         <PageColumns
           rail={
-            initialSeries.distillers.length ? (
-              <SeriesDistilleries distillers={initialSeries.distillers} />
+            initialSeries.numReleases > 0 ? (
+              <>
+                <FlavorProfileSection
+                  showHeading={false}
+                  scope={{ kind: "series", series: initialSeries.id }}
+                />
+                {initialSeries.distillers.length ? (
+                  <SeriesDistilleries distillers={initialSeries.distillers} />
+                ) : null}
+              </>
             ) : undefined
           }
           railBehavior="stack"
