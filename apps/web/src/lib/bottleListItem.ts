@@ -43,7 +43,9 @@ export function toBottlePickerOption(
     bottle: {
       ...identity,
       imageUrl: bottle.imageUrl,
-      provenance: identity.provenance?.map(({ name }) => ({ name })),
+      provenance: identity.provenance?.map(({ name, title }) =>
+        title ? { name, title } : { name },
+      ),
     },
   };
 }
@@ -63,18 +65,29 @@ export function getBottleIdentityProps(
   const releaseFact = getBottleReleaseMetadata(bottle);
   const releaseYear =
     bottle.releaseYear == null ? null : `${bottle.releaseYear} release`;
+  const distillers = bottle.distillers ?? [];
+  const distillerProvenance =
+    distillers.length > 3
+      ? [
+          {
+            name: `${distillers.length.toLocaleString("en-US")} distilleries`,
+            title: distillers.map((distiller) => distiller.name).join(" · "),
+          },
+        ]
+      : distillers
+          .filter((distiller) => distiller.id !== bottle.brand.id)
+          .map((distiller) => ({
+            name: distiller.name,
+            href: getEntityUrl(distiller),
+          }));
+
   return {
     name: formatBottleDisplayName(bottle, {
       includeBrand: includeBrandInName,
       includeSeries: includeSeriesInName,
     }),
     provenance: [
-      ...(bottle.distillers ?? [])
-        .filter((distiller) => distiller.id !== bottle.brand.id)
-        .map((distiller) => ({
-          name: distiller.name,
-          href: getEntityUrl(distiller),
-        })),
+      ...distillerProvenance,
       ...(includeBottler &&
       bottle.bottler &&
       bottle.bottler.id !== bottle.brand.id

@@ -1,4 +1,10 @@
-import { mockBottle } from "@peated/server/orpc/mock/fixtures";
+import {
+  mockBottle,
+  mockCaolIlaEntity,
+  mockHighlandParkEntity,
+  mockSpringbankEntity,
+  mockTaliskerEntity,
+} from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, test } from "vitest";
 
 import { toBottleListItem, toBottlePickerOption } from "./bottleListItem";
@@ -38,6 +44,57 @@ describe("toBottleListItem", () => {
       toBottleListItem({ ...mockBottle, distillers: [mockBottle.brand] })
         .provenance,
     ).toEqual([{ name: "Single Malt" }]);
+  });
+
+  test("shows up to three distilleries by name", () => {
+    const distillers = [
+      mockCaolIlaEntity,
+      mockHighlandParkEntity,
+      mockTaliskerEntity,
+    ];
+
+    expect(toBottleListItem({ ...mockBottle, distillers }).provenance).toEqual([
+      ...distillers.map((distiller) => ({
+        name: distiller.name,
+        href: `/distillers/${distiller.id}-${distiller.name
+          .toLowerCase()
+          .replaceAll(" ", "-")}`,
+      })),
+      { name: "Single Malt" },
+    ]);
+  });
+
+  test("summarizes more than three distilleries with their names in a tooltip", () => {
+    const distillers = [
+      mockCaolIlaEntity,
+      mockHighlandParkEntity,
+      mockSpringbankEntity,
+      mockTaliskerEntity,
+    ];
+
+    expect(toBottleListItem({ ...mockBottle, distillers }).provenance).toEqual([
+      {
+        name: "4 distilleries",
+        title: distillers.map((distiller) => distiller.name).join(" · "),
+      },
+      { name: "Single Malt" },
+    ]);
+  });
+
+  test("keeps the distillery tooltip inside a picker option", () => {
+    const distillers = [
+      mockCaolIlaEntity,
+      mockHighlandParkEntity,
+      mockSpringbankEntity,
+      mockTaliskerEntity,
+    ];
+
+    expect(
+      toBottlePickerOption({ ...mockBottle, distillers }).bottle.provenance,
+    ).toContainEqual({
+      name: "4 distilleries",
+      title: distillers.map((distiller) => distiller.name).join(" · "),
+    });
   });
 
   test("keeps the database ID for selection and removes links inside the option control", () => {
