@@ -9,8 +9,12 @@ import { StoryRow } from "./storyFixtures.stylex";
 const meta = {
   title: "Components/Labels/Chip",
   component: Chip,
-  args: { children: "Smoke", variant: "neutral" },
+  args: { children: "Smoke", size: "md", variant: "neutral" },
   argTypes: {
+    size: {
+      control: "inline-radio",
+      options: ["sm", "md"],
+    },
     variant: {
       control: "inline-radio",
       options: ["neutral", "tinted", "solid"],
@@ -36,6 +40,17 @@ export const Overview: Story = {
 
 export const InteractiveNotes: Story = {
   render: () => <InteractiveChipSet />,
+};
+
+export const CompactNotes: Story = {
+  render: () => (
+    <StoryRow>
+      <Chip size="sm">Smoke</Chip>
+      <Chip size="sm">Dried fruit</Chip>
+      <Chip size="sm">Sea salt</Chip>
+      <Chip size="sm">+2 more</Chip>
+    </StoryRow>
+  ),
 };
 
 function InteractiveChipSet() {

@@ -23,6 +23,7 @@ describe("getCommunityFeedItems", () => {
     });
 
     expect(item?.bottles[0]?.description).toBe(mockExternalReview.clip);
+    expect(item?.bottles[0]?.tags).toEqual(mockExternalReview.extractedTags);
     expect(item?.actorHref).toBe(mockExternalReview.url);
     expect(item?.href).toBe(mockExternalReview.url);
   });
@@ -49,6 +50,7 @@ describe("getCommunityFeedItems", () => {
       bottles: [
         {
           description: mockExternalReview.clip,
+          tags: mockExternalReview.extractedTags,
         },
       ],
     });
@@ -137,6 +139,7 @@ describe("getTastingFeedItems", () => {
           id: String(mockTasting.id),
           description: mockTasting.notes,
           ratingBand: mockTasting.ratingBand,
+          tags: mockTasting.tags,
         },
       ],
     });
@@ -178,6 +181,7 @@ describe("getMemberReviewFeedItems", () => {
         {
           description: expect.stringContaining("Freshly poured"),
           score: { value: mockMemberReview.score, scale: 100 },
+          tags: mockMemberReview.tags,
         },
       ],
     });

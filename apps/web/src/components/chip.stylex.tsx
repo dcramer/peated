@@ -5,18 +5,22 @@ import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, effects } from "../styles/tokens.stylex";
 
 export type ChipVariant = "neutral" | "tinted" | "solid";
+export type ChipSize = "sm" | "md";
 
 export type ChipProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
   "className" | "style" | "type"
 > & {
   children: ReactNode;
+  size?: ChipSize;
   variant?: ChipVariant;
 };
 
+/** A static label or interactive filter; small chips suit dense read-only previews. */
 export function Chip({
   children,
   onClick,
+  size = "md",
   variant = "neutral",
   ...props
 }: ChipProps) {
@@ -30,7 +34,9 @@ export function Chip({
         {...stylex.props(
           foundationStyles.interactiveSmall,
           styles.chip,
+          size === "sm" && styles.small,
           styles.interactive,
+          size === "sm" && styles.smallInteractive,
           variants[variant],
         )}
       >
@@ -45,6 +51,7 @@ export function Chip({
       {...stylex.props(
         foundationStyles.interactiveSmall,
         styles.chip,
+        size === "sm" && styles.small,
         variants[variant],
       )}
     >
@@ -105,6 +112,16 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+  },
+  small: {
+    minHeight: "24px",
+    paddingTop: "2px",
+    paddingRight: "8px",
+    paddingBottom: "2px",
+    paddingLeft: "8px",
+  },
+  smallInteractive: {
+    minHeight: controlMetrics.controlHeightSmall,
   },
   neutral: {
     backgroundColor: "transparent",

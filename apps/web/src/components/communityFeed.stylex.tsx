@@ -7,6 +7,7 @@ import {
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
 import { Card, CardPrimaryLink } from "./card.stylex";
+import { Chip } from "./chip.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { ReviewScore, TastingRating, type RatingBand } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
@@ -19,6 +20,7 @@ export type CommunityFeedBottle = Pick<
   id: string;
   description?: string;
   byline?: string;
+  tags?: readonly string[];
   ratingBand?: RatingBand | null;
   score?: { value: number; scale: number };
 };
@@ -140,18 +142,20 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 metadata={bottle.metadata}
                 verticalPadding="sm"
                 activityDetails={
-                  bottle.description || bottle.byline ? (
-                    <>
+                  bottle.description || bottle.byline || bottle.tags?.length ? (
+                    <div {...stylex.props(styles.details)}>
                       {bottle.description ? (
                         <p
                           {...stylex.props(
                             foundationStyles.body,
                             styles.excerpt,
-                            Boolean(bottle.byline) && styles.excerptWithFooter,
                           )}
                         >
                           {bottle.description}
                         </p>
+                      ) : null}
+                      {bottle.tags?.length ? (
+                        <TastingNotePreview tags={bottle.tags} />
                       ) : null}
                       {bottle.byline ? (
                         <div
@@ -163,7 +167,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                           By {bottle.byline}
                         </div>
                       ) : null}
-                    </>
+                    </div>
                   ) : undefined
                 }
                 end={
@@ -192,6 +196,28 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
         </div>
       </Card>
     </article>
+  );
+}
+
+const MAX_VISIBLE_NOTES = 4;
+
+function TastingNotePreview({ tags }: { tags: readonly string[] }) {
+  const visibleTags = tags.slice(0, MAX_VISIBLE_NOTES);
+  const hiddenCount = tags.length - visibleTags.length;
+
+  return (
+    <ul aria-label="Tasting notes" {...stylex.props(styles.notes)}>
+      {visibleTags.map((tag, index) => (
+        <li key={`${tag}-${index}`} {...stylex.props(styles.note)}>
+          <Chip size="sm">{tag}</Chip>
+        </li>
+      ))}
+      {hiddenCount ? (
+        <li {...stylex.props(styles.note)}>
+          <Chip size="sm">+{hiddenCount} more</Chip>
+        </li>
+      ) : null}
+    </ul>
   );
 }
 
@@ -255,11 +281,24 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x2,
   },
+  details: {
+    display: "flex",
+    flexDirection: "column",
+    gap: space.x2,
+  },
   excerpt: {
     marginTop: 0,
     marginBottom: 0,
     color: colors.ink,
   },
-  excerptWithFooter: { marginBottom: space.x2 },
+  notes: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: space.x1,
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  note: { display: "flex" },
   footer: { color: colors.inkMuted },
 });
