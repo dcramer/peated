@@ -844,7 +844,24 @@ completion record.
   and
   [`DU65110`](https://www.theraremalt.com/products/yamazaki-1999-2010-naganoya-owners-cask-du65110).
   Exact Sotheby's evidence instead places `DV70209` outside this family and in
-  the official single-cask work list. All 75 candidate Owner's
+  the official single-cask work list. A focused 1994 pass adds five more exact
+  Owner's Casks: Yamakyu 40th Anniversary hogshead
+  [`4P70169`](https://www.cmonvin.com/products/detail.php?product_id=5951),
+  Tokyo Premium Night sherry butt
+  [`4R70046`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1994-owners-cask-4r70046-tokyo-premium-night),
+  Esprit Parts sherry butt
+  [`4R70055`](https://www.sothebys.com/en/buy/auction/2025/finest-and-rarest-spirits-3/shan-qi-the-yamazaki-owners-cask-4r70055-61-0-abv),
+  Masanao Serizawa sherry butt `4R70056`, and Itogawa hogshead
+  [`4O70176`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai-3).
+  The exact label and auction evidence establishes `4P70169` as a 2007-bottled,
+  55% hogshead with a 186-bottle outturn; a collector index incorrectly swaps
+  its bottling year and outturn with another cask. The
+  [Acker catalog](https://webdocs.ackerwines.com/203A_FINAL_WEB.pdf) confirms
+  `4R70056` as The Owner's Cask but gives only an individual bottle number, so
+  its total outturn remains unknown. A later exact
+  [Spink catalog](https://storage.spink.com/source/Auto_Catalogue/SFW64.pdf?v=1)
+  adds 1997 sherry butt `BV70004`, bottled in 2010 at 62% for In Anticipation of
+  the Dawn of a New Whisky Era. All 81 candidate Owner's
   Cask records remain unwritten because that durable bulk write requires
   explicit approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
