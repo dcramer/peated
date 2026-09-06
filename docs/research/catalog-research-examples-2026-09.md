@@ -532,10 +532,10 @@ relationships, or existing images were changed.
 ## Yamazaki — September 6, 2026
 
 The full production review is in progress. It started from 107 Bottles attached
-to the Yamazaki Brand (`E0493`) and currently has 140. The modern producer range,
+to the Yamazaki Brand (`E0493`) and currently has 148. The modern producer range,
 named component-whisky releases, existing historical single casks, all original
 Brand pages, and the pre-write set of 169 Yamazaki-distilled records were
-inventoried. Production now reports 200 Yamazaki-distilled records. Older private
+inventoried. Production now reports 208 Yamazaki-distilled records. Older private
 and single-cask releases still require individual evidence, so this is not yet a
 completion record.
 
@@ -609,6 +609,12 @@ completion record.
   established the 1992 vintage, 54% ABV, and cask `ZV70212` now stored as
   `B54413`. The source does not state an age, bottling date, cask type, or named
   family, so those facts remain unknown.
+- An exact
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2018/20181116%20S-24779-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
+  established the 1993-vintage, 2006-bottled, 62% Private Choice for NBA Osaka
+  Kita. Its label identifies both casks, `3D3003` and `3D3006`, so `B54445`
+  stores one multi-cask release rather than two single-cask Bottles. It was
+  duplicate-checked and re-fetched with no bottler.
 - The [2022 Tsukuriwake announcement](https://www.prnewswire.com/news-releases/from-the-birthplace-of-japanese-whisky-the-house-of-suntory-introduces-2022-limited-edition-yamazaki-tsukuriwake-selection-301548951.html)
   and [Whisky Auctioneer's release guide](https://whiskyauctioneer.com/learn/explore-whisky/series/yamazaki-tsukuriwake-selection-2022-editions)
   bounded the named component-whisky range. Series `S0674` now contains the five
@@ -616,11 +622,11 @@ completion record.
   18-year-old is `B54095`; the unqualified core Mizunara 18-year-old `B47537`
   was corrected to the 2025 release proven by its assigned import references and
   exact Whiskyfun review.
-- All 140 current Yamazaki Brand Bottles now have Yamazaki as Brand and
+- All 148 current Yamazaki Brand Bottles now have Yamazaki as Brand and
   distiller with no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
   original two-page Brand inventory was re-fetched with zero remaining non-null
-  bottlers. The 31 later creates were individually verified with no bottler.
+  bottlers. The 39 later creates were individually verified with no bottler.
 - Exact Whisky Auctioneer records for the [8- and 10-year-old set](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-8-10-year-old-suntory-pure-malt-box-set),
   [12-year-old sherry release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-12-year-old-suntory-pure-malt),
   two [15-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt)
@@ -645,8 +651,24 @@ completion record.
   an exact [1993 bourbon-cask record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1993-single-cask-3p70190)
   and a [detailed Japanese release record](https://sakedori.com/s/6ichlw5ytz/blog/4936.html)
   then established cask `3P70190` (`B54414`), bottled and released in 2003 at
-  58% with a 192-bottle outturn. The Series now has 16 members. The sources do
-  not establish that these are the complete historical range. The
+  58% with a 192-bottle outturn.
+- Exact auction catalogs and release records established seven more members of
+  `S0700`: the 1991 sherry butt `IO70047` (`B54418`) in the
+  [Spink SFW29 catalog](https://d3ums4016ncdkp.cloudfront.net/auction/catalogue/SFW29/SFW29.pdf);
+  the 1993 bourbon cask `3P70191` (`B54419`) in an exact
+  [Sotheby's lot](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai/shan-qithe-cask-of-yamazaki-3p70191-58-0-abv-1993);
+  four 1993 Heavily Peated Malt casks, `3Q70040` (`B54421`), `3Q70041`
+  (`B54420`), `3Q70042` (`B54422`), and `3Q70043` (`B54424`), established by
+  [Sotheby's](https://www.sothebys.com/en/buy/auction/2023/kodawarikodawari-the-greatest-japanese-whisky-collection-part-i/shan-qi-yamazaki-the-cask-of-shan-qi-yamazaki),
+  [Ravenel](https://www.ravenel.com/zh-CN/cata/lotsIn/47be8c49-891a-4896-8584-5d4b7293c194),
+  [Spink SFW30](https://d3ums4016ncdkp.cloudfront.net/auction/catalogue/SFW30/SFW30.pdf),
+  [Whiskies R Us](https://whiskiesrus.blogspot.com/2011/10/cask-of-yamazaki-1993-heavily-peated.html),
+  and [Poly Auction](https://cdn.polyauction.com.hk/public-default/auction/sale/sz16084423-xiang-gang-bao-li-2016qiu-pai-zhong-xi-ming-jiu-zhen-niang-shuang-p_cf42c5b6-9be7-4618-9e80-774f3a22fd62.pdf);
+  and 1993 white-oak hogshead `3P70284` (`B54423`) from a
+  [detailed release record](https://www.nomunication.jp/2019/01/23/review-the-cask-of-yamazaki-1993-b-2003-white-oak-hogshead-no-3p70284-ohmi-aging-cellar-location-54-w-23-4-12-216-55-abv/).
+  Every record was duplicate-checked and re-fetched after creation. Facts not
+  stated by exact sources remain unknown. The Series now has 23 members. The
+  sources do not establish that these are the complete historical range. The
   [Suntory Owner's Cask guide](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-owners-cask)
   identifies 32 Yamazaki casks across 1984–2000 vintages. The apparent
   `DN70117` entry is an index typo: the exact
@@ -667,5 +689,5 @@ completion record.
   4028mdk09. `B2276` now uses
   [The Yamazaki Single Malt Whisky Aged 12 years.JPG](https://commons.wikimedia.org/wiki/File:The_Yamazaki_Single_Malt_Whisky_Aged_12_years.JPG)
   under `CC BY-SA 3.0` with credit to Look Sharp!. Both stored WebP transforms
-  were visually checked. Brand image coverage remains 7 of 140 because these
+  were visually checked. Brand image coverage remains 7 of 148 because these
   were licensed replacements, not newly covered records.
