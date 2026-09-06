@@ -289,6 +289,9 @@ async function handleRpcRequest({ request, response, url }) {
         const query = String(input?.query ?? "")
           .trim()
           .toLowerCase();
+        const name = String(input?.name ?? "")
+          .trim()
+          .toLowerCase();
         const kinds = Array.isArray(input?.kinds) ? input.kinds : null;
         const results = [
           testBrand,
@@ -298,6 +301,7 @@ async function handleRpcRequest({ request, response, url }) {
         ].filter(
           (entity) =>
             (!kinds || kinds.includes(entity.kind)) &&
+            (!name || entity.name.toLowerCase() === name) &&
             (!query || entity.name.toLowerCase().includes(query)),
         );
         sendRpcResponse(response, {
