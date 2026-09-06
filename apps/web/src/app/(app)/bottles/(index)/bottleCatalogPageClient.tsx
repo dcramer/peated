@@ -12,6 +12,7 @@ import { addBottleRowActions } from "@peated/web/components/bottleRowActions.sty
 import {
   BottleCatalogFilters,
   BottleCatalogList,
+  BottleCatalogSearch,
   type BottleCatalogFilterOption,
 } from "@peated/web/components/pages/bottleCatalog.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
@@ -234,6 +235,12 @@ export function BottleCatalogPageClient({
           searchParams,
           bottleList.rel.prevCursor,
         )}
+        search={
+          <BottleCatalogSearch
+            onSubmit={(value) => updateParams({ query: value.trim() })}
+            query={displayedSearchParams.get("query") ?? ""}
+          />
+        }
         sort={sort}
         sortOptions={sortOptions}
         total={bottleList.total}
