@@ -20,7 +20,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v15";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v16";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -97,13 +97,15 @@ const RULE_INSTRUCTIONS = [
   "Use articles or products to find one link inside each result on the chosen start page.",
   "Use short CSS selectors that work across the supplied pages.",
   "For reviews, inside selects the article area that contains the reviews.",
-  'Use oneReviewPer "element" when each match is a complete review. Use "heading" when each match starts a review and the following elements continue it.',
-  'For heading reviews, use whenOnlyOneReview "useWholeArea" only when a single review needs the introduction before its heading. Otherwise use "startAtHeading".',
+  'Use oneReviewPer "element" when each selected element is a complete review.',
+  'Use oneReviewPer "section" when a heading or label starts each review. startsAt finds those labels and stopBefore can mark the end of all reviews.',
+  'For sections, use whenOnlyOneReview "useWholeArea" only when one review needs the introduction before its label. Otherwise use "startAtReview".',
+  "For sections, inside must select the closest single area shared by all review starts. Each start must be in a separate direct part of that area, even when the start is nested inside layout elements.",
   "A field's try list is read from top to bottom until a value is found.",
   'A review field can read from the current review or from the article. Article reads must say whether they apply to "firstReview" or "everyReview".',
   "Set tastingNotes only when the page has a reliable narrower selection for flavor tags and clips. The full review body is saved from the review selection.",
   "When a date exists only in the article URL, use dateFromUrl with a format made from yyyy, yy, MM, dd, and * tokens.",
-  "Set canonicalUrl only when page markup provides a preferred article URL or needs simple cleanup. Otherwise set it to null.",
+  "Set canonicalUrl only when page markup provides a preferred article URL. Otherwise set it to null.",
   "Include an optional field only when the supplied pages clearly and consistently provide it.",
   "For catalog sources, collect only the displayed name, preferred product page URL, stable product ID, image URL, volume, ABV, age, edition, and release year fields offered by the catalog schema.",
   "Catalog sources do not require a review, price, currency, or volume. Do not select descriptions or tasting-note prose.",
@@ -115,8 +117,11 @@ const RULE_INSTRUCTIONS = [
   "nextPage selects an anchor whose href leads to the next results page. Set it to null when there is no next page.",
   'Use "src" for image URLs and "datetime" for machine-readable time values when those attributes exist.',
   'Use get "text", "attribute", or "fixed". For text, take chooses the first match or joins all matches.',
-  "startsWith can keep matched text beginning with one of up to 10 labels.",
-  "clean can remove or add literal text at the start or end. Matching is case-insensitive. Set clean to null when it is not needed.",
+  "match is null when the selected value can be used as-is. Otherwise it contains up to three text templates, tried in order without regard to letter case.",
+  "Write normal fixed text in a template. Use {anything} for changing text to ignore, {value} for the text to keep, and {line} for an HTML line break.",
+  'Examples: "Score: {value}/10" keeps the score, "Review {anything} - {value}" keeps the writer, and "{value}{line}{anything}" keeps the first line.',
+  "skipWhen, startsAt, and stopBefore use the same text templates.",
+  "addStart and addEnd can add fixed text to the matched value. Set them to null when they are not needed.",
   "Use fixed values only for a fact that is stable and unambiguous across the selected source pages.",
   "For a numeric score, set score map to null. If the publisher uses a small fixed set of text grades, map every grade to a number on the given scale.",
   "Use only fields allowed by check_rules.",

@@ -10,6 +10,7 @@ import {
   inspectExistingSource,
   type ExistingSourceDefinition,
 } from "./prepareExistingSource";
+import { reviewSourceKey } from "./reviewSourceKey";
 import { ScrapeSourceValidationError } from "./service";
 
 const InputSchema = z
@@ -25,12 +26,15 @@ type ReviewSourceDefinition = ExistingSourceDefinition & {
   listUrl: string;
   isCanonicalArticleUrl: (url: string) => boolean;
   allowsMultipleReviews?: true;
-  expectedReviewKey: (review: {
-    articleUrl: string;
-    name: string;
-    reviewerName: string | null;
-  }) => string;
 };
+
+function isOldReviewKey(siteKey: string, sourceKey: string | null) {
+  const prefix = `${siteKey}:`;
+  return (
+    sourceKey?.startsWith(prefix) === true &&
+    /^[a-f0-9]{64}$/.test(sourceKey.slice(prefix.length))
+  );
+}
 
 /** Checks existing reviews; applying keeps their IDs and leaves collection paused. */
 export async function prepareReviewSource(
@@ -81,23 +85,30 @@ export async function prepareReviewSource(
           `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
         );
       }
-      // Review IDs preserve the order in which the old scraper saved the article.
+      // Migration rule: repeated identical reviews keep their original insert order.
+      const reviewKeyCounts = new Map<string, number>();
       return articleReviews
         .toSorted((left, right) => left.id - right.id)
-        .map((review, index) => {
-          const expectedKey = definition.expectedReviewKey({
-            articleUrl: article.url,
-            name: review.name,
-            reviewerName: review.reviewerName,
-          });
-          if (review.sourceKey !== expectedKey) {
+        .map((review) => {
+          if (!isOldReviewKey(definition.siteKey, review.sourceKey)) {
             throw new ScrapeSourceValidationError(
               `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
             );
           }
+          const firstReviewKey = reviewSourceKey(
+            review.name,
+            review.reviewerName,
+          );
+          const repeatedReviewNumber =
+            (reviewKeyCounts.get(firstReviewKey) ?? 0) + 1;
+          reviewKeyCounts.set(firstReviewKey, repeatedReviewNumber);
           return {
             id: review.id,
-            sourceKey: `${article.url}#review-${index + 1}`,
+            sourceKey: reviewSourceKey(
+              review.name,
+              review.reviewerName,
+              repeatedReviewNumber,
+            ),
           };
         });
     });

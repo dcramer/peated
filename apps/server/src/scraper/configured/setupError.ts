@@ -31,6 +31,7 @@ const SETUP_FIELD_LABELS = {
   "article.reviews": "Reviews",
   "article.reviews.inside": "Review area",
   "article.reviews.selector": "Individual reviews",
+  "article.reviews.startsAt": "Review starts",
   "article.reviews.name": "Bottle name",
   "article.reviews.reviewer": "Reviewer name",
   "article.reviews.tastingNotes": "Tasting notes",

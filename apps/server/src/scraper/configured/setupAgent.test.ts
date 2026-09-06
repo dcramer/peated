@@ -9,10 +9,8 @@ import {
 function text(
   selector: string,
   operations: {
-    startsWith?: string[];
+    match?: string[];
     take?: "first" | "all";
-    removeStart?: string[];
-    removeEnd?: string[];
     addStart?: string;
     addEnd?: string;
   } = {},
@@ -21,19 +19,9 @@ function text(
     get: "text" as const,
     selector,
     take: operations.take ?? ("first" as const),
-    startsWith: operations.startsWith ?? null,
-    clean:
-      operations.removeStart ||
-      operations.removeEnd ||
-      operations.addStart ||
-      operations.addEnd
-        ? {
-            removeStart: operations.removeStart ?? null,
-            removeEnd: operations.removeEnd ?? null,
-            addStart: operations.addStart ?? null,
-            addEnd: operations.addEnd ?? null,
-          }
-        : null,
+    match: operations.match ?? null,
+    addStart: operations.addStart ?? null,
+    addEnd: operations.addEnd ?? null,
   };
 }
 
@@ -52,7 +40,7 @@ function reviewCandidate(
   nameSelector: string,
   listOptions: {
     item?: string;
-    excludeWhen?: { selector: string; startsWith: string[] | null };
+    excludeWhen?: { selector: string; match: string[] | null };
   } = {},
 ) {
   return {
@@ -75,7 +63,9 @@ function reviewCandidate(
               get: "attribute" as const,
               selector: "time",
               attribute: "datetime",
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             },
           ],
         },
@@ -83,10 +73,10 @@ function reviewCandidate(
           inside: "body",
           oneReviewPer: "element" as const,
           selector: "article.review",
-          name: reviewField(nameSelector, { removeEnd: ["Review"] }),
+          name: reviewField(nameSelector, { match: ["{value} Review"] }),
           reviewer: null,
           tastingNotes: reviewField(".body p", {
-            startsWith: ["Nose:", "Finish:"],
+            match: ["Nose:{anything}", "Finish:{anything}"],
             take: "all",
           }),
           score: null,
@@ -200,7 +190,10 @@ test("returns rules only after the rule check passes", async () => {
         "second",
         reviewCandidate(".bottle-name", {
           item: ".product-card",
-          excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
+          excludeWhen: {
+            selector: ".badge",
+            match: ["Sold out{anything}"],
+          },
         }),
       ),
     );
@@ -254,7 +247,7 @@ test("returns rules only after the rule check passes", async () => {
     kind: "review",
     articles: {
       oneArticlePer: ".product-card",
-      skipWhen: { selector: ".badge", startsWith: ["Sold out"] },
+      skipWhen: { selector: ".badge", match: ["Sold out{anything}"] },
       limit: 25,
     },
     article: {
@@ -263,7 +256,7 @@ test("returns rules only after the rule check passes", async () => {
           try: [
             expect.objectContaining({
               selector: ".bottle-name",
-              clean: expect.objectContaining({ removeEnd: ["Review"] }),
+              match: ["{value} Review"],
             }),
           ],
         },
@@ -271,7 +264,7 @@ test("returns rules only after the rule check passes", async () => {
           try: [
             expect.objectContaining({
               selector: ".body p",
-              startsWith: ["Nose:", "Finish:"],
+              match: ["Nose:{anything}", "Finish:{anything}"],
               take: "all",
             }),
           ],
@@ -331,7 +324,7 @@ test("accepts catalog rules without price or review fields", async () => {
   );
 });
 
-test("accepts canonical cleanup, URL dates, and finite score maps", async () => {
+test("accepts canonical matching, URL dates, and finite score maps", async () => {
   const base = reviewCandidate("h1");
   const candidate = {
     ...base,
@@ -345,12 +338,9 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
               get: "attribute" as const,
               selector: 'link[rel="canonical"]',
               attribute: "href",
-              clean: {
-                removeStart: null,
-                removeEnd: ["/"],
-                addStart: null,
-                addEnd: null,
-              },
+              match: ["{value}/"],
+              addStart: null,
+              addEnd: null,
             },
           ],
         },
@@ -367,7 +357,7 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
           score: {
             try: [
               {
-                ...text(".rating", { removeStart: ["Rating:"] }),
+                ...text(".rating", { match: ["Rating: {value}"] }),
                 from: "review" as const,
               },
               {
@@ -414,7 +404,7 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
           expect.objectContaining({
             selector: 'link[rel="canonical"]',
             attribute: "href",
-            clean: expect.objectContaining({ removeEnd: ["/"] }),
+            match: ["{value}/"],
           }),
         ],
       },
@@ -442,7 +432,7 @@ test("accepts canonical cleanup, URL dates, and finite score maps", async () => 
   expect(checkRules).toHaveBeenCalledOnce();
 });
 
-test("turns review headings into sections", async () => {
+test("turns review labels into sections", async () => {
   const base = reviewCandidate("h2");
   const candidate = {
     ...base,
@@ -451,17 +441,29 @@ test("turns review headings into sections", async () => {
       article: {
         ...base.rules.article,
         reviews: {
-          ...base.rules.article.reviews,
           inside: ".entry-content",
-          oneReviewPer: "heading" as const,
-          selector: ".entry-content > h2.review",
-          stopBefore: ".entry-content > .related-posts",
+          oneReviewPer: "section" as const,
+          startsAt: {
+            selector: "h2.review",
+            match: null,
+          },
+          stopBefore: {
+            selector: ".related-posts",
+            match: null,
+          },
           whenOnlyOneReview: "useWholeArea" as const,
+          name: base.rules.article.reviews.name,
+          reviewer: base.rules.article.reviews.reviewer,
+          tastingNotes: base.rules.article.reviews.tastingNotes,
+          score: base.rules.article.reviews.score,
         },
       },
     },
   };
 
+  const request = vi
+    .fn()
+    .mockResolvedValue(toolCallResponse("sections", candidate));
   const result = await runScrapeSourceSetupAgent({
     conversationId: "scrape_source:1",
     externalSiteRunId: 10,
@@ -474,7 +476,7 @@ test("turns review headings into sections", async () => {
       },
     ],
     detailPages: [],
-    request: vi.fn().mockResolvedValue(toolCallResponse("sections", candidate)),
+    request,
     checkRules: vi.fn(async () => ({
       status: "passed" as const,
       checked: "parsed sections",
@@ -485,13 +487,23 @@ test("turns review headings into sections", async () => {
     kind: "review",
     article: {
       reviews: {
-        oneReviewPer: "heading",
-        selector: ".entry-content > h2.review",
-        stopBefore: ".entry-content > .related-posts",
+        oneReviewPer: "section",
+        startsAt: {
+          selector: "h2.review",
+          match: null,
+        },
+        stopBefore: {
+          selector: ".related-posts",
+          match: null,
+        },
         whenOnlyOneReview: "useWholeArea",
       },
     },
   });
+  expect(request.mock.calls[0]?.[0].instructions).toContain(
+    '"Review {anything} - {value}" keeps the writer',
+  );
+  expect(request.mock.calls[0]?.[0].instructions).not.toContain("startsWith");
 });
 
 test("stops after the rule-check limit", async () => {

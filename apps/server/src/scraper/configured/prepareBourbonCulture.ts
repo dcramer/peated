@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import {
   prepareReviewSource,
   type PrepareReviewSourceInput,
@@ -18,7 +17,5 @@ export async function prepareBourbonCultureSource(
       /^https:\/\/thebourbonculture\.com\/whiskey-reviews\/[a-z0-9][a-z0-9-]*\/$/.test(
         url,
       ),
-    expectedReviewKey: ({ articleUrl }) =>
-      `bourbonculture:${createHash("sha256").update(articleUrl).digest("hex")}`,
   });
 }

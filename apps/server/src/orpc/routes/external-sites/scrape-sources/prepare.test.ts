@@ -16,6 +16,7 @@ import {
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { reviewSourceKey } from "@peated/server/scraper/configured/reviewSourceKey";
 import { createScrapeSourceSuggestionRun } from "@peated/server/scraper/configured/runs";
 import { resolveScrapeSourceRunRegistry } from "@peated/server/scraper/configured/runtime";
 import {
@@ -871,7 +872,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
       .where(eq(externalReviews.id, review.id));
     expect(stored).toEqual({
       ...review,
-      sourceKey: `${canonicalUrl}#review-1`,
+      sourceKey: reviewSourceKey(review.name, review.reviewerName),
     });
     expect(
       await db
@@ -946,7 +947,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
     expect(await db.select().from(externalReviews)).toEqual([
       {
         ...review,
-        sourceKey: `${whiskyStudyCanonicalUrl}#review-1`,
+        sourceKey: reviewSourceKey(review.name, review.reviewerName),
       },
     ]);
     expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
@@ -1000,7 +1001,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
     expect(await db.select().from(externalReviews)).toEqual([
       {
         ...review,
-        sourceKey: `${whiskySagaCanonicalUrl}#review-1`,
+        sourceKey: reviewSourceKey(review.name, review.reviewerName),
       },
     ]);
     expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
@@ -1056,7 +1057,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
     expect(await db.select().from(externalReviews)).toEqual([
       {
         ...review,
-        sourceKey: `${whiskeyReviewerCanonicalUrl}#review-1`,
+        sourceKey: reviewSourceKey(review.name, review.reviewerName),
       },
     ]);
     expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
@@ -1112,8 +1113,14 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await syncScraperDefinitions(wordsOfWhiskyRegistry);
     expect(await db.select().from(externalReviewArticles)).toEqual([article]);
     expect(await db.select().from(externalReviews)).toEqual([
-      { ...reviews[0], sourceKey: `${wordsOfWhiskyCanonicalUrl}#review-1` },
-      { ...reviews[1], sourceKey: `${wordsOfWhiskyCanonicalUrl}#review-2` },
+      {
+        ...reviews[0],
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName),
+      },
+      {
+        ...reviews[1],
+        sourceKey: reviewSourceKey(reviews[1].name, reviews[1].reviewerName),
+      },
     ]);
     expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
     expect(await db.select().from(externalReviewPublications)).toEqual(
@@ -1195,8 +1202,14 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await syncScraperDefinitions(whiskyNotesRegistry);
     expect(await db.select().from(externalReviewArticles)).toEqual([article]);
     expect(await db.select().from(externalReviews)).toEqual([
-      { ...reviews[0], sourceKey: `${whiskyNotesCanonicalUrl}#review-1` },
-      { ...reviews[1], sourceKey: `${whiskyNotesCanonicalUrl}#review-2` },
+      {
+        ...reviews[0],
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName),
+      },
+      {
+        ...reviews[1],
+        sourceKey: reviewSourceKey(reviews[1].name, reviews[1].reviewerName),
+      },
     ]);
     expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
     expect(await db.select().from(externalReviewPublications)).toEqual(
@@ -2126,8 +2139,9 @@ describe("POST /admin/scrape-sources/prepare", () => {
                 get: "text",
                 selector: "h1",
                 take: "first",
-                startsWith: null,
-                clean: null,
+                match: null,
+                addStart: null,
+                addEnd: null,
               },
             ],
           },
@@ -2137,7 +2151,9 @@ describe("POST /admin/scrape-sources/prepare", () => {
                 get: "attribute",
                 selector: "time",
                 attribute: "datetime",
-                clean: null,
+                match: null,
+                addStart: null,
+                addEnd: null,
               },
             ],
           },
@@ -2152,8 +2168,9 @@ describe("POST /admin/scrape-sources/prepare", () => {
                   from: "review",
                   selector: "h2.name",
                   take: "first",
-                  startsWith: null,
-                  clean: null,
+                  match: null,
+                  addStart: null,
+                  addEnd: null,
                 },
               ],
             },
@@ -2164,8 +2181,9 @@ describe("POST /admin/scrape-sources/prepare", () => {
                   from: "review",
                   selector: ".author",
                   take: "first",
-                  startsWith: null,
-                  clean: null,
+                  match: null,
+                  addStart: null,
+                  addEnd: null,
                 },
               ],
             },
@@ -2177,8 +2195,9 @@ describe("POST /admin/scrape-sources/prepare", () => {
                   from: "review",
                   selector: ".score",
                   take: "first",
-                  startsWith: null,
-                  clean: null,
+                  match: null,
+                  addStart: null,
+                  addEnd: null,
                 },
               ],
               scale: 10,
