@@ -759,6 +759,28 @@ completion record.
   photographed bottle numbers above 450 disprove that count. These four
   releases are staged for final production duplicate checks and writes; no
   uncertain age or outturn will be inferred.
+- The broader Whisky Auctioneer index and independent exact catalogs establish
+  six more non-Owner's Cask releases. The Cask of Yamazaki sherry butt
+  [`OM70172`](https://www.sothebys.com/en/buy/auction/2020/distilled-a-single-collection-sale-featuring-rare-macallan-suntory-karuizawa-single-cask-whisky/shan-qi-the-cask-of-yamazaki-om70172-59-0-abv-1990)
+  is a 17-year-old distilled in 1990 and bottled in 2007 at 59%, with a
+  438-bottle outturn. The heavily peated, white-oak-puncheon casks
+  [`3Q70047`](https://www.diffordsguide.com/beer-wine-spirits/523/the-cask-of-yamazaki-1993-heavily-peated)
+  and
+  [`3Q70048`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160819%20S-23349-0-3%20Whisky%20%5B112%5D.pdf)
+  are 15-year-olds distilled in 1993 and bottled in 2008 at 62%, with respective
+  outturns of 473 and 503. A 492-bottle secondary transcription for `3Q70048`
+  conflicts with an exact Bonhams label showing bottle 151 of 503, so 503 is the
+  staged value. The Single Cask
+  [`DQ70031`](https://cdn.polyauction.com.hk/public-default/auction/sale/chinese-and-western-wine_261eec0e-9913-4fd2-99cf-134537d9be35.pdf)
+  is a 1999-vintage, 2012-bottled, 58% puncheon sold as Buyer's Selection. The
+  Single Cask
+  [`ES60046`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-2000-single-cask)
+  is a 2000-vintage, 2010-bottled, 57% sherry butt selected for Takashimaya.
+  Suntory Single Cask Whisky
+  [`AS70114`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1996-suntory-single-cask)
+  is a 1996-vintage, 2010-bottled, 54% release for Suntory Logistics' 50th
+  Anniversary. All six are staged for immediate production duplicate checks
+  before any write.
 - The
   [Suntory Owner's Cask guide](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-owners-cask)
   identifies 32 Yamazaki casks across 1984–2000 vintages. The apparent
@@ -768,11 +790,19 @@ completion record.
   An additional exact
   [1995 cask `5G3006` lot](https://www.barnebys.co.uk/realised-prices/lot/yamazaki-1995-5g3006-Ndd3qrOHaY4?q=yamazaki)
   visibly carries The Owner's Cask label and states a 2006 bottling, 53% ABV,
-  barrel maturation, and a 123-bottle outturn. The remaining 32 candidate
-  Owner's Cask records are duplicate-checked and
-  staged for source-by-source verification. They were not written because that
-  durable bulk write still requires explicit approval. Empty destination Series
-  `S0676` has been created.
+  barrel maturation, and a 123-bottle outturn. Exact
+  [Bonhams catalog entries](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2018/20181116%20S-24779-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
+  and two Poly catalogs—[Chinese and Western Wine](https://cdn.polyauction.com.hk/public-default/auction/sale/chinese-and-western-wine_261eec0e-9913-4fd2-99cf-134537d9be35.pdf)
+  and
+  [Prestige Collections](https://cdn.polyauction.com.hk/public-default/auction/sale/sz16084423-xiang-gang-bao-li-2016qiu-pai-zhong-xi-ming-jiu-zhen-niang-shuang-p_cf42c5b6-9be7-4618-9e80-774f3a22fd62.pdf)—add
+  ten more evidenced Owner's Casks: `3K3033`,
+  `2Q70668`, `2V70480`, `4S70040`, `ES70153`, `3P70366`, `EO70049`, `4R70005`,
+  `AX70015`, and `EX65186`. Their exact stated cask, vintage, bottling, strength,
+  maturation, and outturn facts are staged without inferred release dates. The
+  original 31 candidates were production duplicate-checked; these 11 newly
+  found candidates still require those checks. All 42 candidate Owner's Cask
+  records remain unwritten because that durable bulk write requires explicit
+  approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
   creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
   2016 25-year-old Limited Edition is a presentation variant of the core whisky;
@@ -795,7 +825,10 @@ completion record.
   Bonhams, retailer, and auction records establish 2003 Bota Corta cask
   `ADDY3038`, bottled in 2014 at 55% for W. Whisky Shop. Their exact label
   wording still needs to be reconciled before stable Bottle names and editions
-  are written.
+  are written. Poly catalogs describe `CU70065` and `DU65300` as The Owner's
+  Cask, while other exact auction records call them Arima/The Single Cask or
+  Suntory Single Cask Whisky. Both remain unresolved until their labels settle
+  the family and stable name.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
