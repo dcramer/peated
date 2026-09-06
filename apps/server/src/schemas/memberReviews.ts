@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { BottleSchema } from "./bottles";
 import { ServingStyleEnum } from "./common";
+import { TagCategoriesSchema } from "./tags";
 import { UserSchema } from "./users";
 
 export const MemberReviewScoreSchema = z
@@ -37,6 +38,7 @@ export const MemberReviewSchema = z.object({
   bottleId: z.number().int().positive(),
   score: MemberReviewScoreSchema,
   tags: MemberReviewTagsSchema,
+  tagCategories: TagCategoriesSchema,
   color: MemberReviewColorSchema,
   notes: MemberReviewNotesSchema,
   servingStyle: MemberReviewServingStyleSchema,

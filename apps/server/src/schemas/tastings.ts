@@ -9,6 +9,7 @@ import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
+import { TagCategoriesSchema } from "./tags";
 import { UserSchema } from "./users";
 
 const TastingNotesSchema = z
@@ -68,6 +69,7 @@ export const TastingSchema = z.object({
   legacySimpleRating: TastingRatingSchema.readonly(),
   legacyStarRating: z.number().nullable().default(null).readonly(),
   tags: TastingTagsSchema,
+  tagCategories: TagCategoriesSchema,
   color: TastingColorSchema,
   servingStyle: TastingServingStyleSchema,
   friends: z
@@ -113,6 +115,7 @@ export const TastingContentInputSchema = TastingSchema.omit({
   createdBy: true,
   legacySimpleRating: true,
   legacyStarRating: true,
+  tagCategories: true,
 }).extend({
   flight: z
     .string()

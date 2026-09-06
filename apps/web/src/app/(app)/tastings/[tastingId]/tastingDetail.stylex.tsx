@@ -39,6 +39,7 @@ export function TastingDetail({
       rating={{ kind: "tasting", ratingBand: tasting.ratingBand }}
       servingStyle={tasting.servingStyle}
       tags={tasting.tags}
+      tagCategories={tasting.tagCategories}
     />
   );
 }

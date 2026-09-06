@@ -5,6 +5,12 @@ import { FlavorProfileEnum } from "./common";
 
 export const TagCategoryEnum = z.enum(TAG_CATEGORIES);
 
+export const TagCategoriesSchema = z
+  .record(z.string(), TagCategoryEnum)
+  .default({})
+  .readonly()
+  .describe("Stored category for each known tasting note");
+
 export const TagSchema = z.object({
   name: z.string().trim().min(1, "Required").describe("Name of the tag"),
   synonyms: z

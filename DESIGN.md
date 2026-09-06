@@ -33,6 +33,24 @@ colors:
   hairline-dark: "rgb(232 234 227 / 0.11)"
   section-rule: "rgb(22 25 20 / 0.16)"
   section-rule-dark: "rgb(232 234 227 / 0.16)"
+  category-cereal: "#ad6f0b"
+  category-cereal-dark: "#e2a744"
+  category-fruit: "#9f2f50"
+  category-fruit-dark: "#d86485"
+  category-floral: "#6f4a9b"
+  category-floral-dark: "#aa8cd0"
+  category-smoke: "#2c7089"
+  category-smoke-dark: "#76a5b5"
+  category-earthy: "#356b48"
+  category-earthy-dark: "#75a181"
+  category-sulfur: "#707a16"
+  category-sulfur-dark: "#b3b65f"
+  category-sweet: "#c06092"
+  category-sweet-dark: "#e6a0c0"
+  category-spice: "#bd4822"
+  category-spice-dark: "#df7b58"
+  category-wood: "#5c4437"
+  category-wood-dark: "#9a7660"
 typography:
   page-title:
     fontFamily: Hanken Grotesk
@@ -222,8 +240,27 @@ not keep separate theme state. Storybook can switch schemes for review.
 | `hairline`        | 11% ink    | 11% ink    | Dividers in repeated content     |
 | `sectionRule`     | 16% ink    | 16% ink    | Page and footer boundaries       |
 
-Use one warm accent. Do not add a second accent or use red and green as
-sentiment poles.
+Use one warm color for links, ratings, and main actions. Do not add another
+action color or use red and green to mean bad and good.
+
+Each tasting-note category has its own color. Use these colors only to connect
+the same category across saved tags and flavor charts. Use them on complete tag
+borders, the inner edge of the tasting wheel, and filled chart slices. Do not
+use them for links, buttons, ratings, feedback, page decoration, or tag
+backgrounds. If a saved note has no known category, use the usual neutral tag
+border.
+
+| Tasting category | Light     | Dark      |
+| ---------------- | --------- | --------- |
+| Cereal           | `#AD6F0B` | `#E2A744` |
+| Fruit            | `#9F2F50` | `#D86485` |
+| Floral           | `#6F4A9B` | `#AA8CD0` |
+| Smoke            | `#2C7089` | `#76A5B5` |
+| Earthy           | `#356B48` | `#75A181` |
+| Sulfur           | `#707A16` | `#B3B65F` |
+| Sweet            | `#C06092` | `#E6A0C0` |
+| Spice            | `#BD4822` | `#DF7B58` |
+| Wood             | `#5C4437` | `#9A7660` |
 
 ## Typography
 

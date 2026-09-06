@@ -47,6 +47,7 @@ const meta = {
     rating: { kind: "tasting", ratingBand: photoTasting.ratingBand },
     servingStyle: photoTasting.servingStyle,
     tags: photoTasting.tags,
+    tagCategories: photoTasting.tagCategories,
   },
   argTypes: {
     footer: { control: false },
@@ -70,5 +71,6 @@ export const WithoutNotes: Story = {
     notes: null,
     servingStyle: undefined,
     tags: [],
+    tagCategories: {},
   },
 };

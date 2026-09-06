@@ -9,6 +9,7 @@ import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { useState, type ReactNode } from "react";
 
+import { tastingCategoryFillStyles } from "../features/tastingWheel/tastingCategoryStyles.stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 
@@ -148,7 +149,9 @@ export function FlavorWheel({
                     {item.count > 0 ? (
                       <path
                         d={segment(radius, start, end)}
-                        {...stylex.props(styles.fill)}
+                        {...stylex.props(
+                          tastingCategoryFillStyles[item.category],
+                        )}
                       />
                     ) : null}
                     <path
@@ -221,19 +224,21 @@ const styles = stylex.create({
     height: "auto",
     overflow: "visible",
   },
-  segment: { cursor: "pointer", outline: "none" },
+  segment: {
+    cursor: "pointer",
+    outline: "none",
+    opacity: { default: 1, ":hover": 0.82, ":active": 0.68 },
+    transitionProperty: "opacity",
+    transitionDuration: {
+      default: "200ms",
+      "@media (prefers-reduced-motion: reduce)": "0ms",
+    },
+  },
   track: {
     fill: {
       default: colors.inset,
       ":hover": colors.sunken,
       ":active": colors.surface,
-    },
-  },
-  fill: {
-    fill: {
-      default: colors.accent,
-      ":hover": colors.accentDeep,
-      ":active": colors.ink,
     },
   },
   selection: {

@@ -5,6 +5,7 @@ import { foundationStyles } from "@peated/web/styles/foundations.stylex";
 import { Button } from "@peated/web/components";
 import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { textLinkStyles } from "@peated/web/components/textLinkStyles.stylex";
+import { tastingCategoryFillStyles } from "@peated/web/features/tastingWheel/tastingCategoryStyles.stylex";
 import { WHEEL_CATEGORIES } from "@peated/web/features/tastingWheel/tastingWheelData";
 import { useTastingWheel } from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 import * as stylex from "@stylexjs/stylex";
@@ -137,6 +138,18 @@ function TastingWheelGraphic() {
                       selection?.category === category.key &&
                         !selection.note &&
                         styles.selectedSegment,
+                    )}
+                  />
+                  <path
+                    d={ringSegment(
+                      HUB_RADIUS,
+                      HUB_RADIUS + 8,
+                      startAngle + 0.6,
+                      endAngle - 0.6,
+                    )}
+                    {...stylex.props(
+                      styles.categoryBand,
+                      tastingCategoryFillStyles[category.key],
                     )}
                   />
                   <text
@@ -315,12 +328,11 @@ const styles = stylex.create({
     stroke: colors.ground,
     strokeWidth: 2,
   },
-  selectedSegment: { fill: colors.accentTint, stroke: colors.accent },
+  selectedSegment: { stroke: colors.ink, strokeWidth: 3 },
+  categoryBand: { pointerEvents: "none" },
   segmentSurface: { fill: colors.surface },
   segmentInset: { fill: colors.inset },
   segmentSunken: { fill: colors.sunken },
-  segmentAccentTint: { fill: colors.accentTint },
-  segmentAccent: { fill: colors.dataAccent },
   outerSegment: {
     stroke: colors.ground,
     strokeWidth: 1.5,
@@ -328,8 +340,6 @@ const styles = stylex.create({
   outerSurface: { fill: colors.surface },
   outerInset: { fill: colors.inset },
   outerSunken: { fill: colors.sunken },
-  outerAccentTint: { fill: colors.accentTint },
-  outerAccent: { fill: colors.dataAccent },
   categoryLabel: {
     fill: colors.ink,
     fontFamily: fonts.display,
@@ -382,8 +392,8 @@ const SEGMENT_STYLES = [
   styles.segmentSurface,
   styles.segmentInset,
   styles.segmentSunken,
-  styles.segmentAccentTint,
-  styles.segmentAccent,
+  styles.segmentSurface,
+  styles.segmentInset,
   styles.segmentSunken,
 ] as const;
 const OUTER_SEGMENT_STYLES = [
@@ -393,7 +403,7 @@ const OUTER_SEGMENT_STYLES = [
   styles.outerSurface,
   styles.outerInset,
   styles.outerSunken,
-  styles.outerAccentTint,
-  styles.outerAccent,
+  styles.outerSurface,
+  styles.outerInset,
   styles.outerSunken,
 ] as const;

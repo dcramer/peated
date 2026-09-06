@@ -5,12 +5,17 @@ import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /tastings/:tasting", () => {
   test("get tasting by id", async ({ fixtures }) => {
-    const tasting = await fixtures.Tasting();
+    await fixtures.Tag({ name: "peat", tagCategory: "smoke" });
+    const tasting = await fixtures.Tasting({
+      tags: ["peat", "unknown note"],
+    });
 
     const data = await routerClient.tastings.details({
       tasting: tasting.id,
     });
     expect(data.id).toEqual(tasting.id);
+    expect(data.tags).toEqual(["peat", "unknown note"]);
+    expect(data.tagCategories).toEqual({ peat: "smoke" });
   });
 
   test("errors on invalid tasting", async () => {
