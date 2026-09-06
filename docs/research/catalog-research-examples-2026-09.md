@@ -874,8 +874,39 @@ completion record.
   its total outturn remains unknown. A later exact
   [Spink catalog](https://storage.spink.com/source/Auto_Catalogue/SFW64.pdf?v=1)
   adds 1997 sherry butt `BV70004`, bottled in 2010 at 62% for In Anticipation of
-  the Dawn of a New Whisky Era. A vintage-by-vintage 1993 pass adds 17 more
-  candidates supported by exact auction records or readable bottle photos:
+  the Dawn of a New Whisky Era. A complete reconciliation against the 1994
+  specialist index adds 13 more evidence-backed Owner's Casks: `4G3003`,
+  `4M60241`, `4P70150`, `4Q70188`, `4Q70190`, `4Q70192`, `4R70045`,
+  `4R70050`, `4R70054`, `4R70109`, `4R70414`, `4S70035`, and `4S70039`.
+  Exact sources include
+  [Whisky.Auction for `4G3003`](https://whisky.auction/auctions/lot/158028/suntory-yamazaki-1994-the-owner-s-cask),
+  [Sotheby's catalog data for `4M60241`](https://www.lotsearch.net/auction-catalogues/distilled-a-single-collection-featuring-rare-macallan-suntor-y-147952?order=ASC&orderBy=lot-startPrice&page=1&perPage=50&view=table),
+  [Fine Spirits Auction for `4P70150`](https://www.finespirits.auction/uk/spirit-prices/185601------Bottle-Honshu-Osaka-Yamazaki-1994-Of.-The-Owners-Cask-Hogshead-n4P70150-One-of-161-bottled-2007-Suntory-Single-Brown.jsp),
+  [Poly for `4Q70188`](https://cdn.polyauction.com.hk/public-default/auction/sale/xiang-gang-bao-li-2019nian-chun-pai-zhen-xi-wei-shi-ji-ji-gan-yi-shuang_6034f161-930e-4533-b674-b59104604017.pdf),
+  [Whiskyfun for `4Q70190`](https://www.whiskyfun.com/2014/Wandering-throughout-Japan.html),
+  [Ravenel for `4Q70192`](https://ravenel.com/en/cata/lotsIn/88ec9d6b-b5aa-4450-ac52-3b8038529941),
+  [Spink for `4R70045`](https://www.spink.com/lot/SFW29000194),
+  [Whisky.Auction for `4R70050`](https://whisky.auction/auctions/lot/14915/suntory-yamazaki-1994-the-owner-s-cask),
+  [Spiritory for `4R70054`](https://spiritory.com/yamazaki-13-years-old-1994-the-owners-cask-nr4r70054-54207),
+  [Whiskyfun for `4R70109`](https://www.whiskyfun.com/2014/Three-Japanese-sherry-monsters.html),
+  [a contemporary `4R70414` tasting record](https://mypaper.m.pchome.com.tw/hertford/post/1322676774),
+  [Bonhams for `4S70035`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190517%20S-25188-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
+  and
+  [Whisky Auctioneer for `4S70039`](https://whiskyauctioneer.com/whisky-lot/7023297/yamazaki-1994-owners-cask-4s70039).
+  Two exact sources override misleading collector-family labels: Poly and
+  Whiskyfun both call `4Q70188` and `4Q70190` Owner's Casks. Exact Poly and
+  Whisky.Auction records also settle `4G3003` at 51%, not the 58% copied by
+  one collector index. Separately, exact or photographed label records place
+  puncheon [`4Q70191`](https://www.bonhams.com/auction/27039/whisky/?page=3),
+  Good Taste and Good Choice barrel
+  [`4M70123`](https://www.whiskybase.com/whiskies/whisky/274438/yamazaki-1994),
+  and celebration sherry butt
+  [`4R70416`](https://www.whiskybase.com/whiskies/whisky/191464/yamazaki-1994?language=en)
+  outside the Owner's Cask family as The Single Cask or Suntory Single Cask
+  Whisky. Collector-only `4D3004`, `4G3011`, `4R70016`, and `4S70038` remain
+  Owner's Cask leads. `4M70076` Pure Land also remains a lead because no exact
+  label or auction record has been found. A vintage-by-vintage 1993 pass adds
+  17 more candidates supported by exact auction records or readable bottle photos:
   `3F3080`, `3N70037`, `3N70044`, `3P70268`, `3P70269`, `3P70270`, `3P70274`,
   `3Q70282`, `3Q70348`, `3Q70352`, `3S65005`, `3X70002`, `3X70003`,
   `3X70004`, `3X70007`, `3X70009`, and `3K3036`. Exact
@@ -996,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 128 new Owner's Cask
+  one correction rather than a duplicate create. The 141 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1051,7 +1082,7 @@ completion record.
   [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2018/20181116%20S-24779-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
   shows the `樽出原酒` Taru-Dashi Genshu label, and establishes the distinct
   [Yokohama Port Opening 150th Anniversary](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1993-yokohama-port-150th-anniversary)
-  single barrel, distilled in 1993 and bottled in 2009 at 53%. All 40
+  single barrel, distilled in 1993 and bottled in 2009 at 53%. All 43
   evidence-backed non-Owner releases are staged for immediate production
   duplicate checks before any write.
 - The follow-up image review replaced two unattributed retailer-derived images
