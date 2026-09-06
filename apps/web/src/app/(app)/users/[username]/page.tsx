@@ -19,7 +19,7 @@ export default async function ProfileOverviewPage(props: {
   const queryClient = getQueryClient();
   const orpc = createTanstackQueryUtils(client);
   const [activityList, badgePage] = await Promise.all([
-    client.users.activity.list({ limit: 3, user: user.id }),
+    client.users.activity.list({ limit: 10, user: user.id }),
     client.users.badgeList({ cursor: 1, limit: 100, user: user.id }),
     queryClient.prefetchQuery(profileQueries.tastingStats(orpc, user.id)),
   ]);
