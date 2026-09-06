@@ -906,7 +906,37 @@ completion record.
   supplies `3S65005`'s Fresh & Woody edition and 160-bottle outturn. The
   collector-index entries `3N70042`, `3O70320`, `3P70186`, `3P70187`,
   `3Q70046`, and `3Q70300` remain leads until exact label or auction evidence
-  settles their stable family and facts. A focused 1992 pass
+  settles their stable family and facts. Earlier-vintage exact-source passes add
+  13 more Owner's Casks. For 1990, exact Sotheby's, Bonhams, Spink, Catawiki,
+  and review records establish sherry butts `OL3042`, `OS70389`, `OU70403`,
+  `OU70405`, and `OU70406`. The
+  [Whiskyfun `OL3042` review](https://www.whiskyfun.com/archivefebruary13-2.html),
+  [Sotheby's `OS70389` lot](https://www.sothebys.com/en/buy/auction/2023/finest-rarest-spirits/shan-qi-yamazaki-the-owners-cask-suntory-single),
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
+  [Spink `OU70405` catalog](https://storage.spink.com/source/Auto_Catalogue/SFW64.pdf?v=2),
+  and [Catawiki `OU70406` record](https://www.catawiki.com/en/l/106027564-yamazaki-1990-the-owner-s-cask-suntory-b-2005-700ml)
+  supply exact label facts; the Spink record establishes the Esprit edition and
+  442-bottle outturn. `OS70266` and `OS70301` remain index-only leads, while
+  `0U70178` and `O065404` have conflicting Owner's Cask and Suntory Single Cask
+  identities. For 1989, the
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190517%20S-25188-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
+  [Catawiki bottle record](https://www.catawiki.com/de/l/103338014-yamazaki-1989-owner-s-cask-no-9u70062-suntory-b-2007-700-ml),
+  [Bonhams S-25189 catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
+  and [Sotheby's `9W70482` lot](https://www.sothebys.com/en/buy/auction/2023/the-epicureans-atlas-the-encyclopaedic-cellar-extraordinary-whiskies/shan-qi-yamazaki-the-owners-cask-9w70482-60-0-abv)
+  establish `9U70061`, Dental Single Cask Club `9U70062`, `9U70063`, The Oyama
+  `9V70382`, and The Nigita 30th Anniversary `9W70482`. An
+  [auction catalog for `9U70063`](https://www.antiquekeeper.ca/largedocs/dongzheng/2016_572b401a142e9.pdf)
+  establishes its 2008 bottling and 62% strength. Exact and secondary
+  records conflict between 54% and 62% for `9U70062`, so its strength remains
+  unknown. `9V70315` and `9V70227` remain index-only leads; `9V70339` has a
+  conflicting Suntory Single Cask label. The
+  [Acker catalog](https://webdocs.ackerwines.com/203A_FINAL_WEB.pdf) establishes
+  1986 Mizunara butts `6G5014` and `6G5025`, the latter for ANA Hotel Tokyo's
+  20th Anniversary. It also corrects the transcribed cask `6V01032` to
+  `6V1032`; exact sources disagree on that release's intended recipient, so its
+  edition remains unknown. Finally, a
+  [Poly catalog](https://cdn.polyauction.com.hk/public-default/auction/sale/hkf1618-1_e2468927-2d0d-486f-854a-0fc907a753a5.pdf)
+  establishes 1984 hogshead `WF0001`, bottled in 2005 at 60%. A focused 1992 pass
   adds seven more Owner's Casks: Iwase Esta sherry butt
   [`2C3089`](https://www.sothebys.com/en/buy/auction/2020/distilled-a-single-collection-sale-featuring-rare-macallan-suntory-karuizawa-single-cask-whisky/shan-qi-yamazaki-the-owners-cask-2c3089-iwase-esta),
   hogshead
@@ -966,7 +996,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 115 new Owner's Cask
+  one correction rather than a duplicate create. The 128 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
