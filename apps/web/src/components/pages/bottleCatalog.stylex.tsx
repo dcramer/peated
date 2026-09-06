@@ -11,11 +11,15 @@ import {
   EmptyState,
   FacetGroup,
   FilterPanel,
+  FilterQuery,
   ListToolbar,
   type BottleListItem,
   type ListSortOption,
 } from "..";
+import { space } from "../../styles/tokens.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
+
+const NARROW = "@media (max-width: 759px)";
 
 export type BottleCatalogListProps = {
   emptyAction?: ReactNode;
@@ -28,6 +32,7 @@ export type BottleCatalogListProps = {
   page: number;
   pending?: boolean;
   previousHref?: string;
+  search?: ReactNode;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
   total?: number;
@@ -45,12 +50,14 @@ export function BottleCatalogList({
   page,
   pending = false,
   previousHref,
+  search,
   sort,
   sortOptions,
   total,
 }: BottleCatalogListProps) {
   return (
     <section aria-label="Bottle catalog" {...stylex.props(styles.catalog)}>
+      {search}
       <ListToolbar
         count={items.length}
         noun="bottle"
@@ -97,6 +104,26 @@ export function BottleCatalogList({
   );
 }
 
+/** Keeps bottle-name search primary on wide catalog layouts. */
+export function BottleCatalogSearch({
+  onSubmit,
+  query,
+}: {
+  onSubmit: (value: string) => void;
+  query: string;
+}) {
+  return (
+    <div {...stylex.props(styles.desktopSearch)}>
+      <FilterQuery
+        label="Find a bottle"
+        onSubmit={onSubmit}
+        placeholder="Name, brand, or release"
+        query={query}
+      />
+    </div>
+  );
+}
+
 export type BottleCatalogFilterOption = {
   label: string;
   value: string;
@@ -138,6 +165,7 @@ export function BottleCatalogFilters({
         placeholder: "Name, brand, or release",
         query,
       }}
+      queryVisibility="narrow"
     >
       <FacetGroup
         label="Category"
@@ -162,5 +190,11 @@ export function BottleCatalogLoading() {
 const styles = stylex.create({
   catalog: {
     minWidth: 0,
+  },
+  desktopSearch: {
+    marginBottom: space.x4,
+    [NARROW]: {
+      display: "none",
+    },
   },
 });

@@ -23,6 +23,7 @@ export type FilterPanelProps = {
   children: ReactNode;
   onClear?: () => void;
   query?: FilterQueryProps;
+  queryVisibility?: "all" | "narrow";
 };
 
 /** Keeps a page's filters visible on wide screens and disclosed on narrow ones. */
@@ -31,6 +32,7 @@ export function FilterPanel({
   children,
   onClear,
   query,
+  queryVisibility = "all",
 }: FilterPanelProps) {
   const contentId = useId();
   const [open, setOpen] = useState(false);
@@ -48,7 +50,13 @@ export function FilterPanel({
   return (
     <section aria-label={ariaLabel} {...stylex.props(styles.root)}>
       {query ? (
-        <FilterQueryForm filterToggle={toggle} {...query} />
+        queryVisibility === "narrow" ? (
+          <div {...stylex.props(styles.narrowQuery)}>
+            <FilterQueryForm filterToggle={toggle} {...query} />
+          </div>
+        ) : (
+          <FilterQueryForm filterToggle={toggle} {...query} />
+        )
       ) : (
         <button
           aria-controls={contentId}
@@ -65,7 +73,10 @@ export function FilterPanel({
         id={contentId}
         {...stylex.props(
           styles.content,
-          query && styles.contentAfterQuery,
+          query &&
+            (queryVisibility === "narrow"
+              ? styles.contentAfterNarrowQuery
+              : styles.contentAfterQuery),
           open && styles.contentOpen,
         )}
       >
@@ -281,6 +292,15 @@ const styles = stylex.create({
   },
   contentAfterQuery: {
     marginTop: space.x4,
+  },
+  contentAfterNarrowQuery: {
+    marginTop: { default: 0, [NARROW]: space.x4 },
+  },
+  narrowQuery: {
+    display: "none",
+    [NARROW]: {
+      display: "block",
+    },
   },
   contentOpen: {
     [NARROW]: {

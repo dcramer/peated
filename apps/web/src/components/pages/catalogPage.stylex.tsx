@@ -57,7 +57,7 @@ export function CatalogPageLoading({
   return (
     <CatalogPage
       action={action ? <span {...stylex.props(styles.loadingAction)} /> : null}
-      filters={<CatalogFiltersLoading />}
+      filters={<CatalogFiltersLoading query={variant === "bottle"} />}
       navigation={
         navigation ? (
           <div {...stylex.props(styles.loadingNavigation)}>
@@ -69,6 +69,12 @@ export function CatalogPageLoading({
       title={title}
     >
       <div {...stylex.props(styles.loadingResults)}>
+        {variant === "bottle" ? (
+          <div {...stylex.props(styles.loadingSearch)}>
+            <LoadingPlaceholder preset="metadata" />
+            <span {...stylex.props(styles.loadingSearchControl)} />
+          </div>
+        ) : null}
         <div {...stylex.props(styles.loadingToolbar)}>
           <LoadingPlaceholder preset="text" />
           <span {...stylex.props(styles.loadingSort)} />
@@ -83,7 +89,7 @@ export function CatalogPageLoading({
   );
 }
 
-function CatalogFiltersLoading() {
+function CatalogFiltersLoading({ query }: { query: boolean }) {
   return (
     <div
       aria-busy="true"
@@ -92,7 +98,7 @@ function CatalogFiltersLoading() {
       {...stylex.props(styles.loadingFilterPanel)}
     >
       <LoadingPlaceholder preset="metadata" />
-      <span {...stylex.props(styles.loadingFilterControl)} />
+      {query ? <span {...stylex.props(styles.loadingFilterControl)} /> : null}
       <div {...stylex.props(styles.loadingFacet)}>
         <LoadingPlaceholder delay={1} preset="metadata" />
         {([0, 1, 2, 3] as const).map((delay) => (
@@ -149,6 +155,21 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x4,
   },
+  loadingSearch: {
+    display: "flex",
+    flexDirection: "column",
+    gap: space.x2,
+    [NARROW]: {
+      display: "none",
+    },
+  },
+  loadingSearchControl: {
+    display: "block",
+    width: "min(100%, 520px)",
+    height: "34px",
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
   loadingAction: {
     width: "104px",
     height: "34px",
@@ -189,11 +210,14 @@ const styles = stylex.create({
     borderColor: colors.hairline,
   },
   loadingFilterControl: {
-    display: "block",
+    display: "none",
     width: "100%",
     height: "38px",
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
+    [NARROW]: {
+      display: "block",
+    },
   },
   loadingFacet: {
     display: "flex",
