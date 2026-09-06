@@ -5,8 +5,8 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  BottleRatingSummary,
   BottleRatings,
-  RatingSummary,
   ReviewScore,
   TastingRating,
 } from "./scoring.stylex";
@@ -29,8 +29,7 @@ describe("Ratings", () => {
   it("puts the exact review median before its rating name", () => {
     act(() =>
       root.render(
-        <RatingSummary
-          ariaLabel="Series rating"
+        <BottleRatingSummary
           externalScoreCount={2}
           memberScoreCount={3}
           median={91}
@@ -42,10 +41,10 @@ describe("Ratings", () => {
     expect(container.textContent).toContain("Outstanding");
     expect(container.textContent).toContain("91");
     expect(container.textContent ?? "").toMatch(/91.*Outstanding/);
-    expect(container.textContent).not.toContain("Series rating");
+    expect(container.textContent).not.toContain("Bottle rating");
     expect(container.textContent).not.toContain("Tastings");
-    expect(container.firstElementChild?.getAttribute("aria-label")).toBe(
-      "Series rating",
+    expect(container.querySelector("section")?.getAttribute("aria-label")).toBe(
+      "Bottle rating",
     );
     expect(container.querySelector('[role="img"]')).toBeNull();
   });

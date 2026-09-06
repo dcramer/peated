@@ -70,21 +70,6 @@ export const BottleSeriesDetailsSchema = BottleSeriesSchema.extend({
     .describe("Distilleries represented by active Bottles in this Series"),
 });
 
-export const BottleSeriesRatingSummarySchema = z.object({
-  medianScore: z.number().int().gte(0).lte(100).nullable().readonly(),
-  memberScoreCount: z.number().int().gte(0).readonly(),
-  externalScoreCount: z.number().int().gte(0).readonly(),
-  tastingBandCounts: z
-    .object({
-      mediocre: z.number().int().gte(0),
-      good: z.number().int().gte(0),
-      very_good: z.number().int().gte(0),
-      outstanding: z.number().int().gte(0),
-      unicorn: z.number().int().gte(0),
-    })
-    .readonly(),
-});
-
 export const BottleSeriesInputFields = {
   name: BottleSeriesNameSchema,
   description: BottleSeriesDescriptionSchema,

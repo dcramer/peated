@@ -1,8 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type { RatingSummaryProps } from "..";
-import { AppLink, RatingSummary } from "..";
+import type { BottleRatingSummaryProps } from "..";
+import { AppLink, BottleRatingSummary } from "..";
 import { colors, effects, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
@@ -15,7 +15,7 @@ export type BottlePageHeaderProps = {
   metadata?: ReactNode;
   menu?: ReactNode;
   name: string;
-  rating?: Omit<RatingSummaryProps, "ariaLabel"> | null;
+  rating?: BottleRatingSummaryProps | null;
 };
 
 /** Presents a bottle's catalog identity, member actions, and community ratings. */
@@ -56,7 +56,7 @@ export function BottlePageHeader({
       />
       {rating ? (
         <div {...stylex.props(styles.ratings)}>
-          <RatingSummary ariaLabel="Bottle rating" {...rating} />
+          <BottleRatingSummary {...rating} />
         </div>
       ) : null}
     </div>

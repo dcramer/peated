@@ -455,20 +455,6 @@ async function handleRpcRequest({ request, response, url }) {
         ],
       });
       return true;
-    case "bottleSeries/ratingSummary":
-      sendRpcResponse(response, {
-        medianScore: 91,
-        memberScoreCount: 3,
-        externalScoreCount: 2,
-        tastingBandCounts: {
-          mediocre: 0,
-          good: 1,
-          very_good: 2,
-          outstanding: 5,
-          unicorn: 2,
-        },
-      });
-      return true;
     case "bottleSeries/list":
       sendRpcResponse(response, {
         ...emptyList,

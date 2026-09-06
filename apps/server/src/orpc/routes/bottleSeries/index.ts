@@ -5,7 +5,6 @@ import details from "./details";
 import flavorProfile from "./flavor-profile";
 import list from "./list";
 import merge from "./merge";
-import ratingSummary from "./rating-summary";
 import update from "./update";
 
 export default base.tag("bottleSeries").router({
@@ -15,6 +14,5 @@ export default base.tag("bottleSeries").router({
   create,
   update,
   merge,
-  ratingSummary,
   delete: delete_,
 });

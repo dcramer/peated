@@ -188,10 +188,6 @@ breakdown with the review and tasting lists. Compact bottle rows add
 `reviewScoreBandCounts` and `tastingBandCounts` by band for their distribution.
 Individual external reviews still show their original score and scale.
 
-Series pages derive the same short rating summary at read time from reviews and
-tasting ratings assigned to active Bottles in that Series. The review median is
-calculated from the individual included scores, not from Bottle medians.
-
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
 active members. They exclude retired Bottles.
 

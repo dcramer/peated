@@ -129,12 +129,10 @@ export function ReviewScore({
   );
 }
 
-export type RatingSummaryProps = {
-  /** Accessible name for the summary. */
-  ariaLabel: string;
-  /** Critic review scores included in the summary. */
+export type BottleRatingSummaryProps = {
+  /** Critic review scores included in the bottle score. */
   externalScoreCount?: number;
-  /** Member review scores included in the summary. */
+  /** Member review scores included in the bottle score. */
   memberScoreCount?: number;
   /** Median of the included member and critic review scores. */
   median?: number | null;
@@ -143,16 +141,15 @@ export type RatingSummaryProps = {
 };
 
 /**
- * Shows one catalog rating as an exact review score or tasting range with its
+ * Shows one bottle rating as an exact review score or tasting range with its
  * matching name.
  */
-export function RatingSummary({
-  ariaLabel,
+export function BottleRatingSummary({
   externalScoreCount = 0,
   memberScoreCount = 0,
   median = null,
   tastingCounts = {},
-}: RatingSummaryProps) {
+}: BottleRatingSummaryProps) {
   const rating = getBottleRating({
     median,
     scoreCount: memberScoreCount + externalScoreCount,
@@ -161,7 +158,7 @@ export function RatingSummary({
   if (!rating) return null;
 
   return (
-    <div aria-label={ariaLabel}>
+    <section aria-label="Bottle rating">
       <div {...stylex.props(styles.summaryHeadline)}>
         <span {...stylex.props(styles.summaryValueGroup)}>
           <strong {...stylex.props(styles.summaryValue)}>{rating.value}</strong>
@@ -175,12 +172,12 @@ export function RatingSummary({
         </span>
         <strong {...stylex.props(styles.summaryLabel)}>{rating.label}</strong>
       </div>
-    </div>
+    </section>
   );
 }
 
 export type BottleRatingsProps = Pick<
-  RatingSummaryProps,
+  BottleRatingSummaryProps,
   "median" | "tastingCounts"
 > & {
   /** Included review scores grouped into the five rating ranges. */

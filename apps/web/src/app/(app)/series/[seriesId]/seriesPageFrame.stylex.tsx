@@ -3,7 +3,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import * as stylex from "@stylexjs/stylex";
-import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
@@ -13,8 +12,6 @@ import {
   LoadingList,
   LoadingPlaceholder,
   RailList,
-  RatingSummary,
-  SectionError,
   TextLink,
 } from "@peated/web/components";
 import Markdown from "@peated/web/components/markdown";
@@ -24,7 +21,6 @@ import {
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { RailListSection } from "@peated/web/components/pages/railListSection.stylex";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
-import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
@@ -73,7 +69,6 @@ export function SeriesPageFrame({
           rail={
             initialSeries.numReleases > 0 ? (
               <>
-                <SeriesRatingSection seriesId={initialSeries.id} />
                 <FlavorProfileSection
                   showHeading={false}
                   scope={{ kind: "series", series: initialSeries.id }}
@@ -90,48 +85,6 @@ export function SeriesPageFrame({
         </PageColumns>
       </div>
     </SeriesPageFrameContext.Provider>
-  );
-}
-
-function SeriesRatingSection({ seriesId }: { seriesId: number }) {
-  const orpc = useORPC();
-  const query = useQuery(
-    orpc.bottleSeries.ratingSummary.queryOptions({
-      input: { series: seriesId },
-    }),
-  );
-  const rating = query.data;
-  const hasRating =
-    rating &&
-    (rating.memberScoreCount > 0 ||
-      rating.externalScoreCount > 0 ||
-      Object.values(rating.tastingBandCounts).some((count) => count > 0));
-
-  if (query.isSuccess && !hasRating) return null;
-
-  return (
-    <section aria-label="Rating">
-      {query.isPending ? (
-        <div role="status" aria-label="Loading Series rating">
-          <LoadingPlaceholder preset="text" />
-        </div>
-      ) : query.isError ? (
-        <SectionError
-          heading="Could not load rating"
-          onRetry={() => void query.refetch()}
-        >
-          Try loading the Series rating again.
-        </SectionError>
-      ) : rating ? (
-        <RatingSummary
-          ariaLabel="Series rating"
-          externalScoreCount={rating.externalScoreCount}
-          memberScoreCount={rating.memberScoreCount}
-          median={rating.medianScore}
-          tastingCounts={rating.tastingBandCounts}
-        />
-      ) : null}
-    </section>
   );
 }
 
