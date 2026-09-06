@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 141 new Owner's Cask
+  one correction rather than a duplicate create. The 153 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1085,6 +1085,36 @@ completion record.
   single barrel, distilled in 1993 and bottled in 2009 at 53%. All 43
   evidence-backed non-Owner releases are staged for immediate production
   duplicate checks before any write.
+- A cask-by-cask 1995 reconciliation adds 12 more evidence-backed Owner's Casks:
+  hogshead
+  [`5G3025`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1995-owners-cask-5g3025),
+  `5G3087`, `5P70135`, `5P70140`, `5P70141`, `5P70142`, `5R70273`,
+  `5R70324`, and `5R70326`; barrel `5Q3015`; puncheon `5R70190`; and
+  sherry butt `5V70024`. Exact examples include the contemporary
+  [Whiskyfun Japanese index](https://www.whiskyfun.com/Japanese-whisky.html),
+  the photographed
+  [Youme Town 50th Anniversary `5R70273`](https://www.whiskybase.com/whiskies/whisky/269637/yamazaki-1995),
+  the exact
+  [Yokohama Port 150th Anniversary `5R70324`](https://ravenel.com/en/cata/lotsIn/fe071b92-d799-4c5f-b1db-1e6c0e977af7),
+  and the photographed
+  [`5R70326`](https://www.whiskybase.com/whiskies/whisky/55868/yamazaki-1995).
+  A contemporary bar menu independently identifies `5R70190` as an
+  [Owner's Cask white-oak puncheon](https://www.hotpepper.jp/strJ000749203/drink/).
+  The pass also prevents two family errors: the photographed label fields for
+  `5V70023` and `5P70144` read `Suntory Single Cask Whisky`, so both are staged
+  outside the Owner's Cask Series despite their collector-index grouping.
+  Exact auction records add the distinct 2015 Sanki Engineering 90th
+  Anniversary cask
+  [`5Q70067`](https://www.chuo-auction.com/zh/item?id=801103) and the
+  2009-bottled, 61% hogshead
+  [`5R70327`](https://onlineonly.christies.com/s/fine-rare-wines-spirits-online-rarities-cellar-british-writer/yamazaki-single-cask-whisky-1995-677/206668).
+  Casks
+  [`5R70255`](https://www.whiskylink.jp/?p=3746) and
+  [`5R70319`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1995-single-cask-5r70319)
+  are real 1995 releases, but remain leads because the available exact records
+  do not settle their producer-stable Bottle names. This raises the staged sets
+  to 153 new Owner's Casks and 47 evidence-backed non-Owner releases without
+  inventing names or copying bottling years into `releaseYear`.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
