@@ -348,6 +348,8 @@ function toLibraryItem(
         ]
       : undefined,
     id: String(entry.id),
+    // Library thumbnail rule: personal photos fill the frame; catalog art stays complete.
+    imageFit: entry.imageUrl ? "cover" : "contain",
     imageUrl: entry.imageUrl ?? bottle.imageUrl,
     status: entry.status ? capitalize(entry.status) : undefined,
   };
