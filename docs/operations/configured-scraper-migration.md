@@ -57,7 +57,7 @@ requests to the publisher or AI service. The checks live in
    records the authenticated admin as its creator. Repeating this request returns
    a conflict without changing records again.
    Compare the records with step 2. Each review must keep its ID and facts. Its
-   key becomes the saved parser's key for its Bottle name and writer. Counts
+   key changes so the Bottle name and writer keep that review matched. Counts
    and related records must be unchanged. Save the response with the approval
    notes.
 
@@ -137,8 +137,9 @@ Use the preparation endpoint with `{"site": "wordsofwhisky"}`. The check-only
 request locks and verifies every stored article and review. It accepts only the
 publisher's canonical article URLs without a trailing slash, requires at least
 one review per article, and checks that each old key belongs to Words of Whisky.
-Applying replaces only those keys with the saved parser's Bottle name and writer
-keys, then adds a paused source whose list page is `https://wordsofwhisky.com/`.
+Applying changes only those keys so the Bottle name and writer keep each review
+matched, then adds a paused source whose list page is
+`https://wordsofwhisky.com/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
 visibility, scores, writers, publication settings, stored-body counts, and the
@@ -164,8 +165,8 @@ Use the preparation endpoint with `{"site": "whiskynotes"}`. The check-only
 request locks and verifies every stored article and review. It accepts only
 dated WhiskyNotes article URLs with their trailing slash, requires at least one
 review per article, and checks that each old key belongs to WhiskyNotes.
-Applying replaces only those keys with the saved parser's Bottle name and
-writer keys, then adds a paused source whose list page is
+Applying changes only those keys so the Bottle name and writer keep each review
+matched, then adds a paused source whose list page is
 `https://www.whiskynotes.be/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
