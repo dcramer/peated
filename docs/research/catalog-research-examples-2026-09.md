@@ -821,7 +821,15 @@ completion record.
   [`ZS70061`](https://www.sothebys.com/en/buy/auction/2024/finest-and-rarest-spirits-7/shan-qi-yamazaki-the-owners-cask-zs70061-61-0-abv),
   1995 sherry butt `5W70010`, 1998 hogshead `CM60086`, 1999 Bota Corta
   `DV70208`, and 2000 sherry butt `ES60044`. The label establishes digit-one
-  `1V70013`; catalog OCR often renders it as `IV70013`. All 52 candidate Owner's
+  `1V70013`; catalog OCR often renders it as `IV70013`. A later
+  [Bonhams catalog](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-10%2F16%2FS-28697-0-2.pdf)
+  adds 1986 Mizunara butt `6B0018`, 1992 hogshead `ZQ70670`, 1994 sherry butt
+  `4R70051`, 1995 hogshead `5P70205`, and 1995 puncheon `5P70008`. Exact
+  Whisky Auctioneer and Sotheby's lots also establish 1995 hogsheads
+  [`5P70139`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1995-owners-cask-5p70139-tsmwta)
+  and
+  [`5P70206`](https://www.sothebys.com/en/buy/auction/2020/distilled-whisky-moutai/shan-qi-yamazaki-the-owners-cask-suntory-single).
+  All 59 candidate Owner's
   Cask records remain unwritten because that durable bulk write requires
   explicit approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
