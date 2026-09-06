@@ -880,10 +880,30 @@ completion record.
   [`3P70274`](https://sakedori.com/?p=294488). Collector-only `3N70041` and
   `3Q70038` remain leads. `3X70003` also remains unresolved because an exact
   Poly catalog calls it The Owner's Cask while Whisky Auctioneer's exact lot
-  calls it Single Cask; a label inspection is still needed. All 94 candidate
-  Owner's Cask records remain unwritten because that durable bulk write
-  requires explicit approval. Empty destination Series `S0676` has been
-  created.
+  calls it Single Cask; a label inspection is still needed. A focused 1992 pass
+  adds seven more Owner's Casks: Iwase Esta sherry butt
+  [`2C3089`](https://www.sothebys.com/en/buy/auction/2020/distilled-a-single-collection-sale-featuring-rare-macallan-suntory-karuizawa-single-cask-whisky/shan-qi-yamazaki-the-owners-cask-2c3089-iwase-esta),
+  hogshead
+  [`2O70246`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1992-owners-cask-2070246),
+  sherry butt [`2L3002`](https://www.whiskyfun.com/archivefebruary13-2.html),
+  barrel
+  [`2Q70230`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1992-single-cask-2q70230),
+  T. Nigita barrel
+  [`2Q70394`](https://www.whiskyfun.com/Japanese-whisky.html), 100th Tohru
+  Takigawa hogshead
+  [`2Q70675`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160518%20S-23344-0-1%20Fine%20%26%20Rare%20Wine%2C%20Cognac%20and%20Whisky%20%5B168%5D.pdf),
+  and hogshead
+  [`ZQ70658`](https://cdn.polyauction.com.hk/public-default/auction/sale/hkf1618-1_e2468927-2d0d-486f-854a-0fc907a753a5.pdf).
+  Exact Sotheby's, Whisky Auctioneer, Whiskyfun, Bonhams, and Poly records
+  support the staged identity and facts. The Poly record does not state
+  `ZQ70658`'s strength, so it remains unknown. An exact
+  [Whisky Auctioneer record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1992-owners-cask-0)
+  also fills `2S70058`'s previously unknown Sherry Butt maturation and
+  480-bottle outturn. Several auction indexes render `ZS70061` as `2S70061`,
+  but the photographed label and multiple catalog descriptions establish
+  `ZS70061`; only the existing staged release is kept. The 101 candidate
+  Owner's Cask records remain unwritten because that durable bulk write requires
+  explicit approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
   creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
   2016 25-year-old Limited Edition is a presentation variant of the core whisky;
