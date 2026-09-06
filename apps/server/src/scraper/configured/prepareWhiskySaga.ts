@@ -14,7 +14,8 @@ export async function prepareWhiskySagaSource(input: PrepareReviewSourceInput) {
     listUrl: "https://www.whiskysaga.com/blog/category/Scotland",
     isCanonicalArticleUrl: (url) =>
       /^https:\/\/www\.whiskysaga\.com\/blog\/[a-z0-9][a-z0-9-]*$/.test(url),
-    expectedReviewKey: ({ articleUrl }) =>
+    oldReviewKeyIsValid: ({ articleUrl, sourceKey }) =>
+      sourceKey ===
       `whiskysaga:${createHash("sha256").update(articleUrl).digest("hex")}`,
   });
 }

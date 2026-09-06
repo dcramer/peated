@@ -18,7 +18,8 @@ export async function prepareWhiskyStudySource(
       /^https:\/\/thewhiskystudy\.com\/reviews-3\/[a-z0-9][a-z0-9-]*$/.test(
         url,
       ),
-    expectedReviewKey: ({ articleUrl }) =>
+    oldReviewKeyIsValid: ({ articleUrl, sourceKey }) =>
+      sourceKey ===
       `whiskystudy:${createHash("sha256").update(articleUrl).digest("hex")}`,
   });
 }

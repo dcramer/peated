@@ -57,8 +57,9 @@ requests to the publisher or AI service. The checks live in
    records the authenticated admin as its creator. Repeating this request returns
    a conflict without changing records again.
    Compare the records with step 2. Each review must keep its ID and facts. Its
-   key becomes its article URL followed by `#review-1`. Counts and related
-   records must be unchanged. Save the response with the approval notes.
+   key becomes the saved parser's key for its Bottle name and writer. Counts
+   and related records must be unchanged. Save the response with the approval
+   notes.
 
 6. Request suggested rules with
    `POST /v1/admin/scrape-sources/{id}/suggest`, using the returned source ID.
@@ -136,9 +137,9 @@ Use the preparation endpoint with `{"site": "wordsofwhisky"}`. The check-only
 request locks and verifies every stored article and review. It accepts only the
 publisher's canonical article URLs without a trailing slash, requires at least
 one review per article, and verifies each old review key from its stored article
-URL, Bottle name, and writer. Applying changes only those keys to the URL and
-review number used by saved rules, then adds a paused source whose list page is
-`https://wordsofwhisky.com/`.
+URL, Bottle name, and writer. Applying replaces only those keys with the saved
+parser's Bottle name and writer keys, then adds a paused source whose list page
+is `https://wordsofwhisky.com/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,
 visibility, scores, writers, publication settings, stored-body counts, and the
@@ -164,8 +165,8 @@ Use the preparation endpoint with `{"site": "whiskynotes"}`. The check-only
 request locks and verifies every stored article and review. It accepts only
 dated WhiskyNotes article URLs with their trailing slash, requires at least one
 review per article, and checks each old review key against the article URL and
-Bottle name. Applying changes only those keys to the URL and review number used
-by saved rules, then adds a paused source whose list page is
+Bottle name. Applying replaces only those keys with the saved parser's Bottle
+name and writer keys, then adds a paused source whose list page is
 `https://www.whiskynotes.be/`.
 
 Before applying, save article URLs, review IDs and order, Bottle matches,

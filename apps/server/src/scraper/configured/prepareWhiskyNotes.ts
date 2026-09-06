@@ -21,11 +21,11 @@ export async function prepareWhiskyNotesSource(
     allowsMultipleReviews: true,
     isCanonicalArticleUrl: (url) =>
       /^https:\/\/www\.whiskynotes\.be\/\d{4}\/[^/]+\/[^/]+\/$/.test(url),
-    expectedReviewKey: ({ articleUrl, name }) => {
+    oldReviewKeyIsValid: ({ articleUrl, name, sourceKey }) => {
       const digest = createHash("sha256")
         .update(`${articleUrl}\n${normalizeKeyPart(name)}`)
         .digest("hex");
-      return `whiskynotes:${digest}`;
+      return sourceKey === `whiskynotes:${digest}`;
     },
   });
 }

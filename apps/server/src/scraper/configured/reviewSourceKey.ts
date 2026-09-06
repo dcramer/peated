@@ -4,7 +4,7 @@ function normalizeReviewKeyPart(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLocaleLowerCase("en");
 }
 
-/** Keeps a review's identity stable when other reviews move on the page. */
+/** Saved-review identity rule: names and writers, not page order, own the key. */
 export function reviewSourceKey(
   name: string,
   reviewerName: string | null,

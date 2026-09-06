@@ -21,7 +21,7 @@ export async function prepareWordsOfWhiskySource(
     allowsMultipleReviews: true,
     isCanonicalArticleUrl: (url) =>
       /^https:\/\/wordsofwhisky\.com\/[a-z0-9][a-z0-9-]*$/.test(url),
-    expectedReviewKey: ({ articleUrl, name, reviewerName }) => {
+    oldReviewKeyIsValid: ({ articleUrl, name, reviewerName, sourceKey }) => {
       const digest = createHash("sha256")
         .update(
           [articleUrl, name, reviewerName ?? ""]
@@ -29,7 +29,7 @@ export async function prepareWordsOfWhiskySource(
             .join("\n"),
         )
         .digest("hex");
-      return `wordsofwhisky:${digest}`;
+      return sourceKey === `wordsofwhisky:${digest}`;
     },
   });
 }
