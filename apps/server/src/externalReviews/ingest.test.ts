@@ -298,7 +298,7 @@ test.for<[string, string[]]>([
     "Nose: VANILLA, ripe apples and cinnamon. Finish: vanilla.",
     ["apple", "cinnamon", "vanilla"],
   ],
-  ["Palate: pineapple and sweet fruit.", []],
+  ["Palate: pineapple and sweet fruit.", ["fruit"]],
   [
     "Palate: dark-chocolate and orange peel.",
     ["dark chocolate", "orange peel"],
@@ -325,6 +325,10 @@ test.for<[string, string[]]>([
   ["Finish: vanilla taffy.", ["saltwater taffy", "vanilla"]],
   ["Palate: creme brulee and candyfloss.", ["cotton candy", "crème brûlée"]],
   ["Nose: no dill pickle, but spearmint remains.", ["spearmint"]],
+  ["Nose: wood varnish, camphor and fir resin.", ["camphor", "fir", "varnish"]],
+  ["Finish: coastal, saline and peppery.", ["black pepper", "salt", "sea air"]],
+  ["Palate: seawater.", ["salt"]],
+  ["Palate: fruits, waxiness and bitterness.", ["bitter", "fruit", "wax"]],
 ])(
   "extracts review tags from %s",
   async ([reviewText, expected], { fixtures }) => {
@@ -351,6 +355,24 @@ test.for<[string, string[]]>([
         { name: "cotton candy", synonyms: ["candy floss", "candyfloss"] },
         { name: "dill pickle", synonyms: ["dill pickles"] },
         { name: "spearmint" },
+        { name: "varnish", synonyms: ["varnished wood", "wood varnish"] },
+        { name: "camphor", synonyms: ["camphorous"] },
+        { name: "fir", synonyms: ["fir bud", "fir buds", "fir resin"] },
+        { name: "black pepper", synonyms: ["peppery"] },
+        {
+          name: "salt",
+          synonyms: [
+            "saline",
+            "salinity",
+            "saltiness",
+            "sea water",
+            "seawater",
+          ],
+        },
+        { name: "sea air", synonyms: ["coastal", "maritime"] },
+        { name: "bitter", synonyms: ["bitterness"] },
+        { name: "fruit", synonyms: ["fruitiness", "fruits"] },
+        { name: "wax", synonyms: ["waxiness"] },
       ].map((tag) => ({ ...tag, tagCategory: "sweet" as const })),
     );
     const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
