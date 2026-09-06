@@ -7,7 +7,7 @@ import { PageTabs } from "../..";
 const destinations = [
   { href: "/admin/moderation/inbox", label: "Inbox" },
   { href: "/admin/moderation/history", label: "History" },
-  { href: "/admin/moderation/automation", label: "Automation" },
+  { href: "/admin/moderation/automation", label: "Background work" },
 ] as const;
 
 export default function ModerationNav() {

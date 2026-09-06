@@ -171,7 +171,7 @@ export function createModerationAutomationProcedure(
           ...failedOperations.map((operation) => ({
             key: `operation:${operation.id}`,
             kind: "operation" as const,
-            title: `Catalog operation #${operation.id}`,
+            title: `Catalog change #${operation.id}`,
             status: operation.status,
             detail: operation.error,
             href: "/admin/moderation/automation",
@@ -180,7 +180,7 @@ export function createModerationAutomationProcedure(
           ...failedRetries.map((run) => ({
             key: `retry_run:${run.id}`,
             kind: "retry_run" as const,
-            title: `Listing retry run #${run.id}`,
+            title: `Price retry #${run.id}`,
             status: run.status,
             detail: run.error,
             href: `/admin/moderation/automation?run=${run.id}`,
@@ -192,7 +192,7 @@ export function createModerationAutomationProcedure(
           kind: "retry_run" as const,
           title: run.query || "All matching listings",
           status: run.status,
-          detail: `${run.processedCount} of ${run.matchedCount} processed`,
+          detail: `${run.processedCount} of ${run.matchedCount} checked`,
           href: `/admin/moderation/automation?run=${run.id}`,
           occurredAt: run.createdAt.toISOString(),
         })),

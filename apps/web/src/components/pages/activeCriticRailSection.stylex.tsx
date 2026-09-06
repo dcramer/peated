@@ -1,4 +1,9 @@
-import { Avatar, RailList, RailListItem } from "@peated/web/components";
+import {
+  Avatar,
+  RailList,
+  RailListItem,
+  Timestamp,
+} from "@peated/web/components";
 
 import { RailListSection } from "./railListSection.stylex";
 
@@ -27,7 +32,7 @@ export function ActiveCriticRailSection({
       <RailList ariaLabel="Active critics">
         {items.slice(0, 5).map((item) => (
           <RailListItem
-            end={formatPublishedAt(item.publishedAt)}
+            end={<Timestamp date={item.publishedAt} format="monthDay" />}
             href={item.href}
             key={item.type}
             leading={
@@ -54,12 +59,4 @@ function getInitials(name: string) {
         .map((part) => part[0]?.toUpperCase())
         .join("")
     : name.slice(0, 2).toUpperCase();
-}
-
-function formatPublishedAt(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  }).format(new Date(value));
 }

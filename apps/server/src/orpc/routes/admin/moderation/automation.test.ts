@@ -92,10 +92,12 @@ describe("admin moderation automation", () => {
         expect.objectContaining({
           key: `operation:${operation!.id}`,
           status: "failed",
+          title: `Catalog change #${operation!.id}`,
         }),
         expect.objectContaining({
           key: `retry_run:${run!.id}`,
           status: "failed",
+          title: `Price retry #${run!.id}`,
         }),
       ]),
     );

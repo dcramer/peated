@@ -5,6 +5,7 @@ import { colors, space } from "../styles/tokens.stylex";
 import { Avatar } from "./avatar.stylex";
 import { ReviewScore } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
+import { Timestamp } from "./timestamp";
 
 export type CriticReviewProps = {
   href?: string;
@@ -36,7 +37,7 @@ export function CriticReview({
           {publishedAt ? (
             <>
               <span aria-hidden="true"> · </span>
-              <span>{publishedAt}</span>
+              <Timestamp date={publishedAt} format="date" />
             </>
           ) : null}
         </div>

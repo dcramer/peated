@@ -1,57 +1,51 @@
 import { db } from "@peated/server/db";
 import {
+  actors,
   externalSiteRuns,
   externalSites,
+  incomingBottleDecisionLogs,
   scrapeSourceRuns,
 } from "@peated/server/db/schema";
+import { PEATED_SYSTEM_ACTOR_KEY } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import type {
-  AdminScraperActivityCountsSchema,
-  AdminScraperRecordTypeSchema,
+  AdminScraperHealthCountsSchema,
+  AdminScraperSavedCountsSchema,
 } from "@peated/server/schemas";
 import { AdminScraperActivitySchema } from "@peated/server/schemas";
-import { desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 const DAYS = 30;
-const RECORD_TYPES = [
-  "review",
-  "price",
-  "catalog",
-  "bottle",
-  "untracked",
-] as const;
 
-type ActivityCounts = z.infer<typeof AdminScraperActivityCountsSchema>;
-type RecordType = z.infer<typeof AdminScraperRecordTypeSchema>;
+type HealthCounts = z.infer<typeof AdminScraperHealthCountsSchema>;
+type SavedCounts = z.infer<typeof AdminScraperSavedCountsSchema>;
+type SavedKind = "reviews" | "prices" | "bottles";
+type DayCounts = HealthCounts & Record<SavedKind, number>;
 
-function emptyCounts(): ActivityCounts {
+function emptyHealthCounts(): HealthCounts {
   return {
     requests: 0,
     requestErrors: 0,
     requestErrorsComplete: true,
     runs: 0,
     failedRuns: 0,
-    records: 0,
-    newRecords: 0,
-    existingRecords: 0,
-    untrackedRecords: 0,
   };
+}
+
+function emptySavedCounts(): SavedCounts {
+  return { total: 0, new: 0, existing: 0 };
 }
 
 function dayKey(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
-function addRun(
-  counts: ActivityCounts,
+function addRunHealth(
+  counts: HealthCounts,
   run: typeof externalSiteRuns.$inferSelect,
 ) {
-  const untrackedRecords = Math.max(
-    0,
-    run.emittedItemCount - run.newItemCount - run.existingItemCount,
-  );
   counts.requests += run.requestCount;
   counts.requestErrors += run.requestErrorCount ?? 0;
   if (run.requestCount > 0 && run.requestErrorCount === null) {
@@ -59,10 +53,31 @@ function addRun(
   }
   counts.runs += 1;
   counts.failedRuns += run.status === "failed" ? 1 : 0;
-  counts.records += run.emittedItemCount;
-  counts.newRecords += run.newItemCount;
-  counts.existingRecords += run.existingItemCount;
-  counts.untrackedRecords += untrackedRecords;
+}
+
+function addSavedRun(
+  counts: SavedCounts,
+  run: typeof externalSiteRuns.$inferSelect,
+) {
+  counts.total += run.emittedItemCount;
+  counts.new += run.newItemCount;
+  counts.existing += run.existingItemCount;
+}
+
+function savedKindForRun(
+  recordType: typeof externalSiteRuns.$inferSelect.recordType,
+): SavedKind | null {
+  switch (recordType) {
+    case "review":
+      return "reviews";
+    case "price":
+      return "prices";
+    case "bottle":
+      return "bottles";
+    case "catalog":
+    case null:
+      return null;
+  }
 }
 
 export default procedure
@@ -72,7 +87,7 @@ export default procedure
     path: "/admin/scrapers/activity",
     summary: "Get scraper activity",
     description:
-      "Get daily scraper requests, runs, records, and recent failures for the admin homepage.",
+      "Get daily scraper requests, runs, reviews, prices, bottles, and recent failures for the admin homepage.",
     operationId: "getScraperActivity",
   })
   .output(AdminScraperActivitySchema)
@@ -82,59 +97,89 @@ export default procedure
     const firstDay = new Date(today);
     firstDay.setUTCDate(firstDay.getUTCDate() - (DAYS - 1));
 
-    const rows = await db
-      .select({
-        run: externalSiteRuns,
-        site: externalSites,
-        sourcePurpose: scrapeSourceRuns.purpose,
-      })
-      .from(externalSiteRuns)
-      .innerJoin(
-        externalSites,
-        eq(externalSites.id, externalSiteRuns.externalSiteId),
-      )
-      .leftJoin(
-        scrapeSourceRuns,
-        eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
-      )
-      .where(gte(externalSiteRuns.createdAt, firstDay))
-      .orderBy(desc(externalSiteRuns.createdAt));
+    const [rows, bottleDecisions] = await Promise.all([
+      db
+        .select({
+          run: externalSiteRuns,
+          site: externalSites,
+          sourcePurpose: scrapeSourceRuns.purpose,
+        })
+        .from(externalSiteRuns)
+        .innerJoin(
+          externalSites,
+          eq(externalSites.id, externalSiteRuns.externalSiteId),
+        )
+        .leftJoin(
+          scrapeSourceRuns,
+          eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
+        )
+        .where(gte(externalSiteRuns.createdAt, firstDay))
+        .orderBy(desc(externalSiteRuns.createdAt)),
+      db
+        .select({
+          createdAt: incomingBottleDecisionLogs.createdAt,
+          createdBottle: incomingBottleDecisionLogs.createdBottle,
+        })
+        .from(incomingBottleDecisionLogs)
+        .innerJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
+        .where(
+          and(
+            gte(incomingBottleDecisionLogs.createdAt, firstDay),
+            eq(actors.type, "system"),
+            eq(actors.key, PEATED_SYSTEM_ACTOR_KEY),
+            sql`NOT (${incomingBottleDecisionLogs.metadata} ? 'initiatedByUserId')`,
+          ),
+        ),
+    ]);
     const collectionRows = rows.filter(
       ({ run, sourcePurpose }) => (sourcePurpose ?? run.purpose) === "collect",
     );
 
-    const totals = emptyCounts();
-    const days = new Map<string, ActivityCounts>();
+    const totals = emptyHealthCounts();
+    const saved = {
+      reviews: emptySavedCounts(),
+      prices: emptySavedCounts(),
+      bottles: emptySavedCounts(),
+    };
+    const days = new Map<string, DayCounts>();
     for (let offset = 0; offset < DAYS; offset += 1) {
       const date = new Date(firstDay);
       date.setUTCDate(date.getUTCDate() + offset);
-      days.set(dayKey(date), emptyCounts());
+      days.set(dayKey(date), {
+        ...emptyHealthCounts(),
+        reviews: 0,
+        prices: 0,
+        bottles: 0,
+      });
     }
-    const recordTypes = new Map<RecordType, ActivityCounts>(
-      RECORD_TYPES.map((type) => [type, emptyCounts()]),
-    );
 
     for (const { run } of collectionRows) {
       const date = dayKey(run.startedAt ?? run.createdAt);
       const day = days.get(date);
       if (!day) continue;
-      addRun(totals, run);
-      addRun(day, run);
-      addRun(recordTypes.get(run.recordType ?? "untracked")!, run);
+      addRunHealth(totals, run);
+      addRunHealth(day, run);
+      const savedKind = savedKindForRun(run.recordType);
+      if (savedKind) {
+        addSavedRun(saved[savedKind], run);
+        day[savedKind] += run.emittedItemCount;
+      }
+    }
+
+    for (const decision of bottleDecisions) {
+      const day = days.get(dayKey(decision.createdAt));
+      if (!day) continue;
+      saved.bottles.total += 1;
+      saved.bottles[decision.createdBottle ? "new" : "existing"] += 1;
+      day.bottles += 1;
     }
 
     return {
       totals,
+      saved,
       days: [...days.entries()]
         .reverse()
         .map(([date, counts]) => ({ date, ...counts })),
-      recordTypes: RECORD_TYPES.map((type) => ({
-        type,
-        records: recordTypes.get(type)!.records,
-        newRecords: recordTypes.get(type)!.newRecords,
-        existingRecords: recordTypes.get(type)!.existingRecords,
-        untrackedRecords: recordTypes.get(type)!.untrackedRecords,
-      })),
       recentFailures: collectionRows
         .filter(
           ({ run }) => run.status === "failed" && run.completedAt !== null,

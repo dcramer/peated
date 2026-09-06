@@ -265,7 +265,7 @@ export function ModerationInboxContent({
         <div {...stylex.props(foundationStyles.metadata, styles.empty)}>
           <strong>Nothing needs a decision</strong>
           <span>
-            Clear the filters or check Automation for operational work.
+            Clear the filters or check background work for problems and retries.
           </span>
         </div>
       )}

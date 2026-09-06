@@ -8,8 +8,6 @@ import {
   AdminPage,
   AdminPageHeader,
   AdminSection,
-  AdminStat,
-  AdminStatGrid,
   AdminStatus,
   AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
@@ -89,49 +87,18 @@ export default function AutomationPage() {
       <ModerationNav />
       <AdminPage>
         <AdminPageHeader
-          title="Automation"
-          description="See what is moving, what is waiting, and what needs recovery. Human catalog decisions stay in Inbox."
+          title="Background work"
+          description="Inspect work that stopped and retry failed price matches. Decisions that need you stay in Inbox."
           metadata={
             <>
               Updated <TimeSince date={data.generatedAt} />
             </>
           }
         />
-        <AdminStatGrid>
-          <AdminStat label="Processing" value={data.counts.processing} />
-          <AdminStat label="Waiting" value={data.counts.waiting} />
-          <AdminStat label="Failed" value={data.counts.failed} />
-          <AdminStat label="Cleared today" value={data.counts.clearedToday} />
-        </AdminStatGrid>
-        <AdminSection
-          title="Listing decisions"
-          description={
-            data.listingAutomation.sampleSize
-              ? `Last ${data.listingAutomation.sampleSize} completed checks`
-              : "No completed checks"
-          }
-        >
-          <AdminStatGrid>
-            <AdminStat
-              label="Automatic rate"
-              value={
-                data.listingAutomation.rate === null
-                  ? "—"
-                  : `${data.listingAutomation.rate}%`
-              }
-            />
-            <AdminStat
-              label="Automatic"
-              value={data.listingAutomation.automatic}
-            />
-            <AdminStat label="Manual" value={data.listingAutomation.manual} />
-            <AdminStat label="Failed" value={data.listingAutomation.failed} />
-          </AdminStatGrid>
-        </AdminSection>
         {activeRun.data.run ? (
           <AdminSection
-            title={`Active listing retry · Run #${activeRun.data.run.id}`}
-            description={`${activeRun.data.run.processedCount} of ${activeRun.data.run.matchedCount} processed`}
+            title={`Price retry #${activeRun.data.run.id}`}
+            description={`${activeRun.data.run.processedCount} of ${activeRun.data.run.matchedCount} checked`}
             action={
               <Button
                 disabled={cancel.isPending}
@@ -176,11 +143,11 @@ export default function AutomationPage() {
               ]}
             />
           ) : (
-            "No operational failures need attention."
+            "No background work needs attention."
           )}
         </AdminSection>
         <AdminSection
-          title="Recent retry runs"
+          title="Recent price retries"
           action={
             <AdminActions>
               <Button
@@ -189,7 +156,7 @@ export default function AutomationPage() {
                 onClick={() => void startRetry()}
                 size="sm"
               >
-                Retry actionable listings
+                Retry price matches
               </Button>
             </AdminActions>
           }
@@ -211,7 +178,7 @@ export default function AutomationPage() {
               ]}
             />
           ) : (
-            "No recent retry runs."
+            "No recent price retries."
           )}
         </AdminSection>
       </AdminPage>

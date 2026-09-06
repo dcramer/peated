@@ -19,6 +19,7 @@ import {
   AdminTextField,
 } from "@peated/web/components/admin/adminForm.stylex";
 import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
@@ -33,12 +34,6 @@ import {
 import ModerationNav from "./moderationNav";
 
 type Event = Outputs["admin"]["moderation"]["listHistory"]["results"][number];
-
-const recordedFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-});
 
 function eventHref(event: Event, searchParams: URLSearchParams) {
   const [kind, id] = event.key.split(":");
@@ -78,7 +73,7 @@ function HistoryDetails({ eventKey }: { eventKey: string }) {
           <AdminStat label="Actor" value={event.actor ?? "Unavailable"} />
           <AdminStat
             label="Recorded"
-            value={recordedFormatter.format(new Date(event.occurredAt))}
+            value={<Timestamp date={event.occurredAt} format="dateTime" />}
           />
         </AdminStatGrid>
         {details.data.rationale ? (
@@ -99,8 +94,9 @@ function HistoryDetails({ eventKey }: { eventKey: string }) {
               { name: "event", value: (item) => item.label },
               {
                 name: "recorded",
-                value: (item) =>
-                  recordedFormatter.format(new Date(item.occurredAt)),
+                value: (item) => (
+                  <Timestamp date={item.occurredAt} format="dateTime" />
+                ),
               },
             ]}
           />
