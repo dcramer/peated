@@ -28,7 +28,7 @@ export type BottleIdentityRowProps = {
   name: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   query?: string;
-  provenance?: readonly { name: string; href?: string }[];
+  provenance?: readonly { name: string; href?: string; title?: string }[];
   relatedReleases?: {
     count: number;
     href: string;
@@ -144,11 +144,13 @@ export function BottleIdentityRow({
           <Join divider=" · ">
             {provenance.map((item, index) =>
               item.href ? (
-                <TextLink href={item.href} key={index}>
+                <TextLink href={item.href} key={index} title={item.title}>
                   {item.name}
                 </TextLink>
               ) : (
-                <span key={index}>{item.name}</span>
+                <span key={index} title={item.title}>
+                  {item.name}
+                </span>
               ),
             )}
           </Join>
