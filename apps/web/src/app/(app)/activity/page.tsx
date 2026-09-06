@@ -10,6 +10,7 @@ import {
 } from "@peated/web/lib/orpc/client.server";
 import type { Metadata } from "next";
 import {
+  getActiveCriticRailItems,
   getActivityFeedHref,
   getActivityFeedSelection,
   loadActivityFeed,
@@ -50,13 +51,14 @@ export default async function Activity({
 
   const { client: publicClient } = await getAnonymousServerClient();
   const memberClient = user ? (await getServerClient()).client : undefined;
-  const [{ items, note, rel }, library] = await Promise.all([
+  const [{ items, note, rel }, library, activeCritics] = await Promise.all([
     loadActivityFeed({ cursor, following, memberClient, publicClient }),
     memberClient?.collections.bottles.list({
       user: "me",
       collection: "library",
       limit: 25,
     }),
+    publicClient.externalReviews.activeCritics({ limit: 5 }),
   ]);
   const libraryBottles = (library?.results ?? [])
     .filter((item) => !item.hasTasted)
@@ -68,6 +70,7 @@ export default async function Activity({
 
   return (
     <ActivityPage
+      activeCritics={getActiveCriticRailItems(activeCritics)}
       items={items}
       libraryBottles={libraryBottles}
       libraryHref={user ? `/users/${user.username}/library` : undefined}

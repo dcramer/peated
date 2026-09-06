@@ -1,10 +1,12 @@
 import {
   mockActivity,
   mockExternalReview,
+  mockExternalReviews,
   mockFriendships,
 } from "@peated/server/orpc/mock/fixtures";
 import { beforeEach, expect, test, vi } from "vitest";
 import {
+  getActiveCriticRailItems,
   getActivityFeedHref,
   getActivityFeedSelection,
   loadActivityFeed,
@@ -31,6 +33,31 @@ const criticActivity = {
   createdAt: mockExternalReview.article.publishedAt!,
   review: mockExternalReview,
 };
+
+test("maps active critics without adding the review byline", () => {
+  const review = mockExternalReviews[0]!;
+  const critics = getActiveCriticRailItems([
+    {
+      site: {
+        type: review.site!.type,
+        name: review.site!.name,
+        imageUrl: review.site!.imageUrl,
+      },
+      latestReview: {
+        bottleName: review.bottle!.fullName,
+        publishedAt: review.article.publishedAt!,
+        url: review.url,
+      },
+    },
+  ]);
+
+  expect(critics[0]).toMatchObject({
+    bottleName: "Lagavulin 16-year-old",
+    href: mockExternalReviews[0]!.url,
+    name: "Whisky Advocate",
+  });
+  expect(critics[0]).not.toHaveProperty("reviewerName");
+});
 
 beforeEach(() => {
   vi.resetAllMocks();

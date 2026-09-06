@@ -2,6 +2,7 @@ import {
   mockActivity,
   mockCollectionBottles,
   mockExternalReview,
+  mockExternalReviews,
 } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { toBottleListItem } from "../../lib/bottleListItem";
@@ -11,6 +12,33 @@ import { CursorPager } from "../lists.stylex";
 import { PageTabs } from "../pageTabs.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { ActivityPage } from "./activityPage.stylex";
+
+const activeCritics = mockExternalReviews
+  .flatMap((review) => {
+    if (!review.site || !review.bottle || !review.article.publishedAt)
+      return [];
+    return [
+      {
+        bottleName: toBottleListItem(review.bottle).name,
+        href: review.url,
+        imageUrl: review.site.imageUrl,
+        name: review.site.name,
+        publishedAt: review.article.publishedAt,
+        type: review.site.type,
+      },
+    ];
+  })
+  .toSorted(
+    (first, second) =>
+      new Date(second.publishedAt).getTime() -
+      new Date(first.publishedAt).getTime(),
+  )
+  .filter(
+    (critic, index, critics) =>
+      critics.findIndex((candidate) => candidate.type === critic.type) ===
+      index,
+  )
+  .slice(0, 5);
 
 const meta = {
   title: "Pages/Activity",
@@ -26,11 +54,12 @@ const meta = {
     docs: {
       description: {
         component:
-          "Activity uses the catalog columns, with Following/Everyone beside the page title and aligned with the feed column. The cursor pager keeps the selected feed while moving through activity. The sidebar has the tasting action and bottles from the member’s library, and is hidden on mobile. A short notice explains when Following shows everyone's activity because there are no accepted follows.",
+          "Activity uses the catalog columns, with Following/Everyone beside the page title and aligned with the feed column. The cursor pager keeps the selected feed while moving through activity. The sidebar has the tasting action, active critic sites, and bottles from the member’s library, and is hidden on mobile. A short notice explains when Following shows everyone's activity because there are no accepted follows.",
       },
     },
   },
   args: {
+    activeCritics,
     items: getCommunityFeedItems({
       criticReviews: [],
       activity: [

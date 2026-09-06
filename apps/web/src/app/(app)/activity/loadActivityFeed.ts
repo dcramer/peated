@@ -1,10 +1,22 @@
 import type { RouterClient } from "@orpc/server";
-import type { Router } from "@peated/server/orpc/router";
+import type { Outputs, Router } from "@peated/server/orpc/router";
 import { getAuthRedirect } from "@peated/web/lib/auth";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 
 type Client = RouterClient<Router>;
 type ActivityClient = { activity: Pick<Client["activity"], "list"> };
+type ActiveCritic = Outputs["externalReviews"]["activeCritics"][number];
+
+export function getActiveCriticRailItems(critics: readonly ActiveCritic[]) {
+  return critics.map(({ latestReview, site }) => ({
+    bottleName: latestReview.bottleName,
+    href: latestReview.url,
+    imageUrl: site.imageUrl,
+    name: site.name,
+    publishedAt: latestReview.publishedAt,
+    type: site.type,
+  }));
+}
 
 export function getActivityFeedSelection(feed?: string) {
   return feed === "following" ? "following" : "everyone";
