@@ -20,7 +20,6 @@ import scrapeGlenAllachie from "./adapters/legacy/scrapeGlenAllachie";
 import scrapeHealthySpirits from "./adapters/legacy/scrapeHealthySpirits";
 import scrapeMasterOfMalt from "./adapters/legacy/scrapeMasterOfMalt";
 import scrapeMissionLiquor from "./adapters/legacy/scrapeMissionLiquor";
-import scrapeNcnean from "./adapters/legacy/scrapeNcnean";
 import scrapeReserveBar from "./adapters/legacy/scrapeReserveBar";
 import scrapeSingleCaskNation from "./adapters/legacy/scrapeSingleCaskNation";
 import scrapeSMWS from "./adapters/legacy/scrapeSMWS";
@@ -114,7 +113,6 @@ const legacyPriceSources = [
     allowedRequestHeaders: ["x-algolia-api-key", "x-algolia-application-id"],
     scrape: scrapeMasterOfMalt,
   },
-  { type: "ncnean", origin: "https://ncnean.com", scrape: scrapeNcnean },
   {
     type: "reservebar",
     origin: "https://api.liquidcommerce.cloud",
@@ -283,6 +281,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://www.kilchomandistillery.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "ncnean",
+      origins: [
+        {
+          origin: "https://ncnean.com",
           robots: { mode: "enforce" },
         },
       ],
