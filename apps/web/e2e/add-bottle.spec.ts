@@ -152,6 +152,23 @@ test.describe("Add Bottle", () => {
     ).toBeVisible();
   });
 
+  test("splits a leading Brand from a prefilled bottle name", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "leading-brand"),
+    });
+    await page.goto("/bottles/new?name=Lagavulin%2016&returnAction=view");
+
+    await expect(
+      page.getByRole("button", { name: testBrand.name }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("textbox", { name: "Bottle name" }),
+    ).toHaveValue("16");
+  });
+
   test("uses an existing Bottle and preserves the initiating action and photo", async ({
     context,
     page,
@@ -285,6 +302,40 @@ test.describe("Add Bottle", () => {
     ).not.toBeVisible();
   });
 
+  test("keeps the match notice steady while checking an edited name", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "steady-candidates"),
+    });
+    await page.goto(
+      `/bottles/new?name=21-year-old&brand=${testBrand.id}&returnAction=view`,
+    );
+    await expectMatchNoticeToStaySteady(
+      page,
+      testInfo,
+      "match-notice-updating.png",
+    );
+  });
+
+  test("keeps the match notice steady on mobile while checking @mobile", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "steady-candidates-mobile"),
+    });
+    await page.goto(
+      `/bottles/new?name=21-year-old&brand=${testBrand.id}&returnAction=view`,
+    );
+    await expectMatchNoticeToStaySteady(
+      page,
+      testInfo,
+      "match-notice-updating-mobile.png",
+    );
+  });
+
   test("reviews a matching Bottle without leaving the mobile step @mobile", async ({
     context,
     page,
@@ -388,4 +439,68 @@ async function reachFinalCreateStep(page: Page) {
   for (let step = 0; step < 6; step += 1) {
     await page.getByRole("button", { name: "Continue" }).click();
   }
+}
+
+async function expectMatchNoticeToStaySteady(
+  page: Page,
+  testInfo: TestInfo,
+  screenshotName: string,
+) {
+  const notice = page.getByText("1 bottle may match this one.");
+  const review = page.getByRole("button", { name: "Review" });
+  const summary = review.locator("..");
+  const name = page.getByRole("textbox", { name: "Bottle name" });
+  await expect(notice).toBeVisible();
+  const initialSummaryBox = await summary.boundingBox();
+  const initialNameBox = await name.boundingBox();
+  expect(initialSummaryBox).not.toBeNull();
+  expect(initialNameBox).not.toBeNull();
+
+  let releaseCandidates!: () => void;
+  let markCandidatesHeld!: () => void;
+  let markCandidatesContinued!: () => void;
+  const candidatesHeld = new Promise<void>((resolve) => {
+    markCandidatesHeld = resolve;
+  });
+  const candidatesReady = new Promise<void>((resolve) => {
+    releaseCandidates = resolve;
+  });
+  const candidatesContinued = new Promise<void>((resolve) => {
+    markCandidatesContinued = resolve;
+  });
+  const candidateRequests = "**/rpc/bottles/createCandidates*";
+  await page.route(candidateRequests, async (route) => {
+    markCandidatesHeld();
+    await candidatesReady;
+    await route.continue();
+    markCandidatesContinued();
+  });
+
+  try {
+    await name.fill("21-year-old Kogei Collection");
+    await candidatesHeld;
+
+    await expect(name).toBeFocused();
+    await expect(notice).toBeVisible();
+    await expect(review).toBeDisabled();
+    await expect(summary).toHaveAttribute("aria-busy", "true");
+    expect(await summary.boundingBox()).toEqual(initialSummaryBox);
+    expect(await name.boundingBox()).toEqual(initialNameBox);
+    await page.screenshot({
+      animations: "disabled",
+      caret: "hide",
+      fullPage: false,
+      path: testInfo.outputPath(screenshotName),
+    });
+  } finally {
+    releaseCandidates();
+    await candidatesContinued;
+    await page.unroute(candidateRequests);
+  }
+
+  await expect(page.getByText("3 bottles may match this one.")).toBeVisible();
+  await expect(review).toBeEnabled();
+  await expect(name).toBeFocused();
+  expect(await summary.boundingBox()).toEqual(initialSummaryBox);
+  expect(await name.boundingBox()).toEqual(initialNameBox);
 }
