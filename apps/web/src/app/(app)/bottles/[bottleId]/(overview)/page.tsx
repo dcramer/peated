@@ -1,9 +1,13 @@
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
-import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import {
+  getAnonymousServerClient,
+  getPublicPageServerClient,
+} from "@peated/web/lib/orpc/client.server";
 import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getPageBottleList } from "@peated/web/lib/publicCatalog.server";
+import { serializeMemberReviewStructuredData } from "@peated/web/lib/reviewSeo";
 import { getBottleSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
@@ -25,17 +29,24 @@ export default async function BottlePage(props: {
   const { bottleId } = await props.params;
   const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
   const queryClient = getQueryClient();
-  const { client } = await getPublicPageServerClient();
+  const [{ client }, { client: anonymousClient }] = await Promise.all([
+    getPublicPageServerClient(),
+    getAnonymousServerClient(),
+  ]);
   const orpc = createTanstackQueryUtils(client);
+  const anonymousOrpc = createTanstackQueryUtils(anonymousClient);
   const seriesQuery = bottle.series
     ? bottleOverviewQueries.series(orpc, bottle.series.id)
     : null;
 
-  await Promise.all([
+  const [, , publicMemberReviews] = await Promise.all([
     queryClient.prefetchQuery(
       orpc.bottles.flavorProfile.queryOptions({ input: { bottle: bottle.id } }),
     ),
     queryClient.prefetchQuery(bottleOverviewQueries.reviews(orpc, bottle.id)),
+    queryClient.fetchQuery(
+      bottleOverviewQueries.memberReviews(anonymousOrpc, bottle.id),
+    ),
     queryClient.prefetchQuery(bottleOverviewQueries.tastings(orpc, bottle.id)),
     ...(seriesQuery
       ? [
@@ -46,10 +57,22 @@ export default async function BottlePage(props: {
         ]
       : []),
   ]);
+  const firstPublicReview = publicMemberReviews.results[0];
+  const structuredData = firstPublicReview
+    ? serializeMemberReviewStructuredData({ ...firstPublicReview, bottle })
+    : null;
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <BottleOverviewClient />
-    </HydrationBoundary>
+    <>
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: structuredData }}
+        />
+      )}
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <BottleOverviewClient />
+      </HydrationBoundary>
+    </>
   );
 }

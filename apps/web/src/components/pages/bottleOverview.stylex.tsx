@@ -37,6 +37,7 @@ export type BottleOverviewProps = {
   flavorProfile?: ReactNode;
   image: BottleOverviewImage;
   mainState?: ReactNode;
+  memberReviews?: readonly CommunityFeedItem[];
   moreTastingsHref?: string;
   recommendationHeading?: string;
   recommendationState?: ReactNode;
@@ -54,6 +55,7 @@ export function BottleOverview({
   flavorProfile,
   image,
   mainState,
+  memberReviews = [],
   moreTastingsHref,
   recommendationHeading = "If you liked this",
   recommendationState,
@@ -101,6 +103,16 @@ export function BottleOverview({
             </section>
           ) : null}
 
+          {memberReviews.length ? (
+            <section {...stylex.props(styles.section)}>
+              <SectionHeading>Member reviews</SectionHeading>
+              <CommunityFeed
+                ariaLabel="Bottle member reviews"
+                items={memberReviews}
+              />
+            </section>
+          ) : null}
+
           {tastings.length ? (
             <section {...stylex.props(styles.section)}>
               <SectionHeading>Tastings</SectionHeading>
@@ -121,7 +133,9 @@ export function BottleOverview({
             </section>
           ) : null}
 
-          {!criticReviews.length && !tastings.length ? mainState : null}
+          {!criticReviews.length && !memberReviews.length && !tastings.length
+            ? mainState
+            : null}
         </div>
       </div>
 

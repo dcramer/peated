@@ -4,11 +4,16 @@ import type {
   CommunityFeedItem,
 } from "@peated/web/components/communityFeed.stylex";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
-import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
+import {
+  getBottleUrl,
+  getMemberReviewUrl,
+  getTastingUrl,
+} from "@peated/web/lib/urls";
 
 type CriticReview = Outputs["externalReviews"]["list"]["results"][number];
 type Activity = Outputs["activity"]["list"]["results"][number];
 type Bottle = Outputs["bottles"]["list"]["results"][number];
+type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
 function feedBottle(bottle: Bottle): CommunityFeedBottle {
@@ -48,6 +53,31 @@ export function getTastingFeedItems(
   tastings: readonly Tasting[],
 ): CommunityFeedItem[] {
   return tastings.map((tasting) => tastingFeedItem(tasting));
+}
+
+/** Maps public member reviews to the shared activity rows on a Bottle page. */
+export function getMemberReviewFeedItems(
+  reviews: readonly MemberReview[],
+  bottle: Bottle,
+): CommunityFeedItem[] {
+  return reviews.map((review) => ({
+    id: `member-review-${review.id}`,
+    kind: "member_review",
+    actor: review.createdBy.username,
+    actorHref: `/users/${review.createdBy.username}`,
+    actorImageUrl: review.createdBy.pictureUrl,
+    action: "reviewed",
+    date: review.createdAt,
+    href: getMemberReviewUrl(review),
+    bottles: [
+      {
+        ...feedBottle(bottle),
+        id: String(review.id),
+        score: { value: review.score, scale: 100 },
+        description: getPreview(review.notes),
+      },
+    ],
+  }));
 }
 
 export function getCommunityFeedItems({
@@ -131,7 +161,7 @@ export function getCommunityFeedItems({
           kind: "member_review",
           action: "reviewed",
           date: entry.createdAt,
-          href: `/reviews/${entry.review.id}`,
+          href: getMemberReviewUrl(entry.review),
           bottles: [
             {
               ...feedBottle(entry.review.bottle),

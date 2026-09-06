@@ -79,9 +79,10 @@ remain valid. Web links, canonical metadata, structured data, and sitemaps use
 the current slug.
 
 Search descriptions summarize the notes or fall back to the bottle,
-author, and optional rating name. Structured data describes an authored
-`CreativeWork` about a Bottle, without converting tasting bands to review
-scores.
+author, and optional rating name. Structured data uses schema.org's broad
+`Review` type for the authored tasting note about a Bottle. It does not add a
+numeric `reviewRating` because tasting ratings are named categories, not review
+scores. This search representation does not change the stored Tasting model.
 
 The tasting sitemap reads through the anonymous API and includes only public
 tasting URLs. It uses the total tasting count as an upper bound, so private
@@ -93,6 +94,11 @@ not expose a reliable edit timestamp.
 `member_review` owns member scores. A member can have at most one review for an
 exact Bottle. Saving again updates that review. A Bottle merge keeps the review
 with the latest `updatedAt`. A larger review ID breaks an exact time tie.
+
+Public member review pages expose schema.org `Review` data with the stored
+0–100 score. Bottle overview pages show recent public member reviews and may
+reference one in structured data. Private members' reviews never enter search
+metadata or structured data.
 
 Review privacy controls attribution only. A private member's review is hidden
 from people who cannot view that member's activity. Its score still enters the
@@ -167,6 +173,11 @@ data. Application code calls them `legacySimpleRatingAverage` and
 `scoreCount` is the sum of the two score counts in the API. The score and range
 stay `null` when no counted scores exist. The median uses the lower middle value
 when the count is even.
+
+Bottle structured data does not expose this combined median as an
+`AggregateRating`. Search engines define that value as an average and prohibit
+aggregating ratings from other sites, while Peated's Bottle summary is a median
+of member and eligible external review scores.
 
 Bottle presentation derives one rating from these saved summaries. When a
 review median exists, its matching band supplies the label and the median stays

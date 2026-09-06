@@ -1,4 +1,9 @@
+import {
+  formatBottleDisplayName,
+  type BottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayName";
 import config from "@peated/web/config";
+import { summarize } from "./markdown";
 import {
   getCountrySeoMetadata,
   getRegionSeoMetadata,
@@ -6,12 +11,55 @@ import {
 } from "./seoMetadata";
 import {
   getBottleSeriesUrl,
+  getBottleUrl,
   getCountryUrl,
   getEntityUrl,
   getRegionUrl,
 } from "./urls";
 
 type Breadcrumb = { name: string; url: string };
+
+type BottleStructuredDataSource = BottleDisplayNameSource & {
+  id: number;
+  brand: { name: string };
+  description: string | null;
+  imageUrl: string | null;
+  lastPrice: {
+    currency: string;
+    price: number;
+  } | null;
+};
+
+/** Product markup only contains claims that are visible and owned by Peated. */
+export function serializeBottleStructuredData(
+  bottle: BottleStructuredDataSource,
+): string {
+  const title = formatBottleDisplayName(bottle);
+  const bottleUrl = new URL(getBottleUrl(bottle), config.URL_PREFIX).href;
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": `${bottleUrl}#product`,
+    url: bottleUrl,
+    name: title,
+    image: bottle.imageUrl ?? undefined,
+    description: summarize(bottle.description || "", 200) || undefined,
+    brand: { "@type": "Brand", name: bottle.brand.name },
+    // Google forbids aggregates that include ratings from other sites. Peated's
+    // saved Bottle score combines member and critic reviews, so it is omitted.
+    offers: bottle.lastPrice
+      ? {
+          "@type": "AggregateOffer",
+          offerCount: 1,
+          lowPrice: bottle.lastPrice.price / 100,
+          highPrice: bottle.lastPrice.price / 100,
+          priceCurrency: bottle.lastPrice.currency,
+        }
+      : undefined,
+  };
+
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
 
 function serializeCollectionPage({
   name,

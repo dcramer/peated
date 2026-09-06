@@ -79,33 +79,37 @@ export function serializeTastingStructuredData(
 
   const bottleName = formatBottleDisplayName(tasting.bottle);
   const url = new URL(getTastingUrl(tasting), config.URL_PREFIX).href;
+  const bottleUrl = new URL(getBottleUrl(tasting.bottle), config.URL_PREFIX)
+    .href;
   const title = `${bottleName} — tasting by ${tasting.createdBy.username}`;
   const data = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    "@id": url,
+    "@type": "Review",
+    "@id": `${url}#review`,
     url,
     name: title,
-    mainEntity: {
-      // Ratings owns this distinction: a tasting is a personal record, not a scored Review.
-      "@type": "CreativeWork",
-      name: title,
-      mainEntityOfPage: url,
-      datePublished: tasting.createdAt,
-      author: {
-        "@type": "Person",
-        name: tasting.createdBy.username,
-        url: new URL(
-          `/users/${encodeURIComponent(tasting.createdBy.username)}`,
-          config.URL_PREFIX,
-        ).href,
-      },
-      text: tasting.notes?.trim() || undefined,
-      image: tasting.imageUrl || undefined,
-      about: {
-        "@type": "Product",
-        name: bottleName,
-        url: new URL(getBottleUrl(tasting.bottle), config.URL_PREFIX).href,
+    mainEntityOfPage: url,
+    datePublished: tasting.createdAt,
+    author: {
+      "@type": "Person",
+      name: tasting.createdBy.username,
+      url: new URL(
+        `/users/${encodeURIComponent(tasting.createdBy.username)}`,
+        config.URL_PREFIX,
+      ).href,
+    },
+    reviewBody: tasting.notes?.trim() || undefined,
+    image: tasting.imageUrl || undefined,
+    // Ratings owns the score: a named tasting rating must not become a numeric reviewRating.
+    itemReviewed: {
+      "@type": "Product",
+      "@id": `${bottleUrl}#product`,
+      name: bottleName,
+      image: tasting.bottle.imageUrl || undefined,
+      url: bottleUrl,
+      brand: {
+        "@type": "Brand",
+        name: tasting.bottle.brand.name,
       },
     },
   };

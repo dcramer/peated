@@ -28,6 +28,12 @@ export function getTastingUrl(tasting: {
   return `/tastings/${tasting.id}-${slug}`;
 }
 
+export function getMemberReviewUrl(review: {
+  id: number;
+}): `/reviews/${number}` {
+  return `/reviews/${review.id}`;
+}
+
 export function getBottleSeriesUrl(series: {
   id: number;
   fullName: string;

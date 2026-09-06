@@ -52,7 +52,7 @@ describe("tasting SEO", () => {
     const data = JSON.parse(
       serializeTastingStructuredData({ ...tasting, notes })!,
     );
-    expect(data.mainEntity.text).toBe(notes);
+    expect(data.reviewBody).toBe(notes);
   });
 
   it.each([null, "", " \n\t "])(
@@ -94,31 +94,30 @@ describe("tasting SEO", () => {
     expect(metadata.twitter).toMatchObject({ card: "summary" });
   });
 
-  it("attributes the tasting and identifies the bottle without inventing a review score", () => {
+  it("marks up the tasting as an unscored review without inventing a numeric score", () => {
     const data = JSON.parse(serializeTastingStructuredData(tasting)!);
     expect(data).toMatchObject({
       "@context": "https://schema.org",
-      "@type": "WebPage",
+      "@type": "Review",
       url: `${config.URL_PREFIX}/tastings/123-lagavulin-16-year-old`,
-      mainEntity: {
-        "@type": "CreativeWork",
-        datePublished: tasting.createdAt,
-        author: {
-          "@type": "Person",
-          name: "alice",
-          url: `${config.URL_PREFIX}/users/alice`,
-        },
-        text: tasting.notes,
-        image: tasting.imageUrl,
-        about: {
-          "@type": "Product",
-          name: "Lagavulin 16-year-old",
-          url: `${config.URL_PREFIX}/bottles/42-lagavulin-16-year-old`,
-        },
+      datePublished: tasting.createdAt,
+      author: {
+        "@type": "Person",
+        name: "alice",
+        url: `${config.URL_PREFIX}/users/alice`,
+      },
+      reviewBody: tasting.notes,
+      image: tasting.imageUrl,
+      itemReviewed: {
+        "@type": "Product",
+        name: "Lagavulin 16-year-old",
+        image: tasting.bottle.imageUrl,
+        url: `${config.URL_PREFIX}/bottles/42-lagavulin-16-year-old`,
+        brand: { "@type": "Brand", name: "Lagavulin" },
       },
     });
-    expect(data.mainEntity).not.toHaveProperty("reviewRating");
-    expect(data.mainEntity.about).not.toHaveProperty("aggregateRating");
+    expect(data).not.toHaveProperty("reviewRating");
+    expect(data.itemReviewed).not.toHaveProperty("aggregateRating");
   });
 
   it("safely serializes member text containing HTML and script delimiters", () => {
@@ -130,8 +129,8 @@ describe("tasting SEO", () => {
       createdBy: { ...tasting.createdBy, username },
     })!;
     expect(json).not.toContain("<");
-    expect(JSON.parse(json).mainEntity.text).toBe(notes);
-    expect(JSON.parse(json).mainEntity.author.name).toBe(username);
+    expect(JSON.parse(json).reviewBody).toBe(notes);
+    expect(JSON.parse(json).author.name).toBe(username);
   });
 
   it("omits private content from metadata and structured data", () => {

@@ -10,7 +10,7 @@ import {
   TastingRating,
 } from "@peated/web/components";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import { getTastingUrl } from "@peated/web/lib/urls";
+import { getMemberReviewUrl, getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
@@ -146,7 +146,7 @@ export function TastingReviewRail({
               <RailListItem
                 key={`member-${review.id}`}
                 end={`${review.score}/100`}
-                href={`/reviews/${review.id}`}
+                href={getMemberReviewUrl(review)}
                 metadata={`Member · ${dateFormatter.format(new Date(review.updatedAt))}`}
                 title={review.createdBy.username}
               />
