@@ -801,11 +801,11 @@ completion record.
   and two Poly catalogs—[Chinese and Western Wine](https://cdn.polyauction.com.hk/public-default/auction/sale/chinese-and-western-wine_261eec0e-9913-4fd2-99cf-134537d9be35.pdf)
   and
   [Prestige Collections](https://cdn.polyauction.com.hk/public-default/auction/sale/sz16084423-xiang-gang-bao-li-2016qiu-pai-zhong-xi-ming-jiu-zhen-niang-shuang-p_cf42c5b6-9be7-4618-9e80-774f3a22fd62.pdf)—add
-  ten more evidenced Owner's Casks: `3K3033`,
+  nine more evidenced Owner's Casks: `3K3033`,
   `2Q70668`, `2V70480`, `4S70040`, `ES70153`, `3P70366`, `EO70049`, `4R70005`,
-  `AX70015`, and `EX65186`. Their exact stated cask, vintage, bottling, strength,
-  maturation, and outturn facts are staged without inferred release dates. The
-  original 31 candidates were production duplicate-checked; these 11 newly
+  and `EX65186`. Their exact stated cask, vintage, bottling, strength, maturation,
+  and outturn facts are staged without inferred release dates. The original 31
+  candidates were production duplicate-checked; these ten newly
   found candidates still require those checks. A full page-by-page pass through
   Whisky Auctioneer and exact Sotheby's lots adds five more supported candidates:
   1989 hogsheads `9W70427` and
@@ -815,10 +815,15 @@ completion record.
   1997 barrel
   [`BP70305`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai/shan-qiyamazaki-the-owners-cask-bp70305-54-0-abv),
   and 1999 cask `DS70260`. The last candidate has conflicting 2009 and 2010
-  bottling transcriptions, so its staged bottling year remains unknown. All 47
-  candidate Owner's Cask records remain unwritten because that durable bulk
-  write requires explicit approval. Empty destination Series `S0676` has been
-  created.
+  bottling transcriptions, so its staged bottling year remains unknown. Exact
+  Bonhams, Spink, Sotheby's, and Poly records add six more: 1991 hogshead
+  `1V70013`, 1992 sherry butt
+  [`ZS70061`](https://www.sothebys.com/en/buy/auction/2024/finest-and-rarest-spirits-7/shan-qi-yamazaki-the-owners-cask-zs70061-61-0-abv),
+  1995 sherry butt `5W70010`, 1998 hogshead `CM60086`, 1999 Bota Corta
+  `DV70208`, and 2000 sherry butt `ES60044`. The label establishes digit-one
+  `1V70013`; catalog OCR often renders it as `IV70013`. All 52 candidate Owner's
+  Cask records remain unwritten because that durable bulk write requires
+  explicit approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
   creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
   2016 25-year-old Limited Edition is a presentation variant of the core whisky;
@@ -843,8 +848,9 @@ completion record.
   wording still needs to be reconciled before stable Bottle names and editions
   are written. Poly catalogs describe `CU70065` and `DU65300` as The Owner's
   Cask, while other exact auction records call them Arima/The Single Cask or
-  Suntory Single Cask Whisky. Both remain unresolved until their labels settle
-  the family and stable name.
+  Suntory Single Cask Whisky. Bonhams likewise calls `AX70015` Single Cask while
+  Poly calls it The Owner's Cask. All three remain unresolved until their labels
+  settle the family and stable name.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
