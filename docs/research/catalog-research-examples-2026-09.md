@@ -532,10 +532,10 @@ relationships, or existing images were changed.
 ## Yamazaki — September 6, 2026
 
 The full production review is in progress. It started from 107 Bottles attached
-to the Yamazaki Brand (`E0493`) and currently has 124. The modern producer range,
+to the Yamazaki Brand (`E0493`) and currently has 136. The modern producer range,
 named component-whisky releases, existing historical single casks, all original
 Brand pages, and the pre-write set of 169 Yamazaki-distilled records were
-inventoried. Production now reports 184 Yamazaki-distilled records. Older private
+inventoried. Production now reports 196 Yamazaki-distilled records. Older private
 and single-cask releases still require individual evidence, so this is not yet a
 completion record.
 
@@ -571,6 +571,39 @@ completion record.
   independently gives March 14, 1984 as the original Yamazaki launch date.
   All four records were duplicate-checked and re-fetched after creation; their
   auction photos did not state reusable terms.
+- The exact
+  [1984 25th Anniversary record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1984-25th-anniversary)
+  established the marketed anniversary descriptor and Mizunara maturation now
+  stored on `B17672`. The exact
+  [80th Anniversary record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-suntory-pure-malt-80th-anniversary-1)
+  established “Suntory Pure Malt” as the stable product name and “80th
+  Anniversary” as the edition on singleton `B51629`. Both records and the
+  renamed Bottle's edit context, aliases, and references were re-fetched after
+  the updates.
+- A Bonhams catalog entry for the
+  [1984 Waku Waku release](https://images1.bonhams.com/original?src=Images%2Flive%2F2022-10%2F21%2FS-27735-0-1.pdf)
+  established its 20-year age, 2004 bottling and release, 56% ABV, and 20th
+  Anniversary descriptor. It is now `B54356`. The same catalog and exact
+  Whisky Auctioneer pages established six 1984-vintage, 2018
+  [Suntory Single Cask Whisky](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1984-suntory-single-cask)
+  releases: `WE2001` (`B54376`), `WE2004` (`B54378`), `WE2005` (`B54377`),
+  `WE2006` (`B54380`), `WE2007` (`B54381`), and `WI2171` (`B54379`). Exact age
+  was stored only for the three records whose auction source states 34 years;
+  it remains unknown on the others. `W12172` and `W12173` remain leads because
+  only collector-catalog records were found.
+- Five more exact Whisky Auctioneer records established the 1990 sherry-butt
+  cask [`OM70170`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1990-single-cask-om70170?v=1484347)
+  (`B54387`), its sibling
+  [`OM70174`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1990-single-cask-om70174)
+  (`B54393`), the 1992 cask
+  [`ZL3001`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1992-single-cask-zl3001)
+  (`B54384`), the 1995 Whisky Magazine sherry-butt cask
+  [`5X70170`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1995-single-cask-5x70170-whisky-magazine)
+  (`B54385`), and the 1999 Grand Arc Hanzomon hogshead
+  [`DV70305`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1999-single-cask-dv70305-grand-arc-hanzomon)
+  (`B54386`). Unknown bottling and release dates were left null rather than
+  inferred from age or auction date. All 12 new records in these two bullets
+  were duplicate-checked across every Brand page and re-fetched after creation.
 - The [2022 Tsukuriwake announcement](https://www.prnewswire.com/news-releases/from-the-birthplace-of-japanese-whisky-the-house-of-suntory-introduces-2022-limited-edition-yamazaki-tsukuriwake-selection-301548951.html)
   and [Whisky Auctioneer's release guide](https://whiskyauctioneer.com/learn/explore-whisky/series/yamazaki-tsukuriwake-selection-2022-editions)
   bounded the named component-whisky range. Series `S0674` now contains the five
@@ -578,11 +611,11 @@ completion record.
   18-year-old is `B54095`; the unqualified core Mizunara 18-year-old `B47537`
   was corrected to the 2025 release proven by its assigned import references and
   exact Whiskyfun review.
-- All 124 current Yamazaki Brand Bottles now have Yamazaki as Brand and
+- All 136 current Yamazaki Brand Bottles now have Yamazaki as Brand and
   distiller with no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
   original two-page Brand inventory was re-fetched with zero remaining non-null
-  bottlers. The 15 later creates were individually verified with no bottler.
+  bottlers. The 27 later creates were individually verified with no bottler.
 - Exact Whisky Auctioneer records for the [8- and 10-year-old set](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-8-10-year-old-suntory-pure-malt-box-set),
   [12-year-old sherry release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-12-year-old-suntory-pure-malt),
   two [15-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt)
@@ -597,12 +630,14 @@ completion record.
   and every member were re-fetched with the expected facts and no bottler. No
   reusable exact image source was found.
 - [Whisky Auctioneer's Cask of Yamazaki guide](https://whiskyauctioneer.com/learn/explore-whisky/series/cask-yamazaki)
-  matches the 13 cask-numbered releases already in production, but it does not
-  establish that they are the complete historical range. Collector indexes for
+  matches the 13 cask-numbered releases already in production. Series `S0700`
+  was created and all 13 exact members were assigned and re-fetched; its final
+  count is 13. The guide does not establish that these are the complete
+  historical range. Collector indexes for
   [1984](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-1984/) and
   [1990](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-1990/)
-  identify additional casks such as `WM0012`, `0M70170`, `0M70174`, and
-  `0M70176`; those remain research leads because the indexes contain
+  identify additional casks such as `WM0012` and the apparent `OM70176`; those
+  remain research leads because the indexes contain
   transcription errors and each release still needs exact auction or producer
   evidence. The
   [Suntory Owner's Cask guide](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-owners-cask)
@@ -625,5 +660,5 @@ completion record.
   4028mdk09. `B2276` now uses
   [The Yamazaki Single Malt Whisky Aged 12 years.JPG](https://commons.wikimedia.org/wiki/File:The_Yamazaki_Single_Malt_Whisky_Aged_12_years.JPG)
   under `CC BY-SA 3.0` with credit to Look Sharp!. Both stored WebP transforms
-  were visually checked. Brand image coverage remains 7 of 124 because these
+  were visually checked. Brand image coverage remains 7 of 136 because these
   were licensed replacements, not newly covered records.
