@@ -1912,6 +1912,13 @@
       "when": 1788636910775,
       "tag": "0272_premium_zodiak",
       "breakpoints": false
+    },
+    {
+      "idx": 273,
+      "version": "7",
+      "when": 1788652385960,
+      "tag": "0273_complete-tasting-note-vocabulary",
+      "breakpoints": false
     }
   ]
 }
