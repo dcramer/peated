@@ -829,7 +829,14 @@ completion record.
   [`5P70139`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1995-owners-cask-5p70139-tsmwta)
   and
   [`5P70206`](https://www.sothebys.com/en/buy/auction/2020/distilled-whisky-moutai/shan-qi-yamazaki-the-owners-cask-suntory-single).
-  All 59 candidate Owner's
+  A second exact-source pass adds 12 more supported Owner's Casks: `2C3091`,
+  `2Q70654`, `4M70122`,
+  [`5J3020`](https://whisky.auction/auctions/lot/89944/yamazaki-1995-the-owner-s-cask-5j3020),
+  `5P70005`, `AW70162`,
+  [`AX70019`](https://spink.com/lot/SFW30000087), `AX70048`, `BX60181`,
+  `BX70277`, `CO60242`, and `DV70209`. The exact catalog and label evidence
+  prevents misleading shortened auction titles from overriding The Owner's Cask
+  branding. All 71 candidate Owner's
   Cask records remain unwritten because that durable bulk write requires
   explicit approval. Empty destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
@@ -856,9 +863,21 @@ completion record.
   wording still needs to be reconciled before stable Bottle names and editions
   are written. Poly catalogs describe `CU70065` and `DU65300` as The Owner's
   Cask, while other exact auction records call them Arima/The Single Cask or
-  Suntory Single Cask Whisky. Bonhams likewise calls `AX70015` Single Cask while
-  Poly calls it The Owner's Cask. All three remain unresolved until their labels
-  settle the family and stable name.
+  Suntory Single Cask Whisky. Both remain unresolved until their labels settle
+  the family and stable name.
+- Exact Bonhams label images and repeated Sotheby's and Whisky Auctioneer lots
+  resolve `AX70015` as `Suntory Single Cask Whisky`, not The Owner's Cask.
+  [Bonhams](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
+  separately establishes `Black Legend` cask `AX70023`. Seven more exact
+  official single-cask identities are staged without Owner's Cask membership:
+  1998 sherry butts `CU70064`, `CU70066`, `CU70067`, `CU70093`, `CU70095`, and
+  `CV70089`, plus 1998 puncheon `CV70093`. Exact examples include the
+  [Sotheby's Kodawari catalog](https://www.sothebys.com/en/digital-catalogues/%E3%81%93%E3%81%A0%E3%82%8F%E3%82%8Akodawari-the-greatest-japanese-whisky-collection-part-i),
+  [Whisky Auctioneer's `CU70095` record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1998-suntory-single-cask),
+  and the
+  [Bonhams `CV70093` catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160518%20S-23344-0-1%20Fine%20%26%20Rare%20Wine%2C%20Cognac%20and%20Whisky%20%5B168%5D.pdf).
+  Collector-only `CV70092` remains a lead because no exact primary auction
+  record was found in this pass.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
