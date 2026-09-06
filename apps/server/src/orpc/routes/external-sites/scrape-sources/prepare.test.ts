@@ -98,6 +98,15 @@ function prepareWhiskyNotes(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareDramface(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "dramface", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareCompassBox(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "compassbox", ...input },
@@ -170,6 +179,7 @@ function codeOwnedSource(
     | "bruichladdich"
     | "cadenheads"
     | "compassbox"
+    | "dramface"
     | "gordonmacphail"
     | "kilchoman"
     | "ncnean"
@@ -229,6 +239,13 @@ const whiskyNotesCanonicalUrl =
 const whiskyNotesRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("whiskynotes")!],
   sources: [codeOwnedSource("whiskynotes")],
+});
+
+const dramfaceCanonicalUrl =
+  "https://www.dramface.com/all-reviews/2026/example-multi-bottle-review";
+const dramfaceRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("dramface")!],
+  sources: [codeOwnedSource("dramface")],
 });
 
 const compassBoxRegistry = createScraperRegistry({
@@ -535,6 +552,81 @@ async function setupWordsOfWhiskyMigration(bottleIds: [number, number]) {
         nativeScoreValue: 9,
         nativeScoreScale: 10,
         nativeScoreDisplay: "9/10",
+      },
+    ])
+    .returning();
+  await db.insert(externalReviewBodies).values(
+    reviews.map((review) => ({
+      externalReviewId: review.id,
+      body: `Stored body for ${review.name}.`,
+      fetchedAt: new Date(),
+    })),
+  );
+  await db.insert(externalReviewPublications).values({
+    externalSiteId: site.id,
+    approvedAt: new Date(),
+  });
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return { site, article, reviews };
+}
+
+function dramfaceReviewKey(name: string, reviewerName: string | null) {
+  const digest = createHash("sha256")
+    .update(
+      [dramfaceCanonicalUrl, name, reviewerName ?? ""]
+        .map((value) =>
+          value.replaceAll(/\s+/g, " ").trim().toLocaleLowerCase("en"),
+        )
+        .join("\n"),
+    )
+    .digest("hex");
+  return `dramface:${digest}`;
+}
+
+async function setupDramfaceMigration(bottleIds: [number, number]) {
+  const [site] = await db
+    .insert(externalSites)
+    .values({ type: "dramface", name: "Dramface", runEvery: null })
+    .returning();
+  await syncScraperDefinitions(dramfaceRegistry);
+  const [article] = await db
+    .insert(externalReviewArticles)
+    .values({
+      externalSiteId: site.id,
+      canonicalUrl: dramfaceCanonicalUrl,
+      title: "Two Example Whiskies",
+      publishedAt: new Date("2026-08-20"),
+    })
+    .returning();
+  const reviews = await db
+    .insert(externalReviews)
+    .values([
+      {
+        articleId: article.id,
+        sourceKey: dramfaceReviewKey("First Example", "Ogilvie"),
+        name: "First Example",
+        reviewerName: "Ogilvie",
+        bottleId: bottleIds[0],
+        hidden: true,
+        nativeScoreValue: 8,
+        nativeScoreScale: 10,
+        nativeScoreDisplay: "8/10",
+      },
+      {
+        articleId: article.id,
+        sourceKey: dramfaceReviewKey("Second Example", "Broddy"),
+        name: "Second Example",
+        reviewerName: "Broddy",
+        bottleId: bottleIds[1],
+        hidden: false,
+        nativeScoreValue: 7,
+        nativeScoreScale: 10,
+        nativeScoreDisplay: "7/10",
       },
     ])
     .returning();
@@ -1162,6 +1254,126 @@ describe("POST /admin/scrape-sources/prepare", () => {
       code: "BAD_REQUEST",
       message: expect.stringContaining(
         "Check the URL and review records for Words of Whisky article",
+      ),
+    });
+    expect(await db.select().from(externalReviews)).toEqual(before);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Dramface without replacing multi-review records", async ({
+    fixtures,
+  }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { site, article, reviews } = await setupDramfaceMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+    const bodies = await db.select().from(externalReviewBodies);
+    const publications = await db.select().from(externalReviewPublications);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareDramface()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      reviewCount: 2,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(externalReviews)).toEqual(reviews);
+
+    const applied = await prepareDramface({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      reviewCount: 2,
+      applied: true,
+    });
+    await syncScraperDefinitions(dramfaceRegistry);
+    expect(await db.select().from(externalReviewArticles)).toEqual([article]);
+    expect(await db.select().from(externalReviews)).toEqual([
+      {
+        ...reviews[0],
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName),
+      },
+      {
+        ...reviews[1],
+        sourceKey: reviewSourceKey(reviews[1].name, reviews[1].reviewerName),
+      },
+    ]);
+    expect(await db.select().from(externalReviewBodies)).toEqual(bodies);
+    expect(await db.select().from(externalReviewPublications)).toEqual(
+      publications,
+    );
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "review",
+        listUrl: "https://www.dramface.com/all-reviews",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+  });
+
+  test("prepares repeated Dramface review identities", async ({ fixtures }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { reviews } = await setupDramfaceMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+    await db
+      .update(externalReviews)
+      .set({
+        name: reviews[0].name,
+        reviewerName: reviews[0].reviewerName,
+        sourceKey: `dramface:${"a".repeat(64)}`,
+      })
+      .where(eq(externalReviews.id, reviews[1].id));
+
+    await expect(prepareDramface({ apply: true })).resolves.toMatchObject({
+      reviewCount: 2,
+      applied: true,
+    });
+    expect(
+      await db
+        .select({ sourceKey: externalReviews.sourceKey })
+        .from(externalReviews)
+        .orderBy(externalReviews.id),
+    ).toEqual([
+      { sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName) },
+      {
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName, 2),
+      },
+    ]);
+  });
+
+  test("refuses an unknown Dramface review key", async ({ fixtures }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { reviews } = await setupDramfaceMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+    await db
+      .update(externalReviews)
+      .set({ sourceKey: "unexpected" })
+      .where(eq(externalReviews.id, reviews[1].id));
+    const before = await db.select().from(externalReviews);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareDramface({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining(
+        "Check the URL and review records for Dramface article",
       ),
     });
     expect(await db.select().from(externalReviews)).toEqual(before);

@@ -159,6 +159,36 @@ collection and confirm it updates the same review IDs without adding articles
 or reviews. Check Bottle matches, review bodies, the run, and Sentry before
 restoring the saved daily schedule. Preparation must not change publication.
 
+## Dramface
+
+Use the preparation endpoint with `{"site": "dramface"}`. The check-only
+request locks and verifies every stored article and review. It accepts only
+dated Dramface article URLs without a trailing slash and verifies each old
+review key belongs to Dramface. Applying changes only those keys so each review
+stays matched by its Bottle name and writer, then adds a paused source whose
+list page is `https://www.dramface.com/all-reviews`.
+
+Before applying, save article URLs, review IDs and order, Bottle matches,
+visibility, scores, writers, publication settings, stored-body counts, and the
+current schedule. Stop the schedule and wait for active runs. Compare every
+record after applying; multi-Bottle and multi-writer articles must keep the
+same review order and IDs. Repeated reviews with the same Bottle name and writer
+keep separate keys in their original order.
+
+Version 8 rules must select up to 20 articles from the current review page. On
+detail pages, match `Review` headings to split the shared article area into
+sections even when Squarespace layout elements wrap the content. Read the
+Bottle name from the first line of its large-text block, the writer from the
+review heading or article byline, and the score out of 10. Run a full local
+no-write preview and compare single-Bottle, multi-Bottle, and multi-writer
+articles with the code parser before applying.
+
+Activate only a production preview with exact output. Trigger one manual
+collection and confirm that it updates the same review IDs without adding
+articles or reviews. Check Bottle matches, review bodies, the run, and Sentry
+before restoring the saved daily schedule. Preparation must not change
+publication.
+
 ## WhiskyNotes
 
 Use the preparation endpoint with `{"site": "whiskynotes"}`. The check-only
