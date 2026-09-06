@@ -4,6 +4,7 @@ import {
   getBottleUrl,
   getEntityKindSearchUrl,
   getEntityUrl,
+  getMemberReviewUrl,
   getTastingUrl,
 } from "./urls";
 
@@ -22,6 +23,10 @@ describe("public catalog URLs", () => {
     expect(getTastingUrl({ id: 456, bottle })).toBe(
       "/tastings/456-lagavulin-16-year-old",
     );
+  });
+
+  it("uses the member review collection and ID", () => {
+    expect(getMemberReviewUrl({ id: 789 })).toBe("/reviews/789");
   });
 
   it.each([

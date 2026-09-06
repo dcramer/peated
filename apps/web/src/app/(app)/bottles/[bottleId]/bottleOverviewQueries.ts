@@ -10,6 +10,10 @@ export const bottleOverviewQueries = {
     orpc.externalReviews.list.queryOptions({
       input: { bottle: bottleId, limit: 3, sort: "recent" },
     }),
+  memberReviews: (orpc: ORPCQueryUtils, bottleId: number) =>
+    orpc.memberReviews.list.queryOptions({
+      input: { bottle: bottleId, limit: 3 },
+    }),
   series: (orpc: ORPCQueryUtils, seriesId?: number) => ({
     ...orpc.bottles.list.queryOptions({
       input: { limit: 4, series: seriesId, sort: "-release" },

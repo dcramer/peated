@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  serializeBottleStructuredData,
   serializeCountryStructuredData,
   serializeRegionStructuredData,
   serializeSeriesStructuredData,
@@ -7,6 +8,45 @@ import {
 
 describe("catalog structured data", () => {
   const country = { name: "Scotland", slug: "scotland", description: null };
+  it("marks up a Product without the combined median as an aggregate rating", () => {
+    const data = JSON.parse(
+      serializeBottleStructuredData({
+        id: 42,
+        name: "16-year-old",
+        brand: { name: "Lagavulin" },
+        description: "A smoky Islay single malt.",
+        imageUrl: "https://images.peated.com/lagavulin.jpg",
+        lastPrice: { currency: "USD", price: 8999 },
+      }),
+    );
+
+    expect(data).toMatchObject({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: "Lagavulin 16-year-old",
+      url: expect.stringContaining("/bottles/42-lagavulin-16-year-old"),
+      offers: {
+        "@type": "AggregateOffer",
+        lowPrice: 89.99,
+        highPrice: 89.99,
+        priceCurrency: "USD",
+      },
+    });
+    expect(data).not.toHaveProperty("aggregateRating");
+  });
+
+  it("escapes Bottle text in structured data", () => {
+    const json = serializeBottleStructuredData({
+      id: 42,
+      name: '</script><script>alert("bottle")</script>',
+      brand: { name: "Example" },
+      description: '</script><script>alert("description")</script>',
+      imageUrl: null,
+      lastPrice: null,
+    });
+    expect(json).not.toContain("<");
+  });
+
   it("describes countries and regions with their browse hierarchy", () => {
     const countryData = JSON.parse(serializeCountryStructuredData(country));
     expect(countryData).toMatchObject({

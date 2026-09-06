@@ -1,11 +1,16 @@
 import {
   mockActivity,
   mockExternalReview,
+  mockMemberReview,
   mockTasting,
 } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, test } from "vitest";
 
-import { getCommunityFeedItems, getTastingFeedItems } from "./communityFeed";
+import {
+  getCommunityFeedItems,
+  getMemberReviewFeedItems,
+  getTastingFeedItems,
+} from "./communityFeed";
 import { getTastingUrl } from "./urls";
 
 const session = mockActivity.find((item) => item.type === "tasting_session")!;
@@ -153,6 +158,28 @@ describe("getTastingFeedItems", () => {
     expect(withoutPhoto?.bottles[0]).toMatchObject({
       imageFit: "contain",
       imageUrl: mockTasting.bottle.imageUrl,
+    });
+  });
+});
+
+describe("getMemberReviewFeedItems", () => {
+  test("maps a member review to a visible Bottle review row", () => {
+    const [item] = getMemberReviewFeedItems(
+      [mockMemberReview],
+      mockMemberReview.bottle,
+    );
+
+    expect(item).toMatchObject({
+      kind: "member_review",
+      actor: mockMemberReview.createdBy.username,
+      action: "reviewed",
+      href: `/reviews/${mockMemberReview.id}`,
+      bottles: [
+        {
+          description: expect.stringContaining("Freshly poured"),
+          score: { value: mockMemberReview.score, scale: 100 },
+        },
+      ],
     });
   });
 });

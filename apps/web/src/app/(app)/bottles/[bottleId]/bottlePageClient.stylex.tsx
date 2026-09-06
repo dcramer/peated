@@ -36,7 +36,10 @@ import {
 } from "@peated/web/lib/addBottle";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
-import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
+import {
+  getMemberReviewFeedItems,
+  getTastingFeedItems,
+} from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { selectOtherSeriesBottles } from "@peated/web/lib/seriesBottleRail";
@@ -442,6 +445,9 @@ export function BottleOverviewClient() {
   const externalReviewsQuery = useQuery(
     bottleOverviewQueries.reviews(orpc, bottle.id),
   );
+  const memberReviewsQuery = useQuery(
+    bottleOverviewQueries.memberReviews(orpc, bottle.id),
+  );
   const tastingsQuery = useQuery(
     bottleOverviewQueries.tastings(orpc, bottle.id),
   );
@@ -456,6 +462,10 @@ export function BottleOverviewClient() {
     externalReviewsQuery.data?.results
       .map(getCriticReview)
       .filter((review): review is CriticReviewProps => review !== null) ?? [];
+  const memberReviews = getMemberReviewFeedItems(
+    memberReviewsQuery.data?.results ?? [],
+    bottle,
+  );
   const tastings = getTastingFeedItems(tastingsQuery.data?.results ?? []);
   const recommendations =
     recommendationsQuery.data?.results.map((recommendation) =>
@@ -487,13 +497,21 @@ export function BottleOverviewClient() {
   ) : null;
   const mainPending =
     !criticReviews.length &&
+    !memberReviews.length &&
     !tastings.length &&
-    (externalReviewsQuery.isPending || tastingsQuery.isPending);
+    (externalReviewsQuery.isPending ||
+      memberReviewsQuery.isPending ||
+      tastingsQuery.isPending);
   const mainFailed =
     !criticReviews.length &&
+    !memberReviews.length &&
     !tastings.length &&
     !mainPending &&
-    Boolean(externalReviewsQuery.error && tastingsQuery.error);
+    Boolean(
+      externalReviewsQuery.error &&
+      memberReviewsQuery.error &&
+      tastingsQuery.error,
+    );
   const mainState = mainPending ? (
     <LoadingList label="Loading bottle reviews and tastings" rows={3} />
   ) : mainFailed ? (
@@ -501,12 +519,13 @@ export function BottleOverviewClient() {
       heading="Reviews and tastings are unavailable"
       onRetry={() => {
         void externalReviewsQuery.refetch();
+        void memberReviewsQuery.refetch();
         void tastingsQuery.refetch();
       }}
     >
       We could not load this bottle's reviews or tastings. Try again.
     </SectionError>
-  ) : !criticReviews.length && !tastings.length ? (
+  ) : !criticReviews.length && !memberReviews.length && !tastings.length ? (
     <EmptyState
       action={
         <ButtonLink
@@ -522,7 +541,7 @@ export function BottleOverviewClient() {
       }
       heading="No reviews or tastings yet"
     >
-      This bottle has no published critic reviews or community tastings.
+      This bottle has no published reviews or community tastings.
     </EmptyState>
   ) : null;
 
@@ -541,6 +560,7 @@ export function BottleOverviewClient() {
           url: bottle.imageUrl,
         }}
         mainState={mainState}
+        memberReviews={memberReviews}
         moreTastingsHref={`${getBottleUrl(bottle)}/tastings`}
         recommendationState={
           recommendationsQuery.isPending ? (
@@ -560,7 +580,10 @@ export function BottleOverviewClient() {
       />
 
       {recommendationsQuery.error ||
-      (!mainFailed && (externalReviewsQuery.error || tastingsQuery.error)) ? (
+      (!mainFailed &&
+        (externalReviewsQuery.error ||
+          memberReviewsQuery.error ||
+          tastingsQuery.error)) ? (
         <p
           role="status"
           {...stylex.props(foundationStyles.metadata, styles.partialError)}

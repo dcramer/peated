@@ -1,7 +1,10 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import {
+  getMemberReviewSeoMetadata,
+  serializeMemberReviewStructuredData,
+} from "@peated/web/lib/reviewSeo";
 import { cache } from "react";
 
 import { ReviewDetail, ReviewRail } from "./reviewDetail.stylex";
@@ -18,21 +21,7 @@ export async function generateMetadata(props: {
 }) {
   const { reviewId } = await props.params;
   const review = await getReview(Number(reviewId));
-  const title = `${formatBottleDisplayName(review.bottle)} — review by ${review.createdBy.username}`;
-
-  return {
-    title,
-    description: review.notes,
-    openGraph: {
-      title,
-      description: review.notes,
-      images: review.imageUrl ? [review.imageUrl] : undefined,
-    },
-    twitter: {
-      card: review.imageUrl ? "summary_large_image" : "summary",
-      images: review.imageUrl ? [review.imageUrl] : undefined,
-    },
-  };
+  return getMemberReviewSeoMetadata(review);
 }
 
 export default async function ReviewPage(props: {
@@ -40,6 +29,7 @@ export default async function ReviewPage(props: {
 }) {
   const { reviewId } = await props.params;
   const review = await getReview(Number(reviewId));
+  const structuredData = serializeMemberReviewStructuredData(review);
   const { client } = await getPublicPageServerClient();
   const [memberTastings, memberReviews, externalReviews] = await Promise.all([
     client.tastings.list({ user: review.createdBy.id, limit: 4 }),
@@ -59,6 +49,12 @@ export default async function ReviewPage(props: {
       }
       railBehavior="stack"
     >
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: structuredData }}
+        />
+      )}
       <ReviewDetail review={review} />
     </PageColumns>
   );

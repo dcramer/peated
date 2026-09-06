@@ -43,7 +43,11 @@ import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { TastingTagSuggestion } from "@peated/web/lib/tastingForm";
-import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
+import {
+  getBottleUrl,
+  getMemberReviewUrl,
+  getTastingUrl,
+} from "@peated/web/lib/urls";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -904,7 +908,7 @@ function AddBottleFlowContent() {
     });
 
     flash("Review saved.", "info");
-    router.push(`/reviews/${review.id}`);
+    router.push(getMemberReviewUrl(review));
   }
 
   if (requestedBottleKey && handledBottleKey !== requestedBottleKey) {
