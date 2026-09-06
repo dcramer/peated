@@ -8,13 +8,19 @@ import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
-import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
+import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getBottleUrl } from "@peated/web/lib/urls";
 import { Suspense } from "react";
+import { z } from "zod";
 
 import { BottleSection } from "../bottleSection.stylex";
+
+const PageSearchParams = z
+  .object({ cursor: z.string().optional() })
+  .passthrough()
+  .catch({});
 
 export default async function BottleTastingsPage(props: {
   params: Promise<{ bottleId: string }>;
@@ -25,11 +31,14 @@ export default async function BottleTastingsPage(props: {
     props.searchParams,
   ]);
   const id = parseCatalogRouteId(bottleId);
-  const cursor = Number(searchParams.cursor ?? 1) || 1;
+  const { cursor } = PageSearchParams.parse(searchParams);
 
   return (
-    <BottleSection ariaLabel="Bottle tastings">
-      <Suspense key={`${id}:${cursor}`} fallback={<TastingResultsLoading />}>
+    <BottleSection ariaLabel="Bottle reviews and tastings">
+      <Suspense
+        key={`${id}:${cursor ?? "first"}`}
+        fallback={<TastingResultsLoading />}
+      >
         <TastingResults id={id} cursor={cursor} searchParams={searchParams} />
       </Suspense>
     </BottleSection>
@@ -37,7 +46,7 @@ export default async function BottleTastingsPage(props: {
 }
 
 function TastingResultsLoading() {
-  return <LoadingList label="Loading tastings" />;
+  return <LoadingList label="Loading reviews and tastings" />;
 }
 
 async function TastingResults({
@@ -46,14 +55,14 @@ async function TastingResults({
   searchParams,
 }: {
   id: number;
-  cursor: number;
+  cursor?: string;
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const [bottle, { client }] = await Promise.all([
     getBottlePage(id),
-    getAnonymousServerClient(),
+    getPublicPageServerClient(),
   ]);
-  const tastingList = await client.tastings.list({
+  const activity = await client.activity.reviewsAndTastings({
     bottle: id,
     cursor,
     limit: 25,
@@ -62,10 +71,10 @@ async function TastingResults({
 
   return (
     <>
-      {tastingList.results.length ? (
+      {activity.results.length ? (
         <CommunityFeed
-          ariaLabel="Bottle tastings"
-          items={getTastingFeedItems(tastingList.results)}
+          ariaLabel="Bottle reviews and tastings"
+          items={getReviewAndTastingFeedItems(activity.results)}
         />
       ) : (
         <EmptyState
@@ -78,23 +87,17 @@ async function TastingResults({
               Log the first tasting
             </ButtonLink>
           }
-          heading="No tastings yet"
+          heading="No reviews or tastings yet"
         >
-          No one has logged a tasting for this bottle.
+          No one has published a review or logged a tasting for this bottle.
         </EmptyState>
       )}
       <CursorPager
-        ariaLabel="Bottle tasting pages"
+        ariaLabel="Bottle review and tasting pages"
         nextHref={getCursorHref(
           pathname,
           searchParams,
-          tastingList.rel.nextCursor,
-        )}
-        page={cursor}
-        previousHref={getCursorHref(
-          pathname,
-          searchParams,
-          tastingList.rel.prevCursor,
+          activity.rel.nextCursor,
         )}
       />
     </>

@@ -51,6 +51,7 @@ export default contract
           id: z.number(),
           fullName: z.string(),
           totalTastings: z.number(),
+          publicReviewAndTastingCount: z.number().int().nonnegative(),
           medianScore: z.number().int().min(0).max(100).nullable(),
         }),
       ),

@@ -14,7 +14,6 @@ import {
   bottles,
   bottleSeries,
   bottlesToDistillers,
-  bottleTags,
   changes,
   collections,
   comments,
@@ -524,6 +523,8 @@ type BottleGroupMemberFixtureData = Partial<
     | "externalScoreCount"
     | "tastingBandCounts"
     | "totalTastings"
+    | "publicReviewAndTastingCount"
+    | "notedReviewAndTastingCount"
     | "numReleases"
     | "createdAt"
     | "updatedAt"
@@ -887,22 +888,6 @@ export const Tasting = async (
       .returning();
 
     if (!result) throw new Error("Unable to create Tasting fixture");
-
-    for (const tag of result.bottleId === null ? [] : result.tags) {
-      await tx
-        .insert(bottleTags)
-        .values({
-          bottleId: result.bottleId!,
-          tag,
-          count: 1,
-        })
-        .onConflictDoUpdate({
-          target: [bottleTags.bottleId, bottleTags.tag],
-          set: {
-            count: sql<string>`${bottleTags.count} + 1`,
-          },
-        });
-    }
 
     return result;
   });

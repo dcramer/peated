@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleTags, tastings } from "@peated/server/db/schema";
+import { tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
@@ -39,12 +39,6 @@ describe("DELETE /tastings/{tasting}", () => {
         where: eq(tastings.id, tasting.id),
       }),
     ).toBeUndefined();
-    expect(
-      await db.query.bottleTags.findFirst({
-        where: (tags, { and, eq }) =>
-          and(eq(tags.bottleId, bottle.id), eq(tags.tag, "caramel")),
-      }),
-    ).toMatchObject({ count: 0 });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
       { bottleId: bottle.id },

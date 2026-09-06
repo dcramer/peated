@@ -43,7 +43,10 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
         formatCount(stats.distilleries, "distilleries"),
         formatCount(stats.brands, "brands"),
         formatCount(stats.bottlers, "bottlers"),
-        formatCount(stats.tastings, "tastings"),
+        formatCount(
+          stats.tastings + stats.memberReviews + stats.externalReviews,
+          "reviews & tastings",
+        ),
       ].join(" · ")
     : undefined;
 

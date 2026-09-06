@@ -17,6 +17,13 @@ export default procedure
   .output(z.object({ status: z.literal("queued") }).strict())
   .handler(async () => {
     await pushUniqueJob(
+      "RepairBottleStats",
+      {},
+      {
+        delay: 0,
+      },
+    );
+    await pushUniqueJob(
       "RepairEntityBottleCounts",
       {},
       {

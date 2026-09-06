@@ -20,14 +20,13 @@ function SignInShell() {
             alt: "",
             src: "/assets/auth-discovery-illustration.webp",
           }}
-          description="Sign in to record what you pour, keep your library, and see critic and community views side by side."
+          description="Sign in to record what you pour, keep your library, and see critic reviews and tasting notes side by side."
           facts={[
             { label: "Bottles", value: "28,430" },
             { label: "Distillers", value: "2,410" },
             { label: "Brands", value: "3,980" },
             { label: "Bottlers", value: "1,545" },
-            { label: "Tastings", value: "142,580" },
-            { label: "Reviews", value: "65,150" },
+            { label: "Reviews & tastings", value: "207,730" },
           ]}
           footer={
             <AuthenticationLink href="/bottles">

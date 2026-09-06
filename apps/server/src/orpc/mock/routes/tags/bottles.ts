@@ -34,6 +34,10 @@ export default mockOS.tags.bottles.handler(({ input }) => {
       );
       return {
         bottle,
+        matchingReviewAndTastingCount: tastings.filter((tasting) =>
+          tasting.tags.some((tag) => selected.includes(tag)),
+        ).length,
+        notedReviewAndTastingCount: tastings.length,
         matchingTastings: tastings.filter((tasting) =>
           tasting.tags.some((tag) => selected.includes(tag)),
         ).length,

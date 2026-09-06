@@ -36,6 +36,8 @@ export const mockBottleGroup = {
     unicorn: 11,
   },
   totalTastings: 75,
+  publicReviewAndTastingCount: 86,
+  notedReviewAndTastingCount: 64,
   totalBottles: 2,
   createdByActorId: 9101,
   createdAt: timestamp,

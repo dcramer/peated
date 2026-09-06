@@ -26,7 +26,7 @@ export type EntityCatalogItem = EntityListItem & {
   isFollowing: boolean;
   ownerPath?: string;
   totalBottles: number;
-  totalTastings: number;
+  publicReviewAndTastingCount: number;
 };
 
 export function getEntityRowActionGroups({
@@ -195,8 +195,8 @@ function EntityCatalogTable({
     },
     {
       align: "right",
-      cell: (item) => item.totalTastings.toLocaleString("en-US"),
-      header: "Tastings",
+      cell: (item) => item.publicReviewAndTastingCount.toLocaleString("en-US"),
+      header: "Reviews & tastings",
       key: "tastings",
       priority: "secondary",
       width: "count",

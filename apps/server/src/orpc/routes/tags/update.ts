@@ -1,13 +1,20 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
-import { tags } from "@peated/server/db/schema";
+import {
+  bottleTags,
+  externalReviews,
+  memberReviews,
+  tags,
+  tastings,
+} from "@peated/server/db/schema";
+import { dispatchBottleStatsRecomputes } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { TagInputSchema, TagSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TagSerializer } from "@peated/server/serializers/tag";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -60,6 +67,34 @@ export default procedure
       return await serialize(TagSerializer, tag, context.user);
     }
 
+    let affectedBottleIds: number[] = [];
+    if (data.tagCategory !== undefined || data.synonyms !== undefined) {
+      const names = [tag.name, ...tag.synonyms, ...(data.synonyms ?? [])];
+      const namesSql = sql`ARRAY[${sql.join(
+        names.map((name) => sql`${name}`),
+        sql`, `,
+      )}]::varchar[]`;
+      const affected = await db.execute<{ bottleId: number | string }>(sql`
+        SELECT ${bottleTags.bottleId} AS "bottleId"
+        FROM ${bottleTags}
+        WHERE ${bottleTags.tag} = ${tag.name}
+        UNION
+        SELECT ${tastings.bottleId} AS "bottleId"
+        FROM ${tastings}
+        WHERE ${tastings.tags} && ${namesSql}
+        UNION
+        SELECT ${memberReviews.bottleId} AS "bottleId"
+        FROM ${memberReviews}
+        WHERE ${memberReviews.tags} && ${namesSql}
+        UNION
+        SELECT ${externalReviews.bottleId} AS "bottleId"
+        FROM ${externalReviews}
+        WHERE ${externalReviews.bottleId} IS NOT NULL
+          AND ${externalReviews.tags} && ${namesSql}
+      `);
+      affectedBottleIds = affected.rows.map(({ bottleId }) => Number(bottleId));
+    }
+
     const [newTag] = await db
       .update(tags)
       .set(data)
@@ -70,6 +105,10 @@ export default procedure
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update tag.",
       });
+    }
+
+    if (affectedBottleIds.length) {
+      await dispatchBottleStatsRecomputes("tag", tag.name, affectedBottleIds);
     }
 
     return await serialize(TagSerializer, newTag, context.user);

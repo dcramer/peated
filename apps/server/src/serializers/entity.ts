@@ -140,6 +140,7 @@ export const EntitySerializer = serializer({
       updatedAt: item.updatedAt.toISOString(),
 
       totalTastings: item.totalTastings,
+      publicReviewAndTastingCount: item.publicReviewAndTastingCount,
       totalBottles: item.totalBottles,
       isFollowing: attrs.isFollowing,
     };

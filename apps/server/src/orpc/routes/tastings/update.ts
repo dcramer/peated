@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import type { NewTasting, Tasting } from "@peated/server/db/schema";
-import { bottleTags, follows, tastings } from "@peated/server/db/schema";
+import { follows, tastings } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -11,7 +11,7 @@ import { validateTags } from "@peated/server/orpc/validators/tags";
 import { TastingSchema, TastingUpdateFields } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
@@ -166,42 +166,9 @@ export default procedure
       }
       if (!newTasting) return;
 
-      if (tastingData.tags !== undefined) {
-        const bottleId = currentTasting.bottleId!;
-        for (const tag of currentTasting.tags) {
-          await tx
-            .update(bottleTags)
-            .set({
-              count: sql`${bottleTags.count} - 1`,
-            })
-            .where(
-              and(
-                eq(bottleTags.bottleId, bottleId),
-                eq(bottleTags.tag, tag),
-                gt(bottleTags.count, 0),
-              ),
-            );
-        }
-        for (const tag of newTasting.tags) {
-          await tx
-            .insert(bottleTags)
-            .values({
-              bottleId,
-              tag,
-              count: 1,
-            })
-            .onConflictDoUpdate({
-              target: [bottleTags.bottleId, bottleTags.tag],
-              set: {
-                count: sql<string>`${bottleTags.count} + 1`,
-              },
-            });
-        }
-      }
-
       return {
         tasting: newTasting,
-        statsBottleId: ratingChanged ? currentTasting.bottleId : null,
+        statsBottleId: needsBottle ? currentTasting.bottleId : null,
       };
     });
 

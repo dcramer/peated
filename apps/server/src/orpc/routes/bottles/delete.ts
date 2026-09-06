@@ -4,6 +4,7 @@ import {
   bottleFlavorProfiles,
   bottleGroupDistillers,
   bottleGroups,
+  bottleNoteCategories,
   bottleReferences,
   bottleTags,
   bottleTombstones,
@@ -239,6 +240,9 @@ export default procedure
       await tx
         .delete(bottleFlavorProfiles)
         .where(eq(bottleFlavorProfiles.bottleId, bottle.id));
+      await tx
+        .delete(bottleNoteCategories)
+        .where(eq(bottleNoteCategories.bottleId, bottle.id));
       await tx
         .delete(bottlesToDistillers)
         .where(eq(bottlesToDistillers.bottleId, bottle.id));

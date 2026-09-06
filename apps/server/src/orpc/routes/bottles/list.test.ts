@@ -6,6 +6,7 @@ import {
   entityFollows,
   flightBottles,
 } from "@peated/server/db/schema";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -586,6 +587,11 @@ describe("GET /bottles", () => {
   test("filters tags by direct Bottle identity", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
     const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
+    await Promise.all(
+      ["smoky", "peated", "retained-only"].map((name) =>
+        fixtures.TagOrExisting({ name, tagCategory: "smoke" }),
+      ),
+    );
     await fixtures.Tasting({
       bottleId: bottle2.id,
       tags: ["smoky", "peated"],
@@ -594,6 +600,8 @@ describe("GET /bottles", () => {
       bottleId: bottle1.id,
       tags: ["retained-only"],
     });
+    await recomputeBottleStats(bottle1.id);
+    await recomputeBottleStats(bottle2.id);
 
     const [targetMatch, retainedMatch] = await Promise.all([
       routerClient.bottles.list({ tag: "smoky" }),
@@ -655,13 +663,13 @@ describe("GET /bottles", () => {
       Array.from({ length: 5 }, (_, index) =>
         fixtures.Bottle({
           name: `Flight Bottle ${index + 1}`,
-          totalTastings: index + 1,
+          publicReviewAndTastingCount: index + 1,
         }),
       ),
     );
     await fixtures.Bottle({
       name: "Outside flight",
-      totalTastings: 100,
+      publicReviewAndTastingCount: 100,
     });
     const flight = await fixtures.Flight({
       name: "Paginated flight",
@@ -1041,14 +1049,16 @@ describe("GET /bottles", () => {
     expect(followedEntityCount).toBe(3);
   });
 
-  test("sorts bottles by tastings ascending", async ({ fixtures }) => {
+  test("sorts bottles by public reviews and tastings ascending", async ({
+    fixtures,
+  }) => {
     const bottle1 = await fixtures.Bottle({
       name: "Popular Bottle",
-      totalTastings: 10,
+      publicReviewAndTastingCount: 10,
     });
     const bottle2 = await fixtures.Bottle({
       name: "Less Popular",
-      totalTastings: 5,
+      publicReviewAndTastingCount: 5,
     });
 
     const { results } = await routerClient.bottles.list({
@@ -1056,20 +1066,20 @@ describe("GET /bottles", () => {
     });
 
     expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id); // 5 tastings first
-    expect(results[1].id).toBe(bottle1.id); // 10 tastings
+    expect(results[0].id).toBe(bottle2.id);
+    expect(results[1].id).toBe(bottle1.id);
   });
 
-  test("sorts bottles by tastings descending (default)", async ({
+  test("sorts bottles by public reviews and tastings descending", async ({
     fixtures,
   }) => {
     const bottle1 = await fixtures.Bottle({
       name: "Less Popular",
-      totalTastings: 5,
+      publicReviewAndTastingCount: 5,
     });
     const bottle2 = await fixtures.Bottle({
       name: "Popular Bottle",
-      totalTastings: 10,
+      publicReviewAndTastingCount: 10,
     });
 
     const { results } = await routerClient.bottles.list({
@@ -1077,8 +1087,8 @@ describe("GET /bottles", () => {
     });
 
     expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id); // 10 tastings first
-    expect(results[1].id).toBe(bottle1.id); // 5 tastings
+    expect(results[0].id).toBe(bottle2.id);
+    expect(results[1].id).toBe(bottle1.id);
   });
 
   test("sorts bottles by median score with nulls last", async ({
@@ -1155,16 +1165,16 @@ describe("GET /bottles", () => {
     );
   });
 
-  test("sorts bottles by rank without query (falls back to tastings)", async ({
+  test("sorts bottles by rank without query (falls back to public reviews and tastings)", async ({
     fixtures,
   }) => {
     const bottle1 = await fixtures.Bottle({
       name: "Less Popular",
-      totalTastings: 5,
+      publicReviewAndTastingCount: 5,
     });
     const bottle2 = await fixtures.Bottle({
       name: "Popular Bottle",
-      totalTastings: 10,
+      publicReviewAndTastingCount: 10,
     });
 
     const { results } = await routerClient.bottles.list({
@@ -1172,7 +1182,7 @@ describe("GET /bottles", () => {
     });
 
     expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id); // Higher tastings first
+    expect(results[0].id).toBe(bottle2.id);
     expect(results[1].id).toBe(bottle1.id);
   });
 
@@ -1219,7 +1229,7 @@ describe("GET /bottles", () => {
       bottles.push(
         await fixtures.Bottle({
           name: `Bottle ${i}`,
-          totalTastings: i, // For consistent ordering
+          publicReviewAndTastingCount: i,
         }),
       );
     }

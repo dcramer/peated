@@ -2,6 +2,7 @@ import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import { bottleTombstones, bottles } from "@peated/server/db/schema";
 import { aggregateBottleActivityStatsInTransaction } from "@peated/server/lib/recomputeBottleActivityStats";
+import { recomputeBottleNoteStatsInTransaction } from "@peated/server/lib/recomputeBottleNoteStats";
 import { eq } from "drizzle-orm";
 
 export type BottleStatsIntegrityErrorCode =
@@ -26,6 +27,8 @@ export type BottleStatsResult = Omit<
     | "id"
     | "groupId"
     | "totalTastings"
+    | "publicReviewAndTastingCount"
+    | "notedReviewAndTastingCount"
     | "medianScore"
     | "minScore"
     | "maxScore"
@@ -70,15 +73,20 @@ export async function recomputeBottleStatsInTransaction(
     throw new BottleStatsIntegrityError("unmigrated", bottleId);
   }
 
-  const stats = await aggregateBottleActivityStatsInTransaction(tx, [bottleId]);
+  const activityStats = await aggregateBottleActivityStatsInTransaction(tx, [
+    bottleId,
+  ]);
+  const noteStats = await recomputeBottleNoteStatsInTransaction(tx, bottleId);
   const [persisted] = await tx
     .update(bottles)
-    .set({ ...stats, updatedAt: new Date() })
+    .set({ ...activityStats, ...noteStats, updatedAt: new Date() })
     .where(eq(bottles.id, bottleId))
     .returning({
       id: bottles.id,
       groupId: bottles.groupId,
       totalTastings: bottles.totalTastings,
+      publicReviewAndTastingCount: bottles.publicReviewAndTastingCount,
+      notedReviewAndTastingCount: bottles.notedReviewAndTastingCount,
       medianScore: bottles.medianScore,
       minScore: bottles.minScore,
       maxScore: bottles.maxScore,

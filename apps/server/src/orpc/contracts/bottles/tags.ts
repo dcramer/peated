@@ -6,7 +6,7 @@ export default contract
     method: "GET",
     path: "/bottles/{bottle}/tags",
     summary: "Get bottle tags",
-    description: "Get common tasting tags for a bottle",
+    description: "Get common tasting tags from public reviews and tastings",
     spec: (spec) => ({ ...spec, operationId: "getBottleTags" }),
   })
   .input(
@@ -23,6 +23,8 @@ export default contract
           count: z.number(),
         }),
       ),
+      /** @deprecated Use publicReviewAndTastingCount. TODO(api-v1): Remove when /v1 is retired. */
       totalCount: z.number(),
+      publicReviewAndTastingCount: z.number().int().nonnegative(),
     }),
   );

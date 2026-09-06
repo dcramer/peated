@@ -269,6 +269,19 @@ async function handleRpcRequest({ request, response, url }) {
         });
       }
       return true;
+    case "activity/reviewsAndTastings":
+      sendRpcResponse(response, {
+        results: [
+          { type: "tasting", tasting: buildTasting() },
+          {
+            type: "member_review",
+            review: { ...createdMemberReview, bottle: existingBottle },
+          },
+          { type: "critic_review", review: activityReview },
+        ],
+        rel: { nextCursor: null },
+      });
+      return true;
     case "users/activity/list":
       sendRpcResponse(
         response,
@@ -1559,17 +1572,24 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     case "bottles/flavorProfile":
       sendRpcResponse(response, {
-        notedTastings: 4,
+        notedReviewAndTastingCount: 3,
+        notedTastings: 3,
         categories: [
           {
             category: "smoke",
+            reviewAndTastingCount: 3,
             tastingCount: 3,
-            notes: [{ name: "peat", tastingCount: 3 }],
+            notes: [
+              { name: "peat", reviewAndTastingCount: 3, tastingCount: 3 },
+            ],
           },
           {
             category: "fruit",
+            reviewAndTastingCount: 1,
             tastingCount: 1,
-            notes: [{ name: "apple", tastingCount: 1 }],
+            notes: [
+              { name: "apple", reviewAndTastingCount: 1, tastingCount: 1 },
+            ],
           },
         ],
       });
@@ -1577,7 +1597,13 @@ async function handleRpcRequest({ request, response, url }) {
     case "tags/bottles":
       sendRpcResponse(response, {
         results: [
-          { bottle: existingBottle, matchingTastings: 3, taggedTastings: 4 },
+          {
+            bottle: existingBottle,
+            matchingReviewAndTastingCount: 3,
+            notedReviewAndTastingCount: 4,
+            matchingTastings: 3,
+            taggedTastings: 4,
+          },
         ],
       });
       return true;
@@ -1590,6 +1616,7 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, {
         results: [],
         totalCount: 0,
+        publicReviewAndTastingCount: 0,
       });
       return true;
     case "comments/list":

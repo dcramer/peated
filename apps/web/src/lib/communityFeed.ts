@@ -12,6 +12,8 @@ import {
 
 type CriticReview = Outputs["externalReviews"]["list"]["results"][number];
 type Activity = Outputs["activity"]["list"]["results"][number];
+type ReviewAndTasting =
+  Outputs["activity"]["reviewsAndTastings"]["results"][number];
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
@@ -83,6 +85,52 @@ export function getMemberReviewFeedItems(
   }));
 }
 
+function criticReviewFeedItem(
+  review: CriticReview,
+  id = `critic-${review.id}`,
+): CommunityFeedItem | null {
+  if (!review.bottle) return null;
+  const source = review.site?.name ?? review.reviewerName ?? "Critic";
+  return {
+    id,
+    kind: "critic_review",
+    actor: source,
+    actorHref: review.url,
+    actorImageUrl: review.site?.imageUrl,
+    action: "published a review",
+    date: review.article.publishedAt ?? review.createdAt,
+    href: review.url,
+    bottles: [
+      {
+        ...feedBottle(review.bottle),
+        description: getPreview(review.clip ?? review.article.title),
+        tags: review.extractedTags,
+        byline:
+          review.reviewerName && review.reviewerName !== source
+            ? review.reviewerName
+            : undefined,
+        score: review.nativeScore ?? undefined,
+      },
+    ],
+  };
+}
+
+/** Maps combined Bottle, brand, and producer lists while preserving the source. */
+export function getReviewAndTastingFeedItems(
+  entries: readonly ReviewAndTasting[],
+): CommunityFeedItem[] {
+  return entries.flatMap((entry) => {
+    if (entry.type === "tasting") {
+      return [tastingFeedItem(entry.tasting)];
+    }
+    if (entry.type === "member_review") {
+      return getMemberReviewFeedItems([entry.review], entry.review.bottle);
+    }
+    const item = criticReviewFeedItem(entry.review);
+    return item ? [item] : [];
+  });
+}
+
 export function getCommunityFeedItems({
   criticReviews,
   activity,
@@ -91,62 +139,14 @@ export function getCommunityFeedItems({
   activity: readonly Activity[];
 }): CommunityFeedItem[] {
   const criticItems = criticReviews.flatMap((review): CommunityFeedItem[] => {
-    if (!review.bottle) return [];
-    const source = review.site?.name ?? review.reviewerName ?? "Critic";
-    return [
-      {
-        id: `critic-${review.id}`,
-        kind: "critic_review",
-        actor: source,
-        actorHref: review.url,
-        actorImageUrl: review.site?.imageUrl,
-        action: "published a review",
-        date: review.article.publishedAt ?? review.createdAt,
-        href: review.url,
-        bottles: [
-          {
-            ...feedBottle(review.bottle),
-            description: getPreview(review.clip ?? review.article.title),
-            tags: review.extractedTags,
-            byline:
-              review.reviewerName && review.reviewerName !== source
-                ? review.reviewerName
-                : undefined,
-            score: review.nativeScore ?? undefined,
-          },
-        ],
-      },
-    ];
+    const item = criticReviewFeedItem(review);
+    return item ? [item] : [];
   });
   const memberItems = activity.flatMap((entry): CommunityFeedItem[] => {
     if (entry.type === "critic_review") {
       const review = entry.review;
-      if (!review.bottle) return [];
-      const source = review.site?.name ?? review.reviewerName ?? "Critic";
-      return [
-        {
-          id: entry.id,
-          kind: "critic_review",
-          actor: source,
-          actorHref: review.url,
-          actorImageUrl: review.site?.imageUrl,
-          action: "published a review",
-          date: entry.createdAt,
-          href: review.url,
-          bottles: [
-            {
-              ...feedBottle(review.bottle),
-              description: getPreview(review.clip ?? review.article.title),
-              tags: review.extractedTags,
-              byline:
-                review.reviewerName && review.reviewerName !== source
-                  ? review.reviewerName
-                  : undefined,
-              score: review.nativeScore ?? undefined,
-            },
-          ],
-        },
-      ];
+      const item = criticReviewFeedItem(review, entry.id);
+      return item ? [{ ...item, date: entry.createdAt }] : [];
     }
     const actor = {
       actor: entry.createdBy.username,

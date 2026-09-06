@@ -15,10 +15,10 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     await expect(
       routerClient.admin.repairBottleCounts({}, { context: { user: admin } }),
     ).resolves.toEqual({ status: "queued" });
-    expect(pushUniqueJob).toHaveBeenCalledTimes(5);
+    expect(pushUniqueJob).toHaveBeenCalledTimes(6);
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       1,
-      "RepairEntityBottleCounts",
+      "RepairBottleStats",
       {},
       {
         delay: 0,
@@ -26,7 +26,7 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     );
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       2,
-      "RepairLocationBottleCounts",
+      "RepairEntityBottleCounts",
       {},
       {
         delay: 0,
@@ -34,7 +34,7 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     );
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       3,
-      "RepairBottleGroupBottleCounts",
+      "RepairLocationBottleCounts",
       {},
       {
         delay: 0,
@@ -42,7 +42,7 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     );
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       4,
-      "RepairBottleSeriesReleaseCounts",
+      "RepairBottleGroupBottleCounts",
       {},
       {
         delay: 0,
@@ -50,6 +50,14 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     );
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
       5,
+      "RepairBottleSeriesReleaseCounts",
+      {},
+      {
+        delay: 0,
+      },
+    );
+    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+      6,
       "RepairCollectionBottleCounts",
       {},
       {

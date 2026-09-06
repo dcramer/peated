@@ -143,7 +143,11 @@ export default mockOS.bottles.list.handler(
             direction * ((left.medianScore ?? 0) - (right.medianScore ?? 0))
           );
         case "tastings":
-          return direction * (left.totalTastings - right.totalTastings);
+          return (
+            direction *
+            (left.publicReviewAndTastingCount -
+              right.publicReviewAndTastingCount)
+          );
         case "rank":
           return 0;
         case "created":
