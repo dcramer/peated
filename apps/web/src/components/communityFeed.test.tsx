@@ -96,4 +96,28 @@ describe("CommunityFeed", () => {
       "Second Bottle",
     ]);
   });
+
+  it("shows a compact tasting-note preview and preserves the full count", () => {
+    const item: CommunityFeedItem = {
+      id: "review-1",
+      kind: "member_review",
+      actor: "alice",
+      action: "reviewed",
+      date: "2026-09-04T12:00:00.000Z",
+      bottles: [
+        {
+          id: "1",
+          name: "Example Bottle",
+          tags: ["smoke", "brine", "lemon", "vanilla", "pepper", "oak"],
+        },
+      ],
+    };
+
+    act(() => root.render(<CommunityFeed items={[item]} />));
+
+    const notes = container.querySelector('[aria-label="Tasting notes"]');
+    expect(notes?.textContent).toBe("smokebrinelemonvanilla+2 more");
+    expect(notes?.textContent).not.toContain("pepper");
+    expect(notes?.textContent).not.toContain("oak");
+  });
 });

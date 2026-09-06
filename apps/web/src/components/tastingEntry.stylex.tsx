@@ -136,12 +136,7 @@ export function TastingEntry({
               {member.tags?.length ? (
                 <div {...stylex.props(styles.tags)}>
                   {member.tags.map((tag, index) => (
-                    <Chip
-                      key={`${tag}-${index}`}
-                      variant={index < 2 ? "tinted" : "neutral"}
-                    >
-                      {tag}
-                    </Chip>
+                    <Chip key={`${tag}-${index}`}>{tag}</Chip>
                   ))}
                 </div>
               ) : null}

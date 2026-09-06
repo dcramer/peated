@@ -88,6 +88,27 @@ export const TastingList: Story = {
     },
   },
 };
+export const ManyTastingNotes: Story = {
+  args: {
+    ariaLabel: "Tastings",
+    items: withStoryImages(
+      getTastingFeedItems([
+        {
+          ...mockTastings[0]!,
+          tags: ["smoke", "brine", "lemon", "vanilla", "pepper", "oak"],
+        },
+      ]),
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Compact rows show the first four tasting notes and summarize the remaining count. The detail page keeps the full list.",
+      },
+    },
+  },
+};
 export const NarrowColumn: Story = {
   decorators: [
     (Story) => (

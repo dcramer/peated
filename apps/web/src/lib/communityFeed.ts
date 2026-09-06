@@ -44,6 +44,7 @@ function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
         description: getPreview(tasting.notes),
         imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
         ratingBand: tasting.ratingBand,
+        tags: tasting.tags,
       },
     ],
   } satisfies CommunityFeedItem;
@@ -76,6 +77,7 @@ export function getMemberReviewFeedItems(
         id: String(review.id),
         score: { value: review.score, scale: 100 },
         description: getPreview(review.notes),
+        tags: review.tags,
       },
     ],
   }));
@@ -105,6 +107,7 @@ export function getCommunityFeedItems({
           {
             ...feedBottle(review.bottle),
             description: getPreview(review.clip ?? review.article.title),
+            tags: review.extractedTags,
             byline:
               review.reviewerName && review.reviewerName !== source
                 ? review.reviewerName
@@ -134,6 +137,7 @@ export function getCommunityFeedItems({
             {
               ...feedBottle(review.bottle),
               description: getPreview(review.clip ?? review.article.title),
+              tags: review.extractedTags,
               byline:
                 review.reviewerName && review.reviewerName !== source
                   ? review.reviewerName
@@ -168,6 +172,7 @@ export function getCommunityFeedItems({
               ...feedBottle(entry.review.bottle),
               score: { value: entry.review.score, scale: 100 },
               description: getPreview(entry.review.notes),
+              tags: entry.review.tags,
             },
           ],
         },
