@@ -66,7 +66,8 @@ export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
 export const EXTERNAL_SITE_DEFINITIONS = {
   // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", runEvery: null },
-  berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: 10080 },
+  // Berry Bros. & Rudd stays manual-only because robots.txt disallows its search page.
+  berrybrosrudd: { name: "Berry Bros. & Rudd", runEvery: null },
   bruichladdich: { name: "Bruichladdich", runEvery: 10080 },
   cadenheads: { name: "Cadenheads", runEvery: 10080 },
   compassbox: { name: "Compass Box", runEvery: 10080 },
