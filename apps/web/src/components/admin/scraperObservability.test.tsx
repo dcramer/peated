@@ -65,14 +65,20 @@ const run = {
   id: 42,
   status: "queued",
   trigger: "scheduled",
+  purpose: "collect",
   requestedById: null,
   attemptCount: 3,
   requestLimit: 40,
   sliceRequestCount: 0,
   requestCount: 20,
+  requestErrorCount: 4,
   retryCount: 3,
   rateLimitCount: 2,
+  recordType: "review",
   emittedItemCount: 15,
+  newItemCount: 4,
+  existingItemCount: 10,
+  untrackedItemCount: 1,
   itemCount: null,
   error: null,
   nextAttemptAt: "2099-08-18T12:30:00.000Z",
@@ -155,9 +161,13 @@ describe("scraper observability", () => {
     const html = renderToStaticMarkup(<ExternalSiteRunTelemetry run={run} />);
 
     expect(html).toContain("20 / 40 requests");
+    expect(html).toContain("4 errors");
     expect(html).toContain("3 retries");
-    expect(html).toContain("2 rate limits");
-    expect(html).toContain("15 items emitted");
+    expect(html).toContain("2 slow-downs");
+    expect(html).toContain("15 records");
+    expect(html).toContain("4 new");
+    expect(html).toContain("10 seen before");
+    expect(html).toContain("1 not tracked");
     expect(html).toContain("continues");
   });
 

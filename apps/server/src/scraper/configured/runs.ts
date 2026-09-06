@@ -67,8 +67,11 @@ export async function createPinnedScrapeSourceRun(
     .values({
       externalSiteId: source.externalSiteId,
       trigger: input.trigger,
+      purpose: input.purpose,
       requestedById: input.requestedById,
       requestLimit: scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
+      requestErrorCount: 0,
+      recordType: rules.kind,
     })
     .returning();
   if (!run) throw new Error("Failed to create source run.");
@@ -110,8 +113,10 @@ export async function createScrapeSourceSuggestionRun(input: {
       .values({
         externalSiteId: source.externalSiteId,
         trigger: "manual",
+        purpose: "suggest",
         requestedById: input.requestedById,
         requestLimit: suggestionRequestLimit(source.sampleUrls.length),
+        requestErrorCount: 0,
       })
       .returning();
     if (!run) throw new Error("Failed to create AI suggestion run.");

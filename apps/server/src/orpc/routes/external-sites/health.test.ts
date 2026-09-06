@@ -75,7 +75,7 @@ test("health list reports source inventory, runtime, and latest execution", asyn
       rateLimitCount: 1,
       emittedItemCount: 8,
       itemCount: 8,
-      error: "Unexpected scraper failure. See Sentry for this run.",
+      error: "The scraper failed unexpectedly. See Sentry for details.",
       startedAt: new Date("2026-08-12T11:59:00.000Z"),
       completedAt,
     })

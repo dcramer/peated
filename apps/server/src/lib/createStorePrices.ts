@@ -266,6 +266,7 @@ async function persistStorePriceInTransaction({
     if (created) {
       return {
         price: created,
+        isNew: true,
         identityChanged: false,
         sourceIdentityReused: false,
       };
@@ -343,7 +344,12 @@ async function persistStorePriceInTransaction({
       `Store price changed while it was being saved (${existing.id}).`,
     );
   }
-  return { price: updated, identityChanged, sourceIdentityReused };
+  return {
+    price: updated,
+    isNew: false,
+    identityChanged,
+    sourceIdentityReused,
+  };
 }
 
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
@@ -360,9 +366,11 @@ export async function createStorePrices(
     throw new ExternalSiteNotFoundError(input.site);
   }
 
+  let newItemCount = 0;
+  let existingItemCount = 0;
   for (let at = 0; at < input.prices.length; at += 10) {
     const prices = input.prices.slice(at, at + 10);
-    await Promise.all(
+    const results = await Promise.all(
       prices.map(async (sp) => {
         const normalizedBarcode =
           sp.barcode === undefined || sp.barcode === null
@@ -449,6 +457,7 @@ export async function createStorePrices(
             return {
               price: {
                 id: priceId,
+                isNew: persisted.isNew,
                 imageUrl: persisted.price.imageUrl,
                 identityChanged: persisted.identityChanged,
                 hasDirectMatch,
@@ -492,13 +501,17 @@ export async function createStorePrices(
             priceId: price.id,
           });
         }
+        return price.isNew;
       }),
     );
+    newItemCount += results.filter(Boolean).length;
+    existingItemCount += results.filter((isNew) => !isNew).length;
   }
+  return { newItemCount, existingItemCount };
 }
 
 /** Trusted worker capability; callers cannot select an arbitrary actor. */
 export async function createStorePricesAsPeated(input: CreateStorePricesInput) {
   const actor = await getPeatedSystemActor();
-  await createStorePrices(input, actor.id);
+  return await createStorePrices(input, actor.id);
 }

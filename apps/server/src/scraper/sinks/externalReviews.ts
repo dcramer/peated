@@ -5,11 +5,15 @@ import type { ScraperSink } from "../types";
 export const externalReviewSink: ScraperSink<
   ExternalReviewArticleIngestion
 > = async ({ externalSiteId, observation }) => {
-  await ingestExternalReviewArticle({
+  const result = await ingestExternalReviewArticle({
     externalSiteId,
     fetchedAt: new Date(),
     article: observation.value.article,
     externalReviewTexts: observation.value.externalReviewTexts,
     externalReviewBodies: observation.value.externalReviewBodies,
   });
+  return {
+    newItemCount: result.newItemCount,
+    existingItemCount: result.existingItemCount,
+  };
 };

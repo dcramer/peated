@@ -313,6 +313,7 @@ export function createLocalScrapeSourcePreview(input: {
   return {
     key: `local-preview-${input.siteKey}`,
     externalSiteKey: input.siteKey,
+    recordType: input.rules.kind,
     targetKeys: [input.targetKey],
     requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,
@@ -344,7 +345,7 @@ function createScrapeSourceDefinition(input: {
       ? async () => {}
       : input.rules.kind === "review"
         ? async ({ externalSiteId, observation }) => {
-            await externalReviewSink({
+            return await externalReviewSink({
               externalSiteId,
               observation: {
                 ...observation,
@@ -356,7 +357,7 @@ function createScrapeSourceDefinition(input: {
           }
         : input.rules.kind === "catalog"
           ? async ({ externalSiteId, observation }) => {
-              await catalogListingSink({
+              return await catalogListingSink({
                 externalSiteId,
                 observation: {
                   ...observation,
@@ -367,7 +368,7 @@ function createScrapeSourceDefinition(input: {
               });
             }
           : async ({ externalSiteId, observation }) => {
-              await createStorePriceSink(input.siteKey)({
+              return await createStorePriceSink(input.siteKey)({
                 externalSiteId,
                 observation: {
                   ...observation,
@@ -403,6 +404,7 @@ function createScrapeSourceDefinition(input: {
   return {
     key: `source-${input.scrapeSourceId}`,
     externalSiteKey: input.siteKey,
+    recordType: input.rules.kind,
     targetKeys: [input.targetKey],
     requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
     resumeFromLastRun: false,

@@ -59,6 +59,7 @@ async function setupRun({
     sink ??
     (async ({ observation }) => {
       observations.set(observation.sourceKey, observation.value);
+      return { newItemCount: 1, existingItemCount: 0 };
     });
   const registry = createScraperRegistry({
     targets: [
@@ -146,6 +147,8 @@ test("executes the fixture adapter through request, emit, checkpoint, and comple
     sliceRequestCount: 2,
     requestCount: 2,
     emittedItemCount: 2,
+    newItemCount: 2,
+    existingItemCount: 0,
     itemCount: 2,
     cursor: { page: 2 },
     executionToken: null,
@@ -177,7 +180,7 @@ test("fails a queued run before adapter execution when its target is disabled", 
     status: "failed",
     attemptCount: 1,
     requestCount: 0,
-    error: "Scraper target fixture-target is disabled.",
+    error: "The source is disabled.",
   });
 });
 
@@ -525,6 +528,6 @@ test("invalid persisted cursor fails before adapter or network execution", async
     .where(eq(externalSiteRuns.id, run.id));
   expect(stored).toMatchObject({
     status: "failed",
-    error: "Scraper data failed validation.",
+    error: "The source returned data we could not use.",
   });
 });

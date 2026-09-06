@@ -20,7 +20,11 @@ import {
   SCRAPE_SOURCE_KIND_LIST,
   type StoredScrapeRules,
 } from "../../scraper/configured/rules";
-import { externalSiteRuns, externalSites } from "./externalSites";
+import {
+  externalSiteRuns,
+  externalSites,
+  scrapeSourceRunPurposeEnum,
+} from "./externalSites";
 import { users } from "./users";
 
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
@@ -38,12 +42,6 @@ export const scrapeSourcePreviewStatusEnum = pgEnum(
   "scrape_source_preview_status",
   ["pending", "passed", "failed"],
 );
-
-export const scrapeSourceRunPurposeEnum = pgEnum("scrape_source_run_purpose", [
-  "collect",
-  "preview",
-  "suggest",
-]);
 
 export const scrapeSources = pgTable(
   "scrape_source",

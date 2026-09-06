@@ -5,7 +5,7 @@ import type { ScraperSink } from "../types";
 export const bottleObservationSink: ScraperSink<
   LegacyBottleObservation
 > = async ({ observation }) => {
-  await persistBottleObservation(
+  return await persistBottleObservation(
     observation.value.bottle,
     observation.value.price,
     observation.value.imageUrl,

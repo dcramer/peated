@@ -315,13 +315,50 @@ export async function recordScrapeRateLimit({
         .where(eq(scrapeTargets.key, targetKey));
       await tx
         .update(externalSiteRuns)
-        .set({ rateLimitCount: run.rateLimitCount + 1 })
+        .set({
+          rateLimitCount: run.rateLimitCount + 1,
+          requestErrorCount: (run.requestErrorCount ?? 0) + 1,
+        })
         .where(eq(externalSiteRuns.id, runId));
 
       return blockedUntil;
     });
   } catch (error) {
     if (error instanceof ScraperCoordinationError) throw error;
+    throw new ScraperCoordinationError(error);
+  }
+}
+
+/** Records one failed remote request without retaining its URL or response. */
+export async function recordScrapeRequestError({
+  runId,
+  executionToken,
+  database = db,
+}: {
+  runId: number;
+  executionToken: string;
+  database?: CoordinatorDatabase;
+}) {
+  try {
+    await database.transaction(async (tx) => {
+      const [run] = await tx
+        .select()
+        .from(externalSiteRuns)
+        .where(eq(externalSiteRuns.id, runId))
+        .for("update");
+      if (
+        !run ||
+        run.status !== "running" ||
+        run.executionToken !== executionToken
+      ) {
+        return;
+      }
+      await tx
+        .update(externalSiteRuns)
+        .set({ requestErrorCount: (run.requestErrorCount ?? 0) + 1 })
+        .where(eq(externalSiteRuns.id, runId));
+    });
+  } catch (error) {
     throw new ScraperCoordinationError(error);
   }
 }

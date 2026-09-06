@@ -3,6 +3,7 @@ import {
   acquireScrapePermit,
   type PermitDenialReason,
   recordScrapeRateLimit,
+  recordScrapeRequestError,
   releaseScrapePermit,
 } from "./coordinator";
 import { resolveScraperOrigin } from "./definitions";
@@ -321,6 +322,7 @@ export async function requestScraperUrl({
           token: permit.token,
           now: clock.now(),
         });
+        await recordScrapeRequestError({ runId, executionToken });
         const canRetry =
           retry < permit.maxRetries &&
           (method === "GET" || request.retryable === true);
@@ -364,6 +366,7 @@ export async function requestScraperUrl({
           token: permit.token,
           now: clock.now(),
         });
+        await recordScrapeRequestError({ runId, executionToken });
         if (permit.remainingRequests <= 0) {
           throw new ScraperRequestDeferredError("run_budget", null);
         }
@@ -382,6 +385,7 @@ export async function requestScraperUrl({
           now: clock.now(),
         });
         if (!location) {
+          await recordScrapeRequestError({ runId, executionToken });
           throw new ScraperHttpStatusError(
             response.status,
             currentUrl,
@@ -400,6 +404,7 @@ export async function requestScraperUrl({
           resetRateLimitStreak: response.status < 500,
           now: clock.now(),
         });
+        await recordScrapeRequestError({ runId, executionToken });
         throw new ScraperHttpStatusError(
           response.status,
           currentUrl,
@@ -427,6 +432,7 @@ export async function requestScraperUrl({
           token: permit.token,
           now: clock.now(),
         });
+        await recordScrapeRequestError({ runId, executionToken });
         throw error;
       }
     }

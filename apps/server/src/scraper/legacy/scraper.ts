@@ -145,7 +145,7 @@ export async function handleBottle(
   ) {
     return;
   }
-  return await persistBottleObservation(bottle, price, imageUrl, { dryRun });
+  await persistBottleObservation(bottle, price, imageUrl, { dryRun });
 }
 
 export async function persistBottleObservation(
@@ -171,10 +171,12 @@ export async function persistBottleObservation(
   createInput = buildBottleCreateInput(bottle);
 
   let resultBottle;
+  let isNew = true;
   try {
     resultBottle = (await createBottleAsPeated(createInput)).bottle;
   } catch (error) {
     if (!(error instanceof BottleAlreadyExistsError)) throw error;
+    isNew = false;
     // An SMWS cask code outlives its mutable subtitle. Reuse its Bottle id;
     // the update boundary makes the new title canonical and retains the old
     // canonical title as an alias. Scraped nulls are absence, not evidence to
@@ -207,6 +209,11 @@ export async function persistBottleObservation(
   if (price) {
     await createStorePricesAsPeated({ site: "smws", prices: [price] });
   }
+
+  return {
+    newItemCount: isNew ? 1 : 0,
+    existingItemCount: isNew ? 0 : 1,
+  };
 }
 
 export type ScrapePricesCallback = (product: StorePrice) => Promise<void>;

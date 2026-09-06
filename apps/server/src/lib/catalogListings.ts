@@ -85,11 +85,10 @@ async function findCatalogListingForUpdate(
   return existing;
 }
 
-/** Stores source evidence only. This function never resolves or mutates Bottles. */
-export async function upsertCatalogListing(
+async function upsertCatalogListingWithResult(
   externalSiteId: number,
   rawInput: CatalogListingInput,
-): Promise<CatalogListing> {
+): Promise<{ listing: CatalogListing; isNew: boolean }> {
   const input = CatalogListingInputSchema.parse(rawInput);
   return db.transaction(async (tx) => {
     await lockCatalogListingIdentity(tx, externalSiteId, input);
@@ -117,7 +116,7 @@ export async function upsertCatalogListing(
         .values({ externalSiteId, ...values })
         .returning();
       if (!created) throw new Error("Catalog listing was not created.");
-      return created;
+      return { listing: created, isNew: true };
     }
 
     const [updated] = await tx
@@ -128,8 +127,17 @@ export async function upsertCatalogListing(
     if (!updated) {
       throw new Error(`Catalog listing ${existing.id} was not updated.`);
     }
-    return updated;
+    return { listing: updated, isNew: false };
   });
+}
+
+/** Stores source evidence only. This function never resolves or mutates Bottles. */
+export async function upsertCatalogListing(
+  externalSiteId: number,
+  rawInput: CatalogListingInput,
+): Promise<CatalogListing> {
+  return (await upsertCatalogListingWithResult(externalSiteId, rawInput))
+    .listing;
 }
 
 export async function upsertCatalogListings(
@@ -137,8 +145,18 @@ export async function upsertCatalogListings(
   listings: CatalogListingInput[],
 ) {
   const results: CatalogListing[] = [];
+  let newItemCount = 0;
   for (const listing of listings) {
-    results.push(await upsertCatalogListing(externalSiteId, listing));
+    const result = await upsertCatalogListingWithResult(
+      externalSiteId,
+      listing,
+    );
+    results.push(result.listing);
+    if (result.isNew) newItemCount += 1;
   }
-  return results;
+  return {
+    listings: results,
+    newItemCount,
+    existingItemCount: results.length - newItemCount,
+  };
 }

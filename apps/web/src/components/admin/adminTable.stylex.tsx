@@ -25,6 +25,7 @@ export type AdminTableColumn<Item extends object> = {
   fill?: boolean;
   hidden?: boolean;
   name: string;
+  showOnMobile?: boolean;
   sort?: string;
   sortDefaultOrder?: "asc" | "desc";
   title?: string;
@@ -82,6 +83,9 @@ export function AdminTableContent<
 }: AdminTableProps<Item, ItemGroup> & { searchParams: URLSearchParams }) {
   const pathname = usePathname();
   const currentSort = searchParams.get("sort") ?? defaultSort;
+  const scrollsOnMobile = columns.some(
+    (column, index) => index > 0 && column.showOnMobile,
+  );
 
   return (
     <div {...stylex.props(styles.root)}>
@@ -102,8 +106,21 @@ export function AdminTableContent<
           />
         </form>
       ) : null}
-      <div {...stylex.props(styles.frame)}>
-        <table {...stylex.props(styles.table)}>
+      <div
+        aria-label={scrollsOnMobile ? "Scrollable table" : undefined}
+        role={scrollsOnMobile ? "region" : undefined}
+        tabIndex={scrollsOnMobile ? 0 : undefined}
+        {...stylex.props(
+          styles.frame,
+          scrollsOnMobile && styles.scrollableFrame,
+        )}
+      >
+        <table
+          {...stylex.props(
+            styles.table,
+            scrollsOnMobile && styles.mobileWideTable,
+          )}
+        >
           {!noHeaders ? (
             <thead>
               <tr {...stylex.props(styles.headerRow)}>
@@ -119,7 +136,7 @@ export function AdminTableContent<
                         foundationStyles.fieldLabel,
                         styles.header,
                         alignStyles[align],
-                        index > 0 && styles.secondary,
+                        index > 0 && !column.showOnMobile && styles.secondary,
                       )}
                     >
                       {column.sort ? (
@@ -194,7 +211,7 @@ export function AdminTableContent<
                           styles.cell,
                           alignStyles[align],
                           column.fill && styles.fill,
-                          index > 0 && styles.secondary,
+                          index > 0 && !column.showOnMobile && styles.secondary,
                         )}
                       >
                         {index === 0 && itemHref ? (
@@ -323,7 +340,14 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: colors.hairline,
   },
+  scrollableFrame: {
+    outline: "none",
+    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
+  },
   table: { width: "100%", borderCollapse: "collapse", tableLayout: "auto" },
+  mobileWideTable: {
+    "@media (max-width: 639px)": { minWidth: "720px" },
+  },
   headerRow: {
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",

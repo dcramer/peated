@@ -114,7 +114,9 @@ export async function runLocalScrapeSourcePreview(
     .values({
       externalSiteId: site.id,
       trigger: "manual",
+      purpose: "preview",
       requestLimit: scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
+      requestErrorCount: 0,
     })
     .returning();
   if (!run) throw new Error("Failed to create the local scraper preview run.");
