@@ -9,8 +9,10 @@ import { createHash } from "node:crypto";
 import type { z } from "zod";
 import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
+import { reviewSourceKey } from "./reviewSourceKey";
 import type {
   ScrapePageRead,
+  ScrapeRules,
   ScrapeValue,
   ScrapeValueSelectorV1,
   StoredScrapePageField,
@@ -49,6 +51,7 @@ type SavedReviewRules = Extract<
   StoredScrapeRules,
   { kind: "review"; article: unknown }
 >;
+type CurrentReviewRules = Extract<ScrapeRules, { kind: "review" }>;
 type SavedPriceRules = Extract<
   StoredScrapeRules,
   { kind: "price"; product: unknown }
@@ -67,6 +70,12 @@ type LegacyPriceRules = Exclude<
   SavedPriceRules
 >;
 type ScrapePageReadV6 = Extract<StoredScrapePageRead, { clean: unknown }>;
+
+function usesCurrentReviewRules(
+  rules: SavedReviewRules,
+): rules is CurrentReviewRules {
+  return "addStart" in rules.article.title.try[0];
+}
 
 function normalizeValue(value: string | undefined) {
   return value?.replaceAll(/\s+/g, " ").trim() || null;
@@ -1083,6 +1092,8 @@ function parseSavedReviewDetail(
   }> = [];
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
+  const reviewKeyCounts = new Map<string, number>();
+  const useStableReviewKeys = usesCurrentReviewRules(rules);
   const reviewItems = selectSavedReviewItems($, rules.article.reviews);
   if (!reviewItems) {
     issues.push({
@@ -1113,10 +1124,15 @@ function parseSavedReviewDetail(
       });
       return;
     }
-    const sourceKey = `${canonicalUrl?.toString() ?? pageUrl.toString()}#review-${index + 1}`;
     const reviewerName = rules.article.reviews.reviewer
       ? readSavedReviewField($, item, rules.article.reviews.reviewer, index)
       : null;
+    const firstReviewKey = reviewSourceKey(name, reviewerName);
+    const repeatedReviewNumber = (reviewKeyCounts.get(firstReviewKey) ?? 0) + 1;
+    reviewKeyCounts.set(firstReviewKey, repeatedReviewNumber);
+    const sourceKey = useStableReviewKeys
+      ? reviewSourceKey(name, reviewerName, repeatedReviewNumber)
+      : `${canonicalUrl?.toString() ?? pageUrl.toString()}#review-${index + 1}`;
     const scoreRule = rules.article.reviews.score;
     const scoreText = scoreRule
       ? readSavedReviewField($, item, scoreRule, index)

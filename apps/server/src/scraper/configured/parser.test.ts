@@ -1694,6 +1694,63 @@ describe("scrape source parser", () => {
     );
   });
 
+  it("keeps version 8 review keys when reviews move", () => {
+    const parseKeys = (reviews: string) => {
+      const result = parseScrapeDetail(
+        currentReviewRules,
+        `<article>
+          <h1 class="title">Reviews</h1>
+          <time datetime="2026-09-01"></time>
+          <span class="byline">Example Writer</span>
+          <div class="entry-content">${reviews}</div>
+        </article>`,
+        new URL("https://reviews.test/reviews"),
+      );
+      if (result.kind !== "review" || !result.value) {
+        throw new Error("Expected parsed reviews.");
+      }
+      return Object.fromEntries(
+        result.value.article.externalReviews.map(({ name, sourceKey }) => [
+          name,
+          sourceKey,
+        ]),
+      );
+    };
+    const northCoast =
+      '<h2 class="review">North Coast 12</h2><p class="note">Orange.</p>';
+    const harborMalt =
+      '<h2 class="review">Harbor Malt 18</h2><p class="note">Oak.</p>';
+
+    expect(parseKeys(northCoast + harborMalt)).toEqual(
+      parseKeys(harborMalt + northCoast),
+    );
+  });
+
+  it("gives repeated version 8 reviews distinct keys", () => {
+    const result = parseScrapeDetail(
+      currentReviewRules,
+      `<article>
+        <h1 class="title">Reviews</h1>
+        <time datetime="2026-09-01"></time>
+        <span class="byline">Example Writer</span>
+        <div class="entry-content">
+          <h2 class="review">North Coast 12</h2><p class="note">Orange.</p>
+          <h2 class="review">North Coast 12</h2><p class="note">Oak.</p>
+        </div>
+      </article>`,
+      new URL("https://reviews.test/reviews"),
+    );
+    if (result.kind !== "review" || !result.value) {
+      throw new Error("Expected parsed reviews.");
+    }
+    const keys = result.value.article.externalReviews.map(
+      ({ sourceKey }) => sourceKey,
+    );
+
+    expect(new Set(keys)).toHaveLength(2);
+    expect(keys[1]).toBe(`${keys[0]}:2`);
+  });
+
   it("can keep the full article area for one version 8 review", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
