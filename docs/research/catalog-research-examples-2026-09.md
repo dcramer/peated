@@ -931,12 +931,25 @@ completion record.
   stated outturns. `1S70455`'s maturation remains unknown because its exact
   records conflict between barrel and sherry butt. Casks `1V70591`, `1O65110`,
   `1V70375`, `IV70707`, and `1S70461` remain unresolved because exact records
-  disagree between The Owner's Cask and other single-cask labels. The exact
+  disagree between The Owner's Cask and other single-cask labels. A second 1992
+  pass adds exact Sotheby's records for barrel
+  [`2V70243`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai-2/shan-qi-yamazaki-the-owners-cask-2v70243-56-0-abv),
+  Tokyo Suntory Club 40th Anniversary sherry butt
+  [`ZL3003`](https://www.sothebys.com/en/buy/auction/2023/kodawarikodawari-the-greatest-japanese-whisky-collection-part-i/shan-qi-yamazaki-the-owners-cask-zl3003-52-0-abv),
+  and Miyako Hotels 15th Anniversary hogshead
+  [`ZS70182`](https://www.sothebys.com/en/buy/auction/2026/finest-and-rarest-spirits/shan-qi-the-yamazaki-the-owners-cask-zs70182-59-0).
+  The 1992 index-only records `2D3046`, `2M70153`, `2O70240`, `2U60034`,
+  `2U60037`, and `2W65290` remain leads; `2D3046` and `2U60034` also have
+  conflicting Owner's Cask and Suntory Single Cask classifications. A
+  [2006 producer-visit record](https://www.yamaken.org/mt/kuidaore/archives/2006/08/post_871.html)
+  shows cask `2D3048` was offered through the Owner's Cask program, but does not
+  prove that a final Bottle was released, so it is not a create candidate. The
+  exact
   [Owner's Cask index](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-owners-cask?page=3)
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 108 new Owner's Cask
+  one correction rather than a duplicate create. The 111 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
