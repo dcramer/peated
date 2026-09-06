@@ -6,6 +6,7 @@ import {
 } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+import { getRequestDelayMs } from "./definitions";
 
 const LEASE_TIMEOUT_PADDING_MS = 5_000;
 const INITIAL_RATE_LIMIT_COOLDOWN_MS = 60_000;
@@ -187,7 +188,7 @@ export async function acquireScrapePermit({
         .set({
           windowStartedAt,
           windowRequestCount: windowRequestCount + 1,
-          nextRequestAt: addMs(now, target.minimumSpacingMs),
+          nextRequestAt: addMs(now, getRequestDelayMs(target)),
           leaseToken: token,
           leaseExpiresAt: addMs(
             now,

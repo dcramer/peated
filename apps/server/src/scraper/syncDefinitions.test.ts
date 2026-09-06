@@ -150,6 +150,7 @@ test("preserves admin-owned targets, origins, and site mappings", async () => {
       key: "admin-source",
       managedBy: "admin",
       enabled: true,
+      minimumSpacingMs: 2_000,
     }),
   ]);
   expect(await db.select().from(scrapeOrigins)).toEqual([

@@ -3,6 +3,7 @@ import {
   scrapeOrigins,
   scrapeSourceRevisions,
   scrapeSourceRuns,
+  scrapeTargets,
   users,
 } from "@peated/server/db/schema";
 import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
@@ -171,6 +172,12 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         name: "Price Fixture",
         sampleUrls: [],
       });
+      // The test controls this local site. One request per second keeps the
+      // check quick while still testing the wait between requests.
+      await db
+        .update(scrapeTargets)
+        .set({ minimumSpacingMs: 1_000, requestsPerWindow: 3_600 })
+        .where(eq(scrapeTargets.key, site.type));
       await db
         .update(scrapeOrigins)
         .set({

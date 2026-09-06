@@ -53,7 +53,14 @@ const configuredSources = [
   "wordsofwhisky",
 ];
 
-test("registers each code-owned scraper source with explicit target ownership", () => {
+function expectHourlyLimit(key: string, requests: number) {
+  expect(scraperRegistry.targets.get(key)).toMatchObject({
+    requestsPerWindow: requests,
+    windowMs: 60 * 60_000,
+  });
+}
+
+test("registers each built-in scraper source with its target", () => {
   expect([...scraperRegistry.sources.keys()].sort()).toEqual(
     registeredSources.sort(),
   );
@@ -62,91 +69,53 @@ test("registers each code-owned scraper source with explicit target ownership", 
     expect(scraperRegistry.targets.get(source.targetKeys[0])).toBeDefined();
   }
   expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(true);
-  expect(EXTERNAL_SITE_DEFINITIONS.astorwines.runEvery).toBeNull();
-  expect(EXTERNAL_SITE_DEFINITIONS.dramfool.runEvery).toBe(10080);
+  expect(EXTERNAL_SITE_DEFINITIONS.astorwines.initialRunEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.berrybrosrudd.initialRunEvery).toBeNull();
+  expect(EXTERNAL_SITE_DEFINITIONS.dramfool.initialRunEvery).toBe(10080);
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyworld.initialRunEvery).toBeNull();
   expect(scraperRegistry.targets.get("totalwine")?.enabled).toBe(false);
   expect(
     scraperRegistry.targets.get("smws")?.origins.map(({ origin }) => origin),
   ).toEqual(["https://api.smws.com", "https://smws.com"]);
-  expect(scraperRegistry.targets.get("smws")).toMatchObject({
-    allowedRequestHeaders: ["authorization", "content-type"],
-    minimumSpacingMs: 2_000,
-    requestsPerWindow: 80,
-  });
-  expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("bourbonculture")).toMatchObject({
-    minimumSpacingMs: 5_000,
-    requestsPerWindow: 10,
-    windowMs: 3_600_000,
-  });
+  expect(scraperRegistry.targets.get("smws")?.allowedRequestHeaders).toEqual([
+    "authorization",
+    "content-type",
+  ]);
+  expectHourlyLimit("smws", 80);
+  expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.initialRunEvery).toBe(1440);
+  expectHourlyLimit("bourbonculture", 10);
   expect(scraperRegistry.targets.get("bruichladdich")).toBeDefined();
   expect(scraperRegistry.targets.get("compassbox")).toBeDefined();
-  expect(EXTERNAL_SITE_DEFINITIONS.dramface.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("dramface")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 25,
-    windowMs: 3_600_000,
-  });
+  expect(EXTERNAL_SITE_DEFINITIONS.dramface.initialRunEvery).toBe(1440);
+  expectHourlyLimit("dramface", 25);
   expect(scraperRegistry.sources.get("dramface")?.requestLimit).toBe(30);
-  expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("fredminnick")).toMatchObject({
-    minimumSpacingMs: 30_000,
-    requestsPerWindow: 10,
-    windowMs: 3_600_000,
-  });
+  expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.initialRunEvery).toBe(1440);
+  expectHourlyLimit("fredminnick", 10);
   expect(scraperRegistry.sources.get("fredminnick")?.requestLimit).toBe(9);
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("whiskeyreviewer")).toMatchObject({
-    minimumSpacingMs: 5_000,
-    requestsPerWindow: 10,
-    windowMs: 3_600_000,
-  });
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.initialRunEvery).toBe(1440);
+  expectHourlyLimit("whiskeyreviewer", 10);
   expect(scraperRegistry.targets.get("kilchoman")).toBeDefined();
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.runEvery).toBeNull();
-  expect(scraperRegistry.targets.get("whiskyadvocate")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 20,
-    windowMs: 3_600_000,
-  });
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.initialRunEvery).toBeNull();
+  expectHourlyLimit("whiskyadvocate", 20);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.requestLimit).toBe(30);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.resumeFromLastRun).toBe(
     true,
   );
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("whiskynotes")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 30,
-    windowMs: 3_600_000,
-  });
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("whiskyfun")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 25,
-    windowMs: 3_600_000,
-  });
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskynotes.initialRunEvery).toBe(1440);
+  expectHourlyLimit("whiskynotes", 30);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.initialRunEvery).toBe(1440);
+  expectHourlyLimit("whiskyfun", 25);
   expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
   expect(scraperRegistry.sources.get("whiskyfun")?.resumeFromLastRun).toBe(
     true,
   );
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("whiskysaga")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 25,
-    windowMs: 3_600_000,
-  });
-  expect(EXTERNAL_SITE_DEFINITIONS.whiskystudy.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("whiskystudy")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 25,
-    windowMs: 3_600_000,
-  });
-  expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.runEvery).toBe(1440);
-  expect(scraperRegistry.targets.get("wordsofwhisky")).toMatchObject({
-    minimumSpacingMs: 2_500,
-    requestsPerWindow: 25,
-    windowMs: 3_600_000,
-  });
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskysaga.initialRunEvery).toBe(1440);
+  expectHourlyLimit("whiskysaga", 25);
+  expect(EXTERNAL_SITE_DEFINITIONS.whiskystudy.initialRunEvery).toBe(1440);
+  expectHourlyLimit("whiskystudy", 25);
+  expect(EXTERNAL_SITE_DEFINITIONS.wordsofwhisky.initialRunEvery).toBe(1440);
+  expectHourlyLimit("wordsofwhisky", 25);
   for (const type of registeredReviewSources) {
     const source = scraperRegistry.sources.get(type);
     expect(source, `${type} is not registered`).toBeDefined();
@@ -165,9 +134,7 @@ test("registers each code-owned scraper source with explicit target ownership", 
   }
 });
 
-test("dispatches code-owned sources to the isolated scraper job", async ({
-  fixtures,
-}) => {
+test("dispatches built-in sources to the scraper job", async ({ fixtures }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "edradour" });
   const enqueue = vi.fn(async () => undefined);

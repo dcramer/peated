@@ -541,11 +541,11 @@ test("follows a bounded next-page selector", async () => {
 });
 
 test("resumes configured previews without rereading completed pages", async () => {
-  const { pinned, revision, site } = await setupPreview("h1", true);
+  const { pinned, revision } = await setupPreview("h1", true);
   await db
-    .update(scrapeTargets)
-    .set({ requestsPerWindow: 3, windowMs: 60_000 })
-    .where(eq(scrapeTargets.key, site.type));
+    .update(externalSiteRuns)
+    .set({ requestLimit: 3 })
+    .where(eq(externalSiteRuns.id, pinned.run.id));
   const fetchImpl = previewFetch(true);
   const clock = controllableClock();
 

@@ -57,9 +57,8 @@ import { bottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
 
-// TODO(scraper-source-migration): Delete these ordinary HTML adapters after
-// every site has an active database-managed parsing revision. New HTML sources
-// must use configured rules instead of joining this compatibility group.
+// TODO(scraper-source-migration): Delete these HTML adapters after every site
+// uses saved parsing rules. New HTML sources must use those rules.
 const legacyPriceSources = [
   {
     type: "astorwines",
@@ -154,9 +153,8 @@ const legacyPriceSources = [
   },
 ] as const;
 
-// Custom adapters remain available for sources that configured parsing cannot
-// express. SMWS emits bottle-catalog observations from an API, not HTML review
-// or price observations.
+// Some sources still need their own adapters. SMWS reads bottles from an API,
+// not reviews or prices from HTML.
 const legacyBottleSources = [
   {
     type: "smws",
@@ -186,7 +184,7 @@ export const scraperRegistry = createScraperRegistry({
         enabled: "enabled" in source ? source.enabled : true,
         allowedRequestHeaders:
           "allowedRequestHeaders" in source
-            ? source.allowedRequestHeaders
+            ? [...source.allowedRequestHeaders]
             : undefined,
         origins: [{ origin: source.origin, robots: { mode: "enforce" } }],
       }),
@@ -196,21 +194,17 @@ export const scraperRegistry = createScraperRegistry({
         key: source.type,
         allowedRequestHeaders:
           source.type === "smws" ? ["authorization", "content-type"] : [],
-        requestsPerWindow: source.type === "smws" ? 80 : undefined,
-        policyException:
+        requestsPerHour: source.type === "smws" ? 80 : undefined,
+        fasterRateReason:
           source.type === "smws"
-            ? {
-                rationale:
-                  "The official weekly SMWS archive sync uses public batch APIs and about 74 requests with two-second spacing.",
-              }
+            ? "Copying the weekly SMWS bottle list needs about 74 requests."
             : undefined,
-        origins: source.origins,
+        origins: [...source.origins],
       }),
     ),
     defineScrapeTarget({
       key: "bourbonculture",
-      minimumSpacingMs: 5_000,
-      requestsPerWindow: 10,
+      requestsPerHour: 10,
       origins: [
         {
           origin: "https://thebourbonculture.com",
@@ -256,8 +250,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "dramface",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 25,
+      requestsPerHour: 25,
       origins: [
         {
           origin: "https://www.dramface.com",
@@ -267,8 +260,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "fredminnick",
-      minimumSpacingMs: 30_000,
-      requestsPerWindow: 10,
+      requestsPerHour: 10,
       origins: [
         {
           origin: "https://www.fredminnick.com",
@@ -305,8 +297,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskeyreviewer",
-      minimumSpacingMs: 5_000,
-      requestsPerWindow: 10,
+      requestsPerHour: 10,
       origins: [
         {
           origin: "https://whiskeyreviewer.com",
@@ -316,8 +307,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskyadvocate",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 20,
+      requestsPerHour: 20,
       origins: [
         {
           origin: "https://whiskyadvocate.com",
@@ -327,8 +317,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskynotes",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 30,
+      requestsPerHour: 30,
       origins: [
         {
           origin: "https://www.whiskynotes.be",
@@ -338,8 +327,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskyfun",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 25,
+      requestsPerHour: 25,
       origins: [
         {
           origin: "https://www.whiskyfun.com",
@@ -349,8 +337,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskysaga",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 25,
+      requestsPerHour: 25,
       origins: [
         {
           origin: "https://www.whiskysaga.com",
@@ -360,8 +347,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskystudy",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 25,
+      requestsPerHour: 25,
       origins: [
         {
           origin: "https://thewhiskystudy.com",
@@ -371,8 +357,7 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "wordsofwhisky",
-      minimumSpacingMs: 2_500,
-      requestsPerWindow: 25,
+      requestsPerHour: 25,
       origins: [
         {
           origin: "https://wordsofwhisky.com",
@@ -407,7 +392,7 @@ export const scraperRegistry = createScraperRegistry({
       }),
     ),
     // TODO(scraper-source-migration): Remove each remaining HTML review
-    // definition after its publisher activates database-managed rules.
+    // definition after its publisher turns on saved parsing rules.
     defineScraperSource({
       key: "dramface",
       externalSiteKey: "dramface",
@@ -435,8 +420,8 @@ export const scraperRegistry = createScraperRegistry({
       externalSiteKey: "whiskyadvocate",
       recordType: "review",
       targetKeys: ["whiskyadvocate"],
-      // Keep the slice budget above the target quota so one hourly deferral
-      // consumes one execution attempt.
+      // Keep the run limit above the hourly limit so the run waits for the next
+      // hour instead of stopping.
       requestLimit: 30,
       resumeFromLastRun: true,
       cursorSchema: WhiskyAdvocateCursorSchema,

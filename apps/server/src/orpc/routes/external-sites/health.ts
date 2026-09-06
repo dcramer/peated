@@ -23,6 +23,7 @@ import {
   type ExternalSiteScrapeTargetSchema,
 } from "@peated/server/schemas";
 import { getScraperRegistration } from "@peated/server/scraper";
+import { getRequestDelayMs } from "@peated/server/scraper/definitions";
 import {
   serializeExternalReviewPublication,
   serializeExternalSite,
@@ -202,7 +203,7 @@ async function getHealthForSites(
         blockedUntil: row.blockedUntil?.toISOString() ?? null,
         coolingDown:
           row.blockedUntil !== null && row.blockedUntil.getTime() > now,
-        minimumSpacingMs: row.minimumSpacingMs,
+        minimumSpacingMs: getRequestDelayMs(row),
         requestsPerWindow: row.requestsPerWindow,
         windowMs: row.windowMs,
         origins: [],

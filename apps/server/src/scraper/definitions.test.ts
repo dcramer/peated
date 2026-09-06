@@ -33,7 +33,7 @@ test("applies conservative target and run defaults", () => {
 
   expect(target).toMatchObject({
     enabled: true,
-    minimumSpacingMs: 2_000,
+    minimumSpacingMs: 60_000,
     requestsPerWindow: 60,
     windowMs: 3_600_000,
     timeoutMs: 30_000,
@@ -71,33 +71,40 @@ test("allows sources to share one target and a target to declare several origins
   expect(registry.targets.get("operator")?.origins).toHaveLength(2);
 });
 
-test("accepts stricter policies without an exception", () => {
+test("accepts a lower hourly limit without a reason", () => {
   expect(
     defineScrapeTarget({
       key: "slow-operator",
-      minimumSpacingMs: 5_000,
-      requestsPerWindow: 50,
+      requestsPerHour: 30,
       origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
     }),
-  ).toMatchObject({ minimumSpacingMs: 5_000, requestsPerWindow: 50 });
+  ).toMatchObject({ minimumSpacingMs: 120_000, requestsPerWindow: 30 });
 });
 
-test("requires a rationale for a less restrictive policy", () => {
+test("spaces the hourly limit evenly", () => {
+  const target = defineScrapeTarget({
+    key: "slow-operator",
+    requestsPerHour: 10,
+    origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
+  });
+
+  expect(target.minimumSpacingMs).toBe(6 * 60_000);
+});
+
+test("requires a reason for a higher hourly limit", () => {
   expect(() =>
     defineScrapeTarget({
       key: "fast-operator",
-      minimumSpacingMs: 1_000,
+      requestsPerHour: 3_600,
       origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
     }),
-  ).toThrow(/requires a rationale/);
+  ).toThrow(/requires a reason/);
 
   expect(
     defineScrapeTarget({
       key: "fast-operator",
-      minimumSpacingMs: 1_000,
-      policyException: {
-        rationale: "The provider explicitly documents this request cadence.",
-      },
+      requestsPerHour: 3_600,
+      fasterRateReason: "The provider allows one request per second.",
       origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
     }).minimumSpacingMs,
   ).toBe(1_000);

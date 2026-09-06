@@ -197,13 +197,13 @@ test("expires crashed leases without allowing stale release to clear a successor
   expect(target?.leaseToken).toBe("successor");
 });
 
-test("enforces spacing, fixed-window quota, and the run budget", async () => {
+test("spaces requests evenly across the target window", async () => {
   await db.insert(scrapeTargets).values({
     ...baseTarget,
     minimumSpacingMs: 1_000,
     requestsPerWindow: 2,
   });
-  const run = await createRun({ requestLimit: 2 });
+  const run = await createRun({ requestLimit: 3 });
   const startedAt = new Date("2026-08-18T12:00:00Z");
   const first = await acquireScrapePermit({
     runId: run.id,
@@ -226,7 +226,7 @@ test("enforces spacing, fixed-window quota, and the run budget", async () => {
     }),
   ).toMatchObject({ granted: false, reason: "target_spacing" });
 
-  const secondAt = new Date("2026-08-18T12:00:01Z");
+  const secondAt = new Date("2026-08-18T12:30:00Z");
   const second = await acquireScrapePermit({
     runId: run.id,
     targetKey: baseTarget.key,
@@ -239,19 +239,39 @@ test("enforces spacing, fixed-window quota, and the run budget", async () => {
     token: second.token,
     now: secondAt,
   });
+});
+
+test("enforces the saved target limit and run limit", async () => {
+  const startedAt = new Date("2026-08-18T12:00:00Z");
+  await db.insert(scrapeTargets).values({
+    ...baseTarget,
+    requestsPerWindow: 2,
+    windowStartedAt: startedAt,
+    windowRequestCount: 2,
+  });
   const otherRun = await createRun({ siteKey: "whiskyworld" });
   expect(
     await acquireScrapePermit({
       runId: otherRun.id,
       targetKey: baseTarget.key,
-      now: new Date("2026-08-18T12:00:02Z"),
+      now: new Date("2026-08-18T12:30:01Z"),
     }),
   ).toMatchObject({ granted: false, reason: "target_quota" });
+
+  await db
+    .update(scrapeTargets)
+    .set({ windowRequestCount: 0 })
+    .where(eq(scrapeTargets.key, baseTarget.key));
+  const run = await createRun({ requestLimit: 2 });
+  await db
+    .update(externalSiteRuns)
+    .set({ sliceRequestCount: 2 })
+    .where(eq(externalSiteRuns.id, run.id));
   expect(
     await acquireScrapePermit({
       runId: run.id,
       targetKey: baseTarget.key,
-      now: new Date("2026-08-18T12:00:02Z"),
+      now: new Date("2026-08-18T12:30:01Z"),
     }),
   ).toMatchObject({ granted: false, reason: "run_budget" });
 });
