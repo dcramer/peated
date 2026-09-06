@@ -643,10 +643,16 @@ completion record.
   age was inferred.
 - The producer-backed [Hitomi record](https://jwhisky.jp/en/hitomi/) and an exact
   [Bonhams catalog](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-04%2F17%2FS-28686-0-3.pdf)
-  establish the 2012, 59%, 420-bottle Hitomi (`B54461`) assembled from sherry
+  establish the 2012, 59%, 420-bottle Black Hitomi (`B54461`) assembled from sherry
   butt and Mizunara cask `1S70427`. The multi-cask release is explicitly stored
-  as not single-cask. Exact auction records also establish three Suntory Single
-  Cask Whisky releases: the 1998-vintage, 2013-bottled, 54% sherry butt
+  as not single-cask; its missing Black edition is staged as a correction. A
+  [Bonhams sale announcement](https://hk.news.yahoo.com/%E9%A6%99%E6%B8%AF%E9%82%A6%E7%80%9A%E6%96%AF%E5%91%88%E7%8D%BB%E5%85%A9%E5%A0%B4%E6%B4%8B%E9%85%92%E5%8F%8A%E7%83%88%E9%85%92%E6%8B%8D%E8%B3%A3-061120904.html)
+  and independent [sale coverage](https://www.decanter.com/wine-news/yamazaki-whisky-collection-beats-estimate-in-hong-kong-529791/)
+  distinguish Green Hitomi as a separate release. It remains an unwritten lead
+  because the available lot-level evidence does not state its strength,
+  composition, outturn, or release date. Exact auction records also establish
+  three Suntory Single Cask Whisky releases: the 1998-vintage, 2013-bottled, 54%
+  sherry butt
   [`CM70012`](https://www.sothebys.com/en/buy/auction/2023/fine-rare-whisky-the-inaugural-singapore-auction/shan-qi-yamazaki-single-cask-cm70012-54-0-abv-1998-4)
   (`B54465`); the 1998-vintage, 2011-bottled, 61% sherry butt
   [`CU70062`](https://www.sothebys.com/en/buy/auction/2024/fine-rare-whisky/shan-qi-yamazaki-single-cask-cu70062-61-0-abv-1998)
@@ -744,19 +750,22 @@ completion record.
   [Whisky Monitor record](https://www.whisky-monitor.com/bottle.jsp?bid=12106&bottling=Yamazaki+1991%2F2002+%27The+Cask+of%27)
   show that `B54418` should use digit-one cask code `1O70047`; the Spink OCR
   rendered it as letter-I `IO70047`. That correction remains pending.
-- Exact auction photos and catalogs establish three further `S0700` candidates:
+- Exact auction photos, catalogs, and a photographed retailer record establish
+  four further `S0700` candidates:
   1991 white-oak barrel
   [`1O70629`](https://www.barnebys.co.uk/realised-prices/lot/yamazaki-1991-1o70629-R2aWZ-jlYmM?q=yamazaki)
   (2002, 60%, outturn 168), 1991 bourbon cask
   [`1O70640`](https://www.whiskyfun.com/archivenovember08-1.html) (2002, 60%,
-  outturn 144), 1993 white-oak hogshead
+  outturn 144), 1991 bourbon barrel
+  [`1O70644`](https://kuvawhisky.evershop.com.tw/product/328110047/) (2002,
+  60%, outturn 144), and 1993 white-oak hogshead
   [`3P70277`](https://www.barnebys.co.uk/realised-prices/lot/yamazaki-1993-3p70277-K8OvmLPQM_B?q=yamazaki)
   (2005, 54%, outturn 176). Separately, exact auction records establish 1993
   sherry butt
   [`3T70070`](https://www.scotchwhiskyauctions.com/auctions/104-the-66th-auction/117509-yamazaki-1993-the-private-cask-by-la-maison-du-whisky/)
   as The Private Cask for La Maison du Whisky (2012, 57.5%). It is not a member
   of `S0700`. The `3T70070` outturn remains unknown: one review says 300, while
-  photographed bottle numbers above 450 disprove that count. These four
+  photographed bottle numbers above 450 disprove that count. These five
   releases are staged for final production duplicate checks and writes; no
   uncertain age or outturn will be inferred.
 - The broader Whisky Auctioneer index and independent exact catalogs establish
@@ -901,9 +910,36 @@ completion record.
   also fills `2S70058`'s previously unknown Sherry Butt maturation and
   480-bottle outturn. Several auction indexes render `ZS70061` as `2S70061`,
   but the photographed label and multiple catalog descriptions establish
-  `ZS70061`; only the existing staged release is kept. The 101 candidate
-  Owner's Cask records remain unwritten because that durable bulk write requires
-  explicit approval. Empty destination Series `S0676` has been created.
+  `ZS70061`; only the existing staged release is kept. A vintage-by-vintage 1991
+  pass adds eight more exact Owner's
+  Casks: sherry butt
+  [`IN70041`](https://storage.spink.com/source/Auto_Catalogue/SFW70.pdf?v=7),
+  K-G Cask Club barrel
+  [`IV70615`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1991-owners-cask-iv70615),
+  NKS 30th Anniversary barrel
+  [`1V70374`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190517%20S-25188-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
+  puncheon [`1P70529`](https://www.whiskyfun.com/2014/Bits-and-Pieces-today-tasting-Japan.html),
+  Whisky World first-issue bourbon barrel
+  [`1V70373`](https://drinkers-lounge.com/2020/04/05/yamazaki-the-owners-cask-1991-2005-53-the-whisky-world/),
+  Bic Camera sherry butt
+  [`1S70430`](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-04%2F17%2FS-28686-0-3.pdf),
+  sherry butt
+  [`IW70043`](https://www.sothebys.com/en/buy/auction/2023/the-epicureans-atlas-the-encyclopaedic-cellar-extraordinary-whiskies/shan-qi-yamazaki-the-owners-cask-iw70043-61-0-abv),
+  and cask
+  [`1S70455`](https://www.whiskybase.com/whiskies/whisky/299392/yamazaki-1991).
+  Exact sources support their staged vintages, bottling years, strengths, and
+  stated outturns. `1S70455`'s maturation remains unknown because its exact
+  records conflict between barrel and sherry butt. Casks `1V70591`, `1O65110`,
+  `1V70375`, `IV70707`, and `1S70461` remain unresolved because exact records
+  disagree between The Owner's Cask and other single-cask labels. The exact
+  [Owner's Cask index](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-owners-cask?page=3)
+  also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
+  for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
+  522-bottle outturn. Its name, Series, edition, and missing facts are staged as
+  one correction rather than a duplicate create. The 108 new Owner's Cask
+  records and this correction remain unwritten because those durable bulk writes
+  require explicit approval. Empty
+  destination Series `S0676` has been created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
   creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
   2016 25-year-old Limited Edition is a presentation variant of the core whisky;
@@ -955,7 +991,7 @@ completion record.
   [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2018/20181116%20S-24779-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
   shows the `樽出原酒` Taru-Dashi Genshu label, and establishes the distinct
   [Yokohama Port Opening 150th Anniversary](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1993-yokohama-port-150th-anniversary)
-  single barrel, distilled in 1993 and bottled in 2009 at 53%. All 37
+  single barrel, distilled in 1993 and bottled in 2009 at 53%. All 38
   evidence-backed non-Owner releases are staged for immediate production
   duplicate checks before any write.
 - The follow-up image review replaced two unattributed retailer-derived images
