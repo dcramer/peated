@@ -21,7 +21,6 @@ import scrapeHealthySpirits from "./adapters/legacy/scrapeHealthySpirits";
 import scrapeMasterOfMalt from "./adapters/legacy/scrapeMasterOfMalt";
 import scrapeMissionLiquor from "./adapters/legacy/scrapeMissionLiquor";
 import scrapeNcnean from "./adapters/legacy/scrapeNcnean";
-import scrapeNorthStarSpirits from "./adapters/legacy/scrapeNorthStarSpirits";
 import scrapeReserveBar from "./adapters/legacy/scrapeReserveBar";
 import scrapeSingleCaskNation from "./adapters/legacy/scrapeSingleCaskNation";
 import scrapeSMWS from "./adapters/legacy/scrapeSMWS";
@@ -116,11 +115,6 @@ const legacyPriceSources = [
     scrape: scrapeMasterOfMalt,
   },
   { type: "ncnean", origin: "https://ncnean.com", scrape: scrapeNcnean },
-  {
-    type: "northstarspirits",
-    origin: "https://northstarspirits.com",
-    scrape: scrapeNorthStarSpirits,
-  },
   {
     type: "reservebar",
     origin: "https://api.liquidcommerce.cloud",
@@ -289,6 +283,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://www.kilchomandistillery.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "northstarspirits",
+      origins: [
+        {
+          origin: "https://northstarspirits.com",
           robots: { mode: "enforce" },
         },
       ],

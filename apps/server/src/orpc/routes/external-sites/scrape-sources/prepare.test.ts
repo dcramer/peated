@@ -151,6 +151,15 @@ function prepareNorthStar(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareNcnean(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "ncnean", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 
@@ -162,6 +171,7 @@ function codeOwnedSource(
     | "compassbox"
     | "gordonmacphail"
     | "kilchoman"
+    | "ncnean"
     | "northstarspirits"
     | "whiskeyreviewer"
     | "whiskynotes"
@@ -248,6 +258,11 @@ const kilchomanRegistry = createScraperRegistry({
 const northStarRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("northstarspirits")!],
   sources: [codeOwnedSource("northstarspirits")],
+});
+
+const ncneanRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("ncnean")!],
+  sources: [codeOwnedSource("ncnean")],
 });
 
 async function setupMigration(bottleId: number | null = null) {
@@ -724,6 +739,25 @@ async function setupNorthStarMigration() {
     })
     .returning();
   await syncScraperDefinitions(northStarRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupNcneanMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "ncnean",
+      name: "Nc'nean",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(ncneanRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1845,6 +1879,105 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await expect(prepareNorthStar({ apply: true })).rejects.toMatchObject({
       code: "BAD_REQUEST",
       message: expect.stringContaining("Check North Star price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Nc'nean without replacing current or historical prices", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupNcneanMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "15761596776830",
+      name: "Nc'nean Aon 17-163 Madeira Cask (Single Cask)",
+      price: 9495,
+      currency: "gbp",
+      volume: 700,
+      url: "https://ncnean.com/products/aon-17-163-madeira-single-cask",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Nc'nean Quiet Rebels: Amy (Limited Edition)",
+      price: 7995,
+      currency: "gbp",
+      volume: 700,
+      url: "https://ncnean.com/products/quiet-rebels-amy",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareNcnean()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareNcnean({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(ncneanRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://ncnean.com/collections/all/whiskies",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareNcnean({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Nc'nean is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Nc'nean price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupNcneanMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "not-a-number",
+      name: "Nc'nean Unknown release",
+      currency: "gbp",
+      volume: 700,
+      url: "https://ncnean.com/products/unknown-release",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareNcnean({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Nc'nean price"),
     });
     expect(await db.select().from(storePrices)).toEqual(prices);
     expect(await db.select().from(scrapeTargets)).toEqual(targets);
