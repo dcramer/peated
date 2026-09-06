@@ -779,8 +779,14 @@ completion record.
   Suntory Single Cask Whisky
   [`AS70114`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1996-suntory-single-cask)
   is a 1996-vintage, 2010-bottled, 54% release for Suntory Logistics' 50th
-  Anniversary. All six are staged for immediate production duplicate checks
-  before any write.
+  Anniversary. Three more exact Whisky Auctioneer records establish the
+  1998-vintage, 2009-bottled, 59% Suntory Single Cask Whisky `CM70006` for
+  Zenkoji; the 1999-vintage, 2015-bottled, 59% puncheon
+  [`DR70083`](https://whiskyauctioneer.com/whisky-lot/32853/yamazaki-1999-single-cask-dr70083)
+  for Mampei Hotel; and 2000-vintage, 2010-bottled, 53% hogshead
+  [Buyer's Selection Single Cask `EW70568`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-2000-buyers-selection-single-cask-ew70568).
+  All nine releases in this paragraph are staged for immediate production
+  duplicate checks before any write.
 - The
   [Suntory Owner's Cask guide](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-owners-cask)
   identifies 32 Yamazaki casks across 1984–2000 vintages. The apparent
@@ -800,9 +806,19 @@ completion record.
   `AX70015`, and `EX65186`. Their exact stated cask, vintage, bottling, strength,
   maturation, and outturn facts are staged without inferred release dates. The
   original 31 candidates were production duplicate-checked; these 11 newly
-  found candidates still require those checks. All 42 candidate Owner's Cask
-  records remain unwritten because that durable bulk write requires explicit
-  approval. Empty destination Series `S0676` has been created.
+  found candidates still require those checks. A full page-by-page pass through
+  Whisky Auctioneer and exact Sotheby's lots adds five more supported candidates:
+  1989 hogsheads `9W70427` and
+  [`9W70469`](https://www.scotchwhiskyauctions.com/auctions/133-the-94th-auction-/279191-yamazaki-1989-the-owners-cask-9w70469/),
+  1994 bourbon barrel
+  [`4M70118`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai),
+  1997 barrel
+  [`BP70305`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai/shan-qiyamazaki-the-owners-cask-bp70305-54-0-abv),
+  and 1999 cask `DS70260`. The last candidate has conflicting 2009 and 2010
+  bottling transcriptions, so its staged bottling year remains unknown. All 47
+  candidate Owner's Cask records remain unwritten because that durable bulk
+  write requires explicit approval. Empty destination Series `S0676` has been
+  created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
   creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
   2016 25-year-old Limited Edition is a presentation variant of the core whisky;
