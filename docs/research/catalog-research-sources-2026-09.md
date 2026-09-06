@@ -81,6 +81,9 @@ automatically. See the
 - Auction, shop, image, approval, distillation, and bottling dates are not
   release dates.
 - Private picks and single casks often have no complete public list.
+- Specialist-catalog bottler abbreviations such as Whiskybase's `Gs` are source
+  notation, not marketed Bottle names. Keep them only as import references, and
+  check for collisions before treating the complete reference as exact.
 - An exact image may still lack permission for Peated to store it.
 - A direct image URL does not record its source or license.
 
