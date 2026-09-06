@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /bottle-series/{series}/flavor-profile", () => {
@@ -38,6 +39,9 @@ describe("GET /bottle-series/{series}/flavor-profile", () => {
         tags: ["vanilla"],
       },
     ]);
+    await Promise.all(
+      [first, second, unrelated].map(({ id }) => recomputeBottleStats(id)),
+    );
 
     const result = await routerClient.bottleSeries.flavorProfile(
       { series: series.id },
