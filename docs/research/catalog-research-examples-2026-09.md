@@ -861,9 +861,29 @@ completion record.
   its total outturn remains unknown. A later exact
   [Spink catalog](https://storage.spink.com/source/Auto_Catalogue/SFW64.pdf?v=1)
   adds 1997 sherry butt `BV70004`, bottled in 2010 at 62% for In Anticipation of
-  the Dawn of a New Whisky Era. All 81 candidate Owner's
-  Cask records remain unwritten because that durable bulk write requires
-  explicit approval. Empty destination Series `S0676` has been created.
+  the Dawn of a New Whisky Era. A vintage-by-vintage 1993 pass adds 13 more
+  candidates supported by exact auction records or readable bottle photos:
+  `3N70037`, `3N70044`, `3P70268`, `3P70269`, `3P70270`, `3P70274`, `3Q70282`,
+  `3Q70348`, `3Q70352`, `3X70002`, `3X70004`, `3X70009`, and `3K3036`. Exact
+  examples include the 135-bottle
+  [`3N70037`](https://whisky.auction/auctions/lot/179618/suntory-yamazaki-1993-the-owner-s-cask),
+  188-bottle Naganoya
+  [`3P70268`](https://whisky.auction/auctions/lot/219463/suntory-yamazaki-1993-the-owner-s-cask),
+  173-bottle KA&YS
+  [`3P70269`](https://whiskyauctioneer.com/whisky-lot/5085662a/yamazaki-1993-owners-cask-3p70269-kays),
+  468-bottle Kashima Antlers
+  [`3X70009`](https://www.sothebys.com/buy/92eeac44-b2fe-4753-bbe0-fa7d7b63156c/lots/d750b8a6-a717-45f1-8872-3c3317f1ea10),
+  and 167-bottle Keio Plaza Hotel
+  [`3Q70282`](https://www.sothebys.com/buy/6a078af9-80ba-45c3-b1f2-330b33d60ed2/lots/e5eac3b6-6a3e-4666-8ad1-9aad73b63d18)
+  releases. A Poly catalog confirms 196-bottle hogshead `3P70270`; a separate
+  exact Japanese bottle review confirms 159-bottle hogshead
+  [`3P70274`](https://sakedori.com/?p=294488). Collector-only `3N70041` and
+  `3Q70038` remain leads. `3X70003` also remains unresolved because an exact
+  Poly catalog calls it The Owner's Cask while Whisky Auctioneer's exact lot
+  calls it Single Cask; a label inspection is still needed. All 94 candidate
+  Owner's Cask records remain unwritten because that durable bulk write
+  requires explicit approval. Empty destination Series `S0676` has been
+  created.
 - A complete pass through the Bonhams S-26252 catalog prevented several false
   creates. Its `OM70714` index entry is a typo for existing cask `OM70174`; the
   2016 25-year-old Limited Edition is a presentation variant of the core whisky;
@@ -909,7 +929,15 @@ completion record.
   calling it Owner's Cask. Exact Sotheby's evidence similarly settles `DV70209`
   at 54%, correcting the collector index's 56% transcription. Collector-only
   `CV70092` remains a lead because no exact primary auction record was found in
-  this pass.
+  this pass. The 1993 pass adds two 55% Suntory Single Cask Whisky releases for
+  Meiwa Sangyo's 50th Anniversary, `3S65010` and `3W70683`, both bottled in 2010. It also separates 59% sherry-cask `3T70076` from Owner's Cask because
+  an exact
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2018/20181116%20S-24779-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
+  shows the `樽出原酒` Taru-Dashi Genshu label, and establishes the distinct
+  [Yokohama Port Opening 150th Anniversary](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1993-yokohama-port-150th-anniversary)
+  single barrel, distilled in 1993 and bottled in 2009 at 53%. All 37
+  evidence-backed non-Owner releases are staged for immediate production
+  duplicate checks before any write.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
