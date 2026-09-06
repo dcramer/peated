@@ -3,6 +3,7 @@ import {
   scrapeOrigins,
   scrapeSourceRevisions,
   scrapeSourceRuns,
+  scrapeTargets,
   users,
 } from "@peated/server/db/schema";
 import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
@@ -171,6 +172,12 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         name: "Price Fixture",
         sampleUrls: [],
       });
+      // This origin is owned by the test. Keep pacing enabled without making
+      // the live-model suite wait a minute between fixture requests.
+      await db
+        .update(scrapeTargets)
+        .set({ minimumSpacingMs: 1_000, requestsPerWindow: 3_600 })
+        .where(eq(scrapeTargets.key, site.type));
       await db
         .update(scrapeOrigins)
         .set({

@@ -5,6 +5,7 @@ import {
   externalReviews,
   externalSiteRuns,
   memberReviews,
+  scrapeTargets,
 } from "@peated/server/db/schema";
 import { loadScoredExternalReviews } from "@peated/server/externalReviews/scoredReviews";
 import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
@@ -32,18 +33,20 @@ import { AI_INSTRUCTIONS_VERSION } from "./setupAgent";
 import { reviewWebsites, startReviewWebsite } from "./testWebsites";
 
 let fixtureWebsite: Awaited<ReturnType<typeof startReviewWebsite>> | undefined;
-let workerRuntime: WorkerRuntime;
+let workerRuntime: WorkerRuntime | undefined;
 
 async function clearQueue(queue: WorkerRuntime["queues"][number]) {
   await queue.obliterate({ force: true });
 }
 
 async function waitForWorker() {
+  if (!workerRuntime) throw new Error("Worker runtime is not running.");
+  const runtime = workerRuntime;
   const deadline = Date.now() + 290_000;
   let idleChecks = 0;
   while (Date.now() < deadline) {
     const counts = await Promise.all(
-      workerRuntime.queues.map(async (queue) => ({
+      runtime.queues.map(async (queue) => ({
         pending: await queue.getJobCountByTypes(
           "active",
           "delayed",
@@ -82,14 +85,14 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       await Promise.all(queues.map(clearQueue));
       await Promise.all(queues.map((queue) => queue.close()));
       useQueueWorkerDispatch();
-      workerRuntime = await startWorkerRuntime();
     });
     afterAll(async () => {
-      await workerRuntime.close();
       await gracefulShutdown();
       installInMemoryWorkerDispatch();
     });
     afterEach(async () => {
+      await workerRuntime?.close();
+      workerRuntime = undefined;
       await fixtureWebsite?.close();
       fixtureWebsite = undefined;
     });
@@ -130,6 +133,13 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
           },
           context,
         );
+        // This origin is owned by the test. Keep pacing enabled without making
+        // the live-model suite wait a minute between fixture requests.
+        await db
+          .update(scrapeTargets)
+          .set({ minimumSpacingMs: 1_000, requestsPerWindow: 3_600 })
+          .where(eq(scrapeTargets.key, source.site.type));
+        workerRuntime = await startWorkerRuntime();
         expect(source).toMatchObject({
           enabled: false,
           activeRevisionId: null,
