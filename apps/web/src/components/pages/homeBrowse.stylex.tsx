@@ -238,7 +238,7 @@ export function HomeDistilleries({
       <ItemList ariaLabel="Distilleries">
         {distilleries.map((distillery) => (
           <ItemListItem key={distillery.href}>
-            <EntityIdentityRow {...distillery} />
+            <EntityIdentityRow {...distillery} kind={undefined} />
           </ItemListItem>
         ))}
       </ItemList>
