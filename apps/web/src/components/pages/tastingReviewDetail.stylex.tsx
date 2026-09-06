@@ -1,11 +1,11 @@
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
+import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import {
-  Chip,
   FactList,
   LoadingPlaceholder,
   MemberAvatar,
@@ -14,6 +14,7 @@ import {
   TextLink,
   type RatingBand,
 } from "@peated/web/components";
+import { TastingNoteTag } from "@peated/web/features/tastingWheel/tastingNoteTag.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
@@ -90,6 +91,7 @@ export function TastingReviewDetail({
   rating,
   servingStyle,
   tags,
+  tagCategories,
 }: {
   author: Member;
   bottle: Bottle;
@@ -103,6 +105,7 @@ export function TastingReviewDetail({
   rating: Rating;
   servingStyle?: ServingStyle;
   tags: readonly string[];
+  tagCategories: Readonly<Record<string, TagCategory>>;
 }) {
   const bottleName = formatBottleDisplayName(bottle);
   const bottleTitle = bottleName.replaceAll(" - ", "\u00a0- ");
@@ -178,7 +181,12 @@ export function TastingReviewDetail({
       {tags.length ? (
         <div {...stylex.props(styles.tags)}>
           {tags.map((tag, index) => (
-            <Chip key={`${tag}-${index}`}>{tag}</Chip>
+            <TastingNoteTag
+              category={tagCategories[tag]}
+              key={`${tag}-${index}`}
+            >
+              {tag}
+            </TastingNoteTag>
           ))}
         </div>
       ) : null}

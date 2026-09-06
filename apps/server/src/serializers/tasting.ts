@@ -8,8 +8,10 @@ import { bottles, tastingBadgeAwards, toasts, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type TastingSchema } from "../schemas";
+import type { TagCategory } from "../types";
 import { BadgeAwardSerializer } from "./badgeAward";
 import { BottleSerializer } from "./bottle";
+import { categoriesForTags, loadTagCategories } from "./tagCategories";
 import { UserSerializer } from "./user";
 
 type TastingAttrs = {
@@ -18,6 +20,7 @@ type TastingAttrs = {
   bottle: ReturnType<(typeof BottleSerializer)["item"]>;
   friends: ReturnType<(typeof UserSerializer)["item"]>[];
   awards: ReturnType<(typeof BadgeAwardSerializer)["item"]>[];
+  tagCategories: Record<string, TagCategory>;
 };
 
 export const TastingSerializer = serializer({
@@ -27,6 +30,9 @@ export const TastingSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
+    const categoriesByTag = await loadTagCategories(
+      itemList.flatMap((item) => item.tags ?? []),
+    );
     const bottleIds = [...new Set(itemList.map(({ bottleId }) => bottleId))];
     const bottleList = bottleIds.length
       ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
@@ -140,6 +146,7 @@ export const TastingSerializer = serializer({
             bottle,
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
+            tagCategories: categoriesForTags(item.tags ?? [], categoriesByTag),
           },
         ];
       }),
@@ -158,6 +165,7 @@ export const TastingSerializer = serializer({
         : null,
       notes: item.notes,
       tags: item.tags || [],
+      tagCategories: attrs.tagCategories,
       color: item.color,
       ratingBand: item.ratingBand,
       // TODO(ratings): Remove these fields when historical rating display is retired.

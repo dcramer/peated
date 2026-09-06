@@ -19,9 +19,11 @@ describe("member reviews", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const friend = await fixtures.User();
-    await Promise.all(
-      ["apple", "wax", "smoke"].map((name) => fixtures.Tag({ name })),
-    );
+    await Promise.all([
+      fixtures.Tag({ name: "apple", tagCategory: "fruit" }),
+      fixtures.Tag({ name: "wax", tagCategory: "earthy" }),
+      fixtures.Tag({ name: "smoke", tagCategory: "smoke" }),
+    ]);
     await db.insert(follows).values({
       fromUserId: defaults.user.id,
       toUserId: friend.id,
@@ -57,6 +59,7 @@ describe("member reviews", () => {
       id: created.id,
       score: 90,
       tags: ["smoke"],
+      tagCategories: { smoke: "smoke" },
       color: 9,
       notes: null,
       servingStyle: "splash",
@@ -71,6 +74,7 @@ describe("member reviews", () => {
       id: created.id,
       score: 90,
       tags: ["smoke"],
+      tagCategories: { smoke: "smoke" },
       color: 9,
       notes: null,
       servingStyle: "splash",

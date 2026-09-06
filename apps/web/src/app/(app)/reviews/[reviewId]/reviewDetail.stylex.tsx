@@ -21,6 +21,7 @@ export function ReviewDetail({ review }: { review: Review }) {
       rating={{ kind: "review", score: review.score }}
       servingStyle={review.servingStyle}
       tags={review.tags}
+      tagCategories={review.tagCategories}
     />
   );
 }

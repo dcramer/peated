@@ -25,6 +25,11 @@ const meta = {
         },
         ratingBand: "outstanding",
         tags: ["Smoke", "Dried fruit", "Sea salt"],
+        tagCategories: {
+          Smoke: "smoke",
+          "Dried fruit": "fruit",
+          "Sea salt": "smoke",
+        },
       },
       {
         href: "/bottles/ardbeg-uigeadail",
@@ -35,6 +40,7 @@ const meta = {
         },
         ratingBand: "good",
         tags: ["Tar", "Raisin", "Espresso"],
+        tagCategories: { Tar: "smoke", Raisin: "fruit", Espresso: "earthy" },
       },
     ],
     menu: (
@@ -101,6 +107,11 @@ export const LongNotes: Story = {
         },
         ratingBand: "outstanding",
         tags: ["Smoke", "Dried fruit", "Sea salt"],
+        tagCategories: {
+          Smoke: "smoke",
+          "Dried fruit": "fruit",
+          "Sea salt": "smoke",
+        },
       },
     ],
   },

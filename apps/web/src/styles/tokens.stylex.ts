@@ -84,6 +84,15 @@ export const colors = stylex.defineVars({
     default: "rgb(22 25 20 / 0.45)",
     [DARK]: "rgb(232 234 227 / 0.45)",
   },
+  categoryCereal: { default: "#ad6f0b", [DARK]: "#e2a744" },
+  categoryFruit: { default: "#9f2f50", [DARK]: "#d86485" },
+  categoryFloral: { default: "#6f4a9b", [DARK]: "#aa8cd0" },
+  categorySmoke: { default: "#2c7089", [DARK]: "#76a5b5" },
+  categoryEarthy: { default: "#356b48", [DARK]: "#75a181" },
+  categorySulfur: { default: "#707a16", [DARK]: "#b3b65f" },
+  categorySweet: { default: "#c06092", [DARK]: "#e6a0c0" },
+  categorySpice: { default: "#bd4822", [DARK]: "#df7b58" },
+  categoryWood: { default: "#5c4437", [DARK]: "#9a7660" },
 });
 
 export const lightColorTheme = stylex.createTheme(colors, {
@@ -118,6 +127,15 @@ export const lightColorTheme = stylex.createTheme(colors, {
   critical: "#a3231a",
   criticalQuiet: "rgb(163 35 26 / 0.42)",
   dataRange: "rgb(22 25 20 / 0.45)",
+  categoryCereal: "#ad6f0b",
+  categoryFruit: "#9f2f50",
+  categoryFloral: "#6f4a9b",
+  categorySmoke: "#2c7089",
+  categoryEarthy: "#356b48",
+  categorySulfur: "#707a16",
+  categorySweet: "#c06092",
+  categorySpice: "#bd4822",
+  categoryWood: "#5c4437",
 });
 
 export const darkColorTheme = stylex.createTheme(colors, {
@@ -152,6 +170,15 @@ export const darkColorTheme = stylex.createTheme(colors, {
   critical: "#f0776b",
   criticalQuiet: "rgb(240 119 107 / 0.42)",
   dataRange: "rgb(232 234 227 / 0.45)",
+  categoryCereal: "#e2a744",
+  categoryFruit: "#d86485",
+  categoryFloral: "#aa8cd0",
+  categorySmoke: "#76a5b5",
+  categoryEarthy: "#75a181",
+  categorySulfur: "#b3b65f",
+  categorySweet: "#e6a0c0",
+  categorySpice: "#df7b58",
+  categoryWood: "#9a7660",
 });
 
 export const fonts = stylex.defineVars({

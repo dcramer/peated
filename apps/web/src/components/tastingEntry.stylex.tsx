@@ -1,14 +1,15 @@
+import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { foundationStyles } from "../styles/foundations.stylex";
 
+import { TastingNoteTag } from "../features/tastingWheel/tastingNoteTag.stylex";
 import { colors, effects, space } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import {
   BottleIdentityRow,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
-import { Chip } from "./chip.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
 import { TastingToastSummary } from "./tastingToastButton.stylex";
 
@@ -26,6 +27,7 @@ export type TastingEntryMember = {
   ratingBand?: RatingBand;
   servingStyle?: string;
   tags?: readonly string[];
+  tagCategories?: Readonly<Record<string, TagCategory>>;
   tastingId?: number;
   toasts?: number;
 };
@@ -136,7 +138,12 @@ export function TastingEntry({
               {member.tags?.length ? (
                 <div {...stylex.props(styles.tags)}>
                   {member.tags.map((tag, index) => (
-                    <Chip key={`${tag}-${index}`}>{tag}</Chip>
+                    <TastingNoteTag
+                      category={member.tagCategories?.[tag]}
+                      key={`${tag}-${index}`}
+                    >
+                      {tag}
+                    </TastingNoteTag>
                   ))}
                 </div>
               ) : null}
