@@ -27,6 +27,14 @@ export const homeLocationCriteria = {
   } satisfies Inputs["regions"]["list"],
 };
 
+export const homeActivityCriteria = {
+  community: { limit: 5 } satisfies Inputs["activity"]["list"],
+  critics: {
+    limit: 5,
+    sort: "recent",
+  } satisfies Inputs["externalReviews"]["list"],
+};
+
 export const publicHomeQueries = {
   stats: (orpc: ORPCQueryUtils) =>
     orpc.stats.queryOptions({
@@ -42,17 +50,17 @@ export const publicHomeQueries = {
     orpc.events.list.queryOptions({
       input: { limit: 1, onlyUpcoming: true, sort: "date" },
     }),
-  memberActivity: (orpc: ORPCQueryUtils) =>
+  communityActivity: (orpc: ORPCQueryUtils) =>
     orpc.activity.list.queryOptions({
-      input: { limit: 3 },
+      input: homeActivityCriteria.community,
     }),
   releases: (orpc: ORPCQueryUtils) =>
     orpc.bottles.list.queryOptions({
       input: { limit: 5, sort: "-release" },
     }),
-  recentReviews: (orpc: ORPCQueryUtils) =>
+  criticReviews: (orpc: ORPCQueryUtils) =>
     orpc.externalReviews.list.queryOptions({
-      input: { limit: 3, sort: "recent" },
+      input: homeActivityCriteria.critics,
     }),
   countries: (orpc: ORPCQueryUtils) =>
     orpc.countries.list.queryOptions({
