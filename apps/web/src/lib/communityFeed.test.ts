@@ -142,7 +142,7 @@ describe("getTastingFeedItems", () => {
     });
   });
 
-  test("covers a tasting photo and contains the catalog fallback", () => {
+  test("covers tasting photos and catalog fallbacks", () => {
     const photoUrl = "https://images.peated.com/tasting.jpg";
     const [withPhoto] = getTastingFeedItems([
       { ...mockTasting, imageUrl: photoUrl },
@@ -156,7 +156,7 @@ describe("getTastingFeedItems", () => {
       imageUrl: photoUrl,
     });
     expect(withoutPhoto?.bottles[0]).toMatchObject({
-      imageFit: "contain",
+      imageFit: "cover",
       imageUrl: mockTasting.bottle.imageUrl,
     });
   });
@@ -213,6 +213,9 @@ test("includes all four activity types, makes one card per tasting, and omits li
         (bottle) => !("status" in bottle) && !("isLibrary" in bottle),
       ),
     ).toBe(true);
+    expect(item.bottles.every((bottle) => bottle.imageFit === "cover")).toBe(
+      true,
+    );
   }
   const dates = items.map((item) => Date.parse(item.date));
   expect(dates).toEqual([...dates].sort((a, b) => b - a));

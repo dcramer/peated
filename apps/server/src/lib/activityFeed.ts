@@ -10,6 +10,7 @@ import type {
 import {
   bottles,
   collectionBottles,
+  collections,
   externalReviewArticles,
   externalReviewPublications,
   externalReviews,
@@ -40,6 +41,8 @@ export {
 } from "./activityCursor";
 
 export const COLLECTION_PREVIEW_LIMIT = 4;
+// Activity feed rule: a collection-add session ends after six hours of inactivity.
+export const COLLECTION_ADD_SESSION_INACTIVITY_HOURS = 6;
 export const SECONDARY_ENTRY_LIMIT_WITH_PRIMARY = 2;
 export const TASTING_SESSION_INACTIVITY_HOURS = 3;
 
@@ -237,6 +240,160 @@ function markedTastingsSql({
         AND ${tastings.createdAt} <= ${snapshotAt}
     ) ordered_tastings
   `;
+}
+
+function markedCollectionAdditionsSql({
+  userCondition,
+  snapshotAt,
+}: {
+  userCondition: SQL<unknown>;
+  snapshotAt: Date;
+}) {
+  return sql`
+    SELECT
+      ordered_additions.id,
+      ordered_additions.collection_id,
+      ordered_additions.created_at,
+      CASE
+        WHEN ordered_additions.previous_created_at IS NULL
+          OR ordered_additions.created_at - ordered_additions.previous_created_at
+            > (${COLLECTION_ADD_SESSION_INACTIVITY_HOURS} * INTERVAL '1 hour')
+        THEN 1
+        ELSE 0
+      END AS is_session_start
+    FROM (
+      SELECT
+        ${collectionBottles.id} AS id,
+        ${collectionBottles.collectionId} AS collection_id,
+        ${collectionBottles.createdAt} AS created_at,
+        LAG(${collectionBottles.createdAt}) OVER (
+          PARTITION BY ${collectionBottles.collectionId}
+          ORDER BY ${collectionBottles.createdAt}, ${collectionBottles.id}
+        ) AS previous_created_at
+      FROM ${collectionBottles}
+      INNER JOIN ${collections}
+        ON ${collections.id} = ${collectionBottles.collectionId}
+      INNER JOIN ${users} ON ${users.id} = ${collections.createdById}
+      WHERE ${userCondition}
+        AND ${collectionBottles.createdAt} <= ${snapshotAt.toISOString()}::timestamp
+    ) ordered_additions
+  `;
+}
+
+function numberedCollectionAdditionsSql({
+  userCondition,
+  snapshotAt,
+}: {
+  userCondition: SQL<unknown>;
+  snapshotAt: Date;
+}) {
+  return sql`
+    SELECT
+      marked_additions.*,
+      SUM(marked_additions.is_session_start) OVER (
+        PARTITION BY marked_additions.collection_id
+        ORDER BY marked_additions.created_at, marked_additions.id
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+      ) AS session_number
+    FROM (
+      ${markedCollectionAdditionsSql({ userCondition, snapshotAt })}
+    ) marked_additions
+  `;
+}
+
+/** Counts collection-add sessions inside one activity snapshot. */
+export async function countCollectionAddGroups({
+  userCondition,
+  snapshotAt,
+}: {
+  userCondition: SQL<unknown>;
+  snapshotAt: Date;
+}) {
+  const result = await db.execute<{ count: string }>(sql`
+    SELECT COUNT(*) AS count
+    FROM (
+      SELECT 1
+      FROM (
+        ${numberedCollectionAdditionsSql({ userCondition, snapshotAt })}
+      ) numbered_additions
+      GROUP BY
+        numbered_additions.collection_id,
+        numbered_additions.session_number
+    ) collection_add_groups
+  `);
+  return Number(result.rows[0]?.count ?? 0);
+}
+
+type CollectionAddGroupRow = {
+  collection_id: number | string;
+  window_start: string;
+  window_end: string;
+  total_items: string;
+};
+
+/** Pages collection additions without splitting a six-hour activity session. */
+export async function getCollectionAddGroups({
+  userCondition,
+  snapshotAt,
+  offset,
+  limit,
+}: {
+  userCondition: SQL<unknown>;
+  snapshotAt: Date;
+  offset: number;
+  limit: number;
+}): Promise<CollectionAddGroup[]> {
+  if (!limit) return [];
+
+  return await db.transaction(
+    async (tx) => {
+      const result = await tx.execute<CollectionAddGroupRow>(sql`
+        SELECT
+          numbered_additions.collection_id,
+          MIN(numbered_additions.created_at)::text AS window_start,
+          MAX(numbered_additions.created_at)::text AS window_end,
+          COUNT(numbered_additions.id) AS total_items
+        FROM (
+          ${numberedCollectionAdditionsSql({ userCondition, snapshotAt })}
+        ) numbered_additions
+        GROUP BY
+          numbered_additions.collection_id,
+          numbered_additions.session_number
+        ORDER BY window_end DESC, numbered_additions.collection_id DESC
+        OFFSET ${offset}
+        LIMIT ${limit}
+      `);
+
+      const collectionIds = result.rows.map((row) => Number(row.collection_id));
+      if (!collectionIds.length) return [];
+
+      const collectionRows = await tx
+        .select({ collection: collections, user: users })
+        .from(collections)
+        .innerJoin(users, eq(users.id, collections.createdById))
+        .where(inArray(collections.id, collectionIds));
+      const collectionById = new Map(
+        collectionRows.map((row) => [row.collection.id, row]),
+      );
+
+      return result.rows.map((row): CollectionAddGroup => {
+        const target = collectionById.get(Number(row.collection_id));
+        if (!target) {
+          throw new Error(
+            `Activity references missing Collection ${row.collection_id}.`,
+          );
+        }
+        return {
+          collection: target.collection,
+          user: target.user,
+          windowStart: row.window_start,
+          windowEnd: row.window_end,
+          totalItems: Number(row.total_items),
+        };
+      });
+    },
+    { accessMode: "read only", isolationLevel: "repeatable read" },
+  );
 }
 
 /** Counts primary feed entries inside one activity snapshot. */

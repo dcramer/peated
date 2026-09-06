@@ -27,16 +27,19 @@ function withStoryImages(
     return {
       ...item,
       actorImageUrl: null,
-      bottles: item.bottles.map((bottle) => ({
-        ...bottle,
-        imageFit: item.kind === "tasting" && tastingPhoto ? "cover" : "contain",
-        imageUrl:
+      bottles: item.bottles.map((bottle) => {
+        const imageUrl =
           item.kind === "collection_add"
-            ? null
+            ? OblongTastingPhoto.src
             : item.kind === "tasting"
               ? tastingPhoto
-              : SquareTastingPhoto.src,
-      })),
+              : SquareTastingPhoto.src;
+        return {
+          ...bottle,
+          imageFit: imageUrl ? "cover" : "contain",
+          imageUrl,
+        };
+      }),
     };
   });
 }
@@ -48,7 +51,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shared by activity and full-width tasting lists on the homepage, activity, bottle, brand or producer, and member pages. Map activity with getCommunityFeedItems and tasting lists with getTastingFeedItems. Each card includes the author and links to the activity. Bottle titles still link to their bottles. Tastings and reviews use the standard three-line bottle identity; library additions use compact, single-line bottle rows. Critic bylines are optional; library status is omitted.",
+          "Shared by activity and full-width tasting lists on the homepage, activity, bottle, brand or producer, and member pages. Map activity with getCommunityFeedItems and tasting lists with getTastingFeedItems. Each card includes the author and links to the activity. Bottle titles still link to their bottles. Feed images cover their frames. Tastings and reviews use the standard three-line bottle identity; library additions use compact, single-line bottle rows. Critic bylines are optional; library status is omitted.",
       },
     },
   },

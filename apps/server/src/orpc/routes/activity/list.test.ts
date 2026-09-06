@@ -68,6 +68,61 @@ describe("GET /activity", () => {
         },
       ]);
     });
+
+    test(`groups additions across midnight within six hours in ${feed} feed`, async ({
+      fixtures,
+    }) => {
+      const user = await fixtures.User();
+      const collection = await fixtures.Collection({
+        name: "Library",
+        createdById: user.id,
+      });
+      const bottles = await Promise.all([
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+      ]);
+      await insertCollectionBottles([
+        {
+          collectionId: collection.id,
+          bottleId: bottles[0].id,
+          createdAt: new Date("2026-01-03T23:00:00Z"),
+        },
+        {
+          collectionId: collection.id,
+          bottleId: bottles[1].id,
+          createdAt: new Date("2026-01-04T02:00:00Z"),
+        },
+        {
+          collectionId: collection.id,
+          bottleId: bottles[2].id,
+          createdAt: new Date("2026-01-04T09:00:01Z"),
+        },
+      ]);
+
+      const result =
+        feed === "global"
+          ? await routerClient.activity.list({ filter: "global", limit: 10 })
+          : await routerClient.users.activity.list({
+              user: user.username,
+              limit: 10,
+            });
+
+      expect(result.results).toMatchObject([
+        {
+          type: "collection_add",
+          totalItems: 1,
+          windowStart: "2026-01-04T09:00:01.000Z",
+          windowEnd: "2026-01-04T09:00:01.000Z",
+        },
+        {
+          type: "collection_add",
+          totalItems: 2,
+          windowStart: "2026-01-03T23:00:00.000Z",
+          windowEnd: "2026-01-04T02:00:00.000Z",
+        },
+      ]);
+    });
   }
 
   test("returns tastings and grouped collection additions", async ({

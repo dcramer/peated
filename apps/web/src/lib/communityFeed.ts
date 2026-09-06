@@ -16,11 +16,13 @@ type Bottle = Outputs["bottles"]["list"]["results"][number];
 type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
+/** Activity feed rule: real images crop to fill their fixed thumbnail frame. */
 function feedBottle(bottle: Bottle): CommunityFeedBottle {
   return {
     id: bottle.peatedId,
     ...getBottleIdentityProps(bottle),
     href: getBottleUrl(bottle),
+    imageFit: "cover",
     imageUrl: bottle.imageUrl,
   };
 }
@@ -40,7 +42,6 @@ function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
         ...feedBottle(tasting.bottle),
         id: String(tasting.id),
         description: getPreview(tasting.notes),
-        imageFit: tasting.imageUrl ? "cover" : "contain",
         imageUrl: tasting.imageUrl ?? tasting.bottle.imageUrl,
         ratingBand: tasting.ratingBand,
       },
