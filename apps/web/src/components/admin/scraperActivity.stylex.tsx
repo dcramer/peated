@@ -120,7 +120,8 @@ export default function ScraperActivity({ data }: ScraperActivityProps) {
           <p
             {...stylex.props(foundationStyles.body, styles.sectionDescription)}
           >
-            New means Peated did not already have that review, price or bottle.
+            Last 30 days. New means Peated did not already have that review,
+            price or bottle.
           </p>
         </div>
 

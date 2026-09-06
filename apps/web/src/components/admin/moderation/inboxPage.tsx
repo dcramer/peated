@@ -167,7 +167,7 @@ export default function InboxPage({
                     </Button>
                   ) : (
                     <Button href="/admin/moderation/automation">
-                      Check Automation
+                      Check background work
                     </Button>
                   )
                 }
