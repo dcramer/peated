@@ -240,6 +240,7 @@ export async function storeExternalReviewArticleInTransaction(
     storedExternalReviews.push({
       externalReview: stored,
       previousBottleId: existing?.bottleId,
+      isNew: !existing,
     });
   }
 
@@ -273,6 +274,9 @@ export async function storeExternalReviewArticle(
           previousBottleId,
         }),
       ),
+      newItemCount: storedExternalReviews.filter(({ isNew }) => isNew).length,
+      existingItemCount: storedExternalReviews.filter(({ isNew }) => !isNew)
+        .length,
     };
   });
 
@@ -296,5 +300,7 @@ export async function storeExternalReviewArticle(
   return {
     articleId: stored.articleId,
     externalReviewIds: stored.externalReviewIds,
+    newItemCount: stored.newItemCount,
+    existingItemCount: stored.existingItemCount,
   };
 }

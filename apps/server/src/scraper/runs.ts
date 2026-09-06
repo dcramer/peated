@@ -56,19 +56,34 @@ export type ScraperRunExecutionResult =
   | { status: "deferred"; nextAttemptAt: Date };
 
 function safeRunError(error: Error) {
-  if (error instanceof ScraperTargetDisabledError) return error.message;
+  if (error instanceof ScraperTargetDisabledError) {
+    return "The source is disabled.";
+  }
   if (error instanceof ScrapeSourceSetupError) return error.adminMessage();
-  if (error instanceof z.ZodError) return "Scraper data failed validation.";
+  if (error instanceof z.ZodError) {
+    return "The source returned data we could not use.";
+  }
   if (error instanceof ScraperRobotsDeniedError) {
-    return "Robots policy disallows this scraper path.";
+    return "The source does not allow scraping this page.";
   }
   if (error instanceof ScraperHttpStatusError) {
-    return `Remote source returned HTTP ${error.status}.`;
+    return `The source returned error ${error.status}.`;
   }
   if (error instanceof ScraperRequestError) {
-    return `Scraper request failed: ${error.category}.`;
+    switch (error.category) {
+      case "invalid_request":
+        return "The scraper request was not allowed.";
+      case "redirect_limit":
+        return "The source redirected too many times.";
+      case "response_too_large":
+        return "The source response was too large.";
+      case "timeout":
+        return "The source took too long to respond.";
+      case "transport":
+        return "The source could not be reached.";
+    }
   }
-  return "Unexpected scraper failure. See Sentry for this run.";
+  return "The scraper failed unexpectedly. See Sentry for details.";
 }
 
 async function claimScraperRun({

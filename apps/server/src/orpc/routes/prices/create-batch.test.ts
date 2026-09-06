@@ -307,8 +307,11 @@ describe("POST /external-sites/:site/prices", () => {
       url: "https://example.com/products/old-slug",
     };
 
-    await createStorePricesAsPeated({ site: site.type, prices: [listing] });
-    await createStorePricesAsPeated({
+    const firstImport = await createStorePricesAsPeated({
+      site: site.type,
+      prices: [listing],
+    });
+    const secondImport = await createStorePricesAsPeated({
       site: site.type,
       prices: [
         {
@@ -318,6 +321,9 @@ describe("POST /external-sites/:site/prices", () => {
         },
       ],
     });
+
+    expect(firstImport).toEqual({ newItemCount: 1, existingItemCount: 0 });
+    expect(secondImport).toEqual({ newItemCount: 0, existingItemCount: 1 });
 
     const prices = await db.query.storePrices.findMany({
       where: eq(storePrices.externalSiteId, site.id),

@@ -11,6 +11,13 @@ export type JsonValue =
 
 export type ScraperRunPayload = JsonValue | undefined;
 
+export type ScraperRecordType = "review" | "price" | "catalog" | "bottle";
+
+export type ScraperSinkResult = {
+  newItemCount: number;
+  existingItemCount: number;
+};
+
 export type ScraperRequest = {
   target: string;
   url: URL;
@@ -51,11 +58,12 @@ export type ScraperAdapter<TCursor, TObservation> = (input: {
 export type ScraperSink<TObservation> = (input: {
   externalSiteId: number;
   observation: ScraperObservation<TObservation>;
-}) => Promise<void>;
+}) => Promise<ScraperSinkResult | void>;
 
 export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   key: string;
   externalSiteKey: ExternalSiteKey;
+  recordType?: ScraperRecordType;
   targetKeys: readonly [string, ...string[]];
   requestLimit: number;
   resumeFromLastRun: boolean;

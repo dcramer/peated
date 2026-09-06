@@ -178,9 +178,9 @@ export function AdminStat({
       </dt>
       <dd {...stylex.props(styles.statValue)}>{value}</dd>
       {detail ? (
-        <div {...stylex.props(foundationStyles.metadata, styles.statDetail)}>
+        <dd {...stylex.props(foundationStyles.metadata, styles.statDetail)}>
           {detail}
-        </div>
+        </dd>
       ) : null}
     </div>
   );
@@ -430,6 +430,7 @@ const styles = stylex.create({
     lineHeight: 1,
   },
   statDetail: {
+    margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
   },

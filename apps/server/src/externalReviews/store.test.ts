@@ -68,6 +68,7 @@ describe("storeExternalReviewArticle", () => {
     const result = await storeExternalReviewArticle(inputFor(site.id));
 
     expect(result.externalReviewIds).toHaveLength(2);
+    expect(result).toMatchObject({ newItemCount: 2, existingItemCount: 0 });
     expect(
       await db.query.externalReviewArticles.findFirst({
         where: eq(externalReviewArticles.id, result.articleId),
@@ -250,7 +251,12 @@ describe("storeExternalReviewArticle", () => {
 
     const refreshed = await storeExternalReviewArticle(refreshedInput);
 
-    expect(refreshed).toEqual(first);
+    expect(refreshed).toMatchObject({
+      articleId: first.articleId,
+      externalReviewIds: first.externalReviewIds,
+      newItemCount: 0,
+      existingItemCount: 2,
+    });
     expect(await db.select().from(externalReviewArticles)).toMatchObject([
       {
         id: first.articleId,

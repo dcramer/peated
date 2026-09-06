@@ -29,6 +29,19 @@ export const externalSiteRunTriggerEnum = pgEnum("external_site_run_trigger", [
   "manual",
 ]);
 
+export const scrapeRecordTypeEnum = pgEnum("scrape_record_type", [
+  "review",
+  "price",
+  "catalog",
+  "bottle",
+]);
+
+export const scrapeSourceRunPurposeEnum = pgEnum("scrape_source_run_purpose", [
+  "collect",
+  "preview",
+  "suggest",
+]);
+
 export const externalSites = pgTable(
   "external_site",
   {
@@ -63,6 +76,7 @@ export const externalSiteRuns = pgTable(
       .notNull(),
     status: externalSiteRunStatusEnum("status").default("queued").notNull(),
     trigger: externalSiteRunTriggerEnum("trigger").notNull(),
+    purpose: scrapeSourceRunPurposeEnum("purpose").default("collect").notNull(),
     requestedById: bigint("requested_by_id", { mode: "number" }).references(
       () => users.id,
     ),
@@ -70,9 +84,14 @@ export const externalSiteRuns = pgTable(
     requestLimit: integer("request_limit").default(100).notNull(),
     sliceRequestCount: integer("slice_request_count").default(0).notNull(),
     requestCount: integer("request_count").default(0).notNull(),
+    // Null means this run predates request-error tracking.
+    requestErrorCount: integer("request_error_count"),
     retryCount: integer("retry_count").default(0).notNull(),
     rateLimitCount: integer("rate_limit_count").default(0).notNull(),
+    recordType: scrapeRecordTypeEnum("record_type"),
     emittedItemCount: integer("emitted_item_count").default(0).notNull(),
+    newItemCount: integer("new_item_count").default(0).notNull(),
+    existingItemCount: integer("existing_item_count").default(0).notNull(),
     cursor: jsonb("cursor"),
     nextAttemptAt: timestamp("next_attempt_at"),
     executionToken: text("execution_token"),
@@ -91,6 +110,7 @@ export const externalSiteRuns = pgTable(
       table.externalSiteId,
       table.createdAt,
     ),
+    index("external_site_run_created_idx").on(table.createdAt),
     index("external_site_run_site_status_completed_idx").on(
       table.externalSiteId,
       table.status,
@@ -107,9 +127,16 @@ export const externalSiteRuns = pgTable(
         AND ${table.sliceRequestCount} >= 0
         AND ${table.sliceRequestCount} <= ${table.requestLimit}
         AND ${table.requestCount} >= 0
+        AND (${table.requestErrorCount} IS NULL OR (
+          ${table.requestErrorCount} >= 0
+          AND ${table.requestErrorCount} <= ${table.requestCount}
+        ))
         AND ${table.retryCount} >= 0
         AND ${table.rateLimitCount} >= 0
-        AND ${table.emittedItemCount} >= 0`,
+        AND ${table.emittedItemCount} >= 0
+        AND ${table.newItemCount} >= 0
+        AND ${table.existingItemCount} >= 0
+        AND ${table.newItemCount} + ${table.existingItemCount} <= ${table.emittedItemCount}`,
     ),
     check(
       "external_site_run_execution_pair_check",

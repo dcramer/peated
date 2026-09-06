@@ -386,6 +386,7 @@ export const scraperRegistry = createScraperRegistry({
       defineScraperSource({
         key: source.type,
         externalSiteKey: source.type,
+        recordType: "price",
         targetKeys: [source.type],
         cursorSchema: LegacyPriceCursorSchema,
         observationSchema: StorePriceBatchSchema,
@@ -397,6 +398,7 @@ export const scraperRegistry = createScraperRegistry({
       defineScraperSource({
         key: source.type,
         externalSiteKey: source.type,
+        recordType: "bottle",
         targetKeys: [source.type],
         cursorSchema: z.null(),
         observationSchema: LegacyBottleObservationSchema,
@@ -409,6 +411,7 @@ export const scraperRegistry = createScraperRegistry({
     defineScraperSource({
       key: "dramface",
       externalSiteKey: "dramface",
+      recordType: "review",
       targetKeys: ["dramface"],
       requestLimit: 30,
       cursorSchema: DramfaceCursorSchema,
@@ -419,6 +422,7 @@ export const scraperRegistry = createScraperRegistry({
     defineScraperSource({
       key: "fredminnick",
       externalSiteKey: "fredminnick",
+      recordType: "review",
       targetKeys: ["fredminnick"],
       requestLimit: 9,
       cursorSchema: FredMinnickCursorSchema,
@@ -429,6 +433,7 @@ export const scraperRegistry = createScraperRegistry({
     defineScraperSource({
       key: "whiskyadvocate",
       externalSiteKey: "whiskyadvocate",
+      recordType: "review",
       targetKeys: ["whiskyadvocate"],
       // Keep the slice budget above the target quota so one hourly deferral
       // consumes one execution attempt.
@@ -442,6 +447,7 @@ export const scraperRegistry = createScraperRegistry({
     defineScraperSource({
       key: "whiskyfun",
       externalSiteKey: "whiskyfun",
+      recordType: "review",
       targetKeys: ["whiskyfun"],
       requestLimit: 30,
       resumeFromLastRun: true,

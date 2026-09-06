@@ -1919,6 +1919,20 @@
       "when": 1788652385960,
       "tag": "0273_complete-tasting-note-vocabulary",
       "breakpoints": false
+    },
+    {
+      "idx": 274,
+      "version": "7",
+      "when": 1788657598067,
+      "tag": "0274_spooky_norrin_radd",
+      "breakpoints": false
+    },
+    {
+      "idx": 275,
+      "version": "7",
+      "when": 1788666435573,
+      "tag": "0275_clumsy_lifeguard",
+      "breakpoints": false
     }
   ]
 }

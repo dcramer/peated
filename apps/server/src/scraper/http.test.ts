@@ -303,7 +303,11 @@ test("retries only transient failures and reacquires a permit", async () => {
     .select()
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, run.id));
-  expect(runState).toMatchObject({ requestCount: 2, retryCount: 1 });
+  expect(runState).toMatchObject({
+    requestCount: 2,
+    requestErrorCount: 1,
+    retryCount: 1,
+  });
 
   await expect(
     requestScraperUrl({
@@ -326,6 +330,11 @@ test("retries only transient failures and reacquires a permit", async () => {
     status: 404,
     headers: {},
   } satisfies Partial<ScraperHttpStatusError>);
+  const [failedRunState] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(failedRunState?.requestErrorCount).toBe(2);
 });
 
 test("honors Retry-After as a shared durable deferral", async () => {
@@ -378,6 +387,12 @@ test("bounds response bytes from headers and streamed content", async () => {
     }),
   ).rejects.toMatchObject({ category: "response_too_large" });
 
+  const [runState] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(runState?.requestErrorCount).toBe(1);
+
   await db
     .update(scrapeTargets)
     .set({ nextRequestAt: null })
@@ -397,6 +412,11 @@ test("bounds response bytes from headers and streamed content", async () => {
       clock: clockAt(),
     }),
   ).rejects.toMatchObject({ category: "response_too_large" });
+  const [updatedRunState] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(updatedRunState?.requestErrorCount).toBe(2);
 });
 
 test("classifies bounded timeout retries and rejects unsafe headers before contact", async () => {
@@ -420,6 +440,11 @@ test("classifies bounded timeout retries and rejects unsafe headers before conta
     }),
   ).rejects.toEqual(expect.objectContaining({ category: "timeout" }));
   expect(timeoutFetch).toHaveBeenCalledTimes(3);
+  const [runState] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(runState?.requestErrorCount).toBe(3);
 
   const neverFetch = vi.fn<typeof fetch>();
   await expect(

@@ -295,6 +295,7 @@ test("shares server-directed cooldowns across source runs", async () => {
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, firstRun.id));
   expect(storedRun?.rateLimitCount).toBe(1);
+  expect(storedRun?.requestErrorCount).toBe(1);
 });
 
 test("fails closed for undeclared targets and coordination errors", async () => {

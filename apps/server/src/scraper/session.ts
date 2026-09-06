@@ -18,6 +18,12 @@ import type {
 
 const SourceObservationKeySchema = z.string().trim().min(1).max(512);
 const ObservationItemCountSchema = z.number().int().positive().max(1_000);
+const ScraperSinkResultSchema = z
+  .object({
+    newItemCount: z.number().int().nonnegative(),
+    existingItemCount: z.number().int().nonnegative(),
+  })
+  .strict();
 const RUN_EXECUTION_LEASE_MS = 60 * 60_000;
 
 export class ScraperRunOwnershipError extends Error {
@@ -107,15 +113,26 @@ export function createScraperSession<TCursor, TObservation>({
         value: source.observationSchema.parse(observation.value),
       };
       await updateOwnedRun({});
-      await source.sink({
+      const sinkResult = await source.sink({
         externalSiteId: run.externalSiteId,
         observation: validated,
       });
+      const counts = sinkResult
+        ? ScraperSinkResultSchema.parse(sinkResult)
+        : { newItemCount: 0, existingItemCount: 0 };
+      if (
+        counts.newItemCount + counts.existingItemCount >
+        validated.itemCount
+      ) {
+        throw new Error("Scraper sink counted more records than it received.");
+      }
       const now = clock.now();
       const [updated] = await db
         .update(externalSiteRuns)
         .set({
           emittedItemCount: sql`${externalSiteRuns.emittedItemCount} + ${validated.itemCount}`,
+          newItemCount: sql`${externalSiteRuns.newItemCount} + ${counts.newItemCount}`,
+          existingItemCount: sql`${externalSiteRuns.existingItemCount} + ${counts.existingItemCount}`,
           executionExpiresAt: new Date(now.getTime() + RUN_EXECUTION_LEASE_MS),
         })
         .where(

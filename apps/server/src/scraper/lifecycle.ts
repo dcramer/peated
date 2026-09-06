@@ -116,8 +116,11 @@ async function insertRun(
     .values({
       externalSiteId: site.id,
       trigger,
+      purpose: "collect",
       requestedById,
       requestLimit: source.requestLimit,
+      requestErrorCount: 0,
+      recordType: source.recordType,
       cursor,
     })
     .returning();

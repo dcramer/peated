@@ -7,6 +7,9 @@ export function createStorePriceSink(
   site: ExternalSiteKey,
 ): ScraperSink<StorePrice[]> {
   return async ({ observation }) => {
-    await createStorePricesAsPeated({ site, prices: observation.value });
+    return await createStorePricesAsPeated({
+      site,
+      prices: observation.value,
+    });
   };
 }

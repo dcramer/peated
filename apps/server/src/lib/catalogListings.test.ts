@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { catalogListings } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
-import { upsertCatalogListing } from "./catalogListings";
+import { upsertCatalogListing, upsertCatalogListings } from "./catalogListings";
 
 describe("catalog listing persistence", () => {
   test("creates and updates one listing by external product identity", async ({
@@ -51,6 +51,21 @@ describe("catalog listing persistence", () => {
 
     expect(repeated.id).toBe(first.id);
     expect(repeated.name).toBe("Updated release name");
+  });
+
+  test("counts new and existing products in a batch", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "catalog-count-test" });
+    const product = {
+      externalProductId: "product-1",
+      name: "Release name",
+      url: "https://example.com/products/release",
+    };
+
+    const first = await upsertCatalogListings(site.id, [product]);
+    const repeated = await upsertCatalogListings(site.id, [product]);
+
+    expect(first).toMatchObject({ newItemCount: 1, existingItemCount: 0 });
+    expect(repeated).toMatchObject({ newItemCount: 0, existingItemCount: 1 });
   });
 
   test("rejects conflicting product id and URL identities", async ({

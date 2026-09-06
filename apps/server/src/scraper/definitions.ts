@@ -150,6 +150,7 @@ const SourceDefinitionSchema = z
   .object({
     key: DefinitionKeySchema,
     externalSiteKey: z.enum(REGISTERED_EXTERNAL_SITE_KEY_LIST),
+    recordType: z.enum(["review", "price", "catalog", "bottle"]).optional(),
     targetKeys: z.tuple([DefinitionKeySchema], DefinitionKeySchema),
     requestLimit: z
       .number()

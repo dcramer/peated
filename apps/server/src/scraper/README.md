@@ -279,11 +279,16 @@ to refresh them without keeping full articles.
   unexpected remote failure was terminal for that run. Stored errors are
   limited; detailed unexpected failures belong in Sentry.
 
-`sliceRequestCount` resets when a deferred run is reclaimed. `requestCount`,
-retry counts, rate-limit counts, and emitted-item counts are lifetime run
-aggregates. Every network attempt, including robots refreshes and retries,
-requires a SQL permit and consumes the current slice budget. Response bodies
-are streamed within the configured bound and are never stored by the runtime.
+`sliceRequestCount` resets when a deferred run is reclaimed. Request, request
+error, retry, rate-limit, record, new-record, and seen-before counts cover the
+full run. A null request-error count means the run finished before error
+tracking was added. Records without a saved type or new/seen result appear as
+not tracked in Admin. Preview and source suggestion runs do not appear in the
+Admin overview.
+
+Every network attempt, including robots refreshes and retries, requires a SQL
+permit and consumes the current slice budget. Response bodies are streamed
+within the configured bound and are never stored by the runtime.
 
 A run may be claimed for at most ten execution slices and may remain active for
 at most 24 hours. The claim boundary fails older work before another adapter or

@@ -6,5 +6,9 @@ export const catalogListingSink: ScraperSink<CatalogListingInput[]> = async ({
   externalSiteId,
   observation,
 }) => {
-  await upsertCatalogListings(externalSiteId, observation.value);
+  const result = await upsertCatalogListings(externalSiteId, observation.value);
+  return {
+    newItemCount: result.newItemCount,
+    existingItemCount: result.existingItemCount,
+  };
 };

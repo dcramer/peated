@@ -1,0 +1,1 @@
+CREATE INDEX "external_site_run_created_idx" ON "external_site_run" USING btree ("created_at");

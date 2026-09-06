@@ -6,6 +6,10 @@ import React from "react";
 
 const navigationGroups = [
   {
+    label: "Admin",
+    items: [{ href: "/admin", label: "Overview" }],
+  },
+  {
     label: "Moderation",
     items: [
       { href: "/admin/moderation/inbox", label: "Inbox" },
