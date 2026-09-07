@@ -132,7 +132,6 @@ export const entityImages = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    index("entity_image_entity_idx").on(table.entityId),
     index("entity_image_created_by_actor_idx").on(table.createdByActorId),
     uniqueIndex("entity_image_primary_unq")
       .on(table.entityId)
@@ -243,7 +242,6 @@ export const entityAliases = pgTable(
       table.entityId,
       table.normalizedName,
     ),
-    index("entity_alias_entity_idx").on(table.entityId),
     index("entity_alias_created_by_actor_idx").on(table.createdByActorId),
   ],
 );

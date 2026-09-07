@@ -41,7 +41,6 @@ export const regions = pgTable(
       table.countryId,
       sql`LOWER(${table.slug})`,
     ),
-    index("region_country_idx").on(table.countryId),
   ],
 );
 

@@ -1954,6 +1954,13 @@
       "when": 1788804881190,
       "tag": "0278_remove-skipped-catalog-verification-changes",
       "breakpoints": false
+    },
+    {
+      "idx": 279,
+      "version": "7",
+      "when": 1788808427609,
+      "tag": "0279_furry_kylun",
+      "breakpoints": false
     }
   ]
 }

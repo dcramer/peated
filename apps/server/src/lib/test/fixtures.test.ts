@@ -15,6 +15,35 @@ function requireFixtureId(id: number | null, fixture: string): number {
   return id;
 }
 
+describe("location fixtures", () => {
+  test("generated countries remain distinct when callers provide different slugs", async ({
+    fixtures,
+  }) => {
+    const first = await fixtures.Country({ slug: "first-country" });
+    const second = await fixtures.Country({ slug: "second-country" });
+
+    expect(second.id).not.toBe(first.id);
+  });
+
+  test("returns the existing Region when its country and slug conflict", async ({
+    fixtures,
+  }) => {
+    const country = await fixtures.Country();
+    const first = await fixtures.Region({
+      countryId: country.id,
+      name: "First Region Name",
+      slug: "shared-region",
+    });
+    const existing = await fixtures.Region({
+      countryId: country.id,
+      name: "Second Region Name",
+      slug: "shared-region",
+    });
+
+    expect(existing.id).toBe(first.id);
+  });
+});
+
 describe("catalog identity fixtures", () => {
   test("standard consumers reference the Bottle directly", async ({
     fixtures,

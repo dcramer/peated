@@ -663,7 +663,6 @@ export const bottleObservations = pgTable(
       table.sourceKey,
     ),
     index("bottle_observation_bottle_idx").on(table.bottleId),
-    index("bottle_observation_release_idx").on(table.legacyReleaseId),
     index("bottle_observation_external_site_idx").on(table.externalSiteId),
   ],
 );
@@ -914,7 +913,6 @@ export const bottleAliases = pgTable(
       table.bottleId,
       table.normalizedName,
     ),
-    index("bottle_alias_bottle_idx").on(table.bottleId),
     index("bottle_alias_created_by_actor_idx").on(table.createdByActorId),
   ],
 );

@@ -1,0 +1,10 @@
+DROP INDEX "bottle_alias_bottle_idx";
+DROP INDEX "bottle_observation_release_idx";
+DROP INDEX "entity_alias_entity_idx";
+DROP INDEX "entity_image_entity_idx";
+DROP INDEX "review_article_idx";
+DROP INDEX "member_review_bottle_idx";
+DROP INDEX "region_country_idx";
+DROP INDEX "store_price_match_proposal_current_release_idx";
+DROP INDEX "store_price_match_proposal_suggested_release_idx";
+DROP INDEX "store_price_release_idx";
