@@ -179,6 +179,25 @@ export const ModerationAutomationResponseSchema = z
         manual: z.number().int().min(0),
         failed: z.number().int().min(0),
         rate: z.number().int().min(0).max(100).nullable(),
+        byProposalType: z
+          .array(
+            z
+              .object({
+                proposalType: z.enum([
+                  "match_existing",
+                  "create_new",
+                  "correction",
+                  "no_match",
+                ]),
+                sampleSize: z.number().int().min(1).max(100),
+                automatic: z.number().int().min(0),
+                manual: z.number().int().min(0),
+                failed: z.number().int().min(0),
+                rate: z.number().int().min(0).max(100),
+              })
+              .strict(),
+          )
+          .max(4),
       })
       .strict(),
     needsAttention: z.array(AutomationItemSchema),

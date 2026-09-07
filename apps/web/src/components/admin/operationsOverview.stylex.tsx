@@ -20,6 +20,16 @@ type OperationsOverviewProps = {
   data: OperationsData;
 };
 
+const proposalTypeLabels = {
+  match_existing: "Existing matches",
+  create_new: "New Bottles",
+  correction: "Corrections",
+  no_match: "No match",
+} satisfies Record<
+  OperationsData["listingAutomation"]["byProposalType"][number]["proposalType"],
+  string
+>;
+
 function formatCount(value: number) {
   return value.toLocaleString("en-US");
 }
@@ -204,25 +214,43 @@ export default function OperationsOverview({
             ) : null}
           </div>
           {data.listingAutomation.sampleSize ? (
-            <p
-              {...stylex.props(
-                foundationStyles.metadata,
-                styles.matchingDetail,
-              )}
-            >
-              {formatCount(data.listingAutomation.automatic)} automatic ·{" "}
-              {formatCount(data.listingAutomation.manual)} manual ·{" "}
-              <span
+            <>
+              <p
                 {...stylex.props(
-                  data.listingAutomation.failed > 0 && styles.danger,
+                  foundationStyles.metadata,
+                  styles.matchingDetail,
                 )}
               >
-                {formatCount(data.listingAutomation.failed)} failed
-              </span>
-              <br />
-              Last {formatCount(data.listingAutomation.sampleSize)} prices
-              checked
-            </p>
+                {formatCount(data.listingAutomation.automatic)} automatic ·{" "}
+                {formatCount(data.listingAutomation.manual)} manual ·{" "}
+                <span
+                  {...stylex.props(
+                    data.listingAutomation.failed > 0 && styles.danger,
+                  )}
+                >
+                  {formatCount(data.listingAutomation.failed)} failed
+                </span>
+                <br />
+                Last {formatCount(data.listingAutomation.sampleSize)} prices
+                checked
+              </p>
+              <dl
+                aria-label="Price matching by decision"
+                {...stylex.props(styles.matchingBreakdown)}
+              >
+                {data.listingAutomation.byProposalType.map((item) => (
+                  <div
+                    key={item.proposalType}
+                    {...stylex.props(styles.matchingBreakdownRow)}
+                  >
+                    <dt>{proposalTypeLabels[item.proposalType]}</dt>
+                    <dd {...stylex.props(styles.matchingBreakdownValue)}>
+                      {item.rate}% · {formatCount(item.sampleSize)} checked
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </>
           ) : (
             <p
               {...stylex.props(
@@ -405,4 +433,26 @@ const styles = stylex.create({
     lineHeight: 1.2,
   },
   matchingDetail: { marginTop: space.x2, color: colors.inkMuted },
+  matchingBreakdown: {
+    display: "grid",
+    gap: space.x1,
+    margin: 0,
+    marginTop: space.x3,
+    paddingTop: space.x3,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    color: colors.inkMuted,
+    fontSize: "13px",
+  },
+  matchingBreakdownRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: space.x3,
+  },
+  matchingBreakdownValue: {
+    margin: 0,
+    color: colors.ink,
+    fontVariantNumeric: "tabular-nums",
+  },
 });

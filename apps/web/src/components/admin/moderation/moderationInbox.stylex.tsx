@@ -9,7 +9,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { Button } from "../..";
+import { Button, CursorPager } from "../..";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
@@ -66,6 +66,7 @@ export function ModerationInboxContent({
   const blocked = searchParams.get("blocked") === "true";
   const inconclusive = searchParams.get("inconclusive") === "true";
   const query = searchParams.get("query") ?? "";
+  const page = Number(searchParams.get("cursor") ?? 1);
   const [confirmingIgnore, setConfirmingIgnore] = useState(false);
   const listPath = pathname.includes("/inbox/")
     ? "/admin/moderation/inbox"
@@ -269,6 +270,28 @@ export function ModerationInboxContent({
           </span>
         </div>
       )}
+      {data.rel.prevCursor || data.rel.nextCursor ? (
+        <div {...stylex.props(styles.pager)}>
+          <CursorPager
+            ariaLabel="Inbox pages"
+            nextHref={
+              data.rel.nextCursor
+                ? `${listPath}?${buildQueryString(searchParams, {
+                    cursor: data.rel.nextCursor,
+                  })}`
+                : undefined
+            }
+            page={page}
+            previousHref={
+              data.rel.prevCursor
+                ? `${listPath}?${buildQueryString(searchParams, {
+                    cursor: data.rel.prevCursor,
+                  })}`
+                : undefined
+            }
+          />
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -367,6 +390,11 @@ const styles = stylex.create({
     padding: 0,
     overflowY: "auto",
     listStyle: "none",
+  },
+  pager: {
+    paddingRight: space.x4,
+    paddingBottom: space.x4,
+    paddingLeft: space.x4,
   },
   taskItem: {
     borderBottomWidth: "1px",
