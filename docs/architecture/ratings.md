@@ -224,7 +224,7 @@ finishes. This includes member review writes, tasting band changes, external
 review imports, moderation changes, assignments, and review publication
 changes. Large publication changes queue work in batches.
 
-Use **Bottle counts** on Admin → Maintenance to rebuild active Bottle,
+Use **Catalog summaries** on Admin → Maintenance to rebuild active Bottle,
 BottleGroup, and Entity summaries. The repair queues active Bottles in bounded,
 resumable pages and also checks each saved external score count against the
 shared external-review rule.

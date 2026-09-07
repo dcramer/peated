@@ -7,11 +7,11 @@ export default procedure
   .use(requireAdmin)
   .route({
     method: "POST",
-    path: "/admin/catalog/repair-bottle-counts",
-    summary: "Repair saved bottle counts",
+    path: "/admin/catalog/rebuild-summaries",
+    summary: "Rebuild saved catalog summaries",
     description:
-      "Check saved bottle totals and fix any that are wrong. Requires administrator privileges.",
-    operationId: "repairBottleCounts",
+      "Rebuild saved Bottle ratings, flavor notes, and catalog totals. Requires administrator privileges.",
+    operationId: "rebuildCatalogSummaries",
   })
   .input(z.object({}).strict().default({}))
   .output(z.object({ status: z.literal("queued") }).strict())
