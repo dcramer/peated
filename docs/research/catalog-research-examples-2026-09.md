@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 205 new Owner's Cask
+  one correction rather than a duplicate create. The 210 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1257,6 +1257,58 @@ completion record.
   strengths for `DS65840`, so its photographed 52% Whiskybase record is used.
   The staged totals are now 205 new Owner's Casks and 76 evidence-backed
   non-Owner releases.
+- The 2000 reconciliation compares the photographed
+  [vintage index](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-2000/)
+  with the current
+  [Whiskybase distillery index](https://www.whiskybase.com/whiskies/distillery/171/whiskies)
+  and exact label-oriented records. Six more Owner's Casks are staged: Liquor
+  Mountain hogshead
+  [`EN65786`](https://oldliquorcompany.com/shop/suntory-yamazaki-2000-the-owner-s-cask-en-65786-27953?category=173&page=2),
+  Sanyo Foods 50th Anniversary puncheon
+  [`EO70126`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-2000-owners-cask-eo70126-sanyo-foods-50th-anniversary),
+  70th Anniversary barrel
+  [`EP70479`](https://www.whiskybase.com/whiskies/whisky/128875/yamazaki-2000),
+  hogshead
+  [`EP70646`](https://www.whiskybase.com/whiskies/whisky/277482/yamazaki-2000),
+  Liquor Mountain 20th Anniversary barrel
+  [`ER65381`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-2000-owners-cask-er65381-liquor-mountain-20th-anniversary),
+  and `EU70119`, whose exact
+  [retailer record](https://www.treasure-f.com/shop/43/topics/330243/) proves the
+  Owner's Cask family, vintage, and cask number but not its bottling year,
+  strength, or maturation. Twelve more releases are staged outside Owner's Cask:
+  `EA3065`, `EC3006`, `ED3002`, `EJ3001`, `EO70013`, `EO70049`, `EP70561`,
+  `EP70645`, `ER65368`, `ER65384`, `EU70282`, and `EW70065`. Exact examples
+  include 10th Anniversary hogshead
+  [`EA3065`](https://www.whiskybase.com/whiskies/whisky/139857/yamazaki-2000),
+  sherry butt
+  [`EC3006`](https://dekanta.com/products/suntory-single-cask-yamazaki-2000-no-box),
+  sherry butt
+  [`ED3002`](https://www.whiskybase.com/whiskies/whisky/272831/yamazaki-2000),
+  2012 sherry butt
+  [`EO70013`](https://www.whiskybase.com/whiskies/whisky/274757/yamazaki-2000),
+  Code Name Mixology hogshead
+  [`EP70645`](https://www.whiskybase.com/whiskies/whisky/287196/yamazaki-2000),
+  2011 barrel
+  [`ER65368`](https://www.whiskybase.com/whiskies/whisky/280658),
+  2012 hogshead
+  [`EW70065`](https://www.whiskybase.com/whiskies/whisky/180894/yamazaki-2000),
+  and 常晴株式会社 10th Anniversary barrel
+  [`EU70282`](https://www.whiskybase.com/zh-cn/whiskies/whisky/302697/yamazaki-2000).
+  The exact Whisky Shop W. record for
+  [`EO70049`](https://www.whiskybase.com/whiskies/whisky/45268/yamazaki-2000)
+  corrects its first-pass staging from Owner's Cask and 2015 to Suntory Single
+  Cask Whisky, bottled in 2013 for the shop's 3rd Anniversary. An exact
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2018/20181116%20S-24779-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
+  and
+  [Whisky Auctioneer record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-2000-owners-cask-es70153-kasumis-cask-50th-anniversary)
+  settle `ES70153` as the Kasumi's Cask 50th Anniversary Owner's Cask despite
+  Whiskybase's conflicting series field. A Poly label catalog likewise keeps
+  `EX65186` in Owner's Cask. The same review fills `EU70121` as the Bar Cafe
+  Chiroru Tokyo barrel and removes an inferred release year. The Bonhams catalog
+  heading `EN70311` is a transcription error for the photographed `EO70126` and
+  is not a separate create. `EP70749` and `ES70053` remain index-only leads.
+  Twenty-four distinct 2000 casks are now staged, bringing the totals to 210 new
+  Owner's Casks and 88 evidence-backed non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
