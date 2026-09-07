@@ -1018,8 +1018,8 @@ completion record.
   Whisky. `4D3004`, `4R70016`, and `4S70038` were initially collector-only
   Owner's Cask leads and are resolved in the closing findings below. `4G3011`
   was initially held with them and is also resolved there. `4M70076` Pure Land
-  remains a lead because no exact
-  label or auction record has been found. A vintage-by-vintage 1993 pass adds
+  was initially held with them and is resolved in the closing findings below.
+  A vintage-by-vintage 1993 pass adds
   17 more candidates supported by exact auction records or readable bottle photos:
   `3F3080`, `3N70037`, `3N70044`, `3P70268`, `3P70269`, `3P70270`, `3P70274`,
   `3Q70282`, `3Q70348`, `3Q70352`, `3S65005`, `3X70002`, `3X70003`,
@@ -1077,8 +1077,8 @@ completion record.
   [auction catalog for `9U70063`](https://www.antiquekeeper.ca/largedocs/dongzheng/2016_572b401a142e9.pdf)
   establishes its 2008 bottling and 62% strength. Exact and secondary
   records conflict between 54% and 62% for `9U70062`, so its strength remains
-  unknown. `9V70315` remains an index-only lead, while `9V70227` and `9V70339`
-  are resolved in the closing findings below. The
+  unknown. `9V70315`, `9V70227`, and `9V70339` are resolved in the closing
+  findings below. The
   [Acker catalog](https://webdocs.ackerwines.com/203A_FINAL_WEB.pdf) establishes
   1986 Mizunara butts `6G5014` and `6G5025`, the latter for ANA Hotel Tokyo's
   20th Anniversary. It also corrects the transcribed cask `6V01032` to
@@ -1128,18 +1128,20 @@ completion record.
   records conflict between barrel and sherry butt. Casks `1V70591`, `IV70707`,
   and `1S70461` were initially held because exact records disagreed between The
   Owner's Cask and other single-cask labels; their photographed labels resolve
-  them in the closing findings below. `1O65110` remains unresolved. `1V70375`
-  was initially held with them and is also resolved below. A second 1992
+  them in the closing findings below. `1O65110` and `1V70375` are also resolved
+  below. A second 1992
   pass adds exact Sotheby's records for barrel
   [`2V70243`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai-2/shan-qi-yamazaki-the-owners-cask-2v70243-56-0-abv),
   Tokyo Suntory Club 40th Anniversary sherry butt
   [`ZL3003`](https://www.sothebys.com/en/buy/auction/2023/kodawarikodawari-the-greatest-japanese-whisky-collection-part-i/shan-qi-yamazaki-the-owners-cask-zl3003-52-0-abv),
   and Miyako Hotels 15th Anniversary hogshead
   [`ZS70182`](https://www.sothebys.com/en/buy/auction/2026/finest-and-rarest-spirits/shan-qi-the-yamazaki-the-owners-cask-zs70182-59-0).
-  The 1992 index-only records `2D3046`, `2M70153`, `2O70240`, and `2U60034`
-  remain leads; `2U60037` is resolved in the closing findings below. `2D3046`
-  and `2U60034` also have conflicting Owner's
-  Cask and Suntory Single Cask classifications. `2W65290` was initially held
+  The 1992 index-only records `2M70153`, `2O70240`, and `2U60034` remain leads;
+  `2I3046` and `2U60037` are resolved in the closing findings below. The
+  previously transcribed `2D3046` returned no Yamazaki evidence and is not kept
+  as a separate release; the photographed `2I3046` record below is the supported
+  identity. `2U60034` still has conflicting Owner's Cask and Suntory Single Cask
+  classifications. `2W65290` was initially held
   with them and is resolved in the closing findings below. A
   [2006 producer-visit record](https://www.yamaken.org/mt/kuidaore/archives/2006/08/post_871.html)
   shows cask `2D3048` was offered through the Owner's Cask program, but does not
@@ -1177,8 +1179,9 @@ completion record.
   exact retailer and bottle records resolve 2003 Bota Corta cask
   `ADDY3038` as Whisky Shop W. 4th Anniversary and 1999 sherry butt `DU65300`
   as Suntory Single Cask Whisky – 40th Hero; both are staged outside Owner's
-  Cask. `CU70065` remains unresolved because its exact records do not yet
-  settle the producer-stable family and name.
+  Cask. `CU70065` was initially unresolved because its exact records did not
+  settle the producer-stable family and name; the closing findings below resolve
+  it from photographed label text.
 - Exact Bonhams label images and repeated Sotheby's and Whisky Auctioneer lots
   resolve `AX70015` as `Suntory Single Cask Whisky`, not The Owner's Cask.
   [Bonhams](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
@@ -1267,8 +1270,8 @@ completion record.
   Owner's Cask barrel
   [`AS70145`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160819%20S-23349-0-3%20Whisky%20%5B112%5D.pdf),
   bottled in 2006 at 58% with a 186-bottle outturn. The same alternate index
-  exposes `AW70161`, but only its Owner's Cask family, 1996 vintage, and cask
-  number can currently be read; it remains a lead rather than a sparse create.
+  exposes `AW70161`; a later exact photographed record resolves its remaining
+  facts in the closing findings below.
   The 1997 reconciliation adds 15 more evidence-backed Owner's Casks:
   `BP70187`, `BP70249`, `BP70267`, `BP70275`, `BP70280`, `BP70295`,
   `BP70297`, `BP70310`, `BP70312`, `BP60072`, `BO70022`, `BX70188`,
@@ -1974,8 +1977,38 @@ completion record.
   corroborate `CU70065`; a later catalog transcription that calls it Owner's
   Cask and changes its years is not copied. All six exact public Peated searches
   returned no cask match. This takes the staged non-Owner create set from 119
-  to 125. Across both families, the audit now holds 351 evidence-backed creates
-  and 14 corrections for a fresh duplicate check before production writes.
+  to 125.
+- Four exact photographed collector records and one auction record resolve five
+  more Owner's Casks. The 1989 photographed index identifies Y. Otake hogshead
+  [`9V70315`](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-1989/)
+  as a 16-year-old bottled in 2005 at 68%; an independent
+  [photographed listing](https://www.carousell.com.hk/p/yamazaki-1989-single-cask-whisky-700ml-%E5%B1%B1%E5%B4%8E%E5%A8%81%E5%A3%AB%E5%BF%8C-hogshead-cask-9v70315-bottled-in-2005-1287987241/)
+  corroborates the cask and hogshead maturation. The exact collector pages
+  establish WOW Fes. hogshead
+  [`1O65110`](https://yabejojo.jimdoweb.com/2021/04/12/the-owner-s-cask-of-yamazaki-1991-cask-1o65110/),
+  distilled in 1991 and bottled in 2009 at 55%; 1992 sherry butt
+  [`2I3046`](https://yabejojo.jimdoweb.com/2022/03/06/the-owner-s-cask-of-yamazaki-1992-cask-2i3046/),
+  bottled in 2005 at 58%; and 150-bottle 1996 American-oak hogshead
+  [`AW70161`](https://yabejojo.jimdoweb.com/2021/04/17/the-owner-s-cask-of-yamazaki-1996-cask-aw70161/),
+  bottled in 2008. `AW70161`'s strength and the incomplete anniversary text are
+  not copied. The earlier `2D3046` lead is treated as a transcription error, not
+  a second Bottle: exact searches returned no Yamazaki evidence for that code,
+  while the photographed record clearly reads `2I3046`. Finally,
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1994-owners-cask-4o70178-suntory-shopping-club-30th)
+  establishes 1994 hogshead `4O70178`, bottled for Suntory Shopping Club's 30th
+  Anniversary at 50%. Its bottling year remains unknown. This exact cask is not
+  conflated with the unsupported `0U70178` transcription. Exact public Peated
+  searches returned no match for all five, taking the staged Owner's Cask set
+  from 226 to 231.
+- A photographed
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/272160/yamazaki-1994)
+  resolves `4M70076` as `Suntory Single Cask Whisky`, edition `Pure Land`, not
+  Owner's Cask. The label records a 1994 vintage, 2010 bottling, barrel
+  maturation, 58% cask strength, natural color, and no chill filtration. Exact
+  public Peated searches for the cask and edition returned no match. It is the
+  126th staged non-Owner release. Across both families, the audit now holds 357
+  evidence-backed creates and 14 corrections for a fresh duplicate check before
+  production writes.
 - The final image-identity check found that the reusable 180 ml no-age-statement
   photo is assigned to the wrong existing Bottle. Suntory's official
   [180 ml product record](https://products.suntory.co.jp/d/4901777237841/) and
