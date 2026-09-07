@@ -13,8 +13,6 @@ import {
 import { parseDate } from "./dates";
 import { readReviewBody } from "./reviewBody";
 
-// This adapter owns The Whiskey Reviewer parsing. The shared scraper runtime
-// owns every remote request and the shared review sink owns storage.
 const ORIGIN = "https://whiskeyreviewer.com";
 const TARGET = "whiskeyreviewer";
 const MAX_CURRENT_ARTICLES = 5;

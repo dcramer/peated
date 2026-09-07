@@ -38,6 +38,7 @@ import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   parseScrapeRules,
   scrapeRulesLimit,
+  scrapeRunRequestLimit,
   type StoredScrapeRules,
 } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
@@ -317,7 +318,7 @@ export function createLocalScrapeSourcePreview(input: {
     externalSiteKey: input.siteKey,
     recordType: input.rules.kind,
     targetKeys: [input.targetKey],
-    requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
+    requestLimit: scrapeRunRequestLimit(input.rules),
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema: observationSchemaForRules(input.rules),
@@ -408,7 +409,7 @@ function createScrapeSourceDefinition(input: {
     externalSiteKey: input.siteKey,
     recordType: input.rules.kind,
     targetKeys: [input.targetKey],
-    requestLimit: scrapeRulesLimit(input.rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
+    requestLimit: scrapeRunRequestLimit(input.rules),
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema,

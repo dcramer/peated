@@ -73,7 +73,7 @@ async function runToCompletion({
       },
     );
     if (result.status === "completed") return result;
-    if (!("nextAttemptAt" in result)) {
+    if (result.status !== "waiting") {
       throw new Error("The test run is already owned by another execution.");
     }
     clock.advanceTo(result.nextAttemptAt);

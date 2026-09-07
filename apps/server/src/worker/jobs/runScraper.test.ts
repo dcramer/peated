@@ -8,11 +8,11 @@ function createServices() {
   };
 }
 
-test("queues the same run id for its durable next-attempt time", async () => {
+test("queues the same run id for its next attempt", async () => {
   const services = createServices();
   const nextAttemptAt = new Date(Date.now() + 60_000);
   services.executeRun.mockResolvedValue({
-    status: "deferred",
+    status: "waiting",
     nextAttemptAt,
   });
 

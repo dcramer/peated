@@ -164,7 +164,7 @@ async function completeSavedRun({
   while (true) {
     const result = await executeScraperRun({ runId }, { fetchImpl, registry });
     if (result.status === "completed") return result;
-    if (!("nextAttemptAt" in result)) {
+    if (result.status !== "waiting") {
       throw new Error("The saved scraper is already running.");
     }
     await wait(Math.max(0, result.nextAttemptAt.getTime() - Date.now()));

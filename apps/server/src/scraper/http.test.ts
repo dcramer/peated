@@ -17,8 +17,8 @@ import {
 import {
   parseRetryAfter,
   requestScraperUrl as requestScraperUrlImpl,
-  ScraperRequestDeferredError,
   ScraperRequestError,
+  ScraperRequestWaitError,
   type ScraperHttpClock,
   type ScraperHttpStatusError,
 } from "./http";
@@ -368,7 +368,7 @@ test("retries only transient failures and reacquires a permit", async () => {
   expect(failedRunState?.requestErrorCount).toBe(2);
 });
 
-test("honors Retry-After as a shared durable deferral", async () => {
+test("uses Retry-After as the shared next request time", async () => {
   const { registry, run } = await setupRuntime();
   const clock = clockAt();
   const request = requestScraperUrl({
@@ -386,7 +386,7 @@ test("honors Retry-After as a shared durable deferral", async () => {
       ),
     clock,
   });
-  const error = await waitError(request, ScraperRequestDeferredError);
+  const error = await waitError(request, ScraperRequestWaitError);
   expect(error).toMatchObject({
     reason: "rate_limited",
     nextEligibleAt: new Date("2026-08-18T12:02:00Z"),
@@ -495,7 +495,7 @@ test("classifies bounded timeout retries and rejects unsafe headers before conta
   expect(neverFetch).not.toHaveBeenCalled();
 });
 
-test("defers a retryable transport failure when the run budget is exhausted", async () => {
+test("waits after a retryable request uses the run's last request", async () => {
   const { registry, run } = await setupRuntime({ requestLimit: 1 });
   const fetchImpl = vi
     .fn<typeof fetch>()
@@ -513,7 +513,7 @@ test("defers a retryable transport failure when the run budget is exhausted", as
       fetchImpl,
       clock: clockAt(),
     }),
-    ScraperRequestDeferredError,
+    ScraperRequestWaitError,
   );
   expect(error).toMatchObject({
     reason: "run_budget",

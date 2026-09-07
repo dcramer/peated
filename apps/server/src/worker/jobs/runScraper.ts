@@ -29,7 +29,7 @@ export async function runScraper(
 ) {
   const { runId } = InputSchema.parse(input);
   const result = await services.executeRun({ runId });
-  if (result.status !== "deferred" && result.status !== "not_ready") return;
+  if (result.status !== "waiting") return;
 
   const delay = Math.max(0, result.nextAttemptAt.getTime() - Date.now());
   await services.enqueueRun(runId, {

@@ -27,19 +27,19 @@ const EXPOSED_RESPONSE_HEADERS = new Set([
   "link",
 ]);
 
-export type ScraperDeferralReason =
+export type ScraperWaitReason =
   | PermitDenialReason
   | "rate_limited"
   | "robots_unavailable";
 
-export class ScraperRequestDeferredError extends Error {
-  override name = "ScraperRequestDeferredError";
+export class ScraperRequestWaitError extends Error {
+  override name = "ScraperRequestWaitError";
 
   constructor(
-    readonly reason: ScraperDeferralReason,
+    readonly reason: ScraperWaitReason,
     readonly nextEligibleAt: Date | null,
   ) {
-    super(`Scraper request deferred: ${reason}.`);
+    super(`Scraper request must wait: ${reason}.`);
   }
 }
 
@@ -246,7 +246,7 @@ async function acquireOrDefer({
     ) {
       throw new ScraperRequestError("invalid_request");
     }
-    throw new ScraperRequestDeferredError(result.reason, result.nextEligibleAt);
+    throw new ScraperRequestWaitError(result.reason, result.nextEligibleAt);
   }
 }
 
@@ -334,7 +334,7 @@ export async function requestScraperUrl({
           retry < permit.maxRetries &&
           (method === "GET" || request.retryable === true);
         if (canRetry && permit.remainingRequests <= 0) {
-          throw new ScraperRequestDeferredError("run_budget", null);
+          throw new ScraperRequestWaitError("run_budget", null);
         }
         if (canRetry) {
           retry += 1;
@@ -359,7 +359,7 @@ export async function requestScraperUrl({
           retryAt: retryAfter,
           now: clock.now(),
         });
-        throw new ScraperRequestDeferredError("rate_limited", nextEligibleAt);
+        throw new ScraperRequestWaitError("rate_limited", nextEligibleAt);
       }
 
       if (
@@ -375,7 +375,7 @@ export async function requestScraperUrl({
         });
         await recordScrapeRequestError({ runId, executionToken });
         if (permit.remainingRequests <= 0) {
-          throw new ScraperRequestDeferredError("run_budget", null);
+          throw new ScraperRequestWaitError("run_budget", null);
         }
         retry += 1;
         await clock.sleep(retryDelay(retry, clock.random()));
