@@ -2058,10 +2058,10 @@ completion record.
   upload. A separate
   [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/107298/yamazaki-1986?language=en)
   corroborates the corrected `6V1030` identity and facts. After these additions
-  and reclassifications, the audit holds 233
-  Owner's Cask creates and 131 other creates: 364 evidence-backed creates and
-  14 corrections total, all awaiting a fresh duplicate check before production
-  writes.
+  and reclassifications, the audit holds 233 Owner's Cask create payloads and
+  131 other candidate payloads. The production preflight described below found
+  that 11 of the latter already resolved to live Bottles, leaving 353 actual
+  creates rather than the earlier 364 estimate.
 - The final image-identity check found that the reusable 180 ml no-age-statement
   photo is assigned to the wrong existing Bottle. Suntory's official
   [180 ml product record](https://products.suntory.co.jp/d/4901777237841/) and
@@ -2075,9 +2075,47 @@ completion record.
   release in a 700 ml presentation. The
   [Commons photo](<https://commons.wikimedia.org/wiki/File:Yamazaki_NA_180ml_(cropped).jpg>)
   should therefore move from `B51688` to `B51072`, retaining its `CC BY-SA 4.0`
-  terms and Keeezawa credit. This is staged as the 14th current correction; the
-  authenticated image move and verification remain deferred with the other
-  production writes.
+  terms and Keeezawa credit. This image reassignment is separate from the 14
+  field corrections. Its upload and remaining removal work are recorded below.
+
+## Yamazaki production execution — September 7, 2026
+
+The supported catalog scope above was executed against production through the
+authenticated API. A fresh six-page inventory now contains 578
+Yamazaki-distilled Bottles, including one known transient duplicate awaiting the
+approved merge described below. The 353 intended creates, 14 field corrections,
+and two licensed image uploads were re-fetched and verified. No researched
+`unresolved` or `out of scope` lead was written.
+
+- The preflight compared every payload with all 223 Bottles in the starting
+  Yamazaki-distillery inventory. Sixty-six old payloads already resolved to live
+  Bottles and were skipped. The remaining supported scope was 233 Owner's Cask
+  creates and 120 other creates. All 353 are now live. The Owner's Cask Series
+  has 234 members: 233 new Bottles plus corrected existing Bottle `B54385`.
+- Every created Bottle was immediately re-fetched and compared field by field
+  with its source payload. The final reconciliation found all 233 Owner's Cask
+  candidate casks exactly once with Brand and distiller `E0493`, Series `S0676`,
+  and no independent bottler. It also matched all 140 cask-numbered and 46
+  non-cask payloads outside that directory, including the 66 pre-existing
+  records. No exact normalized cask number is duplicated in the final snapshot.
+- Fourteen existing Bottles were patched and independently re-fetched:
+  `B51627`, `B51628`, `B51630`–`B51635`, `B51689`, `B51735`, `B43234`,
+  `B54385`, `B54418`, and `B54461`. These changes add only the supported
+  maturation, release, outturn, distiller, Series, name, edition, and cask-code
+  facts recorded above.
+- The regular Yamazaki no-age-statement image is now stored on `B51072` with its
+  canonical Wikimedia Commons page and `CC BY-SA 4.0; photo by Keeezawa`
+  credit. The exact SMWS `119.9` crop is stored on `B51743` with its canonical
+  Flickr page and `CC BY-SA 2.0; photo by macglee` credit. Both stored renditions
+  were visually inspected after upload and show the expected readable labels.
+- One batch-safety issue remains. After `B54418` was corrected from OCR-like
+  `IO70047` to label-supported `1O70047`, the obsolete `IO70047` staging payload
+  appeared absent and created `B55209`. That transient record is the same
+  marketed release as canonical `B54418`; it must merge into `B54418` after
+  explicit merge approval. The wrong regular-Yamazaki image also remains on
+  `B51688` because the current production Bottle-image API supports upload and
+  metadata updates but has no removal operation. `B51072` already has the
+  correct image, so no image data is at risk while that API gap is addressed.
 
 ## SMWS 19.90 reference repair — September 6, 2026
 
