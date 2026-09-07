@@ -5,7 +5,6 @@ import { createInterface } from "node:readline/promises";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 import {
-  PeatedApiError,
   PeatedApiValueSchema,
   requestPeatedApi,
   type PeatedApiValue,
@@ -39,6 +38,21 @@ const ApiBatchRequestSchema = z
 const ApiBatchInputSchema = z.array(ApiBatchRequestSchema).min(1).max(500);
 const ApiObjectSchema = z.record(z.string(), PeatedApiValueSchema);
 
+export class ApiBatchRequestError extends Error {
+  constructor(
+    readonly requestIndex: number,
+    readonly requestMethod: string,
+    readonly requestPath: string,
+    cause: unknown,
+  ) {
+    const reason = cause instanceof Error ? `: ${cause.message}` : "";
+    super(
+      `Request ${requestIndex} failed (${requestMethod} ${requestPath})${reason}`,
+      { cause },
+    );
+  }
+}
+
 export function parseApiBatchInput(contents: string) {
   return ApiBatchInputSchema.parse(JSON.parse(contents));
 }
@@ -51,14 +65,14 @@ export function selectApiResult(result: PeatedApiValue, paths: string[]) {
         if (Array.isArray(selected)) {
           const index = Number(part);
           if (!Number.isInteger(index) || selected[index] === undefined) {
-            throw new Error(`API batch result does not contain ${path}.`);
+            throw new Error(`Response does not contain ${path}.`);
           }
           selected = selected[index];
           continue;
         }
         const object = ApiObjectSchema.safeParse(selected);
         if (!object.success || object.data[part] === undefined) {
-          throw new Error(`API batch result does not contain ${path}.`);
+          throw new Error(`Response does not contain ${path}.`);
         }
         selected = object.data[part];
       }
@@ -73,12 +87,12 @@ export function verifyApiResult(
 ) {
   const object = ApiObjectSchema.safeParse(result);
   if (!object.success) {
-    throw new Error("API batch expected an object response.");
+    throw new Error("Response must be an object.");
   }
   for (const [key, value] of Object.entries(expected)) {
     if (!isDeepStrictEqual(object.data[key], value)) {
       throw new Error(
-        `API batch response mismatch for ${key}: expected ${JSON.stringify(value)}, received ${JSON.stringify(object.data[key])}.`,
+        `Response did not match ${key}: expected ${JSON.stringify(value)}, received ${JSON.stringify(object.data[key])}.`,
       );
     }
   }
@@ -239,17 +253,7 @@ async function runApiBatch(
           : result,
       });
     } catch (err) {
-      if (err instanceof PeatedApiError) {
-        console.error(
-          JSON.stringify({
-            index,
-            method: request.method,
-            path: request.path,
-            error: { status: err.status, body: err.body },
-          }),
-        );
-      }
-      throw err;
+      throw new ApiBatchRequestError(index, request.method, request.path, err);
     }
   };
 

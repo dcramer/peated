@@ -1,11 +1,35 @@
 import { describe, expect, test } from "vitest";
 import {
+  ApiBatchRequestError,
   parseApiBatchConcurrency,
   parseApiBatchInput,
   parseApiBatchStartIndex,
   selectApiResult,
   verifyApiResult,
 } from "./api";
+
+describe("ApiBatchRequestError", () => {
+  test("keeps the request index and original error", () => {
+    const cause = new Error(
+      'Response did not match status: expected "pending_review", received "approved".',
+    );
+    const error = new ApiBatchRequestError(
+      8,
+      "GET",
+      "/prices/match-queue/123",
+      cause,
+    );
+
+    expect(error).toMatchObject({
+      message:
+        'Request 8 failed (GET /prices/match-queue/123): Response did not match status: expected "pending_review", received "approved".',
+      requestIndex: 8,
+      requestMethod: "GET",
+      requestPath: "/prices/match-queue/123",
+      cause,
+    });
+  });
+});
 
 describe("parseApiBatchInput", () => {
   test("accepts ordered reads and mutations", () => {
@@ -60,7 +84,7 @@ describe("selectApiResult", () => {
 
   test("rejects a missing result path", () => {
     expect(() => selectApiResult({ id: 1 }, ["bottle.id"])).toThrow(
-      "does not contain bottle.id",
+      "Response does not contain bottle.id",
     );
   });
 });
@@ -81,7 +105,7 @@ describe("verifyApiResult", () => {
         { id: 123, status: "approved" },
         { id: 123, status: "pending_review" },
       ),
-    ).toThrow("response mismatch for status");
+    ).toThrow("Response did not match status");
   });
 });
 
