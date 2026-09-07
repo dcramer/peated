@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 166 new Owner's Cask
+  one correction rather than a duplicate create. The 182 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1138,8 +1138,42 @@ completion record.
   because exact Sotheby's and Bonhams records assign that cask to the separate
   59% sherry-butt `Black Legend`. The exact 1996 WhiskyLIVE cask `AX70012` and
   one uncoded 60% 2008 release remain leads until their producer-stable names
-  can be settled. The staged totals are now 166 new Owner's Casks and 55
-  evidence-backed non-Owner releases.
+  can be settled. This pass brought the staged totals to 166 new Owner's Casks
+  and 55 evidence-backed non-Owner releases.
+- A photographed alternate index and exact Bonhams catalog add late 1996
+  Owner's Cask barrel
+  [`AS70145`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160819%20S-23349-0-3%20Whisky%20%5B112%5D.pdf),
+  bottled in 2006 at 58% with a 186-bottle outturn. The same alternate index
+  exposes `AW70161`, but only its Owner's Cask family, 1996 vintage, and cask
+  number can currently be read; it remains a lead rather than a sparse create.
+  The 1997 reconciliation adds 15 more evidence-backed Owner's Casks:
+  `BP70187`, `BP70249`, `BP70267`, `BP70275`, `BP70280`, `BP70295`,
+  `BP70297`, `BP70310`, `BP70312`, `BP60072`, `BO70022`, `BX70188`,
+  `BX70193`, `BX70198`, and `BX70208`. Exact photographed examples include
+  Kawachiya barrel
+  [`BP70187`](https://www.whiskybase.com/whiskies/whisky/12776/yamazaki-1997),
+  sherry butt
+  [`BP70249`](https://yabejojo.jimdoweb.com/2022/03/06/the-owner-s-cask-of-yamazaki-1997-cask-bp70249/),
+  Masterpiece of Bagus sherry butt
+  [`BO70022`](https://yabejojo.jimdoweb.com/2021/04/19/the-owner-s-cask-of-yamazaki-1997-cask-bo70022/),
+  and Obayashi Facilities 45th Anniversary hogshead
+  [`BX70198`](https://www.oldliquorcompany.com/shop/suntory-yamazaki-1997-the-owner-s-cask-obayashi-26424).
+  Whiskybase says `BP60072` was bottled in 2010 while an exact Bonhams-derived
+  auction record says 2011, so its staged bottling year remains unknown. The
+  1997 label review also adds four releases outside Owner's Cask: Koyo
+  Electronics hogshead
+  [`BW70098`](https://storage.spink.com/source/Auto_Catalogue/SFW61.pdf?v=2),
+  Yamagata Foods 80th Anniversary hogshead
+  [`BX60179`](https://www.whiskybase.com/whiskies/whisky/307108/yamazaki-1997),
+  12-year-old Spanish-oak sherry butt
+  [`BO70044`](https://www.whiskybase.com/whiskies/whisky/54367/yamazaki-1997),
+  and Obayashi Facilities hogshead
+  [`BX70203`](https://www.whiskybase.com/whiskies/whisky/287325/yamazaki-1997).
+  Exact labels identify all four as Suntory Single Cask Whisky despite some
+  collector grouping under Owner's Cask. `BW70094` remains a lead because its
+  photographed record combines a 1997 vintage and 2021 bottling with a
+  contradictory 15-year age. The staged totals are now 182 new Owner's Casks
+  and 59 evidence-backed non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
