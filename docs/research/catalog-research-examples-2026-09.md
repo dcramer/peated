@@ -2006,9 +2006,62 @@ completion record.
   Owner's Cask. The label records a 1994 vintage, 2010 bottling, barrel
   maturation, 58% cask strength, natural color, and no chill filtration. Exact
   public Peated searches for the cask and edition returned no match. It is the
-  126th staged non-Owner release. Across both families, the audit now holds 357
-  evidence-backed creates and 14 corrections for a fresh duplicate check before
-  production writes.
+  126th staged non-Owner release.
+- A page-by-page reconciliation of the photographed 1979–2003 vintage indexes
+  resolves four further Owner's Casks. An exact
+  [Whisky Auctioneer record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1989-owners-cask-9v70346-super-premium-magazine-serai)
+  establishes the 17-year-old Super Premium Magazine Serai hogshead `9V70346`,
+  distilled in 1989 and bottled in 2006 at 63% with a 146-bottle outturn. A
+  second exact
+  [Whisky Auctioneer record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1991-owners-cask-iv70708-osaka-kanamono-danchi?v=898391)
+  and its photographed label establish the Osaka Kanamono Danchi barrel
+  `IV70708`, distilled in 1991 and bottled in 2008 at age 17, 59%, with a
+  123-bottle outturn; the auction page's conflicting internal 1994 vintage is
+  not copied. The photographed
+  [1994 index](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-1994/)
+  establishes white-oak cask `4O70330`, edition `Taru-Dashi Genshu #3`, and
+  barrel `4Q70068`; an exact
+  [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160518%20S-23344-0-1%20Fine%20%26%20Rare%20Wine%2C%20Cognac%20and%20Whisky%20%5B168%5D.pdf)
+  independently corroborates `4Q70068` as a 59% 1994 Owner's Cask bottled in 2005. Exact public Peated searches returned no cask match for all four.
+- Three more photographed releases belong outside Owner's Cask. Exact
+  [Sotheby's](https://www.sothebys.com/en/buy/auction/2021/distilled/yamazaki-mizunara-butt-29-year-old-cask-rf1037-55),
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/27640/yamazaki-1979),
+  and
+  [Scotch Whisky Auctions](https://www.scotchwhiskyauctions.com/auctions/144-the-103rd-auction/346602-yamazaki-1979-mizunara-oak/)
+  records establish 29-year-old 1979 `The Cask of Yamazaki - Mizunara Oak`
+  butt `RF1037`, bottled in 2008 at 55% with a 294-bottle outturn. The exact
+  photographed
+  [`2U60042` record](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-1992/cask-2u60042/)
+  and an independent
+  [auction index](https://live.whisky-onlineauctions.com/collections/0915?bytag=no-tags&page=1&show_products=96&sort_by=high-low)
+  identify a 56% `Suntory Single Cask Whisky` barrel distilled in 1992 and
+  bottled in 2011. The photographed
+  [`EN70311` record](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-2000/cask-en-70311/)
+  and an exact
+  [retailer record](https://www.kabukiwhisky.com/suntory/yamazaki/single-cask/yamazaki-distillery-single-cask-puncheon-2000-en-70311-70cl-57/?sl=ja)
+  establish the Mampei Hotel Karuizawa 57% puncheon, distilled in 2000 and
+  bottled in 2016. Exact public Peated searches returned no match for all three.
+- The same label review corrects five collector-page transcription or grouping
+  errors without inventing duplicate Bottles. The label for supposed
+  `EP70749` visibly reads `EP70479`; the `ES70053` overview caption resolves to
+  `ES70153`; and the photographed 1994 labels read `4M70122` and `4R70005`, not
+  `4P70122` and `4R70001`. `EP70479` and
+  [`ES70153`](https://www.whiskybase.com/whiskies/whisky/103088/yamazaki-2000)
+  both visibly say `Suntory Single Cask Whisky`, so their staged payloads move
+  out of The Owner's Cask Series. The exact `ES70153` sources agree on Kasumi's
+  Cask 50th Anniversary, a 2000 vintage, 2010 bottling, sherry butt, and 56%
+  strength. Finally, the staged Esquire Club 40th Anniversary cask is corrected
+  from `6V01030` to the photographed and independently documented `6V1030`;
+  its 1986 vintage, 2004 bottling, age 18, Spanish-oak sherry butt, and 63%
+  strength remain unchanged. The source site explicitly reserves copyright in
+  its photographs, so these images are evidence only and are not staged for
+  upload. A separate
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/107298/yamazaki-1986?language=en)
+  corroborates the corrected `6V1030` identity and facts. After these additions
+  and reclassifications, the audit holds 233
+  Owner's Cask creates and 131 other creates: 364 evidence-backed creates and
+  14 corrections total, all awaiting a fresh duplicate check before production
+  writes.
 - The final image-identity check found that the reusable 180 ml no-age-statement
   photo is assigned to the wrong existing Bottle. Suntory's official
   [180 ml product record](https://products.suntory.co.jp/d/4901777237841/) and
