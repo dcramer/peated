@@ -5,7 +5,7 @@ import {
   scrapeSourceRuns,
   scrapeSources,
 } from "@peated/server/db/schema";
-import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
@@ -16,7 +16,7 @@ function utcStartOfToday() {
 }
 
 describe("GET /admin/scrapers/activity", () => {
-  test("reports collection activity and leaves older counts untracked", async ({
+  test("reports source activity and Bottle resolution for the last 30 days", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
@@ -30,10 +30,11 @@ describe("GET /admin/scrapers/activity", () => {
     });
     const bottle = await fixtures.Bottle();
     const systemActor = await getPeatedSystemActor();
-    const userActor = await getUserActor(admin);
     const today = utcStartOfToday();
     const startedAt = new Date(today.getTime() + 60 * 60_000);
     const completedAt = new Date(today.getTime() + 2 * 60 * 60_000);
+    const olderThanWindow = new Date(today);
+    olderThanWindow.setUTCDate(olderThanWindow.getUTCDate() - 30);
 
     await db.insert(externalSiteRuns).values([
       {
@@ -141,12 +142,45 @@ describe("GET /admin/scrapers/activity", () => {
       revisionId: null,
       purpose: "suggest",
     });
+
+    const createdReview = await fixtures.ExternalReview({
+      externalSiteId: reviewSite.id,
+      bottleId: bottle.id,
+      createdAt: startedAt,
+    });
+    const matchedPrice = await fixtures.StorePrice({
+      externalSiteId: priceSite.id,
+      bottleId: bottle.id,
+      createdAt: startedAt,
+    });
+    await fixtures.ExternalReview({
+      externalSiteId: reviewSite.id,
+      bottleId: bottle.id,
+      createdAt: startedAt,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: priceSite.id,
+      bottleId: null,
+      createdAt: startedAt,
+    });
+    await fixtures.ExternalReview({
+      externalSiteId: reviewSite.id,
+      bottleId: null,
+      hidden: true,
+      createdAt: startedAt,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: priceSite.id,
+      bottleId: null,
+      createdAt: olderThanWindow,
+    });
+
     await db.insert(incomingBottleDecisionLogs).values([
       {
         sourceKind: "review",
-        sourceId: 900_001,
+        sourceId: createdReview.id,
         externalSiteId: reviewSite.id,
-        name: "New bottle from a review",
+        name: createdReview.name,
         decision: "create_bottle",
         actorId: systemActor.id,
         bottleId: bottle.id,
@@ -155,33 +189,12 @@ describe("GET /admin/scrapers/activity", () => {
       },
       {
         sourceKind: "store_price",
-        sourceId: 900_002,
+        sourceId: matchedPrice.id,
         externalSiteId: priceSite.id,
-        name: "Existing bottle from a price",
+        name: matchedPrice.name,
         decision: "match_existing",
         actorId: systemActor.id,
         bottleId: bottle.id,
-        createdAt: startedAt,
-      },
-      {
-        sourceKind: "review",
-        sourceId: 900_003,
-        externalSiteId: reviewSite.id,
-        name: "Bottle matched by an administrator",
-        decision: "match_existing",
-        actorId: userActor.id,
-        bottleId: bottle.id,
-        createdAt: startedAt,
-      },
-      {
-        sourceKind: "store_price",
-        sourceId: 900_004,
-        externalSiteId: priceSite.id,
-        name: "Bottle match approved by an administrator",
-        decision: "match_existing",
-        actorId: systemActor.id,
-        bottleId: bottle.id,
-        metadata: { initiatedByUserId: admin.id },
         createdAt: startedAt,
       },
     ]);
@@ -202,12 +215,17 @@ describe("GET /admin/scrapers/activity", () => {
       ...result.totals,
       reviews: 8,
       prices: 5,
-      bottles: 4,
+      catalogListings: 2,
     });
     expect(result.saved).toEqual({
       reviews: { total: 8, new: 3, existing: 5 },
       prices: { total: 5, new: 2, existing: 3 },
-      bottles: { total: 4, new: 2, existing: 2 },
+      catalogListings: { total: 2, new: 1, existing: 1 },
+    });
+    expect(result.bottleResolution).toEqual({
+      unknown: 1,
+      created: 1,
+      matched: 2,
     });
     expect(result.recentFailures).toEqual([
       {

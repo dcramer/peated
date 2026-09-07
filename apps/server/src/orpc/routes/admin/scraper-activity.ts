@@ -1,12 +1,12 @@
 import { db } from "@peated/server/db";
 import {
-  actors,
+  externalReviews,
   externalSiteRuns,
   externalSites,
   incomingBottleDecisionLogs,
   scrapeSourceRuns,
+  storePrices,
 } from "@peated/server/db/schema";
-import { PEATED_SYSTEM_ACTOR_KEY } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import type {
@@ -21,8 +21,14 @@ const DAYS = 30;
 
 type HealthCounts = z.infer<typeof AdminScraperHealthCountsSchema>;
 type SavedCounts = z.infer<typeof AdminScraperSavedCountsSchema>;
-type SavedKind = "reviews" | "prices" | "bottles";
+type SavedKind = "reviews" | "prices" | "catalogListings";
 type DayCounts = HealthCounts & Record<SavedKind, number>;
+
+type BottleResolutionCounts = {
+  unknown: number;
+  created: number;
+  matched: number;
+};
 
 function emptyHealthCounts(): HealthCounts {
   return {
@@ -73,7 +79,7 @@ function savedKindForRun(
     case "price":
       return "prices";
     case "bottle":
-      return "bottles";
+      return "catalogListings";
     case "catalog":
     case null:
       return null;
@@ -87,7 +93,7 @@ export default procedure
     path: "/admin/scrapers/activity",
     summary: "Get scraper activity",
     description:
-      "Get daily scraper requests, runs, reviews, prices, bottles, and recent failures for the admin homepage.",
+      "Get daily scraper requests, saved source records, Bottle resolution, and recent failures for the admin homepage.",
     operationId: "getScraperActivity",
   })
   .output(AdminScraperActivitySchema)
@@ -97,40 +103,67 @@ export default procedure
     const firstDay = new Date(today);
     firstDay.setUTCDate(firstDay.getUTCDate() - (DAYS - 1));
 
-    const [rows, bottleDecisions] = await Promise.all([
-      db
-        .select({
-          run: externalSiteRuns,
-          site: externalSites,
-          sourcePurpose: scrapeSourceRuns.purpose,
-        })
-        .from(externalSiteRuns)
-        .innerJoin(
-          externalSites,
-          eq(externalSites.id, externalSiteRuns.externalSiteId),
-        )
-        .leftJoin(
-          scrapeSourceRuns,
-          eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
-        )
-        .where(gte(externalSiteRuns.createdAt, firstDay))
-        .orderBy(desc(externalSiteRuns.createdAt)),
-      db
-        .select({
-          createdAt: incomingBottleDecisionLogs.createdAt,
-          createdBottle: incomingBottleDecisionLogs.createdBottle,
-        })
-        .from(incomingBottleDecisionLogs)
-        .innerJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
-        .where(
-          and(
-            gte(incomingBottleDecisionLogs.createdAt, firstDay),
-            eq(actors.type, "system"),
-            eq(actors.key, PEATED_SYSTEM_ACTOR_KEY),
-            sql`NOT (${incomingBottleDecisionLogs.metadata} ? 'initiatedByUserId')`,
+    const [rows, reviewResolutionRows, priceResolutionRows] = await Promise.all(
+      [
+        db
+          .select({
+            run: externalSiteRuns,
+            site: externalSites,
+            sourcePurpose: scrapeSourceRuns.purpose,
+          })
+          .from(externalSiteRuns)
+          .innerJoin(
+            externalSites,
+            eq(externalSites.id, externalSiteRuns.externalSiteId),
+          )
+          .leftJoin(
+            scrapeSourceRuns,
+            eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
+          )
+          .where(gte(externalSiteRuns.createdAt, firstDay))
+          .orderBy(desc(externalSiteRuns.createdAt)),
+        db
+          .select({
+            unknown: sql<number>`count(*) filter (where ${externalReviews.bottleId} is null)::int`,
+            created: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null and coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
+            matched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null and not coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
+          })
+          .from(externalReviews)
+          .leftJoin(
+            incomingBottleDecisionLogs,
+            and(
+              eq(incomingBottleDecisionLogs.sourceKind, "review"),
+              eq(incomingBottleDecisionLogs.sourceId, externalReviews.id),
+            ),
+          )
+          .where(
+            and(
+              gte(externalReviews.createdAt, firstDay),
+              eq(externalReviews.hidden, false),
+            ),
           ),
-        ),
-    ]);
+        db
+          .select({
+            unknown: sql<number>`count(*) filter (where ${storePrices.bottleId} is null)::int`,
+            created: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null and coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
+            matched: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null and not coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
+          })
+          .from(storePrices)
+          .leftJoin(
+            incomingBottleDecisionLogs,
+            and(
+              eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+              eq(incomingBottleDecisionLogs.sourceId, storePrices.id),
+            ),
+          )
+          .where(
+            and(
+              gte(storePrices.createdAt, firstDay),
+              eq(storePrices.hidden, false),
+            ),
+          ),
+      ],
+    );
     const collectionRows = rows.filter(
       ({ run, sourcePurpose }) => (sourcePurpose ?? run.purpose) === "collect",
     );
@@ -139,8 +172,19 @@ export default procedure
     const saved = {
       reviews: emptySavedCounts(),
       prices: emptySavedCounts(),
-      bottles: emptySavedCounts(),
+      catalogListings: emptySavedCounts(),
     };
+    const bottleResolution = [
+      reviewResolutionRows[0],
+      priceResolutionRows[0],
+    ].reduce<BottleResolutionCounts>(
+      (totals, counts) => ({
+        unknown: totals.unknown + (counts?.unknown ?? 0),
+        created: totals.created + (counts?.created ?? 0),
+        matched: totals.matched + (counts?.matched ?? 0),
+      }),
+      { unknown: 0, created: 0, matched: 0 },
+    );
     const days = new Map<string, DayCounts>();
     for (let offset = 0; offset < DAYS; offset += 1) {
       const date = new Date(firstDay);
@@ -149,7 +193,7 @@ export default procedure
         ...emptyHealthCounts(),
         reviews: 0,
         prices: 0,
-        bottles: 0,
+        catalogListings: 0,
       });
     }
 
@@ -166,17 +210,10 @@ export default procedure
       }
     }
 
-    for (const decision of bottleDecisions) {
-      const day = days.get(dayKey(decision.createdAt));
-      if (!day) continue;
-      saved.bottles.total += 1;
-      saved.bottles[decision.createdBottle ? "new" : "existing"] += 1;
-      day.bottles += 1;
-    }
-
     return {
       totals,
       saved,
+      bottleResolution,
       days: [...days.entries()]
         .reverse()
         .map(([date, counts]) => ({ date, ...counts })),

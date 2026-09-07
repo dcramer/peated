@@ -78,11 +78,11 @@ function hasFailures(day: ActivityDay) {
 }
 
 function savedTotal(day: ActivityDay) {
-  return day.reviews + day.prices + day.bottles;
+  return day.reviews + day.prices + day.catalogListings;
 }
 
 function savedDayLabel(day: ActivityDay) {
-  return `${formatFullDay(day.date)}: ${formatNamedCount(day.reviews, "review")}, ${formatNamedCount(day.prices, "price")}, ${formatNamedCount(day.bottles, "bottle")}`;
+  return `${formatFullDay(day.date)}: ${formatNamedCount(day.reviews, "review")}, ${formatNamedCount(day.prices, "price")}, ${formatNamedCount(day.catalogListings, "catalog listing")}`;
 }
 
 function requestDayLabel(day: ActivityDay) {
@@ -106,7 +106,7 @@ function ChartLegend({
 }: {
   items: readonly {
     label: string;
-    tone: "reviews" | "prices" | "bottles" | "requests" | "failures";
+    tone: "reviews" | "prices" | "catalogListings" | "requests" | "failures";
   }[];
 }) {
   return (
@@ -122,7 +122,7 @@ function ChartLegend({
               styles.legendMark,
               item.tone === "reviews" && styles.reviews,
               item.tone === "prices" && styles.prices,
-              item.tone === "bottles" && styles.bottles,
+              item.tone === "catalogListings" && styles.catalogListings,
               item.tone === "requests" && styles.requests,
               item.tone === "failures" && styles.failures,
             )}
@@ -153,7 +153,7 @@ function SavedActivityChart({ days }: { days: readonly ActivityDay[] }) {
         <span aria-hidden="true" {...stylex.props(styles.chartGuide)} />
         {!largestTotal ? (
           <span {...stylex.props(foundationStyles.metadata, styles.chartEmpty)}>
-            No reviews, prices or bottles were saved.
+            No reviews, prices or catalog listings were saved.
           </span>
         ) : null}
         <ol aria-label="Saved items by day" {...stylex.props(styles.chartBars)}>
@@ -187,10 +187,13 @@ function SavedActivityChart({ days }: { days: readonly ActivityDay[] }) {
                         {...stylex.props(styles.savedBarPart, styles.prices)}
                       />
                     ) : null}
-                    {day.bottles > 0 ? (
+                    {day.catalogListings > 0 ? (
                       <span
-                        style={{ flexGrow: day.bottles }}
-                        {...stylex.props(styles.savedBarPart, styles.bottles)}
+                        style={{ flexGrow: day.catalogListings }}
+                        {...stylex.props(
+                          styles.savedBarPart,
+                          styles.catalogListings,
+                        )}
                       />
                     ) : null}
                   </span>
@@ -205,18 +208,24 @@ function SavedActivityChart({ days }: { days: readonly ActivityDay[] }) {
         items={[
           { label: "Reviews", tone: "reviews" },
           { label: "Prices", tone: "prices" },
-          { label: "Bottles", tone: "bottles" },
+          { label: "Catalog listings", tone: "catalogListings" },
         ]}
       />
     </figure>
   );
 }
 
-function RequestActivityChart({ days }: { days: readonly ActivityDay[] }) {
+function RequestActivityChart({
+  days,
+  divided = true,
+}: {
+  days: readonly ActivityDay[];
+  divided?: boolean;
+}) {
   const largestTotal = Math.max(...days.map((day) => day.requests), 0);
 
   return (
-    <figure {...stylex.props(styles.chart, styles.chartDivider)}>
+    <figure {...stylex.props(styles.chart, divided && styles.chartDivider)}>
       <figcaption {...stylex.props(styles.chartHeader)}>
         <span {...stylex.props(foundationStyles.compactRowTitle)}>
           Requests each day
@@ -318,151 +327,41 @@ function SavedTotal({
   );
 }
 
-/** Shows scraper totals, daily charts, exact daily details, and recent problems. */
+/** Shows scraper output, request health, daily details, and recent problems. */
 export default function ScraperActivity({ data }: ScraperActivityProps) {
   const activeDays = data.days.filter(
     (day) =>
-      day.runs > 0 || day.reviews > 0 || day.prices > 0 || day.bottles > 0,
+      day.runs > 0 ||
+      day.requests > 0 ||
+      hasFailures(day) ||
+      day.reviews > 0 ||
+      day.prices > 0 ||
+      day.catalogListings > 0,
   );
   const chartDays = [...data.days].reverse();
+  const savedRecordTotal =
+    data.saved.reviews.total +
+    data.saved.prices.total +
+    data.saved.catalogListings.total;
+  const hasSavedActivity = data.days.some((day) => savedTotal(day) > 0);
+  const hasRequestActivity = data.days.some(
+    (day) => day.requests > 0 || hasFailures(day),
+  );
 
   return (
     <div {...stylex.props(styles.root)}>
-      <section aria-labelledby="scraper-results-heading">
-        <div {...stylex.props(styles.sectionHeading)}>
-          <SectionHeading id="scraper-results-heading">
-            Reviews, prices and bottles
-          </SectionHeading>
-          <p
-            {...stylex.props(foundationStyles.body, styles.sectionDescription)}
-          >
-            Last 30 days. New means Peated did not already have that review,
-            price or bottle.
-          </p>
-        </div>
-
-        <dl {...stylex.props(styles.savedGrid)}>
-          <SavedTotal first label="Reviews" counts={data.saved.reviews} />
-          <SavedTotal label="Prices" counts={data.saved.prices} />
-          <SavedTotal label="Bottles" counts={data.saved.bottles} />
-        </dl>
-
-        <dl {...stylex.props(styles.healthGrid)}>
-          <div {...stylex.props(styles.healthItem)}>
-            <dt
-              {...stylex.props(foundationStyles.metadata, styles.healthLabel)}
-            >
-              Runs
-            </dt>
-            <dd {...stylex.props(styles.healthValue)}>
-              {formatCount(data.totals.runs)}
-            </dd>
-            <dd
-              {...stylex.props(
-                foundationStyles.metadata,
-                styles.healthDetail,
-                data.totals.failedRuns > 0 && styles.failure,
-              )}
-            >
-              {formatNamedCount(data.totals.failedRuns, "failed run")}
-            </dd>
-          </div>
-          <div {...stylex.props(styles.healthItem, styles.healthDivider)}>
-            <dt
-              {...stylex.props(foundationStyles.metadata, styles.healthLabel)}
-            >
-              Requests
-            </dt>
-            <dd {...stylex.props(styles.healthValue)}>
-              {formatCount(data.totals.requests)}
-            </dd>
-            <dd
-              {...stylex.props(
-                foundationStyles.metadata,
-                styles.healthDetail,
-                (data.totals.requestErrors > 0 ||
-                  !data.totals.requestErrorsComplete) &&
-                  styles.failure,
-              )}
-            >
-              {requestFailureText(data.totals)}
-            </dd>
-          </div>
-        </dl>
-      </section>
-
-      <section aria-labelledby="daily-activity-heading">
-        <div {...stylex.props(styles.sectionHeading)}>
-          <SectionHeading id="daily-activity-heading">
-            Daily activity
-          </SectionHeading>
-        </div>
-        {activeDays.length ? (
-          <>
-            <div {...stylex.props(styles.chartGrid)}>
-              <SavedActivityChart days={chartDays} />
-              <RequestActivityChart days={chartDays} />
-            </div>
-            <details {...stylex.props(styles.dailyDetails)}>
-              <summary
-                {...stylex.props(
-                  foundationStyles.interactiveSmall,
-                  styles.dailySummary,
-                )}
-              >
-                Daily details
-              </summary>
-              <ol {...stylex.props(styles.dailyList)}>
-                {activeDays.map((day) => (
-                  <li key={day.date} {...stylex.props(styles.dailyRow)}>
-                    <time
-                      dateTime={day.date}
-                      {...stylex.props(
-                        foundationStyles.compactRowTitle,
-                        styles.day,
-                      )}
-                    >
-                      {formatDay(day.date)}
-                    </time>
-                    <div {...stylex.props(styles.dailyResults)}>
-                      <span>{formatNamedCount(day.reviews, "review")}</span>
-                      <span>{formatNamedCount(day.prices, "price")}</span>
-                      <span>{formatNamedCount(day.bottles, "bottle")}</span>
-                    </div>
-                    <div
-                      {...stylex.props(
-                        foundationStyles.metadata,
-                        styles.dailyHealth,
-                      )}
-                    >
-                      <span>
-                        {formatNamedCount(day.runs, "run")} ·{" "}
-                        {formatNamedCount(day.requests, "request")}
-                      </span>
-                      <span
-                        {...stylex.props(hasFailures(day) && styles.failure)}
-                      >
-                        {failureText(day)}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </details>
-          </>
-        ) : (
-          <p {...stylex.props(foundationStyles.body, styles.empty)}>
-            No scraper activity in the last 30 days.
-          </p>
-        )}
-      </section>
-
       {data.recentFailures.length ? (
-        <section aria-labelledby="recent-problems-heading">
-          <div {...stylex.props(styles.sectionHeading)}>
+        <section
+          aria-labelledby="recent-problems-heading"
+          {...stylex.props(styles.problemSection)}
+        >
+          <div {...stylex.props(styles.problemSectionHeader)}>
             <SectionHeading id="recent-problems-heading">
-              Recent problems
+              Recent scraper problems
             </SectionHeading>
+            <span {...stylex.props(styles.problemCount)}>
+              {formatCount(data.recentFailures.length)}
+            </span>
           </div>
           <ul {...stylex.props(styles.problemList)}>
             {data.recentFailures.map((failure) => (
@@ -493,6 +392,162 @@ export default function ScraperActivity({ data }: ScraperActivityProps) {
           </ul>
         </section>
       ) : null}
+
+      <section aria-labelledby="source-activity-heading">
+        <div {...stylex.props(styles.sourceHeader)}>
+          <div {...stylex.props(styles.sectionHeading)}>
+            <SectionHeading id="source-activity-heading">
+              Source activity
+            </SectionHeading>
+            <p
+              {...stylex.props(
+                foundationStyles.body,
+                styles.sectionDescription,
+              )}
+            >
+              Last 30 days. New means Peated did not already have that review,
+              price or catalog listing.
+            </p>
+          </div>
+          <AdminTextLink href="/admin/sites">Manage scrapers</AdminTextLink>
+        </div>
+
+        <dl {...stylex.props(styles.healthSummary)}>
+          <div {...stylex.props(styles.healthSummaryItem)}>
+            <dt
+              {...stylex.props(foundationStyles.metadata, styles.healthLabel)}
+            >
+              Runs
+            </dt>
+            <dd {...stylex.props(styles.healthSummaryValue)}>
+              {formatCount(data.totals.runs)}
+            </dd>
+            <dd
+              {...stylex.props(
+                foundationStyles.metadata,
+                styles.healthDetail,
+                data.totals.failedRuns > 0 && styles.failure,
+              )}
+            >
+              {formatNamedCount(data.totals.failedRuns, "failed run")}
+            </dd>
+          </div>
+          <div {...stylex.props(styles.healthSummaryItem)}>
+            <dt
+              {...stylex.props(foundationStyles.metadata, styles.healthLabel)}
+            >
+              Requests
+            </dt>
+            <dd {...stylex.props(styles.healthSummaryValue)}>
+              {formatCount(data.totals.requests)}
+            </dd>
+            <dd
+              {...stylex.props(
+                foundationStyles.metadata,
+                styles.healthDetail,
+                (data.totals.requestErrors > 0 ||
+                  !data.totals.requestErrorsComplete) &&
+                  styles.failure,
+              )}
+            >
+              {requestFailureText(data.totals)}
+            </dd>
+          </div>
+        </dl>
+
+        {savedRecordTotal ? (
+          <dl {...stylex.props(styles.savedGrid)}>
+            <SavedTotal first label="Reviews" counts={data.saved.reviews} />
+            <SavedTotal label="Prices" counts={data.saved.prices} />
+            <SavedTotal
+              label="Catalog listings"
+              counts={data.saved.catalogListings}
+            />
+          </dl>
+        ) : hasRequestActivity || data.totals.runs > 0 ? (
+          <p {...stylex.props(foundationStyles.body, styles.savedEmpty)}>
+            No reviews, prices or catalog listings saved.
+          </p>
+        ) : null}
+
+        {hasSavedActivity || hasRequestActivity ? (
+          <>
+            <div
+              {...stylex.props(
+                styles.chartGrid,
+                hasSavedActivity && hasRequestActivity
+                  ? styles.chartGridSplit
+                  : styles.chartGridSingle,
+              )}
+            >
+              {hasSavedActivity ? (
+                <SavedActivityChart days={chartDays} />
+              ) : null}
+              {hasRequestActivity ? (
+                <RequestActivityChart
+                  days={chartDays}
+                  divided={hasSavedActivity}
+                />
+              ) : null}
+            </div>
+            <details {...stylex.props(styles.dailyDetails)}>
+              <summary
+                {...stylex.props(
+                  foundationStyles.interactiveSmall,
+                  styles.dailySummary,
+                )}
+              >
+                Daily details
+              </summary>
+              <ol {...stylex.props(styles.dailyList)}>
+                {activeDays.map((day) => (
+                  <li key={day.date} {...stylex.props(styles.dailyRow)}>
+                    <time
+                      dateTime={day.date}
+                      {...stylex.props(
+                        foundationStyles.compactRowTitle,
+                        styles.day,
+                      )}
+                    >
+                      {formatDay(day.date)}
+                    </time>
+                    <div {...stylex.props(styles.dailyResults)}>
+                      <span>{formatNamedCount(day.reviews, "review")}</span>
+                      <span>{formatNamedCount(day.prices, "price")}</span>
+                      <span>
+                        {formatNamedCount(
+                          day.catalogListings,
+                          "catalog listing",
+                        )}
+                      </span>
+                    </div>
+                    <div
+                      {...stylex.props(
+                        foundationStyles.metadata,
+                        styles.dailyHealth,
+                      )}
+                    >
+                      <span>
+                        {formatNamedCount(day.runs, "run")} ·{" "}
+                        {formatNamedCount(day.requests, "request")}
+                      </span>
+                      <span
+                        {...stylex.props(hasFailures(day) && styles.failure)}
+                      >
+                        {failureText(day)}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          </>
+        ) : (
+          <p {...stylex.props(foundationStyles.body, styles.empty)}>
+            No scraper activity in the last 30 days.
+          </p>
+        )}
+      </section>
     </div>
   );
 }
@@ -502,14 +557,25 @@ const styles = stylex.create({
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
-    rowGap: space.x8,
+    rowGap: space.x6,
+  },
+  sourceHeader: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: space.x6,
+    marginBottom: space.x4,
+    "@media (max-width: 559px)": {
+      flexDirection: "column",
+      gap: space.x2,
+    },
   },
   sectionHeading: {
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
     rowGap: space.x2,
-    marginBottom: space.x4,
   },
   sectionDescription: {
     maxWidth: "68ch",
@@ -533,9 +599,9 @@ const styles = stylex.create({
   },
   savedTotal: {
     minWidth: 0,
-    paddingTop: space.x6,
+    paddingTop: space.x4,
     paddingRight: space.x6,
-    paddingBottom: space.x6,
+    paddingBottom: space.x4,
     paddingLeft: space.x6,
     "@media (max-width: 639px)": {
       paddingRight: 0,
@@ -555,10 +621,10 @@ const styles = stylex.create({
   savedLabel: { color: colors.ink },
   savedValue: {
     margin: 0,
-    marginTop: space.x3,
+    marginTop: space.x2,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "40px",
+    fontSize: "32px",
     fontWeight: 700,
     letterSpacing: "-0.04em",
     lineHeight: 1,
@@ -570,69 +636,59 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x1,
     margin: 0,
-    marginTop: space.x3,
+    marginTop: space.x2,
     color: colors.inkMuted,
   },
   breakdownValue: { color: colors.ink, fontWeight: 600 },
-  healthGrid: {
-    display: "grid",
+  healthSummary: {
+    display: "flex",
     minWidth: 0,
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    flexWrap: "wrap",
+    gap: space.x4,
     margin: 0,
+    marginBottom: space.x3,
     padding: 0,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
   },
-  healthItem: {
+  healthSummaryItem: {
     display: "grid",
     minWidth: 0,
-    gridTemplateColumns: "minmax(72px, auto) auto 1fr",
+    gridTemplateColumns: "auto auto auto",
     alignItems: "baseline",
-    columnGap: space.x3,
-    paddingTop: space.x4,
-    paddingRight: space.x6,
-    paddingBottom: space.x4,
-    paddingLeft: space.x6,
+    columnGap: space.x2,
     "@media (max-width: 639px)": {
-      gridTemplateColumns: "1fr",
-      rowGap: space.x1,
-      paddingRight: space.x4,
-      paddingLeft: 0,
+      gridTemplateColumns: "auto auto",
     },
   },
-  healthDivider: {
-    borderLeftWidth: "1px",
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.hairline,
-    "@media (max-width: 639px)": { paddingLeft: space.x4 },
-  },
   healthLabel: { color: colors.inkMuted },
-  healthValue: {
+  healthSummaryValue: {
     margin: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "24px",
+    fontSize: "18px",
     fontWeight: 700,
     lineHeight: 1,
     fontVariantNumeric: "tabular-nums",
   },
-  healthDetail: { margin: 0, color: colors.inkMuted },
+  healthDetail: {
+    margin: 0,
+    color: colors.inkMuted,
+    "@media (max-width: 639px)": { gridColumn: "1 / -1" },
+  },
   failure: { color: colors.critical },
   chartGrid: {
     display: "grid",
     minWidth: 0,
-    gridTemplateColumns: {
-      default: "repeat(2, minmax(0, 1fr))",
-      "@media (max-width: 759px)": "1fr",
-    },
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.sectionRule,
   },
+  chartGridSplit: {
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      "@media (max-width: 759px)": "1fr",
+    },
+  },
+  chartGridSingle: { gridTemplateColumns: "1fr" },
   chart: {
     minWidth: 0,
     margin: 0,
@@ -738,7 +794,7 @@ const styles = stylex.create({
   },
   reviews: { backgroundColor: colors.ratingFill },
   prices: { backgroundColor: colors.dataAccent },
-  bottles: { backgroundColor: colors.dataRange },
+  catalogListings: { backgroundColor: colors.dataRange },
   requests: { backgroundColor: colors.dataAccent },
   failures: { backgroundColor: colors.critical },
   chartDates: {
@@ -840,6 +896,47 @@ const styles = stylex.create({
     borderBottomColor: colors.hairline,
     color: colors.inkMuted,
   },
+  savedEmpty: {
+    paddingTop: space.x3,
+    paddingBottom: space.x3,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.sectionRule,
+    color: colors.inkMuted,
+  },
+  problemSection: {
+    minWidth: 0,
+    padding: { default: space.x4, "@media (max-width: 639px)": space.x3 },
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.criticalQuiet,
+    backgroundColor: colors.surface,
+  },
+  problemSectionHeader: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space.x3,
+    marginBottom: space.x3,
+  },
+  problemCount: {
+    display: "inline-flex",
+    minWidth: "24px",
+    height: "24px",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: space.x2,
+    paddingLeft: space.x2,
+    borderRadius: "12px",
+    backgroundColor: colors.critical,
+    color: colors.ground,
+    fontFamily: fonts.display,
+    fontSize: "13px",
+    fontWeight: 700,
+    lineHeight: 1,
+    fontVariantNumeric: "tabular-nums",
+  },
   problemList: {
     margin: 0,
     padding: 0,
@@ -854,7 +951,7 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x2,
     paddingTop: space.x4,
-    paddingBottom: space.x4,
+    paddingBottom: space.x3,
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,

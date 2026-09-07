@@ -2,233 +2,407 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, fonts, space } from "../../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  fonts,
+  space,
+} from "../../styles/tokens.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
+import { AdminTextLink } from "./adminContent.stylex";
 
 type OperationsData = Outputs["admin"]["moderation"]["automation"];
-type OperationsOverviewProps = { data: OperationsData };
+type BottleResolution = Outputs["admin"]["scraperActivity"]["bottleResolution"];
+type OperationsOverviewProps = {
+  bottleResolution: BottleResolution;
+  data: OperationsData;
+};
 
 function formatCount(value: number) {
   return value.toLocaleString("en-US");
 }
 
-function Metric({
+function formatPercent(value: number, total: number) {
+  return total ? Math.round((value / total) * 100) : 0;
+}
+
+function ResolutionItem({
   detail,
-  first = false,
   label,
-  mobileLeft = false,
-  mobileTop = false,
+  tone,
+  total,
+  value,
+}: {
+  detail: string;
+  label: string;
+  tone: "unknown" | "created" | "matched";
+  total: number;
+  value: number;
+}) {
+  return (
+    <div {...stylex.props(styles.resolutionItem)}>
+      <dt {...stylex.props(styles.resolutionLabel)}>
+        <span
+          aria-hidden="true"
+          {...stylex.props(
+            styles.resolutionMark,
+            tone === "unknown" && styles.unknown,
+            tone === "created" && styles.created,
+            tone === "matched" && styles.matched,
+          )}
+        />
+        <span {...stylex.props(foundationStyles.compactRowTitle)}>{label}</span>
+      </dt>
+      <dd {...stylex.props(styles.resolutionValue)}>{formatCount(value)}</dd>
+      <dd {...stylex.props(foundationStyles.metadata, styles.resolutionDetail)}>
+        {formatPercent(value, total)}% · {detail}
+      </dd>
+    </div>
+  );
+}
+
+function StatusRow({
+  label,
   tone = "default",
   value,
 }: {
-  detail?: ReactNode;
-  first?: boolean;
   label: string;
-  mobileLeft?: boolean;
-  mobileTop?: boolean;
   tone?: "default" | "danger";
   value: number;
 }) {
   return (
-    <div
-      {...stylex.props(
-        styles.metric,
-        !first && styles.metricDivider,
-        mobileLeft && styles.mobileLeft,
-        mobileTop && styles.mobileTop,
-      )}
-    >
-      <dt {...stylex.props(foundationStyles.rowTitle, styles.metricLabel)}>
+    <div {...stylex.props(styles.statusRow)}>
+      <dt {...stylex.props(foundationStyles.body, styles.statusLabel)}>
         {label}
       </dt>
       <dd
         {...stylex.props(
-          styles.metricValue,
+          styles.statusValue,
           tone === "danger" && styles.danger,
         )}
       >
         {formatCount(value)}
       </dd>
-      {detail ? (
-        <dd {...stylex.props(foundationStyles.metadata, styles.metricDetail)}>
-          {detail}
-        </dd>
-      ) : null}
     </div>
   );
 }
 
-/** Summarizes live background work and recent price matching for administrators. */
-export default function OperationsOverview({ data }: OperationsOverviewProps) {
+/** Prioritizes Bottle outcomes, live work, and recent price matching. */
+export default function OperationsOverview({
+  bottleResolution,
+  data,
+}: OperationsOverviewProps) {
+  const resolutionTotal =
+    bottleResolution.unknown +
+    bottleResolution.created +
+    bottleResolution.matched;
+
   return (
-    <div {...stylex.props(styles.root)}>
-      <section aria-labelledby="current-operations-heading">
-        <div {...stylex.props(styles.sectionHeading)}>
-          <SectionHeading id="current-operations-heading">
-            Right now
+    <div {...stylex.props(styles.overviewGrid)}>
+      <section
+        aria-labelledby="bottle-resolution-heading"
+        {...stylex.props(styles.resolutionPanel)}
+      >
+        <div {...stylex.props(styles.panelHeading)}>
+          <SectionHeading id="bottle-resolution-heading">
+            Bottle resolution
           </SectionHeading>
+          <p {...stylex.props(foundationStyles.body, styles.panelDescription)}>
+            New reviews and prices from the last 30 days, grouped by their
+            current Bottle match.
+          </p>
         </div>
-        <dl {...stylex.props(styles.currentGrid)}>
-          <Metric
-            first
+
+        {resolutionTotal ? (
+          <>
+            <div aria-hidden="true" {...stylex.props(styles.resolutionTrack)}>
+              {bottleResolution.unknown ? (
+                <span
+                  style={{ flexGrow: bottleResolution.unknown }}
+                  {...stylex.props(styles.resolutionSegment, styles.unknown)}
+                />
+              ) : null}
+              {bottleResolution.created ? (
+                <span
+                  style={{ flexGrow: bottleResolution.created }}
+                  {...stylex.props(styles.resolutionSegment, styles.created)}
+                />
+              ) : null}
+              {bottleResolution.matched ? (
+                <span
+                  style={{ flexGrow: bottleResolution.matched }}
+                  {...stylex.props(styles.resolutionSegment, styles.matched)}
+                />
+              ) : null}
+            </div>
+            <dl {...stylex.props(styles.resolutionList)}>
+              <ResolutionItem
+                label="Unknown"
+                value={bottleResolution.unknown}
+                total={resolutionTotal}
+                detail="no Bottle match yet"
+                tone="unknown"
+              />
+              <ResolutionItem
+                label="New bottles"
+                value={bottleResolution.created}
+                total={resolutionTotal}
+                detail="added to Peated"
+                tone="created"
+              />
+              <ResolutionItem
+                label="Existing matches"
+                value={bottleResolution.matched}
+                total={resolutionTotal}
+                detail="matched to Bottles in Peated"
+                tone="matched"
+              />
+            </dl>
+          </>
+        ) : (
+          <p {...stylex.props(foundationStyles.body, styles.empty)}>
+            No new reviews or prices in the last 30 days.
+          </p>
+        )}
+      </section>
+
+      <section
+        aria-labelledby="system-status-heading"
+        {...stylex.props(styles.statusPanel)}
+      >
+        <div {...stylex.props(styles.statusHeader)}>
+          <SectionHeading id="system-status-heading">
+            System status
+          </SectionHeading>
+          <AdminTextLink href="/admin/moderation/automation">
+            View work
+          </AdminTextLink>
+        </div>
+
+        <dl {...stylex.props(styles.statusList)}>
+          <StatusRow
             label="Needs attention"
             value={data.counts.failed}
             tone={data.counts.failed > 0 ? "danger" : "default"}
           />
-          <Metric
-            label="In progress"
-            mobileLeft
-            value={data.counts.processing}
-          />
-          <Metric label="Waiting" mobileTop value={data.counts.waiting} />
-          <Metric
-            label="Finished today"
-            mobileLeft
-            mobileTop
-            value={data.counts.clearedToday}
-          />
+          <StatusRow label="In progress" value={data.counts.processing} />
+          <StatusRow label="Waiting" value={data.counts.waiting} />
+          <StatusRow label="Finished today" value={data.counts.clearedToday} />
         </dl>
-      </section>
 
-      <section aria-labelledby="price-matching-heading">
-        <div {...stylex.props(styles.sectionHeading)}>
-          <SectionHeading id="price-matching-heading">
-            Price matching
-          </SectionHeading>
-          <p
-            {...stylex.props(foundationStyles.body, styles.sectionDescription)}
-          >
-            {data.listingAutomation.sampleSize
-              ? `Last ${formatCount(data.listingAutomation.sampleSize)} prices checked`
-              : "No completed price checks yet."}
-          </p>
+        <div {...stylex.props(styles.matching)}>
+          <div {...stylex.props(styles.matchingHeader)}>
+            <h3 {...stylex.props(foundationStyles.compactRowTitle)}>
+              Price matching
+            </h3>
+            {data.listingAutomation.sampleSize ? (
+              <strong {...stylex.props(styles.matchingRate)}>
+                {data.listingAutomation.rate ?? 0}% automatic
+              </strong>
+            ) : null}
+          </div>
+          {data.listingAutomation.sampleSize ? (
+            <p
+              {...stylex.props(
+                foundationStyles.metadata,
+                styles.matchingDetail,
+              )}
+            >
+              {formatCount(data.listingAutomation.automatic)} automatic ·{" "}
+              {formatCount(data.listingAutomation.manual)} manual ·{" "}
+              <span
+                {...stylex.props(
+                  data.listingAutomation.failed > 0 && styles.danger,
+                )}
+              >
+                {formatCount(data.listingAutomation.failed)} failed
+              </span>
+              <br />
+              Last {formatCount(data.listingAutomation.sampleSize)} prices
+              checked
+            </p>
+          ) : (
+            <p
+              {...stylex.props(
+                foundationStyles.metadata,
+                styles.matchingDetail,
+              )}
+            >
+              No completed price checks yet.
+            </p>
+          )}
         </div>
-        {data.listingAutomation.sampleSize ? (
-          <dl {...stylex.props(styles.matchingGrid)}>
-            <Metric
-              first
-              label="Matched automatically"
-              value={data.listingAutomation.automatic}
-              detail={`${data.listingAutomation.rate ?? 0}% of checks`}
-            />
-            <Metric
-              label="Handled by a person"
-              mobileTop
-              value={data.listingAutomation.manual}
-            />
-            <Metric
-              label="Failed"
-              mobileTop
-              value={data.listingAutomation.failed}
-              tone={data.listingAutomation.failed > 0 ? "danger" : "default"}
-            />
-          </dl>
-        ) : null}
       </section>
     </div>
   );
 }
 
 const styles = stylex.create({
-  root: {
-    display: "flex",
+  overviewGrid: {
+    display: "grid",
     minWidth: 0,
-    flexDirection: "column",
-    rowGap: space.x8,
+    gridTemplateColumns: {
+      default: "minmax(0, 1.7fr) minmax(280px, 1fr)",
+      "@media (max-width: 839px)": "1fr",
+    },
+    gap: space.x4,
   },
-  sectionHeading: {
+  resolutionPanel: {
+    minWidth: 0,
+    padding: { default: space.x6, "@media (max-width: 639px)": space.x4 },
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
+  statusPanel: {
+    minWidth: 0,
+    padding: { default: space.x6, "@media (max-width: 639px)": space.x4 },
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.hairline,
+    borderRadius: controlMetrics.radius,
+  },
+  panelHeading: {
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
     rowGap: space.x2,
-    marginBottom: space.x4,
   },
-  sectionDescription: {
-    maxWidth: "68ch",
-    color: colors.inkMuted,
+  panelDescription: { maxWidth: "62ch", color: colors.inkMuted },
+  resolutionTrack: {
+    display: "flex",
+    height: "10px",
+    marginTop: space.x6,
+    overflow: "hidden",
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.inset,
   },
-  currentGrid: {
-    display: "grid",
-    minWidth: 0,
-    gridTemplateColumns: {
-      default: "repeat(4, minmax(0, 1fr))",
-      "@media (max-width: 639px)": "repeat(2, minmax(0, 1fr))",
-    },
-    margin: 0,
-    padding: 0,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
-  },
-  matchingGrid: {
+  resolutionSegment: { minWidth: "3px", flexBasis: 0 },
+  unknown: { backgroundColor: colors.dataRange },
+  created: { backgroundColor: colors.accent },
+  matched: { backgroundColor: colors.dataAccent },
+  resolutionList: {
     display: "grid",
     minWidth: 0,
     gridTemplateColumns: {
       default: "repeat(3, minmax(0, 1fr))",
-      "@media (max-width: 639px)": "1fr",
+      "@media (max-width: 559px)": "1fr",
     },
+    gap: { default: space.x4, "@media (max-width: 559px)": space.x3 },
     margin: 0,
+    marginTop: space.x6,
     padding: 0,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.sectionRule,
   },
-  metric: {
+  resolutionItem: {
+    display: "grid",
     minWidth: 0,
-    paddingTop: space.x6,
-    paddingRight: space.x6,
-    paddingBottom: space.x6,
-    paddingLeft: space.x6,
-    "@media (max-width: 639px)": {
-      paddingRight: 0,
-      paddingLeft: 0,
+    gridTemplateColumns: "1fr auto",
+    columnGap: space.x2,
+    alignItems: "baseline",
+    "@media (max-width: 559px)": {
+      paddingBottom: space.x3,
+      borderBottomWidth: "1px",
+      borderBottomStyle: "solid",
+      borderBottomColor: colors.hairline,
     },
   },
-  metricDivider: {
-    borderLeftWidth: { default: "1px", "@media (max-width: 639px)": 0 },
-    borderLeftStyle: "solid",
-    borderLeftColor: colors.hairline,
+  resolutionLabel: {
+    display: "inline-flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: space.x2,
   },
-  mobileLeft: {
-    "@media (max-width: 639px)": {
-      paddingLeft: space.x4,
-      borderLeftWidth: "1px",
-      borderLeftStyle: "solid",
-      borderLeftColor: colors.hairline,
-    },
+  resolutionMark: {
+    width: "9px",
+    height: "9px",
+    flexShrink: 0,
+    borderRadius: "50%",
   },
-  mobileTop: {
-    "@media (max-width: 639px)": {
-      borderTopWidth: "1px",
-      borderTopStyle: "solid",
-      borderTopColor: colors.hairline,
-    },
-  },
-  metricLabel: { color: colors.ink },
-  metricValue: {
+  resolutionValue: {
     margin: 0,
-    marginTop: space.x3,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "40px",
+    fontSize: "28px",
     fontWeight: 700,
-    letterSpacing: "-0.04em",
+    letterSpacing: "-0.035em",
     lineHeight: 1,
     fontVariantNumeric: "tabular-nums",
   },
-  metricDetail: {
+  resolutionDetail: {
+    gridColumn: "1 / -1",
     margin: 0,
-    marginTop: space.x3,
+    marginTop: space.x1,
     color: colors.inkMuted,
   },
+  empty: {
+    marginTop: space.x6,
+    paddingTop: space.x6,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+    color: colors.inkMuted,
+  },
+  statusHeader: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x3,
+  },
+  statusList: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    margin: 0,
+    marginTop: space.x4,
+    padding: 0,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.hairline,
+  },
+  statusRow: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x4,
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  statusLabel: { color: colors.inkMuted },
+  statusValue: {
+    margin: 0,
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "20px",
+    fontWeight: 700,
+    lineHeight: 1,
+    fontVariantNumeric: "tabular-nums",
+  },
   danger: { color: colors.critical },
+  matching: {
+    marginTop: space.x4,
+    padding: space.x3,
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.surface,
+  },
+  matchingHeader: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x3,
+  },
+  matchingRate: {
+    color: colors.accentDeep,
+    fontFamily: fonts.display,
+    fontSize: "15px",
+    fontWeight: 700,
+    lineHeight: 1.2,
+  },
+  matchingDetail: { marginTop: space.x2, color: colors.inkMuted },
 });

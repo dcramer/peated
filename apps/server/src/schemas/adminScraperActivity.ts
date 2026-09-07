@@ -20,14 +20,19 @@ export const AdminScraperActivitySchema = z.object({
   saved: z.object({
     reviews: AdminScraperSavedCountsSchema,
     prices: AdminScraperSavedCountsSchema,
-    bottles: AdminScraperSavedCountsSchema,
+    catalogListings: AdminScraperSavedCountsSchema,
+  }),
+  bottleResolution: z.object({
+    unknown: z.number().int().min(0),
+    created: z.number().int().min(0),
+    matched: z.number().int().min(0),
   }),
   days: z.array(
     AdminScraperHealthCountsSchema.extend({
       date: z.string().date(),
       reviews: z.number().int().min(0),
       prices: z.number().int().min(0),
-      bottles: z.number().int().min(0),
+      catalogListings: z.number().int().min(0),
     }),
   ),
   recentFailures: z.array(

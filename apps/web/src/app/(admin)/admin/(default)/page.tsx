@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  AdminActions,
   AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
-  AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
 import OperationsOverview from "@peated/web/components/admin/operationsOverview.stylex";
 import ScraperActivity from "@peated/web/components/admin/scraperActivity.stylex";
@@ -39,16 +37,11 @@ export default function Page() {
             Updated <TimeSince date={operations.generatedAt} />
           </>
         }
-        actions={
-          <AdminActions>
-            <AdminTextLink href="/admin/moderation/automation">
-              View background work
-            </AdminTextLink>
-            <AdminTextLink href="/admin/sites">Manage scrapers</AdminTextLink>
-          </AdminActions>
-        }
       />
-      <OperationsOverview data={operations} />
+      <OperationsOverview
+        bottleResolution={scraperActivity.bottleResolution}
+        data={operations}
+      />
       <ScraperActivity data={scraperActivity} />
     </AdminPage>
   );
