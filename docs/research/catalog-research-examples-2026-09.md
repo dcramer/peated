@@ -728,6 +728,26 @@ completion record.
   Second Release is staged as a new Bottle after exact public Peated searches
   returned zero matches. The totals are now 211 new Owner's Casks and 98
   evidence-backed non-Owner releases.
+- Two named private releases are also missing. Exact
+  [Sotheby's](https://www.sothebys.com/buy/61598e77-f3c3-41cf-86fa-1232a63b2546/lots/0b776a48-5e95-4989-b236-dffc53b35d38),
+  [Whisky.Auction](https://whisky.auction/auctions/lot/166781/yamazaki-junshin),
+  and
+  [Bonhams catalog](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-10%2F16%2FS-28697-0-2.pdf)
+  records establish Junshin as a 200-bottle, 52% no-age-statement vatting
+  bottled and privately released in 2022 from Mizunara-, Spanish-oak-, and
+  American-oak-matured components. Exact
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-gibraltar-heart-rock-commemorative-bottle)
+  and
+  [retailer](https://www.oldliquorcompany.com/shop/suntory-yamazaki-2014-gibraltar-heart-on-the-rock-26559)
+  records establish Heart on the Rock as a 140-bottle, 43% Prudential 140th
+  Anniversary gift release, bottled in 2014 from Mizunara- and wine-cask-matured
+  malt. Its distribution date remains unknown rather than inferred from the
+  2015 anniversary. Exact public Peated searches returned zero for both names,
+  so both are staged. The index-only Yamazaki 90th Anniversary is explicitly a
+  non-commercial internal item, and Kakubin Genshu is explicitly a 50 ml sample
+  bottling; neither is a marketed release under the catalog identity rules.
+  The totals are now 211 new Owner's Casks and 100 evidence-backed non-Owner
+  releases.
 - The last complete Brand inventory contained 161 Bottles, all with Yamazaki as
   Brand and distiller and no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
