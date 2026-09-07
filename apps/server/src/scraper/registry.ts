@@ -14,7 +14,6 @@ import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeDecadentDrinks from "./adapters/legacy/scrapeDecadentDrinks";
 import scrapeDouglasLaing from "./adapters/legacy/scrapeDouglasLaing";
 import scrapeDramfool from "./adapters/legacy/scrapeDramfool";
-import scrapeEdradour from "./adapters/legacy/scrapeEdradour";
 import scrapeFineDrams from "./adapters/legacy/scrapeFineDrams";
 import scrapeGlenAllachie from "./adapters/legacy/scrapeGlenAllachie";
 import scrapeHealthySpirits from "./adapters/legacy/scrapeHealthySpirits";
@@ -81,11 +80,6 @@ const legacyPriceSources = [
     scrape: scrapeDouglasLaing,
   },
   { type: "dramfool", origin: "https://dramfool.com", scrape: scrapeDramfool },
-  {
-    type: "edradour",
-    origin: "https://www.edradour.com",
-    scrape: scrapeEdradour,
-  },
   {
     type: "finedrams",
     origin: "https://www.finedrams.com",
@@ -235,6 +229,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://www.compassboxwhisky.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "edradour",
+      origins: [
+        {
+          origin: "https://www.edradour.com",
           robots: { mode: "enforce" },
         },
       ],
