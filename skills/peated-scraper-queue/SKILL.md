@@ -62,7 +62,7 @@ from another release or use model confidence as evidence.
    from the classifier: a `create_new` proposal may match an existing Bottle, a
    proposed match may use a different exact Bottle, and an unsupported listing may
    be ignored. Use the atomic queue endpoints: `create-bottle` with the reviewed
-   `independentBottle` for `create_new` or `match_existing`,
+   `independentBottle` for a missing Bottle, including an errored `no_match`,
    `apply-bottle-repair` for a proven repair, or the proposal action endpoint for
    match and ignore. Never create a Bottle separately and then match it merely to
    work around a missing atomic queue action. For a large reviewed set, partition

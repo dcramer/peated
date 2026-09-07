@@ -3455,6 +3455,115 @@ describe("price match queue", () => {
     });
   });
 
+  test("creates a reviewed Bottle from an errored no_match proposal", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Recovered Review Brand" });
+    const price = await fixtures.StorePrice({
+      name: "Recovered Review Release",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+        error: "Classifier unavailable",
+      })
+      .returning();
+
+    const createdBottle = await routerClient.prices.matchQueue.createBottle(
+      {
+        proposal: proposal.id,
+        independentBottle: {
+          name: "Recovered Review Release",
+          brand: brand.id,
+          category: "single_malt",
+          abv: 46,
+        },
+      },
+      { context: { user } },
+    );
+
+    const [updatedProposal, updatedPrice, decisionLog] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+      db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+          eq(incomingBottleDecisionLogs.sourceId, price.id),
+        ),
+      }),
+    ]);
+
+    expect(createdBottle).toMatchObject({
+      name: "Recovered Review Release",
+      category: "single_malt",
+      abv: 46,
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      currentBottleId: createdBottle.id,
+      suggestedBottleId: createdBottle.id,
+      reviewedById: user.id,
+    });
+    expect(updatedPrice).toMatchObject({ bottleId: createdBottle.id });
+    expect(decisionLog).toMatchObject({
+      proposalId: proposal.id,
+      bottleId: createdBottle.id,
+      decision: "create_bottle",
+      createdBottle: true,
+    });
+  });
+
+  test("rejects Bottle creation while an errored proposal is processing", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Processing Review Brand" });
+    const price = await fixtures.StorePrice({
+      name: "Processing Review Release",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "errored",
+        proposalType: "no_match",
+        processingToken: "active-create-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    const err = await waitError(
+      routerClient.prices.matchQueue.createBottle(
+        {
+          proposal: proposal.id,
+          independentBottle: {
+            name: "Processing Review Release",
+            brand: brand.id,
+          },
+        },
+        { context: { user } },
+      ),
+    );
+
+    const createdBottle = await db.query.bottles.findFirst({
+      where: eq(
+        bottles.fullName,
+        "Processing Review Brand Processing Review Release",
+      ),
+    });
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Price match proposal is currently processing (${proposal.id}).]`,
+    );
+    expect(createdBottle).toBeUndefined();
+  });
+
   test("rejects proposal-backed bottle creation for correction proposals", async ({
     fixtures,
   }) => {
@@ -3487,7 +3596,7 @@ describe("price match queue", () => {
       where: eq(bottles.fullName, "Mismatch Brand Should Not Exist"),
     });
     expect(err).toMatchInlineSnapshot(
-      `[Error: Price match proposal has invalid type (${proposal.id}, expected create_new or match_existing, got correction).]`,
+      `[Error: Price match proposal has invalid type (${proposal.id}, expected create_new or match_existing or no_match, got correction).]`,
     );
     expect(createdBottle).toBeUndefined();
   });

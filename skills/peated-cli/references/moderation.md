@@ -95,7 +95,9 @@ pnpm cli api post /prices/match-queue/123 --input /tmp/peated-request.json --yes
 ```
 
 Create body: `{ "proposal": 123, "independentBottle": ... }`. Validate the
-Bottle input; do not copy incomplete classifier output.
+Bottle input; do not copy incomplete classifier output. A moderator may use this
+atomic action for a reviewable `create_new`, `match_existing`, or `no_match`
+proposal, including `errored`; active processing still blocks the write.
 
 ```bash
 pnpm cli api post /prices/match-queue/123/create-bottle --input /tmp/peated-request.json --yes
