@@ -179,6 +179,15 @@ function prepareNcnean(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareThompsonBros(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "thompsonbros", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 
@@ -194,6 +203,7 @@ function codeOwnedSource(
     | "kilchoman"
     | "ncnean"
     | "northstarspirits"
+    | "thompsonbros"
     | "whiskeyreviewer"
     | "whiskynotes"
     | "whiskysaga"
@@ -296,6 +306,11 @@ const northStarRegistry = createScraperRegistry({
 const ncneanRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("ncnean")!],
   sources: [codeOwnedSource("ncnean")],
+});
+
+const thompsonBrosRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("thompsonbros")!],
+  sources: [codeOwnedSource("thompsonbros")],
 });
 
 async function setupMigration(bottleId: number | null = null) {
@@ -885,6 +900,25 @@ async function setupNcneanMigration() {
     })
     .returning();
   await syncScraperDefinitions(ncneanRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupThompsonBrosMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "thompsonbros",
+      name: "Thompson Bros.",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(thompsonBrosRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1615,6 +1649,106 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await expect(prepareEdradour({ apply: true })).rejects.toMatchObject({
       code: "BAD_REQUEST",
       message: expect.stringContaining("Check Edradour price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Thompson Bros. without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupThompsonBrosMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "108879",
+      name: "Thompson Bros Glen Scotia Single Malt Scotch Whisky, 2013, 12-year-old, 70CL, 56.7%ABV",
+      price: 5833,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.thompsonbrosdistillers.com/product/glen-scotia-single-malt-scotch-whisky-2013-12-year-old/",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Thompson Bros Highland Single Malt Scotch Whisky, 18-year-old, 70CL, 48.5% ABV",
+      price: 5417,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.thompsonbrosdistillers.com/product/Highland18yo/",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareThompsonBros()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareThompsonBros({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(thompsonBrosRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl:
+          "https://www.thompsonbrosdistillers.com/product-category/whisky/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareThompsonBros({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Thompson Bros. is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Thompson Bros. price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupThompsonBrosMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "108879",
+      name: "Thompson Bros Glen Scotia Single Malt Scotch Whisky",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/product/glen-scotia/",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareThompsonBros({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Thompson Bros. price"),
     });
     expect(await db.select().from(storePrices)).toEqual(prices);
     expect(await db.select().from(scrapeTargets)).toEqual(targets);
