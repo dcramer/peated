@@ -2,6 +2,9 @@
   "mcpServers": {
     "sentry": {
       "url": "https://mcp.sentry.dev/mcp/peated/peated?experimental=1"
+    },
+    "planetscale": {
+      "url": "https://mcp.pscale.dev/mcp/planetscale"
     }
   }
 }

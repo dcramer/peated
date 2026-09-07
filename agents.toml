@@ -15,3 +15,7 @@ source = "getsentry/dotagents"
 [[mcp]]
 name = "sentry"
 url = "https://mcp.sentry.dev/mcp/peated/peated?experimental=1"
+
+[[mcp]]
+name = "planetscale"
+url = "https://mcp.pscale.dev/mcp/planetscale"
