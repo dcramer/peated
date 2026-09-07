@@ -1,47 +1,23 @@
+import { loadBottleSitemapPage } from "@peated/web/lib/bottleSitemaps";
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { buildPagesSitemap, type Sitemap } from "@peated/web/lib/sitemaps";
-import { getBottleUrl } from "@peated/web/lib/urls";
+import { buildPagesSitemap } from "@peated/web/lib/sitemaps";
 
 const SITEMAP_CACHE_CONTROL =
   "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
 
 export const dynamic = "force-dynamic";
 
-const PAGE_LIMIT = 1000;
-
 export async function GET(
-  request: Request,
+  _request: Request,
   props: { params: Promise<{ id: string }> },
 ) {
-  const params = await props.params;
-
-  const { id } = params;
+  const { id } = await props.params;
 
   const { client } = await createAnonymousServerClient();
-
-  const startCursor = (Number(id) - 1) * (PAGE_LIMIT / 100) + 1;
-
-  let cursor: number | null = startCursor;
-  let count = 0;
-  const pages: Sitemap = [];
-  while (cursor && count < PAGE_LIMIT) {
-    const { results, rel } = await client.bottles.list({
-      cursor,
-      limit: 100,
-      sort: "created",
-    });
-
-    pages.push(
-      ...results.map((bottle) => ({
-        url: getBottleUrl(bottle),
-        lastModified: bottle.updatedAt,
-      })),
-    );
-
-    cursor = rel.nextCursor;
-    count += results.length;
-  }
-
+  const { pages, startCursor } = await loadBottleSitemapPage(
+    Number(id),
+    client.bottles.list,
+  );
   const pagesSitemapXML = await buildPagesSitemap(pages);
 
   return new Response(pagesSitemapXML, {
