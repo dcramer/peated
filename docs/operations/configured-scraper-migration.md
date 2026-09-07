@@ -268,6 +268,28 @@ Activate only exact output, trigger one manual collection, and confirm that it
 updates the same price IDs and Bottle matches before restoring the schedule.
 Check the run and Sentry.
 
+## Edradour
+
+Use the preparation endpoint with `{"site": "edradour"}`. The check-only
+request examines every saved price without changing it. It stops if a price
+has a product ID or does not use an Edradour product URL, an `Edradour` or
+`Ballechin` name, GBP, or a supported bottle size. Applying moves the request
+limits to a paused price source for `https://www.edradour.com/shop/`. It does
+not change price rows or history.
+
+Before applying, stop the `edradour` schedule and wait for active collection to
+finish. Save the existing price IDs, URLs, Bottle links, hidden states,
+histories, request limits, and run history. Run the version 8 rules through the
+full local preview. The shop-page rules must keep only whisky that can be
+bought. The product-page rules must read the displayed name, GBP price, bottle
+size, product URL, and image. Add the `Edradour` prefix when an Edradour whisky
+name does not already start with `Edradour` or `Ballechin`.
+
+After applying, save and preview the reviewed rules. Activate only exact
+output, trigger one manual collection, and confirm that it updates the same
+price IDs and Bottle links. Check the run and Sentry before restoring the
+weekly schedule.
+
 ## Kilchoman
 
 Use the preparation endpoint with `{"site": "kilchoman"}`. The check-only
@@ -352,10 +374,11 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture,
-Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, Nc'nean,
-North Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study,
-and Words of Whisky. Other sites are rejected without changing records. Add
-each site's conversion behind this route as its existing records are reviewed.
+Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, Gordon & MacPhail,
+Kilchoman, Nc'nean, North Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga,
+The Whisky Study, and Words of Whisky. Other sites are rejected without
+changing records. Add each site's conversion behind this route as its existing
+records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store
