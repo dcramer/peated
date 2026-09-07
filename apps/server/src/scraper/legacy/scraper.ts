@@ -1,8 +1,4 @@
-/**
- * Owns retailer fetching, normalization, and dispatch into durable server
- * capabilities. Persistence failures escape to the worker boundary; optional
- * image transfer may degrade without discarding the authoritative listing.
- */
+/** Compatibility helpers for retailer scrapers that have not moved to saved rules. */
 import config from "@peated/server/config";
 import {
   defaultHeaders,

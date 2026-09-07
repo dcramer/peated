@@ -1,9 +1,4 @@
-/**
- * Public application boundary for scraper lifecycle operations.
- *
- * Runtime internals and source implementations stay private to this module;
- * API routes and workers only queue, execute, or initialize durable runs.
- */
+/** Public scraper actions used by API routes and workers. */
 import type { ExternalSite } from "@peated/server/db/schema";
 import type { ExternalSiteKey } from "@peated/server/types";
 import { createScrapeSourceSuggestionRun } from "./configured/runs";

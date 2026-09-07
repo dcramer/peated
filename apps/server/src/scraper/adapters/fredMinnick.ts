@@ -13,8 +13,6 @@ import {
 import { parseDate } from "./dates";
 import { readReviewBody } from "./reviewBody";
 
-// This adapter owns Fred Minnick parsing. The shared scraper runtime owns
-// every remote request and the shared review sink owns storage.
 const ORIGIN = "https://www.fredminnick.com";
 const TARGET = "fredminnick";
 const MAX_CURRENT_ARTICLES = 5;

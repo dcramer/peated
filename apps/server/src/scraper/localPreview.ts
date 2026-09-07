@@ -10,8 +10,7 @@ import { z } from "zod";
 import type { ScrapeSourcePreviewResult } from "./configured/preview";
 import {
   parseScrapeRules,
-  SCRAPE_SOURCE_MAX_LIST_PAGES,
-  scrapeRulesLimit,
+  scrapeRunRequestLimit,
   withScrapeRulesLimit,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
@@ -38,7 +37,7 @@ export async function runLocalScrapeSourcePreview(
     fetchImpl?: typeof fetch;
     clock?: ScraperHttpClock;
     executionToken?: string;
-    onDeferred?: (nextAttemptAt: Date) => void;
+    onWaiting?: (nextAttemptAt: Date) => void;
   } = {},
 ) {
   const parsed = InputSchema.parse(input);
@@ -115,7 +114,7 @@ export async function runLocalScrapeSourcePreview(
       externalSiteId: site.id,
       trigger: "manual",
       purpose: "preview",
-      requestLimit: scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
+      requestLimit: scrapeRunRequestLimit(rules),
       requestErrorCount: 0,
     })
     .returning();
@@ -133,8 +132,8 @@ export async function runLocalScrapeSourcePreview(
         },
       );
       if (result.status === "completed") break;
-      if ("nextAttemptAt" in result) {
-        options.onDeferred?.(result.nextAttemptAt);
+      if (result.status === "waiting") {
+        options.onWaiting?.(result.nextAttemptAt);
         await clock.sleep(
           Math.max(0, result.nextAttemptAt.getTime() - clock.now().getTime()),
         );

@@ -2746,7 +2746,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
           },
         );
         if (result.status === "completed") return result;
-        if (!("nextAttemptAt" in result)) {
+        if (result.status !== "waiting") {
           throw new Error("The saved scraper is already running.");
         }
         now = result.nextAttemptAt;
