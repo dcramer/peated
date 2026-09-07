@@ -28,6 +28,65 @@ Sources found in earlier Peated catalog tasks. Recheck each site before use.
 | Suntory and Yamazaki | [Essence](https://www.suntory.co.jp/whisky/essence/), [Hibiki](https://www.suntory.co.jp/whisky/hibiki/portfolio/), [Hakushu](https://www.suntory.co.jp/whisky/hakushu/lineup/), [global news](https://www.suntoryglobalspirits.com/news), Whisky Auctioneer                                                                                                                                       | Japanese pages listed more than global pages                               |
 | Wolves Whiskey       | [Producer archive](https://wolveswhiskeyca.com/collections/archive), Shopify product data, [TTB COLA](https://www.ttbonline.gov/colasonline/publicSearchColasBasic.do), PR Newswire, venue shops                                                                                                                                                                                                   | Venue releases and collaborations were missing from the main archive       |
 
+## Wolves x BARTENDER Magazine — September 7, 2026
+
+This production repair covered the one marketed Wolves x BARTENDER Magazine
+release, Bottle `B52994`. Searches for the exact collaboration, age, and cask
+number found no second release or Peated duplicate.
+
+- Wolves' exact [product page](https://wolveswhiskeyca.com/products/wolves-x-bartender-magazine)
+  confirms the 11-year American single malt collaboration, 62% ABV, single
+  barrel 548, and American-oak maturation. The page was already indexed as sold
+  out in March 2026, so the stored November 2026 release date was impossible.
+- Wolves' dated [November 5, 2025 announcement](https://www.linkedin.com/posts/wolveswhiskeyca_wolves-x-bartender-magazine-11-year-american-activity-7391902152958427136-5zoA)
+  linked directly to purchase. Together with the producer page, this supports
+  changing the release year to 2025. It does not prove the first day of sale, so
+  the release day remains unknown.
+- Main Street Liquor's exact [retailer listing](https://mainstreetliquor.com/products/wolves-whiskey-x-bartender-magazine-11-year-american-single-malt-limited-single-barrel)
+  says the preorder was expected to arrive in mid-to-late November but gives no
+  year. It supports the stored November month, not a 2026 year. It also reports
+  an outturn of 252 bottles; the producer page does not state the outturn.
+- The Bottle image is exact and came from a retailer page, but that page states
+  no reusable image license. The existing image and provenance were preserved;
+  no new image was copied. The Bottle had no aliases or import references.
+- Final status: one update, no creates, merges, or unresolved identities.
+  Production Bottle `B52994` now stores November 2025 and was re-fetched after
+  the write.
+
+## Wolves x ARIA and Wolves x Flamingo Estate — September 7, 2026
+
+This production audit covered the one marketed release for each collaboration,
+Bottles `B53005` and `B52997`. Both Bottles already existed. Exact-name,
+partner, age, and Brand searches found no Peated duplicates.
+
+- Sip Whiskey's exact [ARIA listing](https://sipwhiskey.com/products/wolves-x-aria-13-year-old-single-malt)
+  confirms the partnership with ARIA Resort & Casino, 13-year American single
+  malt, Single Barrel Reserve edition, Wolves Whiskey production, and marketed
+  `ARIA` casing. Its public [Shopify product data](https://sipwhiskey.com/products/wolves-x-aria-13-year-old-single-malt.js)
+  was created and published on November 18, 2024. That is evidence the listing
+  existed by then, not proof of the whisky's release date, so Bottle `B53005`
+  retains an unknown release year, month, and day.
+- The existing ARIA image is an exact Bottle image from
+  [BuyMyLiquor](https://www.buymyliquor.com/products/wolves-x-aria-american-single-malt-whiskey-single-barrel-reserve-13-years),
+  but the page states no reusable image license. The image and provenance were
+  preserved rather than copied again.
+- Wolves' exact [Flamingo Estate product page](https://wolveswhiskeyca.com/products/wolves-x-flamingo-estate-bundle)
+  confirms the stable product name, six-year age, 48% ABV, three 59.4-gallon
+  Demptos American oak barrels, and one char 3, one heavy-toast, and one
+  light-toast barrel. Its description explicitly calls the whisky a blend of
+  three barrels, so Bottle `B52997` is not a single-cask release.
+- An archived exact [ReserveBar listing](https://web.archive.org/web/20250522040420id_/https://www.reservebar.com/products/wolves-x-flamingo-estate-single-malt-whiskey/GROUPING-2493872)
+  describes it as part of the 2024 holiday collaboration. This supports release
+  year 2024. Its undated October delivery estimate does not prove a release
+  month or day, which remain unknown.
+- The existing Flamingo Estate image came from the live ReserveBar product page,
+  which states no reusable image license. Both Bottles had no aliases or import
+  references, and both Bottle groups contained one member.
+- Final status: two updates, no creates or merges. Bottle `B53005` now uses the
+  marketed `ARIA` casing and remains in `S0541`, The Hotel Series. Bottle
+  `B52997` now stores release year 2024 and `singleCask: false`. Both were
+  re-fetched after the writes.
+
 ## Springbank Open Day naming repair — September 5, 2026
 
 This production repair covered the 32 existing Springbank, Longrow, and
