@@ -706,7 +706,7 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, bottle);
       return true;
     }
-    case "admin/repairBottleCounts":
+    case "admin/rebuildCatalogSummaries":
       sendRpcResponse(response, { status: "queued" });
       return true;
     case "admin/moderation/listTasks": {

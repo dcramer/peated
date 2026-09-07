@@ -18,22 +18,26 @@ import { space } from "../../../../../styles/tokens.stylex";
 
 export default function MaintenancePage() {
   const orpc = useORPC();
-  const bottleCountRepair = useMutation(
-    orpc.admin.repairBottleCounts.mutationOptions(),
+  const catalogSummaryRebuild = useMutation(
+    orpc.admin.rebuildCatalogSummaries.mutationOptions(),
   );
-  const [bottleCountError, setBottleCountError] = useState<string | null>(null);
-  const [bottleCountNotice, setBottleCountNotice] = useState<string | null>(
+  const [catalogSummaryError, setCatalogSummaryError] = useState<string | null>(
     null,
   );
+  const [catalogSummaryNotice, setCatalogSummaryNotice] = useState<
+    string | null
+  >(null);
 
-  async function startBottleCountRepair() {
-    setBottleCountError(null);
-    setBottleCountNotice(null);
+  async function startCatalogSummaryRebuild() {
+    setCatalogSummaryError(null);
+    setCatalogSummaryNotice(null);
     try {
-      await bottleCountRepair.mutateAsync({});
-      setBottleCountNotice("Bottle count check started.");
+      await catalogSummaryRebuild.mutateAsync({});
+      setCatalogSummaryNotice("Catalog summary rebuild started.");
     } catch {
-      setBottleCountError("The Bottle count check could not start. Try again.");
+      setCatalogSummaryError(
+        "The catalog summary rebuild could not start. Try again.",
+      );
     }
   }
 
@@ -55,25 +59,25 @@ export default function MaintenancePage() {
       />
 
       <AdminSection
-        title="Bottle counts"
-        description="Check saved Bottle counts and fix any that are wrong. Bottle editing can continue while this runs."
+        title="Catalog summaries"
+        description="Rebuild saved Bottle ratings, flavor notes, and catalog totals. Bottle editing can continue while this runs."
       >
         <div {...stylex.props(styles.sectionContent)}>
           <div {...stylex.props(styles.actionRow)}>
             <Button
-              disabled={bottleCountRepair.isPending}
-              loading={bottleCountRepair.isPending}
-              onClick={() => void startBottleCountRepair()}
+              disabled={catalogSummaryRebuild.isPending}
+              loading={catalogSummaryRebuild.isPending}
+              onClick={() => void startCatalogSummaryRebuild()}
               variant="default"
             >
-              Check Bottle counts
+              Rebuild catalog summaries
             </Button>
           </div>
-          {bottleCountNotice ? (
-            <Alert type="success">{bottleCountNotice}</Alert>
+          {catalogSummaryNotice ? (
+            <Alert type="success">{catalogSummaryNotice}</Alert>
           ) : null}
-          {bottleCountError ? (
-            <Alert type="error">{bottleCountError}</Alert>
+          {catalogSummaryError ? (
+            <Alert type="error">{catalogSummaryError}</Alert>
           ) : null}
         </div>
       </AdminSection>

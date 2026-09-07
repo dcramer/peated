@@ -3,7 +3,11 @@ import { expect, test } from "./test";
 import { adminUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test("runs the Bottle count repair", async ({ context, page, snapshot }) => {
+test("runs the catalog summary rebuild", async ({
+  context,
+  page,
+  snapshot,
+}) => {
   await signIn(context, {
     user: adminUser,
   });
@@ -14,15 +18,17 @@ test("runs the Bottle count repair", async ({ context, page, snapshot }) => {
     page.getByRole("heading", { name: "Maintenance", exact: true }),
   ).toBeVisible();
   await snapshot("admin/maintenance", {
-    ready: page.getByRole("button", { name: "Check Bottle counts" }),
+    ready: page.getByRole("button", { name: "Rebuild catalog summaries" }),
   });
 
-  const bottleCountRequest = page.waitForRequest((request) =>
-    request.url().includes("/rpc/admin/repairBottleCounts"),
+  const catalogSummaryRequest = page.waitForRequest((request) =>
+    request.url().includes("/rpc/admin/rebuildCatalogSummaries"),
   );
-  await page.getByRole("button", { name: "Check Bottle counts" }).click();
-  await bottleCountRequest;
-  await expect(page.getByText("Bottle count check started.")).toBeVisible();
+  await page.getByRole("button", { name: "Rebuild catalog summaries" }).click();
+  await catalogSummaryRequest;
+  await expect(
+    page.getByText("Catalog summary rebuild started."),
+  ).toBeVisible();
 });
 
 test("@mobile shows Maintenance", async ({ context, page, snapshot }) => {
@@ -33,6 +39,6 @@ test("@mobile shows Maintenance", async ({ context, page, snapshot }) => {
   await page.goto("/admin/maintenance");
 
   await snapshot("admin/maintenance-mobile", {
-    ready: page.getByRole("button", { name: "Check Bottle counts" }),
+    ready: page.getByRole("button", { name: "Rebuild catalog summaries" }),
   });
 });
