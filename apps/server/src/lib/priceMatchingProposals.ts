@@ -330,10 +330,11 @@ export class InvalidStorePriceMatchProposalTypeError extends Error {
   constructor(
     readonly proposalId: number,
     readonly proposalType: StorePriceMatchProposal["proposalType"],
-    readonly expectedProposalType: StorePriceMatchProposal["proposalType"],
+    readonly expectedProposalTypes: readonly StorePriceMatchProposal["proposalType"][],
   ) {
+    const expected = expectedProposalTypes.join(" or ");
     super(
-      `Price match proposal has invalid type (${proposalId}, expected ${expectedProposalType}, got ${proposalType}).`,
+      `Price match proposal has invalid type (${proposalId}, expected ${expected}, got ${proposalType}).`,
     );
     this.name = "InvalidStorePriceMatchProposalTypeError";
   }
@@ -943,7 +944,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
 
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
-    expectedProposalType: "create_new",
+    expectedProposalTypes: ["create_new", "match_existing"],
     allowedStatuses: ["pending_review"],
     expectedProcessingToken,
   });
@@ -1536,12 +1537,12 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
   tx: AnyDatabase,
   {
     proposalId,
-    expectedProposalType,
+    expectedProposalTypes,
     allowedStatuses = REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
     expectedProcessingToken,
   }: {
     proposalId: number;
-    expectedProposalType?: StorePriceMatchProposal["proposalType"];
+    expectedProposalTypes?: readonly StorePriceMatchProposal["proposalType"][];
     allowedStatuses?: readonly StorePriceMatchProposal["status"][];
     expectedProcessingToken?: string;
   },
@@ -1586,13 +1587,13 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
   }
 
   if (
-    expectedProposalType &&
-    row.proposal.proposalType !== expectedProposalType
+    expectedProposalTypes &&
+    !expectedProposalTypes.includes(row.proposal.proposalType)
   ) {
     throw new InvalidStorePriceMatchProposalTypeError(
       proposalId,
       row.proposal.proposalType,
-      expectedProposalType,
+      expectedProposalTypes,
     );
   }
 
@@ -1947,7 +1948,7 @@ export async function applyStorePriceBottleRepairFromProposal({
       tx,
       {
         proposalId,
-        expectedProposalType: "correction",
+        expectedProposalTypes: ["correction"],
         expectedProcessingToken,
       },
     );

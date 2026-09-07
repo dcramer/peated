@@ -37,7 +37,7 @@ export default procedure
     path: "/prices/match-queue/{proposal}/create-bottle",
     summary: "Create bottle from price match proposal",
     description:
-      "Create a new bottle from a store price match proposal and approve the proposal in a single transaction. Requires moderator privileges",
+      "Create a new bottle from a proposed create or match and approve the proposal in a single transaction. Requires moderator privileges",
     operationId: "createBottleFromPriceMatchQueueItem",
   })
   .input(IndependentInputSchema)
