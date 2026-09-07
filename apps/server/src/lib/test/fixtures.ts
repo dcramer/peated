@@ -37,7 +37,7 @@ import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { generateOAuthClientId } from "@peated/server/lib/oauth";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import slugify from "@sindresorhus/slugify";
-import { eq, inArray, or, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
 import path from "path";
 import { z } from "zod";
@@ -261,7 +261,7 @@ export const Country = async (
   { ...data }: Partial<dbSchema.NewCountry> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Country> => {
-  const name = data.name ?? faker.location.country();
+  const name = data.name ?? `Test Country ${faker.string.uuid()}`;
   const slug = data.slug ?? slugify(name);
   let [result] = await db.transaction(async (tx) => {
     return await tx
@@ -294,24 +294,38 @@ export const Region = async (
   { ...data }: Partial<dbSchema.NewRegion> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Region> => {
-  const name = data.name ?? faker.location.state();
-  let [result] = await db.transaction(async (tx) => {
-    return await tx
+  const name = data.name ?? `Test Region ${faker.string.uuid()}`;
+  const slug = data.slug ?? slugify(name);
+  const inserted = await db.transaction(async (tx) => {
+    const countryId = data.countryId ?? (await Country({}, tx)).id;
+    const [result] = await tx
       .insert(dbSchema.regions)
       .values({
-        countryId: data.countryId || (await Country({}, tx)).id,
         ...data,
+        countryId,
         name,
-        slug: data.slug ?? slugify(name),
+        slug,
       })
       .onConflictDoNothing()
       .returning();
+
+    return { countryId, result };
   });
+  const { countryId } = inserted;
+  let { result } = inserted;
   if (!result) {
     [result] = await db
       .select()
       .from(dbSchema.regions)
-      .where(eq(dbSchema.regions.name, name));
+      .where(
+        and(
+          eq(dbSchema.regions.countryId, countryId),
+          or(
+            eq(sql`LOWER(${dbSchema.regions.name})`, name.toLowerCase()),
+            eq(sql`LOWER(${dbSchema.regions.slug})`, slug.toLowerCase()),
+          ),
+        ),
+      );
   }
   if (!result) throw new Error("Unable to create Region fixture");
   return result;
