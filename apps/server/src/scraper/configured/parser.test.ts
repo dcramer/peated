@@ -504,9 +504,9 @@ const dramfaceSavedRules = {
   article: {
     canonicalUrl: pageAttribute('link[rel="canonical"]', "href"),
     title: pageText(".blog-item-title"),
-    publishedDate: pageText("time.dt-published"),
+    publishedDate: pageAttribute('meta[itemprop="datePublished"]', "content"),
     reviews: {
-      inside: "article",
+      inside: "article.h-entry .blog-item-content > .sqs-layout > .row > .col",
       oneReviewPer: "section",
       startsAt: {
         selector: "h3",
