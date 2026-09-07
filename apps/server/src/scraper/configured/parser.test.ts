@@ -1647,6 +1647,42 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("accepts a list page where every result is explicitly skipped", () => {
+    const result = parseScrapeList(
+      currentReviewRules,
+      `<main>
+        <article class="card"><span class="skip">News</span><a href="/news">News</a></article>
+        <article class="card"><span class="skip">Interview</span><a href="/interview">Interview</a></article>
+      </main>`,
+      new URL("https://reviews.test/"),
+    );
+
+    expect(result).toEqual({
+      links: [],
+      nextPageUrl: null,
+      issues: [],
+    });
+  });
+
+  it("still reports when a saved result selector finds nothing", () => {
+    expect(
+      parseScrapeList(
+        currentReviewRules,
+        "<main></main>",
+        new URL("https://reviews.test/"),
+      ),
+    ).toEqual({
+      links: [],
+      nextPageUrl: null,
+      issues: [
+        {
+          field: "articles.link",
+          message: "No links were found.",
+        },
+      ],
+    });
+  });
+
   it("reads version 8 review sections and explicit article values", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
