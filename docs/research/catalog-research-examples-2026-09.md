@@ -644,8 +644,8 @@ completion record.
   releases: `WE2001` (`B54376`), `WE2004` (`B54378`), `WE2005` (`B54377`),
   `WE2006` (`B54380`), `WE2007` (`B54381`), and `WI2171` (`B54379`). Exact age
   was stored only for the three records whose auction source states 34 years;
-  it remains unknown on the others. `W12172` and `W12173` remain leads because
-  only collector-catalog records were found.
+  it remains unknown on the others. `W12172` and `W12173` were initially held
+  as collector-only leads and are resolved in the closing findings below.
 - Five more exact Whisky Auctioneer records established the 1990 sherry-butt
   cask [`OM70170`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1990-single-cask-om70170?v=1484347)
   (`B54387`), its sibling
@@ -802,14 +802,17 @@ completion record.
   bottling; neither is a marketed release under the catalog identity rules.
   The totals are now 211 new Owner's Casks and 100 evidence-backed non-Owner
   releases.
-- The last complete Brand inventory contained 161 Bottles, all with Yamazaki as
-  Brand and distiller and no explicit bottler. Thirty records incorrectly stored
+- The earlier complete Brand inventory contained 161 Bottles, all with Yamazaki
+  as Brand and distiller and no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
   original two-page Brand inventory was re-fetched with zero remaining non-null
   bottlers. The 52 later creates in that inventory were individually verified
   with no bottler. The three subsequent creates also returned Yamazaki as Brand
-  and distiller and no bottler, taking the current Brand count to 164; a new full
-  Brand inventory is still required.
+  and distiller and no bottler, taking the Brand count to 164. A September 7
+  refresh of both current Brand pages again found 164 unique Bottles and zero
+  non-null bottlers. It found one missing distillery relationship on `B43234`,
+  described in the closing findings below; the other 163 records all name
+  Yamazaki as distiller.
 - Exact Whisky Auctioneer records for the [8- and 10-year-old set](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-8-10-year-old-suntory-pure-malt-box-set),
   [12-year-old sherry release](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-12-year-old-suntory-pure-malt),
   two [15-year-old](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-taru-dashi-genshu-15-year-old-suntory-pure-malt)
@@ -1823,6 +1826,54 @@ completion record.
   differently marketed whisky. It collapses to existing `B2276`, as do the
   early 750 ml and 2023 100th-anniversary label formats. No extra Bottle is
   staged for packaging alone.
+- One more exact corporate release is absent from production. L-Auction's
+  [photographed lot](https://l-auction.com/l-engine/rakusatsu00351/) names it
+  `Special Single Malt`, identifies Yamazaki Distillery, and records a 700 ml,
+  50% release commemorating Seven-Eleven's 50th anniversary. The exact
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/269465/50th-anniversary-of-seven-eleven)
+  independently agrees on the single-malt category, distillery, strength,
+  format, and Seven-Eleven selection. Seven-Eleven's official
+  [anniversary announcement](https://www.sej.co.jp/company/news_release/news/2023/202301051100.html)
+  dates the company milestone to 2023, but does not prove the Bottle's release
+  date. The staged record therefore leaves release and bottling years unknown.
+  A collector tasting note describes Mizunara components and their ages, but
+  those unsupported component claims are not stored as Bottle facts. An exact
+  public Peated search returned no match. This is the 114th evidence-backed
+  non-Owner release; the Owner's Cask count remains 211.
+- Three full-size 50% component bottles are not counted as marketed releases.
+  The broad indexes name separate Mizunara, Puncheon, and Spanish Oak cask
+  components for Yamazaki 12-year-old, and a
+  [secondary-market page](https://spiritory.com/es/yamazaki-spanish-oak-cask-component-for-yamazaki-12-year-old-229481)
+  records a 700 ml Spanish Oak bottle. However, a contemporary
+  [distillery tasting account](https://nao-yoshi.seesaa.net/article/472187683.html)
+  and Suntory's later official
+  [Yamazaki Experience announcement](https://www.suntory.co.jp/news/article/mt_items/14921.pdf)
+  identify these as component-whisky tasting pours. No producer sale,
+  allocation, or marketed release was found. They remain evidence about the
+  Yamazaki 12-year-old vatting, not three catalog Bottles.
+- The two 1984 puncheons `W12172` and `W12173` are now resolved as distinct
+  releases 115 and 116. Their exact photographed
+  [collector records](https://www.whiskybase.com/whiskies/whisky/181740/yamazaki-1984)
+  and
+  [sibling record](https://www.whiskybase.com/whiskies/whisky/181739/yamazaki-1984)
+  identify the producer-facing label as `Suntory Single Cask Whisky` and agree
+  on a 1984 vintage, 2018 bottling, 34-year age, puncheon maturation, 57%
+  strength, and the respective cask numbers. A separate
+  [secondary-market record](https://spiritory.com/yamazaki-34-years-old-1984-cask-nrw12172-181740)
+  corroborates `W12172`, while a photographed
+  [seller record](https://www.carousell.com.hk/p/yamazaki-1984-34-years-single-cask-whisky-700ml-%E5%B1%B1%E5%B4%8E%E5%A8%81%E5%A3%AB%E5%BF%8C-puncheon-cask-w12173-bottled-in-2018-1380508315/)
+  corroborates `W12173`. Exact public Peated searches returned no match for
+  either cask. Release year, outturn, and cask-strength status remain unknown.
+- The refreshed production inventory also found that
+  [`B43234`](https://peated.com/bottles/43234-yamazaki-spanish-oak-12-year-old)
+  is the only Yamazaki Brand Bottle without Yamazaki in its distiller
+  relationship. The public Bottle and group both have Brand `E0493`, the
+  [exact component record](https://www.whiskybase.com/whiskies/whisky/229481/yamazaki-spanish-oak-cask)
+  identifies Yamazaki Distillery, and the group is a singleton.
+  A minimal patch adding distiller `E0493` is staged as the 13th current field
+  correction. A separate 222-result public name search found no other Bottle
+  with Yamazaki in its title but outside the 223-record distillery inventory;
+  its only exception was this same `B43234`.
 
 ## SMWS 19.90 reference repair — September 6, 2026
 

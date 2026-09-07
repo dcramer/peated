@@ -59,6 +59,7 @@ direct image links are leads only. Save the page that explains the item.
 | [Whisky Hunter](https://whiskyhunter.net/base/)                             | Old range searches, especially Rare Malts                       |
 | [Buxrud Rare Malts list](https://www.buxrud.se/raremalt.htm)                | Rare Malts cross-check                                          |
 | [Whiskybase](https://www.whiskybase.com/)                                   | Finding historical gaps, names, and casks                       |
+| [Spirit Radar](https://www.spiritradar.com/)                                | Broad brand indexes and obscure presentation-bottle leads       |
 | [The Whisky Exchange](https://www.thewhiskyexchange.com/)                   | Old products and retailer exclusives                            |
 | [Master of Malt](https://www.masterofmalt.com/)                             | Old products, casks, and readable labels                        |
 | [Whiskyfun](https://www.whiskyfun.com/)                                     | Long-running distillery and review archives                     |
@@ -70,6 +71,10 @@ direct image links are leads only. Save the page that explains the item.
 Whiskybase was useful in many tasks, but Peated must not collect or copy it
 automatically. See the
 [source access audit](./external-review-source-audit-2026-08.md).
+Spirit Radar was useful as a manually reviewed lead index for Yamazaki. Its
+brand page mixed proper releases, packaging variants, tasting samples, and
+misattributed Suntory bottles, so every exact identity required independent
+producer, auction, or retailer evidence.
 
 ## Common Mistakes
 
