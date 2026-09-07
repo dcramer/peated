@@ -9,7 +9,7 @@ export default contract
     path: "/tags/bottles",
     summary: "Find bottles by tasting note",
     description:
-      "Rank bottles by the share of tastings with notes that mention a category or note. Break ties by matching tasting count, then bottle ID.",
+      "Rank bottles by how often a category or note appears in their public reviews and tastings. Break ties by the number of matches, then bottle ID.",
     spec: (spec) => ({ ...spec, operationId: "listTastingNoteBottles" }),
   })
   .input(
@@ -24,7 +24,11 @@ export default contract
       results: z.array(
         z.object({
           bottle: BottleSchema,
+          matchingReviewAndTastingCount: z.number().int().positive(),
+          notedReviewAndTastingCount: z.number().int().positive(),
+          /** @deprecated Use matchingReviewAndTastingCount. TODO(api-v1): Remove when /v1 is retired. */
           matchingTastings: z.number().int().positive(),
+          /** @deprecated Use notedReviewAndTastingCount. TODO(api-v1): Remove when /v1 is retired. */
           taggedTastings: z.number().int().positive(),
         }),
       ),

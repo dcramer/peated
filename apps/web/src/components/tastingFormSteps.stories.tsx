@@ -10,13 +10,14 @@ import { memberOptions } from "./storyData";
 import { StoryCanvas } from "./storyFixtures.stylex";
 import { TastingFormModeChoice } from "./tastingFormModeChoice.stylex";
 import {
+  MemberReviewNotesStep,
   MemberReviewScoreStep,
   TastingNotesStep,
   TastingPourStep,
   TastingRatingStep,
 } from "./tastingFormSteps.stylex";
 
-type Step = "choose" | "notes" | "pour" | "rating" | "score";
+type Step = "choose" | "notes" | "review-notes" | "pour" | "rating" | "score";
 
 function TastingStepExample({
   step,
@@ -27,6 +28,9 @@ function TastingStepExample({
 }) {
   const [notes, setNotes] = useState("");
   const [tags, setTags] = useState<readonly string[]>([]);
+  const [noseTags, setNoseTags] = useState<readonly string[]>([]);
+  const [palateTags, setPalateTags] = useState<readonly string[]>([]);
+  const [finishTags, setFinishTags] = useState<readonly string[]>([]);
   const [color, setColor] = useState<number | null>(null);
   const [serving, setServing] = useState<
     (typeof SERVING_STYLE_LIST)[number] | null
@@ -64,6 +68,44 @@ function TastingStepExample({
           ],
           onChange: setTags,
           value: tags,
+        }}
+      />
+    );
+  if (step === "review-notes")
+    return (
+      <MemberReviewNotesStep
+        notes={{
+          id: "review-notes",
+          value: notes,
+          disabled,
+          onChange: (event) => setNotes(event.currentTarget.value),
+        }}
+        nose={{
+          id: "review-nose",
+          notes: [
+            { name: "Smoke", category: "Peaty", common: true, usageCount: 1 },
+            { name: "Vanilla", category: "Sweet", common: true, usageCount: 1 },
+          ],
+          onChange: setNoseTags,
+          value: noseTags,
+        }}
+        palate={{
+          id: "review-palate",
+          notes: [
+            { name: "Smoke", category: "Peaty", common: true, usageCount: 1 },
+            { name: "Vanilla", category: "Sweet", common: true, usageCount: 1 },
+          ],
+          onChange: setPalateTags,
+          value: palateTags,
+        }}
+        finish={{
+          id: "review-finish",
+          notes: [
+            { name: "Smoke", category: "Peaty", common: true, usageCount: 1 },
+            { name: "Vanilla", category: "Sweet", common: true, usageCount: 1 },
+          ],
+          onChange: setFinishTags,
+          value: finishTags,
         }}
       />
     );
@@ -133,7 +175,7 @@ const meta = {
   argTypes: {
     step: {
       control: "select",
-      options: ["choose", "notes", "pour", "rating", "score"],
+      options: ["choose", "notes", "review-notes", "pour", "rating", "score"],
     },
   },
   decorators: [
@@ -147,7 +189,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The shared fields used by tasting and review forms. Notes come first, serving and color follow, and the rating or score comes last. Photos and friends open in a separate panel.",
+          "The fields used by tasting and review forms. A tasting has one Flavors field. A review has Nose, Palate, and Finish. Serving and color come next, followed by the rating or score. Photos and friends open separately.",
       },
     },
   },

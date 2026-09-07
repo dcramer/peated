@@ -65,6 +65,7 @@ const EntityResultSchema = EntitySchema.pick({
   name: true,
   kind: true,
   isFollowing: true,
+  publicReviewAndTastingCount: true,
 }).extend({
   region: z.object({ name: z.string() }).nullable(),
 });

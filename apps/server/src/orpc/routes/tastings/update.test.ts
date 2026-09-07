@@ -1,9 +1,6 @@
-import { db } from "@peated/server/db";
-import { bottleTags, tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("PATCH /tastings/{tasting}", () => {
@@ -73,7 +70,7 @@ describe("PATCH /tastings/{tasting}", () => {
     expect(result.ratingBand).toBeNull();
   });
 
-  test("updates tag accounting on the direct Bottle", async ({
+  test("queues direct Bottle statistics when tags change", async ({
     defaults,
     fixtures,
   }) => {
@@ -90,14 +87,14 @@ describe("PATCH /tastings/{tasting}", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(
-      await db.query.bottleTags.findMany({
-        where: eq(bottleTags.bottleId, bottle.id),
-        orderBy: (tags, { asc }) => asc(tags.tag),
-      }),
-    ).toMatchObject([
-      { tag: "new", count: 1 },
-      { tag: "old", count: 0 },
-    ]);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
+      {
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    );
   });
 });

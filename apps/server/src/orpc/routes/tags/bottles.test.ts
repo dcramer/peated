@@ -1,6 +1,13 @@
 import { db } from "@peated/server/db";
-import { bottleTombstones, tastings } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  externalReviewArticles,
+  memberReviews,
+  tastings,
+} from "@peated/server/db/schema";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /tags/bottles", () => {
@@ -33,6 +40,9 @@ describe("GET /tags/bottles", () => {
         createdAt: new Date(2026, 0, 1, 0, 0, index),
       })),
     );
+    for (const bottle of [frequent, consistent, smallSample, unrelated]) {
+      await recomputeBottleStats(bottle.id);
+    }
     const { results } = await routerClient.tags.bottles({
       category: "smoke",
       limit: 3,
@@ -80,6 +90,7 @@ describe("GET /tags/bottles", () => {
     await db
       .insert(bottleTombstones)
       .values({ bottleId: merged.id, newBottleId: bottle.id });
+    await recomputeBottleStats(bottle.id);
     const result = await routerClient.tags.bottles({
       category: "smoke",
       note: " SMOKY ",
@@ -98,6 +109,61 @@ describe("GET /tags/bottles", () => {
     expect(
       (await routerClient.tags.bottles({ category: "cereal" })).results,
     ).toEqual([]);
+  });
+
+  test("uses public member and critic reviews in prevalence", async ({
+    fixtures,
+    defaults,
+  }) => {
+    await fixtures.Tag({ name: "smoke", tagCategory: "smoke" });
+    await fixtures.Tag({ name: "honey", tagCategory: "sweet" });
+    const bottle = await fixtures.Bottle();
+    const privateUser = await fixtures.User({ private: true });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: defaults.user.id,
+      tags: ["smoke"],
+    });
+    await db.insert(memberReviews).values([
+      {
+        bottleId: bottle.id,
+        createdById: defaults.user.id,
+        score: 88,
+        tags: ["honey"],
+      },
+      {
+        bottleId: bottle.id,
+        createdById: privateUser.id,
+        score: 90,
+        tags: ["smoke"],
+      },
+    ]);
+    await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      tags: ["smoke"],
+    });
+    const unpublished = await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      tags: ["smoke"],
+    });
+    await db
+      .update(externalReviewArticles)
+      .set({ contentHash: "unpublished" })
+      .where(eq(externalReviewArticles.id, unpublished.articleId));
+    await recomputeBottleStats(bottle.id);
+
+    const { results } = await routerClient.tags.bottles({
+      category: "smoke",
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({
+      bottle: { id: bottle.id },
+      matchingReviewAndTastingCount: 2,
+      notedReviewAndTastingCount: 3,
+      matchingTastings: 2,
+      taggedTastings: 3,
+    });
   });
 
   test("excludes private tastings from examples and prevalence, even for their author", async ({
@@ -126,6 +192,8 @@ describe("GET /tags/bottles", () => {
         createdById: privateUser.id,
       },
     ]);
+    await recomputeBottleStats(publicBottle.id);
+    await recomputeBottleStats(privateBottle.id);
     const { results } = await routerClient.tags.bottles(
       { category: "smoke" },
       { context: { user: privateUser } },

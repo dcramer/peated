@@ -78,14 +78,42 @@ async function runWithFakeModel(
   agent: Agent<unknown, JsonSchemaDefinition>,
   input: string,
   finalOutput: JsonValue,
-): Promise<{ outputType: JsonSchemaDefinition; result: unknown }> {
+  {
+    researchTurns = 0,
+    runOptions,
+  }: {
+    researchTurns?: number;
+    runOptions?: Awaited<
+      ReturnType<typeof prepareBottleClassifierAgentRun>
+    >["runOptions"];
+  } = {},
+): Promise<{
+  outputType: JsonSchemaDefinition;
+  result: unknown;
+  turn: number;
+}> {
   let outputType: JsonSchemaDefinition | undefined;
+  let turn = 0;
   const model: Model = {
     async getResponse(request) {
+      turn += 1;
       if (request.outputType === "text") {
         throw new Error("Expected a JSON schema output type.");
       }
       outputType = request.outputType;
+      if (turn <= researchTurns) {
+        return {
+          usage: new Usage(),
+          output: [
+            {
+              type: "function_call",
+              callId: `call-${turn}`,
+              name: "search_bottles",
+              arguments: JSON.stringify({ query: `Example query ${turn}` }),
+            },
+          ],
+        };
+      }
       return {
         usage: new Usage(),
         output: [
@@ -109,12 +137,13 @@ async function runWithFakeModel(
   const result = await new Runner({ tracingDisabled: true }).run(
     agent.clone({ model }),
     input,
+    runOptions,
   );
 
   if (!outputType) {
     throw new Error("Fake model did not receive an output type");
   }
-  return { outputType, result };
+  return { outputType, result, turn };
 }
 
 describe("classifier output boundary", () => {
@@ -290,6 +319,37 @@ describe("classifier output boundary", () => {
         matchedBottleId: null,
         proposedBottle: null,
       },
+    });
+  });
+
+  test("returns a decision after eight research turns", async () => {
+    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
+      reference: { name: "Example Single Malt" },
+      extractedIdentity: null,
+      initialCandidates: [],
+    });
+
+    const { result, turn } = await runWithFakeModel(
+      prepared.agent,
+      prepared.input,
+      {
+        action: "no_match",
+        rationale: "No safe local match.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        referenceScope: "none",
+        observation: null,
+        confidenceBasis: null,
+        matchedBottleId: null,
+        proposedBottle: null,
+      },
+      { researchTurns: 8, runOptions: prepared.runOptions },
+    );
+
+    expect(turn).toBe(9);
+    expect(prepared.runOptions.maxTurns).toBe(turn);
+    expect(prepared.getAgentResult(result).decision).toMatchObject({
+      action: "no_match",
     });
   });
 

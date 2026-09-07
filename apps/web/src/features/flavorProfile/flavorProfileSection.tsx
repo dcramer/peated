@@ -52,8 +52,8 @@ export function FlavorProfileSection({
 
   if (
     query.isSuccess &&
-    ("notedTastings" in query.data
-      ? query.data.notedTastings
+    ("notedReviewAndTastingCount" in query.data
+      ? query.data.notedReviewAndTastingCount
       : query.data.notedBottles) === 0
   ) {
     return null;

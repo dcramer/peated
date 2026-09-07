@@ -27,6 +27,7 @@ export const mockEntityCatalog = {
       id: mockBottle.id,
       fullName: mockBottle.fullName,
       totalTastings: mockBottle.totalTastings,
+      publicReviewAndTastingCount: mockBottle.publicReviewAndTastingCount,
       medianScore: mockBottle.medianScore,
     },
   ],
@@ -45,6 +46,7 @@ export function mockEntityCatalogFor(
         id: bottle.id,
         fullName: bottle.fullName,
         totalTastings: bottle.totalTastings,
+        publicReviewAndTastingCount: bottle.publicReviewAndTastingCount,
         medianScore: bottle.medianScore,
       })),
     };
@@ -134,6 +136,7 @@ export function mockEntityCatalogFor(
       id: bottle.id,
       fullName: bottle.fullName,
       totalTastings: bottle.totalTastings,
+      publicReviewAndTastingCount: bottle.publicReviewAndTastingCount,
       medianScore: bottle.medianScore,
     })),
   };

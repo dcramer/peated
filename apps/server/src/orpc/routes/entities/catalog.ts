@@ -140,11 +140,12 @@ export default implement(entityCatalogContract).handler(async function ({
         id: bottles.id,
         fullName: bottles.fullName,
         totalTastings: bottles.totalTastings,
+        publicReviewAndTastingCount: bottles.publicReviewAndTastingCount,
         medianScore: bottles.medianScore,
       })
       .from(bottles)
       .where(associatedBottle)
-      .orderBy(desc(bottles.totalTastings), asc(bottles.fullName))
+      .orderBy(desc(bottles.publicReviewAndTastingCount), asc(bottles.fullName))
       .limit(4),
   ]);
 

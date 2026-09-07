@@ -10,7 +10,7 @@ const meta = {
   args: {
     href: "#review",
     publication: "Whisky Advocate",
-    publishedAt: "14 Mar 2025",
+    publishedAt: "2025-03-14T18:30:00.000Z",
     nativeScore: { value: 92, scale: 100 },
     reviewerName: "Jonny McCormick",
     summary:
@@ -37,7 +37,7 @@ export const Overview: Story = {
       <ItemListItem>
         <CriticReview
           publication="Malt Review"
-          publishedAt="2 Sep 2024"
+          publishedAt="2024-09-02T18:30:00.000Z"
           nativeScore={{ value: 8, scale: 10 }}
         />
       </ItemListItem>

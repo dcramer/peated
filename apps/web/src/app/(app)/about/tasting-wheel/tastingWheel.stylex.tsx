@@ -2,10 +2,13 @@
 
 import { foundationStyles } from "@peated/web/styles/foundations.stylex";
 
-import { Button } from "@peated/web/components";
 import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { textLinkStyles } from "@peated/web/components/textLinkStyles.stylex";
-import { tastingCategoryFillStyles } from "@peated/web/features/tastingWheel/tastingCategoryStyles.stylex";
+import {
+  tastingCategoryBorderStyles,
+  tastingCategoryFillStyles,
+} from "@peated/web/features/tastingWheel/tastingCategoryStyles.stylex";
+import { TastingNoteButton } from "@peated/web/features/tastingWheel/tastingNoteButton.stylex";
 import { WHEEL_CATEGORIES } from "@peated/web/features/tastingWheel/tastingWheelData";
 import { useTastingWheel } from "@peated/web/features/tastingWheel/tastingWheelDetails.stylex";
 import * as stylex from "@stylexjs/stylex";
@@ -143,7 +146,7 @@ function TastingWheelGraphic() {
                   <path
                     d={ringSegment(
                       HUB_RADIUS,
-                      HUB_RADIUS + 8,
+                      HUB_RADIUS + 12,
                       startAngle + 0.6,
                       endAngle - 0.6,
                     )}
@@ -227,7 +230,10 @@ export function TastingWheelCategories() {
         <article
           id={`tasting-note-${category.key}`}
           key={category.key}
-          {...stylex.props(styles.category)}
+          {...stylex.props(
+            styles.category,
+            tastingCategoryBorderStyles[category.key],
+          )}
         >
           <SectionHeading level={3}>{category.name}</SectionHeading>
           <button
@@ -253,15 +259,14 @@ export function TastingWheelCategories() {
           </p>
           <div {...stylex.props(styles.notes)}>
             {category.notes.map((note) => (
-              <Button
+              <TastingNoteButton
+                category={category.key}
                 key={note}
-                size="sm"
-                variant="tonal"
                 aria-haspopup="dialog"
                 onClick={() => select({ category: category.key, note })}
               >
                 {note}
-              </Button>
+              </TastingNoteButton>
             ))}
           </div>
         </article>
@@ -368,9 +373,8 @@ const styles = stylex.create({
   category: {
     minWidth: 0,
     paddingTop: space.x3,
-    borderTopWidth: "1px",
+    borderTopWidth: "2px",
     borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
     scrollMarginTop: space.x8,
   },
   categoryDescription: {

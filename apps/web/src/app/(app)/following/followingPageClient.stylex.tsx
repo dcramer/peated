@@ -25,7 +25,7 @@ type EntityList = Outputs["entities"]["list"];
 
 const sortOptions = [
   { label: "Name", value: "name" },
-  { label: "Most tasted", value: "-tastings" },
+  { label: "Most reviews & tastings", value: "-tastings" },
   { label: "Recently added", value: "-created" },
 ] as const;
 

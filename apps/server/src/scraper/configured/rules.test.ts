@@ -11,6 +11,7 @@ import {
   ScrapeRulesV4Schema,
   ScrapeRulesV5Schema,
   ScrapeRulesV6Schema,
+  ScrapeRulesV7Schema,
   ScrapeValueSchema,
 } from "./rules";
 
@@ -47,13 +48,21 @@ test("bounds list and detail pages", () => {
             get: "text",
             selector: "h1",
             take: "first",
-            startsWith: null,
-            clean: null,
+            match: null,
+            addStart: null,
+            addEnd: null,
           },
         ],
       },
       publishedDate: {
-        try: [{ get: "fixed", value: "2026-01-01", clean: null }],
+        try: [
+          {
+            get: "fixed",
+            value: "2026-01-01",
+            addStart: null,
+            addEnd: null,
+          },
+        ],
       },
       reviews: {
         inside: "main",
@@ -66,8 +75,9 @@ test("bounds list and detail pages", () => {
               from: "review",
               selector: "h2",
               take: "first",
-              startsWith: null,
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             },
           ],
         },
@@ -79,7 +89,7 @@ test("bounds list and detail pages", () => {
   });
   if (rules.kind !== "review") throw new Error("Expected review rules.");
   expect(rules.articles.limit).toBe(99);
-  expect(parseScrapeRules(6, rules)).toEqual(rules);
+  expect(parseScrapeRules(8, rules)).toEqual(rules);
   expect(() =>
     ScrapeRulesSchema.parse({
       ...rules,
@@ -94,8 +104,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesV5Schema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(8, rules)).toThrow(
-    "Unsupported scrape rules version: 8.",
+  expect(() => parseScrapeRules(9, rules)).toThrow(
+    "Unsupported scrape rules version: 9.",
   );
 });
 
@@ -108,7 +118,7 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(7);
+  expect(SCRAPE_RULES_VERSION).toBe(8);
 });
 
 test("adds catalog rules only in version 7", () => {
@@ -123,7 +133,7 @@ test("adds catalog rules only in version 7", () => {
       },
     ],
   });
-  const rules = ScrapeRulesSchema.parse({
+  const rules = ScrapeRulesV7Schema.parse({
     kind: "catalog",
     products: {
       oneProductPer: "article.product",
@@ -148,6 +158,98 @@ test("adds catalog rules only in version 7", () => {
   expect(parseScrapeRules(7, rules)).toEqual(rules);
   expect(() => ScrapeRulesV6Schema.parse(rules)).toThrow();
   expect(() => parseScrapeRules(6, rules)).toThrow();
+});
+
+test("changes text matching only in version 8", () => {
+  const version8 = ScrapeRulesSchema.parse({
+    kind: "price",
+    products: {
+      oneProductPer: "article.product",
+      link: "a[href]",
+      skipWhen: null,
+      nextPage: null,
+      limit: 25,
+    },
+    product: {
+      name: {
+        try: [
+          {
+            get: "text",
+            selector: "h1",
+            take: "first",
+            match: ["{value}{line}{anything}"],
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+      },
+      price: {
+        try: [
+          {
+            get: "text",
+            selector: ".price",
+            take: "first",
+            match: ["Price: {value}"],
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+      },
+      currency: "usd",
+      volume: {
+        try: [
+          {
+            get: "fixed",
+            value: "750 ml",
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+      },
+      url: null,
+      externalProductId: null,
+      imageUrl: null,
+      barcode: null,
+    },
+  });
+
+  expect(parseScrapeRules(8, version8)).toEqual(version8);
+  expect(() => parseScrapeRules(7, version8)).toThrow();
+  if (version8.kind !== "price") throw new Error("Expected price rules.");
+
+  const version7 = ScrapeRulesV7Schema.parse({
+    ...version8,
+    product: {
+      ...version8.product,
+      name: {
+        try: [
+          {
+            get: "text",
+            selector: "h1",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      price: {
+        try: [
+          {
+            get: "text",
+            selector: ".price",
+            take: "first",
+            startsWith: null,
+            clean: null,
+          },
+        ],
+      },
+      volume: {
+        try: [{ get: "fixed", value: "750 ml", clean: null }],
+      },
+    },
+  });
+  expect(parseScrapeRules(7, version7)).toEqual(version7);
+  expect(() => parseScrapeRules(8, version7)).toThrow();
 });
 
 test("loads version 2 rules only through their original contract", () => {

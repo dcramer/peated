@@ -22,6 +22,7 @@ const brand = {
   address: null,
   location: null,
   totalTastings: 0,
+  publicReviewAndTastingCount: 0,
   totalBottles: 1,
   isFollowing: false,
   createdAt: timestamp,
@@ -82,6 +83,8 @@ const bottle = {
     unicorn: 0,
   },
   totalTastings: 0,
+  publicReviewAndTastingCount: 0,
+  notedReviewAndTastingCount: 0,
   createdAt: timestamp,
   updatedAt: timestamp,
   isFavorite: false,
@@ -118,7 +121,8 @@ describe("ReviewTable", () => {
     expect(html).toContain('title="Springbank review"');
     expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
-    expect(html).toContain("Published Jul 21, 2026");
+    expect(html).toContain("Published <time");
+    expect(html).toContain("Jul 21, 2026");
     expect(html).toContain('dateTime="2026-07-21T00:00:00.000Z"');
   });
 

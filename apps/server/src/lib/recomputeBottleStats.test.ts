@@ -2,7 +2,9 @@ import type { RatingBandId } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
+  bottleNoteCategories,
   bottles,
+  bottleTags,
   bottleTombstones,
   externalReviewArticles,
   memberReviews,
@@ -220,6 +222,76 @@ describe("Bottle statistics recomputation", () => {
         unicorn: 5,
       },
     });
+  });
+
+  test("rebuilds public note summaries from tastings and both review sources", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const privateUser = await fixtures.User({ private: true });
+    await Promise.all([
+      fixtures.Tag({
+        name: "smoke",
+        synonyms: ["smoky"],
+        tagCategory: "smoke",
+      }),
+      fixtures.Tag({ name: "oak", tagCategory: "wood" }),
+      fixtures.Tag({ name: "vanilla", tagCategory: "sweet" }),
+    ]);
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: defaults.user.id,
+      tags: ["smoky", "smoke"],
+    });
+    await db.insert(memberReviews).values([
+      {
+        bottleId: bottle.id,
+        createdById: defaults.user.id,
+        score: 88,
+        tags: ["smoke", "oak"],
+      },
+      {
+        bottleId: bottle.id,
+        createdById: privateUser.id,
+        score: 90,
+        tags: ["vanilla"],
+      },
+    ]);
+    await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      tags: ["vanilla"],
+    });
+    await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      hidden: true,
+      tags: ["oak"],
+    });
+
+    await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
+      publicReviewAndTastingCount: 3,
+      notedReviewAndTastingCount: 3,
+    });
+    await expect(
+      db.query.bottleTags.findMany({
+        where: eq(bottleTags.bottleId, bottle.id),
+        orderBy: (bottleTags, { asc }) => asc(bottleTags.tag),
+      }),
+    ).resolves.toMatchObject([
+      { tag: "oak", count: 1 },
+      { tag: "smoke", count: 2 },
+      { tag: "vanilla", count: 1 },
+    ]);
+    await expect(
+      db.query.bottleNoteCategories.findMany({
+        where: eq(bottleNoteCategories.bottleId, bottle.id),
+        orderBy: (categories, { asc }) => asc(categories.category),
+      }),
+    ).resolves.toMatchObject([
+      { category: "smoke", count: 2 },
+      { category: "sweet", count: 1 },
+      { category: "wood", count: 1 },
+    ]);
   });
 
   test("rejects missing, retired, and unmigrated Bottles", async ({

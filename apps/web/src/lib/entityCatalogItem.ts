@@ -17,6 +17,6 @@ export function toEntityCatalogItem(
     id: entity.id,
     isFollowing,
     totalBottles: entity.totalBottles,
-    totalTastings: entity.totalTastings,
+    publicReviewAndTastingCount: entity.publicReviewAndTastingCount,
   };
 }

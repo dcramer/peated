@@ -40,13 +40,21 @@ const rules = {
           get: "text",
           selector: "h1",
           take: "first",
-          startsWith: null,
-          clean: null,
+          match: null,
+          addStart: null,
+          addEnd: null,
         },
       ],
     },
     publishedDate: {
-      try: [{ get: "fixed", value: "2026-01-01", clean: null }],
+      try: [
+        {
+          get: "fixed",
+          value: "2026-01-01",
+          addStart: null,
+          addEnd: null,
+        },
+      ],
     },
     reviews: {
       inside: "body",
@@ -59,8 +67,9 @@ const rules = {
             from: "review",
             selector: "h2",
             take: "first",
-            startsWith: null,
-            clean: null,
+            match: null,
+            addStart: null,
+            addEnd: null,
           },
         ],
       },
@@ -175,8 +184,9 @@ test("keeps immutable revisions and only activates a passing revision", async ()
               get: "text",
               selector: "main h1",
               take: "first",
-              startsWith: null,
-              clean: null,
+              match: null,
+              addStart: null,
+              addEnd: null,
             },
           ],
         },
@@ -235,7 +245,7 @@ test("database constraints keep source and revision identity valid", async () =>
     createdById: user.id,
   });
   expect(first.revision).toBe(1);
-  expect(first.rulesVersion).toBe(7);
+  expect(first.rulesVersion).toBe(8);
 
   await expect(
     db.insert(scrapeSources).values({

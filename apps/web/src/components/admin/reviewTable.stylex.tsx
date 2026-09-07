@@ -2,18 +2,12 @@ import type { ExternalReview, PagingRel } from "@peated/server/types";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
+import { Timestamp } from "../timestamp";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { AdminTextLink } from "./adminContent.stylex";
 import { AdminTable } from "./adminTable.stylex";
-
-const publishedDateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
 
 export default function ReviewTable({
   reviews,
@@ -47,12 +41,13 @@ export function ReviewRows({
                 {...stylex.props(foundationStyles.metadata, styles.metadata)}
               >
                 {review.article.publishedAt ? (
-                  <time dateTime={review.article.publishedAt}>
+                  <span>
                     Published{" "}
-                    {publishedDateFormatter.format(
-                      new Date(review.article.publishedAt),
-                    )}
-                  </time>
+                    <Timestamp
+                      date={review.article.publishedAt}
+                      format="date"
+                    />
+                  </span>
                 ) : (
                   "Publish date unknown"
                 )}

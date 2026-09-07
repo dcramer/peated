@@ -1,90 +1,101 @@
 import { db } from "@peated/server/db";
 import {
+  bottleNoteCategories,
   bottles,
+  bottleTags,
   bottleTombstones,
   tags,
-  tastings,
-  users,
 } from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import contract from "@peated/server/orpc/contracts/tags/bottles";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, sql, type SQL } from "drizzle-orm";
 
 export default implement(contract).handler(async ({ input, context }) => {
-  const selectedTags = await db
-    .select()
-    .from(tags)
-    .where(
-      and(
-        eq(tags.tagCategory, input.category),
-        input.note
-          ? sql`(lower(${tags.name}) = ${input.note.toLowerCase()} OR EXISTS (
-      SELECT FROM unnest(${tags.synonyms}) AS synonym WHERE lower(synonym) = ${input.note.toLowerCase()}
-    ))`
-          : undefined,
-      ),
-    );
-  const names = [
-    ...new Set(selectedTags.flatMap((tag) => [tag.name, ...tag.synonyms])),
-  ];
-  if (!names.length) return { results: [] };
+  let counts: SQL;
+  if (input.note) {
+    const [selectedTag] = await db
+      .select({ name: tags.name })
+      .from(tags)
+      .where(
+        and(
+          eq(tags.tagCategory, input.category),
+          sql`(lower(${tags.name}) = ${input.note.toLowerCase()} OR EXISTS (
+            SELECT FROM unnest(${tags.synonyms}) AS synonym
+            WHERE lower(synonym) = ${input.note.toLowerCase()}
+          ))`,
+        ),
+      )
+      .orderBy(
+        desc(sql`lower(${tags.name}) = ${input.note.toLowerCase()}`),
+        tags.name,
+      )
+      .limit(1);
+    if (!selectedTag) return { results: [] };
+    counts = sql`
+        SELECT ${bottleTags.bottleId} AS bottle_id,
+          ${bottleTags.count}::integer AS matching
+        FROM ${bottleTags}
+        WHERE ${bottleTags.tag} = ${selectedTag.name}
+      `;
+  } else {
+    counts = sql`
+        SELECT ${bottleNoteCategories.bottleId} AS bottle_id,
+          ${bottleNoteCategories.count}::integer AS matching
+        FROM ${bottleNoteCategories}
+        WHERE ${bottleNoteCategories.category} = ${input.category}
+      `;
+  }
 
-  // Public examples exclude private tastings, even for their author or followers.
-  // A tasting counts once even when it contains several notes in the category.
-  // Untagged tastings provide no evidence about flavor and are not in the denominator.
-  const matches = sql`${tastings.tags} && ARRAY[${sql.join(
-    names.map((name) => sql`${name}`),
-    sql`, `,
-  )}]::varchar[]`;
-  const counts = db
-    .select({
-      bottleId: tastings.bottleId,
-      matching: sql<number>`count(*) FILTER (WHERE ${matches})`
-        .mapWith(Number)
-        .as("matching"),
-      tagged: sql<number>`count(*)`.mapWith(Number).as("tagged"),
-    })
-    .from(tastings)
-    .innerJoin(users, eq(users.id, tastings.createdById))
-    .where(
-      and(eq(users.private, false), sql`cardinality(${tastings.tags}) > 0`),
-    )
-    .groupBy(tastings.bottleId)
-    .having(sql`count(*) FILTER (WHERE ${matches}) > 0`)
-    .as("note_counts");
-
-  const rows = await db
-    .select({
-      bottle: bottles,
-      matching: counts.matching,
-      tagged: counts.tagged,
-    })
-    .from(counts)
-    .innerJoin(bottles, eq(bottles.id, counts.bottleId))
-    .where(
-      and(
-        isNotNull(bottles.groupId),
-        sql`NOT EXISTS (
-      SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-    )`,
-      ),
-    )
-    .orderBy(
-      desc(sql`${counts.matching}::numeric / ${counts.tagged}`),
-      desc(counts.matching),
-      asc(bottles.id),
-    )
-    .limit(input.limit);
+  const result = await db.execute<{
+    bottleId: number;
+    matching: number;
+    tagged: number;
+  }>(sql`
+    SELECT ${bottles.id} AS "bottleId",
+      note_counts.matching,
+      ${bottles.notedReviewAndTastingCount}::integer AS tagged
+    FROM (${counts}) AS note_counts
+    INNER JOIN ${bottles} ON ${bottles.id} = note_counts.bottle_id
+    WHERE ${bottles.groupId} IS NOT NULL
+      AND NOT EXISTS (
+        SELECT FROM ${bottleTombstones}
+        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+      )
+      AND ${bottles.notedReviewAndTastingCount} > 0
+    ORDER BY note_counts.matching::numeric /
+        ${bottles.notedReviewAndTastingCount} DESC,
+      note_counts.matching DESC, ${bottles.id} ASC
+    LIMIT ${input.limit}
+  `);
+  const rows = result.rows.map((row) => ({
+    bottleId: Number(row.bottleId),
+    matching: Number(row.matching),
+    tagged: Number(row.tagged),
+  }));
+  const selectedBottles = rows.length
+    ? await db.query.bottles.findMany({
+        where: (bottles, { inArray }) =>
+          inArray(
+            bottles.id,
+            rows.map((row) => row.bottleId),
+          ),
+      })
+    : [];
+  const bottlesById = new Map(
+    selectedBottles.map((bottle) => [bottle.id, bottle]),
+  );
   const serialized = await serialize(
     BottleSerializer,
-    rows.map((row) => row.bottle),
+    rows.map((row) => bottlesById.get(row.bottleId)!),
     context.user,
   );
   return {
     results: rows.map((row, index) => ({
       bottle: serialized[index]!,
+      matchingReviewAndTastingCount: row.matching,
+      notedReviewAndTastingCount: row.tagged,
       matchingTastings: row.matching,
       taggedTastings: row.tagged,
     })),

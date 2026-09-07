@@ -1,8 +1,13 @@
 import { db } from "@peated/server/db";
-import { bottleTags, bottles, tags } from "@peated/server/db/schema";
+import {
+  bottles,
+  bottleTags,
+  bottleTombstones,
+  tags,
+} from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import suggestedTagsContract from "@peated/server/orpc/contracts/bottles/suggested-tags";
-import { desc, eq, or, sql } from "drizzle-orm";
+import { and, eq, isNotNull, notExists, or, sql } from "drizzle-orm";
 
 const COMMON_TASTING_NOTE_NAMES = [
   "vanilla",
@@ -19,7 +24,18 @@ export default implement(suggestedTagsContract).handler(async function ({
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(eq(bottles.id, input.bottle));
+    .where(
+      and(
+        eq(bottles.id, input.bottle),
+        isNotNull(bottles.groupId),
+        notExists(
+          db
+            .select({ bottleId: bottleTombstones.bottleId })
+            .from(bottleTombstones)
+            .where(eq(bottleTombstones.bottleId, bottles.id)),
+        ),
+      ),
+    );
 
   if (!bottle) {
     throw errors.NOT_FOUND({
@@ -33,22 +49,24 @@ export default implement(suggestedTagsContract).handler(async function ({
   // 3. low: recorded for this category (e.g. bourbon)
   const usedTags = Object.fromEntries(
     (
-      await db
-        .select({
-          tag: bottleTags.tag,
-          total: sql<string>`SUM(${bottleTags.count})`.as("total"),
-        })
-        .from(bottleTags)
-        .innerJoin(bottles, eq(bottles.id, bottleTags.bottleId))
-        .where(
-          or(
-            eq(bottleTags.bottleId, bottle.id),
-            eq(bottles.brandId, bottle.brandId),
-          ),
-        )
-        .groupBy(bottleTags.tag)
-        .orderBy(desc(sql`total`))
-    ).map((t) => [t.tag, t.total]),
+      await db.execute<{ tag: string; total: number }>(sql`
+        SELECT ${bottleTags.tag} AS tag,
+          SUM(${bottleTags.count})::integer AS total
+        FROM ${bottleTags}
+        INNER JOIN ${bottles} ON ${bottles.id} = ${bottleTags.bottleId}
+        WHERE ${or(
+          eq(bottleTags.bottleId, bottle.id),
+          eq(bottles.brandId, bottle.brandId),
+        )}
+          AND ${bottles.groupId} IS NOT NULL
+          AND NOT EXISTS (
+            SELECT FROM ${bottleTombstones}
+            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+          )
+        GROUP BY ${bottleTags.tag}
+        ORDER BY total DESC, ${bottleTags.tag} ASC
+      `)
+    ).rows.map((t) => [t.tag, t.total]),
   );
 
   const defaultTags = await db.select().from(tags);

@@ -300,6 +300,8 @@ export const BottleSerializer = serializer({
       reviewScoreBandCounts: item.reviewScoreBandCounts,
       tastingBandCounts: item.tastingBandCounts,
       totalTastings: item.totalTastings,
+      publicReviewAndTastingCount: item.publicReviewAndTastingCount,
+      notedReviewAndTastingCount: item.notedReviewAndTastingCount,
 
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,

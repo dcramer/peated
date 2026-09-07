@@ -78,9 +78,22 @@ async function createTasting(
 
 describe("BottleGroup statistics recomputation", () => {
   test("counts active member Bottles once", async ({ defaults, fixtures }) => {
-    const first = await fixtures.Bottle();
+    const first = await fixtures.Bottle({
+      publicReviewAndTastingCount: 5,
+      notedReviewAndTastingCount: 3,
+    });
     const second = await createMember(first, "Aggregate Member Two");
-    const unrelated = await fixtures.Bottle();
+    const unrelated = await fixtures.Bottle({
+      publicReviewAndTastingCount: 99,
+      notedReviewAndTastingCount: 99,
+    });
+    await db
+      .update(bottles)
+      .set({
+        publicReviewAndTastingCount: 7,
+        notedReviewAndTastingCount: 4,
+      })
+      .where(eq(bottles.id, second.id));
 
     await createTasting(first.id, defaults.user.id, "good", 1);
     await createTasting(first.id, defaults.user.id, "outstanding", 2);
@@ -106,6 +119,8 @@ describe("BottleGroup statistics recomputation", () => {
       id: first.groupId,
       totalBottles: 2,
       totalTastings: 3,
+      publicReviewAndTastingCount: 12,
+      notedReviewAndTastingCount: 7,
       medianScore: 84,
       minScore: 75,
       maxScore: 94,
@@ -134,8 +149,18 @@ describe("BottleGroup statistics recomputation", () => {
     defaults,
     fixtures,
   }) => {
-    const active = await fixtures.Bottle();
+    const active = await fixtures.Bottle({
+      publicReviewAndTastingCount: 3,
+      notedReviewAndTastingCount: 2,
+    });
     const retired = await createMember(active, "Retired Aggregate Member");
+    await db
+      .update(bottles)
+      .set({
+        publicReviewAndTastingCount: 8,
+        notedReviewAndTastingCount: 6,
+      })
+      .where(eq(bottles.id, retired.id));
     const replacement = await fixtures.Bottle();
     await db.insert(bottleTombstones).values({
       bottleId: retired.id,
@@ -149,6 +174,8 @@ describe("BottleGroup statistics recomputation", () => {
     ).resolves.toMatchObject({
       totalBottles: 1,
       totalTastings: 1,
+      publicReviewAndTastingCount: 3,
+      notedReviewAndTastingCount: 2,
       memberScoreCount: 0,
       externalScoreCount: 0,
       reviewScoreBandCounts: { unicorn: 0 },

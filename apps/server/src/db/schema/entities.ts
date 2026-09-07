@@ -76,6 +76,11 @@ export const entities = pgTable(
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),
+    publicReviewAndTastingCount: bigint("public_review_and_tasting_count", {
+      mode: "number",
+    })
+      .default(0)
+      .notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -87,6 +92,9 @@ export const entities = pgTable(
   },
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
+    index("entity_public_activity_count_idx").on(
+      table.publicReviewAndTastingCount,
+    ),
     foreignKey({
       name: "entity_owner_fk",
       columns: [table.ownerId],

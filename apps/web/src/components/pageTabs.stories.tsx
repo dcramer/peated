@@ -5,7 +5,11 @@ import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const items = [
   { href: "/bottles/19936", label: "Overview" },
-  { count: 412, href: "/bottles/19936/tastings", label: "Tastings" },
+  {
+    count: 412,
+    href: "/bottles/19936/tastings",
+    label: "Reviews & tastings",
+  },
   { href: "/bottles/19936/prices", label: "Prices" },
   { count: 3, href: "/bottles/19936/releases", label: "Releases" },
 ] as const;

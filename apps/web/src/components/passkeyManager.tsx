@@ -9,6 +9,7 @@ import {
   ItemList,
   ItemRow,
   TextInput,
+  Timestamp,
 } from "@peated/web/components";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -168,9 +169,13 @@ export default function PasskeyManager() {
                 }
                 leading={getTransportIcon(passkey.transports)}
                 metadata={
-                  passkey.lastUsedAt
-                    ? `Last used ${formatDate(passkey.lastUsedAt)}`
-                    : `Added ${formatDate(passkey.createdAt)}`
+                  <>
+                    {passkey.lastUsedAt ? "Last used " : "Added "}
+                    <Timestamp
+                      date={passkey.lastUsedAt ?? passkey.createdAt}
+                      format="date"
+                    />
+                  </>
                 }
                 title={
                   editing ? (

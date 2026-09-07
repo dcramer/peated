@@ -4,6 +4,7 @@ import {
   bottleReferences,
   bottles,
   bottlesToDistillers,
+  bottleTags,
   bottleTombstones,
   collectionBottles,
   countries,
@@ -12,7 +13,6 @@ import {
   flightBottles,
   flights,
   regions,
-  tastings,
 } from "@peated/server/db/schema";
 import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
 import { companyBottleEntityIds } from "@peated/server/lib/companyPortfolio";
@@ -299,7 +299,7 @@ export default implement(bottleListContract).handler(async function ({
   }
   if (rest.tag) {
     where.push(
-      sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+      sql`EXISTS(SELECT FROM ${bottleTags} WHERE ${bottleTags.tag} = ${rest.tag} AND ${bottleTags.bottleId} = ${bottles.id})`,
     );
   }
   if (rest.minScore !== null && rest.minScore !== undefined) {
@@ -336,7 +336,7 @@ export default implement(bottleListContract).handler(async function ({
             ts_rank(${bottles.searchVector}, ${prefixQuery}) * 0.5
           ) DESC`;
       } else {
-        orderBy = desc(bottles.totalTastings);
+        orderBy = desc(bottles.publicReviewAndTastingCount);
       }
       break;
     case "brand":
@@ -366,7 +366,7 @@ export default implement(bottleListContract).handler(async function ({
       orderBy = sql`${bottles.statedAge} DESC NULLS LAST`;
       break;
     case "tastings":
-      orderBy = asc(bottles.totalTastings);
+      orderBy = asc(bottles.publicReviewAndTastingCount);
       break;
     case "-release":
       orderBy = sql`
@@ -384,7 +384,7 @@ export default implement(bottleListContract).handler(async function ({
       break;
     case "-tastings":
     default:
-      orderBy = desc(bottles.totalTastings);
+      orderBy = desc(bottles.publicReviewAndTastingCount);
   }
 
   const [results, [totalRow]] = await Promise.all([

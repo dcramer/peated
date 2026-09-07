@@ -39,15 +39,18 @@ export default async function BottlePage(props: {
     ? bottleOverviewQueries.series(orpc, bottle.series.id)
     : null;
 
-  const [, , publicMemberReviews] = await Promise.all([
+  const [, publicMemberReviews] = await Promise.all([
     queryClient.prefetchQuery(
       orpc.bottles.flavorProfile.queryOptions({ input: { bottle: bottle.id } }),
     ),
-    queryClient.prefetchQuery(bottleOverviewQueries.reviews(orpc, bottle.id)),
     queryClient.fetchQuery(
-      bottleOverviewQueries.memberReviews(anonymousOrpc, bottle.id),
+      anonymousOrpc.memberReviews.list.queryOptions({
+        input: { bottle: bottle.id, limit: 1 },
+      }),
     ),
-    queryClient.prefetchQuery(bottleOverviewQueries.tastings(orpc, bottle.id)),
+    queryClient.prefetchQuery(
+      bottleOverviewQueries.reviewsAndTastings(orpc, bottle.id),
+    ),
     ...(seriesQuery
       ? [
           queryClient.prefetchQuery({

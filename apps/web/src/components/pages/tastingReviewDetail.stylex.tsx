@@ -12,6 +12,7 @@ import {
   ReviewScore,
   TastingRating,
   TextLink,
+  Timestamp,
   type RatingBand,
 } from "@peated/web/components";
 import { TastingNoteTag } from "@peated/web/features/tastingWheel/tastingNoteTag.stylex";
@@ -30,13 +31,6 @@ type ServingStyle = Outputs["tastings"]["details"]["servingStyle"];
 type Rating =
   | { kind: "review"; score: number }
   | { kind: "tasting"; ratingBand: RatingBand | null };
-
-const fullDateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-  year: "numeric",
-});
 
 function TastingReviewDetailLayout({
   author,
@@ -109,7 +103,13 @@ export function TastingReviewDetail({
 }) {
   const bottleName = formatBottleDisplayName(bottle);
   const bottleTitle = bottleName.replaceAll(" - ", "\u00a0- ");
-  const metadata = `${rating.kind === "review" ? "Review" : "Tasting"} · ${fullDateFormatter.format(new Date(createdAt))}`;
+  const metadata = (
+    <>
+      {rating.kind === "review" ? "Review" : "Tasting"}{" "}
+      <span aria-hidden="true">· </span>
+      <Timestamp date={createdAt} format="dateLong" />
+    </>
+  );
   const facts = [
     servingStyle
       ? { label: "Serving", value: formatServingStyle(servingStyle) }

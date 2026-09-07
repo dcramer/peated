@@ -60,7 +60,7 @@ type BottleRow = Omit<BottleResult, "group"> & {
 };
 type EntityRow = EntityResult & {
   shortName: string | null;
-  totalTastings: number;
+  publicReviewAndTastingCount: number;
 };
 type SeriesRow = Omit<SeriesResult, "peatedId" | "brand"> & {
   brand: Omit<SeriesResult["brand"], "peatedId">;
@@ -273,7 +273,7 @@ function entityColumns(context: Context) {
     shortName: entities.shortName,
     kind: entities.kind,
     region: { name: regions.name },
-    totalTastings: entities.totalTastings,
+    publicReviewAndTastingCount: entities.publicReviewAndTastingCount,
     isFollowing: context.user
       ? sql<boolean>`EXISTS(
           SELECT FROM ${entityFollows}
@@ -424,7 +424,11 @@ async function searchEntities(
     .leftJoin(regions, eq(entities.regionId, regions.id))
     .where(where)
     .limit(limit + 1)
-    .orderBy(rank, sql`${entities.totalTastings} DESC`, asc(entities.id));
+    .orderBy(
+      rank,
+      sql`${entities.publicReviewAndTastingCount} DESC`,
+      asc(entities.id),
+    );
   return {
     hasMore: rows.length > limit,
     results: rows.slice(0, limit).map(({ searchRank: _, ...result }) => result),
@@ -733,7 +737,7 @@ async function findNearest(
               result.name,
               result.shortName,
             ]),
-            tie: result.totalTastings,
+            tie: result.publicReviewAndTastingCount,
           });
         }
         break;

@@ -27,7 +27,7 @@ type BottleList = Outputs["bottles"]["list"];
 
 const sortOptions = [
   { label: "Newest release", value: "-release" },
-  { label: "Most tasted", value: "-tastings" },
+  { label: "Most reviews & tastings", value: "-tastings" },
   { label: "Highest score", value: "-score" },
   { label: "Brand and bottle", value: "brand" },
   { label: "Bottle name", value: "name" },

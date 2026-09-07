@@ -27,6 +27,8 @@ export type BottleGroupStatsResult = Pick<
   | "id"
   | "totalBottles"
   | "totalTastings"
+  | "publicReviewAndTastingCount"
+  | "notedReviewAndTastingCount"
   | "medianScore"
   | "minScore"
   | "maxScore"
@@ -150,12 +152,34 @@ export async function recomputeBottleGroupStatsInTransaction(
     tx,
     activeMembers.map(({ id }) => id),
   );
+  const [publicCounts] = await tx
+    .select({
+      publicReviewAndTastingCount:
+        sql<number>`COALESCE(SUM(${bottles.publicReviewAndTastingCount}), 0)`.mapWith(
+          Number,
+        ),
+      notedReviewAndTastingCount:
+        sql<number>`COALESCE(SUM(${bottles.notedReviewAndTastingCount}), 0)`.mapWith(
+          Number,
+        ),
+    })
+    .from(bottles)
+    .where(
+      inArray(
+        bottles.id,
+        activeMembers.map(({ id }) => id),
+      ),
+    );
+  if (!publicCounts) {
+    throw new BottleGroupStatsIntegrityError("invalid_catalog_graph", groupId);
+  }
 
   const [persisted] = await tx
     .update(bottleGroups)
     .set({
       totalBottles: activeMembers.length,
       ...stats,
+      ...publicCounts,
       updatedAt: new Date(),
     })
     .where(eq(bottleGroups.id, groupId))
@@ -163,6 +187,8 @@ export async function recomputeBottleGroupStatsInTransaction(
       id: bottleGroups.id,
       totalBottles: bottleGroups.totalBottles,
       totalTastings: bottleGroups.totalTastings,
+      publicReviewAndTastingCount: bottleGroups.publicReviewAndTastingCount,
+      notedReviewAndTastingCount: bottleGroups.notedReviewAndTastingCount,
       medianScore: bottleGroups.medianScore,
       minScore: bottleGroups.minScore,
       maxScore: bottleGroups.maxScore,

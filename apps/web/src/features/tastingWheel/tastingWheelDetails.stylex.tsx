@@ -11,6 +11,8 @@ import { ArrowLeft } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
+import { tastingCategoryBackgroundStyles } from "./tastingCategoryStyles.stylex";
+import { TastingNoteButton } from "./tastingNoteButton.stylex";
 import { CATEGORY_DEFINITIONS, NOTE_DESCRIPTIONS } from "./tastingWheelData";
 
 type Selection = {
@@ -44,9 +46,22 @@ export function TastingWheelProvider({ children }: { children: ReactNode }) {
         open={open}
         onClose={() => setOpen(false)}
         title={
-          selection?.note
-            ? titleCase(selection.note)
-            : (category?.name ?? "Tasting notes")
+          selection ? (
+            <span {...stylex.props(styles.panelTitle)}>
+              <span
+                aria-hidden
+                {...stylex.props(
+                  styles.categoryMarker,
+                  tastingCategoryBackgroundStyles[selection.category],
+                )}
+              />
+              {selection.note
+                ? titleCase(selection.note)
+                : (category?.name ?? "Tasting notes")}
+            </span>
+          ) : (
+            "Tasting notes"
+          )
         }
         navigation={
           selection?.note ? (
@@ -106,22 +121,21 @@ function TastingWheelDetails({
         </SectionHeading>
         <div {...stylex.props(styles.notes)}>
           {notes.map((note) => (
-            <Button
+            <TastingNoteButton
+              category={selection.category}
               key={note}
-              size="sm"
-              variant={selection.note === note ? "accent" : "tonal"}
-              aria-pressed={selection.note === note}
+              selected={selection.note === note}
               onClick={() => select({ category: selection.category, note })}
             >
               {note}
-            </Button>
+            </TastingNoteButton>
           ))}
         </div>
       </section>
       <section aria-busy={query.isPending}>
         <SectionHeading level={3}>Bottles with these notes</SectionHeading>
         <p {...stylex.props(foundationStyles.body, styles.explanation)}>
-          Ordered by how often people mention these notes in their public
+          Ordered by how often these notes appear in public reviews and
           tastings.
         </p>
         <div aria-live="polite">
@@ -143,7 +157,7 @@ function TastingWheelDetails({
             />
           ) : (
             <p {...stylex.props(styles.status)}>
-              No bottles have recorded tastings for{" "}
+              No bottles have recorded notes for{" "}
               {selection.note ?? `this category`} yet. Try another note.
             </p>
           )}
@@ -158,6 +172,18 @@ function titleCase(value: string) {
 }
 
 const styles = stylex.create({
+  panelTitle: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: space.x3,
+  },
+  categoryMarker: {
+    display: "inline-block",
+    width: "20px",
+    height: "3px",
+    flexShrink: 0,
+    borderRadius: "1px",
+  },
   details: { display: "flex", flexDirection: "column", gap: space.x6 },
   description: {
     margin: 0,

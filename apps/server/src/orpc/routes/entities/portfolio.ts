@@ -60,10 +60,10 @@ export default implement(contract).handler(async function ({
       orderBy = asc(entities.totalBottles);
       break;
     case "tastings":
-      orderBy = asc(entities.totalTastings);
+      orderBy = asc(entities.publicReviewAndTastingCount);
       break;
     case "-tastings":
-      orderBy = desc(entities.totalTastings);
+      orderBy = desc(entities.publicReviewAndTastingCount);
       break;
     case "-bottles":
     default:

@@ -1,18 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { StoryCanvas } from "../storyFixtures.stylex";
-import ScraperActivity from "./scraperActivity";
+import ScraperActivity from "./scraperActivity.stylex";
 
-const emptyCounts = {
+const emptyHealth = {
   requests: 0,
   requestErrors: 0,
   requestErrorsComplete: true,
   runs: 0,
   failedRuns: 0,
-  records: 0,
-  newRecords: 0,
-  existingRecords: 0,
-  untrackedRecords: 0,
 };
+
+const emptySaved = { total: 0, new: 0, existing: 0 };
 
 const meta = {
   title: "Admin/Scraper Activity",
@@ -28,7 +26,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The admin overview shows 30 days of collection requests, runs, saved records, and recent scraper problems. Preview and suggestion runs are excluded.",
+          "Shows 30-day scraper output, request health, daily details, and recent problems.",
       },
     },
   },
@@ -40,10 +38,16 @@ const meta = {
         requestErrorsComplete: false,
         runs: 16,
         failedRuns: 2,
-        records: 92,
-        newRecords: 31,
-        existingRecords: 55,
-        untrackedRecords: 6,
+      },
+      saved: {
+        reviews: { total: 47, new: 18, existing: 29 },
+        prices: { total: 42, new: 13, existing: 26 },
+        catalogListings: { total: 21, new: 6, existing: 15 },
+      },
+      bottleResolution: {
+        unknown: 8,
+        created: 6,
+        matched: 75,
       },
       days: [
         {
@@ -53,10 +57,9 @@ const meta = {
           requestErrorsComplete: true,
           runs: 4,
           failedRuns: 1,
-          records: 28,
-          newRecords: 9,
-          existingRecords: 19,
-          untrackedRecords: 0,
+          reviews: 12,
+          prices: 9,
+          catalogListings: 4,
         },
         {
           date: "2026-09-04",
@@ -65,33 +68,20 @@ const meta = {
           requestErrorsComplete: false,
           runs: 3,
           failedRuns: 0,
-          records: 20,
-          newRecords: 4,
-          existingRecords: 10,
-          untrackedRecords: 6,
-        },
-      ],
-      recordTypes: [
-        {
-          type: "review",
-          records: 47,
-          newRecords: 18,
-          existingRecords: 29,
-          untrackedRecords: 0,
+          reviews: 8,
+          prices: 11,
+          catalogListings: 3,
         },
         {
-          type: "price",
-          records: 39,
-          newRecords: 13,
-          existingRecords: 26,
-          untrackedRecords: 0,
-        },
-        {
-          type: "untracked",
-          records: 6,
-          newRecords: 0,
-          existingRecords: 0,
-          untrackedRecords: 6,
+          date: "2026-09-03",
+          requests: 27,
+          requestErrors: 0,
+          requestErrorsComplete: true,
+          runs: 2,
+          failedRuns: 0,
+          reviews: 6,
+          prices: 7,
+          catalogListings: 2,
         },
       ],
       recentFailures: [
@@ -114,12 +104,22 @@ export const Overview: Story = {};
 export const NoActivity: Story = {
   args: {
     data: {
-      totals: emptyCounts,
+      totals: emptyHealth,
+      saved: {
+        reviews: emptySaved,
+        prices: emptySaved,
+        catalogListings: emptySaved,
+      },
+      bottleResolution: { unknown: 0, created: 0, matched: 0 },
       days: [
-        { date: "2026-09-05", ...emptyCounts },
-        { date: "2026-09-04", ...emptyCounts },
+        {
+          date: "2026-09-05",
+          ...emptyHealth,
+          reviews: 0,
+          prices: 0,
+          catalogListings: 0,
+        },
       ],
-      recordTypes: [],
       recentFailures: [],
     },
   },

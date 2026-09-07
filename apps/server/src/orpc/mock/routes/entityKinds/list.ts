@@ -58,7 +58,11 @@ export function listEntities(
         case "created":
           return direction * left.createdAt.localeCompare(right.createdAt);
         case "tastings":
-          return direction * (left.totalTastings - right.totalTastings);
+          return (
+            direction *
+            (left.publicReviewAndTastingCount -
+              right.publicReviewAndTastingCount)
+          );
         case "bottles":
           return direction * (left.totalBottles - right.totalBottles);
         default:

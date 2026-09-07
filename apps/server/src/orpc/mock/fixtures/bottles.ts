@@ -84,6 +84,8 @@ const bottleDefaults = {
   flavorProfile: null,
   tastingNotes: null,
   suggestedTags: [],
+  publicReviewAndTastingCount: 0,
+  notedReviewAndTastingCount: 0,
   createdAt: timestamp,
   updatedAt: timestamp,
   isFavorite: false,
@@ -115,6 +117,8 @@ export const mockBottle = {
   suggestedTags: ["smoke", "sea salt", "dried fruit"],
   ...scoreSummary(89, 24),
   totalTastings: 120,
+  publicReviewAndTastingCount: 132,
+  notedReviewAndTastingCount: 96,
 } satisfies Bottle;
 
 export const mockBottles: Bottle[] = [
@@ -566,6 +570,7 @@ export const mockBottleTags = {
     { tag: "dried fruit", count: 22 },
   ],
   totalCount: 120,
+  publicReviewAndTastingCount: 132,
 } satisfies MockOutputs["bottles"]["tags"];
 
 export function mockBottleTagsFor(
@@ -576,9 +581,13 @@ export function mockBottleTagsFor(
   return {
     results: (bottle.suggestedTags ?? []).map((tag, index) => ({
       tag,
-      count: Math.max(4, Math.round(bottle.totalTastings / (index + 3))),
+      count: Math.max(
+        4,
+        Math.round(bottle.publicReviewAndTastingCount / (index + 3)),
+      ),
     })),
-    totalCount: bottle.totalTastings,
+    totalCount: bottle.publicReviewAndTastingCount,
+    publicReviewAndTastingCount: bottle.publicReviewAndTastingCount,
   };
 }
 

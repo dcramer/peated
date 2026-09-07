@@ -96,18 +96,21 @@ describe("exact Bottle merges", () => {
       bottleId: destination.id,
       name: "Shared   Market Name",
     });
+    await fixtures.Tag({ name: "smoke", tagCategory: "smoke" });
 
     const sourceTasting = await fixtures.Tasting({
       bottleId: source.id,
       createdById: user.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
       legacyStarRating: 4,
+      tags: ["smoke"],
     });
     const destinationTasting = await fixtures.Tasting({
       bottleId: destination.id,
       createdById: user.id,
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
       legacyStarRating: 3,
+      tags: ["smoke"],
     });
     const review = await fixtures.ExternalReview({
       externalSiteId: externalSite.id,
@@ -201,16 +204,6 @@ describe("exact Bottle merges", () => {
       { flightId: flightWithCollision.id, bottleId: source.id },
       { flightId: flightWithCollision.id, bottleId: destination.id },
     ]);
-    await db.insert(bottleTags).values({
-      bottleId: source.id,
-      tag: "smoke",
-      count: 2,
-    });
-    await db.insert(bottleTags).values({
-      bottleId: destination.id,
-      tag: "smoke",
-      count: 3,
-    });
     await db.insert(bottleFlavorProfiles).values({
       bottleId: source.id,
       flavorProfile: "peated",
@@ -369,7 +362,7 @@ describe("exact Bottle merges", () => {
           eq(bottleTags.tag, "smoke"),
         ),
       }),
-    ).toMatchObject({ count: 5 });
+    ).toMatchObject({ count: 2 });
     expect(
       await db.query.bottleFlavorProfiles.findFirst({
         where: and(
