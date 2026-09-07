@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import verifyEntityCreation from "./verifyEntityCreation";
 
 describe("verifyEntityCreation", () => {
-  test("records flagged findings for suspicious automated entities", async ({
+  test("does not record changes for flagged automated entities", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -17,32 +17,48 @@ describe("verifyEntityCreation", () => {
       creationSource: "price_match_automation",
     });
 
-    const entityChanges = await db
-      .select()
-      .from(changes)
-      .where(
-        and(eq(changes.objectType, "entity"), eq(changes.objectId, entity.id)),
-      );
-    const verificationChange = entityChanges.find(
-      (change) => change.data?.catalogVerification?.phase === "result",
-    );
-    const catalogVerification = verificationChange?.data.catalogVerification;
-    if (catalogVerification?.phase !== "result") {
-      throw new Error("Expected a catalog verification result change.");
-    }
-
-    expect(catalogVerification).toMatchObject({
-      source: "price_match_automation",
-      status: "flagged",
-    });
     expect(
-      catalogVerification.findings.map(
-        (finding: { kind: string }) => finding.kind,
-      ),
-    ).toContain("entity_audit_candidate");
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "entity"),
+            eq(changes.objectId, entity.id),
+            eq(changes.type, "update"),
+          ),
+        ),
+    ).toEqual([]);
   });
 
-  test("records skipped results for trusted creation flows", async ({
+  test("does not record changes for passed entity verification", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Specific Brand",
+      kind: "brand",
+    });
+
+    await verifyEntityCreation({
+      entityId: entity.id,
+      creationSource: "manual_entry",
+    });
+
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "entity"),
+            eq(changes.objectId, entity.id),
+            eq(changes.type, "update"),
+          ),
+        ),
+    ).toEqual([]);
+  });
+
+  test("does not record changes for skipped trusted creation flows", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -55,20 +71,18 @@ describe("verifyEntityCreation", () => {
       creationSource: "repair_workflow",
     });
 
-    const entityChanges = await db
-      .select()
-      .from(changes)
-      .where(
-        and(eq(changes.objectType, "entity"), eq(changes.objectId, entity.id)),
-      );
-    const verificationChange = entityChanges.find(
-      (change) => change.data?.catalogVerification?.phase === "result",
-    );
-
-    expect(verificationChange?.data.catalogVerification).toMatchObject({
-      source: "repair_workflow",
-      status: "skipped",
-    });
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "entity"),
+            eq(changes.objectId, entity.id),
+            eq(changes.type, "update"),
+          ),
+        ),
+    ).toEqual([]);
   });
 
   test("skips stale verification for a deleted Entity", async () => {

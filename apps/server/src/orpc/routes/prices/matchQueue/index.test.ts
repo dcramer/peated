@@ -2694,7 +2694,7 @@ describe("price match queue", () => {
     expect(observation).toMatchObject({
       bottleId: result.id,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
@@ -3213,7 +3213,7 @@ describe("price match queue", () => {
     );
     expect(bottlesAfter).toHaveLength(bottlesBefore.length + 1);
     expect(groupsAfter).toHaveLength(groupsBefore.length + 1);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,

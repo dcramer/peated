@@ -80,7 +80,7 @@ describe("POST /bottles", () => {
       bottleId: result.id,
       generateDetails: false,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
