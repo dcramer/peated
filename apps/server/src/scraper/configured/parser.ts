@@ -379,8 +379,10 @@ function parseSavedList(
       ? rules.articles.oneArticlePer
       : rules.products.oneProductPer;
   const fieldRoot = rules.kind === "review" ? "articles" : "products";
+  const itemElements = $(itemSelector).toArray();
+  let skippedItemCount = 0;
   try {
-    for (const itemElement of $(itemSelector).toArray()) {
+    for (const itemElement of itemElements) {
       const item = load($.html(itemElement));
       if (list.skipWhen) {
         const skipWhen = list.skipWhen;
@@ -403,7 +405,10 @@ function parseSavedList(
             matchFirstText(readText(item(element)), skipWhen.match),
           );
         });
-        if (shouldSkip) continue;
+        if (shouldSkip) {
+          skippedItemCount += 1;
+          continue;
+        }
       }
       const itemLinks = item(list.link).toArray();
       for (const element of itemLinks) {
@@ -431,7 +436,9 @@ function parseSavedList(
         error instanceof Error ? error.message : "Unable to read the list.",
     });
   }
-  if (links.size === 0) {
+  const allItemsWereSkipped =
+    itemElements.length > 0 && skippedItemCount === itemElements.length;
+  if (links.size === 0 && !allItemsWereSkipped) {
     issues.push({
       field: `${fieldRoot}.link`,
       message: "No links were found.",
