@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 197 new Owner's Cask
+  one correction rather than a duplicate create. The 205 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1206,6 +1206,57 @@ completion record.
   one uncoded 1998 Owner's Cask remain leads because their producer-stable names
   or exact identities are not yet settled. The staged totals are now 197 new
   Owner's Casks and 64 evidence-backed non-Owner releases.
+- The 1999 reconciliation closes the gap between the first source pass and the
+  40 distinct cask codes in the photographed
+  [vintage index](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-1999/)
+  and current
+  [Whiskybase distillery index](https://www.whiskybase.com/whiskies/distillery/171/whiskies).
+  Eight more evidence-backed Owner's Casks are staged: Sapporo and Asahikawa
+  Grand Hotel puncheon
+  [`DN70167`](https://cdn.polyauction.com.hk/public-default/auction/sale/sz17030627-xiang-gang-bao-li-2017nian-chun-pai-zhong-xi-ming-jiu-zhuan-chang-100dpi-shuang-p_cf0cab11-f15d-406b-bab2-db3a89735050.pdf),
+  Hermit Private Stock VIII hogshead
+  [`DQ60668`](https://www.whiskybase.com/whiskies/whisky/107276/yamazaki-1999),
+  Tokyo Baycourt Club 3rd Edition hogshead
+  [`DO70110`](https://whiskyauctioneer.com/product/1033356), barrel casks
+  [`DS70109`](https://www.whiskybase.com/whiskies/whisky/279940/yamazaki-1999),
+  [`DS70325`](https://www.whiskybase.com/whiskies/whisky/180091/yamazaki-1999),
+  and
+  [`DS70368`](https://www.whiskybase.com/whiskies/whisky/285674/yamazaki-1999),
+  Fruity & Woody white-oak hogshead
+  [`DW70506`](https://www.whiskybase.com/whiskies/whisky/50824/yamazaki-1999),
+  and the sherry butt
+  [`DX70141`](https://www.whiskybase.com/whiskies/whisky/196461/yamazaki-1999).
+  Twelve more photographed releases are staged outside Owner's Cask:
+  `DE00157`, `DO70111`, `DQ70159`,
+  [`DR60201`](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1999-single-cask-dr60201),
+  `DR70117`, `DR70118`,
+  `DR70119`, `DS65840`, `DS70322`, `DU65296`, `DU65300`, and `DX60397`.
+  Exact examples include the 15-year-old Hakushu-stored hogshead
+  [`DE00157`](https://www.christies.com/en/lot/lot-6241276), Bar Kohno 10th
+  Anniversary hogshead
+  [`DO70111`](https://www.whiskybase.com/whiskies/whisky/278123/yamazaki-1999),
+  61% puncheon
+  [`DQ70159`](https://www.whiskybase.com/whiskies/whisky/110637/yamazaki-1999),
+  Whisky Shop W. 2nd Anniversary puncheon
+  [`DR70117`](https://www.whiskybase.com/whiskies/whisky/57834/yamazaki-1999),
+  Energy Advance 10th Anniversary puncheon
+  [`DR70118`](https://www.whiskybase.com/whiskies/whisky/196245/yamazaki-1999),
+  27th Mr. Bartender Commemoration puncheon
+  [`DR70119`](https://whisky.auction/auctions/lot/185772/yamazaki-1999),
+  Allied Telesis sherry butt
+  [`DU65296`](https://www.whiskybase.com/whiskies/whisky/133553/yamazaki-1999),
+  40th Hero sherry butt
+  [`DU65300`](https://images3.bonhams.com/original?src=Images%2Flive%2F2017-04%2F27%2FS-24013-0-1.pdf),
+  and KIZUNA Charity cask
+  [`DX60397`](https://www.whiskybase.com/whiskies/whisky/32074/yamazaki-1999).
+  `DR60201` is staged conservatively with unknown bottling year and maturation
+  because its exact auction record proves only the 1999 vintage, 55% strength,
+  and single-cask identity. A current Catawiki title misclassifies `DQ70159` as
+  Owner's Cask, while its photographed label record says Suntory Single Cask
+  Whisky at 61%; the latter is staged. A retailer page gives three different
+  strengths for `DS65840`, so its photographed 52% Whiskybase record is used.
+  The staged totals are now 205 new Owner's Casks and 76 evidence-backed
+  non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
