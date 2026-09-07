@@ -85,6 +85,9 @@ automatically. See the
 - Specialist-catalog bottler abbreviations such as Whiskybase's `Gs` are source
   notation, not marketed Bottle names. Keep them only as import references, and
   check for collisions before treating the complete reference as exact.
+- An SMWS cask code owns the release identity. A legacy reference that combines
+  one release's code with another release's subtitle is not evidence of an old
+  title; verify both parts against exact producer pages before assigning it.
 - Collector indexes can contain fabricated or misidentified lead entries. Verify
   the exact label against an independent auction, producer, or retailer source
   before creating a Bottle; a plausible old date and name are not evidence.

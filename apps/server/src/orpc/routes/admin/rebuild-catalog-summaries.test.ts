@@ -2,7 +2,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 
-describe("POST /admin/catalog/repair-bottle-counts", () => {
+describe("POST /admin/catalog/rebuild-summaries", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -13,7 +13,10 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
     const admin = await fixtures.User({ admin: true });
 
     await expect(
-      routerClient.admin.repairBottleCounts({}, { context: { user: admin } }),
+      routerClient.admin.rebuildCatalogSummaries(
+        {},
+        { context: { user: admin } },
+      ),
     ).resolves.toEqual({ status: "queued" });
     expect(pushUniqueJob).toHaveBeenCalledTimes(6);
     expect(pushUniqueJob).toHaveBeenNthCalledWith(
@@ -71,7 +74,7 @@ describe("POST /admin/catalog/repair-bottle-counts", () => {
 
     await expect(
       waitError(
-        routerClient.admin.repairBottleCounts({}, { context: { user } }),
+        routerClient.admin.rebuildCatalogSummaries({}, { context: { user } }),
       ),
     ).resolves.toMatchObject({ message: "Unauthorized." });
     expect(pushUniqueJob).not.toHaveBeenCalled();
