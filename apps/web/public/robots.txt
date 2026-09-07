@@ -25,7 +25,6 @@ Sitemap: https://peated.com/sitemaps/series/sitemap.xml
 Sitemap: https://peated.com/sitemaps/locations.xml
 Sitemap: https://peated.com/sitemaps/regions/sitemap.xml
 Sitemap: https://peated.com/sitemaps/bottles/sitemap.xml
-Sitemap: https://peated.com/sitemaps/tastings/sitemap.xml
 Sitemap: https://peated.com/sitemaps/brands/sitemap.xml
 Sitemap: https://peated.com/sitemaps/distillers/sitemap.xml
 Sitemap: https://peated.com/sitemaps/bottlers/sitemap.xml
