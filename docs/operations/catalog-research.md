@@ -1,11 +1,7 @@
-# Finding Whisky Catalogs — September 2026
+# Catalog Research
 
-Reviewed 25 archived catalog tasks and three active ones after scanning 610 task
-summaries. This is a starting point, not proof that a site is complete or may be
-collected automatically. Recheck terms, access rules, and image rights.
-
-See [Catalog Source Examples](./catalog-research-examples-2026-09.md) for the
-sites that worked for each producer or range.
+Use this guide to find and assess evidence for catalog maintenance. Exact, dated
+results from individual tasks live under `docs/research/catalog/`.
 
 ## Look In This Order
 
@@ -70,7 +66,7 @@ direct image links are leads only. Save the page that explains the item.
 
 Whiskybase was useful in many tasks, but Peated must not collect or copy it
 automatically. See the
-[source access audit](./external-review-source-audit-2026-08.md).
+[source access audit](../research/external-review-source-audit-2026-08.md).
 Spirit Radar was useful as a manually reviewed lead index for Yamazaki. Its
 brand page mixed proper releases, packaging variants, tasting samples, and
 misattributed Suntory bottles, so every exact identity required independent
@@ -101,7 +97,7 @@ producer, auction, or retailer evidence.
 - An exact image may still lack permission for Peated to store it.
 - A direct image URL does not record its source or license.
 
-## Keep After The Task
+## Preserve Durable Research
 
 - Catalog and exact evidence links
 - Years, markets, ranges, and exclusions checked
@@ -112,5 +108,5 @@ producer, auction, or retailer evidence.
 
 Do not keep raw API replies, downloaded images, tokens, or request files unless
 they have lasting value. The
-[Whisky Auctioneer audit](../operations/catalog-audits/2026-09-02-whisky-auctioneer/README.md)
+[Whisky Auctioneer audit](./catalog-audits/2026-09-02-whisky-auctioneer/README.md)
 shows how to keep useful links and decisions without raw downloads.

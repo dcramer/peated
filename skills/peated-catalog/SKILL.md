@@ -47,14 +47,11 @@ user gives.
    API returns a conflict or validation error.
 8. Re-fetch every changed record. Check shared edits, images, aliases,
    references, and redirects when they apply.
-9. Before reporting completion, update the dated catalog research records under
-   `docs/research/`. Add or revise the target in
-   `catalog-research-examples-*` with the exact source pages that worked and a
-   short note about their useful coverage or limits. Add to
-   `catalog-research-sources-*` only when the task found a reusable search path,
-   source combination, access or license limit, or recurring trap that is not
-   already recorded. Use a record dated for the research instead of rewriting
-   an older snapshot.
+9. Before reporting completion, save durable results in a dated,
+   scope-specific artifact under `docs/research/catalog/`. Use
+   `YYYY-MM-DD-short-name.md`, or a directory with a `README.md` when the report
+   has supporting data. Do not append separate tasks to a shared or monthly
+   report.
 
 For the research record, keep exact links, what each source established, the
 years, markets, and release families covered, material conflicts or page errors,
@@ -62,6 +59,9 @@ searches tried for unresolved gaps, and image source and reuse findings when
 they will help later work. Distinguish leads from evidence and do not claim that
 a source is complete unless it proves that. Do not keep raw API replies,
 downloaded images, tokens, request files, or other temporary working data.
+Update `docs/operations/catalog-research.md` only when the task finds a reusable
+research method, access limit, or recurring trap. Keep task-specific results in
+the scoped research artifact.
 
 ## Rules
 
