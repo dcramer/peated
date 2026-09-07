@@ -146,11 +146,37 @@ export default implement(contract).handler(async function ({
   const pathEntitiesById = new Map(
     pathEntities.map((entity) => [entity.id, entity]),
   );
-  const serializedPortfolio = await serialize(
+  const [
+    brandPreviewRows = [],
+    distilleryPreviewRows = [],
+    bottlerPreviewRows = [],
+  ] = previewRowGroups;
+  const serializedRows = await serialize(
     EntitySerializer,
-    shownPortfolioRows,
+    [
+      ...shownPortfolioRows,
+      ...brandPreviewRows,
+      ...distilleryPreviewRows,
+      ...bottlerPreviewRows,
+      ...groupCompanyRows,
+    ],
     context.user,
   );
+  const portfolioEnd = shownPortfolioRows.length;
+  const brandPreviewEnd = portfolioEnd + brandPreviewRows.length;
+  const distilleryPreviewEnd = brandPreviewEnd + distilleryPreviewRows.length;
+  const bottlerPreviewEnd = distilleryPreviewEnd + bottlerPreviewRows.length;
+  const serializedPortfolio = serializedRows.slice(0, portfolioEnd);
+  const brandPreviews = serializedRows.slice(portfolioEnd, brandPreviewEnd);
+  const distilleryPreviews = serializedRows.slice(
+    brandPreviewEnd,
+    distilleryPreviewEnd,
+  );
+  const bottlerPreviews = serializedRows.slice(
+    distilleryPreviewEnd,
+    bottlerPreviewEnd,
+  );
+  const serializedGroupCompanies = serializedRows.slice(bottlerPreviewEnd);
   const counts = new Map(
     totalRows.map(({ kind, count }) => [kind, Number(count)]),
   );
@@ -159,12 +185,6 @@ export default implement(contract).handler(async function ({
     distilleries: counts.get("distillery") ?? 0,
     bottlers: counts.get("bottler") ?? 0,
   };
-  const [brandPreviews, distilleryPreviews, bottlerPreviews] =
-    await Promise.all(
-      previewRowGroups.map((rows) =>
-        serialize(EntitySerializer, rows, context.user),
-      ),
-    );
 
   return {
     results: serializedPortfolio.map((entity) => ({
@@ -189,17 +209,13 @@ export default implement(contract).handler(async function ({
       all: totals.brands + totals.distilleries + totals.bottlers,
     },
     groupCompanies: {
-      results: await serialize(
-        EntitySerializer,
-        groupCompanyRows,
-        context.user,
-      ),
+      results: serializedGroupCompanies,
       total: Number(groupCompanyTotalRow?.count ?? 0),
     },
     previews: {
-      brands: brandPreviews ?? [],
-      distilleries: distilleryPreviews ?? [],
-      bottlers: bottlerPreviews ?? [],
+      brands: brandPreviews,
+      distilleries: distilleryPreviews,
+      bottlers: bottlerPreviews,
     },
     rel: {
       nextCursor: portfolioRows.length > input.limit ? input.cursor + 1 : null,
