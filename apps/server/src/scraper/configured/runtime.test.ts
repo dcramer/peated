@@ -34,7 +34,9 @@ import {
   recordScrapeSourcePreview,
 } from "./service";
 
-function fixedClock(): ScraperHttpClock {
+type TestClock = ScraperHttpClock & { advanceTo(value: Date): void };
+
+function fixedClock(): TestClock {
   let now = new Date("2026-08-28T12:00:00Z");
   return {
     now: () => now,
@@ -42,21 +44,41 @@ function fixedClock(): ScraperHttpClock {
       now = new Date(now.getTime() + milliseconds);
     },
     random: () => 0,
-  };
-}
-
-function controllableClock() {
-  let now = new Date("2026-08-28T12:00:00Z");
-  return {
-    now: () => now,
-    sleep: async (milliseconds: number) => {
-      now = new Date(now.getTime() + milliseconds);
-    },
-    random: () => 0,
     advanceTo: (value: Date) => {
       now = value;
     },
   };
+}
+
+async function runToCompletion({
+  runId,
+  fetchImpl,
+  clock = fixedClock(),
+  executionToken,
+}: {
+  runId: number;
+  fetchImpl: typeof fetch;
+  clock?: TestClock;
+  executionToken: string;
+}) {
+  const registry = createScraperRegistry({ targets: [], sources: [] });
+  for (let attempt = 1; attempt <= 20; attempt += 1) {
+    const result = await executeScraperRun(
+      { runId },
+      {
+        registry,
+        fetchImpl,
+        clock,
+        executionToken: `${executionToken}-${attempt}`,
+      },
+    );
+    if (result.status === "completed") return result;
+    if (!("nextAttemptAt" in result)) {
+      throw new Error("The test run is already owned by another execution.");
+    }
+    clock.advanceTo(result.nextAttemptAt);
+  }
+  throw new Error("The test run did not finish within 20 executions.");
 }
 
 function reviewRules(titleSelector = "h1", paginate = false) {
@@ -321,15 +343,11 @@ function previewFetch(paginate = false) {
 test("runs preview through the normal request controls without product writes", async () => {
   const { pinned, revision } = await setupPreview();
   await expect(
-    executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl: previewFetch(),
-        clock: fixedClock(),
-        executionToken: "preview-owner",
-      },
-    ),
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl: previewFetch(),
+      executionToken: "preview-owner",
+    }),
   ).resolves.toEqual({ status: "completed" });
 
   const [storedRevision] = await db
@@ -361,15 +379,11 @@ test("previews an official catalog without writing listings", async () => {
   });
 
   await expect(
-    executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl: catalogFetch(),
-        clock: fixedClock(),
-        executionToken: "catalog-preview-owner",
-      },
-    ),
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl: catalogFetch(),
+      executionToken: "catalog-preview-owner",
+    }),
   ).resolves.toEqual({ status: "completed" });
 
   const [storedRevision] = await db
@@ -429,15 +443,11 @@ test("collects and updates only catalog listings", async () => {
       purpose: "collect",
     });
     await expect(
-      executeScraperRun(
-        { runId: pinned.run.id },
-        {
-          registry: createScraperRegistry({ targets: [], sources: [] }),
-          fetchImpl: catalogFetch(name),
-          clock: fixedClock(),
-          executionToken: `catalog-collection-owner-${index}`,
-        },
-      ),
+      runToCompletion({
+        runId: pinned.run.id,
+        fetchImpl: catalogFetch(name),
+        executionToken: `catalog-collection-owner-${index}`,
+      }),
     ).resolves.toEqual({ status: "completed" });
   }
 
@@ -484,15 +494,11 @@ test("keeps a catalog product that is absent from a later run", async () => {
       trigger: "manual",
       purpose: "collect",
     });
-    await executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl: catalogProductsFetch(products),
-        clock: fixedClock(),
-        executionToken,
-      },
-    );
+    await runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl: catalogProductsFetch(products),
+      executionToken,
+    });
   };
 
   const firstProducts = [
@@ -524,15 +530,11 @@ test("follows a bounded next-page selector", async () => {
   const fetchImpl = previewFetch(true);
 
   await expect(
-    executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl,
-        clock: fixedClock(),
-        executionToken: "pagination-owner",
-      },
-    ),
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "pagination-owner",
+    }),
   ).resolves.toEqual({ status: "completed" });
 
   const [storedRevision] = await db
@@ -548,47 +550,15 @@ test("follows a bounded next-page selector", async () => {
   });
 });
 
-test("resumes configured previews without rereading completed pages", async () => {
+test("resumes configured previews between spaced requests", async () => {
   const { pinned, revision } = await setupPreview("h1", true);
-  await db
-    .update(externalSiteRuns)
-    .set({ requestLimit: 3 })
-    .where(eq(externalSiteRuns.id, pinned.run.id));
   const fetchImpl = previewFetch(true);
-  const clock = controllableClock();
-
-  const first = await executeScraperRun(
-    { runId: pinned.run.id },
-    {
-      registry: createScraperRegistry({ targets: [], sources: [] }),
-      fetchImpl,
-      clock,
-      executionToken: "first-preview-owner",
-    },
-  );
-  expect(first.status).toBe("deferred");
-  if (!("nextAttemptAt" in first)) throw new Error("Expected deferral.");
-
-  const [deferred] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, pinned.run.id));
-  expect(deferred?.cursor).toMatchObject({
-    detailIndex: 1,
-    previewPages: [{ url: "https://preview.example/one" }],
-  });
-
-  clock.advanceTo(first.nextAttemptAt);
   await expect(
-    executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl,
-        clock,
-        executionToken: "second-preview-owner",
-      },
-    ),
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "preview-owner",
+    }),
   ).resolves.toEqual({ status: "completed" });
 
   const [storedRevision] = await db
@@ -607,20 +577,21 @@ test("resumes configured previews without rereading completed pages", async () =
   expect(requestedPaths.filter((path) => path === "/archive")).toHaveLength(2);
   expect(requestedPaths.filter((path) => path === "/one")).toHaveLength(1);
   expect(requestedPaths.filter((path) => path === "/two")).toHaveLength(1);
+  const [run] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(run?.attemptCount).toBe(1);
 });
 
 test("stores safe validation issues when a selector stops matching", async () => {
   const { pinned, revision } = await setupPreview("h3.missing");
   await expect(
-    executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl: previewFetch(),
-        clock: fixedClock(),
-        executionToken: "preview-owner",
-      },
-    ),
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl: previewFetch(),
+      executionToken: "preview-owner",
+    }),
   ).rejects.toThrow("The page did not match the saved parsing rules.");
 
   const [storedRevision] = await db
@@ -653,15 +624,11 @@ test("a collection failure does not change the preview result", async () => {
   });
 
   await expect(
-    executeScraperRun(
-      { runId: pinned.run.id },
-      {
-        registry: createScraperRegistry({ targets: [], sources: [] }),
-        fetchImpl: previewFetch(),
-        clock: fixedClock(),
-        executionToken: "collection-owner",
-      },
-    ),
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl: previewFetch(),
+      executionToken: "collection-owner",
+    }),
   ).rejects.toThrow("The page did not match the saved parsing rules.");
 
   const [storedRevision] = await db

@@ -204,12 +204,14 @@ async function acquireOrDefer({
   executionToken,
   targetKey,
   isRetry,
+  canResumeLater,
   clock,
 }: {
   runId: number;
   executionToken: string;
   targetKey: string;
   isRetry: boolean;
+  canResumeLater: boolean;
   clock: ScraperHttpClock;
 }) {
   while (true) {
@@ -225,7 +227,11 @@ async function acquireOrDefer({
     const delay = result.nextEligibleAt
       ? result.nextEligibleAt.getTime() - clock.now().getTime()
       : null;
-    if (result.reason === "target_spacing" && delay !== null) {
+    if (
+      result.reason === "target_spacing" &&
+      delay !== null &&
+      !canResumeLater
+    ) {
       if (delay > 0) await clock.sleep(delay);
       continue;
     }
@@ -305,6 +311,7 @@ export async function requestScraperUrl({
         executionToken,
         targetKey: request.target,
         isRetry: retry > 0,
+        canResumeLater: request.canResumeLater ?? false,
         clock,
       });
       let response: Response;

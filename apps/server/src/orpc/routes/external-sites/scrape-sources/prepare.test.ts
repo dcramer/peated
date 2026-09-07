@@ -2733,6 +2733,26 @@ describe("POST /admin/scrape-sources/prepare", () => {
       },
       random: () => 0,
     };
+    const completeRun = async (runId: number, executionToken: string) => {
+      let execution = 1;
+      while (true) {
+        const result = await executeScraperRun(
+          { runId },
+          {
+            registry,
+            fetchImpl,
+            clock,
+            executionToken: `${executionToken}-${execution}`,
+          },
+        );
+        if (result.status === "completed") return result;
+        if (!("nextAttemptAt" in result)) {
+          throw new Error("The saved scraper is already running.");
+        }
+        now = result.nextAttemptAt;
+        execution += 1;
+      }
+    };
     for (let attempt = 0; attempt < 2; attempt++) {
       await db
         .update(externalSites)
@@ -2754,15 +2774,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
         }),
       ]);
       await expect(
-        executeScraperRun(
-          { runId: run.id },
-          {
-            registry,
-            fetchImpl,
-            clock,
-            executionToken: `migration-${attempt}`,
-          },
-        ),
+        completeRun(run.id, `migration-${attempt}`),
       ).resolves.toEqual({ status: "completed" });
     }
     expect(await db.select().from(externalReviewArticles)).toHaveLength(1);

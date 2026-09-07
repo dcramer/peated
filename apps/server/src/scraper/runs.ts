@@ -267,6 +267,11 @@ async function deferRun(
     .update(externalSiteRuns)
     .set({
       status: "queued",
+      attemptCount:
+        error instanceof ScraperRequestDeferredError &&
+        error.reason === "target_spacing"
+          ? Math.max(0, claim.run.attemptCount - 1)
+          : claim.run.attemptCount,
       nextAttemptAt,
       executionToken: null,
       executionExpiresAt: null,

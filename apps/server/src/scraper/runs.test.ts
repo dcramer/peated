@@ -6,6 +6,7 @@ import type { z } from "zod";
 import {
   FixtureCursorSchema,
   FixtureObservationSchema,
+  FixturePageSchema,
   fixtureScraperAdapter,
 } from "./adapters/fixture";
 import { ScrapeSourceSetupError } from "./configured/setupError";
@@ -259,6 +260,76 @@ test("defers at the slice budget and resumes the same run from its cursor", asyn
     status: "succeeded",
     attemptCount: 2,
     sliceRequestCount: 1,
+    requestCount: 2,
+  });
+  expect(observations.size).toBe(2);
+});
+
+test("does not count planned spacing as another run attempt", async () => {
+  const adapter: ScraperAdapter<FixtureCursor, FixtureObservation> = async ({
+    cursor,
+    session,
+  }) => {
+    let page = cursor?.page ?? 1;
+    while (true) {
+      const response = await session.request({
+        target: "fixture-target",
+        url: new URL(`/catalog?page=${page}`, "https://fixture.invalid"),
+        canResumeLater: true,
+      });
+      const parsed = FixturePageSchema.parse(JSON.parse(response.body));
+      for (const item of parsed.items) {
+        await session.emit({ sourceKey: item.id, value: item });
+      }
+      if (parsed.nextPage === null) return;
+      await session.checkpoint({ page: parsed.nextPage });
+      page = parsed.nextPage;
+    }
+  };
+  const { registry, run, observations } = await setupRun({ adapter });
+  const fetchImpl = pageFetch({
+    1: { items: [{ id: "a", value: "A" }], nextPage: 2 },
+    2: { items: [{ id: "b", value: "B" }], nextPage: null },
+  });
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      { registry, fetchImpl, clock: fixedClock(), executionToken: "first" },
+    ),
+  ).resolves.toEqual({
+    status: "deferred",
+    nextAttemptAt: new Date("2026-08-18T12:01:00Z"),
+  });
+  const [deferred] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(deferred).toMatchObject({
+    status: "queued",
+    attemptCount: 0,
+    requestCount: 1,
+    cursor: { page: 2 },
+  });
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      {
+        registry,
+        fetchImpl,
+        clock: fixedClock("2026-08-18T12:01:00Z"),
+        executionToken: "second",
+      },
+    ),
+  ).resolves.toEqual({ status: "completed" });
+  const [completed] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(completed).toMatchObject({
+    status: "succeeded",
+    attemptCount: 1,
     requestCount: 2,
   });
   expect(observations.size).toBe(2);

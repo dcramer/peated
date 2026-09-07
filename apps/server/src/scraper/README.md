@@ -63,9 +63,8 @@ must share one request limit. A target may list several web addresses when that
 organization uses more than one host. Do not group sites from their domain
 names alone.
 
-Set `requestsPerHour` for each target. The scraper waits between requests so
-they fill the hour evenly: 60 per hour means one request per minute. A value
-above 60 needs a short reason.
+Set `requestsPerHour` for each target. Requests are spread evenly across the
+hour: 60 means one request per minute. A value above 60 needs a short reason.
 
 ## Scrape sources
 
@@ -308,9 +307,9 @@ Every network attempt, including robots refreshes and retries, requires a SQL
 permit and consumes the current slice budget. Response bodies are streamed
 within the configured bound and are never stored by the runtime.
 
-A run may be claimed for at most ten execution slices and may remain active for
-at most 24 hours. The claim boundary fails older work before another adapter or
-network execution so a bad cursor or permanent deferral cannot live forever.
+A planned wait between saved-rule requests does not count toward the
+ten-attempt safety limit. Other restarts do. Every run must finish within 24
+hours, so a bad cursor or permanent delay cannot live forever.
 
 ## Bot identity
 
