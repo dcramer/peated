@@ -1679,6 +1679,49 @@ completion record.
   Bonhams catalog likewise lists a 43% Yamazaki 1985 only as `Blended`, without
   enough label detail or independent evidence to establish its consumer Brand
   or identity. Neither thin record is staged.
+- Three independently supported named releases are missing from production. An
+  exact
+  [Whisky Auctioneer lot](https://whiskyauctioneer.com/whisky-lot/5154538/yamazaki-suntory-pure-malt)
+  establishes the 1990, 43%, 760 ml Suntory Pure Malt selected for Shirahama
+  Golf Club's 30th anniversary. Suntory's official
+  [Kintetsu announcement](https://www.kintetsu.co.jp/all_news/news_info/130823senguuuisuki-.pdf)
+  establishes `Senguu` as a Kintetsu-exclusive Yamazaki single malt released on
+  September 27, 2013 at 48%, with 300 bottles. The announcement says its
+  components were matured for at least 20 years, but does not market the Bottle
+  with an age statement, so the staged record remains no-age-statement. Exact
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-15-year-old-sherry-butt),
+  [L-Auction](https://l-auction.com/l-engine/l-engine/%E5%B1%B1%E5%B4%8E%E8%92%B8%E6%BA%9C%E6%89%80-%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E3%83%A2%E3%83%AB%E3%83%88-%E3%82%B7%E3%82%A7%E3%83%AA%E3%83%BC%E3%83%90%E3%83%83%E3%83%88-15%E5%B9%B4/),
+  and [contemporary tasting](https://www.whiskyfun.com/archivejanuary12-2.html)
+  records establish a distinct 15-year-old, 61% Yamazaki Sherry Butt vatting
+  selected for Isetan. It is not the existing 1998-vintage single cask
+  `B54466`; the new release has no supported vintage, bottling date, outturn,
+  or cask-strength claim. Exact public Peated searches for all three identities
+  returned no matches. They are staged as releases 107 through 109; the
+  Owner's Cask count remains 211.
+- Four more cached index leads remain unresolved. The
+  [1960/2003](https://www.whiskybase.com/whiskies/whisky/53930/yamazaki-1960)
+  record is corroborated as a 56% tasting sample by
+  [Nonjatta](https://nonjatta.blogspot.com/2014/04/Karuizawa-1960-vs-Yamazaki-1960.html)
+  and [Whiskyfun](https://www.whiskyfun.com/Japanese-whisky.html), but neither
+  source establishes cask, outturn, or evidence that it was a marketed Bottle.
+  A lone
+  [1977 Vintage Malt](https://www.whiskybase.com/whiskies/whisky/108368/yamazaki-1977)
+  entry supplies only vintage, 56% strength, and size; it is absent from the
+  independently documented producer sequence. The “12-year-old Suntory for
+  Seminar” lead has no exact independent source. Finally, a collector record
+  describes a 48%, 190 ml
+  [Yamazaki 100th Anniversary](https://www.whiskybase.com/whiskies/whisky/296913/yamazaki-100th-anniversary),
+  while Suntory's official
+  [2023 product announcement](https://www.suntory.co.jp/news/article/14314.html)
+  documents only the 700 ml no-age-statement and 12-year-old anniversary-label
+  releases and identifies both as label designs. None of the four is staged
+  without exact release evidence.
+- The 600 ml
+  [12-year-old Saxophone](https://www.australianwhiskyauctions.com.au/lot-164479/yamazaki-12-year-old-pure-malt-saxophone-bottle)
+  is a presentation decanter of the normal 43% Yamazaki 12-year-old, not a
+  differently marketed whisky. It collapses to existing `B2276`, as do the
+  early 750 ml and 2023 100th-anniversary label formats. No extra Bottle is
+  staged for packaging alone.
 
 ## Laphroaig — September 6, 2026
 
