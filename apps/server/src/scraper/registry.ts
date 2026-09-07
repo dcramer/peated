@@ -23,7 +23,6 @@ import scrapeReserveBar from "./adapters/legacy/scrapeReserveBar";
 import scrapeSingleCaskNation from "./adapters/legacy/scrapeSingleCaskNation";
 import scrapeSMWS from "./adapters/legacy/scrapeSMWS";
 import scrapeSMWSA from "./adapters/legacy/scrapeSMWSA";
-import scrapeThompsonBros from "./adapters/legacy/scrapeThompsonBros";
 import scrapeTotalWine from "./adapters/legacy/scrapeTotalWine";
 import scrapeWhiskyWorld from "./adapters/legacy/scrapeWhiskyWorld";
 import scrapeWoodenCork from "./adapters/legacy/scrapeWoodenCork";
@@ -123,11 +122,6 @@ const legacyPriceSources = [
     origin: "https://singlecasknation.com",
     scrape: (options?: { dryRun?: boolean }) =>
       scrapeSingleCaskNation(options, loadSingleCaskNationReleases),
-  },
-  {
-    type: "thompsonbros",
-    origin: "https://www.thompsonbrosdistillers.com",
-    scrape: scrapeThompsonBros,
   },
   {
     type: "totalwine",
@@ -294,6 +288,15 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://northstarspirits.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "thompsonbros",
+      origins: [
+        {
+          origin: "https://www.thompsonbrosdistillers.com",
           robots: { mode: "enforce" },
         },
       ],
