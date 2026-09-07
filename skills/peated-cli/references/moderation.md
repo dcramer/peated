@@ -16,6 +16,20 @@ Queue filters: `kind=create_new|match_existing|correction|errored`,
 
 Fetch details before deciding and immediately before writing.
 
+For a reviewed multi-item plan, use one ordered batch file to avoid starting a
+new CLI process for every request. Put a `GET` preflight immediately before each
+mutation and assert the proposal's ID, status, and type with `expect`. Use
+`select` to keep output small. The runner stops at the first mismatch or API
+error and prints zero-based indexes, so resume from the failed item's preflight:
+
+```bash
+pnpm cli api batch --input /tmp/peated-batch.json --yes
+pnpm cli api batch --input /tmp/peated-batch.json --from 8 --yes
+```
+
+Never resume at a mutation after an indeterminate failure. Re-fetch first,
+because the write may have committed before the response was lost.
+
 ## Decide
 
 Compare the complete marketed Bottle:

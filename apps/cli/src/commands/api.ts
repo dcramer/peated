@@ -2,7 +2,10 @@ import program from "@peated/cli/program";
 import { readFile } from "node:fs/promises";
 import { basename, extname } from "node:path";
 import { createInterface } from "node:readline/promises";
+import { isDeepStrictEqual } from "node:util";
+import { z } from "zod";
 import {
+  PeatedApiError,
   PeatedApiValueSchema,
   requestPeatedApi,
   type PeatedApiValue,
@@ -14,9 +17,84 @@ import {
 } from "../api/credentials";
 
 type ApiCommandOptions = {
+  from?: string;
   input?: string;
   yes?: boolean;
 };
+
+const ApiBatchRequestSchema = z
+  .object({
+    method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]),
+    path: z
+      .string()
+      .startsWith("/")
+      .refine((path) => !path.startsWith("//"), "Path cannot start with //"),
+    body: PeatedApiValueSchema.optional(),
+    expect: z.record(z.string(), PeatedApiValueSchema).optional(),
+    select: z.array(z.string().min(1)).min(1).max(20).optional(),
+  })
+  .strict();
+
+const ApiBatchInputSchema = z.array(ApiBatchRequestSchema).min(1).max(500);
+const ApiObjectSchema = z.record(z.string(), PeatedApiValueSchema);
+
+export function parseApiBatchInput(contents: string) {
+  return ApiBatchInputSchema.parse(JSON.parse(contents));
+}
+
+export function selectApiResult(result: PeatedApiValue, paths: string[]) {
+  return Object.fromEntries(
+    paths.map((path) => {
+      let selected: PeatedApiValue = result;
+      for (const part of path.split(".")) {
+        if (Array.isArray(selected)) {
+          const index = Number(part);
+          if (!Number.isInteger(index) || selected[index] === undefined) {
+            throw new Error(`API batch result does not contain ${path}.`);
+          }
+          selected = selected[index];
+          continue;
+        }
+        const object = ApiObjectSchema.safeParse(selected);
+        if (!object.success || object.data[part] === undefined) {
+          throw new Error(`API batch result does not contain ${path}.`);
+        }
+        selected = object.data[part];
+      }
+      return [path, selected];
+    }),
+  );
+}
+
+export function verifyApiResult(
+  result: PeatedApiValue,
+  expected: Record<string, PeatedApiValue>,
+) {
+  const object = ApiObjectSchema.safeParse(result);
+  if (!object.success) {
+    throw new Error("API batch expected an object response.");
+  }
+  for (const [key, value] of Object.entries(expected)) {
+    if (!isDeepStrictEqual(object.data[key], value)) {
+      throw new Error(
+        `API batch response mismatch for ${key}: expected ${JSON.stringify(value)}, received ${JSON.stringify(object.data[key])}.`,
+      );
+    }
+  }
+}
+
+export function parseApiBatchStartIndex(
+  value: string | undefined,
+  requestCount: number,
+) {
+  const index = Number(value ?? 0);
+  if (!Number.isInteger(index) || index < 0 || index >= requestCount) {
+    throw new Error(
+      `Batch start index must be between 0 and ${requestCount - 1}.`,
+    );
+  }
+  return index;
+}
 
 type ApiImageUploadOptions = {
   caption?: string;
@@ -114,6 +192,55 @@ async function runApiCommand(
   console.log(JSON.stringify(result, null, 2));
 }
 
+async function runApiBatch(
+  inputPath: string,
+  options: Pick<ApiCommandOptions, "from" | "yes">,
+): Promise<void> {
+  const requests = parseApiBatchInput(await readFile(inputPath, "utf8"));
+  const from = parseApiBatchStartIndex(options.from, requests.length);
+  const selectedRequests = requests.slice(from);
+  const hasMutation = selectedRequests.some(({ method }) => method !== "GET");
+  if (hasMutation && !options.yes) {
+    await confirmMutation("BATCH", `${selectedRequests.length} API requests`);
+  }
+
+  const credentials = await requireCredentials();
+  for (const [offset, request] of selectedRequests.entries()) {
+    const index = from + offset;
+    try {
+      const result = await requestPeatedApi({
+        ...credentials,
+        method: request.method,
+        path: request.path,
+        body: request.body,
+      });
+      if (request.expect) verifyApiResult(result, request.expect);
+      console.log(
+        JSON.stringify({
+          index,
+          method: request.method,
+          path: request.path,
+          result: request.select
+            ? selectApiResult(result, request.select)
+            : result,
+        }),
+      );
+    } catch (err) {
+      if (err instanceof PeatedApiError) {
+        console.error(
+          JSON.stringify({
+            index,
+            method: request.method,
+            path: request.path,
+            error: { status: err.status, body: err.body },
+          }),
+        );
+      }
+      throw err;
+    }
+  }
+}
+
 async function runImageUploadCommand(
   path: string,
   options: ApiImageUploadOptions,
@@ -172,6 +299,14 @@ subcommand
   .option("--idempotency-key <key>", "Idempotency key for the upload")
   .option("--yes", "Send the mutation without an interactive confirmation")
   .action(async (path, options) => runImageUploadCommand(path, options));
+
+subcommand
+  .command("batch")
+  .description("Run API requests sequentially from a JSON file")
+  .requiredOption("--input <file>", "Read a JSON array of API requests")
+  .option("--from <index>", "Resume at a zero-based request index")
+  .option("--yes", "Send mutations without an interactive confirmation")
+  .action(async (options) => runApiBatch(options.input, options));
 
 for (const method of ["POST", "PUT", "PATCH", "DELETE"] as const) {
   subcommand
