@@ -53,28 +53,14 @@ A 5-point or 10-point scale does not by itself justify multiplying the score.
 The source's guide must support the comparison. Leave scores out when the
 comparison is uncertain. Review original 100-point sites by the same standard.
 
-## Repair Legacy Whisky Advocate Scores
+## Legacy Whisky Advocate Score Repair
 
-Use this one-time operation only while the temporary repair route is deployed.
-It copies valid 1–100 scores retained by the old Whisky Advocate importer into
-the native score fields. It does not fetch source pages, change Bottle matches,
-or overwrite a native score.
-
-Authenticate as an administrator, then run:
-
-```bash
-pnpm cli api post /admin/external-sites/whiskyadvocate/repair-review-scores --yes
-```
-
-Record the returned counts. `updatedReviews` is the number repaired by this
-call, while `affectedBottles` and `queuedBottleUpdates` count distinct matched
-Bottles sent to the summary dispatcher. A safe repeat returns zero updated
-reviews and sends the already repaired matched Bottles again.
-
-After the jobs finish, confirm a repaired review exposes its original score and
-its Bottle summary includes the review. Investigate worker errors before a
-retry. Remove the temporary route after production verification; do not clear
-the restored scores or their preserved legacy evidence.
+On September 7, 2026, an administrator repaired the legacy Whisky Advocate
+import. The operation restored 7,067 native scores, preserved 85 existing
+native scores, skipped no reviews, and queued summary updates for 4,552 matched
+Bottles. The temporary repair route was removed after the stored scores were
+verified. Do not clear the restored native scores or their preserved legacy
+evidence.
 
 ## Stop Clip Generation
 
