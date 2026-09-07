@@ -1444,3 +1444,184 @@ completion record.
   to macglee, the canonical Flickr page as `sourceUrl`, and `CC BY-SA 2.0` as
   `license`. The authenticated upload and immediate verification remain
   deferred until production API access resumes, so coverage is still 7 of 164.
+- A named-release pass adds one more evidence-backed non-Owner release. A
+  [contemporary bottle review](https://whiskywarehouse.blog.jp/archives/1063011159.html)
+  shows the exact `YAMAZAKI DISTILLERY MIZUNARA For Salon de Shimaji` label and
+  records a December 2016 arrival, 700 ml size, 48% strength, and 60-bottle
+  outturn. Shiseido's official
+  [Salon de Shimaji history](https://www.shiseido.co.jp/gb/shiseidomen/sp/salon/chefs_5/05_2/)
+  independently confirms that all 60 bottles were served at the Isetan bar.
+  The contemporary source describes a vatting of Mizunara-matured Yamazaki
+  spirits, so the Bottle is staged as a no-age-statement single malt rather
+  than a single cask. A later collector transcription says 46%, but the
+  contemporary label review says 48%; the staged record uses 48% and preserves
+  that conflict in the evidence record. An exact public Peated search returned
+  no match. The staged totals are now 211 new Owner's Casks and 101
+  evidence-backed non-Owner releases.
+- The apparent missing 1983 Sherry Wood is existing `B51631`, not a create.
+  Its [public Bottle page](https://peated.com/bottles/51631-yamazaki-sherry-wood)
+  already stores the 1983 vintage, 1998 bottling, and 45% strength. Exact
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/131242/yamazaki-1983),
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1983-suntory-pure-malt-sherry-wood?v=226118),
+  and [Acker catalog](https://webdocs.ackerwines.com/194A_FINAL_WEB.pdf)
+  records establish exclusive sherry-wood maturation and a 6,000-bottle
+  outturn. Those two missing facts are staged as the sixth current field
+  correction. The stored release year is not changed: the exact sources prove
+  the bottling year, but do not independently prove the first retail date.
+- Two groups of apparent variants resolve to existing Bottles without a write.
+  The old 300 ml, 40% Distillery Exclusive is existing
+  [`B51749`](https://peated.com/bottles/51749-yamazaki-distillery-exclusive);
+  exact [Whiskybase](https://www.whiskybase.com/whiskies/whisky/94765/yamazaki-distillery-exclusive)
+  and [Acker](https://webdocs.ackerwines.com/203A_FINAL_WEB.pdf) records show
+  numbered bottles, while a detailed
+  [distillery-shop history](https://japanesewhisky.livedoor.blog/archives/45426154.html)
+  shows that it continued as the same 40% whisky before the separate 180 ml,
+  48% release already stored as `B51750`. Collector entries dated 2016, 2017,
+  or without a date are bottlings or packages of `B51749`, not new marketed
+  identities. Whisky Shop W releases `WSO-005`, `WSO-007`, and `WSO-009` are
+  likewise already stored as `B51850`, `B51852`, and `B51854` under their
+  correct consumer Brand, with Yamazaki as distiller.
+- Four broad-index hits are not Yamazaki Brand Bottles. The
+  [Rolling Stones 50th Anniversary](https://whiskyauctioneer.com/whisky-lot/5094017c/suntory-rolling-stones-50th-anniversary)
+  is a Suntory blend containing Yamazaki, Hakushu, and Chita components; it is
+  not a Yamazaki single malt. The exact
+  [Taka product record](https://jwhisky.com/products/taka-blended-whisky)
+  identifies Minami Alps Wine & Beverages and explicitly rejects the copied
+  Yamazaki attribution. The
+  [Kise listing](https://www.whiskybase.com/whiskies/whisky/75152/yamazaki-kise)
+  resolves through its exact
+  [product page](https://dekanta.com/products/suntory-bamboo-ceramic-bottle) to
+  Suntory blended whisky in a bamboo-shaped ceramic bottle. A broad
+  [Suntory whisky guide](https://whisky-nights.com/suntory-whisky-guide/)
+  likewise identifies Hokuto 50.5 as a separate Suntory blended-whisky
+  identity. None is staged under the named Yamazaki Brand scope.
+- Private one-off bottles were kept out of the marketed-release inventory. The
+  [Club Natsume 50-year-old](https://www.prnewswire.com/jp/news-releases/1-302798908.html)
+  was a unique personal gift that was never intended for sale. The separate
+  [43% employee 50-year-old](https://www.whiskybase.com/whiskies/whisky/244840/yamazaki-50-year-old)
+  is explicitly an employee release. The one-bottle
+  [Denis Spirits Multi Vintages](https://www.whiskybase.com/whiskies/whisky/273663/yamazaki-multi-vintages-dnss)
+  was bottled for a named individual, with no evidence of a marketed release.
+  These exclusions leave the three existing 2005, 2007, and 2011 50-year-old
+  Bottles as the supported commercial producer release set.
+- Four weakly evidenced names remain unresolved rather than being guessed into
+  production. A Suntory
+  [WHISKY-S bar history](https://bar-navi.blog.suntory.co.jp/sp/001030.html)
+  confirms an original whisky developed with Yamazaki Distillery, but does not
+  establish the label's consumer Brand or category. Collector records for
+  [Sanyo's 50th Anniversary](https://www.whiskybase.com/whiskies/whisky/269466/yamazaki-50th-anniversary-sanyo-co-ltd)
+  and
+  [Kurafuyamame's 50th Anniversary](https://www.whiskybase.com/whiskies/whisky/269467/yamazaki-50th-anniversary-kurafuyamame)
+  have no independent exact source. Christie's confirms a 58%
+  [Yamazaki From the Barrel](https://onlineonly.christies.com/s/fine-rare-wines-spirits-online-festive-edition/yamazaki-barrel-492/203833),
+  but the available facts do not show whether it is distinct from the nine
+  catalogued Taru-Dashi Genshu releases. Searches of producer, auction,
+  retailer, and public Peated records did not settle those identity questions,
+  so none is staged.
+- Two more named releases are staged after exact public Peated searches returned
+  zero matches. Nobu's current
+  [Downtown New York menu](https://www.noburestaurants.com/downtown/menus)
+  markets `NOBU WHISKY` as a Yamazaki single malt by the one- or two-ounce pour,
+  while the exact
+  [bottle record](https://www.whiskybase.com/whiskies/whisky/268079/yamazaki-nobu?language=en)
+  supplies the 48% label strength. No age, bottling date, release date, or
+  maturation is inferred. Whisky Auctioneer's exact
+  [Okada Kazuo record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-okada-kazuo)
+  establishes a 75 cl Yamazaki single malt commemorative release bottled and
+  released in 1997 at 43%. It was not publicly sold, but unlike the unique Club
+  Natsume gift it is presented as a named release rather than a one-off bottle;
+  unknown age, cask composition, and outturn remain unset. This brings the
+  staged totals to 211 new Owner's Casks and 103 evidence-backed non-Owner
+  releases.
+- The Plum Liqueur Cask Finish is existing
+  [`B51630`](https://peated.com/bottles/51630-yamazaki-plum-liqueur-cask-finish),
+  not another create. Its stored single-malt category, 40% strength, 2008
+  release year, September release month, and 3,000-bottle outturn agree with the
+  exact
+  [Whisky Auctioneer record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-plum-liqueur-cask-finish)
+  and a detailed
+  [Japanese release review](https://japanesewhisky.livedoor.blog/archives/28777413.html).
+  A [contemporary review](https://nonjatta.blogspot.com/2008/10/yamazaki-plum-liqueur-cask-finish.html)
+  establishes that the vatting used Yamazaki whisky aged for more than 12 years
+  in white oak, Mizunara, and Spanish oak before a two-year finish in casks that
+  held plum liqueur. That missing maturation is staged as the seventh current
+  field correction; the component ages are not promoted to a stated Bottle age.
+- A presentation-format pass adds the 12-year-old Cask Strength Barrel
+  Decanter. Exact
+  [Whisky Auctioneer](https://whiskyauctioneer.com/whisky-lot/141400/yamazaki-12-year-old-suntory-pure-malt-litre-barrel-decanter),
+  [Australian Whisky Auctions](https://www.australianwhiskyauctions.com.au/lot-181423/yamazaki-12-year-old-pure-malt-cask-strength-barrel-1000ml),
+  and [retailer](https://www.danmurphys.com.au/product/DM_ER_1000007645_FWS10058SY12)
+  records establish a distinct 1 litre, 58% Yamazaki 12-year-old in a barrel
+  decanter. A photographed
+  [contemporary booklet record](https://www.reddit.com/r/JapaneseWhisky/comments/1w1a6m6/yamazaki_12_years_cask_strength_mini_barrel/)
+  describes a vatting of light-medium-style whisky matured in puncheons, so it
+  is staged as cask strength but not single cask. Conflicting 1989–1991 date
+  estimates are left unknown. Three exact public Peated searches returned no
+  match, bringing the staged totals to 211 new Owner's Casks and 104
+  evidence-backed non-Owner releases.
+- Other presentation hits did not create extra Yamazaki identities. The exact
+  barcode on Whisky Auctioneer's so-called
+  [Treasured Malt](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-suntory-treasured-malt)
+  is `4901777012110`, which exact
+  [product](https://jwhisky.com/products/suntory-yamazaki-12-jahre-alte-abfullung)
+  and [Whiskybase](https://www.whiskybase.com/whiskies/whisky/109542)
+  records assign to the early 750 ml Yamazaki 12-year-old already represented
+  by `B2276`; its frosted presentation does not establish different whisky.
+  The no-age-statement Gold Bottle is already `B51621`, while the later
+  12-year-old gold presentation is the same 43% core whisky. Finally, the
+  sphere-decanter
+  [Century 21-year-old](https://www.spink.com/lot/SFW28000028) is a Suntory
+  pure-malt blend whose contemporary
+  [description](https://sakedori.com/s/resort/blog/55507.html) includes both
+  Hakushu and Yamazaki components; an auction index calling it Yamazaki does
+  not make it a Yamazaki Brand Bottle.
+- An overlooked Bonhams catalog entry and an exact
+  [Spink lot](https://www.spink.com/lot/SFW48000251) establish the Yamazaki
+  Suntory Hall 20th Anniversary single cask. Suntory Hall guests signed the
+  1986 cask at the venue's 10th anniversary; Yamazaki bottled and presented the
+  matured cask for its 20th anniversary in 2006. The exact records prove a
+  20-year-old, 58%, 700 ml single malt bottled at cask strength, while the
+  photographed
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/273713/yamazaki-1986?language=en)
+  identifies its white-oak puncheon maturation. An apparent 20-bottle outturn
+  is not independently supported and remains unknown. Three exact public Peated
+  searches returned no match. It is staged as the 105th evidence-backed
+  non-Owner release; the Owner's Cask count remains 211.
+- The rest of the early Sherry Wood family resolves to four existing Bottles,
+  not new releases. Exact Whisky Auctioneer records establish sherry-wood
+  maturation for the
+  [1982](https://whiskyauctioneer.com/whisky-lot/5151244a/yamazaki-1982-suntory-pure-malt-sherry-wood),
+  [1984](https://whiskyauctioneer.com/whisky-lot/5176415/yamazaki-1984-suntory-pure-malt-sherry-wood),
+  [1985](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-suntory-pure-malt-1985-sherry-wood),
+  and
+  [1986](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1986-suntory-pure-malt-sherry-wood)
+  releases stored as `B51634`, `B51632`, `B51633`, and `B51635`. The 1984
+  source and a photographed
+  [auction catalog](https://d3d9mb8xdsbq52.cloudfront.net/auctions_catalog/2020d/Artemperor%20Autumn%20Auction%202020%20%28Finest%20and%20Rarest%20Whisky%29.pdf)
+  also agree on a 3,600-bottle outturn. Those facts are staged as four more
+  existing-Bottle corrections, bringing the current correction set to 11.
+  Source dates describe distillation and bottling; none is copied into a more
+  precise retail release date. Collector-calculated maturation ages likewise
+  do not override the no-age-statement labels already stored.
+- A separately marketed corporate anniversary release is also missing. Exact
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/52682/yamazaki-1983)
+  and
+  [Old Liquor Company](https://www.oldliquorcompany.com/shop/suntory-yamazaki-1983-royce-20th-anniversary-27520)
+  records agree on a Yamazaki single malt distilled in 1983 and bottled in
+  2003 for Royce's 20th anniversary, with a 20-year age statement, 45%
+  strength, 600 ml format, and sherry-cask maturation. Exact public Peated
+  searches for the anniversary name, the vintage plus age, and the full
+  marketed title returned no match. It is staged with unknown outturn and
+  unknown cask-strength status as the 106th evidence-backed non-Owner release.
+- Two sparse early records remain unresolved. A lone
+  [1982 Vintage Malt](https://www.whiskybase.com/whiskies/whisky/108369/yamazaki-1982)
+  entry reports a 55%, 700 ml Yamazaki single malt but gives no bottling date,
+  cask, or release context. That vintage is absent from the producer's normal
+  56% Vintage Malt sequence summarized by
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/series/suntory-vintage-malts)
+  and the detailed
+  [Japanese release index](https://w.atwiki.jp/jwhisky/pages/213.html), while a
+  reseller repeats the collector record without independent provenance. A
+  Bonhams catalog likewise lists a 43% Yamazaki 1985 only as `Blended`, without
+  enough label detail or independent evidence to establish its consumer Brand
+  or identity. Neither thin record is staged.
