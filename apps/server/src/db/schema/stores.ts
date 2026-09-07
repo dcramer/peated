@@ -109,7 +109,6 @@ export const storePrices = pgTable(
       table.volume,
     ),
     index("store_price_bottle_idx").on(table.bottleId),
-    index("store_price_release_idx").on(table.legacyReleaseId),
     check(
       "store_price_barcode_check",
       sql`${table.barcode} IS NULL OR (${table.barcode} ~ '^[0-9]+$' AND char_length(${table.barcode}) IN (8, 12, 13, 14))`,
@@ -241,9 +240,6 @@ export const storePriceMatchProposals = pgTable(
     index("store_price_match_proposal_current_bottle_idx").on(
       table.currentBottleId,
     ),
-    index("store_price_match_proposal_current_release_idx").on(
-      table.legacyCurrentReleaseId,
-    ),
     index("store_price_match_proposal_processing_expires_idx").on(
       table.processingExpiresAt,
     ),
@@ -252,9 +248,6 @@ export const storePriceMatchProposals = pgTable(
     ),
     index("store_price_match_proposal_suggested_bottle_idx").on(
       table.suggestedBottleId,
-    ),
-    index("store_price_match_proposal_suggested_release_idx").on(
-      table.legacySuggestedReleaseId,
     ),
     index("store_price_match_proposal_parent_bottle_idx").on(
       table.legacyParentBottleId,

@@ -80,7 +80,6 @@ export const externalReviews = pgTable(
       table.sourceKey,
     ),
     index("review_bottle_idx").on(table.bottleId),
-    index("review_article_idx").on(table.articleId),
     index("review_release_idx").on(table.legacyReleaseId),
     check(
       "review_rating_check",

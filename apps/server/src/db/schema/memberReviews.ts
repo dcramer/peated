@@ -59,7 +59,6 @@ export const memberReviews = pgTable(
       table.bottleId,
       table.createdById,
     ),
-    index("member_review_bottle_idx").on(table.bottleId),
     index("member_review_created_by_idx").on(table.createdById),
     check("member_review_score_check", sql`${table.score} BETWEEN 0 AND 100`),
   ],
