@@ -16,8 +16,11 @@ import {
 import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
 import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import { formatBottleName } from "@peated/server/lib/format";
-import { logError, logInfo } from "@peated/server/lib/log";
-import { updateBottleAsPeated } from "@peated/server/lib/updateBottle";
+import { logError, logInfo, logWarn } from "@peated/server/lib/log";
+import {
+  BottleUpdateConflictError,
+  updateBottleAsPeated,
+} from "@peated/server/lib/updateBottle";
 import { updateBottleImageAsPeated } from "@peated/server/lib/updateBottleImage";
 import type {
   BottleInputSchema,
@@ -184,15 +187,29 @@ export async function persistBottleObservation(
     const backfillPatch = Object.fromEntries(
       Object.entries(bottle).filter(([, value]) => value != null),
     );
-    resultBottle = (
-      await updateBottleAsPeated({
-        bottleId: error.bottleId,
-        input: backfillPatch,
-      })
-    ).bottle;
+    try {
+      resultBottle = (
+        await updateBottleAsPeated({
+          bottleId: error.bottleId,
+          input: backfillPatch,
+        })
+      ).bottle;
+    } catch (updateError) {
+      if (!(updateError instanceof BottleUpdateConflictError)) {
+        throw updateError;
+      }
+      // Only a moderator can decide which duplicate Bottle to keep. Leave both
+      // unchanged, but still save a retailer price because it has its own source.
+      logWarn("Skipped scraped Bottle update because another Bottle matches", {
+        extra: {
+          bottleId: error.bottleId,
+          conflictingBottleId: updateError.conflictingBottleId,
+        },
+      });
+    }
   }
 
-  if (!resultBottle.imageUrl && imageUrl) {
+  if (resultBottle && !resultBottle.imageUrl && imageUrl) {
     try {
       const blob = await downloadFileAsBlob(imageUrl);
       await updateBottleImageAsPeated({

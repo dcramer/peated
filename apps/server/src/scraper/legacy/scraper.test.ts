@@ -146,6 +146,60 @@ describe("handleBottle", () => {
     });
   });
 
+  it("keeps scraping when two Bottles claim the same SMWS cask", async ({
+    fixtures,
+  }) => {
+    const society = await fixtures.Entity({
+      name: "The Scotch Malt Whisky Society",
+      shortName: "SMWS",
+    });
+    const original = await fixtures.Bottle({
+      name: "35.331 Original title",
+      brandId: society.id,
+      bottlerId: society.id,
+      caskNumber: "35.331",
+      singleCask: true,
+    });
+    const duplicate = await fixtures.Bottle({
+      name: "35.331 Current title",
+      brandId: society.id,
+      bottlerId: society.id,
+      caskNumber: "35.331",
+      singleCask: true,
+    });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+
+    await expect(
+      handleBottle(
+        {
+          name: duplicate.name,
+          brand: society.id,
+          bottler: society.id,
+          caskNumber: "35.331",
+          singleCask: true,
+        },
+        priceInput,
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(
+      await db.query.bottles.findMany({
+        orderBy: (table, { asc }) => asc(table.id),
+      }),
+    ).toMatchObject([
+      { id: original.id, name: original.name },
+      { id: duplicate.id, name: duplicate.name },
+    ]);
+    expect(
+      await db.query.storePrices.findFirst({
+        where: and(
+          eq(storePrices.externalSiteId, site.id),
+          eq(storePrices.price, priceInput.price),
+        ),
+      }),
+    ).toMatchObject({ price: priceInput.price });
+  });
+
   it("rejects invalid flat Bottle input before persistence", async () => {
     await expect(handleBottle({ ...bottleInput, name: "" })).rejects.toThrow();
 
