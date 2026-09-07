@@ -80,6 +80,8 @@ automatically. See the
 - Labels can be more accurate than page text.
 - Auction, shop, image, approval, distillation, and bottling dates are not
   release dates.
+- An undated retailer shipping month does not inherit the current calendar
+  year. Check a dated producer announcement before storing the year.
 - Private picks and single casks often have no complete public list.
 - Specialist-catalog bottler abbreviations such as Whiskybase's `Gs` are source
   notation, not marketed Bottle names. Keep them only as import references, and
