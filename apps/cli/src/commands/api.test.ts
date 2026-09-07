@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+  parseApiBatchConcurrency,
   parseApiBatchInput,
   parseApiBatchStartIndex,
   selectApiResult,
@@ -95,5 +96,20 @@ describe("parseApiBatchStartIndex", () => {
 
   test.each(["-1", "4", "1.5", "nope"])("rejects %s", (value) => {
     expect(() => parseApiBatchStartIndex(value, 4)).toThrow();
+  });
+});
+
+describe("parseApiBatchConcurrency", () => {
+  test.each([
+    [undefined, 1],
+    ["1", 1],
+    ["10", 10],
+    ["20", 20],
+  ])("parses %j as %i", (value, expected) => {
+    expect(parseApiBatchConcurrency(value)).toBe(expected);
+  });
+
+  test.each(["0", "21", "1.5", "nope"])("rejects %s", (value) => {
+    expect(() => parseApiBatchConcurrency(value)).toThrow();
   });
 });

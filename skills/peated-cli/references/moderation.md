@@ -27,6 +27,16 @@ pnpm cli api batch --input /tmp/peated-batch.json --yes
 pnpm cli api batch --input /tmp/peated-batch.json --from 8 --yes
 ```
 
+For a GET-only inventory or evidence batch, use bounded concurrency to avoid
+serial network latency:
+
+```bash
+pnpm cli api batch --input /tmp/peated-reads.json --concurrency 10
+```
+
+Concurrent batches cannot contain mutations. Keep write batches sequential so
+their preflight reads and mutations stay ordered.
+
 Never resume at a mutation after an indeterminate failure. Re-fetch first,
 because the write may have committed before the response was lost.
 

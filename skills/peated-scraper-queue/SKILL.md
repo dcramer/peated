@@ -71,6 +71,8 @@ from another release or use model confidence as evidence.
    when they may share a new Entity or Series. If a response is lost or the
    connection fails, re-fetch that proposal before retrying: a successful write
    may have committed even when the client saw no response.
+   Use bounded concurrency for GET-only inventory and evidence batches; mutation
+   batches must remain sequential so each write follows its own fresh preflight.
 6. Verify the proposal and moderation history after each action. For a match,
    create, or repair, also verify the listing's Bottle and the Bottle record.
    After a create, compare the stored relationship IDs and names and all
