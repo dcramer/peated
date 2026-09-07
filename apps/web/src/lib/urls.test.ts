@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getBottleSeriesUrl,
   getBottleUrl,
+  getBottleUrlFromFullName,
   getEntityKindSearchUrl,
   getEntityUrl,
   getMemberReviewUrl,
@@ -17,6 +18,15 @@ const bottle = {
 describe("public catalog URLs", () => {
   it("uses the Bottle collection, ID, and display name", () => {
     expect(getBottleUrl(bottle)).toBe("/bottles/123-lagavulin-16-year-old");
+  });
+
+  it("uses a stored Bottle full name when only sitemap fields are loaded", () => {
+    expect(
+      getBottleUrlFromFullName({
+        id: 123,
+        fullName: "Lagavulin 16-year-old",
+      }),
+    ).toBe("/bottles/123-lagavulin-16-year-old");
   });
 
   it("uses the tasting ID with its Bottle's display name", () => {

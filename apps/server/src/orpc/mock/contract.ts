@@ -12,6 +12,7 @@ import bottleFlavorProfile from "@peated/server/orpc/contracts/bottles/flavor-pr
 import bottleList from "@peated/server/orpc/contracts/bottles/list";
 import bottlePriceList from "@peated/server/orpc/contracts/bottles/prices/list";
 import bottleRecommendations from "@peated/server/orpc/contracts/bottles/recommendations";
+import bottleSitemap from "@peated/server/orpc/contracts/bottles/sitemap";
 import bottleSuggestedTags from "@peated/server/orpc/contracts/bottles/suggested-tags";
 import bottleTags from "@peated/server/orpc/contracts/bottles/tags";
 import brandList from "@peated/server/orpc/contracts/brands/list";
@@ -95,6 +96,7 @@ export const mockContract = {
       list: bottlePriceList,
     },
     recommendations: bottleRecommendations,
+    sitemap: bottleSitemap,
     suggestedTags: bottleSuggestedTags,
     tags: bottleTags,
   },

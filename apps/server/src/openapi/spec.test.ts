@@ -114,12 +114,17 @@ describe("Published OpenAPI metadata", () => {
       });
     }
 
-    const references = spec.paths?.["/entities/{entity}/references"]?.get;
-    expect(references).toMatchObject({
-      "x-internal": true,
-      "x-badges": [{ name: "Internal", position: "before" }],
-    });
-    expect(references?.security).toBeUndefined();
+    for (const [path, method] of [
+      ["/bottles/sitemap", "get"],
+      ["/entities/{entity}/references", "get"],
+    ] as const) {
+      const operation = spec.paths?.[path]?.[method];
+      expect(operation, `${method} ${path}`).toMatchObject({
+        "x-internal": true,
+        "x-badges": [{ name: "Internal", position: "before" }],
+      });
+      expect(operation?.security).toBeUndefined();
+    }
 
     for (const [path, method] of [
       ["/bottles", "get"],
@@ -187,6 +192,7 @@ describe("Published OpenAPI metadata", () => {
       publicPaths.sort(),
     );
     expect(publicSpec.paths?.["/admin/oauth-clients"]).toBeUndefined();
+    expect(publicSpec.paths?.["/bottles/sitemap"]).toBeUndefined();
     expect(publicSpec.paths?.["/entities/{entity}/references"]).toBeUndefined();
     expect(publicSpec.paths?.["/bottles/{bottle}"]?.get).toBeDefined();
     expect(publicSpec.paths?.["/bottles/{bottle}"]?.patch).toBeUndefined();

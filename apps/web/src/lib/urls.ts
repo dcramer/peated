@@ -17,6 +17,13 @@ export function getBottleUrl(
   return `/bottles/${bottle.id}-${slug}`;
 }
 
+export function getBottleUrlFromFullName(bottle: {
+  id: number;
+  fullName: string;
+}): `/bottles/${number}-${string}` {
+  return `/bottles/${bottle.id}-${createUrlSlug(bottle.fullName, "bottle")}`;
+}
+
 export function getTastingUrl(tasting: {
   id: number;
   bottle: BottleDisplayNameSource;
