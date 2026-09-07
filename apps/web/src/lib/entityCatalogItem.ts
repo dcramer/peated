@@ -6,8 +6,22 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { getEntityIdentityProps } from "./entityIdentity";
 
+type EntityWithOptionalPublicCount = Omit<
+  Entity,
+  "publicReviewAndTastingCount"
+> &
+  Partial<Pick<Entity, "publicReviewAndTastingCount">>;
+
+export function getEntityReviewAndTastingCount(
+  entity: Pick<Entity, "totalTastings"> &
+    Partial<Pick<Entity, "publicReviewAndTastingCount">>,
+) {
+  // TODO(api-rollout): Remove this fallback after API releases without the combined count are retired.
+  return entity.publicReviewAndTastingCount ?? entity.totalTastings;
+}
+
 export function toEntityCatalogItem(
-  entity: Entity,
+  entity: EntityWithOptionalPublicCount,
   isFollowing = entity.isFollowing,
 ): EntityCatalogItem {
   return {
@@ -17,6 +31,6 @@ export function toEntityCatalogItem(
     id: entity.id,
     isFollowing,
     totalBottles: entity.totalBottles,
-    publicReviewAndTastingCount: entity.publicReviewAndTastingCount,
+    publicReviewAndTastingCount: getEntityReviewAndTastingCount(entity),
   };
 }

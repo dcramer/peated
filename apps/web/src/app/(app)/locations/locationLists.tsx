@@ -7,6 +7,7 @@ import {
   LoadingPlaceholder,
   type DataTableColumn,
 } from "@peated/web/components";
+import { getEntityReviewAndTastingCount } from "@peated/web/lib/entityCatalogItem";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 type LocationListItem = {
@@ -129,7 +130,8 @@ const distillerColumns: DataTableColumn<Entity>[] = [
   },
   {
     align: "right",
-    cell: (item) => item.publicReviewAndTastingCount.toLocaleString("en-US"),
+    cell: (item) =>
+      getEntityReviewAndTastingCount(item).toLocaleString("en-US"),
     header: "Reviews & tastings",
     key: "tastings",
     priority: "secondary",
