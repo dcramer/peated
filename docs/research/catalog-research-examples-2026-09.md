@@ -695,6 +695,39 @@ completion record.
   18-year-old is `B54095`; the unqualified core Mizunara 18-year-old `B47537`
   was corrected to the 2025 release proven by its assigned import references and
   exact Whiskyfun review.
+- A modern special-release reconciliation found no duplicate creates. All four
+  Smoky Batch releases and the 2024–2026 Story of the Distillery editions are
+  already present. The Kogei Collection Japanese Kimono Edition is existing
+  `B51689`, stored under its producer-facing name, Peated Malt Spanish Oak;
+  Suntory's exact
+  [Kogei page](https://house.suntory.com/kogei-collection-japanese-kimono-edition)
+  confirms its peated malt and Spanish-oak-cask maturation, which is staged as
+  a missing-fact correction. The separate 2024 distillery-exclusive Peated Malt
+  Spanish Oak is already `B51750`. Suntory's exact
+  [launch announcement](https://www.suntoryglobalspirits.com/news/house-suntory-unveils-its-oldest-mizunara-aged-yamazaki-expression-date-yamazaki-25-years-old)
+  also confirms that existing `B51627`, Mizunara 25-year-old, is the August 7,
+  2025 release matured exclusively in Mizunara oak casks at 48%. Its stored age,
+  strength, and release date are correct; the missing maturation is staged as a
+  second correction. Broad searches using the award-entry wording initially
+  returned zero because Peated uses the shorter producer-facing names, so each
+  candidate was resolved by identity before deciding whether to create.
+- The oldest-age-statement pass confirms the three existing 50-year-old records
+  as the complete producer release set: 50 bottles in 2005, 50 in 2007, and 150
+  in 2011. Their stored release years, strengths, and outturns agree with the
+  exact
+  [Sotheby's release history](https://www.sothebys.com/buy/fc43ba21-c184-414d-ab06-0920ec9626ce/lots/eaec5d17-b30d-4970-9afb-46290a0b7787).
+  The 55-year-old needs two records, however. Suntory's
+  [Japan announcement](https://www.suntory.co.jp/news/article/13651.html)
+  establishes a June 30, 2020 First Release of 100 bottles, while its separate
+  [global announcement](https://www.suntoryglobalspirits.com/news/house-suntory-whisky-proudly-introduces-yamazakir-55-years-oldtm)
+  establishes a Second Release of another 100 bottles in September 2021. Both
+  are 46% vattings of 1960 Mizunara- and 1964 American-white-oak-matured malt;
+  the second was bottled in 2020. Existing `B51628` incorrectly combines them as
+  a 200-bottle 2020 release. Its correction to the 100-bottle First Release is
+  staged without disturbing its ID or history, and the separately marketed
+  Second Release is staged as a new Bottle after exact public Peated searches
+  returned zero matches. The totals are now 211 new Owner's Casks and 98
+  evidence-backed non-Owner releases.
 - The last complete Brand inventory contained 161 Bottles, all with Yamazaki as
   Brand and distiller and no explicit bottler. Thirty records incorrectly stored
   Yamazaki as its own bottler; those relationships were cleared and the full
