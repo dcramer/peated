@@ -21,7 +21,7 @@ describe("verifyBottleCreation", () => {
     runAudit = vi.fn();
   });
 
-  test("records skipped results for trusted creation flows", async ({
+  test("does not record changes for skipped trusted creation flows", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -31,20 +31,18 @@ describe("verifyBottleCreation", () => {
       creationSource: "price_match_review",
     });
 
-    const bottleChanges = await db
-      .select()
-      .from(changes)
-      .where(
-        and(eq(changes.objectType, "bottle"), eq(changes.objectId, bottle.id)),
-      );
-    const verificationChange = bottleChanges.find(
-      (change) => change.data?.catalogVerification?.phase === "result",
-    );
-
-    expect(verificationChange?.data.catalogVerification).toMatchObject({
-      source: "price_match_review",
-      status: "skipped",
-    });
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "bottle"),
+            eq(changes.objectId, bottle.id),
+            eq(changes.type, "update"),
+          ),
+        ),
+    ).toEqual([]);
     expect(runAudit).not.toHaveBeenCalled();
   });
 
@@ -67,19 +65,18 @@ describe("verifyBottleCreation", () => {
         ),
     ).toEqual([]);
 
-    const bottleChanges = await db
-      .select()
-      .from(changes)
-      .where(
-        and(eq(changes.objectType, "bottle"), eq(changes.objectId, bottle.id)),
-      );
-    const verificationChange = bottleChanges.find(
-      (change) => change.data?.catalogVerification?.phase === "result",
-    );
-    expect(verificationChange?.data.catalogVerification).toMatchObject({
-      source: "price_match_automation",
-      status: "skipped",
-    });
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "bottle"),
+            eq(changes.objectId, bottle.id),
+            eq(changes.type, "update"),
+          ),
+        ),
+    ).toEqual([]);
   });
 
   test("skips stale verification for a deleted Bottle", async () => {
@@ -109,13 +106,13 @@ describe("verifyBottleCreation", () => {
       .select()
       .from(changes)
       .where(
-        and(eq(changes.objectType, "bottle"), eq(changes.objectId, bottle.id)),
+        and(
+          eq(changes.objectType, "bottle"),
+          eq(changes.objectId, bottle.id),
+          eq(changes.type, "update"),
+        ),
       );
-    expect(
-      bottleChanges.some(
-        (change) => change.data?.catalogVerification?.phase === "result",
-      ),
-    ).toBe(false);
+    expect(bottleChanges).toEqual([]);
     expect(
       await db
         .select({ id: bottleChecks.id })

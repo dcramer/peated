@@ -3,10 +3,10 @@ import {
   type CatalogVerificationResult,
   buildCatalogVerificationCreationMetadata,
   buildCatalogVerificationResult,
+  getCatalogVerificationSkipReason,
+  shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
-import { db } from "@peated/server/db";
-import { changes } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { logInfo } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
 
 export function getCatalogVerificationCreationMetadata(
@@ -22,6 +22,24 @@ export async function queueBottleCreationVerification({
   bottleId: number;
   creationSource: CatalogVerificationCreationSource;
 }) {
+  const policyInput = {
+    objectType: "bottle",
+    source: creationSource,
+  } as const;
+  if (!shouldRunCatalogVerification(policyInput)) {
+    logCatalogVerificationResult({
+      objectId: bottleId,
+      objectType: "bottle",
+      result: {
+        source: creationSource,
+        status: "skipped",
+        reason: getCatalogVerificationSkipReason(policyInput),
+        findings: [],
+      },
+    });
+    return;
+  }
+
   await pushUniqueJob(
     "VerifyBottleCreation",
     {
@@ -39,6 +57,24 @@ export async function queueEntityCreationVerification({
   entityId: number;
   creationSource: CatalogVerificationCreationSource;
 }) {
+  const policyInput = {
+    objectType: "entity",
+    source: creationSource,
+  } as const;
+  if (!shouldRunCatalogVerification(policyInput)) {
+    logCatalogVerificationResult({
+      objectId: entityId,
+      objectType: "entity",
+      result: {
+        source: creationSource,
+        status: "skipped",
+        reason: getCatalogVerificationSkipReason(policyInput),
+        findings: [],
+      },
+    });
+    return;
+  }
+
   await pushUniqueJob(
     "VerifyEntityCreation",
     {
@@ -49,27 +85,29 @@ export async function queueEntityCreationVerification({
   );
 }
 
-export async function recordCatalogVerificationResult({
-  displayName,
+export function logCatalogVerificationResult({
   objectId,
   objectType,
   result,
 }: {
-  displayName: string;
   objectId: number;
   objectType: "bottle" | "entity";
   result: Omit<CatalogVerificationResult, "phase">;
 }) {
-  const actor = await getPeatedSystemActor();
+  const verification = buildCatalogVerificationResult(result);
 
-  await db.insert(changes).values({
-    objectType,
-    objectId,
-    displayName,
-    type: "update",
-    actorId: actor.id,
-    data: {
-      catalogVerification: buildCatalogVerificationResult(result),
+  logInfo("Catalog verification {status} for {objectType} {objectId}", {
+    extra: {
+      objectId,
+      objectType,
+      source: verification.source,
+      status: verification.status,
+      reason: verification.reason,
+      findingCount: verification.findings.length,
+      findingKinds: verification.findings.map(({ kind }) => kind),
+      findingWorkstreams: Array.from(
+        new Set(verification.findings.map(({ workstream }) => workstream)),
+      ),
     },
   });
 }

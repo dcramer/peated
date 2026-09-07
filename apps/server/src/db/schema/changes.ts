@@ -1,7 +1,4 @@
-import type {
-  CatalogVerificationCreationMetadata,
-  CatalogVerificationResult,
-} from "@peated/catalog-verifier";
+import type { CatalogVerificationCreationMetadata } from "@peated/catalog-verifier";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -32,9 +29,7 @@ type ChangeDataValue =
   | ChangeData;
 
 export interface ChangeData {
-  catalogVerification?:
-    | CatalogVerificationCreationMetadata
-    | CatalogVerificationResult;
+  catalogVerification?: CatalogVerificationCreationMetadata;
   [key: string]: ChangeDataValue;
 }
 

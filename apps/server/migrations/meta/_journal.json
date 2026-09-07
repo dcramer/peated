@@ -1947,6 +1947,13 @@
       "when": 1788739056553,
       "tag": "0277_uneven_boomer",
       "breakpoints": false
+    },
+    {
+      "idx": 278,
+      "version": "7",
+      "when": 1788804881190,
+      "tag": "0278_remove-skipped-catalog-verification-changes",
+      "breakpoints": false
     }
   ]
 }
