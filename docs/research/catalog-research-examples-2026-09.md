@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 182 new Owner's Cask
+  one correction rather than a duplicate create. The 197 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1174,6 +1174,38 @@ completion record.
   photographed record combines a 1997 vintage and 2021 bottling with a
   contradictory 15-year age. The staged totals are now 182 new Owner's Casks
   and 59 evidence-backed non-Owner releases.
+- The 1998 reconciliation adds 15 evidence-backed Owner's Casks: `CM70004`,
+  `CM70007`, `CM70008`, `CM70027`, `CN70168`, `CN70170`, `CN70178`,
+  `CN70179`, `CO60227`, `CP70174`, `CW70135`, `CX70068`, `CX70076`,
+  `CX70082`, and `CX70085`. Exact photographed examples include Yokohama Bay
+  Sheraton 10th Anniversary sherry butt
+  [`CM70007`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
+  chief blender Seiichi Koshimizu's barrel
+  [`CO60227`](https://www.kabukiwhisky.com/suntory/owners-cask/yamazaki-distillery/yamazaki-owners-cask-barrel-1998-co60227-70cl-52/?sl=ja),
+  the 206-bottle hogshead
+  [`CN70168`](https://cdn.polyauction.com.hk/public-default/auction/sale/xiang-gang-bao-li-2017nian-qiu-pai-zhong-xi-ming-jiu-zhen-niang-hong-jiu-bai-jiu-bu-fen-shuang-ps_81b01252-4c4f-4914-ab92-32b78f17b321.pdf),
+  Pegasus barrel
+  [`CX70082`](https://www.whiskybase.com/whiskies/whisky/146614/yamazaki-1998),
+  and the 53% Only One cask
+  [`CX70085`](https://item.rakuten.co.jp/mituwa/su-owner1998/).
+  Conflicting transcriptions were not copied: exact sources support 58% for
+  `CM70008`, 206 bottles for `CN70168`, 54% for `CP70174`, and disagree on
+  whether `CX70085` is a barrel or hogshead, so that last maturation remains
+  unknown. Five more photographed 1998 releases are staged outside Owner's
+  Cask: 150th Anniversary of Yokohama Port sherry butt
+  [`CV70092`](https://www.whiskybase.com/whiskies/whisky/69975/yamazaki-1998),
+  Whisky Shop W. 1st Anniversary sherry butt
+  [`CU70094`](https://w.atwiki.jp/jwhisky/pages/225.html), Bartender's Choice
+  [`CC3083`](https://www.whiskybase.com/whiskies/whisky/124851), single-cask
+  sherry butt
+  [`CU70071`](https://www.whiskybase.com/whiskies/whisky/299238/yamazaki-1998),
+  and `CV70070`, whose photographed label says Suntory Single Cask Whisky even
+  though auction indexes group it under Owner's Cask. `CU70065` remains
+  unresolved because exact catalogs and label-oriented records disagree between
+  Owner's Cask and Arima/Suntory Single Cask Whisky. `CW70201`, `CW70207`, and
+  one uncoded 1998 Owner's Cask remain leads because their producer-stable names
+  or exact identities are not yet settled. The staged totals are now 197 new
+  Owner's Casks and 64 evidence-backed non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
