@@ -71,7 +71,16 @@ export default procedure
       }
     }
 
-    const tags = await validateTags(input.tags);
+    const [noseTags, palateTags, finishTags] = await Promise.all([
+      validateTags(input.noseTags),
+      validateTags(input.palateTags),
+      validateTags(input.finishTags),
+    ]);
+    // Bottle flavor summaries count a review once per flavor, even when the
+    // same flavor appears in more than one part of the review.
+    const tags = Array.from(
+      new Set([...noseTags, ...palateTags, ...finishTags]),
+    );
     const friendUserIds = Array.from(new Set(input.friends));
     if (friendUserIds.length) {
       const matches = await db
@@ -109,6 +118,9 @@ export default procedure
           createdById: context.user.id,
           score: input.score,
           tags,
+          noseTags,
+          palateTags,
+          finishTags,
           color: input.color,
           notes: input.notes,
           servingStyle: input.servingStyle,
@@ -119,6 +131,9 @@ export default procedure
           set: {
             score: input.score,
             tags,
+            noseTags,
+            palateTags,
+            finishTags,
             color: input.color,
             notes: input.notes,
             servingStyle: input.servingStyle,

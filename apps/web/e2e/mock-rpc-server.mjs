@@ -1669,7 +1669,10 @@ async function handleRpcRequest({ request, response, url }) {
         input?.color !== null ||
         input?.notes !== "Coastal and waxy." ||
         input?.servingStyle !== null ||
-        JSON.stringify(input?.tags) !== JSON.stringify([]) ||
+        input?.tags !== undefined ||
+        JSON.stringify(input?.noseTags) !== JSON.stringify(["smoke"]) ||
+        JSON.stringify(input?.palateTags) !== JSON.stringify(["citrus"]) ||
+        JSON.stringify(input?.finishTags) !== JSON.stringify(["smoke"]) ||
         JSON.stringify(input?.friends) !== JSON.stringify([])
       ) {
         sendRpcError(response, "Unexpected member review save payload");

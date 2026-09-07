@@ -11,9 +11,10 @@ These records have different intent. Do not add review fields to a tasting.
 
 Member reviews and external reviews share the same basic meaning. Their source
 and fields differ. A member review has a member, a whole-number score from 0
-through 100, and optional tasting notes, color, comments, serving style,
-friends, and picture. An external review can have a publication, reviewer,
-article link, and the score format used by its source.
+through 100, and optional written notes, nose tags, palate tags, finish tags,
+color, comments, serving style, friends, and picture. An external review can
+have a publication, reviewer, article link, and the score format used by its
+source.
 An external review can also have one short generated clip and matched tasting
 tags. Its full body is saved for internal parsing, following
 [External Reviews](../features/external-reviews.md).
@@ -93,6 +94,11 @@ not expose a reliable edit timestamp.
 `member_review` owns member scores. A member can have at most one review for an
 exact Bottle. Saving again updates that review. A Bottle merge keeps the review
 with the latest `updatedAt`. A larger review ID breaks an exact time tie.
+
+Member reviews save flavors separately for the nose, palate, and finish. The
+`tags` field combines those flavors for Bottle summaries, with each flavor
+counted once per review. Existing reviews keep their saved flavors until a
+member edits and saves them with the new fields.
 
 Public member review pages expose schema.org `Review` data with the stored
 0–100 score. Bottle overview pages show recent public member reviews and may

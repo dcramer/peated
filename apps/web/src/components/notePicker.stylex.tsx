@@ -42,11 +42,13 @@ export type NotePickerFieldProps = Pick<
   "notes" | "onChange" | "value"
 > & {
   id?: string;
+  label?: string;
 };
 
 /** Keeps the full picker available without replacing the surrounding form. */
 export function NotePickerField({
   id,
+  label,
   notes,
   onChange,
   value,
@@ -128,7 +130,7 @@ export function NotePickerField({
           aria-autocomplete="list"
           aria-controls={suggestionsOpen ? listboxId : undefined}
           aria-expanded={suggestionsOpen}
-          aria-label="Find a tasting note"
+          aria-label={label ?? "Find a tasting note"}
           id={inputId}
           onChange={(event) => {
             setQuery(event.currentTarget.value);
@@ -142,6 +144,9 @@ export function NotePickerField({
           {...stylex.props(foundationStyles.input, styles.fieldInput)}
         />
         <Button
+          aria-label={
+            label ? `Browse ${label.toLocaleLowerCase()} notes` : undefined
+          }
           aria-expanded={isBrowserOpen}
           aria-haspopup="dialog"
           onClick={() => {

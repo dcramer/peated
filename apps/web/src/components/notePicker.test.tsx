@@ -55,4 +55,22 @@ describe("NotePickerField", () => {
 
     expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
+
+  it("names the field and browser for its review section", () => {
+    act(() =>
+      root.render(
+        <NotePickerField
+          label="Nose"
+          notes={notes}
+          onChange={() => undefined}
+          value={[]}
+        />,
+      ),
+    );
+
+    expect(container.querySelector('input[aria-label="Nose"]')).not.toBeNull();
+    expect(
+      container.querySelector('button[aria-label="Browse nose notes"]'),
+    ).not.toBeNull();
+  });
 });

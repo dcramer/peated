@@ -31,6 +31,18 @@ export const memberReviews = pgTable(
       .array()
       .default(sql`array[]::varchar[]`)
       .notNull(),
+    noseTags: varchar("nose_tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
+    palateTags: varchar("palate_tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
+    finishTags: varchar("finish_tags", { length: 64 })
+      .array()
+      .default(sql`array[]::varchar[]`)
+      .notNull(),
     color: integer("color"),
     notes: text("notes"),
     servingStyle: servingStyleEnum("serving_style"),
