@@ -176,12 +176,12 @@ same review order and IDs. Repeated reviews with the same Bottle name and writer
 keep separate keys in their original order.
 
 Version 8 rules must select up to 20 articles from the current review page. On
-detail pages, match `Review` headings to split the shared article area into
-sections even when Squarespace layout elements wrap the content. Read the
-Bottle name from the first line of its large-text block, the writer from the
-review heading or article byline, and the score out of 10. Run a full local
-no-write preview and compare single-Bottle, multi-Bottle, and multi-writer
-articles with the code parser before applying.
+detail pages, use the content column inside `article.h-entry`, then match
+`Review` headings to split it into sections. Read the full publication time
+from the page metadata, the Bottle name from the first line of its large-text
+block, the writer from the review heading or article byline, and the score out
+of 10. Run a full local no-write preview and compare single-Bottle,
+multi-Bottle, and multi-writer articles with the code parser before applying.
 
 Activate only a production preview with exact output. Trigger one manual
 collection and confirm that it updates the same review IDs without adding
