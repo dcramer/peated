@@ -702,9 +702,11 @@ completion record.
   as not single-cask; its missing Black edition is staged as a correction. A
   [Bonhams sale announcement](https://hk.news.yahoo.com/%E9%A6%99%E6%B8%AF%E9%82%A6%E7%80%9A%E6%96%AF%E5%91%88%E7%8D%BB%E5%85%A9%E5%A0%B4%E6%B4%8B%E9%85%92%E5%8F%8A%E7%83%88%E9%85%92%E6%8B%8D%E8%B3%A3-061120904.html)
   and independent [sale coverage](https://www.decanter.com/wine-news/yamazaki-whisky-collection-beats-estimate-in-hong-kong-529791/)
-  distinguish Green Hitomi as a separate release. It remains an unwritten lead
-  because the available lot-level evidence does not state its strength,
-  composition, outturn, or release date. Exact auction records also establish
+  distinguish Green Hitomi as a separate release. It was initially held as an
+  unwritten lead because the available lot-level evidence does not state its
+  strength, composition, outturn, or release date; the closing findings below
+  resolve the Bottle identity while leaving those facts unknown. Exact auction
+  records also establish
   three Suntory Single Cask Whisky releases: the 1998-vintage, 2013-bottled, 54%
   sherry butt
   [`CM70012`](https://www.sothebys.com/en/buy/auction/2023/fine-rare-whisky-the-inaugural-singapore-auction/shan-qi-yamazaki-single-cask-cm70012-54-0-abv-1998-4)
@@ -1013,8 +1015,9 @@ completion record.
   and celebration sherry butt
   [`4R70416`](https://www.whiskybase.com/whiskies/whisky/191464/yamazaki-1994?language=en)
   outside the Owner's Cask family as The Single Cask or Suntory Single Cask
-  Whisky. Collector-only `4D3004`, `4G3011`, `4R70016`, and `4S70038` remain
-  Owner's Cask leads. `4M70076` Pure Land also remains a lead because no exact
+  Whisky. Collector-only `4D3004`, `4R70016`, and `4S70038` remain Owner's Cask
+  leads. `4G3011` was initially held with them and is resolved in the closing
+  findings below. `4M70076` Pure Land also remains a lead because no exact
   label or auction record has been found. A vintage-by-vintage 1993 pass adds
   17 more candidates supported by exact auction records or readable bottle photos:
   `3F3080`, `3N70037`, `3N70044`, `3P70268`, `3P70269`, `3P70270`, `3P70274`,
@@ -1045,9 +1048,10 @@ completion record.
   `3S65005` and sherry butt `3X70007`; an exact
   [retailer record](https://www.whiskyciti.com/product/yamazaki-the-owners-cask-1993-2010-fresh-woody/)
   supplies `3S65005`'s Fresh & Woody edition and 160-bottle outturn. The
-  collector-index entries `3N70042`, `3O70320`, `3P70186`, `3P70187`,
-  `3Q70046`, and `3Q70300` remain leads until exact label or auction evidence
-  settles their stable family and facts. Earlier-vintage exact-source passes add
+  collector-index entries `3N70042`, `3O70320`, and `3P70186` remain leads until
+  exact label or auction evidence settles their stable family and facts.
+  `3P70187`, `3Q70046`, and `3Q70300` were initially held with them and are
+  resolved in the closing findings below. Earlier-vintage exact-source passes add
   13 more Owner's Casks. For 1990, exact Sotheby's, Bonhams, Spink, Catawiki,
   and review records establish sherry butts `OL3042`, `OS70389`, `OU70403`,
   `OU70405`, and `OU70406`. The
@@ -1057,9 +1061,9 @@ completion record.
   [Spink `OU70405` catalog](https://storage.spink.com/source/Auto_Catalogue/SFW64.pdf?v=2),
   and [Catawiki `OU70406` record](https://www.catawiki.com/en/l/106027564-yamazaki-1990-the-owner-s-cask-suntory-b-2005-700ml)
   supply exact label facts; the Spink record establishes the Esprit edition and
-  442-bottle outturn. `OS70266` and `OS70301` remain index-only leads, while
-  `0U70178` and `O065404` have conflicting Owner's Cask and Suntory Single Cask
-  identities. For 1989, the
+  442-bottle outturn. `OS70266` remains an index-only lead, while `OS70301` is
+  resolved in the closing findings below. `0U70178` and `O065404` have
+  conflicting Owner's Cask and Suntory Single Cask identities. For 1989, the
   [Bonhams catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190517%20S-25188-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
   [Catawiki bottle record](https://www.catawiki.com/de/l/103338014-yamazaki-1989-owner-s-cask-no-9u70062-suntory-b-2007-700-ml),
   [Bonhams S-25189 catalog](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf),
@@ -1069,8 +1073,9 @@ completion record.
   [auction catalog for `9U70063`](https://www.antiquekeeper.ca/largedocs/dongzheng/2016_572b401a142e9.pdf)
   establishes its 2008 bottling and 62% strength. Exact and secondary
   records conflict between 54% and 62% for `9U70062`, so its strength remains
-  unknown. `9V70315` and `9V70227` remain index-only leads; `9V70339` has a
-  conflicting Suntory Single Cask label. The
+  unknown. `9V70315` remains an index-only lead, while `9V70227` is resolved in
+  the closing findings below; `9V70339` has a conflicting Suntory Single Cask
+  label. The
   [Acker catalog](https://webdocs.ackerwines.com/203A_FINAL_WEB.pdf) establishes
   1986 Mizunara butts `6G5014` and `6G5025`, the latter for ANA Hotel Tokyo's
   20th Anniversary. It also corrects the transcribed cask `6V01032` to
@@ -1118,17 +1123,19 @@ completion record.
   Exact sources support their staged vintages, bottling years, strengths, and
   stated outturns. `1S70455`'s maturation remains unknown because its exact
   records conflict between barrel and sherry butt. Casks `1V70591`, `1O65110`,
-  `1V70375`, `IV70707`, and `1S70461` remain unresolved because exact records
-  disagree between The Owner's Cask and other single-cask labels. A second 1992
+  `IV70707`, and `1S70461` remain unresolved because exact records disagree
+  between The Owner's Cask and other single-cask labels. `1V70375` was initially
+  held with them and is resolved in the closing findings below. A second 1992
   pass adds exact Sotheby's records for barrel
   [`2V70243`](https://www.sothebys.com/en/buy/auction/2021/distilled-whisky-moutai-2/shan-qi-yamazaki-the-owners-cask-2v70243-56-0-abv),
   Tokyo Suntory Club 40th Anniversary sherry butt
   [`ZL3003`](https://www.sothebys.com/en/buy/auction/2023/kodawarikodawari-the-greatest-japanese-whisky-collection-part-i/shan-qi-yamazaki-the-owners-cask-zl3003-52-0-abv),
   and Miyako Hotels 15th Anniversary hogshead
   [`ZS70182`](https://www.sothebys.com/en/buy/auction/2026/finest-and-rarest-spirits/shan-qi-the-yamazaki-the-owners-cask-zs70182-59-0).
-  The 1992 index-only records `2D3046`, `2M70153`, `2O70240`, `2U60034`,
-  `2U60037`, and `2W65290` remain leads; `2D3046` and `2U60034` also have
-  conflicting Owner's Cask and Suntory Single Cask classifications. A
+  The 1992 index-only records `2D3046`, `2M70153`, `2O70240`, `2U60034`, and
+  `2U60037` remain leads; `2D3046` and `2U60034` also have conflicting Owner's
+  Cask and Suntory Single Cask classifications. `2W65290` was initially held
+  with them and is resolved in the closing findings below. A
   [2006 producer-visit record](https://www.yamaken.org/mt/kuidaore/archives/2006/08/post_871.html)
   shows cask `2D3048` was offered through the Owner's Cask program, but does not
   prove that a final Bottle was released, so it is not a create candidate. The
@@ -1874,6 +1881,62 @@ completion record.
   correction. A separate 222-result public name search found no other Bottle
   with Yamazaki in its title but outside the 223-record distillery inventory;
   its only exception was this same `B43234`.
+- A further exact-source pass resolves six Owner's Casks that had been held as
+  index-only leads. Exact photographed records, with independent market
+  corroboration where available, establish 1994 sherry butt
+  [`4G3011`](https://www.whiskybase.com/whiskies/whisky/42632/yamazaki-1994)
+  for Izumiya, also shown in an exact
+  [retailer listing](https://ctowhisky.com.hk/index.php/product-category/japan-whiskey/japan-whiskey-suntory/suntory-yamazaki/page/2/),
+  1993 hogshead
+  [`3Q70300`](https://spiritory.com/it/yamazaki-1993-the-owners-cask-nr3q70300-196056),
+  1990 hogshead
+  [`OS70301`](https://spiritory.com/yamazaki-1990-the-owners-cask-nros70301-179686/)
+  for Mitsui O.S.K. Passenger Line, 1989 hogshead
+  [`9V70227`](https://spiritory.com/yamazaki-1989-the-owners-cask-nr9v70227-184744/)
+  for Sanwa General Contractor's 60th anniversary, 1991 Katsuragi barrel
+  [`1V70375`](https://www.whiskybase.com/whiskies/whisky/93796/yamazaki-1991),
+  and 1992 barrel
+  [`2W65290`](https://spiritory.com/yamazaki-1992-the-owners-cask-nr2w65290-206506).
+  Exact public Peated searches returned no match for any of the six. They are
+  staged with source-stated facts only, taking the new Owner's Cask set from
+  211 to 217.
+- Two more releases complete the currently evidenced The Cask of Yamazaki
+  sequence. Exact photographed records establish 10-year-old 1993 barrel
+  [`3P70187`](https://www.whiskybase.com/whiskies/whisky/107347/yamazaki-1993),
+  bottled in 2003 at 57% with a 168-bottle outturn, and 12-year-old 1993
+  Heavily Peated Malt
+  [`3Q70046`](https://www.whiskybase.com/whiskies/whisky/64445/yamazaki-1993),
+  bottled in 2005 at 62% with a 503-bottle outturn. Independent
+  [secondary-market records for `3P70187`](https://spiritory.com/yamazaki-10-years-old-1993-the-cask-of-yamazaki-nr3p70187-107347)
+  and
+  [`3Q70046`](https://spiritory.com/yamazaki-12-years-old-1993-the-cask-of-yamazaki-nr3q70046-64445)
+  corroborate their exact casks, family, strengths, and sizes. Exact public
+  Peated searches returned no match for either release.
+- [Bonhams' 2024 sale announcement](https://hk.news.yahoo.com/%E9%A6%99%E6%B8%AF%E9%82%A6%E7%80%9A%E6%96%AF%E5%91%88%E7%8D%BB%E5%85%A9%E5%A0%B4%E6%B4%8B%E9%85%92%E5%8F%8A%E7%83%88%E9%85%92%E6%8B%8D%E8%B3%A3-061120904.html)
+  and independent
+  [sale coverage](https://www.decanter.com/wine-news/yamazaki-whisky-collection-beats-estimate-in-hong-kong-529791/)
+  identify Green Hitomi as a separate bottle alongside Black Hitomi, Genmu,
+  and Genmu Premium Red Edition. It is staged as `Hitomi` with edition `Green`;
+  strength, year, composition, cask, and outturn remain unknown because the
+  available exact sources do not state them. The exact Peated search returned
+  no match. Together with the two casks above, this takes the evidence-backed
+  non-Owner create set from 116 to 119.
+- The final image-identity check found that the reusable 180 ml no-age-statement
+  photo is assigned to the wrong existing Bottle. Suntory's official
+  [180 ml product record](https://products.suntory.co.jp/d/4901777237841/) and
+  [current lineup](https://www.suntory.co.jp/whisky/yamazaki/product/) identify
+  it as the regular 43% Yamazaki, which is existing `B51072` (`Single Malt`,
+  release 2012). By contrast, exact
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/266965/yamazaki-japan-edition)
+  and
+  [auction](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890042-yamazaki-japan-edition/)
+  records identify `B51688` (`Japan Edition`) as a distinct 2024 travel-retail
+  release in a 700 ml presentation. The
+  [Commons photo](<https://commons.wikimedia.org/wiki/File:Yamazaki_NA_180ml_(cropped).jpg>)
+  should therefore move from `B51688` to `B51072`, retaining its `CC BY-SA 4.0`
+  terms and Keeezawa credit. This is staged as the 14th current correction; the
+  authenticated image move and verification remain deferred with the other
+  production writes.
 
 ## SMWS 19.90 reference repair — September 6, 2026
 
