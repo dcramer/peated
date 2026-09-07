@@ -687,3 +687,166 @@ not identify one exact marketed release.
   exact casks in Peated. None of those four records was merged or given invented
   facts. Ambiguous generic 25-year-old and Single Cask Selection records were
   likewise preserved.
+
+## The Macallan — September 7, 2026
+
+The production catalog was rebuilt from an initial inventory of 193 related
+Bottles. After three verified duplicate merges and two missing-release creates,
+the completed catalog contains 456 branded Bottles, 530 Bottles that name The
+Macallan as a distiller, and 40 Bottle Series holding 432 releases. Official
+releases now use The Macallan as Brand and distiller but not bottler: 287
+incorrect self-bottler relationships were cleared, 50 missing distiller
+relationships were restored, and repeat filters returned zero remaining errors.
+
+- The producer's [current collection](https://www.themacallan.com/en-us/single-malt-scotch-whisky)
+  and [archive](https://www.themacallan.com/en-us/single-malt-scotch-whisky/archive)
+  supplied the primary release inventory. Exact producer pages established
+  names, ages, years, strengths, casks, outturns, and maturation where stated.
+  Auction houses and specialist retailers were used only to fill facts absent
+  from the producer record or to separate older releases with similar names.
+- Forty Series now hold 432 releases. Bounded collections match their
+  released lists, including Fine & Rare 60, Sherry Oak 68, Exceptional Single
+  Cask 40, Anniversary Malt 18, Double Cask 15, M Collection 19, Rare Cask 15,
+  Harmony 12, Fine Oak and Triple Cask Matured 12, Archival Series eight,
+  Classic Cut nine, Distil Your World seven, Six Pillars six, Edition Series
+  six, Gran Reserva six, Colour Collection five, the four-release Replica
+  Collection, and the smaller producer collections. The Red Collection has 12
+  marketed releases across nine age expressions: the 40- and 60-year-olds have
+  distinct annual bottlings, while the newly recorded 77- and 79-year-olds
+  complete the producer's age list. The 1824 Collection now includes the MMIX,
+  MMXI, and MMXII annual Limited Releases as three separate Bottles.
+- The
+  [Fine & Rare archive](https://www.themacallan.com/en-us/single-malt-scotch-whisky/fine-and-rare)
+  was recorded as 60 exact cask releases rather than as generic vintage rows.
+  The Sherry Oak audit separates ages and annual releases, including the
+  historical 18-year-old vintage sequence and current 12-, 18-, 25-, and
+  30-year-old releases. Fine Oak records use the eight documented ages; the
+  later Triple Cask Matured name is retained for its three rebranded ages.
+- The
+  [Masters of Photography collection](https://www.themacallan.com/en/single-malt-scotch-whisky/masters-of-photography)
+  is represented by 43 exact records. These cover all non-Elliott Erwitt
+  releases, the four Annie Leibovitz casks, and 31 of the 58 Elliott Erwitt
+  single casks. The producer confirms 58 Elliott casks with 35 bottles each,
+  but public evidence recovered only 31 exact cask identifiers. The other 27
+  remain deliberately uncreated rather than being represented by guesses or an
+  aggregate placeholder. Two published strengths conflict and remain unknown;
+  the catalog does not choose between them without label evidence.
+- One-off archive releases were verified separately. These include the
+  [72 Years Old in Lalique Genesis Decanter](https://www.themacallan.com/en-us/single-malt-scotch-whisky/the-macallan-72-years-old-in-lalique),
+  [The Reach](https://www.themacallan.com/en/single-malt-scotch-whisky/the-reach-whisky),
+  [Horizon](https://www.themacallan.com/en-sg/single-malt-scotch-whisky/the-macallan-horizon/horizon),
+  [Litha](https://www.themacallan.com/en-sg/single-malt-scotch-whisky/litha-whisky),
+  the 2026 Romantica Collection, and The Tree of Life. Double Cask Gold remains
+  the same Bottle as the former 1824 Series Gold because the producer explicitly
+  calls it the same whisky with a new name and packaging; the historical name
+  is preserved as a Bottle alias. The 1951 precursor to Fine & Rare was
+  separated from the later 1951 Fine & Rare cask and recorded as a 49-year-old,
+  two-sherry-butt release bottled in 2001.
+- The old 7- and 8-year-old Italian releases and both age-stated and
+  no-age-statement Cask Strength products were normalized without inventing
+  dates or batch strengths. Three vintage 80° Proof releases were separated by
+  distillation year; label and auction evidence established Campbell, Hope &
+  King as bottler for the 1954, 1957, and 1962 releases and converted the
+  imperial proof statement to 45.9% ABV.
+  A 1974 Cadenhead's Authentic Collection record now uses William Cadenhead's
+  as Brand and bottler and The Macallan only as distiller. Its incorrect
+  46-year age was cleared because the stored record does not identify which of
+  several documented 1974 releases it represents.
+- A five-page structural scan of all 457 pre-merge branded Bottles found no
+  remaining missing Macallan distiller relationships, Macallan self-bottler
+  assignments, category errors, age/NAS conflicts, impossible release-date
+  chains, or years before their recorded vintages. The only strength below 40%
+  is the 1928 50-year-old Anniversary Malt (`B19236`).
+  [Sotheby's](https://www.sothebys.com/en/buy/auction/2019/the-ultimate-whisky-collection/the-macallan-50-year-old-anniversary-malt-38-6-abv)
+  and
+  [Christie's](https://www.christies.com/en/lot/lot-6051441)
+  both confirm that it was bottled in 1983 at natural cask strength of 38.6%,
+  so the historical exception was retained.
+- A September 7 recheck of the producer's
+  [current collection](https://www.themacallan.com/en/single-malt-scotch-whisky)
+  and [newsroom](https://www.themacallan.com/en-us/about/newsroom) reconciled
+  the named 2025 and 2026 releases with production. The 2026 Sherry Oak 18-,
+  25-, and 30-year-old releases, Double Cask 18-year-old, Romantica, and Diamonds
+  Are Forever were already complete. Exact producer evidence was used to finish
+  Distil Your World Paris (`B54615`), A Night on Earth - The First Light
+  (`B54634`), Inspired by Fresh Coconut (`B54786`), Inspired by Toasted Coconut
+  (`B54787`), and Rare Cask 2026 (`B54740`). The completed fields include their
+  stated strengths, release years or date, natural-colour status where stated,
+  and exact cask compositions. Every changed Bottle was fetched again after the
+  write.
+- Exact current-release evidence also established that two Red Collection
+  releases were absent from production. The 77-year-old was created as `B55171`
+  with its 2022 release year, 43.2% ABV, and sherry-seasoned-oak maturation. The
+  79-year-old was created as `B55174` with its April 7, 2026 release date, 40.8%
+  ABV, and sherry-seasoned-oak maturation. The producer's
+  [77-year-old page](https://www.themacallan.com/en-sg/single-malt-scotch-whisky/red-collection-77-years-old)
+  and
+  [79-year-old announcement](https://www.themacallan.com/en-us/newsroom/new-launches/the-macallan-79-years-old)
+  provide the primary identities. Conflicting secondary bottling years for the
+  79-year-old remain unknown. The producer's
+  [First Light page](https://www.themacallan.com/en/single-malt-scotch-whisky/a-night-on-earth-the-first-light)
+  and [November 4, 2025 announcement](https://www.themacallan.com/zh-hant-tw/newsroom/new-launches/a-night-on-earth-first-light)
+  establish its stable name, 2025 release year, fourth-release position, and
+  maturation in sherry-seasoned American and European oak with a small portion
+  of former-bourbon casks; Virginia's 2026 control-state listing confirms 86
+  proof, or 43% ABV. The producer's
+  [Harmony VI announcement](https://www.themacallan.com/en-us/newsroom/new-launches/final-chapter-harmony)
+  establishes the two concluding releases and 46.3% ABV for Inspired by Fresh
+  Coconut. The exact
+  [Toasted Coconut page](https://www.themacallan.com/en/single-malt-scotch-whisky/the-harmony-collection/inspired-by-toasted-coconut)
+  establishes its travel-exclusive identity and American-oak maturation;
+  exact specialist records agree on 43.3% ABV. No source states reusable image
+  rights.
+- The producer's
+  [79-year-old announcement](https://www.themacallan.com/en-us/newsroom/new-launches/the-macallan-79-years-old)
+  says the addition brings the Red Collection to nine whiskies, meaning nine age
+  expressions: 40, 50, 60, 71, 73, 74, 77, 78, and 79 years old. Its original
+  [2020 release](https://www.themacallan.com/en-us/newsroom/the-red-collection)
+  describes the 40-, 50-, and 60-year-olds as ongoing expressions.
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/macallan-red-collection-60-year-old)
+  separately documents the 2024 60-year-old at 40.4%, distinct from the 2020
+  60-year-old at 43.4%. Whisky Auctioneer's
+  [collection history](https://whiskyauctioneer.com/learn/explore-whisky/series/macallan-red-collection)
+  establishes the 77-year-old's 2022 release and 43.2% strength. Peated's 12
+  Bottle releases now model all nine producer expressions and their documented
+  annual variants.
+- [Sotheby's Macallan history](https://www.sothebys.com/en/articles/the-macallan-in-lalique-the-six-pillars-collection-a-history)
+  records that the distillery used the name Macallan-Glenlivet from 1892 until
+  dropping the suffix in 1980. `Macallan-Glenlivet` was added to `E1157` as a
+  public alias and exact matching reference. The existing `Macallan` and
+  `The Macallan` references were retained. The longer form
+  `The Macallan-Glenlivet` was not added because the evidence did not require a
+  separate exact label.
+- A complete normalized comparison of the branded records found three exact
+  duplicate groups. `B3277` and `B14146` are the same 2017 Classic Cut release;
+  `B18061` and `B54920` are the same Fine & Rare 1976 cask 11354; and `B5467`
+  and `B54983` are the same 18-year-old 1973 Vintage bottled in 1991. Exact
+  producer, auction, and specialist records independently verified all three
+  identities before the approved merges: the producer's
+  [Classic Cut 2017 archive](https://www.themacallan.com/en/single-malt-scotch-whisky/classic-cut-2017-edition)
+  and
+  [Fine & Rare 1976 archive](https://www.themacallan.com/en-us/single-malt-scotch-whisky/fine-and-rare/1976),
+  plus exact [Whiskybase](https://www.whiskybase.com/whiskies/whisky/64437/macallan-1973)
+  and
+  [Bonhams](https://images2.bonhams.com/original?src=Images%2Flive%2F2014-10%2F21%2FS-21945-0-1.pdf)
+  records for the 1973 release. `B14146` was merged into `B3277`, `B54920` into
+  `B18061`, and `B54983` into `B5467`. The older public IDs remain the survivors;
+  old IDs redirect to them, both public reviews were preserved, and all six
+  original reference names still resolve to the survivors. The survivors were
+  normalized as Classic Cut - 2017 Edition at 58.4%, Fine & Rare 1976 cask 11354
+  at 45.5%, and Sherry Oak - 1973 Vintage at 43%.
+- Two standalone records remain intentionally unresolved. `B19116` does not
+  distinguish the old Campbell, Hope & King 1961 Vintage from the later
+  official 40-year-old release. `B4678` could describe either an independent
+  25-year-old 1993 bottling or an official Exceptional Single Cask release.
+  Their sparse stored data cannot support a safe identity choice. The 8-year-old
+  record likewise retains no bottler or date because both Campbell, Hope & King
+  and official 1980s versions are documented, although its age, 43% ABV, and
+  sherry maturation are supported by its exact image.
+- The existing Entity image (`I43`) is sourced to Wikimedia Commons under CC
+  BY-SA 2.0 and was retained. In the pre-merge audit, 44 of 457 branded Bottles
+  had an image; 12 record a source page, 32 are legacy price-derived images
+  without a source page, and none records reusable rights. Missing images were
+  left empty because the exact producer, retailer, and auction pages reviewed
+  did not state reusable rights. No unlicensed image was copied or deleted
+  during this operation.
