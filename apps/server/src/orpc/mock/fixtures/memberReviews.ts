@@ -12,6 +12,9 @@ export const mockMemberReview = {
   bottle: mockBottles[8]!,
   score: 91,
   tags: ["smoke", "dried fruit", "sea salt"],
+  noseTags: ["smoke", "sea salt"],
+  palateTags: ["dried fruit"],
+  finishTags: ["smoke"],
   tagCategories: {
     smoke: "smoke",
     "dried fruit": "fruit",
@@ -37,6 +40,9 @@ export const mockMemberReviews: Review[] = [
     notes:
       "Bright coastal peat, lemon oil, and vanilla. Powerful, but the bourbon casks keep it focused.",
     tags: ["peat", "lemon", "vanilla"],
+    noseTags: ["peat", "lemon"],
+    palateTags: ["vanilla"],
+    finishTags: ["peat"],
     tagCategories: { peat: "smoke", lemon: "fruit", vanilla: "sweet" },
     friends: [],
     imageUrl: null,
@@ -51,6 +57,9 @@ export const mockMemberReviews: Review[] = [
     notes:
       "Ash, brine, and sweet oak. A dense pour that opens well with a few drops of water.",
     tags: ["ash", "brine", "oak"],
+    noseTags: ["ash", "brine"],
+    palateTags: ["oak"],
+    finishTags: ["ash"],
     tagCategories: { ash: "smoke", brine: "smoke", oak: "wood" },
     friends: [],
     imageUrl: null,

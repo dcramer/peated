@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { follows, memberReviews } from "@peated/server/db/schema";
+import { bottleTags, follows, memberReviews } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import waitError from "@peated/server/lib/test/waitError";
@@ -34,7 +34,9 @@ describe("member reviews", () => {
       {
         bottle: bottle.id,
         score: 88,
-        tags: ["apple", "wax"],
+        noseTags: ["apple"],
+        palateTags: ["wax"],
+        finishTags: ["apple"],
         color: 7,
         notes: "Bright fruit.",
         servingStyle: "neat",
@@ -42,11 +44,19 @@ describe("member reviews", () => {
       },
       { context: { user: defaults.user } },
     );
+    expect(created).toMatchObject({
+      tags: ["apple", "wax"],
+      noseTags: ["apple"],
+      palateTags: ["wax"],
+      finishTags: ["apple"],
+    });
     const updated = await routerClient.memberReviews.save(
       {
         bottle: bottle.id,
         score: 90,
-        tags: ["smoke"],
+        noseTags: ["smoke"],
+        palateTags: ["smoke", "wax"],
+        finishTags: [],
         color: 9,
         notes: null,
         servingStyle: "splash",
@@ -58,8 +68,11 @@ describe("member reviews", () => {
     expect(updated).toMatchObject({
       id: created.id,
       score: 90,
-      tags: ["smoke"],
-      tagCategories: { smoke: "smoke" },
+      tags: ["smoke", "wax"],
+      noseTags: ["smoke"],
+      palateTags: ["smoke", "wax"],
+      finishTags: [],
+      tagCategories: { smoke: "smoke", wax: "earthy" },
       color: 9,
       notes: null,
       servingStyle: "splash",
@@ -73,8 +86,11 @@ describe("member reviews", () => {
     ).resolves.toMatchObject({
       id: created.id,
       score: 90,
-      tags: ["smoke"],
-      tagCategories: { smoke: "smoke" },
+      tags: ["smoke", "wax"],
+      noseTags: ["smoke"],
+      palateTags: ["smoke", "wax"],
+      finishTags: [],
+      tagCategories: { smoke: "smoke", wax: "earthy" },
       color: 9,
       notes: null,
       servingStyle: "splash",
@@ -87,12 +103,31 @@ describe("member reviews", () => {
           eq(memberReviews.createdById, defaults.user.id),
         ),
       }),
-    ).resolves.toHaveLength(1);
+    ).resolves.toEqual([
+      expect.objectContaining({
+        tags: ["smoke", "wax"],
+        noseTags: ["smoke"],
+        palateTags: ["smoke", "wax"],
+        finishTags: [],
+      }),
+    ]);
     expect(workerClient.pushJob).toHaveBeenLastCalledWith(
       "UpdateBottleStats",
       { bottleId: bottle.id },
       { delay: 5000, removeOnComplete: true, removeOnFail: false },
     );
+
+    await recomputeBottleStats(bottle.id);
+    await expect(
+      db
+        .select({ count: bottleTags.count, tag: bottleTags.tag })
+        .from(bottleTags)
+        .where(eq(bottleTags.bottleId, bottle.id))
+        .orderBy(bottleTags.tag),
+    ).resolves.toEqual([
+      { count: 1, tag: "smoke" },
+      { count: 1, tag: "wax" },
+    ]);
   });
 
   test("rejects friends who are not active relationships", async ({

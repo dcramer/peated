@@ -24,6 +24,26 @@ import {
   type ServingStyleInputProps,
 } from "./tastingInputs.stylex";
 
+type NotePickerFieldProps = ComponentProps<typeof NotePickerField> & {
+  id: string;
+};
+
+function TastingNoteField({
+  error,
+  label,
+  picker,
+}: {
+  error?: string;
+  label: string;
+  picker: NotePickerFieldProps;
+}) {
+  return (
+    <Field error={error} htmlFor={picker.id} label={label} optional>
+      <NotePickerField {...picker} label={label} />
+    </Field>
+  );
+}
+
 /** Captures a member's words before asking for flavors, serving details, or a rating. */
 export function TastingNotesStep({
   notes,
@@ -33,7 +53,7 @@ export function TastingNotesStep({
   label = "What stood out?",
 }: {
   notes: ComponentProps<typeof Textarea> & { id: string };
-  flavors: ComponentProps<typeof NotePickerField> & { id: string };
+  flavors: NotePickerFieldProps;
   notesError?: string;
   flavorsError?: string;
   label?: string;
@@ -55,9 +75,50 @@ export function TastingNotesStep({
           rows={3}
         />
       </Field>
-      <Field error={flavorsError} htmlFor={flavors.id} label="Flavors" optional>
-        <NotePickerField {...flavors} />
+      <TastingNoteField error={flavorsError} label="Flavors" picker={flavors} />
+    </FormStep>
+  );
+}
+
+export function MemberReviewNotesStep({
+  notes,
+  nose,
+  palate,
+  finish,
+  notesError,
+  noseError,
+  palateError,
+  finishError,
+}: {
+  notes: ComponentProps<typeof Textarea> & { id: string };
+  nose: NotePickerFieldProps;
+  palate: NotePickerFieldProps;
+  finish: NotePickerFieldProps;
+  notesError?: string;
+  noseError?: string;
+  palateError?: string;
+  finishError?: string;
+}) {
+  return (
+    <FormStep title="Notes">
+      <Field
+        error={notesError}
+        errorId={`${notes.id}-error`}
+        htmlFor={notes.id}
+        label="What do you think?"
+        optional
+      >
+        <Textarea
+          {...notes}
+          aria-describedby={notesError ? `${notes.id}-error` : undefined}
+          invalid={Boolean(notesError)}
+          placeholder="What do you want to remember?"
+          rows={3}
+        />
       </Field>
+      <TastingNoteField error={noseError} label="Nose" picker={nose} />
+      <TastingNoteField error={palateError} label="Palate" picker={palate} />
+      <TastingNoteField error={finishError} label="Finish" picker={finish} />
     </FormStep>
   );
 }

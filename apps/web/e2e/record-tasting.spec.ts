@@ -23,6 +23,13 @@ test.describe("tastings and reviews", () => {
     await page.goto(`/bottles/${existingBottle.id}/addTasting`);
     await page.getByRole("button", { name: /^Write a review/ }).click();
     await page.getByLabel("What do you think?").fill("Coastal and waxy.");
+    await expect(page.getByText("Nose", { exact: true })).toBeVisible();
+    await expect(page.getByText("Palate", { exact: true })).toBeVisible();
+    await expect(page.getByText("Finish", { exact: true })).toBeVisible();
+    await expect(page.getByText("Flavors", { exact: true })).toHaveCount(0);
+    await selectReviewTag(page, "Nose", "smoke");
+    await selectReviewTag(page, "Palate", "citrus");
+    await selectReviewTag(page, "Finish", "smoke");
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByLabel("Score out of 100").fill("80");
@@ -80,6 +87,11 @@ test.describe("tastings and reviews", () => {
     );
   });
 });
+
+async function selectReviewTag(page: Page, section: string, tag: string) {
+  await page.getByRole("combobox", { name: section }).fill(tag);
+  await page.getByRole("option").filter({ hasText: tag }).click();
+}
 
 async function startTasting(page: Page, notes: string) {
   await page.getByRole("button", { name: /^Log a tasting/ }).click();

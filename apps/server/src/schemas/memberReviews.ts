@@ -21,7 +21,8 @@ export const MemberReviewNotesSchema = z
 const MemberReviewTagsSchema = z
   .array(z.string())
   .default([])
-  .describe("Tasting notes associated with this review");
+  .describe("All flavors found in this review");
+const MemberReviewFlavorTagsSchema = z.array(z.string()).default([]);
 const MemberReviewColorSchema = z
   .number()
   .gte(0)
@@ -38,6 +39,11 @@ export const MemberReviewSchema = z.object({
   bottleId: z.number().int().positive(),
   score: MemberReviewScoreSchema,
   tags: MemberReviewTagsSchema,
+  noseTags: MemberReviewFlavorTagsSchema.describe("Flavors found on the nose"),
+  palateTags: MemberReviewFlavorTagsSchema.describe(
+    "Flavors found on the palate",
+  ),
+  finishTags: MemberReviewFlavorTagsSchema.describe("Flavors in the finish"),
   tagCategories: TagCategoriesSchema,
   color: MemberReviewColorSchema,
   notes: MemberReviewNotesSchema,
@@ -59,7 +65,13 @@ export const MemberReviewDetailsSchema = MemberReviewSchema.extend({
 export const MemberReviewInputSchema = z
   .object({
     score: MemberReviewScoreSchema,
-    tags: MemberReviewTagsSchema,
+    noseTags: MemberReviewFlavorTagsSchema.describe(
+      "Flavors found on the nose",
+    ),
+    palateTags: MemberReviewFlavorTagsSchema.describe(
+      "Flavors found on the palate",
+    ),
+    finishTags: MemberReviewFlavorTagsSchema.describe("Flavors in the finish"),
     color: MemberReviewColorSchema,
     notes: MemberReviewNotesSchema,
     servingStyle: MemberReviewServingStyleSchema,

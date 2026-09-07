@@ -19,6 +19,7 @@ import {
   type TastingFormMode,
 } from "@peated/web/components/tastingFormModeChoice.stylex";
 import {
+  MemberReviewNotesStep,
   MemberReviewScoreStep,
   TastingNotesStep,
   TastingPourStep,
@@ -163,7 +164,9 @@ export default function TastingForm(
   } = useForm<MemberReviewFormFields>({
     defaultValues: {
       score: null,
-      tags: [],
+      noseTags: [],
+      palateTags: [],
+      finishTags: [],
       color: null,
       notes: null,
       servingStyle: null,
@@ -217,7 +220,9 @@ export default function TastingForm(
     if (reviewQuery.data === undefined) return;
     resetReview({
       score: reviewQuery.data?.score ?? null,
-      tags: reviewQuery.data?.tags ?? [],
+      noseTags: reviewQuery.data?.noseTags ?? [],
+      palateTags: reviewQuery.data?.palateTags ?? [],
+      finishTags: reviewQuery.data?.finishTags ?? [],
       color: reviewQuery.data?.color ?? null,
       notes: reviewQuery.data?.notes ?? null,
       servingStyle: reviewQuery.data?.servingStyle ?? null,
@@ -283,13 +288,17 @@ export default function TastingForm(
   };
 
   async function continueForm() {
-    const fields =
-      currentStep === 0
-        ? (["notes", "tags"] as const)
-        : (["servingStyle", "color", "friends"] as const);
     const stepIsValid = isReview
-      ? await triggerReview([...fields])
-      : await trigger([...fields]);
+      ? await triggerReview(
+          currentStep === 0
+            ? ["notes", "noseTags", "palateTags", "finishTags"]
+            : ["servingStyle", "color", "friends"],
+        )
+      : await trigger(
+          currentStep === 0
+            ? ["notes", "tags"]
+            : ["servingStyle", "color", "friends"],
+        );
     if (!stepIsValid) return;
     setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
     scrollToFormTop();
@@ -414,31 +423,67 @@ export default function TastingForm(
           ) : null}
           {formMode && !reviewIsLoading && !reviewLoadFailed ? (
             currentStep === 0 ? (
-              <TastingNotesStep
-                label={isReview ? "What do you think?" : "What stood out?"}
-                notes={{
-                  ...(isReview
-                    ? registerReview("notes", {
-                        setValueAs: (value) => value || null,
-                      })
-                    : register("notes", {
-                        setValueAs: (value) => value || null,
-                      })),
-                  id: `${formMode}-comments`,
-                  disabled: saving,
-                }}
-                notesError={(isReview ? reviewErrors : errors).notes?.message}
-                flavors={{
-                  id: `${formMode}-flavors`,
-                  notes: noteOptions,
-                  value: (isReview ? reviewValues : tastingValues).tags ?? [],
-                  onChange: (tags) =>
-                    isReview
-                      ? setReviewValue("tags", [...tags], { shouldDirty: true })
-                      : setValue("tags", [...tags], { shouldDirty: true }),
-                }}
-                flavorsError={(isReview ? reviewErrors : errors).tags?.message}
-              />
+              isReview ? (
+                <MemberReviewNotesStep
+                  notes={{
+                    ...registerReview("notes", {
+                      setValueAs: (value) => value || null,
+                    }),
+                    id: "review-comments",
+                    disabled: saving,
+                  }}
+                  notesError={reviewErrors.notes?.message}
+                  nose={{
+                    id: "review-nose",
+                    notes: noteOptions,
+                    value: reviewValues.noseTags ?? [],
+                    onChange: (tags) =>
+                      setReviewValue("noseTags", [...tags], {
+                        shouldDirty: true,
+                      }),
+                  }}
+                  noseError={reviewErrors.noseTags?.message}
+                  palate={{
+                    id: "review-palate",
+                    notes: noteOptions,
+                    value: reviewValues.palateTags ?? [],
+                    onChange: (tags) =>
+                      setReviewValue("palateTags", [...tags], {
+                        shouldDirty: true,
+                      }),
+                  }}
+                  palateError={reviewErrors.palateTags?.message}
+                  finish={{
+                    id: "review-finish",
+                    notes: noteOptions,
+                    value: reviewValues.finishTags ?? [],
+                    onChange: (tags) =>
+                      setReviewValue("finishTags", [...tags], {
+                        shouldDirty: true,
+                      }),
+                  }}
+                  finishError={reviewErrors.finishTags?.message}
+                />
+              ) : (
+                <TastingNotesStep
+                  notes={{
+                    ...register("notes", {
+                      setValueAs: (value) => value || null,
+                    }),
+                    id: "tasting-comments",
+                    disabled: saving,
+                  }}
+                  notesError={errors.notes?.message}
+                  flavors={{
+                    id: "tasting-flavors",
+                    notes: noteOptions,
+                    value: tastingValues.tags ?? [],
+                    onChange: (tags) =>
+                      setValue("tags", [...tags], { shouldDirty: true }),
+                  }}
+                  flavorsError={errors.tags?.message}
+                />
+              )
             ) : currentStep === 1 ? (
               <TastingPourStep
                 disabled={saving}
