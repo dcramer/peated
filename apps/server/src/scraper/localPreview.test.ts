@@ -6,6 +6,7 @@ import {
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
+import { createSiteWithScrapeSource } from "./configured/service";
 import type { ScraperHttpClock } from "./http";
 import { runLocalScrapeSourcePreview } from "./localPreview";
 
@@ -20,7 +21,16 @@ function previewClock(): ScraperHttpClock {
   };
 }
 
-test("previews configured rules through the runtime without product writes", async () => {
+test("previews an admin-managed source without product writes", async ({
+  fixtures,
+}) => {
+  const user = await fixtures.User({ admin: true });
+  await createSiteWithScrapeSource({
+    name: "Example Reviews",
+    kind: "review",
+    websiteUrl: "https://reviews.example/",
+    createdById: user.id,
+  });
   const fetchImpl = vi.fn<typeof fetch>(async (input) => {
     const url = new URL(input instanceof Request ? input.url : input);
     if (url.pathname === "/robots.txt") {
@@ -43,8 +53,8 @@ test("previews configured rules through the runtime without product writes", asy
 
   const result = await runLocalScrapeSourcePreview(
     {
-      site: "whiskystudy",
-      listUrl: "https://thewhiskystudy.com/reviews-3",
+      site: "reviews-example",
+      listUrl: "https://reviews.example/reviews-3",
       rulesVersion: 6,
       rules: {
         kind: "review",
@@ -149,7 +159,7 @@ test("previews configured rules through the runtime without product writes", asy
     pages: [
       {
         kind: "review",
-        url: "https://thewhiskystudy.com/reviews-3/one",
+        url: "https://reviews.example/reviews-3/one",
         title: "Example Whisky",
         publishedAt: "2026-09-01T00:00:00.000Z",
         reviews: [
@@ -170,7 +180,7 @@ test("previews configured rules through the runtime without product writes", asy
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, result.run.id));
   expect(storedRun?.status).toBe("succeeded");
-});
+}, 15_000);
 
 test("previews price rules without storing prices", async () => {
   const fetchImpl = vi.fn<typeof fetch>(async (input) => {

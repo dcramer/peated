@@ -30,6 +30,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | P0         | [Whisky Advocate](https://whiskyadvocate.com/ratings-reviews) | Existing Peated source; publisher describes an archive of more than 6,000 reviews | Ratings paths allowed for general crawlers; GPTBot, ChatGPT-User, and CCBot are blocked                    | Privacy policy references general terms, but no public general terms page or review-reuse restriction was located                                 | `public_index`, second bounded pilot          |
 | P0         | [Whisky Saga](https://www.whiskysaga.com/)                    | Active scored reviews; the Scotland category contains more than 2,000 articles    | Public category and article paths allowed; Squarespace APIs, search, filters, and internal formats blocked | Privacy and editorial pages contain no automated-access restriction                                                                               | `public_index`, daily Scotch feed             |
 | P1         | [The Whisky Study](https://thewhiskystudy.com/reviews-3)      | Active single-Bottle Scotch reviews with explicit dates and 100-point scores      | Public index and article paths allowed; Squarespace APIs, search, filters, and internal formats blocked    | No dedicated terms or privacy page is linked in the public navigation                                                                             | `public_index`, daily Scotch feed             |
+| P1         | [The Dram Report](https://dram.report/all)                    | 633 drams across three reviewers; active exact 100-point scores                   | Explicitly allows all public paths                                                                         | No dedicated terms, privacy, or reuse page linked from the public site                                                                            | `public_index`; pending production preview    |
 | P1         | [Whisky Magazine](https://www.whiskymag.com/search/tastings/) | Structured tasting archive spanning more than 200 magazine issues                 | Verification failed because the server reset the automated request                                         | Terms prohibit automated access, aggregation, and commercial reuse without written permission                                                     | `licensed_only`                               |
 | P1         | [Malt](https://malt-review.com/)                              | Large historical review archive with multiple contributors                        | Automated requests returned HTTP 429 during the audit                                                      | No current terms page verified because automated access was rate-limited                                                                          | `do_not_ingest`; do not work around the block |
 | P1         | [Breaking Bourbon](https://www.breakingbourbon.com/)          | Deep American whiskey archive with structured ratings and reviewers               | robots file exposes a sitemap and no reviewed article-path restriction                                     | Terms prohibit robots, spiders, retrieval/indexing applications, and reuse without written consent                                                | `licensed_only`                               |
@@ -38,7 +39,7 @@ site-specific search; it does not mean unrestricted use is allowed.
 | P2         | [The Whiskey Reviewer](https://whiskeyreviewer.com/)          | Long-running American and world whiskey review archive                            | Public pages allowed; WordPress administration restricted                                                  | No dedicated reuse terms located                                                                                                                  | `public_index`                                |
 | P2         | [Fred Minnick](https://www.fredminnick.com/)                  | Infrequent current American whiskey reviews among a high-volume news stream       | Public content allowed with a 30-second crawl delay; calendar implementation paths restricted              | No dedicated terms page located; the linked privacy page contains placeholder text                                                                | `public_index`; bounded review feed           |
 | P2         | [Bourbon Culture](https://thebourbonculture.com/)             | Active scored bourbon and American whiskey reviews                                | File defines Cloudflare content-signal semantics but publishes no actual allow/deny signal                 | Public privacy page contains no automated-access or content-reuse restriction; no dedicated terms page located                                    | `public_index`, daily feed                    |
-| P3         | [The Scotch Noob](https://scotchnoob.com/)                    | Useful historical backfill through 2023; little current supply                    | Explicitly allows all pages and publishes a sitemap                                                        | No dedicated reuse terms located                                                                                                                  | `public_index`, low priority because inactive |
+| P3         | [The Scotch Noob](https://scotchnoob.com/)                    | Useful historical backfill through 2023; little current supply                    | Explicitly allows all pages and publishes a sitemap, but returns HTTP 403 to Peated's identified crawler   | No dedicated reuse terms located                                                                                                                  | `do_not_ingest`; do not work around the block |
 | Restricted | [Whiskybase](https://www.whiskybase.com/)                     | Millions of community ratings plus bottle identity data                           | robots request returned HTTP 403 during the audit                                                          | Terms prohibit collection, copying, public display, commercial reuse, archiving, and derivative works; copyright and database rights are asserted | `licensed_only`; do not crawl                 |
 | Restricted | [Distiller](https://distiller.com/)                           | Large editorial and community review database                                     | Only `/data-admin` is disallowed and a sitemap is published                                                | Terms prohibit scraping, indexing, database building, permanent copies, and commercial exploitation                                               | `licensed_only`; do not crawl                 |
 
@@ -118,6 +119,36 @@ a separate platform-terms and creator-rights review.
   not follow older pagination or use the sitemap, search, query filters, or
   Squarespace APIs. Review text stays transient and is discarded after parser
   validation.
+
+### The Dram Report
+
+- Evidence: [all-whisky archive](https://dram.report/all),
+  [rating method](https://dram.report/), and
+  [robots.txt](https://dram.report/robots.txt).
+- Rechecked on 2026-09-07. Robots explicitly allow public paths. No dedicated
+  terms, privacy, or reuse page is linked from the public site.
+- The three public reviewer profiles report 261, 190, and 182 drams. Review
+  pages expose one reviewer, Bottle name, tasting notes, and an exact 100-point
+  score. The archive is active and server-rendered.
+- Production source 17 is disabled and unpublished. Its AI setup fetched 12
+  pages without request errors, but rejected its rules because visible dates
+  such as `January 29th, 2024` were not accepted by the parser. Inactive rule
+  revision 28 remains pending.
+- A full local version 8 acceptance preview after adding ordinal-date support
+  and icon-only skip markers read 20 scored reviews in 21 requests. All 20 had
+  a Bottle name, writer, date, and exact score; the run had no parser or request
+  errors, retries, or rate limits. Run the same governed preview in production
+  after those parser changes are deployed; do not activate or publish the
+  source before it passes.
+
+### The Scotch Noob
+
+- Rechecked on 2026-09-07. The public robots file allows all pages, but Peated's
+  identified production crawler received HTTP 403 on the first content-page
+  request after fetching robots successfully.
+- Production source 16 remains disabled and unpublished, with no active rule
+  revision and no collected reviews. Do not change headers, switch to the
+  site's JSON data file, or otherwise work around the block.
 
 ### Dramface
 

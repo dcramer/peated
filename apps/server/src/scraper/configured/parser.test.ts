@@ -841,6 +841,28 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("parses an ordinal published date", () => {
+    const result = parseScrapeDetail(
+      {
+        ...currentReviewRules,
+        article: {
+          ...currentReviewRules.article,
+          publishedDate: pageText("time"),
+        },
+      },
+      '<h1 class="title">Review</h1><time>January 29th, 2024</time><div class="entry-content"><h2 class="review">Example 12 Year</h2><p>Rich and balanced.</p></div>',
+      new URL("https://reviews.test/example"),
+    );
+
+    expect(result.issues).toEqual([]);
+    if (result.kind !== "review" || !result.value) {
+      throw new Error("Expected configured review output.");
+    }
+    expect(result.value.article.publishedAt.toISOString().slice(0, 10)).toBe(
+      "2024-01-29",
+    );
+  });
+
   it.each([
     ["is missing", "", "Required value was not found."],
     [
@@ -1633,7 +1655,7 @@ describe("scrape source parser", () => {
       currentReviewRules,
       `<main>
         <article class="card"><a href="/one">One</a></article>
-        <article class="card"><span class="skip">News</span><a href="/news">News</a></article>
+        <article class="card"><span class="skip"></span><a href="/news">News</a></article>
         <article class="card"><a href="/two">Two</a></article>
         <a class="next" href="/page/2">Next</a>
       </main>`,
