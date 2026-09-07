@@ -26,7 +26,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shows scraper totals, 30-day charts for saved items and requests, exact daily details, and recent problems.",
+          "Shows 30-day scraper output, request health, daily details, and recent problems.",
       },
     },
   },
@@ -42,7 +42,12 @@ const meta = {
       saved: {
         reviews: { total: 47, new: 18, existing: 29 },
         prices: { total: 42, new: 13, existing: 26 },
-        bottles: { total: 21, new: 6, existing: 15 },
+        catalogListings: { total: 21, new: 6, existing: 15 },
+      },
+      bottleResolution: {
+        unknown: 8,
+        created: 6,
+        matched: 75,
       },
       days: [
         {
@@ -54,7 +59,7 @@ const meta = {
           failedRuns: 1,
           reviews: 12,
           prices: 9,
-          bottles: 4,
+          catalogListings: 4,
         },
         {
           date: "2026-09-04",
@@ -65,7 +70,7 @@ const meta = {
           failedRuns: 0,
           reviews: 8,
           prices: 11,
-          bottles: 3,
+          catalogListings: 3,
         },
         {
           date: "2026-09-03",
@@ -76,7 +81,7 @@ const meta = {
           failedRuns: 0,
           reviews: 6,
           prices: 7,
-          bottles: 2,
+          catalogListings: 2,
         },
       ],
       recentFailures: [
@@ -103,15 +108,16 @@ export const NoActivity: Story = {
       saved: {
         reviews: emptySaved,
         prices: emptySaved,
-        bottles: emptySaved,
+        catalogListings: emptySaved,
       },
+      bottleResolution: { unknown: 0, created: 0, matched: 0 },
       days: [
         {
           date: "2026-09-05",
           ...emptyHealth,
           reviews: 0,
           prices: 0,
-          bottles: 0,
+          catalogListings: 0,
         },
       ],
       recentFailures: [],

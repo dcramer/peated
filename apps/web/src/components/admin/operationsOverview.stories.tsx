@@ -23,6 +23,11 @@ const meta = {
     },
   },
   args: {
+    bottleResolution: {
+      unknown: 8,
+      created: 6,
+      matched: 75,
+    },
     data: {
       generatedAt: "2026-09-06T18:00:00.000Z",
       counts: {
@@ -51,6 +56,11 @@ export const Overview: Story = {};
 
 export const Quiet: Story = {
   args: {
+    bottleResolution: {
+      unknown: 0,
+      created: 0,
+      matched: 0,
+    },
     data: {
       generatedAt: "2026-09-06T18:00:00.000Z",
       counts: {
