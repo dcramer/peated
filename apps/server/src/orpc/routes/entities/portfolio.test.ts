@@ -71,6 +71,15 @@ describe("GET /entities/{company}/portfolio", () => {
       ],
       total: 1,
     });
+    expect(result.previews.brands.map(({ id }) => id)).toEqual([
+      directBrand.id,
+    ]);
+    expect(result.previews.distilleries.map(({ id }) => id)).toEqual([
+      nestedDistillery.id,
+    ]);
+    expect(result.previews.bottlers.map(({ id }) => id)).toEqual([
+      nestedBottler.id,
+    ]);
   });
 
   test("filters by kind and keeps totals for the complete portfolio", async ({
