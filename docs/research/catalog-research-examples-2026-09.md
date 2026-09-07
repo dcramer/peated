@@ -814,11 +814,11 @@ completion record.
   and two Poly catalogs—[Chinese and Western Wine](https://cdn.polyauction.com.hk/public-default/auction/sale/chinese-and-western-wine_261eec0e-9913-4fd2-99cf-134537d9be35.pdf)
   and
   [Prestige Collections](https://cdn.polyauction.com.hk/public-default/auction/sale/sz16084423-xiang-gang-bao-li-2016qiu-pai-zhong-xi-ming-jiu-zhen-niang-shuang-p_cf42c5b6-9be7-4618-9e80-774f3a22fd62.pdf)—add
-  nine more evidenced Owner's Casks: `3K3033`,
-  `2Q70668`, `2V70480`, `4S70040`, `ES70153`, `3P70366`, `EO70049`, `4R70005`,
-  and `EX65186`. Their exact stated cask, vintage, bottling, strength, maturation,
+  eight more evidenced Owner's Casks: `3K3033`,
+  `2Q70668`, `2V70480`, `4S70040`, `ES70153`, `3P70366`, `4R70005`, and
+  `EX65186`. Their exact stated cask, vintage, bottling, strength, maturation,
   and outturn facts are staged without inferred release dates. The original 31
-  candidates were production duplicate-checked; these ten newly
+  candidates were production duplicate-checked; these nine newly
   found candidates still require those checks. A full page-by-page pass through
   Whisky Auctioneer and exact Sotheby's lots adds five more supported candidates:
   1989 hogsheads `9W70427` and
@@ -1044,19 +1044,17 @@ completion record.
   describes two 2004–2005 batches. All 19 Yamazaki releases it lists are already
   present. The guide and its exact Bottle records are useful evidence, but its
   current-page related-Bottle block is not a complete catalog.
-- Further exact auction records resolve three private-release leads. Sotheby's
+- Further exact auction records narrow three private-release leads. Sotheby's
   and an independent auction catalog establish 1996 sherry butt `AX70012`,
   bottled in 2009 at 60% for WhiskyLIVE's 10th Anniversary. An exact
   [Whisky.Auction lot](https://whisky.auction/auctions/lot/3207/yamazaki-1998-arima-izumiya-60th-anniversay)
   and [Spink lot](https://spink.com/lot/SFW22000208) establish 1998 sherry butt
   `CU70065`, bottled in 2013 at 60% for Izumiya's 60th Anniversary. Exact
-  Bonhams, retailer, and auction records establish 2003 Bota Corta cask
-  `ADDY3038`, bottled in 2014 at 55% for W. Whisky Shop. Their exact label
-  wording still needs to be reconciled before stable Bottle names and editions
-  are written. Poly catalogs describe `CU70065` and `DU65300` as The Owner's
-  Cask, while other exact auction records call them Arima/The Single Cask or
-  Suntory Single Cask Whisky. Both remain unresolved until their labels settle
-  the family and stable name.
+  Later exact retailer and bottle records resolve 2003 Bota Corta cask
+  `ADDY3038` as Whisky Shop W. 4th Anniversary and 1999 sherry butt `DU65300`
+  as Suntory Single Cask Whisky – 40th Hero; both are staged outside Owner's
+  Cask. `AX70012` and `CU70065` remain unresolved because their exact records
+  do not yet settle the producer-stable family and name.
 - Exact Bonhams label images and repeated Sotheby's and Whisky Auctioneer lots
   resolve `AX70015` as `Suntory Single Cask Whisky`, not The Owner's Cask.
   [Bonhams](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
