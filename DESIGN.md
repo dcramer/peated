@@ -244,9 +244,11 @@ Use one warm color for links, ratings, and main actions. Do not add another
 action color or use red and green to mean bad and good.
 
 Each tasting-note category has its own color. Use these colors only to connect
-the same category across saved tags and flavor charts. Use them on complete tag
-borders, the inner edge of the tasting wheel, and filled chart slices. Do not
-use them for links, buttons, ratings, feedback, page decoration, or tag
+the same category across the tasting wheel, tasting-note vocabulary, saved
+tags, and flavor charts. Use them on category edges, complete borders around
+tasting-note tags and selectors, and filled chart slices. Keep text and action
+states on the usual ink and accent colors. Do not use category colors for
+general links or buttons, ratings, feedback, unrelated decoration, or tag
 backgrounds. If a saved note has no known category, use the usual neutral tag
 border.
 
