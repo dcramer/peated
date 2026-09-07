@@ -84,6 +84,9 @@ automatically. See the
 - Specialist-catalog bottler abbreviations such as Whiskybase's `Gs` are source
   notation, not marketed Bottle names. Keep them only as import references, and
   check for collisions before treating the complete reference as exact.
+- Collector indexes can contain fabricated or misidentified lead entries. Verify
+  the exact label against an independent auction, producer, or retailer source
+  before creating a Bottle; a plausible old date and name are not evidence.
 - An exact image may still lack permission for Peated to store it.
 - A direct image URL does not record its source or license.
 
