@@ -1351,3 +1351,24 @@ completion record.
   under `CC BY-SA 3.0` with credit to Look Sharp!. Both stored WebP transforms
   were visually checked. Brand image coverage remains 7 of 164 because these
   were licensed replacements, not newly covered records.
+- A broader reusable-image pass screened the first 200 commercially reusable
+  [Openverse results for Yamazaki whisky](https://openverse.org/search/image?q=yamazaki%20whisky)
+  plus targeted searches for the 25- and 50-year-olds, Sherry Cask, Bourbon
+  Barrel, Puncheon, Mizunara, the 1984 vintage, Distiller's Reserve, Cask of
+  Yamazaki, and the 2015–2017 Limited Editions. Sixty-nine plausible source
+  images were inspected at full available resolution. Most were distillery
+  interiors, library sample bottles, shelves, standard age statements, or
+  multi-release lineups. The clearest Sherry Cask photo was taken in March 2015,
+  but neither its label nor source description identifies the annual release.
+  The 2012 component-series photos show Sherry Cask, Mizunara, Bourbon Barrel,
+  and Puncheon together and remain useful identity evidence, but no Bottle is
+  isolated well enough for a primary catalog image.
+- One new exact reusable image was found. A
+  [licensed Yamazaki museum photo](https://www.flickr.com/photos/72764592@N00/15573035563)
+  shows the complete label of `SMWS 119.9 Black, cherries and kirsch`; its cask
+  number, 1985 vintage, June 2003 bottling, 18-year age, and 48% strength match
+  `B51743`. The public Bottle page confirms that record has no image. A clean
+  crop from the 5,746-by-3,233 original is ready for upload with creator credit
+  to macglee, the canonical Flickr page as `sourceUrl`, and `CC BY-SA 2.0` as
+  `license`. The authenticated upload and immediate verification remain
+  deferred until production API access resumes, so coverage is still 7 of 164.
