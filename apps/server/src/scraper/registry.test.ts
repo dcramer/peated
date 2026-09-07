@@ -11,7 +11,6 @@ const registeredSources = [
   "douglaslaing",
   "dramface",
   "dramfool",
-  "edradour",
   "finedrams",
   "fredminnick",
   "glenallachie",
@@ -42,6 +41,7 @@ const configuredSources = [
   "bruichladdich",
   "cadenheads",
   "compassbox",
+  "edradour",
   "gordonmacphail",
   "kilchoman",
   "ncnean",
@@ -136,7 +136,7 @@ test("registers each built-in scraper source with its target", () => {
 
 test("dispatches built-in sources to the scraper job", async ({ fixtures }) => {
   const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "edradour" });
+  const site = await fixtures.ExternalSite({ type: "dramfool" });
   const enqueue = vi.fn(async () => undefined);
 
   const run = await createScraperLifecycle({
