@@ -25,7 +25,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 const DEFAULT_SORT = "-tastings";
 
 const sortOptions = [
-  { label: "Most tasted", value: "-tastings" },
+  { label: "Most reviews & tastings", value: "-tastings" },
   { label: "Most bottles", value: "-bottles" },
   { label: "Name", value: "name" },
   { label: "Recently added", value: "-created" },

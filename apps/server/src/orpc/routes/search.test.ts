@@ -339,12 +339,12 @@ describe("GET /search", () => {
     const lessActive = await fixtures.Entity({
       name: "Entitytieneedle Alpha",
       kind: "brand",
-      totalTastings: 1,
+      publicReviewAndTastingCount: 1,
     });
     const moreActive = await fixtures.Entity({
       name: "Entitytieneedle Beta",
       kind: "brand",
-      totalTastings: 5,
+      publicReviewAndTastingCount: 5,
     });
 
     const data = await routerClient.search({

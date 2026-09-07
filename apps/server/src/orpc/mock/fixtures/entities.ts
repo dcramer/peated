@@ -28,6 +28,7 @@ const entityDefaults = {
   address: null,
   location: null,
   totalTastings: 0,
+  publicReviewAndTastingCount: 0,
   totalBottles: 0,
   isFollowing: false,
   createdAt: timestamp,

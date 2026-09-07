@@ -41,6 +41,7 @@ test("preserves the Bottle total and counts tastings for every Entity associatio
     const bottle = await fixtures.Bottle({
       ...bottleOwnerData(ownerRole, entity.id),
       name: `Direct ${ownerRole} Bottle`,
+      publicReviewAndTastingCount: 2,
     });
     await fixtures.Tasting({ bottleId: bottle.id });
   }
@@ -58,6 +59,7 @@ test("preserves the Bottle total and counts tastings for every Entity associatio
   expect(await getEntity(entity.id)).toMatchObject({
     totalBottles: 7,
     totalTastings: 3,
+    publicReviewAndTastingCount: 6,
   });
 });
 
@@ -70,6 +72,7 @@ test("counts each tasting once when an Entity fills every Bottle association", a
     brandId: entity.id,
     bottlerId: entity.id,
     distillerIds: [entity.id],
+    publicReviewAndTastingCount: 4,
   });
   await fixtures.Tasting({ bottleId: bottle.id });
 
@@ -78,6 +81,7 @@ test("counts each tasting once when an Entity fills every Bottle association", a
   expect(await getEntity(entity.id)).toMatchObject({
     totalBottles: 1,
     totalTastings: 1,
+    publicReviewAndTastingCount: 4,
   });
 });
 
@@ -88,10 +92,12 @@ test("counts exact Bottles in the same group independently", async ({
   const first = await fixtures.Bottle({
     name: "Same Group Expression",
     brandId: entity.id,
+    publicReviewAndTastingCount: 3,
   });
   const second = await fixtures.BottleGroupMember({
     groupId: requireBottleGroupId(first),
     edition: "Second Exact Bottle",
+    publicReviewAndTastingCount: 4,
   });
   await fixtures.Tasting({ bottleId: first.id });
   await fixtures.Tasting({ bottleId: second.id });
@@ -101,6 +107,7 @@ test("counts exact Bottles in the same group independently", async ({
   expect(await getEntity(entity.id)).toMatchObject({
     totalBottles: 2,
     totalTastings: 2,
+    publicReviewAndTastingCount: 7,
   });
 });
 
@@ -111,10 +118,12 @@ test("excludes Bottle-tombstoned members and their tastings", async ({
   const activeBottle = await fixtures.Bottle({
     name: "Active Stats Expression",
     brandId: entity.id,
+    publicReviewAndTastingCount: 3,
   });
   const retiredBottle = await fixtures.Bottle({
     name: "Retired Bottle Expression",
     brandId: entity.id,
+    publicReviewAndTastingCount: 8,
   });
   const destination = await fixtures.Bottle({
     name: "Tombstone Destination Expression",
@@ -136,6 +145,7 @@ test("excludes Bottle-tombstoned members and their tastings", async ({
   expect(await getEntity(entity.id)).toMatchObject({
     totalBottles: 1,
     totalTastings: 1,
+    publicReviewAndTastingCount: 3,
   });
 });
 

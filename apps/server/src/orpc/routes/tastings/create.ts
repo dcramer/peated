@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
-  bottleTags,
   flightBottles,
   flights,
   follows,
@@ -30,7 +29,7 @@ import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { pushJob } from "@peated/server/worker/dispatch";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 
@@ -142,24 +141,6 @@ export default implement(tastingCreateContract)
         throw error;
       }
       if (!tasting) return null;
-
-      await Promise.all(
-        tasting.tags.map((tag) =>
-          tx
-            .insert(bottleTags)
-            .values({
-              bottleId,
-              tag,
-              count: 1,
-            })
-            .onConflictDoUpdate({
-              target: [bottleTags.bottleId, bottleTags.tag],
-              set: {
-                count: sql<string>`${bottleTags.count} + 1`,
-              },
-            }),
-        ),
-      );
 
       const awards = await awardAllBadgeXp(tx, tasting);
 

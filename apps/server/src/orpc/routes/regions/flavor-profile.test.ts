@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { tastings } from "@peated/server/db/schema";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /countries/{country}/regions/{region}/flavor-profile", () => {
@@ -38,6 +39,9 @@ describe("GET /countries/{country}/regions/{region}/flavor-profile", () => {
         createdById: defaults.user.id,
         tags: ["apple"],
       })),
+    );
+    await Promise.all(
+      [produced, branded].map(({ id }) => recomputeBottleStats(id)),
     );
 
     const input = {

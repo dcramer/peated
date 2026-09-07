@@ -15,7 +15,7 @@ const item: EntityCatalogItem = {
   kind: "brand",
   name: "Example Brand",
   totalBottles: 3,
-  totalTastings: 8,
+  publicReviewAndTastingCount: 8,
 };
 
 describe("getEntityRowActionGroups", () => {

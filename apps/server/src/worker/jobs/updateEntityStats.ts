@@ -53,6 +53,26 @@ export default async (input: JobPayload) => {
           )
           AND ${bottles.groupId} IS NOT NULL
         )`,
+        publicReviewAndTastingCount: sql<string>`(
+          SELECT COALESCE(SUM(${bottles.publicReviewAndTastingCount}), 0)
+          FROM ${bottles}
+          WHERE (
+            ${bottles.brandId} = ${entities.id}
+            OR ${bottles.bottlerId} = ${entities.id}
+            OR EXISTS (
+              SELECT 1
+              FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${bottlesToDistillers.distillerId} = ${entities.id}
+            )
+          )
+          AND NOT EXISTS (
+            SELECT 1
+            FROM ${bottleTombstones}
+            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+          )
+          AND ${bottles.groupId} IS NOT NULL
+        )`,
         updatedAt: sql`NOW()`,
       })
       .where(eq(entities.id, entityId));

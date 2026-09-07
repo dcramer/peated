@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleTags,
   notifications,
   tastingBadgeAwards,
   tastings,
@@ -11,7 +10,7 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 
@@ -93,21 +92,6 @@ export default procedure
         tx
           .delete(tastingBadgeAwards)
           .where(eq(tastingBadgeAwards.tastingId, lockedTasting.id)),
-
-        ...lockedTasting.tags.map((tag) =>
-          tx
-            .update(bottleTags)
-            .set({
-              count: sql`${bottleTags.count} - 1`,
-            })
-            .where(
-              and(
-                eq(bottleTags.bottleId, bottleId),
-                eq(bottleTags.tag, tag),
-                gt(bottleTags.count, 0),
-              ),
-            ),
-        ),
       ]);
 
       // TODO: delete the image from storage

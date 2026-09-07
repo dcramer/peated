@@ -15,5 +15,6 @@ export default mockOS.bottles.tags.handler(async ({ input, errors }) => {
   return {
     results: tags.results.slice(0, input.limit),
     totalCount: tags.totalCount,
+    publicReviewAndTastingCount: bottle.publicReviewAndTastingCount,
   };
 });

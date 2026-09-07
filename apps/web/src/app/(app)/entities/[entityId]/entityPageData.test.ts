@@ -54,7 +54,7 @@ describe("getEntityTabs", () => {
           name: "Diageo",
           shortName: null,
           totalBottles: 10,
-          totalTastings: 20,
+          publicReviewAndTastingCount: 20,
         },
         { bottles: 400, portfolio: 62 },
       ),
@@ -82,7 +82,7 @@ describe("getEntityTabs", () => {
           name: "Diageo",
           shortName: null,
           totalBottles: 0,
-          totalTastings: 0,
+          publicReviewAndTastingCount: 0,
         },
         { bottles: 0, portfolio: 0 },
       ),
@@ -97,7 +97,7 @@ describe("getEntityTabs", () => {
         name: "Scotch Malt Whisky Society",
         shortName: "SMWS",
         totalBottles: 1_301,
-        totalTastings: 29,
+        publicReviewAndTastingCount: 29,
       }),
     ).toEqual([
       {
@@ -112,7 +112,7 @@ describe("getEntityTabs", () => {
       {
         count: 29,
         href: "/bottlers/4263-scotch-malt-whisky-society/tastings",
-        label: "Tastings",
+        label: "Reviews & tastings",
       },
       {
         href: "/bottlers/4263-scotch-malt-whisky-society/codes",

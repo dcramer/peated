@@ -7,42 +7,42 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import { ButtonLink, CursorPager, EmptyState } from "@peated/web/components";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
-import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
+import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../../styles/tokens.stylex";
 
-type TastingList = Outputs["tastings"]["list"];
+type ReviewsAndTastings = Outputs["activity"]["reviewsAndTastings"];
 
 export function EntityTastingListClient({
   entityId,
   entityName,
-  initialTastingList,
+  initialActivity,
 }: {
   entityId: number;
   entityName: string;
-  initialTastingList: TastingList;
+  initialActivity: ReviewsAndTastings;
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const cursor = Number(searchParams.get("cursor") ?? "1") || 1;
-  const { data: tastingList } = useSuspenseQuery({
-    ...orpc.tastings.list.queryOptions({
+  const cursor = searchParams.get("cursor") ?? undefined;
+  const { data: activity } = useSuspenseQuery({
+    ...orpc.activity.reviewsAndTastings.queryOptions({
       input: { cursor, entity: entityId, limit: 25 },
     }),
-    initialData: initialTastingList,
+    initialData: initialActivity,
   });
 
   return (
     <section
-      aria-label={`Tastings of ${entityName}`}
+      aria-label={`Reviews and tastings of ${entityName}`}
       {...stylex.props(styles.content)}
     >
-      {tastingList.results.length ? (
+      {activity.results.length ? (
         <CommunityFeed
-          ariaLabel={`${entityName} tastings`}
-          items={getTastingFeedItems(tastingList.results)}
+          ariaLabel={`${entityName} reviews and tastings`}
+          items={getReviewAndTastingFeedItems(activity.results)}
         />
       ) : (
         <EmptyState
@@ -55,23 +55,18 @@ export function EntityTastingListClient({
               Find a bottle
             </ButtonLink>
           }
-          heading="No tastings yet"
+          heading="No reviews or tastings yet"
         >
-          No one has logged a tasting connected to {entityName} yet.
+          No one has published a review or logged a tasting connected to{" "}
+          {entityName} yet.
         </EmptyState>
       )}
       <CursorPager
-        ariaLabel={`${entityName} tasting pages`}
+        ariaLabel={`${entityName} review and tasting pages`}
         nextHref={getCursorHref(
           pathname,
           searchParams,
-          tastingList.rel.nextCursor,
-        )}
-        page={cursor}
-        previousHref={getCursorHref(
-          pathname,
-          searchParams,
-          tastingList.rel.prevCursor,
+          activity.rel.nextCursor,
         )}
       />
     </section>

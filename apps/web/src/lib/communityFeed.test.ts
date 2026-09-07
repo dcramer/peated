@@ -9,6 +9,7 @@ import { describe, expect, test } from "vitest";
 import {
   getCommunityFeedItems,
   getMemberReviewFeedItems,
+  getReviewAndTastingFeedItems,
   getTastingFeedItems,
 } from "./communityFeed";
 import { getTastingUrl } from "./urls";
@@ -118,6 +119,33 @@ describe("getCommunityFeedItems", () => {
       undefined,
     ]);
     expect(items[2]?.bottles[0]?.ratingBand).toBe(mockTasting.ratingBand);
+  });
+});
+
+describe("getReviewAndTastingFeedItems", () => {
+  test("keeps ratings and tags together for all three sources", () => {
+    const items = getReviewAndTastingFeedItems([
+      { type: "tasting", tasting: mockTasting },
+      { type: "member_review", review: mockMemberReview },
+      { type: "critic_review", review: mockExternalReview },
+    ]);
+
+    expect(items.map((item) => item.kind)).toEqual([
+      "tasting",
+      "member_review",
+      "critic_review",
+    ]);
+    expect(items.map((item) => item.bottles[0]?.tags)).toEqual([
+      mockTasting.tags,
+      mockMemberReview.tags,
+      mockExternalReview.extractedTags,
+    ]);
+    expect(items.map((item) => item.bottles[0]?.score)).toEqual([
+      undefined,
+      { value: mockMemberReview.score, scale: 100 },
+      mockExternalReview.nativeScore,
+    ]);
+    expect(items[0]?.bottles[0]?.ratingBand).toBe(mockTasting.ratingBand);
   });
 });
 

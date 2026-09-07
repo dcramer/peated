@@ -37,7 +37,9 @@ describe("member review form submissions", () => {
         bottleId: 12,
         fields: {
           score: 91,
-          tags: ["coastal", "wax"],
+          noseTags: ["coastal"],
+          palateTags: ["wax"],
+          finishTags: ["coastal", "wax"],
           color: 8,
           notes: "Coastal and waxy.",
           servingStyle: "neat",
@@ -48,7 +50,9 @@ describe("member review form submissions", () => {
     ).toEqual({
       bottle: 12,
       score: 91,
-      tags: ["coastal", "wax"],
+      noseTags: ["coastal"],
+      palateTags: ["wax"],
+      finishTags: ["coastal", "wax"],
       color: 8,
       notes: "Coastal and waxy.",
       servingStyle: "neat",

@@ -73,14 +73,14 @@ test("previews categories on hover and focus, and explores only on activation", 
   }
 });
 
-test("uses tasting commonality for a bottle and keeps sparse notes interactive", () => {
+test("uses note commonality for a bottle and keeps sparse notes interactive", () => {
   const container = document.createElement("div");
   const root = createRoot(container);
   try {
     act(() => root.render(<FlavorWheel profile={mockBottleFlavorProfile} />));
     expect(
       container.querySelector(
-        '[aria-label^="Smoke, 83% of tastings with notes"]',
+        '[aria-label^="Smoke, 83% of public reviews and tastings with notes"]',
       ),
     ).not.toBeNull();
     expect(container.textContent).not.toMatch(/\d+ bottles|Notes cover/);
@@ -88,12 +88,16 @@ test("uses tasting commonality for a bottle and keeps sparse notes interactive",
       root.render(
         <FlavorWheel
           profile={{
+            notedReviewAndTastingCount: 1,
             notedTastings: 1,
             categories: [
               {
                 category: "smoke",
+                reviewAndTastingCount: 1,
                 tastingCount: 1,
-                notes: [{ name: "peat", tastingCount: 1 }],
+                notes: [
+                  { name: "peat", reviewAndTastingCount: 1, tastingCount: 1 },
+                ],
               },
             ],
           }}
@@ -102,12 +106,12 @@ test("uses tasting commonality for a bottle and keeps sparse notes interactive",
     );
     expect(
       container.querySelector(
-        '[aria-label^="Smoke, 100% of tastings with notes"]',
+        '[aria-label^="Smoke, 100% of public reviews and tastings with notes"]',
       ),
     ).not.toBeNull();
     expect(
       container.querySelector(
-        '[aria-label^="Wood, 0% of tastings with notes"]',
+        '[aria-label^="Wood, 0% of public reviews and tastings with notes"]',
       ),
     ).not.toBeNull();
     act(() =>

@@ -1,7 +1,14 @@
 import { TAG_CATEGORIES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { bottleTombstones, tastings } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  externalReviewArticles,
+  memberReviews,
+  tastings,
+} from "@peated/server/db/schema";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 describe("GET /bottles/{bottle}/flavor-profile", () => {
   test("counts public tastings once per category and keeps exact Bottle scope", async ({
@@ -62,6 +69,7 @@ describe("GET /bottles/{bottle}/flavor-profile", () => {
       },
       { bottleId: sibling.id, createdById: defaults.user.id, tags: ["oak"] },
     ]);
+    await recomputeBottleStats(bottle.id);
 
     const result = await routerClient.bottles.flavorProfile(
       { bottle: bottle.id },
@@ -77,22 +85,25 @@ describe("GET /bottles/{bottle}/flavor-profile", () => {
     expect(result.categories.find((item) => item.category === "smoke")).toEqual(
       {
         category: "smoke",
+        reviewAndTastingCount: 2,
         tastingCount: 2,
         notes: [
-          { name: "smoke", tastingCount: 2 },
-          { name: "ash", tastingCount: 1 },
+          { name: "smoke", reviewAndTastingCount: 2, tastingCount: 2 },
+          { name: "ash", reviewAndTastingCount: 1, tastingCount: 1 },
         ],
       },
     );
     expect(result.categories.find((item) => item.category === "sweet")).toEqual(
       {
         category: "sweet",
+        reviewAndTastingCount: 2,
         tastingCount: 2,
-        notes: [{ name: "vanilla", tastingCount: 2 }],
+        notes: [{ name: "vanilla", reviewAndTastingCount: 2, tastingCount: 2 }],
       },
     );
     expect(result.categories.find((item) => item.category === "wood")).toEqual({
       category: "wood",
+      reviewAndTastingCount: 0,
       tastingCount: 0,
       notes: [],
     });
@@ -113,6 +124,7 @@ describe("GET /bottles/{bottle}/flavor-profile", () => {
         tags: ["unrecognized"],
       },
     ]);
+    await recomputeBottleStats(bottle.id);
     const result = await routerClient.bottles.flavorProfile({
       bottle: bottle.id,
     });
@@ -122,6 +134,100 @@ describe("GET /bottles/{bottle}/flavor-profile", () => {
         (item) => item.tastingCount === 0 && item.notes.length === 0,
       ),
     ).toBe(true);
+  });
+
+  test("combines public tasting, member review, and critic review notes", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const privateUser = await fixtures.User({ private: true });
+    await Promise.all([
+      fixtures.Tag({ name: "smoke", tagCategory: "smoke" }),
+      fixtures.Tag({ name: "vanilla", tagCategory: "sweet" }),
+      fixtures.Tag({ name: "oak", tagCategory: "wood" }),
+    ]);
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: defaults.user.id,
+      tags: ["smoke"],
+    });
+    await db.insert(memberReviews).values([
+      {
+        bottleId: bottle.id,
+        createdById: defaults.user.id,
+        score: 88,
+        tags: ["smoke", "oak"],
+      },
+      {
+        bottleId: bottle.id,
+        createdById: privateUser.id,
+        score: 90,
+        tags: ["vanilla"],
+      },
+    ]);
+    const publishedSite = await fixtures.ExternalSite({
+      type: `published-flavor-${bottle.id}`,
+    });
+    await fixtures.ApprovedExternalReviewPublication({
+      externalSiteId: publishedSite.id,
+    });
+    const published = await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      externalSiteId: publishedSite.id,
+      tags: ["smoke", "vanilla"],
+    });
+    await db
+      .update(externalReviewArticles)
+      .set({ contentHash: "published" })
+      .where(eq(externalReviewArticles.id, published.articleId));
+    await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      hidden: true,
+      tags: ["oak"],
+    });
+    const unpublishedSite = await fixtures.ExternalSite({
+      type: `unpublished-flavor-${bottle.id}`,
+    });
+    const unpublished = await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      externalSiteId: unpublishedSite.id,
+      tags: ["oak"],
+    });
+    await db
+      .update(externalReviewArticles)
+      .set({ contentHash: "unpublished" })
+      .where(eq(externalReviewArticles.id, unpublished.articleId));
+    await recomputeBottleStats(bottle.id);
+
+    const result = await routerClient.bottles.flavorProfile({
+      bottle: bottle.id,
+    });
+
+    expect(result.notedReviewAndTastingCount).toBe(3);
+    expect(result.notedTastings).toBe(3);
+    expect(result.categories.find((item) => item.category === "smoke")).toEqual(
+      {
+        category: "smoke",
+        reviewAndTastingCount: 3,
+        tastingCount: 3,
+        notes: [{ name: "smoke", reviewAndTastingCount: 3, tastingCount: 3 }],
+      },
+    );
+    expect(result.categories.find((item) => item.category === "sweet")).toEqual(
+      {
+        category: "sweet",
+        reviewAndTastingCount: 1,
+        tastingCount: 1,
+        notes: [{ name: "vanilla", reviewAndTastingCount: 1, tastingCount: 1 }],
+      },
+    );
+    expect(result.categories.find((item) => item.category === "wood")).toEqual({
+      category: "wood",
+      reviewAndTastingCount: 1,
+      tastingCount: 1,
+      notes: [{ name: "oak", reviewAndTastingCount: 1, tastingCount: 1 }],
+    });
   });
 
   test("returns an empty profile without tastings", async ({ fixtures }) => {

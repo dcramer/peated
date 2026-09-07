@@ -38,7 +38,7 @@ const label = (category: string) =>
   category.charAt(0).toUpperCase() + category.slice(1);
 
 /**
- * Distribution of public tasting-note categories across bottles or one bottle's tastings.
+ * Distribution of public tasting-note categories across bottles or one Bottle's reviews and tastings.
  * Each wedge has a fixed position and an independent 0–100% area scale.
  * Hover or keyboard focus previews a category's share and two leading notes.
  * The center keeps the last preview when the pointer or focus leaves the wheel.
@@ -57,13 +57,15 @@ export function FlavorWheel({
 }) {
   const [selection, setSelection] = useState<string | null>(null);
   const [focused, setFocused] = useState<string | null>(null);
-  const isBottle = "notedTastings" in profile;
-  const sampleCount = isBottle ? profile.notedTastings : profile.notedBottles;
-  const sample = isBottle ? "tastings" : "bottles";
+  const isBottle = "notedReviewAndTastingCount" in profile;
+  const sampleCount = isBottle
+    ? profile.notedReviewAndTastingCount
+    : profile.notedBottles;
+  const sample = isBottle ? "public reviews and tastings" : "bottles";
   const values = isBottle
     ? profile.categories.map((item) => ({
         category: item.category,
-        count: item.tastingCount,
+        count: item.reviewAndTastingCount,
         notes: item.notes,
       }))
     : profile.categories.map((item) => ({

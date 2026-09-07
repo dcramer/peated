@@ -304,6 +304,18 @@ export const BottleSchema = z.object({
     .gte(0)
     .readonly()
     .describe("Total number of recorded tastings for this bottle"),
+  publicReviewAndTastingCount: z
+    .number()
+    .int()
+    .gte(0)
+    .readonly()
+    .describe("Total public reviews and tastings for this exact Bottle"),
+  notedReviewAndTastingCount: z
+    .number()
+    .int()
+    .gte(0)
+    .readonly()
+    .describe("Public reviews and tastings with recognized tasting notes"),
   createdAt: z
     .string()
     .datetime()

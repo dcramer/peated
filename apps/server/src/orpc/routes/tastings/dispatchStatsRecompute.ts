@@ -3,7 +3,7 @@ import {
   dispatchBottleStatsRecompute,
 } from "@peated/server/lib/dispatchBottleStatsRecompute";
 
-/** Builds direct-Bottle aggregate work for a persisted Tasting change. */
+/** Builds direct-Bottle summary work for a saved Tasting change. */
 export function buildTastingStatsRecomputeJob(
   bottleId: number,
 ): ReturnType<typeof buildBottleStatsRecomputeJob> {
@@ -11,7 +11,7 @@ export function buildTastingStatsRecomputeJob(
 }
 
 /**
- * Queue recomputation after commit. Publication failures are logged and
+ * Queue recomputation after commit. Queue failures are logged and
  * swallowed because the authoritative tasting write is already durable.
  */
 export async function dispatchTastingStatsRecompute(

@@ -14,8 +14,10 @@ import { publicHomeQueries } from "@peated/web/lib/orpc/homeQueries";
 function DatabaseIntro() {
   const orpc = useORPC();
   const stats = useQuery(publicHomeQueries.stats(orpc));
-  const reviewCount = stats.data
-    ? stats.data.memberReviews + stats.data.externalReviews
+  const reviewAndTastingCount = stats.data
+    ? stats.data.tastings +
+      stats.data.memberReviews +
+      stats.data.externalReviews
     : undefined;
 
   return (
@@ -24,7 +26,7 @@ function DatabaseIntro() {
         alt: "",
         src: "/assets/auth-discovery-illustration.webp",
       }}
-      description="Sign in to record what you pour, keep your library, and see critic and community views side by side."
+      description="Sign in to record what you pour, keep your library, and see critic reviews and tasting notes side by side."
       facts={[
         {
           label: "Bottles",
@@ -43,12 +45,8 @@ function DatabaseIntro() {
           value: stats.data?.bottlers.toLocaleString("en-US") ?? "–",
         },
         {
-          label: "Tastings",
-          value: stats.data?.tastings.toLocaleString("en-US") ?? "–",
-        },
-        {
-          label: "Reviews",
-          value: reviewCount?.toLocaleString("en-US") ?? "–",
+          label: "Reviews & tastings",
+          value: reviewAndTastingCount?.toLocaleString("en-US") ?? "–",
         },
       ]}
       loading={stats.isPending}

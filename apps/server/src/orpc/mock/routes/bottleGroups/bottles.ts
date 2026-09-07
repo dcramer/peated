@@ -38,9 +38,15 @@ export default mockOS.bottleGroups.bottles.handler(
           case "-score":
             return (right.medianScore ?? -1) - (left.medianScore ?? -1);
           case "tastings":
-            return left.totalTastings - right.totalTastings;
+            return (
+              left.publicReviewAndTastingCount -
+              right.publicReviewAndTastingCount
+            );
           case "-tastings":
-            return right.totalTastings - left.totalTastings;
+            return (
+              right.publicReviewAndTastingCount -
+              left.publicReviewAndTastingCount
+            );
           case "releaseYear":
             return (left.releaseYear ?? 0) - (right.releaseYear ?? 0);
           case "-releaseYear":

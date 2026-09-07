@@ -61,6 +61,8 @@ export const BottleGroupSummarySerializer = serializer({
       reviewScoreBandCounts: item.reviewScoreBandCounts,
       tastingBandCounts: item.tastingBandCounts,
       totalTastings: item.totalTastings,
+      publicReviewAndTastingCount: item.publicReviewAndTastingCount,
+      notedReviewAndTastingCount: item.notedReviewAndTastingCount,
       totalBottles: item.totalBottles,
       createdByActorId: item.createdByActorId,
       createdAt: item.createdAt.toISOString(),
