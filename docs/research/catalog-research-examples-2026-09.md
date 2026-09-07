@@ -1151,17 +1151,19 @@ completion record.
   describes two 2004–2005 batches. All 19 Yamazaki releases it lists are already
   present. The guide and its exact Bottle records are useful evidence, but its
   current-page related-Bottle block is not a complete catalog.
-- Further exact auction records narrow three private-release leads. Sotheby's
+- Further exact auction records narrow the private-release leads. Sotheby's
   and an independent auction catalog establish 1996 sherry butt `AX70012`,
-  bottled in 2009 at 60% for WhiskyLIVE's 10th Anniversary. An exact
+  bottled in 2009 at 60% for WhiskyLIVE's 10th Anniversary. Later exact
+  records below settle its marketed name and stage it outside Owner's Cask. An
+  exact
   [Whisky.Auction lot](https://whisky.auction/auctions/lot/3207/yamazaki-1998-arima-izumiya-60th-anniversay)
   and [Spink lot](https://spink.com/lot/SFW22000208) establish 1998 sherry butt
-  `CU70065`, bottled in 2013 at 60% for Izumiya's 60th Anniversary. Exact
-  Later exact retailer and bottle records resolve 2003 Bota Corta cask
+  `CU70065`, bottled in 2013 at 60% for Izumiya's 60th Anniversary. Later
+  exact retailer and bottle records resolve 2003 Bota Corta cask
   `ADDY3038` as Whisky Shop W. 4th Anniversary and 1999 sherry butt `DU65300`
   as Suntory Single Cask Whisky – 40th Hero; both are staged outside Owner's
-  Cask. `AX70012` and `CU70065` remain unresolved because their exact records
-  do not yet settle the producer-stable family and name.
+  Cask. `CU70065` remains unresolved because its exact records do not yet
+  settle the producer-stable family and name.
 - Exact Bonhams label images and repeated Sotheby's and Whisky Auctioneer lots
   resolve `AX70015` as `Suntory Single Cask Whisky`, not The Owner's Cask.
   [Bonhams](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2019/20190816%20S-25189-0-1%20Fine%20%26%20Rare%20Wine%20and%20Whisky.pdf)
@@ -1241,10 +1243,10 @@ completion record.
   establishes its 1996 white-oak barrel, 54% strength, and 126-bottle outturn,
   but not its cask number. The collector assignment `AX70023` is withheld
   because exact Sotheby's and Bonhams records assign that cask to the separate
-  59% sherry-butt `Black Legend`. The exact 1996 WhiskyLIVE cask `AX70012` and
-  one uncoded 60% 2008 release remain leads until their producer-stable names
-  can be settled. This pass brought the staged totals to 166 new Owner's Casks
-  and 55 evidence-backed non-Owner releases.
+  59% sherry-butt `Black Legend`. Later exact records below resolve the 1996
+  WhiskyLIVE cask `AX70012` and the uncoded 60% 2008 release without assigning
+  either to Owner's Cask. This pass brought the staged totals to 166 new
+  Owner's Casks and 55 evidence-backed non-Owner releases.
 - A photographed alternate index and exact Bonhams catalog add late 1996
   Owner's Cask barrel
   [`AS70145`](https://electronicsandbooks.com/edt/manual/Art/Auction/Bonhams/2016/20160819%20S-23349-0-3%20Whisky%20%5B112%5D.pdf),
@@ -1733,6 +1735,58 @@ completion record.
   All 14 records currently lack a catalog image, apart from the separately
   prepared licensed `119.9` crop described above; the auction photographs do
   not state reusable terms.
+- Three more exact historical releases are absent from production and staged as
+  releases 111 through 113. Sotheby's
+  [photographed `AX70012`](https://www.sothebys.com/en/buy/auction/2024/distilled-whisky-moutai/shan-qi-yamazaki-single-cask-ax70012-for)
+  and Whisky Auctioneer's
+  [Bottle record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1996-anniversary-bottling-12-year-old?v=5158319)
+  settle `Anniversary Bottling` as the marketed name and “Whisky Live Japan
+  10th Anniversary” as the edition. They establish its 12-year age, 1996
+  vintage, 2009 bottling, 60% strength, sherry-butt maturation, and single-cask
+  identity; an exact
+  [retailer record](https://www.whisky.fr/yamazaki-12-ans-1996-whisky-live-tokyo-2010.html)
+  also identifies it as cask strength. An exact
+  [Bonhams catalog](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-04%2F17%2FS-28686-0-3.pdf)
+  identifies the uncoded 1996 release as `樽出原酒` (`Taru-Dashi Genshu`),
+  bottled in 2008 at 60% from first-fill sherry butt maturation, with an
+  outturn of 2,000. The high outturn prevents a single-cask claim. Its label
+  markets a vintage but no age statement, so no calculated age is stored.
+- A fourth exact historical identity remains unresolved. The
+  [1989 cask `9C0004` record](https://www.whiskybase.com/whiskies/whisky/12788/yamazaki-1989)
+  and its
+  [Bonhams auction entry](https://www.lotsearch.net/index.php/auction-catalogues/whisky-104782?order=ASC&orderBy=lot-title&page=4&perPage=80&view=table)
+  agree on a 19-year-old, cask-strength single-cask malt distilled March 20,
+  1989 and bottled December 18, 2008 at 59% from a puncheon. The exact cask
+  number distinguishes it from both the Owner's Cask sequence and SMWS
+  `119.10`, but neither accessible text record gives a producer-stable product
+  name. Direct label inspection was blocked by the source's anti-bot page, so
+  no Bottle is staged with an invented generic name.
+- Whisky Hammer's exact
+  [Hawaiian Open record](https://www.whiskyhammer.com/item/209608/Yamazaki/Yamazaki---1998-Hawaiian-Open-United-Airlines-75cl.html)
+  establishes a 43% Yamazaki release made for United Airlines to commemorate
+  the 1998 Hawaiian Open. The exact
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/92945/yamazaki-1998-hawaiian-open?language=en)
+  agrees on the event, strength, and United Airlines selection. It describes
+  the whisky as single malt, while Whisky Hammer calls it blended whisky; the
+  category therefore remains unknown. The event year is stored only as
+  `releaseYear`, not as an inferred whisky vintage. Exact public Peated searches
+  for `AX70012`, the 1996 vintage plus strength, `9C0004`, `Hawaiian Open`, and
+  the Taru-Dashi identity found no matching Bottle. The auction and retailer
+  photos prove the identities but do not state reusable image terms, so no
+  image is staged from them.
+- The same duplicate pass found that the 1995, 61% sherry-butt lead is existing
+  `B54385`, cask `5X70170`; its evidence-backed correction remains staged, and
+  no duplicate is added. Two exact collector records for a Sumida Corporation
+  100th Anniversary Yamazaki 12-year-old conflict materially: one reports
+  [50%, cask `19446`](https://www.whiskybase.com/whiskies/whisky/302033), while
+  the other reports
+  [43% with no cask number](https://www.whiskybase.com/de/whiskies/whisky/298251/yamazaki-12-year-old).
+  An auction-derived
+  [listing](https://www.barnebys.com/auctions/lot/yamazaki-12-years-old-mizunara-cask-matured-100th-sc9UpyE-627716582)
+  does not reconcile whether these are two marketed releases or conflicting
+  records for one. Exact public Peated searches found neither identity. Both
+  remain unresolved until a readable producer or label source settles their
+  strength, cask, and release count.
 - Three apparent early-range gaps do not add Yamazaki Brand Bottles. The 1983,
   43% `Special Edition 60th Anniversary` gold bottle is existing `B51621`, and
   the 1984, 45% Sherry Wood release is existing `B51632`, with its evidence and
