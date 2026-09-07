@@ -107,6 +107,15 @@ function prepareDramface(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareEdradour(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "edradour", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareCompassBox(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "compassbox", ...input },
@@ -170,6 +179,15 @@ function prepareNcnean(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareThompsonBros(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "thompsonbros", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 const canonicalUrl =
   "https://thebourbonculture.com/whiskey-reviews/example-review/";
 
@@ -180,10 +198,12 @@ function codeOwnedSource(
     | "cadenheads"
     | "compassbox"
     | "dramface"
+    | "edradour"
     | "gordonmacphail"
     | "kilchoman"
     | "ncnean"
     | "northstarspirits"
+    | "thompsonbros"
     | "whiskeyreviewer"
     | "whiskynotes"
     | "whiskysaga"
@@ -248,6 +268,11 @@ const dramfaceRegistry = createScraperRegistry({
   sources: [codeOwnedSource("dramface")],
 });
 
+const edradourRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("edradour")!],
+  sources: [codeOwnedSource("edradour")],
+});
+
 const compassBoxRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("compassbox")!],
   sources: [codeOwnedSource("compassbox")],
@@ -281,6 +306,11 @@ const northStarRegistry = createScraperRegistry({
 const ncneanRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("ncnean")!],
   sources: [codeOwnedSource("ncnean")],
+});
+
+const thompsonBrosRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("thompsonbros")!],
+  sources: [codeOwnedSource("thompsonbros")],
 });
 
 async function setupMigration(bottleId: number | null = null) {
@@ -746,6 +776,25 @@ async function setupCompassBoxMigration() {
   return site;
 }
 
+async function setupEdradourMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "edradour",
+      name: "Edradour",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(edradourRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
 async function setupCadenheadsMigration() {
   const [site] = await db
     .insert(externalSites)
@@ -851,6 +900,25 @@ async function setupNcneanMigration() {
     })
     .returning();
   await syncScraperDefinitions(ncneanRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupThompsonBrosMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "thompsonbros",
+      name: "Thompson Bros.",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(thompsonBrosRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1488,6 +1556,202 @@ describe("POST /admin/scrape-sources/prepare", () => {
         "Check the URL and review records for WhiskyNotes article",
       ),
     });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Edradour without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupEdradourMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Ballechin 10-year-old",
+      price: 4876,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.edradour.com/ballechin-10-year-old",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Edradour Cask Strength 21-year-old Oloroso Sherry",
+      price: 37500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.edradour.com/Cask-Strength-21-y.o.-Oloroso-Sherry",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareEdradour()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareEdradour({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(edradourRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://www.edradour.com/shop/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareEdradour({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Edradour is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Edradour price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupEdradourMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Edradour Cask Strength 21-year-old Oloroso Sherry",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/Cask-Strength-21-y.o.-Oloroso-Sherry",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareEdradour({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Edradour price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Thompson Bros. without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupThompsonBrosMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "108879",
+      name: "Thompson Bros Glen Scotia Single Malt Scotch Whisky, 2013, 12-year-old, 70CL, 56.7%ABV",
+      price: 5833,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.thompsonbrosdistillers.com/product/glen-scotia-single-malt-scotch-whisky-2013-12-year-old/",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Thompson Bros Highland Single Malt Scotch Whisky, 18-year-old, 70CL, 48.5% ABV",
+      price: 5417,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.thompsonbrosdistillers.com/product/Highland18yo/",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareThompsonBros()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareThompsonBros({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(thompsonBrosRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl:
+          "https://www.thompsonbrosdistillers.com/product-category/whisky/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareThompsonBros({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Thompson Bros. is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Thompson Bros. price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupThompsonBrosMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "108879",
+      name: "Thompson Bros Glen Scotia Single Malt Scotch Whisky",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/product/glen-scotia/",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareThompsonBros({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Thompson Bros. price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
@@ -2469,6 +2733,26 @@ describe("POST /admin/scrape-sources/prepare", () => {
       },
       random: () => 0,
     };
+    const completeRun = async (runId: number, executionToken: string) => {
+      let execution = 1;
+      while (true) {
+        const result = await executeScraperRun(
+          { runId },
+          {
+            registry,
+            fetchImpl,
+            clock,
+            executionToken: `${executionToken}-${execution}`,
+          },
+        );
+        if (result.status === "completed") return result;
+        if (result.status !== "waiting") {
+          throw new Error("The saved scraper is already running.");
+        }
+        now = result.nextAttemptAt;
+        execution += 1;
+      }
+    };
     for (let attempt = 0; attempt < 2; attempt++) {
       await db
         .update(externalSites)
@@ -2490,15 +2774,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
         }),
       ]);
       await expect(
-        executeScraperRun(
-          { runId: run.id },
-          {
-            registry,
-            fetchImpl,
-            clock,
-            executionToken: `migration-${attempt}`,
-          },
-        ),
+        completeRun(run.id, `migration-${attempt}`),
       ).resolves.toEqual({ status: "completed" });
     }
     expect(await db.select().from(externalReviewArticles)).toHaveLength(1);

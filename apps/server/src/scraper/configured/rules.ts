@@ -3,19 +3,19 @@ import type { JsonValue } from "@peated/server/scraper/types";
 import { z } from "zod";
 import { ScrapeTextMatchesSchema } from "./textTemplate";
 
-export const SCRAPE_RULES_VERSION_1 = 1;
-export const SCRAPE_RULES_VERSION_2 = 2;
-export const SCRAPE_RULES_VERSION_3 = 3;
-export const SCRAPE_RULES_VERSION_4 = 4;
-export const SCRAPE_RULES_VERSION_5 = 5;
-export const SCRAPE_RULES_VERSION_6 = 6;
-export const SCRAPE_RULES_VERSION_7 = 7;
+const SCRAPE_RULES_VERSION_1 = 1;
+const SCRAPE_RULES_VERSION_2 = 2;
+const SCRAPE_RULES_VERSION_3 = 3;
+const SCRAPE_RULES_VERSION_4 = 4;
+const SCRAPE_RULES_VERSION_5 = 5;
+const SCRAPE_RULES_VERSION_6 = 6;
+const SCRAPE_RULES_VERSION_7 = 7;
 export const SCRAPE_RULES_VERSION = 8;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price", "catalog"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
 export const SCRAPE_SOURCE_MAX_LIST_PAGES = 5;
-export const SCRAPE_SOURCE_DEFAULT_MAX_ITEMS = 25;
+const SCRAPE_SOURCE_DEFAULT_MAX_ITEMS = 25;
 export const SCRAPE_SOURCE_MAX_ITEMS = 99;
 
 const SCRAPE_VALUE_MAX_LENGTH = 200;
@@ -32,7 +32,7 @@ export const ScrapeSelectorSchema = z
     message: "The :has selector is not supported.",
   });
 
-export const ScrapeAttributeSchema = z.string().trim().min(1).max(100);
+const ScrapeAttributeSchema = z.string().trim().min(1).max(100);
 
 const ScrapeLiteralSchema = z
   .string()
@@ -50,7 +50,7 @@ const ScrapeCleanupSchema = {
   suffix: z.string().min(1).max(SCRAPE_VALUE_MAX_LENGTH).optional(),
 };
 
-export const ScrapeValueSelectorV1Schema = z
+const ScrapeValueSelectorV1Schema = z
   .object({
     selector: ScrapeSelectorSchema,
     attribute: ScrapeAttributeSchema.optional(),
@@ -100,7 +100,7 @@ const ListRulesV1Schema = z
   })
   .strict();
 
-export const ScrapeListExclusionSchema = z
+const ScrapeListExclusionSchema = z
   .object({
     selector: ScrapeSelectorSchema,
     startsWith: ScrapeLiteralListSchema.optional(),
@@ -179,7 +179,7 @@ const ScrapeUrlDateFormatSchema = z
     }
   });
 
-export const ScrapeUrlDateSchema = z
+const ScrapeUrlDateSchema = z
   .object({
     urlDateFormat: ScrapeUrlDateFormatSchema,
   })
@@ -192,6 +192,34 @@ const ScrapeScoreMapEntrySchema = z
   })
   .strict();
 
+function validateScoreMap(
+  score: {
+    scale: number;
+    map?: Array<z.infer<typeof ScrapeScoreMapEntrySchema>> | null;
+  },
+  context: z.RefinementCtx,
+) {
+  const labels = new Set<string>();
+  for (const [index, entry] of (score.map ?? []).entries()) {
+    if (entry.value > score.scale) {
+      context.addIssue({
+        code: "custom",
+        path: ["map", index, "value"],
+        message: "Mapped score cannot exceed its scale.",
+      });
+    }
+    const label = entry.text.toLocaleLowerCase("en");
+    if (labels.has(label)) {
+      context.addIssue({
+        code: "custom",
+        path: ["map", index, "text"],
+        message: "Mapped score labels must be unique.",
+      });
+    }
+    labels.add(label);
+  }
+}
+
 const ScrapeScoreSchema = z
   .object({
     value: ScrapeValueSchema,
@@ -203,27 +231,7 @@ const ScrapeScoreSchema = z
       .optional(),
   })
   .strict()
-  .superRefine((score, context) => {
-    const labels = new Set<string>();
-    for (const [index, entry] of (score.map ?? []).entries()) {
-      if (entry.value > score.scale) {
-        context.addIssue({
-          code: "custom",
-          path: ["map", index, "value"],
-          message: "Mapped score cannot exceed its scale.",
-        });
-      }
-      const label = entry.text.toLocaleLowerCase("en");
-      if (labels.has(label)) {
-        context.addIssue({
-          code: "custom",
-          path: ["map", index, "text"],
-          message: "Mapped score labels must be unique.",
-        });
-      }
-      labels.add(label);
-    }
-  });
+  .superRefine(validateScoreMap);
 
 const ScrapeScoreWithFirstReviewSchema = ScrapeScoreSchema.safeExtend({
   firstReviewFallback: ScrapeValueSchema.optional(),
@@ -422,27 +430,7 @@ function scrapeScoreSchema<T extends z.ZodType>(trySchema: T) {
         .nullable(),
     })
     .strict()
-    .superRefine((score, context) => {
-      const labels = new Set<string>();
-      for (const [index, entry] of (score.map ?? []).entries()) {
-        if (entry.value > score.scale) {
-          context.addIssue({
-            code: "custom",
-            path: ["map", index, "value"],
-            message: "Mapped score cannot exceed its scale.",
-          });
-        }
-        const label = entry.text.toLocaleLowerCase("en");
-        if (labels.has(label)) {
-          context.addIssue({
-            code: "custom",
-            path: ["map", index, "text"],
-            message: "Mapped score labels must be unique.",
-          });
-        }
-        labels.add(label);
-      }
-    });
+    .superRefine(validateScoreMap);
 }
 
 const ScrapeScoreV6Schema = scrapeScoreSchema(ScrapeReviewTryV6Schema);
@@ -593,7 +581,7 @@ const ScrapeFixedReadV8Schema = z
   })
   .strict();
 
-export const ScrapePageReadSchema = z.union([
+const ScrapePageReadSchema = z.union([
   ScrapeTextReadV8Schema,
   ScrapeAttributeReadV8Schema,
   ScrapeFixedReadV8Schema,
@@ -615,11 +603,11 @@ const ScrapeReviewReadV8Schema = z.union([
 
 const ScrapeReviewTryV8Schema = z.array(ScrapeReviewReadV8Schema).min(1).max(3);
 
-export const ScrapePageFieldSchema = z
+const ScrapePageFieldSchema = z
   .object({ try: z.array(ScrapePageReadSchema).min(1).max(3) })
   .strict();
 
-export const ScrapeReviewFieldSchema = z
+const ScrapeReviewFieldSchema = z
   .object({ try: ScrapeReviewTryV8Schema })
   .strict();
 
@@ -755,13 +743,12 @@ export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesSchema,
 ]);
 
-export type ScrapeRulesV1 = z.infer<typeof ScrapeRulesV1Schema>;
 export type ScrapeRulesV5 = z.infer<typeof ScrapeRulesV5Schema>;
 export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapePageRead = z.infer<typeof ScrapePageReadSchema>;
-export type ScrapePageField = z.infer<typeof ScrapePageFieldSchema>;
-export type ScrapeReviewField = z.infer<typeof ScrapeReviewFieldSchema>;
+type ScrapePageField = z.infer<typeof ScrapePageFieldSchema>;
+type ScrapeReviewField = z.infer<typeof ScrapeReviewFieldSchema>;
 export type StoredScrapePageRead =
   | z.infer<typeof ScrapePageReadV6Schema>
   | ScrapePageRead;
@@ -773,7 +760,6 @@ export type StoredScrapeReviewField =
   | ScrapeReviewField;
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
-export type ScrapeListExclusion = z.infer<typeof ScrapeListExclusionSchema>;
 
 /** Parses rules only with the interpreter contract that owns their stored version. */
 export function parseScrapeRules(
@@ -811,6 +797,10 @@ export function scrapeRulesLimit(rules: StoredScrapeRules) {
   if ("articles" in rules) return rules.articles.limit;
   if ("products" in rules) return rules.products.limit;
   return rules.list.maxItems;
+}
+
+export function scrapeRunRequestLimit(rules: StoredScrapeRules) {
+  return scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES;
 }
 
 export function withScrapeRulesLimit(

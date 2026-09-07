@@ -6,11 +6,7 @@ import {
   scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import {
-  SCRAPE_SOURCE_MAX_LIST_PAGES,
-  parseScrapeRules,
-  scrapeRulesLimit,
-} from "./rules";
+import { parseScrapeRules, scrapeRunRequestLimit } from "./rules";
 import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
@@ -69,7 +65,7 @@ export async function createPinnedScrapeSourceRun(
       trigger: input.trigger,
       purpose: input.purpose,
       requestedById: input.requestedById,
-      requestLimit: scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES,
+      requestLimit: scrapeRunRequestLimit(rules),
       requestErrorCount: 0,
       recordType: rules.kind,
     })

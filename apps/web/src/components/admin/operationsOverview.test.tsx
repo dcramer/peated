@@ -17,6 +17,24 @@ const operations = {
     manual: 24,
     failed: 3,
     rate: 73,
+    byProposalType: [
+      {
+        proposalType: "match_existing" as const,
+        sampleSize: 72,
+        automatic: 65,
+        manual: 6,
+        failed: 1,
+        rate: 90,
+      },
+      {
+        proposalType: "create_new" as const,
+        sampleSize: 28,
+        automatic: 8,
+        manual: 18,
+        failed: 2,
+        rate: 29,
+      },
+    ],
   },
   needsAttention: [],
   recentRuns: [],
@@ -36,6 +54,11 @@ describe("OperationsOverview", () => {
     expect(html).toContain("New bottles");
     expect(html).toContain("Existing matches");
     expect(html).toContain("73% automatic");
+    expect(html).toContain("Price matching by decision");
+    expect(html).toContain("Existing matches");
+    expect(html).toContain("90% · 72 checked");
+    expect(html).toContain("New Bottles");
+    expect(html).toContain("29% · 28 checked");
     expect(html).toContain("View work");
   });
 
@@ -48,6 +71,6 @@ describe("OperationsOverview", () => {
     );
 
     expect(html).toContain("No new reviews or prices in the last 30 days.");
-    expect(html).not.toContain("0% ·");
+    expect(html).not.toContain("no Bottle match yet");
   });
 });

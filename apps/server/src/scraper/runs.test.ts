@@ -6,6 +6,7 @@ import type { z } from "zod";
 import {
   FixtureCursorSchema,
   FixtureObservationSchema,
+  FixturePageSchema,
   fixtureScraperAdapter,
 } from "./adapters/fixture";
 import { ScrapeSourceSetupError } from "./configured/setupError";
@@ -17,7 +18,7 @@ import {
   ScraperTargetDisabledError,
 } from "./definitions";
 import type { ScraperHttpClock } from "./http";
-import { ScraperRequestDeferredError } from "./http";
+import { ScraperRequestWaitError } from "./http";
 import { executeScraperRun } from "./runs";
 import { ScraperRunOwnershipError } from "./session";
 import { syncScraperDefinitions } from "./syncDefinitions";
@@ -212,7 +213,7 @@ test("stores an expected setup failure without failing the worker", async () => 
   });
 });
 
-test("defers at the slice budget and resumes the same run from its cursor", async () => {
+test("waits at the request limit and resumes the same run from its saved place", async () => {
   const { registry, run, observations } = await setupRun({ requestLimit: 1 });
   const fetchImpl = pageFetch({
     1: { items: [{ id: "a", value: "A" }], nextPage: 2 },
@@ -225,14 +226,14 @@ test("defers at the slice budget and resumes the same run from its cursor", asyn
       { registry, fetchImpl, clock: fixedClock(), executionToken: "slice-1" },
     ),
   ).resolves.toEqual({
-    status: "deferred",
+    status: "waiting",
     nextAttemptAt: new Date("2026-08-18T12:01:00Z"),
   });
-  const [deferred] = await db
+  const [waiting] = await db
     .select()
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, run.id));
-  expect(deferred).toMatchObject({
+  expect(waiting).toMatchObject({
     status: "queued",
     cursor: { page: 2 },
     sliceRequestCount: 1,
@@ -259,6 +260,76 @@ test("defers at the slice budget and resumes the same run from its cursor", asyn
     status: "succeeded",
     attemptCount: 2,
     sliceRequestCount: 1,
+    requestCount: 2,
+  });
+  expect(observations.size).toBe(2);
+});
+
+test("does not count planned spacing as another run attempt", async () => {
+  const adapter: ScraperAdapter<FixtureCursor, FixtureObservation> = async ({
+    cursor,
+    session,
+  }) => {
+    let page = cursor?.page ?? 1;
+    while (true) {
+      const response = await session.request({
+        target: "fixture-target",
+        url: new URL(`/catalog?page=${page}`, "https://fixture.invalid"),
+        canResumeLater: true,
+      });
+      const parsed = FixturePageSchema.parse(JSON.parse(response.body));
+      for (const item of parsed.items) {
+        await session.emit({ sourceKey: item.id, value: item });
+      }
+      if (parsed.nextPage === null) return;
+      await session.checkpoint({ page: parsed.nextPage });
+      page = parsed.nextPage;
+    }
+  };
+  const { registry, run, observations } = await setupRun({ adapter });
+  const fetchImpl = pageFetch({
+    1: { items: [{ id: "a", value: "A" }], nextPage: 2 },
+    2: { items: [{ id: "b", value: "B" }], nextPage: null },
+  });
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      { registry, fetchImpl, clock: fixedClock(), executionToken: "first" },
+    ),
+  ).resolves.toEqual({
+    status: "waiting",
+    nextAttemptAt: new Date("2026-08-18T12:01:00Z"),
+  });
+  const [waiting] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(waiting).toMatchObject({
+    status: "queued",
+    attemptCount: 0,
+    requestCount: 1,
+    cursor: { page: 2 },
+  });
+
+  await expect(
+    executeScraperRun(
+      { runId: run.id },
+      {
+        registry,
+        fetchImpl,
+        clock: fixedClock("2026-08-18T12:01:00Z"),
+        executionToken: "second",
+      },
+    ),
+  ).resolves.toEqual({ status: "completed" });
+  const [completed] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(completed).toMatchObject({
+    status: "succeeded",
+    attemptCount: 1,
     requestCount: 2,
   });
   expect(observations.size).toBe(2);
@@ -364,7 +435,7 @@ test("reclaims an expired execution lease without changing run identity", async 
   expect(stored).toMatchObject({ id: run.id, status: "succeeded" });
 });
 
-test("does not claim a queued run before its durable next-attempt time", async () => {
+test("does not claim a queued run before its next attempt", async () => {
   const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>(
     async () => {},
   );
@@ -380,7 +451,7 @@ test("does not claim a queued run before its durable next-attempt time", async (
       { runId: run.id },
       { registry, clock: fixedClock(), executionToken: "early-worker" },
     ),
-  ).resolves.toEqual({ status: "not_ready", nextAttemptAt });
+  ).resolves.toEqual({ status: "waiting", nextAttemptAt });
   expect(adapter).not.toHaveBeenCalled();
 });
 
@@ -413,7 +484,7 @@ test("fails a run before an eleventh execution claim", async () => {
   });
 });
 
-test("fails a deferred run after its maximum lifetime", async () => {
+test("fails a waiting run after its maximum lifetime", async () => {
   const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
   const { registry, run } = await setupRun({ adapter });
   await db
@@ -452,7 +523,7 @@ test("replay-safe sink prevents duplicate records after a lost checkpoint", asyn
     });
     attempt += 1;
     if (attempt === 1) {
-      throw new ScraperRequestDeferredError(
+      throw new ScraperRequestWaitError(
         "target_cooldown",
         new Date("2026-08-18T12:01:00Z"),
       );
@@ -477,7 +548,7 @@ test("replay-safe sink prevents duplicate records after a lost checkpoint", asyn
   );
 });
 
-test("defers transient traffic coordination failures", async () => {
+test("waits after temporary traffic coordination failures", async () => {
   const adapter: ScraperAdapter<
     FixtureCursor,
     FixtureObservation
@@ -492,7 +563,7 @@ test("defers transient traffic coordination failures", async () => {
       { registry, clock: fixedClock(), executionToken: "owner" },
     ),
   ).resolves.toEqual({
-    status: "deferred",
+    status: "waiting",
     nextAttemptAt: new Date("2026-08-18T12:15:00Z"),
   });
   const [stored] = await db

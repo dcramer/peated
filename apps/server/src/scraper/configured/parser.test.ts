@@ -504,9 +504,9 @@ const dramfaceSavedRules = {
   article: {
     canonicalUrl: pageAttribute('link[rel="canonical"]', "href"),
     title: pageText(".blog-item-title"),
-    publishedDate: pageText("time.dt-published"),
+    publishedDate: pageAttribute('meta[itemprop="datePublished"]', "content"),
     reviews: {
-      inside: "article",
+      inside: "article.h-entry .blog-item-content > .sqs-layout > .row > .col",
       oneReviewPer: "section",
       startsAt: {
         selector: "h3",
@@ -839,6 +839,28 @@ describe("scrape source parser", () => {
       reviewerName: "Ada",
       nativeScore: { value: 91, scale: 100, display: "91 / 100" },
     });
+  });
+
+  it("parses an ordinal published date", () => {
+    const result = parseScrapeDetail(
+      {
+        ...currentReviewRules,
+        article: {
+          ...currentReviewRules.article,
+          publishedDate: pageText("time"),
+        },
+      },
+      '<h1 class="title">Review</h1><time>January 29th, 2024</time><div class="entry-content"><h2 class="review">Example 12 Year</h2><p>Rich and balanced.</p></div>',
+      new URL("https://reviews.test/example"),
+    );
+
+    expect(result.issues).toEqual([]);
+    if (result.kind !== "review" || !result.value) {
+      throw new Error("Expected configured review output.");
+    }
+    expect(result.value.article.publishedAt.toISOString().slice(0, 10)).toBe(
+      "2024-01-29",
+    );
   });
 
   it.each([
@@ -1633,7 +1655,7 @@ describe("scrape source parser", () => {
       currentReviewRules,
       `<main>
         <article class="card"><a href="/one">One</a></article>
-        <article class="card"><span class="skip">News</span><a href="/news">News</a></article>
+        <article class="card"><span class="skip"></span><a href="/news">News</a></article>
         <article class="card"><a href="/two">Two</a></article>
         <a class="next" href="/page/2">Next</a>
       </main>`,
@@ -1644,6 +1666,42 @@ describe("scrape source parser", () => {
       links: ["https://reviews.test/one", "https://reviews.test/two"],
       nextPageUrl: "https://reviews.test/page/2",
       issues: [],
+    });
+  });
+
+  it("accepts a list page where every result is explicitly skipped", () => {
+    const result = parseScrapeList(
+      currentReviewRules,
+      `<main>
+        <article class="card"><span class="skip">News</span><a href="/news">News</a></article>
+        <article class="card"><span class="skip">Interview</span><a href="/interview">Interview</a></article>
+      </main>`,
+      new URL("https://reviews.test/"),
+    );
+
+    expect(result).toEqual({
+      links: [],
+      nextPageUrl: null,
+      issues: [],
+    });
+  });
+
+  it("still reports when a saved result selector finds nothing", () => {
+    expect(
+      parseScrapeList(
+        currentReviewRules,
+        "<main></main>",
+        new URL("https://reviews.test/"),
+      ),
+    ).toEqual({
+      links: [],
+      nextPageUrl: null,
+      issues: [
+        {
+          field: "articles.link",
+          message: "No links were found.",
+        },
+      ],
     });
   });
 

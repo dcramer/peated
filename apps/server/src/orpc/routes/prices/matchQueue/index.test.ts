@@ -2694,7 +2694,7 @@ describe("price match queue", () => {
     expect(observation).toMatchObject({
       bottleId: result.id,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
@@ -3213,7 +3213,7 @@ describe("price match queue", () => {
     );
     expect(bottlesAfter).toHaveLength(bottlesBefore.length + 1);
     expect(groupsAfter).toHaveLength(groupsBefore.length + 1);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
@@ -3386,13 +3386,18 @@ describe("price match queue", () => {
     expect(groupsAfter).toHaveLength(groupsBefore.length);
   });
 
-  test("rejects proposal-backed bottle creation for non-create_new proposals", async ({
+  test("creates a reviewed Bottle from a match_existing proposal", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Mismatch Brand" });
+    const suggestedBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Conflicting Candidate",
+      abv: 40,
+    });
     const price = await fixtures.StorePrice({
-      name: "Existing Match Candidate",
+      name: "Evidence Backed Release",
     });
 
     const [proposal] = await db
@@ -3401,10 +3406,67 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        proposedBottle: completeProposedBottle({
-          name: "Should Not Exist",
-          brand: { id: brand.id, name: brand.name },
-        }),
+        suggestedBottleId: suggestedBottle.id,
+      })
+      .returning();
+
+    const createdBottle = await routerClient.prices.matchQueue.createBottle(
+      {
+        proposal: proposal.id,
+        independentBottle: {
+          name: "Evidence Backed Release",
+          brand: brand.id,
+          category: "blend",
+          abv: 43,
+        },
+      },
+      { context: { user } },
+    );
+
+    const [updatedProposal, updatedPrice, decisionLog] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+      db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+          eq(incomingBottleDecisionLogs.sourceId, price.id),
+        ),
+      }),
+    ]);
+
+    expect(createdBottle).toMatchObject({
+      name: "Evidence Backed Release",
+      category: "blend",
+      abv: 43,
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      currentBottleId: createdBottle.id,
+      suggestedBottleId: createdBottle.id,
+    });
+    expect(updatedPrice).toMatchObject({ bottleId: createdBottle.id });
+    expect(decisionLog).toMatchObject({
+      proposalId: proposal.id,
+      bottleId: createdBottle.id,
+      decision: "create_bottle",
+      createdBottle: true,
+    });
+  });
+
+  test("rejects proposal-backed bottle creation for correction proposals", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Mismatch Brand" });
+    const price = await fixtures.StorePrice({ name: "Correction Candidate" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "correction",
       })
       .returning();
 
@@ -3424,9 +3486,8 @@ describe("price match queue", () => {
     const createdBottle = await db.query.bottles.findFirst({
       where: eq(bottles.fullName, "Mismatch Brand Should Not Exist"),
     });
-
     expect(err).toMatchInlineSnapshot(
-      `[Error: Price match proposal has invalid type (${proposal.id}, expected create_new, got match_existing).]`,
+      `[Error: Price match proposal has invalid type (${proposal.id}, expected create_new or match_existing, got correction).]`,
     );
     expect(createdBottle).toBeUndefined();
   });

@@ -352,7 +352,7 @@ describe("Bottle updates", () => {
       );
     expect(createdEntities).toHaveLength(2);
     for (const { id: entityId } of createdEntities) {
-      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
         "VerifyEntityCreation",
         { entityId, creationSource: "price_match_review" },
         { delay: 5_000 },

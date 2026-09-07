@@ -62,6 +62,10 @@ export function ModerationStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.stack)}>{children}</div>;
 }
 
+export function ModerationReasonList({ children }: { children: ReactNode }) {
+  return <ul {...stylex.props(styles.reasonList)}>{children}</ul>;
+}
+
 export function ModerationTaskHeader({
   blocked,
   category,
@@ -177,6 +181,12 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   stack: { display: "grid", gap: space.x6 },
+  reasonList: {
+    display: "grid",
+    gap: space.x2,
+    margin: 0,
+    paddingLeft: space.x4,
+  },
   taskHeader: {
     paddingBottom: space.x6,
   },

@@ -41,6 +41,7 @@ import {
   ModerationActions,
   ModerationLoading,
   ModerationMedia,
+  ModerationReasonList,
   ModerationStack,
   ModerationTaskHeader,
 } from "./moderationDetail.stylex";
@@ -128,7 +129,7 @@ function ListingTask({
   async function finish<TResult>(
     action: () => Promise<TResult>,
     message: string,
-  ) {
+  ): Promise<boolean> {
     setError(null);
     try {
       await action();
@@ -136,17 +137,19 @@ function ListingTask({
         queryKey: orpc.prices.matchQueue.key(),
       });
       await onComplete(message);
+      return true;
     } catch (cause) {
       setError(
         errorMessage(
           cause instanceof Error ? cause : new Error("Non-Error thrown"),
         ),
       );
+      return false;
     }
   }
 
   async function selectBottle(bottle: Bottle) {
-    await finish(
+    const saved = await finish(
       () =>
         resolve.mutateAsync({
           proposal: item.id,
@@ -155,7 +158,7 @@ function ListingTask({
         }),
       `Assigned ${item.price.name} to ${formatBottleDisplayName(bottle)}.`,
     );
-    setSelecting(false);
+    if (saved) setSelecting(false);
   }
 
   async function copyDetails() {
@@ -321,6 +324,15 @@ function ListingTask({
       {item.rationale ? (
         <AdminSection title="Rationale">{item.rationale}</AdminSection>
       ) : null}
+      {item.automationBlockers.length ? (
+        <AdminSection title="Why this needs review">
+          <ModerationReasonList>
+            {item.automationBlockers.map((blocker) => (
+              <li key={blocker}>{blocker}</li>
+            ))}
+          </ModerationReasonList>
+        </AdminSection>
+      ) : null}
       {error ? <Alert type="error">{error}</Alert> : null}
 
       <ModerationActions>
@@ -354,9 +366,7 @@ function ListingTask({
           {copyStatus === "copied" ? "Copied details" : "Copy details"}
         </Button>
         {item.proposalType === "create_new" && item.proposedBottle ? (
-          <Button
-            href={`/bottles/new?name=${encodeURIComponent(item.proposedBottle.name)}`}
-          >
+          <Button href={`/bottles/new?proposal=${item.id}`}>
             Edit before creation
           </Button>
         ) : null}
@@ -396,10 +406,6 @@ function ListingTask({
           <DefinitionList.Term>Model</DefinitionList.Term>
           <DefinitionList.Details>
             {item.model ?? "Unavailable"}
-          </DefinitionList.Details>
-          <DefinitionList.Term>Automation score</DefinitionList.Term>
-          <DefinitionList.Details>
-            {item.automationScore ?? "Unavailable"}
           </DefinitionList.Details>
           <DefinitionList.Term>Status</DefinitionList.Term>
           <DefinitionList.Details>{item.status}</DefinitionList.Details>

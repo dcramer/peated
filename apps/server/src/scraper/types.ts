@@ -11,20 +11,15 @@ export type JsonValue =
 
 export type ScraperRunPayload = JsonValue | undefined;
 
-export type ScraperRecordType = "review" | "price" | "catalog" | "bottle";
-
-export type ScraperSinkResult = {
-  newItemCount: number;
-  existingItemCount: number;
-};
-
 export type ScraperRequest = {
   target: string;
   url: URL;
   method?: "GET" | "POST";
   body?: string;
   headers?: Readonly<Record<string, string>>;
-  /** Explicitly marks a read-only POST query as safe for transient retries. */
+  /** Use only when another worker can safely continue this request. */
+  canResumeLater?: boolean;
+  /** Marks a read-only POST request as safe to retry after a temporary failure. */
   retryable?: boolean;
 };
 
@@ -36,9 +31,9 @@ export type ScraperResponse = {
 };
 
 export type ScraperObservation<T> = {
-  /** Stable within a source so replay after a lost checkpoint is idempotent. */
+  /** Stable within a source so repeating saved work does not create duplicates. */
   sourceKey: string;
-  /** Number of source items represented when an adapter emits a bounded batch. */
+  /** Number of source items included when one save contains a limited batch. */
   itemCount?: number;
   value: T;
 };
@@ -58,12 +53,15 @@ export type ScraperAdapter<TCursor, TObservation> = (input: {
 export type ScraperSink<TObservation> = (input: {
   externalSiteId: number;
   observation: ScraperObservation<TObservation>;
-}) => Promise<ScraperSinkResult | void>;
+}) => Promise<{
+  newItemCount: number;
+  existingItemCount: number;
+} | void>;
 
 export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   key: string;
   externalSiteKey: ExternalSiteKey;
-  recordType?: ScraperRecordType;
+  recordType?: "review" | "price" | "catalog" | "bottle";
   targetKeys: readonly [string, ...string[]];
   requestLimit: number;
   resumeFromLastRun: boolean;

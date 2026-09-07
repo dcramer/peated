@@ -176,12 +176,12 @@ same review order and IDs. Repeated reviews with the same Bottle name and writer
 keep separate keys in their original order.
 
 Version 8 rules must select up to 20 articles from the current review page. On
-detail pages, match `Review` headings to split the shared article area into
-sections even when Squarespace layout elements wrap the content. Read the
-Bottle name from the first line of its large-text block, the writer from the
-review heading or article byline, and the score out of 10. Run a full local
-no-write preview and compare single-Bottle, multi-Bottle, and multi-writer
-articles with the code parser before applying.
+detail pages, use the content column inside `article.h-entry`, then match
+`Review` headings to split it into sections. Read the full publication time
+from the page metadata, the Bottle name from the first line of its large-text
+block, the writer from the review heading or article byline, and the score out
+of 10. Run a full local no-write preview and compare single-Bottle,
+multi-Bottle, and multi-writer articles with the code parser before applying.
 
 Activate only a production preview with exact output. Trigger one manual
 collection and confirm that it updates the same review IDs without adding
@@ -268,6 +268,51 @@ Activate only exact output, trigger one manual collection, and confirm that it
 updates the same price IDs and Bottle matches before restoring the schedule.
 Check the run and Sentry.
 
+## Edradour
+
+Use the preparation endpoint with `{"site": "edradour"}`. The check-only
+request examines every saved price without changing it. It stops if a price
+has a product ID or does not use an Edradour product URL, an `Edradour` or
+`Ballechin` name, GBP, or a supported bottle size. Applying moves the request
+limits to a paused price source for `https://www.edradour.com/shop/`. It does
+not change price rows or history.
+
+Before applying, stop the `edradour` schedule and wait for active collection to
+finish. Save the existing price IDs, URLs, Bottle links, hidden states,
+histories, request limits, and run history. Run the version 8 rules through the
+full local preview. The shop-page rules must keep only whisky that can be
+bought. The product-page rules must read the displayed name, GBP price, bottle
+size, product URL, and image. Add the `Edradour` prefix when an Edradour whisky
+name does not already start with `Edradour` or `Ballechin`.
+
+After applying, save and preview the reviewed rules. Activate only exact
+output, trigger one manual collection, and confirm that it updates the same
+price IDs and Bottle links. Check the run and Sentry before restoring the
+weekly schedule.
+
+## Thompson Bros.
+
+Use the preparation endpoint with `{"site": "thompsonbros"}`. The check-only
+request examines every saved price without changing it. It accepts numeric shop
+product IDs and older rows that rely on their product URL. Every row must still
+use a Thompson Bros. product URL and name, GBP, and a supported bottle size.
+Applying moves the request limits to a paused price source for
+`https://www.thompsonbrosdistillers.com/product-category/whisky/`. It does not
+change price rows or history.
+
+Before applying, stop the `thompsonbros` schedule and wait for active collection
+to finish. Save the existing price IDs, product IDs, URLs, Bottle links, hidden
+states, histories, request limits, and run history. Run the version 8 rules
+through the full local no-write preview. The shop-page rules must exclude sold
+out products and rum, including a final page where every product is excluded.
+Product pages must provide the exact displayed name, current GBP price, 700 ml
+size, product URL, product ID, and image.
+
+After applying, save and preview the reviewed rules. Activate only exact output,
+trigger one manual collection, and confirm that it updates the same price IDs
+without reviving older products. Check the run and Sentry before restoring the
+weekly schedule.
+
 ## Kilchoman
 
 Use the preparation endpoint with `{"site": "kilchoman"}`. The check-only
@@ -352,10 +397,11 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture,
-Bruichladdich, Cadenhead's, Compass Box, Gordon & MacPhail, Kilchoman, Nc'nean,
-North Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga, The Whisky Study,
-and Words of Whisky. Other sites are rejected without changing records. Add
-each site's conversion behind this route as its existing records are reviewed.
+Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, Gordon & MacPhail,
+Kilchoman, Nc'nean, North Star, Thompson Bros., The Whiskey Reviewer,
+WhiskyNotes, Whisky Saga, The Whisky Study, and Words of Whisky. Other sites are
+rejected without changing records. Add each site's conversion behind this route
+as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store

@@ -4,7 +4,7 @@ import {
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
 import { runPostUserCreationBottleAudit } from "@peated/server/agents/bottleClassifier/auditBottle";
-import { recordCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
+import { logCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
 import { getCatalogVerificationDisplayName } from "@peated/server/lib/catalogVerificationFindings";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -44,8 +44,7 @@ export async function verifyBottleCreation(
   if (!displayName) return;
 
   if (!shouldRunCatalogVerification(policyInput)) {
-    await recordCatalogVerificationResult({
-      displayName,
+    logCatalogVerificationResult({
       objectId: bottleId,
       objectType: "bottle",
       result: {

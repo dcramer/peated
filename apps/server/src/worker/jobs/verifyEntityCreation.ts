@@ -3,7 +3,7 @@ import {
   getCatalogVerificationSkipReason,
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
-import { recordCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
+import { logCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
 import {
   getCatalogVerificationDisplayName,
   getEntityCatalogVerificationFindings,
@@ -31,8 +31,7 @@ export default async function verifyEntityCreation(input: JobPayload) {
   const policyInput = { objectType: "entity", source: creationSource } as const;
 
   if (!shouldRunCatalogVerification(policyInput)) {
-    await recordCatalogVerificationResult({
-      displayName,
+    logCatalogVerificationResult({
       objectId: entityId,
       objectType: "entity",
       result: {
@@ -47,8 +46,7 @@ export default async function verifyEntityCreation(input: JobPayload) {
 
   const findings = await getEntityCatalogVerificationFindings({ entityId });
 
-  await recordCatalogVerificationResult({
-    displayName,
+  logCatalogVerificationResult({
     objectId: entityId,
     objectType: "entity",
     result: {

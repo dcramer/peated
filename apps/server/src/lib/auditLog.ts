@@ -26,6 +26,7 @@ export enum AuditEvent {
   // External review publishing
   EXTERNAL_REVIEW_PUBLICATION_UPDATED = "external_review.publication.updated",
   EXTERNAL_REVIEW_SCORING_UPDATED = "external_review.scoring.updated",
+  EXTERNAL_REVIEW_SCORES_REPAIRED = "external_review.scores.repaired",
 }
 
 interface AuditLogEntry {

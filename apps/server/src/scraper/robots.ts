@@ -11,8 +11,8 @@ import {
   requestScraperUrl,
   type ScraperHttpClock,
   ScraperHttpStatusError,
-  ScraperRequestDeferredError,
   ScraperRequestError,
+  ScraperRequestWaitError,
 } from "./http";
 import type { ScraperRegistry } from "./types";
 
@@ -156,6 +156,7 @@ export async function ensureRobotsAllowed({
   sourceKey,
   targetKey,
   url,
+  canResumeLater,
   registry,
   fetchImpl = fetch,
   clock,
@@ -165,6 +166,7 @@ export async function ensureRobotsAllowed({
   sourceKey: string;
   targetKey: string;
   url: URL;
+  canResumeLater?: boolean;
   registry: ScraperRegistry;
   fetchImpl?: typeof fetch;
   clock: ScraperHttpClock;
@@ -183,7 +185,7 @@ export async function ensureRobotsAllowed({
       ),
     );
   if (!origin || origin.robotsMode !== "enforce") {
-    throw new ScraperRequestDeferredError("robots_unavailable", null);
+    throw new ScraperRequestWaitError("robots_unavailable", null);
   }
 
   const now = clock.now();
@@ -202,6 +204,7 @@ export async function ensureRobotsAllowed({
           target: targetKey,
           url: new URL("/robots.txt", url.origin),
           headers: { Accept: "text/plain,*/*;q=0.1" },
+          canResumeLater,
         },
         registry,
         fetchImpl,
@@ -215,7 +218,7 @@ export async function ensureRobotsAllowed({
         const missing = { status: "missing" } as const;
         await writeRobotsCache(url.origin, missing, now);
         state = CachedRobotsRulesSchema.safeParse(missing);
-      } else if (error instanceof ScraperRequestDeferredError) {
+      } else if (error instanceof ScraperRequestWaitError) {
         throw error;
       } else if (
         error instanceof ScraperRequestError &&
@@ -223,7 +226,7 @@ export async function ensureRobotsAllowed({
       ) {
         throw error;
       } else {
-        throw new ScraperRequestDeferredError(
+        throw new ScraperRequestWaitError(
           "robots_unavailable",
           new Date(now.getTime() + ROBOTS_UNAVAILABLE_RETRY_MS),
         );
@@ -232,7 +235,7 @@ export async function ensureRobotsAllowed({
   }
 
   if (!state.success) {
-    throw new ScraperRequestDeferredError(
+    throw new ScraperRequestWaitError(
       "robots_unavailable",
       new Date(now.getTime() + ROBOTS_UNAVAILABLE_RETRY_MS),
     );

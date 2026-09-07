@@ -13,8 +13,6 @@ import {
 import { parseDate } from "./dates";
 import { readReviewBody } from "./reviewBody";
 
-// This adapter owns Bourbon Culture parsing. The shared scraper runtime owns
-// every remote request and the shared review sink owns storage.
 const ORIGIN = "https://thebourbonculture.com";
 const TARGET = "bourbonculture";
 const MAX_CURRENT_ARTICLES = 6;

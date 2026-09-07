@@ -374,7 +374,7 @@ async function queueScheduledExternalSiteRun(
   return result.run;
 }
 
-/** Binds infrastructure once so lifecycle callers cannot bypass source ownership. */
+/** Creates the scraper actions used by API routes and scheduled jobs. */
 export function createScraperLifecycle({
   registry,
   enqueue,

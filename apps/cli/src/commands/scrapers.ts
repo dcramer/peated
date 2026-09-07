@@ -57,9 +57,9 @@ subcommand
         limit: options.limit,
       },
       {
-        onDeferred: (nextAttemptAt) => {
+        onWaiting: (nextAttemptAt) => {
           console.error(
-            `Request controls paused the preview. Continuing after ${nextAttemptAt.toISOString()}.`,
+            `Waiting until ${nextAttemptAt.toISOString()} before continuing the preview.`,
           );
         },
       },

@@ -182,7 +182,7 @@ test("caches a missing robots document as allowed for the bounded period", async
   expect(runState?.requestCount).toBe(1);
 });
 
-test("defers when robots is unavailable without a fresh decision", async () => {
+test("waits when robots is unavailable without a fresh decision", async () => {
   const { registry, run } = await setupRobotsRuntime();
   await expect(
     ensureRobotsAllowed({

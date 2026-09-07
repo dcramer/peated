@@ -17,8 +17,8 @@ import {
 import {
   parseRetryAfter,
   requestScraperUrl as requestScraperUrlImpl,
-  ScraperRequestDeferredError,
   ScraperRequestError,
+  ScraperRequestWaitError,
   type ScraperHttpClock,
   type ScraperHttpStatusError,
 } from "./http";
@@ -141,6 +141,35 @@ test("spaces requests from the hourly limit", async () => {
 
   expect(clock.sleepSpy).toHaveBeenCalledWith(120_000);
   expect(fetchImpl).toHaveBeenCalledTimes(2);
+});
+
+test("returns the next request time when saved work can continue later", async () => {
+  const { registry, run } = await setupRuntime({ requestsPerHour: 30 });
+  const clock = clockAt();
+  const fetchImpl = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response("catalog"));
+  const request = {
+    runId: run.id,
+    sourceKey: "finedrams",
+    request: {
+      target: "operator",
+      url: new URL("https://example.com/catalog"),
+      canResumeLater: true,
+    },
+    registry,
+    fetchImpl,
+    clock,
+  };
+
+  await requestScraperUrl(request);
+  await expect(requestScraperUrl(request)).rejects.toMatchObject({
+    reason: "target_spacing",
+    nextEligibleAt: new Date("2026-08-18T12:02:00Z"),
+  });
+
+  expect(clock.sleepSpy).not.toHaveBeenCalled();
+  expect(fetchImpl).toHaveBeenCalledOnce();
 });
 
 test("sends an identified bounded GET and exposes only safe response headers", async () => {
@@ -339,7 +368,7 @@ test("retries only transient failures and reacquires a permit", async () => {
   expect(failedRunState?.requestErrorCount).toBe(2);
 });
 
-test("honors Retry-After as a shared durable deferral", async () => {
+test("uses Retry-After as the shared next request time", async () => {
   const { registry, run } = await setupRuntime();
   const clock = clockAt();
   const request = requestScraperUrl({
@@ -357,7 +386,7 @@ test("honors Retry-After as a shared durable deferral", async () => {
       ),
     clock,
   });
-  const error = await waitError(request, ScraperRequestDeferredError);
+  const error = await waitError(request, ScraperRequestWaitError);
   expect(error).toMatchObject({
     reason: "rate_limited",
     nextEligibleAt: new Date("2026-08-18T12:02:00Z"),
@@ -466,7 +495,7 @@ test("classifies bounded timeout retries and rejects unsafe headers before conta
   expect(neverFetch).not.toHaveBeenCalled();
 });
 
-test("defers a retryable transport failure when the run budget is exhausted", async () => {
+test("waits after a retryable request uses the run's last request", async () => {
   const { registry, run } = await setupRuntime({ requestLimit: 1 });
   const fetchImpl = vi
     .fn<typeof fetch>()
@@ -484,7 +513,7 @@ test("defers a retryable transport failure when the run budget is exhausted", as
       fetchImpl,
       clock: clockAt(),
     }),
-    ScraperRequestDeferredError,
+    ScraperRequestWaitError,
   );
   expect(error).toMatchObject({
     reason: "run_budget",

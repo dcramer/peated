@@ -14,8 +14,6 @@ import {
 import { parseDate } from "./dates";
 import { readReviewBody } from "./reviewBody";
 
-// This adapter owns Words of Whisky parsing. The shared scraper runtime owns
-// every remote request and the shared review sink owns storage.
 const ORIGIN = "https://wordsofwhisky.com";
 const TARGET = "wordsofwhisky";
 const MAX_HOMEPAGE_ARTICLES = 20;

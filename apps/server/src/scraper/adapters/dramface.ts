@@ -14,8 +14,6 @@ import {
 import { parseDate } from "./dates";
 import { readReviewBody } from "./reviewBody";
 
-// This adapter owns Dramface-specific discovery and parsing. The shared
-// scraper runtime owns every remote request and the shared sink owns storage.
 const ORIGIN = "https://www.dramface.com";
 const TARGET = "dramface";
 const MAX_INDEX_ARTICLES = 20;

@@ -379,8 +379,10 @@ function parseSavedList(
       ? rules.articles.oneArticlePer
       : rules.products.oneProductPer;
   const fieldRoot = rules.kind === "review" ? "articles" : "products";
+  const itemElements = $(itemSelector).toArray();
+  let skippedItemCount = 0;
   try {
-    for (const itemElement of $(itemSelector).toArray()) {
+    for (const itemElement of itemElements) {
       const item = load($.html(itemElement));
       if (list.skipWhen) {
         const skipWhen = list.skipWhen;
@@ -399,11 +401,15 @@ function parseSavedList(
               )
             );
           }
+          if (skipWhen.match === null) return true;
           return Boolean(
             matchFirstText(readText(item(element)), skipWhen.match),
           );
         });
-        if (shouldSkip) continue;
+        if (shouldSkip) {
+          skippedItemCount += 1;
+          continue;
+        }
       }
       const itemLinks = item(list.link).toArray();
       for (const element of itemLinks) {
@@ -431,7 +437,9 @@ function parseSavedList(
         error instanceof Error ? error.message : "Unable to read the list.",
     });
   }
-  if (links.size === 0) {
+  const allItemsWereSkipped =
+    itemElements.length > 0 && skippedItemCount === itemElements.length;
+  if (links.size === 0 && !allItemsWereSkipped) {
     issues.push({
       field: `${fieldRoot}.link`,
       message: "No links were found.",
@@ -460,7 +468,11 @@ function parseSavedList(
 
 function parseDate(value: string | null) {
   if (!value) return null;
-  const timestamp = Date.parse(value);
+  const normalizedValue = value.replaceAll(
+    /\b(\d{1,2})(?:st|nd|rd|th)\b/giu,
+    "$1",
+  );
+  const timestamp = Date.parse(normalizedValue);
   return Number.isFinite(timestamp) ? new Date(timestamp) : null;
 }
 

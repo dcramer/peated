@@ -88,6 +88,7 @@ export function createScraperSession<TCursor, TObservation>({
           sourceKey: source.key,
           targetKey: request.target,
           url: request.url,
+          canResumeLater: request.canResumeLater,
           registry,
           fetchImpl,
           clock,

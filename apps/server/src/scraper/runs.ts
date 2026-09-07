@@ -19,8 +19,8 @@ import {
 } from "./definitions";
 import {
   ScraperHttpStatusError,
-  ScraperRequestDeferredError,
   ScraperRequestError,
+  ScraperRequestWaitError,
   scraperSystemClock,
   type ScraperHttpClock,
 } from "./http";
@@ -35,8 +35,8 @@ import type {
 const RUN_EXECUTION_LEASE_MS = 60 * 60_000;
 const MAX_RUN_EXECUTION_ATTEMPTS = 10;
 const MAX_RUN_AGE_MS = 24 * 60 * 60_000;
-const DEFAULT_DEFERRAL_MS = 15 * 60_000;
-const BUDGET_DEFERRAL_MS = 60_000;
+const DEFAULT_WAIT_MS = 15 * 60_000;
+const REQUEST_LIMIT_WAIT_MS = 60_000;
 const RUN_LIMIT_ERROR = "Scraper run exceeded its execution limits.";
 
 const ScraperRunJobInputSchema = z
@@ -52,8 +52,7 @@ type ClaimedRun = {
 
 export type ScraperRunExecutionResult =
   | { status: "completed" | "duplicate" }
-  | { status: "not_ready"; nextAttemptAt: Date }
-  | { status: "deferred"; nextAttemptAt: Date };
+  | { status: "waiting"; nextAttemptAt: Date };
 
 function safeRunError(error: Error) {
   if (error instanceof ScraperTargetDisabledError) {
@@ -149,7 +148,7 @@ async function claimScraperRun({
       candidate.run.nextAttemptAt > now
     ) {
       return {
-        status: "not_ready",
+        status: "waiting",
         nextAttemptAt: candidate.run.nextAttemptAt,
       };
     }
@@ -247,26 +246,31 @@ async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
   });
 }
 
-async function deferRun(
+async function queueRunForLater(
   claim: ClaimedRun,
-  error: ScraperRequestDeferredError | ScraperCoordinationError,
+  error: ScraperRequestWaitError | ScraperCoordinationError,
   now: Date,
 ) {
-  let nextAttemptAt = new Date(now.getTime() + DEFAULT_DEFERRAL_MS);
-  if (error instanceof ScraperRequestDeferredError) {
+  let nextAttemptAt = new Date(now.getTime() + DEFAULT_WAIT_MS);
+  if (error instanceof ScraperRequestWaitError) {
     nextAttemptAt =
       error.nextEligibleAt ??
       new Date(
         now.getTime() +
           (error.reason === "run_budget"
-            ? BUDGET_DEFERRAL_MS
-            : DEFAULT_DEFERRAL_MS),
+            ? REQUEST_LIMIT_WAIT_MS
+            : DEFAULT_WAIT_MS),
       );
   }
   await db
     .update(externalSiteRuns)
     .set({
       status: "queued",
+      attemptCount:
+        error instanceof ScraperRequestWaitError &&
+        error.reason === "target_spacing"
+          ? Math.max(0, claim.run.attemptCount - 1)
+          : claim.run.attemptCount,
       nextAttemptAt,
       executionToken: null,
       executionExpiresAt: null,
@@ -336,11 +340,11 @@ export async function executeScraperRun(
     return { status: "completed" };
   } catch (error) {
     if (
-      error instanceof ScraperRequestDeferredError ||
+      error instanceof ScraperRequestWaitError ||
       error instanceof ScraperCoordinationError
     ) {
-      const nextAttemptAt = await deferRun(claimed, error, clock.now());
-      return { status: "deferred", nextAttemptAt };
+      const nextAttemptAt = await queueRunForLater(claimed, error, clock.now());
+      return { status: "waiting", nextAttemptAt };
     }
     if (error instanceof ScrapeSourceSetupError) {
       await failRun(claimed, error, clock.now());

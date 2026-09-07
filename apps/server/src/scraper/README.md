@@ -1,35 +1,33 @@
 # Scraper Runtime
 
-This module owns Peated's outbound scraper boundary. It keeps four concerns
-separate:
+This module controls Peated's scraper requests and saved progress. It keeps four
+jobs separate:
 
-- definitions say which Peated source may use which remote target and origin;
-- runs limit their source work and can resume it;
-- coordination and HTTP own when and how remote requests happen;
-- adapters parse responses and emit source observations through an injected
-  session.
+- definitions list which websites each source may request;
+- runs limit work and save enough progress to resume;
+- coordination and HTTP space requests, retry temporary failures, and enforce
+  limits;
+- adapters read responses and pass results through the current run.
 
-Code outside this module uses `index.ts` to initialize, queue, or execute a
-durable run. It must not call adapters, target coordination, robots, or scraper
-HTTP internals directly. The internal layout keeps those ownership boundaries
-visible:
+Code outside this module uses `index.ts` to initialize, queue, or execute a run.
+It must not call adapters, request controls, robots checks, or scraper HTTP code
+directly. The files are split by responsibility:
 
-- `lifecycle.ts` owns durable run creation and dispatch through injected
-  registry and queue capabilities;
+- `lifecycle.ts` creates runs and sends them to the worker queue;
 - `runs.ts`, `session.ts`, `http.ts`, `robots.ts`, and `coordinator.ts` own core
   execution without importing production registry or worker infrastructure;
-- `registry.ts` is the production composition root;
+- `registry.ts` lists the built-in sources and request settings;
 - `adapters/legacy/` contains migrated source implementations that still use
-  the compatibility bridge in `legacy/`;
-- native adapters use only their injected session;
+  the old helpers in `legacy/`;
+- newer adapters use only the current run passed to them;
 - `adapters/dates.ts` parses common publisher date formats;
-- `adapters/currentReviews.ts` owns the repeated current-review cursor,
-  request, emit, ignore, and checkpoint lifecycle;
-- `sinks/` is the narrow boundary to Peated domain persistence.
+- `adapters/currentReviews.ts` shares the common steps for reading current
+  reviews and saving progress;
+- `sinks/` saves parsed results.
 
 Registered source implementations must not import raw HTTP, queue, database,
-or product persistence clients. Boundary tests inspect the sources composed by
-the production registry, rather than only the top level of `adapters/`.
+or product-saving clients. Tests check every source listed in the production
+registry, including sources in subfolders.
 
 External review sources must also follow the
 [external review source procedure](../../../../docs/operations/external-review-sources.md).
@@ -37,35 +35,32 @@ It covers review publishing, source approval, and rollback.
 
 ## Registering a source
 
-1. Define a target in `registry.ts`. A target represents one remote operator's
-   shared traffic capacity, not necessarily one hostname. Declare every exact
-   origin it may use and either enforce robots or record why robots do not
-   apply.
-2. Define the source with its external-site key, allowed target keys, strict
-   cursor and observation schemas, request limit, adapter, and sink.
-3. Make the adapter use only its injected session. Checkpoint after a page or
-   partition is safely emitted, before requesting the next one. A cursor must
-   describe the next safe work and remain valid if the prior page is replayed.
-4. Give every observation a stable source key. The sink owns product or review
-   persistence and must safely accept a replay after a worker loses ownership
-   between emit and checkpoint.
+1. Define a target in `registry.ts`. A target groups sources that must share a
+   request limit. List every website address it may use and either enforce
+   robots.txt or record why robots.txt does not apply.
+2. Define the source with its external-site key, allowed targets, schemas for
+   saved progress and parsed results, request limit, adapter, and save function.
+3. Make the adapter use only its current run. After saving a page, save the
+   place where the next run should continue. Repeating the prior page must be
+   safe.
+4. Give every parsed result a stable source key. Saving the same result again
+   must not create a duplicate if a worker stops between saving the result and
+   saving its place.
 5. Synchronize definitions before accepting scraper work. Production dispatch
    has one entry point: the `RunScraper` job with a run id.
 
 Existing retailer sources may use `legacy/scraper.ts` only from
-`adapters/legacy/`. That bridge translates their old helper calls into the
-active scraper session; new sources must not use it. Remove a legacy source's
-bridge dependency when converting it to a native adapter, then move it out of
-`adapters/legacy/`.
+`adapters/legacy/`. It connects their old helper calls to the current run; new
+sources must not use it. When converting an old source, remove those helpers
+and move the source out of `adapters/legacy/`.
 
 Give sources the same target only when the same organization runs them and they
 must share one request limit. A target may list several web addresses when that
 organization uses more than one host. Do not group sites from their domain
 names alone.
 
-Set `requestsPerHour` for each target. The scraper waits between requests so
-they fill the hour evenly: 60 per hour means one request per minute. A value
-above 60 needs a short reason.
+Set `requestsPerHour` for each target. Requests are spread evenly across the
+hour: 60 means one request per minute. A value above 60 needs a short reason.
 
 ## Scrape sources
 
@@ -179,7 +174,7 @@ these checks. The `trigger-evals` label runs the broader eval suite in CI.
 Before saving replacement rules, run the revision input through the local
 runtime. The command uses `.env.local`, the registered target, robots policy,
 request controls, production parser, and validators. It records the local run
-for inspection but uses a no-op sink, so it does not write reviews or prices:
+for inspection but does not save reviews or prices:
 
 ```bash
 pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 3
@@ -261,21 +256,21 @@ next eligible time and resumes from its saved page automatically.
 
 ## Source acceptance rules
 
-Every new or changed source must satisfy this contract. Prove a rule at the
-listed owner. Do not repeat a runtime test in every adapter.
+Every new or changed source must pass these checks. Test shared request rules
+once in the runtime instead of repeating them in every source test.
 
-| Rule                                                                                                                                                                                            | Owner and proof                                                                                                                                                              |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The source requests only its declared targets and exact origins.                                                                                                                                | The registry owns the declaration. Definition and boundary tests prove it.                                                                                                   |
-| Discovery has fixed limits. The adapter does not crawl the whole website.                                                                                                                       | The adapter owns its exact entry points and maximum pages or items. A fixture test proves the limit.                                                                         |
-| Every request uses the injected session. Robots, spacing, quotas, retries, response limits, and `429` cooldowns stay active.                                                                    | The runtime owns request control. Boundary and HTTP tests prove it.                                                                                                          |
-| The configured limits let a run complete or make durable progress. Discovery plus the first work request must fit before a quota or slice boundary. Request spacing must not restart discovery. | The registry owns limits. A registered runtime test proves completion or a cursor advance.                                                                                   |
-| A cursor is strict and describes the next safe work. The adapter emits before it checkpoints. A replay is safe.                                                                                 | The adapter owns progress. Fixture tests prove resume, replay, and failed emit or parse behavior.                                                                            |
-| Observation keys are stable across runs. They are unique within their storage scope.                                                                                                            | The adapter owns source identity. Parser tests prove stable keys, multi-item keys, and known collision cases.                                                                |
-| Parsed output uses the registered strict schema. Product writes happen only in the registered sink.                                                                                             | The session and registry own validation and sink selection. Registry and sink tests prove it.                                                                                |
-| Expected remote deferrals remain non-terminal. Unexpected markup, validation, and persistence failures fail the run.                                                                            | The runtime owns deferrals. The adapter owns the difference between an expected non-item and malformed source data.                                                          |
-| A source change passes deterministic fixtures and one local acceptance run against the current public source.                                                                                   | The source author runs the registered adapter through the local runtime and inspects the run, cursor, request count, and emitted observations. Live checks use the CI label. |
-| The first production run is checked in Admin → Scrapers and Sentry.                                                                                                                             | The source author confirms status, counts, cursor progress, robots state, and any terminal error.                                                                            |
+| What to check                                                                                                           | Where it is checked                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| The source requests only its listed websites.                                                                           | Registry and import tests.                                                                             |
+| The source has a fixed page or item limit and cannot crawl the whole website.                                           | The source's fixture tests.                                                                            |
+| Every request uses the current run, so robots rules, spacing, retries, and response-size limits apply.                  | Import and HTTP tests.                                                                                 |
+| A run can finish or save its place before its request allowance runs out. Waiting between requests repeats no old work. | Registered runtime tests.                                                                              |
+| The saved place points to the next safe item. Results are saved before progress, and repeating work is safe.            | The source's resume and repeat-work tests.                                                             |
+| Each result has a stable source key that is unique where it is stored.                                                  | Parser tests for stable keys and known collisions.                                                     |
+| Parsed output passes the source's strict schema and is saved by its registered save function.                           | Registry and saving tests.                                                                             |
+| A planned wait keeps the run active. Bad markup, invalid data, and failed saves fail the run.                           | Runtime and source tests.                                                                              |
+| A source change passes fixture tests and one local run against the public website.                                      | Inspect its saved progress, request count, and parsed results. Use the CI label for live model checks. |
+| The first production run is checked in Admin → Scrapers and Sentry.                                                     | Confirm its status, counts, saved progress, robots state, and any final error.                         |
 
 Keep source-specific facts in the adapter tests and the owning feature or
 research document. Update a fixture when the publisher changes markup. Do not
@@ -289,28 +284,28 @@ to refresh them without keeping full articles.
 
 ## Run outcomes
 
-- `succeeded` means the adapter returned after validated observations and its
-  latest cursor were persisted.
-- `queued` with `nextAttemptAt` means the same run was durably deferred for a
-  budget, spacing, quota, lease, or remote cooldown. It is not a failure.
-- `failed` means validation, robots, configuration, persistence, or an
-  unexpected remote failure was terminal for that run. Stored errors are
-  limited; detailed unexpected failures belong in Sentry.
+- `succeeded` means the source finished after its valid results and latest
+  progress were saved.
+- `queued` with `nextAttemptAt` means the same run is saved and waiting for its
+  next request time. It is not a failure.
+- `failed` means invalid data, robots rules, settings, saving, or the remote
+  website stopped that run. Stored errors are brief; detailed unexpected
+  failures belong in Sentry.
 
-`sliceRequestCount` resets when a deferred run is reclaimed. Request, request
-error, retry, rate-limit, record, new-record, and seen-before counts cover the
+`sliceRequestCount` counts requests in the current worker attempt and resets
+when a waiting run starts again. The other request and result counts cover the
 full run. A null request-error count means the run finished before error
 tracking was added. Records without a saved type or new/seen result appear as
 not tracked in Admin. Preview and source suggestion runs do not appear in the
 Admin overview.
 
-Every network attempt, including robots refreshes and retries, requires a SQL
-permit and consumes the current slice budget. Response bodies are streamed
-within the configured bound and are never stored by the runtime.
+Every network attempt, including robots refreshes and retries, counts toward
+the current worker's request limit. Response bodies are read only up to the
+configured size and are never stored by the runtime.
 
-A run may be claimed for at most ten execution slices and may remain active for
-at most 24 hours. The claim boundary fails older work before another adapter or
-network execution so a bad cursor or permanent deferral cannot live forever.
+A planned wait between saved-rule requests does not count toward the
+ten-attempt safety limit. Other restarts do. Every run must finish within 24
+hours, so invalid saved progress or a permanent wait cannot live forever.
 
 ## Bot identity
 
