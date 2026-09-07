@@ -111,9 +111,11 @@ export type {
   BottleClassifierToolEvent,
 } from "./runtime/bottleCheckRuntime";
 
-const CLASSIFIER_MAX_TURNS = 8;
-// Parallel tool calls are disabled, and the agent needs one final-output turn.
-const CLASSIFIER_MAX_PROPOSED_OPERATIONS = CLASSIFIER_MAX_TURNS - 1;
+// A reference run can use eight turns for research and one to return its decision.
+const REFERENCE_CLASSIFIER_MAX_TURNS = 9;
+const AUDIT_CLASSIFIER_MAX_TURNS = 8;
+// Tool calls run one at a time, so an audit keeps its last turn for the result.
+const CLASSIFIER_MAX_PROPOSED_OPERATIONS = AUDIT_CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
 
 function buildReferencePageFocus(referenceName: string): string {
@@ -724,7 +726,7 @@ export async function prepareBottleClassifierAgentRun(
           : `${reference.currentBottleId}`,
     },
     runOptions: {
-      maxTurns: CLASSIFIER_MAX_TURNS,
+      maxTurns: REFERENCE_CLASSIFIER_MAX_TURNS,
       stream: false,
     },
     webSearchBudget,
@@ -880,7 +882,7 @@ export function prepareBottleAuditAgentRun(
     }),
     conversationId,
     runOptions: {
-      maxTurns: CLASSIFIER_MAX_TURNS,
+      maxTurns: AUDIT_CLASSIFIER_MAX_TURNS,
       stream: false,
     },
     getArtifacts,
