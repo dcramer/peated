@@ -1698,6 +1698,53 @@ completion record.
   or cask-strength claim. Exact public Peated searches for all three identities
   returned no matches. They are staged as releases 107 through 109; the
   Owner's Cask count remains 211.
+- A further exact single-cask release is missing from production. Sotheby's
+  [2026 auction index](https://www.sothebys.com/en/buy/auction/2026/finest-and-rarest-spirits-2?locale=en&lotFilter=AllLots)
+  lists `The Yamazaki Single Cask #2J6001 Suntory Whisky Meeting` at 63%, and
+  its photographed
+  [lot record](https://www.artauctioner.com/web/auction/dL2619650100003)
+  establishes a 1960 vintage, 2002 bottling, Japanese-oak (Mizunara) sherry
+  butt maturation, 2003 Suntory Whisky Meeting edition, and 36-bottle outturn.
+  An exact
+  [Whiskybase record](https://www.whiskybase.com/zh-cn/whiskies/whisky/300995/yamazaki-1960)
+  agrees with those label facts. Exact public Peated searches for `2J6001`,
+  `Suntory Whisky Meeting`, and the vintage plus strength returned no match.
+  The label does not market an age statement, so the collector-calculated
+  41-year age is not stored. It is staged as the 110th evidence-backed
+  non-Owner release; the Owner's Cask count remains 211.
+- The complete known Yamazaki sequence from The Scotch Malt Whisky Society is
+  already present as `B51735` through `B51748`, covering `119.1` through
+  `119.14` without a gap. The
+  [Whiskybase brand index](https://www.whiskybase.com/whiskies/brand/81479/whiskies)
+  provided the sequence lead; exact Whisky Auctioneer and Bonhams records then
+  confirmed individual label facts. In particular, the exact
+  [`119.1` record](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-1980-smws-22-year-old-1191-prunes-and-mentholated-teak-oil)
+  and a detailed
+  [contemporary review](https://www.whiskysaga.com/blog/smws-1191-prunes-and-mentholated-teak-oil)
+  agree on a 352-bottle outturn, now staged as the twelfth current field
+  correction to `B51735`. The review says its cask type was undisclosed, while
+  [Whisky Magazine](https://whiskymag.com/tastings/the-scotch-malt-whisky-society-1980-white-oak-cask-1191-prunes-and-mentholated-teak-oil/)
+  calls it a white-oak cask, so maturation remains unknown. A
+  [Bonhams catalog](https://images2.bonhams.com/original?src=Images%2Flive%2F2018-10%2F26%2FS-24779-0-1.pdf)
+  confirms label facts for `119.5` through `119.8` and `119.10`; a second
+  [Bonhams catalog](https://images1.bonhams.com/original?src=Images%2Flive%2F2023-04%2F17%2FS-28686-0-3.pdf)
+  confirms `119.14`, including its 538-bottle outturn and Bota Corta cask.
+  Uncorroborated collector outturns for `119.3` and `119.6` are not staged.
+  All 14 records currently lack a catalog image, apart from the separately
+  prepared licensed `119.9` crop described above; the auction photographs do
+  not state reusable terms.
+- Three apparent early-range gaps do not add Yamazaki Brand Bottles. The 1983,
+  43% `Special Edition 60th Anniversary` gold bottle is existing `B51621`, and
+  the 1984, 45% Sherry Wood release is existing `B51632`, with its evidence and
+  staged corrections recorded above. The 43%, 500 ml
+  [Suntory Pure Malt 7-year-old](https://nonjatta.blogspot.com/2011/06/suntory-pure-malt-7-year-old.html)
+  is a Suntory blended malt containing both Hakushu and Yamazaki, not the
+  Yamazaki single malt claimed by one auction index. A photographed
+  [retailer record](https://jwhisky.com/products/suntory-pure-malt-7-years-black-label-yamazaki)
+  independently describes the black-label release as predominantly Yamazaki
+  with a smaller Hakushu component. It belongs under the Suntory Brand with
+  both distillers and is therefore outside this Yamazaki Brand create set; its
+  exact identity is retained for the broader distillery inventory.
 - Four more cached index leads remain unresolved. The
   [1960/2003](https://www.whiskybase.com/whiskies/whisky/53930/yamazaki-1960)
   record is corroborated as a 56% tasting sample by
