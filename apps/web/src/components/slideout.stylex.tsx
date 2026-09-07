@@ -16,7 +16,7 @@ import { IconButton } from "./button.stylex";
 export type SlideoutProps = {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   navigation?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
