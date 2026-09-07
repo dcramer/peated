@@ -210,6 +210,7 @@ function createScrapeSourceAdapter(
         const listResponse = await session.request({
           target: input.targetKey,
           url: new URL(state.nextListUrl),
+          canResumeLater: true,
         });
         const listResult = parseScrapeList(
           input.rules,
@@ -238,6 +239,7 @@ function createScrapeSourceAdapter(
         const response = await session.request({
           target: input.targetKey,
           url: new URL(link),
+          canResumeLater: true,
         });
         const parsed = parseScrapeDetail(
           input.rules,

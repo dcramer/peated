@@ -24,6 +24,8 @@ export type ScraperRequest = {
   method?: "GET" | "POST";
   body?: string;
   headers?: Readonly<Record<string, string>>;
+  /** Use only when this request can continue in another job. */
+  canResumeLater?: boolean;
   /** Explicitly marks a read-only POST query as safe for transient retries. */
   retryable?: boolean;
 };

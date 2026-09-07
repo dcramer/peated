@@ -8,6 +8,7 @@ import {
 } from "@peated/server/db/schema";
 import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
+import { setTimeout as wait } from "node:timers/promises";
 import { createScraperRegistry } from "../definitions";
 import { executeScraperRun } from "../runs";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
@@ -149,6 +150,25 @@ function createFixtureWebsite() {
     });
   };
   return { fetchImpl, requests };
+}
+
+async function completeSavedRun({
+  runId,
+  fetchImpl,
+  registry,
+}: {
+  runId: number;
+  fetchImpl: typeof fetch;
+  registry: ReturnType<typeof createScraperRegistry>;
+}) {
+  while (true) {
+    const result = await executeScraperRun({ runId }, { fetchImpl, registry });
+    if (result.status === "completed") return result;
+    if (!("nextAttemptAt" in result)) {
+      throw new Error("The saved scraper is already running.");
+    }
+    await wait(Math.max(0, result.nextAttemptAt.getTime() - Date.now()));
+  }
 }
 
 describe.skipIf(!isAIGatewayConfigured("scraper"))(
@@ -309,10 +329,11 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         trigger: "manual",
       });
       await expect(
-        executeScraperRun(
-          { runId: previewRun.run.id },
-          { fetchImpl: fixtureWebsite.fetchImpl, registry },
-        ),
+        completeSavedRun({
+          runId: previewRun.run.id,
+          fetchImpl: fixtureWebsite.fetchImpl,
+          registry,
+        }),
       ).resolves.toEqual({ status: "completed" });
 
       const [previewedRevision] = await db
