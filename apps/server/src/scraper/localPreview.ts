@@ -3,6 +3,7 @@ import {
   externalSiteRuns,
   externalSites,
   externalSiteScrapeTargets,
+  scrapeTargets,
 } from "@peated/server/db/schema";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { and, eq, inArray } from "drizzle-orm";
@@ -14,6 +15,7 @@ import {
   withScrapeRulesLimit,
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
+import { loadScrapeSourceTarget } from "./configured/target";
 import { scraperSystemClock, type ScraperHttpClock } from "./http";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
@@ -56,27 +58,48 @@ export async function runLocalScrapeSourcePreview(
     .where(eq(externalSites.type, parsed.site));
   if (!site) throw new Error(`External site ${parsed.site} was not found.`);
 
-  const target = scraperRegistry.targets.get(parsed.site);
+  const codeTarget = scraperRegistry.targets.get(parsed.site);
+  const [storedTarget] = codeTarget
+    ? []
+    : await db
+        .select({ target: scrapeTargets })
+        .from(externalSiteScrapeTargets)
+        .innerJoin(
+          scrapeTargets,
+          eq(scrapeTargets.key, externalSiteScrapeTargets.targetKey),
+        )
+        .where(
+          and(
+            eq(externalSiteScrapeTargets.externalSiteId, site.id),
+            eq(externalSiteScrapeTargets.active, true),
+          ),
+        )
+        .limit(1);
+  const target =
+    codeTarget ??
+    (storedTarget ? await loadScrapeSourceTarget(storedTarget.target) : null);
   if (!target) {
     throw new Error(`External site ${parsed.site} has no scrape target.`);
   }
-  // Local previews still need coordinator authorization after the legacy
-  // source registration is removed. Production migrations own their mapping.
-  await db
-    .insert(externalSiteScrapeTargets)
-    .values({
-      externalSiteId: site.id,
-      targetKey: target.key,
-      managedBy: "code",
-    })
-    .onConflictDoUpdate({
-      target: [
-        externalSiteScrapeTargets.externalSiteId,
-        externalSiteScrapeTargets.targetKey,
-      ],
-      set: { active: true, updatedAt: new Date() },
-      setWhere: eq(externalSiteScrapeTargets.managedBy, "code"),
-    });
+  if (codeTarget) {
+    // Local previews still need coordinator authorization after the legacy
+    // source registration is removed. Production migrations own their mapping.
+    await db
+      .insert(externalSiteScrapeTargets)
+      .values({
+        externalSiteId: site.id,
+        targetKey: target.key,
+        managedBy: "code",
+      })
+      .onConflictDoUpdate({
+        target: [
+          externalSiteScrapeTargets.externalSiteId,
+          externalSiteScrapeTargets.targetKey,
+        ],
+        set: { active: true, updatedAt: new Date() },
+        setWhere: eq(externalSiteScrapeTargets.managedBy, "code"),
+      });
+  }
   const [activeRun] = await db
     .select({ id: externalSiteRuns.id })
     .from(externalSiteRuns)
@@ -106,7 +129,9 @@ export async function runLocalScrapeSourcePreview(
     if (source.externalSiteKey === parsed.site) sources.delete(key);
   }
   sources.set(previewSource.key, previewSource);
-  const registry = { sources, targets: scraperRegistry.targets };
+  const targets = new Map(scraperRegistry.targets);
+  targets.set(target.key, target);
+  const registry = { sources, targets };
 
   const [run] = await db
     .insert(externalSiteRuns)

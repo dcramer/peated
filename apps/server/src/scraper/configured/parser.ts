@@ -401,6 +401,7 @@ function parseSavedList(
               )
             );
           }
+          if (skipWhen.match === null) return true;
           return Boolean(
             matchFirstText(readText(item(element)), skipWhen.match),
           );
@@ -467,7 +468,11 @@ function parseSavedList(
 
 function parseDate(value: string | null) {
   if (!value) return null;
-  const timestamp = Date.parse(value);
+  const normalizedValue = value.replaceAll(
+    /\b(\d{1,2})(?:st|nd|rd|th)\b/giu,
+    "$1",
+  );
+  const timestamp = Date.parse(normalizedValue);
   return Number.isFinite(timestamp) ? new Date(timestamp) : null;
 }
 
