@@ -1027,7 +1027,7 @@ completion record.
   also establishes that existing `B54385`, cask `5X70170`, is The Owner's Cask
   for Shinanoya and Whisky Magazine, with sherry-butt maturation and a
   522-bottle outturn. Its name, Series, edition, and missing facts are staged as
-  one correction rather than a duplicate create. The 210 new Owner's Cask
+  one correction rather than a duplicate create. The 211 new Owner's Cask
   records and this correction remain unwritten because those durable bulk writes
   require explicit approval. Empty
   destination Series `S0676` has been created.
@@ -1309,6 +1309,41 @@ completion record.
   is not a separate create. `EP70749` and `ES70053` remain index-only leads.
   Twenty-four distinct 2000 casks are now staged, bringing the totals to 210 new
   Owner's Casks and 88 evidence-backed non-Owner releases.
+- The current Whiskybase distillery index contains four 2001 releases, and all
+  four are now staged outside Owner's Cask: Takashimaya Buyer's Selection barrel
+  [`FM70167`](https://www.whiskybase.com/whiskies/whisky/284924/yamazaki-2001),
+  Ohmi Aging Cellar barrel
+  [`FN70079`](https://www.whiskybase.com/whiskies/whisky/272620/yamazaki-2001),
+  hogshead
+  [`FN70176`](https://www.whiskybase.com/whiskies/whisky/269573/yamazaki-2001),
+  and Ohmi Aging Cellar hogshead
+  [`FN70180`](https://www.whiskybase.com/whiskies/whisky/272206/yamazaki-2001).
+  Each exact record supplies the producer-stable name, vintage, bottling year,
+  strength, maturation, and cask number. The photographed collector sitemap has
+  no 2002-vintage Yamazaki page, and no 2002-distilled release appears in the
+  current broad distillery index; no Bottle is inferred from that absence.
+- Four 2003 releases are staged. The photographed
+  [vintage index](https://yabejojo.jimdoweb.com/yamazaki/yamazaki-vintage-2003/),
+  an exact
+  [Whiskybase record](https://www.whiskybase.com/whiskies/whisky/58017/yamazaki-2003),
+  and a detailed
+  [Japanese retailer record](https://www.sake-kaitori.jp/menu/menulist/yamazaki-whiskyshopw-4th2003/)
+  establish Whisky Shop W. 4th Anniversary Bota Corta cask `ADDY3038`, bottled
+  in 2014 at 55%. An exact
+  [retailer photo record](https://dekanta.com/products/suntory-2003-yamazaki-single-cask-ahak4001)
+  establishes 57% single cask `AHAK4001`; its unreported bottling year and
+  maturation stay unknown. A photographed
+  [auction catalog](https://www.the-saleroom.com/fr-fr/auction-catalogues/peacock-auctioneers/catalogue-id-whpav11529/pdfexport)
+  establishes Owner's Cask `ADEY2226`, bottled in 2016 at 58%, while the exact
+  maturation and owner remain unknown. Finally, exact
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/162406/yamazaki-2003),
+  [Whisky Auctioneer](https://whiskyauctioneer.com/learn/explore-whisky/bottles/yamazaki-world-cocktail-championships-tokyo-2016),
+  and
+  [contemporary bottle-review](https://japanesewhisky.livedoor.blog/archives/27964543.html)
+  records establish the 190 ml World Cocktail Championships Tokyo 2016 release:
+  2003 vintage, 2016 release, 48%, and a vatting of Mizunara- and Spanish-oak
+  casks rather than a single cask. The staged totals are now 211 new Owner's
+  Casks and 95 evidence-backed non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
