@@ -1,9 +1,12 @@
 import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { externalSites, tags } from "@peated/server/db/schema";
+import { externalSites } from "@peated/server/db/schema";
 import { createReviewClip } from "@peated/server/externalReviews/clip";
-import { extractReviewTags } from "@peated/server/externalReviews/extractTags";
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
+import {
+  loadReviewVocabulary,
+  processExternalReview,
+} from "@peated/server/externalReviews/process";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
@@ -48,7 +51,7 @@ export async function ingestExternalReviewArticle(
   const vocabulary =
     Object.keys(input.externalReviewTexts).length ||
     Object.keys(input.externalReviewBodies).length
-      ? await db.select({ name: tags.name, synonyms: tags.synonyms }).from(tags)
+      ? await loadReviewVocabulary()
       : [];
 
   for (const externalReview of input.article.externalReviews) {
@@ -59,16 +62,19 @@ export async function ingestExternalReviewArticle(
       referenceMatch = await findBottleReferenceAssignment(referenceName);
       if (referenceMatch) break;
     }
-    const reviewText = input.externalReviewTexts[externalReview.sourceKey];
-    const body = input.externalReviewBodies[externalReview.sourceKey];
-    const tagText = reviewText ?? body;
-    const clip = reviewText ? await services.createClip(reviewText) : null;
+    const body =
+      input.externalReviewBodies[externalReview.sourceKey] ??
+      input.externalReviewTexts[externalReview.sourceKey];
+    const processed = body
+      ? await processExternalReview(body, vocabulary, services.createClip)
+      : null;
     storedExternalReviews.push({
       ...externalReview,
       bottleId: referenceMatch?.bottleId ?? null,
-      clip: clip ?? undefined,
+      clip: processed?.clip ?? undefined,
       body,
-      tags: tagText ? extractReviewTags(tagText, vocabulary) : undefined,
+      tags: processed?.tags,
+      version: processed?.version,
     });
   }
 
