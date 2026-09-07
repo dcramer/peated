@@ -122,7 +122,7 @@ export async function runLocalScrapeSourcePreview(
   if (!run) throw new Error("Failed to create the local scraper preview run.");
 
   try {
-    for (let attempt = 0; attempt < 10; attempt += 1) {
+    while (true) {
       const result = await executeScraperRun(
         { runId: run.id },
         {

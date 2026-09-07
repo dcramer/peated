@@ -143,6 +143,35 @@ test("spaces requests from the hourly limit", async () => {
   expect(fetchImpl).toHaveBeenCalledTimes(2);
 });
 
+test("returns the next request time when saved work can continue later", async () => {
+  const { registry, run } = await setupRuntime({ requestsPerHour: 30 });
+  const clock = clockAt();
+  const fetchImpl = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response("catalog"));
+  const request = {
+    runId: run.id,
+    sourceKey: "finedrams",
+    request: {
+      target: "operator",
+      url: new URL("https://example.com/catalog"),
+      canResumeLater: true,
+    },
+    registry,
+    fetchImpl,
+    clock,
+  };
+
+  await requestScraperUrl(request);
+  await expect(requestScraperUrl(request)).rejects.toMatchObject({
+    reason: "target_spacing",
+    nextEligibleAt: new Date("2026-08-18T12:02:00Z"),
+  });
+
+  expect(clock.sleepSpy).not.toHaveBeenCalled();
+  expect(fetchImpl).toHaveBeenCalledOnce();
+});
+
 test("sends an identified bounded GET and exposes only safe response headers", async () => {
   const { registry, run } = await setupRuntime();
   const fetchImpl = vi

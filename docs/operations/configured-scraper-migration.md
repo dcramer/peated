@@ -290,6 +290,29 @@ output, trigger one manual collection, and confirm that it updates the same
 price IDs and Bottle links. Check the run and Sentry before restoring the
 weekly schedule.
 
+## Thompson Bros.
+
+Use the preparation endpoint with `{"site": "thompsonbros"}`. The check-only
+request examines every saved price without changing it. It accepts numeric shop
+product IDs and older rows that rely on their product URL. Every row must still
+use a Thompson Bros. product URL and name, GBP, and a supported bottle size.
+Applying moves the request limits to a paused price source for
+`https://www.thompsonbrosdistillers.com/product-category/whisky/`. It does not
+change price rows or history.
+
+Before applying, stop the `thompsonbros` schedule and wait for active collection
+to finish. Save the existing price IDs, product IDs, URLs, Bottle links, hidden
+states, histories, request limits, and run history. Run the version 8 rules
+through the full local no-write preview. The shop-page rules must exclude sold
+out products and rum, including a final page where every product is excluded.
+Product pages must provide the exact displayed name, current GBP price, 700 ml
+size, product URL, product ID, and image.
+
+After applying, save and preview the reviewed rules. Activate only exact output,
+trigger one manual collection, and confirm that it updates the same price IDs
+without reviving older products. Check the run and Sentry before restoring the
+weekly schedule.
+
 ## Kilchoman
 
 Use the preparation endpoint with `{"site": "kilchoman"}`. The check-only
@@ -375,10 +398,10 @@ handles reviews added after the switch. Do not delete source or run history.
 
 The preparation API is shared. It currently supports Bourbon Culture,
 Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, Gordon & MacPhail,
-Kilchoman, Nc'nean, North Star, The Whiskey Reviewer, WhiskyNotes, Whisky Saga,
-The Whisky Study, and Words of Whisky. Other sites are rejected without
-changing records. Add each site's conversion behind this route as its existing
-records are reviewed.
+Kilchoman, Nc'nean, North Star, Thompson Bros., The Whiskey Reviewer,
+WhiskyNotes, Whisky Saga, The Whisky Study, and Words of Whisky. Other sites are
+rejected without changing records. Add each site's conversion behind this route
+as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store

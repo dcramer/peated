@@ -7,7 +7,7 @@ export const FixtureCursorSchema = z
 export const FixtureObservationSchema = z
   .object({ id: z.string().min(1), value: z.string() })
   .strict();
-const FixturePageSchema = z
+export const FixturePageSchema = z
   .object({
     items: z.array(FixtureObservationSchema),
     nextPage: z.number().int().positive().nullable(),

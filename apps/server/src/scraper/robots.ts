@@ -156,6 +156,7 @@ export async function ensureRobotsAllowed({
   sourceKey,
   targetKey,
   url,
+  canResumeLater,
   registry,
   fetchImpl = fetch,
   clock,
@@ -165,6 +166,7 @@ export async function ensureRobotsAllowed({
   sourceKey: string;
   targetKey: string;
   url: URL;
+  canResumeLater?: boolean;
   registry: ScraperRegistry;
   fetchImpl?: typeof fetch;
   clock: ScraperHttpClock;
@@ -202,6 +204,7 @@ export async function ensureRobotsAllowed({
           target: targetKey,
           url: new URL("/robots.txt", url.origin),
           headers: { Accept: "text/plain,*/*;q=0.1" },
+          canResumeLater,
         },
         registry,
         fetchImpl,

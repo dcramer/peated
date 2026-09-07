@@ -11,6 +11,7 @@ import { prepareGordonMacphailSource } from "@peated/server/scraper/configured/p
 import { prepareKilchomanSource } from "@peated/server/scraper/configured/prepareKilchoman";
 import { prepareNcneanSource } from "@peated/server/scraper/configured/prepareNcnean";
 import { prepareNorthStarSource } from "@peated/server/scraper/configured/prepareNorthStar";
+import { prepareThompsonBrosSource } from "@peated/server/scraper/configured/prepareThompsonBros";
 import { prepareWhiskeyReviewerSource } from "@peated/server/scraper/configured/prepareWhiskeyReviewer";
 import { prepareWhiskyNotesSource } from "@peated/server/scraper/configured/prepareWhiskyNotes";
 import { prepareWhiskySagaSource } from "@peated/server/scraper/configured/prepareWhiskySaga";
@@ -40,7 +41,7 @@ export default procedure
     z
       .object({
         site: ExternalSiteKeySchema.describe(
-          "The existing site's key. Currently supports bourbonculture, bruichladdich, cadenheads, compassbox, dramface, edradour, gordonmacphail, kilchoman, ncnean, northstarspirits, whiskeyreviewer, whiskynotes, whiskysaga, whiskystudy, and wordsofwhisky.",
+          "The existing site's key. Currently supports bourbonculture, bruichladdich, cadenheads, compassbox, dramface, edradour, gordonmacphail, kilchoman, ncnean, northstarspirits, thompsonbros, whiskeyreviewer, whiskynotes, whiskysaga, whiskystudy, and wordsofwhisky.",
         ),
         apply: z
           .boolean()
@@ -81,6 +82,7 @@ export default procedure
       kilchoman: prepareKilchomanSource,
       ncnean: prepareNcneanSource,
       northstarspirits: prepareNorthStarSource,
+      thompsonbros: prepareThompsonBrosSource,
       whiskeyreviewer: prepareWhiskeyReviewerSource,
       whiskynotes: prepareWhiskyNotesSource,
       whiskysaga: prepareWhiskySagaSource,
