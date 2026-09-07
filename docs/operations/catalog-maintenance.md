@@ -370,3 +370,4 @@ The operation is complete only when:
 ## Completed Audits
 
 - [Whisky Auctioneer catalog audit, September 2026](catalog-audits/2026-09-02-whisky-auctioneer/README.md)
+- [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md)
