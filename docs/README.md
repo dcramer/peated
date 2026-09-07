@@ -17,6 +17,19 @@ A document can describe a workflow without belonging in `operations/`. Put it
 under `features/` when it defines user-visible product behavior. Put it under
 `operations/` when an operator follows it to inspect or change production.
 
+## Research Files
+
+- Keep one bounded research task or scope in each dated file. Do not append
+  unrelated work to a shared or monthly report.
+- Group repeated work by topic, such as `research/catalog/`, and name files
+  `YYYY-MM-DD-short-name.md`.
+- Use a directory with a `README.md` only when the report has supporting CSV,
+  JSON, or other durable evidence.
+- Put reusable rules and methods in the architecture, feature, policy, or
+  operations guide that owns them.
+- Do not commit raw API replies, downloads, request files, or other temporary
+  working data.
+
 ## Source Of Truth
 
 Code, runtime schemas, exported types, and tests own exact behavior. Architecture

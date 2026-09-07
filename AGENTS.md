@@ -143,8 +143,7 @@ behavior; research cannot override them.
 - `docs/README.md` — Document placement.
 - `docs/research/entity-image-source-audit-2026-08.md` — Dated image source checks.
 - `docs/research/external-review-source-audit-2026-08.md` — Dated review source checks.
-- `docs/research/catalog-research-sources-2026-09.md` — Catalog source patterns from prior operations.
-- `docs/research/catalog-research-examples-2026-09.md` — Sources that worked for past catalog targets.
+- `docs/research/catalog/` — Dated, scope-specific catalog research.
 
 ### Operate Peated
 
@@ -154,6 +153,7 @@ behavior; research cannot override them.
 - `docs/development/local-web-checks.md` — Local browser checks.
 - `docs/operations/bottle-reference-migrations-0253-0255.md` — Bottle Reference migration and rollback.
 - `docs/operations/catalog-maintenance.md` — Research, merge, and edit production Bottles.
+- `docs/operations/catalog-research.md` — Find and assess catalog evidence.
 - `docs/operations/deployments.md` — Vercel, Render, and PlanetScale deploy checks.
 - `docs/operations/entity-images.md` — Add or replace production Entity images.
 - `docs/operations/external-review-sources.md` — Add, publish, stop, or remove a review source.

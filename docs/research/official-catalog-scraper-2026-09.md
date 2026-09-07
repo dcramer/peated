@@ -5,8 +5,8 @@ research. It does not define runtime behavior or grant permission. Recheck a
 site's current pages, robots rules, and terms before enabling collection.
 
 This audit covers sources for automated catalog collection. For broader Bottle
-research, see [Finding Whisky Catalogs](./catalog-research-sources-2026-09.md)
-and [Catalog Source Examples](./catalog-research-examples-2026-09.md).
+research, see [Catalog Research](../operations/catalog-research.md) and the
+target-specific reports under `docs/research/catalog/`.
 
 ## Summary
 
