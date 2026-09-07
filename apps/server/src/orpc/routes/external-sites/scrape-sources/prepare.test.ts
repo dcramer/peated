@@ -107,6 +107,15 @@ function prepareDramface(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareEdradour(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "edradour", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareCompassBox(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "compassbox", ...input },
@@ -180,6 +189,7 @@ function codeOwnedSource(
     | "cadenheads"
     | "compassbox"
     | "dramface"
+    | "edradour"
     | "gordonmacphail"
     | "kilchoman"
     | "ncnean"
@@ -246,6 +256,11 @@ const dramfaceCanonicalUrl =
 const dramfaceRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("dramface")!],
   sources: [codeOwnedSource("dramface")],
+});
+
+const edradourRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("edradour")!],
+  sources: [codeOwnedSource("edradour")],
 });
 
 const compassBoxRegistry = createScraperRegistry({
@@ -737,6 +752,25 @@ async function setupCompassBoxMigration() {
     })
     .returning();
   await syncScraperDefinitions(compassBoxRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupEdradourMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "edradour",
+      name: "Edradour",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(edradourRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1488,6 +1522,102 @@ describe("POST /admin/scrape-sources/prepare", () => {
         "Check the URL and review records for WhiskyNotes article",
       ),
     });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Edradour without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupEdradourMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Ballechin 10-year-old",
+      price: 4876,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.edradour.com/ballechin-10-year-old",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Edradour Cask Strength 21-year-old Oloroso Sherry",
+      price: 37500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://www.edradour.com/Cask-Strength-21-y.o.-Oloroso-Sherry",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareEdradour()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareEdradour({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(edradourRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://www.edradour.com/shop/",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareEdradour({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Edradour is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Edradour price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupEdradourMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Edradour Cask Strength 21-year-old Oloroso Sherry",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/Cask-Strength-21-y.o.-Oloroso-Sherry",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareEdradour({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Edradour price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
