@@ -159,26 +159,31 @@ describe("admin moderation automation", () => {
   test("reports automatic, manual, and failed listing checks", () => {
     const attempts = [
       {
+        proposalType: "no_match" as const,
         initialStatus: "ignored" as const,
         finalStatus: "ignored" as const,
         automationEligible: false,
       },
       {
+        proposalType: "match_existing" as const,
         initialStatus: "verified" as const,
         finalStatus: "approved" as const,
         automationEligible: false,
       },
       {
+        proposalType: "match_existing" as const,
         initialStatus: "pending_review" as const,
         finalStatus: "approved" as const,
         automationEligible: true,
       },
       {
+        proposalType: "create_new" as const,
         initialStatus: "pending_review" as const,
         finalStatus: "approved" as const,
         automationEligible: false,
       },
       {
+        proposalType: "create_new" as const,
         initialStatus: "errored" as const,
         finalStatus: "errored" as const,
         automationEligible: false,
@@ -191,6 +196,32 @@ describe("admin moderation automation", () => {
       manual: 1,
       failed: 1,
       rate: 60,
+      byProposalType: [
+        {
+          proposalType: "match_existing",
+          sampleSize: 2,
+          automatic: 2,
+          manual: 0,
+          failed: 0,
+          rate: 100,
+        },
+        {
+          proposalType: "create_new",
+          sampleSize: 2,
+          automatic: 0,
+          manual: 1,
+          failed: 1,
+          rate: 0,
+        },
+        {
+          proposalType: "no_match",
+          sampleSize: 1,
+          automatic: 1,
+          manual: 0,
+          failed: 0,
+          rate: 100,
+        },
+      ],
     });
   });
 });

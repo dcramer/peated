@@ -16,12 +16,10 @@ const LISTING_AUTOMATION_SAMPLE_SIZE = 100;
 
 type CompletedListingAttempt = Pick<
   typeof storePriceMatchAttempts.$inferSelect,
-  "automationEligible" | "finalStatus" | "initialStatus"
+  "automationEligible" | "finalStatus" | "initialStatus" | "proposalType"
 >;
 
-export function summarizeListingAutomation(
-  attempts: CompletedListingAttempt[],
-) {
+function summarizeListingOutcomes(attempts: CompletedListingAttempt[]) {
   let automatic = 0;
   let failed = 0;
 
@@ -52,6 +50,29 @@ export function summarizeListingAutomation(
       attempts.length > 0
         ? Math.round((automatic / attempts.length) * 100)
         : null,
+  };
+}
+
+const listingProposalTypes = [
+  "match_existing",
+  "create_new",
+  "correction",
+  "no_match",
+] as const;
+
+export function summarizeListingAutomation(
+  attempts: CompletedListingAttempt[],
+) {
+  return {
+    ...summarizeListingOutcomes(attempts),
+    byProposalType: listingProposalTypes.flatMap((proposalType) => {
+      const summary = summarizeListingOutcomes(
+        attempts.filter((attempt) => attempt.proposalType === proposalType),
+      );
+      return summary.rate === null
+        ? []
+        : [{ proposalType, ...summary, rate: summary.rate }];
+    }),
   };
 }
 
@@ -117,6 +138,7 @@ export function createModerationAutomationProcedure(
             automationEligible: storePriceMatchAttempts.automationEligible,
             finalStatus: storePriceMatchAttempts.finalStatus,
             initialStatus: storePriceMatchAttempts.initialStatus,
+            proposalType: storePriceMatchAttempts.proposalType,
           })
           .from(storePriceMatchAttempts)
           .where(isNotNull(storePriceMatchAttempts.finalStatus))

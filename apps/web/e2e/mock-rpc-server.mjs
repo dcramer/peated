@@ -2167,6 +2167,9 @@ function buildDirectBottleQueueProposal() {
   return {
     ...proposal,
     id: directBottleQueueProposalId,
+    automationBlockers: [
+      "The exact Bottle details still need a person to confirm them.",
+    ],
     proposedBottle: {
       ...proposal.proposedBottle,
       name: anotherReleaseSourceBottle.name,

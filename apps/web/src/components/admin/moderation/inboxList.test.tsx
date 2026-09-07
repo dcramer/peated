@@ -71,4 +71,35 @@ describe("Moderation Inbox list", () => {
       "/admin/moderation/inbox/operation/22?category=catalog&blocked=true",
     );
   });
+
+  test("renders page links without keeping a selected task in the path", () => {
+    const html = renderToStaticMarkup(
+      <InboxListContent
+        data={{
+          results: [listingTask],
+          counts: {
+            all: 201,
+            listing: 201,
+            catalog: 0,
+            blocked: 1,
+            inconclusive: 0,
+          },
+          rel: { nextCursor: 3, prevCursor: 1 },
+        }}
+        pathname="/admin/moderation/inbox/listing/7"
+        searchParams={
+          new URLSearchParams("category=listing&query=whisky&cursor=2")
+        }
+        selectedKey="listing:7"
+      />,
+    );
+
+    expect(html).toContain("Page 2");
+    expect(html).toContain(
+      'href="/admin/moderation/inbox?category=listing&amp;query=whisky&amp;cursor=1"',
+    );
+    expect(html).toContain(
+      'href="/admin/moderation/inbox?category=listing&amp;query=whisky&amp;cursor=3"',
+    );
+  });
 });

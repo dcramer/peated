@@ -41,6 +41,17 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("button", { name: "Create Bottle" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Why this needs review" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "The exact Bottle details still need a person to confirm them.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Edit before creation" }),
+    ).toHaveAttribute("href", "/bottles/new?proposal=9911");
 
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
