@@ -1342,6 +1342,25 @@ completion record.
   2003 vintage, 2016 release, 48%, and a vatting of Mizunara- and Spanish-oak
   casks rather than a single cask. The staged totals are now 211 new Owner's
   Casks and 95 evidence-backed non-Owner releases.
+- A post-2003 vintage pass adds two more non-Owner releases. Exact
+  [Whiskybase](https://www.whiskybase.com/whiskies/whisky/269572/yamazaki-2009)
+  and
+  [Spink catalog](https://storage.spink.com/source/Auto_Catalogue/SFW61.pdf?v=2)
+  records establish `AJVY30163` as Suntory Single Cask Whisky, Dumpie 4th
+  Edition for Kobe Golf Club: 2009 vintage, bottled in 2022 at 52%, and matured
+  in a hogshead. The catalog gives bottle number 224, but not the total outturn,
+  so no outturn is inferred. Whiskybase, a photographed
+  [retailer record](https://store.shopping.yahoo.co.jp/marukou78/r6sake-470.html),
+  and the
+  [Fukushima prefecture completion report](https://www.pref.fukushima.lg.jp/site/chiji/0512ugoki.html)
+  establish Fukushima Future Barrel as a 10-year-old Yamazaki distilled in
+  2013, bottled in 2023 at 48%, and made for the Fukushima Minpo project. Its
+  cask type, single-cask status, and outturn remain unknown. Exact public Peated
+  searches for `AJVY30163` and `Fukushima Future Barrel` each returned zero
+  records. No 2004-, 2006-, or 2007-distilled Yamazaki release appears in the
+  current broad distillery index, but that absence is retained only as a search
+  result, not evidence that no release exists. The staged totals are now 211
+  new Owner's Casks and 97 evidence-backed non-Owner releases.
 - The follow-up image review replaced two unattributed retailer-derived images
   with exact licensed photos. `B14506` now uses
   [Yamazaki Single Malt Whisky.JPG](https://commons.wikimedia.org/wiki/File:Yamazaki_Single_Malt_Whisky.JPG),
