@@ -20,7 +20,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v20";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v21";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_PAGES_TO_CHECK = 3;
 const MAX_RULE_CHECKS = 3;
@@ -30,7 +30,11 @@ const CHECK_RULES_TOOL_DESCRIPTION =
   "Try a complete set of rules on the given website pages. Rules that pass are ready to save.";
 const SETUP_AGENT_NAME = "Scrape source setup";
 
-export type WebsitePage = { url: string; html: string };
+export type WebsitePage = {
+  url: string;
+  html: string;
+  document?: "html" | "xml";
+};
 
 /** Counts requests needed to find pages and try three sets of rules. */
 export function setupRequestLimit(samplePageCount: number) {
@@ -109,9 +113,12 @@ const RULE_INSTRUCTIONS = [
   "You have at most three checks. Do not answer with an explanation.",
   "</tool>",
   "<success_criteria>",
+  'For reviews, prefer a start page marked document "xml". It is a public RSS, Atom, or RDF feed advertised by the website and already checked for usable same-site article links.',
+  "Use the feed only to find article links. Read review details from the linked HTML pages.",
   "Use short CSS selectors that work on every given page.",
   "For several reviews on one page, select the HTML element around each review. If there is no such element, set item to null; each name then starts a review.",
   "Set the review name to null only when one review's article title is the Bottle name. If the title adds words such as review or tasting notes, select the Bottle name on the page.",
+  "Set reviewer when the page shows an author or byline, including when it appears once for the whole article. Code shares one article-level reviewer across its reviews.",
   "Set tastingNotes only when a narrower selector reliably finds flavor notes. The full review body comes from the review area or item.",
   "Use an optional field only when every given page clearly provides it.",
   "For catalog sources, collect only the displayed name, product URL, stable product ID, image URL, volume, ABV, age, edition, and release year.",
@@ -151,12 +158,16 @@ export function preparePagesForSetup(pages: WebsitePage[]) {
     Math.floor(MAX_AI_INPUT_CHARS / pages.length),
   );
   return pages.map((page) => {
-    const $ = load(page.html);
+    const $ = load(
+      page.html,
+      page.document === "xml" ? { xmlMode: true } : undefined,
+    );
     // Remove page code before shortening the HTML so the useful content remains.
     $("script, style").remove();
     return {
       url: page.url,
       html: $.html().slice(0, charsPerPage),
+      document: page.document ?? "html",
     };
   });
 }

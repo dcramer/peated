@@ -126,6 +126,28 @@ test("keeps links and review facts after a large page header", () => {
   expect(pages[0]!.html).toContain("/* page script */");
 });
 
+test("keeps feed links visible to the setup agent", () => {
+  const [prepared] = preparePagesForSetup([
+    {
+      url: "https://example.test/feed.xml",
+      document: "xml",
+      html: `
+        <rss><channel><item>
+          <title>Latest whisky reviews</title>
+          <link>https://example.test/reviews/latest</link>
+        </item></channel></rss>
+      `,
+    },
+  ]);
+
+  expect(prepared).toMatchObject({
+    document: "xml",
+    url: "https://example.test/feed.xml",
+  });
+  const $ = load(prepared!.html, { xmlMode: true });
+  expect($("item > link").text()).toBe("https://example.test/reviews/latest");
+});
+
 test("returns rules only after the rule check passes", async () => {
   const request = vi
     .fn()
@@ -217,6 +239,9 @@ test("returns rules only after the rule check passes", async () => {
   expect(JSON.stringify(secondRequest?.input)).toContain("North Coast 12");
   expect(secondRequest?.instructions).toContain(
     "Your work is complete only when check_rules accepts the rules.",
+  );
+  expect(secondRequest?.instructions).toContain(
+    "Code shares one article-level reviewer across its reviews.",
   );
 });
 

@@ -162,6 +162,10 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
           previewStatus: "pending",
           active: false,
         });
+        if (website.key === "rss") {
+          expect(revision.listUrl).toBe(`${origin}/feed.xml`);
+          expect(revision.rules).toMatchObject({ kind: "review" });
+        }
         expect(revision.aiModel).toBeTruthy();
         expect(await db.select().from(externalReviews)).toEqual([]);
 
