@@ -98,7 +98,7 @@ const RULE_INSTRUCTIONS = [
   "list.links selects the article or product links on the chosen start page.",
   "For reviews, detail.reviews.area selects the one page area that contains the review text.",
   "Set detail.reviews.item when each review has its own wrapper. Otherwise set it to null. When there are several unwrapped reviews, the name selector starts each review.",
-  "Set the review name to null when one review uses the article title as its name.",
+  "Set the review name to null only when one review's article title is the Bottle name. If the title adds words such as review or tasting notes, select the Bottle name on the page.",
   "Set tastingNotes only when a narrower selector reliably finds flavor notes. The full review body comes from the review area or item.",
   "For date, select a date element when one is clear. Set it to null to use standard page metadata or a date in the page URL.",
   "Set url only when the page provides its preferred URL. Otherwise set it to null and the fetched page URL is used.",

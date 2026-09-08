@@ -98,9 +98,10 @@ For reviews, `detail.reviews.area` selects the one area containing the review
 text. Set `item` when each review has its own wrapper. When several reviews do
 not have wrappers, set `item` to null; each match of the `name` selector starts
 a review. When an article has one review and its title is the Bottle name, set
-`name` to null. The parser uses the article title. A review's writer, score,
-and tasting notes are read inside that review. For a score, `outOf` is the
-publisher's scoring scale.
+`name` to null. The parser uses the article title and removes a trailing
+`review`. A review's writer may be inside that review or shared by the article.
+Scores and tasting notes are read inside each review. For a score, `outOf` is
+the publisher's scoring scale.
 
 The parser uses a review's Bottle name and writer to keep it matched when other
 reviews are added or moved. Repeated reviews with the same name and writer stay

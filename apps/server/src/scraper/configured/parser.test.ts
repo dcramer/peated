@@ -145,6 +145,89 @@ it("splits unwrapped reviews at their name selectors", () => {
   });
 });
 
+it("uses an article writer for each wrapped review", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "article",
+        item: "section.tasting",
+        name: "h2",
+        reviewer: ".byline",
+        tastingNotes: null,
+        score: { selector: ".score", outOf: 100 },
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<article><h1>Two island malts</h1><time datetime="2026-08-22"></time>
+      <span class="byline">Mara Vale</span>
+      <section class="tasting"><h2>First Malt</h2><b class="score">88/100</b></section>
+      <section class="tasting"><h2>Second Malt</h2><b class="score">85/100</b></section>
+    </article>`,
+    new URL("https://reviews.example/two-malts"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        externalReviews: [
+          { name: "First Malt", reviewerName: "Mara Vale" },
+          { name: "Second Malt", reviewerName: "Mara Vale" },
+        ],
+      },
+    },
+  });
+});
+
+it("removes a trailing review label from a single article title", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "article",
+        item: null,
+        name: null,
+        reviewer: ".author",
+        tastingNotes: null,
+        score: { selector: ".score", outOf: 5 },
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<article><h1>Orchard Bourbon review</h1>
+      <meta itemprop="datePublished" content="2026-08-21">
+      <span class="author">Jon Bell</span><b class="score">3.5</b>
+    </article>`,
+    new URL("https://reviews.example/orchard-bourbon"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        title: "Orchard Bourbon review",
+        externalReviews: [
+          { name: "Orchard Bourbon", reviewerName: "Jon Bell" },
+        ],
+      },
+    },
+  });
+});
+
 const reviewConfig = {
   kind: "review" as const,
   list: {

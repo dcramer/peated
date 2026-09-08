@@ -1433,13 +1433,10 @@ function parseSavedCatalogDetail(
 
 type SimpleValueKind = "text" | "date" | "url" | "image" | "id";
 
-function readSimpleValue(
-  root: ReturnType<typeof load>,
-  selector: string,
-  kind: SimpleValueKind = "text",
-  all = false,
+function readSimpleElement(
+  selected: ReturnType<ReturnType<typeof load>>,
+  kind: SimpleValueKind,
 ) {
-  const values: string[] = [];
   const attributes =
     kind === "date"
       ? ["datetime", "content", "value"]
@@ -1450,13 +1447,23 @@ function readSimpleValue(
           : kind === "id"
             ? ["value", "content", "data-product-id", "data-item-id"]
             : ["content", "value"];
+  return (
+    attributes
+      .map((attribute) => normalizeValue(selected.attr(attribute)))
+      .find(Boolean) ?? normalizeValue(readText(selected))
+  );
+}
+
+function readSimpleValue(
+  root: ReturnType<typeof load>,
+  selector: string,
+  kind: SimpleValueKind = "text",
+  all = false,
+) {
+  const values: string[] = [];
 
   root(selector).each((_, element) => {
-    const selected = root(element);
-    const value =
-      attributes
-        .map((attribute) => normalizeValue(selected.attr(attribute)))
-        .find(Boolean) ?? normalizeValue(readText(selected));
+    const value = readSimpleElement(root(element), kind);
     if (!value) return;
     values.push(value);
     if (!all || values.length > 100) return false;
@@ -1465,6 +1472,28 @@ function readSimpleValue(
     throw new Error("A selector matched more than 100 values.");
   }
   return normalizeValue(all ? values.join("\n") : values[0]);
+}
+
+function readSharedReviewValue(
+  $: ReturnType<typeof load>,
+  selector: string,
+  reviewItems: NonNullable<ReturnType<typeof selectSimpleReviews>>,
+) {
+  const outsideReview = $(selector)
+    .toArray()
+    .filter(
+      (element) =>
+        !reviewItems.some(({ body }) =>
+          [...body.toArray(), ...body.find("*").toArray()].includes(element),
+        ),
+    );
+  return outsideReview.length === 1
+    ? readSimpleElement($(outsideReview[0]!), "text")
+    : null;
+}
+
+function cleanArticleTitleForReviewName(title: string) {
+  return title.replace(/\s+review$/iu, "").trim() || title;
 }
 
 function simpleUrl(value: string, pageUrl: URL, sameWebsite: boolean) {
@@ -1669,10 +1698,18 @@ function parseSimpleReviewDetail(
     });
   }
 
+  const reviewerSelector = rules.detail.reviews.reviewer;
+  const sharedReviewerName =
+    reviewItems && reviewerSelector
+      ? readSharedReviewValue($, reviewerSelector, reviewItems)
+      : null;
+
   reviewItems?.forEach(({ body, item }, index) => {
     const name = rules.detail.reviews.name
       ? readSimpleValue(item, rules.detail.reviews.name)
-      : title;
+      : title
+        ? cleanArticleTitleForReviewName(title)
+        : null;
     if (!name) {
       issues.push({
         field: "detail.reviews.name",
@@ -1680,12 +1717,8 @@ function parseSimpleReviewDetail(
       });
       return;
     }
-    const reviewerSelector = rules.detail.reviews.reviewer;
     const reviewerName = reviewerSelector
-      ? (readSimpleValue(item, reviewerSelector) ??
-        (reviewItems.length === 1
-          ? readSimpleValue($, reviewerSelector)
-          : null))
+      ? (readSimpleValue(item, reviewerSelector) ?? sharedReviewerName)
       : null;
     const firstKey = reviewSourceKey(name, reviewerName);
     const repeat = (keyCounts.get(firstKey) ?? 0) + 1;
