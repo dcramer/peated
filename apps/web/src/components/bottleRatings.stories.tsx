@@ -51,6 +51,7 @@ export const Overview: Story = {
         raterCount={5}
         scoreCount={5}
       />
+      <BottleRatings median={90} scoreCount={1} />
       <BottleRatings
         raterCount={7}
         tastingCounts={{ outstanding: 2, unicorn: 1, very_good: 4 }}
