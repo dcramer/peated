@@ -33,24 +33,22 @@ export default async function CountryBottlesPage(props: {
     props.params,
     props.searchParams,
   ]);
+  const country = await getCountryPage(countrySlug);
   const queryParams = normalizeBottleCatalogQueryParams(
     getApiQueryParams(searchParams, {
       defaults: { sort: LOCATION_BOTTLE_DEFAULT_SORT },
       allowedValues: BOTTLE_CATALOG_ALLOWED_VALUES,
       fields: LOCATION_BOTTLE_QUERY_FIELDS,
       numericFields: ["cursor"],
-      overrides: { country: countrySlug, limit: 25 },
+      overrides: { country: country.slug, limit: 25 },
     }),
   );
   const { client } = await getPublicPageServerClient();
-  const [country, bottleList] = await Promise.all([
-    getCountryPage(countrySlug),
-    client.bottles.list(queryParams),
-  ]);
+  const bottleList = await client.bottles.list(queryParams);
 
   return (
     <LocationBottleListClient
-      country={countrySlug}
+      country={country.slug}
       initialBottleList={bottleList}
       locationName={country.name}
     />

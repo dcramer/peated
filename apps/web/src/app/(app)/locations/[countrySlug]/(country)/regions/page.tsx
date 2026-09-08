@@ -35,23 +35,24 @@ export default async function CountryRegionsPage(props: {
     props.params,
     props.searchParams,
   ]);
+  const country = await getCountryPage(countrySlug);
   const queryParams = getApiQueryParams(searchParams, {
     defaults: { sort: "-bottles" },
     allowedValues: { sort: REGION_LIST_SORT_OPTIONS },
     fields: REGION_QUERY_FIELDS,
     numericFields: ["cursor", "limit"],
-    overrides: { country: countrySlug, limit: 100 },
+    overrides: { country: country.slug, limit: 100 },
   });
   const { client } = await getPublicPageServerClient();
   const regionList = await client.regions.list(queryParams);
-  const pathname = `/locations/${countrySlug}/regions`;
+  const pathname = `/locations/${country.slug}/regions`;
   const page = Number(queryParams.cursor ?? 1) || 1;
 
   return (
     <>
       {regionList.results.length ? (
         <LocationTable
-          caption={`Whisky regions in ${countrySlug.replaceAll("-", " ")}`}
+          caption={`Whisky regions in ${country.name}`}
           getHref={(region) => `${pathname}/${region.slug}`}
           items={regionList.results}
         />

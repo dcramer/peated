@@ -1,5 +1,6 @@
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveCountryOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 
 import {
   EntityCatalogPageClient,
@@ -17,14 +18,17 @@ export async function EntityCatalogPage({
     numericFields: ["cursor", "limit"],
   });
   const { client } = await getPublicPageServerClient();
-  const entityList =
+  const entityListPromise =
     kind === "distillery"
-      ? await client.distilleries.list(queryParams)
+      ? client.distilleries.list(queryParams)
       : kind === "brand"
-        ? await client.brands.list(queryParams)
+        ? client.brands.list(queryParams)
         : kind === "bottler"
-          ? await client.bottlers.list(queryParams)
-          : await client.companies.list(queryParams);
+          ? client.bottlers.list(queryParams)
+          : client.companies.list(queryParams);
+  const entityList = queryParams.country
+    ? await resolveCountryOrNotFound(entityListPromise, "query")
+    : await entityListPromise;
 
   return <EntityCatalogPageClient initialEntityList={entityList} kind={kind} />;
 }
