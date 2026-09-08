@@ -7,7 +7,6 @@ import {
   AdminOverviewPageLoading,
   AdminSectionsPageLoading,
 } from "./adminContent.stylex";
-import { ModerationSplitPageLoading } from "./moderation/inboxPage";
 
 const meta = {
   title: "Admin/Page Loading",
@@ -48,8 +47,4 @@ export const Sections: Story = {
       title="Background work"
     />
   ),
-};
-
-export const SplitView: Story = {
-  render: () => <ModerationSplitPageLoading />,
 };
