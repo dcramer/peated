@@ -26,7 +26,124 @@ import {
   parseScrapeRules,
   type ScrapeRules,
   type ScrapeRulesV5,
+  type ScrapeRulesV9,
 } from "./rules";
+
+it("reads price fields from text and their usual HTML attributes", () => {
+  const rules = {
+    kind: "price",
+    list: {
+      links: ".product a[href]",
+      nextPage: null,
+      limit: 10,
+    },
+    detail: {
+      name: "h1",
+      price: ".price",
+      currency: "gbp",
+      volume: 700,
+      url: 'link[rel="canonical"]',
+      id: "input[name='product-id']",
+      image: 'meta[property="og:image"]',
+      barcode: null,
+    },
+  } satisfies ScrapeRules;
+
+  expect(
+    parseScrapeList(
+      rules,
+      '<div class="product"><a href="/products/one">One</a></div>',
+      new URL("https://shop.example/products"),
+    ),
+  ).toEqual({
+    links: ["https://shop.example/products/one"],
+    nextPageUrl: null,
+    issues: [],
+  });
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      `<head>
+        <link rel="canonical" href="/products/one">
+        <meta property="og:image" content="https://images.example/one.jpg">
+      </head><body>
+        <h1>Example Whisky</h1>
+        <span class="price"></span>
+        <span class="price"><s>£1,399.95</s> £1,299.95</span>
+        <input name="product-id" value="product-1">
+      </body>`,
+      new URL("https://shop.example/products/one?ref=list"),
+    ),
+  ).toMatchObject({
+    kind: "price",
+    issues: [],
+    value: [
+      {
+        name: "Example Whisky",
+        price: 129995,
+        currency: "gbp",
+        volume: 700,
+        url: "https://shop.example/products/one",
+        externalProductId: "product-1",
+        imageUrl: "https://images.example/one.jpg",
+      },
+    ],
+  });
+});
+
+it("splits unwrapped reviews at their name selectors", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "main",
+        item: null,
+        name: "h2.name",
+        reviewer: ".writer",
+        tastingNotes: ".notes",
+        score: { selector: ".score", outOf: 100 },
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<h1>Two new whiskies</h1><main>
+      <h2 class="name">First Whisky</h2><p class="writer">Ada</p>
+      <p>First review body.</p><p class="notes">Apple and oak.</p><b class="score">Score: 88/100</b>
+      <h2 class="name">Second Whisky</h2><p class="writer">Bea</p>
+      <p>Second review body.</p><p class="notes">Pear and smoke.</p><b class="score">91 points</b>
+    </main>`,
+    new URL("https://reviews.example/2026/09/07/two-whiskies"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        title: "Two new whiskies",
+        publishedAt: new Date("2026-09-07T00:00:00.000Z"),
+        externalReviews: [
+          {
+            name: "First Whisky",
+            reviewerName: "Ada",
+            nativeScore: { value: 88, scale: 100 },
+          },
+          {
+            name: "Second Whisky",
+            reviewerName: "Bea",
+            nativeScore: { value: 91, scale: 100 },
+          },
+        ],
+      },
+    },
+  });
+});
 
 const reviewConfig = {
   kind: "review" as const,
@@ -491,7 +608,7 @@ const currentReviewRules = {
       },
     },
   },
-} as const satisfies ScrapeRules;
+} as const satisfies ScrapeRulesV9;
 
 const dramfaceSavedRules = {
   kind: "review",
@@ -579,7 +696,7 @@ const dramfaceSavedRules = {
       },
     },
   },
-} as const satisfies ScrapeRules;
+} as const satisfies ScrapeRulesV9;
 
 const elementArticleRules = {
   ...currentReviewRules,
@@ -622,7 +739,7 @@ const elementArticleRules = {
       },
     },
   },
-} as const satisfies ScrapeRules;
+} as const satisfies ScrapeRulesV9;
 
 test("reads text links from an XML review index", () => {
   const rules = {
@@ -638,7 +755,7 @@ test("reads text links from an XML review index", () => {
       nextPage: null,
       limit: 20,
     },
-  } as const satisfies ScrapeRules;
+  } as const satisfies ScrapeRulesV9;
 
   expect(
     parseScrapeList(
@@ -685,7 +802,7 @@ test("reads formatted dates from attributes and filters review elements", () => 
         contains: "h2",
       },
     },
-  } as const satisfies ScrapeRules;
+  } as const satisfies ScrapeRulesV9;
 
   const result = parseScrapeDetail(
     rules,
@@ -791,7 +908,7 @@ describe("scrape source parser", () => {
         imageUrl: null,
         barcode: null,
       },
-    } as const satisfies ScrapeRules;
+    } as const satisfies ScrapeRulesV9;
 
     expect(
       parseScrapeList(
@@ -2066,7 +2183,7 @@ describe("scrape source parser", () => {
         imageUrl: pageAttribute("img.bottle", "src"),
         barcode: null,
       },
-    } as const satisfies ScrapeRules;
+    } as const satisfies ScrapeRulesV9;
 
     expect(
       parseScrapeDetail(

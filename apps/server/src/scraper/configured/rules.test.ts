@@ -12,6 +12,7 @@ import {
   ScrapeRulesV5Schema,
   ScrapeRulesV6Schema,
   ScrapeRulesV7Schema,
+  ScrapeRulesV9Schema,
   ScrapeValueSchema,
 } from "./rules";
 
@@ -33,56 +34,19 @@ function reviewConfig(maxItems: number) {
 test("bounds list and detail pages", () => {
   const rules = ScrapeRulesSchema.parse({
     kind: "review",
-    articles: {
-      document: "html",
-      oneArticlePer: "article",
-      link: "a",
-      skipWhen: null,
+    list: {
+      links: "article a",
       nextPage: null,
       limit: SCRAPE_SOURCE_MAX_ITEMS,
     },
-    article: {
-      canonicalUrl: null,
-      title: {
-        try: [
-          {
-            get: "text",
-            selector: "h1",
-            take: "first",
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
-      publishedDate: {
-        try: [
-          {
-            get: "fixed",
-            value: "2026-01-01",
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
+    detail: {
+      url: null,
+      title: "h1",
+      date: "time",
       reviews: {
-        inside: "main",
-        oneReviewPer: "element",
-        selector: "article.review",
-        contains: null,
-        name: {
-          try: [
-            {
-              get: "text",
-              from: "review",
-              selector: "h2",
-              take: "first",
-              match: null,
-              addStart: null,
-              addEnd: null,
-            },
-          ],
-        },
+        area: "main",
+        item: "article.review",
+        name: "h2",
         reviewer: null,
         tastingNotes: null,
         score: null,
@@ -90,26 +54,14 @@ test("bounds list and detail pages", () => {
     },
   });
   if (rules.kind !== "review") throw new Error("Expected review rules.");
-  expect(rules.articles.limit).toBe(99);
-  expect(parseScrapeRules(9, rules)).toEqual(rules);
-  expect(() => parseScrapeRules(8, rules)).toThrow();
-  if (rules.article.reviews.oneReviewPer !== "element") {
-    throw new Error("Expected element review rules.");
-  }
-  const { document: _document, ...version8Articles } = rules.articles;
-  const { contains: _contains, ...version8Reviews } = rules.article.reviews;
-  const version8Rules = {
-    ...rules,
-    articles: version8Articles,
-    article: { ...rules.article, reviews: version8Reviews },
-  };
-  expect(parseScrapeRules(8, version8Rules)).toEqual(version8Rules);
-  expect(() => parseScrapeRules(9, version8Rules)).toThrow();
+  expect(rules.list.limit).toBe(99);
+  expect(parseScrapeRules(10, rules)).toEqual(rules);
+  expect(() => parseScrapeRules(9, rules)).toThrow();
   expect(() =>
     ScrapeRulesSchema.parse({
       ...rules,
-      articles: {
-        ...rules.articles,
+      list: {
+        ...rules.list,
         limit: SCRAPE_SOURCE_MAX_ITEMS + 1,
       },
     }),
@@ -119,8 +71,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesV5Schema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(10, rules)).toThrow(
-    "Unsupported scrape rules version: 10.",
+  expect(() => parseScrapeRules(11, rules)).toThrow(
+    "Unsupported scrape rules version: 11.",
   );
 });
 
@@ -133,7 +85,7 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(9);
+  expect(SCRAPE_RULES_VERSION).toBe(10);
 });
 
 test("adds catalog rules only in version 7", () => {
@@ -176,7 +128,7 @@ test("adds catalog rules only in version 7", () => {
 });
 
 test("changes text matching only in version 8", () => {
-  const version8 = ScrapeRulesSchema.parse({
+  const version8 = ScrapeRulesV9Schema.parse({
     kind: "price",
     products: {
       oneProductPer: "article.product",
@@ -228,7 +180,9 @@ test("changes text matching only in version 8", () => {
     },
   });
 
+  expect(parseScrapeRules(9, version8)).toEqual(version8);
   expect(parseScrapeRules(8, version8)).toEqual(version8);
+  expect(() => parseScrapeRules(10, version8)).toThrow();
   expect(() => parseScrapeRules(7, version8)).toThrow();
   if (version8.kind !== "price") throw new Error("Expected price rules.");
 

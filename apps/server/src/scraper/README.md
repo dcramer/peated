@@ -81,46 +81,33 @@ admin can return to any older revision that passed. Pausing a source stops
 collection but keeps its revisions and run history.
 
 Older rule versions remain supported so saved sources keep working. New
-sources use version 9. A review source has `articles` for finding article links
-and `article` for reading an article. A price source uses `products` and
-`product` in the same way. `oneArticlePer` or `oneProductPer` identifies each
-result on the list page. `link` finds its link, `skipWhen` can leave out a
-result, and `nextPage` can continue to the next list page. Links must stay on
-the source website. Code follows at most five list pages and stops at `limit`.
-Review indexes set `document` to `html` or `xml`. HTML links use `href`; XML
-links use the selected element's text.
+sources use version 10. Rules describe page structure with CSS selectors. The
+`list.links` selector finds article or product links. `list.nextPage` can find a
+link to the next list page. Links must stay on the source website. Code follows
+at most five list pages and stops at `list.limit`. It reads `href` from HTML
+links and text from XML index entries automatically.
 
-Each field has an ordered `try` list. A read can get text, get an attribute, or
-use a fixed value. The parser uses the first non-empty result. A read can match
-the selected text against up to three templates. Templates contain normal text
-and three placeholders: `{anything}` ignores changing text, `{value}` keeps the
-wanted text, and `{line}` matches an HTML line break. For example,
-`Score: {value}/10` returns the score and
-`Review {anything} - {value}` returns the writer. Matching ignores letter case.
-List filters and review starts use the same templates. `addStart` and `addEnd`
-can add known text after a match. Publication dates can also come from a URL
-path with bounded `yyyy`, `yy`, `MM`, `dd`, and `*` parts. Scores can map up to
-25 written grades to numbers.
+Detail fields are CSS selectors too. The parser reads text by default and uses
+the normal HTML attribute for links, images, dates, metadata, and form values.
+It also handles whitespace, relative URLs, prices, scores, dates, and volumes.
+A price source can use a number of milliliters as a fixed volume. Rules do not
+contain cleanup steps or text templates. Put unusual cleanup for a specific
+source in a small named code function.
 
-For reviews, `article.reviews.inside` identifies the part of the article that
-contains reviews. `oneReviewPer: "element"` means each selected element is one
-review. `contains` can require another selector inside each review element.
-`oneReviewPer: "section"` means each matching `startsAt` label starts a
-review; `stopBefore` can mark where the reviews end. `inside` must select the
-closest single area shared by every review start. This also works when layout
-elements wrap the labels and review content. A single section must say whether
-to start at its label or use the whole review area. A field read states
-whether it reads inside the review or from the article, and an article-level
-read states whether it applies to the first review or every review. This keeps
-names, writers, and scores from leaking between reviews.
+For reviews, `detail.reviews.area` selects the one area containing the review
+text. Set `item` when each review has its own wrapper. When several reviews do
+not have wrappers, set `item` to null; each match of the `name` selector starts
+a review. When an article has one review and its title is the Bottle name, set
+`name` to null. The parser uses the article title. A review's writer, score,
+and tasting notes are read inside that review. For a score, `outOf` is the
+publisher's scoring scale.
 
 The parser uses a review's Bottle name and writer to keep it matched when other
 reviews are added or moved. Repeated reviews with the same name and writer stay
 separate. This is automatic and is not part of the saved rules.
 
 The setup agent submits this same rule shape, and the saved revision and parser
-use it directly. There is no setup-only translation step.
-Rules do not support
+use it directly. There is no setup-only translation step. Rules do not support
 scripts, custom code, arbitrary request headers, browser automation, numbered
 page templates, infinite scrolling, or links to another website. Add a built-in
 adapter when a source needs one of those features.
@@ -186,67 +173,28 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Set `rulesVersion` to `9` when testing current operations. An omitted
+API. Set `rulesVersion` to `10` when testing current operations. An omitted
 version means version 1 so existing preview files keep their original behavior:
 
 ```json
 {
-  "rulesVersion": 9,
+  "rulesVersion": 10,
   "listUrl": "https://example.com/reviews",
   "rules": {
     "kind": "review",
-    "articles": {
-      "document": "html",
-      "oneArticlePer": "article",
-      "link": "a[href]",
-      "skipWhen": null,
+    "list": {
+      "links": "article a[href]",
       "nextPage": null,
       "limit": 3
     },
-    "article": {
-      "canonicalUrl": null,
-      "title": {
-        "try": [
-          {
-            "get": "text",
-            "selector": "h1",
-            "take": "first",
-            "match": null,
-            "addStart": null,
-            "addEnd": null
-          }
-        ]
-      },
-      "publishedDate": {
-        "try": [
-          {
-            "get": "attribute",
-            "selector": "time",
-            "attribute": "datetime",
-            "match": null,
-            "addStart": null,
-            "addEnd": null
-          }
-        ]
-      },
+    "detail": {
+      "url": null,
+      "title": "h1",
+      "date": "time",
       "reviews": {
-        "inside": "main",
-        "oneReviewPer": "element",
-        "selector": "article.review",
-        "contains": null,
-        "name": {
-          "try": [
-            {
-              "get": "text",
-              "from": "review",
-              "selector": "h2",
-              "take": "first",
-              "match": null,
-              "addStart": null,
-              "addEnd": null
-            }
-          ]
-        },
+        "area": "main",
+        "item": "article.review",
+        "name": "h2",
         "reviewer": null,
         "tastingNotes": null,
         "score": null

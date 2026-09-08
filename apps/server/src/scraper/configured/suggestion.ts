@@ -72,11 +72,11 @@ type CheckedDetailPage = AiPage & {
 };
 
 function linkField(rules: ScrapeRules) {
-  return rules.kind === "review" ? "articles.link" : "products.link";
+  return "list.links";
 }
 
 function nextPageField(rules: ScrapeRules) {
-  return rules.kind === "review" ? "articles.nextPage" : "products.nextPage";
+  return "list.nextPage";
 }
 
 export function checkListPage(input: {

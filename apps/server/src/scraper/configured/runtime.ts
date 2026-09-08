@@ -142,6 +142,7 @@ type RecordScrapeSourcePreview = (input: {
 function linkField(rules: StoredScrapeRules) {
   if ("articles" in rules) return "articles.link";
   if ("products" in rules) return "products.link";
+  if ("links" in rules.list) return "list.links";
   return "list.detailLink";
 }
 

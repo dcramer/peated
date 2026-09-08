@@ -14,7 +14,8 @@ const SCRAPE_RULES_VERSION_5 = 5;
 const SCRAPE_RULES_VERSION_6 = 6;
 const SCRAPE_RULES_VERSION_7 = 7;
 const SCRAPE_RULES_VERSION_8 = 8;
-export const SCRAPE_RULES_VERSION = 9;
+const SCRAPE_RULES_VERSION_9 = 9;
+export const SCRAPE_RULES_VERSION = 10;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price", "catalog"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -746,7 +747,7 @@ const ScrapeReviewGroupsV9Schema = z.union([
     .strict(),
 ]);
 
-export const ScrapeReviewRulesSchema = z
+const ScrapeReviewRulesV9Schema = z
   .object({
     kind: z.literal("review"),
     articles: ScrapeArticlesV9Schema,
@@ -761,7 +762,7 @@ export const ScrapeReviewRulesSchema = z
   })
   .strict();
 
-export const ScrapePriceRulesSchema = z
+const ScrapePriceRulesV9Schema = z
   .object({
     kind: z.literal("price"),
     products: ScrapeProductsV8Schema,
@@ -780,7 +781,7 @@ export const ScrapePriceRulesSchema = z
   })
   .strict();
 
-export const ScrapeCatalogRulesSchema = z
+const ScrapeCatalogRulesV9Schema = z
   .object({
     kind: z.literal("catalog"),
     products: ScrapeProductsV8Schema,
@@ -800,10 +801,99 @@ export const ScrapeCatalogRulesSchema = z
   })
   .strict();
 
+export const ScrapeRulesV9Schema = z.discriminatedUnion("kind", [
+  ScrapeReviewRulesV9Schema,
+  ScrapePriceRulesV9Schema,
+  ScrapeCatalogRulesV9Schema,
+]);
+
+const ScrapeListSchema = z
+  .object({
+    links: ScrapeSelectorSchema,
+    nextPage: ScrapeSelectorSchema.nullable(),
+    limit: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS),
+  })
+  .strict();
+
+const ScrapeScoreV10Schema = z
+  .object({
+    selector: ScrapeSelectorSchema,
+    outOf: z.number().positive(),
+  })
+  .strict();
+
+const ScrapeReviewRulesV10Schema = z
+  .object({
+    kind: z.literal("review"),
+    list: ScrapeListSchema,
+    detail: z
+      .object({
+        url: ScrapeSelectorSchema.nullable(),
+        title: ScrapeSelectorSchema,
+        date: ScrapeSelectorSchema.nullable(),
+        reviews: z
+          .object({
+            area: ScrapeSelectorSchema,
+            item: ScrapeSelectorSchema.nullable(),
+            name: ScrapeSelectorSchema.nullable(),
+            reviewer: ScrapeSelectorSchema.nullable(),
+            tastingNotes: ScrapeSelectorSchema.nullable(),
+            score: ScrapeScoreV10Schema.nullable(),
+          })
+          .strict(),
+      })
+      .strict(),
+  })
+  .strict();
+
+const ScrapeVolumeV10Schema = z.union([
+  ScrapeSelectorSchema,
+  z.number().int().positive().max(100_000),
+]);
+
+const ScrapeProductFieldsV10Schema = z
+  .object({
+    name: ScrapeSelectorSchema,
+    url: ScrapeSelectorSchema.nullable(),
+    id: ScrapeSelectorSchema.nullable(),
+    image: ScrapeSelectorSchema.nullable(),
+    volume: ScrapeVolumeV10Schema.nullable(),
+  })
+  .strict();
+
+const ScrapePriceRulesV10Schema = z
+  .object({
+    kind: z.literal("price"),
+    list: ScrapeListSchema,
+    detail: ScrapeProductFieldsV10Schema.extend({
+      price: ScrapeSelectorSchema,
+      currency: z.enum(CURRENCY_LIST),
+      volume: ScrapeVolumeV10Schema,
+      barcode: ScrapeSelectorSchema.nullable(),
+    }).strict(),
+  })
+  .strict();
+
+const ScrapeCatalogRulesV10Schema = z
+  .object({
+    kind: z.literal("catalog"),
+    list: ScrapeListSchema,
+    detail: ScrapeProductFieldsV10Schema.extend({
+      abv: ScrapeSelectorSchema.nullable(),
+      age: ScrapeSelectorSchema.nullable(),
+      edition: ScrapeSelectorSchema.nullable(),
+      year: ScrapeSelectorSchema.nullable(),
+    }).strict(),
+  })
+  .strict();
+
+export const ScrapeReviewRulesSchema = ScrapeReviewRulesV10Schema;
+export const ScrapePriceRulesSchema = ScrapePriceRulesV10Schema;
+export const ScrapeCatalogRulesSchema = ScrapeCatalogRulesV10Schema;
 export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
-  ScrapeReviewRulesSchema,
-  ScrapePriceRulesSchema,
-  ScrapeCatalogRulesSchema,
+  ScrapeReviewRulesV10Schema,
+  ScrapePriceRulesV10Schema,
+  ScrapeCatalogRulesV10Schema,
 ]);
 
 export const StoredScrapeRulesSchema = z.union([
@@ -816,13 +906,15 @@ export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV7Schema,
   z.discriminatedUnion("kind", [
     ScrapeReviewRulesV8Schema,
-    ScrapePriceRulesSchema,
-    ScrapeCatalogRulesSchema,
+    ScrapePriceRulesV9Schema,
+    ScrapeCatalogRulesV9Schema,
   ]),
+  ScrapeRulesV9Schema,
   ScrapeRulesSchema,
 ]);
 
 export type ScrapeRulesV5 = z.infer<typeof ScrapeRulesV5Schema>;
+export type ScrapeRulesV9 = z.infer<typeof ScrapeRulesV9Schema>;
 export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapePageRead = z.infer<typeof ScrapePageReadSchema>;
@@ -870,10 +962,13 @@ export function parseScrapeRules(
     return z
       .discriminatedUnion("kind", [
         ScrapeReviewRulesV8Schema,
-        ScrapePriceRulesSchema,
-        ScrapeCatalogRulesSchema,
+        ScrapePriceRulesV9Schema,
+        ScrapeCatalogRulesV9Schema,
       ])
       .parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_9) {
+    return ScrapeRulesV9Schema.parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);
@@ -884,6 +979,7 @@ export function parseScrapeRules(
 export function scrapeRulesLimit(rules: StoredScrapeRules) {
   if ("articles" in rules) return rules.articles.limit;
   if ("products" in rules) return rules.products.limit;
+  if ("links" in rules.list) return rules.list.limit;
   return rules.list.maxItems;
 }
 
@@ -910,5 +1006,16 @@ export function withScrapeRulesLimit(
       products: { ...rules.products, limit },
     } as StoredScrapeRules;
   }
-  return { ...rules, list: { ...rules.list, maxItems: limit } };
+  if ("links" in rules.list) {
+    // SAFETY: This branch proves the current list shape and preserves every other field.
+    return {
+      ...rules,
+      list: { ...rules.list, limit },
+    } as StoredScrapeRules;
+  }
+  // SAFETY: The remaining stored rules all use the bounded maxItems list shape.
+  return {
+    ...rules,
+    list: { ...rules.list, maxItems: limit },
+  } as StoredScrapeRules;
 }
