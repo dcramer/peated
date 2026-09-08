@@ -3564,6 +3564,67 @@ describe("price match queue", () => {
     expect(createdBottle).toBeUndefined();
   });
 
+  test("rejects Bottle creation from a verified proposal", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Verified Review Brand" });
+    const suggestedBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Verified Match",
+    });
+    const price = await fixtures.StorePrice({
+      name: "Verified Review Release",
+      bottleId: null,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "verified",
+        proposalType: "match_existing",
+        suggestedBottleId: suggestedBottle.id,
+      })
+      .returning();
+
+    const err = await waitError(
+      routerClient.prices.matchQueue.createBottle(
+        {
+          proposal: proposal.id,
+          independentBottle: {
+            name: "Verified Review Release",
+            brand: brand.id,
+          },
+        },
+        { context: { user } },
+      ),
+    );
+
+    const [updatedProposal, updatedPrice, createdBottle] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+      db.query.bottles.findFirst({
+        where: eq(
+          bottles.fullName,
+          "Verified Review Brand Verified Review Release",
+        ),
+      }),
+    ]);
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Price match proposal is not reviewable (${proposal.id}, verified).]`,
+    );
+    expect(updatedProposal).toMatchObject({
+      status: "verified",
+      suggestedBottleId: suggestedBottle.id,
+      reviewedById: null,
+    });
+    expect(updatedPrice).toMatchObject({ bottleId: null });
+    expect(createdBottle).toBeUndefined();
+  });
+
   test("rejects proposal-backed bottle creation for correction proposals", async ({
     fixtures,
   }) => {

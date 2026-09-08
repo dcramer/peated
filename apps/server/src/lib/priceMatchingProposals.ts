@@ -945,6 +945,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
     expectedProposalTypes: ["create_new", "match_existing", "no_match"],
+    allowedStatuses: ["pending_review", "errored"],
     expectedProcessingToken,
   });
   if (
