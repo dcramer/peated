@@ -129,7 +129,7 @@ describe("public catalog page reads", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("refreshes catalog snapshots after five minutes and bypasses them for members", async () => {
+  it("refreshes catalog snapshots after five minutes and shares them with members", async () => {
     vi.useFakeTimers({ toFake: ["Date", "performance"] });
     const catalog = await getPageEntityCatalog(1);
     expect(await getPageEntityCatalog(1)).toEqual(catalog);
@@ -137,11 +137,12 @@ describe("public catalog page reads", () => {
 
     vi.advanceTimersByTime(301_000);
     expect(await getPageEntityCatalog(1)).toEqual(catalog);
-    expect(await getPageEntityCatalog(1)).not.toEqual(catalog);
+    const refreshedCatalog = await getPageEntityCatalog(1);
+    expect(refreshedCatalog).not.toEqual(catalog);
+
     accessToken = "test-member";
-    await getPageEntityCatalog(1);
-    await getPageEntityCatalog(1);
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(await getPageEntityCatalog(1)).toEqual(refreshedCatalog);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("propagates failures without caching an empty catalog", async () => {

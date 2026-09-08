@@ -66,13 +66,8 @@ const loadCompanyPortfolio = unstable_cache(
   { revalidate: 300 },
 );
 
-/** Public page summaries revalidate every five minutes; member reads stay fresh. */
+/** Entity catalog summaries are public and revalidate every five minutes. */
 export async function getPageEntityCatalog(entity: number) {
-  const session = await getSession();
-  if (session.accessToken) {
-    const { client } = await getPublicPageServerClient();
-    return client.entities.catalog({ entity });
-  }
   return loadEntityCatalog(entity);
 }
 
