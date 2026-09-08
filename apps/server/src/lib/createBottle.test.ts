@@ -532,6 +532,45 @@ describe("Bottle creation", () => {
     ]);
   });
 
+  test("allows one marketed title to have distinct Series and outturns", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const context = contextFor(defaults.user);
+    const brand = await fixtures.Entity({ name: "Structured Release Brand" });
+    const firstSeries = await fixtures.BottleSeries({ brandId: brand.id });
+    const secondSeries = await fixtures.BottleSeries({ brandId: brand.id });
+    const shared = {
+      name: "Limited Selection",
+      brand: brand.id,
+      vintageYear: 1982,
+      bottlingYear: 2001,
+      abv: 50,
+    };
+    const first = await createBottle({
+      context,
+      input: { ...shared, series: firstSeries.id, outturn: 274 },
+    });
+    const differentSeries = await createBottle({
+      context,
+      input: { ...shared, series: secondSeries.id, outturn: 274 },
+    });
+    const differentOutturn = await createBottle({
+      context,
+      input: { ...shared, series: firstSeries.id, outturn: 285 },
+    });
+
+    expect(
+      new Set(
+        [first, differentSeries, differentOutturn].map(
+          ({ bottle }) => bottle.id,
+        ),
+      ).size,
+    ).toBe(3);
+    expect(differentSeries.bottle.seriesId).toBe(secondSeries.id);
+    expect(differentOutturn.bottle.outturn).toBe(285);
+  });
+
   test("fails closed instead of reusing retired Bottle identities", async ({
     defaults,
     fixtures,

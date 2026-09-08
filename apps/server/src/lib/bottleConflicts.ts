@@ -17,12 +17,14 @@ export type BottleIdentityState = {
   name: string;
   fullName: string;
   brandId: number;
+  seriesId: number | null;
   brand: BottleIdentityEntity;
   bottler: BottleIdentityEntity | null;
   edition: string | null;
   statedAge: number | null;
   noAgeStatement: boolean | null;
   vintageYear: number | null;
+  bottlingYear: number | null;
   releaseYear: number | null;
   releaseMonth: number | null;
   releaseDay: number | null;
@@ -30,6 +32,7 @@ export type BottleIdentityState = {
   singleCask: boolean | null;
   caskStrength: boolean | null;
   caskNumber: string | null;
+  outturn: number | null;
 };
 
 export type BottleIdentityCandidate = {
@@ -246,10 +249,12 @@ export async function reserveBottleIdentitiesInTransaction(
     const key = JSON.stringify([
       desired.brandId,
       desired.fullName.toLowerCase(),
+      desired.seriesId,
       desired.edition,
       desired.statedAge,
       desired.noAgeStatement,
       desired.vintageYear,
+      desired.bottlingYear,
       desired.releaseYear,
       desired.releaseMonth,
       desired.releaseDay,
@@ -257,6 +262,7 @@ export async function reserveBottleIdentitiesInTransaction(
       desired.singleCask,
       desired.caskStrength,
       desired.caskNumber,
+      desired.outturn,
     ]);
     const owner = structuredIdentityOwners.get(key);
     if (owner !== undefined && owner !== bottleId) {
@@ -285,10 +291,12 @@ export async function reserveBottleIdentitiesInTransaction(
           notInArray(bottles.id, excludedBottleIds),
           eq(bottles.brandId, desired.brandId),
           eq(sql`LOWER(${bottles.fullName})`, desired.fullName.toLowerCase()),
+          sql`${bottles.seriesId} IS NOT DISTINCT FROM ${desired.seriesId}`,
           sql`${bottles.edition} IS NOT DISTINCT FROM ${desired.edition}`,
           sql`${bottles.statedAge} IS NOT DISTINCT FROM ${desired.statedAge}`,
           sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${desired.noAgeStatement}`,
           sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${desired.vintageYear}`,
+          sql`${bottles.bottlingYear} IS NOT DISTINCT FROM ${desired.bottlingYear}`,
           sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${desired.releaseYear}`,
           sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${desired.releaseMonth}`,
           sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${desired.releaseDay}`,
@@ -296,6 +304,7 @@ export async function reserveBottleIdentitiesInTransaction(
           sql`${bottles.singleCask} IS NOT DISTINCT FROM ${desired.singleCask}`,
           sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${desired.caskStrength}`,
           sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${desired.caskNumber}`,
+          sql`${bottles.outturn} IS NOT DISTINCT FROM ${desired.outturn}`,
         ),
       )
       .orderBy(asc(bottles.id))
