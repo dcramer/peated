@@ -95,7 +95,13 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
               </ButtonLink>
             ) : (
               <>
-                <ButtonLink href="/login" size="sm" variant="text">
+                {/* Auth requires a document load to rebuild a restored tab's session state. */}
+                <ButtonLink
+                  href="/login"
+                  reloadDocument
+                  size="sm"
+                  variant="text"
+                >
                   Sign in
                 </ButtonLink>
                 <ButtonLink href="/register" size="sm" variant="default">

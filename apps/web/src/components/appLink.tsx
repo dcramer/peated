@@ -10,6 +10,8 @@ import { textLinkStyles } from "./textLinkStyles.stylex";
 
 export type AppLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
   prefetch?: boolean | null;
+  /** Use a native navigation when the destination must rebuild the root layout. */
+  reloadDocument?: boolean;
 };
 
 export function isInternalAppHref(href: string) {
@@ -17,7 +19,8 @@ export function isInternalAppHref(href: string) {
 }
 
 /**
- * Uses client navigation for app routes and native anchors for other targets.
+ * Uses client navigation for app routes and native anchors for other targets
+ * or when the caller requests a document reload.
  * A bare link gets the shared text-link interaction treatment and inherits its
  * surrounding typography. Composite components replace that treatment by
  * supplying their own class. Use TextLink for inline text because its API also
@@ -30,6 +33,7 @@ export const AppLink = forwardRef(function AppLink(
     download,
     href,
     prefetch = false,
+    reloadDocument = false,
     style,
     ...props
   }: AppLinkProps,
@@ -44,7 +48,12 @@ export const AppLink = forwardRef(function AppLink(
     style: fallbackProps?.style ? { ...fallbackProps.style, ...style } : style,
   };
 
-  if (!href || !isInternalAppHref(href) || download !== undefined) {
+  if (
+    !href ||
+    !isInternalAppHref(href) ||
+    download !== undefined ||
+    reloadDocument
+  ) {
     return (
       <a {...linkProps} download={download} href={href} ref={ref}>
         {children}
