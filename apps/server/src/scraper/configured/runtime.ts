@@ -27,7 +27,13 @@ import type {
   ScraperSink,
   ScraperSourceDefinition,
 } from "../types";
-import { findLikelyDetailPages, findLikelyListPages } from "./discovery";
+import {
+  MAX_LIKELY_LIST_PAGES,
+  findAdvertisedSyndicationPages,
+  findLikelyDetailPages,
+  findLikelyListPages,
+  inspectSyndicationFeed,
+} from "./discovery";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import {
   ScrapeSourcePreviewPageSchema,
@@ -482,26 +488,63 @@ export async function resolveScrapeSourceRunRegistry(
                 new URL(value).toString(),
               ),
             );
+            const entryFeed =
+              suggestion.source.kind === "review"
+                ? inspectSyndicationFeed({
+                    pageUrl: entryResponse.url,
+                    xml: entryResponse.body,
+                  })
+                : null;
             const listPages = [
               {
                 url: entryResponse.url.toString(),
                 html: entryResponse.body,
+                document: entryFeed ? ("xml" as const) : ("html" as const),
               },
             ];
-            const likelyListPages = findLikelyListPages({
-              kind: suggestion.source.kind,
-              pageUrl: entryResponse.url,
-              html: entryResponse.body,
-            }).filter((value) => !sampleUrls.has(value));
+            const advertisedFeeds =
+              suggestion.source.kind === "review" && !entryFeed
+                ? findAdvertisedSyndicationPages({
+                    pageUrl: entryResponse.url,
+                    html: entryResponse.body,
+                  })
+                : [];
+            const advertisedFeedSet = new Set(advertisedFeeds);
+            const likelyListPages = [
+              ...advertisedFeeds,
+              ...findLikelyListPages({
+                kind: suggestion.source.kind,
+                pageUrl: entryResponse.url,
+                html: entryResponse.body,
+              }),
+            ]
+              .filter(
+                (value, index, values) =>
+                  !sampleUrls.has(value) && values.indexOf(value) === index,
+              )
+              .slice(0, MAX_LIKELY_LIST_PAGES);
             for (const value of likelyListPages) {
               try {
                 const response = await session.request({
                   target: target.key,
                   url: new URL(value),
                 });
+                const advertisedFeed = advertisedFeedSet.has(value);
+                if (
+                  advertisedFeed &&
+                  !inspectSyndicationFeed({
+                    pageUrl: response.url,
+                    xml: response.body,
+                  })
+                ) {
+                  continue;
+                }
                 listPages.push({
                   url: response.url.toString(),
                   html: response.body,
+                  document: advertisedFeed
+                    ? ("xml" as const)
+                    : ("html" as const),
                 });
               } catch (error) {
                 if (
@@ -523,6 +566,7 @@ export async function resolveScrapeSourceRunRegistry(
               detailPages.push({
                 url: response.url.toString(),
                 html: response.body,
+                document: "html" as const,
               });
             }
             const suppliedDetailUrls = new Set(
@@ -542,6 +586,7 @@ export async function resolveScrapeSourceRunRegistry(
                 detailPages.push({
                   url: response.url.toString(),
                   html: response.body,
+                  document: "html" as const,
                 });
               } catch (error) {
                 if (
@@ -567,6 +612,7 @@ export async function resolveScrapeSourceRunRegistry(
                 return {
                   url: response.url.toString(),
                   html: response.body,
+                  document: "html" as const,
                 };
               },
             });

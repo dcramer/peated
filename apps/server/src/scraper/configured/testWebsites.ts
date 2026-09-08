@@ -5,7 +5,7 @@ import { createServer } from "node:http";
 import { z } from "zod";
 
 export type ReviewWebsite = {
-  key: "decimal" | "stars" | "points";
+  key: "decimal" | "rss" | "stars" | "points";
   name: string;
   pages: Record<string, string>;
   policy: ExternalReviewScoringPolicy | null;
@@ -20,6 +20,44 @@ export type ReviewWebsite = {
 };
 
 export const reviewWebsites: ReviewWebsite[] = [
+  {
+    key: "rss",
+    name: "Whisky Feed",
+    pages: {
+      "/": "index.html",
+      "/feed.xml": "feed.xml",
+      "/reviews": "reviews.html",
+      "/reviews/island-pair": "island-pair.html",
+      "/reviews/hill-malt": "hill-malt.html",
+    },
+    policy: null,
+    reviews: [
+      {
+        name: "Island Malt First Release",
+        reviewerName: "Mara Vale",
+        url: "/reviews/island-pair",
+        publishedAt: "2026-08-22T00:00:00.000Z",
+        nativeScore: { value: 88, scale: 100, display: "88/100" },
+        score: 88,
+      },
+      {
+        name: "Island Malt Loch Edition",
+        reviewerName: "Mara Vale",
+        url: "/reviews/island-pair",
+        publishedAt: "2026-08-22T00:00:00.000Z",
+        nativeScore: { value: 85, scale: 100, display: "85/100" },
+        score: 85,
+      },
+      {
+        name: "Hill Malt 10 Year",
+        reviewerName: "Mara Vale",
+        url: "/reviews/hill-malt",
+        publishedAt: "2026-08-19T00:00:00.000Z",
+        nativeScore: { value: 89, scale: 100, display: "89/100" },
+        score: 89,
+      },
+    ],
+  },
   {
     key: "decimal",
     name: "Malt Journal",
@@ -145,8 +183,14 @@ export async function startReviewWebsite(website: ReviewWebsite) {
       response.writeHead(404).end();
       return;
     }
-    response.setHeader("content-type", "text/html; charset=utf-8");
-    response.end(html);
+    response.setHeader(
+      "content-type",
+      path.endsWith(".xml")
+        ? "application/rss+xml; charset=utf-8"
+        : "text/html; charset=utf-8",
+    );
+    const host = request.headers.host;
+    response.end(host ? html.replaceAll("{{origin}}", `http://${host}`) : html);
   });
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
