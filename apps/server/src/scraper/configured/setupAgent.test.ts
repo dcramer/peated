@@ -48,6 +48,7 @@ function reviewCandidate(
     rules: {
       kind: "review" as const,
       articles: {
+        document: "html" as const,
         oneArticlePer: listOptions.item ?? "body",
         link: "a.review",
         skipWhen: listOptions.excludeWhen ?? null,
@@ -73,6 +74,7 @@ function reviewCandidate(
           inside: "body",
           oneReviewPer: "element" as const,
           selector: "article.review",
+          contains: null,
           name: reviewField(nameSelector, { match: ["{value} Review"] }),
           reviewer: null,
           tastingNotes: reviewField(".body p", {

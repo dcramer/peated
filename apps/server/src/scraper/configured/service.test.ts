@@ -26,6 +26,7 @@ import {
 const rules = {
   kind: "review",
   articles: {
+    document: "html",
     oneArticlePer: "body",
     link: "a.review",
     skipWhen: null,
@@ -60,6 +61,7 @@ const rules = {
       inside: "body",
       oneReviewPer: "element",
       selector: "article.review",
+      contains: null,
       name: {
         try: [
           {
@@ -245,7 +247,7 @@ test("database constraints keep source and revision identity valid", async () =>
     createdById: user.id,
   });
   expect(first.revision).toBe(1);
-  expect(first.rulesVersion).toBe(8);
+  expect(first.rulesVersion).toBe(9);
 
   await expect(
     db.insert(scrapeSources).values({

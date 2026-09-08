@@ -1,7 +1,10 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
 import type { JsonValue } from "@peated/server/scraper/types";
 import { z } from "zod";
-import { ScrapeTextMatchesSchema } from "./textTemplate";
+import {
+  ScrapeTextMatchesSchema,
+  ScrapeTextTemplateSchema,
+} from "./textTemplate";
 
 const SCRAPE_RULES_VERSION_1 = 1;
 const SCRAPE_RULES_VERSION_2 = 2;
@@ -10,7 +13,8 @@ const SCRAPE_RULES_VERSION_4 = 4;
 const SCRAPE_RULES_VERSION_5 = 5;
 const SCRAPE_RULES_VERSION_6 = 6;
 const SCRAPE_RULES_VERSION_7 = 7;
-export const SCRAPE_RULES_VERSION = 8;
+const SCRAPE_RULES_VERSION_8 = 8;
+export const SCRAPE_RULES_VERSION = 9;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price", "catalog"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -620,6 +624,30 @@ const ScrapeDateFieldV8Schema = z
   })
   .strict();
 
+const ScrapeDateFromAttributeV9Schema = z
+  .object({
+    get: z.literal("dateFromAttribute"),
+    selector: ScrapeSelectorSchema,
+    attribute: ScrapeAttributeSchema,
+    format: ScrapeUrlDateFormatSchema,
+  })
+  .strict();
+
+const ScrapeDateFieldV9Schema = z
+  .object({
+    try: z
+      .array(
+        z.union([
+          ScrapePageReadSchema,
+          ScrapeDateFromUrlV6Schema,
+          ScrapeDateFromAttributeV9Schema,
+        ]),
+      )
+      .min(1)
+      .max(3),
+  })
+  .strict();
+
 const ScrapeScoreV8Schema = scrapeScoreSchema(ScrapeReviewTryV8Schema);
 
 const scrapeReviewFieldsV8 = {
@@ -668,11 +696,20 @@ const ScrapeArticlesV8Schema = ScrapeArticlesV6Schema.extend({
   skipWhen: ScrapeSkipV8Schema.nullable(),
 }).strict();
 
+const ScrapeSkipV9Schema = ScrapeSkipV8Schema.extend({
+  match: z.array(ScrapeTextTemplateSchema).min(1).max(10).nullable(),
+}).strict();
+
+const ScrapeArticlesV9Schema = ScrapeArticlesV8Schema.extend({
+  document: z.enum(["html", "xml"]),
+  skipWhen: ScrapeSkipV9Schema.nullable(),
+}).strict();
+
 const ScrapeProductsV8Schema = ScrapeProductsV6Schema.extend({
   skipWhen: ScrapeSkipV8Schema.nullable(),
 }).strict();
 
-export const ScrapeReviewRulesSchema = z
+const ScrapeReviewRulesV8Schema = z
   .object({
     kind: z.literal("review"),
     articles: ScrapeArticlesV8Schema,
@@ -682,6 +719,43 @@ export const ScrapeReviewRulesSchema = z
         title: ScrapePageFieldSchema,
         publishedDate: ScrapeDateFieldV8Schema,
         reviews: ScrapeReviewGroupsV8Schema,
+      })
+      .strict(),
+  })
+  .strict();
+
+const ScrapeReviewGroupsV9Schema = z.union([
+  z
+    .object({
+      inside: ScrapeSelectorSchema,
+      oneReviewPer: z.literal("element"),
+      selector: ScrapeSelectorSchema,
+      contains: ScrapeSelectorSchema.nullable(),
+      ...scrapeReviewFieldsV8,
+    })
+    .strict(),
+  z
+    .object({
+      inside: ScrapeSelectorSchema,
+      oneReviewPer: z.literal("section"),
+      startsAt: ScrapeTextMarkerV8Schema,
+      stopBefore: ScrapeTextMarkerV8Schema.nullable(),
+      whenOnlyOneReview: z.enum(["startAtReview", "useWholeArea"]),
+      ...scrapeReviewFieldsV8,
+    })
+    .strict(),
+]);
+
+export const ScrapeReviewRulesSchema = z
+  .object({
+    kind: z.literal("review"),
+    articles: ScrapeArticlesV9Schema,
+    article: z
+      .object({
+        canonicalUrl: ScrapePageFieldSchema.nullable(),
+        title: ScrapePageFieldSchema,
+        publishedDate: ScrapeDateFieldV9Schema,
+        reviews: ScrapeReviewGroupsV9Schema,
       })
       .strict(),
   })
@@ -740,6 +814,11 @@ export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV5Schema,
   ScrapeRulesV6Schema,
   ScrapeRulesV7Schema,
+  z.discriminatedUnion("kind", [
+    ScrapeReviewRulesV8Schema,
+    ScrapePriceRulesSchema,
+    ScrapeCatalogRulesSchema,
+  ]),
   ScrapeRulesSchema,
 ]);
 
@@ -786,6 +865,15 @@ export function parseScrapeRules(
   }
   if (rulesVersion === SCRAPE_RULES_VERSION_7) {
     return ScrapeRulesV7Schema.parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_8) {
+    return z
+      .discriminatedUnion("kind", [
+        ScrapeReviewRulesV8Schema,
+        ScrapePriceRulesSchema,
+        ScrapeCatalogRulesSchema,
+      ])
+      .parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);

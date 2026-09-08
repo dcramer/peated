@@ -409,6 +409,33 @@ output, trigger one manual collection, and confirm that it updates the same
 price IDs and Bottle matches without reviving old products. Check the run and
 Sentry before restoring the saved schedule.
 
+## Whiskyfun
+
+Use the preparation endpoint with `{"site": "whiskyfun"}`. The check-only
+request inventories every saved review without changing it. It accepts both
+standalone current article URLs under `/YYYY/` and dated fragments on archive
+pages. Applying rewrites only the old hashed review keys, keeps article and
+review IDs and Bottle matches, transfers the existing request settings, and
+creates a paused review source.
+
+Before applying, stop the `whiskyfun` schedule and wait for active collection
+to finish. Save the existing article and review IDs, canonical URLs, review
+keys, Bottle links, publication approval, request limits, and run history. Run
+the version 9 rules through the full local no-write preview. Use Whiskyfun's
+public `whatsnew.xml` index to discover its stable standalone article URLs; it
+does not require a partnership or private feed. Set `articles.document` to
+`xml`, omit rum and other non-whisky article titles, and extract reviews only
+from the linked HTML pages. Each review element must contain a bottle heading.
+Read the visible date, author metadata, complete bottle name, and 100-point
+score.
+
+After applying, save and preview the reviewed rules in production. Activate
+only exact output, trigger one manual collection, and confirm that it updates
+the same current article and review IDs rather than creating duplicates. Check
+the run, parsed item counts, publication state, request state, and Sentry before
+restoring the daily schedule. Keep the built-in adapter until that production
+run is verified; remove it in a later cleanup.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -421,9 +448,9 @@ handles reviews added after the switch. Do not delete source or run history.
 The preparation API is shared. It currently supports Bourbon Culture,
 Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, GlenAllachie,
 Gordon & MacPhail, Kilchoman, Nc'nean, North Star, Thompson Bros., The Whiskey Reviewer,
-WhiskyNotes, Whisky Saga, The Whisky Study, and Words of Whisky. Other sites are
-rejected without changing records. Add each site's conversion behind this route
-as its existing records are reviewed.
+Whiskyfun, WhiskyNotes, Whisky Saga, The Whisky Study, and Words of Whisky.
+Other sites are rejected without changing records. Add each site's conversion
+behind this route as its existing records are reviewed.
 
 Prepare each source using its own rules for recognizing existing records.
 Articles with several reviews need a verified match for each review. Store

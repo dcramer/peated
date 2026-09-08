@@ -392,6 +392,7 @@ function reviewText(selector: string, take: "first" | "all" = "first") {
 const currentReviewRules = {
   kind: "review",
   articles: {
+    document: "html",
     oneArticlePer: "article.card",
     link: "a[href]",
     skipWhen: { selector: ".skip", match: null },
@@ -495,6 +496,7 @@ const currentReviewRules = {
 const dramfaceSavedRules = {
   kind: "review",
   articles: {
+    document: "html",
     oneArticlePer: "article.blog-basic-grid--container",
     link: "h1.blog-title a[href]",
     skipWhen: null,
@@ -578,6 +580,134 @@ const dramfaceSavedRules = {
     },
   },
 } as const satisfies ScrapeRules;
+
+const elementArticleRules = {
+  ...currentReviewRules,
+  articles: {
+    document: "html",
+    oneArticlePer: "body",
+    link: "a[href]",
+    skipWhen: null,
+    nextPage: null,
+    limit: 10,
+  },
+  article: {
+    ...currentReviewRules.article,
+    title: pageText("h1"),
+    publishedDate: {
+      try: [{ get: "dateFromUrl", format: "/yyyy/MM/dd/example.html" }],
+    },
+    reviews: {
+      inside: "body",
+      oneReviewPer: "element",
+      selector: "article.review",
+      contains: null,
+      name: reviewText("h2"),
+      reviewer: null,
+      tastingNotes: null,
+      score: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: ".score",
+            take: "first",
+            match: ["{value} points"],
+            addStart: null,
+            addEnd: " points",
+          },
+        ],
+        scale: 100,
+        map: null,
+      },
+    },
+  },
+} as const satisfies ScrapeRules;
+
+test("reads text links from an XML review index", () => {
+  const rules = {
+    ...currentReviewRules,
+    articles: {
+      document: "xml",
+      oneArticlePer: "item",
+      link: "link",
+      skipWhen: {
+        selector: "title",
+        match: ["{anything}rum{anything}"],
+      },
+      nextPage: null,
+      limit: 20,
+    },
+  } as const satisfies ScrapeRules;
+
+  expect(
+    parseScrapeList(
+      rules,
+      `
+        <rss><channel>
+          <item>
+            <title>A little trio of malts</title>
+            <link>https://reviews.test/2026/malts.html</link>
+          </item>
+          <item>
+            <title>A few rums</title>
+            <link>https://reviews.test/2026/rums.html</link>
+          </item>
+        </channel></rss>
+      `,
+      new URL("https://reviews.test/whatsnew.xml"),
+    ),
+  ).toEqual({
+    links: ["https://reviews.test/2026/malts.html"],
+    nextPageUrl: null,
+    issues: [],
+  });
+});
+
+test("reads formatted dates from attributes and filters review elements", () => {
+  const rules = {
+    ...elementArticleRules,
+    article: {
+      ...elementArticleRules.article,
+      publishedDate: {
+        try: [
+          {
+            get: "dateFromAttribute",
+            selector: "a[name]",
+            attribute: "name",
+            format: "ddMMyy",
+          },
+        ],
+      },
+      reviews: {
+        ...elementArticleRules.article.reviews,
+        selector: "article",
+        contains: "h2",
+      },
+    },
+  } as const satisfies ScrapeRules;
+
+  const result = parseScrapeDetail(
+    rules,
+    `
+      <a name="070926"></a><h1>September seven</h1>
+      <article><p>Introduction</p></article>
+      <article><h2>Example Malt</h2><span class="score">88 points</span></article>
+    `,
+    new URL("https://reviews.test/2026/example.html"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        publishedAt: new Date("2026-09-07T00:00:00.000Z"),
+        externalReviews: [{ name: "Example Malt" }],
+      },
+    },
+  });
+});
 
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseScrapeDetail>,
