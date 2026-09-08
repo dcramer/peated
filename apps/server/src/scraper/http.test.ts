@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { BOT_USER_AGENT } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
@@ -7,7 +8,10 @@ import {
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
+import { generateKeyPairSync } from "node:crypto";
 import { vi } from "vitest";
+import { verify } from "web-bot-auth";
+import { verifierFromJWK } from "web-bot-auth/crypto";
 import { z } from "zod";
 import {
   createScraperRegistry,
@@ -180,6 +184,7 @@ test("sends an identified bounded GET and exposes only safe response headers", a
         expect(new Headers(init?.headers).get("user-agent")).toBe(
           BOT_USER_AGENT,
         );
+        expect(new Headers(init?.headers).get("signature")).toBeNull();
         expect(init).toMatchObject({ method: "GET", redirect: "manual" });
         return new Response("catalog", {
           headers: {
@@ -215,6 +220,79 @@ test("sends an identified bounded GET and exposes only safe response headers", a
     .where(eq(externalSiteRuns.id, run.id));
   expect(runState).toMatchObject({ requestCount: 1, retryCount: 0 });
   expect((await db.select().from(scrapeTargets))[0]?.leaseToken).toBeNull();
+});
+
+test("signs requests when the PeatedBot private key is configured", async () => {
+  const { privateKey } = generateKeyPairSync("ed25519");
+  const privateJwk = privateKey.export({ format: "jwk" });
+  const originalKey = config.PEATED_BOT_PRIVATE_JWK;
+  config.PEATED_BOT_PRIVATE_JWK = JSON.stringify(privateJwk);
+  try {
+    const { registry, run } = await setupRuntime();
+    const verifier = await verifierFromJWK(privateJwk);
+    const now = new Date("2026-08-18T12:00:00Z");
+    const fetchImpl = vi.fn<typeof fetch>(async (url, init) => {
+      const signedRequest = new Request(url, init);
+      expect(signedRequest.headers.get("signature-agent")).toBe(
+        '"https://peated.com"',
+      );
+      const verified = await verify(signedRequest, {
+        resolver: () => verifier,
+        now,
+      });
+      expect(verified).toMatchObject({
+        keyid: verifier.keyid,
+        tag: "web-bot-auth",
+      });
+      return new Response("catalog");
+    });
+
+    await requestScraperUrl({
+      runId: run.id,
+      sourceKey: "finedrams",
+      request: {
+        target: "operator",
+        url: new URL("https://example.com/catalog"),
+      },
+      registry,
+      fetchImpl,
+      clock: clockAt(now.toISOString()),
+    });
+
+    expect(fetchImpl).toHaveBeenCalledOnce();
+  } finally {
+    config.PEATED_BOT_PRIVATE_JWK = originalKey;
+  }
+});
+
+test("does not send a request when the PeatedBot key is invalid", async () => {
+  const originalKey = config.PEATED_BOT_PRIVATE_JWK;
+  config.PEATED_BOT_PRIVATE_JWK = '{"kty":"OKP","crv":"Ed25519"}';
+  try {
+    const { registry, run } = await setupRuntime();
+    const fetchImpl = vi.fn<typeof fetch>();
+
+    await expect(
+      requestScraperUrl({
+        runId: run.id,
+        sourceKey: "finedrams",
+        request: {
+          target: "operator",
+          url: new URL("https://example.com/catalog"),
+        },
+        registry,
+        fetchImpl,
+        clock: clockAt(),
+      }),
+    ).rejects.toThrow(
+      "PEATED_BOT_PRIVATE_JWK must contain a private Ed25519 JWK.",
+    );
+
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect((await db.select().from(scrapeTargets))[0]?.leaseToken).toBeNull();
+  } finally {
+    config.PEATED_BOT_PRIVATE_JWK = originalKey;
+  }
 });
 
 test("sends code-authorized POST queries without implicit retries", async () => {

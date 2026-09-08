@@ -7,6 +7,7 @@ import {
   releaseScrapePermit,
 } from "./coordinator";
 import { resolveScraperOrigin } from "./definitions";
+import { signScraperRequest } from "./signing";
 import type { ScraperRegistry, ScraperRequest, ScraperResponse } from "./types";
 
 const MAX_REDIRECTS = 5;
@@ -314,12 +315,27 @@ export async function requestScraperUrl({
         canResumeLater: request.canResumeLater ?? false,
         clock,
       });
+      let requestHeaders: Headers;
+      try {
+        requestHeaders = await signScraperRequest(
+          currentUrl,
+          headers,
+          clock.now(),
+        );
+      } catch (error) {
+        await releaseScrapePermit({
+          targetKey: request.target,
+          token: permit.token,
+          now: clock.now(),
+        });
+        throw error;
+      }
       let response: Response;
       try {
         response = await fetchImpl(currentUrl, {
           method,
           body: request.body,
-          headers,
+          headers: requestHeaders,
           redirect: "manual",
           signal: AbortSignal.timeout(permit.timeoutMs),
         });

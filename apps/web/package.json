@@ -49,6 +49,7 @@
     "autoprefixer": "^10.4.27",
     "dayjs": "^1.11.19",
     "fathom-client": "^3.7.2",
+    "http-message-sig": "0.3.0",
     "iron-session": "^8.0.4",
     "isomorphic-dompurify": "^2.12.0",
     "lucide-react": "^1.35.0",
@@ -62,6 +63,7 @@
     "react-qr-code": "^2.0.18",
     "schema-dts": "^1.1.5",
     "usehooks-ts": "^3.1.1",
+    "web-bot-auth": "0.2.0",
     "zod": "catalog:"
   },
   "devDependencies": {
