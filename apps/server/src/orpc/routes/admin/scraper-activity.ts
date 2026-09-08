@@ -79,8 +79,8 @@ function savedKindForRun(
     case "price":
       return "prices";
     case "bottle":
-      return "catalogListings";
     case "catalog":
+      return "catalogListings";
     case null:
       return null;
   }
