@@ -387,6 +387,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      undici:
+        specifier: 7.22.0
+        version: 7.22.0
       web-bot-auth:
         specifier: 0.2.0
         version: 0.2.0

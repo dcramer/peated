@@ -158,7 +158,7 @@ export async function ensureRobotsAllowed({
   url,
   canResumeLater,
   registry,
-  fetchImpl = fetch,
+  fetchImpl,
   clock,
 }: {
   runId: number;

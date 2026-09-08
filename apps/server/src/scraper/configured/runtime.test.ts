@@ -17,10 +17,11 @@ import {
   storePrices,
   users,
 } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { eq } from "drizzle-orm";
 import { vi } from "vitest";
 import { createScraperRegistry } from "../definitions";
-import type { ScraperHttpClock } from "../http";
+import { ScraperRequestError, type ScraperHttpClock } from "../http";
 import { executeScraperRun } from "../runs";
 import type { ScrapeRules } from "./rules";
 import {
@@ -127,7 +128,9 @@ function catalogRules() {
   } as const satisfies ScrapeRules;
 }
 
-async function setupCatalogSource() {
+async function setupCatalogSource(
+  websiteUrl = "https://catalog.example/whisky",
+) {
   const [user] = await db
     .insert(users)
     .values({
@@ -140,7 +143,7 @@ async function setupCatalogSource() {
   const { site, source } = await createSiteWithScrapeSource({
     name: "Official Catalog",
     kind: "catalog",
-    websiteUrl: "https://catalog.example/whisky",
+    websiteUrl,
     createdById: user.id,
   });
   const revision = await createScrapeSourceRevision({
@@ -396,6 +399,38 @@ test("resumes a detail page from its redirect", async () => {
     detailUrls: ["https://catalog.example/whisky/release"],
     detailIndex: 1,
   });
+});
+
+test("fails a configured source before requesting a reserved destination", async () => {
+  const { revision, site, source, user } = await setupCatalogSource(
+    "http://127.0.0.1/catalog",
+  );
+  const pinned = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: site.id,
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+    requestedById: user.id,
+    trigger: "manual",
+    purpose: "preview",
+  });
+  const fetchImpl = vi.fn<typeof fetch>();
+
+  const error = await waitError(
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "reserved-destination-owner",
+    }),
+    ScraperRequestError,
+  );
+  expect(error.category).toBe("invalid_request");
+
+  expect(fetchImpl).not.toHaveBeenCalled();
+  const [run] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(run).toMatchObject({ status: "failed", requestCount: 0 });
 });
 
 test("collects and updates only catalog listings", async () => {

@@ -290,7 +290,7 @@ export async function executeScraperRun(
   input: ScraperRunPayload,
   {
     registry,
-    fetchImpl = fetch,
+    fetchImpl,
     clock = scraperSystemClock,
     executionToken = randomUUID(),
   }: {
