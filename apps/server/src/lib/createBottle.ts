@@ -390,8 +390,9 @@ async function findExactBottleIdentityInTransaction(
   tx: AnyTransaction,
   bottle: NewBottle,
 ) {
-  // Names are marketed titles, not unique ids. Serialize same-title creates and
-  // compare the structured identity that can safely prove an exact duplicate.
+  // BottleGroup relates releases of one expression; it does not collapse their
+  // Bottle-owned exact fields. Serialize same-title creates and compare the
+  // structured identity that can safely prove an exact duplicate.
   await tx.execute(
     sql`SELECT pg_advisory_xact_lock(hashtext(${`bottle:identity:${bottle.fullName.toLowerCase()}`}))`,
   );
@@ -406,6 +407,7 @@ async function findExactBottleIdentityInTransaction(
         sql`${bottles.statedAge} IS NOT DISTINCT FROM ${bottle.statedAge ?? null}`,
         sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${bottle.noAgeStatement ?? null}`,
         sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${bottle.vintageYear ?? null}`,
+        sql`${bottles.bottlingYear} IS NOT DISTINCT FROM ${bottle.bottlingYear ?? null}`,
         sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${bottle.releaseYear ?? null}`,
         sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${bottle.releaseMonth ?? null}`,
         sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${bottle.releaseDay ?? null}`,
@@ -602,6 +604,8 @@ export async function createBottleInTransaction(
     });
   }
 
+  // TODO(catalog): Add a reviewed regrouping operation so verified releases of
+  // one expression can share a BottleGroup without guessing from their names.
   const group = await createIndependentGroupPrefix(tx, {
     actorId: createdByActorId,
     fields: groupFields,
