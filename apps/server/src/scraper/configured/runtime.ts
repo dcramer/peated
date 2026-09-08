@@ -15,7 +15,7 @@ import {
 } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { ScraperHttpStatusError } from "../http";
+import { ScraperHttpStatusError, ScraperRequestWaitError } from "../http";
 import { catalogListingSink } from "../sinks/catalogListings";
 import { externalReviewSink } from "../sinks/externalReviews";
 import { createStorePriceSink } from "../sinks/storePrices";
@@ -211,11 +211,20 @@ function createScrapeSourceAdapter(
           ]);
         }
         listUrls.add(state.nextListUrl);
-        const listResponse = await session.request({
-          target: input.targetKey,
-          url: new URL(state.nextListUrl),
-          canResumeLater: true,
-        });
+        let listResponse;
+        try {
+          listResponse = await session.request({
+            target: input.targetKey,
+            url: new URL(state.nextListUrl),
+            canResumeLater: true,
+          });
+        } catch (error) {
+          if (error instanceof ScraperRequestWaitError && error.resumeUrl) {
+            state = { ...state, nextListUrl: error.resumeUrl.toString() };
+            await session.checkpoint(state);
+          }
+          throw error;
+        }
         const listResult = parseScrapeList(
           input.rules,
           listResponse.body,
@@ -240,11 +249,22 @@ function createScrapeSourceAdapter(
       while (state.detailIndex < state.detailUrls.length) {
         const link = state.detailUrls[state.detailIndex];
         if (!link) throw new Error("Configured scraper detail URL is missing.");
-        const response = await session.request({
-          target: input.targetKey,
-          url: new URL(link),
-          canResumeLater: true,
-        });
+        let response;
+        try {
+          response = await session.request({
+            target: input.targetKey,
+            url: new URL(link),
+            canResumeLater: true,
+          });
+        } catch (error) {
+          if (error instanceof ScraperRequestWaitError && error.resumeUrl) {
+            const detailUrls = [...state.detailUrls];
+            detailUrls[state.detailIndex] = error.resumeUrl.toString();
+            state = { ...state, detailUrls };
+            await session.checkpoint(state);
+          }
+          throw error;
+        }
         const parsed = parseScrapeDetail(
           input.rules,
           response.body,

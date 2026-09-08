@@ -635,6 +635,21 @@ function parseNumber(value: string | null) {
   return Number.isFinite(number) ? number : null;
 }
 
+function parseScore(value: string | null) {
+  if (!value) return null;
+  const labeled = value
+    .replaceAll(",", "")
+    .match(/(-?\d+(?:\.\d+)?)\s*(?:points?\b|\/\s*\d+)/iu);
+  return labeled ? Number(labeled[1]) : parseNumber(value);
+}
+
+function parsePlainNumber(value: string) {
+  const normalized = value.trim().replaceAll(",", "");
+  if (!/^-?\d+(?:\.\d+)?$/u.test(normalized)) return null;
+  const number = Number(normalized);
+  return Number.isFinite(number) ? number : null;
+}
+
 function parsePriceInSmallestUnit(value: string | null) {
   const number = parseNumber(value);
   if (number === null || number <= 0) return null;
@@ -658,13 +673,34 @@ function parseDisplayedPrice(value: string | null) {
 function parseVolume(value: string | null) {
   if (!value) return null;
   const normalized = value.toLowerCase().replaceAll(",", "");
-  const number = parseNumber(normalized);
+  const amount = normalized.match(/(-?\d+(?:\.\d+)?)\s*(ml|cl|l)(?:\b|$)/u);
+  const number = amount ? Number(amount[1]) : parsePlainNumber(normalized);
   if (number === null || number <= 0) return null;
-  if (normalized.includes("cl")) return Math.round(number * 10);
-  if (/(?:^|[^a-z])l(?:[^a-z]|$)/.test(normalized)) {
-    return Math.round(number * 1000);
-  }
+  if (amount?.[2] === "cl") return Math.round(number * 10);
+  if (amount?.[2] === "l") return Math.round(number * 1000);
   return Math.round(number);
+}
+
+function parseAbv(value: string | null) {
+  if (!value) return null;
+  const match = value.match(
+    /(?:\b(?:abv|alcohol)\s*:?\s*)?(\d+(?:\.\d+)?)\s*%(?:\s*(?:abv|vol(?:ume)?))?/iu,
+  );
+  return match ? Number(match[1]) : parsePlainNumber(value);
+}
+
+function parseStatedAge(value: string | null) {
+  if (!value) return null;
+  const match = value.match(
+    /(\d+(?:\.\d+)?)\s*(?:years?\s*old|y\.?\s*o\.?)\b/iu,
+  );
+  return match ? Number(match[1]) : parsePlainNumber(value);
+}
+
+function parseReleaseYear(value: string | null) {
+  if (!value) return null;
+  const match = value.match(/\b(?:19|20)\d{2}\b/u);
+  return match ? Number(match[0]) : parsePlainNumber(value);
 }
 
 function validationIssues(
@@ -1458,11 +1494,15 @@ function readElement(
   selected: ReturnType<ReturnType<typeof load>>,
   kind: PageValueKind,
 ) {
-  return (
-    PAGE_VALUE_ATTRIBUTES[kind]
-      .map((attribute) => normalizeValue(selected.attr(attribute)))
-      .find(Boolean) ?? normalizeValue(readText(selected))
-  );
+  const attributeValue = PAGE_VALUE_ATTRIBUTES[kind]
+    .map((attribute) => normalizeValue(selected.attr(attribute)))
+    .find(Boolean);
+  if (attributeValue) return attributeValue;
+  if (kind === "id") {
+    const id = normalizeValue(selected.attr("id"));
+    if (id) return id.replace(/^product-/iu, "");
+  }
+  return normalizeValue(readText(selected));
 }
 
 function readSelectedValue(
@@ -1504,7 +1544,11 @@ function readArticleReviewValue(
 }
 
 function reviewNameFromTitle(title: string) {
-  return title.replace(/\s+review$/iu, "").trim() || title;
+  return title.replace(/\s+(?:shelf\s+)?review$/iu, "").trim() || title;
+}
+
+function reviewerNameFromText(value: string | null) {
+  return value?.replace(/^by\s+/iu, "").trim() || null;
 }
 
 function dateFromPageUrl(pageUrl: URL) {
@@ -1702,10 +1746,15 @@ function parseReviewPage(
     reviewItems && reviewerSelector
       ? readArticleReviewValue($, reviewerSelector, reviewItems)
       : null;
+  const nameSelector = rules.detail.reviews.name;
+  const sharedReviewName =
+    reviewItems?.length === 1 && nameSelector
+      ? readArticleReviewValue($, nameSelector, reviewItems)
+      : null;
 
   reviewItems?.forEach(({ body, item }, index) => {
-    const name = rules.detail.reviews.name
-      ? readSelectedValue(item, rules.detail.reviews.name)
+    const name = nameSelector
+      ? (readSelectedValue(item, nameSelector) ?? sharedReviewName)
       : title
         ? reviewNameFromTitle(title)
         : null;
@@ -1716,9 +1765,11 @@ function parseReviewPage(
       });
       return;
     }
-    const reviewerName = reviewerSelector
-      ? (readSelectedValue(item, reviewerSelector) ?? sharedReviewerName)
-      : null;
+    const reviewerName = reviewerNameFromText(
+      reviewerSelector
+        ? (readSelectedValue(item, reviewerSelector) ?? sharedReviewerName)
+        : null,
+    );
     const firstKey = reviewSourceKey(name, reviewerName);
     const repeat = (keyCounts.get(firstKey) ?? 0) + 1;
     keyCounts.set(firstKey, repeat);
@@ -1730,7 +1781,7 @@ function parseReviewPage(
           ? readSelectedValue($, scoreRule.selector)
           : null))
       : null;
-    const scoreValue = parseNumber(scoreText);
+    const scoreValue = parseScore(scoreText);
     if (scoreText && scoreValue === null) {
       issues.push({
         field: "detail.reviews.score",
@@ -1808,6 +1859,14 @@ function readProductUrl(
   return value ? sameWebsiteUrl(value, pageUrl) : pageUrl.toString();
 }
 
+function cleanProductName(value: string | null) {
+  return (
+    value
+      ?.replace(/\s+[–-]\s*[$£€]\s*\d[\d,.]*(?:\s*[A-Z]{3})?\s*$/u, "")
+      .trim() || null
+  );
+}
+
 function readImageUrl(
   $: ReturnType<typeof load>,
   selector: string | null,
@@ -1842,12 +1901,13 @@ function parseProductPage(
   const readOptional = (
     selector: string | null,
     kind: PageValueKind = "text",
-  ) => (selector ? readSelectedValue($, selector, kind) : null);
+    joinMatches = false,
+  ) => (selector ? readSelectedValue($, selector, kind, joinMatches) : null);
   const volume = isFixedVolume(rules.detail.volume)
     ? rules.detail.volume
-    : parseVolume(readOptional(rules.detail.volume));
+    : parseVolume(readOptional(rules.detail.volume, "text", true));
   const common = {
-    name: readSelectedValue($, rules.detail.name),
+    name: cleanProductName(readSelectedValue($, rules.detail.name)),
     url: readProductUrl($, rules.detail.url, pageUrl),
     externalProductId: readOptional(rules.detail.id, "id") ?? undefined,
     imageUrl: readImageUrl($, rules.detail.image, pageUrl),
@@ -1857,7 +1917,9 @@ function parseProductPage(
   if (rules.kind === "price") {
     const result = StorePriceInputSchema.safeParse({
       ...common,
-      price: parseDisplayedPrice(readSelectedValue($, rules.detail.price)),
+      price: parseDisplayedPrice(
+        readSelectedValue($, rules.detail.price, "text", true),
+      ),
       currency: rules.detail.currency,
       barcode: readOptional(rules.detail.barcode, "id") ?? undefined,
     });
@@ -1871,9 +1933,11 @@ function parseProductPage(
   }
 
   const sourceBottleIdentity = {
-    stated_age: parseNumber(readOptional(rules.detail.age)),
-    abv: parseNumber(readOptional(rules.detail.abv)),
-    release_year: parseNumber(readOptional(rules.detail.year)),
+    stated_age: parseStatedAge(readOptional(rules.detail.age, "text", true)),
+    abv: parseAbv(readOptional(rules.detail.abv, "text", true)),
+    release_year: parseReleaseYear(
+      readOptional(rules.detail.year, "text", true),
+    ),
     edition: readOptional(rules.detail.edition),
   };
   const result = CatalogListingInputSchema.safeParse({

@@ -89,10 +89,12 @@ stay on the source website. Code reads at most five list pages and stops at
 Fields on an article or product page are CSS selectors too. Code reads text by
 default. It reads `href` from links, `src` from images, `datetime` from dates,
 `content` from meta tags, and `value` from form fields. It also trims spaces,
-makes full URLs, and reads prices, scores, dates, and volumes. A price source
-can use a number of milliliters as a fixed volume. Rules do not contain cleanup
-steps or text templates. Put unusual cleanup for one source in a small named
-function.
+makes full URLs, and reads prices, scores, dates, volumes, strength, ages, and
+release years. A selector may match a short group of facts; code finds values
+beside familiar labels such as `70cl`, `46% ABV`, `10 Year Old`, and `91 points`.
+A price source can use a number of milliliters as a fixed volume. Rules do not
+contain cleanup steps or text templates. Put unusual cleanup for one source in
+a small named function.
 
 For reviews, `detail.reviews.area` selects the one area containing the review
 text. Set `item` to the HTML element around each review. When reviews have no
@@ -172,7 +174,8 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 
 The input has the same `listUrl` and `rules` fields accepted by the API. Set
 `rulesVersion` to `10` for new rules. An omitted version means version 1 so
-existing preview files keep their original behavior:
+existing preview files keep their original behavior. If the site exists only
+in production, the command creates the local records needed for the preview:
 
 ```json
 {

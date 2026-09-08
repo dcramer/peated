@@ -39,6 +39,7 @@ export class ScraperRequestWaitError extends Error {
   constructor(
     readonly reason: ScraperWaitReason,
     readonly nextEligibleAt: Date | null,
+    readonly resumeUrl: URL | null = null,
   ) {
     super(`Scraper request must wait: ${reason}.`);
   }
@@ -310,14 +311,26 @@ export async function requestScraperUrl({
     let retry = 0;
 
     while (true) {
-      const permit = await acquireOrDefer({
-        runId,
-        executionToken,
-        targetKey: request.target,
-        isRetry: retry > 0,
-        canResumeLater: request.canResumeLater ?? false,
-        clock,
-      });
+      let permit;
+      try {
+        permit = await acquireOrDefer({
+          runId,
+          executionToken,
+          targetKey: request.target,
+          isRetry: retry > 0,
+          canResumeLater: request.canResumeLater ?? false,
+          clock,
+        });
+      } catch (error) {
+        if (error instanceof ScraperRequestWaitError && redirect > 0) {
+          throw new ScraperRequestWaitError(
+            error.reason,
+            error.nextEligibleAt,
+            currentUrl,
+          );
+        }
+        throw error;
+      }
       let requestHeaders: Headers;
       try {
         requestHeaders = await signScraperRequest(
@@ -378,7 +391,11 @@ export async function requestScraperUrl({
           retryAt: retryAfter,
           now: clock.now(),
         });
-        throw new ScraperRequestWaitError("rate_limited", nextEligibleAt);
+        throw new ScraperRequestWaitError(
+          "rate_limited",
+          nextEligibleAt,
+          redirect > 0 ? currentUrl : null,
+        );
       }
 
       if (

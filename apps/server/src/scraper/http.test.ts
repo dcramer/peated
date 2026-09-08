@@ -393,6 +393,35 @@ test("follows declared redirects and rejects an undeclared redirect before conta
   expect(unsafeFetch).toHaveBeenCalledTimes(1);
 });
 
+test("returns the redirect URL when saved work must wait", async () => {
+  const { registry, run } = await setupRuntime({ requestsPerHour: 30 });
+  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(
+    new Response(null, {
+      status: 302,
+      headers: { location: "https://example.com/final" },
+    }),
+  );
+
+  await expect(
+    requestScraperUrl({
+      runId: run.id,
+      sourceKey: "finedrams",
+      request: {
+        target: "operator",
+        url: new URL("https://example.com/start"),
+        canResumeLater: true,
+      },
+      registry,
+      fetchImpl,
+      clock: clockAt(),
+    }),
+  ).rejects.toMatchObject({
+    reason: "target_spacing",
+    resumeUrl: new URL("https://example.com/final"),
+  });
+  expect(fetchImpl).toHaveBeenCalledOnce();
+});
+
 test("retries only transient failures and reacquires a permit", async () => {
   const { registry, run } = await setupRuntime();
   const fetchImpl = vi

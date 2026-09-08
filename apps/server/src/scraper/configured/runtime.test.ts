@@ -348,6 +348,56 @@ test("previews an official catalog without writing listings", async () => {
   expect(await db.select().from(storePrices)).toHaveLength(0);
 });
 
+test("resumes a detail page from its redirect", async () => {
+  const { revision, site, source, user } = await setupCatalogSource();
+  const pinned = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: site.id,
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+    requestedById: user.id,
+    trigger: "manual",
+    purpose: "preview",
+  });
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/whisky") {
+      return new Response(
+        '<article class="product"><a href="/old-release">Release</a></article>',
+      );
+    }
+    if (url.pathname === "/old-release") {
+      return new Response(null, {
+        status: 301,
+        headers: { location: "/whisky/release" },
+      });
+    }
+    if (url.pathname === "/whisky/release") {
+      return new Response(
+        '<main data-product-id="official-1"><h1>Official Release</h1><span class="volume">70 cl</span></main>',
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  });
+
+  await expect(
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "redirected-catalog-preview",
+    }),
+  ).resolves.toEqual({ status: "completed" });
+  expect(fetchImpl).toHaveBeenCalledTimes(3);
+
+  const [run] = await db
+    .select({ cursor: externalSiteRuns.cursor })
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(run?.cursor).toMatchObject({
+    detailUrls: ["https://catalog.example/whisky/release"],
+    detailIndex: 1,
+  });
+});
+
 test("collects and updates only catalog listings", async () => {
   const { revision, site, source, user } = await setupCatalogSource();
   await recordScrapeSourcePreview({
