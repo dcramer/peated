@@ -25,14 +25,15 @@ export default function BotPage() {
       <ContentSection title="What it reads">
         <ContentText>
           PeatedBot reads public catalog and product pages for bottle names,
-          producers, release facts, images, prices, and availability. It reads
-          public review pages for titles, writers, dates, scores, Bottle names,
-          and review text.
+          producers, ages, strengths, release years, images, prices, and
+          availability. It reads public review pages for titles, writers, dates,
+          scores, bottle names, and review text.
         </ContentText>
         <ContentText>
-          Peated stores normalized facts, source links, and attribution. Full
-          review text may be kept privately so Peated can update parsing without
-          fetching the page again. Peated does not publish that full text.
+          Peated stores bottle facts, source links, and credit to the original
+          website. Full review text may be stored privately so Peated can
+          improve how it reads pages without requesting them again. Peated does
+          not publish that full text.
         </ContentText>
       </ContentSection>
       <ContentSection title="How it behaves">
@@ -40,13 +41,16 @@ export default function BotPage() {
           <li>
             It identifies requests as PeatedBot/1.0 and links to this page.
           </li>
-          <li>It follows robots.txt for the PeatedBot product token.</li>
+          <li>It follows robots.txt rules written for PeatedBot.</li>
           <li>
-            Each source has its own request rate. Requests are spaced through
-            the hour.
+            Each website has its own request limit. PeatedBot spreads those
+            requests across the hour.
           </li>
-          <li>It obeys 429 responses and the Retry-After header.</li>
-          <li>It uses bounded runs, timeouts, retries, and response sizes.</li>
+          <li>
+            It obeys HTTP 429 responses and waits for the time named in
+            Retry-After.
+          </li>
+          <li>It limits each run, request, retry, and download.</li>
           <li>It does not bypass authentication or access controls.</li>
         </ContentList>
       </ContentSection>

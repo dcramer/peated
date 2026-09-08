@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
 import { chmod, mkdir, realpath, stat, writeFile } from "node:fs/promises";
 import {
@@ -15,6 +14,7 @@ import { fileURLToPath } from "node:url";
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryDirectory = resolve(scriptDirectory, "../../..");
 const filename = "peated-bot-private.jwk";
+const encodedKeyPattern = /^[A-Za-z0-9_-]{43}$/;
 
 function isWithin(parent, candidate) {
   const pathFromParent = relative(parent, candidate);
@@ -89,10 +89,14 @@ async function main() {
   const { privateKey } = generateKeyPairSync("ed25519");
   const jwk = privateKey.export({ format: "jwk" });
 
-  assert.equal(jwk.kty, "OKP");
-  assert.equal(jwk.crv, "Ed25519");
-  assert.match(jwk.x, /^[A-Za-z0-9_-]+$/);
-  assert.match(jwk.d, /^[A-Za-z0-9_-]+$/);
+  if (
+    jwk.kty !== "OKP" ||
+    jwk.crv !== "Ed25519" ||
+    !encodedKeyPattern.test(jwk.x ?? "") ||
+    !encodedKeyPattern.test(jwk.d ?? "")
+  ) {
+    throw new Error("Node.js did not generate a valid Ed25519 private key.");
+  }
 
   try {
     await writeFile(outputPath, `${JSON.stringify(jwk)}\n`, {

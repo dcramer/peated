@@ -15,16 +15,18 @@ const PrivateJwkSchema = z
     kty: z.literal("OKP"),
     crv: z.literal("Ed25519"),
     alg: z.literal("EdDSA").optional(),
-    x: z.string().min(1),
-    d: z.string().min(1),
+    x: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+    d: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   })
-  .passthrough();
+  .strip();
 
 function parsePrivateJwk(configuredKey: string) {
   let value: unknown;
   try {
     value = JSON.parse(configuredKey);
   } catch {
+    // Sensitive-data policy: JSON parse errors can quote the private key, so do
+    // not preserve the parser error as the cause.
     throw new Error("PEATED_BOT_PRIVATE_JWK must be valid JSON.");
   }
 

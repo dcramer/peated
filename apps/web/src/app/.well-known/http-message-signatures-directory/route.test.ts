@@ -26,6 +26,18 @@ describe("HTTP message signature directory", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
 
+  it("reports invalid configuration without repeating the configured value", async () => {
+    vi.stubEnv("PEATED_BOT_PRIVATE_JWK", "private-value-that-must-stay-hidden");
+
+    await expect(
+      GET(
+        new Request(
+          "https://peated.com/.well-known/http-message-signatures-directory",
+        ),
+      ),
+    ).rejects.toThrow("PEATED_BOT_PRIVATE_JWK must be valid JSON.");
+  });
+
   it("publishes only the public key in a signed directory", async () => {
     const { privateKey } = generateKeyPairSync("ed25519");
     const privateJwk = privateKey.export({ format: "jwk" });
@@ -40,16 +52,11 @@ describe("HTTP message signature directory", () => {
     expect(response.headers.get("content-type")).toBe(
       "application/http-message-signatures-directory+json",
     );
-    expect(directory).toEqual({
-      keys: [
-        {
-          kty: "OKP",
-          crv: "Ed25519",
-          x: privateJwk.x,
-        },
-      ],
-    });
-    expect(directory.keys[0]).not.toHaveProperty("d");
+    const publishedKey = directory.keys[0];
+    expect(publishedKey.kty).toBe("OKP");
+    expect(publishedKey.crv).toBe("Ed25519");
+    expect(publishedKey.x).toBe(privateJwk.x);
+    expect(Object.keys(publishedKey).sort()).toEqual(["crv", "kty", "x"]);
 
     const verifier = await verifierFromJWK(privateJwk);
     const descriptor: ResponseDescriptor = {

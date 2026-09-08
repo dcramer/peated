@@ -1,22 +1,22 @@
-# PeatedBot Request Signing
+# PeatedBot request signing
 
-PeatedBot identifies scraper traffic with
-`PeatedBot/1.0 (+https://peated.com/bot)` and signs requests using Cloudflare Web
-Bot Auth. The private signing key is a deployment secret. The public key is
-served from
+PeatedBot identifies its requests with
+`PeatedBot/1.0 (+https://peated.com/bot)`. It uses Cloudflare Web Bot Auth to
+prove that those requests came from Peated. The private signing key is a
+deployment secret. Peated serves the matching public key from
 `https://peated.com/.well-known/http-message-signatures-directory`.
 
-Cloudflare registration and a production source check are operational steps.
+Cloudflare registration and a production website check are operational steps.
 They cannot be completed by merging code alone.
 
 ## Create the key
 
-Create a dedicated Ed25519 key on a trusted workstation. Do not create it in
-the repository or a shared temporary directory. Replace the example directory
-below with a private local path. The repository script creates the directory,
-sets restrictive permissions, validates the generated JWK, and refuses to
-overwrite an existing key. It uses Peated's supported Node.js version, so this
-does not depend on the system OpenSSL build:
+Create a dedicated Ed25519 key on a trusted workstation. The script stores it
+in JSON Web Key (JWK) format. Do not create it in the repository or a shared
+temporary directory. Replace the example directory below with a private local
+path. The repository script creates the directory, limits access to it, checks
+the generated key, and refuses to overwrite an existing key. It uses Peated's
+supported Node.js version, so it does not depend on the system OpenSSL build:
 
 ```bash
 PEATED_BOT_KEY_DIR="/path/to/private/peated-bot-key"
@@ -61,38 +61,39 @@ Deploy the web and scraper services before registration.
 1. Request the public directory and confirm it returns HTTP 200,
    `Content-Type: application/http-message-signatures-directory+json`,
    `Signature-Input`, and `Signature`.
-2. Confirm every published key contains only `kty`, `crv`, and `x`. A `d`
-   property is a private key leak. Remove the secret and deployment immediately
-   if it appears.
-3. From a server environment with the secret, run the crawl check:
+2. Confirm every published key contains only `kty`, `crv`, and `x`. The `d`
+   field contains the private key. Remove the secret and deployment immediately
+   if it appears in the response.
+3. From a server environment with the secret, run Cloudflare's request check:
 
    ```bash
    pnpm --filter @peated/server check:peated-bot-signature
    ```
 
-   This uses the same signing function as the shared scraper transport and does
-   not print request headers. Before registration, HTTP 401 is expected when the
-   format is valid but the key is unknown. After registration, require HTTP 200;
-   HTTP 401 can also mean that a known key failed verification. HTTP 400 means
-   the request format is invalid.
+   This uses the same signing function as the shared scraper request code and
+   does not print request headers. Before registration, HTTP 401 is expected
+   when the format is valid but the key is unknown. After registration, require
+   HTTP 200; HTTP 401 can also mean that a known key failed verification. HTTP
+   400 means the request format is invalid.
 
-4. Confirm an ordinary unsigned-compatible source still completes through
+4. Confirm a source that does not require a signature still completes through
    Admin → Scrapers.
 
-Do not print request headers while checking a signed request. The signature is
-short-lived, but it is still authentication material.
+Do not print request headers while checking a signed request. Someone could
+reuse the signature before it expires.
 
 ## Register with Cloudflare
 
 In the Cloudflare dashboard, open Manage Account → Configurations → Bot
 Submission Form. Choose **Request Signature** as the verification method. Use
-the public directory URL as the validation instruction and list
+the public key directory URL for **Validation Instructions** and list
 `PeatedBot/1.0 (+https://peated.com/bot)` as the user agent.
 
 After Cloudflare accepts the submission:
 
 1. Repeat the crawl test and require HTTP 200.
-2. Run one bounded catalog request against a Cloudflare-backed source.
+2. Run one catalog request, with the usual limits, against a site protected by
+   Cloudflare.
 3. Record the UTC time, source, HTTP status, and scraper run ID in the issue or
    deployment record. Do not record request headers or the fetched body.
 4. If Springbank still returns its Cloudflare block page, record that the site
@@ -109,8 +110,9 @@ publishes one key. Rotate during a short scraper pause:
 3. Change the web deployment to publish the new key.
 4. Submit or update the new public key with Cloudflare and wait for acceptance.
 5. Change the worker and API secrets to the new key, then resume scraper work.
-6. Require HTTP 200 from the crawl test and verify a Cloudflare-backed source.
-7. Remove the old key from every deployment and the recovery store.
+6. Require HTTP 200 from the crawl test and verify a site protected by
+   Cloudflare.
+7. Remove the old key from every deployment and the secret manager.
 
 If the private key is lost, create and register a new key. If it may have been
 exposed, remove it from scraper services first, contact Cloudflare to revoke the

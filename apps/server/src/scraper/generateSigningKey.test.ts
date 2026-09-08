@@ -34,9 +34,10 @@ describe("generate-peated-bot-key", () => {
       `Created ${join(await realpath(outputDirectory), "peated-bot-private.jwk")}\n`,
     );
     const key = JSON.parse(await readFile(outputPath, "utf8"));
-    expect(key).toMatchObject({ kty: "OKP", crv: "Ed25519" });
-    expect(key.x).toMatch(/^[A-Za-z0-9_-]+$/);
-    expect(key.d).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(key.kty).toBe("OKP");
+    expect(key.crv).toBe("Ed25519");
+    expect(/^[A-Za-z0-9_-]{43}$/.test(key.x ?? "")).toBe(true);
+    expect(/^[A-Za-z0-9_-]{43}$/.test(key.d ?? "")).toBe(true);
     expect((await stat(outputDirectory)).mode & 0o777).toBe(0o700);
     expect((await stat(outputPath)).mode & 0o777).toBe(0o600);
   });

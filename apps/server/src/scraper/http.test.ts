@@ -265,6 +265,36 @@ test("signs requests when the PeatedBot private key is configured", async () => 
   }
 });
 
+test("does not send a request when the PeatedBot key is invalid", async () => {
+  const originalKey = config.PEATED_BOT_PRIVATE_JWK;
+  config.PEATED_BOT_PRIVATE_JWK = '{"kty":"OKP","crv":"Ed25519"}';
+  try {
+    const { registry, run } = await setupRuntime();
+    const fetchImpl = vi.fn<typeof fetch>();
+
+    await expect(
+      requestScraperUrl({
+        runId: run.id,
+        sourceKey: "finedrams",
+        request: {
+          target: "operator",
+          url: new URL("https://example.com/catalog"),
+        },
+        registry,
+        fetchImpl,
+        clock: clockAt(),
+      }),
+    ).rejects.toThrow(
+      "PEATED_BOT_PRIVATE_JWK must contain a private Ed25519 JWK.",
+    );
+
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect((await db.select().from(scrapeTargets))[0]?.leaseToken).toBeNull();
+  } finally {
+    config.PEATED_BOT_PRIVATE_JWK = originalKey;
+  }
+});
+
 test("sends code-authorized POST queries without implicit retries", async () => {
   const { registry, run } = await setupRuntime({
     allowedRequestHeaders: ["x-catalog-key"],
