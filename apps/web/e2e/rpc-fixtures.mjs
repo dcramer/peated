@@ -298,6 +298,7 @@ export function buildBottle({
     maxScore: null,
     memberScoreCount: 0,
     externalScoreCount: 0,
+    raterCount: 0,
     scoreCount: 0,
     reviewScoreBandCounts: {
       mediocre: 0,
@@ -461,6 +462,7 @@ export const exactMatchedBottle = {
   maxScore: null,
   memberScoreCount: 0,
   externalScoreCount: 0,
+  raterCount: 0,
   scoreCount: 0,
   totalTastings: 0,
   isFavorite: false,
@@ -526,6 +528,7 @@ export function buildBottleGroup({
     maxScore: bottle.maxScore,
     memberScoreCount: bottle.memberScoreCount,
     externalScoreCount: bottle.externalScoreCount,
+    raterCount: bottle.raterCount,
     scoreCount: bottle.scoreCount,
     reviewScoreBandCounts: {
       mediocre: 0,
@@ -635,6 +638,7 @@ export const bottleGroup = {
   maxScore: null,
   memberScoreCount: 11,
   externalScoreCount: 0,
+  raterCount: 11,
   scoreCount: 11,
   totalTastings: 37,
   totalBottles: 3,

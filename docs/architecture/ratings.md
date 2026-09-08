@@ -167,6 +167,8 @@ Bottle and BottleGroup summaries store:
 
 - `medianScore`, `minScore`, and `maxScore`
 - `memberScoreCount` and `externalScoreCount`
+- `raterCount`, the number of distinct Peated members with a scored review or
+  rated tasting, plus distinct external critic sites with an included score
 - `publicReviewAndTastingCount`, the number of public tastings, public member
   reviews, and published visible external reviews
 - `notedReviewAndTastingCount`, the number of those records with at least one
@@ -195,6 +197,11 @@ data. Application code calls them `legacySimpleRatingAverage` and
 stay `null` when no counted scores exist. The median uses the lower middle value
 when the count is even.
 
+`raterCount` deduplicates one Peated member across their review and every rated
+tasting for the Bottle scope. It also deduplicates multiple included reviews
+from the same external critic site. BottleGroup summaries apply the same rule
+across every active member Bottle; they do not sum saved Bottle counts.
+
 Bottle structured data does not expose this combined median as an
 `AggregateRating`. Search engines define that value as an average and prohibit
 aggregating ratings from other sites, while Peated's Bottle summary is a median
@@ -206,8 +213,9 @@ visible as the exact score. Otherwise, the lower-middle tasting band supplies
 the label and the UI shows that band's range rather than inventing a point
 score. The bottle header keeps this summary short and leaves the rating
 breakdown with the review and tasting lists. Compact bottle rows add
-`reviewScoreBandCounts` and `tastingBandCounts` by band for their distribution.
-Individual external reviews still show their original score and scale.
+the distinct-rater count and, on wide layouts, the exact review-score minimum
+and maximum. Narrow rows omit that range line. Individual external reviews
+still show their original score and scale.
 
 Exact Bottle summaries use only that Bottle. BottleGroup summaries combine all
 active members. They exclude retired Bottles. Entity combined counts sum the
@@ -236,6 +244,9 @@ BottleGroups.
 Migration 0276 adds the combined public counts and note-category cache. Run the
 same repair after deploying it to backfill those summaries before relying on
 the new public ordering and flavor reads.
+
+Migration 0281 adds the distinct rater count. Run the same repair after
+deploying it to backfill Bottle and BottleGroup counts before showing them.
 
 ## Public reviews-and-tastings lists
 

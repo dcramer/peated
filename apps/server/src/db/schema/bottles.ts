@@ -259,6 +259,7 @@ export const bottles = pgTable(
     externalScoreCount: bigint("external_score_count", { mode: "number" })
       .default(0)
       .notNull(),
+    raterCount: bigint("rater_count", { mode: "number" }).default(0).notNull(),
     reviewScoreBandCounts: jsonb("review_score_band_counts")
       .default(EMPTY_REVIEW_SCORE_BAND_COUNTS)
       .notNull()
@@ -436,6 +437,7 @@ export const bottleGroups = pgTable(
     externalScoreCount: bigint("external_score_count", { mode: "number" })
       .default(0)
       .notNull(),
+    raterCount: bigint("rater_count", { mode: "number" }).default(0).notNull(),
     reviewScoreBandCounts: jsonb("review_score_band_counts")
       .default(EMPTY_REVIEW_SCORE_BAND_COUNTS)
       .notNull()

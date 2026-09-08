@@ -421,11 +421,15 @@ JSDoc.
 - Do not add decorative axis labels to compact distributions.
 - Bottle rating summaries use one label from the fixed rating ranges. Show an
   exact review median beside that label when available; for tastings alone,
-  show the full range. Compact rows use a small right-aligned label, value, and
-  distribution without counts. In bottle headers, show the value first and its
-  label underneath; keep the section's accessible name without repeating
-  “Bottle rating” on screen. Do not add source labels or the compact
-  distribution there. Omit the whole summary when no rating exists.
+  show the full range. Standard bottle rows use a three-line, right-aligned
+  summary: the label; a distinct-rater count with the people icon and the bold
+  median; then the exact review-score minimum and maximum joined by a bounded
+  line. Keep the median at the right edge. On narrow rows, omit the range line.
+  Hide the count when it has not been computed, and omit a range with equal
+  endpoints. In bottle headers, show the value first and its label underneath;
+  keep the section's accessible name without repeating “Bottle rating” on
+  screen. Do not add source labels or row details there. Omit the whole summary
+  when no rating exists.
 
 ### Storybook
 

@@ -7,14 +7,10 @@ const meta = {
   title: "Components/Ratings/Bottle Ratings",
   component: BottleRatings,
   args: {
+    maxScore: 96,
     median: 91,
-    reviewCounts: {
-      good: 0,
-      mediocre: 0,
-      outstanding: 4,
-      unicorn: 0,
-      very_good: 1,
-    },
+    minScore: 84,
+    raterCount: 24,
     scoreCount: 5,
     tastingCounts: {
       good: 1,
@@ -35,7 +31,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use at the end of a bottle row. It shows the middle review score when one exists. With tastings only, it shows the middle tasting's full range. The bar includes member reviews, critic reviews, and tastings. Bottles with no ratings show nothing.",
+          "Use at the end of a bottle row. It shows the rating name, distinct rater count, and middle review score. Wide rows add the exact review-score range; narrow rows omit it. With tastings only, it shows the middle tasting's full range. Bottles with no ratings show nothing.",
       },
     },
   },
@@ -49,11 +45,14 @@ export const Overview: Story = {
     <StoryStack>
       <BottleRatings {...args} />
       <BottleRatings
+        maxScore={92}
         median={86}
-        reviewCounts={{ good: 1, outstanding: 1, very_good: 3 }}
+        minScore={81}
+        raterCount={5}
         scoreCount={5}
       />
       <BottleRatings
+        raterCount={7}
         tastingCounts={{ outstanding: 2, unicorn: 1, very_good: 4 }}
       />
       <BottleRatings />

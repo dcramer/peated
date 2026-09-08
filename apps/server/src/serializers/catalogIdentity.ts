@@ -57,6 +57,7 @@ export const BottleGroupSummarySerializer = serializer({
       maxScore: item.maxScore,
       memberScoreCount: item.memberScoreCount,
       externalScoreCount: item.externalScoreCount,
+      raterCount: item.raterCount,
       scoreCount: item.memberScoreCount + item.externalScoreCount,
       reviewScoreBandCounts: item.reviewScoreBandCounts,
       tastingBandCounts: item.tastingBandCounts,

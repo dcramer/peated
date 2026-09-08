@@ -60,6 +60,7 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     totalTastings: 3,
     medianScore: null,
     memberScoreCount: 0,
+    raterCount: 2,
     reviewScoreBandCounts: {
       mediocre: 0,
       good: 0,
@@ -77,6 +78,7 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
     totalTastings: 3,
     medianScore: null,
     memberScoreCount: 0,
+    raterCount: 2,
     reviewScoreBandCounts: {
       mediocre: 0,
       good: 0,

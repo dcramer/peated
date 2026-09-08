@@ -141,8 +141,10 @@ export function toBottleListItem(
     isLibrary: bottle.isLibrary,
     ratings: includeRatings
       ? {
+          maxScore: bottle.maxScore,
           median: bottle.medianScore,
-          reviewCounts: bottle.reviewScoreBandCounts,
+          minScore: bottle.minScore,
+          raterCount: bottle.raterCount,
           scoreCount: bottle.scoreCount,
           tastingCounts: bottle.tastingBandCounts,
         }

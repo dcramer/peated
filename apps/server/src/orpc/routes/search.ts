@@ -251,11 +251,13 @@ function bottleColumns() {
     releaseYear: bottles.releaseYear,
     imageUrl: bottles.imageUrl,
     medianScore: bottles.medianScore,
+    minScore: bottles.minScore,
+    maxScore: bottles.maxScore,
+    raterCount: bottles.raterCount,
     scoreCount:
       sql<number>`${bottles.memberScoreCount} + ${bottles.externalScoreCount}`.mapWith(
         Number,
       ),
-    reviewScoreBandCounts: bottles.reviewScoreBandCounts,
     tastingBandCounts: bottles.tastingBandCounts,
     brand: {
       name: entities.name,

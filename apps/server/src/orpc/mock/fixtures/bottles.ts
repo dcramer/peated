@@ -41,6 +41,7 @@ function scoreSummary(medianScore: number, scoreCount: number) {
     maxScore: Math.min(100, medianScore + 6),
     memberScoreCount: scoreCount - externalScoreCount,
     externalScoreCount,
+    raterCount: scoreCount,
     scoreCount,
     reviewScoreBandCounts,
     tastingBandCounts: {
