@@ -85,8 +85,7 @@ export async function prepareReviewSource(
           `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
         );
       }
-      // Migration rule: repeated identical reviews keep their original insert order.
-      const reviewKeyCounts = new Map<string, number>();
+      const reviewKeys = new Set<string>();
       return articleReviews
         .toSorted((left, right) => left.id - right.id)
         .map((review) => {
@@ -95,20 +94,16 @@ export async function prepareReviewSource(
               `Check the URL and review records for ${definition.siteName} article ${article.id} before continuing.`,
             );
           }
-          const firstReviewKey = reviewSourceKey(
-            review.name,
-            review.reviewerName,
-          );
-          const repeatedReviewNumber =
-            (reviewKeyCounts.get(firstReviewKey) ?? 0) + 1;
-          reviewKeyCounts.set(firstReviewKey, repeatedReviewNumber);
+          const sourceKey = reviewSourceKey(review.name, review.reviewerName);
+          if (reviewKeys.has(sourceKey)) {
+            throw new ScrapeSourceValidationError(
+              `Each review in ${definition.siteName} article ${article.id} must have a unique name and writer combination.`,
+            );
+          }
+          reviewKeys.add(sourceKey);
           return {
             id: review.id,
-            sourceKey: reviewSourceKey(
-              review.name,
-              review.reviewerName,
-              repeatedReviewNumber,
-            ),
+            sourceKey,
           };
         });
     });
