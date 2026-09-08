@@ -103,6 +103,7 @@ export function ButtonLink({
       {children}
       {props.href &&
       isInternalAppHref(props.href) &&
+      !props.reloadDocument &&
       props.download === undefined ? (
         <LinkPending />
       ) : null}
