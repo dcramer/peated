@@ -7,6 +7,7 @@ import {
 export const reviewRules = {
   kind: "review" as const,
   articles: {
+    document: "html",
     oneArticlePer: "li",
     link: "a.review",
     skipWhen: null,
@@ -41,6 +42,7 @@ export const reviewRules = {
       inside: "body",
       oneReviewPer: "element" as const,
       selector: "article.review",
+      contains: null,
       name: {
         try: [
           {

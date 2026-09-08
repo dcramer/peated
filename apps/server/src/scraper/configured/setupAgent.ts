@@ -20,7 +20,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v16";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v18";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -94,10 +94,10 @@ const RULE_INSTRUCTIONS = [
   "You have at most three checks. Do not answer with an explanation.",
   "</tool>",
   "<success_criteria>",
-  "Use articles or products to find one link inside each result on the chosen start page.",
+  "Use articles or products to find one link inside each result on the chosen start page. Set articles.document to html for webpages or xml for a public XML index.",
   "Use short CSS selectors that work across the supplied pages.",
   "For reviews, inside selects the article area that contains the reviews.",
-  'Use oneReviewPer "element" when each selected element is a complete review.',
+  'Use oneReviewPer "element" when each selected element is a complete review. Set contains only when each review element must contain another selector; otherwise set contains to null.',
   'Use oneReviewPer "section" when a heading or label starts each review. startsAt finds those labels and stopBefore can mark the end of all reviews.',
   'For sections, use whenOnlyOneReview "useWholeArea" only when one review needs the introduction before its label. Otherwise use "startAtReview".',
   "For sections, inside must select the closest single area shared by all review starts. Each start must be in a separate direct part of that area, even when the start is nested inside layout elements.",
@@ -105,6 +105,7 @@ const RULE_INSTRUCTIONS = [
   'A review field can read from the current review or from the article. Article reads must say whether they apply to "firstReview" or "everyReview".',
   "Set tastingNotes only when the page has a reliable narrower selection for flavor tags and clips. The full review body is saved from the review selection.",
   "When a date exists only in the article URL, use dateFromUrl with a format made from yyyy, yy, MM, dd, and * tokens.",
+  "Use dateFromAttribute with the same bounded format when a selected attribute contains the complete date.",
   "Set canonicalUrl only when page markup provides a preferred article URL. Otherwise set it to null.",
   "Include an optional field only when the supplied pages clearly and consistently provide it.",
   "For catalog sources, collect only the displayed name, preferred product page URL, stable product ID, image URL, volume, ABV, age, edition, and release year fields offered by the catalog schema.",
@@ -112,7 +113,7 @@ const RULE_INSTRUCTIONS = [
   "A nextPage selector must add new article or product links.",
   "</success_criteria>",
   "<rules>",
-  "oneArticlePer or oneProductPer must select each result container. link selects an anchor inside it; its href is used automatically.",
+  "oneArticlePer or oneProductPer must select each result container. link selects an anchor inside an HTML result and its href is used automatically. For an XML review index, link selects the element whose text is the URL.",
   "skipWhen selects content inside a result that means it should be skipped. Set it to null when every result should be read.",
   "nextPage selects an anchor whose href leads to the next results page. Set it to null when there is no next page.",
   'Use "src" for image URLs and "datetime" for machine-readable time values when those attributes exist.',

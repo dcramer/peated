@@ -85,6 +85,7 @@ function reviewRules(titleSelector = "h1", paginate = false) {
   return {
     kind: "review",
     articles: {
+      document: "html",
       oneArticlePer: "body",
       link: "a.review",
       skipWhen: null,
@@ -121,6 +122,7 @@ function reviewRules(titleSelector = "h1", paginate = false) {
         inside: "body",
         oneReviewPer: "element",
         selector: "article.review",
+        contains: null,
         name: {
           try: [
             {

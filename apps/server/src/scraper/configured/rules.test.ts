@@ -34,6 +34,7 @@ test("bounds list and detail pages", () => {
   const rules = ScrapeRulesSchema.parse({
     kind: "review",
     articles: {
+      document: "html",
       oneArticlePer: "article",
       link: "a",
       skipWhen: null,
@@ -68,6 +69,7 @@ test("bounds list and detail pages", () => {
         inside: "main",
         oneReviewPer: "element",
         selector: "article.review",
+        contains: null,
         name: {
           try: [
             {
@@ -89,7 +91,20 @@ test("bounds list and detail pages", () => {
   });
   if (rules.kind !== "review") throw new Error("Expected review rules.");
   expect(rules.articles.limit).toBe(99);
-  expect(parseScrapeRules(8, rules)).toEqual(rules);
+  expect(parseScrapeRules(9, rules)).toEqual(rules);
+  expect(() => parseScrapeRules(8, rules)).toThrow();
+  if (rules.article.reviews.oneReviewPer !== "element") {
+    throw new Error("Expected element review rules.");
+  }
+  const { document: _document, ...version8Articles } = rules.articles;
+  const { contains: _contains, ...version8Reviews } = rules.article.reviews;
+  const version8Rules = {
+    ...rules,
+    articles: version8Articles,
+    article: { ...rules.article, reviews: version8Reviews },
+  };
+  expect(parseScrapeRules(8, version8Rules)).toEqual(version8Rules);
+  expect(() => parseScrapeRules(9, version8Rules)).toThrow();
   expect(() =>
     ScrapeRulesSchema.parse({
       ...rules,
@@ -104,8 +119,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesV5Schema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(9, rules)).toThrow(
-    "Unsupported scrape rules version: 9.",
+  expect(() => parseScrapeRules(10, rules)).toThrow(
+    "Unsupported scrape rules version: 10.",
   );
 });
 
@@ -118,7 +133,7 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(8);
+  expect(SCRAPE_RULES_VERSION).toBe(9);
 });
 
 test("adds catalog rules only in version 7", () => {

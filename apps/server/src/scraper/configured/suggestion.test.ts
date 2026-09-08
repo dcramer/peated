@@ -9,6 +9,7 @@ import {
 const reviewRules = {
   kind: "review",
   articles: {
+    document: "html",
     oneArticlePer: "body",
     link: "a.review",
     skipWhen: null,
@@ -45,6 +46,7 @@ const reviewRules = {
       inside: "body",
       oneReviewPer: "element",
       selector: "article.review",
+      contains: null,
       name: {
         try: [
           {

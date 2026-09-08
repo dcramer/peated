@@ -80,12 +80,14 @@ admin can return to any older revision that passed. Pausing a source stops
 collection but keeps its revisions and run history.
 
 Older rule versions remain supported so saved sources keep working. New
-sources use version 8. A review source has `articles` for finding article links
+sources use version 9. A review source has `articles` for finding article links
 and `article` for reading an article. A price source uses `products` and
 `product` in the same way. `oneArticlePer` or `oneProductPer` identifies each
 result on the list page. `link` finds its link, `skipWhen` can leave out a
 result, and `nextPage` can continue to the next list page. Links must stay on
 the source website. Code follows at most five list pages and stops at `limit`.
+Review indexes set `document` to `html` or `xml`. HTML links use `href`; XML
+links use the selected element's text.
 
 Each field has an ordered `try` list. A read can get text, get an attribute, or
 use a fixed value. The parser uses the first non-empty result. A read can match
@@ -101,7 +103,8 @@ path with bounded `yyyy`, `yy`, `MM`, `dd`, and `*` parts. Scores can map up to
 
 For reviews, `article.reviews.inside` identifies the part of the article that
 contains reviews. `oneReviewPer: "element"` means each selected element is one
-review. `oneReviewPer: "section"` means each matching `startsAt` label starts a
+review. `contains` can require another selector inside each review element.
+`oneReviewPer: "section"` means each matching `startsAt` label starts a
 review; `stopBefore` can mark where the reviews end. `inside` must select the
 closest single area shared by every review start. This also works when layout
 elements wrap the labels and review content. A single section must say whether
@@ -182,16 +185,17 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Set `rulesVersion` to `8` when testing current operations. An omitted
+API. Set `rulesVersion` to `9` when testing current operations. An omitted
 version means version 1 so existing preview files keep their original behavior:
 
 ```json
 {
-  "rulesVersion": 8,
+  "rulesVersion": 9,
   "listUrl": "https://example.com/reviews",
   "rules": {
     "kind": "review",
     "articles": {
+      "document": "html",
       "oneArticlePer": "article",
       "link": "a[href]",
       "skipWhen": null,
@@ -228,6 +232,7 @@ version means version 1 so existing preview files keep their original behavior:
         "inside": "main",
         "oneReviewPer": "element",
         "selector": "article.review",
+        "contains": null,
         "name": {
           "try": [
             {

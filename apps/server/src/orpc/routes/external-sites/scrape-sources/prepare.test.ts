@@ -98,6 +98,15 @@ function prepareWhiskyNotes(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareWhiskyfun(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "whiskyfun", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareDramface(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "dramface", ...input },
@@ -215,6 +224,7 @@ function codeOwnedSource(
     | "northstarspirits"
     | "thompsonbros"
     | "whiskeyreviewer"
+    | "whiskyfun"
     | "whiskynotes"
     | "whiskysaga"
     | "whiskystudy"
@@ -269,6 +279,11 @@ const whiskyNotesCanonicalUrl =
 const whiskyNotesRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("whiskynotes")!],
   sources: [codeOwnedSource("whiskynotes")],
+});
+
+const whiskyfunRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("whiskyfun")!],
+  sources: [codeOwnedSource("whiskyfun")],
 });
 
 const dramfaceCanonicalUrl =
@@ -770,6 +785,61 @@ async function setupWhiskyNotesMigration(bottleIds: [number, number]) {
     completedAt: new Date(),
   });
   return { site, article, reviews };
+}
+
+async function setupWhiskyfunMigration(bottleIds: [number, number]) {
+  const [site] = await db
+    .insert(externalSites)
+    .values({ type: "whiskyfun", name: "Whiskyfun", runEvery: null })
+    .returning();
+  await syncScraperDefinitions(whiskyfunRegistry);
+  const articles = await db
+    .insert(externalReviewArticles)
+    .values([
+      {
+        externalSiteId: site.id,
+        canonicalUrl:
+          "https://www.whiskyfun.com/2026/A-little-example-trio.html",
+        title: "A little example trio",
+        publishedAt: new Date("2026-09-07"),
+      },
+      {
+        externalSiteId: site.id,
+        canonicalUrl:
+          "https://www.whiskyfun.com/archivejuly26-1-Caol-Ila.html#080726",
+        title: "A small example session",
+        publishedAt: new Date("2026-07-08"),
+      },
+    ])
+    .returning();
+  const reviews = await db
+    .insert(externalReviews)
+    .values([
+      {
+        articleId: articles[0]!.id,
+        sourceKey: `whiskyfun:${"a".repeat(64)}`,
+        name: "First Example (46%)",
+        reviewerName: "Serge Valentin",
+        bottleId: bottleIds[0],
+        hidden: true,
+        nativeScoreValue: 88,
+        nativeScoreScale: 100,
+        nativeScoreDisplay: "88 points",
+      },
+      {
+        articleId: articles[1]!.id,
+        sourceKey: `whiskyfun:${"b".repeat(64)}`,
+        name: "Second Example (51.2%)",
+        reviewerName: "Serge Valentin",
+        bottleId: bottleIds[1],
+        hidden: false,
+        nativeScoreValue: 91,
+        nativeScoreScale: 100,
+        nativeScoreDisplay: "91 points",
+      },
+    ])
+    .returning();
+  return { site, articles, reviews };
 }
 
 async function setupCompassBoxMigration() {
@@ -1481,6 +1551,56 @@ describe("POST /admin/scrape-sources/prepare", () => {
     expect(await db.select().from(externalReviews)).toEqual(before);
     expect(await db.select().from(scrapeTargets)).toEqual(targets);
     expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Whiskyfun without replacing current or archive reviews", async ({
+    fixtures,
+  }) => {
+    const firstBottle = await fixtures.Bottle();
+    const secondBottle = await fixtures.Bottle();
+    const { site, articles, reviews } = await setupWhiskyfunMigration([
+      firstBottle.id,
+      secondBottle.id,
+    ]);
+
+    await expect(prepareWhiskyfun()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      reviewCount: 2,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(externalReviews)).toEqual(reviews);
+
+    const applied = await prepareWhiskyfun({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      reviewCount: 2,
+      applied: true,
+    });
+    await syncScraperDefinitions(whiskyfunRegistry);
+    expect(await db.select().from(externalReviewArticles)).toEqual(articles);
+    expect(await db.select().from(externalReviews)).toEqual([
+      {
+        ...reviews[0],
+        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName),
+      },
+      {
+        ...reviews[1],
+        sourceKey: reviewSourceKey(reviews[1].name, reviews[1].reviewerName),
+      },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "review",
+        listUrl: "https://www.whiskyfun.com/whatsnew.xml",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
   });
 
   test("prepares WhiskyNotes without replacing multi-review records", async ({
@@ -2734,6 +2854,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
       rules: {
         kind: "review",
         articles: {
+          document: "html",
           oneArticlePer: "body",
           link: "a.review",
           skipWhen: null,
@@ -2770,6 +2891,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
             inside: "body",
             oneReviewPer: "element",
             selector: ".entry-content",
+            contains: null,
             name: {
               try: [
                 {

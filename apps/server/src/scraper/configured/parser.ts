@@ -370,7 +370,13 @@ function parseSavedList(
   html: string,
   pageUrl: URL,
 ): ScrapeListResult {
-  const $ = load(html);
+  const document =
+    "articles" in rules &&
+    "document" in rules.articles &&
+    rules.articles.document === "xml"
+      ? "xml"
+      : "html";
+  const $ = load(html, document === "xml" ? { xmlMode: true } : undefined);
   const issues: ScrapeIssue[] = [];
   const links = new Set<string>();
   const list = rules.kind === "review" ? rules.articles : rules.products;
@@ -383,7 +389,10 @@ function parseSavedList(
   let skippedItemCount = 0;
   try {
     for (const itemElement of itemElements) {
-      const item = load($.html(itemElement));
+      const item = load(
+        $.html(itemElement),
+        document === "xml" ? { xmlMode: true } : undefined,
+      );
       if (list.skipWhen) {
         const skipWhen = list.skipWhen;
         const matches = item(skipWhen.selector).toArray();
@@ -413,7 +422,9 @@ function parseSavedList(
       }
       const itemLinks = item(list.link).toArray();
       for (const element of itemLinks) {
-        const raw = item(element).attr("href");
+        const raw =
+          item(element).attr("href") ??
+          (document === "xml" ? readText(item(element)) : null);
         if (!raw?.trim()) continue;
         try {
           links.add(absoluteHttpUrl(raw.trim(), pageUrl));
@@ -476,7 +487,7 @@ function parseDate(value: string | null) {
   return Number.isFinite(timestamp) ? new Date(timestamp) : null;
 }
 
-function parseDateFromUrl(url: URL, format: string) {
+function parseDateWithFormat(value: string, format: string) {
   // Rules v3 owns this token grammar; literals are escaped so saved rules cannot run regex code.
   const tokens: string[] = [];
   let pattern = "^";
@@ -498,7 +509,7 @@ function parseDateFromUrl(url: URL, format: string) {
   pattern += format.slice(offset).replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
   pattern += "$";
 
-  const match = new RegExp(pattern, "u").exec(url.pathname);
+  const match = new RegExp(pattern, "u").exec(value);
   if (!match) return null;
   const values = new Map<string, number>();
   for (const [index, token] of tokens.entries()) {
@@ -526,6 +537,10 @@ function parseDateFromUrl(url: URL, format: string) {
     date.getUTCDate() === day
     ? date
     : null;
+}
+
+function parseDateFromUrl(url: URL, format: string) {
+  return parseDateWithFormat(url.pathname, format);
 }
 
 function parseNumber(value: string | null) {
@@ -933,6 +948,11 @@ function selectSavedReviewItems(
   if (rules.oneReviewPer === "element") {
     return area
       .find(rules.selector)
+      .filter((_, element) =>
+        "contains" in rules && rules.contains
+          ? $(element).find(rules.contains).length > 0
+          : true,
+      )
       .toArray()
       .map((element) => ({
         body: $(element),
@@ -1038,6 +1058,12 @@ function readPublishedDate(
   for (const rule of field.try) {
     if (rule.get === "dateFromUrl") {
       const date = parseDateFromUrl(pageUrl, rule.format);
+      if (date) return date;
+      continue;
+    }
+    if (rule.get === "dateFromAttribute") {
+      const value = $(rule.selector).first().attr(rule.attribute);
+      const date = value ? parseDateWithFormat(value, rule.format) : null;
       if (date) return date;
       continue;
     }
