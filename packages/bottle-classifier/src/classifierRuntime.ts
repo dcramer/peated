@@ -111,8 +111,8 @@ export type {
   BottleClassifierToolEvent,
 } from "./runtime/bottleCheckRuntime";
 
-// A reference run can use eight turns for research and one to return its decision.
-const REFERENCE_CLASSIFIER_MAX_TURNS = 9;
+// A reference run can use 17 turns for research and one to return its decision.
+const REFERENCE_CLASSIFIER_MAX_TURNS = 18;
 const AUDIT_CLASSIFIER_MAX_TURNS = 8;
 // Tool calls run one at a time, so an audit keeps its last turn for the result.
 const CLASSIFIER_MAX_PROPOSED_OPERATIONS = AUDIT_CLASSIFIER_MAX_TURNS - 1;
