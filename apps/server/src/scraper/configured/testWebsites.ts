@@ -154,8 +154,9 @@ export const reviewWebsites: ReviewWebsite[] = [
   },
 ];
 
-/** Live model checks serve fixture HTML over HTTP without intercepting model traffic. */
+/** Live model checks intercept only the fixture origin; model traffic uses system fetch. */
 export async function startReviewWebsite(website: ReviewWebsite) {
+  const systemFetch = globalThis.fetch;
   const pages = new Map(
     await Promise.all(
       Object.entries(website.pages).map(
@@ -169,6 +170,7 @@ export async function startReviewWebsite(website: ReviewWebsite) {
   );
   const requestedPages: string[] = [];
   const missingPages: string[] = [];
+  const origin = `http://${website.key}.reviews.example`;
   const server = createServer((request, response) => {
     const path = request.url ?? "/";
     requestedPages.push(path);
@@ -189,16 +191,25 @@ export async function startReviewWebsite(website: ReviewWebsite) {
         ? "application/rss+xml; charset=utf-8"
         : "text/html; charset=utf-8",
     );
-    const host = request.headers.host;
-    response.end(host ? html.replaceAll("{{origin}}", `http://${host}`) : html);
+    response.end(html.replaceAll("{{origin}}", origin));
   });
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
   const address = z
     .object({ port: z.number().int().positive() })
     .parse(server.address());
+  const localOrigin = `http://127.0.0.1:${address.port}`;
+  const fetchImpl: typeof fetch = async (input, init) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.origin !== origin) return await systemFetch(input, init);
+    return await systemFetch(
+      new URL(`${url.pathname}${url.search}`, localOrigin),
+      init,
+    );
+  };
   return {
-    origin: `http://127.0.0.1:${address.port}`,
+    origin,
+    fetchImpl,
     requestedPages,
     async close() {
       server.closeAllConnections();

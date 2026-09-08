@@ -28,6 +28,7 @@ import {
   describe,
   expect,
   test,
+  vi,
 } from "vitest";
 import { AI_INSTRUCTIONS_VERSION } from "./setupAgent";
 import { reviewWebsites, startReviewWebsite } from "./testWebsites";
@@ -93,6 +94,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
     afterEach(async () => {
       await workerRuntime?.close();
       workerRuntime = undefined;
+      vi.unstubAllGlobals();
       await fixtureWebsite?.close();
       fixtureWebsite = undefined;
     });
@@ -109,6 +111,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         fixtures,
       }) => {
         fixtureWebsite = await startReviewWebsite(website);
+        vi.stubGlobal("fetch", fixtureWebsite.fetchImpl);
         const { origin, requestedPages } = fixtureWebsite;
         const admin = await fixtures.User({ admin: true });
         const context = { context: { user: admin } };
