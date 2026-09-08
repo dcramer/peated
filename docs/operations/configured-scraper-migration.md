@@ -387,6 +387,28 @@ output, trigger one manual collection, and confirm that it updates the same
 price IDs and Bottle links without reviving historical rows. Check the run and
 Sentry before restoring the weekly schedule.
 
+## GlenAllachie
+
+Use the preparation endpoint with `{"site": "glenallachie"}`. The check-only
+request locks and inventories every stored price without changing it. It stops
+if a price does not use the expected shop product URL, numeric Shopify product
+ID, supported whisky name, GBP currency, or 700 ml volume. Applying transfers
+the existing request settings to administrator ownership and adds a paused
+price source whose list page is
+`https://shop.theglenallachie.com/collections/all-products`.
+
+Before applying, stop the `glenallachie` schedule and wait for active runs.
+Save the existing price IDs, product IDs, URLs, Bottle links, hidden states,
+histories, request limits, and run history. Run the current rules through the
+full local no-write preview. Compare every current product with the code
+scraper. The rules must omit unavailable and non-whisky products and preserve
+the Shopify product ID used by existing prices.
+
+After applying, save and preview the reviewed rules. Activate only exact
+output, trigger one manual collection, and confirm that it updates the same
+price IDs and Bottle matches without reviving old products. Check the run and
+Sentry before restoring the saved schedule.
+
 ## If something goes wrong
 
 A request without `apply: true` leaves records unchanged. After applying, keep the
@@ -397,8 +419,8 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture,
-Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, Gordon & MacPhail,
-Kilchoman, Nc'nean, North Star, Thompson Bros., The Whiskey Reviewer,
+Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, GlenAllachie,
+Gordon & MacPhail, Kilchoman, Nc'nean, North Star, Thompson Bros., The Whiskey Reviewer,
 WhiskyNotes, Whisky Saga, The Whisky Study, and Words of Whisky. Other sites are
 rejected without changing records. Add each site's conversion behind this route
 as its existing records are reviewed.

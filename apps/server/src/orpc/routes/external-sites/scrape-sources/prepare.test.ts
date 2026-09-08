@@ -152,6 +152,15 @@ function prepareGordonMacphail(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareGlenAllachie(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "glenallachie", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareKilchoman(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "kilchoman", ...input },
@@ -199,6 +208,7 @@ function codeOwnedSource(
     | "compassbox"
     | "dramface"
     | "edradour"
+    | "glenallachie"
     | "gordonmacphail"
     | "kilchoman"
     | "ncnean"
@@ -291,6 +301,11 @@ const bruichladdichRegistry = createScraperRegistry({
 const gordonMacphailRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("gordonmacphail")!],
   sources: [codeOwnedSource("gordonmacphail")],
+});
+
+const glenAllachieRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("glenallachie")!],
+  sources: [codeOwnedSource("glenallachie")],
 });
 
 const kilchomanRegistry = createScraperRegistry({
@@ -843,6 +858,25 @@ async function setupGordonMacphailMigration() {
     })
     .returning();
   await syncScraperDefinitions(gordonMacphailRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupGlenAllachieMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "glenallachie",
+      name: "GlenAllachie",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(glenAllachieRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -2166,6 +2200,105 @@ describe("POST /admin/scrape-sources/prepare", () => {
       message: expect.stringContaining("Check Gordon & MacPhail price"),
     });
     expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares GlenAllachie without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupGlenAllachieMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "9187573072212",
+      name: "The GlenAllachie 12-year-old",
+      price: 5699,
+      currency: "gbp",
+      volume: 700,
+      url: "https://shop.theglenallachie.com/products/glenallachie-12-year-old",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "9187894034772",
+      name: "White Heather 15-year-old",
+      price: 6999,
+      currency: "gbp",
+      volume: 700,
+      url: "https://shop.theglenallachie.com/products/white-heather-15-year-old",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareGlenAllachie()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareGlenAllachie({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(glenAllachieRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://shop.theglenallachie.com/collections/all-products",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareGlenAllachie({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "GlenAllachie is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected GlenAllachie price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupGlenAllachieMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "not-a-number",
+      name: "Unknown product",
+      currency: "gbp",
+      volume: 700,
+      url: "https://shop.theglenallachie.com/products/unknown-product",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareGlenAllachie({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check GlenAllachie price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
     expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
