@@ -322,7 +322,7 @@ describe("classifier output boundary", () => {
     });
   });
 
-  test("returns a decision after eight research turns", async () => {
+  test("returns a decision after 17 research turns", async () => {
     const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
       reference: { name: "Example Single Malt" },
       extractedIdentity: null,
@@ -343,10 +343,10 @@ describe("classifier output boundary", () => {
         matchedBottleId: null,
         proposedBottle: null,
       },
-      { researchTurns: 8, runOptions: prepared.runOptions },
+      { researchTurns: 17, runOptions: prepared.runOptions },
     );
 
-    expect(turn).toBe(9);
+    expect(turn).toBe(18);
     expect(prepared.runOptions.maxTurns).toBe(turn);
     expect(prepared.getAgentResult(result).decision).toMatchObject({
       action: "no_match",
