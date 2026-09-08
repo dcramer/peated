@@ -11,6 +11,7 @@ import {
   ingestExternalReviewArticle as ingestExternalReviewArticleWithServices,
   type ExternalReviewIngestionServices,
 } from "@peated/server/externalReviews/ingest";
+import { CURRENT_REVIEW_VERSION } from "@peated/server/externalReviews/process";
 import { routerClient } from "@peated/server/orpc/router";
 import { asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -207,6 +208,7 @@ test("stores a review without a clip when generation returns null", async ({
   expect(createReviewClipMock).toHaveBeenCalledWith(sourceText);
   expect(await db.query.externalReviews.findFirst()).toMatchObject({
     clip: null,
+    version: CURRENT_REVIEW_VERSION,
   });
 });
 
@@ -232,10 +234,11 @@ test("does not request a clip when a review has no source text", async ({
   expect(createReviewClipMock).not.toHaveBeenCalled();
   expect(await db.query.externalReviews.findFirst()).toMatchObject({
     clip: null,
+    version: 0,
   });
 });
 
-test("stores a generated clip without storing its source text", async ({
+test("stores a generated clip and its source text for later processing", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
@@ -260,10 +263,11 @@ test("stores a generated clip without storing its source text", async ({
   expect(createReviewClipMock).toHaveBeenCalledWith(sourceText);
   expect(await db.query.externalReviews.findFirst()).toMatchObject({
     clip: "Rich fruit and gentle smoke lead to a dry finish.",
+    version: CURRENT_REVIEW_VERSION,
   });
-  expect(
-    JSON.stringify(await db.query.externalReviews.findFirst()),
-  ).not.toContain(sourceText);
+  expect(await db.query.externalReviewBodies.findFirst()).toMatchObject({
+    body: sourceText,
+  });
 });
 
 test("keeps an existing clip when later generation returns no clip", async ({
@@ -506,7 +510,7 @@ test("retains complete bodies internally, refreshes them per review, and preserv
     { externalReviewId: firstId, body, fetchedAt },
     { externalReviewId: secondId, body: "Second review: oak.", fetchedAt },
   ]);
-  expect(createReviewClipMock).toHaveBeenCalledTimes(1);
+  expect(createReviewClipMock).toHaveBeenCalledTimes(2);
   for (const response of [
     await routerClient.externalReviews.list({
       bottle: bottle.id,
@@ -519,7 +523,7 @@ test("retains complete bodies internally, refreshes them per review, and preserv
   ]) {
     expect(
       response.results.find(({ id }) => id === firstId)?.extractedTags,
-    ).toEqual(["vanilla"]);
+    ).toEqual(["oak", "vanilla"]);
     expect(response.results.every((review) => !("body" in review))).toBe(true);
     expect(JSON.stringify(response)).not.toContain("Long review prose");
   }

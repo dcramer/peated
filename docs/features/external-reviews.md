@@ -39,9 +39,10 @@ parser change must check that reordered reviews do not create duplicates.
 
 ## Review Clips
 
-Adapters may pass tasting text keyed by the matching review source
-key to the shared import. One shared function generates clips for all sources.
-Only the returned clip is published. Model input is not recorded in logs or traces.
+One shared function generates clips from saved review bodies for all sources.
+Older scrapers that only return tasting text save and use that text instead.
+Only the returned clip is published. Model input is not recorded in logs or
+traces.
 
 Missing text, disabled or missing model configuration, invalid output, and
 request failures produce no new clip and do not block ingestion. A failed
@@ -49,9 +50,9 @@ refresh keeps the existing clip. Live clip checks run through `pnpm evals`.
 
 ## Extracted Tasting Tags
 
-Review imports match existing tag names and synonyms against the scraper's
-tasting text, or the full body when separate tasting text is missing. Matching
-ignores case, accepts hyphenated phrases, and counts each tag once per review.
+Review imports match existing tag names and synonyms against the saved review
+body. Matching ignores case, accepts hyphenated phrases, and counts each tag
+once per review.
 Longer phrases win: "dark chocolate" does not also add "chocolate". Shared
 synonyms are skipped unless they match an exact tag name.
 
@@ -66,9 +67,9 @@ the same public Bottle, distillery, and region flavor summaries as public member
 reviews and tastings. Matching makes no model requests and works when clips are
 disabled.
 
-Importing a review with text again replaces its tags, even when nothing matches.
-Imports without text keep previous tags. Existing reviews gain tags on their
-next import with text; the migration does not fill them in.
+Each review stores the version of the code that processed its body. When that
+version changes, a worker updates its tags and clip from the saved body. Reviews
+without a saved body update the next time a scraper imports their text.
 
 ## Internal Review Bodies
 
@@ -80,9 +81,9 @@ bodies on their next import when text is available.
 
 Scrapers select each bottle's full review, including its introduction and
 conclusion. For configurable sources, `article.reviews` defines each full
-review. Optional `tastingNotes` reads narrower text for tags and clips. Older
-rules that select only tasting notes may need updating. Articles with several
-reviews save each review's own section.
+review. Optional `tastingNotes` remains accepted for older rules when a full
+review body is unavailable. Articles with several reviews save each review's
+own section.
 
 Scrapers remove HTML, scripts, forms, navigation, and comments, and keep paragraph
 breaks. The saved body is not cut to the clip input limit; fetch limits still

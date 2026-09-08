@@ -7,7 +7,7 @@ import config from "../config";
 import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo, logTelemetryError } from "../lib/log";
 import { initializeScraperRuntime } from "../scraper";
-import { runJob, type WorkerDispatch } from "./dispatch";
+import { pushUniqueJob, runJob, type WorkerDispatch } from "./dispatch";
 import "./jobs";
 import createNextRepeatingEvents from "./jobs/createNextRepeatingEvents";
 import scheduleScrapers from "./jobs/scheduleScrapers";
@@ -216,6 +216,13 @@ export async function runWorker() {
     );
     scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
       await runJob("CleanupPendingUploads");
+    });
+    scheduledJob("27 * * * *", "update-external-reviews", async () => {
+      await pushUniqueJob(
+        "UpdateExternalReviews",
+        {},
+        { removeOnComplete: true, removeOnFail: false },
+      );
     });
   }
 

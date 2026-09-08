@@ -67,6 +67,7 @@ export const externalReviews = pgTable(
     nativeScoreScale: doublePrecision("native_score_scale"),
     nativeScoreDisplay: text("native_score_display"),
     clip: text("clip"),
+    version: integer("version").default(0).notNull(),
     tags: varchar("tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)
@@ -85,6 +86,7 @@ export const externalReviews = pgTable(
       "review_rating_check",
       sql`${table.legacyNormalizedScore} IS NULL OR ${table.legacyNormalizedScore} BETWEEN 0 AND 100`,
     ),
+    check("review_version_check", sql`${table.version} >= 0`),
     check(
       "review_native_score_check",
       sql`(

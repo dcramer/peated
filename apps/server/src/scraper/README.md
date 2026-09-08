@@ -139,8 +139,9 @@ HTML copies so large page headers do not crowd out links and article content.
 It keeps the page structure and attributes used by selectors. Rule checks and
 collection still parse the original fetched HTML.
 
-For reviews, each selected review is the full body saved internally. Optional
-`tastingNotes` reads narrower text for tags and clips. [External Reviews](../../../../docs/features/external-reviews.md)
+For reviews, each selected review is the full body saved internally and used for
+tags and clips. Older rules can use `tastingNotes` when a full body is not
+available. [External Reviews](../../../../docs/features/external-reviews.md)
 defines what is saved, who can read it, and when it is deleted. Each review can
 read its own writer. An article-level writer is used only when the rules
 explicitly apply it to the first review or every review.

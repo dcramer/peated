@@ -35,6 +35,7 @@ export type JobName =
   | "UpdateSiteReviewScores"
   | "UpdateCountryStats"
   | "UpdateEntityStats"
+  | "UpdateExternalReviews"
   | "UpdateRegionStats"
   | "VerifyBottleCreation"
   | "VerifyEntityCreation";

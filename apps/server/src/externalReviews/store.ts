@@ -21,6 +21,7 @@ import { z } from "zod";
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
   clip: z.string().trim().min(1).max(180).nullable().optional(),
+  version: z.number().int().nonnegative().optional(),
   tags: z.array(z.string().min(1).max(64)).optional(),
   body: z.string().trim().min(1).optional(),
 });
@@ -199,6 +200,9 @@ export async function storeExternalReviewArticleInTransaction(
       values.reviewerName = externalReview.reviewerName;
       if (externalReview.clip !== undefined) {
         values.clip = externalReview.clip;
+      }
+      if (externalReview.version !== undefined) {
+        values.version = externalReview.version;
       }
       // Review imports own these tags. Missing text keeps the previous tags;
       // supplied text replaces them, even when nothing matches.
