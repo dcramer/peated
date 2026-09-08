@@ -771,6 +771,43 @@ describe("scrape source parser", () => {
     });
   });
 
+  it("requests UK prices from GlenAllachie product pages", () => {
+    const rules = {
+      kind: "price",
+      products: {
+        oneProductPer: "article.product",
+        link: "a[href]",
+        skipWhen: null,
+        nextPage: null,
+        limit: 20,
+      },
+      product: {
+        name: pageText("h1"),
+        price: pageText(".price"),
+        currency: "gbp",
+        volume: pageText(".volume"),
+        url: null,
+        externalProductId: null,
+        imageUrl: null,
+        barcode: null,
+      },
+    } as const satisfies ScrapeRules;
+
+    expect(
+      parseScrapeList(
+        rules,
+        '<article class="product"><a href="/products/glenallachie-12">Bottle</a></article>',
+        new URL("https://shop.theglenallachie.com/collections/all-products"),
+      ),
+    ).toEqual({
+      links: [
+        "https://shop.theglenallachie.com/products/glenallachie-12?country=GB",
+      ],
+      nextPageUrl: null,
+      issues: [],
+    });
+  });
+
   it("excludes unavailable list cards with bounded text matching", () => {
     const result = parseScrapeList(
       {
