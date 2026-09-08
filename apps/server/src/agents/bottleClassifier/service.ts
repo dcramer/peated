@@ -4,7 +4,10 @@ import type {
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
 import { AuditBottleInputSchema } from "@peated/bottle-classifier/contract";
-import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
+import type {
+  BottleClassifierRunOptions,
+  RunBottleClassifierAgentInput,
+} from "@peated/bottle-classifier/internal/runtime";
 import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
 import {
   EntityResolutionSchema,
@@ -131,6 +134,7 @@ export function getBottleClassifier(
 async function runBottleReferenceForWorkload(
   input: ClassifyBottleReferenceInput,
   workload: AIGatewayWorkload,
+  options?: BottleClassifierRunOptions,
 ) {
   const reference = normalizeReferenceForClassifier(input.reference);
   const conversationId = buildReferenceConversationId(
@@ -149,11 +153,14 @@ async function runBottleReferenceForWorkload(
       return exactReferenceRun;
     }
 
-    return await getBottleClassifier(workload).runBottleReference({
-      ...input,
-      reference,
-      conversationId,
-    });
+    return await getBottleClassifier(workload).runBottleReference(
+      {
+        ...input,
+        reference,
+        conversationId,
+      },
+      options,
+    );
   });
 }
 
@@ -169,8 +176,9 @@ export async function runBottleReference(input: ClassifyBottleReferenceInput) {
 
 export async function runScrapedBottleReference(
   input: ClassifyBottleReferenceInput,
+  options?: BottleClassifierRunOptions,
 ) {
-  return await runBottleReferenceForWorkload(input, "scraper");
+  return await runBottleReferenceForWorkload(input, "scraper", options);
 }
 
 export async function classifyScrapedBottleReference(

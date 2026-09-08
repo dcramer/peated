@@ -268,6 +268,11 @@ export type RunBottleClassifierAgentInput = {
   resolvedEntities?: EntityResolution[];
   identityAnchor?: BottleClassificationDecision | null;
   webSearchBudget?: BottleWebSearchBudget;
+  signal?: AbortSignal;
+};
+
+export type BottleClassifierRunOptions = {
+  signal?: AbortSignal;
 };
 
 export type BottleClassifierAdapters = BottleClassifierDataSource;
@@ -332,6 +337,7 @@ export type CreateBottleClassifierOptions = BaseCreateBottleClassifierOptions &
 export type BottleClassifier = {
   runBottleReference: (
     input: ClassifyBottleReferenceInput,
+    options?: BottleClassifierRunOptions,
   ) => Promise<BottleReferenceRun>;
   classifyBottleReference: (
     input: ClassifyBottleReferenceInput,
@@ -592,6 +598,7 @@ export async function prepareBottleClassifierAgentRun(
     identityAnchor = null,
     webSearchBudget: inputWebSearchBudget,
     conversationId,
+    signal,
   }: RunBottleClassifierAgentInput,
 ): Promise<PreparedBottleClassifierAgentRun> {
   const dataSource = getBottleClassifierDataSource(options);
@@ -708,6 +715,11 @@ export async function prepareBottleClassifierAgentRun(
       imageEvidence: normalizedImageEvidence,
       state,
     });
+  const runOptions: PreparedBottleClassifierAgentRun["runOptions"] = {
+    maxTurns: REFERENCE_CLASSIFIER_MAX_TURNS,
+    stream: false,
+  };
+  if (signal) runOptions.signal = signal;
 
   return {
     agent,
@@ -725,10 +737,7 @@ export async function prepareBottleClassifierAgentRun(
           ? "none"
           : `${reference.currentBottleId}`,
     },
-    runOptions: {
-      maxTurns: REFERENCE_CLASSIFIER_MAX_TURNS,
-      stream: false,
-    },
+    runOptions,
     webSearchBudget,
     getArtifacts,
     getAgentResult: (result) => {
@@ -1465,6 +1474,7 @@ export function createBottleClassifier(
 
   const runBottleReference = async (
     input: ClassifyBottleReferenceInput,
+    runOptions: BottleClassifierRunOptions = {},
   ): Promise<BottleReferenceRun> => {
     const parsedInput = ClassifyBottleReferenceInputSchema.parse(input);
     const conversationId = buildClassifierConversationId(
@@ -1494,7 +1504,7 @@ export function createBottleClassifier(
         };
       }
 
-      const agentRun = await runBottleClassifierAgentWithBudget({
+      const agentInput: RunBottleClassifierAgentInput = {
         reference: parsedInput.reference,
         conversationId,
         extractedIdentity: artifacts.extractedIdentity,
@@ -1505,7 +1515,9 @@ export function createBottleClassifier(
         resolvedEntities: artifacts.resolvedEntities,
         identityAnchor: preparedEvidence.deterministicDecision,
         webSearchBudget: preparedEvidence.webSearchBudget,
-      });
+      };
+      if (runOptions.signal) agentInput.signal = runOptions.signal;
+      const agentRun = await runBottleClassifierAgentWithBudget(agentInput);
       const agentResult = {
         ...agentRun.agentResult,
         // Extraction provenance is runtime-owned. Agent output cannot replace it.

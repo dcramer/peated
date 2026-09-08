@@ -1,4 +1,5 @@
 import type { ClassifyBottleReferenceInput } from "@peated/bottle-classifier";
+import type { BottleClassifierRunOptions } from "@peated/bottle-classifier/internal/runtime";
 import {
   classifyScrapedBottleReference as classifyWithServerAdapters,
   runScrapedBottleReference as runWithServerAdapters,
@@ -14,7 +15,8 @@ export async function classifyScrapedBottleReference(
 
 export async function runScrapedBottleReference(
   input: ClassifyBottleReferenceInput,
+  options: BottleClassifierRunOptions = {},
   runReference: typeof runWithServerAdapters = runWithServerAdapters,
 ) {
-  return await runReference(input);
+  return await runReference(input, options);
 }

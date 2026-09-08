@@ -12,9 +12,29 @@ import {
 import {
   claimStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
+  STORE_PRICE_MATCH_PROCESSING_LEASE_MS,
 } from "@peated/server/lib/priceMatchingProcessingLease";
 import { resolveStorePriceMatchProposal } from "@peated/server/lib/priceMatchingProposals";
-import { and, asc, eq, exists, inArray, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  exists,
+  gte,
+  inArray,
+  isNull,
+  lt,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
+
+const RETRY_RUN_JOB_ATTEMPTS = 3;
+const RETRY_RUN_ITEM_MAX_ATTEMPTS = 3;
+const RETRY_RUN_ITEM_TIMEOUT_MS =
+  STORE_PRICE_MATCH_PROCESSING_LEASE_MS - 60_000;
+const RETRY_RUN_ITEM_STALE_AFTER_MS =
+  STORE_PRICE_MATCH_PROCESSING_LEASE_MS + 60_000;
 
 export const STORE_PRICE_MATCH_RETRY_RUN_TERMINAL_STATUSES = [
   "completed",
@@ -142,41 +162,96 @@ export async function enqueueStorePriceMatchRetryRunJob({
       runId,
     },
     {
+      attempts: RETRY_RUN_JOB_ATTEMPTS,
+      backoff: {
+        delay: 1_000,
+        type: "exponential",
+      },
       delay: delayMs,
       removeOnComplete: true,
+      removeOnFail: false,
     },
   );
 }
 
-async function claimRetryRunItems({
-  batchSize,
+function getStaleRetryRunItemWhere(runId: number, staleAfterMs: number) {
+  return and(
+    eq(storePriceMatchRetryRunItems.runId, runId),
+    eq(storePriceMatchRetryRunItems.status, "processing"),
+    or(
+      isNull(storePriceMatchRetryRunItems.startedAt),
+      lte(
+        storePriceMatchRetryRunItems.startedAt,
+        sql`NOW() - ${staleAfterMs} * interval '1 millisecond'`,
+      ),
+    ),
+  );
+}
+
+async function claimRetryRunItem({
   runId,
+  staleAfterMs,
 }: {
-  batchSize: number;
   runId: number;
+  staleAfterMs: number;
 }) {
   return await db.transaction(async (tx) => {
-    const pendingItems = await tx
+    // Retry-run worker owns stale-item recovery after the proposal lease can no
+    // longer belong to the interrupted attempt.
+    const exhaustedItems = await tx
+      .update(storePriceMatchRetryRunItems)
+      .set({
+        completedAt: sql`NOW()`,
+        error: "Retry item exceeded its recovery attempts.",
+        status: "failed",
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          getStaleRetryRunItemWhere(runId, staleAfterMs),
+          gte(
+            storePriceMatchRetryRunItems.attempts,
+            RETRY_RUN_ITEM_MAX_ATTEMPTS,
+          ),
+        ),
+      )
+      .returning({ id: storePriceMatchRetryRunItems.id });
+
+    if (exhaustedItems.length) {
+      await tx
+        .update(storePriceMatchRetryRuns)
+        .set({
+          failedCount: sql`${storePriceMatchRetryRuns.failedCount} + ${exhaustedItems.length}`,
+          processedCount: sql`${storePriceMatchRetryRuns.processedCount} + ${exhaustedItems.length}`,
+          updatedAt: sql`NOW()`,
+        })
+        .where(
+          and(
+            eq(storePriceMatchRetryRuns.id, runId),
+            inArray(storePriceMatchRetryRuns.status, ["pending", "running"]),
+          ),
+        );
+    }
+
+    const claimableWhere = or(
+      eq(storePriceMatchRetryRunItems.status, "pending"),
+      and(
+        getStaleRetryRunItemWhere(runId, staleAfterMs),
+        lt(storePriceMatchRetryRunItems.attempts, RETRY_RUN_ITEM_MAX_ATTEMPTS),
+      ),
+    );
+    const [pendingItem] = await tx
       .select({
         id: storePriceMatchRetryRunItems.id,
       })
       .from(storePriceMatchRetryRunItems)
-      .where(
-        and(
-          eq(storePriceMatchRetryRunItems.runId, runId),
-          eq(storePriceMatchRetryRunItems.status, "pending"),
-        ),
-      )
+      .where(and(eq(storePriceMatchRetryRunItems.runId, runId), claimableWhere))
       .orderBy(asc(storePriceMatchRetryRunItems.id))
-      .limit(batchSize);
+      .limit(1);
 
-    const itemIds = pendingItems.map((item) => item.id);
-    if (!itemIds.length) {
-      const noItems: StorePriceMatchRetryRunItem[] = [];
-      return noItems;
-    }
+    if (!pendingItem) return null;
 
-    return await tx
+    const [item] = await tx
       .update(storePriceMatchRetryRunItems)
       .set({
         attempts: sql`${storePriceMatchRetryRunItems.attempts} + 1`,
@@ -186,11 +261,12 @@ async function claimRetryRunItems({
       })
       .where(
         and(
-          inArray(storePriceMatchRetryRunItems.id, itemIds),
-          eq(storePriceMatchRetryRunItems.status, "pending"),
+          eq(storePriceMatchRetryRunItems.id, pendingItem.id),
+          claimableWhere,
         ),
       )
       .returning();
+    return item ?? null;
   });
 }
 
@@ -429,10 +505,12 @@ async function completeRetryRunIfDone(runId: number) {
 }
 
 async function processRetryRunItem({
+  itemTimeoutMs,
   item,
   mode,
   resolveProposal,
 }: {
+  itemTimeoutMs: number;
   item: StorePriceMatchRetryRunItem;
   mode: StorePriceMatchRetryRunMode;
   resolveProposal: ResolveStorePriceMatchProposal;
@@ -450,9 +528,11 @@ async function processRetryRunItem({
   }
 
   try {
+    const signal = AbortSignal.timeout(itemTimeoutMs);
     const proposal = await resolveProposal(item.priceId, {
       force: true,
       processingToken: lease.processingToken,
+      signal,
       ...getRetryRunModeOptions(mode),
     });
     await markRetryRunItemCompleted({
@@ -476,14 +556,18 @@ export async function processStorePriceMatchRetryRun({
   batchSize = config.PRICE_MATCH_RETRY_RUN_BATCH_SIZE,
   delayMs = config.PRICE_MATCH_RETRY_RUN_DELAY_MS,
   enqueueNext = enqueueStorePriceMatchRetryRunJob,
+  itemTimeoutMs = RETRY_RUN_ITEM_TIMEOUT_MS,
   resolveProposal = resolveStorePriceMatchProposal,
   runId,
+  staleAfterMs = RETRY_RUN_ITEM_STALE_AFTER_MS,
 }: {
   batchSize?: number;
   delayMs?: number;
   enqueueNext?: (args: { delayMs?: number; runId: number }) => Promise<void>;
+  itemTimeoutMs?: number;
   resolveProposal?: ResolveStorePriceMatchProposal;
   runId: number;
+  staleAfterMs?: number;
 }) {
   const existingRun = await db.query.storePriceMatchRetryRuns.findFirst({
     where: eq(storePriceMatchRetryRuns.id, runId),
@@ -506,12 +590,19 @@ export async function processStorePriceMatchRetryRun({
     })
     .where(eq(storePriceMatchRetryRuns.id, runId));
 
-  const items = await claimRetryRunItems({ batchSize, runId });
-  if (!items.length) {
-    return await completeRetryRunIfDone(runId);
+  const completedRun = await completeRetryRunIfDone(runId);
+  if (completedRun) {
+    return completedRun;
   }
 
-  for (const item of items) {
+  // Retry-run worker owns durable continuation: queue before slow model work
+  // so a worker restart cannot strand the run.
+  await enqueueNext({ delayMs, runId });
+
+  for (let itemNumber = 0; itemNumber < batchSize; itemNumber += 1) {
+    const item = await claimRetryRunItem({ runId, staleAfterMs });
+    if (!item) break;
+
     const currentRun = await db.query.storePriceMatchRetryRuns.findFirst({
       where: eq(storePriceMatchRetryRuns.id, runId),
     });
@@ -521,18 +612,17 @@ export async function processStorePriceMatchRetryRun({
     }
 
     await processRetryRunItem({
+      itemTimeoutMs,
       item,
       mode: currentRun.mode,
       resolveProposal,
     });
   }
 
-  const completedRun = await completeRetryRunIfDone(runId);
-  if (completedRun) {
-    return completedRun;
+  const finishedRun = await completeRetryRunIfDone(runId);
+  if (finishedRun) {
+    return finishedRun;
   }
-
-  await enqueueNext({ delayMs, runId });
 
   return await db.query.storePriceMatchRetryRuns.findFirst({
     where: eq(storePriceMatchRetryRuns.id, runId),

@@ -4048,8 +4048,14 @@ describe("price match queue", () => {
         runId: result.id,
       },
       {
+        attempts: 3,
+        backoff: {
+          delay: 1_000,
+          type: "exponential",
+        },
         delay: 0,
         removeOnComplete: true,
+        removeOnFail: false,
       },
     );
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(

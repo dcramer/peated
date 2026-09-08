@@ -4,6 +4,7 @@ export {
   type BottleClassifier,
   type BottleClassifierAdapters,
   type BottleClassifierDataSource,
+  type BottleClassifierRunOptions,
   type BottleReferenceRun,
   type CreateBottleClassifierOptions,
   type RunBottleAuditAgentInput,

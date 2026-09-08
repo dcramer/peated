@@ -18,15 +18,16 @@ test("keeps scraped classification on the isolated service capability", async ()
     artifacts: {},
   });
   const run = { result: classification, modelMetadata: null };
+  const signal = AbortSignal.timeout(1_000);
   classifyInService.mockResolvedValue(classification);
   runInService.mockResolvedValue(run);
 
   await expect(
     classifyScrapedBottleReference(input, classifyInService),
   ).resolves.toBe(classification);
-  await expect(runScrapedBottleReference(input, runInService)).resolves.toBe(
-    run,
-  );
+  await expect(
+    runScrapedBottleReference(input, { signal }, runInService),
+  ).resolves.toBe(run);
   expect(classifyInService).toHaveBeenCalledWith(input);
-  expect(runInService).toHaveBeenCalledWith(input);
+  expect(runInService).toHaveBeenCalledWith(input, { signal });
 });
