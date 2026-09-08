@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 
+import { serializeJsonLd } from "./structuredData";
 import { getBottleUrl, getTastingUrl } from "./urls";
 
 type Tasting = Outputs["tastings"]["details"];
@@ -115,5 +116,5 @@ export function serializeTastingStructuredData(
   };
 
   // Tasting SEO embeds member text in a script element; escape HTML delimiters.
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return serializeJsonLd(data);
 }
