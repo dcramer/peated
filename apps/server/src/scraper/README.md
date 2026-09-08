@@ -36,10 +36,10 @@ It covers review publishing, source approval, and rollback.
 ## Registering a source
 
 1. Define a target in `registry.ts`. A target groups sources that must share a
-   request limit. List every website address it may use and either enforce
+   request pace. List every website address it may use and either enforce
    robots.txt or record why robots.txt does not apply.
 2. Define the source with its external-site key, allowed targets, schemas for
-   saved progress and parsed results, request limit, adapter, and save function.
+   saved progress and parsed results, adapter, and save function.
 3. Make the adapter use only its current run. After saving a page, save the
    place where the next run should continue. Repeating the prior page must be
    safe.
@@ -55,12 +55,13 @@ sources must not use it. When converting an old source, remove those helpers
 and move the source out of `adapters/legacy/`.
 
 Give sources the same target only when the same organization runs them and they
-must share one request limit. A target may list several web addresses when that
+must share one request pace. A target may list several web addresses when that
 organization uses more than one host. Do not group sites from their domain
 names alone.
 
 Set `requestsPerHour` for each target. Requests are spread evenly across the
-hour: 60 means one request per minute. A value above 60 needs a short reason.
+hour: 120 means one request every 30 seconds. A value above 120 needs a short
+reason.
 
 ## Scrape sources
 

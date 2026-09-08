@@ -84,7 +84,6 @@ async function setupRun({
         key: "fixture-source",
         externalSiteKey: "finedrams",
         targetKeys: ["fixture-target"],
-        requestLimit,
         cursorSchema: FixtureCursorSchema,
         observationSchema: FixtureObservationSchema,
         adapter,
@@ -299,7 +298,7 @@ test("does not count planned spacing as another run attempt", async () => {
     ),
   ).resolves.toEqual({
     status: "waiting",
-    nextAttemptAt: new Date("2026-08-18T12:01:00Z"),
+    nextAttemptAt: new Date("2026-08-18T12:00:30Z"),
   });
   const [waiting] = await db
     .select()
@@ -318,7 +317,7 @@ test("does not count planned spacing as another run attempt", async () => {
       {
         registry,
         fetchImpl,
-        clock: fixedClock("2026-08-18T12:01:00Z"),
+        clock: fixedClock("2026-08-18T12:00:30Z"),
         executionToken: "second",
       },
     ),

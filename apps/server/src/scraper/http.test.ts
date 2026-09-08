@@ -87,7 +87,6 @@ async function setupRuntime({
         key: "finedrams",
         externalSiteKey: "finedrams",
         targetKeys: ["operator"],
-        requestLimit,
         cursorSchema: z.null(),
         observationSchema: z.string(),
         adapter,

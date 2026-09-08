@@ -63,7 +63,6 @@ export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {
   externalSiteKey: ExternalSiteKey;
   recordType?: "review" | "price" | "catalog" | "bottle";
   targetKeys: readonly [string, ...string[]];
-  requestLimit: number;
   resumeFromLastRun: boolean;
   cursorSchema: z.ZodType<TCursor>;
   observationSchema: z.ZodType<TObservation>;

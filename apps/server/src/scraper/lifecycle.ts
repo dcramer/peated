@@ -28,6 +28,7 @@ import type { ScraperRegistry } from "./types";
 
 const STALE_EXTERNAL_SITE_RUN_MS = 10 * 60_000;
 const EXTERNAL_SITE_RUN_RECONCILE_LIMIT = 100;
+const REQUESTS_BEFORE_PAUSE = 100;
 
 type RunTrigger = ExternalSiteRun["trigger"];
 export type ScraperEnqueue = (
@@ -118,7 +119,7 @@ async function insertRun(
       trigger,
       purpose: "collect",
       requestedById,
-      requestLimit: source.requestLimit,
+      requestLimit: REQUESTS_BEFORE_PAUSE,
       requestErrorCount: 0,
       recordType: source.recordType,
       cursor,
