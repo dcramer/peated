@@ -41,7 +41,7 @@ import {
   type StoredScrapeRules,
 } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
-import { MAX_SUGGESTION_DETAIL_PAGES } from "./setupAgent";
+import { MAX_PAGES_TO_CHECK } from "./setupAgent";
 import { suggestScrapeSourceRevision } from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
@@ -49,7 +49,7 @@ class ScrapeSourceParseError extends Error {
   override name = "ScrapeSourceParseError";
 
   constructor(readonly issues: ScrapeIssue[]) {
-    super("The page did not match the saved parsing rules.");
+    super("The page did not match the saved rules.");
   }
 }
 
@@ -142,6 +142,7 @@ type RecordScrapeSourcePreview = (input: {
 function linkField(rules: StoredScrapeRules) {
   if ("articles" in rules) return "articles.link";
   if ("products" in rules) return "products.link";
+  if ("links" in rules.list) return "list.links";
   return "list.detailLink";
 }
 
@@ -529,7 +530,7 @@ export async function resolveScrapeSourceRunRegistry(
             );
             const likelyDetailPages = findLikelyDetailPages({
               kind: suggestion.source.kind,
-              limit: MAX_SUGGESTION_DETAIL_PAGES,
+              limit: MAX_PAGES_TO_CHECK,
               pages: listPages,
             }).filter((value) => !suppliedDetailUrls.has(value));
             for (const value of likelyDetailPages) {
@@ -627,10 +628,10 @@ export async function resolveScrapeSourceRunRegistry(
 
   const rules = parseScrapeRules(row.revision.rulesVersion, row.revision.rules);
   if (row.run.purpose === "suggest") {
-    throw new Error("An AI run cannot use saved parsing rules.");
+    throw new Error("An AI run cannot use saved rules.");
   }
   if (rules.kind !== row.source.kind) {
-    throw new Error("The parsing rules collect the wrong content.");
+    throw new Error("The rules collect the wrong content.");
   }
   const target = await loadScrapeSourceTarget(row.target);
   const source = createScrapeSourceDefinition({

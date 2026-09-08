@@ -8,72 +8,21 @@ import {
 
 const reviewRules = {
   kind: "review",
-  articles: {
-    document: "html",
-    oneArticlePer: "body",
-    link: "a.review",
-    skipWhen: null,
+  list: {
+    links: "a.review",
     nextPage: null,
     limit: 10,
   },
-  article: {
-    canonicalUrl: null,
-    title: {
-      try: [
-        {
-          get: "text",
-          selector: "h1",
-          take: "first",
-          match: null,
-          addStart: null,
-          addEnd: null,
-        },
-      ],
-    },
-    publishedDate: {
-      try: [
-        {
-          get: "attribute",
-          selector: "time",
-          attribute: "datetime",
-          match: null,
-          addStart: null,
-          addEnd: null,
-        },
-      ],
-    },
+  detail: {
+    url: null,
+    title: "h1",
+    date: "time",
     reviews: {
-      inside: "body",
-      oneReviewPer: "element",
-      selector: "article.review",
-      contains: null,
-      name: {
-        try: [
-          {
-            get: "text",
-            from: "review",
-            selector: "h2",
-            take: "first",
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
+      area: "body",
+      item: "article.review",
+      name: "h2",
       reviewer: null,
-      tastingNotes: {
-        try: [
-          {
-            get: "text",
-            from: "review",
-            selector: ".body",
-            take: "first",
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
+      tastingNotes: ".body",
       score: null,
     },
   },
@@ -109,8 +58,8 @@ test("validates the selected list page and returns its detail links", () => {
 test("checks that pagination adds detail links", async () => {
   const rules = {
     ...reviewRules,
-    articles: {
-      ...reviewRules.articles,
+    list: {
+      ...reviewRules.list,
       nextPage: "a.next",
     },
   };
@@ -146,7 +95,7 @@ test("rejects a list page that was not supplied", () => {
       rules: reviewRules,
       pages: [{ url: "https://example.test/", html: "<main></main>" }],
     }),
-  ).toThrow("The proposed list page was not one of the supplied pages.");
+  ).toThrow("The chosen list page was not one of the given pages.");
 });
 
 test("parses supplied detail pages with the production parser", async () => {
@@ -185,37 +134,23 @@ test("parses supplied detail pages with the production parser", async () => {
 });
 
 test("checks catalog detail pages without returning publisher prose", async () => {
-  const textField = (selector: string) => ({
-    try: [
-      {
-        get: "text" as const,
-        selector,
-        take: "first" as const,
-        match: null,
-        addStart: null,
-        addEnd: null,
-      },
-    ],
-  });
   const rules = {
     kind: "catalog",
-    products: {
-      oneProductPer: "article.product",
-      link: "a[href]",
-      skipWhen: null,
+    list: {
+      links: "article.product a[href]",
       nextPage: null,
       limit: 10,
     },
-    product: {
-      name: textField("h1"),
+    detail: {
+      name: "h1",
       url: null,
-      externalProductId: null,
-      imageUrl: null,
+      id: null,
+      image: null,
       volume: null,
-      abv: textField(".abv"),
-      statedAge: null,
+      abv: ".abv",
+      age: null,
       edition: null,
-      releaseYear: null,
+      year: null,
     },
   } as const satisfies ScrapeRules;
   const detailPages = await checkDetailPages({
@@ -304,7 +239,5 @@ test("rejects suggested rules that do not parse a detail page", async () => {
         html: "<main>Unrelated page</main>",
       }),
     }),
-  ).rejects.toThrow(
-    "The proposed rules did not read an article or product page.",
-  );
+  ).rejects.toThrow("The rules did not read an article or product page.");
 });

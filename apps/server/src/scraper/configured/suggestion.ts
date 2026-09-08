@@ -15,19 +15,21 @@ import type { ScrapeRules } from "./rules";
 import { createScrapeSourceRevision } from "./service";
 import {
   AI_INSTRUCTIONS_VERSION,
-  MAX_SUGGESTION_DETAIL_PAGES,
+  MAX_PAGES_TO_CHECK,
   runScrapeSourceSetupAgent,
-  type AiPage,
+  type WebsitePage,
 } from "./setupAgent";
 import { ScrapeSourceSetupError } from "./setupError";
 
-type SelectedListPage = AiPage & {
+type SelectedListPage = WebsitePage & {
   links: string[];
   firstPageLinks: string[];
   nextPageUrl: string | null;
-  nextPage: (AiPage & { links: string[]; nextPageUrl: string | null }) | null;
+  nextPage:
+    | (WebsitePage & { links: string[]; nextPageUrl: string | null })
+    | null;
 };
-type CheckedDetailPage = AiPage & {
+type CheckedDetailPage = WebsitePage & {
   output:
     | {
         kind: "review";
@@ -71,18 +73,10 @@ type CheckedDetailPage = AiPage & {
       };
 };
 
-function linkField(rules: ScrapeRules) {
-  return rules.kind === "review" ? "articles.link" : "products.link";
-}
-
-function nextPageField(rules: ScrapeRules) {
-  return rules.kind === "review" ? "articles.nextPage" : "products.nextPage";
-}
-
 export function checkListPage(input: {
   listPageUrl: string;
   rules: ScrapeRules;
-  pages: AiPage[];
+  pages: WebsitePage[];
 }): SelectedListPage {
   const selectedUrl = new URL(input.listPageUrl).toString();
   const selected = input.pages.find(
@@ -90,11 +84,11 @@ export function checkListPage(input: {
   );
   if (!selected) {
     throw new ScrapeSourceSetupError(
-      "The proposed list page was not one of the supplied pages.",
+      "The chosen list page was not one of the given pages.",
       [
         {
           field: "listPageUrl",
-          message: "Choose the exact URL of one supplied list page.",
+          message: "Choose the exact URL of one given list page.",
         },
       ],
     );
@@ -106,12 +100,12 @@ export function checkListPage(input: {
   );
   if (result.links.length === 0 || result.issues.length > 0) {
     throw new ScrapeSourceSetupError(
-      "The proposed rules did not read the selected list page.",
+      "The rules did not read the chosen list page.",
       result.issues.length > 0
         ? result.issues
         : [
             {
-              field: linkField(input.rules),
+              field: "list.links",
               message: "The selector did not find any page links.",
             },
           ],
@@ -129,25 +123,22 @@ export function checkListPage(input: {
 export async function checkNextListPage(input: {
   rules: ScrapeRules;
   listPage: SelectedListPage;
-  loadPage: (url: URL) => Promise<AiPage>;
+  loadPage: (url: URL) => Promise<WebsitePage>;
 }): Promise<SelectedListPage> {
   if (!input.listPage.nextPageUrl) return input.listPage;
   if (input.listPage.nextPageUrl === input.listPage.url) {
-    throw new ScrapeSourceSetupError(
-      "The proposed next page repeats the list page.",
-      [
-        {
-          field: nextPageField(input.rules),
-          message: "Select a link to a different list page.",
-        },
-      ],
-    );
+    throw new ScrapeSourceSetupError("The next page repeats the list page.", [
+      {
+        field: "list.nextPage",
+        message: "Select a link to a different list page.",
+      },
+    ]);
   }
   const page = await input.loadPage(new URL(input.listPage.nextPageUrl));
   const result = parseScrapeList(input.rules, page.html, new URL(page.url));
   if (result.issues.length > 0) {
     throw new ScrapeSourceSetupError(
-      "The proposed rules did not read the next list page.",
+      "The rules did not read the next list page.",
       result.issues,
     );
   }
@@ -156,10 +147,10 @@ export async function checkNextListPage(input: {
   for (const link of result.links) links.add(link);
   if (links.size === firstPageLinkCount) {
     throw new ScrapeSourceSetupError(
-      "The proposed next page did not add any new pages.",
+      "The next page did not add any new pages.",
       [
         {
-          field: nextPageField(input.rules),
+          field: "list.nextPage",
           message: "Select the link to the next page of results.",
         },
       ],
@@ -176,11 +167,14 @@ export async function checkNextListPage(input: {
   };
 }
 
-function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
+function parseDetailPage(
+  rules: ScrapeRules,
+  page: WebsitePage,
+): CheckedDetailPage {
   const parsed = parseScrapeDetail(rules, page.html, new URL(page.url));
   if (parsed.issues.length > 0 || !parsed.value) {
     throw new ScrapeSourceSetupError(
-      "The proposed rules did not read an article or product page.",
+      "The rules did not read an article or product page.",
       parsed.issues,
     );
   }
@@ -241,27 +235,24 @@ function parseDetailPage(rules: ScrapeRules, page: AiPage): CheckedDetailPage {
 export async function checkDetailPages(input: {
   rules: ScrapeRules;
   listPage: SelectedListPage;
-  suppliedPages: AiPage[];
-  loadPage: (url: URL) => Promise<AiPage>;
+  suppliedPages: WebsitePage[];
+  loadPage: (url: URL) => Promise<WebsitePage>;
 }): Promise<CheckedDetailPage[]> {
   const suppliedPages = new Map(
     input.suppliedPages.map((page) => [new URL(page.url).toString(), page]),
   );
   const pages: CheckedDetailPage[] = [];
-  for (const link of input.listPage.links.slice(
-    0,
-    MAX_SUGGESTION_DETAIL_PAGES,
-  )) {
+  for (const link of input.listPage.links.slice(0, MAX_PAGES_TO_CHECK)) {
     const page =
       suppliedPages.get(link) ?? (await input.loadPage(new URL(link)));
     pages.push(parseDetailPage(input.rules, page));
   }
   if (pages.length === 0) {
     throw new ScrapeSourceSetupError(
-      "The proposed rules did not find an article or product page.",
+      "The rules did not find an article or product page.",
       [
         {
-          field: linkField(input.rules),
+          field: "list.links",
           message: "The selector did not find a usable page.",
         },
       ],
@@ -307,14 +298,14 @@ async function requestAi(input: {
   return await client.responses.create(request);
 }
 
-/** Creates an inactive revision only after the production parser accepts it. */
+/** Creates an inactive revision only after the production scrape code reads it. */
 export async function suggestScrapeSourceRevision(input: {
   scrapeSourceId: number;
   externalSiteRunId: number;
   createdById: number;
-  listPages: AiPage[];
-  detailPages: AiPage[];
-  loadPage: (url: URL) => Promise<AiPage>;
+  listPages: WebsitePage[];
+  detailPages: WebsitePage[];
+  loadPage: (url: URL) => Promise<WebsitePage>;
 }) {
   const source = await loadAiSource(input.scrapeSourceId);
   const pageCache = new Map(
@@ -340,8 +331,8 @@ export async function suggestScrapeSourceRevision(input: {
         maxOutputTokens: 8_000,
       });
     },
-    checkRules: async (candidate) => {
-      const inspectedPages: AiPage[] = [];
+    checkRules: async (submittedRules) => {
+      const inspectedPages: WebsitePage[] = [];
       const loadPage = async (url: URL) => {
         const key = url.toString();
         const cached = pageCache.get(key);
@@ -353,17 +344,17 @@ export async function suggestScrapeSourceRevision(input: {
       };
       try {
         const firstListPage = checkListPage({
-          listPageUrl: candidate.listPageUrl,
-          rules: candidate.rules,
+          listPageUrl: submittedRules.listPageUrl,
+          rules: submittedRules.rules,
           pages: input.listPages,
         });
         const listPage = await checkNextListPage({
-          rules: candidate.rules,
+          rules: submittedRules.rules,
           listPage: firstListPage,
           loadPage,
         });
         const detailPages = await checkDetailPages({
-          rules: candidate.rules,
+          rules: submittedRules.rules,
           listPage,
           suppliedPages: [...pageCache.values()],
           loadPage,

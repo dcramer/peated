@@ -172,7 +172,7 @@ export async function createScrapeSourceRevision(
     }
     if (source.kind !== rules.kind) {
       throw new ScrapeSourceValidationError(
-        "The parsing rules collect the wrong content.",
+        "The rules collect the wrong content.",
       );
     }
     const [latest] = await tx
@@ -195,7 +195,7 @@ export async function createScrapeSourceRevision(
         createdById: input.createdById,
       })
       .returning();
-    if (!revision) throw new Error("Failed to create parsing-rule revision.");
+    if (!revision) throw new Error("Failed to save the new rule version.");
     return revision;
   });
 }

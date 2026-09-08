@@ -93,20 +93,9 @@ describe("POST /admin/scrape-sources/:id/revisions", () => {
           listUrl: source.listUrl,
           rules: {
             ...reviewRules,
-            article: {
-              ...reviewRules.article,
-              canonicalUrl: {
-                try: [
-                  {
-                    get: "attribute",
-                    selector: 'link[rel="canonical"]',
-                    attribute: "href",
-                    match: ["{value}/"],
-                    addStart: null,
-                    addEnd: null,
-                  },
-                ],
-              },
+            detail: {
+              ...reviewRules.detail,
+              url: 'link[rel="canonical"]',
             },
           },
         }),
@@ -133,19 +122,8 @@ describe("POST /admin/scrape-sources/:id/revisions", () => {
         previewStatus: "pending",
         revision: 1,
         rules: {
-          article: {
-            canonicalUrl: {
-              try: [
-                {
-                  get: "attribute",
-                  selector: 'link[rel="canonical"]',
-                  attribute: "href",
-                  match: ["{value}/"],
-                  addStart: null,
-                  addEnd: null,
-                },
-              ],
-            },
+          detail: {
+            url: 'link[rel="canonical"]',
           },
         },
       },

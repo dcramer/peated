@@ -6,56 +6,19 @@ import {
 
 export const reviewRules = {
   kind: "review" as const,
-  articles: {
-    document: "html",
-    oneArticlePer: "li",
-    link: "a.review",
-    skipWhen: null,
+  list: {
+    links: "li a.review",
     nextPage: null,
     limit: 5,
   },
-  article: {
-    canonicalUrl: null,
-    title: {
-      try: [
-        {
-          get: "text" as const,
-          selector: "h1",
-          take: "first" as const,
-          match: null,
-          addStart: null,
-          addEnd: null,
-        },
-      ],
-    },
-    publishedDate: {
-      try: [
-        {
-          get: "fixed" as const,
-          value: "2026-01-01",
-          addStart: null,
-          addEnd: null,
-        },
-      ],
-    },
+  detail: {
+    url: null,
+    title: "h1",
+    date: "time",
     reviews: {
-      inside: "body",
-      oneReviewPer: "element" as const,
-      selector: "article.review",
-      contains: null,
-      name: {
-        try: [
-          {
-            get: "text" as const,
-            from: "review" as const,
-            selector: "h2",
-            take: "first" as const,
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
+      area: "body",
+      item: "article.review",
+      name: "h2",
       reviewer: null,
       tastingNotes: null,
       score: null,

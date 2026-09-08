@@ -84,72 +84,21 @@ async function runToCompletion({
 function reviewRules(titleSelector = "h1", paginate = false) {
   return {
     kind: "review",
-    articles: {
-      document: "html",
-      oneArticlePer: "body",
-      link: "a.review",
-      skipWhen: null,
+    list: {
+      links: "a.review",
       nextPage: paginate ? "a.next" : null,
       limit: 5,
     },
-    article: {
-      canonicalUrl: null,
-      title: {
-        try: [
-          {
-            get: "text",
-            selector: titleSelector,
-            take: "first",
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
-      publishedDate: {
-        try: [
-          {
-            get: "attribute",
-            selector: "time",
-            attribute: "datetime",
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
+    detail: {
+      url: null,
+      title: titleSelector,
+      date: "time",
       reviews: {
-        inside: "body",
-        oneReviewPer: "element",
-        selector: "article.review",
-        contains: null,
-        name: {
-          try: [
-            {
-              get: "text",
-              from: "review",
-              selector: "h2",
-              take: "first",
-              match: null,
-              addStart: null,
-              addEnd: null,
-            },
-          ],
-        },
+        area: "body",
+        item: "article.review",
+        name: "h2",
         reviewer: null,
-        tastingNotes: {
-          try: [
-            {
-              get: "text",
-              from: "review",
-              selector: ".body",
-              take: "first",
-              match: null,
-              addStart: null,
-              addEnd: null,
-            },
-          ],
-        },
+        tastingNotes: ".body",
         score: null,
       },
     },
@@ -157,46 +106,23 @@ function reviewRules(titleSelector = "h1", paginate = false) {
 }
 
 function catalogRules() {
-  const field = (selector: string, attribute?: string) => ({
-    try: [
-      attribute
-        ? {
-            get: "attribute" as const,
-            selector,
-            attribute,
-            match: null,
-            addStart: null,
-            addEnd: null,
-          }
-        : {
-            get: "text" as const,
-            selector,
-            take: "first" as const,
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-    ],
-  });
   return {
     kind: "catalog",
-    products: {
-      oneProductPer: "article.product",
-      link: "a[href]",
-      skipWhen: null,
+    list: {
+      links: "article.product a[href]",
       nextPage: null,
       limit: 5,
     },
-    product: {
-      name: field("h1"),
+    detail: {
+      name: "h1",
       url: null,
-      externalProductId: field("[data-product-id]", "data-product-id"),
-      imageUrl: null,
-      volume: field(".volume"),
-      abv: field(".abv"),
-      statedAge: null,
+      id: "[data-product-id]",
+      image: null,
+      volume: ".volume",
+      abv: ".abv",
+      age: null,
       edition: null,
-      releaseYear: null,
+      year: null,
     },
   } as const satisfies ScrapeRules;
 }
@@ -594,7 +520,7 @@ test("stores safe validation issues when a selector stops matching", async () =>
       fetchImpl: previewFetch(),
       executionToken: "preview-owner",
     }),
-  ).rejects.toThrow("The page did not match the saved parsing rules.");
+  ).rejects.toThrow("The page did not match the saved rules.");
 
   const [storedRevision] = await db
     .select()
@@ -603,7 +529,7 @@ test("stores safe validation issues when a selector stops matching", async () =>
   expect(storedRevision).toMatchObject({ previewStatus: "failed" });
   expect(storedRevision?.previewResult).toMatchObject({
     pages: [],
-    issues: [expect.objectContaining({ field: "article.title" })],
+    issues: [expect.objectContaining({ field: "detail.title" })],
   });
 });
 
@@ -631,7 +557,7 @@ test("a collection failure does not change the preview result", async () => {
       fetchImpl: previewFetch(),
       executionToken: "collection-owner",
     }),
-  ).rejects.toThrow("The page did not match the saved parsing rules.");
+  ).rejects.toThrow("The page did not match the saved rules.");
 
   const [storedRevision] = await db
     .select()

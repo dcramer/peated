@@ -25,56 +25,19 @@ import {
 
 const rules = {
   kind: "review",
-  articles: {
-    document: "html",
-    oneArticlePer: "body",
-    link: "a.review",
-    skipWhen: null,
+  list: {
+    links: "a.review",
     nextPage: null,
     limit: 99,
   },
-  article: {
-    canonicalUrl: null,
-    title: {
-      try: [
-        {
-          get: "text",
-          selector: "h1",
-          take: "first",
-          match: null,
-          addStart: null,
-          addEnd: null,
-        },
-      ],
-    },
-    publishedDate: {
-      try: [
-        {
-          get: "fixed",
-          value: "2026-01-01",
-          addStart: null,
-          addEnd: null,
-        },
-      ],
-    },
+  detail: {
+    url: null,
+    title: "h1",
+    date: "time",
     reviews: {
-      inside: "body",
-      oneReviewPer: "element",
-      selector: "article.review",
-      contains: null,
-      name: {
-        try: [
-          {
-            get: "text",
-            from: "review",
-            selector: "h2",
-            take: "first",
-            match: null,
-            addStart: null,
-            addEnd: null,
-          },
-        ],
-      },
+      area: "body",
+      item: "article.review",
+      name: "h2",
       reviewer: null,
       tastingNotes: null,
       score: null,
@@ -178,20 +141,9 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     listUrl: "https://versioned.example/new-archive",
     rules: {
       ...rules,
-      article: {
-        ...rules.article,
-        title: {
-          try: [
-            {
-              get: "text",
-              selector: "main h1",
-              take: "first",
-              match: null,
-              addStart: null,
-              addEnd: null,
-            },
-          ],
-        },
+      detail: {
+        ...rules.detail,
+        title: "main h1",
       },
     },
     author: "person",
@@ -247,7 +199,7 @@ test("database constraints keep source and revision identity valid", async () =>
     createdById: user.id,
   });
   expect(first.revision).toBe(1);
-  expect(first.rulesVersion).toBe(9);
+  expect(first.rulesVersion).toBe(10);
 
   await expect(
     db.insert(scrapeSources).values({

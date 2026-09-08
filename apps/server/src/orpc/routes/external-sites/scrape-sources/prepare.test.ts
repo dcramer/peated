@@ -2853,86 +2853,24 @@ describe("POST /admin/scrape-sources/prepare", () => {
       createdById: admin.id,
       rules: {
         kind: "review",
-        articles: {
-          document: "html",
-          oneArticlePer: "body",
-          link: "a.review",
-          skipWhen: null,
+        list: {
+          links: "a.review",
           nextPage: null,
           limit: 6,
         },
-        article: {
-          canonicalUrl: null,
-          title: {
-            try: [
-              {
-                get: "text",
-                selector: "h1",
-                take: "first",
-                match: null,
-                addStart: null,
-                addEnd: null,
-              },
-            ],
-          },
-          publishedDate: {
-            try: [
-              {
-                get: "attribute",
-                selector: "time",
-                attribute: "datetime",
-                match: null,
-                addStart: null,
-                addEnd: null,
-              },
-            ],
-          },
+        detail: {
+          url: null,
+          title: "h1",
+          date: "time",
           reviews: {
-            inside: "body",
-            oneReviewPer: "element",
-            selector: ".entry-content",
-            contains: null,
-            name: {
-              try: [
-                {
-                  get: "text",
-                  from: "review",
-                  selector: "h2.name",
-                  take: "first",
-                  match: null,
-                  addStart: null,
-                  addEnd: null,
-                },
-              ],
-            },
-            reviewer: {
-              try: [
-                {
-                  get: "text",
-                  from: "review",
-                  selector: ".author",
-                  take: "first",
-                  match: null,
-                  addStart: null,
-                  addEnd: null,
-                },
-              ],
-            },
+            area: "body",
+            item: ".entry-content",
+            name: "h2.name",
+            reviewer: ".author",
             tastingNotes: null,
             score: {
-              try: [
-                {
-                  get: "text",
-                  from: "review",
-                  selector: ".score",
-                  take: "first",
-                  match: null,
-                  addStart: null,
-                  addEnd: null,
-                },
-              ],
-              scale: 10,
-              map: null,
+              selector: ".score",
+              outOf: 10,
             },
           },
         },
