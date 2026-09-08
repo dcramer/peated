@@ -29,17 +29,15 @@ export default async function CountryDistillersPage(props: {
     props.params,
     props.searchParams,
   ]);
+  const country = await getCountryPage(countrySlug);
   const queryParams = getApiQueryParams(searchParams, {
     defaults: { sort: "-bottles" },
     numericFields: ["cursor", "limit"],
-    overrides: { country: countrySlug, limit: 50 },
+    overrides: { country: country.slug, limit: 50 },
   });
   const { client } = await getPublicPageServerClient();
-  const [country, distillerList] = await Promise.all([
-    getCountryPage(countrySlug),
-    client.distilleries.list(queryParams),
-  ]);
-  const pathname = `/locations/${countrySlug}/distillers`;
+  const distillerList = await client.distilleries.list(queryParams);
+  const pathname = `/locations/${country.slug}/distillers`;
   const page = Number(queryParams.cursor ?? 1) || 1;
 
   return (
