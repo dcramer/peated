@@ -122,6 +122,145 @@ it("reports an invalid list selector", () => {
   });
 });
 
+it("reads common Bottle facts from surrounding text", () => {
+  const rules = {
+    kind: "catalog",
+    list: { links: "a.product", nextPage: null, limit: 10 },
+    detail: {
+      name: "h1",
+      url: null,
+      id: null,
+      image: null,
+      volume: ".facts",
+      abv: ".facts",
+      age: ".facts",
+      edition: null,
+      year: ".release",
+    },
+  } satisfies ScrapeRules;
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      `<h1>Example 2012</h1>
+       <p class="facts">Distilled in 2012</p>
+       <p class="facts">10 Year Old</p>
+       <p class="facts">46.3% ABV</p>
+       <p class="facts">70cl</p>
+       <p class="release">Released in 2024</p>`,
+      new URL("https://example.test/whisky/one"),
+    ),
+  ).toMatchObject({
+    kind: "catalog",
+    issues: [],
+    value: [
+      {
+        volume: 700,
+        sourceBottleIdentity: {
+          stated_age: 10,
+          abv: 46.3,
+          release_year: 2024,
+        },
+      },
+    ],
+  });
+});
+
+it("does not use an unrelated fact as the stated age", () => {
+  const rules = {
+    kind: "catalog",
+    list: { links: "a.product", nextPage: null, limit: 10 },
+    detail: {
+      name: "h1",
+      url: null,
+      id: null,
+      image: null,
+      volume: null,
+      abv: ".facts",
+      age: ".facts",
+      edition: null,
+      year: null,
+    },
+  } satisfies ScrapeRules;
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      '<h1>Example Whisky</h1><p class="facts">64.1% ABV</p>',
+      new URL("https://example.test/whisky/one"),
+    ),
+  ).toMatchObject({
+    kind: "catalog",
+    issues: [],
+    value: [
+      {
+        sourceBottleIdentity: {
+          stated_age: null,
+          abv: 64.1,
+        },
+      },
+    ],
+  });
+});
+
+it("removes a displayed price from a product name", () => {
+  const rules = {
+    kind: "price",
+    list: { links: "a.product", nextPage: null, limit: 10 },
+    detail: {
+      name: "h1",
+      url: null,
+      id: null,
+      image: null,
+      volume: 700,
+      price: ".price",
+      currency: "gbp",
+      barcode: null,
+    },
+  } satisfies ScrapeRules;
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      '<h1>Island Malt, 18 Years Old – £75.00</h1><p class="price">£62.50</p>',
+      new URL("https://example.test/whisky/one"),
+    ),
+  ).toMatchObject({
+    kind: "price",
+    issues: [],
+    value: [{ name: "Island Malt, 18 Years Old", price: 6250 }],
+  });
+});
+
+it("reads a product ID from an element ID", () => {
+  const rules = {
+    kind: "price",
+    list: { links: "a.product", nextPage: null, limit: 10 },
+    detail: {
+      name: "h1",
+      url: null,
+      id: "div.product",
+      image: null,
+      volume: 700,
+      price: ".price",
+      currency: "gbp",
+      barcode: null,
+    },
+  } satisfies ScrapeRules;
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      '<div class="product" id="product-21952"><h1>Island Malt</h1><p class="price">£62.50</p></div>',
+      new URL("https://example.test/whisky/one"),
+    ),
+  ).toMatchObject({
+    kind: "price",
+    issues: [],
+    value: [{ externalProductId: "21952" }],
+  });
+});
+
 it("splits unwrapped reviews at their name selectors", () => {
   const rules = {
     kind: "review",
@@ -217,6 +356,46 @@ it("uses an article writer for each wrapped review", () => {
   });
 });
 
+it("uses an article Bottle name for one wrapped review", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1.article-title",
+      date: null,
+      reviews: {
+        area: "article",
+        item: "section.review",
+        name: "h1.bottle-name",
+        reviewer: null,
+        tastingNotes: null,
+        score: null,
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<article><h1 class="article-title">Full Circle</h1>
+      <h1 class="bottle-name">Bladnoch 10 Year Old</h1>
+      <time datetime="2026-08-22"></time>
+      <section class="review"><p>The review body.</p></section>
+    </article>`,
+    new URL("https://reviews.example/full-circle"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        title: "Full Circle",
+        externalReviews: [{ name: "Bladnoch 10 Year Old" }],
+      },
+    },
+  });
+});
+
 it("removes a trailing review label from a single article title", () => {
   const rules = {
     kind: "review",
@@ -252,6 +431,51 @@ it("removes a trailing review label from a single article title", () => {
         title: "Orchard Bourbon review",
         externalReviews: [
           { name: "Orchard Bourbon", reviewerName: "Jon Bell" },
+        ],
+      },
+    },
+  });
+});
+
+it("cleans common review labels without extra rules", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "article",
+        item: null,
+        name: null,
+        reviewer: ".author",
+        tastingNotes: null,
+        score: { selector: ".score", outOf: 100 },
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<article><h1>Orchard Bourbon Shelf Review</h1>
+      <time datetime="2026-08-21"></time>
+      <span class="author">By Jon Bell</span>
+      <b class="score">SGP: 551 - 91 points</b>
+    </article>`,
+    new URL("https://reviews.example/orchard-bourbon"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        externalReviews: [
+          {
+            name: "Orchard Bourbon",
+            reviewerName: "Jon Bell",
+            nativeScore: { value: 91, scale: 100 },
+          },
         ],
       },
     },

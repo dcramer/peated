@@ -41,7 +41,7 @@ const subcommand = program
 subcommand
   .command("preview")
   .description("Preview saved parsing rules without writing products")
-  .requiredOption("--site <key>", "Existing code-owned external site key")
+  .requiredOption("--site <key>", "Site key for the local preview")
   .requiredOption("--input <file>", "JSON file containing listUrl and rules")
   .option(
     "--limit <count>",

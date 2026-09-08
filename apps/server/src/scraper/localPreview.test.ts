@@ -2,6 +2,8 @@ import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
   externalSiteRuns,
+  externalSiteScrapeTargets,
+  externalSites,
   storePrices,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -255,5 +257,90 @@ test("previews price rules without storing prices", async () => {
     ],
   });
   expect(await db.select().from(externalReviewArticles)).toHaveLength(0);
+  expect(await db.select().from(storePrices)).toHaveLength(0);
+  const [site] = await db
+    .select({ id: externalSites.id })
+    .from(externalSites)
+    .where(eq(externalSites.type, "finedrams"));
+  expect(
+    await db
+      .select({ managedBy: externalSiteScrapeTargets.managedBy })
+      .from(externalSiteScrapeTargets)
+      .where(eq(externalSiteScrapeTargets.externalSiteId, site!.id)),
+  ).toContainEqual({ managedBy: "admin" });
+});
+
+test("previews a site that exists only in production", async () => {
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/robots.txt") {
+      return new Response("User-agent: *\nDisallow:");
+    }
+    if (url.pathname === "/whisky") {
+      return new Response('<a class="product" href="/whisky/one">One</a>');
+    }
+    if (url.pathname === "/whisky/one") {
+      return new Response("<main><h1>Example Whisky</h1></main>");
+    }
+    return new Response(null, { status: 404 });
+  });
+
+  const result = await runLocalScrapeSourcePreview(
+    {
+      site: "production-only-example",
+      listUrl: "https://production-only.example/whisky",
+      rulesVersion: 10,
+      rules: {
+        kind: "catalog",
+        list: {
+          links: "a.product",
+          nextPage: null,
+          limit: 20,
+        },
+        detail: {
+          name: "h1",
+          url: null,
+          id: null,
+          image: null,
+          volume: null,
+          abv: null,
+          age: null,
+          edition: null,
+          year: null,
+        },
+      },
+      limit: 1,
+    },
+    {
+      fetchImpl,
+      clock: previewClock(),
+      executionToken: "production-only-preview-owner",
+    },
+  );
+
+  expect(result.run).toMatchObject({
+    status: "succeeded",
+    requestCount: 3,
+    emittedItemCount: 0,
+  });
+  expect(result.preview).toEqual({
+    issues: [],
+    pages: [
+      {
+        kind: "catalog",
+        url: "https://production-only.example/whisky/one",
+        products: [
+          {
+            externalProductId: null,
+            name: "Example Whisky",
+            url: "https://production-only.example/whisky/one",
+            imageUrl: null,
+            volume: null,
+            sourceBottleIdentity: null,
+          },
+        ],
+      },
+    ],
+  });
   expect(await db.select().from(storePrices)).toHaveLength(0);
 });

@@ -3,9 +3,11 @@ import {
   externalSiteRuns,
   externalSites,
   externalSiteScrapeTargets,
+  scrapeOrigins,
   scrapeTargets,
 } from "@peated/server/db/schema";
 import { syncExternalSites } from "@peated/server/lib/externalSites";
+import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import type { ScrapeSourcePreviewResult } from "./configured/preview";
@@ -16,6 +18,7 @@ import {
 } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
 import { loadScrapeSourceTarget } from "./configured/target";
+import { defineScrapeTarget } from "./definitions";
 import { scraperSystemClock, type ScraperHttpClock } from "./http";
 import { scraperRegistry } from "./registry";
 import { executeScraperRun } from "./runs";
@@ -23,7 +26,7 @@ import { syncScraperDefinitions } from "./syncDefinitions";
 
 const InputSchema = z
   .object({
-    site: z.string().trim().min(1),
+    site: ExternalSiteKeySchema,
     listUrl: z.url(),
     rulesVersion: z.number().int().positive().default(1),
     rules: z.json(),
@@ -32,6 +35,61 @@ const InputSchema = z
   .strict();
 
 export type LocalScrapeSourcePreviewInput = z.input<typeof InputSchema>;
+
+async function createLocalPreviewTarget(siteKey: string, listUrl: URL) {
+  const target = defineScrapeTarget({
+    key: siteKey,
+    origins: [{ origin: listUrl.origin, robots: { mode: "enforce" } }],
+  });
+  return await db.transaction(async (tx) => {
+    const [createdSite] = await tx
+      .insert(externalSites)
+      .values({ type: siteKey, name: siteKey, runEvery: null })
+      .onConflictDoNothing()
+      .returning();
+    const [existingSite] = createdSite
+      ? []
+      : await tx
+          .select()
+          .from(externalSites)
+          .where(eq(externalSites.type, siteKey));
+    const site = createdSite ?? existingSite;
+    if (!site) throw new Error("Failed to create the local preview site.");
+
+    await tx
+      .insert(scrapeTargets)
+      .values({
+        key: target.key,
+        managedBy: "admin",
+        enabled: true,
+        minimumSpacingMs: target.minimumSpacingMs,
+        requestsPerWindow: target.requestsPerWindow,
+        windowMs: target.windowMs,
+        timeoutMs: target.timeoutMs,
+        maxResponseBytes: target.maxResponseBytes,
+        maxRetries: target.maxRetries,
+      })
+      .onConflictDoNothing();
+    await tx
+      .insert(scrapeOrigins)
+      .values({
+        origin: listUrl.origin,
+        managedBy: "admin",
+        targetKey: target.key,
+        robotsMode: "enforce",
+      })
+      .onConflictDoNothing();
+    await tx
+      .insert(externalSiteScrapeTargets)
+      .values({
+        externalSiteId: site.id,
+        targetKey: target.key,
+        managedBy: "admin",
+      })
+      .onConflictDoNothing();
+    return { site, target };
+  });
+}
 
 export async function runLocalScrapeSourcePreview(
   input: LocalScrapeSourcePreviewInput,
@@ -52,52 +110,57 @@ export async function runLocalScrapeSourcePreview(
   await syncExternalSites();
   await syncScraperDefinitions(scraperRegistry);
 
-  const [site] = await db
+  let [site] = await db
     .select()
     .from(externalSites)
     .where(eq(externalSites.type, parsed.site));
-  if (!site) throw new Error(`External site ${parsed.site} was not found.`);
 
   const codeTarget = scraperRegistry.targets.get(parsed.site);
-  const [storedTarget] = codeTarget
-    ? []
-    : await db
-        .select({ target: scrapeTargets })
-        .from(externalSiteScrapeTargets)
-        .innerJoin(
-          scrapeTargets,
-          eq(scrapeTargets.key, externalSiteScrapeTargets.targetKey),
-        )
-        .where(
-          and(
-            eq(externalSiteScrapeTargets.externalSiteId, site.id),
-            eq(externalSiteScrapeTargets.active, true),
-          ),
-        )
-        .limit(1);
-  const target =
+  const [storedTarget] =
+    !site || codeTarget
+      ? []
+      : await db
+          .select({ target: scrapeTargets })
+          .from(externalSiteScrapeTargets)
+          .innerJoin(
+            scrapeTargets,
+            eq(scrapeTargets.key, externalSiteScrapeTargets.targetKey),
+          )
+          .where(
+            and(
+              eq(externalSiteScrapeTargets.externalSiteId, site.id),
+              eq(externalSiteScrapeTargets.active, true),
+            ),
+          )
+          .limit(1);
+  let target =
     codeTarget ??
     (storedTarget ? await loadScrapeSourceTarget(storedTarget.target) : null);
-  if (!target) {
-    throw new Error(`External site ${parsed.site} has no scrape target.`);
+
+  if (!site || !target) {
+    const local = await createLocalPreviewTarget(
+      parsed.site,
+      new URL(parsed.listUrl),
+    );
+    site = local.site;
+    target = local.target;
   }
   if (codeTarget) {
-    // Local previews still need coordinator authorization after the legacy
-    // source registration is removed. Production migrations own their mapping.
+    // Keep local previews authorized when another preview refreshes the code
+    // definitions. Production owns its own site-to-target mapping.
     await db
       .insert(externalSiteScrapeTargets)
       .values({
         externalSiteId: site.id,
         targetKey: target.key,
-        managedBy: "code",
+        managedBy: "admin",
       })
       .onConflictDoUpdate({
         target: [
           externalSiteScrapeTargets.externalSiteId,
           externalSiteScrapeTargets.targetKey,
         ],
-        set: { active: true, updatedAt: new Date() },
-        setWhere: eq(externalSiteScrapeTargets.managedBy, "code"),
+        set: { active: true, managedBy: "admin", updatedAt: new Date() },
       });
   }
   const [activeRun] = await db
