@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "check:peated-bot-signature": "tsx ./scripts/check-peated-bot-signature.ts",
+    "generate:peated-bot-key": "node ./scripts/generate-peated-bot-key.mjs",
     "dev": "concurrently 'npm:dev:api' 'npm:dev:worker'",
     "dev:api": "tsx watch --require dotenv/config ./src/run-server.ts",
     "dev:mock": "tsx watch ./src/orpc/mock/run-server.ts",
@@ -67,6 +69,7 @@
     "toad-scheduler": "^3.0.1",
     "tsx": "catalog:",
     "typescript": "catalog:",
+    "web-bot-auth": "0.2.0",
     "wkx": "^0.5.0",
     "zod": "catalog:"
   },

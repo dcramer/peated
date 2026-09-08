@@ -265,3 +265,7 @@ still stopping work that cannot make progress.
 Outbound requests identify as `PeatedBot/1.0 (+https://peated.com/bot)`. The
 public page explains Peated's purpose, request controls, and contact path. Do
 not replace it with a browser identity or add credential/cookie forwarding.
+When `PEATED_BOT_PRIVATE_JWK` is configured, the shared HTTP transport signs
+each request with Cloudflare Web Bot Auth. Follow the
+[PeatedBot request signing runbook](../../../../docs/operations/peated-bot.md)
+for deployment, registration, checks, and key rotation.

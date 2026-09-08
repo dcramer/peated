@@ -77,6 +77,7 @@ export default {
   FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || null,
   SCRAPER_FIRECRAWL_API_KEY:
     process.env.SCRAPER_FIRECRAWL_API_KEY?.trim() || null,
+  PEATED_BOT_PRIVATE_JWK: process.env.PEATED_BOT_PRIVATE_JWK?.trim() || null,
   FIRECRAWL_API_URL: process.env.FIRECRAWL_API_URL || null,
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||

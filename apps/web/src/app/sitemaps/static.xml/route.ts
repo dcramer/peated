@@ -15,6 +15,7 @@ export async function GET() {
     { url: "/companies" },
     { url: "/about" },
     { url: "/about/tasting-wheel" },
+    { url: "/bot" },
     { url: "/bottlers/4263/codes" },
     { url: "/activity" },
     { url: "/events" },
