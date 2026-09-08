@@ -1,5 +1,5 @@
-import { LoadingList } from "@peated/web/components";
+import { AdminDetailPageLoading } from "@peated/web/components/admin/adminContent.stylex";
 
 export default function Loading() {
-  return <LoadingList label="Loading site records" rows={4} />;
+  return <AdminDetailPageLoading label="Loading scraper" sections={3} />;
 }

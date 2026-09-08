@@ -1,5 +1,5 @@
 import { AdminDetailPageLoading } from "@peated/web/components/admin/adminContent.stylex";
 
 export default function Loading() {
-  return <AdminDetailPageLoading label="Loading location" />;
+  return <AdminDetailPageLoading label="Loading event" />;
 }

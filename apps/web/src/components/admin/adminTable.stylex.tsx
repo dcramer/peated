@@ -3,8 +3,7 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { PagingRel } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowDown, ArrowUp, Search } from "lucide-react";
-import Link from "next/link";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ReactElement, ReactNode } from "react";
 
@@ -16,6 +15,9 @@ import {
   effects,
   space,
 } from "../../styles/tokens.stylex";
+import { AppLink } from "../appLink";
+import { LoadingPlaceholder } from "../feedback.stylex";
+import { TextInput } from "../field.stylex";
 import { linkedRowStyles } from "../linkedRow.stylex";
 import { LinkPending } from "../linkPending.stylex";
 import { AdminPager } from "./adminUtility.stylex";
@@ -64,6 +66,83 @@ export function AdminTable<
   );
 }
 
+type AdminTableLoadingProps = {
+  columns?: 1 | 2 | 3 | 4;
+  label?: string;
+  rows?: 3 | 4 | 5 | 6;
+  withSearch?: boolean;
+};
+
+const loadingDelays = [0, 1, 2, 3, 4] as const;
+
+/** Reserves the shared administrator table structure while its rows load. */
+export function AdminTableLoading({
+  columns = 2,
+  label = "Loading records",
+  rows = 5,
+  withSearch = false,
+}: AdminTableLoadingProps) {
+  return (
+    <div
+      aria-busy="true"
+      aria-label={label}
+      role="status"
+      {...stylex.props(styles.root)}
+    >
+      {withSearch ? (
+        <div aria-hidden="true" {...stylex.props(styles.loadingSearch)} />
+      ) : null}
+      <div {...stylex.props(styles.frame)}>
+        <table {...stylex.props(styles.table)}>
+          <thead>
+            <tr {...stylex.props(styles.headerRow)}>
+              {Array.from({ length: columns }, (_, columnIndex) => (
+                <th
+                  key={columnIndex}
+                  scope="col"
+                  {...stylex.props(
+                    styles.header,
+                    columnIndex > 0 && styles.secondary,
+                  )}
+                >
+                  <LoadingPlaceholder
+                    delay={loadingDelays[columnIndex]}
+                    preset="metadata"
+                  />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: rows }, (_, rowIndex) => (
+              <tr key={rowIndex} {...stylex.props(styles.row)}>
+                {Array.from({ length: columns }, (_, columnIndex) => (
+                  <td
+                    key={columnIndex}
+                    {...stylex.props(
+                      styles.cell,
+                      columnIndex > 0 && styles.secondary,
+                    )}
+                  >
+                    <LoadingPlaceholder
+                      delay={
+                        loadingDelays[
+                          (rowIndex + columnIndex) % loadingDelays.length
+                        ]
+                      }
+                      preset={columnIndex === 0 ? "text" : "metadata"}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export function AdminTableContent<
   Item extends object,
   ItemGroup extends Group = Group,
@@ -91,18 +170,13 @@ export function AdminTableContent<
     <div {...stylex.props(styles.root)}>
       {withSearch ? (
         <form action={pathname} {...stylex.props(styles.searchForm)}>
-          <Search
-            aria-hidden="true"
-            size={16}
-            {...stylex.props(styles.searchIcon)}
-          />
-          <input
+          <TextInput
             aria-label="Search"
+            controlSize="md"
             defaultValue={searchParams.get("query") ?? ""}
             name="query"
             placeholder="Search"
             type="search"
-            {...stylex.props(foundationStyles.input, styles.searchInput)}
           />
         </form>
       ) : null}
@@ -179,12 +253,12 @@ export function AdminTableContent<
                       )}
                     >
                       {groupTo ? (
-                        <Link
+                        <AppLink
                           href={groupTo(group)}
                           {...stylex.props(styles.groupLink)}
                         >
                           {groupItem(group)}
-                        </Link>
+                        </AppLink>
                       ) : (
                         group.name
                       )}
@@ -215,11 +289,13 @@ export function AdminTableContent<
                         )}
                       >
                         {index === 0 && itemHref ? (
-                          <Link
+                          <AppLink
                             aria-label={`Open ${itemKey}`}
                             href={itemHref}
                             {...stylex.props(linkedRowStyles.primaryLink)}
-                          />
+                          >
+                            <LinkPending />
+                          </AppLink>
                         ) : null}
                         <span {...stylex.props()}>
                           {getColumnValue(item, column)}
@@ -260,19 +336,18 @@ function SortLink({
         : defaultOrder === "asc"
           ? name
           : inverted;
+  const search = buildQueryString(searchParams, { sort: nextSort });
   return (
-    <Link
-      href={{
-        pathname,
-        search: buildQueryString(searchParams, { sort: nextSort }),
-      }}
+    <AppLink
+      href={`${pathname}?${search}`}
+      prefetch={null}
       {...stylex.props(styles.sortLink)}
     >
       {label}
       <LinkPending />
       {sort === name ? <ArrowDown aria-hidden="true" size={12} /> : null}
       {sort === inverted ? <ArrowUp aria-hidden="true" size={12} /> : null}
-    </Link>
+    </AppLink>
   );
 }
 
@@ -309,29 +384,12 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x3,
   },
-  searchForm: { position: "relative", display: "flex", alignItems: "center" },
-  searchIcon: {
-    position: "absolute",
-    left: space.x3,
-    color: colors.inkMuted,
-    pointerEvents: "none",
-  },
-  searchInput: {
-    boxSizing: "border-box",
+  searchForm: { display: "flex", alignItems: "center" },
+  loadingSearch: {
     width: "100%",
-    height: "40px",
-    paddingRight: space.x4,
-    paddingLeft: "38px",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.fieldRule,
+    height: controlMetrics.controlHeight,
     borderRadius: controlMetrics.radius,
-    outline: "none",
     backgroundColor: colors.inset,
-    color: colors.ink,
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-    "::placeholder": { color: colors.inkMuted, opacity: 1 },
-    "::-webkit-search-cancel-button": { appearance: "none" },
   },
   frame: {
     minWidth: 0,

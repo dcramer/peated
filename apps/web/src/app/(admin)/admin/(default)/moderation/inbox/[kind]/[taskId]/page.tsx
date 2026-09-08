@@ -1,4 +1,3 @@
-import InboxPage from "@peated/web/components/admin/moderation/inboxPage";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 
@@ -14,12 +13,5 @@ export default async function Page({
   if (!parsedKind.success || !/^\d+$/.test(taskId)) {
     notFound();
   }
-  return (
-    <InboxPage
-      selected={{
-        kind: parsedKind.data,
-        id: Number(taskId),
-      }}
-    />
-  );
+  return null;
 }

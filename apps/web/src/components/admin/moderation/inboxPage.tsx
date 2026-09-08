@@ -9,7 +9,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import InboxList, { inboxTaskHref } from "./inboxList";
 import {
@@ -17,9 +17,10 @@ import {
   ModerationDetailContent,
   ModerationDetailFrame,
   ModerationEmpty,
+  ModerationLoading,
   ScreenReaderAnnouncement,
 } from "./moderationDetail.stylex";
-import ModerationNav from "./moderationNav";
+import { ModerationInboxLoading } from "./moderationInbox.stylex";
 import TaskDetail from "./taskDetail";
 
 export function nextTaskAfterCompletion<Task extends { key: string }>(
@@ -38,15 +39,49 @@ export function nextTaskAfterCompletion<Task extends { key: string }>(
   );
 }
 
-export default function InboxPage({
-  selected,
+export function selectedInboxTask(
+  pathname: string,
+): { kind: "listing" | "operation" | "finding"; id: number } | undefined {
+  const match = pathname.match(
+    /^\/admin\/moderation\/inbox\/(listing|operation|finding)\/(\d+)\/?$/,
+  );
+  if (!match) return undefined;
+  const kind = match[1];
+  if (kind !== "listing" && kind !== "operation" && kind !== "finding") {
+    return undefined;
+  }
+
+  return {
+    kind,
+    id: Number(match[2]),
+  };
+}
+
+export function ModerationSplitPageLoading({
+  title = "Inbox",
 }: {
-  selected?: { kind: "listing" | "operation" | "finding"; id: number };
+  title?: string;
 }) {
+  return (
+    <AdminSplitView
+      selected={false}
+      list={<ModerationInboxLoading title={title} />}
+      detail={
+        <ModerationDetailFrame>
+          <ModerationLoading>Loading moderation details…</ModerationLoading>
+        </ModerationDetailFrame>
+      }
+    />
+  );
+}
+
+export default function InboxPage() {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const selected = selectedInboxTask(pathname);
   const category = searchParams.get("category");
   const query = searchParams.get("query");
   const input: NonNullable<Inputs["admin"]["moderation"]["listTasks"]> = {
@@ -121,64 +156,61 @@ export default function InboxPage({
     : -1;
 
   return (
-    <>
-      <ModerationNav />
-      <AdminSplitView
-        selected={Boolean(selected)}
-        list={
-          <InboxList
-            bulkError={bulkError}
-            data={data}
-            ignoreInconclusivePending={ignoreInconclusive.isPending}
-            onIgnoreInconclusive={ignoreAllInconclusive}
-            selectedKey={selectedKey}
-          />
-        }
-        detail={
-          <ModerationDetailFrame>
-            <ScreenReaderAnnouncement>{announcement}</ScreenReaderAnnouncement>
-            {selectedKey ? (
-              <ModerationDetailContent>
-                <ModerationActionBar>
+    <AdminSplitView
+      selected={Boolean(selected)}
+      list={
+        <InboxList
+          bulkError={bulkError}
+          data={data}
+          ignoreInconclusivePending={ignoreInconclusive.isPending}
+          onIgnoreInconclusive={ignoreAllInconclusive}
+          selectedKey={selectedKey}
+        />
+      }
+      detail={
+        <ModerationDetailFrame>
+          <ScreenReaderAnnouncement>{announcement}</ScreenReaderAnnouncement>
+          {selectedKey ? (
+            <ModerationDetailContent>
+              <ModerationActionBar>
+                <Button
+                  href={`/admin/moderation/inbox?${searchParams.toString()}`}
+                >
+                  Back to Inbox
+                </Button>
+                <Button
+                  disabled={selectedIndex < 0}
+                  onClick={() => openTask(selectedIndex + 1)}
+                >
+                  Skip
+                </Button>
+              </ModerationActionBar>
+              <TaskDetail onComplete={complete} taskKey={selectedKey} />
+            </ModerationDetailContent>
+          ) : (
+            <ModerationEmpty
+              title="Choose one decision"
+              action={
+                data.results[0] ? (
                   <Button
-                    href={`/admin/moderation/inbox?${searchParams.toString()}`}
+                    variant="accent"
+                    href={inboxTaskHref(data.results[0], searchParams)}
                   >
-                    Back to Inbox
+                    Start with the oldest
                   </Button>
-                  <Button
-                    disabled={selectedIndex < 0}
-                    onClick={() => openTask(selectedIndex + 1)}
-                  >
-                    Skip
+                ) : (
+                  <Button href="/admin/moderation/automation">
+                    Check background work
                   </Button>
-                </ModerationActionBar>
-                <TaskDetail onComplete={complete} taskKey={selectedKey} />
-              </ModerationDetailContent>
-            ) : (
-              <ModerationEmpty
-                title="Choose one decision"
-                action={
-                  data.results[0] ? (
-                    <Button
-                      variant="accent"
-                      href={inboxTaskHref(data.results[0], searchParams)}
-                    >
-                      Start with the oldest
-                    </Button>
-                  ) : (
-                    <Button href="/admin/moderation/automation">
-                      Check background work
-                    </Button>
-                  )
-                }
-              >
-                The oldest work is first. Each task asks one question and
-                advances after you decide.
-              </ModerationEmpty>
-            )}
-          </ModerationDetailFrame>
-        }
-      />
-    </>
+                )
+              }
+            >
+              The oldest work is first. Each task asks one question and advances
+              after you decide.
+            </ModerationEmpty>
+          )}
+        </ModerationDetailFrame>
+      }
+    />
   );
 }

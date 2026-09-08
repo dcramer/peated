@@ -1,5 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import { AdminTextLink } from "@peated/web/components/admin/adminContent.stylex";
+import { TextLink } from "@peated/web/components";
 import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import * as stylex from "@stylexjs/stylex";
@@ -75,7 +75,7 @@ export default function CatalogListingTable({
           name: "product",
           value: (listing) => (
             <div>
-              <AdminTextLink href={listing.url}>{listing.name}</AdminTextLink>
+              <TextLink href={listing.url}>{listing.name}</TextLink>
               <MobileListingDetails listing={listing} />
             </div>
           ),

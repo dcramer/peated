@@ -11,22 +11,27 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import { type Bottle } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { Plus, X } from "lucide-react";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { SectionHeading } from "../../sectionHeading.stylex";
 
 import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
-import { BottleIdentityRow, IconButton, TextLink } from "../..";
+import {
+  AppLink,
+  BottleIdentityRow,
+  IconButton,
+  TextInput,
+  TextLink,
+} from "../..";
 import { useORPC } from "../../../lib/orpc/context";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
-  controlMetrics,
   effects,
   space,
   zIndices,
 } from "../../../styles/tokens.stylex";
+import { LinkPending } from "../../linkPending.stylex";
 
 export default function ModerationBottlePicker({
   name,
@@ -137,8 +142,9 @@ export default function ModerationBottlePicker({
             />
           </header>
           <div {...stylex.props(styles.searchRow)}>
-            <input
+            <TextInput
               aria-label="Search bottles"
+              controlSize="md"
               onChange={(event) => {
                 const value = event.currentTarget.value;
                 setQuery(value);
@@ -152,7 +158,6 @@ export default function ModerationBottlePicker({
               placeholder="Search for a bottle"
               type="search"
               value={query}
-              {...stylex.props(foundationStyles.input, styles.search)}
             />
           </div>
           <div {...stylex.props(foundationStyles.metadata, styles.context)}>
@@ -207,7 +212,7 @@ export default function ModerationBottlePicker({
             ))}
             {showAdd ? (
               <li {...stylex.props(styles.resultItem)}>
-                <Link
+                <AppLink
                   href={`/bottles/new?${newBottleParams.toString()}`}
                   {...stylex.props(
                     foundationStyles.body,
@@ -229,7 +234,8 @@ export default function ModerationBottlePicker({
                         : "Add a new bottle to the database."}
                     </span>
                   </span>
-                </Link>
+                  <LinkPending />
+                </AppLink>
               </li>
             ) : null}
           </ul>
@@ -286,20 +292,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
   },
-  search: {
-    boxSizing: "border-box",
-    width: "100%",
-    height: "42px",
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderWidth: 0,
-    borderRadius: controlMetrics.radius,
-    outline: "none",
-    backgroundColor: colors.inset,
-    color: colors.ink,
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-    "::-webkit-search-cancel-button": { appearance: "none" },
-  },
   context: {
     padding: space.x4,
     borderBottomWidth: "1px",
@@ -325,6 +317,7 @@ const styles = stylex.create({
     borderBottomColor: colors.hairline,
   },
   result: {
+    position: "relative",
     boxSizing: "border-box",
     display: "flex",
     width: "100%",

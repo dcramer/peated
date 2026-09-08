@@ -2,6 +2,7 @@
 
 import { use } from "react";
 
+import { TextLink } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
@@ -9,7 +10,6 @@ import {
   AdminPage,
   AdminPageHeader,
   AdminSection,
-  AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
 import DateRange from "@peated/web/components/dateRange";
@@ -76,9 +76,7 @@ export default function Page({
           <DefinitionList.Term>Website</DefinitionList.Term>
           <DefinitionList.Details>
             {event.website ? (
-              <AdminTextLink href={event.website}>
-                {event.website}
-              </AdminTextLink>
+              <TextLink href={event.website}>{event.website}</TextLink>
             ) : (
               "Not set"
             )}

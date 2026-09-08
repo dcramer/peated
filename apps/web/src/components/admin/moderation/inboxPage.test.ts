@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { nextTaskAfterCompletion } from "./inboxPage";
+import { nextTaskAfterCompletion, selectedInboxTask } from "./inboxPage";
 
 const task = (key: string) => ({ key });
 
@@ -57,5 +57,21 @@ describe("nextTaskAfterCompletion", () => {
         "C",
       ),
     ).toEqual(task("A"));
+  });
+});
+
+describe("selectedInboxTask", () => {
+  test("reads a selected task from the inbox route", () => {
+    expect(selectedInboxTask("/admin/moderation/inbox/operation/42")).toEqual({
+      kind: "operation",
+      id: 42,
+    });
+  });
+
+  test("leaves the inbox unselected on list and invalid routes", () => {
+    expect(selectedInboxTask("/admin/moderation/inbox")).toBeUndefined();
+    expect(
+      selectedInboxTask("/admin/moderation/inbox/unknown/42"),
+    ).toBeUndefined();
   });
 });

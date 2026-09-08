@@ -3,14 +3,14 @@
 import type { PagingRel } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { AlertTriangle } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-import { CursorPager } from "..";
+import { AppLink, CursorPager } from "..";
 import { buildQueryString } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
+import { LinkPending } from "../linkPending.stylex";
 
 export function AdminPager({
   ariaLabel = "Pagination",
@@ -83,12 +83,13 @@ export function AdminEmptyActivity({
   href?: string;
 }) {
   return href ? (
-    <Link
+    <AppLink
       href={href}
       {...stylex.props(foundationStyles.body, styles.empty, styles.emptyLink)}
     >
       {children}
-    </Link>
+      <LinkPending />
+    </AppLink>
   ) : (
     <div {...stylex.props(foundationStyles.body, styles.empty)}>{children}</div>
   );
@@ -173,6 +174,7 @@ const styles = stylex.create({
     textAlign: "center",
   },
   emptyLink: {
+    position: "relative",
     outline: "none",
     color: { default: colors.inkMuted, ":hover": colors.accentDeep },
     textDecoration: "none",

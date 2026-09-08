@@ -4,12 +4,12 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
+import { TextLink } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminCodeBlock,
   AdminDetails,
   AdminSection,
-  AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
 import {
   AdminSelectField,
@@ -277,9 +277,7 @@ function ListingTask({
               currency: item.price.currency.toUpperCase(),
             })}
           </div>
-          <AdminTextLink href={item.price.url}>
-            Open source listing
-          </AdminTextLink>
+          <TextLink href={item.price.url}>Open source listing</TextLink>
         </ModerationMedia>
       </AdminSection>
 

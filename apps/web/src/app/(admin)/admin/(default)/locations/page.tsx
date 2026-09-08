@@ -2,7 +2,6 @@
 
 import type { Inputs } from "@peated/server/orpc/router";
 import {
-  AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
@@ -30,19 +29,6 @@ export default function Page() {
 
   return (
     <AdminPage>
-      <AdminBreadcrumbs
-        items={[
-          {
-            label: "Admin",
-            href: "/admin",
-          },
-          {
-            label: "Locations",
-            href: "/admin/locations",
-            current: true,
-          },
-        ]}
-      />
       <AdminPageHeader title="Locations" />
 
       <Table

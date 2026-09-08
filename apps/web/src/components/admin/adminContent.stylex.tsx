@@ -2,11 +2,10 @@
 
 import * as stylex from "@stylexjs/stylex";
 import { ChevronRight, Home } from "lucide-react";
-import Link from "next/link";
 import type { HTMLAttributes, ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { TextLink } from "..";
+import { AppLink, LoadingList, LoadingPlaceholder } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
@@ -15,6 +14,8 @@ import {
   fonts,
   space,
 } from "../../styles/tokens.stylex";
+import { LinkPending } from "../linkPending.stylex";
+import { AdminTableLoading } from "./adminTable.stylex";
 
 export type AdminBreadcrumb = {
   current?: boolean;
@@ -31,13 +32,15 @@ export function AdminBreadcrumbs({
     <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumbs)}>
       <ol {...stylex.props(styles.breadcrumbList)}>
         <li>
-          <Link
+          <AppLink
             aria-label="Admin"
             href="/admin"
+            prefetch={null}
             {...stylex.props(foundationStyles.metadata, styles.breadcrumbLink)}
           >
             <Home aria-hidden="true" size={14} />
-          </Link>
+            <LinkPending />
+          </AppLink>
         </li>
         {items.map((item) => (
           <li
@@ -49,9 +52,10 @@ export function AdminBreadcrumbs({
               size={13}
               {...stylex.props(styles.breadcrumbSeparator)}
             />
-            <Link
+            <AppLink
               aria-current={item.current ? "page" : undefined}
               href={item.href}
+              prefetch={null}
               title={item.label}
               {...stylex.props(
                 foundationStyles.metadata,
@@ -60,7 +64,8 @@ export function AdminBreadcrumbs({
               )}
             >
               {item.label}
-            </Link>
+              <LinkPending />
+            </AppLink>
           </li>
         ))}
       </ol>
@@ -71,6 +76,140 @@ export function AdminBreadcrumbs({
 export function AdminPage({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.page)}>{children}</div>;
 }
+
+export function AdminListPageLoading({
+  columns = 2,
+  label,
+  title,
+  withSearch = false,
+}: {
+  columns?: 1 | 2 | 3 | 4;
+  label: string;
+  title: string;
+  withSearch?: boolean;
+}) {
+  return (
+    <AdminPage>
+      <AdminPageHeader title={title} />
+      <AdminTableLoading
+        columns={columns}
+        label={label}
+        withSearch={withSearch}
+      />
+    </AdminPage>
+  );
+}
+
+export function AdminDetailPageLoading({
+  label,
+  sections = 2,
+}: {
+  label: string;
+  sections?: 1 | 2 | 3;
+}) {
+  return (
+    <div aria-busy="true" aria-label={label} role="status">
+      <AdminPage>
+        <AdminPageHeader title={<LoadingPlaceholder preset="pageTitle" />} />
+        {Array.from({ length: sections }, (_, index) => (
+          <AdminSection
+            key={index}
+            title={
+              <LoadingPlaceholder
+                delay={loadingDelays[index]}
+                preset="heading"
+              />
+            }
+          >
+            <LoadingList
+              label={`${label}: section ${index + 1}`}
+              rows={3}
+              variant="text"
+            />
+          </AdminSection>
+        ))}
+      </AdminPage>
+    </div>
+  );
+}
+
+export function AdminOverviewPageLoading() {
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Loading operations overview"
+      role="status"
+    >
+      <AdminPage>
+        <AdminPageHeader
+          title="Operations"
+          description="See what Peated is processing and what needs attention."
+          metadata={<LoadingPlaceholder preset="pageMetadata" />}
+        />
+        <div {...stylex.props(styles.loadingOverviewGrid)}>
+          <AdminSection title="Bottle resolution">
+            <LoadingList
+              label="Loading Bottle resolution"
+              rows={3}
+              variant="text"
+            />
+          </AdminSection>
+          <AdminSection title="System status">
+            <LoadingList
+              label="Loading system status"
+              rows={4}
+              variant="text"
+            />
+          </AdminSection>
+        </div>
+        <AdminSection title="Scraper activity">
+          <LoadingList
+            label="Loading scraper activity"
+            rows={4}
+            variant="text"
+          />
+        </AdminSection>
+      </AdminPage>
+    </div>
+  );
+}
+
+export function AdminSectionsPageLoading({
+  label,
+  sections = 3,
+  title,
+}: {
+  label: string;
+  sections?: 2 | 3;
+  title: string;
+}) {
+  return (
+    <div aria-busy="true" aria-label={label} role="status">
+      <AdminPage>
+        <AdminPageHeader title={title} />
+        {Array.from({ length: sections }, (_, index) => (
+          <AdminSection
+            key={index}
+            title={
+              <LoadingPlaceholder
+                delay={loadingDelays[index]}
+                preset="heading"
+              />
+            }
+          >
+            <LoadingList
+              label={`${label}: section ${index + 1}`}
+              rows={3}
+              variant="text"
+            />
+          </AdminSection>
+        ))}
+      </AdminPage>
+    </div>
+  );
+}
+
+const loadingDelays = [0, 1, 2] as const;
 
 export type AdminPageHeaderProps = {
   actions?: ReactNode;
@@ -186,6 +325,7 @@ export function AdminStat({
   );
 }
 
+/** Shows a compact status whose text carries the meaning and tone adds emphasis. */
 export function AdminStatus({
   children,
   tone = "neutral",
@@ -203,24 +343,6 @@ export function AdminStatus({
     >
       {children}
     </span>
-  );
-}
-
-export function AdminTextLink({
-  children,
-  href,
-  title,
-  truncate = false,
-}: {
-  children: ReactNode;
-  href: string;
-  title?: string;
-  truncate?: boolean;
-}) {
-  return (
-    <TextLink href={href} title={title} truncate={truncate}>
-      {children}
-    </TextLink>
   );
 }
 
@@ -273,7 +395,9 @@ export function AdminSplitView({
   selected: boolean;
 }) {
   return (
-    <div {...stylex.props(styles.splitView)}>
+    <div
+      {...stylex.props(styles.splitView, selected && styles.splitViewSelected)}
+    >
       <div
         {...stylex.props(styles.splitList, selected && styles.splitListHidden)}
       >
@@ -298,6 +422,13 @@ const styles = stylex.create({
     flexDirection: "column",
     rowGap: space.x6,
   },
+  loadingOverviewGrid: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: "minmax(0, 1.3fr) minmax(280px, 0.7fr)",
+    gap: space.x4,
+    "@media (max-width: 839px)": { gridTemplateColumns: "minmax(0, 1fr)" },
+  },
   breadcrumbs: { minWidth: 0 },
   breadcrumbList: {
     display: "flex",
@@ -316,6 +447,7 @@ const styles = stylex.create({
   },
   breadcrumbSeparator: { flexShrink: 0, color: colors.hairline },
   breadcrumbLink: {
+    position: "relative",
     display: "inline-flex",
     minWidth: 0,
     alignItems: "center",
@@ -451,8 +583,8 @@ const styles = stylex.create({
   statusSuccess: { backgroundColor: colors.inset, color: colors.ink },
   statusWarning: { backgroundColor: colors.accentTint, color: colors.ink },
   statusDanger: {
-    backgroundColor: colors.accentTint,
-    color: colors.accentDeep,
+    backgroundColor: colors.criticalQuiet,
+    color: colors.ink,
   },
   code: {
     color: colors.ink,
@@ -497,13 +629,22 @@ const styles = stylex.create({
   splitView: {
     display: "grid",
     minWidth: 0,
-    minHeight: "70dvh",
+    minHeight: {
+      default: "440px",
+      "@media (max-width: 839px)": "auto",
+    },
     gridTemplateColumns: "minmax(260px, 340px) minmax(0, 1fr)",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
     backgroundColor: "transparent",
     "@media (max-width: 839px)": { display: "block" },
+  },
+  splitViewSelected: {
+    minHeight: {
+      default: "70dvh",
+      "@media (max-width: 839px)": "calc(100dvh - 56px)",
+    },
   },
   splitList: {
     minWidth: 0,

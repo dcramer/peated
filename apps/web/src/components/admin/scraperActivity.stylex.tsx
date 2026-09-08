@@ -3,11 +3,11 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
+import { TextLink } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, fonts, space } from "../../styles/tokens.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
 import TimeSince from "../timeSince";
-import { AdminTextLink } from "./adminContent.stylex";
 
 type ScraperActivityData = Outputs["admin"]["scraperActivity"];
 type HealthCounts = ScraperActivityData["totals"];
@@ -367,9 +367,9 @@ export default function ScraperActivity({ data }: ScraperActivityProps) {
             {data.recentFailures.map((failure) => (
               <li key={failure.runId} {...stylex.props(styles.problem)}>
                 <div {...stylex.props(styles.problemHeader)}>
-                  <AdminTextLink href={`/admin/sites/${failure.site.key}/runs`}>
+                  <TextLink href={`/admin/sites/${failure.site.key}/runs`}>
                     {failure.site.name}
-                  </AdminTextLink>
+                  </TextLink>
                   <span
                     {...stylex.props(
                       foundationStyles.metadata,
@@ -409,7 +409,7 @@ export default function ScraperActivity({ data }: ScraperActivityProps) {
               price or catalog listing.
             </p>
           </div>
-          <AdminTextLink href="/admin/sites">Manage scrapers</AdminTextLink>
+          <TextLink href="/admin/sites">Manage scrapers</TextLink>
         </div>
 
         <dl {...stylex.props(styles.healthSummary)}>

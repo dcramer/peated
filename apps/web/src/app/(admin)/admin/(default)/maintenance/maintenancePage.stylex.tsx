@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
-  AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
   AdminSection,
@@ -43,16 +42,6 @@ export default function MaintenancePage() {
 
   return (
     <AdminPage>
-      <AdminBreadcrumbs
-        items={[
-          { label: "Admin", href: "/admin" },
-          {
-            label: "Maintenance",
-            href: "/admin/maintenance",
-            current: true,
-          },
-        ]}
-      />
       <AdminPageHeader
         title="Maintenance"
         description="Run administrator-only checks and repairs."
