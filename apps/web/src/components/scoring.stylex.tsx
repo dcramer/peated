@@ -227,7 +227,14 @@ export function BottleRatings({
       title={label}
       {...stylex.props(styles.bottleRatings)}
     >
-      <span aria-hidden="true" {...stylex.props(styles.compactLabel)}>
+      <span
+        aria-hidden="true"
+        {...stylex.props(
+          styles.ratingLabel,
+          styles.smallRatingLabel,
+          styles.compactLabel,
+        )}
+      >
         {rating.label}
       </span>
       <span aria-hidden="true" {...stylex.props(styles.compactSummary)}>
@@ -566,11 +573,6 @@ const styles = stylex.create({
   },
   compactLabel: {
     width: "100%",
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
-    fontWeight: 600,
-    lineHeight: 1.15,
     textAlign: "right",
     whiteSpace: "nowrap",
   },

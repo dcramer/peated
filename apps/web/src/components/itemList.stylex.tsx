@@ -142,7 +142,16 @@ export function ItemRow({
             </div>
           ) : null}
         </div>
-        {end ? <div {...stylex.props(styles.end)}>{end}</div> : null}
+        {end ? (
+          <div
+            {...stylex.props(
+              styles.end,
+              align === "start" && styles.startAlignedEnd,
+            )}
+          >
+            {end}
+          </div>
+        ) : null}
         {action ? <div {...stylex.props(styles.action)}>{action}</div> : null}
       </div>
     </ItemListItem>
@@ -254,6 +263,9 @@ const styles = stylex.create({
     [MOBILE]: {
       maxWidth: "92px",
     },
+  },
+  startAlignedEnd: {
+    alignSelf: "center",
   },
   action: {
     position: "relative",
