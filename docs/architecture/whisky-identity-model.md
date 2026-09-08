@@ -253,6 +253,10 @@ Entity.
   duplicates because the time spent maturing can differ. It does not by itself
   prove that two source records describe separate marketed releases. Create a
   separate Bottle only when release evidence supports that distinction.
+- Different BottleSeries membership or a different stated `outturn` likewise
+  means two canonical identities are not exact duplicates. Neither difference
+  independently proves a separate marketed release; creation still requires
+  release evidence, and uncertain values remain unknown.
 - Do not infer `statedAge` from year fields unless the source states the age.
 
 When one uniform consumer label markets whiskies from multiple named

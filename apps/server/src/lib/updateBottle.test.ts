@@ -1834,6 +1834,70 @@ describe("Bottle updates", () => {
     ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
   });
 
+  test("allows identity updates distinguished by Series or outturn", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Update Identity Brand" });
+    const firstSeries = await fixtures.BottleSeries({ brandId: brand.id });
+    const secondSeries = await fixtures.BottleSeries({ brandId: brand.id });
+    const shared = {
+      name: "Limited Selection",
+      brand: brand.id,
+      vintageYear: 1982,
+      abv: 50,
+    };
+    await createBottle({
+      context: contextFor(mod),
+      input: {
+        ...shared,
+        series: firstSeries.id,
+        bottlingYear: 2001,
+        outturn: 274,
+      },
+    });
+    const differentSeries = await createBottle({
+      context: contextFor(mod),
+      input: {
+        ...shared,
+        series: secondSeries.id,
+        bottlingYear: 2000,
+        outturn: 274,
+      },
+    });
+    const differentOutturn = await createBottle({
+      context: contextFor(mod),
+      input: {
+        ...shared,
+        series: firstSeries.id,
+        bottlingYear: 1999,
+        outturn: 285,
+      },
+    });
+
+    const seriesResult = await updateBottle({
+      bottleId: differentSeries.bottle.id,
+      input: { bottlingYear: 2001 },
+      context: contextFor(mod),
+    });
+    const outturnResult = await updateBottle({
+      bottleId: differentOutturn.bottle.id,
+      input: { bottlingYear: 2001 },
+      context: contextFor(mod),
+    });
+
+    expect(seriesResult.bottle).toMatchObject({
+      seriesId: secondSeries.id,
+      bottlingYear: 2001,
+      outturn: 274,
+    });
+    expect(outturnResult.bottle).toMatchObject({
+      seriesId: firstSeries.id,
+      bottlingYear: 2001,
+      outturn: 285,
+    });
+  });
+
   test("keeps marketed-title updates separate from exact references", async ({
     fixtures,
   }) => {

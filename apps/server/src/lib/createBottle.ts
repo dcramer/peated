@@ -403,6 +403,7 @@ async function findExactBottleIdentityInTransaction(
       and(
         eq(bottles.brandId, bottle.brandId),
         eq(sql`LOWER(${bottles.fullName})`, bottle.fullName.toLowerCase()),
+        sql`${bottles.seriesId} IS NOT DISTINCT FROM ${bottle.seriesId ?? null}`,
         sql`${bottles.edition} IS NOT DISTINCT FROM ${bottle.edition ?? null}`,
         sql`${bottles.statedAge} IS NOT DISTINCT FROM ${bottle.statedAge ?? null}`,
         sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${bottle.noAgeStatement ?? null}`,
@@ -415,6 +416,7 @@ async function findExactBottleIdentityInTransaction(
         sql`${bottles.singleCask} IS NOT DISTINCT FROM ${bottle.singleCask ?? null}`,
         sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${bottle.caskStrength ?? null}`,
         sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${bottle.caskNumber ?? null}`,
+        sql`${bottles.outturn} IS NOT DISTINCT FROM ${bottle.outturn ?? null}`,
       ),
     )
     .orderBy(bottles.id)
