@@ -54,6 +54,17 @@ export default async function EntityPage(props: {
     );
   }
 
+  if (entity.kind === "distillery") {
+    prefetches.push(
+      queryClient.prefetchQuery(
+        entityOverviewQueries.seriesByBottleCount(orpc, entity),
+      ),
+      queryClient.prefetchQuery(
+        entityOverviewQueries.recentReviewsAndTastings(orpc, entity),
+      ),
+    );
+  }
+
   if (entity.kind === "company") {
     prefetches.push(
       queryClient.prefetchQuery(

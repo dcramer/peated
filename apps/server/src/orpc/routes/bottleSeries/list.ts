@@ -1,12 +1,31 @@
 import { db } from "@peated/server/db";
-import { bottleSeries } from "@peated/server/db/schema";
+import {
+  bottles,
+  bottleSeries,
+  bottlesToDistillers,
+  bottleTombstones,
+  entities,
+} from "@peated/server/db/schema";
+import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
-import { BottleSeriesSchema, CursorSchema } from "@peated/server/schemas";
+import {
+  BottleSeriesListItemSchema,
+  CursorSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  getTableColumns,
+  isNotNull,
+  isNull,
+  sql,
+} from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -14,8 +33,7 @@ export default procedure
     method: "GET",
     path: "/bottle-series",
     summary: "List bottle series",
-    description:
-      "List bottle series, with optional brand filtering, search, and pagination.",
+    description: "Find bottle series by name, brand, or distillery.",
     spec: (spec) => ({ ...spec, operationId: "listBottleSeries" }),
   })
   .input(
@@ -24,20 +42,39 @@ export default procedure
         .string()
         .default("")
         .describe("Search text only. Search operators are not supported."),
-      brand: z.coerce.number().optional().describe("Filter by brand ID."),
+      brand: z.coerce
+        .number()
+        .int()
+        .positive()
+        .optional()
+        .describe("Filter by brand ID."),
+      distillery: z.coerce
+        .number()
+        .int()
+        .positive()
+        .optional()
+        .describe(
+          "Filter to bottle series with active bottles from this distillery ID.",
+        ),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
+      sort: z
+        .enum(["name", "-bottles"])
+        .default("name")
+        .describe(
+          "Use `name` for A–Z or `-bottles` for the most matching bottles first.",
+        ),
     }),
   )
   .output(
     z.object({
-      results: z.array(BottleSeriesSchema),
+      results: z.array(BottleSeriesListItemSchema),
       total: z.number(),
       rel: CursorSchema,
     }),
   )
-  .handler(async function ({ input, context, errors }) {
-    const { query, brand, cursor, limit } = input;
+  .handler(async function ({ input, context }) {
+    const { query, brand, distillery, cursor, limit, sort } = input;
     const offset = (cursor - 1) * limit;
 
     const where: (SQL<unknown> | undefined)[] = [];
@@ -50,12 +87,50 @@ export default procedure
       );
     }
 
+    const matchingBottleCount = distillery
+      ? sql<number>`(
+          SELECT COUNT(DISTINCT ${bottles.id})::int
+          FROM ${bottles}
+          INNER JOIN ${bottlesToDistillers}
+            ON ${bottlesToDistillers.bottleId} = ${bottles.id}
+          LEFT JOIN ${bottleTombstones}
+            ON ${bottleTombstones.bottleId} = ${bottles.id}
+          WHERE ${bottles.seriesId} = ${bottleSeries.id}
+            AND ${bottlesToDistillers.distillerId} = ${distillery}
+            AND ${isNotNull(bottles.groupId)}
+            AND ${isNull(bottleTombstones.bottleId)}
+        )`
+      : bottleSeries.numReleases;
+
+    if (distillery) {
+      where.push(sql`${matchingBottleCount} > 0`);
+    }
+
+    const orderBy =
+      sort === "-bottles"
+        ? [
+            desc(matchingBottleCount),
+            asc(bottleSeries.name),
+            asc(bottleSeries.id),
+          ]
+        : [asc(bottleSeries.name), asc(bottleSeries.id)];
+
     const [results, total] = await Promise.all([
       db
-        .select()
+        .select({
+          series: getTableColumns(bottleSeries),
+          brand: {
+            id: entities.id,
+            name: entities.name,
+            shortName: entities.shortName,
+            kind: entities.kind,
+          },
+          numBottles: matchingBottleCount,
+        })
         .from(bottleSeries)
+        .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
         .where(where ? and(...where) : undefined)
-        .orderBy(asc(bottleSeries.name))
+        .orderBy(...orderBy)
         .limit(limit + 1)
         .offset(offset),
       db
@@ -64,12 +139,22 @@ export default procedure
         .where(where ? and(...where) : undefined),
     ]);
 
+    const page = results.slice(0, limit);
+    const serializedSeries = await serialize(
+      BottleSeriesSerializer,
+      page.map(({ series }) => series),
+      context.user,
+    );
+
     return {
-      results: await serialize(
-        BottleSeriesSerializer,
-        results.slice(0, limit),
-        context.user,
-      ),
+      results: serializedSeries.map((series, index) => ({
+        ...series,
+        brand: {
+          ...page[index].brand,
+          peatedId: formatPeatedId("entity", page[index].brand.id),
+        },
+        numBottles: Number(page[index].numBottles),
+      })),
       total: Number(total[0].count),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

@@ -1,8 +1,11 @@
+import { db } from "@peated/server/db";
+import { bottleTombstones } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, it } from "vitest";
 
 describe("GET /bottle-series", () => {
-  it("lists series for a brand", async function ({ fixtures, defaults }) {
+  it("lists series for a brand", async function ({ fixtures }) {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const series1 = await fixtures.BottleSeries({
@@ -17,7 +20,6 @@ describe("GET /bottle-series", () => {
       brandId: brand.id,
     });
 
-    // Create a series for another brand to ensure filtering works
     const otherBrand = await fixtures.Entity({ name: "Macallan" });
     await fixtures.BottleSeries({
       name: "Edition No.",
@@ -36,6 +38,7 @@ describe("GET /bottle-series", () => {
           id: series1.id,
           name: series1.name,
           description: series1.description,
+          brand: expect.objectContaining({ id: brand.id, name: brand.name }),
         }),
         expect.objectContaining({
           id: series2.id,
@@ -46,7 +49,100 @@ describe("GET /bottle-series", () => {
     );
   });
 
-  it("filters series by query", async function ({ fixtures, defaults }) {
+  it("lists a distillery's series by matching bottle count", async function ({
+    fixtures,
+  }) {
+    const distillery = await fixtures.Entity({
+      kind: "distillery",
+      name: "Port Ellen",
+    });
+    const otherDistillery = await fixtures.Entity({
+      kind: "distillery",
+      name: "Brora",
+    });
+    const brand = await fixtures.Entity({ kind: "brand", name: "Rare Malts" });
+    const seriesWithTwoBottles = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Rare Series",
+    });
+    const seriesWithOneBottle = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Special Releases",
+    });
+    const unrelatedSeries = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Other Distillery",
+    });
+
+    await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+      seriesId: seriesWithTwoBottles.id,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+      seriesId: seriesWithTwoBottles.id,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+      seriesId: seriesWithOneBottle.id,
+    });
+    await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [otherDistillery.id],
+      seriesId: unrelatedSeries.id,
+    });
+    await fixtures.LegacyBottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+      seriesId: seriesWithTwoBottles.id,
+    });
+    const retiredBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distillery.id],
+      seriesId: seriesWithTwoBottles.id,
+    });
+    const replacementBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [otherDistillery.id],
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredBottle.id,
+      newBottleId: replacementBottle.id,
+    });
+
+    const result = await routerClient.bottleSeries.list({
+      distillery: distillery.id,
+      sort: "-bottles",
+    });
+
+    expect(result.total).toBe(2);
+    expect(result.results).toMatchObject([
+      {
+        id: seriesWithTwoBottles.id,
+        brand: { id: brand.id, name: brand.name },
+        numBottles: 2,
+      },
+      {
+        id: seriesWithOneBottle.id,
+        brand: { id: brand.id, name: brand.name },
+        numBottles: 1,
+      },
+    ]);
+  });
+
+  it("rejects an unsupported sort", async function () {
+    // SAFETY: This test sends an unsupported value through the public input boundary.
+    const error = await waitError(() =>
+      routerClient.bottleSeries.list({ sort: "popular" as "name" }),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
+
+  it("filters series by query", async function ({ fixtures }) {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 
     const series1 = await fixtures.BottleSeries({
@@ -72,10 +168,7 @@ describe("GET /bottle-series", () => {
     });
   });
 
-  it("returns empty list for non-existent brand", async function ({
-    fixtures,
-    defaults,
-  }) {
+  it("returns empty list for non-existent brand", async function () {
     const { results } = await routerClient.bottleSeries.list({
       brand: 12345,
     });

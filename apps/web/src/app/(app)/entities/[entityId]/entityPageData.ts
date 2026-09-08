@@ -102,6 +102,13 @@ export function getEntityTabs(
     });
   }
 
+  if (entity.kind === "distillery") {
+    tabs.push({
+      href: `${baseUrl}/series`,
+      label: "Series",
+    });
+  }
+
   if (entityHasBottleCatalog(entity)) {
     tabs.push({
       count: entity.publicReviewAndTastingCount,
