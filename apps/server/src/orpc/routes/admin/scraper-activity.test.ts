@@ -101,6 +101,21 @@ describe("GET /admin/scrapers/activity", () => {
       {
         externalSiteId: reviewSite.id,
         status: "succeeded",
+        trigger: "scheduled",
+        purpose: "collect",
+        recordType: "catalog",
+        requestCount: 2,
+        requestErrorCount: 0,
+        emittedItemCount: 3,
+        newItemCount: 2,
+        existingItemCount: 1,
+        createdAt: startedAt,
+        startedAt,
+        completedAt,
+      },
+      {
+        externalSiteId: reviewSite.id,
+        status: "succeeded",
         trigger: "manual",
         purpose: "preview",
         recordType: "review",
@@ -204,10 +219,10 @@ describe("GET /admin/scrapers/activity", () => {
     });
 
     expect(result.totals).toEqual({
-      requests: 21,
+      requests: 23,
       requestErrors: 2,
       requestErrorsComplete: false,
-      runs: 4,
+      runs: 5,
       failedRuns: 1,
     });
     expect(result.days[0]).toEqual({
@@ -215,12 +230,12 @@ describe("GET /admin/scrapers/activity", () => {
       ...result.totals,
       reviews: 8,
       prices: 5,
-      catalogListings: 2,
+      catalogListings: 5,
     });
     expect(result.saved).toEqual({
       reviews: { total: 8, new: 3, existing: 5 },
       prices: { total: 5, new: 2, existing: 3 },
-      catalogListings: { total: 2, new: 1, existing: 1 },
+      catalogListings: { total: 5, new: 3, existing: 2 },
     });
     expect(result.bottleResolution).toEqual({
       unknown: 1,
