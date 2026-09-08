@@ -69,6 +69,11 @@ Moderators can:
 - choose a different existing Bottle; or
 - ignore the proposal.
 
+A moderator may atomically create a complete, independently reviewed Bottle
+from a reviewable `create_new`, `match_existing`, or `no_match` proposal,
+including an `errored` proposal. An active processing lease still blocks the
+write, and `correction` proposals continue through the correction action.
+
 Approval locks and rechecks current state. It submits one Bottle ID. It never
 selects a BottleGroup representative or a legacy release. Failed work can retry
 only after reconciliation; stale work needs a new check or manual correction.

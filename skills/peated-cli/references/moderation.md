@@ -16,6 +16,30 @@ Queue filters: `kind=create_new|match_existing|correction|errored`,
 
 Fetch details before deciding and immediately before writing.
 
+For a reviewed multi-item plan, use one ordered batch file to avoid starting a
+new CLI process for every request. Put a `GET` preflight immediately before each
+mutation and assert the proposal's ID, status, and type with `expect`. Use
+`select` to keep output small. The runner stops at the first mismatch or API
+error and prints zero-based indexes, so resume from the failed item's preflight:
+
+```bash
+pnpm cli api batch --input /tmp/peated-batch.json --yes
+pnpm cli api batch --input /tmp/peated-batch.json --from 8 --yes
+```
+
+For a GET-only inventory or evidence batch, use bounded concurrency to avoid
+serial network latency:
+
+```bash
+pnpm cli api batch --input /tmp/peated-reads.json --concurrency 10
+```
+
+Concurrent batches cannot contain mutations. Keep write batches sequential so
+their preflight reads and mutations stay ordered.
+
+Never resume at a mutation after an indeterminate failure. Re-fetch first,
+because the write may have committed before the response was lost.
+
 ## Decide
 
 Compare the complete marketed Bottle:
@@ -71,7 +95,9 @@ pnpm cli api post /prices/match-queue/123 --input /tmp/peated-request.json --yes
 ```
 
 Create body: `{ "proposal": 123, "independentBottle": ... }`. Validate the
-Bottle input; do not copy incomplete classifier output.
+Bottle input; do not copy incomplete classifier output. A moderator may use this
+atomic action for a reviewable `create_new`, `match_existing`, or `no_match`
+proposal, including `errored`; active processing still blocks the write.
 
 ```bash
 pnpm cli api post /prices/match-queue/123/create-bottle --input /tmp/peated-request.json --yes
