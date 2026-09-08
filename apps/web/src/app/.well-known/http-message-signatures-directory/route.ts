@@ -8,7 +8,7 @@ import { generateNonce } from "web-bot-auth";
 import { signerFromJWK } from "web-bot-auth/crypto";
 import { z } from "zod";
 
-const CACHE_CONTROL = "public, max-age=86400";
+const CACHE_CONTROL = "no-store";
 const CONTENT_TYPE = "application/http-message-signatures-directory+json";
 const DIRECTORY_SIGNATURE_TAG = "http-message-signatures-directory";
 const SIGNATURE_LIFETIME_SECONDS = 60;

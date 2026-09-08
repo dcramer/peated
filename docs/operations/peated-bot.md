@@ -60,7 +60,8 @@ Deploy the web and scraper services before registration.
 
 1. Request the public directory and confirm it returns HTTP 200,
    `Content-Type: application/http-message-signatures-directory+json`,
-   `Signature-Input`, and `Signature`.
+   `Cache-Control: no-store`, `Signature-Input`, and `Signature`. The response
+   must not be cached because its signature expires after 60 seconds.
 2. Confirm every published key contains only `kty`, `crv`, and `x`. The `d`
    field contains the private key. Remove the secret and deployment immediately
    if it appears in the response.
