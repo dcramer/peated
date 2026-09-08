@@ -14,16 +14,12 @@ export async function GET(
   const { id } = await props.params;
 
   const { client } = await createAnonymousServerClient();
-  const { pages, startCursor } = await loadBottleSitemapPage(
-    Number(id),
-    client.bottles.list,
-  );
+  const pages = await loadBottleSitemapPage(Number(id), client.bottles.sitemap);
   const pagesSitemapXML = await buildPagesSitemap(pages);
 
   return new Response(pagesSitemapXML, {
     headers: {
       "Cache-Control": SITEMAP_CACHE_CONTROL,
-      "X-Cursor-Start": `${startCursor}`,
       "Content-Type": "application/xml",
     },
   });

@@ -12,6 +12,7 @@ import bottleFlavorProfile from "./routes/bottles/flavor-profile";
 import bottleList from "./routes/bottles/list";
 import bottlePriceList from "./routes/bottles/prices/list";
 import bottleRecommendations from "./routes/bottles/recommendations";
+import bottleSitemap from "./routes/bottles/sitemap";
 import bottleSuggestedTags from "./routes/bottles/suggested-tags";
 import bottleTags from "./routes/bottles/tags";
 import brandList from "./routes/brands/list";
@@ -95,6 +96,7 @@ export const mockRouter = mockOS.router({
       list: bottlePriceList,
     },
     recommendations: bottleRecommendations,
+    sitemap: bottleSitemap,
     suggestedTags: bottleSuggestedTags,
     tags: bottleTags,
   },

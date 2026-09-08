@@ -15,6 +15,7 @@ import merge from "./merge";
 import prices from "./prices";
 import recommendations from "./recommendations";
 import similar from "./similar";
+import sitemap from "./sitemap";
 import suggestedTags from "./suggested-tags";
 import tags from "./tags";
 import update from "./update";
@@ -37,6 +38,7 @@ export default base.tag("bottles").router({
   merge,
   validation,
   recommendations,
+  sitemap,
   similar,
   tags,
   suggestedTags,
