@@ -1165,6 +1165,7 @@ export type StorePriceMatchResolverOptions = {
   force?: boolean;
   processingToken?: string;
   reuseExistingExtraction?: boolean;
+  signal?: AbortSignal;
 };
 
 export type StorePriceReferenceRunner = typeof runScrapedBottleReference;
@@ -1184,6 +1185,7 @@ export function createStorePriceMatchResolver({
       force = false,
       processingToken,
       reuseExistingExtraction = false,
+      signal,
     }: StorePriceMatchResolverOptions = {},
   ) {
     const price = await db.query.storePrices.findFirst({
@@ -1275,7 +1277,9 @@ export function createStorePriceMatchResolver({
           parseStoredExtractedLabel(existingProposal);
       }
 
-      const classificationRun = await runReference(classificationInput);
+      const classificationRun = signal
+        ? await runReference(classificationInput, { signal })
+        : await runReference(classificationInput);
       const classification = classificationRun.result;
       classificationModelMetadata = classificationRun.modelMetadata;
 

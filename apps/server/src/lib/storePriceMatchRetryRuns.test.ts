@@ -82,6 +82,7 @@ describe("store price match retry runs", () => {
         force: true,
         processingToken: expect.any(String),
         reuseExistingExtraction: true,
+        signal: expect.any(AbortSignal),
       }),
     );
     expect(enqueueNext).toHaveBeenCalledWith({
@@ -109,6 +110,160 @@ describe("store price match retry runs", () => {
       processedCount: 2,
       reviewableCount: 2,
       status: "completed",
+    });
+  });
+
+  test("recovers an item abandoned by an interrupted worker", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({
+      name: "Retry Run Interrupted",
+    });
+    const exhaustedPrice = await fixtures.StorePrice({
+      name: "Retry Run Interrupted Repeatedly",
+    });
+    const [proposal, exhaustedProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values([
+        {
+          priceId: price.id,
+          status: "pending_review",
+          proposalType: "match_existing",
+        },
+        {
+          priceId: exhaustedPrice.id,
+          status: "pending_review",
+          proposalType: "match_existing",
+        },
+      ])
+      .returning();
+    const [run] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({
+        matchedCount: 2,
+        status: "running",
+      })
+      .returning();
+    const [item, exhaustedItem] = await db
+      .insert(storePriceMatchRetryRunItems)
+      .values([
+        {
+          attempts: 1,
+          priceId: price.id,
+          proposalId: proposal!.id,
+          runId: run!.id,
+          startedAt: new Date(Date.now() - 60_000),
+          status: "processing",
+        },
+        {
+          attempts: 3,
+          priceId: exhaustedPrice.id,
+          proposalId: exhaustedProposal!.id,
+          runId: run!.id,
+          startedAt: new Date(Date.now() - 60_000),
+          status: "processing",
+        },
+      ])
+      .returning();
+    const resolveProposal = vi.fn(async () => proposal!);
+
+    await processStorePriceMatchRetryRun({
+      enqueueNext: vi.fn(async () => undefined),
+      resolveProposal,
+      runId: run!.id,
+      staleAfterMs: 0,
+    });
+
+    const [updatedRun, updatedItem, updatedExhaustedItem] = await Promise.all([
+      db.query.storePriceMatchRetryRuns.findFirst({
+        where: eq(storePriceMatchRetryRuns.id, run!.id),
+      }),
+      db.query.storePriceMatchRetryRunItems.findFirst({
+        where: eq(storePriceMatchRetryRunItems.id, item!.id),
+      }),
+      db.query.storePriceMatchRetryRunItems.findFirst({
+        where: eq(storePriceMatchRetryRunItems.id, exhaustedItem!.id),
+      }),
+    ]);
+    expect(resolveProposal).toHaveBeenCalledOnce();
+    expect(updatedRun).toMatchObject({
+      failedCount: 1,
+      processedCount: 2,
+      reviewableCount: 1,
+      status: "completed",
+    });
+    expect(updatedItem).toMatchObject({
+      attempts: 2,
+      resultStatus: "pending_review",
+      status: "completed",
+    });
+    expect(updatedExhaustedItem).toMatchObject({
+      attempts: 3,
+      status: "failed",
+    });
+  });
+
+  test("fails a classifier attempt that exceeds its time limit", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({
+      name: "Retry Run Timeout",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+      })
+      .returning();
+    const [run] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({ matchedCount: 1 })
+      .returning();
+    const [item] = await db
+      .insert(storePriceMatchRetryRunItems)
+      .values({
+        priceId: price.id,
+        proposalId: proposal!.id,
+        runId: run!.id,
+      })
+      .returning();
+    const resolveProposal = vi.fn(
+      async (_priceId: number, options?: { signal?: AbortSignal }) => {
+        const signal = options?.signal;
+        if (!signal) throw new Error("Missing retry timeout signal.");
+        await new Promise<void>((_resolve, reject) => {
+          signal.addEventListener("abort", () => reject(signal.reason), {
+            once: true,
+          });
+        });
+        return proposal!;
+      },
+    );
+
+    await processStorePriceMatchRetryRun({
+      enqueueNext: vi.fn(async () => undefined),
+      itemTimeoutMs: 1,
+      resolveProposal,
+      runId: run!.id,
+    });
+
+    const [updatedRun, updatedItem] = await Promise.all([
+      db.query.storePriceMatchRetryRuns.findFirst({
+        where: eq(storePriceMatchRetryRuns.id, run!.id),
+      }),
+      db.query.storePriceMatchRetryRunItems.findFirst({
+        where: eq(storePriceMatchRetryRunItems.id, item!.id),
+      }),
+    ]);
+    expect(updatedRun).toMatchObject({
+      failedCount: 1,
+      processedCount: 1,
+      status: "completed",
+    });
+    expect(updatedItem).toMatchObject({
+      status: "failed",
     });
   });
 
@@ -203,6 +358,7 @@ describe("store price match retry runs", () => {
     });
 
     await vi.waitFor(() => expect(resolveProposal).toHaveBeenCalledOnce());
+    expect(enqueueNext).toHaveBeenCalledOnce();
     await cancelStorePriceMatchRetryRun(run!.id);
     finishResolution(proposal!);
     await processing;
@@ -225,6 +381,5 @@ describe("store price match retry runs", () => {
       resultStatus: null,
       status: "skipped",
     });
-    expect(enqueueNext).not.toHaveBeenCalled();
   });
 });

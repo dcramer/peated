@@ -353,6 +353,18 @@ describe("classifier output boundary", () => {
     });
   });
 
+  test("passes an abort signal to the reference agent run", async () => {
+    const signal = AbortSignal.timeout(1_000);
+    const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
+      reference: { name: "Example Single Malt" },
+      extractedIdentity: null,
+      initialCandidates: [],
+      signal,
+    });
+
+    expect(prepared.runOptions.signal).toBe(signal);
+  });
+
   test("rejects operation fields in the strict reference result", async () => {
     const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
       reference: { name: "Laphroaig Cairdeas 2022" },
