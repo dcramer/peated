@@ -19,6 +19,7 @@ import {
   robotsAllowsUrl,
   ScraperRobotsDeniedError,
 } from "./robots";
+import { createScraperSession } from "./session";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
 const adapter = async () => {};
@@ -150,6 +151,43 @@ test("uses a fresh SQL cache and refuses a disallowed path without contact", asy
     }),
   ).rejects.toBeInstanceOf(ScraperRobotsDeniedError);
   expect(fetchImpl).not.toHaveBeenCalled();
+});
+
+test("checks cached robots rules before following a redirect", async () => {
+  const { registry, run } = await setupRobotsRuntime();
+  const now = new Date("2026-08-18T12:00:00Z");
+  await db
+    .update(scrapeOrigins)
+    .set({
+      robotsState: parseRobotsRules("User-agent: *\nDisallow: /private"),
+      robotsFetchedAt: now,
+      robotsExpiresAt: new Date("2026-08-19T12:00:00Z"),
+    })
+    .where(eq(scrapeOrigins.origin, "https://example.com"));
+  const source = registry.sources.get("finedrams");
+  if (!source) throw new Error("Expected source.");
+  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(
+    new Response(null, {
+      status: 302,
+      headers: { location: "/private/article" },
+    }),
+  );
+  const session = createScraperSession({
+    run,
+    source,
+    registry,
+    executionToken: EXECUTION_TOKEN,
+    fetchImpl,
+    clock: fixedClock(),
+  });
+
+  await expect(
+    session.request({
+      target: "operator",
+      url: new URL("https://example.com/public/article"),
+    }),
+  ).rejects.toBeInstanceOf(ScraperRobotsDeniedError);
+  expect(fetchImpl).toHaveBeenCalledOnce();
 });
 
 test("caches a missing robots document as allowed for the bounded period", async () => {

@@ -82,23 +82,27 @@ export function createScraperSession<TCursor, TObservation>({
   return {
     async request(request: ScraperRequest) {
       try {
-        await ensureRobotsAllowed({
-          runId: run.id,
-          executionToken,
-          sourceKey: source.key,
-          targetKey: request.target,
-          url: request.url,
-          canResumeLater: request.canResumeLater,
-          registry,
-          fetchImpl,
-          clock,
-        });
+        const checkRobots = async (url: URL) => {
+          await ensureRobotsAllowed({
+            runId: run.id,
+            executionToken,
+            sourceKey: source.key,
+            targetKey: request.target,
+            url,
+            canResumeLater: request.canResumeLater,
+            registry,
+            fetchImpl,
+            clock,
+          });
+        };
+        await checkRobots(request.url);
         return await requestScraperUrl({
           runId: run.id,
           executionToken,
           sourceKey: source.key,
           request,
           registry,
+          checkRedirect: checkRobots,
           fetchImpl,
           clock,
         });
