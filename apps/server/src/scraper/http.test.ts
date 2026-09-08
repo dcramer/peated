@@ -263,6 +263,7 @@ test("follows declared redirects and rejects an undeclared redirect before conta
       }),
     )
     .mockResolvedValueOnce(new Response("ok"));
+  const checkRedirect = vi.fn<(url: URL) => Promise<void>>(async () => {});
 
   const response = await requestScraperUrl({
     runId: run.id,
@@ -272,11 +273,15 @@ test("follows declared redirects and rejects an undeclared redirect before conta
       url: new URL("https://example.com/start"),
     },
     registry,
+    checkRedirect,
     fetchImpl,
     clock: clockAt(),
   });
   expect(response.url.origin).toBe("https://static.example.com");
   expect(fetchImpl).toHaveBeenCalledTimes(2);
+  expect(checkRedirect).toHaveBeenCalledExactlyOnceWith(
+    new URL("https://static.example.com/catalog"),
+  );
 
   const [secondRun] = await db
     .update(externalSiteRuns)

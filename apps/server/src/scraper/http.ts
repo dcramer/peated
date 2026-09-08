@@ -256,6 +256,7 @@ export async function requestScraperUrl({
   sourceKey,
   request,
   registry,
+  checkRedirect,
   fetchImpl = fetch,
   clock = scraperSystemClock,
 }: {
@@ -264,6 +265,7 @@ export async function requestScraperUrl({
   sourceKey: string;
   request: ScraperRequest;
   registry: ScraperRegistry;
+  checkRedirect?: (url: URL) => Promise<void>;
   fetchImpl?: typeof fetch;
   clock?: ScraperHttpClock;
 }): Promise<ScraperResponse> {
@@ -303,6 +305,7 @@ export async function requestScraperUrl({
     ) {
       throw new ScraperRequestError("invalid_request");
     }
+    if (redirect > 0) await checkRedirect?.(currentUrl);
     let retry = 0;
 
     while (true) {
