@@ -41,4 +41,16 @@ test("@mobile shows Maintenance", async ({ context, page, snapshot }) => {
   await snapshot("admin/maintenance-mobile", {
     ready: page.getByRole("button", { name: "Rebuild catalog summaries" }),
   });
+
+  await expect(
+    page.getByRole("navigation", { name: "Breadcrumb" }),
+  ).toHaveCount(0);
+
+  const menu = page.locator("header details");
+  await menu.locator("summary").click();
+  await expect(menu).toHaveAttribute("open", "");
+  await menu.getByRole("link", { name: "Inbox" }).click();
+
+  await expect(page).toHaveURL("/admin/moderation/inbox");
+  await expect(menu).not.toHaveAttribute("open", "");
 });

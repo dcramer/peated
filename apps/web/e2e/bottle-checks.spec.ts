@@ -68,29 +68,6 @@ test("reviews independent catalog operations one task at a time", async ({
   ).toBeDisabled();
 });
 
-test("closes the admin menu after navigation @mobile", async ({
-  context,
-  page,
-}, testInfo) => {
-  await signIn(context, {
-    accessToken: uniqueAccessToken(testInfo, "mobile-admin-navigation"),
-    user: { ...testUser, admin: true, mod: true },
-  });
-
-  await page.goto("/admin/maintenance");
-  await expect(
-    page.getByRole("navigation", { name: "Breadcrumb" }),
-  ).toHaveCount(0);
-
-  const menu = page.locator("header details");
-  await menu.locator("summary").click();
-  await expect(menu).toHaveAttribute("open", "");
-  await menu.getByRole("link", { name: "Inbox" }).click();
-
-  await expect(page).toHaveURL("/admin/moderation/inbox");
-  await expect(menu).not.toHaveAttribute("open", "");
-});
-
 test("shows a clean moderator Bottle audit inline", async ({
   context,
   page,
