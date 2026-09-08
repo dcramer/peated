@@ -234,6 +234,7 @@ test("waits at the request limit and resumes the same run from its saved place",
     .where(eq(externalSiteRuns.id, run.id));
   expect(waiting).toMatchObject({
     status: "queued",
+    attemptCount: 0,
     cursor: { page: 2 },
     sliceRequestCount: 1,
     requestCount: 1,
@@ -257,7 +258,7 @@ test("waits at the request limit and resumes the same run from its saved place",
   expect(completed).toMatchObject({
     id: run.id,
     status: "succeeded",
-    attemptCount: 2,
+    attemptCount: 1,
     sliceRequestCount: 1,
     requestCount: 2,
   });
@@ -489,7 +490,7 @@ test("fails a waiting run after its maximum lifetime", async () => {
   await db
     .update(externalSiteRuns)
     .set({
-      createdAt: new Date("2026-08-17T11:59:59Z"),
+      createdAt: new Date("2026-08-15T11:59:59Z"),
       nextAttemptAt: new Date("2026-08-19T12:00:00Z"),
     })
     .where(eq(externalSiteRuns.id, run.id));

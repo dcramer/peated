@@ -34,7 +34,7 @@ import type {
 
 const RUN_EXECUTION_LEASE_MS = 60 * 60_000;
 const MAX_RUN_EXECUTION_ATTEMPTS = 10;
-const MAX_RUN_AGE_MS = 24 * 60 * 60_000;
+const MAX_RUN_AGE_MS = 3 * 24 * 60 * 60_000;
 const DEFAULT_WAIT_MS = 15 * 60_000;
 const REQUEST_LIMIT_WAIT_MS = 60_000;
 const RUN_LIMIT_ERROR = "Scraper run exceeded its execution limits.";
@@ -268,7 +268,7 @@ async function queueRunForLater(
       status: "queued",
       attemptCount:
         error instanceof ScraperRequestWaitError &&
-        error.reason === "target_spacing"
+        (error.reason === "target_spacing" || error.reason === "run_budget")
           ? Math.max(0, claim.run.attemptCount - 1)
           : claim.run.attemptCount,
       nextAttemptAt,

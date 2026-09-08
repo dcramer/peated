@@ -79,6 +79,11 @@ the website. A new body replaces the previous one; missing text keeps the saved
 body and its date. Deleting a review also deletes its body. Existing reviews get
 bodies on their next import when text is available.
 
+When an admin starts a review scraper, it starts over if that site has reviews
+without saved text. Long imports remember where they stopped while waiting.
+Reviews that already have saved text are updated without fetching the website
+again.
+
 Scrapers select each bottle's full review, including its introduction and
 conclusion. For configurable sources, `article.reviews` defines each full
 review. Optional `tastingNotes` remains accepted for older rules when a full

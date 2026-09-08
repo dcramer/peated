@@ -310,9 +310,9 @@ Every network attempt, including robots refreshes and retries, counts toward
 the current worker's request limit. Response bodies are read only up to the
 configured size and are never stored by the runtime.
 
-A planned wait between saved-rule requests does not count toward the
-ten-attempt safety limit. Other restarts do. Every run must finish within 24
-hours, so invalid saved progress or a permanent wait cannot live forever.
+Planned waits do not count as failed attempts. Other restarts do. A run may last
+up to three days. This gives a historical review import time to finish while
+still stopping work that cannot make progress.
 
 ## Bot identity
 

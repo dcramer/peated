@@ -1,5 +1,8 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
+  externalReviewArticles,
+  externalReviewBodies,
+  externalReviews,
   externalSiteRuns,
   externalSites,
   scrapeSources,
@@ -66,6 +69,31 @@ async function findActiveRun(siteId: number, connection: AnyDatabase = db) {
   return run;
 }
 
+async function hasReviewsWithoutSavedText(
+  connection: AnyDatabase,
+  externalSiteId: number,
+) {
+  const [review] = await connection
+    .select({ id: externalReviews.id })
+    .from(externalReviews)
+    .innerJoin(
+      externalReviewArticles,
+      eq(externalReviews.articleId, externalReviewArticles.id),
+    )
+    .leftJoin(
+      externalReviewBodies,
+      eq(externalReviewBodies.externalReviewId, externalReviews.id),
+    )
+    .where(
+      and(
+        eq(externalReviewArticles.externalSiteId, externalSiteId),
+        isNull(externalReviewBodies.externalReviewId),
+      ),
+    )
+    .limit(1);
+  return Boolean(review);
+}
+
 async function insertRun(
   connection: AnyDatabase,
   site: Pick<ExternalSite, "id" | "type">,
@@ -97,7 +125,11 @@ async function insertRun(
   }
   requireEnabledScraperTargets(registry, source);
   let cursor = null;
-  if (source.resumeFromLastRun) {
+  const restartForMissingReviewText =
+    trigger === "manual" &&
+    source.recordType === "review" &&
+    (await hasReviewsWithoutSavedText(connection, site.id));
+  if (source.resumeFromLastRun && !restartForMissingReviewText) {
     const [priorRun] = await connection
       .select({ cursor: externalSiteRuns.cursor })
       .from(externalSiteRuns)
