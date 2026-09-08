@@ -7,6 +7,11 @@ import {
   releaseScrapePermit,
 } from "./coordinator";
 import { resolveScraperOrigin } from "./definitions";
+import {
+  fetchScraperUrl,
+  hasBlockedScraperLiteralAddress,
+  isScraperNetworkPolicyError,
+} from "./networkPolicy";
 import { signScraperRequest } from "./signing";
 import type { ScraperRegistry, ScraperRequest, ScraperResponse } from "./types";
 
@@ -170,6 +175,7 @@ function transientStatus(status: number) {
 }
 
 function transportCategory(error: Error): ScraperRequestErrorCategory {
+  if (isScraperNetworkPolicyError(error)) return "invalid_request";
   if (
     error instanceof DOMException &&
     (error.name === "AbortError" || error.name === "TimeoutError")
@@ -259,7 +265,7 @@ export async function requestScraperUrl({
   request,
   registry,
   checkRedirect,
-  fetchImpl = fetch,
+  fetchImpl = fetchScraperUrl,
   clock = scraperSystemClock,
 }: {
   runId: number;
@@ -301,6 +307,9 @@ export async function requestScraperUrl({
 
   for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect += 1) {
     resolveScraperOrigin(registry, sourceKey, request.target, currentUrl);
+    if (hasBlockedScraperLiteralAddress(currentUrl)) {
+      throw new ScraperRequestError("invalid_request");
+    }
     if (
       currentUrl.origin !== initialOrigin &&
       (hasTargetSpecificHeaders || method !== "GET")
@@ -362,7 +371,11 @@ export async function requestScraperUrl({
           now: clock.now(),
         });
         await recordScrapeRequestError({ runId, executionToken });
+        const category = transportCategory(
+          error instanceof Error ? error : new Error(),
+        );
         const canRetry =
+          category !== "invalid_request" &&
           retry < permit.maxRetries &&
           (method === "GET" || request.retryable === true);
         if (canRetry && permit.remainingRequests <= 0) {
@@ -373,9 +386,7 @@ export async function requestScraperUrl({
           await clock.sleep(retryDelay(retry, clock.random()));
           continue;
         }
-        throw new ScraperRequestError(
-          transportCategory(error instanceof Error ? error : new Error()),
-        );
+        throw new ScraperRequestError(category);
       }
 
       const retryAfter = parseRetryAfter(

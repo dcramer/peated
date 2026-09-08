@@ -39,7 +39,7 @@ export function createScraperSession<TCursor, TObservation>({
   source,
   registry,
   executionToken,
-  fetchImpl = fetch,
+  fetchImpl,
   clock = scraperSystemClock,
 }: {
   run: {

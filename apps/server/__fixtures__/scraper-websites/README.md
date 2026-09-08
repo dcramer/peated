@@ -30,9 +30,10 @@ dates, reviewers, original scores, Bottle assignments, totals alongside a
 member score, and repeated collection.
 Multi-review pages retain one shared article byline without mixing bottle scores.
 
-A local HTTP server supplies the website HTML in the real-model suite.
-Model requests go directly to the configured provider without interception;
-the model chooses all parsing rules.
+A local HTTP server supplies the website HTML in the real-model suite. The suite
+intercepts only each fixture's `.example` origin and forwards it to that server.
+Model requests go directly to the configured provider; the model chooses all
+parsing rules.
 All parsing, setup checks, API validation, database writes, and relevant worker
 jobs are real. This suite uses real request timing, Redis queues, BullMQ workers,
 and registered production job handlers. Existing Bottle References keep Bottle

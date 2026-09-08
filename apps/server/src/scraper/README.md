@@ -5,8 +5,8 @@ jobs separate:
 
 - definitions list which websites each source may request;
 - runs limit work and save enough progress to resume;
-- coordination and HTTP space requests, retry temporary failures, and enforce
-  limits;
+- coordination spaces requests and enforces limits;
+- HTTP rejects non-public destinations and retries temporary failures;
 - adapters read responses and pass results through the current run.
 
 Code outside this module uses `index.ts` to initialize, queue, or execute a run.
@@ -14,8 +14,9 @@ It must not call adapters, request controls, robots checks, or scraper HTTP code
 directly. The files are split by responsibility:
 
 - `lifecycle.ts` creates runs and sends them to the worker queue;
-- `runs.ts`, `session.ts`, `http.ts`, `robots.ts`, and `coordinator.ts` own core
-  execution without importing production registry or worker infrastructure;
+- `runs.ts`, `session.ts`, `http.ts`, `networkPolicy.ts`, `robots.ts`, and
+  `coordinator.ts` own core execution without importing production registry or
+  worker infrastructure;
 - `registry.ts` lists the built-in sources and request settings;
 - `adapters/legacy/` contains migrated source implementations that still use
   the old helpers in `legacy/`;

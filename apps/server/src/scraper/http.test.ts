@@ -26,6 +26,7 @@ import {
   type ScraperHttpClock,
   type ScraperHttpStatusError,
 } from "./http";
+import { ScraperNetworkPolicyError } from "./networkPolicy";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
 const adapter = async () => {};
@@ -419,6 +420,61 @@ test("returns the redirect URL when saved work must wait", async () => {
     reason: "target_spacing",
     resumeUrl: new URL("https://example.com/final"),
   });
+  expect(fetchImpl).toHaveBeenCalledOnce();
+});
+
+test("rejects a redirect to a reserved literal address before contact", async () => {
+  const { registry, run } = await setupRuntime({
+    origins: ["https://example.com", "http://127.0.0.1"],
+  });
+  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(
+    new Response(null, {
+      status: 302,
+      headers: { location: "http://127.0.0.1/metadata" },
+    }),
+  );
+
+  const error = await waitError(
+    requestScraperUrl({
+      runId: run.id,
+      sourceKey: "finedrams",
+      request: {
+        target: "operator",
+        url: new URL("https://example.com/start"),
+      },
+      registry,
+      fetchImpl,
+      clock: clockAt(),
+    }),
+    ScraperRequestError,
+  );
+  expect(error.category).toBe("invalid_request");
+  expect(fetchImpl).toHaveBeenCalledOnce();
+});
+
+test("does not retry a DNS result rejected by the network policy", async () => {
+  const { registry, run } = await setupRuntime();
+  const fetchImpl = vi.fn<typeof fetch>().mockRejectedValue(
+    new TypeError("fetch failed", {
+      cause: new ScraperNetworkPolicyError(),
+    }),
+  );
+
+  const error = await waitError(
+    requestScraperUrl({
+      runId: run.id,
+      sourceKey: "finedrams",
+      request: {
+        target: "operator",
+        url: new URL("https://example.com/catalog"),
+      },
+      registry,
+      fetchImpl,
+      clock: clockAt(),
+    }),
+    ScraperRequestError,
+  );
+  expect(error.category).toBe("invalid_request");
   expect(fetchImpl).toHaveBeenCalledOnce();
 });
 
