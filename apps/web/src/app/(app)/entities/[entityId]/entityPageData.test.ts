@@ -120,6 +120,35 @@ describe("getEntityTabs", () => {
       },
     ]);
   });
+
+  it("adds a Series tab for distilleries", () => {
+    expect(
+      getEntityTabs({
+        id: 321,
+        kind: "distillery",
+        name: "Port Ellen",
+        shortName: null,
+        totalBottles: 42,
+        publicReviewAndTastingCount: 8,
+      }),
+    ).toEqual([
+      { href: "/distillers/321-port-ellen", label: "Overview" },
+      {
+        count: 42,
+        href: "/distillers/321-port-ellen/bottles",
+        label: "Bottles",
+      },
+      {
+        href: "/distillers/321-port-ellen/series",
+        label: "Series",
+      },
+      {
+        count: 8,
+        href: "/distillers/321-port-ellen/tastings",
+        label: "Reviews & tastings",
+      },
+    ]);
+  });
 });
 
 describe("getEntityCurrentHref", () => {

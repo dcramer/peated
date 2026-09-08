@@ -22,6 +22,8 @@ import { EntityOverviewLayout } from "./entityOverviewLayout.stylex";
 import { entityOverviewQueries } from "./entityOverviewQueries";
 import { useEntityPage } from "./entityPageFrameClient.stylex";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
+import { EntityReviewsAndTastingsOverview } from "./entityReviewsAndTastingsOverview";
+import { EntitySeriesOverview } from "./entitySeriesOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
 export function EntityOverviewClient() {
@@ -33,6 +35,12 @@ export function EntityOverviewClient() {
   const eventListQuery = useQuery(entityOverviewQueries.events(orpc, entity));
   const bottleListQuery = useQuery(
     entityOverviewQueries.popularBottles(orpc, entity),
+  );
+  const seriesListQuery = useQuery(
+    entityOverviewQueries.seriesByBottleCount(orpc, entity),
+  );
+  const recentReviewsAndTastingsQuery = useQuery(
+    entityOverviewQueries.recentReviewsAndTastings(orpc, entity),
   );
   const releaseListQuery = useQuery(
     entityOverviewQueries.releases(orpc, entity),
@@ -102,6 +110,13 @@ export function EntityOverviewClient() {
             releaseList={releaseListQuery.data}
             retry={() => void releaseListQuery.refetch()}
           />
+          <EntitySeriesOverview
+            entity={entity}
+            error={Boolean(seriesListQuery.error)}
+            pending={seriesListQuery.isPending}
+            retry={() => void seriesListQuery.refetch()}
+            seriesList={seriesListQuery.data}
+          />
           <EntityBottleOverview
             bottleList={bottleListQuery.data}
             createBottleHref={getEntityBottleCreateHref(entity)}
@@ -110,6 +125,13 @@ export function EntityOverviewClient() {
             pending={bottleListQuery.isPending}
             retry={() => void bottleListQuery.refetch()}
             totalBottles={entity.totalBottles}
+          />
+          <EntityReviewsAndTastingsOverview
+            entity={entity}
+            error={Boolean(recentReviewsAndTastingsQuery.error)}
+            pending={recentReviewsAndTastingsQuery.isPending}
+            retry={() => void recentReviewsAndTastingsQuery.refetch()}
+            reviewsAndTastings={recentReviewsAndTastingsQuery.data}
           />
           <EntityHistoryOverview
             entityName={entity.name}

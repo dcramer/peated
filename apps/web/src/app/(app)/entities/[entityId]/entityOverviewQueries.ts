@@ -38,6 +38,22 @@ export const entityOverviewQueries = {
     }),
     enabled: entityHasBottleCatalog(entity),
   }),
+  seriesByBottleCount: (orpc: ORPCQueryUtils, entity: Entity) => ({
+    ...orpc.bottleSeries.list.queryOptions({
+      input: {
+        distillery: entity.id,
+        limit: 4,
+        sort: "-bottles",
+      },
+    }),
+    enabled: entity.kind === "distillery",
+  }),
+  recentReviewsAndTastings: (orpc: ORPCQueryUtils, entity: Entity) => ({
+    ...orpc.activity.reviewsAndTastings.queryOptions({
+      input: { entity: entity.id, limit: 3 },
+    }),
+    enabled: entity.kind === "distillery",
+  }),
   releases: (orpc: ORPCQueryUtils, entity: Entity) => ({
     ...orpc.bottles.list.queryOptions({
       input: {

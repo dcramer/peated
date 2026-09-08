@@ -25,6 +25,7 @@ export type ListSortOption = {
 export type ListToolbarProps = {
   count: number;
   noun: string;
+  pluralNoun?: string;
   onExport?: () => void;
   onSortChange: (value: string) => void;
   pending?: boolean;
@@ -37,6 +38,7 @@ export type ListToolbarProps = {
 export function ListToolbar({
   count,
   noun,
+  pluralNoun = `${noun}s`,
   onExport,
   onSortChange,
   pending = false,
@@ -48,7 +50,7 @@ export function ListToolbar({
     <div {...stylex.props(styles.toolbar)}>
       <p aria-live="polite" {...stylex.props(styles.count)}>
         <strong {...stylex.props(styles.countValue)}>
-          {count.toLocaleString("en-US")} {count === 1 ? noun : `${noun}s`}
+          {count.toLocaleString("en-US")} {count === 1 ? noun : pluralNoun}
         </strong>
         {total !== undefined ? (
           <span
@@ -68,7 +70,7 @@ export function ListToolbar({
         <label {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}>
           <span>Sort</span>
           <CompactSelect
-            aria-label={`Sort ${noun}s`}
+            aria-label={`Sort ${pluralNoun}`}
             onChange={(event) => onSortChange(event.currentTarget.value)}
             value={sort}
           >

@@ -43,14 +43,26 @@ export const BottleSeriesSchema = z.object({
     .describe("Timestamp when the series was last updated"),
 });
 
+const BottleSeriesBrandSchema = EntitySchema.pick({
+  id: true,
+  peatedId: true,
+  name: true,
+  shortName: true,
+  kind: true,
+});
+
+export const BottleSeriesListItemSchema = BottleSeriesSchema.extend({
+  brand: BottleSeriesBrandSchema.describe("Brand that owns this bottle series"),
+  numBottles: z
+    .number()
+    .int()
+    .nonnegative()
+    .readonly()
+    .describe("Number of active bottles matching the list filters"),
+});
+
 export const BottleSeriesDetailsSchema = BottleSeriesSchema.extend({
-  brand: EntitySchema.pick({
-    id: true,
-    peatedId: true,
-    name: true,
-    shortName: true,
-    kind: true,
-  }).describe("Brand that owns this bottle series"),
+  brand: BottleSeriesBrandSchema.describe("Brand that owns this bottle series"),
   distillers: z
     .array(
       EntitySchema.pick({
