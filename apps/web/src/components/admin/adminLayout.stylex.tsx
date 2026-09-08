@@ -2,10 +2,10 @@
 
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, Menu } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { SectionHeading } from "../sectionHeading.stylex";
+import { useRef, type ReactNode } from "react";
+import { AppLink } from "../appLink";
+import { LinkPending } from "../linkPending.stylex";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
@@ -37,7 +37,7 @@ export type AdminLayoutProps = {
   groups: readonly AdminNavigationGroup[];
 };
 
-function isCurrentHref(currentHref: string, item: AdminNavigationItem) {
+export function isCurrentHref(currentHref: string, item: AdminNavigationItem) {
   return item.match === "exact"
     ? currentHref === item.href
     : currentHref === item.href || currentHref.startsWith(`${item.href}/`);
@@ -46,26 +46,30 @@ function isCurrentHref(currentHref: string, item: AdminNavigationItem) {
 function AdminNavigation({
   currentHref,
   groups,
+  onNavigate,
 }: {
   currentHref: string;
   groups: readonly AdminNavigationGroup[];
+  onNavigate?: () => void;
 }) {
   return (
     <nav aria-label="Admin navigation" {...stylex.props(styles.navigation)}>
       {groups.map((group) => (
         <section key={group.label} {...stylex.props(styles.navigationGroup)}>
-          <div {...stylex.props(styles.groupLabel)}>
-            <SectionHeading>{group.label}</SectionHeading>
-          </div>
+          <h2 {...stylex.props(foundationStyles.fieldLabel, styles.groupLabel)}>
+            {group.label}
+          </h2>
           <ul {...stylex.props(styles.navigationList)}>
             {group.items.map((item) => {
               const current = isCurrentHref(currentHref, item);
 
               return (
                 <li key={item.href}>
-                  <Link
+                  <AppLink
                     aria-current={current ? "page" : undefined}
                     href={item.href}
+                    onClick={onNavigate}
+                    prefetch={null}
                     {...stylex.props(
                       foundationStyles.interactiveSmall,
                       styles.navigationLink,
@@ -73,7 +77,8 @@ function AdminNavigation({
                     )}
                   >
                     {item.label}
-                  </Link>
+                    <LinkPending />
+                  </AppLink>
                 </li>
               );
             })}
@@ -92,19 +97,30 @@ export function AdminLayout({
 }: AdminLayoutProps) {
   const pathname = usePathname();
   const activeHref = currentHref ?? pathname;
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+
+  function closeMobileMenu() {
+    mobileMenuRef.current?.removeAttribute("open");
+  }
 
   return (
     <div {...stylex.props(foundationStyles.document, styles.layout)}>
+      <AppLink
+        href="#admin-content"
+        {...stylex.props(foundationStyles.interactiveSmall, styles.skipLink)}
+      >
+        Skip to admin content
+      </AppLink>
       <header {...stylex.props(styles.mobileHeader)}>
-        <Link href="/admin" {...stylex.props(styles.mobileBrand)}>
+        <AppLink href="/admin" {...stylex.props(styles.mobileBrand)}>
           <span {...stylex.props(styles.brandName)}>Peated</span>
           <span
             {...stylex.props(foundationStyles.metadata, styles.brandContext)}
           >
             Admin
           </span>
-        </Link>
-        <details {...stylex.props(styles.mobileMenu)}>
+        </AppLink>
+        <details ref={mobileMenuRef} {...stylex.props(styles.mobileMenu)}>
           <summary
             {...stylex.props(
               foundationStyles.interactiveSmall,
@@ -115,9 +131,14 @@ export function AdminLayout({
             Menu
           </summary>
           <div {...stylex.props(styles.mobileMenuPanel)}>
-            <AdminNavigation currentHref={activeHref} groups={groups} />
-            <Link
+            <AdminNavigation
+              currentHref={activeHref}
+              groups={groups}
+              onNavigate={closeMobileMenu}
+            />
+            <AppLink
               href="/"
+              onClick={closeMobileMenu}
               {...stylex.props(
                 foundationStyles.interactiveSmall,
                 styles.returnLink,
@@ -125,31 +146,32 @@ export function AdminLayout({
             >
               <ArrowLeft aria-hidden="true" size={15} />
               Return to Peated
-            </Link>
+            </AppLink>
           </div>
         </details>
       </header>
 
       <aside {...stylex.props(styles.sidebar)}>
-        <Link href="/admin" {...stylex.props(styles.brand)}>
+        <AppLink href="/admin" {...stylex.props(styles.brand)}>
           <span {...stylex.props(styles.brandName)}>Peated</span>
           <span
             {...stylex.props(foundationStyles.metadata, styles.brandContext)}
           >
             Admin
           </span>
-        </Link>
-        <Link
+        </AppLink>
+        <AdminNavigation currentHref={activeHref} groups={groups} />
+        <AppLink
           href="/"
           {...stylex.props(
             foundationStyles.interactiveSmall,
             styles.returnLink,
+            styles.desktopReturnLink,
           )}
         >
           <ArrowLeft aria-hidden="true" size={15} />
           Return to Peated
-        </Link>
-        <AdminNavigation currentHref={activeHref} groups={groups} />
+        </AppLink>
       </aside>
 
       <main id="admin-content" {...stylex.props(styles.content)}>
@@ -178,6 +200,23 @@ const styles = stylex.create({
     backgroundColor: colors.ground,
     [WIDE]: { display: "none" },
   },
+  skipLink: {
+    position: "fixed",
+    zIndex: zIndices.menuControl,
+    top: space.x2,
+    left: space.x2,
+    padding: space.x3,
+    borderRadius: controlMetrics.radius,
+    outline: "none",
+    backgroundColor: colors.ink,
+    color: colors.ground,
+    textDecoration: "none",
+    transform: {
+      default: "translateY(calc(-100% - 16px))",
+      ":focus-visible": "translateY(0)",
+    },
+    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
+  },
   mobileBrand: {
     display: "flex",
     alignItems: "baseline",
@@ -193,7 +232,7 @@ const styles = stylex.create({
   mobileMenu: { position: "relative" },
   mobileMenuTrigger: {
     display: "inline-flex",
-    minHeight: "34px",
+    minHeight: "44px",
     alignItems: "center",
     gap: space.x2,
     paddingRight: space.x3,
@@ -214,9 +253,12 @@ const styles = stylex.create({
     position: "absolute",
     top: `calc(100% + ${space.x2})`,
     right: 0,
+    display: "flex",
     boxSizing: "border-box",
     width: "min(320px, calc(100vw - 24px))",
     maxHeight: "calc(100dvh - 76px)",
+    flexDirection: "column",
+    gap: space.x6,
     padding: space.x3,
     overflowY: "auto",
     borderWidth: "1px",
@@ -275,28 +317,27 @@ const styles = stylex.create({
     display: "inline-flex",
     minHeight: "34px",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: space.x2,
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.hairline,
-    borderRadius: controlMetrics.radius,
+    paddingRight: space.x2,
+    paddingLeft: space.x2,
+    borderRadius: controlMetrics.radiusSmall,
     outline: "none",
     backgroundColor: {
-      default: colors.ground,
+      default: "transparent",
       ":hover": colors.inset,
       ":active": colors.inset,
     },
-    color: colors.ink,
-    fontWeight: 700,
+    color: colors.inkMuted,
+    fontWeight: 600,
     textDecoration: "none",
     boxShadow: {
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+    [COMPACT]: { minHeight: "44px" },
   },
+  desktopReturnLink: { marginTop: "auto" },
   navigation: {
     display: "flex",
     flexDirection: "column",
@@ -307,7 +348,17 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x2,
   },
-  groupLabel: { paddingRight: space.x2, paddingLeft: space.x2 },
+  groupLabel: {
+    margin: 0,
+    paddingRight: space.x3,
+    paddingLeft: space.x3,
+    color: colors.accentDeep,
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.08em",
+    lineHeight: 1.3,
+    textTransform: "uppercase",
+  },
   navigationList: {
     display: "flex",
     margin: 0,
@@ -317,6 +368,7 @@ const styles = stylex.create({
     listStyle: "none",
   },
   navigationLink: {
+    position: "relative",
     display: "flex",
     minHeight: "34px",
     alignItems: "center",
@@ -336,6 +388,7 @@ const styles = stylex.create({
       default: "none",
       ":focus-visible": effects.focusRing,
     },
+    [COMPACT]: { minHeight: "44px" },
   },
   currentNavigationLink: {
     backgroundColor: colors.accentTint,

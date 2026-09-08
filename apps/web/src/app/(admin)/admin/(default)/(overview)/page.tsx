@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
@@ -26,9 +25,6 @@ export default function Page() {
 
   return (
     <AdminPage>
-      <AdminBreadcrumbs
-        items={[{ label: "Overview", href: "/admin", current: true }]}
-      />
       <AdminPageHeader
         title="Operations"
         description="See what Peated is processing and what needs attention."

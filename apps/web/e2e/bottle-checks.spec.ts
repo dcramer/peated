@@ -18,7 +18,19 @@ test("reviews independent catalog operations one task at a time", async ({
     user: { ...testUser, admin: true, mod: true },
   });
 
-  await page.goto("/admin/moderation/inbox/operation/701");
+  await page.goto("/admin/moderation/inbox");
+  const inbox = page.getByRole("region", { name: "Moderation inbox" });
+  await expect(inbox).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Moderation" }),
+  ).toHaveCount(0);
+  await inbox.evaluate((element) => {
+    element.dataset.navigationMarker = "retained";
+  });
+  await inbox.getByRole("link", { name: /Update Entity #42/ }).click();
+
+  await expect(page).toHaveURL("/admin/moderation/inbox/operation/701");
+  await expect(inbox).toHaveAttribute("data-navigation-marker", "retained");
 
   await expect(
     page.getByRole("heading", {
@@ -54,6 +66,29 @@ test("reviews independent catalog operations one task at a time", async ({
   await expect(
     blockedOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeDisabled();
+});
+
+test("closes the admin menu after navigation @mobile", async ({
+  context,
+  page,
+}, testInfo) => {
+  await signIn(context, {
+    accessToken: uniqueAccessToken(testInfo, "mobile-admin-navigation"),
+    user: { ...testUser, admin: true, mod: true },
+  });
+
+  await page.goto("/admin/maintenance");
+  await expect(
+    page.getByRole("navigation", { name: "Breadcrumb" }),
+  ).toHaveCount(0);
+
+  const menu = page.locator("header details");
+  await menu.locator("summary").click();
+  await expect(menu).toHaveAttribute("open", "");
+  await menu.getByRole("link", { name: "Inbox" }).click();
+
+  await expect(page).toHaveURL("/admin/moderation/inbox");
+  await expect(menu).not.toHaveAttribute("open", "");
 });
 
 test("shows a clean moderator Bottle audit inline", async ({

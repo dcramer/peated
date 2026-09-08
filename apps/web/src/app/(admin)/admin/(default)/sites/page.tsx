@@ -3,7 +3,6 @@
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
-  AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
@@ -37,9 +36,6 @@ export default function Page() {
 
   return (
     <AdminPage>
-      <AdminBreadcrumbs
-        items={[{ label: "Scrapers", href: "/admin/sites", current: true }]}
-      />
       <AdminPageHeader
         title="Scrapers"
         actions={

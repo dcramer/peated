@@ -4,7 +4,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 
-import { AdminTextLink } from "./adminContent.stylex";
+import { TextLink } from "..";
 import { AdminTable } from "./adminTable.stylex";
 
 export default function StorePriceTable({
@@ -21,7 +21,7 @@ export default function StorePriceTable({
           name: "listing",
           value: (price) => (
             <div>
-              <AdminTextLink href={price.url}>{price.name}</AdminTextLink>
+              <TextLink href={price.url}>{price.name}</TextLink>
               {price.bottle ? (
                 <BottleIdentityRow
                   {...toBottleListItem(price.bottle)}

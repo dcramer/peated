@@ -4,9 +4,9 @@ import * as stylex from "@stylexjs/stylex";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 import { Timestamp } from "../timestamp";
 
+import { TextLink } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
-import { AdminTextLink } from "./adminContent.stylex";
 import { AdminTable } from "./adminTable.stylex";
 
 export default function ReviewTable({
@@ -34,9 +34,9 @@ export function ReviewRows({
           name: "review",
           value: (review) => (
             <div {...stylex.props(styles.review)}>
-              <AdminTextLink href={review.url} title={review.name} truncate>
+              <TextLink href={review.url} title={review.name} truncate>
                 {review.name}
-              </AdminTextLink>
+              </TextLink>
               <div
                 {...stylex.props(foundationStyles.metadata, styles.metadata)}
               >

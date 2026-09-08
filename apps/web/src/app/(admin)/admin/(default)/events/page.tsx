@@ -2,7 +2,6 @@
 
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
-  AdminBreadcrumbs,
   AdminPage,
   AdminPageHeader,
   AdminSection,
@@ -34,19 +33,6 @@ export default function Page() {
 
   return (
     <AdminPage>
-      <AdminBreadcrumbs
-        items={[
-          {
-            label: "Admin",
-            href: "/admin",
-          },
-          {
-            label: "Events",
-            href: "/admin/events",
-            current: true,
-          },
-        ]}
-      />
       <AdminPageHeader
         actions={
           <Button variant="default" href="/admin/events/add">

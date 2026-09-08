@@ -139,7 +139,7 @@ export function ModerationLoading({ children }: { children: ReactNode }) {
 }
 
 const styles = stylex.create({
-  frame: { minWidth: 0, minHeight: "70dvh" },
+  frame: { minWidth: 0 },
   content: {
     boxSizing: "border-box",
     width: "100%",

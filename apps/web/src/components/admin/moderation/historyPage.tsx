@@ -31,7 +31,6 @@ import {
   ModerationLoading,
   ModerationStack,
 } from "./moderationDetail.stylex";
-import ModerationNav from "./moderationNav";
 
 type Event = Outputs["admin"]["moderation"]["listHistory"]["results"][number];
 
@@ -194,23 +193,20 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
   );
 
   return (
-    <>
-      <ModerationNav />
-      <AdminSplitView
-        list={list}
-        selected={Boolean(selectedKey)}
-        detail={
-          <ModerationDetailFrame>
-            {selectedKey ? (
-              <HistoryDetails eventKey={selectedKey} />
-            ) : (
-              <ModerationEmpty title="Choose a completed decision">
-                History is read-only and comes from completed decisions.
-              </ModerationEmpty>
-            )}
-          </ModerationDetailFrame>
-        }
-      />
-    </>
+    <AdminSplitView
+      list={list}
+      selected={Boolean(selectedKey)}
+      detail={
+        <ModerationDetailFrame>
+          {selectedKey ? (
+            <HistoryDetails eventKey={selectedKey} />
+          ) : (
+            <ModerationEmpty title="Choose a completed decision">
+              History is read-only and comes from completed decisions.
+            </ModerationEmpty>
+          )}
+        </ModerationDetailFrame>
+      }
+    />
   );
 }

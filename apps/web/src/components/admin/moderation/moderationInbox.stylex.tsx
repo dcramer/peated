@@ -5,11 +5,17 @@ import ConfirmationDialog from "@peated/web/components/confirmationDialog.client
 import TimeSince from "@peated/web/components/timeSince";
 import { buildQueryString } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { Button, CursorPager } from "../..";
+import {
+  AppLink,
+  Button,
+  CursorPager,
+  LoadingList,
+  LoadingPlaceholder,
+  TextInput,
+} from "../..";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,
@@ -17,6 +23,7 @@ import {
   effects,
   space,
 } from "../../../styles/tokens.stylex";
+import { LinkPending } from "../../linkPending.stylex";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 
@@ -52,6 +59,52 @@ export default function ModerationInbox(props: InboxListProps) {
     />
   );
 }
+
+/** Keeps the inbox controls and row density stable while work loads. */
+export function ModerationInboxLoading({
+  title = "Inbox",
+}: {
+  title?: string;
+}) {
+  return (
+    <section
+      aria-busy="true"
+      aria-label={`Loading ${title.toLowerCase()}`}
+      role="status"
+      {...stylex.props(styles.root)}
+    >
+      <header {...stylex.props(styles.header)}>
+        <div {...stylex.props(styles.titleRow)}>
+          <h1
+            {...stylex.props(foundationStyles.pageTitleCompact, styles.title)}
+          >
+            {title}
+          </h1>
+          <LoadingPlaceholder preset="metadata" />
+        </div>
+        <div aria-hidden="true" {...stylex.props(styles.loadingSearch)} />
+        <div aria-hidden="true" {...stylex.props(styles.loadingFilters)}>
+          {Array.from({ length: 4 }, (_, index) => (
+            <LoadingPlaceholder
+              delay={loadingDelays[index]}
+              key={index}
+              preset="metadata"
+            />
+          ))}
+        </div>
+      </header>
+      <div {...stylex.props(styles.loadingTasks)}>
+        <LoadingList
+          label={`Loading ${title.toLowerCase()} records`}
+          rows={6}
+          variant="text"
+        />
+      </div>
+    </section>
+  );
+}
+
+const loadingDelays = [0, 1, 2, 3] as const;
 
 export function ModerationInboxContent({
   bulkError,
@@ -134,20 +187,21 @@ export function ModerationInboxContent({
           <label htmlFor="moderation-search" {...stylex.props(styles.srOnly)}>
             Search inbox
           </label>
-          <input
+          <TextInput
+            controlSize="md"
             defaultValue={query}
             id="moderation-search"
             name="query"
             placeholder="Search decisions"
             type="search"
-            {...stylex.props(foundationStyles.input, styles.search)}
           />
         </form>
         <nav aria-label="Inbox filters" {...stylex.props(styles.filters)}>
           {filters.map((filter) => (
-            <Link
+            <AppLink
               aria-current={filter.active ? "page" : undefined}
               href={filter.href}
+              prefetch={null}
               key={filter.label}
               {...stylex.props(
                 foundationStyles.interactiveSmall,
@@ -156,7 +210,8 @@ export function ModerationInboxContent({
               )}
             >
               {filter.label}
-            </Link>
+              <LinkPending />
+            </AppLink>
           ))}
         </nav>
         {inconclusive && data.counts.inconclusive > 0 ? (
@@ -202,7 +257,7 @@ export function ModerationInboxContent({
             const selected = task.key === selectedKey;
             return (
               <li key={task.key} {...stylex.props(styles.taskItem)}>
-                <Link
+                <AppLink
                   aria-current={selected ? "true" : undefined}
                   href={inboxTaskHref(task, searchParams)}
                   {...stylex.props(
@@ -257,7 +312,8 @@ export function ModerationInboxContent({
                       {task.statusLabel}
                     </span>
                   </span>
-                </Link>
+                  <LinkPending />
+                </AppLink>
               </li>
             );
           })}
@@ -322,23 +378,20 @@ const styles = stylex.create({
   },
   count: { color: colors.inkMuted },
   searchForm: { marginTop: space.x4 },
-  search: {
-    boxSizing: "border-box",
+  loadingSearch: {
     width: "100%",
-    height: "40px",
-    paddingRight: space.x3,
-    paddingLeft: space.x3,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.fieldRule,
+    height: controlMetrics.controlHeight,
+    marginTop: space.x4,
     borderRadius: controlMetrics.radius,
-    outline: "none",
     backgroundColor: colors.inset,
-    color: colors.ink,
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-    "::placeholder": { color: colors.inkMuted },
-    "::-webkit-search-cancel-button": { appearance: "none" },
   },
+  loadingFilters: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: space.x2,
+    marginTop: space.x3,
+  },
+  loadingTasks: { paddingRight: space.x4, paddingLeft: space.x4 },
   srOnly: {
     position: "absolute",
     width: "1px",
@@ -354,6 +407,7 @@ const styles = stylex.create({
     flexWrap: "wrap",
   },
   filter: {
+    position: "relative",
     display: "inline-flex",
     minHeight: "32px",
     alignItems: "center",
@@ -402,6 +456,7 @@ const styles = stylex.create({
     borderBottomColor: colors.hairline,
   },
   taskLink: {
+    position: "relative",
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
@@ -443,12 +498,12 @@ const styles = stylex.create({
   blocked: { color: colors.accentDeep },
   empty: {
     display: "flex",
-    minHeight: "180px",
+    minHeight: "120px",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "column",
     gap: space.x2,
-    padding: space.x8,
+    padding: space.x6,
     color: colors.inkMuted,
     textAlign: "center",
   },

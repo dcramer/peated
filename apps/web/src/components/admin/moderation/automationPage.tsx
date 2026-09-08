@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { TextLink } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
@@ -9,7 +10,6 @@ import {
   AdminPageHeader,
   AdminSection,
   AdminStatus,
-  AdminTextLink,
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminAlert as Alert } from "@peated/web/components/admin/adminUtility.stylex";
@@ -20,8 +20,6 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-
-import ModerationNav from "./moderationNav";
 
 export default function AutomationPage() {
   const orpc = useORPC();
@@ -83,105 +81,98 @@ export default function AutomationPage() {
   }
 
   return (
-    <>
-      <ModerationNav />
-      <AdminPage>
-        <AdminPageHeader
-          title="Background work"
-          description="Inspect work that stopped and retry failed price matches. Decisions that need you stay in Inbox."
-          metadata={
-            <>
-              Updated <TimeSince date={data.generatedAt} />
-            </>
-          }
-        />
-        {activeRun.data.run ? (
-          <AdminSection
-            title={`Price retry #${activeRun.data.run.id}`}
-            description={`${activeRun.data.run.processedCount} of ${activeRun.data.run.matchedCount} checked`}
-            action={
-              <Button
-                disabled={cancel.isPending}
-                loading={cancel.isPending}
-                onClick={() => void cancelRun()}
-              >
-                Cancel run
-              </Button>
-            }
-            tone="accent"
-          >
-            <AdminStatus tone="accent">{activeRun.data.run.status}</AdminStatus>
-          </AdminSection>
-        ) : null}
-        {error ? <Alert type="error">{error}</Alert> : null}
+    <AdminPage>
+      <AdminPageHeader
+        title="Background work"
+        description="Inspect work that stopped and retry failed price matches. Decisions that need you stay in Inbox."
+        metadata={
+          <>
+            Updated <TimeSince date={data.generatedAt} />
+          </>
+        }
+      />
+      {activeRun.data.run ? (
         <AdminSection
-          title="Needs attention"
-          description={`${data.needsAttention.length} items`}
-        >
-          {data.needsAttention.length ? (
-            <AdminTable
-              items={data.needsAttention}
-              primaryKey={(item) => item.key}
-              columns={[
-                { name: "item", value: (item) => item.title },
-                {
-                  name: "status",
-                  value: (item) => (
-                    <AdminStatus tone="danger">{item.status}</AdminStatus>
-                  ),
-                },
-                { name: "detail", value: (item) => item.detail ?? "—" },
-                {
-                  name: "action",
-                  value: (item) =>
-                    item.href ? (
-                      <AdminTextLink href={item.href}>Open</AdminTextLink>
-                    ) : (
-                      "—"
-                    ),
-                },
-              ]}
-            />
-          ) : (
-            "No background work needs attention."
-          )}
-        </AdminSection>
-        <AdminSection
-          title="Recent price retries"
+          title={`Price retry #${activeRun.data.run.id}`}
+          description={`${activeRun.data.run.processedCount} of ${activeRun.data.run.matchedCount} checked`}
           action={
-            <AdminActions>
-              <Button
-                disabled={Boolean(activeRun.data.run) || retryAll.isPending}
-                loading={retryAll.isPending}
-                onClick={() => void startRetry()}
-                size="sm"
-              >
-                Retry price matches
-              </Button>
-            </AdminActions>
+            <Button
+              disabled={cancel.isPending}
+              loading={cancel.isPending}
+              onClick={() => void cancelRun()}
+            >
+              Cancel run
+            </Button>
           }
+          tone="accent"
         >
-          {data.recentRuns.length ? (
-            <AdminTable
-              items={data.recentRuns}
-              primaryKey={(run) => run.key}
-              columns={[
-                { name: "run", value: (run) => run.title },
-                {
-                  name: "status",
-                  value: (run) => <AdminStatus>{run.status}</AdminStatus>,
-                },
-                {
-                  name: "detail",
-                  value: (run) => run.detail ?? "Progress unavailable",
-                },
-              ]}
-            />
-          ) : (
-            "No recent price retries."
-          )}
+          <AdminStatus tone="accent">{activeRun.data.run.status}</AdminStatus>
         </AdminSection>
-      </AdminPage>
-    </>
+      ) : null}
+      {error ? <Alert type="error">{error}</Alert> : null}
+      <AdminSection
+        title="Needs attention"
+        description={`${data.needsAttention.length} items`}
+      >
+        {data.needsAttention.length ? (
+          <AdminTable
+            items={data.needsAttention}
+            primaryKey={(item) => item.key}
+            columns={[
+              { name: "item", value: (item) => item.title },
+              {
+                name: "status",
+                value: (item) => (
+                  <AdminStatus tone="danger">{item.status}</AdminStatus>
+                ),
+              },
+              { name: "detail", value: (item) => item.detail ?? "—" },
+              {
+                name: "action",
+                value: (item) =>
+                  item.href ? <TextLink href={item.href}>Open</TextLink> : "—",
+              },
+            ]}
+          />
+        ) : (
+          "No background work needs attention."
+        )}
+      </AdminSection>
+      <AdminSection
+        title="Recent price retries"
+        action={
+          <AdminActions>
+            <Button
+              disabled={Boolean(activeRun.data.run) || retryAll.isPending}
+              loading={retryAll.isPending}
+              onClick={() => void startRetry()}
+              size="sm"
+            >
+              Retry price matches
+            </Button>
+          </AdminActions>
+        }
+      >
+        {data.recentRuns.length ? (
+          <AdminTable
+            items={data.recentRuns}
+            primaryKey={(run) => run.key}
+            columns={[
+              { name: "run", value: (run) => run.title },
+              {
+                name: "status",
+                value: (run) => <AdminStatus>{run.status}</AdminStatus>,
+              },
+              {
+                name: "detail",
+                value: (run) => run.detail ?? "Progress unavailable",
+              },
+            ]}
+          />
+        ) : (
+          "No recent price retries."
+        )}
+      </AdminSection>
+    </AdminPage>
   );
 }

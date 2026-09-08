@@ -3,6 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
+import { TextLink } from "..";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
@@ -11,7 +12,6 @@ import {
   space,
 } from "../../styles/tokens.stylex";
 import { SectionHeading } from "../sectionHeading.stylex";
-import { AdminTextLink } from "./adminContent.stylex";
 
 type OperationsData = Outputs["admin"]["moderation"]["automation"];
 type BottleResolution = Outputs["admin"]["scraperActivity"]["bottleResolution"];
@@ -186,9 +186,7 @@ export default function OperationsOverview({
           <SectionHeading id="system-status-heading">
             System status
           </SectionHeading>
-          <AdminTextLink href="/admin/moderation/automation">
-            View work
-          </AdminTextLink>
+          <TextLink href="/admin/moderation/automation">View work</TextLink>
         </div>
 
         <dl {...stylex.props(styles.statusList)}>
@@ -271,6 +269,7 @@ const styles = stylex.create({
   overviewGrid: {
     display: "grid",
     minWidth: 0,
+    alignItems: "start",
     gridTemplateColumns: {
       default: "minmax(0, 1.7fr) minmax(280px, 1fr)",
       "@media (max-width: 839px)": "1fr",
