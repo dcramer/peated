@@ -52,6 +52,7 @@ describe("HTTP message signature directory", () => {
     expect(response.headers.get("content-type")).toBe(
       "application/http-message-signatures-directory+json",
     );
+    expect(response.headers.get("cache-control")).toBe("no-store");
     const publishedKey = directory.keys[0];
     expect(publishedKey.kty).toBe("OKP");
     expect(publishedKey.crv).toBe("Ed25519");
