@@ -51,8 +51,10 @@ const BottleResultSchema = BottleSchema.pick({
   releaseYear: true,
   imageUrl: true,
   medianScore: true,
+  minScore: true,
+  maxScore: true,
+  raterCount: true,
   scoreCount: true,
-  reviewScoreBandCounts: true,
   tastingBandCounts: true,
 }).extend({
   brand: EntitySchema.pick({ name: true, shortName: true }),

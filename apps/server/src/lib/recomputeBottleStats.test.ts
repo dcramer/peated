@@ -80,6 +80,7 @@ describe("Bottle statistics recomputation", () => {
       maxScore: 99,
       memberScoreCount: 20,
       externalScoreCount: 0,
+      raterCount: 20,
       reviewScoreBandCounts: {
         mediocre: 0,
         good: 5,
@@ -126,6 +127,7 @@ describe("Bottle statistics recomputation", () => {
       maxScore: 92,
       memberScoreCount: 1,
       externalScoreCount: 0,
+      raterCount: 1,
       reviewScoreBandCounts: { outstanding: 1 },
     });
   });
@@ -145,6 +147,7 @@ describe("Bottle statistics recomputation", () => {
 
     for (const [site, value, scale, hidden] of [
       [allowedSite, 90, 100, false],
+      [allowedSite, 94, 100, false],
       [allowedSite, 91.5, 100, false],
       [allowedSite, 9, 10, false],
       [allowedSite, 92, 100, true],
@@ -174,11 +177,12 @@ describe("Bottle statistics recomputation", () => {
 
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       memberScoreCount: 0,
-      externalScoreCount: 1,
+      externalScoreCount: 2,
+      raterCount: 1,
       medianScore: 90,
       minScore: 90,
-      maxScore: 90,
-      reviewScoreBandCounts: { outstanding: 1 },
+      maxScore: 94,
+      reviewScoreBandCounts: { outstanding: 2 },
     });
   });
 
@@ -211,6 +215,7 @@ describe("Bottle statistics recomputation", () => {
     await expect(recomputeBottleStats(bottle.id)).resolves.toMatchObject({
       memberScoreCount: 19,
       externalScoreCount: 1,
+      raterCount: 20,
       medianScore: 89,
       minScore: 80,
       maxScore: 100,

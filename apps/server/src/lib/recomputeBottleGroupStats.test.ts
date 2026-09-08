@@ -126,6 +126,7 @@ describe("BottleGroup statistics recomputation", () => {
       maxScore: 94,
       memberScoreCount: 20,
       externalScoreCount: 0,
+      raterCount: 20,
       reviewScoreBandCounts: {
         mediocre: 5,
         good: 5,
@@ -178,6 +179,7 @@ describe("BottleGroup statistics recomputation", () => {
       notedReviewAndTastingCount: 2,
       memberScoreCount: 0,
       externalScoreCount: 0,
+      raterCount: 0,
       reviewScoreBandCounts: { unicorn: 0 },
       tastingBandCounts: { unicorn: 0 },
     });

@@ -20,6 +20,7 @@ export type BottleActivityStats = Pick<
   | "maxScore"
   | "memberScoreCount"
   | "externalScoreCount"
+  | "raterCount"
   | "reviewScoreBandCounts"
   | "tastingBandCounts"
 >;
@@ -33,6 +34,7 @@ type RawBottleActivityStats = {
   unicorn: number | string;
   memberScoreCount: number | string;
   externalScoreCount: number | string;
+  memberRaterCount: number | string;
   reviewMediocre: number | string;
   reviewGood: number | string;
   reviewVeryGood: number | string;
@@ -78,6 +80,11 @@ export async function aggregateBottleActivityStatsInTransaction(
   const externalScores = reviews.flatMap(({ contribution }) =>
     contribution.value === null ? [] : [contribution.value],
   );
+  const externalRaterCount = new Set(
+    reviews.flatMap(({ contribution, siteId }) =>
+      contribution.value === null ? [] : [siteId],
+    ),
+  ).size;
   // Ratings passes one integer-array parameter, including for large BottleGroups.
   const scoreArray = `{${externalScores.join(",")}}`;
   const result = await tx.execute<RawBottleActivityStats>(sql`
@@ -89,6 +96,17 @@ export async function aggregateBottleActivityStatsInTransaction(
       UNION ALL
 
       SELECT unnest(${scoreArray}::integer[]) AS score, 'external'::text AS source
+    ), member_raters AS (
+      SELECT ${memberReviews.createdById} AS member_id
+      FROM ${memberReviews}
+      WHERE ${inArray(memberReviews.bottleId, bottleIds)}
+
+      UNION
+
+      SELECT ${tastings.createdById} AS member_id
+      FROM ${tastings}
+      WHERE ${inArray(tastings.bottleId, bottleIds)}
+        AND ${tastings.ratingBand} IS NOT NULL
     ), score_stats AS (
       SELECT
         COUNT(*) FILTER (WHERE source = 'member') AS "memberScoreCount",
@@ -110,6 +128,7 @@ export async function aggregateBottleActivityStatsInTransaction(
       COUNT(${tastings.id}) FILTER (WHERE ${tastings.ratingBand} = 'very_good') AS "veryGood",
       COUNT(${tastings.id}) FILTER (WHERE ${tastings.ratingBand} = 'outstanding') AS outstanding,
       COUNT(${tastings.id}) FILTER (WHERE ${tastings.ratingBand} = 'unicorn') AS unicorn,
+      (SELECT COUNT(*) FROM member_raters) AS "memberRaterCount",
       score_stats.*
     FROM score_stats
     LEFT JOIN ${tastings} ON ${inArray(tastings.bottleId, bottleIds)}
@@ -130,6 +149,7 @@ export async function aggregateBottleActivityStatsInTransaction(
 
   const memberScoreCount = requiredCount(raw.memberScoreCount);
   const externalScoreCount = requiredCount(raw.externalScoreCount);
+  const memberRaterCount = requiredCount(raw.memberRaterCount);
 
   return {
     totalTastings: requiredCount(raw.totalTastings),
@@ -138,6 +158,7 @@ export async function aggregateBottleActivityStatsInTransaction(
     maxScore: requiredScore(raw.maxScore),
     memberScoreCount,
     externalScoreCount,
+    raterCount: memberRaterCount + externalRaterCount,
     reviewScoreBandCounts: {
       ...EMPTY_REVIEW_SCORE_BAND_COUNTS,
       mediocre: requiredCount(raw.reviewMediocre),

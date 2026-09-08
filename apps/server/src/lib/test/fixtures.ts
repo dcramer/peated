@@ -535,6 +535,7 @@ type BottleGroupMemberFixtureData = Partial<
     | "maxScore"
     | "memberScoreCount"
     | "externalScoreCount"
+    | "raterCount"
     | "tastingBandCounts"
     | "totalTastings"
     | "publicReviewAndTastingCount"

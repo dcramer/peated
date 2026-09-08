@@ -99,13 +99,9 @@ export const Overview: Story = {
         <ItemRow
           end={
             <BottleRatings
-              reviewCounts={{
-                good: 3,
-                mediocre: 1,
-                outstanding: 12,
-                unicorn: 4,
-                very_good: 8,
-              }}
+              maxScore={98}
+              minScore={80}
+              raterCount={24}
               tastingCounts={{
                 good: 8,
                 mediocre: 2,

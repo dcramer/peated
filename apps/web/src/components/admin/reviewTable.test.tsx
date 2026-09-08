@@ -67,6 +67,7 @@ const bottle = {
   maxScore: null,
   memberScoreCount: 0,
   externalScoreCount: 0,
+  raterCount: 0,
   scoreCount: 0,
   reviewScoreBandCounts: {
     mediocre: 0,

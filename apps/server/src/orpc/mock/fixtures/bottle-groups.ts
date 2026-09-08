@@ -20,6 +20,7 @@ export const mockBottleGroup = {
   maxScore: 96,
   memberScoreCount: 24,
   externalScoreCount: 6,
+  raterCount: 30,
   scoreCount: 30,
   reviewScoreBandCounts: {
     mediocre: 2,

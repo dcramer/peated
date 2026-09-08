@@ -273,6 +273,14 @@ export const BottleSchema = z.object({
     .gte(0)
     .readonly()
     .describe("Number of permitted external scores for this exact Bottle"),
+  raterCount: z
+    .number()
+    .int()
+    .gte(0)
+    .readonly()
+    .describe(
+      "Number of distinct members and external critics with a rating for this exact Bottle",
+    ),
   scoreCount: z
     .number()
     .int()

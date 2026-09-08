@@ -12,14 +12,10 @@ const items: BottleListProps["items"] = [
     metadata: ["Single Malt", "10 years", "46% ABV"],
     name: "Port Charlotte 10-year-old",
     ratings: {
+      maxScore: 94,
       median: 84,
-      reviewCounts: {
-        good: 8,
-        mediocre: 4,
-        outstanding: 3,
-        unicorn: 1,
-        very_good: 12,
-      },
+      minScore: 78,
+      raterCount: 24,
       scoreCount: 28,
       tastingCounts: {
         good: 19,
@@ -36,14 +32,10 @@ const items: BottleListProps["items"] = [
     metadata: ["Single Malt", "NAS", "54.2% ABV"],
     name: "Ardbeg Uigeadail",
     ratings: {
+      maxScore: 97,
       median: 89,
-      reviewCounts: {
-        good: 6,
-        mediocre: 2,
-        outstanding: 17,
-        unicorn: 5,
-        very_good: 24,
-      },
+      minScore: 80,
+      raterCount: 48,
       scoreCount: 54,
       tastingCounts: {
         good: 14,
@@ -59,7 +51,10 @@ const items: BottleListProps["items"] = [
     id: "3",
     metadata: ["Single Malt", "12 years", "43% ABV"],
     name: "Caol Ila 12-year-old",
-    ratings: { tastingCounts: { outstanding: 3, very_good: 1 } },
+    ratings: {
+      raterCount: 4,
+      tastingCounts: { outstanding: 3, very_good: 1 },
+    },
   },
   {
     align: "start",

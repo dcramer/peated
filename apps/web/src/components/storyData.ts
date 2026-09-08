@@ -61,14 +61,10 @@ export const searchResultGroups = [
         href: "/bottles/872",
         id: "bottle-872",
         ratings: {
+          maxScore: 96,
           median: 88,
-          reviewCounts: {
-            good: 2,
-            mediocre: 1,
-            outstanding: 6,
-            unicorn: 1,
-            very_good: 8,
-          },
+          minScore: 79,
+          raterCount: 16,
           scoreCount: 18,
           tastingCounts: {
             good: 8,
@@ -89,14 +85,10 @@ export const searchResultGroups = [
         href: "/bottles/1188",
         id: "bottle-1188",
         ratings: {
+          maxScore: 98,
           median: 91,
-          reviewCounts: {
-            good: 1,
-            mediocre: 0,
-            outstanding: 7,
-            unicorn: 2,
-            very_good: 4,
-          },
+          minScore: 82,
+          raterCount: 13,
           scoreCount: 14,
           tastingCounts: {
             good: 3,

@@ -1,5 +1,6 @@
 import { RATING_BANDS as SERVER_RATING_BANDS } from "@peated/server/constants";
 import * as stylex from "@stylexjs/stylex";
+import { Users } from "lucide-react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
@@ -180,24 +181,44 @@ export type BottleRatingsProps = Pick<
   BottleRatingSummaryProps,
   "median" | "tastingCounts"
 > & {
-  /** Included review scores grouped into the five rating ranges. */
-  reviewCounts?: RatingCounts;
+  /** Highest included member or critic review score. */
+  maxScore?: number | null;
+  /** Lowest included member or critic review score. */
+  minScore?: number | null;
+  /** Distinct members and external critics represented by the rating. */
+  raterCount?: number;
   /** Number of included member and critic review scores. */
   scoreCount?: number;
 };
 
 /** Compact, trailing rating summary for one bottle row. */
 export function BottleRatings({
+  maxScore = null,
   median = null,
-  reviewCounts = {},
+  minScore = null,
+  raterCount = 0,
   scoreCount = 0,
   tastingCounts = {},
 }: BottleRatingsProps) {
   const rating = getBottleRating({ median, scoreCount, tastingCounts });
   if (!rating) return null;
 
-  const combinedCounts = combineRatingCounts(reviewCounts, tastingCounts);
-  const label = `${rating.label}, ${rating.value}${rating.exact ? " out of 100" : " range"}. ${formatRatingCounts(combinedCounts)}`;
+  const hasRange =
+    rating.exact &&
+    minScore !== null &&
+    maxScore !== null &&
+    minScore < maxScore;
+  const ratingDescription = rating.exact
+    ? `Median review score ${rating.value} out of 100.`
+    : `Tasting rating range ${rating.value}.`;
+  const raterDescription =
+    raterCount > 0
+      ? ` ${raterCount.toLocaleString("en-US")} ${raterCount === 1 ? "rater" : "raters"}.`
+      : "";
+  const rangeDescription = hasRange
+    ? ` Ratings range from ${minScore} to ${maxScore}.`
+    : "";
+  const label = `${rating.label}. ${ratingDescription}${raterDescription}${rangeDescription}`;
 
   return (
     <span
@@ -206,13 +227,35 @@ export function BottleRatings({
       title={label}
       {...stylex.props(styles.bottleRatings)}
     >
-      <span aria-hidden="true" {...stylex.props(styles.compactCopy)}>
-        <span {...stylex.props(styles.compactLabel)}>{rating.label}</span>
-        <span {...stylex.props(styles.compactValue)}>{rating.value}</span>
+      <span
+        aria-hidden="true"
+        {...stylex.props(
+          styles.ratingLabel,
+          styles.smallRatingLabel,
+          styles.compactLabel,
+        )}
+      >
+        {rating.label}
       </span>
-      <span aria-hidden="true" {...stylex.props(styles.compactDistribution)}>
-        <RatingDistribution compact counts={combinedCounts} />
+      <span aria-hidden="true" {...stylex.props(styles.compactSummary)}>
+        {raterCount > 0 ? (
+          <span {...stylex.props(styles.compactRaters)}>
+            <span>{raterCount.toLocaleString("en-US")}</span>
+            <Users size={13} strokeWidth={1.75} />
+          </span>
+        ) : null}
+        <strong {...stylex.props(styles.compactValue)}>{rating.value}</strong>
       </span>
+      {hasRange ? (
+        <span aria-hidden="true" {...stylex.props(styles.compactRange)}>
+          <span>{minScore}</span>
+          <span {...stylex.props(styles.compactRangeTrack)}>
+            <span {...stylex.props(styles.compactRangeStart)} />
+            <span {...stylex.props(styles.compactRangeEnd)} />
+          </span>
+          <span>{maxScore}</span>
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -261,18 +304,6 @@ function getMedianTastingBand(counts: RatingCounts) {
     if (seen >= middle) return band;
   }
   return null;
-}
-
-function combineRatingCounts(...counts: RatingCounts[]) {
-  const total = (key: RatingBand) =>
-    counts.reduce((sum, group) => sum + (group[key] ?? 0), 0);
-  return {
-    mediocre: total("mediocre"),
-    good: total("good"),
-    very_good: total("very_good"),
-    outstanding: total("outstanding"),
-    unicorn: total("unicorn"),
-  };
 }
 
 function totalRatings(counts: RatingCounts) {
@@ -528,26 +559,20 @@ const styles = stylex.create({
     flexShrink: 0,
     flexDirection: "column",
     alignItems: "flex-end",
-    gap: space.x1,
+    gap: "2px",
     textAlign: "right",
     [COMPACT]: { width: "80px" },
   },
-  compactCopy: {
+  compactSummary: {
     display: "flex",
     width: "100%",
     minWidth: 0,
-    flexDirection: "column",
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
-    gap: "2px",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x1,
   },
   compactLabel: {
     width: "100%",
-    color: colors.inkMuted,
-    fontFamily: fonts.reading,
-    fontSize: "12px",
-    fontWeight: 600,
-    lineHeight: 1.15,
     textAlign: "right",
     whiteSpace: "nowrap",
   },
@@ -562,9 +587,55 @@ const styles = stylex.create({
     lineHeight: 1,
     [COMPACT]: { fontSize: "18px" },
   },
-  compactDistribution: {
-    display: "block",
+  compactRaters: {
+    display: "inline-flex",
+    minWidth: 0,
+    alignItems: "center",
+    gap: "3px",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "12px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 500,
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+  },
+  compactRange: {
+    display: "flex",
     width: "100%",
+    alignItems: "center",
+    gap: "4px",
+    color: colors.inkMuted,
+    fontFamily: fonts.reading,
+    fontSize: "10px",
+    fontVariantNumeric: "tabular-nums",
+    fontWeight: 500,
+    lineHeight: 1,
+    [COMPACT]: { display: "none" },
+  },
+  compactRangeTrack: {
+    position: "relative",
+    display: "block",
+    height: "1px",
+    minWidth: 0,
+    flexGrow: 1,
+    backgroundColor: colors.inkMuted,
+  },
+  compactRangeStart: {
+    position: "absolute",
+    top: "-3px",
+    left: 0,
+    width: "1px",
+    height: "7px",
+    backgroundColor: colors.inkMuted,
+  },
+  compactRangeEnd: {
+    position: "absolute",
+    top: "-3px",
+    right: 0,
+    width: "1px",
+    height: "7px",
+    backgroundColor: colors.inkMuted,
   },
   band1Fill: { backgroundColor: colors.band1 },
   band2Fill: { backgroundColor: colors.band2 },

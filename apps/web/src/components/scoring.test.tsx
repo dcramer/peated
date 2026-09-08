@@ -53,13 +53,54 @@ describe("Ratings", () => {
     act(() =>
       root.render(
         <BottleRatings
+          raterCount={3}
           tastingCounts={{ outstanding: 1, unicorn: 1, very_good: 1 }}
         />,
       ),
     );
 
     expect(container.firstElementChild?.getAttribute("aria-label")).toContain(
-      "Outstanding, 90–94 range",
+      "Outstanding. Tasting rating range 90–94.",
+    );
+  });
+
+  it("shows the rater count, right-aligned median, and exact score range", () => {
+    act(() =>
+      root.render(
+        <BottleRatings
+          maxScore={94}
+          median={94}
+          minScore={90}
+          raterCount={24}
+          scoreCount={31}
+          tastingCounts={{ outstanding: 12 }}
+        />,
+      ),
+    );
+
+    expect(container.textContent ?? "").toMatch(/Outstanding.*24.*94.*90.*94/);
+    expect(container.querySelector("svg")).not.toBeNull();
+    expect(container.firstElementChild?.getAttribute("aria-label")).toBe(
+      "Outstanding. Median review score 94 out of 100. 24 raters. Ratings range from 90 to 94.",
+    );
+  });
+
+  it("does not repeat a single exact score as a range", () => {
+    act(() =>
+      root.render(
+        <BottleRatings
+          maxScore={92}
+          median={92}
+          minScore={92}
+          raterCount={1}
+          scoreCount={1}
+        />,
+      ),
+    );
+
+    expect(container.textContent).toBe("Outstanding192");
+    expect(container.firstElementChild?.getAttribute("aria-label")).toBe(
+      "Outstanding. Median review score 92 out of 100. 1 rater.",
     );
   });
 
@@ -71,7 +112,7 @@ describe("Ratings", () => {
     );
 
     expect(container.firstElementChild?.getAttribute("aria-label")).toContain(
-      "Outstanding, 90–94 range",
+      "Outstanding. Tasting rating range 90–94.",
     );
   });
 

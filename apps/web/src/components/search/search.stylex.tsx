@@ -169,8 +169,10 @@ function bottleItem(
     id: `bottle-${bottle.id}`,
     ratings: showRatings
       ? {
+          maxScore: bottle.maxScore,
           median: bottle.medianScore,
-          reviewCounts: bottle.reviewScoreBandCounts,
+          minScore: bottle.minScore,
+          raterCount: bottle.raterCount,
           scoreCount: bottle.scoreCount,
           tastingCounts: bottle.tastingBandCounts,
         }
