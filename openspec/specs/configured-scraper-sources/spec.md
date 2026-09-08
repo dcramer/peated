@@ -1,0 +1,196 @@
+## Purpose
+
+Define database-managed scraper sources, revisions, previews, and activation.
+
+## Requirements
+
+### Requirement: Admins can create controlled sources
+
+The system SHALL let an admin create an external site and its first scrape
+source with a name, website URL, conservative request policy, and robots
+enforcement. The system MUST derive its internal key from the website hostname,
+limit it to the allowed length, and use the website URL as the initial list
+page. The source MUST start disabled.
+
+#### Scenario: Admin creates a review source
+
+- **WHEN** an admin submits a valid new site and chooses `review`
+- **THEN** the system stores the site, generated internal key, admin-managed network rows, and a disabled review source without a deploy
+
+#### Scenario: Admin creates a source
+
+- **WHEN** an admin creates a source
+- **THEN** the system queues AI setup for its first parsing-rule revision
+
+#### Scenario: Rules try to change network access
+
+- **WHEN** proposed rules contain an origin, credential, header, or robots exception
+- **THEN** strict rules validation rejects the complete proposal
+
+### Requirement: Each source has one kind
+
+The system SHALL support `review` and `price` source kinds. A site SHALL own at
+most one scrape source. The source SHALL own its kind, enablement, list URL,
+sample URLs, and revisions.
+
+#### Scenario: An admin chooses a source kind
+
+- **WHEN** an admin creates a site with a review or price source
+- **THEN** its source retains that kind across all revisions
+
+#### Scenario: A second source is stored
+
+- **WHEN** code tries to store a second scrape source for one site
+- **THEN** the database rejects it
+
+### Requirement: Rule revisions are immutable and explicit
+
+The system SHALL store each rules change as a new immutable revision. Each
+revision SHALL pin its list URL and rules version. A source SHALL have at most
+one active revision. Each collection or preview run MUST record its exact
+source and revision.
+
+#### Scenario: An admin edits rules or the list URL
+
+- **WHEN** an admin saves a change
+- **THEN** the system creates a new revision and leaves prior revisions unchanged
+
+#### Scenario: The active revision changes during a run
+
+- **WHEN** an admin activates another revision while a run is queued or running
+- **THEN** the run continues with its recorded revision and list URL
+
+### Requirement: Preview uses production parsing
+
+The system SHALL preview a revision with the same parser, validator, request
+controls, and output schema used for collection. Preview MUST NOT write reviews
+or prices.
+
+#### Scenario: A review revision is previewed
+
+- **WHEN** an admin previews review rules against current pages
+- **THEN** the system stores structured article and review fields, source links, and a limited number of errors without storing HTML or review text
+
+#### Scenario: A price revision is previewed
+
+- **WHEN** an admin previews price rules against current pages
+- **THEN** the system stores structured product fields and a limited number of errors without storing prices as products
+
+### Requirement: AI suggestions create inactive revisions only
+
+The system SHALL run AI setup for every new source. It SHALL make at most two
+rule proposals. Each proposal that passes code checks SHALL receive an AI review
+of the parsed fields. The AI MUST identify the list page, detail fields, and an
+optional next-page link. It MUST have no tools. It MUST NOT activate a revision,
+change network control, or write products.
+
+#### Scenario: AI is allowed
+
+- **WHEN** an admin requests the first suggestion or a repair after the latest preview fails
+- **THEN** the system fetches the main page, up to four candidate list pages from the same website, one next list page when found, and up to three detail pages, parses them with the proposed rules, asks AI to compare the parsed fields with the HTML, and stores an inactive revision only when both checks pass
+
+#### Scenario: Proposed pagination repeats or leaves the website
+
+- **WHEN** the next-page selector returns a page that was already read or uses another origin
+- **THEN** code rejects the run before it reads that page
+
+#### Scenario: AI response is invalid
+
+- **WHEN** the AI response does not match the required rules format or uses the wrong kind
+- **THEN** the system stores no revision and reports an error without page content
+
+#### Scenario: Proposed rules do not parse current pages
+
+- **WHEN** the list selector, detail selectors, conversions, or product schema fail against the supplied pages
+- **THEN** the system does not ask AI to approve invalid parsed fields and gives the failure to one automatic repair attempt before it fails the run
+
+#### Scenario: AI review rejects parsed fields
+
+- **WHEN** the reviewer finds that a parsed field does not represent the supplied HTML
+- **THEN** the system lets one remaining proposal attempt repair the reported fields, repeats all checks, and stores no revision if the final review fails
+
+#### Scenario: AI setup cannot produce working rules
+
+- **WHEN** both proposal attempts fail expected rule or content checks
+- **THEN** the run stores a concise failure without page content and completes as an expected setup failure instead of reporting only to Sentry
+
+### Requirement: Activation and rollback require a passing preview
+
+The system MUST prevent activation of a revision that has not passed its latest
+preview. Activation and rollback SHALL retain all prior revisions.
+
+#### Scenario: A passing revision is activated
+
+- **WHEN** an admin activates a revision whose latest preview passed
+- **THEN** it becomes the source's only active revision and the source becomes enabled
+
+#### Scenario: A failed revision is activated
+
+- **WHEN** an admin activates a pending or failed revision
+- **THEN** the system rejects activation and keeps the current active revision
+
+#### Scenario: An admin rolls back
+
+- **WHEN** an admin activates an older passing revision
+- **THEN** new runs use it and existing runs keep their recorded revisions
+
+### Requirement: Scrape source runs preserve product boundaries
+
+The system SHALL execute scrape sources through the existing scraper session.
+Review sources SHALL emit the strict external-review observation. Price sources
+SHALL emit the strict store-price observation.
+
+#### Scenario: Review collection succeeds
+
+- **WHEN** an enabled review source emits valid observations
+- **THEN** the existing review storage code owns matching, storage, and publication
+
+#### Scenario: Price collection succeeds
+
+- **WHEN** an enabled price source emits valid observations
+- **THEN** the existing price storage code owns identity, matching, storage, and visibility
+
+#### Scenario: Parsed output is invalid
+
+- **WHEN** required fields are missing or invalid
+- **THEN** the run fails without partial product writes and does not change the active revision
+
+### Requirement: Code-managed and admin-managed sources coexist
+
+The system SHALL preserve existing code source definitions. Startup sync SHALL
+not disable or rewrite admin-managed targets, origins, or site mappings.
+
+#### Scenario: Definitions synchronize
+
+- **WHEN** the application synchronizes code source definitions
+- **THEN** admin-managed network rows remain unchanged
+
+### Requirement: The admin flow exposes the revision lifecycle
+
+The Admin Scrapers area SHALL let an admin add a site, choose a source kind,
+follow queued or running AI setup, see a setup failure, retry it, edit the
+generated list URL and rules, preview, activate, view revision history, roll
+back, pause collection, and inspect health. Example detail pages SHALL be
+optional and labeled as such. The manual rules editor SHALL stay hidden until
+the admin chooses to open it.
+
+#### Scenario: AI setup has not created a revision
+
+- **WHEN** an admin opens a source with no revision
+- **THEN** the source view shows whether setup is queued, running, failed, or completed and does not show placeholder rules as a revision
+
+#### Scenario: An active source needs repair
+
+- **WHEN** its latest preview fails after a page change
+- **THEN** the source view shows the failure and permits a repair revision
+
+### Requirement: Tests match ownership boundaries
+
+The system MUST test parsing without database or network access. It MUST test
+persistence and runtime behavior with deterministic integration tests. Hosted
+AI suggestion quality MUST run only through the eval command.
+
+#### Scenario: Deterministic tests run
+
+- **WHEN** `pnpm test` runs
+- **THEN** it tests schemas, parsing, checks, source identity, activation, run pinning, preview isolation, and outputs without hosted AI
