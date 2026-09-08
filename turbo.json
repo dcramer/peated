@@ -44,9 +44,7 @@
     "SENTRY_ORG",
     "SENTRY_PROJECT",
     "SENTRY_AUTH_TOKEN",
-    "FATHOM_SITE_ID",
-    "API_SERVER",
-    "FATHOM_SITE_ID"
+    "API_SERVER"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
