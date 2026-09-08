@@ -801,7 +801,7 @@ const ScrapeCatalogRulesV9Schema = z
   })
   .strict();
 
-export const ScrapeRulesV9Schema = z.discriminatedUnion("kind", [
+const ScrapeRulesV9Schema = z.discriminatedUnion("kind", [
   ScrapeReviewRulesV9Schema,
   ScrapePriceRulesV9Schema,
   ScrapeCatalogRulesV9Schema,
@@ -809,16 +809,23 @@ export const ScrapeRulesV9Schema = z.discriminatedUnion("kind", [
 
 const ScrapeListSchema = z
   .object({
-    links: ScrapeSelectorSchema,
-    nextPage: ScrapeSelectorSchema.nullable(),
-    limit: z.number().int().min(1).max(SCRAPE_SOURCE_MAX_ITEMS),
+    links: ScrapeSelectorSchema.describe("Links to article or product pages."),
+    nextPage: ScrapeSelectorSchema.nullable().describe(
+      "The link to the next list page, or null.",
+    ),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(SCRAPE_SOURCE_MAX_ITEMS)
+      .describe("Most articles or products to read in one run."),
   })
   .strict();
 
 const ScrapeScoreV10Schema = z
   .object({
-    selector: ScrapeSelectorSchema,
-    outOf: z.number().positive(),
+    selector: ScrapeSelectorSchema.describe("The displayed score."),
+    outOf: z.number().positive().describe("The highest possible score."),
   })
   .strict();
 
@@ -828,17 +835,33 @@ const ScrapeReviewRulesV10Schema = z
     list: ScrapeListSchema,
     detail: z
       .object({
-        url: ScrapeSelectorSchema.nullable(),
-        title: ScrapeSelectorSchema,
-        date: ScrapeSelectorSchema.nullable(),
+        url: ScrapeSelectorSchema.nullable().describe(
+          "The page's preferred URL, or null to use the fetched URL.",
+        ),
+        title: ScrapeSelectorSchema.describe("The article title."),
+        date: ScrapeSelectorSchema.nullable().describe(
+          "The published date, or null to use a standard page date or a date in the URL.",
+        ),
         reviews: z
           .object({
-            area: ScrapeSelectorSchema,
-            item: ScrapeSelectorSchema.nullable(),
-            name: ScrapeSelectorSchema.nullable(),
-            reviewer: ScrapeSelectorSchema.nullable(),
-            tastingNotes: ScrapeSelectorSchema.nullable(),
-            score: ScrapeScoreV10Schema.nullable(),
+            area: ScrapeSelectorSchema.describe(
+              "The page area that contains the review text.",
+            ),
+            item: ScrapeSelectorSchema.nullable().describe(
+              "The element around each review, or null when reviews have no separate elements.",
+            ),
+            name: ScrapeSelectorSchema.nullable().describe(
+              "The Bottle name, or null when one review uses the article title.",
+            ),
+            reviewer: ScrapeSelectorSchema.nullable().describe(
+              "The review writer, or null when no writer is shown.",
+            ),
+            tastingNotes: ScrapeSelectorSchema.nullable().describe(
+              "A smaller area containing only tasting notes, or null.",
+            ),
+            score: ScrapeScoreV10Schema.nullable().describe(
+              "The review score, or null when no score is shown.",
+            ),
           })
           .strict(),
       })
@@ -846,18 +869,25 @@ const ScrapeReviewRulesV10Schema = z
   })
   .strict();
 
-const ScrapeVolumeV10Schema = z.union([
-  ScrapeSelectorSchema,
-  z.number().int().positive().max(100_000),
-]);
+const ScrapeVolumeV10Schema = z
+  .union([ScrapeSelectorSchema, z.number().int().positive().max(100_000)])
+  .describe("The volume selector or a fixed number of milliliters.");
 
 const ScrapeProductFieldsV10Schema = z
   .object({
-    name: ScrapeSelectorSchema,
-    url: ScrapeSelectorSchema.nullable(),
-    id: ScrapeSelectorSchema.nullable(),
-    image: ScrapeSelectorSchema.nullable(),
-    volume: ScrapeVolumeV10Schema.nullable(),
+    name: ScrapeSelectorSchema.describe("The product name."),
+    url: ScrapeSelectorSchema.nullable().describe(
+      "The page's preferred product URL, or null to use the fetched URL.",
+    ),
+    id: ScrapeSelectorSchema.nullable().describe(
+      "The website's stable product ID, or null.",
+    ),
+    image: ScrapeSelectorSchema.nullable().describe(
+      "The product image URL, or null.",
+    ),
+    volume: ScrapeVolumeV10Schema.nullable().describe(
+      "The volume, or null when no volume is shown.",
+    ),
   })
   .strict();
 
@@ -866,10 +896,12 @@ const ScrapePriceRulesV10Schema = z
     kind: z.literal("price"),
     list: ScrapeListSchema,
     detail: ScrapeProductFieldsV10Schema.extend({
-      price: ScrapeSelectorSchema,
-      currency: z.enum(CURRENCY_LIST),
+      price: ScrapeSelectorSchema.describe("The displayed price."),
+      currency: z.enum(CURRENCY_LIST).describe("The price currency."),
       volume: ScrapeVolumeV10Schema,
-      barcode: ScrapeSelectorSchema.nullable(),
+      barcode: ScrapeSelectorSchema.nullable().describe(
+        "The product barcode, or null.",
+      ),
     }).strict(),
   })
   .strict();
@@ -879,10 +911,14 @@ const ScrapeCatalogRulesV10Schema = z
     kind: z.literal("catalog"),
     list: ScrapeListSchema,
     detail: ScrapeProductFieldsV10Schema.extend({
-      abv: ScrapeSelectorSchema.nullable(),
-      age: ScrapeSelectorSchema.nullable(),
-      edition: ScrapeSelectorSchema.nullable(),
-      year: ScrapeSelectorSchema.nullable(),
+      abv: ScrapeSelectorSchema.nullable().describe("The ABV, or null."),
+      age: ScrapeSelectorSchema.nullable().describe("The stated age, or null."),
+      edition: ScrapeSelectorSchema.nullable().describe(
+        "The edition name, or null.",
+      ),
+      year: ScrapeSelectorSchema.nullable().describe(
+        "The release year, or null.",
+      ),
     }).strict(),
   })
   .strict();
@@ -914,7 +950,6 @@ export const StoredScrapeRulesSchema = z.union([
 ]);
 
 export type ScrapeRulesV5 = z.infer<typeof ScrapeRulesV5Schema>;
-export type ScrapeRulesV9 = z.infer<typeof ScrapeRulesV9Schema>;
 export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapePageRead = z.infer<typeof ScrapePageReadSchema>;
@@ -932,7 +967,7 @@ export type StoredScrapeReviewField =
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
 
-/** Parses rules only with the interpreter contract that owns their stored version. */
+/** Uses the rule shape that was current when the rules were saved. */
 export function parseScrapeRules(
   rulesVersion: number,
   rules: StoredScrapeRules | JsonValue,
@@ -993,27 +1028,27 @@ export function withScrapeRulesLimit(
 ): StoredScrapeRules {
   const limit = Math.min(scrapeRulesLimit(rules), requestedLimit);
   if ("articles" in rules) {
-    // SAFETY: Every stored article rule has the same bounded limit field.
+    // SAFETY: All saved article rules use this number field.
     return {
       ...rules,
       articles: { ...rules.articles, limit },
     } as StoredScrapeRules;
   }
   if ("products" in rules) {
-    // SAFETY: Every stored product rule has the same bounded limit field.
+    // SAFETY: All saved product rules use this number field.
     return {
       ...rules,
       products: { ...rules.products, limit },
     } as StoredScrapeRules;
   }
   if ("links" in rules.list) {
-    // SAFETY: This branch proves the current list shape and preserves every other field.
+    // SAFETY: This check identifies the current list shape.
     return {
       ...rules,
       list: { ...rules.list, limit },
     } as StoredScrapeRules;
   }
-  // SAFETY: The remaining stored rules all use the bounded maxItems list shape.
+  // SAFETY: All remaining saved rules use maxItems.
   return {
     ...rules,
     list: { ...rules.list, maxItems: limit },

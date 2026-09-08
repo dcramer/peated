@@ -73,86 +73,83 @@ To replace an existing scraper, follow
 [Move an existing scraper to saved rules](../../../../docs/operations/configured-scraper-migration.md).
 Keep the existing site and record IDs when switching to the new rules.
 
-The database stores each source and its parsing rules. Each saved revision is
-immutable. A preview reads sample pages and stores only parsed fields and errors.
-It does not store fetched HTML, review text, or full product records in the
-product database. Only a revision that passes its preview can become active. An
-admin can return to any older revision that passed. Pausing a source stops
-collection but keeps its revisions and run history.
+The database stores each source and its rules. A saved version cannot be edited.
+A preview checks sample pages and saves only the fields it found and any errors.
+It does not save downloaded HTML, review text, or full product records. Only a
+version that passes its preview can be used. An admin can return to any older
+version that passed. Pausing a source stops collection but keeps its saved
+versions and run history.
 
 Older rule versions remain supported so saved sources keep working. New
-sources use version 10. Rules describe page structure with CSS selectors. The
-`list.links` selector finds article or product links. `list.nextPage` can find a
-link to the next list page. Links must stay on the source website. Code follows
-at most five list pages and stops at `list.limit`. It reads `href` from HTML
-links and text from XML index entries automatically.
+sources use version 10. Each rule is a CSS selector. `list.links` finds article
+or product links. `list.nextPage` can find the next page of links. Links must
+stay on the source website. Code reads at most five list pages and stops at
+`list.limit`. It reads `href` from HTML links and text from XML links.
 
-Detail fields are CSS selectors too. The parser reads text by default and uses
-the normal HTML attribute for links, images, dates, metadata, and form values.
-It also handles whitespace, relative URLs, prices, scores, dates, and volumes.
-A price source can use a number of milliliters as a fixed volume. Rules do not
-contain cleanup steps or text templates. Put unusual cleanup for a specific
-source in a small named code function.
+Fields on an article or product page are CSS selectors too. Code reads text by
+default. It reads `href` from links, `src` from images, `datetime` from dates,
+`content` from meta tags, and `value` from form fields. It also trims spaces,
+makes full URLs, and reads prices, scores, dates, and volumes. A price source
+can use a number of milliliters as a fixed volume. Rules do not contain cleanup
+steps or text templates. Put unusual cleanup for one source in a small named
+function.
 
 For reviews, `detail.reviews.area` selects the one area containing the review
-text. Set `item` when each review has its own wrapper. When several reviews do
-not have wrappers, set `item` to null; each match of the `name` selector starts
-a review. When an article has one review and its title is the Bottle name, set
-`name` to null. The parser uses the article title and removes a trailing
-`review`. A review's writer may be inside that review or shared by the article.
-Scores and tasting notes are read inside each review. For a score, `outOf` is
-the publisher's scoring scale.
+text. Set `item` to the HTML element around each review. When reviews have no
+separate elements, set `item` to null; each match of `name` starts a review.
+When an article has one review and its title is the Bottle name, set `name` to
+null. Code uses the article title and removes a trailing `review`. A review's
+writer may be inside that review or shared by the article. Scores and tasting
+notes are read inside each review. For a score, `outOf` is the highest possible
+score.
 
-The parser uses a review's Bottle name and writer to keep it matched when other
+Code uses a review's Bottle name and writer to keep it matched when other
 reviews are added or moved. Repeated reviews with the same name and writer stay
 separate. This is automatic and is not part of the saved rules.
 
-The setup agent submits this same rule shape, and the saved revision and parser
-use it directly. There is no setup-only translation step. Rules do not support
-scripts, custom code, arbitrary request headers, browser automation, numbered
-page templates, infinite scrolling, or links to another website. Add a built-in
-adapter when a source needs one of those features.
+Setup saves exactly the rules it checks. Rules do not support scripts, custom
+code, request headers, browser automation, numbered page patterns, endless
+scrolling, or links to another website. Write source-specific code when a
+source needs one of those features.
 
 Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or
-product pages. AI calls `check_rules` with the list, next-page, and detail rules.
-Code checks the list page, one next page when present, and up to three detail
-pages with the same parser used during collection. When a check fails, AI
-receives the errors and inspected pages to correct its rules. Setup allows
-three checks in total and saves a revision only after a check passes. Expected
-final rule failures are stored on the run and shown in Admin; they do not fail
-only through Sentry. Provider, database, queue, and unexpected network failures
-remain system errors. The AI provider does not store request content. An admin must still
-preview and activate the inactive revision. AI never changes the active
-revision directly.
+product pages. AI calls `check_rules` with the list page and article or product
+page rules. Code checks the list page, one next page when present, and up to
+three article or product pages using the same code as collection. When a check
+fails, AI gets the errors and pages so it can fix the rules. Setup allows three
+checks and saves a version only after a check passes. Final rule errors are
+saved with the run and shown in Admin. Problems with the AI service, database,
+job runner, or network remain system errors. The AI service does not store
+request content. An admin must still preview and turn on the new version. AI
+never changes the version in use.
 
-Before limiting model input, setup removes script and style elements from its
-HTML copies so large page headers do not crowd out links and article content.
-It keeps the page structure and attributes used by selectors. Rule checks and
-collection still parse the original fetched HTML.
+Before shortening pages for AI, setup removes scripts and styles from its copy.
+This keeps links and article content from being cut off. Rule checks and
+collection still read the full downloaded HTML.
 
 For reviews, each selected review is the full body saved internally and used for
 tags and clips. Older rules can use `tastingNotes` when a full body is not
 available. [External Reviews](../../../../docs/features/external-reviews.md)
-defines what is saved, who can read it, and when it is deleted. Each review can
-read its own writer. An article-level writer is used only when the rules
-explicitly apply it to the first review or every review.
+defines what is saved, who can read it, and when it is deleted. New rules can
+read a writer inside one review or reuse one writer shown for the article.
+Older saved rules keep their own writer settings.
 
-Setup traces may record the complete model instructions, public website input,
-model output, and rule-check arguments and results. They must not include
+Setup records may contain complete AI instructions, public website pages, AI
+output, and rule-check inputs and results. They must not include
 credentials, request headers, cookies, or private admin data. Normal collection
-must keep page bodies and publisher prose out of logs and traces. Follow
+must keep page bodies and website writing out of logs and traces. Follow
 [Sensitive Data](../../../../docs/policies/sensitive-data.md).
 
-`pnpm evals:scraper:e2e` runs the [real-model create-scraper suite](./configured/createScraper.eval.test.ts).
+`pnpm evals:scraper:e2e` runs the [live create-scraper checks](./configured/createScraper.eval.test.ts).
 A local HTTP server serves [small website fixtures](../../__fixtures__/scraper-websites/README.md).
-Model requests go directly to the configured AI provider without interception. Each case
-starts with a homepage URL, lets the model build rules, previews and activates
-them, then collects reviews and checks stored fields, score totals, and repeated
-collection. No parsing rules or expected answers are supplied to the model.
-The suite requires the local test database and a gateway key; missing credentials
-skip the live cases locally. It uses real request timing, Redis queues, BullMQ
-workers, and registered production job handlers. Clip generation stays disabled.
+AI requests go directly to the configured service. Each check starts with a
+main page URL, lets AI build rules, previews and turns them on, then collects
+reviews and checks saved fields, score totals, and repeated collection. No
+rules or expected answers are given to AI. The checks require the local test
+database and an AI service key; missing keys skip them locally. They use real
+request timing and the same background jobs as production. Clip generation
+stays disabled.
 
 The dedicated `test / scraper` CI job runs on relevant
 same-repository pull requests and every push to `main`. It uses its own test
@@ -164,18 +161,18 @@ label. Fork pull requests run the ordinary tests without secrets.
 live AI service, including the full creation scenarios. Normal test runs exclude
 these checks. The `trigger-evals` label runs the broader eval suite in CI.
 
-Before saving replacement rules, run the revision input through the local
-runtime. The command uses `.env.local`, the registered target, robots policy,
-request controls, production parser, and validators. It records the local run
-for inspection but does not save reviews or prices:
+Before saving replacement rules, check them locally. The command uses
+`.env.local` and the same website settings, robots.txt rules, request limits,
+reading code, and checks used in production. It records the local run but does
+not save reviews or prices:
 
 ```bash
 pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 3
 ```
 
-The input has the same `listUrl` and `rules` fields accepted by the revision
-API. Set `rulesVersion` to `10` when testing current operations. An omitted
-version means version 1 so existing preview files keep their original behavior:
+The input has the same `listUrl` and `rules` fields accepted by the API. Set
+`rulesVersion` to `10` for new rules. An omitted version means version 1 so
+existing preview files keep their original behavior:
 
 ```json
 {
@@ -205,12 +202,12 @@ version means version 1 so existing preview files keep their original behavior:
 }
 ```
 
-Omit `--limit` for a full acceptance preview. A bounded preview is useful while
-editing rules; the complete rules still need a full local acceptance run before
-production activation. If request controls pause a run, the command prints the
-next eligible time and resumes from its saved page automatically.
+Omit `--limit` for a full check. A small check is useful while editing rules;
+the complete rules still need a full local check before they are used in
+production. If request limits pause a run, the command prints when it can
+continue and resumes from its saved page automatically.
 
-## Source acceptance rules
+## Checks for every source
 
 Every new or changed source must pass these checks. Test shared request rules
 once in the runtime instead of repeating them in every source test.

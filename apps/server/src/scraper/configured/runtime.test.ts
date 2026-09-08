@@ -520,7 +520,7 @@ test("stores safe validation issues when a selector stops matching", async () =>
       fetchImpl: previewFetch(),
       executionToken: "preview-owner",
     }),
-  ).rejects.toThrow("The page did not match the saved parsing rules.");
+  ).rejects.toThrow("The page did not match the saved rules.");
 
   const [storedRevision] = await db
     .select()
@@ -557,7 +557,7 @@ test("a collection failure does not change the preview result", async () => {
       fetchImpl: previewFetch(),
       executionToken: "collection-owner",
     }),
-  ).rejects.toThrow("The page did not match the saved parsing rules.");
+  ).rejects.toThrow("The page did not match the saved rules.");
 
   const [storedRevision] = await db
     .select()

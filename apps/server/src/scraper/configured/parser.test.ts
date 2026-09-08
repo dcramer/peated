@@ -26,7 +26,7 @@ import {
   parseScrapeRules,
   type ScrapeRules,
   type ScrapeRulesV5,
-  type ScrapeRulesV9,
+  type StoredScrapeRules,
 } from "./rules";
 
 it("reads price fields from text and their usual HTML attributes", () => {
@@ -89,6 +89,36 @@ it("reads price fields from text and their usual HTML attributes", () => {
         imageUrl: "https://images.example/one.jpg",
       },
     ],
+  });
+});
+
+it("reports an invalid list selector", () => {
+  const rules = {
+    kind: "catalog",
+    list: { links: "a[", nextPage: null, limit: 10 },
+    detail: {
+      name: "h1",
+      url: null,
+      id: null,
+      image: null,
+      volume: null,
+      abv: null,
+      age: null,
+      edition: null,
+      year: null,
+    },
+  } satisfies ScrapeRules;
+
+  expect(
+    parseScrapeList(
+      rules,
+      "<a href='/one'>One</a>",
+      new URL("https://example.test"),
+    ),
+  ).toEqual({
+    links: [],
+    nextPageUrl: null,
+    issues: [{ field: "list.links", message: "CSS selector is not valid." }],
   });
 });
 
@@ -691,7 +721,7 @@ const currentReviewRules = {
       },
     },
   },
-} as const satisfies ScrapeRulesV9;
+} as const satisfies StoredScrapeRules;
 
 const dramfaceSavedRules = {
   kind: "review",
@@ -779,7 +809,7 @@ const dramfaceSavedRules = {
       },
     },
   },
-} as const satisfies ScrapeRulesV9;
+} as const satisfies StoredScrapeRules;
 
 const elementArticleRules = {
   ...currentReviewRules,
@@ -822,7 +852,7 @@ const elementArticleRules = {
       },
     },
   },
-} as const satisfies ScrapeRulesV9;
+} as const satisfies StoredScrapeRules;
 
 test("reads text links from an XML review index", () => {
   const rules = {
@@ -838,7 +868,7 @@ test("reads text links from an XML review index", () => {
       nextPage: null,
       limit: 20,
     },
-  } as const satisfies ScrapeRulesV9;
+  } as const satisfies StoredScrapeRules;
 
   expect(
     parseScrapeList(
@@ -885,7 +915,7 @@ test("reads formatted dates from attributes and filters review elements", () => 
         contains: "h2",
       },
     },
-  } as const satisfies ScrapeRulesV9;
+  } as const satisfies StoredScrapeRules;
 
   const result = parseScrapeDetail(
     rules,
@@ -991,7 +1021,7 @@ describe("scrape source parser", () => {
         imageUrl: null,
         barcode: null,
       },
-    } as const satisfies ScrapeRulesV9;
+    } as const satisfies StoredScrapeRules;
 
     expect(
       parseScrapeList(
@@ -2266,7 +2296,7 @@ describe("scrape source parser", () => {
         imageUrl: pageAttribute("img.bottle", "src"),
         barcode: null,
       },
-    } as const satisfies ScrapeRulesV9;
+    } as const satisfies StoredScrapeRules;
 
     expect(
       parseScrapeDetail(

@@ -1,12 +1,12 @@
 import { load } from "cheerio";
 import { expect, test, vi } from "vitest";
 import {
-  prepareAiPages,
+  preparePagesForSetup,
   runScrapeSourceSetupAgent,
-  suggestionRequestLimit,
+  setupRequestLimit,
 } from "./setupAgent";
 
-function reviewCandidate(nameSelector: string) {
+function reviewRuleCheck(nameSelector: string) {
   return {
     listPageUrl: "https://example.test/reviews",
     rules: {
@@ -33,7 +33,7 @@ function reviewCandidate(nameSelector: string) {
   };
 }
 
-function catalogCandidate() {
+function catalogRuleCheck() {
   return {
     listPageUrl: "https://example.test/whisky",
     rules: {
@@ -58,7 +58,7 @@ function catalogCandidate() {
   };
 }
 
-function toolCallResponse<T extends object>(callId: string, candidate: T) {
+function toolCallResponse<T extends object>(callId: string, ruleCheck: T) {
   return {
     model: "test-setup-model",
     output: [
@@ -66,15 +66,15 @@ function toolCallResponse<T extends object>(callId: string, candidate: T) {
         type: "function_call" as const,
         call_id: callId,
         name: "check_rules",
-        arguments: JSON.stringify(candidate),
+        arguments: JSON.stringify(ruleCheck),
       },
     ],
   };
 }
 
 test("reserves requests for discovery and three rule checks", () => {
-  expect(suggestionRequestLimit(0)).toBe(20);
-  expect(suggestionRequestLimit(2)).toBe(22);
+  expect(setupRequestLimit(0)).toBe(20);
+  expect(setupRequestLimit(2)).toBe(22);
 });
 
 test("bounds total AI input while keeping every sample page", () => {
@@ -82,7 +82,7 @@ test("bounds total AI input while keeping every sample page", () => {
     url: `https://example.test/${index}`,
     html: "x".repeat(50_000),
   }));
-  const prepared = prepareAiPages(pages);
+  const prepared = preparePagesForSetup(pages);
 
   expect(prepared).toHaveLength(pages.length);
   expect(prepared.every((page) => page.html.length > 0)).toBe(true);
@@ -110,7 +110,7 @@ test("keeps links and review facts after a large page header", () => {
     </body></html>`,
     },
   ];
-  const [prepared] = prepareAiPages(pages);
+  const [prepared] = preparePagesForSetup(pages);
   const $ = load(prepared!.html);
 
   expect(prepared!.url).toBe(pages[0]!.url);
@@ -129,9 +129,9 @@ test("keeps links and review facts after a large page header", () => {
 test("returns rules only after the rule check passes", async () => {
   const request = vi
     .fn()
-    .mockResolvedValueOnce(toolCallResponse("first", reviewCandidate(".bad")))
+    .mockResolvedValueOnce(toolCallResponse("first", reviewRuleCheck(".bad")))
     .mockResolvedValueOnce(
-      toolCallResponse("second", reviewCandidate(".bottle-name")),
+      toolCallResponse("second", reviewRuleCheck(".bottle-name")),
     );
   const checkRules = vi.fn(async ({ rules }) => {
     if (rules.kind !== "review") throw new Error("Expected review rules.");
@@ -139,7 +139,7 @@ test("returns rules only after the rule check passes", async () => {
       return {
         status: "failed" as const,
         feedback: {
-          message: "The proposed rules did not read an article page.",
+          message: "The rules did not read an article page.",
           issues: [
             {
               field: "article.reviews.name",
@@ -223,7 +223,7 @@ test("returns rules only after the rule check passes", async () => {
 test("accepts catalog rules without price or review fields", async () => {
   const request = vi
     .fn()
-    .mockResolvedValue(toolCallResponse("catalog", catalogCandidate()));
+    .mockResolvedValue(toolCallResponse("catalog", catalogRuleCheck()));
   const result = await runScrapeSourceSetupAgent({
     conversationId: "scrape_source:2",
     externalSiteRunId: 11,
@@ -254,8 +254,8 @@ test("accepts catalog rules without price or review fields", async () => {
 });
 
 test("accepts canonical, automatic date, and score selectors", async () => {
-  const base = reviewCandidate("h1");
-  const candidate = {
+  const base = reviewRuleCheck("h1");
+  const ruleCheck = {
     ...base,
     rules: {
       ...base.rules,
@@ -290,7 +290,7 @@ test("accepts canonical, automatic date, and score selectors", async () => {
       },
     ],
     detailPages: [],
-    request: vi.fn().mockResolvedValue(toolCallResponse("mapped", candidate)),
+    request: vi.fn().mockResolvedValue(toolCallResponse("mapped", ruleCheck)),
     checkRules,
   });
 
@@ -307,8 +307,8 @@ test("accepts canonical, automatic date, and score selectors", async () => {
 });
 
 test("uses review names to split unwrapped reviews", async () => {
-  const base = reviewCandidate("h2");
-  const candidate = {
+  const base = reviewRuleCheck("h2");
+  const ruleCheck = {
     ...base,
     rules: {
       ...base.rules,
@@ -326,7 +326,7 @@ test("uses review names to split unwrapped reviews", async () => {
 
   const request = vi
     .fn()
-    .mockResolvedValue(toolCallResponse("sections", candidate));
+    .mockResolvedValue(toolCallResponse("sections", ruleCheck));
   const result = await runScrapeSourceSetupAgent({
     conversationId: "scrape_source:1",
     externalSiteRunId: 10,
@@ -357,14 +357,14 @@ test("uses review names to split unwrapped reviews", async () => {
     },
   });
   expect(request.mock.calls[0]?.[0].instructions).toContain(
-    "The parser handles whitespace, prices, scores, dates, volumes, and relative URLs.",
+    "Code trims spaces, makes full URLs, and reads prices, scores, dates, and volumes.",
   );
   expect(request.mock.calls[0]?.[0].instructions).not.toContain("addStart");
 });
 
 test("stops after the rule-check limit", async () => {
   const request = vi.fn(async () =>
-    toolCallResponse("failed", reviewCandidate(".bad")),
+    toolCallResponse("failed", reviewRuleCheck(".bad")),
   );
 
   await expect(

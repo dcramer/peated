@@ -77,7 +77,7 @@ function usesNameBasedReviewKeys(rules: SavedReviewRules) {
   return "addStart" in rules.article.title.try[0];
 }
 
-function usesSimpleRules(rules: StoredScrapeRules): rules is ScrapeRules {
+function usesDirectSelectors(rules: StoredScrapeRules): rules is ScrapeRules {
   return "list" in rules && "links" in rules.list;
 }
 
@@ -284,20 +284,25 @@ function readPageField(
   return null;
 }
 
-function absoluteHttpUrl(value: string, baseUrl: URL) {
+function webUrl(value: string, baseUrl: URL) {
   const url = new URL(value, baseUrl);
   if (!["http:", "https:"].includes(url.protocol)) {
     throw new Error("URL must use HTTP or HTTPS.");
-  }
-  if (url.origin !== baseUrl.origin) {
-    throw new Error("Pages must stay on the source website.");
   }
   url.hash = "";
   return url.toString();
 }
 
+function sameWebsiteUrl(value: string, baseUrl: URL) {
+  const url = new URL(webUrl(value, baseUrl));
+  if (url.origin !== baseUrl.origin) {
+    throw new Error("Pages must stay on the source website.");
+  }
+  return url.toString();
+}
+
 function detailPageUrl(value: string, listUrl: URL) {
-  const url = new URL(absoluteHttpUrl(value, listUrl));
+  const url = new URL(sameWebsiteUrl(value, listUrl));
   if (
     url.hostname === "shop.theglenallachie.com" &&
     url.pathname.startsWith("/products/")
@@ -308,7 +313,7 @@ function detailPageUrl(value: string, listUrl: URL) {
   return url.toString();
 }
 
-function parseSimpleList(
+function parseSelectedLinks(
   rules: ScrapeRules,
   html: string,
   pageUrl: URL,
@@ -321,7 +326,17 @@ function parseSimpleList(
   const issues: ScrapeIssue[] = [];
   const links = new Set<string>();
 
-  for (const element of $(rules.list.links).toArray()) {
+  let linkElements;
+  try {
+    linkElements = $(rules.list.links).toArray();
+  } catch {
+    return {
+      links: [],
+      nextPageUrl: null,
+      issues: [{ field: "list.links", message: "CSS selector is not valid." }],
+    };
+  }
+  for (const element of linkElements) {
     const raw = $(element).attr("href") ?? readText($(element));
     if (!raw) continue;
     try {
@@ -341,19 +356,17 @@ function parseSimpleList(
 
   let nextPageUrl: string | null = null;
   if (rules.list.nextPage) {
-    const raw = $(rules.list.nextPage).first().attr("href");
-    if (raw) {
-      try {
-        nextPageUrl = absoluteHttpUrl(raw, pageUrl);
-      } catch (error) {
-        issues.push({
-          field: "list.nextPage",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Unable to read the next page link.",
-        });
-      }
+    try {
+      const raw = $(rules.list.nextPage).first().attr("href");
+      if (raw) nextPageUrl = sameWebsiteUrl(raw, pageUrl);
+    } catch (error) {
+      issues.push({
+        field: "list.nextPage",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unable to read the next page link.",
+      });
     }
   }
 
@@ -365,8 +378,8 @@ export function parseScrapeList(
   html: string,
   pageUrl: URL,
 ): ScrapeListResult {
-  if (usesSimpleRules(rules)) {
-    return parseSimpleList(rules, html, pageUrl);
+  if (usesDirectSelectors(rules)) {
+    return parseSelectedLinks(rules, html, pageUrl);
   }
   if ("articles" in rules || "products" in rules) {
     return parseSavedList(rules, html, pageUrl);
@@ -421,7 +434,7 @@ export function parseScrapeList(
     const raw = readValue($, rules.list.nextPage);
     if (raw) {
       try {
-        nextPageUrl = absoluteHttpUrl(raw, pageUrl);
+        nextPageUrl = sameWebsiteUrl(raw, pageUrl);
       } catch (error) {
         issues.push({
           field: "list.nextPage",
@@ -533,7 +546,7 @@ function parseSavedList(
     const raw = $(list.nextPage).first().attr("href");
     if (raw) {
       try {
-        nextPageUrl = absoluteHttpUrl(raw, pageUrl);
+        nextPageUrl = sameWebsiteUrl(raw, pageUrl);
       } catch (error) {
         issues.push({
           field: `${fieldRoot}.nextPage`,
@@ -774,7 +787,7 @@ function parseReviewDetail(
       );
     } else {
       try {
-        canonicalUrl = new URL(absoluteHttpUrl(canonicalUrlText, pageUrl));
+        canonicalUrl = new URL(sameWebsiteUrl(canonicalUrlText, pageUrl));
       } catch (error) {
         canonicalUrl = null;
         reportArticleFieldIssue(
@@ -955,7 +968,7 @@ function parseStorePriceDetail(
   let url = pageUrl.toString();
   if (rules.detail.url) {
     const value = readValue($, rules.detail.url);
-    if (value) url = absoluteHttpUrl(value, pageUrl);
+    if (value) url = sameWebsiteUrl(value, pageUrl);
   }
   const price = {
     name: readValue($, rules.detail.name),
@@ -1135,7 +1148,7 @@ function selectSavedReviewItems(
   });
 }
 
-function readPublishedDate(
+function readSavedPublishedDate(
   $: ReturnType<typeof load>,
   field: SavedReviewRules["article"]["publishedDate"],
   pageUrl: URL,
@@ -1177,7 +1190,7 @@ function parseSavedReviewDetail(
       });
     } else {
       try {
-        canonicalUrl = new URL(absoluteHttpUrl(value, pageUrl));
+        canonicalUrl = new URL(sameWebsiteUrl(value, pageUrl));
       } catch (error) {
         canonicalUrl = null;
         issues.push({
@@ -1188,7 +1201,7 @@ function parseSavedReviewDetail(
     }
   }
   const title = readPageField($, rules.article.title);
-  const publishedAt = readPublishedDate(
+  const publishedAt = readSavedPublishedDate(
     $,
     rules.article.publishedDate,
     canonicalUrl ?? pageUrl,
@@ -1351,7 +1364,7 @@ function parseSavedPriceDetail(
   let url = pageUrl.toString();
   if (rules.product.url) {
     const value = readPageField($, rules.product.url);
-    if (value) url = absoluteHttpUrl(value, pageUrl);
+    if (value) url = sameWebsiteUrl(value, pageUrl);
   }
   const product = {
     name: readPageField($, rules.product.name),
@@ -1391,7 +1404,7 @@ function parseSavedCatalogDetail(
   let url = pageUrl.toString();
   if (rules.product.url) {
     const value = readPageField($, rules.product.url);
-    if (value) url = absoluteHttpUrl(value, pageUrl);
+    if (value) url = sameWebsiteUrl(value, pageUrl);
   }
   const readOptional = (field: StoredScrapePageField | null) =>
     field ? readPageField($, field) : null;
@@ -1431,53 +1444,51 @@ function parseSavedCatalogDetail(
   return { kind: "catalog", value: [result.data], issues: [] };
 }
 
-type SimpleValueKind = "text" | "date" | "url" | "image" | "id";
+type PageValueKind = "text" | "date" | "url" | "image" | "id";
 
-function readSimpleElement(
+const PAGE_VALUE_ATTRIBUTES = {
+  text: ["content", "value"],
+  date: ["datetime", "content", "value"],
+  url: ["href", "content", "src", "value"],
+  image: ["src", "content", "href", "value"],
+  id: ["value", "content", "data-product-id", "data-item-id"],
+} as const satisfies Record<PageValueKind, readonly string[]>;
+
+function readElement(
   selected: ReturnType<ReturnType<typeof load>>,
-  kind: SimpleValueKind,
+  kind: PageValueKind,
 ) {
-  const attributes =
-    kind === "date"
-      ? ["datetime", "content", "value"]
-      : kind === "url"
-        ? ["href", "content", "src", "value"]
-        : kind === "image"
-          ? ["src", "content", "href", "value"]
-          : kind === "id"
-            ? ["value", "content", "data-product-id", "data-item-id"]
-            : ["content", "value"];
   return (
-    attributes
+    PAGE_VALUE_ATTRIBUTES[kind]
       .map((attribute) => normalizeValue(selected.attr(attribute)))
       .find(Boolean) ?? normalizeValue(readText(selected))
   );
 }
 
-function readSimpleValue(
+function readSelectedValue(
   root: ReturnType<typeof load>,
   selector: string,
-  kind: SimpleValueKind = "text",
-  all = false,
+  kind: PageValueKind = "text",
+  joinMatches = false,
 ) {
   const values: string[] = [];
 
   root(selector).each((_, element) => {
-    const value = readSimpleElement(root(element), kind);
+    const value = readElement(root(element), kind);
     if (!value) return;
     values.push(value);
-    if (!all || values.length > 100) return false;
+    if (!joinMatches || values.length > 100) return false;
   });
   if (values.length > 100) {
     throw new Error("A selector matched more than 100 values.");
   }
-  return normalizeValue(all ? values.join("\n") : values[0]);
+  return normalizeValue(joinMatches ? values.join("\n") : values[0]);
 }
 
-function readSharedReviewValue(
+function readArticleReviewValue(
   $: ReturnType<typeof load>,
   selector: string,
-  reviewItems: NonNullable<ReturnType<typeof selectSimpleReviews>>,
+  reviewItems: NonNullable<ReturnType<typeof selectReviews>>,
 ) {
   const outsideReview = $(selector)
     .toArray()
@@ -1488,24 +1499,12 @@ function readSharedReviewValue(
         ),
     );
   return outsideReview.length === 1
-    ? readSimpleElement($(outsideReview[0]!), "text")
+    ? readElement($(outsideReview[0]!), "text")
     : null;
 }
 
-function cleanArticleTitleForReviewName(title: string) {
+function reviewNameFromTitle(title: string) {
   return title.replace(/\s+review$/iu, "").trim() || title;
-}
-
-function simpleUrl(value: string, pageUrl: URL, sameWebsite: boolean) {
-  const url = new URL(value, pageUrl);
-  if (!["http:", "https:"].includes(url.protocol)) {
-    throw new Error("URL must use HTTP or HTTPS.");
-  }
-  if (sameWebsite && url.origin !== pageUrl.origin) {
-    throw new Error("Pages must stay on the source website.");
-  }
-  url.hash = "";
-  return url.toString();
 }
 
 function dateFromPageUrl(pageUrl: URL) {
@@ -1544,13 +1543,13 @@ function dateFromPageUrl(pageUrl: URL) {
   return null;
 }
 
-function readSimplePublishedDate(
+function readPublishedDate(
   $: ReturnType<typeof load>,
   selector: string | null,
   pageUrl: URL,
 ) {
   if (selector) {
-    return parseDate(readSimpleValue($, selector, "date"));
+    return parseDate(readSelectedValue($, selector, "date"));
   }
   const selectors = [
     'meta[property="article:published_time"]',
@@ -1558,14 +1557,14 @@ function readSimplePublishedDate(
     "time[datetime]",
   ];
   for (const candidate of selectors) {
-    const value = readSimpleValue($, candidate, "date");
+    const value = readSelectedValue($, candidate, "date");
     const date = parseDate(value);
     if (date) return date;
   }
   return dateFromPageUrl(pageUrl);
 }
 
-function selectSimpleReviews(
+function selectReviews(
   $: ReturnType<typeof load>,
   rules: Extract<ScrapeRules, { kind: "review" }>["detail"]["reviews"],
 ) {
@@ -1618,7 +1617,7 @@ function selectSimpleReviews(
   });
 }
 
-function simpleReviewField(path: PropertyKey[]) {
+function reviewRuleField(path: PropertyKey[]) {
   if (path[0] !== "article") return "detail";
   if (path[1] === "canonicalUrl") return "detail.url";
   if (path[1] === "title") return "detail.title";
@@ -1630,7 +1629,7 @@ function simpleReviewField(path: PropertyKey[]) {
   return "detail.reviews";
 }
 
-function parseSimpleReviewDetail(
+function parseReviewPage(
   rules: Extract<ScrapeRules, { kind: "review" }>,
   html: string,
   pageUrl: URL,
@@ -1639,7 +1638,7 @@ function parseSimpleReviewDetail(
   const issues: ScrapeIssue[] = [];
   let canonicalUrl = pageUrl.toString();
   if (rules.detail.url) {
-    const value = readSimpleValue($, rules.detail.url, "url");
+    const value = readSelectedValue($, rules.detail.url, "url");
     if (!value) {
       issues.push({
         field: "detail.url",
@@ -1647,7 +1646,7 @@ function parseSimpleReviewDetail(
       });
     } else {
       try {
-        canonicalUrl = simpleUrl(value, pageUrl, true);
+        canonicalUrl = sameWebsiteUrl(value, pageUrl);
       } catch (error) {
         issues.push({
           field: "detail.url",
@@ -1656,8 +1655,8 @@ function parseSimpleReviewDetail(
       }
     }
   }
-  const title = readSimpleValue($, rules.detail.title);
-  const publishedAt = readSimplePublishedDate(
+  const title = readSelectedValue($, rules.detail.title);
+  const publishedAt = readPublishedDate(
     $,
     rules.detail.date,
     new URL(canonicalUrl),
@@ -1685,7 +1684,7 @@ function parseSimpleReviewDetail(
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
   const keyCounts = new Map<string, number>();
-  const reviewItems = selectSimpleReviews($, rules.detail.reviews);
+  const reviewItems = selectReviews($, rules.detail.reviews);
   if (!reviewItems) {
     issues.push({
       field: "detail.reviews.area",
@@ -1701,14 +1700,14 @@ function parseSimpleReviewDetail(
   const reviewerSelector = rules.detail.reviews.reviewer;
   const sharedReviewerName =
     reviewItems && reviewerSelector
-      ? readSharedReviewValue($, reviewerSelector, reviewItems)
+      ? readArticleReviewValue($, reviewerSelector, reviewItems)
       : null;
 
   reviewItems?.forEach(({ body, item }, index) => {
     const name = rules.detail.reviews.name
-      ? readSimpleValue(item, rules.detail.reviews.name)
+      ? readSelectedValue(item, rules.detail.reviews.name)
       : title
-        ? cleanArticleTitleForReviewName(title)
+        ? reviewNameFromTitle(title)
         : null;
     if (!name) {
       issues.push({
@@ -1718,7 +1717,7 @@ function parseSimpleReviewDetail(
       return;
     }
     const reviewerName = reviewerSelector
-      ? (readSimpleValue(item, reviewerSelector) ?? sharedReviewerName)
+      ? (readSelectedValue(item, reviewerSelector) ?? sharedReviewerName)
       : null;
     const firstKey = reviewSourceKey(name, reviewerName);
     const repeat = (keyCounts.get(firstKey) ?? 0) + 1;
@@ -1726,9 +1725,9 @@ function parseSimpleReviewDetail(
     const sourceKey = reviewSourceKey(name, reviewerName, repeat);
     const scoreRule = rules.detail.reviews.score;
     const scoreText = scoreRule
-      ? (readSimpleValue(item, scoreRule.selector) ??
+      ? (readSelectedValue(item, scoreRule.selector) ??
         (reviewItems.length === 1
-          ? readSimpleValue($, scoreRule.selector)
+          ? readSelectedValue($, scoreRule.selector)
           : null))
       : null;
     const scoreValue = parseNumber(scoreText);
@@ -1762,7 +1761,7 @@ function parseSimpleReviewDetail(
           : null,
     });
     if (rules.detail.reviews.tastingNotes) {
-      const value = readSimpleValue(
+      const value = readSelectedValue(
         item,
         rules.detail.reviews.tastingNotes,
         "text",
@@ -1787,7 +1786,7 @@ function parseSimpleReviewDetail(
   if (!result.success) {
     const reportedFields = new Set(issues.map(({ field }) => field));
     issues.push(
-      ...validationIssues(result.error, simpleReviewField).filter(
+      ...validationIssues(result.error, reviewRuleField).filter(
         ({ field }) => !reportedFields.has(field),
       ),
     );
@@ -1799,31 +1798,31 @@ function parseSimpleReviewDetail(
   };
 }
 
-function readSimpleProductUrl(
+function readProductUrl(
   $: ReturnType<typeof load>,
   selector: string | null,
   pageUrl: URL,
 ) {
   if (!selector) return pageUrl.toString();
-  const value = readSimpleValue($, selector, "url");
-  return value ? simpleUrl(value, pageUrl, true) : pageUrl.toString();
+  const value = readSelectedValue($, selector, "url");
+  return value ? sameWebsiteUrl(value, pageUrl) : pageUrl.toString();
 }
 
-function readSimpleImageUrl(
+function readImageUrl(
   $: ReturnType<typeof load>,
   selector: string | null,
   pageUrl: URL,
 ) {
   if (!selector) return undefined;
-  const value = readSimpleValue($, selector, "image");
-  return value ? simpleUrl(value, pageUrl, false) : undefined;
+  const value = readSelectedValue($, selector, "image");
+  return value ? webUrl(value, pageUrl) : undefined;
 }
 
 function isFixedVolume(value: string | number | null): value is number {
   return Number.isInteger(value);
 }
 
-function simpleProductField(path: PropertyKey[]) {
+function productRuleField(path: PropertyKey[]) {
   if (path[0] === "externalProductId") return "detail.id";
   if (path[0] === "imageUrl") return "detail.image";
   if (path[0] === "sourceBottleIdentity") {
@@ -1834,7 +1833,7 @@ function simpleProductField(path: PropertyKey[]) {
   return path[0] ? `detail.${String(path[0])}` : "detail";
 }
 
-function parseSimpleProductDetail(
+function parseProductPage(
   rules: Extract<ScrapeRules, { kind: "price" | "catalog" }>,
   html: string,
   pageUrl: URL,
@@ -1842,23 +1841,23 @@ function parseSimpleProductDetail(
   const $ = load(html);
   const readOptional = (
     selector: string | null,
-    kind: SimpleValueKind = "text",
-  ) => (selector ? readSimpleValue($, selector, kind) : null);
+    kind: PageValueKind = "text",
+  ) => (selector ? readSelectedValue($, selector, kind) : null);
   const volume = isFixedVolume(rules.detail.volume)
     ? rules.detail.volume
     : parseVolume(readOptional(rules.detail.volume));
   const common = {
-    name: readSimpleValue($, rules.detail.name),
-    url: readSimpleProductUrl($, rules.detail.url, pageUrl),
+    name: readSelectedValue($, rules.detail.name),
+    url: readProductUrl($, rules.detail.url, pageUrl),
     externalProductId: readOptional(rules.detail.id, "id") ?? undefined,
-    imageUrl: readSimpleImageUrl($, rules.detail.image, pageUrl),
+    imageUrl: readImageUrl($, rules.detail.image, pageUrl),
     volume,
   };
 
   if (rules.kind === "price") {
     const result = StorePriceInputSchema.safeParse({
       ...common,
-      price: parseDisplayedPrice(readSimpleValue($, rules.detail.price)),
+      price: parseDisplayedPrice(readSelectedValue($, rules.detail.price)),
       currency: rules.detail.currency,
       barcode: readOptional(rules.detail.barcode, "id") ?? undefined,
     });
@@ -1867,7 +1866,7 @@ function parseSimpleProductDetail(
       : {
           kind: "price",
           value: [],
-          issues: validationIssues(result.error, simpleProductField),
+          issues: validationIssues(result.error, productRuleField),
         };
   }
 
@@ -1890,7 +1889,7 @@ function parseSimpleProductDetail(
     : {
         kind: "catalog",
         value: [],
-        issues: validationIssues(result.error, simpleProductField),
+        issues: validationIssues(result.error, productRuleField),
       };
 }
 
@@ -1900,10 +1899,10 @@ export function parseScrapeDetail(
   pageUrl: URL,
 ): ScrapeDetailResult {
   try {
-    if (usesSimpleRules(rules)) {
+    if (usesDirectSelectors(rules)) {
       return rules.kind === "review"
-        ? parseSimpleReviewDetail(rules, html, pageUrl)
-        : parseSimpleProductDetail(rules, html, pageUrl);
+        ? parseReviewPage(rules, html, pageUrl)
+        : parseProductPage(rules, html, pageUrl);
     }
     if (rules.kind === "review" && "article" in rules) {
       return parseSavedReviewDetail(rules, html, pageUrl);

@@ -95,7 +95,7 @@ test("rejects a list page that was not supplied", () => {
       rules: reviewRules,
       pages: [{ url: "https://example.test/", html: "<main></main>" }],
     }),
-  ).toThrow("The proposed list page was not one of the supplied pages.");
+  ).toThrow("The chosen list page was not one of the given pages.");
 });
 
 test("parses supplied detail pages with the production parser", async () => {
@@ -239,7 +239,5 @@ test("rejects suggested rules that do not parse a detail page", async () => {
         html: "<main>Unrelated page</main>",
       }),
     }),
-  ).rejects.toThrow(
-    "The proposed rules did not read an article or product page.",
-  );
+  ).rejects.toThrow("The rules did not read an article or product page.");
 });

@@ -11,7 +11,7 @@ import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
 } from "./service";
-import { suggestionRequestLimit } from "./setupAgent";
+import { setupRequestLimit } from "./setupAgent";
 
 export async function createPinnedScrapeSourceRun(
   connection: AnyDatabase,
@@ -111,7 +111,7 @@ export async function createScrapeSourceSuggestionRun(input: {
         trigger: "manual",
         purpose: "suggest",
         requestedById: input.requestedById,
-        requestLimit: suggestionRequestLimit(source.sampleUrls.length),
+        requestLimit: setupRequestLimit(source.sampleUrls.length),
         requestErrorCount: 0,
       })
       .returning();

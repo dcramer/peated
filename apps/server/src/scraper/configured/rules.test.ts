@@ -12,8 +12,8 @@ import {
   ScrapeRulesV5Schema,
   ScrapeRulesV6Schema,
   ScrapeRulesV7Schema,
-  ScrapeRulesV9Schema,
   ScrapeValueSchema,
+  type StoredScrapeRules,
 } from "./rules";
 
 function reviewConfig(maxItems: number) {
@@ -128,7 +128,7 @@ test("adds catalog rules only in version 7", () => {
 });
 
 test("changes text matching only in version 8", () => {
-  const version8 = ScrapeRulesV9Schema.parse({
+  const version8 = {
     kind: "price",
     products: {
       oneProductPer: "article.product",
@@ -178,7 +178,7 @@ test("changes text matching only in version 8", () => {
       imageUrl: null,
       barcode: null,
     },
-  });
+  } as const satisfies StoredScrapeRules;
 
   expect(parseScrapeRules(9, version8)).toEqual(version8);
   expect(parseScrapeRules(8, version8)).toEqual(version8);
