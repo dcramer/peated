@@ -498,7 +498,7 @@ describe("Bottle creation", () => {
     });
   });
 
-  test("allows one marketed title to have distinct structured releases", async ({
+  test("allows one marketed title to have distinct bottling years", async ({
     defaults,
     fixtures,
   }) => {
@@ -509,7 +509,8 @@ describe("Bottle creation", () => {
       input: {
         name: "Annual Selection",
         brand: brand.id,
-        releaseYear: 2025,
+        vintageYear: 1990,
+        bottlingYear: 2025,
         abv: 46,
       },
     });
@@ -518,14 +519,15 @@ describe("Bottle creation", () => {
       input: {
         name: "Annual Selection",
         brand: brand.id,
-        releaseYear: 2026,
-        abv: 48,
+        vintageYear: 1990,
+        bottlingYear: 2026,
+        abv: 46,
       },
     });
 
     expect(second.bottle.id).not.toBe(first.bottle.id);
     expect(second.bottle.fullName).toBe(first.bottle.fullName);
-    expect([first.bottle.releaseYear, second.bottle.releaseYear]).toEqual([
+    expect([first.bottle.bottlingYear, second.bottle.bottlingYear]).toEqual([
       2025, 2026,
     ]);
   });

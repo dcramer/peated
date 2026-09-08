@@ -202,6 +202,8 @@ BottleSeries means “related products in the same range.”
   BottleGroup.
 - Macallan 18 annual releases can be separate Bottles in one BottleGroup when
   they are marketed as annual versions of the same expression.
+- One vintage bottled in different years can be separate Bottles in one
+  BottleGroup because the additional time in cask can change the whisky.
 - Octomore 13.1 and 13.3 are distinct expressions in separate BottleGroups,
   even if they share a BottleSeries.
 
@@ -234,10 +236,10 @@ Entity.
   when the producer sells one ongoing product without batch-specific
   marketing.
 - Bottle names combine the stable expression with an explicit marketed
-  edition. Age, vintage year, release year, ABV, cask strength, cask number, and
-  outturn remain structured facts. Do not generate name suffixes from those
-  fields to make a Bottle look unique. Wording already marketed in the
-  expression remains there.
+  edition. Age, vintage year, bottling year, release year, ABV, cask strength,
+  cask number, and outturn remain structured facts. Do not generate name
+  suffixes from those fields to make a Bottle look unique. Wording already
+  marketed in the expression remains there.
 - For a uniform multi-distillery label with no separate expression name, use
   the featured distillery as the Bottle name. For example, use `Glenury Royal`
   as the Rare Series Bottle name. Store its 55-year age, 1970 vintage, 2026
@@ -247,9 +249,10 @@ Entity.
   available. Store `releaseMonth` and `releaseDay` only when the source gives
   them. A month requires a year, and a day requires a month. Do not make up a
   month or day. A bare year is ambiguous until the source explains it.
-- A different `bottlingYear` does not prove that it is a different Bottle.
-  Create a separate Bottle for that year only when the producer markets the
-  bottling as a separate release.
+- A different `bottlingYear` means two structured identities are not exact
+  duplicates because the time spent maturing can differ. It does not by itself
+  prove that two source records describe separate marketed releases. Create a
+  separate Bottle only when release evidence supports that distinction.
 - Do not infer `statedAge` from year fields unless the source states the age.
 
 When one uniform consumer label markets whiskies from multiple named
