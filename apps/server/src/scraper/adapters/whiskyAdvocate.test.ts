@@ -13,6 +13,20 @@ import {
   WhiskyAdvocateCursorSchema,
 } from "./whiskyAdvocate";
 
+function keepFirstIssues(data: string, count: number) {
+  const $ = cheerio(data);
+  $("select")
+    .filter(
+      (_, element) =>
+        element.attribs.name === "filters[default][custom_rating_issue][]",
+    )
+    .find("option")
+    .filter((_, element) => element.attribs.value !== "")
+    .slice(count)
+    .remove();
+  return $.html();
+}
+
 test("accepts a cursor stored by the previous adapter", () => {
   expect(
     WhiskyAdvocateCursorSchema.parse({ processedIssues: ["Winter 2023"] }),
@@ -28,8 +42,11 @@ test("accepts a cursor stored by the previous adapter", () => {
   });
 });
 
-test("starts old saved progress again and checks older issues later", async () => {
-  const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
+test("starts old saved progress again and finishes remaining issues", async () => {
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    2,
+  );
   const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
   const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
   const issueNames = parseIssueList(issueHtml);
@@ -68,6 +85,9 @@ test("starts old saved progress again and checks older issues later", async () =
       "custom_rating_issue[0]",
     ),
   ).toBe(issueNames[0]);
+  expect(oldRun.checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({ completedIssues: issueNames }),
+  );
 
   const nextRun = await run({
     checksReviewDates: true,
@@ -81,7 +101,7 @@ test("starts old saved progress again and checks older issues later", async () =
     ),
   ).toBe(issueNames[1]);
   expect(nextRun.checkpoint).toHaveBeenLastCalledWith(
-    expect.objectContaining({ completedIssues: issueNames.slice(0, 2) }),
+    expect.objectContaining({ completedIssues: issueNames }),
   );
 });
 
@@ -105,8 +125,11 @@ test("parses the publisher date template", async () => {
   ).toThrow("Whisky Advocate review date is invalid.");
 });
 
-test("fetches dates for the latest issue and checkpoints each review", async () => {
-  const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
+test("fetches dates and checkpoints each review", async () => {
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    1,
+  );
   const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
   const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
   const $ = cheerio(issueHtml);
@@ -190,7 +213,10 @@ test("fetches dates for the latest issue and checkpoints each review", async () 
 });
 
 test("rechecks old saved reviews and resumes reviews checked for dates", async () => {
-  const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    1,
+  );
   const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
   const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
   const $ = cheerio(reviewHtml);
@@ -262,7 +288,10 @@ test("rechecks old saved reviews and resumes reviews checked for dates", async (
 });
 
 test("fails when the newest issue has no review results", async () => {
-  const issueHtml = await loadFixture("whiskyadvocate", "empty-search.html");
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    1,
+  );
   const request = vi.fn(async () => ({
     url: new URL("https://whiskyadvocate.com/ratings-reviews"),
     status: 200,

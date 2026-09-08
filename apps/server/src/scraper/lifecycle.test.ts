@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
-import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
+import {
+  externalReviewBodies,
+  externalSiteRuns,
+  externalSites,
+} from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 import {
@@ -117,6 +121,12 @@ test("opted-in source resumes the last successful run cursor", async ({
       completedAt: new Date("2026-08-21T00:00:00Z"),
     },
   ]);
+  const review = await fixtures.ExternalReview({ externalSiteId: site.id });
+  await db.insert(externalReviewBodies).values({
+    externalReviewId: review.id,
+    body: "Saved review text.",
+    fetchedAt: new Date(),
+  });
 
   const run = await queueManualExternalSiteRun({
     site,
@@ -125,6 +135,34 @@ test("opted-in source resumes the last successful run cursor", async ({
   });
 
   expect(run.cursor).toEqual(successfulCursor);
+});
+
+test("manual review run restarts when reviews are missing saved text", async ({
+  fixtures,
+}) => {
+  const requestedBy = await fixtures.User({ admin: true });
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  await fixtures.ExternalReview({ externalSiteId: site.id });
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    trigger: "scheduled",
+    status: "succeeded",
+    cursor: {
+      checksReviewDates: true,
+      completedIssues: ["Summer 2026"],
+      issue: null,
+      completedReviewUrls: [],
+    },
+    completedAt: new Date("2026-08-20T00:00:00Z"),
+  });
+
+  const run = await queueManualExternalSiteRun({
+    site,
+    requestedById: requestedBy.id,
+    enqueue: async () => undefined,
+  });
+
+  expect(run.cursor).toBeNull();
 });
 
 test("active run prevents overlap", async ({ fixtures }) => {

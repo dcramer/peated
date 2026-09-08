@@ -36,8 +36,9 @@ const DatedWhiskyAdvocateCursorSchema = z
   })
   .strict();
 
-// Active runs can resume across deploys.
-// Accept cursors written by the prior adapter.
+// Runs can span deploys.
+// TODO(scraper): Remove the two old cursor shapes after this change has been
+// live for three days, when no older run can still be active.
 export const WhiskyAdvocateCursorSchema = z.union([
   DatedWhiskyAdvocateCursorSchema,
   LegacyWhiskyAdvocateCursorSchema,
@@ -182,88 +183,94 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
   const completedIssues = new Set(
     cursor && "checksReviewDates" in cursor ? cursor.completedIssues : [],
   );
-  const activeIssue = cursor && "issue" in cursor ? cursor.issue : null;
-  const issue =
-    activeIssue ?? issueList.find((value) => !completedIssues.has(value));
-  if (!issue) return;
+  let issue = cursor && "issue" in cursor ? cursor.issue : null;
   const completedReviewUrls = new Set(
-    cursor && "completedReviewUrls" in cursor ? cursor.completedReviewUrls : [],
+    issue && cursor && "completedReviewUrls" in cursor
+      ? cursor.completedReviewUrls
+      : [],
   );
 
-  const reviewUrl = new URL("/ratings-reviews", ORIGIN);
-  reviewUrl.searchParams.set("custom_rating_issue[0]", issue);
-  reviewUrl.searchParams.set("order_by", "published_desc");
-  const reviewResponse = await session.request({
-    target: TARGET,
-    url: reviewUrl,
-  });
-  const externalReviews = parseReviews(
-    reviewResponse.body,
-    reviewResponse.url.href,
-  );
-  if (externalReviews.length === 0) {
-    throw new Error("Whisky Advocate issue contains no external reviews.");
-  }
+  while (true) {
+    issue ??= issueList.find((value) => !completedIssues.has(value)) ?? null;
+    if (!issue) return;
 
-  for (const review of externalReviews) {
-    if (completedReviewUrls.has(review.url)) continue;
-    const articleResponse = await session.request({
+    const reviewUrl = new URL("/ratings-reviews", ORIGIN);
+    reviewUrl.searchParams.set("custom_rating_issue[0]", issue);
+    reviewUrl.searchParams.set("order_by", "published_desc");
+    const reviewResponse = await session.request({
       target: TARGET,
-      url: new URL(review.url),
+      url: reviewUrl,
     });
-    const publishedAt = parseReviewPublishedAt(articleResponse.body);
-    const body = parseReviewBody(articleResponse.body);
-    const nativeScore = {
-      value: review.rating,
-      scale: 100,
-      display: `${review.rating}/100`,
-    };
-    const value = WhiskyAdvocateObservationSchema.parse({
-      article: {
-        canonicalUrl: review.url,
-        title: review.name,
-        issue: review.issue,
-        publishedAt,
-        contentHash: createHash("sha256")
-          .update(
-            JSON.stringify({
+    const externalReviews = parseReviews(
+      reviewResponse.body,
+      reviewResponse.url.href,
+    );
+    if (externalReviews.length === 0) {
+      throw new Error("Whisky Advocate issue contains no external reviews.");
+    }
+
+    for (const review of externalReviews) {
+      if (completedReviewUrls.has(review.url)) continue;
+      const articleResponse = await session.request({
+        target: TARGET,
+        url: new URL(review.url),
+      });
+      const publishedAt = parseReviewPublishedAt(articleResponse.body);
+      const body = parseReviewBody(articleResponse.body);
+      const nativeScore = {
+        value: review.rating,
+        scale: 100,
+        display: `${review.rating}/100`,
+      };
+      const value = WhiskyAdvocateObservationSchema.parse({
+        article: {
+          canonicalUrl: review.url,
+          title: review.name,
+          issue: review.issue,
+          publishedAt,
+          contentHash: createHash("sha256")
+            .update(
+              JSON.stringify({
+                name: review.name,
+                category: review.category,
+                rating: review.rating,
+                url: review.url,
+                issue: review.issue,
+                body,
+              }),
+            )
+            .digest("hex"),
+          externalReviews: [
+            {
+              sourceKey: review.url,
               name: review.name,
               category: review.category,
-              rating: review.rating,
-              url: review.url,
-              issue: review.issue,
-              body,
-            }),
-          )
-          .digest("hex"),
-        externalReviews: [
-          {
-            sourceKey: review.url,
-            name: review.name,
-            category: review.category,
-            reviewerName: null,
-            nativeScore,
-          },
-        ],
-      },
-      externalReviewTexts: {},
-      externalReviewBodies: { [review.url]: body },
-    });
-    await session.emit({ sourceKey: review.url, value });
-    completedReviewUrls.add(review.url);
+              reviewerName: null,
+              nativeScore,
+            },
+          ],
+        },
+        externalReviewTexts: {},
+        externalReviewBodies: { [review.url]: body },
+      });
+      await session.emit({ sourceKey: review.url, value });
+      completedReviewUrls.add(review.url);
+      await session.checkpoint({
+        checksReviewDates: true,
+        completedIssues: [...completedIssues],
+        issue,
+        completedReviewUrls: [...completedReviewUrls],
+      });
+    }
+
+    completedIssues.add(issue);
     await session.checkpoint({
       checksReviewDates: true,
       completedIssues: [...completedIssues],
-      issue,
-      completedReviewUrls: [...completedReviewUrls],
+      issue: null,
+      completedReviewUrls: [],
     });
+    issue = null;
+    completedReviewUrls.clear();
   }
-
-  completedIssues.add(issue);
-  await session.checkpoint({
-    checksReviewDates: true,
-    completedIssues: [...completedIssues],
-    issue: null,
-    completedReviewUrls: [],
-  });
 };
