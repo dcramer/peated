@@ -89,16 +89,13 @@ test("registers each built-in scraper source with its target", () => {
   expect(scraperRegistry.targets.get("compassbox")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.dramface.initialRunEvery).toBe(1440);
   expectHourlyLimit("dramface", 25);
-  expect(scraperRegistry.sources.get("dramface")?.requestLimit).toBe(30);
   expect(EXTERNAL_SITE_DEFINITIONS.fredminnick.initialRunEvery).toBe(1440);
   expectHourlyLimit("fredminnick", 10);
-  expect(scraperRegistry.sources.get("fredminnick")?.requestLimit).toBe(9);
   expect(EXTERNAL_SITE_DEFINITIONS.whiskeyreviewer.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskeyreviewer", 10);
   expect(scraperRegistry.targets.get("kilchoman")).toBeDefined();
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyadvocate.initialRunEvery).toBeNull();
-  expectHourlyLimit("whiskyadvocate", 20);
-  expect(scraperRegistry.sources.get("whiskyadvocate")?.requestLimit).toBe(30);
+  expectHourlyLimit("whiskyadvocate", 120);
   expect(scraperRegistry.sources.get("whiskyadvocate")?.resumeFromLastRun).toBe(
     true,
   );
@@ -106,7 +103,6 @@ test("registers each built-in scraper source with its target", () => {
   expectHourlyLimit("whiskynotes", 30);
   expect(EXTERNAL_SITE_DEFINITIONS.whiskyfun.initialRunEvery).toBe(1440);
   expectHourlyLimit("whiskyfun", 25);
-  expect(scraperRegistry.sources.get("whiskyfun")?.requestLimit).toBe(30);
   expect(scraperRegistry.sources.get("whiskyfun")?.resumeFromLastRun).toBe(
     true,
   );

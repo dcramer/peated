@@ -24,7 +24,7 @@ function source(
   });
 }
 
-test("applies conservative target and run defaults", () => {
+test("applies target defaults", () => {
   const target = defineScrapeTarget({
     key: "retailer",
     origins: [{ origin: "https://example.com", robots: { mode: "enforce" } }],
@@ -33,14 +33,13 @@ test("applies conservative target and run defaults", () => {
 
   expect(target).toMatchObject({
     enabled: true,
-    minimumSpacingMs: 60_000,
-    requestsPerWindow: 60,
+    minimumSpacingMs: 30_000,
+    requestsPerWindow: 120,
     windowMs: 3_600_000,
     timeoutMs: 30_000,
     maxResponseBytes: 10 * 1024 * 1024,
     maxRetries: 2,
   });
-  expect(definition.requestLimit).toBe(100);
   expect(definition.resumeFromLastRun).toBe(false);
 });
 

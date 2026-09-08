@@ -17,8 +17,7 @@ export class ScraperTargetDisabledError extends Error {
 }
 
 export const DEFAULT_SCRAPER_SETTINGS = Object.freeze({
-  requestsPerHour: 60,
-  requestLimit: 100,
+  requestsPerHour: 120,
   timeoutMs: 30_000,
   maxResponseBytes: 10 * 1024 * 1024,
   maxRetries: 2,
@@ -156,12 +155,6 @@ const SourceDefinitionSchema = z
     externalSiteKey: z.enum(REGISTERED_EXTERNAL_SITE_KEY_LIST),
     recordType: z.enum(["review", "price", "catalog", "bottle"]).optional(),
     targetKeys: z.tuple([DefinitionKeySchema], DefinitionKeySchema),
-    requestLimit: z
-      .number()
-      .int()
-      .positive()
-      .max(DEFAULT_SCRAPER_SETTINGS.requestLimit)
-      .default(DEFAULT_SCRAPER_SETTINGS.requestLimit),
     resumeFromLastRun: z.boolean().default(false),
     cursorSchema: ZodSchemaSchema,
     observationSchema: ZodSchemaSchema,
@@ -194,16 +187,14 @@ export function defineScrapeTarget(
 export function defineScraperSource<TCursor, TObservation>(
   input: Omit<
     BuiltInScraperSourceDefinition<TCursor, TObservation>,
-    "requestLimit" | "resumeFromLastRun"
+    "resumeFromLastRun"
   > & {
-    requestLimit?: number;
     resumeFromLastRun?: boolean;
   },
 ): BuiltInScraperSourceDefinition<TCursor, TObservation> {
   const parsed = SourceDefinitionSchema.parse(input);
   return {
     ...input,
-    requestLimit: parsed.requestLimit,
     resumeFromLastRun: parsed.resumeFromLastRun,
   };
 }

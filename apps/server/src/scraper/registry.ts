@@ -313,7 +313,6 @@ export const scraperRegistry = createScraperRegistry({
     }),
     defineScrapeTarget({
       key: "whiskyadvocate",
-      requestsPerHour: 20,
       origins: [
         {
           origin: "https://whiskyadvocate.com",
@@ -404,7 +403,6 @@ export const scraperRegistry = createScraperRegistry({
       externalSiteKey: "dramface",
       recordType: "review",
       targetKeys: ["dramface"],
-      requestLimit: 30,
       cursorSchema: DramfaceCursorSchema,
       observationSchema: DramfaceObservationSchema,
       adapter: dramfaceAdapter,
@@ -415,7 +413,6 @@ export const scraperRegistry = createScraperRegistry({
       externalSiteKey: "fredminnick",
       recordType: "review",
       targetKeys: ["fredminnick"],
-      requestLimit: 9,
       cursorSchema: FredMinnickCursorSchema,
       observationSchema: FredMinnickObservationSchema,
       adapter: fredMinnickAdapter,
@@ -426,9 +423,6 @@ export const scraperRegistry = createScraperRegistry({
       externalSiteKey: "whiskyadvocate",
       recordType: "review",
       targetKeys: ["whiskyadvocate"],
-      // Keep the run limit above the hourly limit so the run waits for the next
-      // hour instead of stopping.
-      requestLimit: 30,
       resumeFromLastRun: true,
       cursorSchema: WhiskyAdvocateCursorSchema,
       observationSchema: WhiskyAdvocateObservationSchema,
@@ -440,7 +434,6 @@ export const scraperRegistry = createScraperRegistry({
       externalSiteKey: "whiskyfun",
       recordType: "review",
       targetKeys: ["whiskyfun"],
-      requestLimit: 30,
       resumeFromLastRun: true,
       cursorSchema: WhiskyfunCursorSchema,
       observationSchema: WhiskyfunObservationSchema,

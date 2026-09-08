@@ -38,14 +38,10 @@ import {
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   parseScrapeRules,
   scrapeRulesLimit,
-  scrapeRunRequestLimit,
   type StoredScrapeRules,
 } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
-import {
-  MAX_SUGGESTION_DETAIL_PAGES,
-  suggestionRequestLimit,
-} from "./setupAgent";
+import { MAX_SUGGESTION_DETAIL_PAGES } from "./setupAgent";
 import { suggestScrapeSourceRevision } from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
@@ -318,7 +314,6 @@ export function createLocalScrapeSourcePreview(input: {
     externalSiteKey: input.siteKey,
     recordType: input.rules.kind,
     targetKeys: [input.targetKey],
-    requestLimit: scrapeRunRequestLimit(input.rules),
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema: observationSchemaForRules(input.rules),
@@ -409,7 +404,6 @@ function createScrapeSourceDefinition(input: {
     externalSiteKey: input.siteKey,
     recordType: input.rules.kind,
     targetKeys: [input.targetKey],
-    requestLimit: scrapeRunRequestLimit(input.rules),
     resumeFromLastRun: false,
     cursorSchema: ConfiguredScrapeCursorSchema,
     observationSchema,
@@ -584,7 +578,6 @@ export async function resolveScrapeSourceRunRegistry(
       key: `source-${suggestion.source.id}`,
       externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
-      requestLimit: suggestionRequestLimit(suggestion.source.sampleUrls.length),
       resumeFromLastRun: false,
       cursorSchema: z.null(),
       observationSchema: z.unknown(),
