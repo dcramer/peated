@@ -85,10 +85,12 @@ reuse the signature before it expires.
 
 ## Register with Cloudflare
 
-In the Cloudflare dashboard, open Manage Account → Configurations → Bot
-Submission Form. Choose **Request Signature** as the verification method. Use
-the public key directory URL for **Validation Instructions** and list
-`PeatedBot/1.0 (+https://peated.com/bot)` as the user agent.
+In the Cloudflare dashboard, open Protect & Connect → Application Security →
+BotBase → Submission form. Choose **Request Signature** as the verification
+method. Use the public key directory URL for **Validation Instructions** and
+list `PeatedBot/1.0 (+https://peated.com/bot)` as the user agent. Cloudflare's
+older Web Bot Auth instructions may still point to Manage Account →
+Configurations, but Cloudflare moved the form to BotBase in August 2026.
 
 After Cloudflare accepts the submission:
 
