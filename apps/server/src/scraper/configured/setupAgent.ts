@@ -20,7 +20,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v18";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v19";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_SUGGESTION_DETAIL_PAGES = 3;
 const MAX_RULE_CHECKS = 3;
@@ -104,8 +104,9 @@ const RULE_INSTRUCTIONS = [
   "A field's try list is read from top to bottom until a value is found.",
   'A review field can read from the current review or from the article. Article reads must say whether they apply to "firstReview" or "everyReview".',
   "Set tastingNotes only when the page has a reliable narrower selection for flavor tags and clips. The full review body is saved from the review selection.",
-  "When a date exists only in the article URL, use dateFromUrl with a format made from yyyy, yy, MM, dd, and * tokens.",
-  "Use dateFromAttribute with the same bounded format when a selected attribute contains the complete date.",
+  "Prefer a machine-readable date or timestamp from page text or an attribute so available time and timezone data are kept.",
+  "Only when no complete machine-readable date is available, use dateFromUrl with a format made from yyyy, yy, MM, dd, and * tokens.",
+  "Use dateFromAttribute with the same bounded format only when a selected attribute contains the complete date but is not a standard machine-readable date or timestamp.",
   "Set canonicalUrl only when page markup provides a preferred article URL. Otherwise set it to null.",
   "Include an optional field only when the supplied pages clearly and consistently provide it.",
   "For catalog sources, collect only the displayed name, preferred product page URL, stable product ID, image URL, volume, ABV, age, edition, and release year fields offered by the catalog schema.",
