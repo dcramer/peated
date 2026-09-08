@@ -3,7 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { ImagePlus } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Button, Field, FieldGroup, TextInput } from ".";
 import { colors, space } from "../styles/tokens.stylex";
@@ -47,18 +47,33 @@ export function EntityImageEditor({
   onChange: (images: EntityImageDraft[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const objectUrlsRef = useRef(new Set<string>());
+
+  useEffect(() => {
+    const objectUrls = objectUrlsRef.current;
+    return () => {
+      for (const objectUrl of objectUrls) URL.revokeObjectURL(objectUrl);
+      objectUrls.clear();
+    };
+  }, []);
 
   function addFiles(files: FileList) {
-    const additions = Array.from(files).map((file) => ({
-      key: `new-${crypto.randomUUID()}`,
-      imageId: null,
-      file,
-      imageUrl: URL.createObjectURL(file),
-      caption: "",
-      sourceUrl: "",
-      license: "",
-      isPrimary: false,
-    }));
+    const additions = Array.from(files).map((file) => {
+      // React Doctor cannot follow the Set-backed removal and unmount cleanup.
+      // react-doctor-disable-next-line react-doctor/no-create-object-url-without-revoke
+      const imageUrl = URL.createObjectURL(file);
+      objectUrlsRef.current.add(imageUrl);
+      return {
+        key: `new-${crypto.randomUUID()}`,
+        imageId: null,
+        file,
+        imageUrl,
+        caption: "",
+        sourceUrl: "",
+        license: "",
+        isPrimary: false,
+      };
+    });
     if (!images.length && additions[0]) additions[0].isPrimary = true;
     onChange([...images, ...additions]);
   }
@@ -171,6 +186,9 @@ export function EntityImageEditor({
                 <Button
                   disabled={disabled}
                   onClick={() => {
+                    if (objectUrlsRef.current.delete(image.imageUrl)) {
+                      URL.revokeObjectURL(image.imageUrl);
+                    }
                     const remaining = images.filter(
                       (candidate) => candidate.key !== image.key,
                     );

@@ -7,6 +7,7 @@ import { logError } from "@peated/web/lib/log";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
+import { serializeJsonLd } from "@peated/web/lib/structuredData";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
@@ -64,7 +65,7 @@ export default async function EntityLayout(props: {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <EntityPageFrameClient
         companyCounts={companyCounts}

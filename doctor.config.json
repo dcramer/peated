@@ -1,0 +1,11 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "projects": ["apps/web"],
+  "scope": "changed",
+  "blocking": "none",
+  "noScore": true,
+  "share": false,
+  "supplyChain": {
+    "enabled": false
+  }
+}

@@ -3,6 +3,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 
+import { serializeJsonLd } from "./structuredData";
 import { getBottleUrl, getMemberReviewUrl } from "./urls";
 
 type MemberReview = Outputs["memberReviews"]["details"];
@@ -122,5 +123,5 @@ export function serializeMemberReviewStructuredData(
     },
   };
 
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return serializeJsonLd(data);
 }

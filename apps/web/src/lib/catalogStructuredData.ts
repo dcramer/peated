@@ -9,6 +9,7 @@ import {
   getRegionSeoMetadata,
   getSeriesSeoMetadata,
 } from "./seoMetadata";
+import { serializeJsonLd } from "./structuredData";
 import {
   getBottleSeriesUrl,
   getBottleUrl,
@@ -58,7 +59,7 @@ export function serializeBottleStructuredData(
       : undefined,
   };
 
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return serializeJsonLd(data);
 }
 
 function serializeCollectionPage({
@@ -94,7 +95,7 @@ function serializeCollectionPage({
     },
   };
   // Catalog SEO embeds stored descriptions and names in HTML script elements.
-  return JSON.stringify(data).replace(/</g, "\\u003c");
+  return serializeJsonLd(data);
 }
 
 export function serializeSeriesStructuredData(

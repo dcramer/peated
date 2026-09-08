@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getProfilePage } from "@peated/web/lib/profilePage.server";
+import { serializeJsonLd } from "@peated/web/lib/structuredData";
 import type { ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 
@@ -48,7 +49,7 @@ export default async function ProfileLayout({
   return (
     <>
       <script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         type="application/ld+json"
       />
       <ProfileLayoutClient
