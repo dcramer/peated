@@ -292,6 +292,18 @@ function absoluteHttpUrl(value: string, baseUrl: URL) {
   return url.toString();
 }
 
+function detailPageUrl(value: string, listUrl: URL) {
+  const url = new URL(absoluteHttpUrl(value, listUrl));
+  if (
+    url.hostname === "shop.theglenallachie.com" &&
+    url.pathname.startsWith("/products/")
+  ) {
+    // GlenAllachie source: its product pages require this to return UK prices.
+    url.searchParams.set("country", "GB");
+  }
+  return url.toString();
+}
+
 export function parseScrapeList(
   rules: StoredScrapeRules,
   html: string,
@@ -317,7 +329,7 @@ export function parseScrapeList(
           : item(element).text();
         if (!raw?.trim()) continue;
         try {
-          links.add(absoluteHttpUrl(raw.trim(), pageUrl));
+          links.add(detailPageUrl(raw.trim(), pageUrl));
         } catch (error) {
           issues.push({
             field: "list.detailLink",
@@ -427,7 +439,7 @@ function parseSavedList(
           (document === "xml" ? readText(item(element)) : null);
         if (!raw?.trim()) continue;
         try {
-          links.add(absoluteHttpUrl(raw.trim(), pageUrl));
+          links.add(detailPageUrl(raw.trim(), pageUrl));
         } catch (error) {
           issues.push({
             field: `${fieldRoot}.link`,
