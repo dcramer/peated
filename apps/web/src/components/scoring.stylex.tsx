@@ -577,6 +577,7 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   compactValue: {
+    marginLeft: "auto",
     flexShrink: 0,
     color: colors.ink,
     fontFamily: fonts.display,
