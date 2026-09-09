@@ -1,0 +1,3 @@
+ALTER TABLE "bottle_series" ADD COLUMN "representative_bottle_id" bigint;
+ALTER TABLE "bottle_series" ADD CONSTRAINT "bottle_series_representative_bottle_id_bottle_id_fk" FOREIGN KEY ("representative_bottle_id") REFERENCES "public"."bottle"("id") ON DELETE set null ON UPDATE no action;
+CREATE INDEX "bottle_series_representative_bottle_idx" ON "bottle_series" USING btree ("representative_bottle_id");

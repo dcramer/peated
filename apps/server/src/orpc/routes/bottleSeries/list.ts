@@ -8,7 +8,7 @@ import {
   CursorSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
+import { BottleSeriesWithImageSerializer } from "@peated/server/serializers/bottleSeries";
 import type { SQL } from "drizzle-orm";
 import { and, asc, desc, eq, getTableColumns, gt, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -116,7 +116,7 @@ export default procedure
 
     const page = results.slice(0, limit);
     const serializedSeries = await serialize(
-      BottleSeriesSerializer,
+      BottleSeriesWithImageSerializer,
       page.map(({ series }) => series),
       context.user,
     );

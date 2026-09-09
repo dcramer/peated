@@ -1410,6 +1410,7 @@ export async function BottleSeries(
       createdAt: data.createdAt ?? new Date(),
       updatedAt: data.updatedAt ?? new Date(),
       numReleases: data.numReleases ?? 0,
+      representativeBottleId: data.representativeBottleId ?? null,
     };
 
     const result = await tx

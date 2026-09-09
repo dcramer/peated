@@ -128,6 +128,11 @@ export const bottleSeries = pgTable(
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
       .notNull(),
+    // TODO(catalog): Denormalize the earliest known member Bottle release
+    // year, month, and day for Series chronology while preserving partial dates.
+    representativeBottleId: bigint("representative_bottle_id", {
+      mode: "number",
+    }).references((): AnyPgColumn => bottles.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     createdByActorId: bigint("created_by_actor_id", {
@@ -143,6 +148,9 @@ export const bottleSeries = pgTable(
     ),
     index("bottle_series_search_idx").using("gin", table.searchVector),
     index("bottle_series_brand_idx").on(table.brandId),
+    index("bottle_series_representative_bottle_idx").on(
+      table.representativeBottleId,
+    ),
     index("bottle_series_created_by_actor_idx").on(table.createdByActorId),
   ],
 );
@@ -527,6 +535,9 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   representativeForGroups: many(bottleGroups, {
     relationName: "bottle_group_representative_bottle",
   }),
+  representativeForSeries: many(bottleSeries, {
+    relationName: "bottle_series_representative_bottle",
+  }),
   brand: one(entities, {
     fields: [bottles.brandId],
     references: [entities.id],
@@ -571,6 +582,11 @@ export const bottleSeriesRelations = relations(
       relationName: "series",
     }),
     bottleGroups: many(bottleGroups),
+    representativeBottle: one(bottles, {
+      fields: [bottleSeries.representativeBottleId],
+      references: [bottles.id],
+      relationName: "bottle_series_representative_bottle",
+    }),
     createdByActor: one(actors, {
       fields: [bottleSeries.createdByActorId],
       references: [actors.id],

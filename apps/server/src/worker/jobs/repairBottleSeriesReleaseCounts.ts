@@ -2,6 +2,10 @@ import {
   checkBottleSeriesReleaseCounts,
   repairBottleSeriesReleaseCount,
 } from "@peated/server/lib/bottleSeriesReleaseCounts";
+import {
+  checkBottleSeriesRepresentatives,
+  repairBottleSeriesRepresentative,
+} from "@peated/server/lib/bottleSeriesRepresentatives";
 import { logInfo } from "@peated/server/lib/log";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -16,7 +20,9 @@ export default async function repairBottleSeriesReleaseCountsJob(
   RepairBottleSeriesReleaseCountsJobArgsSchema.parse(input);
 
   const wrongCounts = await checkBottleSeriesReleaseCounts();
+  const wrongRepresentatives = await checkBottleSeriesRepresentatives();
   let repairedCount = 0;
+  let repairedRepresentativeCount = 0;
 
   for (const wrongCount of wrongCounts) {
     if (await repairBottleSeriesReleaseCount(wrongCount.seriesId)) {
@@ -24,10 +30,18 @@ export default async function repairBottleSeriesReleaseCountsJob(
     }
   }
 
-  logInfo("Finished BottleSeries release count repair", {
+  for (const wrongRepresentative of wrongRepresentatives) {
+    if (await repairBottleSeriesRepresentative(wrongRepresentative.seriesId)) {
+      repairedRepresentativeCount += 1;
+    }
+  }
+
+  logInfo("Finished BottleSeries aggregate repair", {
     extra: {
       wrongCount: wrongCounts.length,
       repairedCount,
+      wrongRepresentativeCount: wrongRepresentatives.length,
+      repairedRepresentativeCount,
     },
   });
 

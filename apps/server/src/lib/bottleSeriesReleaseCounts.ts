@@ -5,6 +5,7 @@ import {
   bottles,
 } from "@peated/server/db/schema";
 import { and, asc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
+import { reconcileBottleSeriesRepresentatives } from "./bottleSeriesRepresentatives";
 
 export type BottleSeriesMembership = {
   bottleId: number;
@@ -162,6 +163,8 @@ export async function updateBottleSeriesReleaseCounts(
 
     await repairExistingBottleSeriesReleaseCount(tx, seriesId);
   }
+
+  await reconcileBottleSeriesRepresentatives(tx, Array.from(changes.keys()));
 }
 
 /** Checks saved release totals against active Bottle membership. */

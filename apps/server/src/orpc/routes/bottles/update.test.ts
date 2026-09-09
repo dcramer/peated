@@ -4,6 +4,7 @@ import {
   bottleGroupDistillers,
   bottleGroups,
   bottleImages,
+  bottleSeries,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -11,6 +12,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { materializeBottleForGroup } from "@peated/server/lib/bottleIdentity";
+import { reconcileBottleSeriesRepresentatives } from "@peated/server/lib/bottleSeriesRepresentatives";
 import {
   createBottle,
   type BottleCreateInput,
@@ -163,9 +165,12 @@ describe("PATCH /bottles/{bottle}", () => {
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
+    const series = await fixtures.BottleSeries();
     const bottle = await fixtures.Bottle({
       imageUrl: "https://example.com/removed.jpg",
       rejectedImageUrls: ["https://example.com/older-removed.jpg"],
+      brandId: series.brandId,
+      seriesId: series.id,
     });
     await db.insert(bottleImages).values({
       bottleId: bottle.id,
@@ -175,6 +180,9 @@ describe("PATCH /bottles/{bottle}", () => {
       isPrimary: true,
       createdByActorId: bottle.createdByActorId,
     });
+    await db.transaction((tx) =>
+      reconcileBottleSeriesRepresentatives(tx, [series.id]),
+    );
 
     await routerClient.bottles.update(
       { bottle: bottle.id, image: null },
@@ -196,6 +204,11 @@ describe("PATCH /bottles/{bottle}", () => {
           and(eq(images.bottleId, bottle.id), eq(images.isPrimary, true)),
       }),
     ).resolves.toBeUndefined();
+    await expect(
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, series.id),
+      }),
+    ).resolves.toMatchObject({ representativeBottleId: null });
   });
 
   test("clears an inherited stated age from a singleton group", async ({

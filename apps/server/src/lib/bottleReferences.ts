@@ -16,6 +16,7 @@ import {
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
+import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
 import {
   logError,
   logInfo,
@@ -821,6 +822,9 @@ export async function fillMissingBottleImage(
         isPrimary: true,
         createdByActorId: bottleImageCandidate.createdByActorId,
       });
+      await reconcileBottleSeriesRepresentativesForBottles(tx, [
+        targetBottleId,
+      ]);
       return true;
     });
 

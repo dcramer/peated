@@ -4,6 +4,7 @@ import {
   bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroups,
+  bottleImages,
   bottleObservations,
   bottleReferences,
   bottleSeries,
@@ -19,6 +20,7 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { reconcileBottleSeriesRepresentatives } from "@peated/server/lib/bottleSeriesRepresentatives";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -138,6 +140,23 @@ describe("DELETE /bottles/:bottle", () => {
       groupId,
       edition: "Batch 2",
     });
+    await db.insert(bottleImages).values([
+      {
+        bottleId: representative.id,
+        imageUrl: "/uploads/deleted-representative.jpg",
+        isPrimary: true,
+        createdByActorId: representative.createdByActorId,
+      },
+      {
+        bottleId: sibling.id,
+        imageUrl: "/uploads/remaining-representative.jpg",
+        isPrimary: true,
+        createdByActorId: sibling.createdByActorId,
+      },
+    ]);
+    await db.transaction((tx) =>
+      reconcileBottleSeriesRepresentatives(tx, [series.id]),
+    );
 
     const before = await loadGroupedBottleGraph(groupId);
     expect(before.group[0]?.representativeBottleId).toBe(representative.id);
@@ -162,7 +181,10 @@ describe("DELETE /bottles/:bottle", () => {
       await db.query.bottleSeries.findFirst({
         where: eq(bottleSeries.id, series.id),
       }),
-    ).toMatchObject({ numReleases: 1 });
+    ).toMatchObject({
+      numReleases: 1,
+      representativeBottleId: sibling.id,
+    });
     expect(
       await db.query.entities.findFirst({
         where: eq(entities.id, representative.brandId),
