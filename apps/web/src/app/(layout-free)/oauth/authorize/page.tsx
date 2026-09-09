@@ -9,6 +9,7 @@ import {
   parseOAuthAuthorizationQuery,
 } from "@peated/web/lib/oauth";
 import { createAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { noIndexPageMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -16,7 +17,7 @@ import AuthorizationForm from "./authorizationForm";
 
 export const metadata: Metadata = {
   title: "Authorize Application",
-  robots: { index: false, follow: false },
+  ...noIndexPageMetadata,
 };
 
 type SearchParams = Record<string, string | string[] | undefined>;

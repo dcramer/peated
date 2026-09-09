@@ -1,5 +1,6 @@
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
 import { getPublicStats } from "@peated/web/lib/publicStats.server";
+import { noIndexFollowPageMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import type { Metadata } from "next";
 
@@ -8,6 +9,7 @@ import { SearchPageClient } from "./searchPageClient.stylex";
 export const metadata: Metadata = {
   title: "Search",
   description: "Search the Peated whisky database.",
+  ...noIndexFollowPageMetadata,
 };
 
 const apiScopes = [

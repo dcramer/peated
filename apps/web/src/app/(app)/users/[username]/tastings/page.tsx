@@ -2,12 +2,17 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { getQueryClient } from "@peated/web/lib/orpc/query";
 import { getProfilePage } from "@peated/web/lib/profilePage.server";
+import { noIndexFollowPageMetadata } from "@peated/web/lib/seoMetadata";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import type { Metadata } from "next";
 
 import { getProfileTastingCursor, profileQueries } from "../profileQueries";
 import { ProfileTastingsPageClient } from "./profileTastingsPageClient.stylex";
 
 export const fetchCache = "default-no-store";
+
+// Search engines should index the profile overview, not this list.
+export const metadata: Metadata = noIndexFollowPageMetadata;
 
 export default async function ProfilePageRoute(props: {
   params: Promise<{ username: string }>;

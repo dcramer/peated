@@ -109,6 +109,7 @@ behavior; research cannot override them.
 - `docs/architecture/whisky-identity-model.md` — Bottle and Entity identity rules.
 - `docs/features/bottle-entry-workflow.md` — Bottle creation and editing.
 - `docs/features/bottle-presentation.md` — Bottle display rules.
+- `docs/features/catalog-page-seo.md` — Public search pages, metadata, canonical URLs, and sitemaps.
 - `docs/features/external-reviews.md` — External review storage and publication.
 - `docs/features/moderation-workspace.md` — Moderation inbox, history, and automation.
 - `docs/features/photo-assisted-bottle-resolution.md` — Bottle lookup from a photo.

@@ -1,0 +1,15 @@
+id: web-robots-metadata-owned
+language: TypeScript
+severity: error
+message: Use the shared search policy metadata instead of declaring robots rules here.
+note: Import noIndexPageMetadata or noIndexFollowPageMetadata from apps/web/src/lib/seoMetadata.ts.
+files:
+  - apps/web/src/**/*.ts
+  - apps/web/src/**/*.tsx
+ignores:
+  - apps/web/src/**/*.test.ts
+  - apps/web/src/lib/seoMetadata.ts
+rule:
+  pattern:
+    context: "{ robots: $VALUE }"
+    selector: pair

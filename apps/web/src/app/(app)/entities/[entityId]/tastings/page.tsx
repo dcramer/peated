@@ -1,7 +1,9 @@
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getEntityUrl } from "@peated/web/lib/urls";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -12,6 +14,25 @@ const PageSearchParams = z
   .object({ cursor: z.string().optional() })
   .passthrough()
   .catch({});
+
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const [{ entityId }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
+  return getCatalogSeoMetadata(
+    {
+      title: `${entity.name} reviews and tastings`,
+      description: `Read public whisky reviews and tasting notes for ${entity.name}.`,
+      url: `${getEntityUrl(entity)}/tastings`,
+    },
+    searchParams,
+  );
+}
 
 export default async function EntityTastingsPage(props: {
   params: Promise<{ entityId: string }>;

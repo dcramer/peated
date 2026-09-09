@@ -1,11 +1,13 @@
 import { ForbiddenPage } from "@peated/web/components/errors/errorPages.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
+import { noIndexPageMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import { type Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
   title: "Admin",
+  ...noIndexPageMetadata,
 };
 
 export default async function Layout({

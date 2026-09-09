@@ -34,6 +34,16 @@ export const homeMetadata: Metadata = {
   },
 };
 
+/** Private, account, add, and edit pages must stay out of search results. */
+export const noIndexPageMetadata = {
+  robots: { index: false, follow: false },
+} satisfies Metadata;
+
+/** These pages stay out of results, but search engines may follow their links. */
+export const noIndexFollowPageMetadata = {
+  robots: { index: false, follow: true },
+} satisfies Metadata;
+
 type BottleSeoMetadataSource = BottleDisplayNameSource & {
   id: number;
   description: string | null;
@@ -61,7 +71,12 @@ type MetadataOptions = {
 
 export type SeoSearchParams = Record<string, string | string[] | undefined>;
 
-/** Catalog SEO keeps pagination crawlable and excludes filtered or personal lists. */
+/**
+ * Only unfiltered catalog lists may appear in search. Keep the cursor in the
+ * canonical URL, ignore tracking parameters, and let search engines follow
+ * links on filtered, sorted, or personal versions without indexing those pages.
+ * See docs/features/catalog-page-seo.md.
+ */
 export function getCatalogSeoMetadata(
   {
     title,

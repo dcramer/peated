@@ -9,7 +9,9 @@ import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { getPageBottleList } from "@peated/web/lib/publicCatalog.server";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getEntityUrl } from "@peated/web/lib/urls";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import {
@@ -17,6 +19,25 @@ import {
   getDistilleryBottleView,
 } from "../entityPageData";
 import { EntityBottleListClient } from "./entityBottleListClient.stylex";
+
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const [{ entityId }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
+  return getCatalogSeoMetadata(
+    {
+      title: `${entity.name} whisky bottles`,
+      description: `Browse whisky bottles listed for ${entity.name}.`,
+      url: `${getEntityUrl(entity)}/bottles`,
+    },
+    searchParams,
+  );
+}
 
 export default async function EntityBottlesPage(props: {
   params: Promise<{ entityId: string }>;

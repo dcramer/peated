@@ -7,7 +7,9 @@ const SITEMAP_CACHE_CONTROL =
 export const dynamic = "force-static";
 
 /**
- * Serves the root sitemap index with the same public CDN policy as child maps.
+ * List preferred catalog pages. Public tastings and member reviews rely on
+ * normal links instead. See docs/features/catalog-page-seo.md. Child maps use
+ * the same public CDN cache rules as this index.
  */
 export async function GET() {
   const sitemapIndexXML = await buildSitemapIndex([

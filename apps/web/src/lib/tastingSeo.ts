@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 
+import { noIndexPageMetadata } from "./seoMetadata";
 import { serializeJsonLd } from "./structuredData";
 import { getBottleUrl, getTastingUrl } from "./urls";
 
@@ -20,7 +21,7 @@ export function getTastingSeoMetadata(tasting: TastingSeoSource): Metadata {
   if (tasting.createdBy.private) {
     return {
       title: "Private tasting",
-      robots: { index: false, follow: false },
+      ...noIndexPageMetadata,
     };
   }
 
