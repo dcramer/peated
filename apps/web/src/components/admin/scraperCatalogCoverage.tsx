@@ -1,6 +1,11 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import { AdminSection, AdminStat, AdminStatGrid } from "./adminContent.stylex";
+import {
+  AdminMetadataList,
+  AdminSection,
+  AdminStat,
+  AdminStatGrid,
+} from "./adminContent.stylex";
 
 type Coverage = Outputs["admin"]["catalogCoverage"];
 
@@ -19,17 +24,40 @@ export default function ScraperCatalogCoverage({
         <AdminStat
           label="Active bottles"
           value={coverage.bottles.total.toLocaleString("en-US")}
-          detail={`${percentage(coverage.bottles.withDescription, coverage.bottles.total)} described · ${percentage(coverage.bottles.withImage, coverage.bottles.total)} pictured · ${percentage(coverage.bottles.withReviews, coverage.bottles.total)} with reviews · ${percentage(coverage.bottles.withPriceListings, coverage.bottles.total)} with prices`}
+          detail={
+            <AdminMetadataList
+              items={[
+                `${percentage(coverage.bottles.withDescription, coverage.bottles.total)} described`,
+                `${percentage(coverage.bottles.withImage, coverage.bottles.total)} pictured`,
+                `${percentage(coverage.bottles.withReviews, coverage.bottles.total)} with reviews`,
+                `${percentage(coverage.bottles.withPriceListings, coverage.bottles.total)} with prices`,
+              ]}
+            />
+          }
         />
         <AdminStat
           label="Visible reviews"
           value={coverage.externalReviews.total.toLocaleString("en-US")}
-          detail={`${coverage.externalReviews.matched.toLocaleString("en-US")} matched · ${coverage.externalReviews.unmatched.toLocaleString("en-US")} unmatched`}
+          detail={
+            <AdminMetadataList
+              items={[
+                `${coverage.externalReviews.matched.toLocaleString("en-US")} matched`,
+                `${coverage.externalReviews.unmatched.toLocaleString("en-US")} unmatched`,
+              ]}
+            />
+          }
         />
         <AdminStat
           label="Visible prices"
           value={coverage.priceListings.total.toLocaleString("en-US")}
-          detail={`${coverage.priceListings.matched.toLocaleString("en-US")} matched · ${coverage.priceListings.unmatched.toLocaleString("en-US")} unmatched`}
+          detail={
+            <AdminMetadataList
+              items={[
+                `${coverage.priceListings.matched.toLocaleString("en-US")} matched`,
+                `${coverage.priceListings.unmatched.toLocaleString("en-US")} unmatched`,
+              ]}
+            />
+          }
         />
       </AdminStatGrid>
     </AdminSection>

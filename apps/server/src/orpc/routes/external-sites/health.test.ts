@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  catalogListings,
   externalReviews,
   externalSiteRuns,
   externalSiteScrapeTargets,
@@ -36,6 +37,12 @@ test("health list reports source inventory, runtime, and latest execution", asyn
     externalSiteId: site.id,
     bottleId: null,
     hidden: false,
+  });
+  await db.insert(catalogListings).values({
+    externalSiteId: site.id,
+    sourceFingerprint: "decadent-single-cask",
+    name: "Decadent Single Cask",
+    url: "https://decadent-drinks.com/products/single-cask",
   });
   await db.insert(scrapeTargets).values({
     key: "decadentdrinks",
@@ -89,6 +96,7 @@ test("health list reports source inventory, runtime, and latest execution", asyn
   expect(result.results).toHaveLength(1);
   expect(result.results[0]).toMatchObject({
     type: "decadentdrinks",
+    catalogListings: { total: 1 },
     externalReviews: { total: 0, matched: 0, unmatched: 0 },
     priceListings: { total: 2, matched: 1, unmatched: 1 },
     lastRunAt: null,

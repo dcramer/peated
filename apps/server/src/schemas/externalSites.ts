@@ -89,6 +89,9 @@ export const ExternalSiteScrapeTargetSchema = z.object({
 });
 
 export const ExternalSiteHealthSchema = ExternalSiteSchema.extend({
+  catalogListings: z.object({
+    total: z.number().int().min(0),
+  }),
   externalReviews: ExternalSiteItemCoverageSchema,
   priceListings: ExternalSiteItemCoverageSchema,
   latestRun: ExternalSiteRunSchema.nullable(),

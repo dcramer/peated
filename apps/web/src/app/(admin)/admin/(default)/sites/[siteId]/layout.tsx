@@ -8,6 +8,7 @@ import { AdminButton as Button } from "@peated/web/components/admin/adminButton.
 import {
   AdminActions,
   AdminBreadcrumbs,
+  AdminMetadataList,
   AdminPage,
   AdminPageHeader,
   AdminStat,
@@ -128,7 +129,16 @@ export default function Layout({
         <AdminStat
           label="Catalog products"
           value={catalogCoverage.total.toLocaleString("en-US")}
-          detail={`${catalogCoverage.withProductId.toLocaleString("en-US")} with product IDs · ${catalogCoverage.withImage.toLocaleString("en-US")} with images · ${catalogCoverage.withVolume.toLocaleString("en-US")} with volume · ${catalogCoverage.withBottleDetails.toLocaleString("en-US")} with bottle details`}
+          detail={
+            <AdminMetadataList
+              items={[
+                `${catalogCoverage.withProductId.toLocaleString("en-US")} with product IDs`,
+                `${catalogCoverage.withImage.toLocaleString("en-US")} with images`,
+                `${catalogCoverage.withVolume.toLocaleString("en-US")} with volume`,
+                `${catalogCoverage.withBottleDetails.toLocaleString("en-US")} with bottle details`,
+              ]}
+            />
+          }
         />
       </AdminStatGrid>
       <PageTabs

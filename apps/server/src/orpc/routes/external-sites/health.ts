@@ -1,6 +1,7 @@
 import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  catalogListings,
   externalReviewArticles,
   externalReviewPublications,
   externalReviews,
@@ -39,6 +40,7 @@ async function getHealthForSites(
 
   const siteIds = sites.map((site) => site.id);
   const [
+    catalogCoverageRows,
     reviewCoverageRows,
     priceCoverageRows,
     latestRuns,
@@ -47,6 +49,14 @@ async function getHealthForSites(
     reviewPublications,
     configuredRows,
   ] = await Promise.all([
+    db
+      .select({
+        externalSiteId: catalogListings.externalSiteId,
+        total: sql<number>`count(*)::int`,
+      })
+      .from(catalogListings)
+      .where(inArray(catalogListings.externalSiteId, siteIds))
+      .groupBy(catalogListings.externalSiteId),
     db
       .select({
         externalSiteId: externalReviewArticles.externalSiteId,
@@ -163,6 +173,9 @@ async function getHealthForSites(
       .where(inArray(scrapeSources.externalSiteId, siteIds)),
   ]);
 
+  const catalogCoverageBySite = new Map(
+    catalogCoverageRows.map((row) => [row.externalSiteId, row]),
+  );
   const reviewCoverageBySite = new Map(
     reviewCoverageRows.map((row) => [row.externalSiteId, row]),
   );
@@ -231,6 +244,7 @@ async function getHealthForSites(
       isExternalReviewSiteKey(site.type) || configured?.kind === "review";
     const reviewCoverage = reviewCoverageBySite.get(site.id);
     const priceCoverage = priceCoverageBySite.get(site.id);
+    const catalogCoverage = catalogCoverageBySite.get(site.id);
     const latestRun = latestRunBySite.get(site.id);
     const lastSucceeded = lastSucceededBySite.get(site.id);
     const targets = targetsBySite.get(site.id);
@@ -238,6 +252,7 @@ async function getHealthForSites(
 
     return {
       ...serializeExternalSite(site),
+      catalogListings: catalogCoverage ?? { total: 0 },
       externalReviews: reviewCoverage ?? { total: 0, matched: 0, unmatched: 0 },
       priceListings: priceCoverage ?? { total: 0, matched: 0, unmatched: 0 },
       latestRun: latestRun ? serializeExternalSiteRun(latestRun) : null,
@@ -274,7 +289,7 @@ export const healthList = procedure
     path: "/admin/external-sites",
     summary: "List external site health",
     description:
-      "List import status, recent runs, and bottle matching counts for external sites. Includes reviews awaiting publication. Requires administrator privileges.",
+      "List import status, recent runs, catalog listing counts, and bottle matching counts for external sites. Includes reviews awaiting publication. Requires administrator privileges.",
     operationId: "listExternalSiteHealth",
   })
   .input(inputSchema)
@@ -312,7 +327,7 @@ export const healthDetails = procedure
     path: "/admin/external-sites/{site}/health",
     summary: "Get external site health",
     description:
-      "Get import status, recent runs, and bottle matching counts for one external site. Includes reviews awaiting publication. Requires administrator privileges.",
+      "Get import status, recent runs, catalog listing counts, and bottle matching counts for one external site. Includes reviews awaiting publication. Requires administrator privileges.",
     operationId: "retrieveExternalSiteHealth",
   })
   .input(z.object({ site: ExternalSiteKeySchema }))

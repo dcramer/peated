@@ -329,16 +329,40 @@ export function AdminStat({
   );
 }
 
+/** Shows short metadata values with consistently spaced separators. */
+export function AdminMetadataList({ items }: { items: readonly ReactNode[] }) {
+  return (
+    <span {...stylex.props(foundationStyles.metadata, styles.metadataList)}>
+      {items.map((item, index) => (
+        <span key={index} {...stylex.props(styles.metadataListItem)}>
+          {index > 0 ? (
+            <span
+              aria-hidden="true"
+              {...stylex.props(styles.metadataSeparator)}
+            >
+              ·
+            </span>
+          ) : null}
+          {item}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 /** Shows a compact status whose text carries the meaning and tone adds emphasis. */
 export function AdminStatus({
   children,
+  title,
   tone = "neutral",
 }: {
   children: ReactNode;
+  title?: string;
   tone?: "accent" | "danger" | "neutral" | "success" | "warning";
 }) {
   return (
     <span
+      title={title}
       {...stylex.props(
         foundationStyles.metadata,
         styles.status,
@@ -569,6 +593,13 @@ const styles = stylex.create({
     margin: 0,
     marginTop: space.x2,
     color: colors.inkMuted,
+  },
+  metadataList: { display: "inline" },
+  metadataListItem: { display: "inline-block", whiteSpace: "nowrap" },
+  metadataSeparator: {
+    display: "inline-block",
+    marginRight: space.x2,
+    marginLeft: space.x2,
   },
   status: {
     display: "inline-flex",

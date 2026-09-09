@@ -25,6 +25,7 @@ const site = {
   lastRunAt: null,
   nextRunAt: null,
   runEvery: 1_440,
+  catalogListings: { total: 0 },
   externalReviews: { total: 12, matched: 10, unmatched: 2 },
   priceListings: { total: 0, matched: 0, unmatched: 0 },
   latestRun: null,
@@ -114,7 +115,29 @@ describe("scraper observability", () => {
       <ExternalSiteRunStatus site={manualOnlySite} />,
     );
     expect(html).toContain("Never recorded");
+    expect(html).toContain('title="No runs have been recorded."');
     expect(html).not.toContain("Disabled");
+  });
+
+  it("keeps run timing in a tooltip", () => {
+    const html = renderToStaticMarkup(
+      <ExternalSiteRunStatus
+        site={{
+          ...site,
+          latestRun: {
+            ...run,
+            status: "failed",
+            completedAt: timestamp,
+          },
+          lastSucceededAt: "2026-08-17T12:00:00.000Z",
+        }}
+      />,
+    );
+
+    expect(html).toContain(">Failed</span>");
+    expect(html).toContain('title="Failed Aug 18, 2026');
+    expect(html).toContain("Last succeeded Aug 17, 2026");
+    expect(html).not.toContain("<time");
   });
 
   it("shows review publishing with matched coverage", () => {
@@ -189,6 +212,7 @@ describe("scraper observability", () => {
     );
 
     expect(html).toContain("50% described");
+    expect(html).toContain('aria-hidden="true"');
     expect(html).toContain("30 matched");
     expect(html).toContain("180 matched");
   });

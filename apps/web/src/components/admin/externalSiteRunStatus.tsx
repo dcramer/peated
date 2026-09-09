@@ -1,18 +1,18 @@
+"use client";
+
 import { type ExternalSiteHealthSchema } from "@peated/server/schemas";
-import TimeSince from "@peated/web/components/timeSince";
+import {
+  formatTimestamp,
+  useViewerTimeZone,
+} from "@peated/web/components/timestamp";
 import { type z } from "zod";
 
 import { AdminStatus } from "./adminContent.stylex";
 
 type SiteHealth = z.infer<typeof ExternalSiteHealthSchema>;
 
-export default function ExternalSiteRunStatus({
-  site,
-  compact = false,
-}: {
-  site: SiteHealth;
-  compact?: boolean;
-}) {
+export default function ExternalSiteRunStatus({ site }: { site: SiteHealth }) {
+  const timeZone = useViewerTimeZone();
   const run = site.latestRun;
   const status = run?.status ?? "never";
   const labels = {
@@ -35,22 +35,24 @@ export default function ExternalSiteRunStatus({
       : run?.status === "running"
         ? run.startedAt
         : run?.completedAt;
+  const timingLabel = {
+    never: "No runs have been recorded.",
+    queued: "Queued",
+    running: "Started",
+    succeeded: "Succeeded",
+    failed: "Failed",
+  } as const;
+  const title = timestamp
+    ? `${timingLabel[status]} ${formatTimestamp(timestamp, "dateTime", timeZone)}.${
+        status === "failed" && site.lastSucceededAt
+          ? ` Last succeeded ${formatTimestamp(site.lastSucceededAt, "dateTime", timeZone)}.`
+          : ""
+      }`
+    : timingLabel[status];
 
   return (
-    <AdminStatus tone={tones[status]}>
+    <AdminStatus title={title} tone={tones[status]}>
       {labels[status]}
-      {timestamp ? (
-        <>
-          {" "}
-          · <TimeSince date={timestamp} />
-        </>
-      ) : null}
-      {!compact && status === "failed" && site.lastSucceededAt ? (
-        <>
-          {" "}
-          · last succeeded <TimeSince date={site.lastSucceededAt} />
-        </>
-      ) : null}
     </AdminStatus>
   );
 }
