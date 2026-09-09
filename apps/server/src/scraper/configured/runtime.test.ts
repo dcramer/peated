@@ -3,8 +3,8 @@ import {
   bottleGroups,
   bottleObservations,
   bottleReferences,
-  bottleSeries,
   bottles,
+  bottleSeries,
   catalogListings,
   externalReviewArticles,
   externalReviewBodies,
@@ -32,7 +32,9 @@ import {
   activateScrapeSourceRevision,
   createScrapeSourceRevision,
   createSiteWithScrapeSource,
+  pauseScrapeSource,
   recordScrapeSourcePreview,
+  SCRAPE_SOURCE_PAUSED_ERROR,
 } from "./service";
 
 type TestClock = ScraperHttpClock & { advanceTo(value: Date): void };
@@ -160,6 +162,26 @@ async function setupCatalogSource(
     })
     .where(eq(scrapeOrigins.origin, "https://catalog.example"));
   return { revision, site, source, user };
+}
+
+async function setupCatalogCollection() {
+  const created = await setupCatalogSource();
+  await recordScrapeSourcePreview({
+    revisionId: created.revision.id,
+    status: "passed",
+    result: { issues: [], pages: [] },
+  });
+  await activateScrapeSourceRevision({
+    scrapeSourceId: created.source.id,
+    revisionId: created.revision.id,
+  });
+  const pinned = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: created.site.id,
+    requestedById: created.user.id,
+    trigger: "manual",
+    purpose: "collect",
+  });
+  return { ...created, pinned };
 }
 
 function catalogFetch(name = "Official Release") {
@@ -431,6 +453,86 @@ test("fails a configured source before requesting a reserved destination", async
     .from(externalSiteRuns)
     .where(eq(externalSiteRuns.id, pinned.run.id));
   expect(run).toMatchObject({ status: "failed", requestCount: 0 });
+});
+
+test("does not request a queued collection after its source is paused", async () => {
+  const { site, source, pinned } = await setupCatalogCollection();
+  await pauseScrapeSource(source.id);
+  const fetchImpl = vi.fn<typeof fetch>();
+
+  await expect(
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "paused-before-claim",
+    }),
+  ).resolves.toEqual({ status: "completed" });
+
+  expect(fetchImpl).not.toHaveBeenCalled();
+  const [run] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(run).toMatchObject({
+    status: "failed",
+    requestCount: 0,
+    emittedItemCount: 0,
+    error: SCRAPE_SOURCE_PAUSED_ERROR,
+  });
+});
+
+test("stops an active collection before saving later observations", async () => {
+  const { site, source, pinned } = await setupCatalogCollection();
+  const secondRequest = Promise.withResolvers<void>();
+  const continueRequest = Promise.withResolvers<void>();
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/whisky") {
+      return new Response(
+        '<article class="product"><a href="/whisky/one">One</a></article><article class="product"><a href="/whisky/two">Two</a></article>',
+      );
+    }
+    if (url.pathname === "/whisky/one") {
+      return new Response(
+        '<main data-product-id="official-1"><h1>First Release</h1></main>',
+      );
+    }
+    if (url.pathname === "/whisky/two") {
+      secondRequest.resolve();
+      await continueRequest.promise;
+      return new Response(
+        '<main data-product-id="official-2"><h1>Second Release</h1></main>',
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  });
+
+  const execution = runToCompletion({
+    runId: pinned.run.id,
+    fetchImpl,
+    executionToken: "paused-during-run",
+  });
+  await secondRequest.promise;
+  await pauseScrapeSource(source.id);
+  continueRequest.resolve();
+
+  await expect(execution).resolves.toEqual({ status: "completed" });
+  expect(await db.select().from(catalogListings)).toMatchObject([
+    {
+      externalSiteId: site.id,
+      externalProductId: "official-1",
+      name: "First Release",
+    },
+  ]);
+  const [run] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(run).toMatchObject({
+    status: "failed",
+    emittedItemCount: 1,
+    error: SCRAPE_SOURCE_PAUSED_ERROR,
+  });
 });
 
 test("collects and updates only catalog listings", async () => {

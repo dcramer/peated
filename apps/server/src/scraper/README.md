@@ -78,8 +78,9 @@ The database stores each source and its rules. A saved version cannot be edited.
 A preview checks sample pages and saves only the fields it found and any errors.
 It does not save downloaded HTML, review text, or full product records. Only a
 version that passes its preview can be used. An admin can return to any older
-version that passed. Pausing a source stops collection but keeps its saved
-versions and run history.
+version that passed. Pausing a source fails queued collection runs and stops
+active work at the next request, save, or checkpoint. Saved versions and run
+history stay. Preview and AI setup still work.
 
 Older rule versions remain supported so saved sources keep working. New
 sources use version 10. Each rule is a CSS selector. `list.links` finds article

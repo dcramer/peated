@@ -10,6 +10,7 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { resolveScrapeSourceRunRegistry } from "./configured/runtime";
+import { SCRAPE_SOURCE_PAUSED_ERROR } from "./configured/service";
 import { ScrapeSourceSetupError } from "./configured/setupError";
 import { ScraperCoordinationError } from "./coordinator";
 import {
@@ -105,7 +106,8 @@ async function claimScraperRun({
         eq(externalSites.id, externalSiteRuns.externalSiteId),
       )
       .where(eq(externalSiteRuns.id, runId))
-      .for("update");
+      // Lifecycle and Pause own site locks. A worker owns only its run.
+      .for("update", { of: externalSiteRuns });
     if (!candidate) throw new Error(`Scraper run ${runId} not found.`);
     if (
       candidate.run.status === "succeeded" ||
@@ -183,6 +185,14 @@ async function claimScraperRun({
       executionToken,
     };
   });
+}
+
+async function isScraperRunPaused(runId: number) {
+  const [run] = await db
+    .select({ error: externalSiteRuns.error, status: externalSiteRuns.status })
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, runId));
+  return run?.status === "failed" && run.error === SCRAPE_SOURCE_PAUSED_ERROR;
 }
 
 async function completeRun(claim: ClaimedRun, completedAt: Date) {
@@ -339,6 +349,14 @@ export async function executeScraperRun(
     await completeRun(claimed, clock.now());
     return { status: "completed" };
   } catch (error) {
+    if (
+      (error instanceof ScraperRunOwnershipError ||
+        (error instanceof ScraperRequestError &&
+          error.category === "invalid_request")) &&
+      (await isScraperRunPaused(claimed.run.id))
+    ) {
+      return { status: "completed" };
+    }
     if (
       error instanceof ScraperRequestWaitError ||
       error instanceof ScraperCoordinationError

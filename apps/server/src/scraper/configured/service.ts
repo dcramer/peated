@@ -54,6 +54,8 @@ export class ScrapeSourceValidationError extends Error {
   override name = "ScrapeSourceValidationError";
 }
 
+export const SCRAPE_SOURCE_PAUSED_ERROR = "The source was paused.";
+
 const DatabaseErrorSchema = z.object({ code: z.string() });
 const ReviewSourceKeyPattern = /^review:[a-f0-9]{64}$/;
 
@@ -528,11 +530,63 @@ export async function activateScrapeSourceRevision(input: {
 }
 
 export async function pauseScrapeSource(scrapeSourceId: number) {
-  const [source] = await db
-    .update(scrapeSources)
-    .set({ enabled: false, updatedAt: new Date() })
-    .where(eq(scrapeSources.id, scrapeSourceId))
-    .returning();
-  if (!source) throw new ScrapeSourceNotFoundError();
-  return source;
+  return await db.transaction(async (tx) => {
+    // Lifecycle and Pause lock the site before touching collection runs. This
+    // prevents a new run from being saved after Pause stops the current one.
+    const [site] = await tx
+      .select({ id: externalSites.id })
+      .from(scrapeSources)
+      .innerJoin(
+        externalSites,
+        eq(externalSites.id, scrapeSources.externalSiteId),
+      )
+      .where(eq(scrapeSources.id, scrapeSourceId))
+      .for("update", { of: externalSites });
+    if (!site) throw new ScrapeSourceNotFoundError();
+
+    const completedAt = new Date();
+    const [source] = await tx
+      .update(scrapeSources)
+      .set({ enabled: false, updatedAt: completedAt })
+      .where(eq(scrapeSources.id, scrapeSourceId))
+      .returning();
+    if (!source) throw new ScrapeSourceNotFoundError();
+
+    const [activeRun] = await tx
+      .select({ id: externalSiteRuns.id })
+      .from(externalSiteRuns)
+      .innerJoin(
+        scrapeSourceRuns,
+        eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
+      )
+      .where(
+        and(
+          eq(scrapeSourceRuns.scrapeSourceId, source.id),
+          eq(scrapeSourceRuns.purpose, "collect"),
+          inArray(externalSiteRuns.status, ["queued", "running"]),
+        ),
+      )
+      .for("update", { of: externalSiteRuns });
+    if (!activeRun) return source;
+
+    const [stoppedRun] = await tx
+      .update(externalSiteRuns)
+      .set({
+        status: "failed",
+        error: SCRAPE_SOURCE_PAUSED_ERROR,
+        completedAt,
+        nextAttemptAt: null,
+        executionToken: null,
+        executionExpiresAt: null,
+      })
+      .where(eq(externalSiteRuns.id, activeRun.id))
+      .returning({ id: externalSiteRuns.id });
+    if (!stoppedRun) throw new Error("Failed to stop the active scraper run.");
+
+    await tx
+      .update(externalSites)
+      .set({ lastRunAt: completedAt, lastRunId: stoppedRun.id })
+      .where(eq(externalSites.id, site.id));
+    return source;
+  });
 }
