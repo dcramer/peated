@@ -51,6 +51,7 @@ import {
   getBottleSeriesMemberships,
   updateBottleSeriesReleaseCounts,
 } from "@peated/server/lib/bottleSeriesReleaseCounts";
+import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import {
@@ -1640,6 +1641,7 @@ export async function updateBottleInTransaction(
           eq(bottleImages.isPrimary, true),
         ),
       );
+    await reconcileBottleSeriesRepresentativesForBottles(tx, [bottleId]);
   }
 
   if (memberSeriesChanged) {

@@ -5,6 +5,7 @@ import {
   bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroups,
+  bottleImages,
   bottleObservations,
   bottleReferences,
   bottles,
@@ -27,6 +28,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { reconcileBottleSeriesRepresentatives } from "@peated/server/lib/bottleSeriesRepresentatives";
 import {
   BottleMergeAuthorizationError,
   BottleMergeConflictError,
@@ -539,6 +541,26 @@ describe("exact Bottle merges", () => {
       brandId: brand.id,
       seriesId: destinationSeries.id,
     });
+    await db.insert(bottleImages).values([
+      {
+        bottleId: source.id,
+        imageUrl: "/uploads/source-series.jpg",
+        isPrimary: true,
+        createdByActorId: source.createdByActorId,
+      },
+      {
+        bottleId: destination.id,
+        imageUrl: "/uploads/destination-series.jpg",
+        isPrimary: true,
+        createdByActorId: destination.createdByActorId,
+      },
+    ]);
+    await db.transaction((tx) =>
+      reconcileBottleSeriesRepresentatives(tx, [
+        sourceSeries.id,
+        destinationSeries.id,
+      ]),
+    );
 
     await mergeBottles({
       sourceBottleId: source.id,
@@ -547,16 +569,24 @@ describe("exact Bottle merges", () => {
     });
 
     const seriesRows = await db
-      .select({ id: bottleSeries.id, numReleases: bottleSeries.numReleases })
+      .select({
+        id: bottleSeries.id,
+        numReleases: bottleSeries.numReleases,
+        representativeBottleId: bottleSeries.representativeBottleId,
+      })
       .from(bottleSeries)
       .where(inArray(bottleSeries.id, [sourceSeries.id, destinationSeries.id]));
     expect(
-      Object.fromEntries(
-        seriesRows.map(({ id, numReleases }) => [id, numReleases]),
-      ),
+      Object.fromEntries(seriesRows.map(({ id, ...values }) => [id, values])),
     ).toEqual({
-      [sourceSeries.id]: 0,
-      [destinationSeries.id]: 1,
+      [sourceSeries.id]: {
+        numReleases: 0,
+        representativeBottleId: null,
+      },
+      [destinationSeries.id]: {
+        numReleases: 1,
+        representativeBottleId: destination.id,
+      },
     });
   });
 

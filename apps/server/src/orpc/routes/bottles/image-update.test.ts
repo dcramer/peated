@@ -1,6 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { bottleImages } from "@peated/server/db/schema";
+import { bottleImages, bottleSeries } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -37,8 +37,11 @@ describe("POST /bottles/:bottle/image", () => {
     const user = await fixtures.User({ mod: true });
     const otherUser = await fixtures.User();
     const otherActor = await getUserActor(otherUser);
+    const series = await fixtures.BottleSeries();
     const bottle = await fixtures.Bottle({
       createdByActorId: otherActor.id,
+      brandId: series.brandId,
+      seriesId: series.id,
     });
 
     const response = await routerClient.bottles.imageUpdate(
@@ -68,6 +71,11 @@ describe("POST /bottles/:bottle/image", () => {
       license: "CC BY 4.0",
       createdByActorId: (await getUserActor(user)).id,
     });
+    await expect(
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, series.id),
+      }),
+    ).resolves.toMatchObject({ representativeBottleId: bottle.id });
   });
 
   test("bottle image does resize down", async ({ fixtures, defaults }) => {

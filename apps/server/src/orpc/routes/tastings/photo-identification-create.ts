@@ -7,6 +7,7 @@ import { db } from "@peated/server/db";
 import { bottleImages, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
+import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -159,6 +160,9 @@ async function applyCatalogImageApproval({
         isPrimary: true,
         createdByActorId: actorId,
       });
+      await reconcileBottleSeriesRepresentativesForBottles(tx, [
+        result.bottleId,
+      ]);
       return updated;
     });
     if (!updatedBottle) {

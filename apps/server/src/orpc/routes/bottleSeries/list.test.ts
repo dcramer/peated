@@ -1,5 +1,12 @@
+import { db } from "@peated/server/db";
+import {
+  bottleImages,
+  bottleSeries,
+  bottleTombstones,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 describe("GET /bottle-series", () => {
@@ -17,6 +24,20 @@ describe("GET /bottle-series", () => {
       description: "Special releases for committee members",
       brandId: brand.id,
     });
+    const representative = await fixtures.Bottle({
+      brandId: brand.id,
+      seriesId: series1.id,
+    });
+    await db.insert(bottleImages).values({
+      bottleId: representative.id,
+      imageUrl: "/uploads/series-list.jpg",
+      isPrimary: true,
+      createdByActorId: representative.createdByActorId,
+    });
+    await db
+      .update(bottleSeries)
+      .set({ representativeBottleId: representative.id })
+      .where(eq(bottleSeries.id, series1.id));
 
     const otherBrand = await fixtures.Entity({ name: "Macallan" });
     await fixtures.BottleSeries({
@@ -36,12 +57,16 @@ describe("GET /bottle-series", () => {
           id: series1.id,
           name: series1.name,
           description: series1.description,
+          representativeBottleId: representative.id,
+          imageUrl: expect.stringMatching(/\/uploads\/series-list\.jpg$/),
           brand: expect.objectContaining({ id: brand.id, name: brand.name }),
         }),
         expect.objectContaining({
           id: series2.id,
           name: series2.name,
           description: series2.description,
+          representativeBottleId: null,
+          imageUrl: null,
         }),
       ]),
     );

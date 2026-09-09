@@ -1,12 +1,14 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
+  bottleImages,
   bottles,
   bottleSeries,
   bottleSeriesTombstones,
   bottleTombstones,
   changes,
 } from "@peated/server/db/schema";
+import { reconcileBottleSeriesRepresentatives } from "@peated/server/lib/bottleSeriesRepresentatives";
 import { createBottle } from "@peated/server/lib/createBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -65,6 +67,15 @@ describe("POST /bottle-series/:series/merge", () => {
       brandId: brand.id,
       seriesId: source.id,
     });
+    await db.insert(bottleImages).values({
+      bottleId: grouped.bottle.id,
+      imageUrl: "/uploads/merged-series.jpg",
+      isPrimary: true,
+      createdByActorId: grouped.bottle.createdByActorId,
+    });
+    await db.transaction((tx) =>
+      reconcileBottleSeriesRepresentatives(tx, [source.id]),
+    );
 
     const result = await routerClient.bottleSeries.merge(
       {
@@ -133,7 +144,11 @@ describe("POST /bottle-series/:series/merge", () => {
 
     await expect(
       routerClient.bottleSeries.details({ series: source.id }),
-    ).resolves.toMatchObject({ id: destination.id });
+    ).resolves.toMatchObject({
+      id: destination.id,
+      representativeBottleId: grouped.bottle.id,
+      imageUrl: expect.stringMatching(/\/uploads\/merged-series\.jpg$/),
+    });
     await expect(
       routerClient.bottleSeries.details({ series: olderSource.id }),
     ).resolves.toMatchObject({ id: destination.id });

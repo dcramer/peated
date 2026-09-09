@@ -14,7 +14,7 @@ import {
   detailsResponse,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
+import { BottleSeriesWithImageSerializer } from "@peated/server/serializers/bottleSeries";
 import {
   and,
   asc,
@@ -110,7 +110,11 @@ export default procedure
       );
 
     return {
-      ...(await serialize(BottleSeriesSerializer, result.series, context.user)),
+      ...(await serialize(
+        BottleSeriesWithImageSerializer,
+        result.series,
+        context.user,
+      )),
       brand: {
         ...result.brand,
         peatedId: formatPeatedId("entity", result.brand.id),

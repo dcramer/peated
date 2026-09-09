@@ -4,6 +4,7 @@ import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import { bottleImages, bottles } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
+import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -110,6 +111,7 @@ async function persistBottleImage({
         .update(bottles)
         .set({ imageUrl })
         .where(eq(bottles.id, bottleId));
+      await reconcileBottleSeriesRepresentativesForBottles(tx, [bottleId]);
       return image;
     }
 
@@ -131,7 +133,10 @@ async function persistBottleImage({
         sourceUrl: bottleImages.sourceUrl,
         license: bottleImages.license,
       });
-    if (updatedImage) return updatedImage;
+    if (updatedImage) {
+      await reconcileBottleSeriesRepresentativesForBottles(tx, [bottleId]);
+      return updatedImage;
+    }
     const [image] = await tx
       .insert(bottleImages)
       .values({
@@ -146,6 +151,7 @@ async function persistBottleImage({
         sourceUrl: bottleImages.sourceUrl,
         license: bottleImages.license,
       });
+    await reconcileBottleSeriesRepresentativesForBottles(tx, [bottleId]);
     return image;
   });
   if (!storedImage) {
