@@ -26,7 +26,9 @@ user gives.
    from sources outside Peated. Fetch every page of Peated results and compare
    the lists. The producer's current range does not define the catalog. Search
    every period and product family, including discontinued, one-off, and
-   country-specific releases.
+   country-specific releases. For a distillery scope, also search historical
+   owner and house brands; domestic blends and older releases may not use the
+   distillery as their Brand.
 3. Use specialist catalogs, collector lists, old sites, and auction archives to
    find past releases. Verify each release and fact with producer pages,
    announcements from the time, readable labels, or exact auction records. If a
@@ -71,11 +73,19 @@ the scoped research artifact.
   facts, and outturn in their fields.
 - Use `null` for unknown or disputed facts. Keep an existing value unless a
   stronger source for the same Bottle proves it wrong.
-- Use a Series only for a named product range. Add an alias only for a proven
-  public name. Assign an import reference only when the full text identifies one
-  Bottle.
-- Use only an image of the exact Bottle. Save the page where it appears and its
-  reuse terms, then inspect the stored image.
+- A Bottler independently selects and releases whisky made by another producer.
+  A name on the label does not prove that role: do not infer it from an owner,
+  importer, distributor, physical packer, customer, retailer, bar, or private
+  barrel holder. Do not clear an existing Bottler only because a source omits
+  it; require stronger evidence that the assignment is wrong.
+- Use a Series only for an evidenced, named product range owned by one Brand.
+  Shared artwork, a client, a release year, or similar packaging does not prove
+  Series membership. Add an alias only for a proven public name. Assign an
+  import reference only when the full text identifies one Bottle.
+- Use only an image of the exact Bottle. Save the canonical page where it
+  appears and its reuse terms, then inspect the stored image. A populated image
+  URL, a direct asset URL, or a missing license does not by itself complete the
+  provenance check.
 - Merge only proven copies of the same marketed release.
 
 Completing one family or the current range does not complete the catalog.
