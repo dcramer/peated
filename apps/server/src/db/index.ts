@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import config from "../config";
 import { logDebug } from "../lib/log";
-import { getPostgresConnectionConfig } from "./connection";
+import { getPostgresPoolConfig } from "./connection";
 import * as schema from "./schema";
 
 // I love to ESM.
@@ -27,7 +27,7 @@ BigInt.prototype.toJSON = function (): string {
 };
 
 function createPool(): NodePgPool {
-  const poolConfig = getPostgresConnectionConfig();
+  const poolConfig = getPostgresPoolConfig();
   if (config.ENV === "test") {
     // Vitest can re-evaluate modules across suites. Reusing one low-concurrency
     // pool in test mode avoids exhausting local Postgres clients.
