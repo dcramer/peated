@@ -93,6 +93,7 @@ describe("admin moderation automation", () => {
           key: `operation:${operation!.id}`,
           status: "failed",
           title: `Catalog change #${operation!.id}`,
+          href: `/admin/moderation/history/operation/${operation!.id}`,
         }),
         expect.objectContaining({
           key: `retry_run:${run!.id}`,
@@ -102,6 +103,53 @@ describe("admin moderation automation", () => {
       ]),
     );
     expect(getQueueCounts).toHaveBeenCalledOnce();
+  });
+
+  test("omits catalog failures after their audit is closed", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle();
+    const [check] = await db
+      .insert(bottleChecks)
+      .values({
+        intent: "audit_bottle",
+        origin: "moderator",
+        bottleId: bottle.id,
+        subjectKey: `audit:${bottle.id}:closed-automation-test`,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
+        inputSnapshot: {},
+        output: { summary: "Execution stopped", findings: [] },
+        closedAt: new Date(),
+        closedById: admin.id,
+        closeReason: "dismissed",
+      })
+      .returning();
+    const [operation] = await db
+      .insert(bottleOperations)
+      .values({
+        checkId: check!.id,
+        proposal: {
+          type: "update_entity",
+          input: { entityId: bottle.brandId, patch: { name: "Stale brand" } },
+          rationale: "Execution test.",
+          evidenceRefs: [],
+        },
+        status: "stale",
+        error: "Catalog state changed.",
+      })
+      .returning();
+
+    const automationClient = createRouterClient(
+      { automation: createModerationAutomationProcedure(getQueueCounts) },
+      { context: { user: admin } },
+    );
+    const result = await automationClient.automation();
+
+    expect(result.counts.failed).toBe(1);
+    expect(result.needsAttention).not.toContainEqual(
+      expect.objectContaining({ key: `operation:${operation!.id}` }),
+    );
   });
 
   test("counts retry health beyond the ten most recent runs", async ({

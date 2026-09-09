@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleChecks,
   bottleOperations,
   incomingBottleDecisionLogs,
   storePriceMatchAttempts,
@@ -9,7 +10,16 @@ import {
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { getQueue } from "@peated/server/worker/queue";
-import { desc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  sql,
+} from "drizzle-orm";
 import { ModerationAutomationResponseSchema } from "./schemas";
 
 const LISTING_AUTOMATION_SAMPLE_SIZE = 100;
@@ -108,6 +118,7 @@ export function createModerationAutomationProcedure(
       startOfToday.setHours(0, 0, 0, 0);
 
       // Health totals cover all durable work; limits apply only to rendered lists.
+      // Moderation owns open audit failures; closed audit records remain in History.
       const [
         proposalCounts,
         operationCounts,
@@ -124,11 +135,15 @@ export function createModerationAutomationProcedure(
           .from(storePriceMatchProposals),
         db
           .select({
-            processing: sql<number>`count(*) filter (where ${bottleOperations.status} = 'applying')::int`,
-            failed: sql<number>`count(*) filter (where ${bottleOperations.status} IN ('stale', 'failed'))::int`,
+            processing: sql<number>`count(*) filter (where ${bottleChecks.closedAt} IS NULL AND ${bottleOperations.status} = 'applying')::int`,
+            failed: sql<number>`count(*) filter (where ${bottleChecks.closedAt} IS NULL AND ${bottleOperations.status} IN ('stale', 'failed'))::int`,
             clearedToday: sql<number>`count(*) filter (where ${bottleOperations.executionCompletedAt} >= ${startOfToday} OR (${bottleOperations.reviewedAt} >= ${startOfToday} AND ${bottleOperations.status} = 'rejected'))::int`,
           })
-          .from(bottleOperations),
+          .from(bottleOperations)
+          .innerJoin(
+            bottleChecks,
+            eq(bottleChecks.id, bottleOperations.checkId),
+          ),
         db
           .select({ count: sql<number>`count(*)::int` })
           .from(incomingBottleDecisionLogs)
@@ -165,9 +180,15 @@ export function createModerationAutomationProcedure(
       ]);
 
       const failedOperations = await db
-        .select()
+        .select({ operation: bottleOperations })
         .from(bottleOperations)
-        .where(inArray(bottleOperations.status, ["stale", "failed"]))
+        .innerJoin(bottleChecks, eq(bottleChecks.id, bottleOperations.checkId))
+        .where(
+          and(
+            inArray(bottleOperations.status, ["stale", "failed"]),
+            isNull(bottleChecks.closedAt),
+          ),
+        )
         .orderBy(desc(bottleOperations.updatedAt))
         .limit(25);
       return {
@@ -190,13 +211,13 @@ export function createModerationAutomationProcedure(
         },
         listingAutomation: summarizeListingAutomation(recentListingAttempts),
         needsAttention: [
-          ...failedOperations.map((operation) => ({
+          ...failedOperations.map(({ operation }) => ({
             key: `operation:${operation.id}`,
             kind: "operation" as const,
             title: `Catalog change #${operation.id}`,
             status: operation.status,
             detail: operation.error,
-            href: "/admin/moderation/automation",
+            href: `/admin/moderation/history/operation/${operation.id}`,
             occurredAt: operation.updatedAt.toISOString(),
           })),
           ...failedRetries.map((run) => ({

@@ -53,7 +53,7 @@ export default procedure
     path: "/admin/moderation/history/{key}",
     summary: "Get moderation history details",
     description:
-      "Get the recorded evidence, decision, and activity for a completed moderation event. Requires administrator privileges.",
+      "Get the recorded evidence, status, and activity for a moderation event. Requires administrator privileges.",
     operationId: "getModerationHistoryDetails",
   })
   .input(InputSchema)
@@ -112,21 +112,28 @@ export default procedure
         .leftJoin(users, eq(users.id, bottleOperations.reviewedById))
         .where(eq(bottleOperations.id, id))
         .limit(1);
-      if (!row?.operation.reviewedAt) {
+      if (
+        !row ||
+        (!row.operation.reviewedAt &&
+          row.operation.status !== "stale" &&
+          row.operation.status !== "failed")
+      ) {
         throw errors.NOT_FOUND({ message: "History event not found." });
       }
       const { operation, actor } = row;
-      const reviewedAt = operation.reviewedAt!;
+      const occurredAt = operation.reviewedAt ?? operation.updatedAt;
       const activity = [
         {
           label: "Suggestion created",
           occurredAt: operation.createdAt.toISOString(),
         },
-        {
-          label: "Review recorded",
-          occurredAt: reviewedAt.toISOString(),
-        },
       ];
+      if (operation.reviewedAt) {
+        activity.push({
+          label: "Review recorded",
+          occurredAt: operation.reviewedAt.toISOString(),
+        });
+      }
       if (operation.executionCompletedAt) {
         activity.push({
           label: "Execution finished",
@@ -141,7 +148,7 @@ export default procedure
           title: operationTitle(operation.proposal),
           outcome: operation.status.replaceAll("_", " "),
           actor,
-          occurredAt: reviewedAt.toISOString(),
+          occurredAt: occurredAt.toISOString(),
         },
         sourceUrl: null,
         resourceUrl: operationResourceUrl(operation.proposal),
