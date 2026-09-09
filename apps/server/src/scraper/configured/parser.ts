@@ -6,7 +6,7 @@ import {
 } from "@peated/server/schemas";
 import { load } from "cheerio";
 import { createHash } from "node:crypto";
-import type { z } from "zod";
+import { z } from "zod";
 import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
 import { reviewSourceKey } from "./reviewSourceKey";
@@ -72,6 +72,9 @@ type LegacyPriceRules = Extract<
   { kind: "price"; list: { detailLink: unknown } }
 >;
 type ScrapePageReadV6 = Extract<StoredScrapePageRead, { clean: unknown }>;
+const JsonLdValueSchema = z.json();
+const JsonLdObjectSchema = z.record(z.string(), JsonLdValueSchema);
+type JsonLdValue = z.infer<typeof JsonLdValueSchema>;
 
 function usesNameBasedReviewKeys(rules: SavedReviewRules) {
   return "addStart" in rules.article.title.try[0];
@@ -1561,7 +1564,12 @@ function readArticleReviewValue(
 }
 
 function reviewNameFromTitle(title: string) {
-  return title.replace(/\s+(?:shelf\s+)?review$/iu, "").trim() || title;
+  return (
+    title
+      .replace(/^review\s+of\s+/iu, "")
+      .replace(/\s+(?:shelf\s+)?review$/iu, "")
+      .trim() || title
+  );
 }
 
 function reviewerNameFromText(value: string | null) {
@@ -1622,7 +1630,41 @@ function readPublishedDate(
     const date = parseDate(value);
     if (date) return date;
   }
+  const jsonLdDate = readJsonLdPublishedDate($);
+  if (jsonLdDate) return jsonLdDate;
   return dateFromPageUrl(pageUrl);
+}
+
+function readJsonLdPublishedDate($: ReturnType<typeof load>) {
+  for (const script of $('script[type="application/ld+json"]').toArray()) {
+    let value: JsonLdValue;
+    try {
+      value = JsonLdValueSchema.parse(JSON.parse($(script).text()));
+    } catch {
+      continue;
+    }
+
+    const pending: JsonLdValue[] = [value];
+    for (let index = 0; index < pending.length && index < 10_000; index += 1) {
+      const current = pending[index];
+      if (Array.isArray(current)) {
+        pending.push(...current);
+        continue;
+      }
+
+      const objectValue = JsonLdObjectSchema.safeParse(current);
+      if (!objectValue.success) continue;
+      const publishedDate = z
+        .string()
+        .safeParse(objectValue.data.datePublished);
+      if (publishedDate.success) {
+        const date = parseDate(publishedDate.data);
+        if (date) return date;
+      }
+      pending.push(...Object.values(objectValue.data));
+    }
+  }
+  return null;
 }
 
 function selectReviews(
