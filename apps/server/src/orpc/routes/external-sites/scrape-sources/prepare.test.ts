@@ -7,6 +7,7 @@ import {
   externalSiteRuns,
   externalSites,
   externalSiteScrapeTargets,
+  scrapeSourceRevisions,
   scrapeSourceRuns,
   scrapeSources,
   scrapeTargets,
@@ -23,7 +24,6 @@ import {
   activateScrapeSourceRevision,
   createScrapeSourceRevision,
   pauseScrapeSource,
-  recordScrapeSourcePreview,
   ScrapeSourceValidationError,
 } from "@peated/server/scraper/configured/service";
 import {
@@ -2831,6 +2831,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
     const suggestionRegistry = await resolveScrapeSourceRunRegistry(
       suggestion.id,
       registry,
+      "suggestion-owner",
     );
     expect(
       [...suggestionRegistry.sources.values()].map((value) => value.key),
@@ -2878,6 +2879,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
     const previewRegistry = await resolveScrapeSourceRunRegistry(
       preview.id,
       registry,
+      "preview-owner",
     );
     expect(
       [...previewRegistry.sources.values()].map((value) => value.key),
@@ -2887,11 +2889,14 @@ describe("POST /admin/scrape-sources/prepare", () => {
       .update(externalSiteRuns)
       .set({ status: "succeeded", completedAt: new Date() })
       .where(eq(externalSiteRuns.id, preview.id));
-    await recordScrapeSourcePreview({
-      revisionId: revision.id,
-      status: "passed",
-      result: { pages: [], issues: [] },
-    });
+    await db
+      .update(scrapeSourceRevisions)
+      .set({
+        previewStatus: "passed",
+        previewResult: { pages: [], issues: [] },
+        previewedAt: new Date(),
+      })
+      .where(eq(scrapeSourceRevisions.id, revision.id));
     await activateScrapeSourceRevision({
       scrapeSourceId: source.id,
       revisionId: revision.id,

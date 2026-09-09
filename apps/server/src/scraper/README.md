@@ -17,6 +17,9 @@ directly. The files are split by responsibility:
 - `runs.ts`, `session.ts`, `http.ts`, `networkPolicy.ts`, `robots.ts`, and
   `coordinator.ts` own core execution without importing production registry or
   worker infrastructure;
+- `runTimeout.ts` keeps the database and queue timeouts together. It also says
+  how often a worker extends the database timeout during slow work such as AI
+  setup;
 - `registry.ts` lists the built-in sources and request settings;
 - `adapters/legacy/` contains migrated source implementations that still use
   the old helpers in `legacy/`;
@@ -81,6 +84,10 @@ version that passes its preview can be used. An admin can return to any older
 version that passed. Pausing a source fails queued collection runs and stops
 active work at the next request, save, or checkpoint. Saved versions and run
 history stay. Preview and AI setup still work.
+
+Before saving a preview or AI version, code checks that the worker still owns
+the run. The check and save happen together. If another worker has taken over,
+the old worker cannot overwrite the preview or add another version.
 
 Older rule versions remain supported so saved sources keep working. New
 sources use version 11. Most rule fields are CSS selectors. `list.links` finds article

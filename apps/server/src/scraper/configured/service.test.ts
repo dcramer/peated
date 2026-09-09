@@ -14,9 +14,13 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
+import { ScraperRunTakenOverError } from "../session";
 import { reviewSourceKey } from "./reviewSourceKey";
 import type { ScrapeRules } from "./rules";
-import { createPinnedScrapeSourceRun } from "./runs";
+import {
+  createPinnedScrapeSourceRun,
+  createScrapeSourceSuggestionRun,
+} from "./runs";
 import {
   activateScrapeSourceRevision,
   createScrapeSourceRevision,
@@ -24,6 +28,7 @@ import {
   createSiteWithScrapeSource,
   listScrapeSourceRevisions,
   recordScrapeSourcePreview,
+  saveScrapeSourceSuggestion,
   ScrapeSourceConflictError,
   ScrapeSourceValidationError,
 } from "./service";
@@ -57,6 +62,17 @@ async function createUser() {
     .returning();
   if (!user) throw new Error("Failed to create test user.");
   return user;
+}
+
+async function markPreviewPassed(revisionId: number) {
+  await db
+    .update(scrapeSourceRevisions)
+    .set({
+      previewStatus: "passed",
+      previewResult: { issues: [], pages: [] },
+      previewedAt: new Date(),
+    })
+    .where(eq(scrapeSourceRevisions.id, revisionId));
 }
 
 test("creates a site and its admin-owned request rows", async () => {
@@ -127,11 +143,7 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     }),
   ).rejects.toBeInstanceOf(ScrapeSourceValidationError);
 
-  await recordScrapeSourcePreview({
-    revisionId: first.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(first.id);
   const activated = await activateScrapeSourceRevision({
     scrapeSourceId: source.id,
     revisionId: first.id,
@@ -181,16 +193,118 @@ test("keeps immutable revisions and only activates a passing revision", async ()
     .set({ status: "succeeded", completedAt: new Date() })
     .where(eq(externalSiteRuns.id, pinned.run.id));
 
-  await recordScrapeSourcePreview({
-    revisionId: second.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(second.id);
   const updated = await activateScrapeSourceRevision({
     scrapeSourceId: source.id,
     revisionId: second.id,
   });
   expect(updated.source.listUrl).toBe("https://versioned.example/new-archive");
+});
+
+test("an old worker cannot overwrite a preview after another worker takes over", async () => {
+  const user = await createUser();
+  const { site, source } = await createSiteWithScrapeSource({
+    name: "Owned Preview",
+    kind: "review",
+    websiteUrl: "https://owned-preview.example/",
+    createdById: user.id,
+  });
+  const revision = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    rules,
+    author: "person",
+    createdById: user.id,
+  });
+  const pinned = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: site.id,
+    requestedById: user.id,
+    trigger: "manual",
+    purpose: "preview",
+    revisionId: revision.id,
+  });
+  await db
+    .update(externalSiteRuns)
+    .set({
+      status: "running",
+      executionToken: "new-worker",
+      executionExpiresAt: new Date("2026-09-08T13:00:00Z"),
+    })
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+
+  await expect(
+    recordScrapeSourcePreview({
+      runId: pinned.run.id,
+      executionToken: "old-worker",
+      revisionId: revision.id,
+      status: "passed",
+      result: { issues: [], pages: [] },
+    }),
+  ).rejects.toBeInstanceOf(ScraperRunTakenOverError);
+  const [stored] = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(stored).toMatchObject({
+    previewStatus: "pending",
+    previewedAt: null,
+  });
+});
+
+test("an old worker cannot add an AI version after another worker takes over", async () => {
+  const user = await createUser();
+  const { source } = await createSiteWithScrapeSource({
+    name: "Owned Suggestion",
+    kind: "review",
+    websiteUrl: "https://owned-suggestion.example/",
+    createdById: user.id,
+  });
+  const run = await createScrapeSourceSuggestionRun({
+    scrapeSourceId: source.id,
+    requestedById: user.id,
+  });
+  await db
+    .update(externalSiteRuns)
+    .set({
+      status: "running",
+      executionToken: "new-worker",
+      executionExpiresAt: new Date("2026-09-08T13:00:00Z"),
+    })
+    .where(eq(externalSiteRuns.id, run.id));
+  const input = {
+    scrapeSourceId: source.id,
+    externalSiteRunId: run.id,
+    rules,
+    author: "ai" as const,
+    createdById: user.id,
+    aiModel: "test-model",
+    aiInstructionsVersion: "test-instructions",
+  };
+
+  await expect(
+    saveScrapeSourceSuggestion({
+      ...input,
+      executionToken: "old-worker",
+    }),
+  ).rejects.toBeInstanceOf(ScraperRunTakenOverError);
+  expect(await db.select().from(scrapeSourceRevisions)).toEqual([]);
+
+  const revision = await saveScrapeSourceSuggestion({
+    ...input,
+    executionToken: "new-worker",
+  });
+  await expect(
+    saveScrapeSourceSuggestion({
+      ...input,
+      executionToken: "new-worker",
+    }),
+  ).resolves.toMatchObject({ id: revision.id });
+  expect(await db.select().from(scrapeSourceRevisions)).toHaveLength(1);
+  expect(await db.select().from(scrapeSourceRuns)).toEqual([
+    expect.objectContaining({
+      externalSiteRunId: run.id,
+      revisionId: revision.id,
+    }),
+  ]);
 });
 
 test("keeps the original review and the newer scraped data", async ({
@@ -260,11 +374,7 @@ test("keeps the original review and the newer scraped data", async ({
     author: "person",
     createdById: user.id,
   });
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
   await activateScrapeSourceRevision({
     scrapeSourceId: source.id,
     revisionId: revision.id,
@@ -337,11 +447,7 @@ test("refuses conflicting Bottle matches for the same review", async ({
     author: "person",
     createdById: user.id,
   });
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
 
   await expect(
     activateScrapeSourceRevision({
@@ -389,11 +495,7 @@ test("refuses review identities that depend on page position", async () => {
     author: "person",
     createdById: user.id,
   });
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
 
   await expect(
     activateScrapeSourceRevision({
@@ -423,11 +525,7 @@ test("does not activate a revision while a run is active", async () => {
     author: "person",
     createdById: user.id,
   });
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "queued",

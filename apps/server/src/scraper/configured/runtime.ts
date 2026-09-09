@@ -357,6 +357,8 @@ export function createLocalScrapeSourcePreview(input: {
 
 function createScrapeSourceDefinition(input: {
   siteKey: string;
+  runId: number;
+  executionToken: string;
   scrapeSourceId: number;
   revisionId: number;
   targetKey: string;
@@ -413,6 +415,8 @@ function createScrapeSourceDefinition(input: {
           purpose: "preview",
           recordPreview: async ({ status, result }) => {
             await recordScrapeSourcePreview({
+              runId: input.runId,
+              executionToken: input.executionToken,
               revisionId: input.revisionId,
               status,
               result,
@@ -443,6 +447,7 @@ function createScrapeSourceDefinition(input: {
 export async function resolveScrapeSourceRunRegistry(
   runId: number,
   baseRegistry: ScraperRegistry,
+  executionToken: string,
 ): Promise<ScraperRegistry> {
   const [suggestion] = await db
     .select({
@@ -618,9 +623,10 @@ export async function resolveScrapeSourceRunRegistry(
                 throw error;
               }
             }
-            const revision = await suggestScrapeSourceRevision({
+            await suggestScrapeSourceRevision({
               scrapeSourceId: suggestion.source.id,
               externalSiteRunId: runId,
+              executionToken,
               createdById: requestedById,
               listPages,
               detailPages,
@@ -636,10 +642,6 @@ export async function resolveScrapeSourceRunRegistry(
                 };
               },
             });
-            await db
-              .update(scrapeSourceRuns)
-              .set({ revisionId: revision.id })
-              .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
           };
     const source: ScraperSourceDefinition<null, unknown> = {
       key: `source-${suggestion.source.id}`,
@@ -702,6 +704,8 @@ export async function resolveScrapeSourceRunRegistry(
   const target = await loadScrapeSourceTarget(row.target);
   const source = createScrapeSourceDefinition({
     siteKey: row.siteKey,
+    runId,
+    executionToken,
     scrapeSourceId: row.source.id,
     revisionId: row.revision.id,
     targetKey: target.key,

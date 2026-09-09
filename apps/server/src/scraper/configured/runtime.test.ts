@@ -33,7 +33,6 @@ import {
   createScrapeSourceRevision,
   createSiteWithScrapeSource,
   pauseScrapeSource,
-  recordScrapeSourcePreview,
   SCRAPE_SOURCE_PAUSED_ERROR,
 } from "./service";
 
@@ -51,6 +50,17 @@ function fixedClock(): TestClock {
       now = value;
     },
   };
+}
+
+async function markPreviewPassed(revisionId: number) {
+  await db
+    .update(scrapeSourceRevisions)
+    .set({
+      previewStatus: "passed",
+      previewResult: { issues: [], pages: [] },
+      previewedAt: new Date(),
+    })
+    .where(eq(scrapeSourceRevisions.id, revisionId));
 }
 
 async function runToCompletion({
@@ -166,11 +176,7 @@ async function setupCatalogSource(
 
 async function setupCatalogCollection() {
   const created = await setupCatalogSource();
-  await recordScrapeSourcePreview({
-    revisionId: created.revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(created.revision.id);
   await activateScrapeSourceRevision({
     scrapeSourceId: created.source.id,
     revisionId: created.revision.id,
@@ -537,11 +543,7 @@ test("stops an active collection before saving later observations", async () => 
 
 test("collects and updates only catalog listings", async () => {
   const { revision, site, source, user } = await setupCatalogSource();
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
   await activateScrapeSourceRevision({
     scrapeSourceId: source.id,
     revisionId: revision.id,
@@ -589,11 +591,7 @@ test("collects and updates only catalog listings", async () => {
 
 test("keeps a catalog product that is absent from a later run", async () => {
   const { revision, site, source, user } = await setupCatalogSource();
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
   await activateScrapeSourceRevision({
     scrapeSourceId: source.id,
     revisionId: revision.id,
@@ -722,11 +720,7 @@ test("stores safe validation issues when a selector stops matching", async () =>
 
 test("a collection failure does not change the preview result", async () => {
   const { revision, site, source, user } = await setupSource("h3.missing");
-  await recordScrapeSourcePreview({
-    revisionId: revision.id,
-    status: "passed",
-    result: { issues: [], pages: [] },
-  });
+  await markPreviewPassed(revision.id);
   await activateScrapeSourceRevision({
     scrapeSourceId: source.id,
     revisionId: revision.id,

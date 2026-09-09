@@ -1,6 +1,8 @@
+import { db } from "@peated/server/db";
+import { scrapeSourceRevisions } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { recordScrapeSourcePreview } from "@peated/server/scraper/configured/service";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import { createTestRevision, createTestSource } from "./testUtils";
 
@@ -48,11 +50,14 @@ describe("POST /admin/scrape-sources/:id/revisions/:revisionId/activate", () => 
     const admin = await fixtures.User({ admin: true });
     const { source } = await createTestSource(admin.id);
     const revision = await createTestRevision(source.id, admin.id);
-    await recordScrapeSourcePreview({
-      revisionId: revision.id,
-      status: "passed",
-      result: { issues: [], pages: [] },
-    });
+    await db
+      .update(scrapeSourceRevisions)
+      .set({
+        previewStatus: "passed",
+        previewResult: { issues: [], pages: [] },
+        previewedAt: new Date(),
+      })
+      .where(eq(scrapeSourceRevisions.id, revision.id));
 
     await expect(
       routerClient.externalSites.scrapeSources.activate(

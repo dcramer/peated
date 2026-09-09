@@ -1,4 +1,4 @@
-import { type AnyDatabase, db } from "@peated/server/db";
+import { type AnyDatabase, type AnyTransaction, db } from "@peated/server/db";
 import {
   externalReviewArticles,
   externalReviewBodies,
@@ -20,12 +20,13 @@ import {
 } from "@peated/server/schemas";
 import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
 import slugify from "@sindresorhus/slugify";
-import { and, asc, desc, eq, inArray, max } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, max } from "drizzle-orm";
 import { z } from "zod";
 import {
   DEFAULT_SCRAPER_SETTINGS,
   getHourlyRequestSettings,
 } from "../definitions";
+import { ScraperRunTakenOverError } from "../session";
 import type { ScrapeSourcePreviewResult } from "./preview";
 import { reviewSourceKey } from "./reviewSourceKey";
 import {
@@ -330,49 +331,108 @@ export async function createScrapeSourceRevision(
   input: CreateScrapeSourceRevisionInput,
 ) {
   const rules = ScrapeRulesSchema.parse(input.rules);
-  return await db.transaction(async (tx) => {
-    const [source] = await tx
-      .select()
-      .from(scrapeSources)
-      .where(eq(scrapeSources.id, input.scrapeSourceId))
-      .for("update");
-    if (!source) throw new ScrapeSourceNotFoundError();
-    const listUrl = ScrapeSourceUrlSchema.parse(
-      input.listUrl ?? source.listUrl,
+  return await db.transaction(async (tx) =>
+    insertScrapeSourceRevision(tx, input, rules),
+  );
+}
+
+async function insertScrapeSourceRevision(
+  tx: AnyTransaction,
+  input: CreateScrapeSourceRevisionInput,
+  rules: ScrapeRules,
+) {
+  const [source] = await tx
+    .select()
+    .from(scrapeSources)
+    .where(eq(scrapeSources.id, input.scrapeSourceId))
+    .for("update");
+  if (!source) throw new ScrapeSourceNotFoundError();
+  const listUrl = ScrapeSourceUrlSchema.parse(input.listUrl ?? source.listUrl);
+  if (exactOrigin(new URL(listUrl)) !== exactOrigin(new URL(source.listUrl))) {
+    throw new ScrapeSourceValidationError(
+      "The list page must stay on the source website.",
     );
+  }
+  if (source.kind !== rules.kind) {
+    throw new ScrapeSourceValidationError(
+      "The rules collect the wrong content.",
+    );
+  }
+  const [latest] = await tx
+    .select({ revision: max(scrapeSourceRevisions.revision) })
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
+  const [revision] = await tx
+    .insert(scrapeSourceRevisions)
+    .values({
+      scrapeSourceId: source.id,
+      revision: (latest?.revision ?? 0) + 1,
+      rulesVersion: SCRAPE_RULES_VERSION,
+      listUrl: new URL(listUrl).toString(),
+      rules,
+      author: input.author,
+      aiModel: input.author === "ai" ? input.aiModel : null,
+      aiInstructionsVersion:
+        input.author === "ai" ? input.aiInstructionsVersion : null,
+      previewResult: { issues: [], pages: [] },
+      createdById: input.createdById,
+    })
+    .returning();
+  if (!revision) throw new Error("Failed to save the new rule version.");
+  return revision;
+}
+
+export async function saveScrapeSourceSuggestion(
+  input: CreateScrapeSourceRevisionInput & {
+    externalSiteRunId: number;
+    executionToken: string;
+  },
+) {
+  const rules = ScrapeRulesSchema.parse(input.rules);
+  return await db.transaction(async (tx) => {
+    const [runState] = await tx
+      .select({ run: externalSiteRuns, sourceRun: scrapeSourceRuns })
+      .from(scrapeSourceRuns)
+      .innerJoin(
+        externalSiteRuns,
+        eq(externalSiteRuns.id, scrapeSourceRuns.externalSiteRunId),
+      )
+      .where(
+        and(
+          eq(scrapeSourceRuns.externalSiteRunId, input.externalSiteRunId),
+          eq(scrapeSourceRuns.scrapeSourceId, input.scrapeSourceId),
+          eq(scrapeSourceRuns.purpose, "suggest"),
+        ),
+      )
+      .for("update");
+    if (!runState) throw new ScrapeSourceNotFoundError();
     if (
-      exactOrigin(new URL(listUrl)) !== exactOrigin(new URL(source.listUrl))
+      runState.run.status !== "running" ||
+      runState.run.executionToken !== input.executionToken
     ) {
-      throw new ScrapeSourceValidationError(
-        "The list page must stay on the source website.",
-      );
+      throw new ScraperRunTakenOverError();
     }
-    if (source.kind !== rules.kind) {
-      throw new ScrapeSourceValidationError(
-        "The rules collect the wrong content.",
-      );
+    if (runState.sourceRun.revisionId !== null) {
+      const [revision] = await tx
+        .select()
+        .from(scrapeSourceRevisions)
+        .where(eq(scrapeSourceRevisions.id, runState.sourceRun.revisionId));
+      if (!revision) throw new ScrapeSourceNotFoundError();
+      return revision;
     }
-    const [latest] = await tx
-      .select({ revision: max(scrapeSourceRevisions.revision) })
-      .from(scrapeSourceRevisions)
-      .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
-    const [revision] = await tx
-      .insert(scrapeSourceRevisions)
-      .values({
-        scrapeSourceId: source.id,
-        revision: (latest?.revision ?? 0) + 1,
-        rulesVersion: SCRAPE_RULES_VERSION,
-        listUrl: new URL(listUrl).toString(),
-        rules,
-        author: input.author,
-        aiModel: input.author === "ai" ? input.aiModel : null,
-        aiInstructionsVersion:
-          input.author === "ai" ? input.aiInstructionsVersion : null,
-        previewResult: { issues: [], pages: [] },
-        createdById: input.createdById,
-      })
-      .returning();
-    if (!revision) throw new Error("Failed to save the new rule version.");
+
+    const revision = await insertScrapeSourceRevision(tx, input, rules);
+    const [linked] = await tx
+      .update(scrapeSourceRuns)
+      .set({ revisionId: revision.id })
+      .where(
+        and(
+          eq(scrapeSourceRuns.externalSiteRunId, input.externalSiteRunId),
+          isNull(scrapeSourceRuns.revisionId),
+        ),
+      )
+      .returning({ externalSiteRunId: scrapeSourceRuns.externalSiteRunId });
+    if (!linked) throw new ScraperRunTakenOverError();
     return revision;
   });
 }
@@ -418,21 +478,47 @@ export async function getLatestScrapeSourceSetup(scrapeSourceId: number) {
 }
 
 export async function recordScrapeSourcePreview(input: {
+  runId: number;
+  executionToken: string;
   revisionId: number;
   status: "passed" | "failed";
   result: ScrapeSourcePreviewResult;
 }) {
-  const [revision] = await db
-    .update(scrapeSourceRevisions)
-    .set({
-      previewStatus: input.status,
-      previewResult: input.result,
-      previewedAt: new Date(),
-    })
-    .where(eq(scrapeSourceRevisions.id, input.revisionId))
-    .returning();
-  if (!revision) throw new ScrapeSourceNotFoundError();
-  return revision;
+  return await db.transaction(async (tx) => {
+    const [runState] = await tx
+      .select({ run: externalSiteRuns })
+      .from(scrapeSourceRuns)
+      .innerJoin(
+        externalSiteRuns,
+        eq(externalSiteRuns.id, scrapeSourceRuns.externalSiteRunId),
+      )
+      .where(
+        and(
+          eq(scrapeSourceRuns.externalSiteRunId, input.runId),
+          eq(scrapeSourceRuns.revisionId, input.revisionId),
+          eq(scrapeSourceRuns.purpose, "preview"),
+        ),
+      )
+      .for("update");
+    if (!runState) throw new ScrapeSourceNotFoundError();
+    if (
+      runState.run.status !== "running" ||
+      runState.run.executionToken !== input.executionToken
+    ) {
+      throw new ScraperRunTakenOverError();
+    }
+    const [revision] = await tx
+      .update(scrapeSourceRevisions)
+      .set({
+        previewStatus: input.status,
+        previewResult: input.result,
+        previewedAt: new Date(),
+      })
+      .where(eq(scrapeSourceRevisions.id, input.revisionId))
+      .returning();
+    if (!revision) throw new ScrapeSourceNotFoundError();
+    return revision;
+  });
 }
 
 export async function activateScrapeSourceRevision(input: {

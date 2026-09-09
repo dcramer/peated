@@ -7,6 +7,7 @@ import config from "../config";
 import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo, logTelemetryError } from "../lib/log";
 import { initializeScraperRuntime } from "../scraper";
+import { SCRAPER_JOB_LOCK_MS } from "../scraper/runTimeout";
 import { pushUniqueJob, runJob, type WorkerDispatch } from "./dispatch";
 import "./jobs";
 import createNextRepeatingEvents from "./jobs/createNextRepeatingEvents";
@@ -122,8 +123,6 @@ export const queueWorkerDispatch: WorkerDispatch = {
   pushUniqueJob: pushUniqueJobToQueue,
   runJob: runRegisteredJob,
 };
-const SCRAPER_JOB_LOCK_DURATION_MS = 60 * 60_000;
-
 export async function gracefulShutdown(signal?: string, worker?: Worker) {
   scheduler.stop();
   disconnectConnection();
@@ -165,8 +164,7 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
     connection,
     autorun: false,
     concurrency: 4,
-    // Scraper runs own a one-hour database lease and can wait on model or site requests.
-    lockDuration: SCRAPER_JOB_LOCK_DURATION_MS,
+    lockDuration: SCRAPER_JOB_LOCK_MS,
   });
 
   for (const worker of [defaultWorker, scraperWorker]) {
