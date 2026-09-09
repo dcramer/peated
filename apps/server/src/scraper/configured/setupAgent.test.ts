@@ -243,6 +243,7 @@ test("returns rules only after the rule check passes", async () => {
   expect(secondRequest?.instructions).toContain(
     "Code shares one article-level reviewer across its reviews.",
   );
+  expect(secondRequest?.instructions).toContain("Review of {value}");
 });
 
 test("accepts catalog rules without price or review fields", async () => {

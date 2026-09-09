@@ -55,7 +55,7 @@ test("bounds list and detail pages", () => {
   });
   if (rules.kind !== "review") throw new Error("Expected review rules.");
   expect(rules.list.limit).toBe(99);
-  expect(parseScrapeRules(10, rules)).toEqual(rules);
+  expect(parseScrapeRules(11, rules)).toEqual(rules);
   expect(() => parseScrapeRules(9, rules)).toThrow();
   expect(() =>
     ScrapeRulesSchema.parse({
@@ -71,8 +71,8 @@ test("bounds list and detail pages", () => {
 
 test("rejects rules for an unsupported stored format", () => {
   const rules = ScrapeRulesV5Schema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(11, rules)).toThrow(
-    "Unsupported scrape rules version: 11.",
+  expect(() => parseScrapeRules(12, rules)).toThrow(
+    "Unsupported scrape rules version: 12.",
   );
 });
 
@@ -85,7 +85,43 @@ test("loads old rules only through the version 1 contract", () => {
       list: { ...rules.list, item: ".card" },
     }),
   ).toThrow();
-  expect(SCRAPE_RULES_VERSION).toBe(10);
+  expect(SCRAPE_RULES_VERSION).toBe(11);
+});
+
+test("adds review name matches only in version 11", () => {
+  const rules = ScrapeRulesSchema.parse({
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "article",
+        item: null,
+        name: { selector: null, match: "Review of {value}" },
+        reviewer: null,
+        tastingNotes: null,
+        score: null,
+      },
+    },
+  });
+  if (rules.kind !== "review") throw new Error("Expected review rules.");
+
+  expect(parseScrapeRules(11, rules)).toEqual(rules);
+  expect(() => parseScrapeRules(10, rules)).toThrow();
+  expect(() =>
+    ScrapeRulesSchema.parse({
+      ...rules,
+      detail: {
+        ...rules.detail,
+        reviews: {
+          ...rules.detail.reviews,
+          name: { selector: null, match: "Review" },
+        },
+      },
+    }),
+  ).toThrow("A review name match must contain {value}.");
 });
 
 test("adds catalog rules only in version 7", () => {

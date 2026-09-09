@@ -556,7 +556,7 @@ it("cleans common review labels without extra rules", () => {
   });
 });
 
-it("removes a leading review-of label from a single article title", () => {
+it("uses a name match with the article title", () => {
   const rules = {
     kind: "review",
     list: { links: "a.review", nextPage: null, limit: 10 },
@@ -567,7 +567,7 @@ it("removes a leading review-of label from a single article title", () => {
       reviews: {
         area: "article",
         item: null,
-        name: null,
+        name: { selector: null, match: "Review of {value}" },
         reviewer: null,
         tastingNotes: null,
         score: null,

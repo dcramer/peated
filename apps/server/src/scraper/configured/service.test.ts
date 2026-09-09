@@ -459,7 +459,7 @@ test("database constraints keep source and revision identity valid", async () =>
     createdById: user.id,
   });
   expect(first.revision).toBe(1);
-  expect(first.rulesVersion).toBe(10);
+  expect(first.rulesVersion).toBe(11);
 
   await expect(
     db.insert(scrapeSources).values({

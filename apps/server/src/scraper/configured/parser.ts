@@ -20,8 +20,12 @@ import type {
   StoredScrapeReviewField,
   StoredScrapeRules,
 } from "./rules";
-import { ScrapeReviewSectionSchema, ScrapeSelectorSchema } from "./rules";
-import { matchFirstText } from "./textTemplate";
+import {
+  normalizeScrapeReviewNameRule,
+  ScrapeReviewSectionSchema,
+  ScrapeSelectorSchema,
+} from "./rules";
+import { matchFirstText, matchText } from "./textTemplate";
 
 export type ScrapeListResult = {
   links: string[];
@@ -1564,12 +1568,7 @@ function readArticleReviewValue(
 }
 
 function reviewNameFromTitle(title: string) {
-  return (
-    title
-      .replace(/^review\s+of\s+/iu, "")
-      .replace(/\s+(?:shelf\s+)?review$/iu, "")
-      .trim() || title
-  );
+  return title.replace(/\s+(?:shelf\s+)?review$/iu, "").trim() || title;
 }
 
 function reviewerNameFromText(value: string | null) {
@@ -1670,6 +1669,7 @@ function readJsonLdPublishedDate($: ReturnType<typeof load>) {
 function selectReviews(
   $: ReturnType<typeof load>,
   rules: Extract<ScrapeRules, { kind: "review" }>["detail"]["reviews"],
+  nameSelector: string | null,
 ) {
   const areas = $(rules.area).toArray();
   if (areas.length !== 1) return null;
@@ -1686,7 +1686,7 @@ function selectReviews(
       }));
   }
 
-  const starts = rules.name ? area.find(rules.name).toArray() : [];
+  const starts = nameSelector ? area.find(nameSelector).toArray() : [];
   if (starts.length < 2) {
     return [{ body: area, item: load($.html(areaElement)) }];
   }
@@ -1787,7 +1787,9 @@ function parseReviewPage(
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
   const reviewKeys = new Set<string>();
-  const reviewItems = selectReviews($, rules.detail.reviews);
+  const { selector: nameSelector, match: nameMatch } =
+    normalizeScrapeReviewNameRule(rules.detail.reviews.name);
+  const reviewItems = selectReviews($, rules.detail.reviews, nameSelector);
   if (!reviewItems) {
     issues.push({
       field: "detail.reviews.area",
@@ -1805,18 +1807,22 @@ function parseReviewPage(
     reviewItems && reviewerSelector
       ? readArticleReviewValue($, reviewerSelector, reviewItems)
       : null;
-  const nameSelector = rules.detail.reviews.name;
   const sharedReviewName =
     reviewItems?.length === 1 && nameSelector
       ? readArticleReviewValue($, nameSelector, reviewItems)
       : null;
 
   reviewItems?.forEach(({ body, item }, index) => {
-    const name = nameSelector
+    const selectedName = nameSelector
       ? (readSelectedValue(item, nameSelector) ?? sharedReviewName)
-      : title
-        ? reviewNameFromTitle(title)
-        : null;
+      : title;
+    const name = selectedName
+      ? nameMatch
+        ? matchText(selectedName, nameMatch)
+        : nameSelector
+          ? selectedName
+          : reviewNameFromTitle(selectedName)
+      : null;
     if (!name) {
       issues.push({
         field: "detail.reviews.name",
