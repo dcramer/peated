@@ -5,7 +5,12 @@ import * as stylex from "@stylexjs/stylex";
 import { ImagePlus } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-import { Button, Field, FieldGroup, TextInput } from ".";
+import { Button } from "@peated/web/components/button.stylex";
+import {
+  Field,
+  FieldGroup,
+  TextInput,
+} from "@peated/web/components/field.stylex";
 import { colors, space } from "../styles/tokens.stylex";
 import { ImageViewer } from "./imageViewer.stylex";
 

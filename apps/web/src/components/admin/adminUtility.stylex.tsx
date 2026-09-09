@@ -6,7 +6,8 @@ import { AlertTriangle } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-import { AppLink, CursorPager } from "..";
+import { AppLink } from "@peated/web/components/appLink";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { buildQueryString } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";

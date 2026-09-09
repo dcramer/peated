@@ -1,6 +1,6 @@
 "use client";
 
-import { LoadingList } from "@peated/web/components";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { redirectToAuth } from "../lib/auth";

@@ -5,14 +5,11 @@ import { useMutation } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
-import {
-  Button,
-  ButtonLink,
-  EmptyState,
-  PageTabs,
-  RowMenu,
-} from "@peated/web/components";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
 import { MemberProfileHeader } from "@peated/web/components/pages/memberProfileHeader.stylex";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { space } from "../../../../styles/tokens.stylex";
 import { ProfileProvider, type ProfileUser } from "./profileContext";

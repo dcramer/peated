@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { Button, ButtonLink, RowMenu } from "..";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { BottlePageHeader } from "./bottlePageHeader.stylex";
 

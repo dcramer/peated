@@ -1,4 +1,4 @@
-import { RailList, RailListItem } from "@peated/web/components";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import type { Metadata } from "next";
 import { AboutPage, AboutText, AboutTextStack } from "../aboutPage.stylex";

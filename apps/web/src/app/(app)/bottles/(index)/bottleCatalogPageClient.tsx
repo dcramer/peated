@@ -7,8 +7,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import { ButtonLink } from "@peated/web/components";
 import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
   BottleCatalogFilters,
   BottleCatalogList,

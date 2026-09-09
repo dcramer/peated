@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { Card, TextLink } from "@peated/web/components";
+import { Card } from "@peated/web/components/card.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { colors, space } from "../../../../styles/tokens.stylex";
 
 import { foundationStyles } from "../../../../styles/foundations.stylex";

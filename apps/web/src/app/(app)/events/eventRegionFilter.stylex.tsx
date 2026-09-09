@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { ButtonLink, LoadingPlaceholder } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, space } from "../../../styles/tokens.stylex";
 import type { EventRegion, EventRegionOption } from "./eventRegionData";

@@ -1,6 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { LoadingList, LoadingPlaceholder } from "@peated/web/components";
+import {
+  LoadingList,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
 import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 639px)";

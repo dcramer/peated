@@ -1,4 +1,5 @@
-import { ButtonLink, EmptyState } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
 import {
   PageHeader,
   PageSection,

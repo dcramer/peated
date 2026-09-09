@@ -7,17 +7,16 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
+import { Avatar } from "@peated/web/components/avatar.stylex";
 import {
-  Avatar,
-  CursorPager,
   EmptyState,
-  ItemList,
-  ItemRow,
   LoadingPlaceholder,
-  MemberAvatar,
-  RowMenu,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
+import { MemberAvatar } from "@peated/web/components/memberAvatar";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";

@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Checkbox } from "@peated/web/components";
+import { Button } from "@peated/web/components/button.stylex";
+import { Checkbox } from "@peated/web/components/checkbox.stylex";
 import {
   AuthenticationActions,
   AuthenticationCard,

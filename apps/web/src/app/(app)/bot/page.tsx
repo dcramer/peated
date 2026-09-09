@@ -1,5 +1,5 @@
 import { BOT_USER_AGENT } from "@peated/server/constants";
-import { FactList } from "@peated/web/components";
+import { FactList } from "@peated/web/components/factList.stylex";
 import {
   ContentLink,
   ContentList,

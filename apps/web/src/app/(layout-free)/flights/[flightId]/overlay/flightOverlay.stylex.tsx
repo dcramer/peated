@@ -1,13 +1,10 @@
 "use client";
 
 import type { Bottle } from "@peated/server/types";
-import {
-  BottleIdentityRow,
-  Card,
-  ItemList,
-  ItemListItem,
-} from "@peated/web/components";
+import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { Card } from "@peated/web/components/card.stylex";
 import { ClientOnly } from "@peated/web/components/clientOnly";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
 import QRCodeClient from "@peated/web/components/qrcode.client.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";

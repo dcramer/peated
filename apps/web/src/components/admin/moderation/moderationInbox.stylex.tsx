@@ -8,14 +8,14 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { AppLink } from "@peated/web/components/appLink";
+import { Button } from "@peated/web/components/button.stylex";
 import {
-  AppLink,
-  Button,
-  CursorPager,
   LoadingList,
   LoadingPlaceholder,
-  TextInput,
-} from "../..";
+} from "@peated/web/components/feedback.stylex";
+import { TextInput } from "@peated/web/components/field.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {
   colors,

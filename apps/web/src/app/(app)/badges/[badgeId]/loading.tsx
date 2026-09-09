@@ -1,4 +1,4 @@
-import { LoadingPlaceholder } from "@peated/web/components";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
 import {
   PageHeader,
   PageSection,

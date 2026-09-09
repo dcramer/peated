@@ -1,4 +1,4 @@
-import { EmptyState } from "@peated/web/components";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";

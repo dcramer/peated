@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Copy } from "lucide-react";
 
-import { Button, ButtonLink, IconButton } from "..";
+import {
+  Button,
+  ButtonLink,
+  IconButton,
+} from "@peated/web/components/button.stylex";
 import {
   ErrorPage,
   ErrorPageLayout,

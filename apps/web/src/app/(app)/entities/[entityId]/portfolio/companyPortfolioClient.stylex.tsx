@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import { PageTabs } from "@peated/web/components";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.stylex";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { toEntityCatalogItem } from "@peated/web/lib/entityCatalogItem";

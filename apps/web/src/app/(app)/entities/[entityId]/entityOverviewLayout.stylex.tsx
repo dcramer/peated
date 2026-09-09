@@ -1,7 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { LoadingList, LoadingPlaceholder } from "@peated/web/components";
+import {
+  LoadingList,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
 import { colors, space } from "../../../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";

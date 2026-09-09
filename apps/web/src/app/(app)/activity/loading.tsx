@@ -1,6 +1,6 @@
 "use client";
 
-import { PageTabs } from "@peated/web/components";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { ActivityPage } from "@peated/web/components/pages/activityPage.stylex";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";

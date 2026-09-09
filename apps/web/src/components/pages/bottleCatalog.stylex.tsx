@@ -5,17 +5,20 @@ import type { ReactNode } from "react";
 
 import {
   BottleList,
-  Button,
-  ButtonLink,
-  CursorPager,
-  EmptyState,
+  type BottleListItem,
+} from "@peated/web/components/bottleList.stylex";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import {
   FacetGroup,
   FilterPanel,
   FilterQuery,
+} from "@peated/web/components/filterPanel.stylex";
+import {
+  CursorPager,
   ListToolbar,
-  type BottleListItem,
   type ListSortOption,
-} from "..";
+} from "@peated/web/components/lists.stylex";
 import { space } from "../../styles/tokens.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
 

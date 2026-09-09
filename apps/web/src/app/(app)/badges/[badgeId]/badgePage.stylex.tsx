@@ -2,13 +2,10 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import {
-  BadgeImage,
-  CursorPager,
-  ItemList,
-  ItemRow,
-  LoadingPlaceholder,
-} from "@peated/web/components";
+import { BadgeImage } from "@peated/web/components/badgeImage.stylex";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import {
   PageHeader,
   PageSection,

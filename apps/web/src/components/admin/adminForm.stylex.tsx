@@ -8,15 +8,16 @@ import { useController } from "react-hook-form";
 
 import {
   Field,
+  Textarea,
+  TextInput,
+} from "@peated/web/components/field.stylex";
+import { Select, Switch } from "@peated/web/components/formControls.stylex";
+import {
   FormActions,
   FormGrid,
   FormSection,
   FormStack,
-  Select,
-  Switch,
-  Textarea,
-  TextInput,
-} from "..";
+} from "@peated/web/components/formLayout.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, fonts, space, zIndices } from "../../styles/tokens.stylex";
 import { WorkflowScreen } from "../workflowScreen.stylex";

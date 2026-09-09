@@ -4,7 +4,6 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
-import { TextLink } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminCodeBlock,
@@ -23,6 +22,7 @@ import CheckResult from "@peated/web/components/bottleChecks/checkResult.stylex"
 import type { ExcludedOperationField } from "@peated/web/components/bottleChecks/operationCard.stylex";
 import OperationCard from "@peated/web/components/bottleChecks/operationCard.stylex";
 import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";

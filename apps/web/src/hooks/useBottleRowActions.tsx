@@ -4,8 +4,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-import type { RowMenuItem } from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import type { RowMenuItem } from "@peated/web/components/rowMenu.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
 

@@ -7,18 +7,16 @@ import { X } from "lucide-react";
 import { useState } from "react";
 
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
-import {
-  Button,
-  CursorPager,
-  EmptyState,
-  IconButton,
-  ItemList,
-  ItemListItem,
-  LoadingPlaceholder,
-  TextLink,
-} from "@peated/web/components";
 import { Avatar } from "@peated/web/components/avatar.stylex";
+import { Button, IconButton } from "@peated/web/components/button.stylex";
+import {
+  EmptyState,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";

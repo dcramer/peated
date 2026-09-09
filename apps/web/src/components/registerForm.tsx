@@ -1,6 +1,8 @@
 "use client";
 
-import { ButtonLink, Checkbox, Field, TextInput } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { Checkbox } from "@peated/web/components/checkbox.stylex";
+import { Field, TextInput } from "@peated/web/components/field.stylex";
 import GoogleLoginButton from "@peated/web/components/googleLoginButton";
 import {
   AuthenticationActions,

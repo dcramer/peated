@@ -1,7 +1,11 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { PageTabs, SectionHeading, type PageTabItem } from "..";
+import {
+  PageTabs,
+  type PageTabItem,
+} from "@peated/web/components/pageTabs.stylex";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 

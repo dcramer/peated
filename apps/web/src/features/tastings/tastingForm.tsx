@@ -3,17 +3,17 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
 import type { User } from "@peated/server/types";
+import { Button } from "@peated/web/components/button.stylex";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
 import {
-  Button,
   FormNotice,
   FormSection,
   FormStack,
   FormSteps,
-  LoadingList,
-  SelectedBottleSummary,
-  type MemberPickerOption,
-  type NotePickerOption,
-} from "@peated/web/components";
+} from "@peated/web/components/formLayout.stylex";
+import type { MemberPickerOption } from "@peated/web/components/memberPicker.stylex";
+import type { NotePickerOption } from "@peated/web/components/notePicker.stylex";
+import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import {
   TastingFormModeChoice,
   type TastingFormMode,

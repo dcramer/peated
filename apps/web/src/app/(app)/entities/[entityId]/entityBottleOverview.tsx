@@ -1,14 +1,14 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
+import { BottleList } from "@peated/web/components/bottleList.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  BottleList,
-  ButtonLink,
   EmptyState,
   LoadingList,
   SectionError,
-  TextLink,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getEntityUrl } from "@peated/web/lib/urls";
 

@@ -1,5 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import type { PageTabItem } from "@peated/web/components";
+import type { PageTabItem } from "@peated/web/components/pageTabs.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 export type Entity = Outputs["entities"]["details"];

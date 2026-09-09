@@ -4,13 +4,17 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { PageTabs, TextLink, type PageTabItem } from "@peated/web/components";
 import { LocationMapIcon } from "@peated/web/components/locationMapIcon";
 import { RegionMapCredit } from "@peated/web/components/locationMapIcon/credit.stylex";
 import {
   PageHeader,
   TabbedPage,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import {
+  PageTabs,
+  type PageTabItem,
+} from "@peated/web/components/pageTabs.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import {
   needsRegionMapCredit,
   type LocationMap,

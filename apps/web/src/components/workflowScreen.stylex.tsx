@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
 
-import { Button, IconButton, LoadingList } from "@peated/web/components";
+import { Button, IconButton } from "@peated/web/components/button.stylex";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
 import {
   colors,

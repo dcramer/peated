@@ -2,7 +2,10 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { TextLink, type TextLinkProps } from "..";
+import {
+  TextLink,
+  type TextLinkProps,
+} from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 

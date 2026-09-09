@@ -1,12 +1,11 @@
+import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
 import {
-  BottleIdentityRow,
-  BottleRatings,
-  CursorPager,
   EmptyState,
-  ItemList,
-  ItemListItem,
   LoadingList,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
+import { BottleRatings } from "@peated/web/components/scoring.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";

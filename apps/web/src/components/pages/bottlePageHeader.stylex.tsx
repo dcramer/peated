@@ -1,8 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type { BottleRatingSummaryProps } from "..";
-import { AppLink, BottleRatingSummary } from "..";
+import { AppLink } from "@peated/web/components/appLink";
+import type { BottleRatingSummaryProps } from "@peated/web/components/scoring.stylex";
+import { BottleRatingSummary } from "@peated/web/components/scoring.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 

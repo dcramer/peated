@@ -2,7 +2,6 @@
 
 import { use } from "react";
 
-import { TextLink } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
@@ -14,6 +13,7 @@ import {
 import { AdminDefinitionList as DefinitionList } from "@peated/web/components/admin/adminUtility.stylex";
 import DateRange from "@peated/web/components/dateRange";
 import Markdown from "@peated/web/components/markdown";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 

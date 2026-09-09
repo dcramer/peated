@@ -5,17 +5,19 @@ import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { BottleMergeSchema } from "@peated/server/schemas";
+import { FieldGroup } from "@peated/web/components/field.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import { ChoiceList } from "@peated/web/components/formControls.stylex";
 import {
-  ChoiceList,
-  FieldGroup,
   FormNotice,
   FormSection,
   FormStack,
+} from "@peated/web/components/formLayout.stylex";
+import {
   SearchSelect,
-  SelectedBottleSummary,
   type SearchPickerOption,
-} from "@peated/web/components";
-import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+} from "@peated/web/components/searchPicker.stylex";
+import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";

@@ -1,8 +1,8 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import { TastingToastSummary } from "@peated/web/components";
 import { TastingReviewDetail } from "@peated/web/components/pages/tastingReviewDetail.stylex";
 import { TastingReviewRail } from "@peated/web/components/pages/tastingReviewRail.stylex";
+import { TastingToastSummary } from "@peated/web/components/tastingToastButton.stylex";
 
 import { TastingActions } from "./tastingActions";
 

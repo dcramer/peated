@@ -1,13 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import type { BottleListItem } from "@peated/web/components/bottleList.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  ButtonLink,
   EmptyState,
   LoadingList,
-  TextLink,
-  type BottleListItem,
-} from "..";
+} from "@peated/web/components/feedback.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";

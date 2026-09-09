@@ -5,7 +5,10 @@ import * as stylex from "@stylexjs/stylex";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useOptimistic, useTransition } from "react";
 
-import { LoadingList, LoadingPlaceholder } from "@peated/web/components";
+import {
+  LoadingList,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import {
   Search,

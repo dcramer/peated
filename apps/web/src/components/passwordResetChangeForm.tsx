@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, ButtonLink, Field, TextInput } from "@peated/web/components";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { Field, TextInput } from "@peated/web/components/field.stylex";
 import {
   AuthenticationActions,
   AuthenticationCard,

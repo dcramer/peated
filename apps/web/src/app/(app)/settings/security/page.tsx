@@ -1,14 +1,13 @@
 "use client";
 
+import { Button } from "@peated/web/components/button.stylex";
+import { Field, TextInput } from "@peated/web/components/field.stylex";
 import {
-  Button,
-  Field,
   FormActions,
   FormNotice,
   FormSection,
   FormStack,
-  TextInput,
-} from "@peated/web/components";
+} from "@peated/web/components/formLayout.stylex";
 import PasskeyManager from "@peated/web/components/passkeyManager";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";

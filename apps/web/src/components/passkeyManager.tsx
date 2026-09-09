@@ -1,16 +1,14 @@
 "use client";
 
+import { Button, IconButton } from "@peated/web/components/button.stylex";
+import { TextInput } from "@peated/web/components/field.stylex";
 import {
-  Button,
   FormActions,
   FormNotice,
   FormStack,
-  IconButton,
-  ItemList,
-  ItemRow,
-  TextInput,
-  Timestamp,
-} from "@peated/web/components";
+} from "@peated/web/components/formLayout.stylex";
+import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startRegistration } from "@simplewebauthn/browser";

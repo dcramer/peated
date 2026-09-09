@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@peated/web/components";
+import { Button } from "@peated/web/components/button.stylex";
 import { AuthenticationNotice } from "@peated/web/components/pages/authentication.stylex";
 import { resendVerificationForm } from "@peated/web/lib/auth.actions";
 import { useActionState } from "react";

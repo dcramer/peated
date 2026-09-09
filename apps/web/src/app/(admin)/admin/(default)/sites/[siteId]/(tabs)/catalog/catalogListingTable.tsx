@@ -1,6 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import { TextLink } from "@peated/web/components";
 import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import * as stylex from "@stylexjs/stylex";
 import { styles } from "./catalogListingTable.stylex";

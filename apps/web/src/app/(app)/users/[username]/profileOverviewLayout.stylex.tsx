@@ -6,15 +6,17 @@ import type { ReactNode } from "react";
 import {
   FactList,
   type FactListItem,
+} from "@peated/web/components/factList.stylex";
+import {
   LoadingList,
   LoadingPlaceholder,
-  SectionHeading,
-  TextLink,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
 import {
   PageColumns,
   RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { colors, space } from "../../../../styles/tokens.stylex";
 import { useProfile } from "./profileContext";
 

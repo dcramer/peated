@@ -1,9 +1,9 @@
 import {
   FactList,
-  TextLink,
   hasVisibleFacts,
   type FactListItem,
-} from "@peated/web/components";
+} from "@peated/web/components/factList.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { getEntityUrl, parseDomain } from "@peated/web/lib/urls";
 
 import type { Entity } from "./entityPageData";

@@ -1,7 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { LoadingList, LoadingPlaceholder } from "..";
+import {
+  LoadingList,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 

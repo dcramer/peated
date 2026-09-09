@@ -1,17 +1,20 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import type { BottleListItem, FactListItem } from "..";
+import { AppLink } from "@peated/web/components/appLink";
+import type { BottleListItem } from "@peated/web/components/bottleList.stylex";
+import { BottleVisual } from "@peated/web/components/bottleVisual.stylex";
+import type { FactListItem } from "@peated/web/components/factList.stylex";
 import {
-  AppLink,
-  BottleVisual,
   FactList,
   hasVisibleFacts,
-  ImageAttribution,
+} from "@peated/web/components/factList.stylex";
+import {
   LoadingList,
   LoadingPlaceholder,
-  SectionHeading,
-} from "..";
+} from "@peated/web/components/feedback.stylex";
+import { ImageAttribution } from "@peated/web/components/imageAttribution.stylex";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
 import { CommunityFeed, type CommunityFeedItem } from "../communityFeed.stylex";

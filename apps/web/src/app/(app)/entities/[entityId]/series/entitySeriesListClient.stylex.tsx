@@ -6,14 +6,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import {
-  CursorPager,
-  EmptyState,
-  ItemList,
-  ItemListItem,
-  ListToolbar,
-  SeriesIdentityRow,
-} from "@peated/web/components";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
+import { CursorPager, ListToolbar } from "@peated/web/components/lists.stylex";
+import { SeriesIdentityRow } from "@peated/web/components/seriesIdentityRow.stylex";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getBottleSeriesUrl } from "@peated/web/lib/urls";

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { LoadingList } from "@peated/web/components";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
 import {
   PageColumns,
   RailSection,

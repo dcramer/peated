@@ -1,4 +1,5 @@
-import { FactList, RailList, RailListItem } from "@peated/web/components";
+import { FactList } from "@peated/web/components/factList.stylex";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import {
   PageSection,
   RailSection,

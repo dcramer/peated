@@ -2,17 +2,19 @@
 
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityMergeSchema } from "@peated/server/schemas";
+import { Checkbox } from "@peated/web/components/checkbox.stylex";
+import { FieldGroup } from "@peated/web/components/field.stylex";
+import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import { ChoiceList } from "@peated/web/components/formControls.stylex";
 import {
-  Checkbox,
-  ChoiceList,
-  FieldGroup,
   FormNotice,
   FormSection,
   FormStack,
+} from "@peated/web/components/formLayout.stylex";
+import {
   SearchSelect,
   type SearchPickerOption,
-} from "@peated/web/components";
-import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+} from "@peated/web/components/searchPicker.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";

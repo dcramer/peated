@@ -1,7 +1,7 @@
 "use client";
 
-import { ButtonLink } from "@peated/web/components";
 import { AuthenticationPage } from "@peated/web/components/auth/authenticationPage.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
   AuthenticationNotice,
   AuthenticationPanel,

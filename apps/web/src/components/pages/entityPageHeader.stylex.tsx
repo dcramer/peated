@@ -1,7 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { KeyFacts, PeatedId, hasVisibleKeyFacts, type KeyFactList } from "..";
+import {
+  KeyFacts,
+  PeatedId,
+  hasVisibleKeyFacts,
+  type KeyFactList,
+} from "@peated/web/components/catalogDetails.stylex";
 import { space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 

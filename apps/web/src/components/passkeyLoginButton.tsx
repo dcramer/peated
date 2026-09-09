@@ -3,8 +3,8 @@
 import {
   Button,
   type ButtonVariant,
-  ValidationMessage,
-} from "@peated/web/components";
+} from "@peated/web/components/button.stylex";
+import { ValidationMessage } from "@peated/web/components/field.stylex";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { startAuthentication } from "@simplewebauthn/browser";

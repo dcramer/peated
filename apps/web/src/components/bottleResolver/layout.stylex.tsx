@@ -3,7 +3,7 @@ import { Camera } from "lucide-react";
 import type { ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { Button } from "..";
+import { Button } from "@peated/web/components/button.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 

@@ -1,12 +1,11 @@
 import type { Bottle } from "@peated/server/types";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  Button,
-  ButtonLink,
   FormDetails,
   FormNotice,
   FormStack,
-  SelectedBottleSummary,
-} from "@peated/web/components";
+} from "@peated/web/components/formLayout.stylex";
+import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 

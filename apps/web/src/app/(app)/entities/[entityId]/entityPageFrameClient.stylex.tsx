@@ -5,17 +5,16 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, type ReactNode } from "react";
 
-import {
-  Button,
-  ButtonLink,
-  ExpandableDescription,
-  PageTabs,
-  RowMenu,
-  SectionError,
-  type RowMenuItem,
-} from "@peated/web/components";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { ExpandableDescription } from "@peated/web/components/expandableDescription.stylex";
+import { SectionError } from "@peated/web/components/feedback.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
+import {
+  RowMenu,
+  type RowMenuItem,
+} from "@peated/web/components/rowMenu.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";

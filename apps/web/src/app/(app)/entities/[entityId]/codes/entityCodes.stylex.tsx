@@ -1,8 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { Card, EntityIdentityRow, TextLink } from "@peated/web/components";
+import { Card } from "@peated/web/components/card.stylex";
 import { CatalogTable } from "@peated/web/components/catalogTable.stylex";
+import { EntityIdentityRow } from "@peated/web/components/entityIdentityRow.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
 

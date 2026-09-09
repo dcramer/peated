@@ -2,10 +2,10 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
 import {
-  HistoryTimeline,
   LoadingList,
   SectionError,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { HistoryTimeline } from "@peated/web/components/historyTimeline.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 
 import { getEntityHistoryEvents } from "./entityHistoryData";

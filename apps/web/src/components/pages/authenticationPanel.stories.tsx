@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { Button, ButtonLink, Checkbox, Field, TextInput } from "..";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { Checkbox } from "@peated/web/components/checkbox.stylex";
+import { Field, TextInput } from "@peated/web/components/field.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   AuthenticationActions,

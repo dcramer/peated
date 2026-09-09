@@ -7,8 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { ButtonLink, SectionError } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import { SectionError } from "@peated/web/components/feedback.stylex";
 import {
   HomeActivityFeed,
   HomeActivityFeedLoading,

@@ -4,8 +4,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-import { RowMenu } from "@peated/web/components";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 

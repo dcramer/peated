@@ -1,6 +1,6 @@
 import type { EntityKind } from "@peated/server/types";
 
-import { TextLink } from "@peated/web/components";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import Join from "./join";

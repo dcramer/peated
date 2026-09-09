@@ -1,4 +1,5 @@
-import { ButtonLink, ExpandableDescription } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { ExpandableDescription } from "@peated/web/components/expandableDescription.stylex";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { getCountryPage } from "@peated/web/lib/locationPage.server";
 import type { ReactNode } from "react";

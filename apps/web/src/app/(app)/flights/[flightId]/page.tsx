@@ -1,10 +1,7 @@
-import {
-  BottleIdentityRow,
-  ButtonLink,
-  EmptyState,
-  ItemList,
-  ItemListItem,
-} from "@peated/web/components";
+import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
 import {
   PageHeader,
   PageSection,

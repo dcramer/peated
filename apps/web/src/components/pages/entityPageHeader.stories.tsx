@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { Button, RowMenu } from "..";
+import { Button } from "@peated/web/components/button.stylex";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import { EntityPageHeader } from "./entityPageHeader.stylex";
 
 const meta = {

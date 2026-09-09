@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { TextLink } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
@@ -13,6 +12,7 @@ import {
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminAlert as Alert } from "@peated/web/components/admin/adminUtility.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {

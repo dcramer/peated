@@ -5,16 +5,16 @@ import type { TagCategory } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import { FactList } from "@peated/web/components/factList.stylex";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
+import { MemberAvatar } from "@peated/web/components/memberAvatar";
 import {
-  FactList,
-  LoadingPlaceholder,
-  MemberAvatar,
   ReviewScore,
   TastingRating,
-  TextLink,
-  Timestamp,
   type RatingBand,
-} from "@peated/web/components";
+} from "@peated/web/components/scoring.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 import { TastingNoteTag } from "@peated/web/features/tastingWheel/tastingNoteTag.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";

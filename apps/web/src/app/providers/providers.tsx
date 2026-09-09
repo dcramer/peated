@@ -11,7 +11,6 @@ import {
 } from "@peated/web/lib/auth.actions";
 import ORPCProvider from "@peated/web/lib/orpc/provider";
 import { type SessionData } from "@peated/web/lib/session.server";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import { setUser } from "@sentry/nextjs";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { useRouter } from "next/navigation";
@@ -90,20 +89,18 @@ export default function Providers({
   );
 
   return (
-    <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-      <ORPCProvider
-        apiServer={config.API_SERVER}
-        accessToken={session.accessToken}
-        onUnauthorized={handleUnauthorized}
-      >
-        <ReactQueryStreamedHydration>
-          <OnlineStatusProvider>
-            <AuthProvider user={session.user}>
-              <FlashMessages>{children}</FlashMessages>
-            </AuthProvider>
-          </OnlineStatusProvider>
-        </ReactQueryStreamedHydration>
-      </ORPCProvider>
-    </GoogleOAuthProvider>
+    <ORPCProvider
+      apiServer={config.API_SERVER}
+      accessToken={session.accessToken}
+      onUnauthorized={handleUnauthorized}
+    >
+      <ReactQueryStreamedHydration>
+        <OnlineStatusProvider>
+          <AuthProvider user={session.user}>
+            <FlashMessages>{children}</FlashMessages>
+          </AuthProvider>
+        </OnlineStatusProvider>
+      </ReactQueryStreamedHydration>
+    </ORPCProvider>
   );
 }

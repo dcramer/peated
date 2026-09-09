@@ -4,7 +4,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
-import { ImageAttribution, ImageViewer } from "@peated/web/components";
+import { ImageAttribution } from "@peated/web/components/imageAttribution.stylex";
+import { ImageViewer } from "@peated/web/components/imageViewer.stylex";
 import {
   colors,
   controlMetrics,

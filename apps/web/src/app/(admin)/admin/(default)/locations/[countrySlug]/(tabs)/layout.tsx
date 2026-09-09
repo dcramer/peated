@@ -2,7 +2,6 @@
 
 import { use, type ReactNode } from "react";
 
-import { PageTabs } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
 import {
   AdminActions,
@@ -10,6 +9,7 @@ import {
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 

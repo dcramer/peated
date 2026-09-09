@@ -1,4 +1,4 @@
-import { RailList, RailListItem } from "@peated/web/components";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import {
   PageSection,
   RailSection,

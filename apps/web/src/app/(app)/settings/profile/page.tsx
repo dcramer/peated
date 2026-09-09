@@ -1,18 +1,20 @@
 "use client";
 
 import { UserInputSchema } from "@peated/server/schemas";
+import { Button } from "@peated/web/components/button.stylex";
 import {
-  Button,
   Field,
   FieldGroup,
+  TextInput,
+} from "@peated/web/components/field.stylex";
+import { Switch } from "@peated/web/components/formControls.stylex";
+import {
   FormActions,
   FormNotice,
   FormSection,
   FormStack,
-  PictureInput,
-  Switch,
-  TextInput,
-} from "@peated/web/components";
+} from "@peated/web/components/formLayout.stylex";
+import { PictureInput } from "@peated/web/components/tastingInputs.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
   acceptTosForm,

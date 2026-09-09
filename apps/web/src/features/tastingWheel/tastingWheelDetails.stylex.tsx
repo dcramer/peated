@@ -1,8 +1,10 @@
 "use client";
 
 import type { TagCategory } from "@peated/server/types";
-import { BottleList, Button, Slideout } from "@peated/web/components";
+import { BottleList } from "@peated/web/components/bottleList.stylex";
+import { Button } from "@peated/web/components/button.stylex";
 import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
+import { Slideout } from "@peated/web/components/slideout.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import * as stylex from "@stylexjs/stylex";
