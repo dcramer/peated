@@ -127,6 +127,7 @@ export const EntitySerializer = serializer({
       name: item.name,
       shortName: item.shortName,
       kind: item.kind,
+      status: item.status,
       ownerId: item.ownerId,
       owner: attrs.owner,
       description: item.description,

@@ -136,8 +136,10 @@ Review Series as catalog records, not only as a field on a Bottle:
 
 When the requested scope is an Entity such as a Brand, distillery, or bottler,
 also review the target Entity's catalog record. Fill supported names, kind,
-owner, description and source, establishment year, official website, country,
-region, address, and location. Review its aliases and exact references. Follow
+status, owner, description and source, establishment year, official website,
+and origin country, region, address, and location. For a Distillery, location is
+the production site. Do not use a later headquarters or office. Review aliases
+and exact references. Follow
 [Entity Images](./entity-images.md) for reusable images and attribution. Do not
 expand the operation to unrelated owners, companies, or places merely because
 the target links to them.

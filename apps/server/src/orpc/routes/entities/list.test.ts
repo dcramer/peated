@@ -85,6 +85,34 @@ describe("GET /entities", () => {
     expect(results.map(({ id }) => id)).toEqual([brand.id, bottler.id]);
   });
 
+  test("filters Entities by status", async ({ fixtures }) => {
+    const activeBrand = await fixtures.Entity({
+      name: "Active Brand",
+      kind: "brand",
+      status: "active",
+    });
+    const activeDistillery = await fixtures.Entity({
+      name: "Active Distillery",
+      kind: "distillery",
+      status: "active",
+    });
+    await fixtures.Entity({
+      name: "Closed Distillery",
+      kind: "distillery",
+      status: "closed",
+    });
+
+    const { results } = await routerClient.entities.list({
+      status: "active",
+      sort: "name",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([
+      activeBrand.id,
+      activeDistillery.id,
+    ]);
+  });
+
   test("includes the current user's follow state", async ({
     defaults,
     fixtures,

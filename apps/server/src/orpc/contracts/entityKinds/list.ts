@@ -1,4 +1,8 @@
-import { EntitySchema, listResponse } from "@peated/server/schemas";
+import {
+  EntitySchema,
+  EntityStatusEnum,
+  listResponse,
+} from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
 
@@ -36,15 +40,18 @@ export const EntityKindListInputSchema = z
       .positive()
       .nullish()
       .describe("Filter by the current owner Entity ID"),
+    status: EntityStatusEnum.nullish().describe(
+      "Only return Entities with this status",
+    ),
     country: z.coerce
       .string()
       .nullish()
-      .describe("Filter by country slug or numeric ID"),
+      .describe("Filter by origin country slug or numeric ID"),
     region: z.coerce
       .string()
       .nullish()
       .describe(
-        "Filter by region slug or numeric ID. A slug requires `country`.",
+        "Filter by origin region slug or numeric ID. A slug requires `country`.",
       ),
     filter: z.enum(["all", "following"]).default("all"),
     sort: z

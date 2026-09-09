@@ -1,7 +1,12 @@
 "use client";
 
+import { ENTITY_STATUS_BY_KIND } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
+import {
+  EntityInputSchema,
+  EntityKindEnum,
+  isEntityStatusAllowed,
+} from "@peated/server/schemas";
 import type { Entity } from "@peated/server/types";
 import { Button } from "@peated/web/components/button.stylex";
 import {
@@ -89,6 +94,8 @@ export default function EntityForm({
     resolver: zodResolver(EntityInputSchema),
   });
   const country = watch("country");
+  const kind = watch("kind");
+  const kindInput = register("kind");
   const { data: countries } = useSuspenseQuery(
     orpc.countries.list.queryOptions({ input: { limit: 100, sort: "name" } }),
   );
@@ -183,9 +190,19 @@ export default function EntityForm({
               required
             >
               <Select
-                {...register("kind")}
+                {...kindInput}
                 id="entity-kind"
                 invalid={Boolean(errors.kind)}
+                onChange={(event) => {
+                  void kindInput.onChange(event);
+                  const nextKind = EntityKindEnum.parse(
+                    event.currentTarget.value,
+                  );
+                  const currentStatus = getValues("status");
+                  if (!isEntityStatusAllowed(nextKind, currentStatus)) {
+                    setValue("status", null);
+                  }
+                }}
               >
                 {EntityKindEnum.options.map((kind) => (
                   <option key={kind} value={kind}>
@@ -194,10 +211,36 @@ export default function EntityForm({
                 ))}
               </Select>
             </Field>
+            <Field
+              error={errors.status?.message}
+              htmlFor="entity-status"
+              label="Status"
+              optional
+            >
+              <Select
+                {...register("status", {
+                  setValueAs: (value) => value || null,
+                })}
+                id="entity-status"
+                invalid={Boolean(errors.status)}
+              >
+                <option value="">Not set</option>
+                {ENTITY_STATUS_BY_KIND[kind].map((status) => (
+                  <option key={status} value={status}>
+                    {toTitleCase(status)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
           </FormSection>
 
-          <FormSection title="Location">
-            <Field htmlFor="entity-country" label="Country" optional>
+          <FormSection title="Origin">
+            <Field
+              hint="Where this brand or producer comes from, not a later headquarters or office."
+              htmlFor="entity-country"
+              label="Country"
+              optional
+            >
               <Select
                 id="entity-country"
                 onChange={(event) => {

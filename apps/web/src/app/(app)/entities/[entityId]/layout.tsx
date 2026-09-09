@@ -50,12 +50,16 @@ export default async function EntityLayout(props: {
     name: entity.name,
     image: entity.images?.[0]?.imageUrl,
     description: entity.description ?? undefined,
-    address: entity.country
+    // This is an origin or production site, not a headquarters.
+    location: entity.country
       ? [
           {
-            "@type": "PostalAddress",
-            streetAddress: entity.address ?? undefined,
-            addressCountry: entity.country.name,
+            "@type": "Place",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: entity.address ?? undefined,
+              addressCountry: entity.country.name,
+            },
           },
         ]
       : [],

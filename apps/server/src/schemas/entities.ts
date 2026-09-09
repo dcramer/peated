@@ -1,7 +1,8 @@
+import { ENTITY_STATUS_BY_KIND } from "@peated/server/constants";
 import { isCanonicalPeatedId } from "@peated/server/lib/peatedId";
 import { z } from "zod";
 
-import { ContentSourceEnum, EntityKindEnum } from "./common";
+import { ContentSourceEnum, EntityKindEnum, EntityStatusEnum } from "./common";
 import { CountrySchema } from "./countries";
 import { ImageLicenseSchema, ImageSourceUrlSchema } from "./images";
 import { RegionSchema } from "./regions";
@@ -21,6 +22,9 @@ const EntityShortNameSchema = z
 const EntityKindSchema = EntityKindEnum.describe(
   "Best short description of what this entity is",
 );
+const EntityStatusSchema = EntityStatusEnum.nullable()
+  .default(null)
+  .describe("Current status, or null when it is unknown");
 const EntityOwnerIdSchema = z
   .number()
   .nullable()
@@ -62,10 +66,10 @@ const EntityAddressSchema = z
   .trim()
   .nullish()
   .default(null)
-  .describe("Physical address of the entity");
+  .describe("Address where the entity comes from");
 const EntityLocationSchema = PointSchema.nullable()
   .default(null)
-  .describe("Geographic coordinates of the entity");
+  .describe("Geographic coordinates where the entity comes from");
 
 export const EntityImageSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the image"),
@@ -110,6 +114,7 @@ export const EntitySchema = z.object({
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
   kind: EntityKindSchema,
+  status: EntityStatusSchema,
   ownerId: EntityOwnerIdSchema,
   owner: EntityOwnerSchema,
   description: EntityDescriptionSchema,
@@ -118,10 +123,10 @@ export const EntitySchema = z.object({
   website: EntityWebsiteSchema,
   country: CountrySchema.nullable()
     .default(null)
-    .describe("Country where the entity is located"),
+    .describe("Country where the entity comes from"),
   region: RegionSchema.nullable()
     .default(null)
-    .describe("Region where the entity is located"),
+    .describe("Region where the entity comes from"),
   address: EntityAddressSchema,
   location: EntityLocationSchema,
 
@@ -172,6 +177,7 @@ export const EntityInputFields = {
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
   kind: EntityKindSchema,
+  status: EntityStatusSchema,
   ownerId: EntityOwnerIdSchema,
   description: EntityDescriptionSchema,
   descriptionSrc: EntityDescriptionSourceSchema,
@@ -181,17 +187,48 @@ export const EntityInputFields = {
     .number()
     .nullish()
     .default(null)
-    .describe("Country ID where the entity is located"),
+    .describe("Country ID where the entity comes from"),
   region: z
     .number()
     .nullish()
     .default(null)
-    .describe("Region ID where the entity is located"),
+    .describe("Region ID where the entity comes from"),
   address: EntityAddressSchema,
   location: EntityLocationSchema,
 } as const;
 
-export const EntityInputSchema = z.object(EntityInputFields);
+export function isEntityStatusAllowed(
+  kind: z.infer<typeof EntityKindEnum>,
+  status: z.infer<typeof EntityStatusEnum> | null,
+) {
+  return (
+    status === null ||
+    ENTITY_STATUS_BY_KIND[kind].some(
+      (allowedStatus) => allowedStatus === status,
+    )
+  );
+}
+
+export function validateEntityStatus(
+  entity: {
+    kind?: z.infer<typeof EntityKindEnum>;
+    status: z.infer<typeof EntityStatusEnum> | null;
+  },
+  context: z.RefinementCtx,
+) {
+  if (entity.kind && !isEntityStatusAllowed(entity.kind, entity.status)) {
+    context.addIssue({
+      code: "custom",
+      path: ["status"],
+      message: `Status ${entity.status} is not allowed for ${entity.kind}.`,
+    });
+  }
+}
+
+export const EntityInputObjectSchema = z.object(EntityInputFields);
+
+export const EntityInputSchema =
+  EntityInputObjectSchema.superRefine(validateEntityStatus);
 
 export const EntityMergeSchema = z.object({
   // TODO: rename to entity

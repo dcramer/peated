@@ -36,3 +36,13 @@ describe("Entity relations", () => {
     expect(loaded?.region?.id).toBe(region.id);
   });
 });
+
+describe("Entity status", () => {
+  test("rejects a status that does not match the Entity kind", async ({
+    fixtures,
+  }) => {
+    await expect(
+      fixtures.Entity({ kind: "brand", status: "mothballed" }),
+    ).rejects.toMatchObject({ code: "23514" });
+  });
+});

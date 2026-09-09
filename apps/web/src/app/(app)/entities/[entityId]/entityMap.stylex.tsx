@@ -31,7 +31,7 @@ export function EntityMap({ entity }: { entity: Entity }) {
   const coordinateLabel = `${formatCoordinate(latitude, "N", "S")} ${formatCoordinate(longitude, "E", "W")}`;
 
   return (
-    <PageSection heading="Where">
+    <PageSection heading="Origin">
       <Card appearance="plain" padding="sm">
         {entity.address ? (
           <p {...stylex.props(foundationStyles.metadata, styles.address)}>

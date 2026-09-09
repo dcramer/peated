@@ -65,7 +65,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Use this component for every brand or producer row. Identity contains its name, known kind and location, and following status. Use getEntityIdentityProps for API reads. Keep IDs and descriptions on detail screens; counts and actions belong in end or separate table cells. Standard rows use 18px titles; search and sidebar use 15px titles. Names and metadata wrap. Use layout=cell inside a table or selection control. Row Layouts compares the real catalog, sidebar, search, and picker components.",
+          "Use this component for every brand or producer row. Identity contains its name, known kind and origin, and following status. Use getEntityIdentityProps for API reads. Keep IDs and descriptions on detail screens; counts and actions belong in end or separate table cells. Standard rows use 18px titles; search and sidebar use 15px titles. Names and metadata wrap. Use layout=cell inside a table or selection control. Row Layouts compares the real catalog, sidebar, search, and picker components.",
       },
     },
   },

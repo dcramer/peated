@@ -61,6 +61,10 @@ export async function listEntities({
     where.push(eq(entities.ownerId, input.owner));
   }
 
+  if (input.status) {
+    where.push(eq(entities.status, input.status));
+  }
+
   if (query) {
     where.push(
       or(

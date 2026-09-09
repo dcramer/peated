@@ -18,6 +18,7 @@ type Entity = MockOutputs["entities"]["list"]["results"][number];
 // producer's address, location, founding year, or ownership (see README.md).
 const entityDefaults = {
   shortName: null,
+  status: null,
   ownerId: null,
   owner: null,
   description: null,

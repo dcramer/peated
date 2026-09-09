@@ -50,6 +50,39 @@ describe("POST /entities", () => {
     );
   });
 
+  test("creates an entity with a status", async ({ defaults }) => {
+    const data = await routerClient.entities.create(
+      {
+        name: "Closed Distillery",
+        kind: "distillery",
+        status: "closed",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.status).toBe("closed");
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, data.id) }),
+    ).resolves.toMatchObject({ status: "closed" });
+  });
+
+  test("rejects a status that does not match the Entity kind", async ({
+    defaults,
+  }) => {
+    const error = await waitError(
+      routerClient.entities.create(
+        {
+          name: "Invalid Brand",
+          kind: "brand",
+          status: "mothballed",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({ status: 400 });
+  });
+
   test("creates an entity with a current owner", async ({
     fixtures,
     defaults,

@@ -1,3 +1,4 @@
+import { toTitleCase } from "@peated/server/lib/strings";
 import {
   FactList,
   hasVisibleFacts,
@@ -28,7 +29,11 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
   ) : null;
 
   return [
-    { label: "Region", value: location },
+    { label: "Origin", value: location },
+    {
+      label: "Status",
+      value: entity.status ? toTitleCase(entity.status) : null,
+    },
     { label: "Established", value: entity.yearEstablished },
     {
       label: "Part of",

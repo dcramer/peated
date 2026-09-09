@@ -22,6 +22,7 @@ function buildBottleEntityInput(
       // Classifier evidence is stronger than the Bottle relationship default.
       // The default keeps older and non-classifier Bottle drafts usable.
       kind: choice.kind ?? defaultKind,
+      status: null,
       ownerId: null,
       description: null,
       shortName: null,

@@ -38,6 +38,15 @@ Classifier terms are governed by the
 Collection membership describes a user's physical unit, status, and image. It
 does not create another catalog identity layer.
 
+An Entity's optional `status` records its current state. `active` applies to
+every Entity kind, `mothballed` only to a Distillery, `closed` to a Distillery,
+Bottler, or Company, and `discontinued` only to a Brand. A missing status is
+unknown. Dated Entity events remain separate history facts.
+
+Entity country, region, address, and coordinates record where the Entity comes
+from. For a Distillery, they record the production site. Do not replace them
+with a later headquarters or office.
+
 ## Core Invariants
 
 - Every marketed release is a Bottle, including a dated, batched, annual,

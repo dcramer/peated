@@ -9,7 +9,12 @@ import {
   EntityKindEnum,
   FlavorProfileEnum,
 } from "./common";
-import { EntityInputSchema, EntitySchema } from "./entities";
+import {
+  EntityInputFields,
+  EntityInputSchema,
+  EntitySchema,
+  validateEntityStatus,
+} from "./entities";
 import { ImageLicenseSchema, ImageSourceUrlSchema } from "./images";
 
 const BottleNameSchema = z
@@ -367,10 +372,13 @@ export const BottleRecommendationsSchema = z.object({
     ),
 });
 
-export const EntityChoiceInputSchema = EntityInputSchema.extend({
-  kind: EntityKindEnum.optional(),
-  id: z.number().nullish().describe("Optional ID for the entity"),
-});
+export const EntityChoiceInputSchema = z
+  .object({
+    ...EntityInputFields,
+    kind: EntityKindEnum.optional(),
+    id: z.number().nullish().describe("Optional ID for the entity"),
+  })
+  .superRefine(validateEntityStatus);
 export const EntityChoiceSchema = z.union([
   EntityChoiceInputSchema,
   z.number(),

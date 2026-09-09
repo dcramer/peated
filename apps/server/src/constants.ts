@@ -186,6 +186,23 @@ export const ENTITY_KIND_LIST = [
   "company",
 ] as const;
 
+export const ENTITY_STATUS_LIST = [
+  "active",
+  "mothballed",
+  "closed",
+  "discontinued",
+] as const;
+
+export const ENTITY_STATUS_BY_KIND = {
+  brand: ["active", "discontinued"],
+  distillery: ["active", "mothballed", "closed"],
+  bottler: ["active", "closed"],
+  company: ["active", "closed"],
+} as const satisfies Record<
+  (typeof ENTITY_KIND_LIST)[number],
+  readonly (typeof ENTITY_STATUS_LIST)[number][]
+>;
+
 export const ENTITY_EVENT_KIND_LIST = [
   "generic",
   "opened",

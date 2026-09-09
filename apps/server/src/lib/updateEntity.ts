@@ -36,7 +36,10 @@ import {
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
-import { EntityInputFields } from "@peated/server/schemas/entities";
+import {
+  EntityInputFields,
+  isEntityStatusAllowed,
+} from "@peated/server/schemas/entities";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { asc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -45,6 +48,7 @@ export const EntityUpdateInputSchema = z.object({
   name: EntityInputFields.name.optional(),
   shortName: EntityInputFields.shortName.removeDefault().optional(),
   kind: EntityInputFields.kind.optional(),
+  status: EntityInputFields.status.removeDefault().optional(),
   ownerId: EntityInputFields.ownerId.removeDefault().optional(),
   description: EntityInputFields.description.removeDefault().optional(),
   descriptionSrc: EntityInputFields.descriptionSrc.optional(),
@@ -69,6 +73,13 @@ export class EntityUpdateNotFoundError extends Error {
   constructor(readonly resource: "Entity" | "Country" | "Region" | "Owner") {
     super(`${resource} not found.`);
     this.name = "EntityUpdateNotFoundError";
+  }
+}
+
+export class EntityUpdateInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "EntityUpdateInputError";
   }
 }
 
@@ -99,6 +110,7 @@ type EntityUpdateData = Partial<
     | "name"
     | "shortName"
     | "kind"
+    | "status"
     | "ownerId"
     | "description"
     | "descriptionSrc"
@@ -128,6 +140,7 @@ export type EntityUpdateExpectedState = {
     name?: string;
     shortName?: string | null;
     kind?: Entity["kind"];
+    status?: Entity["status"];
     ownerId?: Entity["ownerId"];
     website?: string | null;
     countryId?: number | null;
@@ -172,6 +185,7 @@ export async function updateEntityInTransaction(
       name: entity.name,
       shortName: entity.shortName,
       kind: entity.kind,
+      status: entity.status,
       ownerId: entity.ownerId,
       website: entity.website,
       countryId: entity.countryId,
@@ -193,6 +207,14 @@ export async function updateEntityInTransaction(
   }
 
   const data: EntityUpdateData = {};
+
+  const nextKind = input.kind ?? entity.kind;
+  const nextStatus = input.status !== undefined ? input.status : entity.status;
+  if (!isEntityStatusAllowed(nextKind, nextStatus)) {
+    throw new EntityUpdateInputError(
+      `Status ${nextStatus} is not allowed for ${nextKind}.`,
+    );
+  }
 
   if (input.name && input.name !== entity.name) {
     data.name = normalizeEntityName(input.name);
@@ -270,6 +292,9 @@ export async function updateEntityInTransaction(
 
   if (input.kind !== undefined && input.kind !== entity.kind) {
     data.kind = input.kind;
+  }
+  if (input.status !== undefined && input.status !== entity.status) {
+    data.status = input.status;
   }
   if (input.ownerId !== undefined && input.ownerId !== entity.ownerId) {
     try {
