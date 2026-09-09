@@ -1,0 +1,1 @@
+CREATE INDEX "change_feed_page_idx" ON "change" USING btree ("id","object_type","actor_id") WHERE "change"."object_type" IN ('bottle', 'entity');

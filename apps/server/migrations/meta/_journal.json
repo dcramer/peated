@@ -2017,6 +2017,13 @@
       "when": 1788963885225,
       "tag": "0287_burly_power_man",
       "breakpoints": false
+    },
+    {
+      "idx": 288,
+      "version": "7",
+      "when": 1788964569154,
+      "tag": "0288_smooth_the_enforcers",
+      "breakpoints": false
     }
   ]
 }
