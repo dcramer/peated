@@ -14,13 +14,14 @@ import {
   ScrapePriceRulesSchema,
   ScrapeReviewRulesSchema,
   type ScrapeRules,
+  type StoredScrapeRules,
 } from "./rules";
 import {
   ScrapeSourceSetupError,
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v22";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v23";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_PAGES_TO_CHECK = 3;
 const MAX_RULE_CHECKS = 3;
@@ -121,6 +122,7 @@ const RULE_INSTRUCTIONS = [
   "Set reviewer when the page shows an author or byline, including when it appears once for the whole article. Code shares one article-level reviewer across its reviews.",
   "Set tastingNotes only when a narrower selector reliably finds flavor notes. The full review body comes from the review area or item.",
   "Use an optional field only when every given page clearly provides it.",
+  "When previousSetup is given, preserve the kinds of items its working rules included and excluded. Use its rules and matchedPageUrls as evidence, but submit only fields allowed by check_rules.",
   "For catalog sources, collect only the displayed name, product URL, stable product ID, image URL, volume, ABV, age, edition, and release year.",
   "Catalog sources do not require a review, price, currency, or volume. Do not select descriptions or tasting notes.",
   "A nextPage selector must lead to a page with new links.",
@@ -244,6 +246,12 @@ type ScrapeSourceSetupAgentInput<T> = {
   scrapeSourceId: number;
   listPages: WebsitePage[];
   detailPages: WebsitePage[];
+  previousSetup?: {
+    listPageUrl: string;
+    rulesVersion: number;
+    rules: StoredScrapeRules;
+    matchedPageUrls: string[];
+  };
   request: (
     request: SetupAgentModelRequest,
   ) => Promise<SetupAgentModelResponse>;
@@ -347,6 +355,7 @@ export async function runScrapeSourceSetupAgent<T>(
     kind: input.kind,
     startPages: pages.slice(0, input.listPages.length),
     examplePages: pages.slice(input.listPages.length),
+    previousSetup: input.previousSetup,
   });
   return await runAgent({
     details: {

@@ -1,10 +1,10 @@
 import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { scrapeSources } from "@peated/server/db/schema";
+import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
 import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
 import type { Currency } from "@peated/server/types";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type {
   ResponseCreateParamsNonStreaming,
   ResponseInput,
@@ -242,7 +242,7 @@ export async function checkDetailPages(input: {
     input.suppliedPages.map((page) => [new URL(page.url).toString(), page]),
   );
   const pages: CheckedDetailPage[] = [];
-  for (const link of input.listPage.links.slice(0, MAX_PAGES_TO_CHECK)) {
+  for (const link of sampleDetailLinks(input.listPage.links)) {
     const page =
       suppliedPages.get(link) ?? (await input.loadPage(new URL(link)));
     pages.push(parseDetailPage(input.rules, page));
@@ -261,13 +261,34 @@ export async function checkDetailPages(input: {
   return pages;
 }
 
+export function sampleDetailLinks(links: string[]) {
+  if (links.length <= MAX_PAGES_TO_CHECK) return links;
+  return Array.from({ length: MAX_PAGES_TO_CHECK }, (_, index) => {
+    const linkIndex = Math.round(
+      (index * (links.length - 1)) / (MAX_PAGES_TO_CHECK - 1),
+    );
+    return links[linkIndex]!;
+  });
+}
+
 async function loadAiSource(scrapeSourceId: number) {
   // Confirm the source still exists immediately before each AI request.
   const [source] = await db
     .select({
       kind: scrapeSources.kind,
+      previousListPageUrl: scrapeSourceRevisions.listUrl,
+      previousRulesVersion: scrapeSourceRevisions.rulesVersion,
+      previousRules: scrapeSourceRevisions.rules,
+      previousPreviewResult: scrapeSourceRevisions.previewResult,
     })
     .from(scrapeSources)
+    .leftJoin(
+      scrapeSourceRevisions,
+      and(
+        eq(scrapeSourceRevisions.scrapeSourceId, scrapeSources.id),
+        eq(scrapeSourceRevisions.active, true),
+      ),
+    )
     .where(eq(scrapeSources.id, scrapeSourceId));
   if (!source) throw new Error("Scrape source not found.");
   return source;
@@ -322,6 +343,18 @@ export async function suggestScrapeSourceRevision(input: {
     scrapeSourceId: input.scrapeSourceId,
     listPages: input.listPages,
     detailPages: input.detailPages,
+    previousSetup:
+      source.previousListPageUrl &&
+      source.previousRulesVersion &&
+      source.previousRules
+        ? {
+            listPageUrl: source.previousListPageUrl,
+            rulesVersion: source.previousRulesVersion,
+            rules: source.previousRules,
+            matchedPageUrls:
+              source.previousPreviewResult?.pages.map((page) => page.url) ?? [],
+          }
+        : undefined,
     request: async (request) => {
       await loadAiSource(input.scrapeSourceId);
       return await requestAi({
