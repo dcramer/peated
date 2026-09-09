@@ -229,7 +229,6 @@ export {
   RATING_BANDS,
   ReviewScore,
   TastingRating,
-  TastingRatingDistribution,
 } from "./scoring.stylex";
 export type {
   BottleRatingSummaryProps,
@@ -237,8 +236,6 @@ export type {
   RatingBand,
   RatingCounts,
   ReviewScoreProps,
-  TastingRatingCounts,
-  TastingRatingDistributionProps,
   TastingRatingProps,
 } from "./scoring.stylex";
 export { SearchBox } from "./searchBox.stylex";

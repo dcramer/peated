@@ -6,6 +6,10 @@ import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import {
+  DistributionList,
+  type DistributionListItem,
+} from "@peated/web/components/distributionList.stylex";
 import { EntityIdentityRow } from "@peated/web/components/entityIdentityRow.stylex";
 import {
   FactList,
@@ -18,10 +22,7 @@ import {
 import { ItemListItem } from "@peated/web/components/itemList.stylex";
 import { RailList } from "@peated/web/components/lists.stylex";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
-import {
-  TastingRatingDistribution,
-  type TastingRatingCounts,
-} from "@peated/web/components/scoring.stylex";
+import { RATING_BANDS } from "@peated/web/components/scoring.stylex";
 import { Timestamp } from "@peated/web/components/timestamp";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -54,7 +55,7 @@ export function ProfileOverviewPageClient({
   const orpc = useORPC();
   const { isCurrentUser, user } = useProfile();
   const statsQuery = useQuery(profileQueries.tastingStats(orpc, user.id));
-  const bands = getBands(statsQuery.data);
+  const ratings = getRatingBreakdown(statsQuery.data);
   const producerGroups = getProducerGroups(statsQuery.data?.producers);
   const facts: readonly [FactListItem, ...FactListItem[]] = user.createdAt
     ? [
@@ -110,12 +111,8 @@ export function ProfileOverviewPageClient({
           <RailSection heading="Passport">
             <ProfilePassport awards={initialBadgeAwards} />
           </RailSection>
-          {statsQuery.isPending || bands ? (
-            <RatingSummary
-              bands={bands}
-              label={isCurrentUser ? "Your ratings" : "Their ratings"}
-              loading={statsQuery.isPending}
-            />
+          {statsQuery.isPending || ratings ? (
+            <RatingSummary items={ratings} />
           ) : null}
         </>
       }
@@ -146,19 +143,11 @@ function ProducerSections({ groups }: { groups: readonly ProducerGroup[] }) {
   );
 }
 
-function RatingSummary({
-  bands,
-  label,
-  loading,
-}: {
-  bands?: TastingRatingCounts;
-  label: string;
-  loading: boolean;
-}) {
+function RatingSummary({ items }: { items?: readonly DistributionListItem[] }) {
   return (
-    <RailSection heading={label}>
-      {bands ? (
-        <TastingRatingDistribution counts={bands} showCounts />
+    <RailSection heading="Reviews">
+      {items ? (
+        <DistributionList items={items} />
       ) : (
         <div
           aria-busy="true"
@@ -175,15 +164,14 @@ function RatingSummary({
   );
 }
 
-function getBands(stats?: TastingStats): TastingRatingCounts | undefined {
+function getRatingBreakdown(
+  stats?: TastingStats,
+): readonly DistributionListItem[] | undefined {
   if (!stats?.bands.total) return undefined;
-  return {
-    good: stats.bands.good,
-    mediocre: stats.bands.mediocre,
-    outstanding: stats.bands.outstanding,
-    unicorn: stats.bands.unicorn,
-    very_good: stats.bands.very_good,
-  };
+  return RATING_BANDS.map((band) => ({
+    count: stats.bands[band.key],
+    label: `${band.label} · ${band.range}`,
+  }));
 }
 
 function getProducerGroups(
