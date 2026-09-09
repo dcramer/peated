@@ -1982,6 +1982,13 @@
       "when": 1788912069822,
       "tag": "0282_tranquil_warlock",
       "breakpoints": false
+    },
+    {
+      "idx": 283,
+      "version": "7",
+      "when": 1788922307061,
+      "tag": "0283_kind_silver_fox",
+      "breakpoints": false
     }
   ]
 }

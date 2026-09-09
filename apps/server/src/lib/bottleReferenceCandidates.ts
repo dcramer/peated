@@ -16,6 +16,7 @@ import {
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
+  BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS,
   bottleReferences,
   bottleSeries,
   bottleTombstones,
@@ -903,7 +904,13 @@ async function getVectorCandidates(
     workload === "scraper"
       ? await createEmbedding(queryText, { workload })
       : await createEmbedding(queryText);
-  const vector = sql.raw(`'[${embedding.join(",")}]'::vector`);
+  const halfVectorType = sql.raw(
+    `halfvec(${BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS})`,
+  );
+  const vector = sql.raw(
+    `'[${embedding.join(",")}]'::halfvec(${BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS})`,
+  );
+  const distance = sql`(${bottleReferences.embedding}::${halfVectorType}) <=> ${vector}`;
 
   const rows = await runQuery(sql`
     SELECT
@@ -923,7 +930,7 @@ async function getVectorCandidates(
       ${bottles.maturation} AS "maturation",
       ${bottles.caskNumber} AS "caskNumber",
       ${bottles.outturn} AS "outturn",
-      1 - (${bottleReferences.embedding} <=> ${vector}) AS score
+      1 - (${distance}) AS score
     FROM ${bottleReferences}
     INNER JOIN ${bottles}
       ON ${bottles.id} = ${bottleReferences.bottleId}
@@ -934,7 +941,7 @@ async function getVectorCandidates(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}
       )
-    ORDER BY ${bottleReferences.embedding} <=> ${vector}
+    ORDER BY ${distance}
     LIMIT ${VECTOR_CANDIDATE_LIMIT}
   `);
 

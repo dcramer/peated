@@ -1,0 +1,1 @@
+CREATE INDEX "bottle_reference_embedding_hnsw_idx" ON "bottle_reference" USING hnsw (("embedding"::halfvec(3072)) halfvec_cosine_ops) WHERE "bottle_reference"."embedding" IS NOT NULL AND "bottle_reference"."ignored" IS DISTINCT FROM TRUE;
