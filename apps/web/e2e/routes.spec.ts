@@ -161,7 +161,7 @@ test(
       .getByRole("combobox", { name: "Sort bottles" })
       .selectOption({ label: "Bottle name" });
     await expect(page).toHaveURL("/bottles?category=single_malt&sort=name");
-    await dialog.getByRole("button", { name: "Done" }).click();
+    await dialog.getByRole("button", { name: "View results" }).click();
 
     const activeTrigger = page.getByRole("button", {
       name: "Search, filters, and sort, 1 active filter",
