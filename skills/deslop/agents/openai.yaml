@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deslop"
+  short_description: "Remove jargon and needless complexity"
+  default_prompt: "Use $deslop to simplify this area while preserving its behavior and safeguards."
