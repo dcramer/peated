@@ -1,6 +1,7 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
+import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
@@ -13,11 +14,14 @@ import {
 import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { toEntityCatalogItem } from "@peated/web/lib/entityCatalogItem";
 import { filterFollowingEntities } from "@peated/web/lib/entityFollowing";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { foundationStyles } from "../../../styles/foundations.stylex";
+import { colors, space } from "../../../styles/tokens.stylex";
 
 import { getFollowingPageState } from "./followingPageData";
 
@@ -117,14 +121,24 @@ export function FollowingPageClient({
         </FilterPanel>
       }
       navigation={
-        <PageTabs
-          ariaLabel="Following views"
-          currentHref={state.view === "following" ? followingHref : findHref}
-          items={[
-            { href: followingHref, label: "Following" },
-            { href: findHref, label: "Find more" },
-          ]}
-        />
+        <div {...stylex.props(styles.navigation)}>
+          <PageTabs
+            ariaLabel="Following views"
+            currentHref={state.view === "following" ? followingHref : findHref}
+            items={[
+              { href: followingHref, label: "Following" },
+              { href: findHref, label: "Find more" },
+            ]}
+          />
+          <p {...stylex.props(foundationStyles.body, styles.description)}>
+            Follow distillers, brands, and bottlers you want to keep up with.
+            Peated puts their latest releases in New for you on the home page
+            and groups their bottles in the{" "}
+            <TextLink href="/bottles?filter=following">Following view</TextLink>
+            .
+          </p>
+          {/* TODO(following): Offer an opt-in weekly email for verified new releases from followed producers; exclude older catalog backfills. */}
+        </div>
       }
       title="Following"
     >
@@ -193,3 +207,16 @@ function getViewHref(
   nextParams.delete("cursor");
   return buildSearchHref(pathname, nextParams);
 }
+
+const styles = stylex.create({
+  navigation: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x3,
+  },
+  description: {
+    maxWidth: "680px",
+    color: colors.inkMuted,
+  },
+});

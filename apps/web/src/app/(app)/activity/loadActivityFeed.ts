@@ -63,6 +63,7 @@ export async function loadActivityFeed({
 }) {
   let note: string | undefined;
 
+  // TODO(activity): Include activity about followed distilleries as well as activity from followed people.
   if (following && memberClient) {
     const follows = await memberClient.friends.list({
       filter: "active",
