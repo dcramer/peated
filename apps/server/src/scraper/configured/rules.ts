@@ -1,21 +1,10 @@
 import { CURRENCY_LIST } from "@peated/server/constants";
-import type { JsonValue } from "@peated/server/scraper/types";
 import { z } from "zod";
 import {
   ScrapeTextMatchesSchema,
   ScrapeTextTemplateSchema,
 } from "./textTemplate";
 
-const SCRAPE_RULES_VERSION_1 = 1;
-const SCRAPE_RULES_VERSION_2 = 2;
-const SCRAPE_RULES_VERSION_3 = 3;
-const SCRAPE_RULES_VERSION_4 = 4;
-const SCRAPE_RULES_VERSION_5 = 5;
-const SCRAPE_RULES_VERSION_6 = 6;
-const SCRAPE_RULES_VERSION_7 = 7;
-const SCRAPE_RULES_VERSION_8 = 8;
-const SCRAPE_RULES_VERSION_9 = 9;
-const SCRAPE_RULES_VERSION_10 = 10;
 export const SCRAPE_RULES_VERSION = 11;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price", "catalog"] as const;
@@ -239,17 +228,6 @@ const ScrapeScoreSchema = z
   .strict()
   .superRefine(validateScoreMap);
 
-const ScrapeScoreWithFirstReviewSchema = ScrapeScoreSchema.safeExtend({
-  firstReviewFallback: ScrapeValueSchema.optional(),
-});
-
-export const ScrapeReviewSectionSchema = z
-  .object({
-    start: ScrapeSelectorSchema,
-    endBefore: ScrapeSelectorSchema.optional(),
-  })
-  .strict();
-
 function legacyReviewRulesSchema<T extends z.ZodType, U extends z.ZodType>(
   reviewItemSchema: T,
   scoreSchema: U,
@@ -305,29 +283,8 @@ export const ScrapeRulesV1Schema = z.discriminatedUnion("kind", [
   priceRulesSchema(ScrapeValueSelectorV1Schema, ListRulesV1Schema),
 ]);
 
-export const ScrapeRulesV2Schema = z.discriminatedUnion("kind", [
-  reviewRulesSchema(ScrapeValueSchema, ListRulesSchema),
-  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
-]);
-
 export const ScrapeRulesV3Schema = z.discriminatedUnion("kind", [
   legacyReviewRulesSchema(ScrapeSelectorSchema, ScrapeScoreSchema),
-  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
-]);
-
-export const ScrapeRulesV4Schema = z.discriminatedUnion("kind", [
-  legacyReviewRulesSchema(
-    z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
-    ScrapeScoreSchema,
-  ),
-  priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
-]);
-
-export const ScrapeRulesV5Schema = z.discriminatedUnion("kind", [
-  legacyReviewRulesSchema(
-    z.union([ScrapeSelectorSchema, ScrapeReviewSectionSchema]),
-    ScrapeScoreWithFirstReviewSchema,
-  ),
   priceRulesSchema(ScrapeValueSchema, ListRulesSchema),
 ]);
 
@@ -802,8 +759,14 @@ const ScrapeCatalogRulesV9Schema = z
   })
   .strict();
 
-const ScrapeRulesV9Schema = z.discriminatedUnion("kind", [
+export const ScrapeRulesV9Schema = z.discriminatedUnion("kind", [
   ScrapeReviewRulesV9Schema,
+  ScrapePriceRulesV9Schema,
+  ScrapeCatalogRulesV9Schema,
+]);
+
+export const ScrapeRulesV8Schema = z.discriminatedUnion("kind", [
+  ScrapeReviewRulesV8Schema,
   ScrapePriceRulesV9Schema,
   ScrapeCatalogRulesV9Schema,
 ]);
@@ -955,7 +918,7 @@ const ScrapeCatalogRulesV10Schema = z
   })
   .strict();
 
-const ScrapeRulesV10Schema = z.discriminatedUnion("kind", [
+export const ScrapeRulesV10Schema = z.discriminatedUnion("kind", [
   ScrapeReviewRulesV10Schema,
   ScrapePriceRulesV10Schema,
   ScrapeCatalogRulesV10Schema,
@@ -964,31 +927,25 @@ const ScrapeRulesV10Schema = z.discriminatedUnion("kind", [
 export const ScrapeReviewRulesSchema = ScrapeReviewRulesV11Schema;
 export const ScrapePriceRulesSchema = ScrapePriceRulesV10Schema;
 export const ScrapeCatalogRulesSchema = ScrapeCatalogRulesV10Schema;
-export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
+export const ScrapeRulesV11Schema = z.discriminatedUnion("kind", [
   ScrapeReviewRulesV11Schema,
   ScrapePriceRulesV10Schema,
   ScrapeCatalogRulesV10Schema,
 ]);
+export const ScrapeRulesSchema = ScrapeRulesV11Schema;
 
 export const StoredScrapeRulesSchema = z.union([
   ScrapeRulesV1Schema,
-  ScrapeRulesV2Schema,
   ScrapeRulesV3Schema,
-  ScrapeRulesV4Schema,
-  ScrapeRulesV5Schema,
   ScrapeRulesV6Schema,
   ScrapeRulesV7Schema,
-  z.discriminatedUnion("kind", [
-    ScrapeReviewRulesV8Schema,
-    ScrapePriceRulesV9Schema,
-    ScrapeCatalogRulesV9Schema,
-  ]),
+  ScrapeRulesV8Schema,
   ScrapeRulesV9Schema,
   ScrapeRulesV10Schema,
-  ScrapeRulesSchema,
+  ScrapeRulesV11Schema,
 ]);
 
-export type ScrapeRulesV5 = z.infer<typeof ScrapeRulesV5Schema>;
+export type ScrapeRulesV3 = z.infer<typeof ScrapeRulesV3Schema>;
 export type ScrapeRules = z.infer<typeof ScrapeRulesSchema>;
 export type StoredScrapeRules = z.infer<typeof StoredScrapeRulesSchema>;
 export type ScrapePageRead = z.infer<typeof ScrapePageReadSchema>;
@@ -1016,95 +973,4 @@ export function normalizeScrapeReviewNameRule(
         selector: ScrapeSelectorSchema.nullable().parse(name),
         match: null,
       };
-}
-
-/** Uses the rule shape that was current when the rules were saved. */
-export function parseScrapeRules(
-  rulesVersion: number,
-  rules: StoredScrapeRules | JsonValue,
-) {
-  if (rulesVersion === SCRAPE_RULES_VERSION_1) {
-    return ScrapeRulesV1Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_2) {
-    return ScrapeRulesV2Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_3) {
-    return ScrapeRulesV3Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_4) {
-    return ScrapeRulesV4Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_5) {
-    return ScrapeRulesV5Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_6) {
-    return ScrapeRulesV6Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_7) {
-    return ScrapeRulesV7Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_8) {
-    return z
-      .discriminatedUnion("kind", [
-        ScrapeReviewRulesV8Schema,
-        ScrapePriceRulesV9Schema,
-        ScrapeCatalogRulesV9Schema,
-      ])
-      .parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_9) {
-    return ScrapeRulesV9Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION_10) {
-    return ScrapeRulesV10Schema.parse(rules);
-  }
-  if (rulesVersion === SCRAPE_RULES_VERSION) {
-    return ScrapeRulesSchema.parse(rules);
-  }
-  throw new Error(`Unsupported scrape rules version: ${rulesVersion}.`);
-}
-
-export function scrapeRulesLimit(rules: StoredScrapeRules) {
-  if ("articles" in rules) return rules.articles.limit;
-  if ("products" in rules) return rules.products.limit;
-  if ("links" in rules.list) return rules.list.limit;
-  return rules.list.maxItems;
-}
-
-export function scrapeRunRequestLimit(rules: StoredScrapeRules) {
-  return scrapeRulesLimit(rules) + SCRAPE_SOURCE_MAX_LIST_PAGES;
-}
-
-export function withScrapeRulesLimit(
-  rules: StoredScrapeRules,
-  requestedLimit: number,
-): StoredScrapeRules {
-  const limit = Math.min(scrapeRulesLimit(rules), requestedLimit);
-  if ("articles" in rules) {
-    // SAFETY: All saved article rules use this number field.
-    return {
-      ...rules,
-      articles: { ...rules.articles, limit },
-    } as StoredScrapeRules;
-  }
-  if ("products" in rules) {
-    // SAFETY: All saved product rules use this number field.
-    return {
-      ...rules,
-      products: { ...rules.products, limit },
-    } as StoredScrapeRules;
-  }
-  if ("links" in rules.list) {
-    // SAFETY: This check identifies the current list shape.
-    return {
-      ...rules,
-      list: { ...rules.list, limit },
-    } as StoredScrapeRules;
-  }
-  // SAFETY: All remaining saved rules use maxItems.
-  return {
-    ...rules,
-    list: { ...rules.list, maxItems: limit },
-  } as StoredScrapeRules;
 }

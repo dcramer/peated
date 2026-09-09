@@ -1,20 +1,22 @@
+import type { JsonValue } from "@peated/server/scraper/types";
 import { expect, test } from "vitest";
+import { loadExecutableScrapeRules } from "./compatibility";
 import {
-  parseScrapeRules,
   SCRAPE_RULES_VERSION,
   SCRAPE_SOURCE_MAX_ITEMS,
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   ScrapeRulesSchema,
   ScrapeRulesV1Schema,
-  ScrapeRulesV2Schema,
   ScrapeRulesV3Schema,
-  ScrapeRulesV4Schema,
-  ScrapeRulesV5Schema,
   ScrapeRulesV6Schema,
   ScrapeRulesV7Schema,
   ScrapeValueSchema,
   type StoredScrapeRules,
 } from "./rules";
+
+function decodeStoredRules(rulesVersion: number, storedJson: JsonValue) {
+  return loadExecutableScrapeRules(rulesVersion, storedJson).storedRules;
+}
 
 function reviewConfig(maxItems: number) {
   return {
@@ -55,8 +57,8 @@ test("bounds list and detail pages", () => {
   });
   if (rules.kind !== "review") throw new Error("Expected review rules.");
   expect(rules.list.limit).toBe(99);
-  expect(parseScrapeRules(11, rules)).toEqual(rules);
-  expect(() => parseScrapeRules(9, rules)).toThrow();
+  expect(decodeStoredRules(11, rules)).toEqual(rules);
+  expect(() => decodeStoredRules(9, rules)).toThrow();
   expect(() =>
     ScrapeRulesSchema.parse({
       ...rules,
@@ -70,17 +72,17 @@ test("bounds list and detail pages", () => {
 });
 
 test("rejects rules for an unsupported stored format", () => {
-  const rules = ScrapeRulesV5Schema.parse(reviewConfig(25));
-  expect(() => parseScrapeRules(12, rules)).toThrow(
+  const rules = ScrapeRulesV3Schema.parse(reviewConfig(25));
+  expect(() => decodeStoredRules(12, rules)).toThrow(
     "Unsupported scrape rules version: 12.",
   );
 });
 
 test("loads old rules only through the version 1 contract", () => {
   const rules = ScrapeRulesV1Schema.parse(reviewConfig(25));
-  expect(parseScrapeRules(1, rules)).toEqual(rules);
+  expect(decodeStoredRules(1, rules)).toEqual(rules);
   expect(() =>
-    parseScrapeRules(1, {
+    decodeStoredRules(1, {
       ...rules,
       list: { ...rules.list, item: ".card" },
     }),
@@ -108,8 +110,8 @@ test("adds review name matches only in version 11", () => {
   });
   if (rules.kind !== "review") throw new Error("Expected review rules.");
 
-  expect(parseScrapeRules(11, rules)).toEqual(rules);
-  expect(() => parseScrapeRules(10, rules)).toThrow();
+  expect(decodeStoredRules(11, rules)).toEqual(rules);
+  expect(() => decodeStoredRules(10, rules)).toThrow();
   expect(() =>
     ScrapeRulesSchema.parse({
       ...rules,
@@ -158,9 +160,9 @@ test("adds catalog rules only in version 7", () => {
     },
   });
 
-  expect(parseScrapeRules(7, rules)).toEqual(rules);
+  expect(decodeStoredRules(7, rules)).toEqual(rules);
   expect(() => ScrapeRulesV6Schema.parse(rules)).toThrow();
-  expect(() => parseScrapeRules(6, rules)).toThrow();
+  expect(() => decodeStoredRules(6, rules)).toThrow();
 });
 
 test("changes text matching only in version 8", () => {
@@ -216,10 +218,10 @@ test("changes text matching only in version 8", () => {
     },
   } as const satisfies StoredScrapeRules;
 
-  expect(parseScrapeRules(9, version8)).toEqual(version8);
-  expect(parseScrapeRules(8, version8)).toEqual(version8);
-  expect(() => parseScrapeRules(10, version8)).toThrow();
-  expect(() => parseScrapeRules(7, version8)).toThrow();
+  expect(decodeStoredRules(9, version8)).toEqual(version8);
+  expect(decodeStoredRules(8, version8)).toEqual(version8);
+  expect(() => decodeStoredRules(10, version8)).toThrow();
+  expect(() => decodeStoredRules(7, version8)).toThrow();
   if (version8.kind !== "price") throw new Error("Expected price rules.");
 
   const version7 = ScrapeRulesV7Schema.parse({
@@ -253,74 +255,15 @@ test("changes text matching only in version 8", () => {
       },
     },
   });
-  expect(parseScrapeRules(7, version7)).toEqual(version7);
-  expect(() => parseScrapeRules(8, version7)).toThrow();
-});
-
-test("loads version 2 rules only through their original contract", () => {
-  const rules = ScrapeRulesV2Schema.parse(reviewConfig(25));
-  expect(parseScrapeRules(2, rules)).toEqual(rules);
-  expect(() =>
-    parseScrapeRules(2, {
-      ...rules,
-      detail: {
-        ...rules.detail,
-        canonicalUrl: {
-          selector: 'link[rel="canonical"]',
-          attribute: "href",
-        },
-      },
-    }),
-  ).toThrow();
-});
-
-test("loads version 4 rules only through their original contract", () => {
-  const rules = ScrapeRulesV4Schema.parse({
-    ...reviewConfig(25),
-    detail: {
-      ...reviewConfig(25).detail,
-      canonicalUrl: {
-        selector: 'link[rel="canonical"]',
-        attribute: "href",
-        removeSuffixes: ["/"],
-      },
-      publishedAt: { urlDateFormat: "/yyyy/MM/*-MMddyy" },
-      score: {
-        value: { selector: ".rating", removePrefixes: ["Rating:"] },
-        scale: 100,
-        map: [
-          { text: "A", value: 95 },
-          { text: "B+", value: 87 },
-        ],
-      },
-    },
-  });
-
-  expect(parseScrapeRules(4, rules)).toEqual(rules);
-  expect(() =>
-    parseScrapeRules(4, {
-      ...rules,
-      detail: {
-        ...rules.detail,
-        score: {
-          value: { selector: ".rating", removePrefixes: ["Rating:"] },
-          scale: 100,
-          map: [
-            { text: "A", value: 95 },
-            { text: "B+", value: 87 },
-          ],
-          firstReviewFallback: { selector: ".article-rating" },
-        },
-      },
-    }),
-  ).toThrow();
+  expect(decodeStoredRules(7, version7)).toEqual(version7);
+  expect(() => decodeStoredRules(8, version7)).toThrow();
 });
 
 test("loads version 3 rules only through their original contract", () => {
   const rules = ScrapeRulesV3Schema.parse(reviewConfig(25));
-  expect(parseScrapeRules(3, rules)).toEqual(rules);
+  expect(decodeStoredRules(3, rules)).toEqual(rules);
   expect(() =>
-    parseScrapeRules(3, {
+    decodeStoredRules(3, {
       ...rules,
       detail: {
         ...rules.detail,
@@ -330,47 +273,6 @@ test("loads version 3 rules only through their original contract", () => {
   ).toThrow();
 });
 
-test("accepts review sections with an end selector", () => {
-  const config = reviewConfig(25);
-  const rules = ScrapeRulesV5Schema.parse({
-    ...config,
-    detail: {
-      ...config.detail,
-      reviewItem: {
-        start: ".entry-content > h2.review",
-        endBefore: ".entry-content > .related-posts",
-      },
-    },
-  });
-
-  expect(parseScrapeRules(5, rules)).toMatchObject({
-    kind: "review",
-    detail: {
-      reviewItem: {
-        start: ".entry-content > h2.review",
-        endBefore: ".entry-content > .related-posts",
-      },
-    },
-  });
-});
-
-test("accepts a separate first-review score", () => {
-  const config = reviewConfig(25);
-  const rules = ScrapeRulesV5Schema.parse({
-    ...config,
-    detail: {
-      ...config.detail,
-      score: {
-        value: { selector: ".review-score" },
-        firstReviewFallback: { selector: ".article-score" },
-        scale: 100,
-      },
-    },
-  });
-
-  expect(parseScrapeRules(5, rules)).toEqual(rules);
-});
-
 test.each([
   ["missing URL year", "/reviews/MM/dd/*"],
   ["missing URL month", "/reviews/yyyy/dd/*"],
@@ -378,7 +280,7 @@ test.each([
   ["unknown URL token", "/reviews/yyyy/MM/DD/*"],
 ])("rejects invalid URL date formats: %s", (_, urlDateFormat) => {
   expect(() =>
-    ScrapeRulesV5Schema.parse({
+    ScrapeRulesV3Schema.parse({
       ...reviewConfig(25),
       detail: {
         ...reviewConfig(25).detail,
@@ -391,7 +293,7 @@ test.each([
 test("rejects duplicate or out-of-range score mappings", () => {
   const config = reviewConfig(25);
   expect(() =>
-    ScrapeRulesV5Schema.parse({
+    ScrapeRulesV3Schema.parse({
       ...config,
       detail: {
         ...config.detail,
@@ -410,7 +312,7 @@ test("rejects duplicate or out-of-range score mappings", () => {
 
 test("accepts bounded list-card exclusion only with an item selector", () => {
   expect(
-    ScrapeRulesV5Schema.parse({
+    ScrapeRulesV3Schema.parse({
       ...reviewConfig(25),
       list: {
         ...reviewConfig(25).list,
@@ -423,7 +325,7 @@ test("accepts bounded list-card exclusion only with an item selector", () => {
     excludeWhen: { selector: ".badge", startsWith: ["Sold out"] },
   });
   expect(() =>
-    ScrapeRulesV5Schema.parse({
+    ScrapeRulesV3Schema.parse({
       ...reviewConfig(25),
       list: {
         ...reviewConfig(25).list,

@@ -123,7 +123,7 @@ async function keepOriginalReview(
 }
 
 /** Keeps original review IDs when new rules change how reviews are matched. */
-// TODO(scraper): Remove this repair after every review source uses version 10
+// TODO(scraper): Remove this repair after every review source uses version 11
 // and all saved reviews are matched by name and writer.
 async function prepareReviewKeysForActivation(
   tx: AnyDatabase,

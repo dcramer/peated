@@ -95,6 +95,19 @@ or product links. `list.nextPage` can find the next page of links. Links must
 stay on the source website. Code reads at most five list pages and stops at
 `list.limit`. It reads `href` from HTML links and text from XML links.
 
+Each stored rule version has a decoder in `configured/compatibility/`. The
+decoder validates the saved JSON and returns the executable contract used by
+the runtime. Historical meaning, including review source keys, belongs to that
+version's decoder instead of being inferred from the JSON shape. Current rule
+generation uses the current schema directly. Source-specific URL behavior is
+registered in `configured/sourceCompatibility.ts`; generic parsing must not
+identify a source by name or host.
+
+Move a source to the current rule format by creating a new revision, previewing
+it, and activating it. Never change a saved revision's version or rules in
+place: completed runs keep their revision ID. Remove a compatibility decoder
+only after production has no active or runnable revisions that use it.
+
 Fields on an article or product page are CSS selectors too. Code reads text by
 default. It reads `href` from links, `src` from images, `datetime` from dates,
 `content` from meta tags, and `value` from form fields. It also trims spaces,
@@ -184,13 +197,13 @@ pnpm cli scrapers preview --site whiskystudy --input /tmp/revision.json --limit 
 ```
 
 The input has the same `listUrl` and `rules` fields accepted by the API. Set
-`rulesVersion` to `10` for new rules. An omitted version means version 1 so
+`rulesVersion` to `11` for new rules. An omitted version means version 1 so
 existing preview files keep their original behavior. If the site exists only
 in production, the command creates the local records needed for the preview:
 
 ```json
 {
-  "rulesVersion": 10,
+  "rulesVersion": 11,
   "listUrl": "https://example.com/reviews",
   "rules": {
     "kind": "review",

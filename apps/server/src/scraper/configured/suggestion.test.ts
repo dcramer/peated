@@ -4,6 +4,7 @@ import {
   checkDetailPages,
   checkListPage,
   checkNextListPage,
+  sampleDetailLinks,
 } from "./suggestion";
 
 const reviewRules = {
@@ -240,4 +241,20 @@ test("rejects suggested rules that do not parse a detail page", async () => {
       }),
     }),
   ).rejects.toThrow("The rules did not read an article or product page.");
+});
+
+test("samples detail links across the full list", () => {
+  expect(
+    sampleDetailLinks([
+      "https://example.test/products/one",
+      "https://example.test/products/two",
+      "https://example.test/products/three",
+      "https://example.test/products/four",
+      "https://example.test/products/five",
+    ]),
+  ).toEqual([
+    "https://example.test/products/one",
+    "https://example.test/products/three",
+    "https://example.test/products/five",
+  ]);
 });

@@ -246,6 +246,114 @@ test("returns rules only after the rule check passes", async () => {
   expect(secondRequest?.instructions).toContain("Review of {value}");
 });
 
+test("gives the agent the active setup as migration evidence", async () => {
+  const request = vi
+    .fn()
+    .mockResolvedValue(toolCallResponse("migrated", reviewRuleCheck("h1")));
+
+  await runScrapeSourceSetupAgent({
+    conversationId: "scrape_source:1",
+    externalSiteRunId: 10,
+    kind: "review",
+    scrapeSourceId: 1,
+    listPages: [
+      {
+        url: "https://example.test/reviews",
+        html: '<a class="review" href="/reviews/one">Review</a>',
+      },
+    ],
+    detailPages: [],
+    previousSetup: {
+      listPageUrl: "https://example.test/reviews",
+      rulesVersion: 6,
+      rules: {
+        kind: "review",
+        articles: {
+          oneArticlePer: "body",
+          link: "a.review",
+          skipWhen: null,
+          nextPage: null,
+          limit: 25,
+        },
+        article: {
+          canonicalUrl: null,
+          title: {
+            try: [
+              {
+                get: "text",
+                selector: "h1",
+                take: "first",
+                startsWith: null,
+                clean: null,
+              },
+            ],
+          },
+          publishedDate: {
+            try: [
+              {
+                get: "text",
+                selector: "time",
+                take: "first",
+                startsWith: null,
+                clean: null,
+              },
+            ],
+          },
+          reviews: {
+            inside: "body",
+            oneReviewPer: "element",
+            selector: "article.review",
+            name: {
+              try: [
+                {
+                  get: "text",
+                  from: "review",
+                  selector: "h2",
+                  take: "first",
+                  startsWith: null,
+                  clean: null,
+                },
+              ],
+            },
+            reviewer: null,
+            tastingNotes: null,
+            score: null,
+          },
+        },
+      },
+      matchedPageUrls: ["https://example.test/reviews/one"],
+    },
+    request,
+    checkRules: async () => ({
+      status: "passed" as const,
+      checked: "parsed review",
+    }),
+  });
+
+  const firstRequest = request.mock.calls[0]?.[0];
+  expect(firstRequest?.input).toMatchObject([
+    {
+      role: "user",
+      content: expect.stringContaining(
+        '"matchedPageUrls":["https://example.test/reviews/one"]',
+      ),
+    },
+  ]);
+  expect(firstRequest?.input).toMatchObject([
+    {
+      content: expect.stringContaining('"rulesVersion":6'),
+    },
+  ]);
+  expect(firstRequest?.input).toMatchObject([
+    {
+      content: expect.stringContaining('"link":"a.review"'),
+    },
+  ]);
+  expect(firstRequest?.instructions).toContain(
+    "preserve the kinds of items its working rules included and excluded",
+  );
+});
+
 test("accepts catalog rules without price or review fields", async () => {
   const request = vi
     .fn()

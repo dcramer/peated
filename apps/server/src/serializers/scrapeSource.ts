@@ -10,8 +10,8 @@ import type {
   ScrapeSourceRevisionSchema,
   ScrapeSourceSchema,
 } from "../schemas";
+import { loadExecutableScrapeRules } from "../scraper/configured/compatibility";
 import { ScrapeSourcePreviewResultSchema } from "../scraper/configured/preview";
-import { parseScrapeRules } from "../scraper/configured/rules";
 import { serializeExternalSite } from "./externalSite";
 
 function serializeRevisionAuthor(revision: ScrapeSourceRevision) {
@@ -41,7 +41,8 @@ function revisionItem(
     revision: revision.revision,
     rulesVersion: revision.rulesVersion,
     listUrl: revision.listUrl,
-    rules: parseScrapeRules(revision.rulesVersion, revision.rules),
+    rules: loadExecutableScrapeRules(revision.rulesVersion, revision.rules)
+      .storedRules,
     active: revision.active,
     ...serializeRevisionAuthor(revision),
     previewStatus: revision.previewStatus,

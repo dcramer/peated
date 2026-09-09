@@ -23,7 +23,10 @@ import {
   AdminTextField,
 } from "./adminForm.stylex";
 import { AdminEmptyActivity } from "./adminUtility.stylex";
-import { getSetupAfterLatestVersion } from "./scraperParsingStatus";
+import {
+  getSetupAfterLatestVersion,
+  needsScrapeRulesUpdate,
+} from "./scraperParsingStatus";
 import { ScraperPreviewResult } from "./scraperPreviewResult.stylex";
 
 type Source = Outputs["externalSites"]["scrapeSources"]["list"][number];
@@ -100,9 +103,10 @@ export function ScraperParsingEditor({
     (revision) => revision.id === source.activeRevisionId,
   );
   const setup = getSetupAfterLatestVersion(source);
+  const needsRulesUpdate = needsScrapeRulesUpdate(source);
   const canSuggest =
     (!setup || setup.status === "failed") &&
-    (!latest || latest.previewStatus === "failed");
+    (!latest || latest.previewStatus === "failed" || needsRulesUpdate);
   const setupSteps = getSetupSteps(source);
   const setupDescription = getSetupDescription(source);
   const previewRevisionId =
@@ -182,11 +186,13 @@ export function ScraperParsingEditor({
                 })
               }
             >
-              {latest
-                ? "Ask AI to repair"
-                : setup
-                  ? "Retry AI setup"
-                  : "Start AI setup"}
+              {needsRulesUpdate
+                ? "Update parsing rules"
+                : latest
+                  ? "Ask AI to repair"
+                  : setup
+                    ? "Retry AI setup"
+                    : "Start AI setup"}
             </AdminButton>
           ) : undefined
         }
@@ -460,6 +466,9 @@ function getSetupDescription(source: Source) {
       : "The generated version is loading.";
   }
   const latest = source.revisions[0];
+  if (needsScrapeRulesUpdate(source)) {
+    return "This source uses an older rule format. Create and test an updated version before activating it.";
+  }
   if (latest?.previewStatus === "failed") {
     return "The latest version needs repair.";
   }

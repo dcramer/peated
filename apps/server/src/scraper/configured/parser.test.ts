@@ -11,23 +11,63 @@ import {
   discoverWhiskeyReviewerArticles,
   parseWhiskeyReviewerArticle,
 } from "../adapters/whiskeyReviewer";
-import {
-  discoverWhiskyNotesArticles,
-  parseWhiskyNotesArticle,
-} from "../adapters/whiskyNotes";
 import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
 import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
+import { loadExecutableScrapeRules } from "./compatibility";
 import {
-  discoverWordsOfWhiskyArticles,
-  parseWordsOfWhiskyArticle,
-} from "../adapters/wordsOfWhisky";
-import { parseScrapeDetail, parseScrapeList } from "./parser";
+  parseEarlyScrapeDetail,
+  parseEarlyScrapeList,
+  parseSavedScrapeDetail,
+  parseSavedScrapeList,
+  parseScrapeDetail,
+  parseScrapeList,
+} from "./parser";
 import {
-  parseScrapeRules,
   type ScrapeRules,
-  type ScrapeRulesV5,
+  type ScrapeRulesV3,
   type StoredScrapeRules,
 } from "./rules";
+
+type SavedFixtureRules = Extract<
+  StoredScrapeRules,
+  { articles: unknown } | { products: unknown }
+>;
+
+function isDirectFixtureRules(rules: StoredScrapeRules): rules is ScrapeRules {
+  return "list" in rules && "links" in rules.list;
+}
+
+function isSavedFixtureRules(
+  rules: StoredScrapeRules,
+): rules is SavedFixtureRules {
+  return "articles" in rules || "products" in rules;
+}
+
+function parseFixtureList(
+  rules: StoredScrapeRules,
+  html: string,
+  pageUrl: URL,
+) {
+  if (isDirectFixtureRules(rules)) {
+    return parseScrapeList(rules, html, pageUrl);
+  }
+  return isSavedFixtureRules(rules)
+    ? parseSavedScrapeList(rules, html, pageUrl)
+    : parseEarlyScrapeList(rules, html, pageUrl);
+}
+
+function parseFixtureDetail(
+  rules: StoredScrapeRules,
+  html: string,
+  pageUrl: URL,
+) {
+  if (isDirectFixtureRules(rules)) {
+    return parseScrapeDetail(rules, html, pageUrl);
+  }
+  return isSavedFixtureRules(rules)
+    ? parseSavedScrapeDetail(rules, html, pageUrl, "name-and-writer")
+    : parseEarlyScrapeDetail(rules, html, pageUrl);
+}
 
 it("reads price fields from text and their usual HTML attributes", () => {
   const rules = {
@@ -650,7 +690,7 @@ const whiskyStudyRules = {
       scale: 100,
     },
   },
-} satisfies ScrapeRulesV5;
+} satisfies ScrapeRulesV3;
 
 const whiskySagaRules = {
   kind: "review",
@@ -687,7 +727,7 @@ const whiskySagaRules = {
       scale: 100,
     },
   },
-} satisfies ScrapeRulesV5;
+} satisfies ScrapeRulesV3;
 
 const bourbonCultureRules = {
   kind: "review",
@@ -729,7 +769,7 @@ const bourbonCultureRules = {
       scale: 10,
     },
   },
-} satisfies ScrapeRulesV5;
+} satisfies ScrapeRulesV3;
 
 const compassBoxRules = {
   kind: "price",
@@ -745,7 +785,7 @@ const compassBoxRules = {
     currency: "gbp",
     volume: { value: "700 ml" },
   },
-} satisfies ScrapeRulesV5;
+} satisfies ScrapeRulesV3;
 
 const kilchomanRules = {
   kind: "price",
@@ -767,7 +807,7 @@ const kilchomanRules = {
       attribute: "content",
     },
   },
-} satisfies ScrapeRulesV5;
+} satisfies ScrapeRulesV3;
 
 const whiskeyReviewerRules = {
   kind: "review",
@@ -826,87 +866,7 @@ const whiskeyReviewerRules = {
       ],
     },
   },
-} satisfies ScrapeRulesV5;
-
-const wordsOfWhiskyRules = {
-  kind: "review",
-  list: {
-    item: "article.category-tastingnotes",
-    detailLink: { selector: "a[href]", attribute: "href" },
-    maxItems: 20,
-  },
-  detail: {
-    canonicalUrl: {
-      selector: 'link[rel="canonical"]',
-      attribute: "href",
-      removeSuffixes: ["/"],
-    },
-    title: { selector: ".post-wrap .entry-title" },
-    publishedAt: {
-      selector: ".post-wrap time.entry-date",
-      attribute: "datetime",
-    },
-    reviewItem: { start: ".entry-content > h2" },
-    name: { selector: "h2" },
-    reviewerName: {
-      selector: ".side-author__wrap .side-meta .title",
-    },
-    reviewText: {
-      selector: "p",
-      startsWith: ["Nose:", "Palate:", "Taste:", "Finish:"],
-      all: true,
-    },
-    score: {
-      value: {
-        selector: ".lets-review-block__final-score",
-        suffix: "/10",
-      },
-      scale: 10,
-    },
-  },
-} satisfies ScrapeRulesV5;
-
-const whiskyNotesRules = {
-  kind: "review",
-  list: {
-    item: "#featured article, #posts article",
-    detailLink: { selector: "a.entry-permalink", attribute: "href" },
-    excludeWhen: {
-      selector:
-        ".category-armagnac, .category-bars, .category-cognac, .category-distillery-visits, .category-other-spirits, .category-rum, .category-whisky-news",
-    },
-    nextPage: { selector: 'link[rel="next"]', attribute: "href" },
-    maxItems: 20,
-  },
-  detail: {
-    title: { selector: "#main article.post .entry-title" },
-    publishedAt: {
-      selector: "#main article.post time.entry-date.published",
-      attribute: "datetime",
-    },
-    reviewItem: {
-      start:
-        '.entry-content > h2:contains("%"), .entry-content > h2:contains("Proof"), .entry-content > h2:contains("proof")',
-      endBefore: ".entry-content > .yarpp",
-    },
-    name: { selector: "h2" },
-    reviewerName: { selector: ".author.vcard" },
-    reviewText: { selector: "h2, h2 ~ p", all: true },
-    score: {
-      value: {
-        selector:
-          'p:contains("Score:") > span:last-child strong, p:contains("Score:") > strong:last-child',
-        removeSuffixes: ["/100"],
-        suffix: "/100",
-      },
-      firstReviewFallback: {
-        selector: ".entry-score",
-        suffix: "/100",
-      },
-      scale: 100,
-    },
-  },
-} satisfies ScrapeRulesV5;
+} satisfies ScrapeRulesV3;
 
 function pageText(selector: string) {
   return {
@@ -1206,7 +1166,7 @@ test("reads text links from an XML review index", () => {
   } as const satisfies StoredScrapeRules;
 
   expect(
-    parseScrapeList(
+    parseFixtureList(
       rules,
       `
         <rss><channel>
@@ -1252,7 +1212,7 @@ test("reads formatted dates from attributes and filters review elements", () => 
     },
   } as const satisfies StoredScrapeRules;
 
-  const result = parseScrapeDetail(
+  const result = parseFixtureDetail(
     rules,
     `
       <a name="070926"></a><h1>September seven</h1>
@@ -1275,7 +1235,7 @@ test("reads formatted dates from attributes and filters review elements", () => 
 });
 
 function expectReviewFactsAndEvidenceToMatch(
-  configured: ReturnType<typeof parseScrapeDetail>,
+  configured: ReturnType<typeof parseFixtureDetail>,
   legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
 ) {
   expect(configured.kind).toBe("review");
@@ -1305,7 +1265,7 @@ function expectReviewFactsAndEvidenceToMatch(
 
 describe("scrape source parser", () => {
   it("limits detail links to the same website", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       reviewConfig,
       '<a class="review" href="/one">One</a><a class="review" href="https://reviews.test/two#top">Two</a><a class="review" href="/three">Three</a>',
       new URL("https://reviews.test/archive"),
@@ -1318,7 +1278,7 @@ describe("scrape source parser", () => {
   });
 
   it("extracts a same-website next page", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       {
         ...reviewConfig,
         list: {
@@ -1359,7 +1319,7 @@ describe("scrape source parser", () => {
     } as const satisfies StoredScrapeRules;
 
     expect(
-      parseScrapeList(
+      parseFixtureList(
         rules,
         '<article class="product"><a href="/products/glenallachie-12">Bottle</a></article>',
         new URL("https://shop.theglenallachie.com/collections/all-products"),
@@ -1374,7 +1334,7 @@ describe("scrape source parser", () => {
   });
 
   it("excludes unavailable list cards with bounded text matching", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       {
         ...reviewConfig,
         list: {
@@ -1401,7 +1361,7 @@ describe("scrape source parser", () => {
       ({ url }) => url,
     );
 
-    expect(parseScrapeList(compassBoxRules, html, pageUrl)).toEqual({
+    expect(parseFixtureList(compassBoxRules, html, pageUrl)).toEqual({
       links: legacyLinks,
       nextPageUrl: null,
       issues: [],
@@ -1415,7 +1375,7 @@ describe("scrape source parser", () => {
       ({ url }) => url,
     );
 
-    expect(parseScrapeList(kilchomanRules, html, pageUrl)).toEqual({
+    expect(parseFixtureList(kilchomanRules, html, pageUrl)).toEqual({
       links: legacyLinks,
       nextPageUrl: null,
       issues: [],
@@ -1429,7 +1389,7 @@ describe("scrape source parser", () => {
       (url) => url.href,
     );
 
-    expect(parseScrapeList(bourbonCultureRules, html, pageUrl)).toEqual({
+    expect(parseFixtureList(bourbonCultureRules, html, pageUrl)).toEqual({
       links: legacyLinks,
       nextPageUrl: null,
       issues: [],
@@ -1443,7 +1403,7 @@ describe("scrape source parser", () => {
       (url) => url.href,
     );
 
-    expect(parseScrapeList(whiskeyReviewerRules, html, pageUrl)).toEqual({
+    expect(parseFixtureList(whiskeyReviewerRules, html, pageUrl)).toEqual({
       links: [
         "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026/",
         "https://whiskeyreviewer.com/2026/08/example-scotch-review-080626/",
@@ -1452,38 +1412,10 @@ describe("scrape source parser", () => {
       issues: [],
     });
     expect(
-      parseScrapeList(whiskeyReviewerRules, html, pageUrl).links.map((url) =>
+      parseFixtureList(whiskeyReviewerRules, html, pageUrl).links.map((url) =>
         url.replace(/\/$/u, ""),
       ),
     ).toEqual(legacyLinks);
-  });
-
-  it("matches the current Words of Whisky article links", async () => {
-    const pageUrl = new URL("https://wordsofwhisky.com/");
-    const html = await loadFixture("wordsofwhisky", "index.html");
-    const legacyLinks = discoverWordsOfWhiskyArticles(html).map(
-      (url) => url.href,
-    );
-
-    expect(
-      parseScrapeList(wordsOfWhiskyRules, html, pageUrl).links.map((url) =>
-        url.replace(/\/$/u, ""),
-      ),
-    ).toEqual(legacyLinks);
-  });
-
-  it("matches the current WhiskyNotes article links", async () => {
-    const pageUrl = new URL("https://www.whiskynotes.be/");
-    const html = await loadFixture("whiskynotes", "archive.html");
-    const legacyLinks = discoverWhiskyNotesArticles(html).map(
-      (url) => url.href,
-    );
-
-    expect(parseScrapeList(whiskyNotesRules, html, pageUrl)).toEqual({
-      links: legacyLinks,
-      nextPageUrl: "https://www.whiskynotes.be/page/2/",
-      issues: [],
-    });
   });
 
   it.each([
@@ -1503,7 +1435,7 @@ describe("scrape source parser", () => {
     const html = await loadFixture("dramface", fixture);
     const pageUrl = new URL(url);
     const legacy = parseDramfaceArticle(html, pageUrl);
-    const configured = parseScrapeDetail(dramfaceSavedRules, html, pageUrl);
+    const configured = parseFixtureDetail(dramfaceSavedRules, html, pageUrl);
 
     expect(configured.kind).toBe("review");
     expect(configured.issues).toEqual([]);
@@ -1527,7 +1459,7 @@ describe("scrape source parser", () => {
   });
 
   it("rejects a next page on another website", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       {
         ...reviewConfig,
         list: {
@@ -1546,7 +1478,7 @@ describe("scrape source parser", () => {
   });
 
   it("rejects links on another origin", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       reviewConfig,
       '<a class="review" href="https://other.test/one">One</a>',
       new URL("https://reviews.test/archive"),
@@ -1558,7 +1490,7 @@ describe("scrape source parser", () => {
   });
 
   it("extracts and validates review records", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       reviewConfig,
       '<h1>Spring reviews</h1><time datetime="2026-04-02"></time><article class="review"><h2>Example 12 Year</h2><span class="author">Ada</span><span class="score">91 / 100</span><div class="body">Rich and balanced.</div></article>',
       new URL("https://reviews.test/spring"),
@@ -1574,7 +1506,7 @@ describe("scrape source parser", () => {
   });
 
   it("parses an ordinal published date", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         ...currentReviewRules,
         article: {
@@ -1605,7 +1537,7 @@ describe("scrape source parser", () => {
   ])(
     "reports one canonical URL issue when the configured value %s",
     (_, canonicalMarkup, message) => {
-      const result = parseScrapeDetail(
+      const result = parseFixtureDetail(
         {
           ...reviewConfig,
           detail: {
@@ -1634,7 +1566,7 @@ describe("scrape source parser", () => {
     );
     const html = await loadFixture("whiskeyreviewer", "review.html");
     const legacy = parseWhiskeyReviewerArticle(html, pageUrl);
-    const configured = parseScrapeDetail(whiskeyReviewerRules, html, pageUrl);
+    const configured = parseFixtureDetail(whiskeyReviewerRules, html, pageUrl);
 
     expect(configured.kind).toBe("review");
     expect(configured.issues).toEqual([]);
@@ -1659,89 +1591,11 @@ describe("scrape source parser", () => {
     );
   });
 
-  it.each(["single-review.html", "multi-review.html"])(
-    "matches the current Words of Whisky parser for %s",
-    async (fixture) => {
-      const url = new URL(
-        fixture === "single-review.html"
-          ? "https://wordsofwhisky.com/bruichladdich-greener-still-review"
-          : "https://wordsofwhisky.com/kanosuke-dingle-meikle-toir-the-whisky-exchange",
-      );
-      const html = await loadFixture("wordsofwhisky", fixture);
-      const legacy = parseWordsOfWhiskyArticle(html, url);
-      const configured = parseScrapeDetail(wordsOfWhiskyRules, html, url);
-
-      expect(configured.kind).toBe("review");
-      expect(configured.issues).toEqual([]);
-      if (configured.kind !== "review" || !configured.value) {
-        throw new Error("Expected configured review output.");
-      }
-      expect(configured.value.article).toMatchObject({
-        canonicalUrl: legacy.article.canonicalUrl,
-        title: legacy.article.title,
-        publishedAt: legacy.article.publishedAt,
-      });
-      expect(configured.value.article.externalReviews).toMatchObject(
-        legacy.article.externalReviews.map((review) => ({
-          name: review.name,
-          reviewerName: review.reviewerName,
-          nativeScore: review.nativeScore,
-        })),
-      );
-      expect(Object.values(configured.value.externalReviewTexts)).toEqual(
-        Object.values(legacy.externalReviewTexts),
-      );
-      expect(Object.values(configured.value.externalReviewBodies)).toEqual(
-        Object.values(legacy.externalReviewBodies),
-      );
-    },
-  );
-
-  it.each([
-    [
-      "single-review.html",
-      "https://www.whiskynotes.be/2026/world/kanekou-okinawa-whisky/",
-    ],
-    [
-      "multi-review.html",
-      "https://www.whiskynotes.be/2026/bowmore/bowmore-2005-ben-nevis-1996-whisky-agency/",
-    ],
-  ])("matches the current WhiskyNotes parser for %s", async (fixture, url) => {
-    const html = await loadFixture("whiskynotes", fixture);
-    const pageUrl = new URL(url);
-    const legacy = parseWhiskyNotesArticle(html, pageUrl);
-    const configured = parseScrapeDetail(whiskyNotesRules, html, pageUrl);
-
-    expect(configured.kind).toBe("review");
-    expect(configured.issues).toEqual([]);
-    if (configured.kind !== "review" || !configured.value) {
-      throw new Error("Expected configured review output.");
-    }
-    expect(configured.value.article).toMatchObject({
-      canonicalUrl: legacy.article.canonicalUrl,
-      title: legacy.article.title,
-      publishedAt: legacy.article.publishedAt,
-    });
-    expect(configured.value.article.externalReviews).toMatchObject(
-      legacy.article.externalReviews.map((review) => ({
-        name: review.name,
-        reviewerName: review.reviewerName,
-        nativeScore: review.nativeScore,
-      })),
-    );
-    expect(Object.values(configured.value.externalReviewTexts)).toEqual(
-      Object.values(legacy.externalReviewTexts),
-    );
-    expect(Object.values(configured.value.externalReviewBodies)).toEqual(
-      Object.values(legacy.externalReviewBodies),
-    );
-  });
-
   it("rejects conflicting URL dates and unmapped scores", async () => {
     const html = (await loadFixture("whiskeyreviewer", "review.html"))
       .replace("/2026/08/example-bourbon", "/2025/08/example-bourbon")
       .replace("Rating: B+", "Rating: E");
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       whiskeyReviewerRules,
       html,
       new URL(
@@ -1760,7 +1614,7 @@ describe("scrape source parser", () => {
   });
 
   it("removes Whisky Study title suffixes and finds a labeled score", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         ...reviewConfig,
         detail: {
@@ -1801,7 +1655,7 @@ describe("scrape source parser", () => {
   });
 
   it("joins only Whisky Saga tasting sections in document order", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         ...reviewConfig,
         detail: {
@@ -1848,7 +1702,7 @@ describe("scrape source parser", () => {
     if (!legacy) throw new Error("Expected legacy review output.");
 
     expectReviewFactsAndEvidenceToMatch(
-      parseScrapeDetail(whiskyStudyRules, html, url),
+      parseFixtureDetail(whiskyStudyRules, html, url),
       legacy,
     );
   });
@@ -1864,7 +1718,7 @@ describe("scrape source parser", () => {
     if (!legacy) throw new Error("Expected legacy review output.");
 
     expectReviewFactsAndEvidenceToMatch(
-      parseScrapeDetail(whiskySagaRules, html, url),
+      parseFixtureDetail(whiskySagaRules, html, url),
       legacy,
     );
   });
@@ -1878,13 +1732,13 @@ describe("scrape source parser", () => {
     expect(legacy.article.externalReviews).toHaveLength(1);
 
     expectReviewFactsAndEvidenceToMatch(
-      parseScrapeDetail(bourbonCultureRules, html, url),
+      parseFixtureDetail(bourbonCultureRules, html, url),
       legacy,
     );
   });
 
   it("uses fixed values and literal prefixes before price validation", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         kind: "price",
         list: {
@@ -1909,7 +1763,7 @@ describe("scrape source parser", () => {
   });
 
   it("reports joined values over the element bound", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         ...reviewConfig,
         detail: {
@@ -1932,7 +1786,7 @@ describe("scrape source parser", () => {
   });
 
   it("treats values emptied by literal cleanup as missing", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         ...reviewConfig,
         detail: {
@@ -1950,9 +1804,8 @@ describe("scrape source parser", () => {
   });
 
   it("keeps version 1 parsing output unchanged", () => {
-    const rules = parseScrapeRules(1, reviewConfig);
-    const result = parseScrapeDetail(
-      rules,
+    const rules = loadExecutableScrapeRules(1, reviewConfig);
+    const result = rules.parseDetail(
       '<h1>Spring reviews</h1><time datetime="2026-04-02"></time><article class="review"><h2>Example 12 Year</h2><span class="score">91 / 100</span><div class="body">Rich and balanced.</div></article>',
       new URL("https://reviews.test/spring"),
     );
@@ -1970,7 +1823,7 @@ describe("scrape source parser", () => {
   });
 
   it("reads page fields for a single review", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       reviewConfig,
       '<h1>Spring reviews</h1><time datetime="2026-04-02"></time><h2>Example 12 Year</h2><article class="review"><span class="author">Ada</span><div class="body">Rich and balanced.</div></article>',
       new URL("https://reviews.test/spring"),
@@ -1989,7 +1842,7 @@ describe("scrape source parser", () => {
 
   it("keeps complete plain-text bodies per review while selecting narrower tasting text", () => {
     const longParagraph = "Body prose. ".repeat(5000).trim();
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       reviewConfig,
       `
       <nav>Page navigation</nav><h1>Two reviews</h1><time datetime="2026-09-01"></time>
@@ -2018,43 +1871,8 @@ describe("scrape source parser", () => {
     });
   });
 
-  it("stops review sections at the next heading or end selector", () => {
-    const result = parseScrapeDetail(
-      {
-        ...reviewConfig,
-        detail: {
-          ...reviewConfig.detail,
-          reviewItem: {
-            start: ".reviews > h2.review",
-            endBefore: ".reviews > .related",
-          },
-          name: { selector: "h2.review" },
-          reviewText: { selector: "p.notes" },
-          score: undefined,
-        },
-      },
-      `<h1>Two reviews</h1><time datetime="2026-09-01"></time>
-      <div class="reviews">
-        <h2 class="review">First Bottle</h2><p class="notes">Nose: fruit.</p>
-        <h2 class="review">Second Bottle</h2><p class="notes">Palate: smoke.</p>
-        <div class="related">Related reviews</div>
-      </div>`,
-      new URL("https://reviews.test/sections"),
-    );
-
-    expect(result.issues).toEqual([]);
-    if (result.kind !== "review" || !result.value) {
-      throw new Error("Expected reviews");
-    }
-    const [first, second] = result.value.article.externalReviews;
-    expect(result.value.externalReviewBodies).toEqual({
-      [first.sourceKey]: "First Bottle\n\nNose: fruit.",
-      [second.sourceKey]: "Second Bottle\n\nPalate: smoke.",
-    });
-  });
-
   it("does not reuse a page field for repeated reviews", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       reviewConfig,
       '<h1>Spring reviews</h1><h2>Shared bottle</h2><article class="review"></article><article class="review"></article>',
       new URL("https://reviews.test/spring"),
@@ -2089,7 +1907,7 @@ describe("scrape source parser", () => {
   ])(
     "keeps review fields separate with %s",
     (_, pageBylines, firstByline, reviewers) => {
-      const result = parseScrapeDetail(
+      const result = parseFixtureDetail(
         reviewConfig,
         `<h1>Two reviews</h1><time datetime="2026-08-22"></time>${pageBylines}
       <span class="score">99</span>
@@ -2121,7 +1939,7 @@ describe("scrape source parser", () => {
   );
 
   it("extracts repeated reviews and reports invalid dates and scores", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       reviewConfig,
       '<h1>Spring reviews</h1><time datetime="not-a-date"></time><article class="review"><h2>First Bottle</h2><span class="score">none</span></article><article class="review"><h2>Second Bottle</h2><span class="score">88</span></article>',
       new URL("https://reviews.test/spring"),
@@ -2139,7 +1957,7 @@ describe("scrape source parser", () => {
   });
 
   it("reports required review fields when unrelated markup is selected", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       reviewConfig,
       "<main><p>Nothing to parse</p></main>",
       new URL("https://reviews.test/unrelated"),
@@ -2155,7 +1973,7 @@ describe("scrape source parser", () => {
   });
 
   it("normalizes a store price and volume", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         kind: "price",
         list: {
@@ -2210,7 +2028,7 @@ describe("scrape source parser", () => {
             },
       ],
     });
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         kind: "catalog",
         products: {
@@ -2269,7 +2087,7 @@ describe("scrape source parser", () => {
   });
 
   it("reports a missing catalog product name", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         kind: "catalog",
         products: {
@@ -2311,7 +2129,7 @@ describe("scrape source parser", () => {
   });
 
   it("converts liters to milliliters", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         kind: "price",
         list: {
@@ -2336,7 +2154,7 @@ describe("scrape source parser", () => {
   });
 
   it("reports invalid store fields", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       {
         kind: "price",
         list: {
@@ -2365,7 +2183,7 @@ describe("scrape source parser", () => {
   });
 
   it("reports a selector that no longer finds detail links", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       reviewConfig,
       '<a class="new-review-link" href="/one">One</a>',
       new URL("https://reviews.test/archive"),
@@ -2383,7 +2201,7 @@ describe("scrape source parser", () => {
   });
 
   it("reads version 8 article links inside each result", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       currentReviewRules,
       `<main>
         <article class="card"><a href="/one">One</a></article>
@@ -2402,7 +2220,7 @@ describe("scrape source parser", () => {
   });
 
   it("accepts a list page where every result is explicitly skipped", () => {
-    const result = parseScrapeList(
+    const result = parseFixtureList(
       currentReviewRules,
       `<main>
         <article class="card"><span class="skip">News</span><a href="/news">News</a></article>
@@ -2420,7 +2238,7 @@ describe("scrape source parser", () => {
 
   it("still reports when a saved result selector finds nothing", () => {
     expect(
-      parseScrapeList(
+      parseFixtureList(
         currentReviewRules,
         "<main></main>",
         new URL("https://reviews.test/"),
@@ -2438,7 +2256,7 @@ describe("scrape source parser", () => {
   });
 
   it("reads version 8 review sections and explicit article values", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       currentReviewRules,
       `<article>
         <h1 class="title">Two autumn reviews</h1>
@@ -2486,8 +2304,8 @@ describe("scrape source parser", () => {
 
   it("keeps reviews matched when they move", () => {
     const parseKeys = (reviews: string) => {
-      const result = parseScrapeDetail(
-        currentReviewRules,
+      const rules = loadExecutableScrapeRules(9, currentReviewRules);
+      const result = rules.parseDetail(
         `<article>
           <h1 class="title">Reviews</h1>
           <time datetime="2026-09-01"></time>
@@ -2517,8 +2335,8 @@ describe("scrape source parser", () => {
   });
 
   it("rejects reviews without a stable identity", () => {
-    const result = parseScrapeDetail(
-      currentReviewRules,
+    const rules = loadExecutableScrapeRules(9, currentReviewRules);
+    const result = rules.parseDetail(
       `<article>
         <h1 class="title">Reviews</h1>
         <time datetime="2026-09-01"></time>
@@ -2539,7 +2357,7 @@ describe("scrape source parser", () => {
   });
 
   it("can keep the full article area for one version 8 review", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       currentReviewRules,
       `<article>
         <h1 class="title">One autumn review</h1>
@@ -2568,7 +2386,7 @@ describe("scrape source parser", () => {
   });
 
   it("reports a version 8 review area that is not unique", () => {
-    const result = parseScrapeDetail(
+    const result = parseFixtureDetail(
       currentReviewRules,
       `<h1 class="title">Reviews</h1>
        <time datetime="2026-09-01"></time>
@@ -2631,7 +2449,7 @@ describe("scrape source parser", () => {
     } as const satisfies StoredScrapeRules;
 
     expect(
-      parseScrapeDetail(
+      parseFixtureDetail(
         rules,
         `<h1>Coastal Malt</h1>
          <span class="price">$84.99</span>

@@ -19,7 +19,6 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { parseDramfaceArticle } from "../adapters/dramface";
 import { parseWhiskyNotesArticle } from "../adapters/whiskyNotes";
 import { parseWordsOfWhiskyArticle } from "../adapters/wordsOfWhisky";
-import { parseScrapeDetail } from "../configured/parser";
 import { externalReviewSink } from "./externalReviews";
 
 const wordsOfWhiskyPolicy: ExternalReviewScoringPolicy = {
@@ -78,48 +77,6 @@ const wordsOfWhiskyCapture: CapturedReviewCase = {
 
 const captures: CapturedReviewCase[] = [
   wordsOfWhiskyCapture,
-  {
-    ...wordsOfWhiskyCapture,
-    label: "Words of Whisky saved scraper rules",
-    parse: (html, url) => {
-      const result = parseScrapeDetail(
-        {
-          kind: "review",
-          list: {
-            detailLink: {
-              selector: "article.category-tastingnotes a",
-              attribute: "href",
-            },
-            maxItems: 20,
-          },
-          detail: {
-            title: { selector: ".post-wrap .entry-title" },
-            publishedAt: {
-              selector: ".post-wrap time.entry-date",
-              attribute: "datetime",
-            },
-            reviewItem: ".post-wrap .entry-content",
-            name: { selector: "h2" },
-            reviewerName: { selector: ".side-author__wrap .side-meta .title" },
-            score: {
-              value: { selector: ".lets-review-block__final-score" },
-              scale: 10,
-            },
-          },
-        },
-        html,
-        url,
-      );
-      expect(result.issues).toEqual([]);
-      if (result.kind !== "review" || !result.value)
-        throw new Error("Expected a parsed review.");
-      return result.value;
-    },
-    reviews: wordsOfWhiskyCapture.reviews.map((review) => ({
-      ...review,
-      nativeScore: { ...review.nativeScore, display: "8.7" },
-    })),
-  },
   {
     label: "Dramface published score with a different hypothetical score",
     site: "dramface",

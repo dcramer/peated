@@ -20,11 +20,11 @@ import type {
   StoredScrapeReviewField,
   StoredScrapeRules,
 } from "./rules";
+import { normalizeScrapeReviewNameRule } from "./rules";
 import {
-  normalizeScrapeReviewNameRule,
-  ScrapeReviewSectionSchema,
-  ScrapeSelectorSchema,
-} from "./rules";
+  applyDetailPageUrlCompatibility,
+  readCompatiblePublishedDate,
+} from "./sourceCompatibility";
 import { matchFirstText, matchText } from "./textTemplate";
 
 export type ScrapeListResult = {
@@ -75,18 +75,11 @@ type LegacyPriceRules = Extract<
   StoredScrapeRules,
   { kind: "price"; list: { detailLink: unknown } }
 >;
+type EarlyRules = LegacyReviewRules | LegacyPriceRules;
 type ScrapePageReadV6 = Extract<StoredScrapePageRead, { clean: unknown }>;
 const JsonLdValueSchema = z.json();
 const JsonLdObjectSchema = z.record(z.string(), JsonLdValueSchema);
 type JsonLdValue = z.infer<typeof JsonLdValueSchema>;
-
-function usesNameBasedReviewKeys(rules: SavedReviewRules) {
-  return "addStart" in rules.article.title.try[0];
-}
-
-function usesDirectSelectors(rules: StoredScrapeRules): rules is ScrapeRules {
-  return "list" in rules && "links" in rules.list;
-}
 
 function normalizeValue(value: string | undefined) {
   return value?.replaceAll(/\s+/g, " ").trim() || null;
@@ -309,15 +302,9 @@ function sameWebsiteUrl(value: string, baseUrl: URL) {
 }
 
 function detailPageUrl(value: string, listUrl: URL) {
-  const url = new URL(sameWebsiteUrl(value, listUrl));
-  if (
-    url.hostname === "shop.theglenallachie.com" &&
-    url.pathname.startsWith("/products/")
-  ) {
-    // GlenAllachie source: its product pages require this to return UK prices.
-    url.searchParams.set("country", "GB");
-  }
-  return url.toString();
+  return applyDetailPageUrlCompatibility(
+    new URL(sameWebsiteUrl(value, listUrl)),
+  ).toString();
 }
 
 function parseSelectedLinks(
@@ -381,16 +368,26 @@ function parseSelectedLinks(
 }
 
 export function parseScrapeList(
-  rules: StoredScrapeRules,
+  rules: ScrapeRules,
   html: string,
   pageUrl: URL,
 ): ScrapeListResult {
-  if (usesDirectSelectors(rules)) {
-    return parseSelectedLinks(rules, html, pageUrl);
-  }
-  if ("articles" in rules || "products" in rules) {
-    return parseSavedList(rules, html, pageUrl);
-  }
+  return parseDirectScrapeList(rules, html, pageUrl);
+}
+
+export function parseDirectScrapeList(
+  rules: ScrapeRules,
+  html: string,
+  pageUrl: URL,
+) {
+  return parseSelectedLinks(rules, html, pageUrl);
+}
+
+export function parseEarlyScrapeList(
+  rules: EarlyRules,
+  html: string,
+  pageUrl: URL,
+): ScrapeListResult {
   const issues: ScrapeIssue[] = [];
   const links = new Set<string>();
   try {
@@ -456,7 +453,7 @@ export function parseScrapeList(
   return { links: [...links], nextPageUrl, issues };
 }
 
-function parseSavedList(
+export function parseSavedScrapeList(
   rules: SavedRules,
   html: string,
   pageUrl: URL,
@@ -761,54 +758,12 @@ function selectReviewItems(
   $: ReturnType<typeof load>,
   rule: LegacyReviewRules["detail"]["reviewItem"],
 ) {
-  const section = ScrapeReviewSectionSchema.safeParse(rule);
-  if (!section.success) {
-    return $(ScrapeSelectorSchema.parse(rule))
-      .toArray()
-      .map((element) => ({
-        body: $(element),
-        item: load($.html(element)),
-      }));
-  }
-
-  const starts = $(section.data.start).toArray();
-  return starts.map((start) => {
-    if (starts.length === 1) {
-      const parent = $(start).parent();
-      if (!section.data.endBefore) {
-        return {
-          body: parent,
-          item: load(parent.html() ?? ""),
-        };
-      }
-      const body = $($(start).prevAll().toArray().reverse())
-        .add(start)
-        .add($(start).nextUntil(section.data.endBefore));
-      return {
-        body,
-        item: load(
-          body
-            .toArray()
-            .map((element) => $.html(element))
-            .join(""),
-        ),
-      };
-    }
-
-    const stopSelector = [section.data.start, section.data.endBefore]
-      .filter(Boolean)
-      .join(", ");
-    const body = $(start).add($(start).nextUntil(stopSelector));
-    return {
-      body,
-      item: load(
-        body
-          .toArray()
-          .map((element) => $.html(element))
-          .join(""),
-      ),
-    };
-  });
+  return $(rule)
+    .toArray()
+    .map((element) => ({
+      body: $(element),
+      item: load($.html(element)),
+    }));
 }
 
 function parseReviewDetail(
@@ -929,17 +884,9 @@ function parseReviewDetail(
         ? (readValue(item, reviewerSelector) ?? pageReviewerName)
         : null;
       const scoreRule = rules.detail.score;
-      const firstReviewFallback =
-        scoreRule &&
-        "firstReviewFallback" in scoreRule &&
-        scoreRule.firstReviewFallback;
       const scoreText = scoreRule
         ? (readValue(item, scoreRule.value) ??
-          (index === 0 && firstReviewFallback
-            ? readValue($, firstReviewFallback)
-            : reviewItems.length === 1
-              ? readValue($, scoreRule.value)
-              : null))
+          (reviewItems.length === 1 ? readValue($, scoreRule.value) : null))
         : null;
       const scoreMap =
         rules.detail.score && "map" in rules.detail.score
@@ -1228,6 +1175,7 @@ function parseSavedReviewDetail(
   rules: SavedReviewRules,
   html: string,
   pageUrl: URL,
+  keysUseNameAndWriter: boolean,
 ): ScrapeDetailResult {
   const $ = load(html);
   const issues: ScrapeIssue[] = [];
@@ -1281,7 +1229,6 @@ function parseSavedReviewDetail(
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
   const reviewKeys = new Set<string>();
-  const keysUseNameAndWriter = usesNameBasedReviewKeys(rules);
   const reviewItems = selectSavedReviewItems($, rules.article.reviews);
   if (!reviewItems) {
     issues.push({
@@ -1595,20 +1542,7 @@ function dateFromPageUrl(pageUrl: URL) {
     );
   }
 
-  if (pageUrl.hostname.endsWith("whiskyfun.com")) {
-    // Whiskyfun source: standalone article filenames end with a MMDDYY date.
-    const compact = pageUrl.pathname.match(
-      /(?:^|\D)(\d{2})(\d{2})(\d{2})(?:\D|$)/u,
-    );
-    if (compact) {
-      return createDate(
-        2000 + Number(compact[3]),
-        Number(compact[1]),
-        Number(compact[2]),
-      );
-    }
-  }
-  return null;
+  return readCompatiblePublishedDate(pageUrl);
 }
 
 // TODO(scraper-platform): Carry RSS and Atom item dates into detail parsing
@@ -2031,29 +1965,13 @@ function parseProductPage(
       };
 }
 
-export function parseScrapeDetail(
-  rules: StoredScrapeRules,
-  html: string,
-  pageUrl: URL,
+function safelyParseScrapeDetail(
+  rules: Pick<StoredScrapeRules, "kind">,
+  field: "article" | "product" | "detail",
+  parse: () => ScrapeDetailResult,
 ): ScrapeDetailResult {
   try {
-    if (usesDirectSelectors(rules)) {
-      return rules.kind === "review"
-        ? parseReviewPage(rules, html, pageUrl)
-        : parseProductPage(rules, html, pageUrl);
-    }
-    if (rules.kind === "review" && "article" in rules) {
-      return parseSavedReviewDetail(rules, html, pageUrl);
-    }
-    if (rules.kind === "price" && "product" in rules) {
-      return parseSavedPriceDetail(rules, html, pageUrl);
-    }
-    if (rules.kind === "catalog") {
-      return parseSavedCatalogDetail(rules, html, pageUrl);
-    }
-    return rules.kind === "review"
-      ? parseReviewDetail(rules, html, pageUrl)
-      : parseStorePriceDetail(rules, html, pageUrl);
+    return parse();
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to parse selector.";
@@ -2061,23 +1979,77 @@ export function parseScrapeDetail(
       return {
         kind: "review",
         value: null,
-        issues: [
-          {
-            field: "article" in rules ? "article" : "detail",
-            message,
-          },
-        ],
+        issues: [{ field, message }],
+      };
+    }
+    if (rules.kind === "price") {
+      return {
+        kind: "price",
+        value: [],
+        issues: [{ field, message }],
       };
     }
     return {
-      kind: rules.kind,
+      kind: "catalog",
       value: [],
-      issues: [
-        {
-          field: "product" in rules ? "product" : "detail",
-          message,
-        },
-      ],
+      issues: [{ field, message }],
     };
   }
+}
+
+export function parseDirectScrapeDetail(
+  rules: ScrapeRules,
+  html: string,
+  pageUrl: URL,
+) {
+  return safelyParseScrapeDetail(rules, "detail", () =>
+    rules.kind === "review"
+      ? parseReviewPage(rules, html, pageUrl)
+      : parseProductPage(rules, html, pageUrl),
+  );
+}
+
+export function parseSavedScrapeDetail(
+  rules: SavedRules,
+  html: string,
+  pageUrl: URL,
+  reviewKeys: "position" | "name-and-writer",
+) {
+  return safelyParseScrapeDetail(
+    rules,
+    rules.kind === "review" ? "article" : "product",
+    () => {
+      if (rules.kind === "review") {
+        return parseSavedReviewDetail(
+          rules,
+          html,
+          pageUrl,
+          reviewKeys === "name-and-writer",
+        );
+      }
+      return rules.kind === "price"
+        ? parseSavedPriceDetail(rules, html, pageUrl)
+        : parseSavedCatalogDetail(rules, html, pageUrl);
+    },
+  );
+}
+
+export function parseEarlyScrapeDetail(
+  rules: EarlyRules,
+  html: string,
+  pageUrl: URL,
+) {
+  return safelyParseScrapeDetail(rules, "detail", () =>
+    rules.kind === "review"
+      ? parseReviewDetail(rules, html, pageUrl)
+      : parseStorePriceDetail(rules, html, pageUrl),
+  );
+}
+
+export function parseScrapeDetail(
+  rules: ScrapeRules,
+  html: string,
+  pageUrl: URL,
+): ScrapeDetailResult {
+  return parseDirectScrapeDetail(rules, html, pageUrl);
 }
