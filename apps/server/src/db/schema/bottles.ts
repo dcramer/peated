@@ -307,6 +307,7 @@ export const bottles = pgTable(
     index("bottle_search_idx").using("gin", table.searchVector),
     index("bottle_brand_idx").on(table.brandId),
     index("bottle_bottler_idx").on(table.bottlerId),
+    index("bottle_series_idx").on(table.seriesId),
     index("bottle_created_by_actor_idx").on(table.createdByActorId),
     index("bottle_category_idx").on(table.category),
     index("bottle_flavor_profile_idx").on(table.flavorProfile),
