@@ -1,6 +1,5 @@
 "use client";
 
-import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import {
@@ -11,23 +10,18 @@ import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { EmptyState } from "@peated/web/components/feedback.stylex";
 import {
   FacetGroup,
-  FilterPanel,
-  FilterQuery,
+  type FilterQueryProps,
 } from "@peated/web/components/filterPanel.stylex";
-import {
-  CursorPager,
-  ListToolbar,
-  type ListSortOption,
-} from "@peated/web/components/lists.stylex";
-import { space } from "../../styles/tokens.stylex";
+import { type ListSortOption } from "@peated/web/components/lists.stylex";
+import { Table } from "@peated/web/components/table.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
 
-const NARROW = "@media (max-width: 759px)";
-
 export type BottleCatalogListProps = {
+  activeFilterCount?: number;
   emptyAction?: ReactNode;
   emptyDescription?: ReactNode;
   emptyHeading?: string;
+  filters?: ReactNode;
   items: readonly BottleListItem[];
   nextHref?: string;
   onClear?: () => void;
@@ -35,7 +29,7 @@ export type BottleCatalogListProps = {
   page: number;
   pending?: boolean;
   previousHref?: string;
-  search?: ReactNode;
+  query?: FilterQueryProps;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
   total?: number;
@@ -43,9 +37,11 @@ export type BottleCatalogListProps = {
 
 /** Presents one API page and an optional API-owned full-result total. */
 export function BottleCatalogList({
+  activeFilterCount = 0,
   emptyAction,
   emptyDescription = "Try a broader search or remove one of the active filters.",
   emptyHeading = "No bottles found",
+  filters,
   items,
   nextHref,
   onClear,
@@ -53,77 +49,54 @@ export function BottleCatalogList({
   page,
   pending = false,
   previousHref,
-  search,
+  query,
   sort,
   sortOptions,
   total,
 }: BottleCatalogListProps) {
   return (
-    <section aria-label="Bottle catalog" {...stylex.props(styles.catalog)}>
-      {search}
-      <ListToolbar
-        count={items.length}
-        noun="bottle"
-        onSortChange={onSortChange}
-        pending={pending}
-        sort={sort}
-        sortOptions={sortOptions}
-        total={total}
-      />
-      <div aria-busy={pending || undefined}>
-        {items.length ? (
-          <BottleList ariaLabel="Bottle records" items={items} />
-        ) : (
-          <EmptyState
-            action={
-              emptyAction ??
-              (onClear ? (
-                <Button onClick={onClear} size="sm" variant="tonal">
-                  Clear filters
-                </Button>
-              ) : (
-                <ButtonLink
-                  href="/addBottle?intent=catalog"
-                  size="sm"
-                  variant="tonal"
-                >
-                  Add a bottle
-                </ButtonLink>
-              ))
-            }
-            heading={emptyHeading}
-          >
-            {emptyDescription}
-          </EmptyState>
-        )}
-      </div>
-      <CursorPager
-        ariaLabel="Bottle pages"
-        nextHref={nextHref}
-        page={page}
-        previousHref={previousHref}
-      />
-    </section>
-  );
-}
-
-/** Keeps bottle-name search primary on wide catalog layouts. */
-export function BottleCatalogSearch({
-  onSubmit,
-  query,
-}: {
-  onSubmit: (value: string) => void;
-  query: string;
-}) {
-  return (
-    <div {...stylex.props(styles.desktopSearch)}>
-      <FilterQuery
-        label="Find a bottle"
-        onSubmit={onSubmit}
-        placeholder="Name, brand, or release"
-        query={query}
-      />
-    </div>
+    <Table
+      activeFilterCount={activeFilterCount}
+      ariaLabel="Bottle catalog"
+      count={items.length}
+      empty={
+        <EmptyState
+          action={
+            emptyAction ??
+            (onClear ? (
+              <Button onClick={onClear} size="sm" variant="tonal">
+                Clear filters
+              </Button>
+            ) : (
+              <ButtonLink
+                href="/addBottle?intent=catalog"
+                size="sm"
+                variant="tonal"
+              >
+                Add a bottle
+              </ButtonLink>
+            ))
+          }
+          heading={emptyHeading}
+        >
+          {emptyDescription}
+        </EmptyState>
+      }
+      filters={filters}
+      nextHref={nextHref}
+      noun="bottle"
+      onClear={onClear}
+      onSortChange={onSortChange}
+      page={page}
+      pending={pending}
+      previousHref={previousHref}
+      query={query}
+      sort={sort}
+      sortOptions={sortOptions}
+      total={total}
+    >
+      <BottleList ariaLabel="Bottle records" items={items} />
+    </Table>
   );
 }
 
@@ -132,44 +105,23 @@ export type BottleCatalogFilterOption = {
   value: string;
 };
 
-export type BottleCatalogFiltersProps = {
-  age: string;
+export type BottleCatalogFacetsProps = {
   ageBand: string;
   ageBandOptions: readonly BottleCatalogFilterOption[];
   category: string;
   categoryOptions: readonly BottleCatalogFilterOption[];
   onChange: (name: "ageBand" | "category", value: string) => void;
-  onClear: () => void;
-  onQuerySubmit: (value: string) => void;
-  query: string;
 };
 
-/** Keeps catalog filters reachable while the product route owns URL state. */
-export function BottleCatalogFilters({
-  age,
+export function BottleCatalogFacets({
   ageBand,
   ageBandOptions,
   category,
   categoryOptions,
   onChange,
-  onClear,
-  onQuerySubmit,
-  query,
-}: BottleCatalogFiltersProps) {
-  const hasFilters = Boolean(age || ageBand || category || query);
-
+}: BottleCatalogFacetsProps) {
   return (
-    <FilterPanel
-      ariaLabel="Bottle filters"
-      onClear={hasFilters ? onClear : undefined}
-      query={{
-        label: "Find a bottle",
-        onSubmit: onQuerySubmit,
-        placeholder: "Name, brand, or release",
-        query,
-      }}
-      queryVisibility="narrow"
-    >
+    <>
       <FacetGroup
         label="Category"
         onChange={(value) => onChange("category", value)}
@@ -182,22 +134,10 @@ export function BottleCatalogFilters({
         options={ageBandOptions}
         selected={ageBand}
       />
-    </FilterPanel>
+    </>
   );
 }
 
 export function BottleCatalogLoading() {
   return <CatalogPageLoading title="Bottles" />;
 }
-
-const styles = stylex.create({
-  catalog: {
-    minWidth: 0,
-  },
-  desktopSearch: {
-    marginBottom: space.x4,
-    [NARROW]: {
-      display: "none",
-    },
-  },
-});

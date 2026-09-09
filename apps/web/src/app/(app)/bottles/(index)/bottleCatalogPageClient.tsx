@@ -10,9 +10,8 @@ import { useOptimistic, useTransition } from "react";
 import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
 import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  BottleCatalogFilters,
+  BottleCatalogFacets,
   BottleCatalogList,
-  BottleCatalogSearch,
   type BottleCatalogFilterOption,
 } from "@peated/web/components/pages/bottleCatalog.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
@@ -96,6 +95,10 @@ export function BottleCatalogPageClient({
     searchParams.toString(),
   );
   const displayedSearchParams = new URLSearchParams(displayedParams);
+  const query = displayedSearchParams.get("query") ?? "";
+  const activeFilterCount = clearedFilterKeys.filter(
+    (name) => name !== "cursor" && displayedSearchParams.has(name),
+  ).length;
   const queryParams = normalizeBottleCatalogQueryParams(
     useApiQueryParams({
       defaults: { sort: DEFAULT_SORT },
@@ -178,19 +181,6 @@ export function BottleCatalogPageClient({
           Add a bottle
         </ButtonLink>
       }
-      filters={
-        <BottleCatalogFilters
-          age={displayedSearchParams.get("age") ?? ""}
-          ageBand={displayedSearchParams.get("ageBand") ?? ""}
-          ageBandOptions={ageBandOptions}
-          category={displayedSearchParams.get("category") ?? ""}
-          categoryOptions={categoryOptions}
-          onChange={(name, value) => updateParams({ [name]: value })}
-          onClear={clearFilters}
-          onQuerySubmit={(value) => updateParams({ query: value.trim() })}
-          query={displayedSearchParams.get("query") ?? ""}
-        />
-      }
       navigation={
         user ? (
           <BottleCatalogNavigation
@@ -203,6 +193,7 @@ export function BottleCatalogPageClient({
       title={title}
     >
       <BottleCatalogList
+        activeFilterCount={activeFilterCount}
         emptyAction={
           filter === "following" && bottleList.followedEntityCount === 0 ? (
             <ButtonLink href="/distillers" size="sm" variant="tonal">
@@ -221,6 +212,15 @@ export function BottleCatalogPageClient({
             : undefined
         }
         items={items}
+        filters={
+          <BottleCatalogFacets
+            ageBand={displayedSearchParams.get("ageBand") ?? ""}
+            ageBandOptions={ageBandOptions}
+            category={displayedSearchParams.get("category") ?? ""}
+            categoryOptions={categoryOptions}
+            onChange={(name, value) => updateParams({ [name]: value })}
+          />
+        }
         nextHref={getCursorHref(
           pathname,
           searchParams,
@@ -235,12 +235,12 @@ export function BottleCatalogPageClient({
           searchParams,
           bottleList.rel.prevCursor,
         )}
-        search={
-          <BottleCatalogSearch
-            onSubmit={(value) => updateParams({ query: value.trim() })}
-            query={displayedSearchParams.get("query") ?? ""}
-          />
-        }
+        query={{
+          label: "Find a bottle",
+          onSubmit: (value) => updateParams({ query: value.trim() }),
+          placeholder: "Name, brand, or release",
+          query,
+        }}
         sort={sort}
         sortOptions={sortOptions}
         total={bottleList.total}

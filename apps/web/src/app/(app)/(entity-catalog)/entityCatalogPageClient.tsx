@@ -12,7 +12,7 @@ import { ButtonLink } from "@peated/web/components/button.stylex";
 import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import {
-  EntityCatalogFilters,
+  EntityCatalogFacets,
   EntityCatalogList,
 } from "@peated/web/components/pages/entityCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -140,21 +140,6 @@ export function EntityCatalogPageClient({
           Add {config.noun}
         </ButtonLink>
       }
-      filters={
-        <EntityCatalogFilters
-          ariaLabel={`${config.title} filters`}
-          countries={countryOptions}
-          country={country}
-          onClear={clearFilters}
-          onCountryChange={(value) => updateParams({ country: value })}
-          onQuerySubmit={(value) => updateParams({ query: value })}
-          onRegionClear={
-            region ? () => updateParams({ region: "" }) : undefined
-          }
-          query={query}
-          region={region ? formatRegion(region) : undefined}
-        />
-      }
       navigation={
         showFollowing ? (
           <PageTabs
@@ -170,6 +155,7 @@ export function EntityCatalogPageClient({
       title={config.title}
     >
       <EntityCatalogList
+        activeFilterCount={[country, query, region].filter(Boolean).length}
         addHref={addHref}
         emptyAction={
           filter === "following" && !hasFilters ? (
@@ -189,6 +175,17 @@ export function EntityCatalogPageClient({
           filter === "following"
             ? `You don't follow any ${config.title.toLowerCase()} yet`
             : undefined
+        }
+        filters={
+          <EntityCatalogFacets
+            countries={countryOptions}
+            country={country}
+            onCountryChange={(value) => updateParams({ country: value })}
+            onRegionClear={
+              region ? () => updateParams({ region: "" }) : undefined
+            }
+            region={region ? formatRegion(region) : undefined}
+          />
         }
         items={items}
         nextHref={getCursorHref(
@@ -216,6 +213,12 @@ export function EntityCatalogPageClient({
           searchParams,
           entityList.rel.prevCursor,
         )}
+        query={{
+          label: `Find a ${config.noun}`,
+          onSubmit: (value) => updateParams({ query: value }),
+          placeholder: "Name",
+          query,
+        }}
         showFollowingMarks={filter !== "following"}
         sort={sort}
         sortOptions={sortOptions}

@@ -8,18 +8,17 @@ import {
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 
-const NARROW = "@media (max-width: 759px)";
+const NARROW = "@media (max-width: 959px)";
+const VERY_NARROW = "@media (max-width: 359px)";
 
 export function CatalogPage({
   action,
   children,
-  filters,
   navigation,
   title,
 }: {
   action?: ReactNode;
   children: ReactNode;
-  filters: ReactNode;
   navigation?: ReactNode;
   title: ReactNode;
 }) {
@@ -37,10 +36,7 @@ export function CatalogPage({
       {navigation ? (
         <div {...stylex.props(styles.navigation)}>{navigation}</div>
       ) : null}
-      <div {...stylex.props(styles.layout)}>
-        <div {...stylex.props(styles.results)}>{children}</div>
-        <aside {...stylex.props(styles.filters)}>{filters}</aside>
-      </div>
+      {children}
     </div>
   );
 }
@@ -60,7 +56,6 @@ export function CatalogPageLoading({
   return (
     <CatalogPage
       action={action ? <span {...stylex.props(styles.loadingAction)} /> : null}
-      filters={<CatalogFiltersLoading query={variant === "bottle"} />}
       navigation={
         navigation ? (
           <div {...stylex.props(styles.loadingNavigation)}>
@@ -71,22 +66,29 @@ export function CatalogPageLoading({
       }
       title={title}
     >
-      <div {...stylex.props(styles.loadingResults)}>
-        {variant === "bottle" ? (
-          <div {...stylex.props(styles.loadingSearch)}>
-            <LoadingPlaceholder preset="metadata" />
-            <span {...stylex.props(styles.loadingSearchControl)} />
+      <div {...stylex.props(styles.layout)}>
+        <div {...stylex.props(styles.loadingResults)}>
+          {variant === "bottle" ? (
+            <div {...stylex.props(styles.loadingSearch)}>
+              <LoadingPlaceholder preset="metadata" />
+              <span {...stylex.props(styles.loadingSearchControl)} />
+            </div>
+          ) : null}
+          <div {...stylex.props(styles.loadingToolbar)}>
+            <span {...stylex.props(styles.loadingCount)}>
+              <LoadingPlaceholder preset="text" />
+            </span>
+            <span {...stylex.props(styles.loadingSort)} />
           </div>
-        ) : null}
-        <div {...stylex.props(styles.loadingToolbar)}>
-          <LoadingPlaceholder preset="text" />
-          <span {...stylex.props(styles.loadingSort)} />
+          <LoadingList
+            label="Loading catalog records"
+            rows={4}
+            variant={variant === "entity" ? "text" : "standard"}
+          />
         </div>
-        <LoadingList
-          label="Loading catalog records"
-          rows={4}
-          variant={variant === "entity" ? "text" : "standard"}
-        />
+        <aside {...stylex.props(styles.filters)}>
+          <CatalogFiltersLoading query={variant === "bottle"} />
+        </aside>
       </div>
     </CatalogPage>
   );
@@ -132,6 +134,10 @@ const styles = stylex.create({
     [NARROW]: {
       alignItems: "flex-start",
     },
+    [VERY_NARROW]: {
+      flexDirection: "column",
+      gap: space.x3,
+    },
   },
   titleRowWithNavigation: {
     marginBottom: space.x2,
@@ -149,8 +155,11 @@ const styles = stylex.create({
       gridTemplateColumns: "minmax(0, 1fr)",
     },
   },
-  results: {
+  filters: {
     minWidth: 0,
+    [NARROW]: {
+      display: "none",
+    },
   },
   loadingResults: {
     display: "flex",
@@ -175,7 +184,7 @@ const styles = stylex.create({
   },
   loadingAction: {
     width: "104px",
-    height: "34px",
+    height: controlMetrics.controlHeight,
     flexShrink: 0,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
@@ -195,12 +204,20 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: space.x4,
   },
+  loadingCount: {
+    display: "block",
+    width: "160px",
+    maxWidth: "50%",
+  },
   loadingSort: {
     width: "132px",
-    height: "34px",
+    height: controlMetrics.controlHeightSmall,
     flexShrink: 0,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
+    [NARROW]: {
+      width: "88px",
+    },
   },
   loadingFilterPanel: {
     boxSizing: "border-box",
@@ -243,11 +260,5 @@ const styles = stylex.create({
     flexShrink: 0,
     borderRadius: "50%",
     backgroundColor: colors.surface,
-  },
-  filters: {
-    minWidth: 0,
-    [NARROW]: {
-      gridRow: 1,
-    },
   },
 });

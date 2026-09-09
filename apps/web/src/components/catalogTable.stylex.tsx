@@ -5,7 +5,7 @@ import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, space } from "../styles/tokens.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
-const COMPACT = "@media (max-width: 639px)";
+const NARROW = "@media (max-width: 759px)";
 
 export type CatalogTableColumn<Item> = {
   align?: "left" | "center" | "right";
@@ -159,7 +159,7 @@ const styles = stylex.create({
     paddingLeft: 0,
   },
   secondary: {
-    [COMPACT]: {
+    [NARROW]: {
       display: "none",
     },
   },
@@ -172,7 +172,7 @@ const styles = stylex.create({
   },
   actionWidth: {
     width: "104px",
-    [COMPACT]: {
+    [NARROW]: {
       width: "92px",
     },
   },
@@ -184,7 +184,7 @@ const styles = stylex.create({
   },
   ratingWidth: {
     width: "184px",
-    [COMPACT]: {
+    [NARROW]: {
       width: "104px",
     },
   },
