@@ -3,45 +3,63 @@ import {
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
-import type { SQL } from "drizzle-orm";
-import { and, eq, isNull, not, or, sql } from "drizzle-orm";
+import { sql, type SQL } from "drizzle-orm";
 
 /**
  * A distillery release uses the distillery or one of its directly owned
  * labels as the brand, with no outside bottler. Other bottlings use an
  * outside brand or bottler.
  */
-export function bottlesForDistilleryView(
+export function bottleIdsForDistilleryView(
   distilleryId: number,
   view: "releases" | "other",
 ): SQL<unknown> {
-  const ownBrand = or(
-    eq(bottles.brandId, distilleryId),
-    sql`EXISTS(
-      SELECT FROM ${entities}
-      WHERE ${entities.id} = ${bottles.brandId}
-        AND ${entities.ownerId} = ${distilleryId}
+  const scope = sql`
+    WITH owned_entities AS MATERIALIZED (
+      SELECT ${distilleryId}::bigint AS entity_id
+
+      UNION
+
+      SELECT ${entities.id} AS entity_id
+      FROM ${entities}
+      WHERE ${entities.ownerId} = ${distilleryId}
         AND ${entities.kind} IN ('brand', 'bottler')
-    )`,
-  )!;
-  const ownBottler = or(
-    isNull(bottles.bottlerId),
-    eq(bottles.bottlerId, distilleryId),
-    sql`EXISTS(
-      SELECT FROM ${entities}
-      WHERE ${entities.id} = ${bottles.bottlerId}
-        AND ${entities.ownerId} = ${distilleryId}
-        AND ${entities.kind} IN ('brand', 'bottler')
-    )`,
-  )!;
-  const madeByDistillery = sql`EXISTS(
-    SELECT FROM ${bottlesToDistillers}
-    WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-      AND ${bottlesToDistillers.distillerId} = ${distilleryId}
-  )`;
-  const ownRelease = and(ownBrand, ownBottler)!;
+    ),
+    official_releases AS MATERIALIZED (
+      SELECT ${bottles.id} AS bottle_id
+      FROM ${bottles}
+      INNER JOIN owned_entities AS brands
+        ON brands.entity_id = ${bottles.brandId}
+      WHERE ${bottles.bottlerId} IS NULL
+        OR ${bottles.bottlerId} IN (
+          SELECT entity_id FROM owned_entities
+        )
+    )
+  `;
 
   return view === "releases"
-    ? ownRelease
-    : and(or(ownBrand, madeByDistillery), not(ownRelease))!;
+    ? sql`
+        ${scope}
+        SELECT bottle_id FROM official_releases
+      `
+    : sql`
+        ${scope},
+        candidate_bottles AS MATERIALIZED (
+          SELECT ${bottles.id} AS bottle_id
+          FROM ${bottles}
+          INNER JOIN owned_entities AS brands
+            ON brands.entity_id = ${bottles.brandId}
+
+          UNION
+
+          SELECT ${bottlesToDistillers.bottleId} AS bottle_id
+          FROM ${bottlesToDistillers}
+          WHERE ${bottlesToDistillers.distillerId} = ${distilleryId}
+        )
+        SELECT candidate_bottles.bottle_id
+        FROM candidate_bottles
+        LEFT JOIN official_releases
+          ON official_releases.bottle_id = candidate_bottles.bottle_id
+        WHERE official_releases.bottle_id IS NULL
+      `;
 }

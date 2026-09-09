@@ -8,13 +8,13 @@ import {
 import { bottleIdsForEntity } from "@peated/server/lib/entityBottleIds";
 import { implement } from "@peated/server/orpc";
 import entityCatalogContract from "@peated/server/orpc/contracts/entities/catalog";
-import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, ne, sql } from "drizzle-orm";
 
 const activeBottleWhere = (entityId: number) => {
   return and(
     isNotNull(bottles.groupId),
     sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-    inArray(bottles.id, bottleIdsForEntity(entityId)),
+    sql`${bottles.id} IN (${bottleIdsForEntity(entityId)})`,
   );
 };
 

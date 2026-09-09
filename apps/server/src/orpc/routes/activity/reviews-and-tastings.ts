@@ -6,7 +6,6 @@ import type {
 } from "@peated/server/db/schema";
 import {
   bottles,
-  bottlesToDistillers,
   bottleTombstones,
   entities,
   externalReviewArticles,
@@ -18,6 +17,7 @@ import {
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
 import { viewerVisibleUserCondition } from "@peated/server/lib/activityVisibility";
+import { bottleIdsForEntity } from "@peated/server/lib/entityBottleIds";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -99,27 +99,24 @@ export default implement(contract).handler(
       ? new Date(parsedCursor.snapshotAt)
       : new Date();
     const userCondition = viewerVisibleUserCondition(context.user?.id);
+    const scopeCte = input.entity
+      ? sql`
+          WITH scoped_bottles AS MATERIALIZED (
+            SELECT ${bottles.id} AS bottle_id
+            FROM ${bottles}
+            WHERE ${bottles.id} IN (${bottleIdsForEntity(input.entity)})
+              AND ${bottles.groupId} IS NOT NULL
+              AND NOT EXISTS (
+                SELECT FROM ${bottleTombstones}
+                WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+              )
+          )
+        `
+      : sql``;
     const scope = (bottleId: SQL<unknown>) =>
       input.bottle
         ? sql`${bottleId} = ${input.bottle}`
-        : sql`${bottleId} IN (
-          SELECT ${bottles.id}
-          FROM ${bottles}
-          WHERE ${bottles.groupId} IS NOT NULL
-            AND NOT EXISTS (
-              SELECT FROM ${bottleTombstones}
-              WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-            )
-            AND (
-              ${bottles.brandId} = ${input.entity}
-              OR ${bottles.bottlerId} = ${input.entity}
-              OR EXISTS (
-                SELECT FROM ${bottlesToDistillers}
-                WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                  AND ${bottlesToDistillers.distillerId} = ${input.entity}
-              )
-            )
-        )`;
+        : sql`${bottleId} IN (SELECT bottle_id FROM scoped_bottles)`;
     const after = parsedCursor
       ? sql`AND (
         activity.occurred_at < ${new Date(parsedCursor.occurredAt)}
@@ -136,6 +133,7 @@ export default implement(contract).handler(
       : sql``;
 
     const result = await db.execute<Row>(sql`
+    ${scopeCte}
     SELECT activity.type, activity.kind_rank AS "kindRank", activity.id,
       activity.bottle_id AS "bottleId",
       activity.occurred_at AS "occurredAt"

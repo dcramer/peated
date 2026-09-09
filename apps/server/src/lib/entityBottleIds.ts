@@ -1,22 +1,33 @@
-import { db } from "@peated/server/db";
 import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
-import { eq } from "drizzle-orm";
-import { union } from "drizzle-orm/pg-core";
+import { sql, type SQL } from "drizzle-orm";
 
 /** Uses each Bottle relationship index independently and removes role overlaps. */
-export function bottleIdsForEntity(entityId: number) {
-  return union(
-    db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(eq(bottles.brandId, entityId)),
-    db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(eq(bottles.bottlerId, entityId)),
-    db
-      .select({ id: bottlesToDistillers.bottleId })
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.distillerId, entityId)),
-  );
+export function bottleIdsForEntities(entityIds: SQL<unknown>): SQL<unknown> {
+  return sql`
+    WITH target_entities AS MATERIALIZED (
+      ${entityIds}
+    )
+    SELECT ${bottles.id}
+    FROM ${bottles}
+    INNER JOIN target_entities
+      ON target_entities.entity_id = ${bottles.brandId}
+
+    UNION
+
+    SELECT ${bottles.id}
+    FROM ${bottles}
+    INNER JOIN target_entities
+      ON target_entities.entity_id = ${bottles.bottlerId}
+
+    UNION
+
+    SELECT ${bottlesToDistillers.bottleId}
+    FROM ${bottlesToDistillers}
+    INNER JOIN target_entities
+      ON target_entities.entity_id = ${bottlesToDistillers.distillerId}
+  `;
+}
+
+export function bottleIdsForEntity(entityId: number): SQL<unknown> {
+  return bottleIdsForEntities(sql`SELECT ${entityId}::bigint AS entity_id`);
 }

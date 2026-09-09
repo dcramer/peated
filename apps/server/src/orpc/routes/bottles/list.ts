@@ -17,8 +17,11 @@ import {
 import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
 import { companyBottleEntityIds } from "@peated/server/lib/companyPortfolio";
 import { getReservedCollection } from "@peated/server/lib/db";
-import { bottlesForDistilleryView } from "@peated/server/lib/distilleryBottleView";
-import { bottleIdsForEntity } from "@peated/server/lib/entityBottleIds";
+import { bottleIdsForDistilleryView } from "@peated/server/lib/distilleryBottleView";
+import {
+  bottleIdsForEntities,
+  bottleIdsForEntity,
+} from "@peated/server/lib/entityBottleIds";
 import {
   plainTextSearchQuery,
   prefixTextSearchQuery,
@@ -253,15 +256,7 @@ export default implement(bottleListContract).handler(async function ({
 
     const companyEntityIds = companyBottleEntityIds(rest.company);
     where.push(
-      or(
-        sql`${bottles.brandId} IN (${companyEntityIds})`,
-        sql`${bottles.bottlerId} IN (${companyEntityIds})`,
-        sql`EXISTS(
-          SELECT FROM ${bottlesToDistillers}
-          WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-            AND ${bottlesToDistillers.distillerId} IN (${companyEntityIds})
-        )`,
-      ),
+      sql`${bottles.id} IN (${bottleIdsForEntities(companyEntityIds)})`,
     );
   }
   if (rest.distilleryView) {
@@ -279,9 +274,11 @@ export default implement(bottleListContract).handler(async function ({
         message: "Choose a distillery for this view.",
       });
     }
-    where.push(bottlesForDistilleryView(rest.entity, rest.distilleryView));
+    where.push(
+      sql`${bottles.id} IN (${bottleIdsForDistilleryView(rest.entity, rest.distilleryView)})`,
+    );
   } else if (rest.entity) {
-    where.push(inArray(bottles.id, bottleIdsForEntity(rest.entity)));
+    where.push(sql`${bottles.id} IN (${bottleIdsForEntity(rest.entity)})`);
   }
   if (rest.series) {
     where.push(eq(bottles.seriesId, rest.series));
