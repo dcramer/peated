@@ -1,11 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottleSeries,
-  bottlesToDistillers,
-  bottleTombstones,
-  entities,
-} from "@peated/server/db/schema";
+import { bottleSeries, entities } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
@@ -16,16 +10,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
 import type { SQL } from "drizzle-orm";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  getTableColumns,
-  isNotNull,
-  isNull,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -53,9 +38,7 @@ export default procedure
         .int()
         .positive()
         .optional()
-        .describe(
-          "Filter to bottle series with active bottles from this distillery ID.",
-        ),
+        .describe("Filter to bottle series released by this distillery ID."),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
       sort: z
@@ -80,6 +63,12 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [];
 
     if (brand) where.push(eq(bottleSeries.brandId, brand));
+    if (distillery) {
+      where.push(
+        eq(bottleSeries.brandId, distillery),
+        gt(bottleSeries.numReleases, 0),
+      );
+    }
 
     if (query) {
       where.push(
@@ -87,114 +76,42 @@ export default procedure
       );
     }
 
-    const totalCount = sql<number>`count(*) over()::int`.as("total_count");
-    let total = 0;
-    let results;
+    const matchingBottleCount = bottleSeries.numReleases;
+    const orderBy =
+      sort === "-bottles"
+        ? [
+            desc(matchingBottleCount),
+            asc(bottleSeries.name),
+            asc(bottleSeries.id),
+          ]
+        : [asc(bottleSeries.name), asc(bottleSeries.id)];
 
-    if (distillery) {
-      // Count this distillery's active bottles once, before joining their Series.
-      const matchingBottleCounts = db
-        .select({
-          seriesId: bottles.seriesId,
-          numBottles: sql<number>`count(*)::int`.as("num_bottles"),
-        })
-        .from(bottlesToDistillers)
-        .innerJoin(bottles, eq(bottlesToDistillers.bottleId, bottles.id))
-        .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-        .where(
-          and(
-            eq(bottlesToDistillers.distillerId, distillery),
-            isNotNull(bottles.seriesId),
-            isNotNull(bottles.groupId),
-            isNull(bottleTombstones.bottleId),
-          ),
-        )
-        .groupBy(bottles.seriesId)
-        .as("matching_bottle_counts");
+    const results = await db
+      .select({
+        series: getTableColumns(bottleSeries),
+        brand: {
+          id: entities.id,
+          name: entities.name,
+          shortName: entities.shortName,
+          kind: entities.kind,
+        },
+        numBottles: matchingBottleCount,
+        total: sql<number>`count(*) over()::int`.as("total_count"),
+      })
+      .from(bottleSeries)
+      .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
+      .where(where.length ? and(...where) : undefined)
+      .orderBy(...orderBy)
+      .limit(limit + 1)
+      .offset(offset);
 
-      const matchingBottleCount = matchingBottleCounts.numBottles;
-      const orderBy =
-        sort === "-bottles"
-          ? [
-              desc(matchingBottleCount),
-              asc(bottleSeries.name),
-              asc(bottleSeries.id),
-            ]
-          : [asc(bottleSeries.name), asc(bottleSeries.id)];
-
-      results = await db
-        .select({
-          series: getTableColumns(bottleSeries),
-          brand: {
-            id: entities.id,
-            name: entities.name,
-            shortName: entities.shortName,
-            kind: entities.kind,
-          },
-          numBottles: matchingBottleCount,
-          total: totalCount,
-        })
+    let total = Number(results[0]?.total ?? 0);
+    if (!results.length && offset > 0) {
+      const [countResult] = await db
+        .select({ total: sql<number>`count(*)::int` })
         .from(bottleSeries)
-        .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
-        .innerJoin(
-          matchingBottleCounts,
-          eq(matchingBottleCounts.seriesId, bottleSeries.id),
-        )
-        .where(where.length ? and(...where) : undefined)
-        .orderBy(...orderBy)
-        .limit(limit + 1)
-        .offset(offset);
-
-      total = Number(results[0]?.total ?? 0);
-      if (!results.length && offset > 0) {
-        const [countResult] = await db
-          .select({ total: sql<number>`count(*)::int` })
-          .from(bottleSeries)
-          .innerJoin(
-            matchingBottleCounts,
-            eq(matchingBottleCounts.seriesId, bottleSeries.id),
-          )
-          .where(where.length ? and(...where) : undefined);
-        total = Number(countResult?.total ?? 0);
-      }
-    } else {
-      const matchingBottleCount = bottleSeries.numReleases;
-      const orderBy =
-        sort === "-bottles"
-          ? [
-              desc(matchingBottleCount),
-              asc(bottleSeries.name),
-              asc(bottleSeries.id),
-            ]
-          : [asc(bottleSeries.name), asc(bottleSeries.id)];
-
-      results = await db
-        .select({
-          series: getTableColumns(bottleSeries),
-          brand: {
-            id: entities.id,
-            name: entities.name,
-            shortName: entities.shortName,
-            kind: entities.kind,
-          },
-          numBottles: matchingBottleCount,
-          total: totalCount,
-        })
-        .from(bottleSeries)
-        .innerJoin(entities, eq(bottleSeries.brandId, entities.id))
-        .where(where.length ? and(...where) : undefined)
-        .orderBy(...orderBy)
-        .limit(limit + 1)
-        .offset(offset);
-
-      total = Number(results[0]?.total ?? 0);
-      if (!results.length && offset > 0) {
-        const [countResult] = await db
-          .select({ total: sql<number>`count(*)::int` })
-          .from(bottleSeries)
-          .where(where.length ? and(...where) : undefined);
-        total = Number(countResult?.total ?? 0);
-      }
+        .where(where.length ? and(...where) : undefined);
+      total = Number(countResult?.total ?? 0);
     }
 
     const page = results.slice(0, limit);

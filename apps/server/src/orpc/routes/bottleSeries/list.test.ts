@@ -1,5 +1,3 @@
-import { db } from "@peated/server/db";
-import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, it } from "vitest";
@@ -49,68 +47,42 @@ describe("GET /bottle-series", () => {
     );
   });
 
-  it("lists a distillery's series by matching bottle count", async function ({
+  it("lists only series released by the distillery", async function ({
     fixtures,
   }) {
     const distillery = await fixtures.Entity({
       kind: "distillery",
       name: "Port Ellen",
     });
-    const otherDistillery = await fixtures.Entity({
-      kind: "distillery",
-      name: "Brora",
+    const independentBrand = await fixtures.Entity({
+      kind: "brand",
+      name: "Rare Malts",
     });
-    const brand = await fixtures.Entity({ kind: "brand", name: "Rare Malts" });
     const seriesWithTwoBottles = await fixtures.BottleSeries({
-      brandId: brand.id,
+      brandId: distillery.id,
       name: "Rare Series",
+      numReleases: 2,
     });
     const seriesWithOneBottle = await fixtures.BottleSeries({
-      brandId: brand.id,
+      brandId: distillery.id,
       name: "Special Releases",
+      numReleases: 1,
     });
-    const unrelatedSeries = await fixtures.BottleSeries({
-      brandId: brand.id,
-      name: "Other Distillery",
+    const emptySeries = await fixtures.BottleSeries({
+      brandId: distillery.id,
+      name: "Unreleased Series",
+      numReleases: 0,
+    });
+    const independentSeries = await fixtures.BottleSeries({
+      brandId: independentBrand.id,
+      name: "Independent Bottler Series",
+      numReleases: 9,
     });
 
     await fixtures.Bottle({
-      brandId: brand.id,
+      brandId: independentBrand.id,
       distillerIds: [distillery.id],
-      seriesId: seriesWithTwoBottles.id,
-    });
-    await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [distillery.id],
-      seriesId: seriesWithTwoBottles.id,
-    });
-    await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [distillery.id],
-      seriesId: seriesWithOneBottle.id,
-    });
-    await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [otherDistillery.id],
-      seriesId: unrelatedSeries.id,
-    });
-    await fixtures.LegacyBottle({
-      brandId: brand.id,
-      distillerIds: [distillery.id],
-      seriesId: seriesWithTwoBottles.id,
-    });
-    const retiredBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [distillery.id],
-      seriesId: seriesWithTwoBottles.id,
-    });
-    const replacementBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [otherDistillery.id],
-    });
-    await db.insert(bottleTombstones).values({
-      bottleId: retiredBottle.id,
-      newBottleId: replacementBottle.id,
+      seriesId: independentSeries.id,
     });
 
     const result = await routerClient.bottleSeries.list({
@@ -122,15 +94,21 @@ describe("GET /bottle-series", () => {
     expect(result.results).toMatchObject([
       {
         id: seriesWithTwoBottles.id,
-        brand: { id: brand.id, name: brand.name },
+        brand: { id: distillery.id, name: distillery.name },
         numBottles: 2,
       },
       {
         id: seriesWithOneBottle.id,
-        brand: { id: brand.id, name: brand.name },
+        brand: { id: distillery.id, name: distillery.name },
         numBottles: 1,
       },
     ]);
+    expect(result.results).not.toContainEqual(
+      expect.objectContaining({ id: independentSeries.id }),
+    );
+    expect(result.results).not.toContainEqual(
+      expect.objectContaining({ id: emptySeries.id }),
+    );
   });
 
   it("rejects an unsupported sort", async function () {
