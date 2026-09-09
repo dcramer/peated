@@ -95,17 +95,16 @@ makes full URLs, and reads prices, scores, dates, volumes, strength, ages, and
 release years. A selector may match a short group of facts; code finds values
 beside familiar labels such as `70cl`, `46% ABV`, `10 Year Old`, and `91 points`.
 A price source can use a number of milliliters as a fixed volume. Rules do not
-contain general cleanup steps. A review name may use one match template, such
-as `Review of {value}`, to remove fixed text around the Bottle name. Put other
-unusual cleanup for one source in a small named function.
+contain general cleanup steps. Put unusual cleanup for one source in a small
+named function.
 
 For reviews, `detail.reviews.area` selects the one area containing the review
 text. Set `item` to the HTML element around each review. When reviews have no
 separate elements, set `item` to null; each match of `name` starts a review.
 When an article has one review and its title is the Bottle name, set `name` to
-null. When fixed text surrounds that name, set `name` to an object with a
-selector, or null to use the title, and a match containing `{value}`. Code uses
-the article title and removes a trailing `review` by default. A review's
+null. When fixed text surrounds that name, use a match such as
+`{"selector": null, "match": "Review of {value}"}`. Code uses the article title
+and removes a trailing `review` by default. A review's
 writer may be inside that review or shared by the article. Scores and tasting
 notes are read inside each review. For a score, `outOf` is the highest possible
 score.

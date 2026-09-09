@@ -117,7 +117,7 @@ const RULE_INSTRUCTIONS = [
   "Use the feed only to find article links. Read review details from the linked HTML pages.",
   "Use short CSS selectors that work on every given page.",
   "For several reviews on one page, select the HTML element around each review. If there is no such element, set item to null; each name then starts a review.",
-  "Set the review name to null when one review uses the article title. If fixed text surrounds the Bottle name, use a name match such as `Review of {value}`; its selector may be null to use the title.",
+  "Set the review name to null when one review uses the article title. If fixed text surrounds the Bottle name, use a name match such as `Review of {value}`. Set its selector to null to match the title.",
   "Set reviewer when the page shows an author or byline, including when it appears once for the whole article. Code shares one article-level reviewer across its reviews.",
   "Set tastingNotes only when a narrower selector reliably finds flavor notes. The full review body comes from the review area or item.",
   "Use an optional field only when every given page clearly provides it.",

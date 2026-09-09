@@ -887,7 +887,7 @@ const ScrapeMatchedReviewNameSchema = z
       "The Bottle name, or null to use the article title.",
     ),
     match: ScrapeReviewNameMatchSchema.describe(
-      "The complete selected text, with {value} where the Bottle name appears.",
+      "The selected text, with {value} where the Bottle name appears.",
     ),
   })
   .strict();

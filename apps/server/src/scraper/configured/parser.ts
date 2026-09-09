@@ -1816,13 +1816,9 @@ function parseReviewPage(
     const selectedName = nameSelector
       ? (readSelectedValue(item, nameSelector) ?? sharedReviewName)
       : title;
-    const name = selectedName
-      ? nameMatch
-        ? matchText(selectedName, nameMatch)
-        : nameSelector
-          ? selectedName
-          : reviewNameFromTitle(selectedName)
-      : null;
+    let name = selectedName;
+    if (name && nameMatch) name = matchText(name, nameMatch);
+    else if (name && !nameSelector) name = reviewNameFromTitle(name);
     if (!name) {
       issues.push({
         field: "detail.reviews.name",
