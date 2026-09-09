@@ -45,7 +45,7 @@ function DatabaseIntro() {
           value: stats.data?.bottlers.toLocaleString("en-US") ?? "–",
         },
         {
-          label: "Reviews & tastings",
+          label: "Reviews",
           value: reviewAndTastingCount?.toLocaleString("en-US") ?? "–",
         },
       ]}

@@ -27,7 +27,7 @@ import {
 
 const sortOptions = [
   { label: "Latest release", value: "-release" },
-  { label: "Most reviews & tastings", value: "-tastings" },
+  { label: "Most reviewed", value: "-tastings" },
   { label: "Highest score", value: "-score" },
   { label: "Bottle name", value: "name" },
   { label: "Oldest age", value: "-age" },

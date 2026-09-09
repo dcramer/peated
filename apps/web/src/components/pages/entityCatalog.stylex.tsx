@@ -201,7 +201,7 @@ function EntityCatalogTable({
     {
       align: "right",
       cell: (item) => item.publicReviewAndTastingCount.toLocaleString("en-US"),
-      header: "Reviews & tastings",
+      header: "Reviews",
       key: "tastings",
       priority: "secondary",
       width: "count",

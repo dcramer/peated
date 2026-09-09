@@ -26,7 +26,7 @@ function SignInShell() {
             { label: "Distillers", value: "2,410" },
             { label: "Brands", value: "3,980" },
             { label: "Bottlers", value: "1,545" },
-            { label: "Reviews & tastings", value: "207,730" },
+            { label: "Reviews", value: "207,730" },
           ]}
           footer={
             <AuthenticationLink href="/bottles">

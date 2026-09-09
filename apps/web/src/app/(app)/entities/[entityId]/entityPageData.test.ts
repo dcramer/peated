@@ -112,7 +112,7 @@ describe("getEntityTabs", () => {
       {
         count: 29,
         href: "/bottlers/4263-scotch-malt-whisky-society/tastings",
-        label: "Reviews & tastings",
+        label: "Reviews",
       },
       {
         href: "/bottlers/4263-scotch-malt-whisky-society/codes",
@@ -145,7 +145,7 @@ describe("getEntityTabs", () => {
       {
         count: 8,
         href: "/distillers/321-port-ellen/tastings",
-        label: "Reviews & tastings",
+        label: "Reviews",
       },
     ]);
   });

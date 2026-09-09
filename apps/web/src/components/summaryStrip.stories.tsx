@@ -8,7 +8,7 @@ const meta = {
   component: SummaryStrip,
   args: {
     cells: [
-      { label: "Reviews & tastings", value: 128 },
+      { label: "Reviews", value: 128 },
       { label: "Distillers", value: 63 },
       { label: "Never poured", value: 6 },
       {
@@ -45,7 +45,7 @@ export const Overview: Story = {
       <SummaryStrip
         cells={[
           { label: "Bottles", value: 41 },
-          { label: "Reviews & tastings", value: 128 },
+          { label: "Reviews", value: 128 },
           { label: "Distillers", value: 23 },
           { label: "Regions", value: 5 },
           { label: "Never poured", value: 6 },

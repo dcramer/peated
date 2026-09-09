@@ -35,7 +35,7 @@ const DEFAULT_SORT = "-release";
 type BottleList = Outputs["bottles"]["list"];
 
 const sortOptions = [
-  { label: "Most reviews & tastings", value: "-tastings" },
+  { label: "Most reviewed", value: "-tastings" },
   { label: "Latest release", value: "-release" },
   { label: "Highest score", value: "-score" },
   { label: "Recently added", value: "-created" },
