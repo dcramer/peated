@@ -6,7 +6,7 @@ import {
 } from "@peated/server/schemas";
 import { load } from "cheerio";
 import { createHash } from "node:crypto";
-import type { z } from "zod";
+import { z } from "zod";
 import { readReviewBody } from "../adapters/reviewBody";
 import type { ScrapeIssue } from "./preview";
 import { reviewSourceKey } from "./reviewSourceKey";
@@ -20,8 +20,12 @@ import type {
   StoredScrapeReviewField,
   StoredScrapeRules,
 } from "./rules";
-import { ScrapeReviewSectionSchema, ScrapeSelectorSchema } from "./rules";
-import { matchFirstText } from "./textTemplate";
+import {
+  normalizeScrapeReviewNameRule,
+  ScrapeReviewSectionSchema,
+  ScrapeSelectorSchema,
+} from "./rules";
+import { matchFirstText, matchText } from "./textTemplate";
 
 export type ScrapeListResult = {
   links: string[];
@@ -72,6 +76,9 @@ type LegacyPriceRules = Extract<
   { kind: "price"; list: { detailLink: unknown } }
 >;
 type ScrapePageReadV6 = Extract<StoredScrapePageRead, { clean: unknown }>;
+const JsonLdValueSchema = z.json();
+const JsonLdObjectSchema = z.record(z.string(), JsonLdValueSchema);
+type JsonLdValue = z.infer<typeof JsonLdValueSchema>;
 
 function usesNameBasedReviewKeys(rules: SavedReviewRules) {
   return "addStart" in rules.article.title.try[0];
@@ -1622,12 +1629,47 @@ function readPublishedDate(
     const date = parseDate(value);
     if (date) return date;
   }
+  const jsonLdDate = readJsonLdPublishedDate($);
+  if (jsonLdDate) return jsonLdDate;
   return dateFromPageUrl(pageUrl);
+}
+
+function readJsonLdPublishedDate($: ReturnType<typeof load>) {
+  for (const script of $('script[type="application/ld+json"]').toArray()) {
+    let value: JsonLdValue;
+    try {
+      value = JsonLdValueSchema.parse(JSON.parse($(script).text()));
+    } catch {
+      continue;
+    }
+
+    const pending: JsonLdValue[] = [value];
+    for (let index = 0; index < pending.length && index < 10_000; index += 1) {
+      const current = pending[index];
+      if (Array.isArray(current)) {
+        pending.push(...current);
+        continue;
+      }
+
+      const objectValue = JsonLdObjectSchema.safeParse(current);
+      if (!objectValue.success) continue;
+      const publishedDate = z
+        .string()
+        .safeParse(objectValue.data.datePublished);
+      if (publishedDate.success) {
+        const date = parseDate(publishedDate.data);
+        if (date) return date;
+      }
+      pending.push(...Object.values(objectValue.data));
+    }
+  }
+  return null;
 }
 
 function selectReviews(
   $: ReturnType<typeof load>,
   rules: Extract<ScrapeRules, { kind: "review" }>["detail"]["reviews"],
+  nameSelector: string | null,
 ) {
   const areas = $(rules.area).toArray();
   if (areas.length !== 1) return null;
@@ -1644,7 +1686,7 @@ function selectReviews(
       }));
   }
 
-  const starts = rules.name ? area.find(rules.name).toArray() : [];
+  const starts = nameSelector ? area.find(nameSelector).toArray() : [];
   if (starts.length < 2) {
     return [{ body: area, item: load($.html(areaElement)) }];
   }
@@ -1745,7 +1787,9 @@ function parseReviewPage(
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
   const reviewKeys = new Set<string>();
-  const reviewItems = selectReviews($, rules.detail.reviews);
+  const { selector: nameSelector, match: nameMatch } =
+    normalizeScrapeReviewNameRule(rules.detail.reviews.name);
+  const reviewItems = selectReviews($, rules.detail.reviews, nameSelector);
   if (!reviewItems) {
     issues.push({
       field: "detail.reviews.area",
@@ -1763,18 +1807,18 @@ function parseReviewPage(
     reviewItems && reviewerSelector
       ? readArticleReviewValue($, reviewerSelector, reviewItems)
       : null;
-  const nameSelector = rules.detail.reviews.name;
   const sharedReviewName =
     reviewItems?.length === 1 && nameSelector
       ? readArticleReviewValue($, nameSelector, reviewItems)
       : null;
 
   reviewItems?.forEach(({ body, item }, index) => {
-    const name = nameSelector
+    const selectedName = nameSelector
       ? (readSelectedValue(item, nameSelector) ?? sharedReviewName)
-      : title
-        ? reviewNameFromTitle(title)
-        : null;
+      : title;
+    let name = selectedName;
+    if (name && nameMatch) name = matchText(name, nameMatch);
+    else if (name && !nameSelector) name = reviewNameFromTitle(name);
     if (!name) {
       issues.push({
         field: "detail.reviews.name",

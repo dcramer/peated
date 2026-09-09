@@ -15,7 +15,8 @@ const SCRAPE_RULES_VERSION_6 = 6;
 const SCRAPE_RULES_VERSION_7 = 7;
 const SCRAPE_RULES_VERSION_8 = 8;
 const SCRAPE_RULES_VERSION_9 = 9;
-export const SCRAPE_RULES_VERSION = 10;
+const SCRAPE_RULES_VERSION_10 = 10;
+export const SCRAPE_RULES_VERSION = 11;
 // TODO(scraper-platform): Add event after scraped-event match and update rules are defined.
 export const SCRAPE_SOURCE_KIND_LIST = ["review", "price", "catalog"] as const;
 export type ScrapeSourceKind = (typeof SCRAPE_SOURCE_KIND_LIST)[number];
@@ -829,45 +830,76 @@ const ScrapeScoreV10Schema = z
   })
   .strict();
 
-const ScrapeReviewRulesV10Schema = z
+function directReviewRulesSchema<T extends z.ZodType>(nameSchema: T) {
+  return z
+    .object({
+      kind: z.literal("review"),
+      list: ScrapeListSchema,
+      detail: z
+        .object({
+          url: ScrapeSelectorSchema.nullable().describe(
+            "The page's preferred URL, or null to use the fetched URL.",
+          ),
+          title: ScrapeSelectorSchema.describe("The article title."),
+          date: ScrapeSelectorSchema.nullable().describe(
+            "The published date, or null to use a standard page date or a date in the URL.",
+          ),
+          reviews: z
+            .object({
+              area: ScrapeSelectorSchema.describe(
+                "The page area that contains the review text.",
+              ),
+              item: ScrapeSelectorSchema.nullable().describe(
+                "The element around each review, or null when reviews have no separate elements.",
+              ),
+              name: nameSchema,
+              reviewer: ScrapeSelectorSchema.nullable().describe(
+                "The review writer, or null when no writer is shown.",
+              ),
+              tastingNotes: ScrapeSelectorSchema.nullable().describe(
+                "A smaller area containing only tasting notes, or null.",
+              ),
+              score: ScrapeScoreV10Schema.nullable().describe(
+                "The review score, or null when no score is shown.",
+              ),
+            })
+            .strict(),
+        })
+        .strict(),
+    })
+    .strict();
+}
+
+const ScrapeReviewRulesV10Schema = directReviewRulesSchema(
+  ScrapeSelectorSchema.nullable().describe(
+    "The Bottle name, or null when one review uses the article title.",
+  ),
+);
+
+const ScrapeReviewNameMatchSchema = ScrapeTextTemplateSchema.refine(
+  (template) => template.includes("{value}"),
+  { message: "A review name match must contain {value}." },
+);
+
+const ScrapeMatchedReviewNameSchema = z
   .object({
-    kind: z.literal("review"),
-    list: ScrapeListSchema,
-    detail: z
-      .object({
-        url: ScrapeSelectorSchema.nullable().describe(
-          "The page's preferred URL, or null to use the fetched URL.",
-        ),
-        title: ScrapeSelectorSchema.describe("The article title."),
-        date: ScrapeSelectorSchema.nullable().describe(
-          "The published date, or null to use a standard page date or a date in the URL.",
-        ),
-        reviews: z
-          .object({
-            area: ScrapeSelectorSchema.describe(
-              "The page area that contains the review text.",
-            ),
-            item: ScrapeSelectorSchema.nullable().describe(
-              "The element around each review, or null when reviews have no separate elements.",
-            ),
-            name: ScrapeSelectorSchema.nullable().describe(
-              "The Bottle name, or null when one review uses the article title.",
-            ),
-            reviewer: ScrapeSelectorSchema.nullable().describe(
-              "The review writer, or null when no writer is shown.",
-            ),
-            tastingNotes: ScrapeSelectorSchema.nullable().describe(
-              "A smaller area containing only tasting notes, or null.",
-            ),
-            score: ScrapeScoreV10Schema.nullable().describe(
-              "The review score, or null when no score is shown.",
-            ),
-          })
-          .strict(),
-      })
-      .strict(),
+    selector: ScrapeSelectorSchema.nullable().describe(
+      "The Bottle name, or null to use the article title.",
+    ),
+    match: ScrapeReviewNameMatchSchema.describe(
+      "The selected text, with {value} where the Bottle name appears.",
+    ),
   })
   .strict();
+
+const ScrapeReviewNameSchema = z
+  .union([ScrapeSelectorSchema, ScrapeMatchedReviewNameSchema])
+  .nullable()
+  .describe("How to read the Bottle name.");
+
+const ScrapeReviewRulesV11Schema = directReviewRulesSchema(
+  ScrapeReviewNameSchema,
+);
 
 const ScrapeVolumeV10Schema = z
   .union([ScrapeSelectorSchema, z.number().int().positive().max(100_000)])
@@ -923,11 +955,17 @@ const ScrapeCatalogRulesV10Schema = z
   })
   .strict();
 
-export const ScrapeReviewRulesSchema = ScrapeReviewRulesV10Schema;
+const ScrapeRulesV10Schema = z.discriminatedUnion("kind", [
+  ScrapeReviewRulesV10Schema,
+  ScrapePriceRulesV10Schema,
+  ScrapeCatalogRulesV10Schema,
+]);
+
+export const ScrapeReviewRulesSchema = ScrapeReviewRulesV11Schema;
 export const ScrapePriceRulesSchema = ScrapePriceRulesV10Schema;
 export const ScrapeCatalogRulesSchema = ScrapeCatalogRulesV10Schema;
 export const ScrapeRulesSchema = z.discriminatedUnion("kind", [
-  ScrapeReviewRulesV10Schema,
+  ScrapeReviewRulesV11Schema,
   ScrapePriceRulesV10Schema,
   ScrapeCatalogRulesV10Schema,
 ]);
@@ -946,6 +984,7 @@ export const StoredScrapeRulesSchema = z.union([
     ScrapeCatalogRulesV9Schema,
   ]),
   ScrapeRulesV9Schema,
+  ScrapeRulesV10Schema,
   ScrapeRulesSchema,
 ]);
 
@@ -966,6 +1005,18 @@ export type StoredScrapeReviewField =
   | ScrapeReviewField;
 export type ScrapeValueSelectorV1 = z.infer<typeof ScrapeValueSelectorV1Schema>;
 export type ScrapeValue = z.infer<typeof ScrapeValueSchema>;
+
+export function normalizeScrapeReviewNameRule(
+  name: z.infer<typeof ScrapeReviewNameSchema>,
+) {
+  const matched = ScrapeMatchedReviewNameSchema.safeParse(name);
+  return matched.success
+    ? matched.data
+    : {
+        selector: ScrapeSelectorSchema.nullable().parse(name),
+        match: null,
+      };
+}
 
 /** Uses the rule shape that was current when the rules were saved. */
 export function parseScrapeRules(
@@ -1004,6 +1055,9 @@ export function parseScrapeRules(
   }
   if (rulesVersion === SCRAPE_RULES_VERSION_9) {
     return ScrapeRulesV9Schema.parse(rules);
+  }
+  if (rulesVersion === SCRAPE_RULES_VERSION_10) {
+    return ScrapeRulesV10Schema.parse(rules);
   }
   if (rulesVersion === SCRAPE_RULES_VERSION) {
     return ScrapeRulesSchema.parse(rules);

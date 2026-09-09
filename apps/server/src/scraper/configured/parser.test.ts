@@ -472,6 +472,45 @@ it("removes a trailing review label from a single article title", () => {
   });
 });
 
+it("uses a JSON-LD published date when standard date markup is absent", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "article",
+        item: null,
+        name: null,
+        reviewer: null,
+        tastingNotes: null,
+        score: null,
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<script type="application/ld+json">not json</script>
+     <script type="application/ld+json">
+       {"@graph":[{"@type":"Article","datePublished":"2026-09-04T08:00:00+02:00"}]}
+     </script>
+     <article><h1>Orchard Bourbon review</h1><p>The review body.</p></article>`,
+    new URL("https://reviews.example/orchard-bourbon"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        publishedAt: new Date("2026-09-04T06:00:00.000Z"),
+      },
+    },
+  });
+});
+
 it("cleans common review labels without extra rules", () => {
   const rules = {
     kind: "review",
@@ -512,6 +551,43 @@ it("cleans common review labels without extra rules", () => {
             nativeScore: { value: 91, scale: 100 },
           },
         ],
+      },
+    },
+  });
+});
+
+it("uses a name match with the article title", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "article",
+        item: null,
+        name: { selector: null, match: "Review of {value}" },
+        reviewer: null,
+        tastingNotes: null,
+        score: null,
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<article><h1>Review of Orchard Bourbon</h1>
+      <time datetime="2026-08-21"></time>
+    </article>`,
+    new URL("https://reviews.example/orchard-bourbon"),
+  );
+
+  expect(result).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        externalReviews: [{ name: "Orchard Bourbon" }],
       },
     },
   });
