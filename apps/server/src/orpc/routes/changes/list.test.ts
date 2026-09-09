@@ -6,17 +6,30 @@ import { describe, expect, test } from "vitest";
 
 describe("GET /changes", () => {
   test("lists changes", async ({ defaults, fixtures }) => {
-    await fixtures.Entity({ name: "Entity 1" });
-    await fixtures.Entity({ name: "Entity 2" });
+    const first = await fixtures.Entity({ name: "Entity 1" });
+    const second = await fixtures.Entity({ name: "Entity 2" });
+    const third = await fixtures.Entity({ name: "Entity 3" });
 
-    const { results } = await routerClient.changes.list(
-      {},
+    const firstPage = await routerClient.changes.list(
+      { limit: 2 },
       {
         context: { user: defaults.user },
       },
     );
+    expect(firstPage.results.map(({ objectId }) => objectId)).toEqual([
+      third.id,
+      second.id,
+    ]);
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
 
-    expect(results.length).toBe(2);
+    const secondPage = await routerClient.changes.list(
+      { cursor: firstPage.rel.nextCursor!, limit: 2 },
+      { context: { user: defaults.user } },
+    );
+    expect(secondPage.results.map(({ objectId }) => objectId)).toEqual([
+      first.id,
+    ]);
+    expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
   });
 
   test("filters changes by user actor", async ({ defaults, fixtures }) => {

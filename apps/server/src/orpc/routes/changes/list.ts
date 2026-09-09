@@ -5,7 +5,7 @@ import changeListContract from "@peated/server/orpc/contracts/changes/list";
 import { serialize } from "@peated/server/serializers";
 import { ChangeSerializer } from "@peated/server/serializers/change";
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, inArray } from "drizzle-orm";
 
 export default implement(changeListContract).handler(async function ({
   input,
@@ -46,12 +46,18 @@ export default implement(changeListContract).handler(async function ({
     }
   }
 
-  const results = await db
-    .select()
+  const pageIds = db
+    .select({ id: changes.id })
     .from(changes)
-    .where(where ? and(...where) : undefined)
+    .where(and(...where))
     .limit(limit + 1)
     .offset(offset)
+    .orderBy(desc(changes.id))
+    .as("change_page_ids");
+  const results = await db
+    .select({ ...getTableColumns(changes) })
+    .from(changes)
+    .innerJoin(pageIds, eq(pageIds.id, changes.id))
     .orderBy(desc(changes.id));
 
   return {
