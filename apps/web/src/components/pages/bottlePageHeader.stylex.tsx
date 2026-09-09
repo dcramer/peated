@@ -7,6 +7,7 @@ import { colors, effects, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
 const NARROW = "@media (max-width: 900px)";
+const PHONE = "@media (max-width: 480px)";
 
 export type BottlePageHeaderProps = {
   actions?: ReactNode;
@@ -102,6 +103,7 @@ const styles = stylex.create({
     gridColumn: { default: "2", [NARROW]: "1" },
     gridRow: { default: "1", [NARROW]: "auto" },
     gridTemplateColumns: "minmax(0, 1fr)",
+    justifyItems: { default: "stretch", [PHONE]: "center" },
     paddingTop: { default: space.x4, [NARROW]: 0 },
     paddingBottom: { default: space.x4, [NARROW]: 0 },
   },
