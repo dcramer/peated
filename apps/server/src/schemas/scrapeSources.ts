@@ -7,7 +7,10 @@ import {
 } from "../scraper/configured/rules";
 import { ExternalSiteSchema } from "./externalSites";
 
-export { ScrapeRulesSchema } from "../scraper/configured/rules";
+export {
+  SCRAPE_RULES_VERSION,
+  ScrapeRulesSchema,
+} from "../scraper/configured/rules";
 
 export const ScrapeSourceUrlSchema = z
   .url()

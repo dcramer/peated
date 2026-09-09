@@ -43,10 +43,10 @@ describe("parsePreviewInput", () => {
   test("accepts an explicit rules version for the runtime parser", () => {
     expect(
       parsePreviewInput({
-        rulesVersion: 2,
+        rulesVersion: 3,
         listUrl: "https://example.test/products",
         rules,
       }),
-    ).toMatchObject({ rulesVersion: 2, rules });
+    ).toMatchObject({ rulesVersion: 3, rules });
   });
 });

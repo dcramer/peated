@@ -6,7 +6,8 @@ import {
   scrapeSources,
 } from "@peated/server/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { parseScrapeRules, scrapeRunRequestLimit } from "./rules";
+import { loadExecutableScrapeRules } from "./compatibility";
+import { SCRAPE_RULES_VERSION, SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
 import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
@@ -57,7 +58,10 @@ export async function createPinnedScrapeSourceRun(
     );
   }
   const [{ source, revision }] = selected;
-  const rules = parseScrapeRules(revision.rulesVersion, revision.rules);
+  const rules = loadExecutableScrapeRules(
+    revision.rulesVersion,
+    revision.rules,
+  );
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({
@@ -65,7 +69,7 @@ export async function createPinnedScrapeSourceRun(
       trigger: input.trigger,
       purpose: input.purpose,
       requestedById: input.requestedById,
-      requestLimit: scrapeRunRequestLimit(rules),
+      requestLimit: rules.limit + SCRAPE_SOURCE_MAX_LIST_PAGES,
       requestErrorCount: 0,
       recordType: rules.kind,
     })
@@ -94,14 +98,19 @@ export async function createScrapeSourceSuggestionRun(input: {
     const [latestRevision] = await tx
       .select({
         previewStatus: scrapeSourceRevisions.previewStatus,
+        rulesVersion: scrapeSourceRevisions.rulesVersion,
       })
       .from(scrapeSourceRevisions)
       .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id))
       .orderBy(desc(scrapeSourceRevisions.revision))
       .limit(1);
-    if (latestRevision && latestRevision.previewStatus !== "failed") {
+    if (
+      latestRevision &&
+      latestRevision.rulesVersion === SCRAPE_RULES_VERSION &&
+      latestRevision.previewStatus !== "failed"
+    ) {
       throw new ScrapeSourceValidationError(
-        "AI repair is available only after the latest preview fails.",
+        "AI suggestions are available only when the saved rules need updating or the latest preview fails.",
       );
     }
     const [run] = await tx

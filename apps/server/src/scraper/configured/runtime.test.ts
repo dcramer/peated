@@ -718,6 +718,45 @@ test("stores safe validation issues when a selector stops matching", async () =>
   });
 });
 
+test("stores a safe preview issue when a request fails unexpectedly", async () => {
+  const { pinned, revision } = await setupPreview();
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    return url.pathname === "/archive"
+      ? new Response('<a class="review" href="/one">One</a>')
+      : new Response(null, {
+          status: 302,
+          headers: { location: "https://undeclared.example/review" },
+        });
+  });
+
+  await expect(
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "failed-preview-owner",
+    }),
+  ).rejects.toThrow(
+    "Origin https://undeclared.example is not declared for scraper target preview-example.",
+  );
+
+  const [storedRevision] = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision).toMatchObject({ previewStatus: "failed" });
+  expect(storedRevision?.previewResult).toEqual({
+    pages: [],
+    issues: [
+      {
+        field: "preview",
+        message:
+          "Preview stopped before it could finish. Check the run error, then try again.",
+      },
+    ],
+  });
+});
+
 test("a collection failure does not change the preview result", async () => {
   const { revision, site, source, user } = await setupSource("h3.missing");
   await markPreviewPassed(revision.id);

@@ -201,6 +201,60 @@ test("keeps immutable revisions and only activates a passing revision", async ()
   expect(updated.source.listUrl).toBe("https://versioned.example/new-archive");
 });
 
+test("allows AI to update a healthy old rule format", async () => {
+  const user = await createUser();
+  const { source } = await createSiteWithScrapeSource({
+    name: "Old Rules",
+    kind: "review",
+    websiteUrl: "https://old-rules.example/",
+    createdById: user.id,
+  });
+  const revision = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    rules,
+    author: "person",
+    createdById: user.id,
+  });
+  await markPreviewPassed(revision.id);
+  await db
+    .update(scrapeSourceRevisions)
+    .set({ rulesVersion: 10 })
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+
+  await expect(
+    createScrapeSourceSuggestionRun({
+      scrapeSourceId: source.id,
+      requestedById: user.id,
+    }),
+  ).resolves.toMatchObject({ purpose: "suggest", status: "queued" });
+});
+
+test("does not replace a healthy current rule format", async () => {
+  const user = await createUser();
+  const { source } = await createSiteWithScrapeSource({
+    name: "Current Rules",
+    kind: "review",
+    websiteUrl: "https://current-rules.example/",
+    createdById: user.id,
+  });
+  const revision = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    rules,
+    author: "person",
+    createdById: user.id,
+  });
+  await markPreviewPassed(revision.id);
+
+  await expect(
+    createScrapeSourceSuggestionRun({
+      scrapeSourceId: source.id,
+      requestedById: user.id,
+    }),
+  ).rejects.toThrow(
+    "AI suggestions are available only when the saved rules need updating or the latest preview fails.",
+  );
+});
+
 test("an old worker cannot overwrite a preview after another worker takes over", async () => {
   const user = await createUser();
   const { site, source } = await createSiteWithScrapeSource({

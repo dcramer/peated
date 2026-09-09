@@ -15,7 +15,9 @@ import {
 } from "@peated/server/schemas";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { ScraperCoordinationError } from "../coordinator";
 import { ScraperHttpStatusError, ScraperRequestWaitError } from "../http";
+import { ScraperRunTakenOverError } from "../session";
 import { catalogListingSink } from "../sinks/catalogListings";
 import { externalReviewSink } from "../sinks/externalReviews";
 import { createStorePriceSink } from "../sinks/storePrices";
@@ -28,24 +30,22 @@ import type {
   ScraperSourceDefinition,
 } from "../types";
 import {
+  loadExecutableScrapeRules,
+  type ExecutableScrapeRules,
+} from "./compatibility";
+import {
   MAX_LIKELY_LIST_PAGES,
   findAdvertisedSyndicationPages,
   findLikelyDetailPages,
   findLikelyListPages,
   inspectSyndicationFeed,
 } from "./discovery";
-import { parseScrapeDetail, parseScrapeList } from "./parser";
 import {
   ScrapeSourcePreviewPageSchema,
   type ScrapeIssue,
   type ScrapeSourcePreviewPage,
 } from "./preview";
-import {
-  SCRAPE_SOURCE_MAX_LIST_PAGES,
-  parseScrapeRules,
-  scrapeRulesLimit,
-  type StoredScrapeRules,
-} from "./rules";
+import { SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
 import { recordScrapeSourcePreview } from "./service";
 import { MAX_PAGES_TO_CHECK } from "./setupAgent";
 import { suggestScrapeSourceRevision } from "./suggestion";
@@ -145,19 +145,6 @@ type RecordScrapeSourcePreview = (input: {
   };
 }) => Promise<void>;
 
-function linkField(rules: StoredScrapeRules) {
-  if ("articles" in rules) return "articles.link";
-  if ("products" in rules) return "products.link";
-  if ("links" in rules.list) return "list.links";
-  return "list.detailLink";
-}
-
-function nextPageField(rules: StoredScrapeRules) {
-  if ("articles" in rules) return "articles.nextPage";
-  if ("products" in rules) return "products.nextPage";
-  return "list.nextPage";
-}
-
 const ConfiguredScrapeCursorSchema = z
   .object({
     listUrls: z.array(z.url()).max(SCRAPE_SOURCE_MAX_LIST_PAGES),
@@ -170,7 +157,7 @@ const ConfiguredScrapeCursorSchema = z
 
 type ConfiguredScrapeCursor = z.infer<typeof ConfiguredScrapeCursorSchema>;
 
-function observationSchemaForRules(rules: StoredScrapeRules) {
+function observationSchemaForRules(rules: ExecutableScrapeRules) {
   if (rules.kind === "review") return ExternalReviewArticleIngestionSchema;
   if (rules.kind === "catalog") return z.array(CatalogListingInputSchema);
   return z.array(StorePriceInputSchema);
@@ -180,7 +167,7 @@ function createScrapeSourceAdapter(
   input: {
     targetKey: string;
     listUrl: string;
-    rules: StoredScrapeRules;
+    rules: ExecutableScrapeRules;
   } & (
     | { purpose: "collect" }
     | { purpose: "preview"; recordPreview: RecordScrapeSourcePreview }
@@ -200,12 +187,12 @@ function createScrapeSourceAdapter(
       while (
         state.nextListUrl &&
         listUrls.size < SCRAPE_SOURCE_MAX_LIST_PAGES &&
-        detailUrls.size < scrapeRulesLimit(input.rules)
+        detailUrls.size < input.rules.limit
       ) {
         if (listUrls.has(state.nextListUrl)) {
           throw new ScrapeSourceParseError([
             {
-              field: nextPageField(input.rules),
+              field: input.rules.nextPageField,
               message: "Pagination returned a page that was already read.",
             },
           ]);
@@ -225,8 +212,7 @@ function createScrapeSourceAdapter(
           }
           throw error;
         }
-        const listResult = parseScrapeList(
-          input.rules,
+        const listResult = input.rules.parseList(
           listResponse.body,
           listResponse.url,
         );
@@ -235,7 +221,7 @@ function createScrapeSourceAdapter(
         }
         for (const link of listResult.links) {
           detailUrls.add(link);
-          if (detailUrls.size >= scrapeRulesLimit(input.rules)) break;
+          if (detailUrls.size >= input.rules.limit) break;
         }
         state = {
           ...state,
@@ -265,11 +251,7 @@ function createScrapeSourceAdapter(
           }
           throw error;
         }
-        const parsed = parseScrapeDetail(
-          input.rules,
-          response.body,
-          response.url,
-        );
+        const parsed = input.rules.parseDetail(response.body, response.url);
         if (parsed.issues.length > 0 || !parsed.value) {
           throw new ScrapeSourceParseError(parsed.issues);
         }
@@ -305,7 +287,7 @@ function createScrapeSourceAdapter(
                 ? []
                 : [
                     {
-                      field: linkField(input.rules),
+                      field: input.rules.listLinkField,
                       message: "No pages produced valid output.",
                     },
                   ],
@@ -316,11 +298,25 @@ function createScrapeSourceAdapter(
     } catch (error) {
       if (
         input.purpose === "preview" &&
-        error instanceof ScrapeSourceParseError
+        !(error instanceof ScraperRequestWaitError) &&
+        !(error instanceof ScraperCoordinationError) &&
+        !(error instanceof ScraperRunTakenOverError)
       ) {
         await input.recordPreview({
           status: "failed",
-          result: { issues: error.issues, pages: state.previewPages },
+          result: {
+            issues:
+              error instanceof ScrapeSourceParseError
+                ? error.issues
+                : [
+                    {
+                      field: "preview",
+                      message:
+                        "Preview stopped before it could finish. Check the run error, then try again.",
+                    },
+                  ],
+            pages: state.previewPages,
+          },
         });
       }
       throw error;
@@ -333,7 +329,7 @@ export function createLocalScrapeSourcePreview(input: {
   siteKey: string;
   targetKey: string;
   listUrl: string;
-  rules: StoredScrapeRules;
+  rules: ExecutableScrapeRules;
   recordPreview: RecordScrapeSourcePreview;
 }): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
   return {
@@ -364,7 +360,7 @@ function createScrapeSourceDefinition(input: {
   targetKey: string;
   listUrl: string;
   purpose: "collect" | "preview";
-  rules: StoredScrapeRules;
+  rules: ExecutableScrapeRules;
 }): ScraperSourceDefinition<ConfiguredScrapeCursor, unknown> {
   const observationSchema = observationSchemaForRules(input.rules);
   const sink: ScraperSink<unknown> =
@@ -694,7 +690,10 @@ export async function resolveScrapeSourceRunRegistry(
     .where(eq(scrapeSourceRuns.externalSiteRunId, runId));
   if (!row) return baseRegistry;
 
-  const rules = parseScrapeRules(row.revision.rulesVersion, row.revision.rules);
+  const rules = loadExecutableScrapeRules(
+    row.revision.rulesVersion,
+    row.revision.rules,
+  );
   if (row.run.purpose === "suggest") {
     throw new Error("An AI run cannot use saved rules.");
   }

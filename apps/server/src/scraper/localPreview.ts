@@ -10,12 +10,9 @@ import { syncExternalSites } from "@peated/server/lib/externalSites";
 import { ExternalSiteKeySchema } from "@peated/server/schemas/externalSites";
 import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
+import { loadExecutableScrapeRules } from "./configured/compatibility";
 import type { ScrapeSourcePreviewResult } from "./configured/preview";
-import {
-  parseScrapeRules,
-  scrapeRunRequestLimit,
-  withScrapeRulesLimit,
-} from "./configured/rules";
+import { SCRAPE_SOURCE_MAX_LIST_PAGES } from "./configured/rules";
 import { createLocalScrapeSourcePreview } from "./configured/runtime";
 import { loadScrapeSourceTarget } from "./configured/target";
 import { defineScrapeTarget } from "./definitions";
@@ -102,9 +99,12 @@ export async function runLocalScrapeSourcePreview(
 ) {
   const parsed = InputSchema.parse(input);
   const clock = options.clock ?? scraperSystemClock;
-  const parsedRules = parseScrapeRules(parsed.rulesVersion, parsed.rules);
+  const parsedRules = loadExecutableScrapeRules(
+    parsed.rulesVersion,
+    parsed.rules,
+  );
   const rules = parsed.limit
-    ? withScrapeRulesLimit(parsedRules, parsed.limit)
+    ? parsedRules.withLimit(parsed.limit)
     : parsedRules;
 
   await syncExternalSites();
@@ -202,7 +202,7 @@ export async function runLocalScrapeSourcePreview(
       externalSiteId: site.id,
       trigger: "manual",
       purpose: "preview",
-      requestLimit: scrapeRunRequestLimit(rules),
+      requestLimit: rules.limit + SCRAPE_SOURCE_MAX_LIST_PAGES,
       requestErrorCount: 0,
     })
     .returning();

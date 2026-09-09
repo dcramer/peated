@@ -1,5 +1,9 @@
+import { SCRAPE_RULES_VERSION } from "@peated/server/schemas";
 import { describe, expect, it } from "vitest";
-import { getSetupAfterLatestVersion } from "./scraperParsingStatus";
+import {
+  getSetupAfterLatestVersion,
+  needsScrapeRulesUpdate,
+} from "./scraperParsingStatus";
 
 const failedSetup = {
   runId: 1,
@@ -32,5 +36,24 @@ describe("getSetupAfterLatestVersion", () => {
     expect(
       getSetupAfterLatestVersion({ setup: failedSetup, revisions: [] }),
     ).toEqual(failedSetup);
+  });
+});
+
+describe("needsScrapeRulesUpdate", () => {
+  it("finds a latest version that predates the current rule format", () => {
+    expect(
+      needsScrapeRulesUpdate({
+        revisions: [{ rulesVersion: SCRAPE_RULES_VERSION - 1 }],
+      }),
+    ).toBe(true);
+  });
+
+  it("accepts the current rule format and an empty history", () => {
+    expect(
+      needsScrapeRulesUpdate({
+        revisions: [{ rulesVersion: SCRAPE_RULES_VERSION }],
+      }),
+    ).toBe(false);
+    expect(needsScrapeRulesUpdate({ revisions: [] })).toBe(false);
   });
 });

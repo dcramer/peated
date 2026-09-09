@@ -11,9 +11,8 @@ import { and, eq } from "drizzle-orm";
 import { setTimeout as wait } from "node:timers/promises";
 import { createScraperRegistry } from "../definitions";
 import { executeScraperRun } from "../runs";
-import { parseScrapeDetail, parseScrapeList } from "./parser";
+import { loadExecutableScrapeRules } from "./compatibility";
 import { ScrapeSourcePreviewResultSchema } from "./preview";
-import { parseScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
   createScrapeSourceSuggestionRun,
@@ -240,12 +239,11 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         },
       });
 
-      const rules = parseScrapeRules(
+      const rules = loadExecutableScrapeRules(
         suggestedRevision.rulesVersion,
         suggestedRevision.rules,
       );
-      const listResult = parseScrapeList(
-        rules,
+      const listResult = rules.parseList(
         getFixtureHtml(LIST_URL),
         new URL(LIST_URL),
       );
@@ -259,11 +257,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         SECOND_PRODUCT_URL,
         THIRD_PRODUCT_URL,
       ].map((url) => {
-        const result = parseScrapeDetail(
-          rules,
-          getFixtureHtml(url),
-          new URL(url),
-        );
+        const result = rules.parseDetail(getFixtureHtml(url), new URL(url));
         expect(result.issues).toEqual([]);
         if (result.kind !== "price") {
           throw new Error("Generated rules did not parse a price page.");
