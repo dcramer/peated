@@ -1989,6 +1989,13 @@
       "when": 1788922307061,
       "tag": "0283_kind_silver_fox",
       "breakpoints": false
+    },
+    {
+      "idx": 284,
+      "version": "7",
+      "when": 1788923643600,
+      "tag": "0284_goofy_jasper_sitwell",
+      "breakpoints": false
     }
   ]
 }

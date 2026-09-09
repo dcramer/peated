@@ -1,0 +1,1 @@
+CREATE INDEX "bottle_series_idx" ON "bottle" USING btree ("series_id");
