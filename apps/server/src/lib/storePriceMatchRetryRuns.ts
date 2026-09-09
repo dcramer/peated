@@ -27,6 +27,7 @@ import {
   lte,
   or,
   sql,
+  type SQL,
 } from "drizzle-orm";
 
 const RETRY_RUN_JOB_ATTEMPTS = 3;
@@ -233,23 +234,42 @@ async function claimRetryRunItem({
         );
     }
 
-    const claimableWhere = or(
+    const pendingWhere = and(
+      eq(storePriceMatchRetryRunItems.runId, runId),
       eq(storePriceMatchRetryRunItems.status, "pending"),
-      and(
-        getStaleRetryRunItemWhere(runId, staleAfterMs),
-        lt(storePriceMatchRetryRunItems.attempts, RETRY_RUN_ITEM_MAX_ATTEMPTS),
-      ),
-    );
+    )!;
+    const staleWhere = and(
+      getStaleRetryRunItemWhere(runId, staleAfterMs),
+      lt(storePriceMatchRetryRunItems.attempts, RETRY_RUN_ITEM_MAX_ATTEMPTS),
+    )!;
     const [pendingItem] = await tx
       .select({
         id: storePriceMatchRetryRunItems.id,
       })
       .from(storePriceMatchRetryRunItems)
-      .where(and(eq(storePriceMatchRetryRunItems.runId, runId), claimableWhere))
+      .where(pendingWhere)
+      .orderBy(asc(storePriceMatchRetryRunItems.id))
+      .limit(1);
+    const [staleItem] = await tx
+      .select({
+        id: storePriceMatchRetryRunItems.id,
+      })
+      .from(storePriceMatchRetryRunItems)
+      .where(staleWhere)
       .orderBy(asc(storePriceMatchRetryRunItems.id))
       .limit(1);
 
-    if (!pendingItem) return null;
+    let claimableWhere: SQL<unknown>;
+    let candidate: { id: number } | undefined;
+    if (pendingItem && (!staleItem || pendingItem.id < staleItem.id)) {
+      candidate = pendingItem;
+      claimableWhere = pendingWhere;
+    } else {
+      candidate = staleItem;
+      claimableWhere = staleWhere;
+    }
+
+    if (!candidate) return null;
 
     const [item] = await tx
       .update(storePriceMatchRetryRunItems)
@@ -260,10 +280,7 @@ async function claimRetryRunItem({
         updatedAt: sql`NOW()`,
       })
       .where(
-        and(
-          eq(storePriceMatchRetryRunItems.id, pendingItem.id),
-          claimableWhere,
-        ),
+        and(eq(storePriceMatchRetryRunItems.id, candidate.id), claimableWhere),
       )
       .returning();
     return item ?? null;

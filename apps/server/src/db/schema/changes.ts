@@ -1,5 +1,5 @@
 import type { CatalogVerificationCreationMetadata } from "@peated/catalog-verifier";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -49,6 +49,9 @@ export const changes = pgTable(
   },
   (table) => [
     index("change_actor_idx").on(table.actorId),
+    index("change_feed_page_idx")
+      .on(table.id, table.objectType, table.actorId)
+      .where(sql`${table.objectType} IN ('bottle', 'entity')`),
     index("change_object_created_idx").on(
       table.objectType,
       table.objectId,
