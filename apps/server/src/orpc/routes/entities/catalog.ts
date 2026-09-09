@@ -5,33 +5,16 @@ import {
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
+import { bottleIdsForEntity } from "@peated/server/lib/entityBottleIds";
 import { implement } from "@peated/server/orpc";
 import entityCatalogContract from "@peated/server/orpc/contracts/entities/catalog";
 import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
-import { union } from "drizzle-orm/pg-core";
 
 const activeBottleWhere = (entityId: number) => {
-  // Catalog reads use the role indexes independently instead of scanning every
-  // Bottle through one OR expression. The UNION also removes role overlaps.
-  const associatedBottleIds = union(
-    db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(eq(bottles.brandId, entityId)),
-    db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(eq(bottles.bottlerId, entityId)),
-    db
-      .select({ id: bottlesToDistillers.bottleId })
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.distillerId, entityId)),
-  );
-
   return and(
     isNotNull(bottles.groupId),
     sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-    inArray(bottles.id, associatedBottleIds),
+    inArray(bottles.id, bottleIdsForEntity(entityId)),
   );
 };
 
