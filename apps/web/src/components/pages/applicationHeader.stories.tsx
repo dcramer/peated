@@ -139,6 +139,17 @@ export const SignedOut: Story = {
   render: () => <HeaderExample signedIn={false} />,
 };
 
+export const MobileMenuOpen: Story = {
+  globals: {
+    viewport: { isRotated: false, value: "peatedPhone" },
+  },
+  render: () => <HeaderExample />,
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.queryByRole("button", { name: "Open navigation" });
+    if (trigger) await userEvent.click(trigger);
+  },
+};
+
 export const SearchOpen: Story = {
   render: () => <HeaderExample searchOpen />,
 };
