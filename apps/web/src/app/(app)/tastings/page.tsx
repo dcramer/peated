@@ -5,5 +5,5 @@ import { redirect } from "next/navigation";
 export default async function TastingsPage() {
   const user = await getCurrentUser();
   if (!user) return redirectToAuth({ pathname: "/tastings" });
-  redirect(`/users/${user.username}`);
+  redirect(`/users/${user.username}/tastings`);
 }
