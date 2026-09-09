@@ -128,6 +128,8 @@ export const bottleSeries = pgTable(
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
       .notNull(),
+    // TODO(catalog): Denormalize the earliest known member Bottle release
+    // year, month, and day for Series chronology while preserving partial dates.
     representativeBottleId: bigint("representative_bottle_id", {
       mode: "number",
     }).references((): AnyPgColumn => bottles.id, { onDelete: "set null" }),
