@@ -15,6 +15,14 @@ results from individual tasks live under `docs/research/catalog/`.
 5. Record what was searched, what years and markets were covered, and what is
    still unknown.
 
+For a large, cask-heavy catalog, keep two independent inventories: the expected
+release inventory from outside sources and the complete Peated scope fetched by
+every relevant relationship. Partition the release inventory by vintage or
+distillation year and by marketed range. Reconcile both directions after every
+batch of changes. Names alone are not stable enough for this comparison; use
+the exact combination of producer, age or NAS, vintage, bottling year, ABV,
+edition, cask number, and Series when those facts are known.
+
 ## Best Places To Search
 
 | Place                              | Good for                                   | Watch for                                                 |
@@ -76,9 +84,18 @@ producer, auction, or retailer evidence.
 
 - A current range is not the full catalog.
 - One country site is not the worldwide catalog.
+- A distillery name is not the only way its historical releases were branded.
+  Check former owner and house brands, domestic blends, and local-language
+  labels, then require evidence that the distillery made the whisky in scope.
 - One auction or shop row is not always a separate release.
 - Gift boxes, bottle sizes, wax colors, and label changes often use the same
   whisky.
+- A person's, hotel, bar, retailer, importer, or private-cask customer's name
+  on a label does not establish a Bottler. Look for evidence that a business
+  independently selected and released the whisky.
+- Shared artwork or packaging does not establish a BottleSeries. Confirm a
+  named range, its Brand, and each member; split similarly named ranges when the
+  Brand changes.
 - Labels can be more accurate than page text.
 - Auction, shop, image, approval, distillation, and bottling dates are not
   release dates.
@@ -95,7 +112,9 @@ producer, auction, or retailer evidence.
   the exact label against an independent auction, producer, or retailer source
   before creating a Bottle; a plausible old date and name are not evidence.
 - An exact image may still lack permission for Peated to store it.
-- A direct image URL does not record its source or license.
+- A direct image URL does not record its source page or license. Count image
+  identity, source-page provenance, and reuse status separately in the final
+  audit.
 
 ## Preserve Durable Research
 
