@@ -437,6 +437,9 @@ export const storePriceMatchRetryRunItems = pgTable(
       table.runId,
       table.status,
     ),
+    index("store_price_match_retry_run_item_pending_idx")
+      .on(table.runId, table.id)
+      .where(sql`${table.status} = 'pending'`),
     index("store_price_match_retry_run_item_proposal_idx").on(table.proposalId),
     index("store_price_match_retry_run_item_price_idx").on(table.priceId),
   ],

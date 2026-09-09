@@ -1,0 +1,1 @@
+CREATE INDEX "store_price_match_retry_run_item_pending_idx" ON "store_price_match_retry_run_item" USING btree ("run_id","id") WHERE "store_price_match_retry_run_item"."status" = 'pending';
