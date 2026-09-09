@@ -32,6 +32,17 @@ describe("GET /entities/:entity", () => {
     expect(data.updatedAt).toBe(updatedAt.toISOString());
   });
 
+  test("returns current status", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({
+      kind: "brand",
+      status: "discontinued",
+    });
+
+    const data = await routerClient.entities.details({ entity: entity.id });
+
+    expect(data.status).toBe("discontinued");
+  });
+
   test("returns images with the primary image first", async ({ fixtures }) => {
     const entity = await fixtures.Entity();
     const actor = await getUserActor(await fixtures.User());

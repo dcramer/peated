@@ -2,12 +2,15 @@ import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
+import {
+  EntityInputObjectSchema,
+  EntityKindEnum,
+} from "@peated/server/schemas";
 import { getGeneratedEntityDetails } from "@peated/server/worker/jobs/generateEntityDetails";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = EntityInputSchema.partial();
+const InputSchema = EntityInputObjectSchema.partial();
 
 const OutputSchema = z.object({
   description: z.string().nullish(),

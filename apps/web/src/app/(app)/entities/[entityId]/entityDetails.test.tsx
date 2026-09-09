@@ -24,4 +24,25 @@ describe("EntityDetails", () => {
     expect(html).toContain('href="/companies/2-example-company"');
     expect(html).not.toContain('href="/entities/2"');
   });
+
+  test("shows known status and labels location as origin", () => {
+    const entity = {
+      ...mockEntity,
+      images: [],
+      status: "mothballed",
+    } satisfies Entity;
+
+    const html = renderToStaticMarkup(<EntityDetails entity={entity} />);
+
+    expect(html).toContain("Origin");
+    expect(html).toContain("Mothballed");
+  });
+
+  test("omits an unknown status", () => {
+    const entity = { ...mockEntity, images: [], status: null } satisfies Entity;
+
+    const html = renderToStaticMarkup(<EntityDetails entity={entity} />);
+
+    expect(html).not.toContain("Status");
+  });
 });

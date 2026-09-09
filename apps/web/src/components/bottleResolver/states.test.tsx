@@ -19,6 +19,7 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
       name: "Springbank",
       shortName: null,
       kind: "brand",
+      status: null,
       ownerId: null,
       description: null,
       descriptionSrc: null,

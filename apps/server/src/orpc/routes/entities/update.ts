@@ -2,6 +2,7 @@ import {
   EntityUpdateAuthorizationError,
   EntityUpdateConflictError,
   EntityUpdateFailedError,
+  EntityUpdateInputError,
   EntityUpdateInputSchema,
   EntityUpdateNotFoundError,
   updateEntity,
@@ -46,6 +47,9 @@ export default procedure
       }
       if (error instanceof EntityUpdateNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
+      }
+      if (error instanceof EntityUpdateInputError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
       }
       if (error instanceof EntityUpdateConflictError) {
         throw errors.CONFLICT({ message: error.message, cause: error });

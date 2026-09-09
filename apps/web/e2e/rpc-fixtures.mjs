@@ -177,6 +177,7 @@ export const testBrand = {
   name: "Lagavulin",
   shortName: null,
   kind: "brand",
+  status: null,
   ownerId: null,
   description: null,
   descriptionSrc: null,

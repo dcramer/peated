@@ -9,9 +9,10 @@ import type { AnyDatabase } from "../db";
 import type { Collection, Entity, EntityKind } from "../db/schema";
 import { changes, collections, entities, entityReferences } from "../db/schema";
 import {
-  EntityInputSchema,
+  EntityInputObjectSchema,
   EntityKindEnum,
   type EntitySchema,
+  validateEntityStatus,
 } from "../schemas";
 import { getCatalogVerificationCreationMetadata } from "./catalogVerification";
 
@@ -24,7 +25,7 @@ export type UpsertOutcome<T> =
     }
   | undefined;
 
-const EntityUpsertDataSchema = EntityInputSchema.omit({
+const EntityUpsertDataObjectSchema = EntityInputObjectSchema.omit({
   country: true,
   kind: true,
   region: true,
@@ -34,9 +35,13 @@ const EntityUpsertDataSchema = EntityInputSchema.omit({
   countryId: z.number().nullish(),
   regionId: z.number().nullish(),
 });
-const EntityInsertDataSchema = EntityUpsertDataSchema.omit({
+const EntityUpsertDataSchema =
+  EntityUpsertDataObjectSchema.superRefine(validateEntityStatus);
+const EntityInsertDataSchema = EntityUpsertDataObjectSchema.omit({
   id: true,
-}).required({ kind: true });
+})
+  .required({ kind: true })
+  .superRefine(validateEntityStatus);
 type EntityUpsertData = z.input<typeof EntityUpsertDataSchema>;
 type EntityUpsertInput = number | EntityUpsertData;
 

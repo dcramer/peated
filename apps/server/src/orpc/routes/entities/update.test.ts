@@ -327,6 +327,57 @@ describe("PATCH /entities/:entity", () => {
     expect(newEntity.kind).toEqual("distillery");
   });
 
+  test("can set and clear status", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "brand" });
+    const modUser = await fixtures.User({ mod: true });
+
+    const setStatus = await routerClient.entities.update(
+      {
+        entity: entity.id,
+        status: "discontinued",
+      },
+      { context: { user: modUser } },
+    );
+    expect(setStatus.status).toBe("discontinued");
+
+    const clearedStatus = await routerClient.entities.update(
+      {
+        entity: entity.id,
+        status: null,
+      },
+      { context: { user: modUser } },
+    );
+    expect(clearedStatus.status).toBeNull();
+  });
+
+  test("rejects a status that does not match the final kind", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      kind: "brand",
+      status: "discontinued",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const error = await waitError(
+      routerClient.entities.update(
+        {
+          entity: entity.id,
+          kind: "distillery",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(error).toMatchObject({ status: 400 });
+    expect(error.message).toBe(
+      "Status discontinued is not allowed for distillery.",
+    );
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
+    ).resolves.toMatchObject({ kind: "brand", status: "discontinued" });
+  });
+
   test("can change kind and current owner", async ({ fixtures }) => {
     const owner = await fixtures.Entity({ kind: "company" });
     const entity = await fixtures.Entity();

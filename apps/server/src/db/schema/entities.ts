@@ -1,9 +1,10 @@
-import { ENTITY_KIND_LIST } from "@peated/server/constants";
+import { ENTITY_KIND_LIST, ENTITY_STATUS_LIST } from "@peated/server/constants";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
   boolean,
+  check,
   foreignKey,
   index,
   pgEnum,
@@ -31,6 +32,7 @@ export const legacyEntityTypeEnum = pgEnum("entity_type", [
 ]);
 
 export const entityKindEnum = pgEnum("entity_kind", ENTITY_KIND_LIST);
+export const entityStatusEnum = pgEnum("entity_status", ENTITY_STATUS_LIST);
 
 export const entities = pgTable(
   "entity",
@@ -44,6 +46,8 @@ export const entities = pgTable(
 
     searchVector: tsvector("search_vector"),
 
+    // These fields record where the Entity comes from, not a headquarters or
+    // office. For a Distillery, they record the production site.
     _country: text("country"),
     countryId: bigint("country_id", { mode: "number" }).references(
       () => countries.id,
@@ -64,6 +68,7 @@ export const entities = pgTable(
     // Every Entity has one top-level identity kind. Bottle links describe how
     // an Entity is used and must not change this value.
     kind: entityKindEnum("kind").notNull(),
+    status: entityStatusEnum("status"),
 
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
@@ -103,6 +108,15 @@ export const entities = pgTable(
       .onDelete("set null")
       .onUpdate("set null"),
     index("entity_kind_idx").on(table.kind),
+    index("entity_status_idx").on(table.status),
+    check(
+      "entity_status_kind_check",
+      sql`${table.status} IS NULL
+        OR ${table.status} = 'active'
+        OR (${table.kind} = 'distillery' AND ${table.status} IN ('mothballed', 'closed'))
+        OR (${table.kind} = 'brand' AND ${table.status} = 'discontinued')
+        OR (${table.kind} IN ('bottler', 'company') AND ${table.status} = 'closed')`,
+    ),
     index("entity_owner_idx").on(table.ownerId),
     index("entity_search_idx").using("gin", table.searchVector),
     index("entity_country_by_idx").on(table.countryId),

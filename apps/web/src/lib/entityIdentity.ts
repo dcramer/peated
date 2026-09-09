@@ -12,6 +12,7 @@ export function getEntityIdentityProps(
   return {
     name: entity.name,
     kind: entity.kind,
+    // Location means origin, or production site for a Distillery.
     location:
       [entity.region?.name, entity.country?.name].filter(Boolean).join(", ") ||
       undefined,
