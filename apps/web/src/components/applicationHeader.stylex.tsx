@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  Dialog,
+  DialogPanel,
   Menu as HeadlessMenu,
   MenuButton,
   MenuItem,
@@ -61,7 +63,10 @@ export type ApplicationHeaderProps = {
   search?: ReactNode;
 };
 
-/** Keeps search and database navigation reachable across all header widths. */
+/**
+ * Keeps search and database navigation reachable across all header widths.
+ * Mobile navigation opens as a viewport-sized modal with trapped focus and its own scroll.
+ */
 export function ApplicationHeader({
   account,
   accountItems,
@@ -260,24 +265,55 @@ export function ApplicationHeader({
             />
           </div>
         ) : null}
-        {drawerOpen ? (
-          <nav aria-label="Mobile navigation" {...stylex.props(styles.drawer)}>
-            <HeaderDrawerGroup
-              currentHref={currentHref}
-              items={databaseItems}
-              label="Database"
-            />
-            {personalItems.length ? (
+      </div>
+      <Dialog
+        aria-label="Navigation menu"
+        onClose={setDrawerOpen}
+        open={drawerOpen}
+        {...stylex.props(styles.drawerDialog)}
+      >
+        <div {...stylex.props(styles.drawerPosition)}>
+          <DialogPanel {...stylex.props(styles.drawerPanel)}>
+            <div {...stylex.props(styles.drawerHeader)}>
+              <IconButton
+                data-autofocus
+                icon={<X aria-hidden="true" size={18} />}
+                label="Close navigation"
+                onClick={() => setDrawerOpen(false)}
+                size="sm"
+                variant="text"
+              />
+              <AppLink
+                href={brandHref}
+                onClick={() => setDrawerOpen(false)}
+                {...stylex.props(styles.brand)}
+              >
+                {brand}
+              </AppLink>
+            </div>
+            <nav
+              aria-label="Mobile navigation"
+              {...stylex.props(styles.drawer)}
+            >
               <HeaderDrawerGroup
                 currentHref={currentHref}
-                items={personalItems}
-                label="You"
+                items={databaseItems}
+                label="Database"
+                onNavigate={() => setDrawerOpen(false)}
               />
-            ) : null}
-            <div {...stylex.props(styles.drawerAction)}>{action}</div>
-          </nav>
-        ) : null}
-      </div>
+              {personalItems.length ? (
+                <HeaderDrawerGroup
+                  currentHref={currentHref}
+                  items={personalItems}
+                  label="You"
+                  onNavigate={() => setDrawerOpen(false)}
+                />
+              ) : null}
+              <div {...stylex.props(styles.drawerAction)}>{action}</div>
+            </nav>
+          </DialogPanel>
+        </div>
+      </Dialog>
     </header>
   );
 }
@@ -357,10 +393,12 @@ function HeaderDrawerGroup({
   currentHref,
   items,
   label,
+  onNavigate,
 }: {
   currentHref: string;
   items: readonly HeaderNavigationItem[];
   label: string;
+  onNavigate: () => void;
 }) {
   return (
     <section>
@@ -377,6 +415,7 @@ function HeaderDrawerGroup({
                   : undefined
               }
               href={item.href}
+              onClick={onNavigate}
               {...stylex.props(
                 foundationStyles.interactive,
                 styles.drawerLink,
@@ -664,18 +703,57 @@ const styles = stylex.create({
       display: "none",
     },
   },
+  drawerDialog: {
+    position: "relative",
+    zIndex: zIndices.dialog,
+  },
+  drawerPosition: {
+    position: "fixed",
+    inset: 0,
+  },
+  drawerPanel: {
+    boxSizing: "border-box",
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    minWidth: 0,
+    flexDirection: "column",
+    backgroundColor: colors.ground,
+    color: colors.ink,
+  },
+  drawerHeader: {
+    boxSizing: "border-box",
+    display: "flex",
+    width: "100%",
+    minHeight: "54px",
+    alignItems: "center",
+    gap: space.x2,
+    paddingTop: `calc(${space.x2} + env(safe-area-inset-top))`,
+    paddingRight: `max(${space.x3}, env(safe-area-inset-right))`,
+    paddingBottom: space.x2,
+    paddingLeft: `max(${space.x3}, env(safe-area-inset-left))`,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+    flexShrink: 0,
+  },
   drawer: {
-    display: "none",
+    boxSizing: "border-box",
+    display: "flex",
+    width: "100%",
+    maxWidth: "1320px",
+    minHeight: 0,
+    marginRight: "auto",
+    marginLeft: "auto",
+    overflowY: "auto",
+    overscrollBehavior: "contain",
+    flex: 1,
+    flexDirection: "column",
+    rowGap: space.x4,
     paddingTop: space.x4,
-    paddingBottom: space.x4,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-    [MOBILE]: {
-      display: "flex",
-      flexDirection: "column",
-      rowGap: space.x4,
-    },
+    paddingRight: `max(${space.x3}, env(safe-area-inset-right))`,
+    paddingBottom: `max(${space.x4}, env(safe-area-inset-bottom))`,
+    paddingLeft: `max(${space.x3}, env(safe-area-inset-left))`,
   },
   drawerHeading: { marginBottom: space.x2 },
   drawerList: {
