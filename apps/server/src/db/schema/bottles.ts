@@ -102,6 +102,7 @@ export const BOTTLE_REFERENCE_ASSIGNMENT_SOURCES = [
   "classifier_approved",
   "human_approved",
 ] as const;
+export const BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS = 3072;
 export type BottleReferenceAssignmentSource =
   (typeof BOTTLE_REFERENCE_ASSIGNMENT_SOURCES)[number];
 export const bottleReferenceAssignmentSourceEnum = pgEnum(
@@ -842,7 +843,9 @@ export const bottleReferences = pgTable(
     // Retained compatibility field for safe migrations; do not use in new logic.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
     name: varchar("name", { length: 255 }).notNull(),
-    embedding: vector("embedding", { length: 3072 }),
+    embedding: vector("embedding", {
+      length: BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS,
+    }),
     // Ignored references are retained for audit/history but excluded from exact matching.
     ignored: boolean("ignored").default(false),
     assignmentSource: bottleReferenceAssignmentSourceEnum("assignment_source")
@@ -864,6 +867,14 @@ export const bottleReferences = pgTable(
       "btree",
       sql`LOWER(${table.name})`,
     ),
+    index("bottle_reference_embedding_hnsw_idx")
+      .using(
+        "hnsw",
+        sql`(${table.embedding}::halfvec(3072)) halfvec_cosine_ops`,
+      )
+      .where(
+        sql`${table.embedding} IS NOT NULL AND ${table.ignored} IS DISTINCT FROM TRUE`,
+      ),
     index("bottle_reference_bottle_idx").on(table.bottleId),
     index("bottle_reference_release_idx").on(table.legacyReleaseId),
     index("bottle_reference_assigned_by_actor_idx").on(table.assignedByActorId),
