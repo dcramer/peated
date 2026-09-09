@@ -4,17 +4,10 @@ function normalizeReviewKeyPart(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLocaleLowerCase("en");
 }
 
-/** Keeps the same review matched when other reviews move on the page. */
-export function reviewSourceKey(
-  name: string,
-  reviewerName: string | null,
-  repeatedReviewNumber = 1,
-) {
+/** A review is matched by its name and writer within an article, never page order. */
+export function reviewSourceKey(name: string, reviewerName: string | null) {
   const digest = createHash("sha256")
     .update([name, reviewerName ?? ""].map(normalizeReviewKeyPart).join("\n"))
     .digest("hex");
-  const baseKey = `review:${digest}`;
-  return repeatedReviewNumber === 1
-    ? baseKey
-    : `${baseKey}:${repeatedReviewNumber}`;
+  return `review:${digest}`;
 }

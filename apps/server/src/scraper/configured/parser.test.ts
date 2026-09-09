@@ -66,7 +66,7 @@ it("reads price fields from text and their usual HTML attributes", () => {
       rules,
       `<head>
         <link rel="canonical" href="/products/one">
-        <meta property="og:image" content="https://images.example/one.jpg">
+        <meta property="og:image" content="http://images.example/one.jpg">
       </head><body>
         <h1>Example Whisky</h1>
         <span class="price"></span>
@@ -144,9 +144,9 @@ it("reads common Bottle facts from surrounding text", () => {
       rules,
       `<h1>Example 2012</h1>
        <p class="facts">Distilled in 2012</p>
-       <p class="facts">10 Year Old</p>
+       <p class="facts">10-15 Year Old whiskies</p>
        <p class="facts">46.3% ABV</p>
-       <p class="facts">70cl</p>
+       <p class="facts">Volume (ml): 700</p>
        <p class="release">Released in 2024</p>`,
       new URL("https://example.test/whisky/one"),
     ),
@@ -312,6 +312,41 @@ it("splits unwrapped reviews at their name selectors", () => {
       },
     },
   });
+});
+
+it("rejects version 10 reviews without a stable identity", () => {
+  const rules = {
+    kind: "review",
+    list: { links: "a.review", nextPage: null, limit: 10 },
+    detail: {
+      url: null,
+      title: "h1",
+      date: null,
+      reviews: {
+        area: "main",
+        item: "section.review",
+        name: "h2",
+        reviewer: ".writer",
+        tastingNotes: null,
+        score: null,
+      },
+    },
+  } satisfies ScrapeRules;
+  const result = parseScrapeDetail(
+    rules,
+    `<h1>Two reviews</h1><main>
+      <section class="review"><h2>Same Whisky</h2><p class="writer">Ada</p><p>First review.</p></section>
+      <section class="review"><h2>Same Whisky</h2><p class="writer">Ada</p><p>Second review.</p></section>
+    </main>`,
+    new URL("https://reviews.example/2026/09/07/two-reviews"),
+  );
+
+  expect(result.issues).toContainEqual({
+    field: "detail.reviews.name",
+    message:
+      "Each review in an article must have a unique name and writer combination.",
+  });
+  expect(result.value).toBeNull();
 });
 
 it("uses an article writer for each wrapped review", () => {
@@ -2405,7 +2440,7 @@ describe("scrape source parser", () => {
     );
   });
 
-  it("keeps repeated reviews separate", () => {
+  it("rejects reviews without a stable identity", () => {
     const result = parseScrapeDetail(
       currentReviewRules,
       `<article>
@@ -2419,15 +2454,12 @@ describe("scrape source parser", () => {
       </article>`,
       new URL("https://reviews.test/reviews"),
     );
-    if (result.kind !== "review" || !result.value) {
-      throw new Error("Expected parsed reviews.");
-    }
-    const keys = result.value.article.externalReviews.map(
-      ({ sourceKey }) => sourceKey,
-    );
-
-    expect(new Set(keys)).toHaveLength(2);
-    expect(keys[1]).toBe(`${keys[0]}:2`);
+    expect(result.issues).toContainEqual({
+      field: "article.reviews.name",
+      message:
+        "Each review in an article must have a unique name and writer combination.",
+    });
+    expect(result.value).toBeNull();
   });
 
   it("can keep the full article area for one version 8 review", () => {

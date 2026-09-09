@@ -674,10 +674,15 @@ function parseVolume(value: string | null) {
   if (!value) return null;
   const normalized = value.toLowerCase().replaceAll(",", "");
   const amount = normalized.match(/(-?\d+(?:\.\d+)?)\s*(ml|cl|l)(?:\b|$)/u);
-  const number = amount ? Number(amount[1]) : parsePlainNumber(normalized);
+  const labeled = normalized.match(
+    /\bvolume\s*\(\s*(ml|cl|l)\s*\)\s*:?\s*(-?\d+(?:\.\d+)?)/u,
+  );
+  const numberText = amount?.[1] ?? labeled?.[2];
+  const number = numberText ? Number(numberText) : parsePlainNumber(normalized);
   if (number === null || number <= 0) return null;
-  if (amount?.[2] === "cl") return Math.round(number * 10);
-  if (amount?.[2] === "l") return Math.round(number * 1000);
+  const unit = amount?.[2] ?? labeled?.[1];
+  if (unit === "cl") return Math.round(number * 10);
+  if (unit === "l") return Math.round(number * 1000);
   return Math.round(number);
 }
 
@@ -691,6 +696,10 @@ function parseAbv(value: string | null) {
 
 function parseStatedAge(value: string | null) {
   if (!value) return null;
+  const range = value.match(
+    /(\d+(?:\.\d+)?)\s*[-–—]\s*\d+(?:\.\d+)?\s*(?:years?\s*old|y\.?\s*o\.?)\b/iu,
+  );
+  if (range) return Number(range[1]);
   const match = value.match(
     /(\d+(?:\.\d+)?)\s*(?:years?\s*old|y\.?\s*o\.?)\b/iu,
   );
@@ -1264,7 +1273,7 @@ function parseSavedReviewDetail(
   }> = [];
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
-  const reviewKeyCounts = new Map<string, number>();
+  const reviewKeys = new Set<string>();
   const keysUseNameAndWriter = usesNameBasedReviewKeys(rules);
   const reviewItems = selectSavedReviewItems($, rules.article.reviews);
   if (!reviewItems) {
@@ -1299,12 +1308,20 @@ function parseSavedReviewDetail(
     const reviewerName = rules.article.reviews.reviewer
       ? readSavedReviewField($, item, rules.article.reviews.reviewer, index)
       : null;
-    const firstReviewKey = reviewSourceKey(name, reviewerName);
-    const repeatedReviewNumber = (reviewKeyCounts.get(firstReviewKey) ?? 0) + 1;
-    reviewKeyCounts.set(firstReviewKey, repeatedReviewNumber);
     const sourceKey = keysUseNameAndWriter
-      ? reviewSourceKey(name, reviewerName, repeatedReviewNumber)
+      ? reviewSourceKey(name, reviewerName)
       : `${canonicalUrl?.toString() ?? pageUrl.toString()}#review-${index + 1}`;
+    if (keysUseNameAndWriter) {
+      if (reviewKeys.has(sourceKey)) {
+        issues.push({
+          field: "article.reviews.name",
+          message:
+            "Each review in an article must have a unique name and writer combination.",
+        });
+        return;
+      }
+      reviewKeys.add(sourceKey);
+    }
     const scoreRule = rules.article.reviews.score;
     const scoreText = scoreRule
       ? readSavedReviewField($, item, scoreRule, index)
@@ -1727,7 +1744,7 @@ function parseReviewPage(
   }> = [];
   const externalReviewTexts: Record<string, string> = {};
   const externalReviewBodies: Record<string, string> = {};
-  const keyCounts = new Map<string, number>();
+  const reviewKeys = new Set<string>();
   const reviewItems = selectReviews($, rules.detail.reviews);
   if (!reviewItems) {
     issues.push({
@@ -1770,10 +1787,16 @@ function parseReviewPage(
         ? (readSelectedValue(item, reviewerSelector) ?? sharedReviewerName)
         : null,
     );
-    const firstKey = reviewSourceKey(name, reviewerName);
-    const repeat = (keyCounts.get(firstKey) ?? 0) + 1;
-    keyCounts.set(firstKey, repeat);
-    const sourceKey = reviewSourceKey(name, reviewerName, repeat);
+    const sourceKey = reviewSourceKey(name, reviewerName);
+    if (reviewKeys.has(sourceKey)) {
+      issues.push({
+        field: "detail.reviews.name",
+        message:
+          "Each review in an article must have a unique name and writer combination.",
+      });
+      return;
+    }
+    reviewKeys.add(sourceKey);
     const scoreRule = rules.detail.reviews.score;
     const scoreText = scoreRule
       ? (readSelectedValue(item, scoreRule.selector) ??
@@ -1874,7 +1897,12 @@ function readImageUrl(
 ) {
   if (!selector) return undefined;
   const value = readSelectedValue($, selector, "image");
-  return value ? webUrl(value, pageUrl) : undefined;
+  if (!value) return undefined;
+  const url = new URL(webUrl(value, pageUrl));
+  if (pageUrl.protocol === "https:" && url.protocol === "http:") {
+    url.protocol = "https:";
+  }
+  return url.toString();
 }
 
 function isFixedVolume(value: string | number | null): value is number {

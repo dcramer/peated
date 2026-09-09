@@ -1495,7 +1495,7 @@ describe("POST /admin/scrape-sources/prepare", () => {
     ]);
   });
 
-  test("prepares repeated Dramface review identities", async ({ fixtures }) => {
+  test("refuses repeated Dramface review identities", async ({ fixtures }) => {
     const firstBottle = await fixtures.Bottle();
     const secondBottle = await fixtures.Bottle();
     const { reviews } = await setupDramfaceMigration([
@@ -1511,21 +1511,14 @@ describe("POST /admin/scrape-sources/prepare", () => {
       })
       .where(eq(externalReviews.id, reviews[1].id));
 
-    await expect(prepareDramface({ apply: true })).resolves.toMatchObject({
-      reviewCount: 2,
-      applied: true,
+    const before = await db.select().from(externalReviews);
+
+    await expect(prepareDramface({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Each review in Dramface article"),
     });
-    expect(
-      await db
-        .select({ sourceKey: externalReviews.sourceKey })
-        .from(externalReviews)
-        .orderBy(externalReviews.id),
-    ).toEqual([
-      { sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName) },
-      {
-        sourceKey: reviewSourceKey(reviews[0].name, reviews[0].reviewerName, 2),
-      },
-    ]);
+    expect(await db.select().from(externalReviews)).toEqual(before);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
   });
 
   test("refuses an unknown Dramface review key", async ({ fixtures }) => {

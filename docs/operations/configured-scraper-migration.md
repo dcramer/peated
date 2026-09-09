@@ -9,6 +9,11 @@ Once a site has a saved source, it stops using its old scraper. Collection stays
 stopped until the new rules pass preview and an admin enables them. Pausing the
 new source also stops collection.
 
+If an earlier attempt created a second copy of a review, activation keeps the
+original review ID and visibility. It carries over the later Bottle match and
+newest saved body before removing the copy. It stops when the two copies point
+to different Bottles, and it refreshes affected Bottle summaries after saving.
+
 ## Bourbon Culture
 
 Use `POST /v1/admin/scrape-sources/prepare` with an authenticated admin account
@@ -172,8 +177,9 @@ Before applying, save article URLs, review IDs and order, Bottle matches,
 visibility, scores, writers, publication settings, stored-body counts, and the
 current schedule. Stop the schedule and wait for active runs. Compare every
 record after applying; multi-Bottle and multi-writer articles must keep the
-same review order and IDs. Repeated reviews with the same Bottle name and writer
-keep separate keys in their original order.
+same review order and IDs. Each review in an article must have a unique name and
+writer combination. If a page repeats both, adjust the name rule to include the
+publisher's distinguishing text. Never identify a review by its page position.
 
 Version 8 rules must select up to 20 articles from the current review page. On
 detail pages, use the content column inside `article.h-entry`, then match
