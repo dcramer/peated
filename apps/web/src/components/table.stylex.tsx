@@ -4,7 +4,6 @@ import * as stylex from "@stylexjs/stylex";
 import { ListFilter } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
-import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, space } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { FilterQuery, type FilterQueryProps } from "./filterPanel.stylex";
@@ -149,7 +148,7 @@ export function Table({
                 size="md"
                 variant="accent"
               >
-                Done
+                View results
               </Button>
             </div>
           }
@@ -166,9 +165,6 @@ export function Table({
               options={sortOptions}
               value={sort}
             />
-            <p {...stylex.props(foundationStyles.metadata, styles.liveNote)}>
-              Changes apply as you make them.
-            </p>
             {filters ? (
               <section aria-label="Filters">
                 <div
@@ -270,10 +266,6 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     gap: space.x6,
-  },
-  liveNote: {
-    margin: 0,
-    color: colors.inkMuted,
   },
   footerActions: {
     display: "flex",
