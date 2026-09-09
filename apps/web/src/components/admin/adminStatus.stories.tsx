@@ -26,7 +26,12 @@ export const Overview: Story = {
       <AdminStatus tone="accent">In progress</AdminStatus>
       <AdminStatus tone="success">Active</AdminStatus>
       <AdminStatus tone="warning">Needs review</AdminStatus>
-      <AdminStatus tone="danger">Failed</AdminStatus>
+      <AdminStatus
+        title="Failed Sep 9, 2026, 1:14 PM PDT. Last succeeded Sep 8, 2026, 11:03 PM PDT."
+        tone="danger"
+      >
+        Failed
+      </AdminStatus>
     </StoryRow>
   ),
 };

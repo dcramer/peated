@@ -6,6 +6,7 @@ export default function Loading() {
       columns={4}
       label="Loading scrapers"
       title="Scrapers"
+      withSearch
     />
   );
 }

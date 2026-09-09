@@ -9,12 +9,17 @@ import {
 import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import { ExternalSiteIdentity } from "@peated/web/components/admin/externalSiteIcon.stylex";
-import ExternalSiteRunStatus from "@peated/web/components/admin/externalSiteRunStatus";
 import ScraperCatalogCoverage from "@peated/web/components/admin/scraperCatalogCoverage";
-import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQueries } from "@tanstack/react-query";
+
+import { foundationStyles } from "../../../../../styles/foundations.stylex";
+import {
+  ScraperRecordCount,
+  ScraperRunSummary,
+} from "./scraperIndexCell.stylex";
 
 export default function Page() {
   const queryParams = useApiQueryParams({
@@ -38,6 +43,7 @@ export default function Page() {
     <AdminPage>
       <AdminPageHeader
         title="Scrapers"
+        description="Check what each source has saved and what needs attention."
         actions={
           <AdminActions>
             <Button href="/admin/sites/add" variant="accent">
@@ -57,6 +63,8 @@ export default function Page() {
           columns={[
             {
               name: "name",
+              fill: true,
+              showOnMobile: true,
               sort: "name",
               sortDefaultOrder: "asc",
               value: (site) => (
@@ -64,33 +72,55 @@ export default function Page() {
                   imageUrl={site.imageUrl}
                   name={site.name}
                   size="sm"
+                >
+                  <span {...stylex.props(foundationStyles.compactRowTitle)}>
+                    {site.name}
+                  </span>
+                </ExternalSiteIdentity>
+              ),
+            },
+            {
+              align: "left",
+              name: "catalogListings",
+              showOnMobile: true,
+              title: "Catalog",
+              value: (site) => (
+                <ScraperRecordCount total={site.catalogListings.total} />
+              ),
+            },
+            {
+              align: "left",
+              name: "externalReviews",
+              showOnMobile: true,
+              title: "Reviews",
+              value: (site) => (
+                <ScraperRecordCount
+                  total={site.externalReviews.total}
+                  unmatched={site.externalReviews.unmatched}
                 />
               ),
             },
             {
-              name: "inventory",
-              title: "Inventory",
-              value: (site) =>
-                `${site.externalReviews.matched.toLocaleString("en-US")} / ${site.externalReviews.total.toLocaleString("en-US")} reviews · ${site.priceListings.matched.toLocaleString("en-US")} / ${site.priceListings.total.toLocaleString("en-US")} prices`,
+              align: "left",
+              name: "priceListings",
+              showOnMobile: true,
+              title: "Prices",
+              value: (site) => (
+                <ScraperRecordCount
+                  total={site.priceListings.total}
+                  unmatched={site.priceListings.unmatched}
+                />
+              ),
             },
             {
-              name: "status",
-              title: "Status",
-              value: (site) => <ExternalSiteRunStatus site={site} />,
-            },
-            {
-              name: "nextRunAt",
-              title: "Next Run",
-              value: (site) =>
-                site.nextRunAt ? (
-                  <TimeSince date={site.nextRunAt} />
-                ) : site.runEvery === null ? (
-                  "Manual only"
-                ) : (
-                  "Due now"
-                ),
+              align: "left",
+              name: "run",
+              showOnMobile: true,
+              title: "Run",
+              value: (site) => <ScraperRunSummary site={site} />,
             },
           ]}
+          withSearch
         />
       ) : (
         <EmptyActivity>No scrapers are configured.</EmptyActivity>
