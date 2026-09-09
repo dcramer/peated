@@ -1,7 +1,7 @@
 import type { RatingBandId } from "@peated/server/constants";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
-import { and, asc, eq, gt } from "drizzle-orm";
+import { and, asc, eq, gt, isNull } from "drizzle-orm";
 
 const TASTING_BOTTLE_SCAN_BATCH_SIZE = 200;
 
@@ -92,6 +92,7 @@ export async function* scanUserTastingBottles(
       .where(
         and(
           eq(tastings.createdById, userId),
+          isNull(tastings.removedAt),
           afterId === null ? undefined : gt(tastings.id, afterId),
         ),
       )

@@ -146,6 +146,7 @@ export default implement(contract).handler(
       INNER JOIN ${users} ON ${users.id} = ${tastings.createdById}
       WHERE ${userCondition}
         AND ${scope(sql`${tastings.bottleId}`)}
+        AND ${tastings.removedAt} IS NULL
         AND ${tastings.createdAt} <= ${snapshotAt}
 
       UNION ALL
@@ -157,6 +158,7 @@ export default implement(contract).handler(
       INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
       WHERE ${userCondition}
         AND ${scope(sql`${memberReviews.bottleId}`)}
+        AND ${memberReviews.removedAt} IS NULL
         AND ${memberReviews.createdAt} <= ${snapshotAt}
 
       UNION ALL

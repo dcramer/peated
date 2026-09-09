@@ -25,6 +25,13 @@ const navigationGroups = [
     ],
   },
   {
+    label: "Content",
+    items: [
+      { href: "/admin/reviews", label: "Reviews" },
+      { href: "/admin/tastings", label: "Tastings" },
+    ],
+  },
+  {
     label: "Catalog",
     items: [
       { href: "/admin/badges", label: "Badges" },

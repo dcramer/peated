@@ -50,6 +50,7 @@ export default procedure
       SELECT unnest(${tastings.tags}) as tag
       FROM ${tastings}
       WHERE ${tastings.createdById} = ${user.id}
+        AND ${tastings.removedAt} IS NULL
     ) as t
     GROUP BY tag
     ORDER BY count DESC
@@ -62,6 +63,7 @@ export default procedure
           sql<{ count: number }>`SELECT COUNT(*) as count
         FROM ${tastings}
         WHERE ${tastings.createdById} = ${user.id}
+        AND ${tastings.removedAt} IS NULL
         AND array_length(${tastings.tags}, 1) > 0
       `,
         )

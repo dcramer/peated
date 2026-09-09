@@ -4,7 +4,7 @@ import { implement } from "@peated/server/orpc";
 import tastingDetailsContract from "@peated/server/orpc/contracts/tastings/details";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 
 export default implement(tastingDetailsContract).handler(async function ({
   input,
@@ -29,7 +29,9 @@ export default implement(tastingDetailsContract).handler(async function ({
     .select({ tasting: tastings })
     .from(tastings)
     .innerJoin(users, eq(users.id, tastings.createdById))
-    .where(and(eq(tastings.id, input.tasting), visible));
+    .where(
+      and(eq(tastings.id, input.tasting), isNull(tastings.removedAt), visible),
+    );
 
   if (!result) {
     throw errors.NOT_FOUND({

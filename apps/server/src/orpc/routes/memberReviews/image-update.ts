@@ -13,7 +13,7 @@ import { MemberReviewSchema } from "@peated/server/schemas";
 import { ImageUploadSchema } from "@peated/server/schemas/images";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { Readable } from "node:stream";
 import { z } from "zod";
 
@@ -41,6 +41,7 @@ export default procedure
       where: and(
         eq(memberReviews.bottleId, input.bottle),
         eq(memberReviews.createdById, context.user.id),
+        isNull(memberReviews.removedAt),
       ),
     });
     if (!review) {

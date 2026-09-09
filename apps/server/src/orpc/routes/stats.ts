@@ -12,7 +12,7 @@ import {
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
 import { implement } from "@peated/server/orpc";
 import statsContract from "@peated/server/orpc/contracts/stats";
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 
 // This route counts only current public Bottle identities.
 function activeBottleWhere() {
@@ -31,7 +31,10 @@ export default implement(statsContract).handler(async function () {
     memberReviewTotals,
     externalReviewTotals,
   ] = await Promise.all([
-    db.select({ tastings: sql<string>`COUNT(${tastings.id})` }).from(tastings),
+    db
+      .select({ tastings: sql<string>`COUNT(${tastings.id})` })
+      .from(tastings)
+      .where(isNull(tastings.removedAt)),
     db
       .select({ bottles: sql<string>`COUNT(${bottles.id})` })
       .from(bottles)
@@ -50,7 +53,7 @@ export default implement(statsContract).handler(async function () {
       })
       .from(memberReviews)
       .innerJoin(bottles, eq(memberReviews.bottleId, bottles.id))
-      .where(activeBottleWhere()),
+      .where(and(activeBottleWhere(), isNull(memberReviews.removedAt))),
     db
       .select({
         externalReviews: sql<string>`COUNT(${externalReviews.id})`,

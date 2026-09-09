@@ -36,7 +36,8 @@ export default async (input: JobPayload) => {
           FROM ${tastings}
           INNER JOIN ${bottles}
             ON ${bottles.id} = ${tastings.bottleId}
-          WHERE (
+          WHERE ${tastings.removedAt} IS NULL
+            AND (
             ${bottles.brandId} = ${entities.id}
             OR ${bottles.bottlerId} = ${entities.id}
             OR EXISTS (

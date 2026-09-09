@@ -8,7 +8,7 @@ import {
 import { MemberReviewSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -32,6 +32,7 @@ export default procedure
         and(
           eq(memberReviews.bottleId, input.bottle),
           eq(memberReviews.createdById, context.user.id),
+          isNull(memberReviews.removedAt),
         ),
       )
       .returning();

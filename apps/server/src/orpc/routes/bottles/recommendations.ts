@@ -5,7 +5,17 @@ import bottleRecommendationsContract from "@peated/server/orpc/contracts/bottles
 import { BOTTLE_RECOMMENDATION_REASON } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { and, asc, desc, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  ne,
+  sql,
+} from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 const MIN_SOURCE_MEMBERS = 3;
@@ -38,6 +48,7 @@ export default implement(bottleRecommendationsContract).handler(
         and(
           eq(tastings.bottleId, source.id),
           inArray(tastings.ratingBand, ["outstanding", "unicorn"]),
+          isNull(tastings.removedAt),
         ),
       );
 
@@ -65,6 +76,8 @@ export default implement(bottleRecommendationsContract).handler(
           eq(sourceRatings.bottleId, source.id),
           inArray(sourceRatings.ratingBand, ["outstanding", "unicorn"]),
           inArray(candidateRatings.ratingBand, ["outstanding", "unicorn"]),
+          isNull(sourceRatings.removedAt),
+          isNull(candidateRatings.removedAt),
           ne(candidateRatings.bottleId, source.id),
           activeBottleConditions,
         ),

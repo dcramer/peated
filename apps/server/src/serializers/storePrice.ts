@@ -5,7 +5,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getReservedCollection } from "@peated/server/lib/db";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
@@ -227,6 +227,7 @@ export const PriceChangeSerializer = serializer({
                 and(
                   eq(tastings.createdById, currentUser.id),
                   inArray(tastings.bottleId, bottleIds),
+                  isNull(tastings.removedAt),
                 ),
               ),
           ])

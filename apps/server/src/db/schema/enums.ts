@@ -18,6 +18,8 @@ export const objectTypeEnum = pgEnum("object_type", [
   "tasting",
   "toast",
   "follow",
+  "member_review",
+  "external_review",
 ]);
 
 export const flavorProfileEnum = pgEnum("flavor_profile", FLAVOR_PROFILES);

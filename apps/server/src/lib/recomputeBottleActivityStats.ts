@@ -92,6 +92,7 @@ export async function aggregateBottleActivityStatsInTransaction(
       SELECT ${memberReviews.score}::integer AS score, 'member'::text AS source
       FROM ${memberReviews}
       WHERE ${inArray(memberReviews.bottleId, bottleIds)}
+        AND ${memberReviews.removedAt} IS NULL
 
       UNION ALL
 
@@ -100,12 +101,14 @@ export async function aggregateBottleActivityStatsInTransaction(
       SELECT ${memberReviews.createdById} AS member_id
       FROM ${memberReviews}
       WHERE ${inArray(memberReviews.bottleId, bottleIds)}
+        AND ${memberReviews.removedAt} IS NULL
 
       UNION
 
       SELECT ${tastings.createdById} AS member_id
       FROM ${tastings}
       WHERE ${inArray(tastings.bottleId, bottleIds)}
+        AND ${tastings.removedAt} IS NULL
         AND ${tastings.ratingBand} IS NOT NULL
     ), score_stats AS (
       SELECT
@@ -132,6 +135,7 @@ export async function aggregateBottleActivityStatsInTransaction(
       score_stats.*
     FROM score_stats
     LEFT JOIN ${tastings} ON ${inArray(tastings.bottleId, bottleIds)}
+      AND ${tastings.removedAt} IS NULL
     GROUP BY
       score_stats."memberScoreCount",
       score_stats."externalScoreCount",

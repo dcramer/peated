@@ -22,7 +22,7 @@ export default implement(externalReviewListContract).handler(async function ({
   const requiresModerator = input.onlyUnknown || !hasPublicScope;
   // Moderator queries include staged records for matching.
   const baseWhere: (SQL<unknown> | undefined)[] = requiresModerator
-    ? []
+    ? [isNull(externalReviews.removedAt)]
     : [visibleExternalReviewWhere()];
   const identityWhere: SQL<unknown>[] = [];
 

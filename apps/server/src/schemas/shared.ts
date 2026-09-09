@@ -26,6 +26,8 @@ export const ObjectTypeEnum = z
     "bottle_series",
     "entity",
     "tasting",
+    "member_review",
+    "external_review",
   ])
   .describe("Type of object in the system");
 

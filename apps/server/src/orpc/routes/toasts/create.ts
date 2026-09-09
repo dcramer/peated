@@ -6,7 +6,7 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -28,7 +28,7 @@ export default procedure
     const [targetTasting] = await db
       .select()
       .from(tastings)
-      .where(eq(tastings.id, tastingId))
+      .where(and(eq(tastings.id, tastingId), isNull(tastings.removedAt)))
       .limit(1);
 
     if (!targetTasting) {

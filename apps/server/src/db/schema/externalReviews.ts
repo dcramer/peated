@@ -13,6 +13,7 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+import { actors } from "./actors";
 import { bottles } from "./bottles";
 import { categoryEnum } from "./enums";
 import { externalSites } from "./externalSites";
@@ -74,6 +75,11 @@ export const externalReviews = pgTable(
       .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    removedAt: timestamp("removed_at"),
+    removedByActorId: bigint("removed_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
+    removalReason: text("removal_reason"),
   },
   (table) => [
     uniqueIndex("review_article_source_key_unq").on(
@@ -82,11 +88,28 @@ export const externalReviews = pgTable(
     ),
     index("review_bottle_idx").on(table.bottleId),
     index("review_release_idx").on(table.legacyReleaseId),
+    index("review_removed_updated_idx").on(
+      table.removedAt,
+      table.updatedAt,
+      table.id,
+    ),
     check(
       "review_rating_check",
       sql`${table.legacyNormalizedScore} IS NULL OR ${table.legacyNormalizedScore} BETWEEN 0 AND 100`,
     ),
     check("review_version_check", sql`${table.version} >= 0`),
+    check(
+      "review_removal_state_check",
+      sql`(
+        ${table.removedAt} IS NULL
+        AND ${table.removedByActorId} IS NULL
+        AND ${table.removalReason} IS NULL
+      ) OR (
+        ${table.removedAt} IS NOT NULL
+        AND ${table.removedByActorId} IS NOT NULL
+        AND NULLIF(BTRIM(${table.removalReason}), '') IS NOT NULL
+      )`,
+    ),
     check(
       "review_native_score_check",
       sql`(
@@ -135,6 +158,10 @@ export const externalReviewsRelations = relations(
     article: one(externalReviewArticles, {
       fields: [externalReviews.articleId],
       references: [externalReviewArticles.id],
+    }),
+    removedByActor: one(actors, {
+      fields: [externalReviews.removedByActorId],
+      references: [actors.id],
     }),
   }),
 );

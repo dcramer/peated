@@ -12,6 +12,7 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+import { actors } from "./actors";
 import { bottles } from "./bottles";
 import { servingStyleEnum } from "./tastings";
 import { users } from "./users";
@@ -53,6 +54,11 @@ export const memberReviews = pgTable(
     imageUrl: text("image_url"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    removedAt: timestamp("removed_at"),
+    removedByActorId: bigint("removed_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
+    removalReason: text("removal_reason"),
   },
   (table) => [
     uniqueIndex("member_review_bottle_member_unq").on(
@@ -60,7 +66,24 @@ export const memberReviews = pgTable(
       table.createdById,
     ),
     index("member_review_created_by_idx").on(table.createdById),
+    index("member_review_removed_updated_idx").on(
+      table.removedAt,
+      table.updatedAt,
+      table.id,
+    ),
     check("member_review_score_check", sql`${table.score} BETWEEN 0 AND 100`),
+    check(
+      "member_review_removal_state_check",
+      sql`(
+        ${table.removedAt} IS NULL
+        AND ${table.removedByActorId} IS NULL
+        AND ${table.removalReason} IS NULL
+      ) OR (
+        ${table.removedAt} IS NOT NULL
+        AND ${table.removedByActorId} IS NOT NULL
+        AND NULLIF(BTRIM(${table.removalReason}), '') IS NOT NULL
+      )`,
+    ),
   ],
 );
 
@@ -72,6 +95,10 @@ export const memberReviewsRelations = relations(memberReviews, ({ one }) => ({
   createdBy: one(users, {
     fields: [memberReviews.createdById],
     references: [users.id],
+  }),
+  removedByActor: one(actors, {
+    fields: [memberReviews.removedByActorId],
+    references: [actors.id],
   }),
 }));
 

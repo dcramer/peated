@@ -41,7 +41,8 @@ export default procedure
   .output(CommentSchema)
   .handler(async function ({ input, context, errors }) {
     const tasting = await db.query.tastings.findFirst({
-      where: (tastings, { eq }) => eq(tastings.id, Number(input.tasting)),
+      where: (tastings, { and, eq, isNull }) =>
+        and(eq(tastings.id, Number(input.tasting)), isNull(tastings.removedAt)),
       with: {
         createdBy: true,
         bottle: true,

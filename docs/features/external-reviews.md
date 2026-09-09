@@ -29,6 +29,12 @@ Stopping publication hides its reviews without deleting them or stopping
 collection. Only a moderator can change publication. Peated records the change
 in the audit log.
 
+An administrator can also remove one review from Peated. This manual removal
+is independent from source publication and the review's `hidden` field. Later
+imports, Bottle matching, publication approval, or visibility changes must not
+restore it. Only an administrator restore action can clear the removal. See
+[Content Moderation](content-moderation.md).
+
 ## Stored Facts
 
 Peated stores the article URL, title, publication date, content hash, Bottle
@@ -94,7 +100,9 @@ Scrapers remove HTML, scripts, forms, navigation, and comments, and keep paragra
 breaks. The saved body is not cut to the clip input limit; fetch limits still
 apply. Only internal server and database work can read it. Review API responses
 and previews exclude bodies, including for moderators. Bodies must stay out of
-logs, errors, cursors, and production-content test snapshots.
+logs, errors, cursors, and production-content test snapshots. The administrator
+review page follows the same rule: it shows the short clip and publisher link,
+never the stored body.
 
 Source setup can send size-limited public HTML and extracted bodies to its model
 and trace, following [Sensitive Data](../policies/sensitive-data.md).

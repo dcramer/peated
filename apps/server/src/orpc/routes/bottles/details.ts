@@ -12,7 +12,7 @@ import bottleDetailsContract from "@peated/server/orpc/contracts/bottles/details
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, isNull, sql } from "drizzle-orm";
 
 export default implement(bottleDetailsContract).handler(async function ({
   input,
@@ -60,7 +60,9 @@ export default implement(bottleDetailsContract).handler(async function ({
           count: sql<string>`COUNT(DISTINCT ${tastings.createdById})`,
         })
         .from(tastings)
-        .where(eq(tastings.bottleId, bottle.id)),
+        .where(
+          and(eq(tastings.bottleId, bottle.id), isNull(tastings.removedAt)),
+        ),
       db
         .select()
         .from(bottleBarcodes)

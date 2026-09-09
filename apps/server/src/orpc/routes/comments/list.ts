@@ -1,10 +1,10 @@
 import { db } from "@peated/server/db";
-import { comments } from "@peated/server/db/schema";
+import { comments, tastings } from "@peated/server/db/schema";
 import { implement } from "@peated/server/orpc";
 import commentListContract from "@peated/server/orpc/contracts/comments/list";
 import { serialize } from "@peated/server/serializers";
 import { CommentSerializer } from "@peated/server/serializers/comment";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 
 export default implement(commentListContract).handler(async function ({
   input,
@@ -45,7 +45,8 @@ export default implement(commentListContract).handler(async function ({
   const results = await db
     .select()
     .from(comments)
-    .where(and(...where))
+    .innerJoin(tastings, eq(comments.tastingId, tastings.id))
+    .where(and(isNull(tastings.removedAt), ...where))
     .limit(limit + 1)
     .offset(offset)
     .orderBy(asc(comments.createdAt));
@@ -53,7 +54,7 @@ export default implement(commentListContract).handler(async function ({
   return {
     results: await serialize(
       CommentSerializer,
-      results.slice(0, limit),
+      results.slice(0, limit).map(({ comments }) => comments),
       context.user,
     ),
     rel: {

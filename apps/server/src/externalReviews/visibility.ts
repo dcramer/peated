@@ -9,6 +9,7 @@ import { and, eq, isNotNull, isNull, or } from "drizzle-orm";
 export function visibleExternalReviewWhere() {
   return and(
     eq(externalReviews.hidden, false),
+    isNull(externalReviews.removedAt),
     or(
       isNull(externalReviewArticles.contentHash),
       isNotNull(externalReviewPublications.approvedAt),

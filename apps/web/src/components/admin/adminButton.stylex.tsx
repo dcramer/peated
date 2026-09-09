@@ -3,6 +3,7 @@ import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from "..";
 
 type BaseProps = {
   "aria-label"?: string;
+  "aria-current"?: "page" | "step" | "location" | "date" | "time" | boolean;
   "aria-pressed"?: boolean | "false" | "true" | "mixed";
   children?: ReactNode;
   disabled?: boolean;

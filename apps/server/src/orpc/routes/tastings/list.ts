@@ -12,7 +12,7 @@ import tastingListContract from "@peated/server/orpc/contracts/tastings/list";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 export default implement(tastingListContract).handler(async function ({
   input: { cursor, limit, ...input },
   context,
@@ -20,7 +20,7 @@ export default implement(tastingListContract).handler(async function ({
 }) {
   const offset = (cursor - 1) * limit;
 
-  const baseWhere: (SQL<unknown> | undefined)[] = [];
+  const baseWhere: (SQL<unknown> | undefined)[] = [isNull(tastings.removedAt)];
   const bottleWhere: SQL<unknown>[] = [];
 
   if (input.bottle !== undefined) {

@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
@@ -58,6 +58,7 @@ export const CollectionBottleSerializer = serializer({
                 and(
                   eq(tastings.createdById, currentUser.id),
                   inArray(tastings.bottleId, bottleIds),
+                  isNull(tastings.removedAt),
                 ),
               )
           ).map(({ bottleId }) => bottleId)

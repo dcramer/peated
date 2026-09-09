@@ -7,7 +7,7 @@ import {
   tastings,
   type Badge,
 } from "@peated/server/db/schema";
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import { logInfo } from "../log";
 import { prepareBadgeCheck, type PreparedBadgeCheck } from "./checks";
 import { getFormula } from "./formula";
@@ -64,7 +64,12 @@ export async function rescanBadge(
         bottleId: tastings.bottleId,
       })
       .from(tastings)
-      .where(afterId === null ? undefined : gt(tastings.id, afterId))
+      .where(
+        and(
+          isNull(tastings.removedAt),
+          afterId === null ? undefined : gt(tastings.id, afterId),
+        ),
+      )
       .orderBy(tastings.id)
       .limit(BADGE_RESCAN_BATCH_SIZE);
     if (tastingRows.length === 0) break;

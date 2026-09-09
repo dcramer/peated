@@ -6,6 +6,7 @@ import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 
@@ -28,7 +29,8 @@ export default async function notifyDiscordOnTasting(input: JobPayload) {
 
   const tasting = await db.transaction(async (tx) => {
     const selected = await tx.query.tastings.findFirst({
-      where: (tastings, { eq }) => eq(tastings.id, tastingId),
+      where: (tastings) =>
+        and(eq(tastings.id, tastingId), isNull(tastings.removedAt)),
       with: {
         createdBy: true,
       },
