@@ -13,13 +13,11 @@ const NARROW = "@media (max-width: 759px)";
 export function CatalogPage({
   action,
   children,
-  filters,
   navigation,
   title,
 }: {
   action?: ReactNode;
   children: ReactNode;
-  filters: ReactNode;
   navigation?: ReactNode;
   title: ReactNode;
 }) {
@@ -37,10 +35,7 @@ export function CatalogPage({
       {navigation ? (
         <div {...stylex.props(styles.navigation)}>{navigation}</div>
       ) : null}
-      <div {...stylex.props(styles.layout)}>
-        <div {...stylex.props(styles.results)}>{children}</div>
-        <aside {...stylex.props(styles.filters)}>{filters}</aside>
-      </div>
+      {children}
     </div>
   );
 }
@@ -60,7 +55,6 @@ export function CatalogPageLoading({
   return (
     <CatalogPage
       action={action ? <span {...stylex.props(styles.loadingAction)} /> : null}
-      filters={<CatalogFiltersLoading query={variant === "bottle"} />}
       navigation={
         navigation ? (
           <div {...stylex.props(styles.loadingNavigation)}>
@@ -71,22 +65,27 @@ export function CatalogPageLoading({
       }
       title={title}
     >
-      <div {...stylex.props(styles.loadingResults)}>
-        {variant === "bottle" ? (
-          <div {...stylex.props(styles.loadingSearch)}>
-            <LoadingPlaceholder preset="metadata" />
-            <span {...stylex.props(styles.loadingSearchControl)} />
+      <div {...stylex.props(styles.layout)}>
+        <div {...stylex.props(styles.loadingResults)}>
+          {variant === "bottle" ? (
+            <div {...stylex.props(styles.loadingSearch)}>
+              <LoadingPlaceholder preset="metadata" />
+              <span {...stylex.props(styles.loadingSearchControl)} />
+            </div>
+          ) : null}
+          <div {...stylex.props(styles.loadingToolbar)}>
+            <LoadingPlaceholder preset="text" />
+            <span {...stylex.props(styles.loadingSort)} />
           </div>
-        ) : null}
-        <div {...stylex.props(styles.loadingToolbar)}>
-          <LoadingPlaceholder preset="text" />
-          <span {...stylex.props(styles.loadingSort)} />
+          <LoadingList
+            label="Loading catalog records"
+            rows={4}
+            variant={variant === "entity" ? "text" : "standard"}
+          />
         </div>
-        <LoadingList
-          label="Loading catalog records"
-          rows={4}
-          variant={variant === "entity" ? "text" : "standard"}
-        />
+        <aside {...stylex.props(styles.filters)}>
+          <CatalogFiltersLoading query={variant === "bottle"} />
+        </aside>
       </div>
     </CatalogPage>
   );
@@ -149,8 +148,11 @@ const styles = stylex.create({
       gridTemplateColumns: "minmax(0, 1fr)",
     },
   },
-  results: {
+  filters: {
     minWidth: 0,
+    [NARROW]: {
+      display: "none",
+    },
   },
   loadingResults: {
     display: "flex",
@@ -243,11 +245,5 @@ const styles = stylex.create({
     flexShrink: 0,
     borderRadius: "50%",
     backgroundColor: colors.surface,
-  },
-  filters: {
-    minWidth: 0,
-    [NARROW]: {
-      gridRow: 1,
-    },
   },
 });

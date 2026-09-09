@@ -24,6 +24,7 @@ export type ListSortOption = {
 
 export type ListToolbarProps = {
   count: number;
+  mobileAction?: ReactNode;
   noun: string;
   pluralNoun?: string;
   onExport?: () => void;
@@ -37,6 +38,7 @@ export type ListToolbarProps = {
 /** Keeps sorting available while pending results retain their last settled count. */
 export function ListToolbar({
   count,
+  mobileAction,
   noun,
   pluralNoun = `${noun}s`,
   onExport,
@@ -47,7 +49,12 @@ export function ListToolbar({
   total,
 }: ListToolbarProps) {
   return (
-    <div {...stylex.props(styles.toolbar)}>
+    <div
+      {...stylex.props(
+        styles.toolbar,
+        Boolean(mobileAction) && styles.toolbarWithMobileAction,
+      )}
+    >
       <p aria-live="polite" {...stylex.props(styles.count)}>
         <strong {...stylex.props(styles.countValue)}>
           {count.toLocaleString("en-US")} {count === 1 ? noun : pluralNoun}
@@ -67,20 +74,14 @@ export function ListToolbar({
         >
           {pending ? "Updating…" : null}
         </span>
-        <label {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}>
-          <span>Sort</span>
-          <CompactSelect
-            aria-label={`Sort ${pluralNoun}`}
-            onChange={(event) => onSortChange(event.currentTarget.value)}
+        <span {...stylex.props(Boolean(mobileAction) && styles.wideSort)}>
+          <ListSort
+            noun={pluralNoun}
+            onChange={onSortChange}
+            options={sortOptions}
             value={sort}
-          >
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </CompactSelect>
-        </label>
+          />
+        </span>
         {onExport ? (
           <IconButton
             icon={<Download aria-hidden="true" size={15} strokeWidth={1.75} />}
@@ -90,20 +91,71 @@ export function ListToolbar({
             variant="text"
           />
         ) : null}
+        {mobileAction ? (
+          <span {...stylex.props(styles.mobileAction)}>{mobileAction}</span>
+        ) : null}
       </div>
     </div>
   );
 }
 
+export function ListSort({
+  fullWidth = false,
+  noun,
+  onChange,
+  options,
+  value,
+}: {
+  fullWidth?: boolean;
+  noun: string;
+  onChange: (value: string) => void;
+  options: readonly [ListSortOption, ...ListSortOption[]];
+  value: string;
+}) {
+  return (
+    <label
+      {...stylex.props(
+        foundationStyles.fieldLabel,
+        styles.sortLabel,
+        fullWidth && styles.fullWidthSort,
+      )}
+    >
+      <span>Sort</span>
+      <CompactSelect
+        aria-label={`Sort ${noun}`}
+        fullWidth={fullWidth}
+        onChange={(event) => onChange(event.currentTarget.value)}
+        value={value}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </CompactSelect>
+    </label>
+  );
+}
+
 function CompactSelect({
   children,
+  fullWidth = false,
   ...props
-}: SelectHTMLAttributes<HTMLSelectElement>) {
+}: SelectHTMLAttributes<HTMLSelectElement> & { fullWidth?: boolean }) {
   return (
-    <span {...stylex.props(styles.selectWrapper)}>
+    <span
+      {...stylex.props(
+        styles.selectWrapper,
+        fullWidth && styles.fullWidthSelect,
+      )}
+    >
       <select
         {...props}
-        {...stylex.props(foundationStyles.input, styles.select)}
+        {...stylex.props(
+          foundationStyles.input,
+          styles.select,
+          fullWidth && styles.fullWidthSelectControl,
+        )}
       >
         {children}
       </select>
@@ -264,6 +316,12 @@ const styles = stylex.create({
       flexDirection: "column",
     },
   },
+  toolbarWithMobileAction: {
+    [COMPACT]: {
+      alignItems: "center",
+      flexDirection: "row",
+    },
+  },
   count: {
     display: "flex",
     minWidth: 0,
@@ -296,10 +354,34 @@ const styles = stylex.create({
     gap: space.x2,
     color: colors.inkMuted,
   },
+  fullWidthSort: {
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
+  wideSort: {
+    display: "inline-flex",
+    ["@media (max-width: 759px)"]: {
+      display: "none",
+    },
+  },
+  mobileAction: {
+    display: "none",
+    ["@media (max-width: 759px)"]: {
+      display: "inline-flex",
+    },
+  },
   selectWrapper: {
     position: "relative",
     display: "inline-flex",
     maxWidth: "176px",
+  },
+  fullWidthSelect: {
+    width: "100%",
+    maxWidth: "none",
+  },
+  fullWidthSelectControl: {
+    width: "100%",
   },
   select: {
     height: controlMetrics.controlHeightSmall,

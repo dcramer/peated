@@ -6,12 +6,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
 import { StoryCanvas } from "../storyFixtures.stylex";
-import {
-  BottleCatalogFilters,
-  BottleCatalogList,
-  BottleCatalogSearch,
-} from "./bottleCatalog.stylex";
-import { CatalogPage } from "./catalogPage.stylex";
+import { BottleCatalogFacets, BottleCatalogList } from "./bottleCatalog.stylex";
+import { CatalogPage, CatalogPageLoading } from "./catalogPage.stylex";
 
 const meta = {
   title: "Pages/Bottle Catalog",
@@ -26,7 +22,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Bottle search leads the results column on wide screens. On narrow screens it returns to the filter panel beside the filter toggle, while Category and Age statement remain discoverable.",
+          "Search, filters, sorting, rows, empty results, and paging share one table layout. Phone widths move all controls into one accessible panel.",
       },
     },
   },
@@ -35,16 +31,62 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Overview: Story = {
+export const Desktop: Story = {
   render: () => <BottleCatalogExample />,
 };
 
-function BottleCatalogExample() {
-  const [filters, setFilters] = useState({
-    ageBand: "",
-    category: "",
-    query: "",
-  });
+export const MobileControls: Story = {
+  globals: {
+    viewport: { isRotated: false, value: "peatedPhone" },
+  },
+  render: () => <BottleCatalogExample />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Search, filters, and sort" }),
+    );
+  },
+};
+
+export const ActiveFilters: Story = {
+  globals: {
+    viewport: { isRotated: false, value: "peatedPhone" },
+  },
+  render: () => (
+    <BottleCatalogExample
+      initialFilters={{ ageBand: "18_24", category: "", query: "Islay" }}
+    />
+  ),
+};
+
+export const Empty: Story = {
+  render: () => <BottleCatalogExample empty />,
+};
+
+export const Loading: Story = {
+  render: () => <CatalogPageLoading title="Bottles" />,
+};
+
+export const LongContent: Story = {
+  render: () => <BottleCatalogExample longContent />,
+};
+
+type BottleFilters = {
+  ageBand: string;
+  category: string;
+  query: string;
+};
+
+function BottleCatalogExample({
+  empty = false,
+  initialFilters = { ageBand: "", category: "", query: "" },
+  longContent = false,
+}: {
+  empty?: boolean;
+  initialFilters?: BottleFilters;
+  longContent?: boolean;
+}) {
+  const [filters, setFilters] = useState(initialFilters);
+  const [sort, setSort] = useState("-release");
 
   function updateFilter(name: "ageBand" | "category", value: string) {
     setFilters((current) => ({ ...current, [name]: value }));
@@ -54,53 +96,53 @@ function BottleCatalogExample() {
     setFilters({ ageBand: "", category: "", query: "" });
   }
 
+  const items = empty
+    ? []
+    : mockBottles.slice(0, 4).map((bottle, index) => ({
+        ...toBottleListItem(bottle, { includeRatings: true }),
+        name:
+          longContent && index === 0
+            ? "A very long single malt bottle name with a cask finish, vintage, bottling year, and release details"
+            : bottle.name,
+      }));
+
   return (
-    <CatalogPage
-      filters={
-        <BottleCatalogFilters
-          age=""
-          ageBand={filters.ageBand}
-          ageBandOptions={[
-            { label: "NAS", value: "nas" },
-            { label: "12–17 years", value: "12_17" },
-            { label: "18–24 years", value: "18_24" },
-          ]}
-          category={filters.category}
-          categoryOptions={[
-            { label: "Single malt", value: "single_malt" },
-            { label: "Blended malt", value: "blended_malt" },
-            { label: "Bourbon", value: "bourbon" },
-          ]}
-          onChange={updateFilter}
-          onClear={clearFilters}
-          onQuerySubmit={(query) =>
-            setFilters((current) => ({ ...current, query }))
-          }
-          query={filters.query}
-        />
-      }
-      title="Bottles"
-    >
+    <CatalogPage title="Bottles">
       <BottleCatalogList
-        items={mockBottles
-          .slice(0, 4)
-          .map((bottle) => toBottleListItem(bottle, { includeRatings: true }))}
-        onSortChange={() => undefined}
-        page={1}
-        search={
-          <BottleCatalogSearch
-            onSubmit={(query) =>
-              setFilters((current) => ({ ...current, query }))
-            }
-            query={filters.query}
+        activeFilterCount={Object.values(filters).filter(Boolean).length}
+        filters={
+          <BottleCatalogFacets
+            ageBand={filters.ageBand}
+            ageBandOptions={[
+              { label: "NAS", value: "nas" },
+              { label: "12–17 years", value: "12_17" },
+              { label: "18–24 years", value: "18_24" },
+            ]}
+            category={filters.category}
+            categoryOptions={[
+              { label: "Single malt", value: "single_malt" },
+              { label: "Blended malt", value: "blended_malt" },
+              { label: "Bourbon", value: "bourbon" },
+            ]}
+            onChange={updateFilter}
           />
         }
-        sort="-release"
+        items={items}
+        onClear={clearFilters}
+        onSortChange={setSort}
+        page={1}
+        query={{
+          label: "Find a bottle",
+          onSubmit: (query) => setFilters((current) => ({ ...current, query })),
+          placeholder: "Name, brand, or release",
+          query: filters.query,
+        }}
+        sort={sort}
         sortOptions={[
           { label: "Latest release", value: "-release" },
           { label: "Highest score", value: "-score" },
         ]}
-        total={mockBottles.length}
+        total={empty ? 0 : mockBottles.length}
       />
     </CatalogPage>
   );

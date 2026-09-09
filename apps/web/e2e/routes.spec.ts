@@ -7,6 +7,7 @@ import {
   mockApiServer,
   testOwnedEntity,
 } from "./rpc-fixtures.mjs";
+import { signIn } from "./session";
 
 test("bottle releases stream new pages without replacing the bottle header", async ({
   page,
@@ -107,9 +108,10 @@ test("distillers filters keep controls responsive while results update", async (
 });
 
 test(
-  "mobile navigation exposes the bottle catalog",
+  "mobile navigation opens the bottle table and its controls",
   { tag: "@mobile" },
-  async ({ page }) => {
+  async ({ context, page }) => {
+    await signIn(context);
     await page.goto("/");
 
     await page.getByRole("button", { name: "Open navigation" }).click();
@@ -118,8 +120,77 @@ test(
     });
 
     await expect(navigation).toBeVisible();
+    const bottles = navigation.getByRole("link", { name: "Bottles" });
+    await expect(bottles).toHaveAttribute("href", "/bottles");
+    await bottles.click();
+
+    const trigger = page.getByRole("button", {
+      name: "Search, filters, and sort",
+    });
+    await expect(trigger).toBeVisible();
     await expect(
-      navigation.getByRole("link", { name: "Bottles" }),
-    ).toHaveAttribute("href", "/bottles");
+      page.getByRole("combobox", { name: "Sort bottles" }),
+    ).toBeHidden();
+
+    await trigger.focus();
+    await trigger.click();
+    const dialog = page.getByRole("dialog", {
+      name: "Search, filters, and sort",
+    });
+    await expect(
+      dialog.getByRole("heading", { name: "Search, filters, and sort" }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        dialog.evaluate((element) => element.contains(document.activeElement)),
+      )
+      .toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+
+    await trigger.click();
+    await dialog
+      .getByRole("button", { name: "Single Malt", exact: true })
+      .click();
+    await expect(page).toHaveURL("/bottles?category=single_malt");
+    await expect(
+      dialog.getByRole("heading", { name: "Search, filters, and sort" }),
+    ).toBeVisible();
+    await dialog
+      .getByRole("combobox", { name: "Sort bottles" })
+      .selectOption({ label: "Bottle name" });
+    await expect(page).toHaveURL("/bottles?category=single_malt&sort=name");
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    const activeTrigger = page.getByRole("button", {
+      name: "Search, filters, and sort, 1 active filter",
+    });
+    await expect(activeTrigger).toBeVisible();
+    await page.reload();
+    await expect(activeTrigger).toBeVisible();
+
+    await activeTrigger.click();
+    await page
+      .getByRole("dialog", { name: "Search, filters, and sort" })
+      .getByRole("button", { name: "Clear filters" })
+      .click();
+    await expect(page).toHaveURL("/bottles?sort=name");
+
+    await page.goto("/following");
+    const followingTrigger = page.getByRole("button", {
+      name: "Search, filters, and sort",
+    });
+    await expect(followingTrigger).toBeVisible();
+    await followingTrigger.click();
+    const followingControls = page.getByRole("dialog", {
+      name: "Search, filters, and sort",
+    });
+    await expect(
+      followingControls.getByRole("button", { name: "Distillers" }),
+    ).toBeVisible();
+    await expect(
+      followingControls.getByRole("combobox", { name: "Sort results" }),
+    ).toBeVisible();
   },
 );

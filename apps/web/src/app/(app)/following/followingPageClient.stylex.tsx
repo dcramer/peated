@@ -6,10 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
 import { ButtonLink } from "@peated/web/components/button.stylex";
-import {
-  FacetGroup,
-  FilterPanel,
-} from "@peated/web/components/filterPanel.stylex";
+import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.stylex";
@@ -97,25 +94,6 @@ export function FollowingPageClient({
 
   return (
     <CatalogPage
-      filters={
-        <FilterPanel
-          ariaLabel="Following filters"
-          onClear={controls.hasFilters ? clearFilters : undefined}
-          query={{
-            label: "Name",
-            onSubmit: (value) => updateParams({ query: value }),
-            placeholder: "Distiller, brand, or bottler",
-            query: controls.query,
-          }}
-        >
-          <FacetGroup
-            label="Type"
-            onChange={(value) => updateParams({ type: value })}
-            options={typeOptions}
-            selected={controls.type === "all" ? "" : controls.type}
-          />
-        </FilterPanel>
-      }
       navigation={
         <PageTabs
           ariaLabel="Following views"
@@ -129,6 +107,11 @@ export function FollowingPageClient({
       title="Following"
     >
       <EntityCatalogList
+        activeFilterCount={
+          [controls.query, controls.type === "all" ? "" : controls.type].filter(
+            Boolean,
+          ).length
+        }
         emptyAction={
           state.view === "following" && !noMatches ? (
             <ButtonLink href={findHref} size="sm" variant="tonal">
@@ -149,6 +132,14 @@ export function FollowingPageClient({
             : state.view === "following"
               ? "Nothing followed yet"
               : "Nothing here yet"
+        }
+        filters={
+          <FacetGroup
+            label="Type"
+            onChange={(value) => updateParams({ type: value })}
+            options={typeOptions}
+            selected={controls.type === "all" ? "" : controls.type}
+          />
         }
         items={items}
         nextHref={getCursorHref(
@@ -173,6 +164,12 @@ export function FollowingPageClient({
           searchParams,
           entityList.rel.prevCursor,
         )}
+        query={{
+          label: "Name",
+          onSubmit: (value) => updateParams({ query: value }),
+          placeholder: "Distiller, brand, or bottler",
+          query: controls.query,
+        }}
         showFollowingMarks={state.view === "find"}
         sort={controls.sort}
         sortOptions={sortOptions}

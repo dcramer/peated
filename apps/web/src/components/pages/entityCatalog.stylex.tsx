@@ -11,18 +11,15 @@ import {
 import { EmptyState } from "@peated/web/components/feedback.stylex";
 import {
   FacetGroup,
-  FilterPanel,
+  type FilterQueryProps,
 } from "@peated/web/components/filterPanel.stylex";
-import {
-  CursorPager,
-  ListToolbar,
-  type ListSortOption,
-} from "@peated/web/components/lists.stylex";
+import { type ListSortOption } from "@peated/web/components/lists.stylex";
 import {
   RowMenu,
   type RowMenuItem,
 } from "@peated/web/components/rowMenu.stylex";
 import { CatalogTable, type CatalogTableColumn } from "../catalogTable.stylex";
+import { Table } from "../table.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
 
 export type EntityCatalogItem = EntityListItem & {
@@ -71,10 +68,12 @@ export function getEntityRowActionGroups({
 }
 
 export type EntityCatalogListProps = {
+  activeFilterCount?: number;
   addHref?: string;
   emptyAction?: ReactNode;
   emptyDescription?: ReactNode;
   emptyHeading?: string;
+  filters?: ReactNode;
   items: readonly EntityCatalogItem[];
   nextHref?: string;
   noun: string;
@@ -85,6 +84,7 @@ export type EntityCatalogListProps = {
   pending?: boolean;
   pendingIds?: ReadonlySet<number>;
   previousHref?: string;
+  query?: FilterQueryProps;
   showFollowingMarks?: boolean;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
@@ -93,10 +93,12 @@ export type EntityCatalogListProps = {
 
 /** Presents one API-owned cursor page and its full-result total. */
 export function EntityCatalogList({
+  activeFilterCount = 0,
   addHref,
   emptyAction,
   emptyDescription = "Try a broader search or remove the current location filter.",
   emptyHeading,
+  filters,
   items,
   nextHref,
   noun,
@@ -107,58 +109,57 @@ export function EntityCatalogList({
   pending = false,
   pendingIds,
   previousHref,
+  query,
   showFollowingMarks = true,
   sort,
   sortOptions,
   total,
 }: EntityCatalogListProps) {
   return (
-    <section aria-label={`${noun} catalog`} {...stylex.props(styles.catalog)}>
-      <ListToolbar
-        count={items.length}
+    <Table
+      activeFilterCount={activeFilterCount}
+      ariaLabel={`${noun} catalog`}
+      count={items.length}
+      empty={
+        <EmptyState
+          action={
+            emptyAction ??
+            (onClear ? (
+              <Button onClick={onClear} size="sm" variant="tonal">
+                Clear filters
+              </Button>
+            ) : addHref ? (
+              <ButtonLink href={addHref} size="sm" variant="tonal">
+                Add {noun}
+              </ButtonLink>
+            ) : undefined)
+          }
+          heading={emptyHeading ?? `No ${noun}s found`}
+        >
+          {emptyDescription}
+        </EmptyState>
+      }
+      filters={filters}
+      nextHref={nextHref}
+      noun={noun}
+      onClear={onClear}
+      onSortChange={onSortChange}
+      page={page}
+      pending={pending}
+      previousHref={previousHref}
+      query={query}
+      sort={sort}
+      sortOptions={sortOptions}
+      total={total}
+    >
+      <EntityCatalogTable
+        items={items}
         noun={noun}
-        onSortChange={onSortChange}
-        pending={pending}
-        sort={sort}
-        sortOptions={sortOptions}
-        total={total}
+        onToggleFollowing={onToggleFollowing}
+        pendingIds={pendingIds}
+        showFollowingMarks={showFollowingMarks}
       />
-      <div aria-busy={pending || undefined}>
-        {items.length ? (
-          <EntityCatalogTable
-            items={items}
-            noun={noun}
-            onToggleFollowing={onToggleFollowing}
-            pendingIds={pendingIds}
-            showFollowingMarks={showFollowingMarks}
-          />
-        ) : (
-          <EmptyState
-            action={
-              emptyAction ??
-              (onClear ? (
-                <Button onClick={onClear} size="sm" variant="tonal">
-                  Clear filters
-                </Button>
-              ) : addHref ? (
-                <ButtonLink href={addHref} size="sm" variant="tonal">
-                  Add {noun}
-                </ButtonLink>
-              ) : undefined)
-            }
-            heading={emptyHeading ?? `No ${noun}s found`}
-          >
-            {emptyDescription}
-          </EmptyState>
-        )}
-      </div>
-      <CursorPager
-        ariaLabel={`${noun} pages`}
-        nextHref={nextHref}
-        page={page}
-        previousHref={previousHref}
-      />
-    </section>
+    </Table>
   );
 }
 
@@ -254,41 +255,23 @@ export type EntityCatalogCountry = {
   value: string;
 };
 
-export type EntityCatalogFiltersProps = {
-  ariaLabel: string;
+export type EntityCatalogFacetsProps = {
   countries: readonly EntityCatalogCountry[];
   country: string;
-  onClear: () => void;
   onCountryChange: (value: string) => void;
-  onQuerySubmit: (value: string) => void;
   onRegionClear?: () => void;
-  query: string;
   region?: string;
 };
 
-/** Keeps query and location filters reachable while the route owns URL state. */
-export function EntityCatalogFilters({
-  ariaLabel,
+export function EntityCatalogFacets({
   countries,
   country,
-  onClear,
   onCountryChange,
-  onQuerySubmit,
   onRegionClear,
-  query,
   region,
-}: EntityCatalogFiltersProps) {
+}: EntityCatalogFacetsProps) {
   return (
-    <FilterPanel
-      ariaLabel={ariaLabel}
-      onClear={query || country || region ? onClear : undefined}
-      query={{
-        label: "Find a record",
-        onSubmit: onQuerySubmit,
-        placeholder: "Name",
-        query,
-      }}
-    >
+    <>
       <FacetGroup
         label="Country"
         onChange={onCountryChange}
@@ -303,7 +286,7 @@ export function EntityCatalogFilters({
           selected={region}
         />
       ) : null}
-    </FilterPanel>
+    </>
   );
 }
 
@@ -321,8 +304,5 @@ const styles = stylex.create({
     clip: "rect(0, 0, 0, 0)",
     whiteSpace: "nowrap",
     borderWidth: 0,
-  },
-  catalog: {
-    minWidth: 0,
   },
 });
