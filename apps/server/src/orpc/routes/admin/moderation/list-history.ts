@@ -1,7 +1,4 @@
-import {
-  filterModerationHistory,
-  projectModerationHistory,
-} from "@peated/server/lib/moderationHistory";
+import { queryModerationHistory } from "@peated/server/lib/moderationHistory";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
@@ -22,16 +19,16 @@ export default procedure
   .input(ModerationHistoryListInputSchema)
   .output(ModerationHistoryListResponseSchema)
   .handler(async ({ input }) => {
-    const events = filterModerationHistory(
-      await projectModerationHistory(),
-      input,
-    );
     const offset = (input.cursor - 1) * input.limit;
+    const events = await queryModerationHistory({
+      ...input,
+      offset,
+      limit: input.limit + 1,
+    });
     return {
-      results: events.slice(offset, offset + input.limit),
+      results: events.slice(0, input.limit),
       rel: {
-        nextCursor:
-          offset + input.limit < events.length ? input.cursor + 1 : null,
+        nextCursor: events.length > input.limit ? input.cursor + 1 : null,
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
       },
     };

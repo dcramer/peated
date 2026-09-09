@@ -96,6 +96,39 @@ describe("admin moderation history", () => {
       `closure:${check!.id}`,
     ]);
 
+    const firstPage = await routerClient.admin.moderation.listHistory(
+      { limit: 2 },
+      { context: { user: admin } },
+    );
+    expect(firstPage.results.map(({ key }) => key)).toEqual([
+      `operation:${operation!.id}`,
+      `incoming:${incoming!.id}`,
+    ]);
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    const secondPage = await routerClient.admin.moderation.listHistory(
+      { cursor: 2, limit: 2 },
+      { context: { user: admin } },
+    );
+    expect(secondPage.results.map(({ key }) => key)).toEqual([
+      `closure:${check!.id}`,
+    ]);
+    expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
+
+    const listingHistory = await routerClient.admin.moderation.listHistory(
+      { category: "listing", query: "history listing" },
+      { context: { user: admin } },
+    );
+    expect(listingHistory.results.map(({ key }) => key)).toEqual([
+      `incoming:${incoming!.id}`,
+    ]);
+    const rejectedHistory = await routerClient.admin.moderation.listHistory(
+      { outcome: "reject", actor: "history-reviewer" },
+      { context: { user: admin } },
+    );
+    expect(rejectedHistory.results.map(({ key }) => key)).toEqual([
+      `operation:${operation!.id}`,
+    ]);
+
     const incomingDetails = await routerClient.admin.moderation.historyDetails(
       { key: `incoming:${incoming!.id}` },
       { context: { user: admin } },
