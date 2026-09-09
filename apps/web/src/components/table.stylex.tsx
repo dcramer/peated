@@ -171,8 +171,14 @@ export function Table({
             </p>
             {filters ? (
               <section aria-label="Filters">
-                <FilterHeading onClear={clearAction} />
-                <div {...stylex.props(styles.filterGroups)}>{filters}</div>
+                <div
+                  {...stylex.props(
+                    styles.filterGroups,
+                    styles.drawerFilterGroups,
+                  )}
+                >
+                  {filters}
+                </div>
               </section>
             ) : null}
           </div>
@@ -242,6 +248,9 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x4,
     paddingTop: space.x4,
+  },
+  drawerFilterGroups: {
+    paddingTop: 0,
   },
   activeCount: {
     minWidth: "18px",
