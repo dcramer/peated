@@ -7,15 +7,52 @@ import {
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { StorePriceMatchQueueListResponse } from "@peated/server/schemas";
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql, type SQL } from "drizzle-orm";
 import {
   getQueueBaseWhere,
   getQueueIsProcessingSql,
   getQueueStateFilter,
-  getQueueWhere,
   QueueListInputSchema,
 } from "./filters";
 import { serializeQueueItems } from "./utils";
+
+type QueueStats = {
+  actionableCount: number;
+  processingCount: number;
+};
+
+function queueStatsSelection() {
+  return {
+    actionableCount:
+      sql<number>`count(*) filter (where ${getQueueStateFilter("actionable")}) over()::int`.as(
+        "actionable_count",
+      ),
+    processingCount:
+      sql<number>`count(*) filter (where ${getQueueStateFilter("processing")}) over()::int`.as(
+        "processing_count",
+      ),
+  };
+}
+
+async function queryQueueStats(baseWhere: SQL): Promise<QueueStats> {
+  const [stats] = await db
+    .select({
+      actionableCount: sql<number>`count(*) filter (where ${getQueueStateFilter("actionable")})::int`,
+      processingCount: sql<number>`count(*) filter (where ${getQueueStateFilter("processing")})::int`,
+    })
+    .from(storePriceMatchProposals)
+    .innerJoin(
+      storePrices,
+      eq(storePrices.id, storePriceMatchProposals.priceId),
+    )
+    .innerJoin(externalSites, eq(externalSites.id, storePrices.externalSiteId))
+    .where(baseWhere);
+
+  return {
+    actionableCount: stats?.actionableCount ?? 0,
+    processingCount: stats?.processingCount ?? 0,
+  };
+}
 
 export default procedure
   .use(requireMod)
@@ -32,11 +69,14 @@ export default procedure
   .handler(async function ({ input, context, errors }) {
     const offset = (input.cursor - 1) * input.limit;
     const baseWhere = getQueueBaseWhere(input);
-    const queueWhere = getQueueWhere(input);
-    const [stats] = await db
+    const queueMatches = db
       .select({
-        actionableCount: sql<number>`count(*) filter (where ${getQueueStateFilter("actionable")})::int`,
-        processingCount: sql<number>`count(*) filter (where ${getQueueStateFilter("processing")})::int`,
+        proposalId: storePriceMatchProposals.id,
+        createdAt: storePriceMatchProposals.createdAt,
+        updatedAt: storePriceMatchProposals.updatedAt,
+        processingQueuedAt: storePriceMatchProposals.processingQueuedAt,
+        isProcessing: getQueueIsProcessingSql().as("is_processing"),
+        ...queueStatsSelection(),
       })
       .from(storePriceMatchProposals)
       .innerJoin(
@@ -47,36 +87,39 @@ export default procedure
         externalSites,
         eq(externalSites.id, storePrices.externalSiteId),
       )
-      .where(baseWhere);
+      .where(baseWhere)
+      .as("queue_matches");
+
+    const queueStateWhere = eq(
+      queueMatches.isProcessing,
+      input.state === "processing",
+    );
     const orderBy =
       input.sort === "created"
-        ? [
-            asc(storePriceMatchProposals.createdAt),
-            asc(storePriceMatchProposals.id),
-          ]
+        ? [asc(queueMatches.createdAt), asc(queueMatches.proposalId)]
         : input.sort === "-created"
-          ? [
-              desc(storePriceMatchProposals.createdAt),
-              desc(storePriceMatchProposals.id),
-            ]
+          ? [desc(queueMatches.createdAt), desc(queueMatches.proposalId)]
           : input.state === "processing"
             ? [
-                desc(storePriceMatchProposals.processingQueuedAt),
-                desc(storePriceMatchProposals.id),
+                desc(queueMatches.processingQueuedAt),
+                desc(queueMatches.proposalId),
               ]
-            : [
-                desc(storePriceMatchProposals.updatedAt),
-                desc(storePriceMatchProposals.id),
-              ];
+            : [desc(queueMatches.updatedAt), desc(queueMatches.proposalId)];
 
     const rows = await db
       .select({
-        isProcessing: getQueueIsProcessingSql(),
+        isProcessing: queueMatches.isProcessing,
+        actionableCount: queueMatches.actionableCount,
+        processingCount: queueMatches.processingCount,
         proposal: storePriceMatchProposals,
         price: storePrices,
         site: externalSites,
       })
-      .from(storePriceMatchProposals)
+      .from(queueMatches)
+      .innerJoin(
+        storePriceMatchProposals,
+        eq(storePriceMatchProposals.id, queueMatches.proposalId),
+      )
       .innerJoin(
         storePrices,
         eq(storePrices.id, storePriceMatchProposals.priceId),
@@ -85,10 +128,19 @@ export default procedure
         externalSites,
         eq(externalSites.id, storePrices.externalSiteId),
       )
-      .where(queueWhere)
+      .where(queueStateWhere)
       .orderBy(...orderBy)
       .limit(input.limit + 1)
       .offset(offset);
+
+    // Queue list rule: count both states from the same filtered scan as the
+    // page. Only run the separate count when the requested page has no rows.
+    const stats = rows[0]
+      ? {
+          actionableCount: rows[0].actionableCount,
+          processingCount: rows[0].processingCount,
+        }
+      : await queryQueueStats(baseWhere);
 
     const hasNextPage = rows.length > input.limit;
     const queueRows = rows.slice(0, input.limit).map((row) => ({
@@ -112,8 +164,8 @@ export default procedure
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
       },
       stats: {
-        actionableCount: stats?.actionableCount ?? 0,
-        processingCount: stats?.processingCount ?? 0,
+        actionableCount: stats.actionableCount,
+        processingCount: stats.processingCount,
       },
     };
   });
