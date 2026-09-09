@@ -12,7 +12,7 @@ import type {
 } from "openai/resources/responses/responses";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeRules } from "./rules";
-import { createScrapeSourceRevision } from "./service";
+import { saveScrapeSourceSuggestion } from "./service";
 import {
   AI_INSTRUCTIONS_VERSION,
   MAX_PAGES_TO_CHECK,
@@ -302,6 +302,7 @@ async function requestAi(input: {
 export async function suggestScrapeSourceRevision(input: {
   scrapeSourceId: number;
   externalSiteRunId: number;
+  executionToken: string;
   createdById: number;
   listPages: WebsitePage[];
   detailPages: WebsitePage[];
@@ -375,8 +376,10 @@ export async function suggestScrapeSourceRevision(input: {
   });
   const suggestedRules = setup.rules;
   const listPage = setup.checked.listPage;
-  return await createScrapeSourceRevision({
+  return await saveScrapeSourceSuggestion({
     scrapeSourceId: input.scrapeSourceId,
+    externalSiteRunId: input.externalSiteRunId,
+    executionToken: input.executionToken,
     listUrl: listPage.url,
     rules: suggestedRules,
     author: "ai",

@@ -1,11 +1,14 @@
 import { db } from "@peated/server/db";
-import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
+import {
+  externalSiteRuns,
+  externalSites,
+  scrapeSourceRevisions,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { createPinnedScrapeSourceRun } from "@peated/server/scraper/configured/runs";
 import {
   activateScrapeSourceRevision,
-  recordScrapeSourcePreview,
   SCRAPE_SOURCE_PAUSED_ERROR,
 } from "@peated/server/scraper/configured/service";
 import { eq } from "drizzle-orm";
@@ -54,11 +57,14 @@ describe("POST /admin/scrape-sources/:id/pause", () => {
     const admin = await fixtures.User({ admin: true });
     const { site, source } = await createTestSource(admin.id);
     const revision = await createTestRevision(source.id, admin.id);
-    await recordScrapeSourcePreview({
-      revisionId: revision.id,
-      status: "passed",
-      result: { issues: [], pages: [] },
-    });
+    await db
+      .update(scrapeSourceRevisions)
+      .set({
+        previewStatus: "passed",
+        previewResult: { issues: [], pages: [] },
+        previewedAt: new Date(),
+      })
+      .where(eq(scrapeSourceRevisions.id, revision.id));
     await activateScrapeSourceRevision({
       scrapeSourceId: source.id,
       revisionId: revision.id,

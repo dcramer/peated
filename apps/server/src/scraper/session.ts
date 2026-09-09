@@ -8,6 +8,7 @@ import {
   scraperSystemClock,
 } from "./http";
 import { ensureRobotsAllowed } from "./robots";
+import { SCRAPER_RUN_TIMEOUT_MS } from "./runTimeout";
 import type {
   ScraperObservation,
   ScraperRegistry,
@@ -24,13 +25,12 @@ const ScraperSinkResultSchema = z
     existingItemCount: z.number().int().nonnegative(),
   })
   .strict();
-const RUN_EXECUTION_LEASE_MS = 60 * 60_000;
 
-export class ScraperRunOwnershipError extends Error {
-  override name = "ScraperRunOwnershipError";
+export class ScraperRunTakenOverError extends Error {
+  override name = "ScraperRunTakenOverError";
 
   constructor() {
-    super("Scraper run is no longer owned by this execution.");
+    super("Another worker has taken over this scraper run.");
   }
 }
 
@@ -62,7 +62,7 @@ export function createScraperSession<TCursor, TObservation>({
       .update(externalSiteRuns)
       .set({
         ...values,
-        executionExpiresAt: new Date(now.getTime() + RUN_EXECUTION_LEASE_MS),
+        executionExpiresAt: new Date(now.getTime() + SCRAPER_RUN_TIMEOUT_MS),
       })
       .where(
         and(
@@ -75,7 +75,7 @@ export function createScraperSession<TCursor, TObservation>({
         requestLimit: externalSiteRuns.requestLimit,
         sliceRequestCount: externalSiteRuns.sliceRequestCount,
       });
-    if (!updated) throw new ScraperRunOwnershipError();
+    if (!updated) throw new ScraperRunTakenOverError();
     remaining = Math.max(0, updated.requestLimit - updated.sliceRequestCount);
   }
 
@@ -138,7 +138,7 @@ export function createScraperSession<TCursor, TObservation>({
           emittedItemCount: sql`${externalSiteRuns.emittedItemCount} + ${validated.itemCount}`,
           newItemCount: sql`${externalSiteRuns.newItemCount} + ${counts.newItemCount}`,
           existingItemCount: sql`${externalSiteRuns.existingItemCount} + ${counts.existingItemCount}`,
-          executionExpiresAt: new Date(now.getTime() + RUN_EXECUTION_LEASE_MS),
+          executionExpiresAt: new Date(now.getTime() + SCRAPER_RUN_TIMEOUT_MS),
         })
         .where(
           and(
@@ -151,7 +151,7 @@ export function createScraperSession<TCursor, TObservation>({
           requestLimit: externalSiteRuns.requestLimit,
           sliceRequestCount: externalSiteRuns.sliceRequestCount,
         });
-      if (!updated) throw new ScraperRunOwnershipError();
+      if (!updated) throw new ScraperRunTakenOverError();
       remaining = Math.max(0, updated.requestLimit - updated.sliceRequestCount);
     },
 

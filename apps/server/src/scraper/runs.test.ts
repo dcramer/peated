@@ -19,8 +19,8 @@ import {
 } from "./definitions";
 import type { ScraperHttpClock } from "./http";
 import { ScraperRequestWaitError } from "./http";
-import { executeScraperRun } from "./runs";
-import { ScraperRunOwnershipError } from "./session";
+import { executeScraperRun, extendRunTimeout } from "./runs";
+import { ScraperRunTakenOverError } from "./session";
 import { syncScraperDefinitions } from "./syncDefinitions";
 import type { ScraperAdapter, ScraperSink } from "./types";
 
@@ -368,7 +368,30 @@ test("duplicate delivery cannot advance an actively owned run", async () => {
   await expect(first).resolves.toEqual({ status: "completed" });
 });
 
-test("a reclaimed execution cannot emit through the prior owner's sink", async () => {
+test("gives a worker more time to finish its run", async () => {
+  const { run } = await setupRun();
+  await db
+    .update(externalSiteRuns)
+    .set({
+      status: "running",
+      executionToken: "slow-worker",
+      executionExpiresAt: new Date("2026-08-18T13:00:00Z"),
+    })
+    .where(eq(externalSiteRuns.id, run.id));
+
+  await extendRunTimeout({
+    runId: run.id,
+    executionToken: "slow-worker",
+    now: new Date("2026-08-18T12:30:00Z"),
+  });
+  const [stored] = await db
+    .select({ executionExpiresAt: externalSiteRuns.executionExpiresAt })
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(stored?.executionExpiresAt).toEqual(new Date("2026-08-18T13:30:00Z"));
+});
+
+test("an old worker cannot save after another worker takes over", async () => {
   let entered: (() => void) | undefined;
   let resume: (() => void) | undefined;
   const ready = new Promise<void>((resolve) => {
@@ -391,19 +414,19 @@ test("a reclaimed execution cannot emit through the prior owner's sink", async (
   const { registry, run } = await setupRun({ adapter, sink });
   const execution = executeScraperRun(
     { runId: run.id },
-    { registry, clock: fixedClock(), executionToken: "prior-owner" },
+    { registry, clock: fixedClock(), executionToken: "old-worker" },
   );
   await ready;
   await db
     .update(externalSiteRuns)
     .set({
-      executionToken: "successor-owner",
+      executionToken: "new-worker",
       executionExpiresAt: new Date("2026-08-18T13:00:00Z"),
     })
     .where(eq(externalSiteRuns.id, run.id));
   resume?.();
 
-  await expect(execution).rejects.toBeInstanceOf(ScraperRunOwnershipError);
+  await expect(execution).rejects.toBeInstanceOf(ScraperRunTakenOverError);
   expect(sink).not.toHaveBeenCalled();
 });
 

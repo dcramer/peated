@@ -26,14 +26,14 @@ import {
   type ScraperHttpClock,
 } from "./http";
 import { ScraperRobotsDeniedError } from "./robots";
-import { createScraperSession, ScraperRunOwnershipError } from "./session";
+import { SCRAPER_RUN_REFRESH_MS, SCRAPER_RUN_TIMEOUT_MS } from "./runTimeout";
+import { createScraperSession, ScraperRunTakenOverError } from "./session";
 import type {
   ScraperRegistry,
   ScraperRunPayload,
   ScraperSourceDefinition,
 } from "./types";
 
-const RUN_EXECUTION_LEASE_MS = 60 * 60_000;
 const MAX_RUN_EXECUTION_ATTEMPTS = 10;
 const MAX_RUN_AGE_MS = 3 * 24 * 60 * 60_000;
 const DEFAULT_WAIT_MS = 15 * 60_000;
@@ -173,7 +173,7 @@ async function claimScraperRun({
             : candidate.run.sliceRequestCount,
         nextAttemptAt: null,
         executionToken,
-        executionExpiresAt: new Date(now.getTime() + RUN_EXECUTION_LEASE_MS),
+        executionExpiresAt: new Date(now.getTime() + SCRAPER_RUN_TIMEOUT_MS),
       })
       .where(eq(externalSiteRuns.id, runId))
       .returning();
@@ -218,7 +218,7 @@ async function completeRun(claim: ClaimedRun, completedAt: Date) {
         id: externalSiteRuns.id,
         externalSiteId: externalSiteRuns.externalSiteId,
       });
-    if (!completed) throw new ScraperRunOwnershipError();
+    if (!completed) throw new ScraperRunTakenOverError();
     await tx
       .update(externalSites)
       .set({ lastRunAt: completedAt, lastRunId: completed.id })
@@ -311,7 +311,11 @@ export async function executeScraperRun(
   },
 ): Promise<ScraperRunExecutionResult> {
   const { runId } = ScraperRunJobInputSchema.parse(input);
-  const runRegistry = await resolveScrapeSourceRunRegistry(runId, registry);
+  const runRegistry = await resolveScrapeSourceRunRegistry(
+    runId,
+    registry,
+    executionToken,
+  );
   const claimed = await claimScraperRun({
     runId,
     registry: runRegistry,
@@ -319,6 +323,12 @@ export async function executeScraperRun(
     executionToken,
   });
   if (!("run" in claimed)) return claimed;
+
+  const stopExtendingRun = startExtendingRunTimeout({
+    runId: claimed.run.id,
+    executionToken: claimed.executionToken,
+    clock,
+  });
 
   Sentry.getIsolationScope().setContext("externalSiteRun", {
     id: claimed.run.id,
@@ -340,6 +350,7 @@ export async function executeScraperRun(
       clock,
     });
     await claimed.source.adapter({ cursor, session });
+    await stopExtendingRun();
 
     const [latest] = await db
       .select({ emittedItemCount: externalSiteRuns.emittedItemCount })
@@ -349,8 +360,9 @@ export async function executeScraperRun(
     await completeRun(claimed, clock.now());
     return { status: "completed" };
   } catch (error) {
+    await stopExtendingRun().catch(() => {});
     if (
-      (error instanceof ScraperRunOwnershipError ||
+      (error instanceof ScraperRunTakenOverError ||
         (error instanceof ScraperRequestError &&
           error.category === "invalid_request")) &&
       (await isScraperRunPaused(claimed.run.id))
@@ -375,4 +387,67 @@ export async function executeScraperRun(
     );
     throw error;
   }
+}
+
+function startExtendingRunTimeout({
+  runId,
+  executionToken,
+  clock,
+}: {
+  runId: number;
+  executionToken: string;
+  clock: ScraperHttpClock;
+}) {
+  let stopped = false;
+  let refreshError: unknown;
+  let refresh = Promise.resolve();
+  const timer = setInterval(() => {
+    refresh = refresh
+      .then(async () => {
+        await extendRunTimeout({
+          runId,
+          executionToken,
+          now: clock.now(),
+        });
+      })
+      .catch((error) => {
+        refreshError = error;
+        clearInterval(timer);
+      });
+  }, SCRAPER_RUN_REFRESH_MS);
+  timer.unref();
+
+  return async () => {
+    if (!stopped) {
+      stopped = true;
+      clearInterval(timer);
+      await refresh;
+    }
+    if (refreshError) throw refreshError;
+  };
+}
+
+export async function extendRunTimeout({
+  runId,
+  executionToken,
+  now,
+}: {
+  runId: number;
+  executionToken: string;
+  now: Date;
+}) {
+  const [updated] = await db
+    .update(externalSiteRuns)
+    .set({
+      executionExpiresAt: new Date(now.getTime() + SCRAPER_RUN_TIMEOUT_MS),
+    })
+    .where(
+      and(
+        eq(externalSiteRuns.id, runId),
+        eq(externalSiteRuns.status, "running"),
+        eq(externalSiteRuns.executionToken, executionToken),
+      ),
+    )
+    .returning({ id: externalSiteRuns.id });
+  if (!updated) throw new ScraperRunTakenOverError();
 }
