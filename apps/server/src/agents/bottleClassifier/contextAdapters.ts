@@ -34,7 +34,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
-import { and, asc, desc, eq, isNotNull, notExists } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, isNull, notExists } from "drizzle-orm";
 
 function exactBottleContext(
   bottle: {
@@ -203,6 +203,7 @@ export async function getBottleClassifierContext(
         and(
           eq(tastings.bottleId, bottleId),
           isNotNull(tastings.imageUrl),
+          isNull(tastings.removedAt),
           eq(users.private, false),
           eq(users.active, true),
         ),

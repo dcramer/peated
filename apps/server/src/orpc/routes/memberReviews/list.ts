@@ -4,7 +4,7 @@ import { implement } from "@peated/server/orpc";
 import memberReviewListContract from "@peated/server/orpc/contracts/memberReviews/list";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, or, sql } from "drizzle-orm";
 
 export default implement(memberReviewListContract).handler(
   async ({ input, context }) => {
@@ -27,7 +27,13 @@ export default implement(memberReviewListContract).handler(
       .select({ review: memberReviews })
       .from(memberReviews)
       .innerJoin(users, eq(users.id, memberReviews.createdById))
-      .where(and(eq(memberReviews.bottleId, input.bottle), visible))
+      .where(
+        and(
+          eq(memberReviews.bottleId, input.bottle),
+          isNull(memberReviews.removedAt),
+          visible,
+        ),
+      )
       .orderBy(desc(memberReviews.updatedAt), desc(memberReviews.id))
       .limit(input.limit + 1)
       .offset(offset);

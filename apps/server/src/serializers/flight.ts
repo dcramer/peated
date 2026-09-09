@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
@@ -72,6 +72,7 @@ export const FlightDetailsSerializer = serializer({
                 inArray(tastings.flightId, flightIds),
                 inArray(tastings.bottleId, bottleIds),
                 eq(tastings.createdById, currentUser.id),
+                isNull(tastings.removedAt),
               ),
             )
         : [];

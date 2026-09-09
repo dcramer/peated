@@ -5,7 +5,7 @@ import { requireAuth } from "@peated/server/orpc/middleware";
 import { MemberReviewSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { MemberReviewSerializer } from "@peated/server/serializers/memberReview";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -25,6 +25,7 @@ export default procedure
       where: and(
         eq(memberReviews.bottleId, input.bottle),
         eq(memberReviews.createdById, context.user.id),
+        isNull(memberReviews.removedAt),
       ),
     });
     return review

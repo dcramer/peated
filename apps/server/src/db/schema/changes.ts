@@ -47,7 +47,14 @@ export const changes = pgTable(
       .references(() => actors.id)
       .notNull(),
   },
-  (table) => [index("change_actor_idx").on(table.actorId)],
+  (table) => [
+    index("change_actor_idx").on(table.actorId),
+    index("change_object_created_idx").on(
+      table.objectType,
+      table.objectId,
+      table.createdAt,
+    ),
+  ],
 );
 
 export const changesRelations = relations(changes, ({ one }) => ({

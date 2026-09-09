@@ -7,7 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const itemCoverageSchema = z.object({
@@ -75,6 +75,7 @@ export default procedure
         .where(
           and(
             eq(externalReviews.hidden, false),
+            isNull(externalReviews.removedAt),
             isNotNull(bottles.groupId),
             sql`not exists (
                 select 1 from ${bottleTombstones}
@@ -105,7 +106,12 @@ export default procedure
           unmatched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is null)::int`,
         })
         .from(externalReviews)
-        .where(eq(externalReviews.hidden, false)),
+        .where(
+          and(
+            eq(externalReviews.hidden, false),
+            isNull(externalReviews.removedAt),
+          ),
+        ),
       db
         .select({
           total: sql<number>`count(*)::int`,

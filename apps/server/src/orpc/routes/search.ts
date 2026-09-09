@@ -483,6 +483,7 @@ async function searchMembers(
   const rank = nameRank([sql`${users.username}`], normalizedQuery);
   const publicTastingCount = sql<number>`COUNT(${tastings.id}) FILTER (
     WHERE ${users.private} = FALSE
+      AND ${tastings.removedAt} IS NULL
   )`;
   const rows = await database
     .select({

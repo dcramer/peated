@@ -12,7 +12,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { ImageUploadSchema } from "@peated/server/schemas/images";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { Readable } from "node:stream";
 import { z } from "zod";
 
@@ -45,7 +45,7 @@ export default procedure
     const [targetTasting] = await db
       .select()
       .from(tastings)
-      .where(eq(tastings.id, tastingId))
+      .where(and(eq(tastings.id, tastingId), isNull(tastings.removedAt)))
       .limit(1);
 
     if (!targetTasting) {

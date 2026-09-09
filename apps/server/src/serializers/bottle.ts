@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
@@ -219,6 +219,7 @@ export const BottleSerializer = serializer({
                   and(
                     inArray(tastings.bottleId, itemIds),
                     eq(tastings.createdById, currentUser.id),
+                    isNull(tastings.removedAt),
                   ),
                 )
             ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),

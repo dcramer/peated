@@ -1975,6 +1975,13 @@
       "when": 1788827231102,
       "tag": "0281_cute_vapor",
       "breakpoints": false
+    },
+    {
+      "idx": 282,
+      "version": "7",
+      "when": 1788912069822,
+      "tag": "0282_tranquil_warlock",
+      "breakpoints": false
     }
   ]
 }

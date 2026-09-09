@@ -11,7 +11,7 @@ import { validateTags } from "@peated/server/orpc/validators/tags";
 import { TastingSchema, TastingUpdateFields } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
@@ -57,6 +57,7 @@ export default procedure
         and(
           eq(tastings.id, input.tasting),
           eq(tastings.createdById, context.user.id),
+          isNull(tastings.removedAt),
         ),
     });
     if (!tasting) {
@@ -132,6 +133,7 @@ export default procedure
           and(
             eq(tastings.id, tasting.id),
             eq(tastings.createdById, context.user.id),
+            isNull(tastings.removedAt),
           ),
         )
         .limit(1)

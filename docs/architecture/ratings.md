@@ -189,6 +189,13 @@ is separate: an eligible untagged score can affect rating summaries without
 affecting flavor summaries, and a published tagged external review can affect
 flavor summaries even when it has no usable score.
 
+Administrator removal is separate from privacy and source publication. A
+removed tasting, member review, or external review remains in the database but
+does not appear in public reads or contribute to any count, score, flavor
+summary, recommendation, or activity feed. Restoring it makes it eligible
+again under its normal privacy and publication rules. See
+[Content Moderation](../features/content-moderation.md).
+
 The shipped `avg_rating` and `rating_stats` SQL columns remain for historical
 data. Application code calls them `legacySimpleRatingAverage` and
 `legacySimpleRatingStats`. Current summaries do not read or update them.

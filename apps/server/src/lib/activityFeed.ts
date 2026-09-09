@@ -237,6 +237,7 @@ function markedTastingsSql({
       FROM ${tastings}
       INNER JOIN ${users} ON ${users.id} = ${tastings.createdById}
       WHERE ${userCondition}
+        AND ${tastings.removedAt} IS NULL
         AND ${tastings.createdAt} <= ${snapshotAt}
     ) ordered_tastings
   `;
@@ -428,6 +429,7 @@ export async function countPrimaryActivity({
       SELECT COUNT(*) FROM ${memberReviews}
       INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
       WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+        AND ${memberReviews.removedAt} IS NULL
     ) ${criticReviewCount} AS count
   `);
   return Number(result.rows[0]?.count ?? 0);
@@ -509,6 +511,7 @@ export async function getPrimaryActivity({
           FROM ${memberReviews}
           INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
           WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+            AND ${memberReviews.removedAt} IS NULL
           ${
             includeCriticReviews
               ? sql`

@@ -101,6 +101,23 @@ export default procedure
     }
 
     let review = await db.transaction(async (tx) => {
+      const [existing] = await tx
+        .select({ removedAt: memberReviews.removedAt })
+        .from(memberReviews)
+        .where(
+          and(
+            eq(memberReviews.bottleId, input.bottle),
+            eq(memberReviews.createdById, context.user.id),
+          ),
+        )
+        .limit(1)
+        .for("update");
+      if (existing?.removedAt) {
+        throw errors.CONFLICT({
+          message: "This review was removed by an administrator.",
+        });
+      }
+
       try {
         await resolveActiveBottleIds(tx, [input.bottle], { lock: "update" });
       } catch (error) {

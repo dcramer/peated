@@ -17,6 +17,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { RATING_BAND_IDS, SERVING_STYLE_LIST } from "../../constants";
+import { actors } from "./actors";
 import { badgeAwards } from "./badges";
 import { bottles } from "./bottles";
 import { flights } from "./flights";
@@ -70,6 +71,11 @@ export const tastings = pgTable(
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
       .notNull(),
+    removedAt: timestamp("removed_at"),
+    removedByActorId: bigint("removed_by_actor_id", {
+      mode: "number",
+    }).references(() => actors.id, { onDelete: "set null" }),
+    removalReason: text("removal_reason"),
   },
   (table) => [
     unique("tasting_unq").on(
@@ -81,6 +87,23 @@ export const tastings = pgTable(
     index("tasting_release_idx").on(table.legacyReleaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
+    index("tasting_removed_created_idx").on(
+      table.removedAt,
+      table.createdAt,
+      table.id,
+    ),
+    check(
+      "tasting_removal_state_check",
+      sql`(
+        ${table.removedAt} IS NULL
+        AND ${table.removedByActorId} IS NULL
+        AND ${table.removalReason} IS NULL
+      ) OR (
+        ${table.removedAt} IS NOT NULL
+        AND ${table.removedByActorId} IS NOT NULL
+        AND NULLIF(BTRIM(${table.removalReason}), '') IS NOT NULL
+      )`,
+    ),
   ],
 );
 
@@ -92,6 +115,10 @@ export const tastingsRelations = relations(tastings, ({ one }) => ({
   createdBy: one(users, {
     fields: [tastings.createdById],
     references: [users.id],
+  }),
+  removedByActor: one(actors, {
+    fields: [tastings.removedByActorId],
+    references: [actors.id],
   }),
 }));
 

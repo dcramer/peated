@@ -1,4 +1,4 @@
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
@@ -97,7 +97,9 @@ export const NotificationSerializer = serializer({
           })
           .from(tastings)
           .innerJoin(toasts, eq(tastings.id, toasts.tastingId))
-          .where(inArray(toasts.id, toastIdList))
+          .where(
+            and(inArray(toasts.id, toastIdList), isNull(tastings.removedAt)),
+          )
       : [];
 
     const commentIdList = itemList
@@ -112,7 +114,12 @@ export const NotificationSerializer = serializer({
           })
           .from(tastings)
           .innerJoin(comments, eq(tastings.id, comments.tastingId))
-          .where(inArray(comments.id, commentIdList))
+          .where(
+            and(
+              inArray(comments.id, commentIdList),
+              isNull(tastings.removedAt),
+            ),
+          )
       : [];
     const tastingReferenceList = [
       ...toastTastingList.map((reference) => ({

@@ -32,6 +32,7 @@ export function publicReviewsAndTastings(bottleIds: readonly number[]) {
     INNER JOIN ${users} ON ${users.id} = ${tastings.createdById}
       AND ${users.private} = FALSE
     WHERE ${inArray(tastings.bottleId, scopedBottleIds)}
+      AND ${tastings.removedAt} IS NULL
 
     UNION ALL
 
@@ -44,6 +45,7 @@ export function publicReviewsAndTastings(bottleIds: readonly number[]) {
     INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
       AND ${users.private} = FALSE
     WHERE ${inArray(memberReviews.bottleId, scopedBottleIds)}
+      AND ${memberReviews.removedAt} IS NULL
 
     UNION ALL
 
