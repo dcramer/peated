@@ -4,15 +4,19 @@ import { FlightInputSchema } from "@peated/server/schemas";
 import type { Bottle } from "@peated/server/types";
 import {
   Field,
+  Textarea,
+  TextInput,
+} from "@peated/web/components/field.stylex";
+import { Switch } from "@peated/web/components/formControls.stylex";
+import {
   FormNotice,
   FormSection,
   FormStack,
+} from "@peated/web/components/formLayout.stylex";
+import {
   SearchPicker,
-  Switch,
-  Textarea,
-  TextInput,
   type SearchPickerOption,
-} from "@peated/web/components";
+} from "@peated/web/components/searchPicker.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
 import {

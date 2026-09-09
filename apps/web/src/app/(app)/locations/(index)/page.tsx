@@ -1,4 +1,5 @@
-import { CardGrid, LocationCard } from "@peated/web/components";
+import { CardGrid } from "@peated/web/components/card.stylex";
+import { LocationCard } from "@peated/web/components/locationCard.stylex";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 

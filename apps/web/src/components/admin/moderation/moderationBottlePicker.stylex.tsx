@@ -15,14 +15,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { SectionHeading } from "../../sectionHeading.stylex";
 
+import { AppLink } from "@peated/web/components/appLink";
+import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { IconButton } from "@peated/web/components/button.stylex";
+import { TextInput } from "@peated/web/components/field.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
-import {
-  AppLink,
-  BottleIdentityRow,
-  IconButton,
-  TextInput,
-  TextLink,
-} from "../..";
 import { useORPC } from "../../../lib/orpc/context";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import {

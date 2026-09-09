@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import {
-  FormSection,
-  FormStack,
   LoadingList,
   LoadingPlaceholder,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import {
+  FormSection,
+  FormStack,
+} from "@peated/web/components/formLayout.stylex";
 import {
   PageHeader,
   TabbedPage,

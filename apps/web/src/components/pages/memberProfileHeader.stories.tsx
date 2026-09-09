@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { Button, ButtonLink } from "..";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   MemberProfileHeader,

@@ -1,13 +1,13 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 
+import { EntityIdentityRow } from "@peated/web/components/entityIdentityRow.stylex";
 import {
-  EntityIdentityRow,
-  ItemListItem,
   LoadingList,
-  RailList,
   SectionError,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { ItemListItem } from "@peated/web/components/itemList.stylex";
+import { RailList } from "@peated/web/components/lists.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 

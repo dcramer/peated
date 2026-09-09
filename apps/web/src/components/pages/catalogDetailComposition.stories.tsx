@@ -2,7 +2,9 @@ import { mockBottles } from "@peated/server/orpc/mock/fixtures";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { BottleList, DistributionList, FactList } from "..";
+import { BottleList } from "@peated/web/components/bottleList.stylex";
+import { DistributionList } from "@peated/web/components/distributionList.stylex";
+import { FactList } from "@peated/web/components/factList.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   PageColumns,

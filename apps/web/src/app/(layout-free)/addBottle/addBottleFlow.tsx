@@ -1,18 +1,6 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import {
-  Button,
-  ButtonLink,
-  CollectionBottleStatusInput,
-  FieldGroup,
-  FormGrid,
-  FormNotice,
-  FormStack,
-  LoadingList,
-  SelectedBottleSummary,
-  type CollectionBottleStatusValue,
-} from "@peated/web/components";
 import BottleResolver, {
   type BottleResolverAction,
   type BottleResolverCreateProposalActionsProps,
@@ -21,10 +9,23 @@ import BottleResolver, {
   type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import {
+  CollectionBottleStatusInput,
+  type CollectionBottleStatusValue,
+} from "@peated/web/components/collectionBottleStatus.stylex";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
+import { FieldGroup } from "@peated/web/components/field.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
+import {
+  FormGrid,
+  FormNotice,
+  FormStack,
+} from "@peated/web/components/formLayout.stylex";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
+import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import TastingForm, {
   TastingFormLoading,

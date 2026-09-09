@@ -1,14 +1,13 @@
 import {
   DataTable,
-  RailList,
-  RailListItem,
-  RATING_BANDS,
   type DataTableColumn,
-} from "@peated/web/components";
+} from "@peated/web/components/dataTable.stylex";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import {
   PageSection,
   RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import { RATING_BANDS } from "@peated/web/components/scoring.stylex";
 import type { Metadata } from "next";
 import {
   AboutPage,

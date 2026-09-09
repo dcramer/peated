@@ -2,8 +2,8 @@
 
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
-import { AppLink as Link } from "@peated/web/components";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
+import { AppLink as Link } from "@peated/web/components/appLink";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight, Copy } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";

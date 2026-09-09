@@ -1,14 +1,13 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import {
-  ItemList,
-  ItemListItem,
   LoadingList,
   SectionError,
-  SeriesIdentityRow,
-  TextLink,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { SeriesIdentityRow } from "@peated/web/components/seriesIdentityRow.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { getBottleSeriesUrl, getEntityUrl } from "@peated/web/lib/urls";
 
 import type { Entity } from "./entityPageData";

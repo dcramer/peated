@@ -3,7 +3,10 @@ import NextLink from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { TextLink, type TextLinkProps } from "..";
+import {
+  TextLink,
+  type TextLinkProps,
+} from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,

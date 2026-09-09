@@ -5,20 +5,24 @@ import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import { EntityIdentityRow } from "@peated/web/components/entityIdentityRow.stylex";
+import {
+  FactList,
+  type FactListItem,
+} from "@peated/web/components/factList.stylex";
 import {
   EmptyState,
-  EntityIdentityRow,
-  FactList,
-  ItemListItem,
   LoadingPlaceholder,
-  RailList,
-  TastingRatingDistribution,
-  Timestamp,
-  type FactListItem,
-  type TastingRatingCounts,
-} from "@peated/web/components";
-import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+} from "@peated/web/components/feedback.stylex";
+import { ItemListItem } from "@peated/web/components/itemList.stylex";
+import { RailList } from "@peated/web/components/lists.stylex";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
+import {
+  TastingRatingDistribution,
+  type TastingRatingCounts,
+} from "@peated/web/components/scoring.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";

@@ -5,20 +5,25 @@ import type { ReactNode } from "react";
 
 import {
   BottleIdentityRow,
-  Button,
-  Chip,
-  CursorPager,
-  EmptyState,
+  type BottleIdentityRowProps,
+} from "@peated/web/components/bottleIdentityRow.stylex";
+import { Button } from "@peated/web/components/button.stylex";
+import { Chip } from "@peated/web/components/chip.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import {
   FacetGroup,
   FilterQuery,
-  ItemList,
-  ItemListItem,
+} from "@peated/web/components/filterPanel.stylex";
+import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
+import {
+  CursorPager,
   ListToolbar,
-  RowMenu,
-  type BottleIdentityRowProps,
   type ListSortOption,
+} from "@peated/web/components/lists.stylex";
+import {
+  RowMenu,
   type RowMenuGroup,
-} from "..";
+} from "@peated/web/components/rowMenu.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
 

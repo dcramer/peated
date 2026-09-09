@@ -4,8 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import { Button, Chip, FactList, SectionError } from "@peated/web/components";
 import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
+import { Button } from "@peated/web/components/button.stylex";
+import { Chip } from "@peated/web/components/chip.stylex";
+import { FactList } from "@peated/web/components/factList.stylex";
+import { SectionError } from "@peated/web/components/feedback.stylex";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useBottleRowActions from "@peated/web/hooks/useBottleRowActions";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";

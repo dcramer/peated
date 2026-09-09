@@ -3,23 +3,27 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import { EntityInputSchema, EntityKindEnum } from "@peated/server/schemas";
 import type { Entity } from "@peated/server/types";
-import {
-  Button,
-  EntityPicker,
-  Field,
-  FormNotice,
-  FormSection,
-  FormStack,
-  Select,
-  Textarea,
-  TextInput,
-  type EntityPickerOption,
-} from "@peated/web/components";
+import { Button } from "@peated/web/components/button.stylex";
 import {
   entityImageDrafts,
   EntityImageEditor,
   type EntityImageDraft,
 } from "@peated/web/components/entityImageEditor.stylex";
+import {
+  EntityPicker,
+  type EntityPickerOption,
+} from "@peated/web/components/entityPicker.stylex";
+import {
+  Field,
+  Textarea,
+  TextInput,
+} from "@peated/web/components/field.stylex";
+import { Select } from "@peated/web/components/formControls.stylex";
+import {
+  FormNotice,
+  FormSection,
+  FormStack,
+} from "@peated/web/components/formLayout.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";

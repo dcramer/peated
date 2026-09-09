@@ -1,12 +1,10 @@
 import type { Event } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 
-import {
-  ButtonLink,
-  LoadingPlaceholder,
-  TextLink,
-} from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import DateRange from "@peated/web/components/dateRange";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
 

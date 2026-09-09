@@ -5,12 +5,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  ButtonLink,
   FacetGroup,
   FilterPanel,
-  PageTabs,
-} from "@peated/web/components";
+} from "@peated/web/components/filterPanel.stylex";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.stylex";
 import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";

@@ -1,9 +1,8 @@
 import {
   DataTable,
-  RailList,
-  RailListItem,
   type DataTableColumn,
-} from "@peated/web/components";
+} from "@peated/web/components/dataTable.stylex";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import {
   PageSection,
   RailSection,

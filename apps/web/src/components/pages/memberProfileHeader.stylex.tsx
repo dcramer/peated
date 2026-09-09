@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { Chip } from "..";
+import { Chip } from "@peated/web/components/chip.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,

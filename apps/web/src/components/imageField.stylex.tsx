@@ -20,7 +20,8 @@ import AvatarEditor from "react-avatar-editor";
 import { z } from "zod";
 import { SectionHeading } from "./sectionHeading.stylex";
 
-import { Button, Field } from ".";
+import { Button } from "@peated/web/components/button.stylex";
+import { Field } from "@peated/web/components/field.stylex";
 import setRef from "../lib/setRef";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, space, zIndices } from "../styles/tokens.stylex";

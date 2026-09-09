@@ -2,14 +2,11 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import {
-  type BottleListItem,
-  LoadingList,
-  RailList,
-  RailListItem,
-  TastingRating,
-  Timestamp,
-} from "@peated/web/components";
+import type { BottleListItem } from "@peated/web/components/bottleList.stylex";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
+import { TastingRating } from "@peated/web/components/scoring.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getMemberReviewUrl, getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";

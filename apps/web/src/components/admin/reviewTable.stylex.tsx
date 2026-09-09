@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 import { Timestamp } from "../timestamp";
 
-import { TextLink } from "..";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { AdminTable } from "./adminTable.stylex";

@@ -3,7 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
-import { TextLink } from "..";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,

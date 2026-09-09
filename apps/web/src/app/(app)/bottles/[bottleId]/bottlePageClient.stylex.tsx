@@ -8,25 +8,28 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-import {
-  Button,
-  ButtonLink,
-  EmptyState,
-  ExpandableDescription,
-  LoadingList,
-  PageTabs,
-  RowMenu,
-  SectionError,
-  TextLink,
-  type FactListItem,
-  type PageTabItem,
-  type RowMenuItem,
-} from "@peated/web/components";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { EntityLinks } from "@peated/web/components/entityLinks";
+import { ExpandableDescription } from "@peated/web/components/expandableDescription.stylex";
+import type { FactListItem } from "@peated/web/components/factList.stylex";
+import {
+  EmptyState,
+  LoadingList,
+  SectionError,
+} from "@peated/web/components/feedback.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
 import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
 import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
+import {
+  PageTabs,
+  type PageTabItem,
+} from "@peated/web/components/pageTabs.stylex";
+import {
+  RowMenu,
+  type RowMenuItem,
+} from "@peated/web/components/rowMenu.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import useAuth from "@peated/web/hooks/useAuth";
 import {

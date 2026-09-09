@@ -1,12 +1,13 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
+import { Button } from "@peated/web/components/button.stylex";
+import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
+import { SearchBox } from "@peated/web/components/searchBox.stylex";
 import type {
   SearchResultGroup,
   SearchResultItem,
-} from "@peated/web/components";
-import { Button, SearchBox } from "@peated/web/components";
-import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
+} from "@peated/web/components/searchResults.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";

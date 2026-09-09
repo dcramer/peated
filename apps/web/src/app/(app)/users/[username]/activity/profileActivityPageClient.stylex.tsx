@@ -4,13 +4,13 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import {
-  CursorPager,
   EmptyState,
   LoadingList,
   SectionError,
-} from "@peated/web/components";
-import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+} from "@peated/web/components/feedback.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { getCommunityFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";

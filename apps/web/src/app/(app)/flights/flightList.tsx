@@ -1,11 +1,8 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import {
-  CursorPager,
-  ItemList,
-  ItemRow,
-  LoadingPlaceholder,
-} from "@peated/web/components";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 
 type FlightListResult = Outputs["flights"]["list"];

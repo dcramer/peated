@@ -2,7 +2,8 @@
 
 import * as stylex from "@stylexjs/stylex";
 
-import { PageTabs, TextLink } from "@peated/web/components";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../styles/tokens.stylex";
 

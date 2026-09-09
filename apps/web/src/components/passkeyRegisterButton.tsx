@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@peated/web/components";
+import { Button } from "@peated/web/components/button.stylex";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {

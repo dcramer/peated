@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { PeatedId, SectionHeading } from "@peated/web/components";
+import { PeatedId } from "@peated/web/components/catalogDetails.stylex";
+import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import { foundationStyles } from "../../../../styles/foundations.stylex";
 import {
   colors,

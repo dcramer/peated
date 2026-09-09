@@ -1,5 +1,10 @@
+import {
+  Button,
+  ButtonLink,
+  type ButtonSize,
+  type ButtonVariant,
+} from "@peated/web/components/button.stylex";
 import { forwardRef, type ReactNode } from "react";
-import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from "..";
 
 type BaseProps = {
   "aria-label"?: string;

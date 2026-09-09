@@ -1,7 +1,8 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 
-import { AppLink, BadgeImage } from "@peated/web/components";
+import { AppLink } from "@peated/web/components/appLink";
+import { BadgeImage } from "@peated/web/components/badgeImage.stylex";
 import { foundationStyles } from "../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../styles/tokens.stylex";
 

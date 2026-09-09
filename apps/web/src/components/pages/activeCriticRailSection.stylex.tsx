@@ -1,9 +1,6 @@
-import {
-  Avatar,
-  RailList,
-  RailListItem,
-  Timestamp,
-} from "@peated/web/components";
+import { Avatar } from "@peated/web/components/avatar.stylex";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 
 import { RailListSection } from "./railListSection.stylex";
 

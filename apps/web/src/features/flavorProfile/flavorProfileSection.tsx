@@ -5,12 +5,12 @@ import type {
   FlavorProfile,
 } from "@peated/server/schemas/flavorProfile";
 import {
-  FlavorWheel,
   LoadingPlaceholder,
   SectionError,
-  TextLink,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { FlavorWheel } from "@peated/web/components/flavorWheel.stylex";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import {
   TastingWheelProvider,
   useTastingWheel,

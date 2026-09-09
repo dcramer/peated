@@ -5,21 +5,21 @@ import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import * as stylex from "@stylexjs/stylex";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+import { EntityIdentityRow } from "@peated/web/components/entityIdentityRow.stylex";
+import { FactList } from "@peated/web/components/factList.stylex";
 import {
-  EntityIdentityRow,
-  FactList,
-  ItemListItem,
   LoadingList,
   LoadingPlaceholder,
-  RailList,
-  TextLink,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { ItemListItem } from "@peated/web/components/itemList.stylex";
+import { RailList } from "@peated/web/components/lists.stylex";
 import Markdown from "@peated/web/components/markdown";
 import {
   PageColumns,
   PageHeader,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { RailListSection } from "@peated/web/components/pages/railListSection.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";

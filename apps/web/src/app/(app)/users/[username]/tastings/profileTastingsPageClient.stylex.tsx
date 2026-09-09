@@ -4,17 +4,16 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import {
-  ButtonLink,
-  CursorPager,
-  EmptyState,
-  ItemListItem,
-  LoadingList,
-  LocationIdentityRow,
-  RailList,
-  SectionError,
-} from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import {
+  EmptyState,
+  LoadingList,
+  SectionError,
+} from "@peated/web/components/feedback.stylex";
+import { ItemListItem } from "@peated/web/components/itemList.stylex";
+import { CursorPager, RailList } from "@peated/web/components/lists.stylex";
+import { LocationIdentityRow } from "@peated/web/components/locationIdentityRow.stylex";
 import { RailSection } from "@peated/web/components/pages/pageLayout.stylex";
 import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";

@@ -2,15 +2,14 @@
 
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 
+import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
+import { Field, Textarea } from "@peated/web/components/field.stylex";
 import {
-  Field,
   FormNotice,
   FormSection,
   FormStack,
-  SelectedBottleSummary,
-  Textarea,
-} from "@peated/web/components";
-import { moderationHrefForAudit } from "@peated/web/components/admin/moderation/auditHref";
+} from "@peated/web/components/formLayout.stylex";
+import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";

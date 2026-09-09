@@ -1,4 +1,4 @@
-import { ButtonLink } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import {
   BOTTLE_CATALOG_ALLOWED_VALUES,

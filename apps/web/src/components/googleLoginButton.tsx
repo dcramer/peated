@@ -1,20 +1,23 @@
 "use client";
 
-import { useGoogleLogin } from "@react-oauth/google";
+import config from "@peated/web/config";
+import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { logWarn } from "../lib/log";
 import { Button, type ButtonVariant } from "./button.stylex";
 
-export default function GoogleLoginButton({
-  action,
-  title = "Continue with Google",
-  variant = "tonal",
-}: {
+type GoogleLoginButtonProps = {
   action: (formData: FormData) => Promise<any>;
   title?: string;
   variant?: ButtonVariant;
-}) {
+};
+
+function GoogleLoginButtonContent({
+  action,
+  title = "Continue with Google",
+  variant = "tonal",
+}: GoogleLoginButtonProps) {
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
 
@@ -65,5 +68,13 @@ export default function GoogleLoginButton({
       </svg>
       {title}
     </Button>
+  );
+}
+
+export default function GoogleLoginButton(props: GoogleLoginButtonProps) {
+  return (
+    <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
+      <GoogleLoginButtonContent {...props} />
+    </GoogleOAuthProvider>
   );
 }

@@ -1,6 +1,9 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import { SiteFooter, type SiteFooterProps } from "@peated/web/components";
+import {
+  SiteFooter,
+  type SiteFooterProps,
+} from "@peated/web/components/siteFooter.stylex";
 
 const groups = [
   {

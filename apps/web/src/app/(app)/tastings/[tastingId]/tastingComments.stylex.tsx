@@ -6,19 +6,19 @@ import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  Button,
-  ButtonLink,
-  Field,
-  ItemList,
-  ItemRow,
   LoadingList,
-  MemberAvatar,
-  RowMenu,
   SectionError,
+} from "@peated/web/components/feedback.stylex";
+import {
+  Field,
   Textarea,
   ValidationMessage,
-} from "@peated/web/components";
+} from "@peated/web/components/field.stylex";
+import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
+import { MemberAvatar } from "@peated/web/components/memberAvatar";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";

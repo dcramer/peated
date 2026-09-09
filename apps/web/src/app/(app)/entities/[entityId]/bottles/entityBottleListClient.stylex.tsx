@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition, type ReactNode } from "react";
 
-import { PageTabs } from "@peated/web/components";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import {

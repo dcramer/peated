@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 
-import { BottleList, type BottleListItem } from "@peated/web/components";
+import {
+  BottleList,
+  type BottleListItem,
+} from "@peated/web/components/bottleList.stylex";
 import { RailListSection } from "./railListSection.stylex";
 
 /** Uses the compact sidebar identity; build items with toBottleListItem. */

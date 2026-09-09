@@ -1,4 +1,5 @@
-import { CursorPager, EmptyState } from "@peated/web/components";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { getCountryPage } from "@peated/web/lib/locationPage.server";

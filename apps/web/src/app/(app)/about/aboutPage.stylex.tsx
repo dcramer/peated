@@ -2,12 +2,15 @@ import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { TextLink, type TextLinkProps } from "@peated/web/components";
 import {
   PageColumns,
   PageHeader,
   TabbedPage,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import {
+  TextLink,
+  type TextLinkProps,
+} from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, space } from "../../../styles/tokens.stylex";
 

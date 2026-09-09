@@ -1,4 +1,5 @@
-import { CursorPager, PageTabs } from "@peated/web/components";
+import { CursorPager } from "@peated/web/components/lists.stylex";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { ActivityPage } from "@peated/web/components/pages/activityPage.stylex";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { getCurrentUser } from "@peated/web/lib/auth.server";

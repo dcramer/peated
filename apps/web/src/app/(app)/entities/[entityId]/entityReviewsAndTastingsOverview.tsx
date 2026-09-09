@@ -1,8 +1,12 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
-import { LoadingList, SectionError, TextLink } from "@peated/web/components";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import {
+  LoadingList,
+  SectionError,
+} from "@peated/web/components/feedback.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getEntityUrl } from "@peated/web/lib/urls";
 

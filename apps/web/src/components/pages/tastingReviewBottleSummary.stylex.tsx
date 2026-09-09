@@ -3,7 +3,9 @@ import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { BottleList, BottleVisual, LoadingList } from "@peated/web/components";
+import { BottleList } from "@peated/web/components/bottleList.stylex";
+import { BottleVisual } from "@peated/web/components/bottleVisual.stylex";
+import { LoadingList } from "@peated/web/components/feedback.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 

@@ -5,26 +5,34 @@ import type { ReactNode } from "react";
 import {
   BottleList,
   type BottleListItem,
+} from "@peated/web/components/bottleList.stylex";
+import {
   DistributionList,
   DistributionListLoading,
+} from "@peated/web/components/distributionList.stylex";
+import {
   EntityIdentityRow,
   type EntityListItem,
-  FactList,
-  ItemListItem,
+} from "@peated/web/components/entityIdentityRow.stylex";
+import { FactList } from "@peated/web/components/factList.stylex";
+import {
   LoadingList,
   LoadingPlaceholder,
-  LocationIdentityRow,
+} from "@peated/web/components/feedback.stylex";
+import { ItemListItem } from "@peated/web/components/itemList.stylex";
+import { RailList } from "@peated/web/components/lists.stylex";
+import { LocationIdentityRow } from "@peated/web/components/locationIdentityRow.stylex";
+import {
   type LocationPreviewItem,
-  RailList,
   RegionPreviewGrid,
   RegionPreviewGridLoading,
-  TextLink,
-} from "@peated/web/components";
+} from "@peated/web/components/locationPreviewCard.stylex";
 import {
   PageColumns,
   PageSection,
   RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { colors, space } from "../../../styles/tokens.stylex";
 
 import { foundationStyles } from "../../../styles/foundations.stylex";

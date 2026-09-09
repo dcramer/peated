@@ -18,11 +18,22 @@ import type { Entity, EntityKind } from "@peated/server/types";
 import {
   BottleCreateCandidates,
   BottleCreateCandidateSummary,
-  BottleIdentityRow,
-  Button,
+  type BottleCreateCandidate,
+} from "@peated/web/components/bottleCreateCandidates.stylex";
+import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { Button } from "@peated/web/components/button.stylex";
+import {
   EntityPicker,
+  type EntityPickerOption,
+} from "@peated/web/components/entityPicker.stylex";
+import {
   Field,
   FieldGroup,
+  Textarea,
+  TextInput,
+} from "@peated/web/components/field.stylex";
+import { Select, Switch } from "@peated/web/components/formControls.stylex";
+import {
   FormActions,
   FormDesktopOnly,
   FormDetails,
@@ -32,19 +43,17 @@ import {
   FormStack,
   FormStep,
   FormSteps,
-  PictureInput,
+} from "@peated/web/components/formLayout.stylex";
+import {
   SearchPicker,
-  Select,
-  SeriesPicker,
-  Switch,
-  Textarea,
-  TextInput,
-  UnitInput,
-  type BottleCreateCandidate,
-  type EntityPickerOption,
   type SearchPickerOption,
+} from "@peated/web/components/searchPicker.stylex";
+import {
+  SeriesPicker,
   type SeriesPickerOption,
-} from "@peated/web/components";
+} from "@peated/web/components/seriesPicker.stylex";
+import { PictureInput } from "@peated/web/components/tastingInputs.stylex";
+import { UnitInput } from "@peated/web/components/unitInput.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";

@@ -1,10 +1,10 @@
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import {
-  ButtonLink,
-  CursorPager,
   EmptyState,
   LoadingList,
-} from "@peated/web/components";
-import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+} from "@peated/web/components/feedback.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";

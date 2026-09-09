@@ -1,4 +1,4 @@
-import { EmptyState } from "@peated/web/components";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
 import {
   PageHeader,
   PageSection,

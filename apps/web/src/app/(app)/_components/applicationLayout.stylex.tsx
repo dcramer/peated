@@ -5,11 +5,9 @@ import { CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTransition, type ReactNode } from "react";
 
-import {
-  ApplicationHeader,
-  ButtonLink,
-  MemberAvatar,
-} from "@peated/web/components";
+import { ApplicationHeader } from "@peated/web/components/applicationHeader.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { MemberAvatar } from "@peated/web/components/memberAvatar";
 import { PageFrame } from "@peated/web/components/pages/pageLayout.stylex";
 import { Search } from "@peated/web/components/search/search.stylex";
 import useAuth from "@peated/web/hooks/useAuth";

@@ -1,13 +1,10 @@
 import type { Change, PagingRel } from "@peated/server/types";
 
-import {
-  Avatar,
-  CursorPager,
-  ItemList,
-  ItemRow,
-  LoadingPlaceholder,
-  TextLink,
-} from "@peated/web/components";
+import { Avatar } from "@peated/web/components/avatar.stylex";
+import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
+import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 

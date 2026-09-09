@@ -4,7 +4,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 
-import { TextLink } from "..";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { AdminTable } from "./adminTable.stylex";
 
 export default function StorePriceTable({

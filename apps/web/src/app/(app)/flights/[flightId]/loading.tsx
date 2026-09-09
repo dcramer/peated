@@ -1,9 +1,8 @@
+import { Button, IconButton } from "@peated/web/components/button.stylex";
 import {
-  Button,
-  IconButton,
   LoadingList,
   LoadingPlaceholder,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
 import {
   PageHeader,
   PageSection,

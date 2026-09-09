@@ -2,8 +2,8 @@ import type { Event } from "@peated/server/types";
 import { SectionHeading } from "@peated/web/components/sectionHeading.stylex";
 import * as stylex from "@stylexjs/stylex";
 
-import { TextLink } from "@peated/web/components";
 import DateRange from "@peated/web/components/dateRange";
+import { TextLink } from "@peated/web/components/textLink.stylex";
 import { formatEventLocation } from "@peated/web/lib/eventLocation";
 import { foundationStyles } from "../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../styles/tokens.stylex";

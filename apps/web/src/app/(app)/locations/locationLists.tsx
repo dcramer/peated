@@ -1,12 +1,14 @@
 import type { Entity } from "@peated/server/types";
 
 import {
-  CursorPager,
   DataTable,
+  type DataTableColumn,
+} from "@peated/web/components/dataTable.stylex";
+import {
   EmptyState,
   LoadingPlaceholder,
-  type DataTableColumn,
-} from "@peated/web/components";
+} from "@peated/web/components/feedback.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 type LocationListItem = {

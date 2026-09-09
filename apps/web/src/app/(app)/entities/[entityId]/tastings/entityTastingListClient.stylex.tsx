@@ -5,8 +5,10 @@ import * as stylex from "@stylexjs/stylex";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import { ButtonLink, CursorPager, EmptyState } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import { CursorPager } from "@peated/web/components/lists.stylex";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";

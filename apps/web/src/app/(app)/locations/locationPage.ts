@@ -1,6 +1,7 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
-import type { LocationPreviewItem, PageTabItem } from "@peated/web/components";
+import type { LocationPreviewItem } from "@peated/web/components/locationPreviewCard.stylex";
+import type { PageTabItem } from "@peated/web/components/pageTabs.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import { getRegionMap } from "@peated/web/lib/locationMap";

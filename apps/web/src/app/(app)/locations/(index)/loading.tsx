@@ -1,4 +1,5 @@
-import { CardGrid, LocationCardLoading } from "@peated/web/components";
+import { CardGrid } from "@peated/web/components/card.stylex";
+import { LocationCardLoading } from "@peated/web/components/locationCard.stylex";
 
 export default function Loading() {
   return (

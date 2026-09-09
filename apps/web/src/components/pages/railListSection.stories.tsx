@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
-import { RailList, RailListItem } from "..";
+import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { BottleRailSection } from "./bottleRailSection.stylex";
 import { RailListSection } from "./railListSection.stylex";

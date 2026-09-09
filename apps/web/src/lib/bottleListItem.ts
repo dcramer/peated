@@ -5,11 +5,9 @@ import {
 } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
-import type {
-  BottleIdentityRowProps,
-  BottleListItem,
-  SearchPickerOption,
-} from "@peated/web/components";
+import type { BottleIdentityRowProps } from "@peated/web/components/bottleIdentityRow.stylex";
+import type { BottleListItem } from "@peated/web/components/bottleList.stylex";
+import type { SearchPickerOption } from "@peated/web/components/searchPicker.stylex";
 
 import { getReleaseFamilyHref } from "./releaseFamily";
 import { getBottleUrl, getEntityUrl } from "./urls";

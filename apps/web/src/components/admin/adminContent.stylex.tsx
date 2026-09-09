@@ -5,7 +5,11 @@ import { ChevronRight, Home } from "lucide-react";
 import type { HTMLAttributes, ReactNode } from "react";
 import { SectionHeading } from "../sectionHeading.stylex";
 
-import { AppLink, LoadingList, LoadingPlaceholder } from "..";
+import { AppLink } from "@peated/web/components/appLink";
+import {
+  LoadingList,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,

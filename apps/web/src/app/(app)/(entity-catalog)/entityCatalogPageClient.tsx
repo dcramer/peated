@@ -8,7 +8,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import { ButtonLink, PageTabs } from "@peated/web/components";
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import {
   EntityCatalogFilters,

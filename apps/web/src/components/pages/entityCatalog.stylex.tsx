@@ -3,20 +3,25 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
-  Button,
-  ButtonLink,
-  CursorPager,
-  EmptyState,
   EntityIdentityRow,
+  type EntityListItem,
+} from "@peated/web/components/entityIdentityRow.stylex";
+import { EmptyState } from "@peated/web/components/feedback.stylex";
+import {
   FacetGroup,
   FilterPanel,
+} from "@peated/web/components/filterPanel.stylex";
+import {
+  CursorPager,
   ListToolbar,
-  RowMenu,
-  type EntityListItem,
   type ListSortOption,
+} from "@peated/web/components/lists.stylex";
+import {
+  RowMenu,
   type RowMenuItem,
-} from "..";
+} from "@peated/web/components/rowMenu.stylex";
 import { CatalogTable, type CatalogTableColumn } from "../catalogTable.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
 

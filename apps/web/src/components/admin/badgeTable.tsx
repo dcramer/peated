@@ -1,5 +1,5 @@
 import type { Badge, PagingRel } from "@peated/server/types";
-import { BadgeImage } from "..";
+import { BadgeImage } from "@peated/web/components/badgeImage.stylex";
 import { AdminTable } from "./adminTable.stylex";
 
 export default function BadgeTable({

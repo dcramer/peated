@@ -1,11 +1,10 @@
 import {
   Button,
   ButtonLink,
-  FactList,
-  FormGrid,
-  FormNotice,
   IconButton,
-} from "@peated/web/components";
+} from "@peated/web/components/button.stylex";
+import { FactList } from "@peated/web/components/factList.stylex";
+import { FormGrid, FormNotice } from "@peated/web/components/formLayout.stylex";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { logError } from "@peated/web/lib/log";
 import { Copy, Plus, RotateCcw, Search } from "lucide-react";
