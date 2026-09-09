@@ -1611,6 +1611,8 @@ function dateFromPageUrl(pageUrl: URL) {
   return null;
 }
 
+// TODO(scraper-platform): Carry RSS and Atom item dates into detail parsing
+// when an article omits its publication date.
 function readPublishedDate(
   $: ReturnType<typeof load>,
   selector: string | null,
