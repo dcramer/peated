@@ -261,7 +261,7 @@ Public Bottle and Entity lists interleave tastings, member reviews, and critic
 reviews in one chronological feed. They use a snapshot and a stable event-time,
 source-kind, and ID cursor so a page does not repeat records while a reader
 moves forward. The existing `/tastings` page URLs remain valid, but combined
-pages and controls are labeled “Reviews & tastings.”
+pages and controls use “Reviews” as the short label.
 
 Unlike anonymous summaries, row lists are viewer-aware. A signed-in member can
 see private member activity when they are the author or an accepted follower.

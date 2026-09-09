@@ -101,14 +101,14 @@ that interleave eligible tastings, member reviews, and critic reviews.
 
 ### Requirement: Accurate public names
 
-The system SHALL call combined public values and lists “reviews and tastings”
-and SHALL keep tasting-only values named as tastings.
+The system SHALL label combined public values and lists “Reviews” and SHALL
+keep tasting-only values named as tastings. Descriptive copy MAY say “reviews
+and tastings” when the distinction helps explain the mixed content.
 
 #### Scenario: Compatibility route
 
 - **WHEN** an existing Bottle or Entity `/tastings` URL is opened
-- **THEN** it remains valid and presents the combined list as “Reviews &
-  tastings”
+- **THEN** it remains valid and presents the combined list as “Reviews”
 
 #### Scenario: Existing totalTastings field
 

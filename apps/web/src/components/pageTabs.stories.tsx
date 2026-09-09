@@ -8,7 +8,7 @@ const items = [
   {
     count: 412,
     href: "/bottles/19936/tastings",
-    label: "Reviews & tastings",
+    label: "Reviews",
   },
   { href: "/bottles/19936/prices", label: "Prices" },
   { count: 3, href: "/bottles/19936/releases", label: "Releases" },

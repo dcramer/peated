@@ -113,7 +113,7 @@ export function getEntityTabs(
     tabs.push({
       count: entity.publicReviewAndTastingCount,
       href: `${baseUrl}/tastings`,
-      label: "Reviews & tastings",
+      label: "Reviews",
     });
   }
 

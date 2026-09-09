@@ -165,7 +165,7 @@ function getTabs(bottle: Bottle): [PageTabItem, ...PageTabItem[]] {
     {
       count: bottle.publicReviewAndTastingCount,
       href: `${baseUrl}/tastings`,
-      label: "Reviews & tastings",
+      label: "Reviews",
     },
     { href: `${baseUrl}/prices`, label: "Prices" },
   ];
@@ -469,7 +469,7 @@ export function BottleOverviewClient() {
     <LoadingList label="Loading bottle reviews and tastings" rows={3} />
   ) : mainFailed ? (
     <SectionError
-      heading="Reviews and tastings are unavailable"
+      heading="Reviews are unavailable"
       onRetry={() => {
         void reviewsAndTastingsQuery.refetch();
       }}

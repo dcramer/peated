@@ -104,7 +104,7 @@ export default async function AboutRoute() {
                   },
                   { label: "Brands", value: stats.brands.toLocaleString() },
                   {
-                    label: "Reviews & tastings",
+                    label: "Reviews",
                     value: (
                       stats.tastings +
                       stats.memberReviews +

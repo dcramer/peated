@@ -37,7 +37,7 @@ const meta = {
   component: SiteFooter,
   args: {
     coverage:
-      "47,402 bottles · 3,102 distilleries · 1,891 brands · 431 bottlers · 312,000 reviews & tastings",
+      "47,402 bottles · 3,102 distilleries · 1,891 brands · 431 bottlers · 312,000 reviews",
     groups,
     legalLinks: [{ href: "/terms", label: "Terms" }],
     provenance: "Edited by members · corrections welcome",

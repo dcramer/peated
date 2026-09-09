@@ -72,7 +72,7 @@ export function BottleOverview({
         <div {...stylex.props(styles.content)}>
           {reviewsAndTastings.length ? (
             <section {...stylex.props(styles.section)}>
-              <SectionHeading>Reviews & tastings</SectionHeading>
+              <SectionHeading>Reviews</SectionHeading>
               <CommunityFeed
                 ariaLabel="Bottle reviews and tastings"
                 items={reviewsAndTastings}
@@ -88,7 +88,7 @@ export function BottleOverview({
                   )}
                 >
                   Show all {reviewAndTastingCount.toLocaleString("en-US")}{" "}
-                  reviews & tastings →
+                  reviews →
                 </AppLink>
               ) : null}
             </section>
