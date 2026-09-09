@@ -1,0 +1,7 @@
+id: web-robots-metadata-owned
+valid:
+  - 'const metadata = { title: "Login", ...noIndexPageMetadata };'
+  - "const robot = { index: false };"
+invalid:
+  - "const metadata = { robots: { index: false, follow: false } };"
+  - "return { title, robots: noIndexPageMetadata.robots };"

@@ -2,6 +2,7 @@ import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { noIndexPageMetadata } from "@peated/web/lib/seoMetadata";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -11,7 +12,10 @@ import {
   FriendsPageFrame,
 } from "./friendsPageClient.stylex";
 
-export const metadata: Metadata = { title: "Friends" };
+export const metadata: Metadata = {
+  title: "Friends",
+  ...noIndexPageMetadata,
+};
 
 export default async function FriendsPage(props: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

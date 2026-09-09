@@ -6,10 +6,25 @@ import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
 import { logError } from "@peated/web/lib/log";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getEntityUrl } from "@peated/web/lib/urls";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { EntityCodes } from "./entityCodes.stylex";
+
+export async function generateMetadata(props: {
+  params: Promise<{ entityId: string }>;
+}): Promise<Metadata> {
+  const { entityId } = await props.params;
+  const entity = await getEntityPage(parseCatalogRouteId(entityId));
+  return getCatalogSeoMetadata({
+    title: "SMWS distillery codes",
+    description:
+      "Look up Scotch Malt Whisky Society codes and their distilleries.",
+    url: `${getEntityUrl(entity)}/codes`,
+  });
+}
 
 export default async function EntityCodesPage(props: {
   params: Promise<{ entityId: string }>;

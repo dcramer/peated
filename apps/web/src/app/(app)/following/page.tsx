@@ -1,6 +1,7 @@
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { noIndexPageMetadata } from "@peated/web/lib/seoMetadata";
 import type { Metadata } from "next";
 
 import { FollowingPageClient } from "./followingPageClient.stylex";
@@ -9,7 +10,10 @@ import {
   type FollowingPageSearchParams,
 } from "./followingPageData";
 
-export const metadata: Metadata = { title: "Following" };
+export const metadata: Metadata = {
+  title: "Following",
+  ...noIndexPageMetadata,
+};
 
 export default async function FollowingPage(props: {
   searchParams: Promise<FollowingPageSearchParams>;

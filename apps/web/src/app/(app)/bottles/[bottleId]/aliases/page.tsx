@@ -2,15 +2,20 @@ import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
+import { noIndexFollowPageMetadata } from "@peated/web/lib/seoMetadata";
+import type { Metadata } from "next";
 
 import { AliasList } from "./aliasList.stylex";
 
 export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
-}) {
+}): Promise<Metadata> {
   const { bottleId } = await props.params;
   const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
-  return { title: `Other names for ${formatBottleDisplayName(bottle)}` };
+  return {
+    title: `Other names for ${formatBottleDisplayName(bottle)}`,
+    ...noIndexFollowPageMetadata,
+  };
 }
 
 export default async function BottleAliasesPage(props: {

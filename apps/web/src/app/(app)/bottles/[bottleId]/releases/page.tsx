@@ -16,20 +16,32 @@ import {
   requireReleaseFamilyAnchor,
   requireReleaseFamilyGroup,
 } from "@peated/web/lib/releaseFamily";
+import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getBottleUrl } from "@peated/web/lib/urls";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { BottleSection } from "../bottleSection.stylex";
 
 export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
-}) {
-  const { bottleId } = await props.params;
-  const { group } = await getReleaseGroup(parseCatalogRouteId(bottleId));
-  return {
-    title: `${group.fullName} releases`,
-    description: `Explore releases of ${group.fullName}.`,
-  };
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const [{ bottleId }, searchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const { anchorBottle, group } = await getReleaseGroup(
+    parseCatalogRouteId(bottleId),
+  );
+  return getCatalogSeoMetadata(
+    {
+      title: `${group.fullName} releases`,
+      description: `Browse releases of ${group.fullName}.`,
+      url: `${getBottleUrl(anchorBottle)}/releases`,
+    },
+    searchParams,
+  );
 }
 
 export default async function BottleReleasesPage(props: {

@@ -3,6 +3,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
 
+import { noIndexPageMetadata } from "./seoMetadata";
 import { serializeJsonLd } from "./structuredData";
 import { getBottleUrl, getMemberReviewUrl } from "./urls";
 
@@ -24,7 +25,7 @@ export function getMemberReviewSeoMetadata(
   if (review.createdBy.private) {
     return {
       title: "Private review",
-      robots: { index: false, follow: false },
+      ...noIndexPageMetadata,
     };
   }
 

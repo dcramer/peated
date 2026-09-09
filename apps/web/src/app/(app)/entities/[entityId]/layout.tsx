@@ -1,3 +1,4 @@
+import config from "@peated/web/config";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import {
   getCompanyPageCounts,
@@ -8,6 +9,7 @@ import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { getEntitySeoMetadata } from "@peated/web/lib/seoMetadata";
 import { getSession } from "@peated/web/lib/session.server";
 import { serializeJsonLd } from "@peated/web/lib/structuredData";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import type { Organization, WithContext } from "schema-dts";
@@ -44,9 +46,12 @@ export default async function EntityLayout(props: {
     entity = await client.entities.details({ entity: canonicalEntity.id });
   }
 
+  const entityUrl = new URL(getEntityUrl(entity), config.URL_PREFIX).href;
   const jsonLd: WithContext<Organization> = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${entityUrl}#organization`,
+    url: entityUrl,
     name: entity.name,
     image: entity.images?.[0]?.imageUrl,
     description: entity.description ?? undefined,
