@@ -17,7 +17,7 @@ import {
 import { SectionHeading } from "./sectionHeading.stylex";
 import { Slideout } from "./slideout.stylex";
 
-const NARROW = "@media (max-width: 759px)";
+const NARROW = "@media (max-width: 959px)";
 
 export type TableProps = {
   activeFilterCount?: number;

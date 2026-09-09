@@ -66,6 +66,17 @@ export const Loading: Story = {
   render: () => <CatalogPageLoading title="Bottles" />,
 };
 
+export const MobileLoading: Story = {
+  globals: {
+    viewport: { isRotated: false, value: "peatedPhone" },
+  },
+  render: () => <CatalogPageLoading title="Bottles" />,
+};
+
+export const Paginated: Story = {
+  render: () => <BottleCatalogExample pagination />,
+};
+
 export const LongContent: Story = {
   render: () => <BottleCatalogExample longContent />,
 };
@@ -80,10 +91,12 @@ function BottleCatalogExample({
   empty = false,
   initialFilters = { ageBand: "", category: "", query: "" },
   longContent = false,
+  pagination = false,
 }: {
   empty?: boolean;
   initialFilters?: BottleFilters;
   longContent?: boolean;
+  pagination?: boolean;
 }) {
   const [filters, setFilters] = useState(initialFilters);
   const [sort, setSort] = useState("-release");
@@ -128,6 +141,7 @@ function BottleCatalogExample({
           />
         }
         items={items}
+        nextHref={pagination ? "/bottles?cursor=2" : undefined}
         onClear={clearFilters}
         onSortChange={setSort}
         page={1}

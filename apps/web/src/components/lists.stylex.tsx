@@ -16,6 +16,7 @@ import { ItemList, ItemListItem } from "./itemList.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
+const TABLE_NARROW = "@media (max-width: 959px)";
 
 export type ListSortOption = {
   label: string;
@@ -70,7 +71,11 @@ export function ListToolbar({
       <div {...stylex.props(styles.actions)}>
         <span
           role="status"
-          {...stylex.props(foundationStyles.metadata, styles.status)}
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.status,
+            Boolean(mobileAction) && styles.statusWithMobileAction,
+          )}
         >
           {pending ? "Updating…" : null}
         </span>
@@ -348,6 +353,11 @@ const styles = stylex.create({
   status: {
     minWidth: "9ch",
   },
+  statusWithMobileAction: {
+    [TABLE_NARROW]: {
+      minWidth: 0,
+    },
+  },
   sortLabel: {
     display: "flex",
     alignItems: "center",
@@ -361,13 +371,13 @@ const styles = stylex.create({
   },
   wideSort: {
     display: "inline-flex",
-    ["@media (max-width: 759px)"]: {
+    [TABLE_NARROW]: {
       display: "none",
     },
   },
   mobileAction: {
     display: "none",
-    ["@media (max-width: 759px)"]: {
+    [TABLE_NARROW]: {
       display: "inline-flex",
     },
   },

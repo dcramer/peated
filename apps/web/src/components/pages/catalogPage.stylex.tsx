@@ -8,7 +8,8 @@ import {
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 
-const NARROW = "@media (max-width: 759px)";
+const NARROW = "@media (max-width: 959px)";
+const VERY_NARROW = "@media (max-width: 359px)";
 
 export function CatalogPage({
   action,
@@ -74,7 +75,9 @@ export function CatalogPageLoading({
             </div>
           ) : null}
           <div {...stylex.props(styles.loadingToolbar)}>
-            <LoadingPlaceholder preset="text" />
+            <span {...stylex.props(styles.loadingCount)}>
+              <LoadingPlaceholder preset="text" />
+            </span>
             <span {...stylex.props(styles.loadingSort)} />
           </div>
           <LoadingList
@@ -131,6 +134,10 @@ const styles = stylex.create({
     [NARROW]: {
       alignItems: "flex-start",
     },
+    [VERY_NARROW]: {
+      flexDirection: "column",
+      gap: space.x3,
+    },
   },
   titleRowWithNavigation: {
     marginBottom: space.x2,
@@ -177,7 +184,7 @@ const styles = stylex.create({
   },
   loadingAction: {
     width: "104px",
-    height: "34px",
+    height: controlMetrics.controlHeight,
     flexShrink: 0,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
@@ -197,12 +204,20 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: space.x4,
   },
+  loadingCount: {
+    display: "block",
+    width: "160px",
+    maxWidth: "50%",
+  },
   loadingSort: {
     width: "132px",
-    height: "34px",
+    height: controlMetrics.controlHeightSmall,
     flexShrink: 0,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
+    [NARROW]: {
+      width: "88px",
+    },
   },
   loadingFilterPanel: {
     boxSizing: "border-box",
