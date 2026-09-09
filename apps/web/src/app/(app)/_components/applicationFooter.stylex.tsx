@@ -17,6 +17,7 @@ const groups = [
   {
     label: "Reference",
     links: [
+      { href: "/about/catalog", label: "Catalog guide" },
       { href: "/about/categories", label: "Whisky categories" },
       { href: "/about/tasting-wheel", label: "Tasting wheel" },
       { href: "/about/ratings", label: "Rating guide" },
