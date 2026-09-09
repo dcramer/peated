@@ -124,4 +124,84 @@ describe("admin moderation history", () => {
       "Review recorded",
     ]);
   });
+
+  test("returns details for a stale operation without a recorded review", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle();
+    const [check] = await db
+      .insert(bottleChecks)
+      .values({
+        intent: "audit_bottle",
+        origin: "moderator",
+        bottleId: bottle.id,
+        subjectKey: `audit:${bottle.id}:stale-history-test`,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
+        inputSnapshot: {},
+        output: { summary: "History", findings: [] },
+      })
+      .returning();
+    const updatedAt = new Date("2026-02-05T00:00:00.000Z");
+    const [operation] = await db
+      .insert(bottleOperations)
+      .values({
+        checkId: check!.id,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: bottle.brandId,
+            patch: { name: "Stale brand" },
+          },
+          rationale: "A stale proposal.",
+          evidenceRefs: [],
+        },
+        status: "stale",
+        error: "Catalog state changed.",
+        updatedAt,
+      })
+      .returning();
+
+    const details = await routerClient.admin.moderation.historyDetails(
+      { key: `operation:${operation!.id}` },
+      { context: { user: admin } },
+    );
+
+    expect(details).toMatchObject({
+      event: {
+        actor: null,
+        occurredAt: updatedAt.toISOString(),
+        outcome: "stale",
+      },
+      details: {
+        checkId: check!.id,
+        error: "Catalog state changed.",
+      },
+    });
+    expect(details.activity.map(({ label }) => label)).toEqual([
+      "Suggestion created",
+    ]);
+
+    const [pendingOperation] = await db
+      .insert(bottleOperations)
+      .values({
+        checkId: check!.id,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: bottle.brandId,
+            patch: { name: "Pending brand" },
+          },
+          rationale: "A pending proposal.",
+          evidenceRefs: [],
+        },
+      })
+      .returning();
+    await expect(
+      routerClient.admin.moderation.historyDetails(
+        { key: `operation:${pendingOperation!.id}` },
+        { context: { user: admin } },
+      ),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
 });
