@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { Users } from "lucide-react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, controlMetrics, fonts, space } from "../styles/tokens.stylex";
+import { colors, fonts, space } from "../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -17,20 +17,6 @@ export const RATING_BANDS = SERVER_RATING_BANDS.map((band) => ({
 
 export type RatingBand = (typeof SERVER_RATING_BANDS)[number]["id"];
 export type RatingCounts = Partial<Record<RatingBand, number>>;
-export type TastingRatingCounts = RatingCounts;
-
-export type TastingRatingDistributionProps = {
-  counts?: RatingCounts;
-  showCounts?: boolean;
-};
-
-/** Shows ratings grouped into Peated's five fixed ranges. */
-export function TastingRatingDistribution({
-  counts = {},
-  showCounts = false,
-}: TastingRatingDistributionProps) {
-  return <RatingDistribution counts={counts} showCounts={showCounts} />;
-}
 
 export type TastingRatingProps = {
   /** One tasting rating. */
@@ -261,13 +247,6 @@ export function BottleRatings({
 }
 
 type BottleRating = { exact: boolean; label: string; value: string };
-type BandFill = 1 | 2 | 3 | 4 | 5;
-type RatingBin = {
-  count: number;
-  fill: BandFill;
-  key: RatingBand;
-  label: string;
-};
 
 function getBottleRating({
   median,
@@ -313,94 +292,6 @@ function totalRatings(counts: RatingCounts) {
   );
 }
 
-function formatRatingCounts(counts: RatingCounts) {
-  return RATING_BANDS.map(
-    (band) => `${band.label} ${counts[band.key] ?? 0}`,
-  ).join(", ");
-}
-
-function RatingDistribution({
-  compact = false,
-  counts,
-  showCounts = false,
-}: {
-  compact?: boolean;
-  counts: RatingCounts;
-  showCounts?: boolean;
-}) {
-  const bins = getRatingBins(counts);
-  const total = bins.reduce((sum, bin) => sum + bin.count, 0);
-  const shares = bins.map((bin) =>
-    total === 0 ? 0 : (bin.count / total) * 100,
-  );
-
-  return (
-    <span
-      aria-label={formatRatingCounts(counts)}
-      data-state={total === 0 ? "empty" : "populated"}
-      role="img"
-      {...stylex.props(styles.ratingDistribution)}
-    >
-      <span
-        {...stylex.props(
-          styles.ratingDistributionTrack,
-          compact && styles.compactRatingDistributionTrack,
-          total === 0 && styles.emptyRatingDistributionTrack,
-        )}
-      >
-        {total > 0
-          ? bins.map((bin, index) => (
-              <span
-                key={bin.key}
-                {...stylex.props(
-                  styles.ratingDistributionSegment(shares[index] ?? 0),
-                  bandFillStyles[bin.fill],
-                )}
-              />
-            ))
-          : null}
-      </span>
-      {showCounts && total > 0 ? (
-        <span
-          {...stylex.props(
-            foundationStyles.metadata,
-            styles.ratingDistributionCounts,
-          )}
-        >
-          {bins.map((bin, index) => (
-            <span
-              key={bin.key}
-              title={`${bin.count}`}
-              {...stylex.props(
-                styles.ratingDistributionCount(shares[index] ?? 0),
-              )}
-            >
-              {bin.count.toLocaleString("en-US")}
-            </span>
-          ))}
-        </span>
-      ) : null}
-    </span>
-  );
-}
-
-function bandFillForKey(key: RatingBand): BandFill {
-  if (key === "mediocre") return 1;
-  if (key === "good") return 2;
-  if (key === "very_good") return 3;
-  if (key === "outstanding") return 4;
-  return 5;
-}
-
-function getRatingBins(counts: RatingCounts): RatingBin[] {
-  return RATING_BANDS.map((band) => ({
-    count: counts[band.key] ?? 0,
-    fill: bandFillForKey(band.key),
-    key: band.key,
-    label: band.label,
-  }));
-}
-
 const styles = stylex.create({
   summaryHeadline: {
     display: "flex",
@@ -434,42 +325,6 @@ const styles = stylex.create({
     lineHeight: 0.9,
   },
   summaryScale: { color: colors.inkMuted },
-  ratingDistribution: { display: "block", width: "100%" },
-  ratingDistributionTrack: {
-    display: "flex",
-    height: "10px",
-    alignItems: "center",
-    gap: 0,
-    overflow: "hidden",
-    borderRadius: controlMetrics.radiusSmall,
-  },
-  emptyRatingDistributionTrack: { backgroundColor: colors.bandTrack },
-  compactRatingDistributionTrack: { height: "4px" },
-  ratingDistributionSegment: (share: number) => ({
-    boxSizing: "border-box",
-    minWidth: "3px",
-    height: "100%",
-    flexBasis: 0,
-    flexGrow: share,
-    borderRightWidth: "1px",
-    borderRightStyle: "solid",
-    borderRightColor: colors.ground,
-  }),
-  ratingDistributionCounts: {
-    display: "flex",
-    gap: "2px",
-    marginTop: "5px",
-    color: colors.inkMuted,
-    fontVariantNumeric: "tabular-nums",
-  },
-  ratingDistributionCount: (share: number) => ({
-    minWidth: 0,
-    overflow: "hidden",
-    flexBasis: 0,
-    flexGrow: share,
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  }),
   ratingLayout: {
     display: "inline-flex",
     flexShrink: 0,
@@ -638,17 +493,4 @@ const styles = stylex.create({
     height: "7px",
     backgroundColor: colors.inkMuted,
   },
-  band1Fill: { backgroundColor: colors.band1 },
-  band2Fill: { backgroundColor: colors.band2 },
-  band3Fill: { backgroundColor: colors.band3 },
-  band4Fill: { backgroundColor: colors.band4 },
-  band5Fill: { backgroundColor: colors.band5 },
 });
-
-const bandFillStyles = {
-  1: styles.band1Fill,
-  2: styles.band2Fill,
-  3: styles.band3Fill,
-  4: styles.band4Fill,
-  5: styles.band5Fill,
-} satisfies Record<BandFill, stylex.StyleXStyles>;
