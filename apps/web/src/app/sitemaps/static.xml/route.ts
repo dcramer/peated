@@ -14,6 +14,7 @@ export async function GET() {
     { url: "/bottlers" },
     { url: "/companies" },
     { url: "/about" },
+    { url: "/about/catalog" },
     { url: "/about/tasting-wheel" },
     { url: "/bot" },
     { url: "/bottlers/4263/codes" },

@@ -55,6 +55,10 @@ export default async function AboutRoute() {
           </RailSection>
           <RailSection heading="Reference">
             <RailList ariaLabel="Peated reference pages">
+              <RailListItem
+                href="/about/catalog"
+                title="How the catalog works"
+              />
               <RailListItem href="/updates" title="Recent changes" />
               <RailListItem href="/terms" title="Terms" />
             </RailList>
