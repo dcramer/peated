@@ -90,25 +90,24 @@ export async function scrapeProducts(
   const data = await getUrl(url);
   const $ = cheerio(data);
 
-  const promises: Promise<void>[] = [];
   const cards = $(PRODUCT_CARD_SELECTOR);
-  cards.each((_, el) => {
+  for (const el of cards.toArray()) {
     const rawName = $(".product-card__title", el).first().text().trim();
     if (!rawName) {
       logScrapeWarning(SITE, "Unable to identify product name");
-      return;
+      continue;
     }
 
     const productUrl = $(".product-card__title a", el).first().attr("href");
     if (!productUrl) {
       logScrapeWarning(SITE, "Unable to identify product URL", { rawName });
-      return;
+      continue;
     }
 
     const [nameWithoutVolume, volume] = extractVolume(rawName);
     if (!ALLOWED_VOLUMES.includes(volume)) {
       logScrapeWarning(SITE, "Invalid product size", { volume, rawName });
-      return;
+      continue;
     }
     const { name } = normalizeBottleInput({ name: nameWithoutVolume });
 
@@ -116,7 +115,7 @@ export async function scrapeProducts(
     const price = parsePrice(priceRaw);
     if (!price) {
       logScrapeWarning(SITE, "Invalid product price", { priceRaw, rawName });
-      return;
+      continue;
     }
 
     const imageUrl = $(".product-card__media img", el).first().attr("src");
@@ -124,35 +123,28 @@ export async function scrapeProducts(
     logScrapedProduct(SITE, { name, price });
 
     const productPageUrl = absoluteUrl(url, productUrl);
-    promises.push(
-      (async () => {
-        let releaseYear = parseExplicitReleaseYear(nameWithoutVolume);
-        const updatedYear = sitemapUpdatedYears.get(
-          productUrlKey(productPageUrl),
-        );
-        if (releaseYear === null && updatedYear !== undefined) {
-          const skuYear = parseSkuReleaseYear(await getUrl(productPageUrl));
-          if (skuYear === updatedYear) releaseYear = skuYear;
-        }
+    let releaseYear = parseExplicitReleaseYear(nameWithoutVolume);
+    const updatedYear = sitemapUpdatedYears.get(productUrlKey(productPageUrl));
+    if (releaseYear === null && updatedYear !== undefined) {
+      const skuYear = parseSkuReleaseYear(await getUrl(productPageUrl));
+      if (skuYear === updatedYear) releaseYear = skuYear;
+    }
 
-        await cb({
-          name,
-          price,
-          currency: "gbp",
-          volume,
-          url: productPageUrl,
-          imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
-          sourceBottleIdentity: BottleExtractedDetailsSchema.parse({
-            bottler: "Decadent Drinks",
-            expression: name,
-            release_year: releaseYear,
-          }),
-        });
-      })(),
-    );
-  });
+    await cb({
+      name,
+      price,
+      currency: "gbp",
+      volume,
+      url: productPageUrl,
+      imageUrl: imageUrl ? absoluteUrl(url, imageUrl) : null,
+      sourceBottleIdentity: BottleExtractedDetailsSchema.parse({
+        bottler: "Decadent Drinks",
+        expression: name,
+        release_year: releaseYear,
+      }),
+    });
+  }
 
-  await Promise.all(promises);
   return { hasSourceProducts: cards.length > 0 };
 }
 

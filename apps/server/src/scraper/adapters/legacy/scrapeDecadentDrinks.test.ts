@@ -1,5 +1,6 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { StorePriceInputSchema } from "@peated/server/schemas";
+import { runLegacyRequestContext } from "../../legacy/requestContext";
 import {
   parseExplicitReleaseYear,
   parseSitemapUpdatedYears,
@@ -84,4 +85,56 @@ test("accepts a SKU year only when the sitemap year agrees", async ({
   );
 
   expect(identities).toMatchObject([{ release_year: 2024 }]);
+});
+
+test("does not overlap product page requests", async () => {
+  const listUrl = "https://decadent-drinks.com/shop?category=5&page=0";
+  const productUrls = [
+    "https://decadent-drinks.com/shop/first",
+    "https://decadent-drinks.com/shop/second",
+  ];
+  const list = `
+    <div class="catalog-results">
+      <div class="view-content">
+        ${productUrls
+          .map(
+            (productUrl, index) => `
+              <div class="col">
+                <div class="product-card">
+                  <div class="product-card__title">
+                    <a href="${productUrl}">Bottle ${index + 1}</a>
+                  </div>
+                  <div class="product-card__price">£100.00</div>
+                </div>
+              </div>
+            `,
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+  let activeProductRequests = 0;
+
+  await runLegacyRequestContext({
+    targetKey: "decadentdrinks",
+    session: {
+      request: async ({ url }) => {
+        if (url.toString() === listUrl) {
+          return { url, status: 200, headers: {}, body: list };
+        }
+        activeProductRequests += 1;
+        expect(activeProductRequests).toBe(1);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        activeProductRequests -= 1;
+        return { url, status: 200, headers: {}, body: '{"SKU":"BDS2401"}' };
+      },
+    },
+    run: async () => {
+      await scrapeProducts(
+        listUrl,
+        async () => {},
+        new Map(productUrls.map((url) => [url, 2024])),
+      );
+    },
+  });
 });
