@@ -21,11 +21,12 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v23";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v24";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_PAGES_TO_CHECK = 3;
 const MAX_RULE_CHECKS = 3;
 const MAX_AI_PAGE_CHARS = 75_000;
+const MAX_AI_ATTRIBUTE_CHARS = 500;
 const CHECK_RULES_TOOL_NAME = "check_rules";
 const CHECK_RULES_TOOL_DESCRIPTION =
   "Try a complete set of rules on the given website pages. Rules that pass are ready to save.";
@@ -166,6 +167,14 @@ export function preparePagesForSetup(pages: WebsitePage[]) {
     );
     // Remove page code before shortening the HTML so the useful content remains.
     $("script, style").remove();
+    $("*").each((_, element) => {
+      if (element.type !== "tag") return;
+      for (const [name, value] of Object.entries(element.attribs)) {
+        if (value.length > MAX_AI_ATTRIBUTE_CHARS) {
+          element.attribs[name] = value.slice(0, MAX_AI_ATTRIBUTE_CHARS);
+        }
+      }
+    });
     return {
       url: page.url,
       html: $.html().slice(0, charsPerPage),
