@@ -10,6 +10,7 @@ import { z } from "zod";
 import { MAX_LIKELY_LIST_PAGES } from "./discovery";
 import type { ScrapeIssue } from "./preview";
 import {
+  SCRAPE_SOURCE_MAX_ITEMS,
   ScrapeCatalogRulesSchema,
   ScrapePriceRulesSchema,
   ScrapeReviewRulesSchema,
@@ -21,10 +22,10 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v25";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v26";
 const MAX_AI_INPUT_CHARS = 200_000;
-export const MAX_PAGES_TO_CHECK = 3;
-const MAX_RULE_CHECKS = 3;
+export const MAX_EXAMPLE_PAGES = 3;
+export const MAX_RULE_CHECKS = 3;
 const MAX_AI_PAGE_CHARS = 75_000;
 const MAX_AI_ATTRIBUTE_CHARS = 500;
 const CHECK_RULES_TOOL_NAME = "check_rules";
@@ -38,14 +39,15 @@ export type WebsitePage = {
   document?: "html" | "xml";
 };
 
-/** Counts requests needed to find pages and try three sets of rules. */
+/** Bounds one setup run even when every rule check finds different pages. */
 export function setupRequestLimit(samplePageCount: number) {
+  // Setup keeps one request for the page that triggered an automatic repair.
   return (
     samplePageCount +
-    1 +
+    2 +
     MAX_LIKELY_LIST_PAGES +
-    MAX_PAGES_TO_CHECK +
-    MAX_RULE_CHECKS * (1 + MAX_PAGES_TO_CHECK)
+    MAX_EXAMPLE_PAGES +
+    MAX_RULE_CHECKS * (1 + SCRAPE_SOURCE_MAX_ITEMS)
   );
 }
 
@@ -93,13 +95,13 @@ type RuleCheckResult<T> =
       inspectedPages: WebsitePage[];
     };
 
-type SetupAgentModelRequest = {
+export type SetupAgentModelRequest = {
   instructions: string;
   input: ResponseInput;
   tools: Tool[];
 };
 
-type SetupAgentModelResponse = {
+export type SetupAgentModelResponse = {
   model: string;
   output: ResponseOutputItem[];
 };
@@ -126,6 +128,7 @@ const RULE_INSTRUCTIONS = [
   "Use an optional field only when every given page clearly provides it.",
   "When previousSetup is given, preserve the kinds of items its working rules included and excluded. Use its rules and matchedPageUrls as evidence, but submit only fields allowed by check_rules.",
   "If previousSetup used skipWhen, preserve those exclusions inside list.links.",
+  "When failure is given, fix the saved rules so they handle that page if the list still includes it.",
   "For catalog sources, collect only the displayed name, product URL, stable product ID, image URL, volume, ABV, age, edition, and release year.",
   "Catalog sources do not require a review, price, currency, or volume. Do not select descriptions or tasting notes.",
   "A nextPage selector must lead to a page with new links.",
@@ -263,6 +266,9 @@ type ScrapeSourceSetupAgentInput<T> = {
     rules: StoredScrapeRules;
     matchedPageUrls: string[];
   };
+  failure?: WebsitePage & {
+    issues: ScrapeIssue[];
+  };
   request: (
     request: SetupAgentModelRequest,
   ) => Promise<SetupAgentModelResponse>;
@@ -358,15 +364,22 @@ export async function runScrapeSourceSetupAgent<T>(
   input: ScrapeSourceSetupAgentInput<T>,
 ) {
   const tool = createCheckRulesTool(input.kind);
+  const pageCount = input.listPages.length + input.detailPages.length;
   const pages = preparePagesForSetup([
     ...input.listPages,
     ...input.detailPages,
+    ...(input.failure ? [input.failure] : []),
   ]);
+  const failurePage = input.failure ? pages[pageCount] : undefined;
   const initialInput = JSON.stringify({
     kind: input.kind,
     startPages: pages.slice(0, input.listPages.length),
-    examplePages: pages.slice(input.listPages.length),
+    examplePages: pages.slice(input.listPages.length, pageCount),
     previousSetup: input.previousSetup,
+    failure:
+      input.failure && failurePage
+        ? { ...failurePage, issues: input.failure.issues }
+        : undefined,
   });
   return await runAgent({
     details: {

@@ -5,22 +5,20 @@ import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
 import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
 import type { Currency } from "@peated/server/types";
 import { and, eq } from "drizzle-orm";
-import type {
-  ResponseCreateParamsNonStreaming,
-  ResponseInput,
-  Tool,
-} from "openai/resources/responses/responses";
 import {
   loadExecutableScrapeRules,
   type ExecutableScrapeRules,
 } from "./compatibility";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
+import type { ScrapeIssue, ScrapeSourcePreviewResult } from "./preview";
 import type { ScrapeRules } from "./rules";
+import { reserveScrapeSourceModelCall } from "./runs";
 import { saveScrapeSourceSuggestion } from "./service";
 import {
   AI_INSTRUCTIONS_VERSION,
-  MAX_PAGES_TO_CHECK,
   runScrapeSourceSetupAgent,
+  type SetupAgentModelRequest,
+  type SetupAgentModelResponse,
   type WebsitePage,
 } from "./setupAgent";
 import { ScrapeSourceSetupError } from "./setupError";
@@ -284,7 +282,7 @@ export async function checkDetailPages(input: {
     input.suppliedPages.map((page) => [new URL(page.url).toString(), page]),
   );
   const pages: CheckedDetailPage[] = [];
-  for (const link of sampleDetailLinks(input.listPage.links)) {
+  for (const link of input.listPage.links) {
     const page =
       suppliedPages.get(link) ?? (await input.loadPage(new URL(link)));
     input.onCheckPage?.(page);
@@ -304,14 +302,28 @@ export async function checkDetailPages(input: {
   return pages;
 }
 
-export function sampleDetailLinks(links: string[]) {
-  if (links.length <= MAX_PAGES_TO_CHECK) return links;
-  return Array.from({ length: MAX_PAGES_TO_CHECK }, (_, index) => {
-    const linkIndex = Math.round(
-      (index * (links.length - 1)) / (MAX_PAGES_TO_CHECK - 1),
-    );
-    return links[linkIndex]!;
-  });
+function createCheckedPreview(
+  detailPages: CheckedDetailPage[],
+): ScrapeSourcePreviewResult {
+  return {
+    issues: [],
+    pages: detailPages.map((page) => {
+      if (page.output.kind === "review") {
+        return {
+          kind: "review",
+          url: page.url,
+          title: page.output.title,
+          publishedAt: page.output.publishedAt,
+          reviews: page.output.reviews.map((review) => ({
+            name: review.name,
+            reviewerName: review.reviewerName,
+            nativeScore: review.nativeScore,
+          })),
+        };
+      }
+      return { ...page.output, url: page.url };
+    }),
+  };
 }
 
 async function loadAiSource(scrapeSourceId: number) {
@@ -337,41 +349,40 @@ async function loadAiSource(scrapeSourceId: number) {
   return source;
 }
 
+export type RequestScrapeSourceModel = (
+  request: SetupAgentModelRequest,
+) => Promise<SetupAgentModelResponse>;
+
 /** Keeps provider storage off and records complete public-site model calls. */
-async function requestAi(input: {
-  model: string;
-  instructions: string;
-  request: ResponseInput;
-  tools?: Tool[];
-  maxOutputTokens: number;
-}) {
+async function requestAi(input: SetupAgentModelRequest) {
   const client = createOpenAIAgentClient({ workload: "scraper" });
-  const request: ResponseCreateParamsNonStreaming = {
-    model: input.model,
+  return await client.responses.create({
+    model: config.SCRAPER_SETUP_MODEL,
     instructions: input.instructions,
-    input: input.request,
-    max_output_tokens: input.maxOutputTokens,
+    input: input.input,
+    max_output_tokens: 8_000,
     store: false,
-  };
-  if (input.tools) {
-    request.include = ["reasoning.encrypted_content"];
-    request.parallel_tool_calls = false;
-    request.tool_choice = "required";
-    request.tools = input.tools;
-  }
-  return await client.responses.create(request);
+    include: ["reasoning.encrypted_content"],
+    parallel_tool_calls: false,
+    tool_choice: "required",
+    tools: input.tools,
+  });
 }
 
-/** Creates an inactive revision only after the production scrape code reads it. */
-export async function suggestScrapeSourceRevision(input: {
-  scrapeSourceId: number;
-  externalSiteRunId: number;
-  executionToken: string;
-  createdById: number;
-  listPages: WebsitePage[];
-  detailPages: WebsitePage[];
-  loadPage: (url: URL) => Promise<WebsitePage>;
-}) {
+/** Saves a checked version without replacing the active version. */
+export async function suggestScrapeSourceRevision(
+  input: {
+    scrapeSourceId: number;
+    externalSiteRunId: number;
+    executionToken: string;
+    createdById?: number;
+    listPages: WebsitePage[];
+    detailPages: WebsitePage[];
+    failure?: WebsitePage & { issues: ScrapeIssue[] };
+    loadPage: (url: URL) => Promise<WebsitePage>;
+  },
+  requestModel: RequestScrapeSourceModel = requestAi,
+) {
   const source = await loadAiSource(input.scrapeSourceId);
   let previousRules: ExecutableScrapeRules | null = null;
   if (source.previousRulesVersion && source.previousRules) {
@@ -397,6 +408,7 @@ export async function suggestScrapeSourceRevision(input: {
     scrapeSourceId: input.scrapeSourceId,
     listPages: input.listPages,
     detailPages: input.detailPages,
+    failure: input.failure,
     previousSetup:
       source.previousListPageUrl &&
       source.previousRulesVersion &&
@@ -411,13 +423,11 @@ export async function suggestScrapeSourceRevision(input: {
         : undefined,
     request: async (request) => {
       await loadAiSource(input.scrapeSourceId);
-      return await requestAi({
-        model: config.SCRAPER_SETUP_MODEL,
-        instructions: request.instructions,
-        request: request.input,
-        tools: request.tools,
-        maxOutputTokens: 8_000,
-      });
+      await reserveScrapeSourceModelCall(
+        input.externalSiteRunId,
+        input.executionToken,
+      );
+      return await requestModel(request);
     },
     checkRules: async (submittedRules) => {
       const checkedPages = new Map<string, WebsitePage>();
@@ -489,5 +499,6 @@ export async function suggestScrapeSourceRevision(input: {
     createdById: input.createdById,
     aiModel: setup.model,
     aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
+    previewResult: createCheckedPreview(setup.checked.detailPages),
   });
 }

@@ -2,7 +2,7 @@ import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract
 import { CURRENCY_LIST } from "@peated/server/constants";
 import { z } from "zod";
 
-const ScrapeIssueSchema = z
+export const ScrapeIssueSchema = z
   .object({
     field: z.string(),
     message: z.string(),

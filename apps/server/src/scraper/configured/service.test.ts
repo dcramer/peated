@@ -29,6 +29,7 @@ import {
   listScrapeSourceRevisions,
   recordScrapeSourcePreview,
   saveScrapeSourceSuggestion,
+  ScrapeSourceChangedError,
   ScrapeSourceConflictError,
   ScrapeSourceValidationError,
 } from "./service";
@@ -332,6 +333,7 @@ test("an old worker cannot add an AI version after another worker takes over", a
     createdById: user.id,
     aiModel: "test-model",
     aiInstructionsVersion: "test-instructions",
+    previewResult: { issues: [], pages: [] },
   };
 
   await expect(
@@ -346,6 +348,10 @@ test("an old worker cannot add an AI version after another worker takes over", a
     ...input,
     executionToken: "new-worker",
   });
+  expect(revision).toMatchObject({
+    previewStatus: "passed",
+    previewResult: { issues: [], pages: [] },
+  });
   await expect(
     saveScrapeSourceSuggestion({
       ...input,
@@ -359,6 +365,60 @@ test("an old worker cannot add an AI version after another worker takes over", a
       revisionId: revision.id,
     }),
   ]);
+});
+
+test("does not activate an automatic repair after the active version changed", async () => {
+  const user = await createUser();
+  const { source } = await createSiteWithScrapeSource({
+    name: "Changed Source",
+    kind: "review",
+    websiteUrl: "https://changed-source.example/",
+    createdById: user.id,
+  });
+  const first = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    rules,
+    author: "person",
+    createdById: user.id,
+  });
+  await markPreviewPassed(first.id);
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: first.id,
+  });
+  const replacement = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    rules: { ...rules, detail: { ...rules.detail, title: "article h1" } },
+    author: "person",
+    createdById: user.id,
+  });
+  await markPreviewPassed(replacement.id);
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: replacement.id,
+  });
+  const repair = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    rules: { ...rules, detail: { ...rules.detail, title: "main h1" } },
+    author: "ai",
+    aiModel: "test-model",
+    aiInstructionsVersion: "test-instructions",
+  });
+  await markPreviewPassed(repair.id);
+
+  await expect(
+    activateScrapeSourceRevision({
+      scrapeSourceId: source.id,
+      revisionId: repair.id,
+      expectedActiveRevisionId: first.id,
+    }),
+  ).rejects.toBeInstanceOf(ScrapeSourceChangedError);
+  expect(
+    await db
+      .select({ id: scrapeSourceRevisions.id })
+      .from(scrapeSourceRevisions)
+      .where(eq(scrapeSourceRevisions.active, true)),
+  ).toEqual([{ id: replacement.id }]);
 });
 
 test("keeps the original review and the newer scraped data", async ({

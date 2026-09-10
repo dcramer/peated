@@ -73,8 +73,8 @@ function toolCallResponse<T extends object>(callId: string, ruleCheck: T) {
 }
 
 test("reserves requests for discovery and three rule checks", () => {
-  expect(setupRequestLimit(0)).toBe(20);
-  expect(setupRequestLimit(2)).toBe(22);
+  expect(setupRequestLimit(0)).toBe(309);
+  expect(setupRequestLimit(2)).toBe(311);
 });
 
 test("bounds total AI input while keeping every sample page", () => {

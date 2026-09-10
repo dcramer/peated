@@ -757,7 +757,7 @@ test("stores a safe preview issue when a request fails unexpectedly", async () =
   });
 });
 
-test("a collection failure does not change the preview result", async () => {
+test("a collection parse failure marks the rules broken and queues repair", async () => {
   const { revision, site, source, user } = await setupSource("h3.missing");
   await markPreviewPassed(revision.id);
   await activateScrapeSourceRevision({
@@ -777,16 +777,32 @@ test("a collection failure does not change the preview result", async () => {
       fetchImpl: previewFetch(),
       executionToken: "collection-owner",
     }),
-  ).rejects.toThrow("The page did not match the saved rules.");
+  ).resolves.toEqual({ status: "completed", nextRunId: 2 });
 
   const [storedRevision] = await db
     .select()
     .from(scrapeSourceRevisions)
     .where(eq(scrapeSourceRevisions.id, revision.id));
   expect(storedRevision).toMatchObject({
-    previewStatus: "passed",
-    previewResult: { issues: [], pages: [] },
+    previewStatus: "failed",
+    previewResult: {
+      issues: [
+        {
+          field: "detail.title",
+          message: "Required value was not found.",
+        },
+      ],
+      pages: [],
+    },
   });
+  expect(await db.select().from(scrapeSourceRuns)).toContainEqual(
+    expect.objectContaining({
+      externalSiteRunId: 2,
+      scrapeSourceId: source.id,
+      revisionId: null,
+      purpose: "suggest",
+    }),
+  );
 });
 
 test("a resumed suggestion run reuses its saved revision", async () => {

@@ -491,7 +491,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
         author: "ai",
         listUrl: LIST_URL,
-        previewStatus: "pending",
+        previewStatus: "passed",
       });
       if (!suggestedRevision) throw new Error("AI did not create a revision.");
       expect(suggestedRevision.aiModel).toBeTruthy();

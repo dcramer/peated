@@ -46,15 +46,25 @@ import {
   type ScrapeSourcePreviewPage,
 } from "./preview";
 import { SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
+import {
+  ScrapeSourceSuggestionCursorSchema,
+  type ScrapeSourceSuggestionCursor,
+} from "./runs";
 import { recordScrapeSourcePreview } from "./service";
-import { MAX_PAGES_TO_CHECK } from "./setupAgent";
-import { suggestScrapeSourceRevision } from "./suggestion";
+import { MAX_EXAMPLE_PAGES } from "./setupAgent";
+import {
+  suggestScrapeSourceRevision,
+  type RequestScrapeSourceModel,
+} from "./suggestion";
 import { loadScrapeSourceTarget } from "./target";
 
-class ScrapeSourceParseError extends Error {
+export class ScrapeSourceParseError extends Error {
   override name = "ScrapeSourceParseError";
 
-  constructor(readonly issues: ScrapeIssue[]) {
+  constructor(
+    readonly pageUrl: string,
+    readonly issues: ScrapeIssue[],
+  ) {
     super("The page did not match the saved rules.");
   }
 }
@@ -190,7 +200,7 @@ function createScrapeSourceAdapter(
         detailUrls.size < input.rules.limit
       ) {
         if (listUrls.has(state.nextListUrl)) {
-          throw new ScrapeSourceParseError([
+          throw new ScrapeSourceParseError(state.nextListUrl, [
             {
               field: input.rules.nextPageField,
               message: "Pagination returned a page that was already read.",
@@ -217,7 +227,10 @@ function createScrapeSourceAdapter(
           listResponse.url,
         );
         if (listResult.issues.length > 0) {
-          throw new ScrapeSourceParseError(listResult.issues);
+          throw new ScrapeSourceParseError(
+            listResponse.url.toString(),
+            listResult.issues,
+          );
         }
         for (const link of listResult.links) {
           detailUrls.add(link);
@@ -253,7 +266,10 @@ function createScrapeSourceAdapter(
         }
         const parsed = input.rules.parseDetail(response.body, response.url);
         if (parsed.issues.length > 0 || !parsed.value) {
-          throw new ScrapeSourceParseError(parsed.issues);
+          throw new ScrapeSourceParseError(
+            response.url.toString(),
+            parsed.issues,
+          );
         }
         const observation = {
           sourceKey: response.url.toString(),
@@ -444,6 +460,7 @@ export async function resolveScrapeSourceRunRegistry(
   runId: number,
   baseRegistry: ScraperRegistry,
   executionToken: string,
+  requestModel?: RequestScrapeSourceModel,
 ): Promise<ScraperRegistry> {
   const [suggestion] = await db
     .select({
@@ -488,22 +505,54 @@ export async function resolveScrapeSourceRunRegistry(
     );
   if (suggestion) {
     const requestedById = suggestion.requestedById;
-    if (suggestion.run.revisionId === null && !requestedById) {
-      throw new Error("AI suggestion run has no requesting admin.");
-    }
     const target = await loadScrapeSourceTarget(suggestion.target);
-    const adapter: ScraperAdapter<null, unknown> =
+    const adapter: ScraperAdapter<ScrapeSourceSuggestionCursor, unknown> =
       suggestion.run.revisionId !== null
         ? // A linked revision means the suggestion finished before the run was retried.
           async () => {}
-        : async ({ session }) => {
-            if (!requestedById) {
+        : async ({ cursor, session }) => {
+            const repair = cursor?.repair;
+            if (!requestedById && !repair) {
               throw new Error("AI suggestion run has no requesting admin.");
             }
-            const entryResponse = await session.request({
-              target: target.key,
-              url: new URL(suggestion.source.listUrl),
-            });
+
+            if (repair) {
+              const [current] = await db
+                .select({
+                  enabled: scrapeSources.enabled,
+                  revisionId: scrapeSourceRevisions.id,
+                })
+                .from(scrapeSources)
+                .leftJoin(
+                  scrapeSourceRevisions,
+                  and(
+                    eq(scrapeSourceRevisions.scrapeSourceId, scrapeSources.id),
+                    eq(scrapeSourceRevisions.active, true),
+                  ),
+                )
+                .where(eq(scrapeSources.id, suggestion.source.id));
+              if (
+                !current?.enabled ||
+                current.revisionId !== repair.revisionId
+              ) {
+                return;
+              }
+            }
+
+            const entryUrl = new URL(suggestion.source.listUrl).toString();
+            const failureResponse = repair
+              ? await session.request({
+                  target: target.key,
+                  url: new URL(repair.pageUrl),
+                })
+              : null;
+            const entryResponse =
+              failureResponse?.url.toString() === entryUrl
+                ? failureResponse
+                : await session.request({
+                    target: target.key,
+                    url: new URL(entryUrl),
+                  });
             const sampleUrls = new Set(
               suggestion.source.sampleUrls.map((value) =>
                 new URL(value).toString(),
@@ -580,10 +629,13 @@ export async function resolveScrapeSourceRunRegistry(
             const detailPages = [];
             for (const value of sampleUrls) {
               if (value === entryResponse.url.toString()) continue;
-              const response = await session.request({
-                target: target.key,
-                url: new URL(value),
-              });
+              const response =
+                failureResponse?.url.toString() === value
+                  ? failureResponse
+                  : await session.request({
+                      target: target.key,
+                      url: new URL(value),
+                    });
               detailPages.push({
                 url: response.url.toString(),
                 html: response.body,
@@ -595,7 +647,7 @@ export async function resolveScrapeSourceRunRegistry(
             );
             const likelyDetailPages = findLikelyDetailPages({
               kind: suggestion.source.kind,
-              limit: MAX_PAGES_TO_CHECK,
+              limit: MAX_EXAMPLE_PAGES,
               pages: listPages,
             }).filter((value) => !suppliedDetailUrls.has(value));
             for (const value of likelyDetailPages) {
@@ -619,32 +671,47 @@ export async function resolveScrapeSourceRunRegistry(
                 throw error;
               }
             }
-            await suggestScrapeSourceRevision({
-              scrapeSourceId: suggestion.source.id,
-              externalSiteRunId: runId,
-              executionToken,
-              createdById: requestedById,
-              listPages,
-              detailPages,
-              loadPage: async (url) => {
-                const response = await session.request({
-                  target: target.key,
-                  url,
-                });
-                return {
-                  url: response.url.toString(),
-                  html: response.body,
-                  document: "html" as const,
-                };
+            await suggestScrapeSourceRevision(
+              {
+                scrapeSourceId: suggestion.source.id,
+                externalSiteRunId: runId,
+                executionToken,
+                createdById: requestedById ?? undefined,
+                listPages,
+                detailPages,
+                failure:
+                  repair && failureResponse
+                    ? {
+                        url: failureResponse.url.toString(),
+                        html: failureResponse.body,
+                        document: "html",
+                        issues: repair.issues,
+                      }
+                    : undefined,
+                loadPage: async (url) => {
+                  const response = await session.request({
+                    target: target.key,
+                    url,
+                  });
+                  return {
+                    url: response.url.toString(),
+                    html: response.body,
+                    document: "html" as const,
+                  };
+                },
               },
-            });
+              requestModel,
+            );
           };
-    const source: ScraperSourceDefinition<null, unknown> = {
+    const source: ScraperSourceDefinition<
+      ScrapeSourceSuggestionCursor,
+      unknown
+    > = {
       key: `source-${suggestion.source.id}`,
       externalSiteKey: suggestion.siteKey,
       targetKeys: [target.key],
       resumeFromLastRun: false,
-      cursorSchema: z.null(),
+      cursorSchema: ScrapeSourceSuggestionCursorSchema,
       observationSchema: z.unknown(),
       sink: async () => {},
       adapter,

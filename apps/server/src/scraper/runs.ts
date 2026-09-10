@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   externalSiteRuns,
   externalSites,
+  scrapeSourceRuns,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
 import type { ExternalSiteKey } from "@peated/server/types";
@@ -9,9 +10,21 @@ import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { resolveScrapeSourceRunRegistry } from "./configured/runtime";
-import { SCRAPE_SOURCE_PAUSED_ERROR } from "./configured/service";
+import {
+  createScrapeSourceRepairRun,
+  ScrapeSourceSuggestionCursorSchema,
+} from "./configured/runs";
+import {
+  resolveScrapeSourceRunRegistry,
+  ScrapeSourceParseError,
+} from "./configured/runtime";
+import {
+  activateScrapeSourceRevision,
+  SCRAPE_SOURCE_PAUSED_ERROR,
+  ScrapeSourceChangedError,
+} from "./configured/service";
 import { ScrapeSourceSetupError } from "./configured/setupError";
+import type { RequestScrapeSourceModel } from "./configured/suggestion";
 import { ScraperCoordinationError } from "./coordinator";
 import {
   findScraperSourceBySiteKey,
@@ -52,7 +65,8 @@ type ClaimedRun = {
 };
 
 export type ScraperRunExecutionResult =
-  | { status: "completed" | "duplicate" }
+  | { status: "completed"; nextRunId?: number }
+  | { status: "duplicate" }
   | { status: "waiting"; nextAttemptAt: Date };
 
 function safeRunError(error: Error) {
@@ -60,6 +74,7 @@ function safeRunError(error: Error) {
     return "The source is disabled.";
   }
   if (error instanceof ScrapeSourceSetupError) return error.adminMessage();
+  if (error instanceof ScrapeSourceParseError) return error.message;
   if (error instanceof z.ZodError) {
     return "The source returned data we could not use.";
   }
@@ -227,7 +242,7 @@ async function completeRun(claim: ClaimedRun, completedAt: Date) {
 }
 
 async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
-  await db.transaction(async (tx) => {
+  return await db.transaction(async (tx) => {
     const [failed] = await tx
       .update(externalSiteRuns)
       .set({
@@ -248,12 +263,61 @@ async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
         id: externalSiteRuns.id,
         externalSiteId: externalSiteRuns.externalSiteId,
       });
-    if (!failed) return;
+    if (!failed) return undefined;
+    const repair =
+      error instanceof ScrapeSourceParseError
+        ? await createScrapeSourceRepairRun(tx, {
+            failedRunId: failed.id,
+            pageUrl: error.pageUrl,
+            issues: error.issues,
+            now: completedAt,
+          })
+        : null;
     await tx
       .update(externalSites)
       .set({ lastRunAt: completedAt, lastRunId: failed.id })
       .where(eq(externalSites.id, failed.externalSiteId));
+    return repair?.id;
   });
+}
+
+async function activateRepair(runId: number, executionToken: string) {
+  const [row] = await db
+    .select({
+      run: externalSiteRuns,
+      sourceRun: scrapeSourceRuns,
+    })
+    .from(externalSiteRuns)
+    .innerJoin(
+      scrapeSourceRuns,
+      eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
+    )
+    .where(eq(externalSiteRuns.id, runId));
+  if (
+    !row ||
+    !["running", "succeeded"].includes(row.run.status) ||
+    row.run.requestedById !== null ||
+    row.sourceRun.purpose !== "suggest" ||
+    row.sourceRun.revisionId === null
+  ) {
+    return;
+  }
+  const cursor = ScrapeSourceSuggestionCursorSchema.safeParse(row.run.cursor);
+  if (!cursor.success || !cursor.data?.repair) return;
+
+  try {
+    await activateScrapeSourceRevision({
+      scrapeSourceId: row.sourceRun.scrapeSourceId,
+      revisionId: row.sourceRun.revisionId,
+      expectedActiveRevisionId: cursor.data.repair.revisionId,
+      currentRun:
+        row.run.status === "running"
+          ? { id: row.run.id, executionToken }
+          : undefined,
+    });
+  } catch (error) {
+    if (!(error instanceof ScrapeSourceChangedError)) throw error;
+  }
 }
 
 async function queueRunForLater(
@@ -303,11 +367,13 @@ export async function executeScraperRun(
     fetchImpl,
     clock = scraperSystemClock,
     executionToken = randomUUID(),
+    requestModel,
   }: {
     registry: ScraperRegistry;
     fetchImpl?: typeof fetch;
     clock?: ScraperHttpClock;
     executionToken?: string;
+    requestModel?: RequestScrapeSourceModel;
   },
 ): Promise<ScraperRunExecutionResult> {
   const { runId } = ScraperRunJobInputSchema.parse(input);
@@ -315,6 +381,7 @@ export async function executeScraperRun(
     runId,
     registry,
     executionToken,
+    requestModel,
   );
   const claimed = await claimScraperRun({
     runId,
@@ -322,7 +389,12 @@ export async function executeScraperRun(
     now: clock.now(),
     executionToken,
   });
-  if (!("run" in claimed)) return claimed;
+  if (!("run" in claimed)) {
+    if (claimed.status === "completed") {
+      await activateRepair(runId, executionToken);
+    }
+    return claimed;
+  }
 
   const stopExtendingRun = startExtendingRunTimeout({
     runId: claimed.run.id,
@@ -357,6 +429,7 @@ export async function executeScraperRun(
       .from(externalSiteRuns)
       .where(eq(externalSiteRuns.id, claimed.run.id));
     claimed.run.emittedItemCount = latest?.emittedItemCount ?? 0;
+    await activateRepair(claimed.run.id, claimed.executionToken);
     await completeRun(claimed, clock.now());
     return { status: "completed" };
   } catch (error) {
@@ -379,6 +452,15 @@ export async function executeScraperRun(
     if (error instanceof ScrapeSourceSetupError) {
       await failRun(claimed, error, clock.now());
       return { status: "completed" };
+    }
+    if (
+      error instanceof ScrapeSourceParseError &&
+      claimed.run.purpose === "collect"
+    ) {
+      const nextRunId = await failRun(claimed, error, clock.now());
+      return nextRunId === undefined
+        ? { status: "completed" }
+        : { status: "completed", nextRunId };
     }
     await failRun(
       claimed,

@@ -55,6 +55,10 @@ export class ScrapeSourceValidationError extends Error {
   override name = "ScrapeSourceValidationError";
 }
 
+export class ScrapeSourceChangedError extends Error {
+  override name = "ScrapeSourceChangedError";
+}
+
 export const SCRAPE_SOURCE_PAUSED_ERROR = "The source was paused.";
 
 const DatabaseErrorSchema = z.object({ code: z.string() });
@@ -321,10 +325,14 @@ export type CreateScrapeSourceRevisionInput = {
   scrapeSourceId: number;
   listUrl?: string;
   rules: ScrapeRules;
-  createdById: number;
 } & (
-  | { author: "person" }
-  | { author: "ai"; aiModel: string; aiInstructionsVersion: string }
+  | { author: "person"; createdById: number }
+  | {
+      author: "ai";
+      createdById?: number;
+      aiModel: string;
+      aiInstructionsVersion: string;
+    }
 );
 
 export async function createScrapeSourceRevision(
@@ -340,6 +348,7 @@ async function insertScrapeSourceRevision(
   tx: AnyTransaction,
   input: CreateScrapeSourceRevisionInput,
   rules: ScrapeRules,
+  previewResult?: ScrapeSourcePreviewResult,
 ) {
   const [source] = await tx
     .select()
@@ -374,7 +383,9 @@ async function insertScrapeSourceRevision(
       aiModel: input.author === "ai" ? input.aiModel : null,
       aiInstructionsVersion:
         input.author === "ai" ? input.aiInstructionsVersion : null,
-      previewResult: { issues: [], pages: [] },
+      previewStatus: previewResult ? "passed" : "pending",
+      previewResult: previewResult ?? { issues: [], pages: [] },
+      previewedAt: previewResult ? new Date() : null,
       createdById: input.createdById,
     })
     .returning();
@@ -386,6 +397,7 @@ export async function saveScrapeSourceSuggestion(
   input: CreateScrapeSourceRevisionInput & {
     externalSiteRunId: number;
     executionToken: string;
+    previewResult: ScrapeSourcePreviewResult;
   },
 ) {
   const rules = ScrapeRulesSchema.parse(input.rules);
@@ -421,7 +433,12 @@ export async function saveScrapeSourceSuggestion(
       return revision;
     }
 
-    const revision = await insertScrapeSourceRevision(tx, input, rules);
+    const revision = await insertScrapeSourceRevision(
+      tx,
+      input,
+      rules,
+      input.previewResult,
+    );
     const [linked] = await tx
       .update(scrapeSourceRuns)
       .set({ revisionId: revision.id })
@@ -524,6 +541,8 @@ export async function recordScrapeSourcePreview(input: {
 export async function activateScrapeSourceRevision(input: {
   scrapeSourceId: number;
   revisionId: number;
+  expectedActiveRevisionId?: number;
+  currentRun?: { id: number; executionToken: string };
 }) {
   const activated = await db.transaction(async (tx) => {
     const [source] = await tx
@@ -532,6 +551,21 @@ export async function activateScrapeSourceRevision(input: {
       .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
     if (!source) throw new ScrapeSourceNotFoundError();
+
+    if (input.expectedActiveRevisionId !== undefined) {
+      const [current] = await tx
+        .select({ id: scrapeSourceRevisions.id })
+        .from(scrapeSourceRevisions)
+        .where(
+          and(
+            eq(scrapeSourceRevisions.scrapeSourceId, source.id),
+            eq(scrapeSourceRevisions.active, true),
+          ),
+        );
+      if (!source.enabled || current?.id !== input.expectedActiveRevisionId) {
+        throw new ScrapeSourceChangedError();
+      }
+    }
 
     const [revision] = await tx
       .select()
@@ -556,7 +590,10 @@ export async function activateScrapeSourceRevision(input: {
       .where(eq(externalSites.id, source.externalSiteId))
       .for("update");
     const [activeRun] = await tx
-      .select({ id: externalSiteRuns.id })
+      .select({
+        id: externalSiteRuns.id,
+        executionToken: externalSiteRuns.executionToken,
+      })
       .from(externalSiteRuns)
       .where(
         and(
@@ -565,7 +602,11 @@ export async function activateScrapeSourceRevision(input: {
         ),
       )
       .limit(1);
-    if (activeRun) {
+    if (
+      activeRun &&
+      (activeRun.id !== input.currentRun?.id ||
+        activeRun.executionToken !== input.currentRun.executionToken)
+    ) {
       throw new ScrapeSourceValidationError(
         "Wait for the current run to finish before activating this version.",
       );
