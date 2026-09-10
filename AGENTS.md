@@ -20,7 +20,7 @@ Peated is a public record of whisky, freely accessible to everyone.
 
 - Use `pnpm`; versions for pnpm and Node.js are in `package.json`.
 - Common commands: `pnpm install`, `pnpm dev`, `pnpm dev:server`, `pnpm dev:web`,
-  `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm format`.
+  `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm typecheck`, `pnpm format`.
 
 | Task             | Command                                                         |
 | ---------------- | --------------------------------------------------------------- |
