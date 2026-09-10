@@ -663,13 +663,19 @@ function parsePriceInSmallestUnit(value: string | null) {
 
 function parseDisplayedPrice(value: string | null) {
   if (!value) return null;
-  const amounts = [
-    ...value
-      .replaceAll(",", "")
-      .matchAll(
-        /(?:[$£€]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:USD|GBP|EUR)\b)/giu,
-      ),
-  ].map((match) => Number(match[1] ?? match[2]));
+  const normalized = value.replaceAll(",", "");
+  const matches = [
+    ...normalized.matchAll(
+      /(?:[$£€]\s*(\d+(?:\.\d+)?)|(\d+(?:\.\d+)?)\s*(?:USD|GBP|EUR)\b)/giu,
+    ),
+  ];
+  const customerAmounts = matches.filter((match) => {
+    const offset = (match.index ?? 0) + match[0].length;
+    return !/^\s*ex(?:cluding)?\.?\s*vat\b/iu.test(normalized.slice(offset));
+  });
+  const amounts = (customerAmounts.length > 0 ? customerAmounts : matches).map(
+    (match) => Number(match[1] ?? match[2]),
+  );
   const number = amounts.at(-1) ?? parseNumber(value);
   if (number === null || number <= 0) return null;
   return Math.round(number * 100);

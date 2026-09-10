@@ -134,6 +134,15 @@ function prepareCompassBox(input: { apply?: boolean } = {}) {
   );
 }
 
+function prepareDecadentDrinks(input: { apply?: boolean } = {}) {
+  return routerClient.externalSites.scrapeSources.prepare(
+    { site: "decadentdrinks", ...input },
+    {
+      context: { user: admin },
+    },
+  );
+}
+
 function prepareCadenheads(input: { apply?: boolean } = {}) {
   return routerClient.externalSites.scrapeSources.prepare(
     { site: "cadenheads", ...input },
@@ -215,6 +224,7 @@ function codeOwnedSource(
     | "bruichladdich"
     | "cadenheads"
     | "compassbox"
+    | "decadentdrinks"
     | "dramface"
     | "edradour"
     | "glenallachie"
@@ -301,6 +311,11 @@ const edradourRegistry = createScraperRegistry({
 const compassBoxRegistry = createScraperRegistry({
   targets: [scraperRegistry.targets.get("compassbox")!],
   sources: [codeOwnedSource("compassbox")],
+});
+
+const decadentDrinksRegistry = createScraperRegistry({
+  targets: [scraperRegistry.targets.get("decadentdrinks")!],
+  sources: [codeOwnedSource("decadentdrinks")],
 });
 
 const cadenheadsRegistry = createScraperRegistry({
@@ -852,6 +867,25 @@ async function setupCompassBoxMigration() {
     })
     .returning();
   await syncScraperDefinitions(compassBoxRegistry);
+  await db.insert(externalSiteRuns).values({
+    externalSiteId: site.id,
+    status: "succeeded",
+    trigger: "scheduled",
+    completedAt: new Date(),
+  });
+  return site;
+}
+
+async function setupDecadentDrinksMigration() {
+  const [site] = await db
+    .insert(externalSites)
+    .values({
+      type: "decadentdrinks",
+      name: "Decadent Drinks",
+      runEvery: null,
+    })
+    .returning();
+  await syncScraperDefinitions(decadentDrinksRegistry);
   await db.insert(externalSiteRuns).values({
     externalSiteId: site.id,
     status: "succeeded",
@@ -1896,6 +1930,105 @@ describe("POST /admin/scrape-sources/prepare", () => {
     await expect(prepareThompsonBros({ apply: true })).rejects.toMatchObject({
       code: "BAD_REQUEST",
       message: expect.stringContaining("Check Thompson Bros. price"),
+    });
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(scrapeTargets)).toEqual(targets);
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+  });
+
+  test("prepares Decadent Drinks without replacing prices or Bottle matches", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const site = await setupDecadentDrinksMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Decadent Drams Dailuaine 19-year-old",
+      price: 14500,
+      currency: "gbp",
+      volume: 700,
+      url: "https://decadent-drinks.com/shop/decadent-drams-dailauine-19-years-old",
+      bottleId: bottle.id,
+    });
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: null,
+      name: "Whisky Sponge Edition No. 82",
+      price: 6500,
+      currency: "gbp",
+      volume: 500,
+      url: "https://decadent-drinks.com/shop/whisky-sponge-edition-no-82/",
+      bottleId: null,
+      hidden: true,
+    });
+    const prices = await db.select().from(storePrices);
+    const histories = await db.select().from(storePriceHistories);
+    const runs = await db.select().from(externalSiteRuns);
+    const [target] = await db.select().from(scrapeTargets);
+
+    await expect(prepareDecadentDrinks()).resolves.toEqual({
+      siteId: site.id,
+      scrapeSourceId: null,
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: false,
+    });
+    expect(await db.select().from(scrapeSources)).toEqual([]);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+
+    const applied = await prepareDecadentDrinks({ apply: true });
+    expect(applied).toEqual({
+      siteId: site.id,
+      scrapeSourceId: expect.any(Number),
+      priceCount: 2,
+      visiblePriceCount: 1,
+      matchedPriceCount: 1,
+      applied: true,
+    });
+    await syncScraperDefinitions(decadentDrinksRegistry);
+    expect(await db.select().from(storePrices)).toEqual(prices);
+    expect(await db.select().from(storePriceHistories)).toEqual(histories);
+    expect(await db.select().from(externalSiteRuns)).toEqual(runs);
+    expect(await db.select().from(scrapeTargets)).toEqual([
+      { ...target, managedBy: "admin", updatedAt: expect.any(Date) },
+    ]);
+    expect(await db.select().from(scrapeSources)).toEqual([
+      expect.objectContaining({
+        id: applied.scrapeSourceId,
+        externalSiteId: site.id,
+        kind: "price",
+        listUrl: "https://decadent-drinks.com/shop/category/whisky",
+        enabled: false,
+        createdById: admin.id,
+      }),
+    ]);
+    await expect(prepareDecadentDrinks({ apply: true })).rejects.toMatchObject({
+      code: "CONFLICT",
+      message: "Decadent Drinks is already prepared for saved scraping rules.",
+    });
+  });
+
+  test("refuses an unexpected Decadent Drinks price without changing records", async ({
+    fixtures,
+  }) => {
+    const site = await setupDecadentDrinksMigration();
+    await fixtures.StorePrice({
+      externalSiteId: site.id,
+      externalProductId: "BDS26053",
+      name: "Decadent Drams Dailuaine 19-year-old",
+      currency: "gbp",
+      volume: 700,
+      url: "https://example.com/shop/decadent-drams-dailuaine-19-years-old",
+      bottleId: null,
+    });
+    const prices = await db.select().from(storePrices);
+    const targets = await db.select().from(scrapeTargets);
+
+    await expect(prepareDecadentDrinks({ apply: true })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
+      message: expect.stringContaining("Check Decadent Drinks price"),
     });
     expect(await db.select().from(storePrices)).toEqual(prices);
     expect(await db.select().from(scrapeTargets)).toEqual(targets);

@@ -133,6 +133,47 @@ it("reads price fields from text and their usual HTML attributes", () => {
   });
 });
 
+it("uses the customer price when a page also shows an ex-VAT amount", () => {
+  const rules = {
+    kind: "price",
+    list: { links: "a.product", nextPage: null, limit: 10 },
+    detail: {
+      name: "h1",
+      url: null,
+      id: null,
+      image: null,
+      volume: 700,
+      price: ".price",
+      currency: "gbp",
+      barcode: null,
+    },
+  } satisfies ScrapeRules;
+  const pageUrl = new URL("https://example.test/whisky/one");
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      '<h1>Example Whisky</h1><p class="price">£145.00 <span>(£120.83 exvat)</span></p>',
+      pageUrl,
+    ),
+  ).toMatchObject({
+    kind: "price",
+    issues: [],
+    value: [{ price: 14500 }],
+  });
+  expect(
+    parseScrapeDetail(
+      rules,
+      '<h1>Example Whisky</h1><p class="price">£120.83 ex VAT</p>',
+      pageUrl,
+    ),
+  ).toMatchObject({
+    kind: "price",
+    issues: [],
+    value: [{ price: 12083 }],
+  });
+});
+
 it("reports an invalid list selector", () => {
   const rules = {
     kind: "catalog",
