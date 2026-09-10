@@ -1,11 +1,7 @@
-import { expect, test, vi } from "vitest";
+import { expect, test } from "vitest";
+import { loadExecutableScrapeRules } from "./compatibility";
 import type { ScrapeRules } from "./rules";
-import {
-  checkDetailPages,
-  checkListPage,
-  checkNextListPage,
-  checkPreviousListPage,
-} from "./suggestion";
+import { testScrapeRules } from "./suggestion";
 
 const reviewRules = {
   kind: "review",
@@ -29,321 +25,201 @@ const reviewRules = {
   },
 } as const satisfies ScrapeRules;
 
-test("validates the selected list page and returns its detail links", () => {
-  const page = checkListPage({
+const article =
+  '<h1>Autumn reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2>North Coast 12</h2><p class="body">Orange and oak.</p></article>';
+
+function testPages(
+  pages: Record<string, string>,
+  options: Partial<
+    Pick<
+      Parameters<typeof testScrapeRules>[0],
+      "rules" | "failureUrl" | "previousRules" | "previousListPageUrl"
+    >
+  > = {},
+) {
+  return testScrapeRules({
     listPageUrl: "https://example.test/reviews",
     rules: reviewRules,
-    pages: [
-      {
-        url: "https://example.test/",
-        html: '<a class="review" href="/reviews/one">One</a>',
-      },
-      {
-        url: "https://example.test/reviews",
-        html: `
-          <a class="review" href="/reviews/one">One</a>
-          <a class="review" href="/reviews/two">Two</a>
-        `,
-      },
-    ],
-  });
-
-  expect(page.url).toBe("https://example.test/reviews");
-  expect(page.links).toEqual([
-    "https://example.test/reviews/one",
-    "https://example.test/reviews/two",
-  ]);
-  expect(page.nextPageUrl).toBeNull();
-});
-
-test("checks that pagination adds detail links", async () => {
-  const rules = {
-    ...reviewRules,
-    list: {
-      ...reviewRules.list,
-      nextPage: "a.next",
+    cursor: null,
+    checkpoint: async () => {},
+    loadPage: async (url) => {
+      const html = pages[url.pathname + url.search];
+      if (html === undefined) throw new Error("Unexpected page: " + url);
+      return { url: url.toString(), html };
     },
-  };
-  const firstPage = checkListPage({
-    listPageUrl: "https://example.test/reviews",
-    rules,
-    pages: [
-      {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">One</a><a class="next" href="/reviews?page=2">Next</a>',
-      },
-    ],
+    ...options,
   });
-  const checked = await checkNextListPage({
-    rules,
-    listPage: firstPage,
-    loadPage: async (url) => ({
-      url: url.toString(),
-      html: '<a class="review" href="/reviews/two">Two</a>',
-    }),
-  });
+}
 
-  expect(checked.links).toEqual([
-    "https://example.test/reviews/one",
-    "https://example.test/reviews/two",
-  ]);
-});
-
-test("rejects list rules that drop the working filters", () => {
-  const page = checkListPage({
-    listPageUrl: "https://example.test/feed.xml",
-    rules: {
-      ...reviewRules,
-      list: { links: "item > link", nextPage: null, limit: 20 },
-    },
-    pages: [
-      {
-        url: "https://example.test/feed.xml",
-        html: `<rss><channel>
-          <item><title>Two malts</title><link>/reviews/malts</link></item>
-          <item><title>A few rums</title><link>/reviews/rums</link></item>
-        </channel></rss>`,
-      },
-    ],
-  });
-  const previousRules = {
-    parseList: () => ({
-      links: ["https://example.test/reviews/malts"],
-      nextPageUrl: null,
-      issues: [],
-    }),
-  };
-
-  expect(() =>
-    checkPreviousListPage({ listPage: page, previousRules }),
-  ).toThrow("The rules changed which pages the working setup includes.");
-
-  const filteredPage = checkListPage({
-    listPageUrl: page.url,
-    rules: {
-      ...reviewRules,
-      list: {
-        links: 'item:not(:has(title:contains("rum"))) > link',
-        nextPage: null,
-        limit: 20,
-      },
-    },
-    pages: [page],
-  });
-  expect(() =>
-    checkPreviousListPage({ listPage: filteredPage, previousRules }),
-  ).not.toThrow();
-});
-
-test("rejects a list page that was not supplied", () => {
-  expect(() =>
-    checkListPage({
-      listPageUrl: "https://example.test/archive",
-      rules: reviewRules,
-      pages: [{ url: "https://example.test/", html: "<main></main>" }],
-    }),
-  ).toThrow("The chosen list page was not one of the given pages.");
-});
-
-test("parses supplied detail pages with the production parser", async () => {
-  const page = {
-    url: "https://example.test/reviews",
-    html: '<a class="review" href="/reviews/one">One</a>',
-    links: ["https://example.test/reviews/one"],
-    firstPageLinks: ["https://example.test/reviews/one"],
-    nextPageUrl: null,
-    nextPage: null,
-  };
-  const detailPages = await checkDetailPages({
-    rules: reviewRules,
-    listPage: page,
-    suppliedPages: [
-      {
-        url: "https://example.test/reviews/one",
-        html: '<h1>Autumn reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2>North Coast 12</h2><p class="body">Orange and oak.</p></article>',
-      },
-    ],
-    loadPage: async () => {
-      throw new Error("A supplied detail page must not be fetched again.");
-    },
-  });
-
-  expect(detailPages).toMatchObject([
+test("uses the production crawl to test every selected link and pagination beyond page two", async () => {
+  const result = await testPages(
     {
-      url: "https://example.test/reviews/one",
-      output: {
-        kind: "review",
-        title: "Autumn reviews",
-        reviews: [{ name: "North Coast 12", reviewText: "Orange and oak." }],
-      },
+      "/reviews":
+        '<a class="review" href="/one">One</a><a class="next" href="/reviews?page=2">Next</a>',
+      "/reviews?page=2":
+        '<a class="review" href="/two">Two</a><a class="next" href="/reviews?page=3">Next</a>',
+      "/reviews?page=3":
+        '<a class="review" href="/three">Three</a><a class="review" href="/four">Four</a><a class="review" href="/five">Five</a>',
+      "/one": article,
+      "/two": article,
+      "/three": article,
+      "/four": article,
+      "/five": article,
     },
-  ]);
-});
-
-test("checks catalog detail pages without returning publisher prose", async () => {
-  const rules = {
-    kind: "catalog",
-    list: {
-      links: "article.product a[href]",
-      nextPage: null,
-      limit: 10,
-    },
-    detail: {
-      name: "h1",
-      url: null,
-      id: null,
-      image: null,
-      volume: null,
-      abv: ".abv",
-      age: null,
-      edition: null,
-      year: null,
-    },
-  } as const satisfies ScrapeRules;
-  const detailPages = await checkDetailPages({
-    rules,
-    listPage: {
-      url: "https://example.test/whisky",
-      html: '<article class="product"><a href="/whisky/one">One</a></article>',
-      links: ["https://example.test/whisky/one"],
-      firstPageLinks: ["https://example.test/whisky/one"],
-      nextPageUrl: null,
-      nextPage: null,
-    },
-    suppliedPages: [
-      {
-        url: "https://example.test/whisky/one",
-        html: '<h1>Official Release</h1><span class="abv">46%</span><p class="description">Publisher prose.</p>',
-      },
-    ],
-    loadPage: async () => {
-      throw new Error("A supplied detail page must not be fetched again.");
-    },
-  });
-
-  expect(detailPages).toMatchObject([
     {
-      output: {
-        kind: "catalog",
-        products: [
-          {
-            name: "Official Release",
-            sourceBottleIdentity: { abv: 46 },
-          },
-        ],
+      rules: {
+        ...reviewRules,
+        list: { ...reviewRules.list, nextPage: "a.next" },
       },
     },
-  ]);
-  expect(JSON.stringify(detailPages.map(({ output }) => output))).not.toContain(
-    "Publisher prose",
   );
-});
-
-test("keeps complete review text in the checked output", async () => {
-  const reviewText = "Long review sentence. ".repeat(100);
-  const detailPages = await checkDetailPages({
-    rules: reviewRules,
-    listPage: {
-      url: "https://example.test/reviews",
-      html: '<a class="review" href="/reviews/one">One</a>',
-      links: ["https://example.test/reviews/one"],
-      firstPageLinks: ["https://example.test/reviews/one"],
-      nextPageUrl: null,
-      nextPage: null,
-    },
-    suppliedPages: [
-      {
-        url: "https://example.test/reviews/one",
-        html: `<h1>Autumn reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2>North Coast 12</h2><p class="body">${reviewText}</p></article>`,
-      },
+  expect(result).toMatchObject({
+    status: "passed",
+    visitedPages: [
+      "https://example.test/reviews",
+      "https://example.test/reviews?page=2",
+      "https://example.test/reviews?page=3",
+      "https://example.test/one",
+      "https://example.test/two",
+      "https://example.test/three",
+      "https://example.test/four",
+      "https://example.test/five",
     ],
-    loadPage: async () => {
-      throw new Error("A supplied detail page must not be fetched again.");
+  });
+  if (result.status !== "passed") throw new Error(result.feedback.message);
+  expect(result.preview.pages).toHaveLength(5);
+  expect(result.preview.pages[0]).toMatchObject({
+    title: "Autumn reviews",
+    reviews: [{ name: "North Coast 12" }],
+  });
+});
+
+test("fails when a detail page beyond the second list page is broken", async () => {
+  const result = await testPages(
+    {
+      "/reviews":
+        '<a class="review" href="/one">One</a><a class="next" href="/reviews?page=2">Next</a>',
+      "/reviews?page=2":
+        '<a class="review" href="/two">Two</a><a class="next" href="/reviews?page=3">Next</a>',
+      "/reviews?page=3": '<a class="review" href="/legacy">Legacy</a>',
+      "/one": article,
+      "/two": article,
+      "/legacy": "<main>Old page layout</main>",
+    },
+    {
+      rules: {
+        ...reviewRules,
+        list: { ...reviewRules.list, nextPage: "a.next" },
+      },
+    },
+  );
+  expect(result).toMatchObject({
+    status: "failed",
+    inspectedPages: expect.arrayContaining([
+      {
+        url: "https://example.test/legacy",
+        html: "<main>Old page layout</main>",
+      },
+    ]),
+  });
+});
+
+test("returns the failing detail page and parser errors to the agent", async () => {
+  const result = await testPages({
+    "/reviews": '<a class="review" href="/one">One</a>',
+    "/one": "<main>Unrelated page</main>",
+  });
+  expect(result).toMatchObject({
+    status: "failed",
+    feedback: {
+      issues: expect.arrayContaining([
+        expect.objectContaining({ field: "detail.title" }),
+      ]),
+    },
+    inspectedPages: expect.arrayContaining([
+      { url: "https://example.test/one", html: "<main>Unrelated page</main>" },
+    ]),
+  });
+});
+
+test("does not pass a repair by excluding the failing page", async () => {
+  const result = await testPages(
+    { "/reviews": '<a class="review" href="/one">One</a>', "/one": article },
+    { failureUrl: "https://example.test/missing" },
+  );
+  expect(result).toMatchObject({
+    status: "failed",
+    feedback: {
+      message: expect.stringContaining("did not reach the page that failed"),
     },
   });
-
-  expect(detailPages[0]?.output).toMatchObject({
-    kind: "review",
-    reviews: [{ reviewText: reviewText.trim() }],
-  });
 });
 
-test("rejects suggested rules that do not parse a detail page", async () => {
-  await expect(
-    checkDetailPages({
-      rules: reviewRules,
-      listPage: {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">One</a>',
-        links: ["https://example.test/reviews/one"],
-        firstPageLinks: ["https://example.test/reviews/one"],
-        nextPageUrl: null,
-        nextPage: null,
-      },
-      suppliedPages: [],
-      loadPage: async (url) => ({
-        url: url.toString(),
-        html: "<main>Unrelated page</main>",
-      }),
-    }),
-  ).rejects.toThrow("The rules did not read an article or product page.");
-});
-
-test("reports a supplied detail page before its rules fail", async () => {
-  const checkedPages: string[] = [];
-  await expect(
-    checkDetailPages({
-      rules: reviewRules,
-      listPage: {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">One</a>',
-        links: ["https://example.test/reviews/one"],
-        firstPageLinks: ["https://example.test/reviews/one"],
-        nextPageUrl: null,
-        nextPage: null,
-      },
-      suppliedPages: [
-        {
-          url: "https://example.test/reviews/one",
-          html: "<main>Unrelated page</main>",
-        },
-      ],
-      loadPage: async () => {
-        throw new Error("A supplied detail page must not be fetched again.");
-      },
-      onCheckPage: (page) => checkedPages.push(page.url),
-    }),
-  ).rejects.toThrow("The rules did not read an article or product page.");
-  expect(checkedPages).toEqual(["https://example.test/reviews/one"]);
-});
-
-test("checks every detail link selected by the rules", async () => {
-  const links = [
-    "https://example.test/products/one",
-    "https://example.test/products/two",
-    "https://example.test/products/three",
-    "https://example.test/products/four",
-    "https://example.test/products/five",
-  ];
-  const loadPage = vi.fn(async (url: URL) => ({
-    url: url.toString(),
-    html: '<h1>Reviews</h1><time datetime="2026-09-01"></time><article class="review"><h2>Whisky</h2><p class="body">Notes.</p></article>',
-  }));
-
-  const pages = await checkDetailPages({
-    rules: reviewRules,
-    listPage: {
-      url: "https://example.test/products",
-      html: "",
-      links,
-      firstPageLinks: links,
-      nextPageUrl: null,
-      nextPage: null,
+test("rejects pagination loops through the same crawler used for collection", async () => {
+  const result = await testPages(
+    {
+      "/reviews":
+        '<a class="review" href="/one">One</a><a class="next" href="/reviews">Again</a>',
     },
-    suppliedPages: [],
-    loadPage,
+    {
+      rules: {
+        ...reviewRules,
+        list: { ...reviewRules.list, nextPage: "a.next" },
+      },
+    },
+  );
+  expect(result).toMatchObject({
+    status: "failed",
+    feedback: { issues: [expect.objectContaining({ field: "list.nextPage" })] },
   });
+});
 
-  expect(pages.map((page) => page.url)).toEqual(links);
-  expect(loadPage).toHaveBeenCalledTimes(5);
+test("rejects empty collection results", async () => {
+  expect(
+    await testPages({ "/reviews": "<main>No reviews</main>" }),
+  ).toMatchObject({ status: "failed" });
+});
+
+test("preserves the working list filters", async () => {
+  const previousRules = loadExecutableScrapeRules(11, {
+    ...reviewRules,
+    list: { ...reviewRules.list, links: "a.whisky" },
+  });
+  const pages = {
+    "/reviews":
+      '<a class="review whisky" href="/malts">Malts</a><a class="review" href="/rums">Rums</a>',
+    "/malts": article,
+  };
+  const previous = {
+    previousRules,
+    previousListPageUrl: "https://example.test/reviews",
+  };
+  expect(await testPages(pages, previous)).toMatchObject({
+    status: "failed",
+    feedback: { message: expect.stringContaining("changed which pages") },
+  });
+  expect(
+    await testPages(pages, {
+      ...previous,
+      rules: {
+        ...reviewRules,
+        list: { ...reviewRules.list, links: "a.whisky" },
+      },
+    }),
+  ).toMatchObject({ status: "passed" });
+});
+
+test("returns page evidence but keeps publisher prose out of the saved preview", async () => {
+  const text = "Long review sentence. ".repeat(100);
+  const html = article.replace("Orange and oak.", text);
+  const result = await testPages({
+    "/reviews": '<a class="review" href="/one">One</a>',
+    "/one": html,
+  });
+  expect(result.status).toBe("passed");
+  if (result.status !== "passed") throw new Error(result.feedback.message);
+  expect(
+    result.inspectedPages.find((page) => page.url.endsWith("/one"))?.html,
+  ).toContain(text.trim());
+  expect(JSON.stringify(result.preview)).not.toContain("Long review sentence.");
 });

@@ -78,12 +78,13 @@ To replace an existing scraper, follow
 Keep the existing site and record IDs when switching to the new rules.
 
 The database stores each source and its rules. A saved version cannot be edited.
-A preview checks sample pages and saves only the fields it found and any errors.
-It does not save downloaded HTML, review text, or full product records. Only a
-version that passes its preview can be used. An admin can return to any older
+Testing runs the collection crawler without importing records. Its saved preview
+contains extracted fields and errors, not downloaded HTML or review text. The
+agent tests during setup; an admin can also test a saved version again. Only a
+version that passed testing can be used. An admin can return to any older
 version that passed. Pausing a source fails queued collection runs and stops
 active work at the next request, save, or checkpoint. Saved versions and run
-history stay. Preview and AI setup still work.
+history stay. Rule testing and AI setup still work.
 
 Before saving a preview or AI version, code checks that the worker still owns
 the run. The check and save happen together. If another worker has taken over,
@@ -141,20 +142,27 @@ source needs one of those features.
 
 Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or
-product pages. AI calls `check_rules` with the list page and article or product
-page rules. Code checks the list page, one next page when present, and all
-selected article or product links using the collection parser. When a check
-fails, AI gets the errors and pages so it can fix the rules. Each setup or repair
-run allows three model calls total, including resumed jobs, and saves a version
-only after a check passes. Final rule errors are
-saved with the run and shown in Admin. Problems with the AI service, database,
-job runner, or network remain system errors. The AI service does not store
-request content. A passing check saves the preview result with the new version.
-An admin turns on versions requested through setup.
+product pages. The agent can use `read_page` to inspect more pages on the same
+website. It submits v11 rules to `test_rules`, which runs the collection crawler
+without importing anything, including the same pagination and item limits.
+The tool returns extracted examples, visited pages, and any errors. The agent
+inspects successful results too: valid fields do not guarantee the right content.
+`finish` saves exactly the last passing rules and their test results. An admin
+turns on versions requested through setup; no separate preview is required.
+
+Each setup or repair run allows three rule tests, four page reads, and eight
+model calls total. The saved conversation, pending tool, crawl progress, and
+model count survive worker restarts. An HTTP wait resumes the pending test
+without another model call. When a run succeeds, fails, or reaches its execution
+limits, code discards its temporary setup conversation and crawl. Cost counts
+and repair history stay. Final rule errors are saved with the run and shown
+in Admin. Problems with the AI service, database, job runner, or network remain
+system errors. The AI service does not store request content.
 
 A collection failure caused by broken rules marks the active version failed,
 which stops further collection. The source gets one automatic repair attempt.
 The agent receives the failing page, errors, saved rules, and previous matches.
+Its test must reach the failing page; dropping it from the crawl is not a repair.
 Passing repair rules activate automatically unless an admin paused the source
 or changed its active version. Network failures do not start repairs.
 
@@ -174,16 +182,19 @@ defines what is saved, who can read it, and when it is deleted. New rules can
 read a writer inside one review or reuse one writer shown for the article.
 Older saved rules keep their own writer settings.
 
-Setup records may contain complete AI instructions, public website pages, AI
-output, and rule-check inputs and results. They must not include
-credentials, request headers, cookies, or private admin data. Normal collection
-must keep page bodies and website writing out of logs and traces. Follow
+Setup records may contain AI instructions, size-limited public HTML, tool
+arguments, extracted preview fields, errors, and opaque model continuation data.
+Only internal server and database work can read saved setup conversations; run
+APIs omit them. Setup traces follow the tracing service's access and retention
+rules. These records must not include credentials, request headers, cookies, or
+private admin data. Normal collection must keep page bodies and website writing
+out of logs and traces. Follow
 [Sensitive Data](../../../../docs/policies/sensitive-data.md).
 
 `pnpm evals:scraper:e2e` runs the [live create-scraper checks](./configured/createScraper.eval.test.ts).
 A local HTTP server serves [small website fixtures](../../__fixtures__/scraper-websites/README.md).
 AI requests go directly to the configured service. Each check starts with a
-main page URL, lets AI build rules, previews and turns them on, then collects
+main page URL, lets AI build and test rules, turns them on, then collects
 reviews and checks saved fields, score totals, and repeated collection. No
 rules or expected answers are given to AI. The checks require the local test
 database and an AI service key; missing keys skip them locally. They use real

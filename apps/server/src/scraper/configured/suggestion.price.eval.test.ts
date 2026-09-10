@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  externalSiteRuns,
   scrapeOrigins,
   scrapeSourceRevisions,
   scrapeSourceRuns,
@@ -427,7 +428,19 @@ async function completeSavedRun({
 }) {
   while (true) {
     const result = await executeScraperRun({ runId }, { fetchImpl, registry });
-    if (result.status === "completed") return result;
+    if (result.status === "completed") {
+      const [run] = await db
+        .select({
+          status: externalSiteRuns.status,
+          error: externalSiteRuns.error,
+        })
+        .from(externalSiteRuns)
+        .where(eq(externalSiteRuns.id, runId));
+      expect(run, run?.error ?? "Run did not succeed").toMatchObject({
+        status: "succeeded",
+      });
+      return result;
+    }
     if (result.status !== "waiting") {
       throw new Error("The saved scraper is already running.");
     }
@@ -477,10 +490,11 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         scrapeSourceId: source.id,
       });
       await expect(
-        executeScraperRun(
-          { runId: suggestionRun.id },
-          { fetchImpl: fixtureWebsite.fetchImpl, registry },
-        ),
+        completeSavedRun({
+          runId: suggestionRun.id,
+          fetchImpl: fixtureWebsite.fetchImpl,
+          registry,
+        }),
       ).resolves.toEqual({ status: "completed" });
 
       const [suggestedRevision] = await db
@@ -605,19 +619,90 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       );
       expect(preview.issues).toEqual([]);
       expect(preview.pages).toHaveLength(3);
-      expect(fixtureWebsite.requests).toEqual([
+      expect(fixtureWebsite.requests).toEqual(
+        expect.arrayContaining([
+          HOME_URL,
+          LIST_URL,
+          FIRST_PRODUCT_URL,
+          SECOND_PRODUCT_URL,
+          SECOND_LIST_URL,
+          THIRD_PRODUCT_URL,
+        ]),
+      );
+    });
+
+    test("finds a collection through pages outside the initial discovery", async ({
+      fixtures,
+    }) => {
+      const admin = await fixtures.User({ admin: true });
+      const { site, source } = await createSiteWithScrapeSource({
+        createdById: admin.id,
+        kind: "price",
+        websiteUrl: HOME_URL,
+        name: "Seasonal Releases",
+        sampleUrls: [],
+      });
+      await db
+        .update(scrapeTargets)
+        .set({ minimumSpacingMs: 1_000, requestsPerWindow: 3_600 })
+        .where(eq(scrapeTargets.key, site.type));
+      await db
+        .update(scrapeOrigins)
+        .set({
+          robotsMode: "not_applicable",
+          robotsRationale: "Reserved test origin has no network operator.",
+        })
+        .where(eq(scrapeOrigins.origin, SITE_ORIGIN));
+      const pages = new Map(WEBSITE_PAGES);
+      pages.set(
         HOME_URL,
-        LIST_URL,
-        FIRST_PRODUCT_URL,
-        SECOND_PRODUCT_URL,
-        SECOND_LIST_URL,
-        THIRD_PRODUCT_URL,
-        LIST_URL,
-        SECOND_LIST_URL,
-        FIRST_PRODUCT_URL,
-        SECOND_PRODUCT_URL,
-        THIRD_PRODUCT_URL,
-      ]);
+        '<h1>Seasonal Releases</h1><p>Our latest selection is in the current edition.</p><a href="/editions">Current edition</a>',
+      );
+      pages.set(
+        `${SITE_ORIGIN}/editions`,
+        '<h1>Our editions</h1><a href="/editions/autumn">Autumn 2026</a>',
+      );
+      pages.set(
+        `${SITE_ORIGIN}/editions/autumn`,
+        '<h1>Autumn 2026</h1><p>The current bottles, sizes, and prices are in our shop.</p><a href="/shop">Shop this edition</a>',
+      );
+      const website = createFixtureWebsite(pages);
+      const run = await createScrapeSourceSuggestionRun({
+        requestedById: admin.id,
+        scrapeSourceId: source.id,
+      });
+      await completeSavedRun({
+        runId: run.id,
+        fetchImpl: website.fetchImpl,
+        registry: createScraperRegistry({ sources: [], targets: [] }),
+      });
+      const [revision] = await db
+        .select()
+        .from(scrapeSourceRevisions)
+        .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
+      expect(revision).toMatchObject({
+        active: false,
+        listUrl: LIST_URL,
+        previewStatus: "passed",
+      });
+      expect(revision?.previewResult.pages).toHaveLength(3);
+      expect(revision?.previewResult.pages).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: "price",
+            products: expect.arrayContaining([
+              expect.objectContaining({ name: "Coastal 12 Year", price: 8499 }),
+            ]),
+          }),
+          expect.objectContaining({
+            kind: "price",
+            products: expect.arrayContaining([
+              expect.objectContaining({ name: "Orchard Blend", price: 12950 }),
+            ]),
+          }),
+        ]),
+      );
+      expect(website.requests).toContain(`${SITE_ORIGIN}/editions/autumn`);
     });
 
     test("preserves Bruichladdich whisky scope when migrating v6 rules", async () => {
@@ -676,10 +761,11 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         scrapeSourceId: source.id,
       });
       await expect(
-        executeScraperRun(
-          { runId: suggestionRun.id },
-          { fetchImpl: fixtureWebsite.fetchImpl, registry },
-        ),
+        completeSavedRun({
+          runId: suggestionRun.id,
+          fetchImpl: fixtureWebsite.fetchImpl,
+          registry,
+        }),
       ).resolves.toEqual({ status: "completed" });
 
       const [suggestedRevision] = await db
@@ -804,10 +890,11 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         scrapeSourceId: source.id,
       });
       await expect(
-        executeScraperRun(
-          { runId: suggestionRun.id },
-          { fetchImpl: fixtureWebsite.fetchImpl, registry },
-        ),
+        completeSavedRun({
+          runId: suggestionRun.id,
+          fetchImpl: fixtureWebsite.fetchImpl,
+          registry,
+        }),
       ).resolves.toEqual({ status: "completed" });
 
       const [suggestedRevision] = await db

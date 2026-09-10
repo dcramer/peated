@@ -10,14 +10,12 @@ import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { ScrapeSourceParseError } from "./configured/crawl";
 import {
   createScrapeSourceRepairRun,
   ScrapeSourceSuggestionCursorSchema,
 } from "./configured/runs";
-import {
-  resolveScrapeSourceRunRegistry,
-  ScrapeSourceParseError,
-} from "./configured/runtime";
+import { resolveScrapeSourceRunRegistry } from "./configured/runtime";
 import {
   activateScrapeSourceRevision,
   SCRAPE_SOURCE_PAUSED_ERROR,
@@ -52,6 +50,11 @@ const MAX_RUN_AGE_MS = 3 * 24 * 60 * 60_000;
 const DEFAULT_WAIT_MS = 15 * 60_000;
 const REQUEST_LIMIT_WAIT_MS = 60_000;
 const RUN_LIMIT_ERROR = "Scraper run exceeded its execution limits.";
+
+// Run completion discards temporary setup evidence, but keeps repair history and cost counts.
+const finishedRunCursor = sql`CASE WHEN ${externalSiteRuns.purpose} = 'suggest'
+  AND jsonb_typeof(${externalSiteRuns.cursor}) = 'object'
+  THEN ${externalSiteRuns.cursor} - 'setup' ELSE ${externalSiteRuns.cursor} END`;
 
 const ScraperRunJobInputSchema = z
   .object({ runId: z.number().int().positive() })
@@ -147,6 +150,7 @@ async function claimScraperRun({
         .set({
           status: "failed",
           error: RUN_LIMIT_ERROR,
+          cursor: finishedRunCursor,
           completedAt: now,
           nextAttemptAt: null,
           executionToken: null,
@@ -216,6 +220,7 @@ async function completeRun(claim: ClaimedRun, completedAt: Date) {
       .update(externalSiteRuns)
       .set({
         status: "succeeded",
+        cursor: finishedRunCursor,
         itemCount: claim.run.emittedItemCount,
         error: null,
         completedAt,
@@ -248,6 +253,7 @@ async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
       .set({
         status: "failed",
         error: safeRunError(error),
+        cursor: finishedRunCursor,
         completedAt,
         executionToken: null,
         executionExpiresAt: null,
