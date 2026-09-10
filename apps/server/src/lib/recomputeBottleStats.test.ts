@@ -167,6 +167,14 @@ describe("Bottle statistics recomputation", () => {
       .set({ contentHash: "blocked-source-content" })
       .where(eq(externalReviewArticles.externalSiteId, blockedSite.id));
     await fixtures.ExternalReview({
+      externalSiteId: blockedSite.id,
+      bottleId: bottle.id,
+      hidden: false,
+      nativeScoreValue: 95,
+      nativeScoreScale: 100,
+      nativeScoreDisplay: "95/100",
+    });
+    await fixtures.ExternalReview({
       externalSiteId: allowedSite.id,
       bottleId: bottle.id,
       hidden: false,

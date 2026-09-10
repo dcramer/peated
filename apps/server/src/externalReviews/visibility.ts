@@ -11,8 +11,11 @@ export function visibleExternalReviewWhere() {
     eq(externalReviews.hidden, false),
     isNull(externalReviews.removedAt),
     or(
-      isNull(externalReviewArticles.contentHash),
       isNotNull(externalReviewPublications.approvedAt),
+      and(
+        isNull(externalReviewPublications.externalSiteId),
+        isNull(externalReviewArticles.contentHash),
+      ),
     ),
   );
 }

@@ -325,6 +325,9 @@ test("missing, hidden, unpublished, and unmatched reviews never contribute", asy
 }) => {
   const mod = await fixtures.User({ mod: true });
   const site = await fixtures.ExternalSite({ type: "review-score-exclusions" });
+  const legacySite = await fixtures.ExternalSite({
+    type: "dramface",
+  });
   await fixtures.ExternalReviewPublication({ externalSiteId: site.id });
   const bottle = await fixtures.Bottle();
   const values = {
@@ -343,16 +346,22 @@ test("missing, hidden, unpublished, and unmatched reviews never contribute", asy
     .where(eq(externalReviewArticles.id, unpublished.articleId));
   const unmatched = await fixtures.ExternalReview({
     ...values,
+    externalSiteId: legacySite.id,
     bottleId: null,
   });
   const missing = await fixtures.ExternalReview({
     ...values,
+    externalSiteId: legacySite.id,
     nativeScoreValue: null,
     nativeScoreScale: null,
     nativeScoreDisplay: null,
   });
   await routerClient.externalSites.reviewScoring.update(
     { site: site.type, policy, expectedVersion: 0 },
+    { context: { user: mod } },
+  );
+  await routerClient.externalSites.reviewScoring.update(
+    { site: legacySite.type, policy, expectedVersion: 0 },
     { context: { user: mod } },
   );
   const rows = await loadScoredExternalReviews({

@@ -130,6 +130,24 @@ describe("GET /external-reviews", () => {
     expect(publicResults.results.map(({ id }) => id)).not.toContain(review.id);
   });
 
+  test("preserves legacy reviews for sources without publication controls", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const legacySite = await fixtures.ExternalSite({ type: "dramface" });
+    const legacyReview = await fixtures.ExternalReview({
+      bottleId: bottle.id,
+      externalSiteId: legacySite.id,
+    });
+
+    const { results } = await routerClient.externalReviews.list({
+      bottle: bottle.id,
+      sort: "name",
+    });
+
+    expect(results.map(({ id }) => id)).toContain(legacyReview.id);
+  });
+
   test("lists recent public reviews by publication date", async ({
     fixtures,
   }) => {
@@ -364,7 +382,7 @@ describe("GET /external-reviews", () => {
     ]);
   });
 
-  test("preserves migrated reviews before source approval", async ({
+  test("hides migrated reviews when source publication is stopped", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -380,7 +398,7 @@ describe("GET /external-reviews", () => {
       sort: "name",
     });
 
-    expect(results.map(({ id }) => id)).toContain(review.id);
+    expect(results.map(({ id }) => id)).not.toContain(review.id);
   });
 
   test("keeps scores available to moderators after publishing stops", async ({
