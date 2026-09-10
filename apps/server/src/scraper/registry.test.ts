@@ -7,7 +7,6 @@ import { externalReviewSink } from "./sinks/externalReviews";
 const registeredSources = [
   "astorwines",
   "berrybrosrudd",
-  "decadentdrinks",
   "douglaslaing",
   "dramface",
   "dramfool",
@@ -40,6 +39,7 @@ const configuredSources = [
   "bruichladdich",
   "cadenheads",
   "compassbox",
+  "decadentdrinks",
   "edradour",
   "gordonmacphail",
   "kilchoman",

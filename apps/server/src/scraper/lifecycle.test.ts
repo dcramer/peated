@@ -48,7 +48,7 @@ test("manual run is attributed, dispatched deterministically, and does not move 
   const requestedBy = await fixtures.User({ admin: true });
   const nextRunAt = new Date(Date.now() + 60_000);
   const site = await fixtures.ExternalSite({
-    type: "decadentdrinks",
+    type: "dramfool",
     nextRunAt,
   });
   const enqueue = vi.fn(async () => undefined);
@@ -167,7 +167,7 @@ test("manual review run restarts when reviews are missing saved text", async ({
 
 test("active run prevents overlap", async ({ fixtures }) => {
   const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "decadentdrinks" });
+  const site = await fixtures.ExternalSite({ type: "dramfool" });
   await queueManualExternalSiteRun({
     site,
     requestedById: requestedBy.id,
@@ -187,7 +187,7 @@ test("dispatch failure is terminal and a scheduled site becomes due", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({
-    type: "decadentdrinks",
+    type: "dramfool",
     runEvery: 60,
     nextRunAt: null,
   });
@@ -316,7 +316,7 @@ test("scheduled run advances scheduling without claiming completion", async ({
 }) => {
   const before = Date.now();
   const site = await fixtures.ExternalSite({
-    type: "decadentdrinks",
+    type: "dramfool",
     runEvery: 60,
     nextRunAt: null,
   });

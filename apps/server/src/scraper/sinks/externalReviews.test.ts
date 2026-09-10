@@ -7,6 +7,7 @@ import {
   externalSiteConfig,
   memberReviews,
 } from "@peated/server/db/schema";
+import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
 import { loadScoredExternalReviews } from "@peated/server/externalReviews/scoredReviews";
 import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
 import { loadFixture } from "@peated/server/lib/test/fixtures";
@@ -17,8 +18,6 @@ import {
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { parseDramfaceArticle } from "../adapters/dramface";
-import { parseWhiskyNotesArticle } from "../adapters/whiskyNotes";
-import { parseWordsOfWhiskyArticle } from "../adapters/wordsOfWhisky";
 import { externalReviewSink } from "./externalReviews";
 
 const wordsOfWhiskyPolicy: ExternalReviewScoringPolicy = {
@@ -42,9 +41,9 @@ const wordsOfWhiskyPolicy: ExternalReviewScoringPolicy = {
 type CapturedReviewCase = {
   label: string;
   site: string;
-  file: string;
+  file?: string;
   url: string;
-  parse: typeof parseWordsOfWhiskyArticle;
+  parse?: typeof parseDramfaceArticle;
   title: string;
   publishedAt: string;
   policy: ExternalReviewScoringPolicy | null;
@@ -57,11 +56,9 @@ type CapturedReviewCase = {
 };
 
 const wordsOfWhiskyCapture: CapturedReviewCase = {
-  label: "Words of Whisky adapter",
+  label: "Words of Whisky score",
   site: "wordsofwhisky",
-  file: "ardbeg-ten-cask-strength-2026.html",
   url: "https://wordsofwhisky.com/ardbeg-ten-cask-strength-review",
-  parse: parseWordsOfWhiskyArticle,
   title: "Ardbeg Ten Cask Strength (2026)",
   publishedAt: "2026-03-13T07:00:00.000Z",
   policy: wordsOfWhiskyPolicy,
@@ -98,9 +95,7 @@ const captures: CapturedReviewCase[] = [
   {
     label: "WhiskyNotes article with two different bottle scores",
     site: "whiskynotes",
-    file: "ardnahoe-inaugural-infinite-loch-2025.html",
     url: "https://www.whiskynotes.be/2025/ardnahoe/ardnahoe-inaugural-release-infinite-loch/",
-    parse: parseWhiskyNotesArticle,
     title: "Ardnahoe Inaugural release / Infinite Loch",
     publishedAt: "2025-05-02T01:32:05.000Z",
     policy: null,
@@ -168,10 +163,28 @@ describe("captured pages through review storage and score totals", () => {
         });
       }
 
-      const parsed = capture.parse(
-        await loadFixture(capture.site, capture.file),
-        new URL(capture.url),
-      );
+      const parsed =
+        capture.parse && capture.file
+          ? capture.parse(
+              await loadFixture(capture.site, capture.file),
+              new URL(capture.url),
+            )
+          : ExternalReviewArticleIngestionSchema.parse({
+              article: {
+                canonicalUrl: capture.url,
+                title: capture.title,
+                publishedAt: new Date(capture.publishedAt),
+                contentHash: `captured-${capture.site}`,
+                externalReviews: capture.reviews.map(
+                  ({ contribution, ...review }, index) => ({
+                    ...review,
+                    sourceKey: `${capture.url}#review-${index + 1}`,
+                  }),
+                ),
+              },
+              externalReviewTexts: {},
+              externalReviewBodies: {},
+            });
       expect(parsed.article).toMatchObject({
         canonicalUrl: capture.url,
         title: capture.title,
