@@ -17,6 +17,7 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
+import { dispatchBottleStatsRecomputes } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
   logError,
   logInfo,
@@ -204,6 +205,7 @@ export type BottleReferenceAssignmentResult = {
   isNew: boolean;
   bottleImageCandidate: BottleImageCandidate | null;
   bottleId: number;
+  changedReviewBottleIds: number[];
 };
 
 type BottleReferenceAssignmentValues = {
@@ -581,7 +583,7 @@ async function syncBottleReferenceConsumersInTransaction(
     eq(externalReviews.bottleId, bottleId),
     expectedReview ? eq(externalReviews.id, expectedReview.id) : undefined,
   );
-  await tx
+  const changedReviews = await tx
     .update(externalReviews)
     .set({ bottleId })
     .where(
@@ -603,11 +605,22 @@ async function syncBottleReferenceConsumersInTransaction(
             )
           : undefined,
         reviewIdentity,
+        sql`${externalReviews.bottleId} IS DISTINCT FROM ${bottleId}`,
       ),
-    );
+    )
+    .returning({ id: externalReviews.id });
 
   const priceWithImage = matchingPrices.find((price) => !!price.imageUrl);
   return {
+    changedReviewBottleIds: changedReviews.length
+      ? Array.from(
+          new Set(
+            [expectedReview?.bottleId, bottleId].filter(
+              (value): value is number => value !== null && value !== undefined,
+            ),
+          ),
+        )
+      : [],
     bottleImageCandidate: priceWithImage?.imageUrl
       ? {
           bottleId,
@@ -644,7 +657,7 @@ export async function assignBottleReferenceInTransaction(
       [name, ...backfillNames].map((value) => value.trim().toLowerCase()),
     ),
   ).filter(Boolean);
-  const { bottleImageCandidate } =
+  const { bottleImageCandidate, changedReviewBottleIds } =
     await syncBottleReferenceConsumersInTransaction(tx, {
       bottleId,
       externalSiteId,
@@ -684,6 +697,7 @@ export async function assignBottleReferenceInTransaction(
       ? { ...bottleImageCandidate, createdByActorId: assignedByActorId }
       : null,
     bottleId,
+    changedReviewBottleIds,
   };
 }
 
@@ -691,7 +705,7 @@ export async function assignBottleReferenceInTransaction(
 export async function syncBottleReferenceConsumersForReferenceChange(
   name: string,
 ) {
-  await db.transaction(async (tx) => {
+  const changedReviewBottleIds = await db.transaction(async (tx) => {
     const [reference] = await tx
       .select({
         name: bottleReferences.name,
@@ -706,7 +720,7 @@ export async function syncBottleReferenceConsumersForReferenceChange(
     if (!reference) {
       throw new Error(`Unknown bottle reference: ${name}`);
     }
-    if (reference.ignored || reference.bottleId === null) return;
+    if (reference.ignored || reference.bottleId === null) return [];
 
     try {
       await lockActiveBottleInTransaction(tx, reference.bottleId);
@@ -716,14 +730,15 @@ export async function syncBottleReferenceConsumersForReferenceChange(
         error instanceof BottleReferenceBottleRetiredError ||
         error instanceof BottleReferenceBottleInactiveError
       ) {
-        return;
+        return [];
       }
       throw error;
     }
-    await syncBottleReferenceConsumersInTransaction(tx, {
-      bottleId: reference.bottleId,
-      lookupNames: [reference.name.toLowerCase()],
-    });
+    const { changedReviewBottleIds } =
+      await syncBottleReferenceConsumersInTransaction(tx, {
+        bottleId: reference.bottleId,
+        lookupNames: [reference.name.toLowerCase()],
+      });
 
     const [unchangedReference] = await tx
       .select({ name: bottleReferences.name })
@@ -742,7 +757,15 @@ export async function syncBottleReferenceConsumersForReferenceChange(
     if (!unchangedReference) {
       throw new BottleReferenceIdentityChangedError(reference.name);
     }
+
+    return changedReviewBottleIds;
   });
+
+  await dispatchBottleStatsRecomputes(
+    "externalReview",
+    `bottleReference:${name}`,
+    changedReviewBottleIds,
+  );
 }
 
 function recordUnresolvedBottleImageCandidate(
@@ -763,9 +786,8 @@ function recordUnresolvedBottleImageCandidate(
 }
 
 /**
- * Runs after commit, fills only missing Bottle images (following a merged
- * source through its tombstone), and logs image/index/notification failures as
- * nonfatal side effects.
+ * Runs post-commit work for one reference assignment. This boundary owns Bottle
+ * summary refreshes for critic reviews moved by the assignment.
  */
 export async function finalizeBottleReferenceAssignment(
   {
@@ -773,6 +795,7 @@ export async function finalizeBottleReferenceAssignment(
     referenceChanged,
     bottleImageCandidate,
     bottleId,
+    changedReviewBottleIds,
   }: BottleReferenceAssignmentResult,
   contexts?: SentryLogContexts,
 ) {
@@ -791,6 +814,12 @@ export async function finalizeBottleReferenceAssignment(
   } catch (err) {
     logError(err, contexts);
   }
+
+  await dispatchBottleStatsRecomputes(
+    "externalReview",
+    `bottleReference:${reference.name}`,
+    changedReviewBottleIds,
+  );
 }
 
 /** Fills only a missing Bottle image and respects rejected image URLs. */
@@ -972,6 +1001,7 @@ export async function correctBottleReference(
         },
         previousBottleId: reference.bottleId,
         changed: false,
+        changedReviewBottleIds: [],
       };
     }
 
@@ -1015,7 +1045,7 @@ export async function correctBottleReference(
             : priorPriceIdentity,
         ),
       );
-    await tx
+    const changedReviews = await tx
       .update(externalReviews)
       .set({ bottleId })
       .where(
@@ -1024,8 +1054,10 @@ export async function correctBottleReference(
           bottleId === null && previousBottleId !== null
             ? eq(externalReviews.bottleId, previousBottleId)
             : priorReviewIdentity,
+          sql`${externalReviews.bottleId} IS DISTINCT FROM ${bottleId}`,
         ),
-      );
+      )
+      .returning({ id: externalReviews.id });
 
     const [updatedReference] = await tx
       .update(bottleReferences)
@@ -1059,6 +1091,11 @@ export async function correctBottleReference(
       },
       previousBottleId,
       changed: true,
+      changedReviewBottleIds: changedReviews.length
+        ? [previousBottleId, bottleId].filter(
+            (value): value is number => value !== null,
+          )
+        : [],
     };
   });
 
@@ -1082,6 +1119,12 @@ export async function correctBottleReference(
         logError(err, contexts);
       }
     }
+
+    await dispatchBottleStatsRecomputes(
+      "externalReview",
+      `bottleReference:${result.reference.id}`,
+      result.changedReviewBottleIds,
+    );
   }
 
   return result.reference;

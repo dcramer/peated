@@ -193,6 +193,15 @@ describe("createMissingBottles", () => {
         bottleId: updatedReview?.bottleId,
       },
     );
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId },
+      {
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    );
   });
 
   test("audits safe canonical create reuse as an existing Bottle match", async ({

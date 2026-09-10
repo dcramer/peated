@@ -142,6 +142,17 @@ describe("PATCH /bottle-references/:reference", () => {
       "IndexBottleSearchVectors",
       { bottleId: target.id },
     );
+    for (const bottle of [source, target]) {
+      expect(workerClient.pushJob).toHaveBeenCalledWith(
+        "UpdateBottleStats",
+        { bottleId: bottle.id },
+        {
+          delay: 5000,
+          removeOnComplete: true,
+          removeOnFail: false,
+        },
+      );
+    }
   });
 
   test("unassigns the reference and exact consumers using the old identity", async ({

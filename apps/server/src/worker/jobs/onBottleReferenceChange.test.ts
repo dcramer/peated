@@ -4,6 +4,7 @@ import {
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { JobPayload } from "../types";
@@ -78,6 +79,15 @@ describe("onBottleReferenceChange", () => {
     ).toMatchObject({ bottleId: otherBottle.id });
     expect(runReferenceIndex).toHaveBeenCalledTimes(2);
     expect(runReferenceIndex).toHaveBeenLastCalledWith(reference.name);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
+      {
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    );
   });
 
   test("does not propagate ignored or unbound aliases", async ({

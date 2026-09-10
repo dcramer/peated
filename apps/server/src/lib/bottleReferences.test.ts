@@ -684,6 +684,11 @@ describe("finalizeBottleReferenceAssignment", () => {
       "IndexBottleSearchVectors",
       { bottleId: bottle.id },
     );
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      expect.anything(),
+      expect.anything(),
+    );
   });
 
   test("treats queue failures as nonfatal post-commit effects", async ({
