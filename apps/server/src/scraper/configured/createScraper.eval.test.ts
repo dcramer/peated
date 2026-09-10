@@ -173,23 +173,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         expect(await db.select().from(externalReviews)).toEqual([]);
 
         const revisionInput = { id: source.id, revisionId: revision.id };
-        await expect(
-          routerClient.externalSites.scrapeSources.activate(
-            revisionInput,
-            context,
-          ),
-        ).rejects.toThrow("Preview this version successfully");
-        await routerClient.externalSites.scrapeSources.preview(
-          revisionInput,
-          context,
-        );
-        await waitForWorker();
-        const [previewed] = await routerClient.externalSites.scrapeSources.list(
-          { site: source.site.type },
-          context,
-        );
-        const preview = previewed.revisions[0].previewResult;
-        expect(previewed.revisions[0].previewStatus).toBe("passed");
+        const preview = revision.previewResult;
         expect(preview.issues).toEqual([]);
         expect(preview.pages).toHaveLength(
           new Set(website.reviews.map((review) => review.url)).size,
@@ -218,10 +202,12 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
           });
         }
         expect(await db.select().from(externalReviews)).toEqual([]);
-        await routerClient.externalSites.scrapeSources.activate(
-          revisionInput,
-          context,
-        );
+        await expect(
+          routerClient.externalSites.scrapeSources.activate(
+            revisionInput,
+            context,
+          ),
+        ).resolves.toEqual({ activeRevisionId: revision.id });
         await routerClient.externalSites.reviewPublication.update(
           { site: source.site.type, publication: { approved: true } },
           context,
