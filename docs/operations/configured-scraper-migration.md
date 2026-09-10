@@ -249,6 +249,36 @@ preview. Activate only exact output, trigger one manual collection, and confirm
 that it updates the same price IDs and Bottle matches. Check the run and Sentry
 before restoring the saved schedule.
 
+## Decadent Drinks
+
+Use the preparation endpoint with `{"site": "decadentdrinks"}`. The check-only
+request inventories every stored price without changing it. It stops if a row
+has a product ID or does not use a Decadent Drinks shop URL, non-empty name,
+GBP currency, or supported bottle size. Applying transfers the existing request
+settings and creates a paused price source for
+`https://decadent-drinks.com/shop/category/whisky`. It does not change price
+rows or history.
+
+Before applying, stop the `decadentdrinks` weekly schedule and wait for active
+collection to finish. Save every price ID, product URL, name, price, currency,
+volume, image URL, Bottle link, hidden state, source identity and fingerprint,
+history, request setting, and run. Run version 11 rules through the full local
+no-write preview. The list rules must select only product-title links from the
+whisky catalog, follow its next-page link, and stop at 99 products. Product
+pages must read the exact displayed name, customer price including VAT, bottle
+size, canonical URL, and main image. Leave the product ID empty so collection
+continues to find existing rows by exact URL. When the same price element also
+shows a lower amount marked `ex VAT`, the parsed price must remain the customer
+price.
+
+Compare the full preview with the code scraper before applying. Existing rows
+must keep their stored source identity when saved rules omit it. After applying,
+save and preview the reviewed revision. Activate only exact output, trigger one
+manual collection, and confirm that it updates the same price IDs, Bottle links,
+source fingerprints, and hidden rows. Check the run and Sentry before restoring
+the weekly schedule. Keep the built-in adapter until that production run is
+verified; remove it in a later cleanup.
+
 ## Bruichladdich
 
 Use the preparation endpoint with `{"site": "bruichladdich"}`. The check-only
@@ -452,9 +482,10 @@ handles reviews added after the switch. Do not delete source or run history.
 ## Other sources
 
 The preparation API is shared. It currently supports Bourbon Culture,
-Bruichladdich, Cadenhead's, Compass Box, Dramface, Edradour, GlenAllachie,
-Gordon & MacPhail, Kilchoman, Nc'nean, North Star, Thompson Bros., The Whiskey Reviewer,
-Whiskyfun, WhiskyNotes, Whisky Saga, The Whisky Study, and Words of Whisky.
+Bruichladdich, Cadenhead's, Compass Box, Decadent Drinks, Dramface, Edradour,
+GlenAllachie, Gordon & MacPhail, Kilchoman, Nc'nean, North Star, Thompson Bros.,
+The Whiskey Reviewer, Whiskyfun, WhiskyNotes, Whisky Saga, The Whisky Study,
+and Words of Whisky.
 Other sites are rejected without changing records. Add each site's conversion
 behind this route as its existing records are reviewed.
 
