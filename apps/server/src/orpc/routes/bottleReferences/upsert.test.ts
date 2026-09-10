@@ -66,6 +66,15 @@ describe("PUT /bottle-references", () => {
         where: eq(externalReviews.id, review.id),
       }),
     ).resolves.toMatchObject({ bottleId: bottle.id });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
+      {
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    );
   });
 
   test("assigns an existing unresolved reference and reindexes it", async ({
