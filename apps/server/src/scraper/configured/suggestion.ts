@@ -3,9 +3,11 @@ import { db } from "@peated/server/db";
 import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
 import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 import { ScraperHttpStatusError } from "../http";
 import {
   loadExecutableScrapeRules,
+  UnsupportedScrapeRulesVersionError,
   type ExecutableScrapeRules,
 } from "./compatibility";
 import {
@@ -241,13 +243,23 @@ export async function suggestScrapeSourceRevision(
   requestModel: RequestScrapeSourceModel = requestAi,
 ) {
   const source = await loadAiSource(input.scrapeSourceId);
-  const previousRules =
-    source.previousRulesVersion && source.previousRules
-      ? loadExecutableScrapeRules(
-          source.previousRulesVersion,
-          source.previousRules,
-        )
-      : null;
+  let previousRules: ExecutableScrapeRules | null = null;
+  if (source.previousRulesVersion && source.previousRules) {
+    try {
+      previousRules = loadExecutableScrapeRules(
+        source.previousRulesVersion,
+        source.previousRules,
+      );
+    } catch (error) {
+      // Scraper setup can replace unreadable rules; keep their raw context below.
+      if (
+        !(error instanceof z.ZodError) &&
+        !(error instanceof UnsupportedScrapeRulesVersionError)
+      ) {
+        throw error;
+      }
+    }
+  }
   const pageCache = new Map(
     [
       ...input.listPages,

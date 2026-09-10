@@ -214,7 +214,7 @@ const BRUICHLADDICH_V6_RULES = {
       startsWith: ["Accessories", "Clothing", "Glassware"],
     },
     nextPage: null,
-    limit: 100,
+    limit: 99,
   },
   product: {
     name: {

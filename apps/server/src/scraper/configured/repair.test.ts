@@ -558,37 +558,61 @@ test("failed repair stops after three model calls and allows an explicit manual 
   ).toMatchObject([{ active: false, previewStatus: "passed" }]);
 });
 
-test("invalid saved rules fail explicitly instead of silently discarding previous setup", async () => {
-  const { revision, repairRunId } = await startRepair();
-  await db
-    .update(scrapeSourceRevisions)
-    .set({ rules: { ...oldRules, list: { ...oldRules.list, limit: 0 } } })
-    .where(eq(scrapeSourceRevisions.id, revision.id));
-  requestModel.mockImplementation(acceptTestedRules(repairedRules));
-  await expect(
-    runToCompletion({
-      runId: repairRunId,
-      fetchImpl: sitePages(),
-      clock: testClock(),
-      executionToken: "invalid-saved-rules",
-    }),
-  ).rejects.toBeInstanceOf(z.ZodError);
-  expect(requestModel).not.toHaveBeenCalled();
-  expect(
+test.each([
+  {
+    rulesVersion: 11,
+    rules: { ...oldRules, list: { ...oldRules.list, limit: 100 } },
+  },
+  { rulesVersion: 2, rules: oldRules },
+])(
+  "setup can replace unreadable saved rules ($rulesVersion)",
+  async (saved) => {
+    const { source, revision, user } = await setupSource();
     await db
-      .select()
-      .from(externalSiteRuns)
-      .where(eq(externalSiteRuns.id, repairRunId)),
-  ).toMatchObject([
-    {
-      status: "failed",
-      error: expect.any(String),
-    },
-  ]);
-  expect(await db.select().from(scrapeSourceRevisions)).toMatchObject([
-    { id: revision.id, active: true },
-  ]);
-});
+      .update(scrapeSourceRevisions)
+      .set({ ...saved, previewStatus: "failed" })
+      .where(eq(scrapeSourceRevisions.id, revision.id));
+    const run = await createScrapeSourceSuggestionRun({
+      scrapeSourceId: source.id,
+      requestedById: user.id,
+    });
+    requestModel.mockImplementation(acceptTestedRules(repairedRules));
+    await expect(
+      runToCompletion({
+        runId: run.id,
+        fetchImpl: sitePages(),
+        clock: testClock(),
+        executionToken: "invalid-saved-rules",
+      }),
+    ).resolves.toEqual({ status: "completed" });
+    const { content } = z
+      .object({ content: z.string() })
+      .parse(requestModel.mock.calls[0]?.[0].input[0]);
+    expect(JSON.parse(content)).toMatchObject({ previousSetup: saved });
+    expect(
+      await db
+        .select()
+        .from(externalSiteRuns)
+        .where(eq(externalSiteRuns.id, run.id)),
+    ).toMatchObject([
+      {
+        status: "succeeded",
+        error: null,
+      },
+    ]);
+    expect(await db.select().from(scrapeSourceRevisions)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: revision.id, active: true, ...saved }),
+        expect.objectContaining({
+          rulesVersion: 11,
+          active: false,
+          rules: repairedRules,
+          previewStatus: "passed",
+        }),
+      ]),
+    );
+  },
+);
 
 test("pausing while repair is running prevents automatic activation", async () => {
   const { site, source, revision, repairRunId } = await startRepair();

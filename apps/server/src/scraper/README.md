@@ -150,6 +150,10 @@ inspects successful results too: valid fields do not guarantee the right content
 `finish` saves exactly the last passing rules and their test results. An admin
 turns on versions requested through setup; no separate preview is required.
 
+Setup keeps old rules and previous matches as context even when their saved
+format cannot be decoded. Only executable old rules can enforce the same list
+filters; their replacements still have to pass the collection test.
+
 Each setup or repair run allows three rule tests, four page reads, and eight
 model calls total. The saved conversation, pending tool, crawl progress, and
 model count survive worker restarts. An HTTP wait resumes the pending test
