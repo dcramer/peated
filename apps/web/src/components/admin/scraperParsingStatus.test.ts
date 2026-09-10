@@ -17,50 +17,26 @@ const failedSetup = {
 };
 
 describe("canSuggestScrapeRules", () => {
-  const revision = {
-    id: 2,
-    createdAt: "2026-09-01T12:00:00Z",
-    rulesVersion: SCRAPE_RULES_VERSION,
-    previewStatus: "passed" as const,
-  };
-  const source = { setup: null, activeRevisionId: 1, revisions: [revision] };
-
-  it.each(["pending", "passed"] as const)(
-    "allows rebuilding a %s inactive proposal",
-    (previewStatus) => {
-      expect(
-        canSuggestScrapeRules({
-          ...source,
-          revisions: [{ ...revision, previewStatus }],
-        }),
-      ).toBe(true);
-    },
-  );
-
   it.each(["queued", "running"] as const)(
-    "blocks rebuilding while setup is %s, even if a newer proposal exists",
+    "blocks rebuilding while setup is %s",
     (status) => {
-      expect(
-        canSuggestScrapeRules({ ...source, setup: { ...failedSetup, status } }),
-      ).toBe(false);
+      expect(canSuggestScrapeRules({ setup: { ...failedSetup, status } })).toBe(
+        false,
+      );
     },
   );
 
-  it("protects healthy active current rules but allows failed or older rules", () => {
-    const active = { ...source, activeRevisionId: revision.id };
-    expect(canSuggestScrapeRules(active)).toBe(false);
-    expect(
-      canSuggestScrapeRules({
-        ...active,
-        revisions: [{ ...revision, previewStatus: "failed" }],
-      }),
-    ).toBe(true);
-    expect(
-      canSuggestScrapeRules({
-        ...active,
-        revisions: [{ ...revision, rulesVersion: SCRAPE_RULES_VERSION - 1 }],
-      }),
-    ).toBe(true);
+  it.each(["failed", "succeeded"] as const)(
+    "allows another setup after it %s",
+    (status) => {
+      expect(canSuggestScrapeRules({ setup: { ...failedSetup, status } })).toBe(
+        true,
+      );
+    },
+  );
+
+  it("allows the first setup", () => {
+    expect(canSuggestScrapeRules({ setup: null })).toBe(true);
   });
 });
 

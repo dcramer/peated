@@ -32,17 +32,8 @@ export function needsScrapeRulesUpdate(source: {
   return Boolean(latest && latest.rulesVersion < SCRAPE_RULES_VERSION);
 }
 
-export function canSuggestScrapeRules(source: Omit<SetupSource, "enabled">) {
-  if (source.setup?.status === "queued" || source.setup?.status === "running") {
-    return false;
-  }
-  const latest = source.revisions[0];
-  return (
-    !latest ||
-    latest.id !== source.activeRevisionId ||
-    latest.previewStatus === "failed" ||
-    needsScrapeRulesUpdate(source)
-  );
+export function canSuggestScrapeRules({ setup }: Pick<Source, "setup">) {
+  return setup?.status !== "queued" && setup?.status !== "running";
 }
 
 export function getSetupSteps(source: SetupSource) {

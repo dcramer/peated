@@ -28,7 +28,6 @@ import {
   getSetupAfterLatestVersion,
   getSetupDescription,
   getSetupSteps,
-  needsScrapeRulesUpdate,
 } from "./scraperParsingStatus";
 import { ScraperPreviewResult } from "./scraperPreviewResult.stylex";
 
@@ -106,7 +105,6 @@ export function ScraperParsingEditor({
     (revision) => revision.id === source.activeRevisionId,
   );
   const setup = getSetupAfterLatestVersion(source);
-  const needsRulesUpdate = needsScrapeRulesUpdate(source);
   const canSuggest = canSuggestScrapeRules(source);
   const setupSteps = getSetupSteps(source);
   const setupDescription = getSetupDescription(source);
@@ -187,15 +185,7 @@ export function ScraperParsingEditor({
                 })
               }
             >
-              {needsRulesUpdate
-                ? "Update parsing rules"
-                : latest
-                  ? latest.previewStatus === "failed"
-                    ? "Ask AI to repair"
-                    : "Rebuild setup"
-                  : setup
-                    ? "Retry AI setup"
-                    : "Start AI setup"}
+              {latest ? "Rebuild setup" : "Start AI setup"}
             </AdminButton>
           ) : undefined
         }

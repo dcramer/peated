@@ -10,7 +10,7 @@ import { z } from "zod";
 import { ScraperRunTakenOverError } from "../session";
 import { loadExecutableScrapeRules } from "./compatibility";
 import { ScrapeIssueSchema, type ScrapeIssue } from "./preview";
-import { SCRAPE_RULES_VERSION, SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
+import { SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
 import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
@@ -195,26 +195,6 @@ export async function createScrapeSourceSuggestionRun(input: {
       .where(eq(scrapeSources.id, input.scrapeSourceId))
       .for("update");
     if (!source) throw new ScrapeSourceNotFoundError();
-    const [latestRevision] = await tx
-      .select({
-        active: scrapeSourceRevisions.active,
-        previewStatus: scrapeSourceRevisions.previewStatus,
-        rulesVersion: scrapeSourceRevisions.rulesVersion,
-      })
-      .from(scrapeSourceRevisions)
-      .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id))
-      .orderBy(desc(scrapeSourceRevisions.revision))
-      .limit(1);
-    // Scraper setup protects active rules, not proposals awaiting activation.
-    if (
-      latestRevision?.active &&
-      latestRevision.rulesVersion === SCRAPE_RULES_VERSION &&
-      latestRevision.previewStatus !== "failed"
-    ) {
-      throw new ScrapeSourceValidationError(
-        "The active rules already use the current format and passed testing.",
-      );
-    }
     const [run] = await tx
       .insert(externalSiteRuns)
       .values({
