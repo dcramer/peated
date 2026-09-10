@@ -29,6 +29,14 @@ export async function runScraper(
 ) {
   const { runId } = InputSchema.parse(input);
   const result = await services.executeRun({ runId });
+  if (result.status === "completed" && result.nextRunId !== undefined) {
+    await services.enqueueRun(result.nextRunId, {
+      jobId: `external-site-run-${result.nextRunId}`,
+      removeOnComplete: true,
+      removeOnFail: true,
+    });
+    return;
+  }
   if (result.status !== "waiting") return;
 
   const delay = Math.max(0, result.nextAttemptAt.getTime() - Date.now());

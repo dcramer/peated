@@ -162,7 +162,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         expect(revision).toMatchObject({
           author: "ai",
           aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
-          previewStatus: "pending",
+          previewStatus: "passed",
           active: false,
         });
         if (website.key === "rss") {

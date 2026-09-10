@@ -1,11 +1,10 @@
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import type { ScrapeRules } from "./rules";
 import {
   checkDetailPages,
   checkListPage,
   checkNextListPage,
   checkPreviousListPage,
-  sampleDetailLinks,
 } from "./suggestion";
 
 const reviewRules = {
@@ -318,18 +317,33 @@ test("reports a supplied detail page before its rules fail", async () => {
   expect(checkedPages).toEqual(["https://example.test/reviews/one"]);
 });
 
-test("samples detail links across the full list", () => {
-  expect(
-    sampleDetailLinks([
-      "https://example.test/products/one",
-      "https://example.test/products/two",
-      "https://example.test/products/three",
-      "https://example.test/products/four",
-      "https://example.test/products/five",
-    ]),
-  ).toEqual([
+test("checks every detail link selected by the rules", async () => {
+  const links = [
     "https://example.test/products/one",
+    "https://example.test/products/two",
     "https://example.test/products/three",
+    "https://example.test/products/four",
     "https://example.test/products/five",
-  ]);
+  ];
+  const loadPage = vi.fn(async (url: URL) => ({
+    url: url.toString(),
+    html: '<h1>Reviews</h1><time datetime="2026-09-01"></time><article class="review"><h2>Whisky</h2><p class="body">Notes.</p></article>',
+  }));
+
+  const pages = await checkDetailPages({
+    rules: reviewRules,
+    listPage: {
+      url: "https://example.test/products",
+      html: "",
+      links,
+      firstPageLinks: links,
+      nextPageUrl: null,
+      nextPage: null,
+    },
+    suppliedPages: [],
+    loadPage,
+  });
+
+  expect(pages.map((page) => page.url)).toEqual(links);
+  expect(loadPage).toHaveBeenCalledTimes(5);
 });

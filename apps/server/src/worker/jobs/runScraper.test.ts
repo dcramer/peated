@@ -35,6 +35,22 @@ test("does not enqueue terminal or duplicate deliveries", async () => {
   expect(services.enqueueRun).not.toHaveBeenCalled();
 });
 
+test("queues an automatic repair after a failed collection", async () => {
+  const services = createServices();
+  services.executeRun.mockResolvedValue({
+    status: "completed",
+    nextRunId: 84,
+  });
+
+  await runScraper({ runId: 42 }, services);
+
+  expect(services.enqueueRun).toHaveBeenCalledWith(84, {
+    jobId: "external-site-run-84",
+    removeOnComplete: true,
+    removeOnFail: true,
+  });
+});
+
 test("rejects queue payload fields other than run id", async () => {
   const services = createServices();
   await expect(

@@ -142,14 +142,26 @@ source needs one of those features.
 Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or
 product pages. AI calls `check_rules` with the list page and article or product
-page rules. Code checks the list page, one next page when present, and up to
-three article or product pages using the same code as collection. When a check
-fails, AI gets the errors and pages so it can fix the rules. Setup allows three
-checks and saves a version only after a check passes. Final rule errors are
+page rules. Code checks the list page, one next page when present, and all
+selected article or product links using the collection parser. When a check
+fails, AI gets the errors and pages so it can fix the rules. Each setup or repair
+run allows three model calls total, including resumed jobs, and saves a version
+only after a check passes. Final rule errors are
 saved with the run and shown in Admin. Problems with the AI service, database,
 job runner, or network remain system errors. The AI service does not store
-request content. An admin must still preview and turn on the new version. AI
-never changes the version in use.
+request content. A passing check saves the preview result with the new version.
+An admin turns on versions requested through setup.
+
+A collection failure caused by broken rules marks the active version failed,
+which stops further collection. The source gets one automatic repair attempt.
+The agent receives the failing page, errors, saved rules, and previous matches.
+Passing repair rules activate automatically unless an admin paused the source
+or changed its active version. Network failures do not start repairs.
+
+If repair fails, or its replacement rules fail collection, collection stays
+stopped for admin review. Run history allows another automatic repair only after
+a complete successful collection—not after time passes, a preview passes, or a
+new version is saved. An admin can still request another suggestion.
 
 Before shortening pages for AI, setup removes scripts and styles from its copy.
 This keeps links and article content from being cut off. Rule checks and
