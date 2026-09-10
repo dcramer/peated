@@ -18,11 +18,18 @@ const meta = {
     docs: {
       description: {
         component:
-          "Summarizes live background work and recent price matching on the admin overview.",
+          "Separates moderation decisions from background work, then summarizes Bottle resolution and recent price matching.",
       },
     },
   },
   args: {
+    inboxCounts: {
+      all: 23,
+      listing: 18,
+      catalog: 5,
+      blocked: 2,
+      inconclusive: 7,
+    },
     bottleResolution: {
       unknown: 8,
       created: 6,
@@ -74,6 +81,13 @@ export const Overview: Story = {};
 
 export const Quiet: Story = {
   args: {
+    inboxCounts: {
+      all: 0,
+      listing: 0,
+      catalog: 0,
+      blocked: 0,
+      inconclusive: 0,
+    },
     bottleResolution: {
       unknown: 0,
       created: 0,

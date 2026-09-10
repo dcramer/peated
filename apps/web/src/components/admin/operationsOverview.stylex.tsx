@@ -14,10 +14,12 @@ import {
 import { SectionHeading } from "../sectionHeading.stylex";
 
 type OperationsData = Outputs["admin"]["moderation"]["automation"];
+type InboxCounts = Outputs["admin"]["moderation"]["listTasks"]["counts"];
 type BottleResolution = Outputs["admin"]["scraperActivity"]["bottleResolution"];
 type OperationsOverviewProps = {
   bottleResolution: BottleResolution;
   data: OperationsData;
+  inboxCounts: InboxCounts;
 };
 
 const proposalTypeLabels = {
@@ -99,10 +101,37 @@ function StatusRow({
   );
 }
 
-/** Prioritizes Bottle outcomes, live work, and recent price matching. */
+function SummaryCount({
+  label,
+  tone = "default",
+  value,
+}: {
+  label: string;
+  tone?: "default" | "danger";
+  value: number;
+}) {
+  return (
+    <p {...stylex.props(styles.summaryCount)}>
+      <strong
+        {...stylex.props(
+          styles.summaryValue,
+          tone === "danger" && styles.danger,
+        )}
+      >
+        {formatCount(value)}
+      </strong>
+      <span {...stylex.props(foundationStyles.body, styles.summaryLabel)}>
+        {label}
+      </span>
+    </p>
+  );
+}
+
+/** Separates human decisions from background work before showing data health. */
 export default function OperationsOverview({
   bottleResolution,
   data,
+  inboxCounts,
 }: OperationsOverviewProps) {
   const resolutionTotal =
     bottleResolution.unknown +
@@ -110,101 +139,130 @@ export default function OperationsOverview({
     bottleResolution.matched;
 
   return (
-    <div {...stylex.props(styles.overviewGrid)}>
-      <section
-        aria-labelledby="bottle-resolution-heading"
-        {...stylex.props(styles.resolutionPanel)}
-      >
-        <div {...stylex.props(styles.panelHeading)}>
-          <SectionHeading id="bottle-resolution-heading">
-            Bottle resolution
-          </SectionHeading>
-          <p {...stylex.props(foundationStyles.body, styles.panelDescription)}>
-            New reviews and prices from the last 30 days, grouped by their
-            current Bottle match.
-          </p>
-        </div>
-
-        {resolutionTotal ? (
-          <>
-            <div aria-hidden="true" {...stylex.props(styles.resolutionTrack)}>
-              {bottleResolution.unknown ? (
-                <span
-                  style={{ flexGrow: bottleResolution.unknown }}
-                  {...stylex.props(styles.resolutionSegment, styles.unknown)}
-                />
-              ) : null}
-              {bottleResolution.created ? (
-                <span
-                  style={{ flexGrow: bottleResolution.created }}
-                  {...stylex.props(styles.resolutionSegment, styles.created)}
-                />
-              ) : null}
-              {bottleResolution.matched ? (
-                <span
-                  style={{ flexGrow: bottleResolution.matched }}
-                  {...stylex.props(styles.resolutionSegment, styles.matched)}
-                />
-              ) : null}
-            </div>
-            <dl {...stylex.props(styles.resolutionList)}>
-              <ResolutionItem
-                label="Unknown"
-                value={bottleResolution.unknown}
-                total={resolutionTotal}
-                detail="no Bottle match yet"
-                tone="unknown"
-              />
-              <ResolutionItem
-                label="New bottles"
-                value={bottleResolution.created}
-                total={resolutionTotal}
-                detail="added to Peated"
-                tone="created"
-              />
-              <ResolutionItem
-                label="Existing matches"
-                value={bottleResolution.matched}
-                total={resolutionTotal}
-                detail="matched to Bottles in Peated"
-                tone="matched"
-              />
-            </dl>
-          </>
-        ) : (
-          <p {...stylex.props(foundationStyles.body, styles.empty)}>
-            No new reviews or prices in the last 30 days.
-          </p>
-        )}
-      </section>
-
-      <section
-        aria-labelledby="system-status-heading"
-        {...stylex.props(styles.statusPanel)}
-      >
-        <div {...stylex.props(styles.statusHeader)}>
-          <SectionHeading id="system-status-heading">
-            System status
-          </SectionHeading>
-          <TextLink href="/admin/moderation/automation">View work</TextLink>
-        </div>
-
-        <dl {...stylex.props(styles.statusList)}>
-          <StatusRow
-            label="Needs attention"
-            value={data.counts.failed}
-            tone={data.counts.failed > 0 ? "danger" : "default"}
+    <div {...stylex.props(styles.root)}>
+      <div {...stylex.props(styles.workGrid)}>
+        <section
+          aria-labelledby="moderation-inbox-heading"
+          {...stylex.props(styles.moderationPanel)}
+        >
+          <div {...stylex.props(styles.panelHeader)}>
+            <SectionHeading id="moderation-inbox-heading">
+              Moderation inbox
+            </SectionHeading>
+            <TextLink href="/admin/moderation/inbox">Open inbox</TextLink>
+          </div>
+          <SummaryCount
+            label={inboxCounts.all === 1 ? "open decision" : "open decisions"}
+            value={inboxCounts.all}
           />
-          <StatusRow label="In progress" value={data.counts.processing} />
-          <StatusRow label="Waiting" value={data.counts.waiting} />
-          <StatusRow label="Finished today" value={data.counts.clearedToday} />
-        </dl>
+          <dl {...stylex.props(styles.statusList)}>
+            <StatusRow label="Listings" value={inboxCounts.listing} />
+            <StatusRow label="Catalog" value={inboxCounts.catalog} />
+          </dl>
+        </section>
 
-        <div {...stylex.props(styles.matching)}>
+        <section
+          aria-labelledby="background-work-heading"
+          {...stylex.props(styles.backgroundPanel)}
+        >
+          <div {...stylex.props(styles.panelHeader)}>
+            <SectionHeading id="background-work-heading">
+              Background work
+            </SectionHeading>
+            <TextLink href="/admin/moderation/automation">
+              View background work
+            </TextLink>
+          </div>
+          <SummaryCount
+            label={data.counts.failed === 1 ? "failed item" : "failed items"}
+            tone={data.counts.failed > 0 ? "danger" : "default"}
+            value={data.counts.failed}
+          />
+          <dl {...stylex.props(styles.statusList)}>
+            <StatusRow label="In progress" value={data.counts.processing} />
+            <StatusRow label="Waiting" value={data.counts.waiting} />
+          </dl>
+        </section>
+      </div>
+
+      <div {...stylex.props(styles.insightsGrid)}>
+        <section
+          aria-labelledby="bottle-resolution-heading"
+          {...stylex.props(styles.resolutionPanel)}
+        >
+          <div {...stylex.props(styles.panelHeading)}>
+            <SectionHeading id="bottle-resolution-heading">
+              Bottle resolution
+            </SectionHeading>
+            <p
+              {...stylex.props(foundationStyles.body, styles.panelDescription)}
+            >
+              New reviews and prices from the last 30 days, grouped by their
+              current Bottle match.
+            </p>
+          </div>
+
+          {resolutionTotal ? (
+            <>
+              <div aria-hidden="true" {...stylex.props(styles.resolutionTrack)}>
+                {bottleResolution.unknown ? (
+                  <span
+                    style={{ flexGrow: bottleResolution.unknown }}
+                    {...stylex.props(styles.resolutionSegment, styles.unknown)}
+                  />
+                ) : null}
+                {bottleResolution.created ? (
+                  <span
+                    style={{ flexGrow: bottleResolution.created }}
+                    {...stylex.props(styles.resolutionSegment, styles.created)}
+                  />
+                ) : null}
+                {bottleResolution.matched ? (
+                  <span
+                    style={{ flexGrow: bottleResolution.matched }}
+                    {...stylex.props(styles.resolutionSegment, styles.matched)}
+                  />
+                ) : null}
+              </div>
+              <dl {...stylex.props(styles.resolutionList)}>
+                <ResolutionItem
+                  label="Unknown"
+                  value={bottleResolution.unknown}
+                  total={resolutionTotal}
+                  detail="no Bottle match yet"
+                  tone="unknown"
+                />
+                <ResolutionItem
+                  label="New bottles"
+                  value={bottleResolution.created}
+                  total={resolutionTotal}
+                  detail="added to Peated"
+                  tone="created"
+                />
+                <ResolutionItem
+                  label="Existing matches"
+                  value={bottleResolution.matched}
+                  total={resolutionTotal}
+                  detail="matched to Bottles in Peated"
+                  tone="matched"
+                />
+              </dl>
+            </>
+          ) : (
+            <p {...stylex.props(foundationStyles.body, styles.empty)}>
+              No new reviews or prices in the last 30 days.
+            </p>
+          )}
+        </section>
+
+        <section
+          aria-labelledby="price-matching-heading"
+          {...stylex.props(styles.matchingPanel)}
+        >
           <div {...stylex.props(styles.matchingHeader)}>
-            <h3 {...stylex.props(foundationStyles.compactRowTitle)}>
+            <SectionHeading id="price-matching-heading">
               Price matching
-            </h3>
+            </SectionHeading>
             {data.listingAutomation.sampleSize ? (
               <strong {...stylex.props(styles.matchingRate)}>
                 {data.listingAutomation.rate ?? 0}% automatic
@@ -229,8 +287,8 @@ export default function OperationsOverview({
                   {formatCount(data.listingAutomation.failed)} failed
                 </span>
                 <br />
-                Last {formatCount(data.listingAutomation.sampleSize)} prices
-                checked
+                Last {formatCount(data.listingAutomation.sampleSize)} completed
+                checks
               </p>
               <dl
                 aria-label="Price matching by decision"
@@ -259,14 +317,30 @@ export default function OperationsOverview({
               No completed price checks yet.
             </p>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
 
 const styles = stylex.create({
-  overviewGrid: {
+  root: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x6,
+  },
+  workGrid: {
+    display: "grid",
+    minWidth: 0,
+    alignItems: "start",
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      "@media (max-width: 839px)": "1fr",
+    },
+    gap: space.x4,
+  },
+  insightsGrid: {
     display: "grid",
     minWidth: 0,
     alignItems: "start",
@@ -274,21 +348,39 @@ const styles = stylex.create({
       default: "minmax(0, 1.7fr) minmax(280px, 1fr)",
       "@media (max-width: 839px)": "1fr",
     },
-    gap: space.x4,
+    gap: space.x6,
+    paddingTop: space.x6,
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.sectionRule,
   },
-  resolutionPanel: {
+  moderationPanel: {
     minWidth: 0,
     padding: { default: space.x6, "@media (max-width: 639px)": space.x4 },
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
   },
-  statusPanel: {
+  backgroundPanel: {
     minWidth: 0,
     padding: { default: space.x6, "@media (max-width: 639px)": space.x4 },
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.hairline,
     borderRadius: controlMetrics.radius,
+  },
+  resolutionPanel: { minWidth: 0 },
+  matchingPanel: { minWidth: 0 },
+  panelHeader: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: space.x3,
+    "@media (max-width: 479px)": {
+      alignItems: "flex-start",
+      flexDirection: "column",
+      gap: space.x2,
+    },
   },
   panelHeading: {
     display: "flex",
@@ -370,13 +462,23 @@ const styles = stylex.create({
     borderTopColor: colors.hairline,
     color: colors.inkMuted,
   },
-  statusHeader: {
+  summaryCount: {
     display: "flex",
-    minWidth: 0,
     alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: space.x3,
+    gap: space.x2,
+    margin: 0,
+    marginTop: space.x6,
   },
+  summaryValue: {
+    color: colors.ink,
+    fontFamily: fonts.display,
+    fontSize: "32px",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    lineHeight: 1,
+    fontVariantNumeric: "tabular-nums",
+  },
+  summaryLabel: { color: colors.inkMuted },
   statusList: {
     display: "flex",
     minWidth: 0,
@@ -411,12 +513,6 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
   danger: { color: colors.critical },
-  matching: {
-    marginTop: space.x4,
-    padding: space.x3,
-    borderRadius: controlMetrics.radiusSmall,
-    backgroundColor: colors.surface,
-  },
   matchingHeader: {
     display: "flex",
     minWidth: 0,
@@ -431,7 +527,7 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.2,
   },
-  matchingDetail: { marginTop: space.x2, color: colors.inkMuted },
+  matchingDetail: { marginTop: space.x4, color: colors.inkMuted },
   matchingBreakdown: {
     display: "grid",
     gap: space.x1,

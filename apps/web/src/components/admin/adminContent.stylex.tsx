@@ -147,9 +147,25 @@ export function AdminOverviewPageLoading() {
       <AdminPage>
         <AdminPageHeader
           title="Operations"
-          description="See what Peated is processing and what needs attention."
+          description="Review open decisions, check background work, and track incoming data."
           metadata={<LoadingPlaceholder preset="pageMetadata" />}
         />
+        <div {...stylex.props(styles.loadingWorkGrid)}>
+          <AdminSection title="Moderation inbox">
+            <LoadingList
+              label="Loading moderation inbox totals"
+              rows={3}
+              variant="text"
+            />
+          </AdminSection>
+          <AdminSection title="Background work">
+            <LoadingList
+              label="Loading background work totals"
+              rows={3}
+              variant="text"
+            />
+          </AdminSection>
+        </div>
         <div {...stylex.props(styles.loadingOverviewGrid)}>
           <AdminSection title="Bottle resolution">
             <LoadingList
@@ -158,9 +174,9 @@ export function AdminOverviewPageLoading() {
               variant="text"
             />
           </AdminSection>
-          <AdminSection title="System status">
+          <AdminSection title="Price matching">
             <LoadingList
-              label="Loading system status"
+              label="Loading price matching"
               rows={4}
               variant="text"
             />
@@ -454,6 +470,13 @@ const styles = stylex.create({
     display: "grid",
     minWidth: 0,
     gridTemplateColumns: "minmax(0, 1.3fr) minmax(280px, 0.7fr)",
+    gap: space.x4,
+    "@media (max-width: 839px)": { gridTemplateColumns: "minmax(0, 1fr)" },
+  },
+  loadingWorkGrid: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
     gap: space.x4,
     "@media (max-width: 839px)": { gridTemplateColumns: "minmax(0, 1fr)" },
   },
