@@ -159,6 +159,7 @@ describe("exact Bottle merges", () => {
         proposalType: "match_existing",
         currentBottleId: source.id,
         suggestedBottleId: source.id,
+        legacyParentBottleId: source.id,
       })
       .returning();
     const [attempt] = await db
@@ -170,6 +171,7 @@ describe("exact Bottle merges", () => {
         initialStatus: "pending_review",
         currentBottleId: source.id,
         suggestedBottleId: source.id,
+        legacyParentBottleId: source.id,
       })
       .returning();
     const [decisionLog] = await db
@@ -297,6 +299,7 @@ describe("exact Bottle merges", () => {
     ).toMatchObject({
       currentBottleId: destination.id,
       suggestedBottleId: destination.id,
+      legacyParentBottleId: destination.id,
     });
     expect(
       await db.query.storePriceMatchAttempts.findFirst({
@@ -305,6 +308,7 @@ describe("exact Bottle merges", () => {
     ).toMatchObject({
       currentBottleId: destination.id,
       suggestedBottleId: destination.id,
+      legacyParentBottleId: destination.id,
     });
 
     expect(
