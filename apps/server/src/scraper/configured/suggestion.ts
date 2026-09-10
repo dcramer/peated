@@ -1,129 +1,41 @@
-import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
 import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
-import type { Currency } from "@peated/server/types";
 import { and, eq } from "drizzle-orm";
+import { z } from "zod";
+import { ScraperHttpStatusError } from "../http";
 import {
   loadExecutableScrapeRules,
+  UnsupportedScrapeRulesVersionError,
   type ExecutableScrapeRules,
 } from "./compatibility";
-import { parseScrapeDetail, parseScrapeList } from "./parser";
+import {
+  createScrapeSourceAdapter,
+  ScrapeSourceParseError,
+  type ConfiguredScrapeCursor,
+} from "./crawl";
+import { inspectSyndicationFeed } from "./discovery";
 import type { ScrapeIssue, ScrapeSourcePreviewResult } from "./preview";
-import type { ScrapeRules } from "./rules";
-import { reserveScrapeSourceModelCall } from "./runs";
+import { SCRAPE_RULES_VERSION, type ScrapeRules } from "./rules";
+import {
+  reserveScrapeSourceModelCall,
+  saveScrapeSourceSetupState,
+} from "./runs";
 import { saveScrapeSourceSuggestion } from "./service";
 import {
   AI_INSTRUCTIONS_VERSION,
   runScrapeSourceSetupAgent,
+  type RuleTestResult,
   type SetupAgentModelRequest,
   type SetupAgentModelResponse,
+  type SetupAgentState,
   type WebsitePage,
 } from "./setupAgent";
 import { ScrapeSourceSetupError } from "./setupError";
 
-type SelectedListPage = WebsitePage & {
-  links: string[];
-  firstPageLinks: string[];
-  nextPageUrl: string | null;
-  nextPage:
-    | (WebsitePage & { links: string[]; nextPageUrl: string | null })
-    | null;
-};
-type CheckedDetailPage = WebsitePage & {
-  output:
-    | {
-        kind: "review";
-        title: string;
-        publishedAt: string | null;
-        reviews: Array<{
-          name: string;
-          reviewerName: string | null;
-          nativeScore: {
-            value: number;
-            scale: number;
-            display: string;
-          } | null;
-          reviewText: string | null;
-          body: string | null;
-        }>;
-      }
-    | {
-        kind: "price";
-        products: Array<{
-          externalProductId: string | null;
-          name: string;
-          price: number;
-          currency: Currency;
-          volume: number;
-          url: string;
-          imageUrl: string | null;
-          barcode: string | null;
-        }>;
-      }
-    | {
-        kind: "catalog";
-        products: Array<{
-          externalProductId: string | null;
-          name: string;
-          url: string;
-          imageUrl: string | null;
-          volume: number | null;
-          sourceBottleIdentity: BottleExtractedDetails | null;
-        }>;
-      };
-};
-
-export function checkListPage(input: {
-  listPageUrl: string;
-  rules: ScrapeRules;
-  pages: WebsitePage[];
-}): SelectedListPage {
-  const selectedUrl = new URL(input.listPageUrl).toString();
-  const selected = input.pages.find(
-    (page) => new URL(page.url).toString() === selectedUrl,
-  );
-  if (!selected) {
-    throw new ScrapeSourceSetupError(
-      "The chosen list page was not one of the given pages.",
-      [
-        {
-          field: "listPageUrl",
-          message: "Choose the exact URL of one given list page.",
-        },
-      ],
-    );
-  }
-  const result = parseScrapeList(
-    input.rules,
-    selected.html,
-    new URL(selected.url),
-  );
-  if (result.links.length === 0 || result.issues.length > 0) {
-    throw new ScrapeSourceSetupError(
-      "The rules did not read the chosen list page.",
-      result.issues.length > 0
-        ? result.issues
-        : [
-            {
-              field: "list.links",
-              message: "The selector did not find any page links.",
-            },
-          ],
-    );
-  }
-  return {
-    ...selected,
-    links: result.links,
-    firstPageLinks: result.links,
-    nextPageUrl: result.nextPageUrl,
-    nextPage: null,
-  };
-}
-
-export function checkPreviousListPage(input: {
-  listPage: SelectedListPage;
+function checkPreviousListPage(input: {
+  listPage: WebsitePage & { firstPageLinks: string[] };
   previousRules: Pick<ExecutableScrapeRules, "parseList">;
 }) {
   const previous = input.previousRules.parseList(
@@ -159,171 +71,115 @@ export function checkPreviousListPage(input: {
   );
 }
 
-export async function checkNextListPage(input: {
+/** Tests the collection crawler without calling its ingestion sink. */
+export async function testScrapeRules(input: {
+  listPageUrl: string;
   rules: ScrapeRules;
-  listPage: SelectedListPage;
+  cursor: ConfiguredScrapeCursor | null;
+  checkpoint: (cursor: ConfiguredScrapeCursor) => Promise<void>;
   loadPage: (url: URL) => Promise<WebsitePage>;
-}): Promise<SelectedListPage> {
-  if (!input.listPage.nextPageUrl) return input.listPage;
-  if (input.listPage.nextPageUrl === input.listPage.url) {
-    throw new ScrapeSourceSetupError("The next page repeats the list page.", [
-      {
-        field: "list.nextPage",
-        message: "Select a link to a different list page.",
-      },
-    ]);
-  }
-  const page = await input.loadPage(new URL(input.listPage.nextPageUrl));
-  const result = parseScrapeList(input.rules, page.html, new URL(page.url));
-  if (result.issues.length > 0) {
-    throw new ScrapeSourceSetupError(
-      "The rules did not read the next list page.",
-      result.issues,
-    );
-  }
-  const links = new Set(input.listPage.links);
-  const firstPageLinkCount = links.size;
-  for (const link of result.links) links.add(link);
-  if (links.size === firstPageLinkCount) {
-    throw new ScrapeSourceSetupError(
-      "The next page did not add any new pages.",
-      [
-        {
-          field: "list.nextPage",
-          message: "Select the link to the next page of results.",
-        },
-      ],
-    );
-  }
-  return {
-    ...input.listPage,
-    links: [...links],
-    nextPage: {
-      ...page,
-      links: result.links,
-      nextPageUrl: result.nextPageUrl,
-    },
+  previousRules?: ExecutableScrapeRules | null;
+  previousListPageUrl?: string | null;
+  failureUrl?: string;
+}): Promise<RuleTestResult> {
+  const rules = loadExecutableScrapeRules(SCRAPE_RULES_VERSION, input.rules);
+  const inspected = new Map<string, WebsitePage>();
+  let cursor = input.cursor;
+  let preview: ScrapeSourcePreviewResult = { issues: [], pages: [] };
+  const loadPage = async (url: URL) => {
+    const page = await input.loadPage(url);
+    inspected.set(page.url, page);
+    return page;
   };
-}
-
-function parseDetailPage(
-  rules: ScrapeRules,
-  page: WebsitePage,
-): CheckedDetailPage {
-  const parsed = parseScrapeDetail(rules, page.html, new URL(page.url));
-  if (parsed.issues.length > 0 || !parsed.value) {
-    throw new ScrapeSourceSetupError(
-      "The rules did not read an article or product page.",
-      parsed.issues,
-    );
-  }
-  if (parsed.kind === "review") {
-    const value = parsed.value;
-    return {
-      ...page,
-      output: {
-        kind: "review",
-        title: value.article.title,
-        publishedAt: value.article.publishedAt?.toISOString() ?? null,
-        reviews: value.article.externalReviews.map((review) => ({
-          name: review.name,
-          reviewerName: review.reviewerName ?? null,
-          nativeScore: review.nativeScore ?? null,
-          reviewText: value.externalReviewTexts[review.sourceKey] ?? null,
-          body:
-            value.externalReviewBodies[review.sourceKey]?.slice(0, 50_000) ??
-            null,
-        })),
-      },
-    };
-  }
-  if (parsed.kind === "catalog") {
-    return {
-      ...page,
-      output: {
-        kind: "catalog",
-        products: parsed.value.map((product) => ({
-          externalProductId: product.externalProductId ?? null,
-          name: product.name,
-          url: product.url,
-          imageUrl: product.imageUrl ?? null,
-          volume: product.volume ?? null,
-          sourceBottleIdentity: product.sourceBottleIdentity ?? null,
-        })),
-      },
-    };
-  }
-  return {
-    ...page,
-    output: {
-      kind: "price",
-      products: parsed.value.map((product) => ({
-        externalProductId: product.externalProductId ?? null,
-        name: product.name,
-        price: product.price,
-        currency: product.currency,
-        volume: product.volume,
-        url: product.url,
-        imageUrl: product.imageUrl ?? null,
-        barcode: product.barcode ?? null,
-      })),
-    },
-  };
-}
-
-export async function checkDetailPages(input: {
-  rules: ScrapeRules;
-  listPage: SelectedListPage;
-  suppliedPages: WebsitePage[];
-  loadPage: (url: URL) => Promise<WebsitePage>;
-  onCheckPage?: (page: WebsitePage) => void;
-}): Promise<CheckedDetailPage[]> {
-  const suppliedPages = new Map(
-    input.suppliedPages.map((page) => [new URL(page.url).toString(), page]),
-  );
-  const pages: CheckedDetailPage[] = [];
-  for (const link of input.listPage.links) {
-    const page =
-      suppliedPages.get(link) ?? (await input.loadPage(new URL(link)));
-    input.onCheckPage?.(page);
-    pages.push(parseDetailPage(input.rules, page));
-  }
-  if (pages.length === 0) {
-    throw new ScrapeSourceSetupError(
-      "The rules did not find an article or product page.",
-      [
-        {
-          field: "list.links",
-          message: "The selector did not find a usable page.",
-        },
-      ],
-    );
-  }
-  return pages;
-}
-
-function createCheckedPreview(
-  detailPages: CheckedDetailPage[],
-): ScrapeSourcePreviewResult {
-  return {
-    issues: [],
-    pages: detailPages.map((page) => {
-      if (page.output.kind === "review") {
-        return {
-          kind: "review",
-          url: page.url,
-          title: page.output.title,
-          publishedAt: page.output.publishedAt,
-          reviews: page.output.reviews.map((review) => ({
-            name: review.name,
-            reviewerName: review.reviewerName,
-            nativeScore: review.nativeScore,
-          })),
-        };
+  try {
+    if (
+      !cursor &&
+      input.previousRules &&
+      input.previousListPageUrl === input.listPageUrl
+    ) {
+      const page = await loadPage(new URL(input.listPageUrl));
+      const parsed = rules.parseList(page.html, new URL(page.url));
+      if (parsed.issues.length > 0) {
+        throw new ScrapeSourceParseError(page.url, parsed.issues);
       }
-      return { ...page.output, url: page.url };
-    }),
-  };
+      checkPreviousListPage({
+        listPage: { ...page, firstPageLinks: parsed.links },
+        previousRules: input.previousRules,
+      });
+    }
+    const adapter = createScrapeSourceAdapter({
+      targetKey: "rule-test",
+      listUrl: input.listPageUrl,
+      rules,
+      purpose: "preview",
+      recordPreview: async (result) => {
+        preview = result.result;
+      },
+    });
+    await adapter({
+      cursor,
+      session: {
+        request: async ({ url }) => {
+          const page = await loadPage(url);
+          return {
+            url: new URL(page.url),
+            body: page.html,
+            headers: {},
+            status: 200,
+          };
+        },
+        emit: async () => {
+          throw new Error("Rule tests must not import data.");
+        },
+        checkpoint: async (value) => {
+          cursor = value;
+          await input.checkpoint(value);
+        },
+        remainingRequests: () => 0,
+      },
+    });
+    const visitedPages = [
+      ...(cursor?.listUrls ?? []),
+      ...(cursor?.detailUrls ?? []),
+    ];
+    // Repair must exercise the failure, not pass by moving it outside the test crawl.
+    if (
+      input.failureUrl &&
+      !visitedPages.includes(input.failureUrl) &&
+      !preview.pages.some((page) => page.url === input.failureUrl)
+    ) {
+      throw new ScrapeSourceSetupError(
+        "The test did not reach the page that failed. Preserve its coverage or ask an admin to review the source.",
+        [{ field: "list.links", message: input.failureUrl }],
+      );
+    }
+    if (preview.issues.length > 0) {
+      throw new ScrapeSourceSetupError(
+        "The crawler did not produce valid output.",
+        preview.issues,
+      );
+    }
+    return {
+      status: "passed",
+      preview,
+      visitedPages,
+      inspectedPages: [...inspected.values()],
+    };
+  } catch (error) {
+    if (error instanceof ScrapeSourceParseError) {
+      return {
+        status: "failed",
+        feedback: { message: error.message, issues: error.issues },
+        inspectedPages: [...inspected.values()],
+      };
+    }
+    if (!(error instanceof ScrapeSourceSetupError)) throw error;
+    return {
+      status: "failed",
+      feedback: error.feedback(),
+      inspectedPages: [...inspected.values()],
+    };
+  }
 }
 
 async function loadAiSource(scrapeSourceId: number) {
@@ -369,7 +225,7 @@ async function requestAi(input: SetupAgentModelRequest) {
   });
 }
 
-/** Saves a checked version without replacing the active version. */
+/** Saves only the exact tested version accepted by the setup agent. */
 export async function suggestScrapeSourceRevision(
   input: {
     scrapeSourceId: number;
@@ -379,6 +235,9 @@ export async function suggestScrapeSourceRevision(
     listPages: WebsitePage[];
     detailPages: WebsitePage[];
     failure?: WebsitePage & { issues: ScrapeIssue[] };
+    failureUrl?: string;
+    state?: SetupAgentState;
+    allowedOrigins: string[];
     loadPage: (url: URL) => Promise<WebsitePage>;
   },
   requestModel: RequestScrapeSourceModel = requestAi,
@@ -391,16 +250,53 @@ export async function suggestScrapeSourceRevision(
         source.previousRulesVersion,
         source.previousRules,
       );
-    } catch {
-      // Invalid legacy rules must not block the suggestion that replaces them.
+    } catch (error) {
+      // Scraper setup can replace unreadable rules; keep their raw context below.
+      if (
+        !(error instanceof z.ZodError) &&
+        !(error instanceof UnsupportedScrapeRulesVersionError)
+      ) {
+        throw error;
+      }
     }
   }
   const pageCache = new Map(
-    [...input.listPages, ...input.detailPages].map((page) => [
-      new URL(page.url).toString(),
-      page,
-    ]),
+    [
+      ...input.listPages,
+      ...input.detailPages,
+      ...(input.failure ? [input.failure] : []),
+    ].map((page) => [new URL(page.url).toString(), page]),
   );
+  const loadPage = async (url: URL) => {
+    if (
+      !input.allowedOrigins.includes(url.origin) ||
+      url.username ||
+      url.password
+    ) {
+      throw new ScrapeSourceSetupError(
+        "Read pages only from this source's allowed website.",
+      );
+    }
+    const cached = pageCache.get(url.toString());
+    if (cached) return cached;
+    let page: WebsitePage;
+    try {
+      page = await input.loadPage(url);
+    } catch (error) {
+      if (
+        error instanceof ScraperHttpStatusError &&
+        [404, 410].includes(error.status)
+      ) {
+        throw new ScrapeSourceSetupError(
+          "That page is no longer available. Choose another link from the website.",
+        );
+      }
+      throw error;
+    }
+    pageCache.set(url.toString(), page);
+    pageCache.set(new URL(page.url).toString(), page);
+    return page;
+  };
   const setup = await runScrapeSourceSetupAgent({
     conversationId: `scrape_source:${input.scrapeSourceId}`,
     externalSiteRunId: input.externalSiteRunId,
@@ -409,6 +305,14 @@ export async function suggestScrapeSourceRevision(
     listPages: input.listPages,
     detailPages: input.detailPages,
     failure: input.failure,
+    state: input.state,
+    saveState: async (state) => {
+      await saveScrapeSourceSetupState(
+        input.externalSiteRunId,
+        input.executionToken,
+        state,
+      );
+    },
     previousSetup:
       source.previousListPageUrl &&
       source.previousRulesVersion &&
@@ -429,76 +333,40 @@ export async function suggestScrapeSourceRevision(
       );
       return await requestModel(request);
     },
-    checkRules: async (submittedRules) => {
-      const checkedPages = new Map<string, WebsitePage>();
-      const rememberCheckedPage = (page: WebsitePage) => {
-        checkedPages.set(new URL(page.url).toString(), page);
+    readPage: async (url) => {
+      const page = await loadPage(url);
+      return {
+        ...page,
+        document: inspectSyndicationFeed({
+          pageUrl: new URL(page.url),
+          xml: page.html,
+        })
+          ? "xml"
+          : "html",
       };
-      const loadPage = async (url: URL) => {
-        const key = url.toString();
-        const cached = pageCache.get(key);
-        const page = cached ?? (await input.loadPage(url));
-        if (!cached) pageCache.set(new URL(page.url).toString(), page);
-        rememberCheckedPage(page);
-        return page;
-      };
-      try {
-        const selectedListPage = input.listPages.find(
-          (page) =>
-            new URL(page.url).toString() ===
-            new URL(submittedRules.listPageUrl).toString(),
-        );
-        if (selectedListPage) rememberCheckedPage(selectedListPage);
-        const firstListPage = checkListPage({
-          listPageUrl: submittedRules.listPageUrl,
-          rules: submittedRules.rules,
-          pages: input.listPages,
-        });
-        if (
-          previousRules &&
-          source.previousListPageUrl &&
-          new URL(source.previousListPageUrl).toString() === firstListPage.url
-        ) {
-          checkPreviousListPage({ listPage: firstListPage, previousRules });
-        }
-        const listPage = await checkNextListPage({
-          rules: submittedRules.rules,
-          listPage: firstListPage,
-          loadPage,
-        });
-        const detailPages = await checkDetailPages({
-          rules: submittedRules.rules,
-          listPage,
-          suppliedPages: [...pageCache.values()],
-          loadPage,
-          onCheckPage: rememberCheckedPage,
-        });
-        return {
-          status: "passed" as const,
-          checked: { listPage, detailPages },
-        };
-      } catch (error) {
-        if (!(error instanceof ScrapeSourceSetupError)) throw error;
-        return {
-          status: "failed" as const,
-          feedback: error.feedback(),
-          inspectedPages: [...checkedPages.values()],
-        };
-      }
+    },
+    testRules: async (submitted, cursor, checkpoint) => {
+      return await testScrapeRules({
+        ...submitted,
+        cursor,
+        checkpoint,
+        loadPage,
+        previousRules,
+        previousListPageUrl: source.previousListPageUrl,
+        failureUrl: input.failureUrl ?? input.failure?.url,
+      });
     },
   });
-  const suggestedRules = setup.rules;
-  const listPage = setup.checked.listPage;
   return await saveScrapeSourceSuggestion({
     scrapeSourceId: input.scrapeSourceId,
     externalSiteRunId: input.externalSiteRunId,
     executionToken: input.executionToken,
-    listUrl: listPage.url,
-    rules: suggestedRules,
+    listUrl: setup.listPageUrl,
+    rules: setup.rules,
     author: "ai",
     createdById: input.createdById,
     aiModel: setup.model,
     aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
-    previewResult: createCheckedPreview(setup.checked.detailPages),
+    previewResult: setup.preview,
   });
 }

@@ -478,34 +478,55 @@ test("does not claim a queued run before its next attempt", async () => {
   expect(adapter).not.toHaveBeenCalled();
 });
 
-test("fails a run before an eleventh execution claim", async () => {
-  const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
-  const { registry, run } = await setupRun({ adapter });
-  await db
-    .update(externalSiteRuns)
-    .set({
-      attemptCount: 10,
-      nextAttemptAt: new Date("2026-08-19T12:00:00Z"),
-    })
-    .where(eq(externalSiteRuns.id, run.id));
+test.each(["collect", "suggest"] as const)(
+  "fails a %s run before an eleventh execution claim",
+  async (purpose) => {
+    const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
+    const { registry, run } = await setupRun({ adapter });
+    await db
+      .update(externalSiteRuns)
+      .set({
+        attemptCount: 10,
+        purpose,
+        cursor:
+          purpose === "suggest"
+            ? {
+                modelCallCount: 2,
+                setup: {
+                  conversation: [
+                    { role: "user", content: "Public setup evidence" },
+                  ],
+                  model: "test-model",
+                  testCount: 0,
+                  readCount: 0,
+                  crawl: null,
+                },
+              }
+            : { page: 2 },
+        nextAttemptAt: new Date("2026-08-19T12:00:00Z"),
+      })
+      .where(eq(externalSiteRuns.id, run.id));
 
-  await expect(
-    executeScraperRun(
-      { runId: run.id },
-      { registry, clock: fixedClock(), executionToken: "next-owner" },
-    ),
-  ).resolves.toEqual({ status: "completed" });
-  expect(adapter).not.toHaveBeenCalled();
-  const [stored] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(stored).toMatchObject({
-    status: "failed",
-    error: "Scraper run exceeded its execution limits.",
-    nextAttemptAt: null,
-  });
-});
+    await expect(
+      executeScraperRun(
+        { runId: run.id },
+        { registry, clock: fixedClock(), executionToken: "next-owner" },
+      ),
+    ).resolves.toEqual({ status: "completed" });
+    expect(adapter).not.toHaveBeenCalled();
+    const [stored] = await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, run.id));
+    expect(stored).toMatchObject({
+      status: "failed",
+      error: "Scraper run exceeded its execution limits.",
+      nextAttemptAt: null,
+      cursor: purpose === "suggest" ? { modelCallCount: 2 } : { page: 2 },
+    });
+    expect(stored!.cursor).not.toHaveProperty("setup");
+  },
+);
 
 test("fails a waiting run after its maximum lifetime", async () => {
   const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
@@ -600,28 +621,38 @@ test("waits after temporary traffic coordination failures", async () => {
   });
 });
 
-test("invalid persisted cursor fails before adapter or network execution", async () => {
-  const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
-  const { registry, run } = await setupRun({
-    adapter,
-    cursor: { page: "private invalid data" },
-  });
-  const fetchImpl = vi.fn<typeof fetch>();
+test.each(["collect", "suggest"] as const)(
+  "invalid %s cursor fails before adapter or network execution",
+  async (purpose) => {
+    const adapter = vi.fn<ScraperAdapter<FixtureCursor, FixtureObservation>>();
+    const { registry, run } = await setupRun({
+      adapter,
+      cursor:
+        purpose === "collect"
+          ? { page: "private invalid data" }
+          : "invalid setup cursor",
+    });
+    await db
+      .update(externalSiteRuns)
+      .set({ purpose })
+      .where(eq(externalSiteRuns.id, run.id));
+    const fetchImpl = vi.fn<typeof fetch>();
 
-  await expect(
-    executeScraperRun(
-      { runId: run.id },
-      { registry, fetchImpl, clock: fixedClock(), executionToken: "owner" },
-    ),
-  ).rejects.toBeDefined();
-  expect(adapter).not.toHaveBeenCalled();
-  expect(fetchImpl).not.toHaveBeenCalled();
-  const [stored] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(stored).toMatchObject({
-    status: "failed",
-    error: "The source returned data we could not use.",
-  });
-});
+    await expect(
+      executeScraperRun(
+        { runId: run.id },
+        { registry, fetchImpl, clock: fixedClock(), executionToken: "owner" },
+      ),
+    ).rejects.toBeDefined();
+    expect(adapter).not.toHaveBeenCalled();
+    expect(fetchImpl).not.toHaveBeenCalled();
+    const [stored] = await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, run.id));
+    expect(stored).toMatchObject({
+      status: "failed",
+      error: "The source returned data we could not use.",
+    });
+  },
+);

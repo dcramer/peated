@@ -15,7 +15,12 @@ import {
   ScrapeSourceNotFoundError,
   ScrapeSourceValidationError,
 } from "./service";
-import { MAX_RULE_CHECKS, setupRequestLimit } from "./setupAgent";
+import {
+  MAX_SETUP_MODEL_CALLS,
+  SetupAgentStateSchema,
+  setupRequestLimit,
+  type SetupAgentState,
+} from "./setupAgent";
 import { ScrapeSourceSetupError } from "./setupError";
 
 export const ScrapeSourceSuggestionCursorSchema = z.union([
@@ -30,7 +35,13 @@ export const ScrapeSourceSuggestionCursorSchema = z.union([
         })
         .strict()
         .optional(),
-      modelCallCount: z.number().int().min(0).max(MAX_RULE_CHECKS).default(0),
+      modelCallCount: z
+        .number()
+        .int()
+        .min(0)
+        .max(MAX_SETUP_MODEL_CALLS)
+        .default(0),
+      setup: SetupAgentStateSchema.optional(),
     })
     .strict(),
 ]);
@@ -59,14 +70,46 @@ export async function reserveScrapeSourceModelCall(
     }
     const cursor = ScrapeSourceSuggestionCursorSchema.parse(run.cursor);
     const count = cursor?.modelCallCount ?? 0;
-    if (count >= MAX_RULE_CHECKS) {
+    if (count >= MAX_SETUP_MODEL_CALLS) {
       throw new ScrapeSourceSetupError(
-        "The rule check limit was reached. Review the source before trying again.",
+        "The setup model call limit was reached. Review the source before trying again.",
       );
     }
     await tx
       .update(externalSiteRuns)
       .set({ cursor: { ...cursor, modelCallCount: count + 1 } })
+      .where(eq(externalSiteRuns.id, runId));
+  });
+}
+
+export async function saveScrapeSourceSetupState(
+  runId: number,
+  executionToken: string,
+  setup: SetupAgentState,
+) {
+  await db.transaction(async (tx) => {
+    const [run] = await tx
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, runId))
+      .for("update");
+    if (
+      !run ||
+      run.status !== "running" ||
+      run.executionToken !== executionToken
+    ) {
+      throw new ScraperRunTakenOverError();
+    }
+    const cursor = ScrapeSourceSuggestionCursorSchema.parse(run.cursor);
+    await tx
+      .update(externalSiteRuns)
+      .set({
+        cursor: {
+          ...cursor,
+          modelCallCount: cursor?.modelCallCount ?? 0,
+          setup: SetupAgentStateSchema.parse(setup),
+        },
+      })
       .where(eq(externalSiteRuns.id, runId));
   });
 }

@@ -20,6 +20,13 @@ const DECODERS = new Map<number, ScrapeRulesDecoder>([
   [11, decodeRulesVersion11],
 ]);
 
+export class UnsupportedScrapeRulesVersionError extends Error {
+  constructor(rulesVersion: number) {
+    super(`Unsupported scrape rules version: ${rulesVersion}.`);
+    this.name = "UnsupportedScrapeRulesVersionError";
+  }
+}
+
 /** Decodes saved JSON and binds it to the parsing behavior for that version. */
 export function loadExecutableScrapeRules(
   rulesVersion: number,
@@ -27,7 +34,7 @@ export function loadExecutableScrapeRules(
 ) {
   const decode = DECODERS.get(rulesVersion);
   if (!decode) {
-    throw new Error(`Unsupported scrape rules version: ${rulesVersion}.`);
+    throw new UnsupportedScrapeRulesVersionError(rulesVersion);
   }
   return decode(storedJson);
 }

@@ -18,6 +18,7 @@ import type { ScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
   createScrapeSourceSuggestionRun,
+  ScrapeSourceSuggestionCursorSchema,
 } from "./runs";
 import {
   activateScrapeSourceRevision,
@@ -25,6 +26,7 @@ import {
   createSiteWithScrapeSource,
   pauseScrapeSource,
 } from "./service";
+import type { SetupAgentModelRequest } from "./setupAgent";
 import type { RequestScrapeSourceModel } from "./suggestion";
 
 const requestModel = vi.fn<RequestScrapeSourceModel>();
@@ -172,13 +174,40 @@ function ruleResponse(rules: ScrapeRules) {
       {
         type: "function_call" as const,
         call_id: "repair-rules",
-        name: "check_rules",
+        name: "test_rules",
         arguments: JSON.stringify({
           listPageUrl: "https://repair.example/archive",
           rules,
         }),
       },
     ],
+  };
+}
+
+function acceptTestedRules(rules: ScrapeRules) {
+  return async (input: SetupAgentModelRequest) => {
+    const last = z
+      .object({ type: z.literal("function_call_output"), output: z.string() })
+      .safeParse(input.input.at(-1));
+    if (
+      last.success &&
+      z
+        .object({ status: z.literal("passed") })
+        .safeParse(JSON.parse(last.data.output)).success
+    ) {
+      return {
+        model: "test-model",
+        output: [
+          {
+            type: "function_call" as const,
+            call_id: "accept-rules",
+            name: "finish",
+            arguments: "{}",
+          },
+        ],
+      };
+    }
+    return ruleResponse(rules);
   };
 }
 
@@ -217,7 +246,7 @@ beforeEach(() => {
   requestModel.mockReset();
 });
 
-test("repairs, checks, and activates broken rules without another model call", async () => {
+test("repairs and activates tested rules, then collects without model calls", async () => {
   const { revision, site, source, user, repairRunId } = await startRepair();
   const fetchImpl = sitePages();
   expect(requestModel).not.toHaveBeenCalled();
@@ -235,7 +264,7 @@ test("repairs, checks, and activates broken rules without another model call", a
     status: "queued",
     purpose: "suggest",
     requestedById: null,
-    requestLimit: 309,
+    requestLimit: 325,
     cursor: {
       repair: {
         revisionId: revision.id,
@@ -245,7 +274,7 @@ test("repairs, checks, and activates broken rules without another model call", a
   });
 
   await expectCollectionStopped(site.id);
-  requestModel.mockResolvedValue(ruleResponse(repairedRules));
+  requestModel.mockImplementation(acceptTestedRules(repairedRules));
   await expect(
     runToCompletion({
       runId: repairRunId,
@@ -277,8 +306,20 @@ test("repairs, checks, and activates broken rules without another model call", a
   expect(
     revisions.find((candidate) => candidate.id === revision.id),
   ).toMatchObject({ active: false });
-  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(requestModel).toHaveBeenCalledTimes(2);
   const firstInput = requestModel.mock.calls[0]?.[0].input[0];
+  const [completedRun] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, repairRunId));
+  const completedCursor = ScrapeSourceSuggestionCursorSchema.parse(
+    completedRun!.cursor,
+  );
+  expect(completedCursor).toMatchObject({
+    modelCallCount: 2,
+    repair: { revisionId: revision.id },
+  });
+  expect(completedCursor).not.toHaveProperty("setup");
   const { content } = z.object({ content: z.string() }).parse(firstInput);
   expect(JSON.parse(content)).toMatchObject({
     failure: {
@@ -299,7 +340,7 @@ test("repairs, checks, and activates broken rules without another model call", a
       executionToken: "duplicate-repair",
     }),
   ).resolves.toEqual({ status: "completed" });
-  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(requestModel).toHaveBeenCalledTimes(2);
 
   const healthy = await createPinnedScrapeSourceRun(db, {
     externalSiteId: site.id,
@@ -315,7 +356,7 @@ test("repairs, checks, and activates broken rules without another model call", a
       executionToken: "healthy-owner",
     }),
   ).resolves.toEqual({ status: "completed" });
-  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(requestModel).toHaveBeenCalledTimes(2);
   expect(
     await db
       .select()
@@ -344,7 +385,7 @@ test("repairs, checks, and activates broken rules without another model call", a
       executionToken: "new-break",
     }),
   ).resolves.toMatchObject({ nextRunId: expect.any(Number) });
-  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(requestModel).toHaveBeenCalledTimes(2);
   expect(
     await db
       .select()
@@ -384,7 +425,7 @@ test("does not ask the model to repair a network failure", async () => {
 
 test("a repaired version that fails collection cannot start another repair days later", async () => {
   const { site, source, repairRunId } = await startRepair();
-  requestModel.mockResolvedValue(ruleResponse(repairedRules));
+  requestModel.mockImplementation(acceptTestedRules(repairedRules));
   await runToCompletion({
     runId: repairRunId,
     fetchImpl: sitePages(),
@@ -446,7 +487,7 @@ test("a repaired version that fails collection cannot start another repair days 
     });
   }
   await expectCollectionStopped(site.id);
-  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(requestModel).toHaveBeenCalledTimes(2);
   expect(
     await db
       .select()
@@ -468,7 +509,7 @@ test("a repaired version that fails collection cannot start another repair days 
 
 test("failed repair stops after three model calls and allows an explicit manual retry", async () => {
   const { site, source, user, revision, repairRunId } = await startRepair();
-  requestModel.mockResolvedValue(ruleResponse(oldRules));
+  requestModel.mockImplementation(acceptTestedRules(oldRules));
   await runToCompletion({
     runId: repairRunId,
     fetchImpl: sitePages(),
@@ -476,12 +517,15 @@ test("failed repair stops after three model calls and allows an explicit manual 
     executionToken: "failed-repair",
   });
   expect(requestModel).toHaveBeenCalledTimes(3);
-  expect(
-    await db
-      .select()
-      .from(externalSiteRuns)
-      .where(eq(externalSiteRuns.id, repairRunId)),
-  ).toMatchObject([{ status: "failed" }]);
+  const [failedRun] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, repairRunId));
+  expect(failedRun).toMatchObject({
+    status: "failed",
+    cursor: { modelCallCount: 3, repair: { revisionId: revision.id } },
+  });
+  expect(failedRun!.cursor).not.toHaveProperty("setup");
   expect(await db.select().from(scrapeSourceRevisions)).toMatchObject([
     { id: revision.id, active: true, previewStatus: "failed" },
   ]);
@@ -498,14 +542,14 @@ test("failed repair stops after three model calls and allows an explicit manual 
     scrapeSourceId: source.id,
     requestedById: user.id,
   });
-  requestModel.mockResolvedValue(ruleResponse(repairedRules));
+  requestModel.mockImplementation(acceptTestedRules(repairedRules));
   await runToCompletion({
     runId: manual.id,
     fetchImpl: sitePages(),
     clock: testClock(),
     executionToken: "manual-retry",
   });
-  expect(requestModel).toHaveBeenCalledTimes(4);
+  expect(requestModel).toHaveBeenCalledTimes(5);
   expect(
     await db
       .select()
@@ -514,11 +558,67 @@ test("failed repair stops after three model calls and allows an explicit manual 
   ).toMatchObject([{ active: false, previewStatus: "passed" }]);
 });
 
+test.each([
+  {
+    rulesVersion: 11,
+    rules: { ...oldRules, list: { ...oldRules.list, limit: 100 } },
+  },
+  { rulesVersion: 2, rules: oldRules },
+])(
+  "setup can replace unreadable saved rules ($rulesVersion)",
+  async (saved) => {
+    const { source, revision, user } = await setupSource();
+    await db
+      .update(scrapeSourceRevisions)
+      .set({ ...saved, previewStatus: "failed" })
+      .where(eq(scrapeSourceRevisions.id, revision.id));
+    const run = await createScrapeSourceSuggestionRun({
+      scrapeSourceId: source.id,
+      requestedById: user.id,
+    });
+    requestModel.mockImplementation(acceptTestedRules(repairedRules));
+    await expect(
+      runToCompletion({
+        runId: run.id,
+        fetchImpl: sitePages(),
+        clock: testClock(),
+        executionToken: "invalid-saved-rules",
+      }),
+    ).resolves.toEqual({ status: "completed" });
+    const { content } = z
+      .object({ content: z.string() })
+      .parse(requestModel.mock.calls[0]?.[0].input[0]);
+    expect(JSON.parse(content)).toMatchObject({ previousSetup: saved });
+    expect(
+      await db
+        .select()
+        .from(externalSiteRuns)
+        .where(eq(externalSiteRuns.id, run.id)),
+    ).toMatchObject([
+      {
+        status: "succeeded",
+        error: null,
+      },
+    ]);
+    expect(await db.select().from(scrapeSourceRevisions)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: revision.id, active: true, ...saved }),
+        expect.objectContaining({
+          rulesVersion: 11,
+          active: false,
+          rules: repairedRules,
+          previewStatus: "passed",
+        }),
+      ]),
+    );
+  },
+);
+
 test("pausing while repair is running prevents automatic activation", async () => {
   const { site, source, revision, repairRunId } = await startRepair();
-  requestModel.mockImplementation(async () => {
+  requestModel.mockImplementation(async (input) => {
     await pauseScrapeSource(source.id);
-    return ruleResponse(repairedRules);
+    return await acceptTestedRules(repairedRules)(input);
   });
   await runToCompletion({
     runId: repairRunId,
@@ -526,7 +626,7 @@ test("pausing while repair is running prevents automatic activation", async () =
     clock: testClock(),
     executionToken: "paused-repair",
   });
-  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(requestModel).toHaveBeenCalledTimes(2);
   expect(
     await db
       .select()
@@ -536,10 +636,11 @@ test("pausing while repair is running prevents automatic activation", async () =
   await expectCollectionStopped(site.id);
 });
 
-test("waiting during a rule check does not give the repair a new model budget", async () => {
-  const { site, repairRunId } = await startRepair();
-  requestModel.mockResolvedValue(ruleResponse(repairedRules));
+test("resumes a waiting rule test without spending another model call", async () => {
+  const { repairRunId } = await startRepair();
+  requestModel.mockImplementation(acceptTestedRules(repairedRules));
   const pages = sitePages();
+  let blocked = false;
   const fetchImpl = vi.fn<typeof fetch>(async (input, init) => {
     const url = new URL(input instanceof Request ? input.url : input);
     if (url.pathname === "/archive") {
@@ -548,12 +649,14 @@ test("waiting during a rule check does not give the repair a new model budget", 
       );
     }
     if (url.pathname === "/third") return pages("https://repair.example/one");
-    if (url.pathname === "/blocked") {
+    if (url.pathname === "/blocked" && !blocked) {
+      blocked = true;
       return new Response(null, {
         status: 429,
         headers: { "retry-after": "60" },
       });
     }
+    if (url.pathname === "/blocked") return pages("https://repair.example/one");
     return pages(input, init);
   });
 
@@ -564,7 +667,7 @@ test("waiting during a rule check does not give the repair a new model budget", 
     executionToken: "waiting-repair",
   });
 
-  expect(requestModel).toHaveBeenCalledTimes(3);
+  expect(requestModel).toHaveBeenCalledTimes(2);
   expect(
     await db
       .select()
@@ -572,9 +675,9 @@ test("waiting during a rule check does not give the repair a new model budget", 
       .where(eq(externalSiteRuns.id, repairRunId)),
   ).toMatchObject([
     {
-      status: "failed",
-      cursor: { modelCallCount: 3 },
-      error: expect.stringContaining("rule check limit"),
+      status: "succeeded",
+      cursor: { modelCallCount: 2 },
+      error: null,
     },
   ]);
   expect(
@@ -583,17 +686,111 @@ test("waiting during a rule check does not give the repair a new model budget", 
       .from(scrapeSourceRuns)
       .where(eq(scrapeSourceRuns.purpose, "suggest")),
   ).toHaveLength(1);
+  expect(blocked).toBe(true);
+});
+
+test("keeps the model budget across executions and does not restart an exhausted repair", async () => {
+  const { site, revision, repairRunId } = await startRepair();
+  const [run] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, repairRunId));
+  await db
+    .update(externalSiteRuns)
+    .set({
+      cursor: {
+        ...ScrapeSourceSuggestionCursorSchema.parse(run!.cursor),
+        modelCallCount: 7,
+      },
+    })
+    .where(eq(externalSiteRuns.id, repairRunId));
+  requestModel.mockResolvedValue({
+    model: "test-model",
+    output: [
+      {
+        type: "function_call",
+        call_id: "untested",
+        name: "finish",
+        arguments: "{}",
+      },
+    ],
+  });
+  await runToCompletion({
+    runId: repairRunId,
+    fetchImpl: sitePages(),
+    clock: testClock(),
+    executionToken: "last-turn",
+  });
+  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(
+    await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, repairRunId)),
+  ).toMatchObject([{ status: "failed", cursor: { modelCallCount: 8 } }]);
+  await runToCompletion({
+    runId: repairRunId,
+    fetchImpl: sitePages(),
+    clock: testClock(),
+    executionToken: "duplicate-exhausted",
+  });
+  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(await db.select().from(scrapeSourceRevisions)).toMatchObject([
+    { id: revision.id },
+  ]);
   await expectCollectionStopped(site.id);
+});
+
+test("a page tool cannot fetch outside the source website", async () => {
+  const { repairRunId } = await startRepair();
+  requestModel
+    .mockResolvedValueOnce({
+      model: "test-model",
+      output: [
+        {
+          type: "function_call",
+          call_id: "offsite",
+          name: "read_page",
+          arguments: JSON.stringify({
+            url: "https://unrelated.example/private",
+          }),
+        },
+      ],
+    })
+    .mockImplementation(acceptTestedRules(repairedRules));
+  const fetchImpl = sitePages();
+  await runToCompletion({
+    runId: repairRunId,
+    fetchImpl,
+    clock: testClock(),
+    executionToken: "scoped-page-read",
+  });
+  expect(JSON.stringify(requestModel.mock.calls[1]?.[0].input)).toContain(
+    "allowed website",
+  );
+  expect(
+    fetchImpl.mock.calls.some(
+      ([url]) =>
+        new URL(url instanceof Request ? url.url : url).hostname ===
+        "unrelated.example",
+    ),
+  ).toBe(false);
+  expect(
+    await db
+      .select()
+      .from(scrapeSourceRevisions)
+      .where(eq(scrapeSourceRevisions.author, "ai")),
+  ).toMatchObject([{ active: true }]);
 });
 
 test("duplicate delivery while the model is running cannot start another repair", async () => {
   const { repairRunId } = await startRepair();
   const enteredModel = Promise.withResolvers<void>();
   const finishModel = Promise.withResolvers<void>();
-  requestModel.mockImplementation(async () => {
+  requestModel.mockImplementation(async (input) => {
     enteredModel.resolve();
     await finishModel.promise;
-    return ruleResponse(repairedRules);
+    return await acceptTestedRules(repairedRules)(input);
   });
   const clock = testClock();
   const running = runToCompletion({

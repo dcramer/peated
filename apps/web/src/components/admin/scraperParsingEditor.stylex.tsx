@@ -25,6 +25,8 @@ import {
 import { AdminEmptyActivity } from "./adminUtility.stylex";
 import {
   getSetupAfterLatestVersion,
+  getSetupDescription,
+  getSetupSteps,
   needsScrapeRulesUpdate,
 } from "./scraperParsingStatus";
 import { ScraperPreviewResult } from "./scraperPreviewResult.stylex";
@@ -392,95 +394,6 @@ export function ScraperParsingEditor({
   );
 }
 
-function getSetupSteps(source: Source) {
-  const latest = source.revisions[0];
-  const setupStatus = getSetupAfterLatestVersion(source)?.status;
-  const setupComplete =
-    Boolean(latest) && (!setupStatus || setupStatus === "succeeded");
-
-  return [
-    {
-      name: "AI setup",
-      status:
-        setupStatus === "running"
-          ? "Running"
-          : setupStatus === "failed"
-            ? "Needs attention"
-            : setupStatus === "queued"
-              ? "Queued"
-              : latest
-                ? "Complete"
-                : "Not started",
-      tone: setupComplete
-        ? ("success" as const)
-        : setupStatus === "failed"
-          ? ("danger" as const)
-          : ("neutral" as const),
-    },
-    {
-      name: "Preview",
-      status: !latest
-        ? "Waiting"
-        : latest.previewStatus === "passed"
-          ? "Passed"
-          : latest.previewStatus === "failed"
-            ? "Needs repair"
-            : "Ready",
-      tone:
-        latest?.previewStatus === "passed"
-          ? ("success" as const)
-          : latest?.previewStatus === "failed"
-            ? ("danger" as const)
-            : ("neutral" as const),
-    },
-    {
-      name: "Activate",
-      status: source.enabled
-        ? "Active"
-        : source.activeRevisionId
-          ? "Paused"
-          : "Waiting",
-      tone: source.enabled ? ("success" as const) : ("neutral" as const),
-    },
-  ];
-}
-
-function getSetupDescription(source: Source) {
-  const hasRevision = source.revisions.length > 0;
-  const setup = getSetupAfterLatestVersion(source);
-
-  if (setup?.status === "running") {
-    return hasRevision
-      ? "Peated is updating this site's setup."
-      : "Peated is finding the pages and information to collect.";
-  }
-  if (setup?.status === "queued") {
-    return "Setup will start shortly. This page refreshes automatically.";
-  }
-  if (setup?.status === "failed") {
-    return "AI could not finish setup. Review the reason, then retry when the site is available.";
-  }
-  if (setup?.status === "succeeded") {
-    return hasRevision
-      ? "The generated setup is ready to test."
-      : "The generated version is loading.";
-  }
-  const latest = source.revisions[0];
-  if (needsScrapeRulesUpdate(source)) {
-    return "This source uses an older rule format. Create and test an updated version before activating it.";
-  }
-  if (latest?.previewStatus === "failed") {
-    return "The latest version needs repair.";
-  }
-  if (latest?.previewStatus === "passed") {
-    return source.enabled
-      ? "Setup is complete."
-      : "The tested version is ready to activate.";
-  }
-  if (latest) return "The generated setup is ready to test.";
-  return "Start AI setup to create the first version.";
-}
-
 const styles = stylex.create({
   stack: {
     display: "flex",
@@ -495,7 +408,7 @@ const styles = stylex.create({
   setupList: {
     display: "grid",
     gridTemplateColumns: {
-      default: "repeat(3, minmax(0, 1fr))",
+      default: "repeat(2, minmax(0, 1fr))",
       "@media (max-width: 639px)": "1fr",
     },
     gap: space.x3,

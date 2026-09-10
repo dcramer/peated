@@ -19,7 +19,7 @@ import {
   useQueueWorkerDispatch,
   type WorkerRuntime,
 } from "@peated/server/worker/client";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import {
   afterAll,
   afterEach,
@@ -71,7 +71,19 @@ async function waitForWorker() {
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
-  throw new Error("Worker queues did not become idle before the test timeout.");
+  const runs = await db
+    .select({
+      id: externalSiteRuns.id,
+      status: externalSiteRuns.status,
+      error: externalSiteRuns.error,
+      requestCount: externalSiteRuns.requestCount,
+      nextAttemptAt: externalSiteRuns.nextAttemptAt,
+      modelCallCount: sql`${externalSiteRuns.cursor} ->> 'modelCallCount'`,
+    })
+    .from(externalSiteRuns);
+  throw new Error(
+    `Worker queues did not become idle before the test timeout: ${JSON.stringify(runs)}`,
+  );
 }
 
 describe.skipIf(!isAIGatewayConfigured("scraper"))(

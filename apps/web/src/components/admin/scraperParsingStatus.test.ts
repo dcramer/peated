@@ -2,6 +2,8 @@ import { SCRAPE_RULES_VERSION } from "@peated/server/schemas";
 import { describe, expect, it } from "vitest";
 import {
   getSetupAfterLatestVersion,
+  getSetupDescription,
+  getSetupSteps,
   needsScrapeRulesUpdate,
 } from "./scraperParsingStatus";
 
@@ -55,5 +57,57 @@ describe("needsScrapeRulesUpdate", () => {
       }),
     ).toBe(false);
     expect(needsScrapeRulesUpdate({ revisions: [] })).toBe(false);
+  });
+});
+
+describe("scraper setup guidance", () => {
+  const revision = {
+    id: 1,
+    createdAt: "2026-09-01T12:00:00Z",
+    rulesVersion: SCRAPE_RULES_VERSION,
+    previewStatus: "passed" as const,
+  };
+  const source = {
+    setup: null,
+    enabled: false,
+    activeRevisionId: null,
+    revisions: [revision],
+  };
+
+  it("moves tested setup directly to activation without a separate preview stage", () => {
+    expect(getSetupSteps(source)).toMatchObject([
+      { name: "Build and test", status: "Complete" },
+      { name: "Collection", status: "Waiting" },
+    ]);
+    expect(getSetupDescription(source)).toBe(
+      "The tested version is ready to activate.",
+    );
+  });
+
+  it("requires testing manually saved rules", () => {
+    const untested = {
+      ...source,
+      revisions: [{ ...revision, previewStatus: "pending" as const }],
+    };
+    expect(getSetupSteps(untested)[0].status).toBe("Needs test");
+    expect(getSetupDescription(untested)).toBe(
+      "Test the saved rules before activating them.",
+    );
+  });
+
+  it("shows failed active rules as stopped without treating them as an admin pause", () => {
+    const broken = {
+      ...source,
+      enabled: true,
+      activeRevisionId: revision.id,
+      revisions: [{ ...revision, previewStatus: "failed" as const }],
+    };
+    expect(getSetupSteps(broken)).toMatchObject([
+      { status: "Needs attention" },
+      { status: "Stopped" },
+    ]);
+    expect(getSetupSteps({ ...broken, enabled: false })[1].status).toBe(
+      "Paused",
+    );
   });
 });

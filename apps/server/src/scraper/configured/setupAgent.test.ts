@@ -1,10 +1,15 @@
 import { load } from "cheerio";
 import { expect, test, vi } from "vitest";
+import { z } from "zod";
+import type { ScrapeRules } from "./rules";
 import {
   preparePagesForSetup,
   runScrapeSourceSetupAgent,
   setupRequestLimit,
+  type SetupAgentModelRequest,
+  type SetupAgentModelResponse,
 } from "./setupAgent";
+import { testScrapeRules } from "./suggestion";
 
 function reviewRuleCheck(nameSelector: string) {
   return {
@@ -65,7 +70,7 @@ function toolCallResponse<T extends object>(callId: string, ruleCheck: T) {
       {
         type: "function_call" as const,
         call_id: callId,
-        name: "check_rules",
+        name: "test_rules",
         arguments: JSON.stringify(ruleCheck),
       },
     ],
@@ -73,8 +78,8 @@ function toolCallResponse<T extends object>(callId: string, ruleCheck: T) {
 }
 
 test("reserves requests for discovery and three rule checks", () => {
-  expect(setupRequestLimit(0)).toBe(309);
-  expect(setupRequestLimit(2)).toBe(311);
+  expect(setupRequestLimit(0)).toBe(325);
+  expect(setupRequestLimit(2)).toBe(327);
 });
 
 test("bounds total AI input while keeping every sample page", () => {
@@ -173,78 +178,93 @@ test("keeps feed links visible to the setup agent", () => {
   expect($("item > link").text()).toBe("https://example.test/reviews/latest");
 });
 
-test("returns rules only after the rule check passes", async () => {
-  const request = vi
-    .fn()
-    .mockResolvedValueOnce(toolCallResponse("first", reviewRuleCheck(".bad")))
-    .mockResolvedValueOnce(
-      toolCallResponse("second", reviewRuleCheck(".bottle-name")),
-    );
-  const checkRules = vi.fn(async ({ rules }) => {
-    if (rules.kind !== "review") throw new Error("Expected review rules.");
-    if (rules.detail.reviews.name === ".bad") {
-      return {
-        status: "failed" as const,
-        feedback: {
-          message: "The rules did not read an article page.",
-          issues: [
-            {
-              field: "article.reviews.name",
-              message: "The selector did not find an item name.",
-            },
-          ],
-        },
-        inspectedPages: [
-          {
-            url: "https://example.test/reviews/one",
-            html: '<article class="review"><h2 class="bottle-name">North Coast 12</h2></article>',
-          },
-        ],
-      };
-    }
-    return { status: "passed" as const, checked: "parsed review" };
-  });
-
-  const result = await runScrapeSourceSetupAgent({
-    conversationId: "scrape_source:1",
-    externalSiteRunId: 10,
-    kind: "review",
-    scrapeSourceId: 1,
-    listPages: [
+function finishResponse(args = {}) {
+  return {
+    model: "test-setup-model",
+    output: [
       {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">Review</a>',
+        type: "function_call" as const,
+        name: "finish",
+        call_id: "finish",
+        arguments: JSON.stringify(args),
       },
     ],
+  };
+}
+
+const listPage = {
+  url: "https://example.test/reviews",
+  html: '<a class="review" href="/reviews/one">Review</a>',
+};
+const article =
+  '<h1>Autumn reviews</h1><time datetime="2026-08-12"></time><article class="review"><h2 class="bottle-name">North Coast 12</h2><div class="body"><p>Orange and oak.</p></div></article>';
+
+function runAgentWithPages(
+  request: (input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>,
+  options: {
+    rules?: ScrapeRules;
+    html?: string;
+    loadPage?: Parameters<typeof testScrapeRules>[0]["loadPage"];
+    previousSetup?: Parameters<
+      typeof runScrapeSourceSetupAgent
+    >[0]["previousSetup"];
+  } = {},
+) {
+  const rules = options.rules ?? reviewRuleCheck(".bottle-name").rules;
+  const loadPage =
+    options.loadPage ??
+    (async (url: URL) => ({
+      url: url.toString(),
+      html:
+        url.pathname === "/reviews" ||
+        url.pathname === "/archive" ||
+        url.pathname === "/whisky"
+          ? rules.kind === "catalog"
+            ? '<article class="product"><a href="/whisky/one">One</a></article>'
+            : listPage.html
+          : (options.html ?? article),
+    }));
+  return runScrapeSourceSetupAgent({
+    conversationId: "scrape_source:1",
+    externalSiteRunId: 10,
+    kind: rules.kind,
+    scrapeSourceId: 1,
+    listPages: [listPage],
     detailPages: [],
     request,
-    checkRules,
+    previousSetup: options.previousSetup,
+    saveState: async () => {},
+    readPage: loadPage,
+    testRules: async (submitted, cursor, checkpoint) =>
+      testScrapeRules({ ...submitted, cursor, checkpoint, loadPage }),
   });
+}
 
-  expect(result.checked).toBe("parsed review");
-  expect(result.model).toBe("test-setup-model");
-  expect(result.rules).toMatchObject({
-    kind: "review",
-    list: {
-      links: "a.review",
-      limit: 25,
-    },
-    detail: {
-      reviews: {
-        name: ".bottle-name",
-        tastingNotes: ".body p",
-      },
-    },
-  });
-  expect(request).toHaveBeenCalledTimes(2);
-  const firstRequest = request.mock.calls[0]?.[0];
-  expect(firstRequest?.tools).toHaveLength(1);
-  expect(firstRequest?.tools[0]).toMatchObject({
-    name: "check_rules",
-    strict: true,
-    parameters: { type: "object" },
-  });
-  const toolSchema = JSON.stringify(firstRequest?.tools[0]);
+test("returns parser failures and successful extractions before accepting the exact tested rules", async () => {
+  const good = reviewRuleCheck(".bottle-name");
+  const request = vi
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(toolCallResponse("bad", reviewRuleCheck(".bad")))
+    .mockResolvedValueOnce(toolCallResponse("good", good))
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request);
+  expect(result.rules).toEqual(good.rules);
+  expect(result.preview.pages).toMatchObject([
+    { reviews: [{ name: "North Coast 12" }] },
+  ]);
+  expect(request).toHaveBeenCalledTimes(3);
+  expect(JSON.stringify(request.mock.calls[1]?.[0].input)).toContain(
+    "detail.reviews.name",
+  );
+  expect(JSON.stringify(request.mock.calls[2]?.[0].input)).toContain(
+    "North Coast 12",
+  );
+  expect(request.mock.calls[0]?.[0].tools).toMatchObject([
+    { name: "test_rules", strict: true },
+    { name: "read_page", strict: true },
+    { name: "finish", strict: true },
+  ]);
+  const toolSchema = JSON.stringify(request.mock.calls[0]?.[0].tools);
   expect(toolSchema).not.toContain('"oneOf"');
   for (const oldRuleName of [
     "oneReviewPer",
@@ -257,164 +277,156 @@ test("returns rules only after the rule check passes", async () => {
   ]) {
     expect(toolSchema).not.toContain(oldRuleName);
   }
-  const secondRequest = request.mock.calls[1]?.[0];
-  expect(JSON.stringify(secondRequest?.input)).toContain(
-    "article.reviews.name",
-  );
-  expect(JSON.stringify(secondRequest?.input)).toContain("North Coast 12");
-  expect(secondRequest?.instructions).toContain(
-    "Your work is complete only when check_rules accepts the rules.",
-  );
-  expect(secondRequest?.instructions).toContain(
-    "Code shares one article-level reviewer across its reviews.",
-  );
-  expect(secondRequest?.instructions).toContain("Review of {value}");
 });
 
-test("gives the agent the active setup as migration evidence", async () => {
+test("lets the agent correct parseable but wrong results before finishing", async () => {
+  const wrong = reviewRuleCheck(".body");
+  const correct = reviewRuleCheck(".bottle-name");
   const request = vi
-    .fn()
-    .mockResolvedValue(toolCallResponse("migrated", reviewRuleCheck("h1")));
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(toolCallResponse("wrong", wrong))
+    .mockImplementationOnce(async (input) => {
+      const { output } = z
+        .object({ output: z.string() })
+        .parse(input.input.at(-1));
+      expect(JSON.parse(output)).toMatchObject({ status: "passed" });
+      expect(JSON.stringify(input.input)).toContain("Orange and oak.");
+      return toolCallResponse("correct", correct);
+    })
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request);
+  expect(result.rules).toEqual(correct.rules);
+  expect(result.preview.pages).toMatchObject([
+    { reviews: [{ name: "North Coast 12" }] },
+  ]);
+});
 
-  await runScrapeSourceSetupAgent({
-    conversationId: "scrape_source:1",
-    externalSiteRunId: 10,
-    kind: "review",
-    scrapeSourceId: 1,
-    listPages: [
-      {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">Review</a>',
-      },
-    ],
-    detailPages: [],
+test("rejects finishing without a passing test or changing rules while finishing", async () => {
+  const checked = reviewRuleCheck(".bottle-name");
+  const request = vi
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(finishResponse())
+    .mockResolvedValueOnce(toolCallResponse("checked", checked))
+    .mockResolvedValueOnce(
+      finishResponse({ rules: reviewRuleCheck(".bad").rules }),
+    )
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request);
+  expect(JSON.stringify(request.mock.calls[1]?.[0].input)).toContain(
+    "before finishing",
+  );
+  expect(JSON.stringify(request.mock.calls[3]?.[0].input)).toContain("failed");
+  expect(result.rules).toEqual(checked.rules);
+});
+
+test("returns feedback for multiple tool calls without testing or accepting unseen results", async () => {
+  const checked = reviewRuleCheck(".bottle-name");
+  const request = vi
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce({
+      model: "test-setup-model",
+      output: [
+        ...toolCallResponse("batch-test", checked).output,
+        ...finishResponse().output,
+      ],
+    })
+    .mockResolvedValueOnce(finishResponse())
+    .mockResolvedValueOnce(toolCallResponse("checked", checked))
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request);
+  const feedback = request.mock.calls[1]![0].input.filter(
+    (item) => "type" in item && item.type === "function_call_output",
+  );
+  expect(feedback).toHaveLength(2);
+  for (const item of feedback) {
+    expect(JSON.parse(z.string().parse(item.output))).toMatchObject({
+      status: "failed",
+    });
+  }
+  expect(JSON.stringify(request.mock.calls[2]![0].input)).toContain(
+    "before finishing",
+  );
+  expect(result.rules).toEqual(checked.rules);
+  expect(result.preview.pages).toMatchObject([
+    { reviews: [{ name: "North Coast 12" }] },
+  ]);
+});
+
+test("can inspect and test a collection page outside the initial examples", async () => {
+  const checked = {
+    ...reviewRuleCheck(".bottle-name"),
+    listPageUrl: "https://example.test/archive",
+  };
+  const request = vi
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce({
+      model: "test-setup-model",
+      output: [
+        {
+          type: "function_call",
+          name: "read_page",
+          call_id: "read",
+          arguments: JSON.stringify({ url: checked.listPageUrl }),
+        },
+      ],
+    })
+    .mockImplementationOnce(async (input) => {
+      expect(JSON.stringify(input.input)).toContain("/reviews/one");
+      return toolCallResponse("checked", checked);
+    })
+    .mockResolvedValueOnce(finishResponse());
+  expect((await runAgentWithPages(request)).listPageUrl).toBe(
+    checked.listPageUrl,
+  );
+});
+
+test("gives the agent saved rules and previous matches", async () => {
+  const checked = reviewRuleCheck(".bottle-name");
+  const request = vi
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(toolCallResponse("checked", checked))
+    .mockResolvedValueOnce(finishResponse());
+  await runAgentWithPages(request, {
     previousSetup: {
-      listPageUrl: "https://example.test/reviews",
-      rulesVersion: 6,
-      rules: {
-        kind: "review",
-        articles: {
-          oneArticlePer: "body",
-          link: "a.review",
-          skipWhen: null,
-          nextPage: null,
-          limit: 25,
-        },
-        article: {
-          canonicalUrl: null,
-          title: {
-            try: [
-              {
-                get: "text",
-                selector: "h1",
-                take: "first",
-                startsWith: null,
-                clean: null,
-              },
-            ],
-          },
-          publishedDate: {
-            try: [
-              {
-                get: "text",
-                selector: "time",
-                take: "first",
-                startsWith: null,
-                clean: null,
-              },
-            ],
-          },
-          reviews: {
-            inside: "body",
-            oneReviewPer: "element",
-            selector: "article.review",
-            name: {
-              try: [
-                {
-                  get: "text",
-                  from: "review",
-                  selector: "h2",
-                  take: "first",
-                  startsWith: null,
-                  clean: null,
-                },
-              ],
-            },
-            reviewer: null,
-            tastingNotes: null,
-            score: null,
-          },
-        },
-      },
+      listPageUrl: listPage.url,
+      rulesVersion: 11,
+      rules: checked.rules,
       matchedPageUrls: ["https://example.test/reviews/one"],
     },
-    request,
-    checkRules: async () => ({
-      status: "passed" as const,
-      checked: "parsed review",
-    }),
   });
-
-  const firstRequest = request.mock.calls[0]?.[0];
-  expect(firstRequest?.input).toMatchObject([
-    {
-      role: "user",
-      content: expect.stringContaining(
-        '"matchedPageUrls":["https://example.test/reviews/one"]',
-      ),
-    },
-  ]);
-  expect(firstRequest?.input).toMatchObject([
-    {
-      content: expect.stringContaining('"rulesVersion":6'),
-    },
-  ]);
-  expect(firstRequest?.input).toMatchObject([
-    {
-      content: expect.stringContaining('"link":"a.review"'),
-    },
-  ]);
-  expect(firstRequest?.instructions).toContain(
-    "preserve the kinds of items its working rules included and excluded",
+  expect(JSON.stringify(request.mock.calls[0]?.[0].input)).toContain(
+    "matchedPageUrls",
+  );
+  expect(JSON.stringify(request.mock.calls[0]?.[0].input)).toContain(
+    "/reviews/one",
   );
 });
 
-test("accepts catalog rules without price or review fields", async () => {
+test("tests catalog rules without price fields or saved publisher prose", async () => {
+  const checked = catalogRuleCheck();
   const request = vi
-    .fn()
-    .mockResolvedValue(toolCallResponse("catalog", catalogRuleCheck()));
-  const result = await runScrapeSourceSetupAgent({
-    conversationId: "scrape_source:2",
-    externalSiteRunId: 11,
-    kind: "catalog",
-    scrapeSourceId: 2,
-    listPages: [
-      {
-        url: "https://example.test/whisky",
-        html: '<article class="product"><a href="/whisky/one">One</a></article>',
-      },
-    ],
-    detailPages: [],
-    request,
-    checkRules: async () => ({
-      status: "passed" as const,
-      checked: "parsed catalog",
-    }),
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(toolCallResponse("catalog", checked))
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request, {
+    rules: checked.rules,
+    html: '<h1>Official Release</h1><span class="abv">46%</span><p>Publisher prose.</p>',
   });
-
-  expect(result.checked).toBe("parsed catalog");
-  expect(result.rules).toMatchObject({
-    kind: "catalog",
-    detail: { name: "h1", abv: ".abv" },
-  });
-  expect(request.mock.calls[0]?.[0].instructions).toContain(
-    "Catalog sources do not require a review, price, currency, or volume.",
-  );
+  expect(result.rules).toEqual(checked.rules);
+  expect(result.preview.pages).toMatchObject([
+    {
+      kind: "catalog",
+      products: [
+        { name: "Official Release", sourceBottleIdentity: { abv: 46 } },
+      ],
+    },
+  ]);
+  expect(JSON.stringify(result.preview)).not.toContain("Publisher prose");
 });
 
-test("accepts canonical, automatic date, and score selectors", async () => {
-  const base = reviewRuleCheck("h1");
-  const ruleCheck = {
+test("tests canonical, automatic date, and score selectors", async () => {
+  const base = reviewRuleCheck(".bottle-name");
+  const checked = {
     ...base,
     rules: {
       ...base.rules,
@@ -424,50 +436,31 @@ test("accepts canonical, automatic date, and score selectors", async () => {
         date: null,
         reviews: {
           ...base.rules.detail.reviews,
-          score: {
-            selector: ".rating",
-            outOf: 100,
-          },
+          score: { selector: ".rating", outOf: 100 },
         },
       },
     },
   };
-  const checkRules = vi.fn(async () => ({
-    status: "passed" as const,
-    checked: "parsed mapped review",
-  }));
-
-  const result = await runScrapeSourceSetupAgent({
-    conversationId: "scrape_source:1",
-    externalSiteRunId: 10,
-    kind: "review",
-    scrapeSourceId: 1,
-    listPages: [
-      {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">Review</a>',
-      },
-    ],
-    detailPages: [],
-    request: vi.fn().mockResolvedValue(toolCallResponse("mapped", ruleCheck)),
-    checkRules,
+  const request = vi
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(toolCallResponse("checked", checked))
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request, {
+    html:
+      article.replace(
+        "</article>",
+        '<span class="rating">88</span></article>',
+      ) + '<link rel="canonical" href="https://example.test/reviews/one">',
   });
-
-  expect(result.rules).toMatchObject({
-    detail: {
-      url: 'link[rel="canonical"]',
-      date: null,
-      reviews: {
-        score: { selector: ".rating", outOf: 100 },
-      },
-    },
-  });
-  expect(checkRules).toHaveBeenCalledOnce();
+  expect(result.rules).toEqual(checked.rules);
+  expect(result.preview.pages).toMatchObject([
+    { reviews: [{ nativeScore: { value: 88, scale: 100 } }] },
+  ]);
 });
 
-test("uses review names to split unwrapped reviews", async () => {
-  const base = reviewRuleCheck("h2");
-  const ruleCheck = {
+test("tests unwrapped reviews using name boundaries", async () => {
+  const base = reviewRuleCheck(".bottle-name");
+  const checked = {
     ...base,
     rules: {
       ...base.rules,
@@ -478,79 +471,48 @@ test("uses review names to split unwrapped reviews", async () => {
           area: ".entry-content",
           item: null,
           name: "h2.review",
+          tastingNotes: null,
         },
       },
     },
   };
-
   const request = vi
-    .fn()
-    .mockResolvedValue(toolCallResponse("sections", ruleCheck));
-  const result = await runScrapeSourceSetupAgent({
-    conversationId: "scrape_source:1",
-    externalSiteRunId: 10,
-    kind: "review",
-    scrapeSourceId: 1,
-    listPages: [
-      {
-        url: "https://example.test/reviews",
-        html: '<a class="review" href="/reviews/one">Review</a>',
-      },
-    ],
-    detailPages: [],
-    request,
-    checkRules: vi.fn(async () => ({
-      status: "passed" as const,
-      checked: "parsed sections",
-    })),
+    .fn<(input: SetupAgentModelRequest) => Promise<SetupAgentModelResponse>>()
+    .mockResolvedValueOnce(toolCallResponse("checked", checked))
+    .mockResolvedValueOnce(finishResponse());
+  const result = await runAgentWithPages(request, {
+    html: '<h1>Reviews</h1><time datetime="2026-08-12"></time><div class="entry-content"><h2 class="review">Coastal Malt</h2><p>Smoke.</p><h2 class="review">Island Malt</h2><p>Salt.</p></div>',
   });
-
-  expect(result.rules).toMatchObject({
-    kind: "review",
-    detail: {
-      reviews: {
-        area: ".entry-content",
-        item: null,
-        name: "h2.review",
-      },
-    },
-  });
-  expect(request.mock.calls[0]?.[0].instructions).toContain(
-    "Code trims spaces, makes full URLs, and reads prices, scores, dates, and volumes.",
-  );
-  expect(request.mock.calls[0]?.[0].instructions).not.toContain("addStart");
+  expect(result.preview.pages).toMatchObject([
+    { reviews: [{ name: "Coastal Malt" }, { name: "Island Malt" }] },
+  ]);
 });
 
-test("stops after the rule-check limit", async () => {
+test("does not send unexpected tool failures back to the model as invalid arguments", async () => {
   const request = vi.fn(async () =>
-    toolCallResponse("failed", reviewRuleCheck(".bad")),
+    toolCallResponse("checked", reviewRuleCheck(".bottle-name")),
   );
-
+  const error = new SyntaxError("The page loader failed unexpectedly.");
   await expect(
-    runScrapeSourceSetupAgent({
-      conversationId: "scrape_source:1",
-      externalSiteRunId: 10,
-      kind: "review",
-      scrapeSourceId: 1,
-      listPages: [
-        { url: "https://example.test/reviews", html: "<main></main>" },
-      ],
-      detailPages: [],
-      request,
-      checkRules: async () => ({
-        status: "failed" as const,
-        feedback: {
-          message: "The rules still fail.",
-          issues: [
-            {
-              field: "article.reviews.name",
-              message: "No item name was found.",
-            },
-          ],
-        },
-        inspectedPages: [],
-      }),
+    runAgentWithPages(request, {
+      loadPage: async () => {
+        throw error;
+      },
     }),
-  ).rejects.toThrow("The rules still fail.");
+  ).rejects.toBe(error);
+  expect(request).toHaveBeenCalledTimes(1);
+});
+
+test("stops after three failed rule tests", async () => {
+  const request = vi.fn(async () =>
+    toolCallResponse("bad", reviewRuleCheck(".bad")),
+  );
+  await expect(runAgentWithPages(request)).rejects.toThrow("rule test limit");
   expect(request).toHaveBeenCalledTimes(3);
+});
+
+test("stops a model that never submits tested rules", async () => {
+  const request = vi.fn(async () => finishResponse());
+  await expect(runAgentWithPages(request)).rejects.toThrow("model call limit");
+  expect(request).toHaveBeenCalledTimes(8);
 });
