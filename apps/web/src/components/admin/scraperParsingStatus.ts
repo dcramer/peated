@@ -32,6 +32,10 @@ export function needsScrapeRulesUpdate(source: {
   return Boolean(latest && latest.rulesVersion < SCRAPE_RULES_VERSION);
 }
 
+export function canSuggestScrapeRules({ setup }: Pick<Source, "setup">) {
+  return setup?.status !== "queued" && setup?.status !== "running";
+}
+
 export function getSetupSteps(source: SetupSource) {
   const latest = source.revisions[0];
   const setupStatus = getSetupAfterLatestVersion(source)?.status;

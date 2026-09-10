@@ -1,6 +1,7 @@
 import { SCRAPE_RULES_VERSION } from "@peated/server/schemas";
 import { describe, expect, it } from "vitest";
 import {
+  canSuggestScrapeRules,
   getSetupAfterLatestVersion,
   getSetupDescription,
   getSetupSteps,
@@ -14,6 +15,30 @@ const failedSetup = {
   createdAt: "2026-08-29T23:19:00.000Z",
   completedAt: "2026-08-29T23:20:00.000Z",
 };
+
+describe("canSuggestScrapeRules", () => {
+  it.each(["queued", "running"] as const)(
+    "blocks rebuilding while setup is %s",
+    (status) => {
+      expect(canSuggestScrapeRules({ setup: { ...failedSetup, status } })).toBe(
+        false,
+      );
+    },
+  );
+
+  it.each(["failed", "succeeded"] as const)(
+    "allows another setup after it %s",
+    (status) => {
+      expect(canSuggestScrapeRules({ setup: { ...failedSetup, status } })).toBe(
+        true,
+      );
+    },
+  );
+
+  it("allows the first setup", () => {
+    expect(canSuggestScrapeRules({ setup: null })).toBe(true);
+  });
+});
 
 describe("getSetupAfterLatestVersion", () => {
   it("ignores a failed setup when a newer version exists", () => {
