@@ -424,12 +424,14 @@ async function repointBottleConsumers(
       .set({
         currentBottleId: sql`CASE WHEN ${table.currentBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${table.currentBottleId} END`,
         suggestedBottleId: sql`CASE WHEN ${table.suggestedBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${table.suggestedBottleId} END`,
+        legacyParentBottleId: sql`CASE WHEN ${table.legacyParentBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${table.legacyParentBottleId} END`,
         updatedAt: new Date(),
       })
       .where(
         or(
           eq(table.currentBottleId, sourceBottleId),
           eq(table.suggestedBottleId, sourceBottleId),
+          eq(table.legacyParentBottleId, sourceBottleId),
         ),
       )
       .returning({ id: table.id });
@@ -575,6 +577,7 @@ export async function lockBottleMergeDependencies(
       or(
         inArray(storePriceMatchProposals.currentBottleId, bottleIds),
         inArray(storePriceMatchProposals.suggestedBottleId, bottleIds),
+        inArray(storePriceMatchProposals.legacyParentBottleId, bottleIds),
       ),
     )
     .orderBy(asc(storePriceMatchProposals.id))
@@ -586,6 +589,7 @@ export async function lockBottleMergeDependencies(
       or(
         inArray(storePriceMatchAttempts.currentBottleId, bottleIds),
         inArray(storePriceMatchAttempts.suggestedBottleId, bottleIds),
+        inArray(storePriceMatchAttempts.legacyParentBottleId, bottleIds),
       ),
     )
     .orderBy(asc(storePriceMatchAttempts.id))
