@@ -111,7 +111,7 @@ export default function AutomationPage() {
       ) : null}
       {error ? <Alert type="error">{error}</Alert> : null}
       <AdminSection
-        title="Needs attention"
+        title="Stopped work"
         description={`${data.needsAttention.length} items`}
       >
         {data.needsAttention.length ? (
@@ -135,7 +135,7 @@ export default function AutomationPage() {
             ]}
           />
         ) : (
-          "No background work needs attention."
+          "No background work has stopped."
         )}
       </AdminSection>
       <AdminSection

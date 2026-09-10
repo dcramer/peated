@@ -40,15 +40,35 @@ const operations = {
   recentRuns: [],
 };
 
+const inboxCounts = {
+  all: 23,
+  listing: 18,
+  catalog: 5,
+  blocked: 2,
+  inconclusive: 7,
+};
+
 describe("OperationsOverview", () => {
   it("distinguishes unknown, new, and matched Bottles", () => {
     const html = renderToStaticMarkup(
       <OperationsOverview
         bottleResolution={{ unknown: 8, created: 6, matched: 75 }}
         data={operations}
+        inboxCounts={inboxCounts}
       />,
     );
 
+    expect(html).toContain("Moderation inbox");
+    expect(html).toContain("open decisions");
+    expect(html).toContain(">23</strong>");
+    expect(html).toContain('href="/admin/moderation/inbox"');
+    expect(html).toContain("Open inbox");
+    expect(html).toContain("Background work");
+    expect(html).toContain("failed items");
+    expect(html).toContain('href="/admin/moderation/automation"');
+    expect(html).toContain("View background work");
+    expect(html).not.toContain("Needs attention");
+    expect(html).not.toContain("System status");
     expect(html).toContain("Bottle resolution");
     expect(html).toContain("Unknown");
     expect(html).toContain("New bottles");
@@ -59,7 +79,6 @@ describe("OperationsOverview", () => {
     expect(html).toContain("90% · 72 checked");
     expect(html).toContain("New Bottles");
     expect(html).toContain("29% · 28 checked");
-    expect(html).toContain("View work");
   });
 
   it("uses a compact empty state when there are no new source items", () => {
@@ -67,6 +86,7 @@ describe("OperationsOverview", () => {
       <OperationsOverview
         bottleResolution={{ unknown: 0, created: 0, matched: 0 }}
         data={operations}
+        inboxCounts={inboxCounts}
       />,
     );
 

@@ -12,11 +12,16 @@ import { useSuspenseQueries } from "@tanstack/react-query";
 
 export default function Page() {
   const orpc = useORPC();
-  const [scraperQuery, operationsQuery] = useSuspenseQueries({
+  const [scraperQuery, operationsQuery, inboxQuery] = useSuspenseQueries({
     queries: [
       orpc.admin.scraperActivity.queryOptions({ refetchInterval: 60_000 }),
       orpc.admin.moderation.automation.queryOptions({
         refetchInterval: 5_000,
+      }),
+      orpc.admin.moderation.listTasks.queryOptions({
+        input: { limit: 1 },
+        refetchOnMount: "always",
+        staleTime: 0,
       }),
     ],
   });
@@ -27,7 +32,7 @@ export default function Page() {
     <AdminPage>
       <AdminPageHeader
         title="Operations"
-        description="See what Peated is processing and what needs attention."
+        description="Review open decisions, check background work, and track incoming data."
         metadata={
           <>
             Updated <TimeSince date={operations.generatedAt} />
@@ -37,6 +42,7 @@ export default function Page() {
       <OperationsOverview
         bottleResolution={scraperActivity.bottleResolution}
         data={operations}
+        inboxCounts={inboxQuery.data.counts}
       />
       <ScraperActivity data={scraperActivity} />
     </AdminPage>

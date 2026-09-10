@@ -31,7 +31,8 @@ History combines completed listing decisions, reviewed catalog changes, and
 closed checks. Show only facts recorded by those sources. Label a missing actor
 or reason as unavailable.
 
-The admin overview shows live queue totals, recent price-matching results, and
-the current Bottle resolution of review and price inputs added in the last 30
-days. Background work shows retry runs and catalog changes that stopped. It is
-not a measure of decision accuracy and cannot approve a catalog change.
+The admin overview shows open Inbox decisions separately from failed and active
+background work. It also shows recent price-matching results and the current
+Bottle resolution of review and price inputs added in the last 30 days.
+Background work shows retry runs and catalog changes that stopped. It is not a
+measure of decision accuracy and cannot approve a catalog change.
