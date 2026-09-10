@@ -42,6 +42,13 @@ const BRUICHLADDICH_PRODUCT_URLS = BRUICHLADDICH_PRODUCT_SLUGS.map(
   (slug) => `${BRUICHLADDICH_ORIGIN}/products/${slug}`,
 );
 const BRUICHLADDICH_MERCH_URL = `${BRUICHLADDICH_ORIGIN}/products/laddie-t-shirt`;
+const WHISKYFUN_ORIGIN = "https://www.whiskyfun.com";
+const WHISKYFUN_FEED_URL = `${WHISKYFUN_ORIGIN}/whatsnew.xml`;
+const WHISKYFUN_ARTICLE_URLS = [
+  `${WHISKYFUN_ORIGIN}/2026/A-trio-of-coastal-malts-090826.html`,
+  `${WHISKYFUN_ORIGIN}/2026/Two-old-island-malts-080826.html`,
+  `${WHISKYFUN_ORIGIN}/2026/A-pair-of-highlanders-070826.html`,
+] as const;
 
 const WEBSITE_PAGES = new Map([
   [
@@ -246,6 +253,120 @@ const BRUICHLADDICH_V6_RULES = {
   },
 } as const satisfies StoredScrapeRules;
 
+function whiskyfunArticle(
+  title: string,
+  reviews: Array<[name: string, notes: string, score: number]>,
+) {
+  const oversizedMapName = "Map".repeat(30_000);
+  return `<!doctype html><html><head><title>${title}</title></head><body>
+    <map name="${oversizedMapName}"><area href="#reviews"></map>
+    <table id="reviews"><tbody>${reviews
+      .map(
+        ([name, notes, score]) => `<tr><td class="TextenormalNEW">
+          <span class="textegrandfoncegras">${name}</span>
+          <p>${notes}</p><strong>SGP:561 - ${score} points.</strong>
+        </td></tr>`,
+      )
+      .join("")}</tbody></table>
+  </body></html>`;
+}
+
+const WHISKYFUN_REVIEWS = [
+  ["Coastal Malt 12 yo", "Coastal Malt 18 yo", "Coastal Malt 25 yo"],
+  ["Island Malt 10 yo", "Island Malt 21 yo"],
+  ["Highland Malt 8 yo", "Highland Malt 30 yo"],
+] as const;
+
+const WHISKYFUN_PAGES = new Map<string, string>([
+  [
+    WHISKYFUN_FEED_URL,
+    `<?xml version="1.0"?><rss><channel>${WHISKYFUN_ARTICLE_URLS.map(
+      (url, index) =>
+        `<item><title>Whisky article ${index + 1}</title><link>${url}</link></item>`,
+    ).join("")}</channel></rss>`,
+  ],
+  ...WHISKYFUN_ARTICLE_URLS.map(
+    (url, index) =>
+      [
+        url,
+        whiskyfunArticle(
+          `Whisky article ${index + 1}`,
+          WHISKYFUN_REVIEWS[index]!.map((name, reviewIndex) => [
+            name,
+            `Tasting notes for ${name}.`,
+            87 + reviewIndex,
+          ]),
+        ),
+      ] as const,
+  ),
+]);
+
+const WHISKYFUN_V9_RULES = {
+  kind: "review",
+  articles: {
+    document: "xml",
+    oneArticlePer: "item",
+    link: "link",
+    skipWhen: null,
+    nextPage: null,
+    limit: 25,
+  },
+  article: {
+    canonicalUrl: null,
+    title: {
+      try: [
+        {
+          get: "text",
+          selector: "title",
+          take: "first",
+          match: null,
+          addStart: null,
+          addEnd: null,
+        },
+      ],
+    },
+    publishedDate: {
+      try: [{ get: "dateFromUrl", format: "*ddMMyy.html" }],
+    },
+    reviews: {
+      inside: "body",
+      oneReviewPer: "element",
+      selector: "td.TextenormalNEW",
+      contains: ".textegrandfoncegras",
+      name: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: ".textegrandfoncegras",
+            take: "first",
+            match: null,
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+      },
+      reviewer: null,
+      tastingNotes: null,
+      score: {
+        try: [
+          {
+            get: "text",
+            from: "review",
+            selector: "strong",
+            take: "first",
+            match: null,
+            addStart: null,
+            addEnd: null,
+          },
+        ],
+        scale: 100,
+        map: null,
+      },
+    },
+  },
+} as const satisfies StoredScrapeRules;
+
 function getFixtureHtml(url: string) {
   const html = WEBSITE_PAGES.get(url);
   if (html === undefined) {
@@ -291,7 +412,7 @@ async function completeSavedRun({
 }
 
 describe.skipIf(!isAIGatewayConfigured("scraper"))(
-  "price rule suggestion eval",
+  "rule suggestion eval",
   () => {
     test("generated selectors extract the exact price fields", async () => {
       const [admin] = await db
@@ -599,6 +720,121 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
       expect(
         fixtureWebsite.requests.slice(requestsBeforePreview),
       ).not.toContain(BRUICHLADDICH_MERCH_URL);
+    });
+
+    test("migrates noisy multi-review pages to working v11 rules", async () => {
+      const [admin] = await db
+        .insert(users)
+        .values({
+          admin: true,
+          email: "whiskyfun-scraper-eval@example.com",
+          username: "whiskyfun-scraper-eval",
+        })
+        .returning();
+      if (!admin) throw new Error("Failed to create eval admin.");
+
+      const { site, source } = await createSiteWithScrapeSource({
+        createdById: admin.id,
+        kind: "review",
+        websiteUrl: WHISKYFUN_FEED_URL,
+        name: "Whiskyfun Fixture",
+        sampleUrls: [],
+      });
+      await db
+        .update(scrapeTargets)
+        .set({ minimumSpacingMs: 1_000, requestsPerWindow: 3_600 })
+        .where(eq(scrapeTargets.key, site.type));
+      await db
+        .update(scrapeOrigins)
+        .set({
+          robotsMode: "not_applicable",
+          robotsRationale: "The eval intercepts this public origin.",
+        })
+        .where(eq(scrapeOrigins.origin, WHISKYFUN_ORIGIN));
+      await db.insert(scrapeSourceRevisions).values({
+        scrapeSourceId: source.id,
+        revision: 1,
+        rulesVersion: 9,
+        listUrl: WHISKYFUN_FEED_URL,
+        rules: WHISKYFUN_V9_RULES,
+        author: "person",
+        active: true,
+        previewStatus: "passed",
+        previewResult: {
+          issues: [],
+          pages: WHISKYFUN_ARTICLE_URLS.map((url) => ({
+            kind: "review" as const,
+            url,
+            title: "Prior preview",
+            publishedAt: null,
+            reviews: [],
+          })),
+        },
+        createdById: admin.id,
+      });
+
+      const fixtureWebsite = createFixtureWebsite(WHISKYFUN_PAGES);
+      const registry = createScraperRegistry({ sources: [], targets: [] });
+      const suggestionRun = await createScrapeSourceSuggestionRun({
+        requestedById: admin.id,
+        scrapeSourceId: source.id,
+      });
+      await expect(
+        executeScraperRun(
+          { runId: suggestionRun.id },
+          { fetchImpl: fixtureWebsite.fetchImpl, registry },
+        ),
+      ).resolves.toEqual({ status: "completed" });
+
+      const [suggestedRevision] = await db
+        .select()
+        .from(scrapeSourceRevisions)
+        .where(
+          and(
+            eq(scrapeSourceRevisions.scrapeSourceId, source.id),
+            eq(scrapeSourceRevisions.author, "ai"),
+          ),
+        );
+      if (!suggestedRevision) throw new Error("AI did not create a revision.");
+      expect(suggestedRevision).toMatchObject({
+        aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
+        listUrl: WHISKYFUN_FEED_URL,
+        rulesVersion: 11,
+      });
+
+      const rules = loadExecutableScrapeRules(
+        suggestedRevision.rulesVersion,
+        suggestedRevision.rules,
+      );
+      expect(
+        rules.parseList(
+          WHISKYFUN_PAGES.get(WHISKYFUN_FEED_URL)!,
+          new URL(WHISKYFUN_FEED_URL),
+        ),
+      ).toMatchObject({
+        issues: [],
+        links: [...WHISKYFUN_ARTICLE_URLS],
+      });
+      for (const [index, url] of WHISKYFUN_ARTICLE_URLS.entries()) {
+        const parsed = rules.parseDetail(
+          WHISKYFUN_PAGES.get(url)!,
+          new URL(url),
+        );
+        expect(parsed.issues).toEqual([]);
+        if (parsed.kind !== "review" || !parsed.value) {
+          throw new Error("Generated rules did not parse a review page.");
+        }
+        expect(
+          parsed.value.article.externalReviews.map((review) => review.name),
+        ).toEqual([...WHISKYFUN_REVIEWS[index]!]);
+        expect(
+          parsed.value.article.externalReviews.map(
+            (review) => review.nativeScore?.value,
+          ),
+        ).toEqual(
+          WHISKYFUN_REVIEWS[index]!.map((_, reviewIndex) => 87 + reviewIndex),
+        );
+      }
     });
   },
 );

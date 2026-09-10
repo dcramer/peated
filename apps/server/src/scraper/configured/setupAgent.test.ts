@@ -126,6 +126,31 @@ test("keeps links and review facts after a large page header", () => {
   expect(pages[0]!.html).toContain("/* page script */");
 });
 
+test("keeps review facts after abnormally large HTML attributes", () => {
+  const oversizedMapName = "Map".repeat(30_000);
+  const [prepared] = preparePagesForSetup([
+    {
+      url: "https://example.test/reviews/one",
+      html: `<html><body>
+        <map name="${oversizedMapName}"><area href="#reviews"></map>
+        <article class="review">
+          <h1>Autumn reviews</h1>
+          <time datetime="2026-09-08">September 8</time>
+          <h2 class="bottle-name">North Coast 12</h2>
+          <p>Orange and oak.</p>
+        </article>
+      </body></html>`,
+    },
+  ]);
+  const $ = load(prepared!.html);
+
+  expect(prepared!.html.length).toBeLessThanOrEqual(75_000);
+  expect($("map").attr("name")).toHaveLength(500);
+  expect($("article.review .bottle-name").text()).toBe("North Coast 12");
+  expect($("article.review time").attr("datetime")).toBe("2026-09-08");
+  expect($("article.review p").text()).toBe("Orange and oak.");
+});
+
 test("keeps feed links visible to the setup agent", () => {
   const [prepared] = preparePagesForSetup([
     {

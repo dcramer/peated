@@ -243,6 +243,34 @@ test("rejects suggested rules that do not parse a detail page", async () => {
   ).rejects.toThrow("The rules did not read an article or product page.");
 });
 
+test("reports a supplied detail page before its rules fail", async () => {
+  const checkedPages: string[] = [];
+  await expect(
+    checkDetailPages({
+      rules: reviewRules,
+      listPage: {
+        url: "https://example.test/reviews",
+        html: '<a class="review" href="/reviews/one">One</a>',
+        links: ["https://example.test/reviews/one"],
+        firstPageLinks: ["https://example.test/reviews/one"],
+        nextPageUrl: null,
+        nextPage: null,
+      },
+      suppliedPages: [
+        {
+          url: "https://example.test/reviews/one",
+          html: "<main>Unrelated page</main>",
+        },
+      ],
+      loadPage: async () => {
+        throw new Error("A supplied detail page must not be fetched again.");
+      },
+      onCheckPage: (page) => checkedPages.push(page.url),
+    }),
+  ).rejects.toThrow("The rules did not read an article or product page.");
+  expect(checkedPages).toEqual(["https://example.test/reviews/one"]);
+});
+
 test("samples detail links across the full list", () => {
   expect(
     sampleDetailLinks([

@@ -237,6 +237,7 @@ export async function checkDetailPages(input: {
   listPage: SelectedListPage;
   suppliedPages: WebsitePage[];
   loadPage: (url: URL) => Promise<WebsitePage>;
+  onCheckPage?: (page: WebsitePage) => void;
 }): Promise<CheckedDetailPage[]> {
   const suppliedPages = new Map(
     input.suppliedPages.map((page) => [new URL(page.url).toString(), page]),
@@ -245,6 +246,7 @@ export async function checkDetailPages(input: {
   for (const link of sampleDetailLinks(input.listPage.links)) {
     const page =
       suppliedPages.get(link) ?? (await input.loadPage(new URL(link)));
+    input.onCheckPage?.(page);
     pages.push(parseDetailPage(input.rules, page));
   }
   if (pages.length === 0) {
@@ -366,17 +368,25 @@ export async function suggestScrapeSourceRevision(input: {
       });
     },
     checkRules: async (submittedRules) => {
-      const inspectedPages: WebsitePage[] = [];
+      const checkedPages = new Map<string, WebsitePage>();
+      const rememberCheckedPage = (page: WebsitePage) => {
+        checkedPages.set(new URL(page.url).toString(), page);
+      };
       const loadPage = async (url: URL) => {
         const key = url.toString();
         const cached = pageCache.get(key);
-        if (cached) return cached;
-        const page = await input.loadPage(url);
-        pageCache.set(new URL(page.url).toString(), page);
-        inspectedPages.push(page);
+        const page = cached ?? (await input.loadPage(url));
+        if (!cached) pageCache.set(new URL(page.url).toString(), page);
+        rememberCheckedPage(page);
         return page;
       };
       try {
+        const selectedListPage = input.listPages.find(
+          (page) =>
+            new URL(page.url).toString() ===
+            new URL(submittedRules.listPageUrl).toString(),
+        );
+        if (selectedListPage) rememberCheckedPage(selectedListPage);
         const firstListPage = checkListPage({
           listPageUrl: submittedRules.listPageUrl,
           rules: submittedRules.rules,
@@ -392,6 +402,7 @@ export async function suggestScrapeSourceRevision(input: {
           listPage,
           suppliedPages: [...pageCache.values()],
           loadPage,
+          onCheckPage: rememberCheckedPage,
         });
         return {
           status: "passed" as const,
@@ -402,7 +413,7 @@ export async function suggestScrapeSourceRevision(input: {
         return {
           status: "failed" as const,
           feedback: error.feedback(),
-          inspectedPages,
+          inspectedPages: [...checkedPages.values()],
         };
       }
     },
