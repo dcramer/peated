@@ -1,18 +1,6 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { describe, expect, it } from "vitest";
-import {
-  discoverBourbonCultureArticles,
-  parseBourbonCultureArticle,
-} from "../adapters/bourbonCulture";
 import { parseDramfaceArticle } from "../adapters/dramface";
-import { parseCompassBoxProducts } from "../adapters/legacy/scrapeCompassBox";
-import { parseKilchomanProducts } from "../adapters/legacy/scrapeKilchoman";
-import {
-  discoverWhiskeyReviewerArticles,
-  parseWhiskeyReviewerArticle,
-} from "../adapters/whiskeyReviewer";
-import { parseWhiskySagaArticle } from "../adapters/whiskySaga";
-import { parseWhiskyStudyArticle } from "../adapters/whiskyStudy";
 import { loadExecutableScrapeRules } from "./compatibility";
 import {
   parseEarlyScrapeDetail,
@@ -1330,7 +1318,16 @@ test("reads formatted dates from attributes and filters review elements", () => 
 
 function expectReviewFactsAndEvidenceToMatch(
   configured: ReturnType<typeof parseFixtureDetail>,
-  legacy: NonNullable<ReturnType<typeof parseWhiskyStudyArticle>>,
+  expected: {
+    canonicalUrl: string;
+    title: string;
+    publishedAt: Date;
+    name: string;
+    reviewerName: string;
+    nativeScore: { value: number; scale: number; display: string };
+    reviewText: string;
+    bodyIncludes: string[];
+  },
 ) {
   expect(configured.kind).toBe("review");
   expect(configured.issues).toEqual([]);
@@ -1338,23 +1335,21 @@ function expectReviewFactsAndEvidenceToMatch(
     throw new Error("Expected configured review output.");
   }
   const configuredReview = configured.value.article.externalReviews[0];
-  const legacyReview = legacy.article.externalReviews[0];
   expect(configured.value.article).toMatchObject({
-    canonicalUrl: legacy.article.canonicalUrl,
-    title: legacy.article.title,
-    publishedAt: legacy.article.publishedAt,
+    canonicalUrl: expected.canonicalUrl,
+    title: expected.title,
+    publishedAt: expected.publishedAt,
   });
   expect(configuredReview).toMatchObject({
-    name: legacyReview?.name,
-    reviewerName: legacyReview?.reviewerName,
-    nativeScore: legacyReview?.nativeScore,
+    name: expected.name,
+    reviewerName: expected.reviewerName,
+    nativeScore: expected.nativeScore,
   });
-  expect(Object.values(configured.value.externalReviewTexts)).toEqual(
-    Object.values(legacy.externalReviewTexts),
-  );
-  expect(Object.values(configured.value.externalReviewBodies)).toEqual(
-    Object.values(legacy.externalReviewBodies),
-  );
+  expect(Object.values(configured.value.externalReviewTexts)).toEqual([
+    expected.reviewText,
+  ]);
+  const body = Object.values(configured.value.externalReviewBodies)[0];
+  for (const text of expected.bodyIncludes) expect(body).toContain(text);
 }
 
 describe("scrape source parser", () => {
@@ -1451,12 +1446,12 @@ describe("scrape source parser", () => {
   it("matches the current Compass Box parser's available product links", async () => {
     const pageUrl = new URL("https://www.compassboxwhisky.com/collections");
     const html = await loadFixture("compassbox", "bottle-list.html");
-    const legacyLinks = parseCompassBoxProducts(html, pageUrl.toString()).map(
-      ({ url }) => url,
-    );
 
     expect(parseFixtureList(compassBoxRules, html, pageUrl)).toEqual({
-      links: legacyLinks,
+      links: [
+        "https://www.compassboxwhisky.com/products/orchard-house",
+        "https://www.compassboxwhisky.com/products/brulee-royale-1",
+      ],
       nextPageUrl: null,
       issues: [],
     });
@@ -1465,12 +1460,12 @@ describe("scrape source parser", () => {
   it("matches the current Kilchoman parser's available product links", async () => {
     const pageUrl = new URL("https://www.kilchomandistillery.com/whisky-shop/");
     const html = await loadFixture("kilchoman", "bottle-list.html");
-    const legacyLinks = parseKilchomanProducts(html, pageUrl.toString()).map(
-      ({ url }) => url,
-    );
 
     expect(parseFixtureList(kilchomanRules, html, pageUrl)).toEqual({
-      links: legacyLinks,
+      links: [
+        "https://www.kilchomandistillery.com/our-whisky/machir-bay/",
+        "https://www.kilchomandistillery.com/our-whisky/13-years-old/",
+      ],
       nextPageUrl: null,
       issues: [],
     });
@@ -1479,12 +1474,12 @@ describe("scrape source parser", () => {
   it("matches the current Bourbon Culture parser's latest review links", async () => {
     const pageUrl = new URL("https://thebourbonculture.com/");
     const html = await loadFixture("bourbonculture", "index.html");
-    const legacyLinks = discoverBourbonCultureArticles(html).map(
-      (url) => url.href,
-    );
 
     expect(parseFixtureList(bourbonCultureRules, html, pageUrl)).toEqual({
-      links: legacyLinks,
+      links: [
+        "https://thebourbonculture.com/whiskey-reviews/example-bourbon-review/",
+        "https://thebourbonculture.com/whiskey-reviews/example-rye-review/",
+      ],
       nextPageUrl: null,
       issues: [],
     });
@@ -1493,9 +1488,6 @@ describe("scrape source parser", () => {
   it("matches the current Whiskey Reviewer article links", async () => {
     const pageUrl = new URL("https://whiskeyreviewer.com/");
     const html = await loadFixture("whiskeyreviewer", "index.html");
-    const legacyLinks = discoverWhiskeyReviewerArticles(html).map(
-      (url) => url.href,
-    );
 
     expect(parseFixtureList(whiskeyReviewerRules, html, pageUrl)).toEqual({
       links: [
@@ -1505,11 +1497,6 @@ describe("scrape source parser", () => {
       nextPageUrl: null,
       issues: [],
     });
-    expect(
-      parseFixtureList(whiskeyReviewerRules, html, pageUrl).links.map((url) =>
-        url.replace(/\/$/u, ""),
-      ),
-    ).toEqual(legacyLinks);
   });
 
   it.each([
@@ -1659,30 +1646,21 @@ describe("scrape source parser", () => {
       "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026/",
     );
     const html = await loadFixture("whiskeyreviewer", "review.html");
-    const legacy = parseWhiskeyReviewerArticle(html, pageUrl);
     const configured = parseFixtureDetail(whiskeyReviewerRules, html, pageUrl);
 
-    expect(configured.kind).toBe("review");
-    expect(configured.issues).toEqual([]);
-    if (configured.kind !== "review" || !configured.value) {
-      throw new Error("Expected configured review output.");
-    }
-    expect(configured.value.article).toMatchObject({
-      canonicalUrl: legacy.article.canonicalUrl,
-      title: legacy.article.title,
-      publishedAt: legacy.article.publishedAt,
+    expect(configured).toMatchObject({ kind: "review", issues: [] });
+    expectReviewFactsAndEvidenceToMatch(configured, {
+      canonicalUrl:
+        "https://whiskeyreviewer.com/2026/08/example-bourbon-review-081026",
+      title: "Example 8 Year Old Bourbon Review",
+      publishedAt: new Date("2026-08-10T00:00:00.000Z"),
+      name: "Example 8 Year Old Bourbon",
+      reviewerName: "Rowan Hill",
+      nativeScore: { value: 87, scale: 100, display: "B+" },
+      reviewText:
+        "The Bourbon The nose has orange peel and vanilla. The palate adds oak spice. The finish is long and dry.",
+      bodyIncludes: ["The Price"],
     });
-    expect(configured.value.article.externalReviews[0]).toMatchObject({
-      name: legacy.article.externalReviews[0]?.name,
-      reviewerName: legacy.article.externalReviews[0]?.reviewerName,
-      nativeScore: legacy.article.externalReviews[0]?.nativeScore,
-    });
-    expect(Object.values(configured.value.externalReviewTexts)).toEqual(
-      Object.values(legacy.externalReviewTexts),
-    );
-    expect(Object.values(configured.value.externalReviewBodies)).toEqual(
-      Object.values(legacy.externalReviewBodies),
-    );
   });
 
   it("rejects conflicting URL dates and unmapped scores", async () => {
@@ -1791,14 +1769,20 @@ describe("scrape source parser", () => {
       "<head>",
       '<head><meta itemprop="datePublished" content="2026-07-04T12:03:15-0700"><meta itemprop="author" content="Chris Ellis">',
     );
-    const legacy = parseWhiskyStudyArticle(html, url);
-    expect(legacy).not.toBeNull();
-    if (!legacy) throw new Error("Expected legacy review output.");
+    const configured = parseFixtureDetail(whiskyStudyRules, html, url);
 
-    expectReviewFactsAndEvidenceToMatch(
-      parseFixtureDetail(whiskyStudyRules, html, url),
-      legacy,
-    );
+    expect(configured).toMatchObject({ kind: "review", issues: [] });
+    expectReviewFactsAndEvidenceToMatch(configured, {
+      canonicalUrl: url.href,
+      title: "Example Scotch 18 Year Shelf Review",
+      publishedAt: new Date("2026-07-04T19:03:15.000Z"),
+      name: "Example Scotch 18 Year",
+      reviewerName: "Chris Ellis",
+      nativeScore: { value: 92, scale: 100, display: "92/100" },
+      reviewText:
+        "Nose: Orchard fruit and soft wax. Palate: Malt, citrus, and gentle oak. Finish: Long and lightly spiced.",
+      bodyIncludes: ["This introduction", "Final Thoughts"],
+    });
   });
 
   it("matches the current Whisky Saga parser facts and evidence", async () => {
@@ -1807,14 +1791,20 @@ describe("scrape source parser", () => {
       "<head>",
       '<head><meta itemprop="datePublished" content="2026-08-17T22:36:08+0200"><meta itemprop="author" content="Thomas Øhrbom">',
     );
-    const legacy = parseWhiskySagaArticle(html, url);
-    expect(legacy).not.toBeNull();
-    if (!legacy) throw new Error("Expected legacy review output.");
+    const configured = parseFixtureDetail(whiskySagaRules, html, url);
 
-    expectReviewFactsAndEvidenceToMatch(
-      parseFixtureDetail(whiskySagaRules, html, url),
-      legacy,
-    );
+    expect(configured).toMatchObject({ kind: "review", issues: [] });
+    expectReviewFactsAndEvidenceToMatch(configured, {
+      canonicalUrl: url.href,
+      title: "Example Scotch 18 YO",
+      publishedAt: new Date("2026-08-17T20:36:08.000Z"),
+      name: "Example Scotch 18 YO",
+      reviewerName: "Thomas Øhrbom",
+      nativeScore: { value: 92, scale: 100, display: "92/100" },
+      reviewText:
+        "Nose: Orchard fruit and soft wax. Palate: Malt, citrus, and gentle oak. Finish: Long and lightly spiced.",
+      bodyIncludes: ["This introduction", "Comment: A balanced release."],
+    });
   });
 
   it("matches the current Bourbon Culture parser facts and evidence", async () => {
@@ -1822,13 +1812,20 @@ describe("scrape source parser", () => {
       "https://thebourbonculture.com/whiskey-reviews/example-bourbon-review/",
     );
     const html = await loadFixture("bourbonculture", "review.html");
-    const legacy = parseBourbonCultureArticle(html, url);
-    expect(legacy.article.externalReviews).toHaveLength(1);
+    const configured = parseFixtureDetail(bourbonCultureRules, html, url);
 
-    expectReviewFactsAndEvidenceToMatch(
-      parseFixtureDetail(bourbonCultureRules, html, url),
-      legacy,
-    );
+    expect(configured).toMatchObject({ kind: "review", issues: [] });
+    expectReviewFactsAndEvidenceToMatch(configured, {
+      canonicalUrl: url.href,
+      title: "Example 10 Year Old Bourbon Review",
+      publishedAt: new Date("2026-07-25T21:19:59.000Z"),
+      name: "Example 10 Year Old Bourbon",
+      reviewerName: "Mike & Mike",
+      nativeScore: { value: 9.5, scale: 10, display: "9.5/10" },
+      reviewText:
+        "Nose: Cherry, vanilla, and mature oak. Palate: Caramel and baking spice. Finish: Long, dry, and balanced.",
+      bodyIncludes: ["introduction", "conclusion"],
+    });
   });
 
   it("uses fixed values and literal prefixes before price validation", () => {

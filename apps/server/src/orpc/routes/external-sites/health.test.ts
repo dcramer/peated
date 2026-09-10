@@ -114,8 +114,8 @@ test("health list reports source inventory, runtime, and latest execution", asyn
     },
     lastSucceededAt: null,
     runtime: {
-      registered: true,
-      targetKeys: ["decadentdrinks"],
+      registered: false,
+      targetKeys: [],
       targets: [
         {
           key: "decadentdrinks",
