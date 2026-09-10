@@ -1,6 +1,7 @@
 type SourceCompatibility = {
   matches(url: URL): boolean;
   detailPageUrl?(url: URL): URL;
+  publishedDateFromValue?(value: string): Date | null;
   publishedDateFromUrl?(url: URL): Date | null;
 };
 
@@ -25,6 +26,16 @@ const SOURCE_COMPATIBILITY: SourceCompatibility[] = [
   },
   {
     matches: (url) => url.hostname.endsWith("whiskyfun.com"),
+    publishedDateFromValue: (value) => {
+      const compact = /^(\d{2})(\d{2})(\d{2})$/u.exec(value);
+      return compact
+        ? createDate(
+            2000 + Number(compact[3]),
+            Number(compact[2]),
+            Number(compact[1]),
+          )
+        : null;
+    },
     publishedDateFromUrl: (url) => {
       const compact = url.pathname.match(
         /(?:^|\D)(\d{2})(\d{2})(\d{2})(?:\D|$)/u,
@@ -52,4 +63,11 @@ export function readCompatiblePublishedDate(url: URL) {
     candidate.matches(url),
   );
   return compatibility?.publishedDateFromUrl?.(url) ?? null;
+}
+
+export function readCompatiblePublishedDateValue(value: string, url: URL) {
+  const compatibility = SOURCE_COMPATIBILITY.find((candidate) =>
+    candidate.matches(url),
+  );
+  return compatibility?.publishedDateFromValue?.(value) ?? null;
 }

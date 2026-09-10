@@ -90,8 +90,9 @@ the run. The check and save happen together. If another worker has taken over,
 the old worker cannot overwrite the preview or add another version.
 
 Older rule versions remain supported so saved sources keep working. New
-sources use version 11. Most rule fields are CSS selectors. `list.links` finds article
-or product links. `list.nextPage` can find the next page of links. Links must
+sources use version 11. Most rule fields are CSS selectors supported by Cheerio,
+including relational selectors such as `:has()`. `list.links` finds article or
+product links. `list.nextPage` can find the next page of links. Links must
 stay on the source website. Code reads at most five list pages and stops at
 `list.limit`. It reads `href` from HTML links and text from XML links.
 

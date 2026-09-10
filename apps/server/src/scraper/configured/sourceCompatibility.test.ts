@@ -2,6 +2,7 @@ import { expect, it } from "vitest";
 import {
   applyDetailPageUrlCompatibility,
   readCompatiblePublishedDate,
+  readCompatiblePublishedDateValue,
 } from "./sourceCompatibility";
 
 it("adds the GlenAllachie UK storefront parameter to product URLs", () => {
@@ -26,6 +27,18 @@ it("reads Whiskyfun's compact article date", () => {
   expect(
     readCompatiblePublishedDate(
       new URL("https://example.test/2026/example-article-090826.html"),
+    ),
+  ).toBeNull();
+  expect(
+    readCompatiblePublishedDateValue(
+      "090926",
+      new URL("https://www.whiskyfun.com/2026/example-article.html"),
+    ),
+  ).toEqual(new Date("2026-09-09T00:00:00.000Z"));
+  expect(
+    readCompatiblePublishedDateValue(
+      "090926",
+      new URL("https://example.test/2026/example-article.html"),
     ),
   ).toBeNull();
 });
