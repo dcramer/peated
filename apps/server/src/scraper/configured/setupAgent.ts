@@ -21,6 +21,7 @@ import {
   SCRAPE_SOURCE_MAX_ITEMS,
   SCRAPE_SOURCE_MAX_LIST_PAGES,
   ScrapeCatalogRulesSchema,
+  ScrapeListSchema,
   ScrapePriceRulesSchema,
   ScrapeReviewRulesSchema,
   ScrapeRulesSchema,
@@ -32,9 +33,10 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v27";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v28";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_EXAMPLE_PAGES = 3;
+export const MAX_RULE_TEST_ITEMS = 20;
 const MAX_RULE_TESTS = 3;
 export const MAX_SETUP_MODEL_CALLS = 8;
 const MAX_PAGE_READS = 4;
@@ -61,7 +63,13 @@ export function setupRequestLimit(samplePageCount: number) {
   );
 }
 
-function ruleTestSchema(kind: ScrapeRules["kind"]) {
+function ruleTestSchema(kind: ScrapeRules["kind"], collectionLimit: number) {
+  const rulesSchema =
+    kind === "review"
+      ? ScrapeReviewRulesSchema
+      : kind === "catalog"
+        ? ScrapeCatalogRulesSchema
+        : ScrapePriceRulesSchema;
   return z
     .object({
       listPageUrl: z
@@ -70,12 +78,15 @@ function ruleTestSchema(kind: ScrapeRules["kind"]) {
         .min(1)
         .max(2_000)
         .describe("The exact URL of a collection page you inspected."),
-      rules:
-        kind === "review"
-          ? ScrapeReviewRulesSchema
-          : kind === "catalog"
-            ? ScrapeCatalogRulesSchema
-            : ScrapePriceRulesSchema,
+      rules: rulesSchema.extend({
+        list: ScrapeListSchema.extend({
+          limit: z
+            .literal(collectionLimit)
+            .describe(
+              "The server-owned collection limit. Keep this value; test sampling is separate.",
+            ),
+        }),
+      }),
     })
     .strict();
 }
@@ -251,6 +262,7 @@ type ScrapeSourceSetupAgentInput = {
   conversationId: string;
   externalSiteRunId: number;
   kind: ScrapeRules["kind"];
+  collectionLimit: number;
   scrapeSourceId: number;
   listPages: WebsitePage[];
   detailPages: WebsitePage[];
@@ -389,7 +401,7 @@ async function runSetupTurns(
               );
             }
             const submitted = parseToolArguments(
-              ruleTestSchema(input.kind),
+              ruleTestSchema(input.kind, input.collectionLimit),
               call.arguments,
             );
             const tested = await input.testRules(
@@ -443,9 +455,8 @@ export async function runScrapeSourceSetupAgent(
   const tools: Tool[] = [
     zodResponsesFunction({
       name: "test_rules",
-      description:
-        "Run the collection crawler without importing data. Returns extracted examples, visited pages, and errors. Inspect the results before finishing; passing means the parser worked, not that the selected content is correct.",
-      parameters: ruleTestSchema(input.kind),
+      description: `Run the collection crawler without importing data. Ordinary setup tests sample at most ${MAX_RULE_TEST_ITEMS} detail pages; repairs test the full collection limit. Sampling never changes the saved collection limit. Returns extracted examples, visited pages, and errors. Inspect the results before finishing; passing means the parser worked, not that the selected content is correct.`,
+      parameters: ruleTestSchema(input.kind, input.collectionLimit),
     }),
     zodResponsesFunction({
       name: "read_page",

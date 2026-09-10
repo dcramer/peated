@@ -155,6 +155,38 @@ test("does not pass a repair by excluding the failing page", async () => {
   });
 });
 
+test("repair tests reach failures beyond the ordinary setup sample", async () => {
+  const pages = Object.fromEntries(
+    Array.from({ length: 21 }, (_, i) => [`/review-${i}`, article]),
+  );
+  pages["/reviews"] = Array.from(
+    { length: 21 },
+    (_, i) => `<a class="review" href="/review-${i}">Review ${i}</a>`,
+  ).join("");
+  pages["/review-20"] = "<main>Broken review</main>";
+  const options = {
+    rules: { ...reviewRules, list: { ...reviewRules.list, limit: 99 } },
+  };
+  expect(await testPages(pages, options)).toMatchObject({ status: "passed" });
+  expect(
+    await testPages(pages, {
+      ...options,
+      failureUrl: "https://example.test/review-20",
+    }),
+  ).toMatchObject({ status: "failed" });
+  pages["/review-20"] = article;
+  const repaired = await testPages(pages, {
+    ...options,
+    failureUrl: "https://example.test/review-20",
+  });
+  expect(repaired).toMatchObject({
+    status: "passed",
+    visitedPages: expect.arrayContaining(["https://example.test/review-20"]),
+  });
+  if (repaired.status !== "passed") throw new Error(repaired.feedback.message);
+  expect(repaired.preview.pages).toHaveLength(21);
+});
+
 test("rejects pagination loops through the same crawler used for collection", async () => {
   const result = await testPages(
     {

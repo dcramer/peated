@@ -81,7 +81,7 @@ async function runToCompletion(input: {
   executionToken: string;
 }) {
   const registry = createScraperRegistry({ targets: [], sources: [] });
-  for (let attempt = 1; attempt <= 20; attempt += 1) {
+  for (let attempt = 1; attempt <= 100; attempt += 1) {
     const result = await executeScraperRun(
       { runId: input.runId },
       {
@@ -98,10 +98,10 @@ async function runToCompletion(input: {
     }
     input.clock.advanceTo(result.nextAttemptAt);
   }
-  throw new Error("The test run did not finish within 20 attempts.");
+  throw new Error("The test run did not finish within 100 attempts.");
 }
 
-async function setupSource() {
+async function setupSource(limit: number = oldRules.list.limit) {
   const [user] = await db
     .insert(users)
     .values({
@@ -121,7 +121,7 @@ async function setupSource() {
     scrapeSourceId: created.source.id,
     author: "person",
     createdById: user.id,
-    rules: oldRules,
+    rules: { ...oldRules, list: { ...oldRules.list, limit } },
   });
   await db
     .update(scrapeSourceRevisions)
@@ -558,6 +558,91 @@ test("failed repair stops after three model calls and allows an explicit manual 
   ).toMatchObject([{ active: false, previewStatus: "passed" }]);
 });
 
+test("a sampled setup preserves the collection cap and collects beyond its sample", async () => {
+  const { source, site, user, revision } = await setupSource(99);
+  const rules = { ...oldRules, list: { ...oldRules.list, limit: 99 } };
+  const fetchImpl: typeof fetch = async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/archive") {
+      return new Response(
+        Array.from(
+          { length: 25 },
+          (_, i) => `<a class="review" href="/reviews/${i}">Malt ${i}</a>`,
+        ).join(""),
+      );
+    }
+    if (url.pathname.startsWith("/reviews/")) {
+      return new Response(
+        `<h1>Malt ${url.pathname.split("/").at(-1)}</h1><time datetime="2026-09-08"></time><article class="review"><h3>Coastal Malt</h3><div class="body">Soft smoke.</div></article>`,
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  };
+  const run = await createScrapeSourceSuggestionRun({
+    scrapeSourceId: source.id,
+    requestedById: user.id,
+  });
+  requestModel
+    .mockResolvedValueOnce(
+      ruleResponse({ ...rules, list: { ...rules.list, limit: 20 } }),
+    )
+    .mockImplementation(acceptTestedRules(rules));
+  await runToCompletion({
+    runId: run.id,
+    fetchImpl,
+    clock: testClock(),
+    executionToken: "sampled-setup",
+  });
+  const revisions = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id));
+  const suggested = revisions.find((candidate) => candidate.author === "ai");
+  expect(suggested).toMatchObject({
+    active: false,
+    rulesVersion: 11,
+    rules,
+    previewStatus: "passed",
+  });
+  expect(suggested!.previewResult!.pages).toHaveLength(20);
+  expect(
+    await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, run.id)),
+  ).toMatchObject([{ status: "succeeded", requestCount: 21 }]);
+  expect(
+    revisions.find((candidate) => candidate.id === revision.id),
+  ).toMatchObject({
+    active: true,
+  });
+
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: suggested!.id,
+  });
+  const collection = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: site.id,
+    trigger: "manual",
+    purpose: "collect",
+    requestedById: user.id,
+  });
+  await runToCompletion({
+    runId: collection.run.id,
+    fetchImpl,
+    clock: testClock(),
+    executionToken: "full-collection",
+  });
+  expect(
+    await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, collection.run.id)),
+  ).toMatchObject([{ status: "succeeded", emittedItemCount: 25 }]);
+  // Scraper setup owns the model budget; collection must not invoke it.
+  expect(requestModel).toHaveBeenCalledTimes(3);
+});
+
 test.each([
   {
     rulesVersion: 11,
@@ -576,7 +661,11 @@ test.each([
       scrapeSourceId: source.id,
       requestedById: user.id,
     });
-    requestModel.mockImplementation(acceptTestedRules(repairedRules));
+    const replacement = {
+      ...repairedRules,
+      list: { ...repairedRules.list, limit: 99 },
+    };
+    requestModel.mockImplementation(acceptTestedRules(replacement));
     await expect(
       runToCompletion({
         runId: run.id,
@@ -606,7 +695,7 @@ test.each([
         expect.objectContaining({
           rulesVersion: 11,
           active: false,
-          rules: repairedRules,
+          rules: replacement,
           previewStatus: "passed",
         }),
       ]),

@@ -782,6 +782,7 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         aiInstructionsVersion: AI_INSTRUCTIONS_VERSION,
         listUrl: BRUICHLADDICH_LIST_URL,
         rulesVersion: 11,
+        rules: { list: { limit: 99 } },
       });
 
       const rules = loadExecutableScrapeRules(
