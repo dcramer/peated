@@ -31,7 +31,7 @@ Bootstrap the environment:
 
 ```bash
 docker compose up -d
-pnpm install
+pnpm run setup:local
 ```
 
 Local Postgres is published on `localhost:15432` and Redis is published on
@@ -39,10 +39,11 @@ Local Postgres is published on `localhost:15432` and Redis is published on
 tracked local test database config in `apps/server/.env.test` uses the same
 host ports.
 
-Copy the example environment file into your local-only configuration:
+The setup command copies the example environment file into your local-only
+configuration when it does not already exist. To do only that step, run:
 
 ```bash
-cp .env.example .env.local
+pnpm run setup:env
 ```
 
 `.env.local` is ignored and is copied into Codex-managed worktrees through
@@ -59,15 +60,18 @@ not need Postgres or Redis. Open `http://localhost:3200`. You can sign in with
 any valid email address and any password. If the UI calls an unsupported API
 route, that request returns `404`.
 
-For the Codex local environment setup script, use:
+Codex uses the same `setup:local` command when it creates a worktree. Git hooks
+are shared with the primary checkout, so the Codex environment skips installing
+them again. Codex also has buttons to run the app without the database or check
+the code.
+
+Run the same code checks used before review:
 
 ```bash
-test -f .env.local || cp .env.example .env.local
-SKIP_INSTALL_SIMPLE_GIT_HOOKS=1 pnpm install --frozen-lockfile
+pnpm check
 ```
 
-Git hooks are shared with the primary checkout, so worktrees do not need to
-install them again.
+This checks formatting and common code problems. It does not run all tests.
 
 Setup the database:
 

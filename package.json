@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "description": "",
   "scripts": {
+    "setup:env": "test -f .env.local || cp .env.example .env.local",
+    "setup:local": "pnpm run setup:env && pnpm install --frozen-lockfile",
+    "setup:tools": "pnpx @sentry/dotagents install",
     "build": "turbo build",
     "build:docker": "pnpm --filter='!./apps/web' build",
     "build:packages": "pnpm -r --filter='./packages/*' build",
@@ -30,6 +33,7 @@
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
     "start": "dotenv -e .env.local -- turbo start",
+    "check": "pnpm format:check && pnpm lint && pnpm ast-grep:test && pnpm sherif && pnpm knip && pnpm typecheck",
     "typecheck": "turbo typecheck",
     "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint && pnpm design:lint && pnpm --filter @peated/bottle-classifier run terms:check",
     "design:lint": "designmd lint DESIGN.md",
