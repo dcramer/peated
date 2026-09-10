@@ -4,6 +4,7 @@ import {
   checkDetailPages,
   checkListPage,
   checkNextListPage,
+  checkPreviousListPage,
   sampleDetailLinks,
 } from "./suggestion";
 
@@ -87,6 +88,52 @@ test("checks that pagination adds detail links", async () => {
     "https://example.test/reviews/one",
     "https://example.test/reviews/two",
   ]);
+});
+
+test("rejects list rules that drop the working filters", () => {
+  const page = checkListPage({
+    listPageUrl: "https://example.test/feed.xml",
+    rules: {
+      ...reviewRules,
+      list: { links: "item > link", nextPage: null, limit: 20 },
+    },
+    pages: [
+      {
+        url: "https://example.test/feed.xml",
+        html: `<rss><channel>
+          <item><title>Two malts</title><link>/reviews/malts</link></item>
+          <item><title>A few rums</title><link>/reviews/rums</link></item>
+        </channel></rss>`,
+      },
+    ],
+  });
+  const previousRules = {
+    parseList: () => ({
+      links: ["https://example.test/reviews/malts"],
+      nextPageUrl: null,
+      issues: [],
+    }),
+  };
+
+  expect(() =>
+    checkPreviousListPage({ listPage: page, previousRules }),
+  ).toThrow("The rules changed which pages the working setup includes.");
+
+  const filteredPage = checkListPage({
+    listPageUrl: page.url,
+    rules: {
+      ...reviewRules,
+      list: {
+        links: 'item:not(:has(title:contains("rum"))) > link',
+        nextPage: null,
+        limit: 20,
+      },
+    },
+    pages: [page],
+  });
+  expect(() =>
+    checkPreviousListPage({ listPage: filteredPage, previousRules }),
+  ).not.toThrow();
 });
 
 test("rejects a list page that was not supplied", () => {

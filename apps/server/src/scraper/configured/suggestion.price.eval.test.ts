@@ -45,9 +45,13 @@ const BRUICHLADDICH_MERCH_URL = `${BRUICHLADDICH_ORIGIN}/products/laddie-t-shirt
 const WHISKYFUN_ORIGIN = "https://www.whiskyfun.com";
 const WHISKYFUN_FEED_URL = `${WHISKYFUN_ORIGIN}/whatsnew.xml`;
 const WHISKYFUN_ARTICLE_URLS = [
-  `${WHISKYFUN_ORIGIN}/2026/A-trio-of-coastal-malts-090826.html`,
-  `${WHISKYFUN_ORIGIN}/2026/Two-old-island-malts-080826.html`,
-  `${WHISKYFUN_ORIGIN}/2026/A-pair-of-highlanders-070826.html`,
+  `${WHISKYFUN_ORIGIN}/2026/A-trio-of-coastal-malts.html`,
+  `${WHISKYFUN_ORIGIN}/2026/Two-old-island-malts.html`,
+  `${WHISKYFUN_ORIGIN}/2026/A-pair-of-highlanders.html`,
+] as const;
+const WHISKYFUN_EXCLUDED_URLS = [
+  `${WHISKYFUN_ORIGIN}/2026/A-few-more-rums.html`,
+  `${WHISKYFUN_ORIGIN}/2026/Cognacs-are-back.html`,
 ] as const;
 
 const WEBSITE_PAGES = new Map([
@@ -255,19 +259,25 @@ const BRUICHLADDICH_V6_RULES = {
 
 function whiskyfunArticle(
   title: string,
+  date: string,
   reviews: Array<[name: string, notes: string, score: number]>,
 ) {
   const oversizedMapName = "Map".repeat(30_000);
   return `<!doctype html><html><head><title>${title}</title></head><body>
     <map name="${oversizedMapName}"><area href="#reviews"></map>
-    <table id="reviews"><tbody>${reviews
-      .map(
-        ([name, notes, score]) => `<tr><td class="TextenormalNEW">
-          <span class="textegrandfoncegras">${name}</span>
-          <p>${notes}</p><strong>SGP:561 - ${score} points.</strong>
-        </td></tr>`,
-      )
-      .join("")}</tbody></table>
+    <a name="${date}"></a>
+    <table><tr><td bgcolor="#FFFF99">
+      <table><tr><td class="TextenormalNEW">An introduction without a review heading.</td></tr></table>
+      ${reviews
+        .map(
+          ([name, notes, score]) => `<table><tr><td class="TextenormalNEW">
+            <span class="textegrandfoncegras">${name}</span>
+            <p>${notes}</p><strong>SGP:561 - ${score} points.</strong>
+          </td></tr></table>`,
+        )
+        .join("")}
+      <table><tr><td class="TextenormalNEW">A conclusion without a review heading.</td></tr></table>
+    </td></tr></table>
   </body></html>`;
 }
 
@@ -280,10 +290,13 @@ const WHISKYFUN_REVIEWS = [
 const WHISKYFUN_PAGES = new Map<string, string>([
   [
     WHISKYFUN_FEED_URL,
-    `<?xml version="1.0"?><rss><channel>${WHISKYFUN_ARTICLE_URLS.map(
-      (url, index) =>
-        `<item><title>Whisky article ${index + 1}</title><link>${url}</link></item>`,
-    ).join("")}</channel></rss>`,
+    `<?xml version="1.0"?><rss><channel>
+      <item><title>Whisky article 1</title><link>${WHISKYFUN_ARTICLE_URLS[0]}</link></item>
+      <item><title>Whisky article 2</title><link>${WHISKYFUN_ARTICLE_URLS[1]}</link></item>
+      <item><title>Whisky article 3</title><link>${WHISKYFUN_ARTICLE_URLS[2]}</link></item>
+      <item><title>A few more rums</title><link>${WHISKYFUN_EXCLUDED_URLS[0]}</link></item>
+      <item><title>Cognacs are back</title><link>${WHISKYFUN_EXCLUDED_URLS[1]}</link></item>
+    </channel></rss>`,
   ],
   ...WHISKYFUN_ARTICLE_URLS.map(
     (url, index) =>
@@ -291,6 +304,7 @@ const WHISKYFUN_PAGES = new Map<string, string>([
         url,
         whiskyfunArticle(
           `Whisky article ${index + 1}`,
+          `${String(9 - index).padStart(2, "0")}0926`,
           WHISKYFUN_REVIEWS[index]!.map((name, reviewIndex) => [
             name,
             `Tasting notes for ${name}.`,
@@ -307,7 +321,10 @@ const WHISKYFUN_V9_RULES = {
     document: "xml",
     oneArticlePer: "item",
     link: "link",
-    skipWhen: null,
+    skipWhen: {
+      selector: "title",
+      match: ["{anything}rum{anything}", "{anything}cognac{anything}"],
+    },
     nextPage: null,
     limit: 25,
   },
@@ -326,7 +343,14 @@ const WHISKYFUN_V9_RULES = {
       ],
     },
     publishedDate: {
-      try: [{ get: "dateFromUrl", format: "*ddMMyy.html" }],
+      try: [
+        {
+          get: "dateFromAttribute",
+          selector: "a[name]",
+          attribute: "name",
+          format: "ddMMyy",
+        },
+      ],
     },
     reviews: {
       inside: "body",
@@ -824,6 +848,9 @@ describe.skipIf(!isAIGatewayConfigured("scraper"))(
         if (parsed.kind !== "review" || !parsed.value) {
           throw new Error("Generated rules did not parse a review page.");
         }
+        expect(parsed.value.article.publishedAt).toEqual(
+          new Date(Date.UTC(2026, 8, 9 - index)),
+        );
         expect(
           parsed.value.article.externalReviews.map((review) => review.name),
         ).toEqual([...WHISKYFUN_REVIEWS[index]!]);

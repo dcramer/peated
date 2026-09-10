@@ -24,6 +24,7 @@ import { normalizeScrapeReviewNameRule } from "./rules";
 import {
   applyDetailPageUrlCompatibility,
   readCompatiblePublishedDate,
+  readCompatiblePublishedDateValue,
 } from "./sourceCompatibility";
 import { matchFirstText, matchText } from "./textTemplate";
 
@@ -1553,7 +1554,12 @@ function readPublishedDate(
   pageUrl: URL,
 ) {
   if (selector) {
-    return parseDate(readSelectedValue($, selector, "date"));
+    const value = readSelectedValue($, selector, "date");
+    const compatibleValue = normalizeValue($(selector).first().attr("name"));
+    const compatibleDate = compatibleValue
+      ? readCompatiblePublishedDateValue(compatibleValue, pageUrl)
+      : null;
+    return compatibleDate ?? parseDate(value);
   }
   const selectors = [
     'meta[property="article:published_time"]',

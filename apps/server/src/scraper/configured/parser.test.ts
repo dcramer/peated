@@ -23,6 +23,7 @@ import {
   parseScrapeList,
 } from "./parser";
 import {
+  ScrapeRulesSchema,
   type ScrapeRules,
   type ScrapeRulesV3,
   type StoredScrapeRules,
@@ -159,6 +160,58 @@ it("reports an invalid list selector", () => {
     links: [],
     nextPageUrl: null,
     issues: [{ field: "list.links", message: "CSS selector is not valid." }],
+  });
+});
+
+it("uses supported relational selectors and Whiskyfun date attributes", () => {
+  const rules = ScrapeRulesSchema.parse({
+    kind: "review",
+    list: { links: "item > link", nextPage: null, limit: 20 },
+    detail: {
+      url: null,
+      title: "title",
+      date: "a[name]",
+      reviews: {
+        area: "main",
+        item: "td.TextenormalNEW:has(.textegrandfoncegras)",
+        name: ".textegrandfoncegras",
+        reviewer: null,
+        tastingNotes: null,
+        score: { selector: "strong", outOf: 100 },
+      },
+    },
+  });
+
+  expect(
+    parseScrapeDetail(
+      rules,
+      `<head><title>A pair of malts</title></head><body>
+        <a name="090926"></a>
+        <main>
+          <table><tr><td class="TextenormalNEW">Introduction.</td></tr></table>
+          <table><tr><td class="TextenormalNEW">
+            <span class="textegrandfoncegras">Coastal Malt 12 yo</span>
+            Orange and oak. <strong>SGP:561 - 88 points.</strong>
+          </td></tr></table>
+          <table><tr><td class="TextenormalNEW">Conclusion.</td></tr></table>
+        </main>
+      </body>`,
+      new URL("https://www.whiskyfun.com/2026/A-pair-of-malts.html"),
+    ),
+  ).toMatchObject({
+    kind: "review",
+    issues: [],
+    value: {
+      article: {
+        publishedAt: new Date("2026-09-09T00:00:00.000Z"),
+        externalReviews: [
+          {
+            name: "Coastal Malt 12 yo",
+            nativeScore: { value: 88, scale: 100 },
+          },
+        ],
+      },
+    },
   });
 });
 

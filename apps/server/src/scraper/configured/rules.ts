@@ -18,14 +18,7 @@ const SCRAPE_LITERAL_MAX_LENGTH = 100;
 const SCRAPE_LITERAL_MAX_ITEMS = 10;
 const SCRAPE_SCORE_MAP_MAX_ITEMS = 25;
 
-export const ScrapeSelectorSchema = z
-  .string()
-  .trim()
-  .min(1)
-  .max(500)
-  .refine((value) => !value.includes(":has("), {
-    message: "The :has selector is not supported.",
-  });
+export const ScrapeSelectorSchema = z.string().trim().min(1).max(500);
 
 const ScrapeAttributeSchema = z.string().trim().min(1).max(100);
 

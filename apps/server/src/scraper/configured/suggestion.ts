@@ -10,6 +10,10 @@ import type {
   ResponseInput,
   Tool,
 } from "openai/resources/responses/responses";
+import {
+  loadExecutableScrapeRules,
+  type ExecutableScrapeRules,
+} from "./compatibility";
 import { parseScrapeDetail, parseScrapeList } from "./parser";
 import type { ScrapeRules } from "./rules";
 import { saveScrapeSourceSuggestion } from "./service";
@@ -118,6 +122,43 @@ export function checkListPage(input: {
     nextPageUrl: result.nextPageUrl,
     nextPage: null,
   };
+}
+
+export function checkPreviousListPage(input: {
+  listPage: SelectedListPage;
+  previousRules: Pick<ExecutableScrapeRules, "parseList">;
+}) {
+  const previous = input.previousRules.parseList(
+    input.listPage.html,
+    new URL(input.listPage.url),
+  );
+  if (previous.issues.length > 0) return;
+
+  const previousLinks = new Set(previous.links);
+  const proposedLinks = new Set(input.listPage.firstPageLinks);
+  const unexpected = input.listPage.firstPageLinks.filter(
+    (url) => !previousLinks.has(url),
+  );
+  const missing = previous.links.filter((url) => !proposedLinks.has(url));
+  if (unexpected.length === 0 && missing.length === 0) return;
+
+  const changes = [
+    unexpected.length > 0
+      ? `${unexpected.length} previously excluded page${unexpected.length === 1 ? "" : "s"} included`
+      : null,
+    missing.length > 0
+      ? `${missing.length} previously included page${missing.length === 1 ? "" : "s"} missing`
+      : null,
+  ].filter(Boolean);
+  throw new ScrapeSourceSetupError(
+    "The rules changed which pages the working setup includes.",
+    [
+      {
+        field: "list.links",
+        message: `Preserve the previousSetup list filters: ${changes.join(", ")}.`,
+      },
+    ],
+  );
 }
 
 export async function checkNextListPage(input: {
@@ -332,6 +373,17 @@ export async function suggestScrapeSourceRevision(input: {
   loadPage: (url: URL) => Promise<WebsitePage>;
 }) {
   const source = await loadAiSource(input.scrapeSourceId);
+  let previousRules: ExecutableScrapeRules | null = null;
+  if (source.previousRulesVersion && source.previousRules) {
+    try {
+      previousRules = loadExecutableScrapeRules(
+        source.previousRulesVersion,
+        source.previousRules,
+      );
+    } catch {
+      // Invalid legacy rules must not block the suggestion that replaces them.
+    }
+  }
   const pageCache = new Map(
     [...input.listPages, ...input.detailPages].map((page) => [
       new URL(page.url).toString(),
@@ -392,6 +444,13 @@ export async function suggestScrapeSourceRevision(input: {
           rules: submittedRules.rules,
           pages: input.listPages,
         });
+        if (
+          previousRules &&
+          source.previousListPageUrl &&
+          new URL(source.previousListPageUrl).toString() === firstListPage.url
+        ) {
+          checkPreviousListPage({ listPage: firstListPage, previousRules });
+        }
         const listPage = await checkNextListPage({
           rules: submittedRules.rules,
           listPage: firstListPage,
