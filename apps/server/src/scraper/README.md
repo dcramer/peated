@@ -144,7 +144,10 @@ Adding a source starts AI setup. The server reads the main page, up to four
 likely list pages on the same website, and any optional example review or
 product pages. The agent can use `read_page` to inspect more pages on the same
 website. It submits v11 rules to `test_rules`, which runs the collection crawler
-without importing anything, including the same pagination and item limits.
+without importing anything. Ordinary setup tests sample at most 20 detail pages;
+repair tests use the full collection limit so they can reach the failing page.
+Code preserves the active rules' collection limit, or uses 99 for new or unreadable
+rules. The agent cannot change that limit to make a test cheaper or easier to pass.
 The tool returns extracted examples, visited pages, and any errors. The agent
 inspects successful results too: valid fields do not guarantee the right content.
 `finish` saves exactly the last passing rules and their test results. An admin

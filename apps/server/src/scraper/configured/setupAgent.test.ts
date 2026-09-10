@@ -228,6 +228,7 @@ function runAgentWithPages(
     conversationId: "scrape_source:1",
     externalSiteRunId: 10,
     kind: rules.kind,
+    collectionLimit: rules.list.limit,
     scrapeSourceId: 1,
     listPages: [listPage],
     detailPages: [],

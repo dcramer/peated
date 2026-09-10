@@ -764,7 +764,7 @@ export const ScrapeRulesV8Schema = z.discriminatedUnion("kind", [
   ScrapeCatalogRulesV9Schema,
 ]);
 
-const ScrapeListSchema = z
+export const ScrapeListSchema = z
   .object({
     links: ScrapeSelectorSchema.describe("Links to article or product pages."),
     nextPage: ScrapeSelectorSchema.nullable().describe(

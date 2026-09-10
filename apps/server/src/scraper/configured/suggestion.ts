@@ -17,7 +17,11 @@ import {
 } from "./crawl";
 import { inspectSyndicationFeed } from "./discovery";
 import type { ScrapeIssue, ScrapeSourcePreviewResult } from "./preview";
-import { SCRAPE_RULES_VERSION, type ScrapeRules } from "./rules";
+import {
+  SCRAPE_RULES_VERSION,
+  SCRAPE_SOURCE_MAX_ITEMS,
+  type ScrapeRules,
+} from "./rules";
 import {
   reserveScrapeSourceModelCall,
   saveScrapeSourceSetupState,
@@ -25,6 +29,7 @@ import {
 import { saveScrapeSourceSuggestion } from "./service";
 import {
   AI_INSTRUCTIONS_VERSION,
+  MAX_RULE_TEST_ITEMS,
   runScrapeSourceSetupAgent,
   type RuleTestResult,
   type SetupAgentModelRequest,
@@ -110,7 +115,8 @@ export async function testScrapeRules(input: {
     const adapter = createScrapeSourceAdapter({
       targetKey: "rule-test",
       listUrl: input.listPageUrl,
-      rules,
+      // Setup samples detail pages; repairs must still exercise the failing page.
+      rules: input.failureUrl ? rules : rules.withLimit(MAX_RULE_TEST_ITEMS),
       purpose: "preview",
       recordPreview: async (result) => {
         preview = result.result;
@@ -301,6 +307,7 @@ export async function suggestScrapeSourceRevision(
     conversationId: `scrape_source:${input.scrapeSourceId}`,
     externalSiteRunId: input.externalSiteRunId,
     kind: source.kind,
+    collectionLimit: previousRules?.limit ?? SCRAPE_SOURCE_MAX_ITEMS,
     scrapeSourceId: input.scrapeSourceId,
     listPages: input.listPages,
     detailPages: input.detailPages,
