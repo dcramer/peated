@@ -24,6 +24,7 @@ import {
 } from "./adminForm.stylex";
 import { AdminEmptyActivity } from "./adminUtility.stylex";
 import {
+  canSuggestScrapeRules,
   getSetupAfterLatestVersion,
   getSetupDescription,
   getSetupSteps,
@@ -106,9 +107,7 @@ export function ScraperParsingEditor({
   );
   const setup = getSetupAfterLatestVersion(source);
   const needsRulesUpdate = needsScrapeRulesUpdate(source);
-  const canSuggest =
-    (!setup || setup.status === "failed") &&
-    (!latest || latest.previewStatus === "failed" || needsRulesUpdate);
+  const canSuggest = canSuggestScrapeRules(source);
   const setupSteps = getSetupSteps(source);
   const setupDescription = getSetupDescription(source);
   const previewRevisionId =
@@ -191,7 +190,9 @@ export function ScraperParsingEditor({
               {needsRulesUpdate
                 ? "Update parsing rules"
                 : latest
-                  ? "Ask AI to repair"
+                  ? latest.previewStatus === "failed"
+                    ? "Ask AI to repair"
+                    : "Rebuild setup"
                   : setup
                     ? "Retry AI setup"
                     : "Start AI setup"}

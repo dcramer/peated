@@ -149,6 +149,8 @@ The tool returns extracted examples, visited pages, and any errors. The agent
 inspects successful results too: valid fields do not guarantee the right content.
 `finish` saves exactly the last passing rules and their test results. An admin
 turns on versions requested through setup; no separate preview is required.
+An admin can rebuild an inactive proposal, whether or not it passed testing.
+The active rules stay in place until the replacement is tested and activated.
 
 Setup keeps old rules and previous matches as context even when their saved
 format cannot be decoded. Only executable old rules can enforce the same list

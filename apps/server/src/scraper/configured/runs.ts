@@ -197,6 +197,7 @@ export async function createScrapeSourceSuggestionRun(input: {
     if (!source) throw new ScrapeSourceNotFoundError();
     const [latestRevision] = await tx
       .select({
+        active: scrapeSourceRevisions.active,
         previewStatus: scrapeSourceRevisions.previewStatus,
         rulesVersion: scrapeSourceRevisions.rulesVersion,
       })
@@ -204,13 +205,14 @@ export async function createScrapeSourceSuggestionRun(input: {
       .where(eq(scrapeSourceRevisions.scrapeSourceId, source.id))
       .orderBy(desc(scrapeSourceRevisions.revision))
       .limit(1);
+    // Scraper setup protects active rules, not proposals awaiting activation.
     if (
-      latestRevision &&
+      latestRevision?.active &&
       latestRevision.rulesVersion === SCRAPE_RULES_VERSION &&
       latestRevision.previewStatus !== "failed"
     ) {
       throw new ScrapeSourceValidationError(
-        "AI suggestions are available only when the saved rules need updating or the latest preview fails.",
+        "The active rules already use the current format and passed testing.",
       );
     }
     const [run] = await tx

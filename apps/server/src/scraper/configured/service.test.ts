@@ -245,6 +245,10 @@ test("does not replace a healthy current rule format", async () => {
     createdById: user.id,
   });
   await markPreviewPassed(revision.id);
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+  });
 
   await expect(
     createScrapeSourceSuggestionRun({
@@ -252,7 +256,7 @@ test("does not replace a healthy current rule format", async () => {
       requestedById: user.id,
     }),
   ).rejects.toThrow(
-    "AI suggestions are available only when the saved rules need updating or the latest preview fails.",
+    "The active rules already use the current format and passed testing.",
   );
 });
 
