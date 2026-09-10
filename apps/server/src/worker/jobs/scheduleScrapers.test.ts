@@ -15,7 +15,7 @@ test("skips disabled targets and schedules other due scrapers", async ({
     nextRunAt: null,
   });
   const enabledSite = await fixtures.ExternalSite({
-    type: "decadentdrinks",
+    type: "dramfool",
     runEvery: 60,
     nextRunAt: null,
   });
