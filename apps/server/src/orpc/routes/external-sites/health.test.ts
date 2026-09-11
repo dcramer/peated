@@ -180,6 +180,14 @@ test("health list keeps batched source data isolated", async ({ fixtures }) => {
     latestRun: { status: "failed" },
     lastSucceededAt: null,
   });
+  expect(result.summary).toEqual({ total: 2, healthy: 1, unhealthy: 1 });
+
+  const filtered = await routerClient.externalSites.healthList(
+    { query: firstSite.name },
+    { context: { user: admin } },
+  );
+  expect(filtered.results).toHaveLength(1);
+  expect(filtered.summary).toEqual({ total: 2, healthy: 1, unhealthy: 1 });
 });
 
 test("health details show review inventory and publication approval", async ({

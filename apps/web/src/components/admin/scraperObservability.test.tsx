@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import ExternalSiteRunStatus from "./externalSiteRunStatus";
 import ExternalSiteRunTelemetry from "./externalSiteRunTelemetry";
 import ScraperAdapterStatus from "./scraperAdapterStatus";
-import ScraperCatalogCoverage from "./scraperCatalogCoverage";
+import ScraperDashboardSummary from "./scraperDashboardSummary.stylex";
 import {
   ReviewPublishingAction,
   ReviewPublishingState,
@@ -194,9 +194,10 @@ describe("scraper observability", () => {
     expect(html).toContain("continues");
   });
 
-  it("shows aggregate Bottle and item coverage", () => {
+  it("summarizes scraper health and catalog coverage", () => {
     const html = renderToStaticMarkup(
-      <ScraperCatalogCoverage
+      <ScraperDashboardSummary
+        health={{ total: 53, healthy: 31, unhealthy: 4 }}
         coverage={{
           bottles: {
             total: 100,
@@ -211,9 +212,18 @@ describe("scraper observability", () => {
       />,
     );
 
+    expect(html).toContain("Total scrapers</dt>");
+    expect(html).toContain(">53</dd>");
+    expect(html).toContain("Healthy</dt>");
+    expect(html).toContain(">31</dd>");
+    expect(html).toContain("Unhealthy</dt>");
+    expect(html).toContain(">4</dd>");
     expect(html).toContain("50% described");
     expect(html).toContain('aria-hidden="true"');
     expect(html).toContain("30 matched");
     expect(html).toContain("180 matched");
+    expect(html).toContain('aria-label="Scraper health"');
+    expect(html).toContain('aria-label="Catalog coverage"');
+    expect(html).not.toContain(">Catalog coverage<");
   });
 });
