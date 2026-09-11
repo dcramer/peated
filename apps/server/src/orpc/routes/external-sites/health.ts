@@ -275,11 +275,50 @@ async function getHealthForSites(
   });
 }
 
+async function getHealthSummary() {
+  // This route owns the dashboard health rule: only a latest succeeded or
+  // failed run enters a health bucket. Other statuses remain unclassified.
+  const [sites, latestRuns] = await Promise.all([
+    db.select({ id: externalSites.id }).from(externalSites),
+    db
+      .selectDistinctOn([externalSiteRuns.externalSiteId], {
+        externalSiteId: externalSiteRuns.externalSiteId,
+        status: externalSiteRuns.status,
+      })
+      .from(externalSiteRuns)
+      .orderBy(
+        asc(externalSiteRuns.externalSiteId),
+        desc(externalSiteRuns.createdAt),
+      ),
+  ]);
+  const latestStatusBySite = new Map(
+    latestRuns.map((run) => [run.externalSiteId, run.status]),
+  );
+
+  return {
+    total: sites.length,
+    healthy: sites.filter(
+      (site) => latestStatusBySite.get(site.id) === "succeeded",
+    ).length,
+    unhealthy: sites.filter(
+      (site) => latestStatusBySite.get(site.id) === "failed",
+    ).length,
+  };
+}
+
 const inputSchema = z.object({
   query: z.coerce.string().default(""),
   sort: z.enum(["name", "-name"]).default("name"),
   cursor: z.coerce.number().gte(1).default(1),
   limit: z.coerce.number().gte(1).lte(100).default(100),
+});
+
+const outputSchema = listResponse(ExternalSiteHealthSchema).extend({
+  summary: z.object({
+    total: z.number().int().min(0),
+    healthy: z.number().int().min(0),
+    unhealthy: z.number().int().min(0),
+  }),
 });
 
 export const healthList = procedure
@@ -289,26 +328,31 @@ export const healthList = procedure
     path: "/admin/external-sites",
     summary: "List external site health",
     description:
-      "List import status, recent runs, catalog listing counts, and bottle matching counts for external sites. Includes reviews awaiting publication. Requires administrator privileges.",
+      "List import status, recent runs, catalog listing counts, and bottle matching counts for external sites. Includes reviews awaiting publication and unfiltered totals for successful and failed latest runs. Requires administrator privileges.",
     operationId: "listExternalSiteHealth",
   })
   .input(inputSchema)
-  .output(listResponse(ExternalSiteHealthSchema))
+  .output(outputSchema)
   .handler(async ({ input }) => {
     const offset = (input.cursor - 1) * input.limit;
-    const results = await db
-      .select()
-      .from(externalSites)
-      .where(
-        input.query ? ilike(externalSites.name, `%${input.query}%`) : undefined,
-      )
-      .orderBy(
-        input.sort === "-name"
-          ? desc(externalSites.name)
-          : asc(externalSites.name),
-      )
-      .limit(input.limit + 1)
-      .offset(offset);
+    const [results, summary] = await Promise.all([
+      db
+        .select()
+        .from(externalSites)
+        .where(
+          input.query
+            ? ilike(externalSites.name, `%${input.query}%`)
+            : undefined,
+        )
+        .orderBy(
+          input.sort === "-name"
+            ? desc(externalSites.name)
+            : asc(externalSites.name),
+        )
+        .limit(input.limit + 1)
+        .offset(offset),
+      getHealthSummary(),
+    ]);
 
     const sites = results.slice(0, input.limit);
     return {
@@ -317,6 +361,7 @@ export const healthList = procedure
         nextCursor: results.length > input.limit ? input.cursor + 1 : null,
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
       },
+      summary,
     };
   });
 

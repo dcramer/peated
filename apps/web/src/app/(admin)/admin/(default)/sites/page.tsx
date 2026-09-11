@@ -9,7 +9,7 @@ import {
 import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import { ExternalSiteIdentity } from "@peated/web/components/admin/externalSiteIcon.stylex";
-import ScraperCatalogCoverage from "@peated/web/components/admin/scraperCatalogCoverage";
+import ScraperDashboardSummary from "@peated/web/components/admin/scraperDashboardSummary.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import * as stylex from "@stylexjs/stylex";
@@ -52,7 +52,7 @@ export default function Page() {
           </AdminActions>
         }
       />
-      <ScraperCatalogCoverage coverage={coverage} />
+      <ScraperDashboardSummary coverage={coverage} health={siteList.summary} />
       {siteList.results.length > 0 ? (
         <Table
           items={siteList.results}
