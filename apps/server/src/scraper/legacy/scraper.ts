@@ -142,7 +142,10 @@ export async function handleBottle(
   bottle: z.input<typeof BottleInputSchema>,
   price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
-  { dryRun = false }: { dryRun?: boolean } = {},
+  {
+    dryRun = false,
+    site = "smws",
+  }: { dryRun?: boolean; site?: ExternalSiteKey } = {},
 ) {
   if (
     !dryRun &&
@@ -150,14 +153,17 @@ export async function handleBottle(
   ) {
     return;
   }
-  await persistBottleObservation(bottle, price, imageUrl, { dryRun });
+  await persistBottleObservation(bottle, price, imageUrl, { dryRun, site });
 }
 
 export async function persistBottleObservation(
   bottle: z.input<typeof BottleInputSchema>,
   price?: z.input<typeof StorePriceInputSchema> | null,
   imageUrl?: string | null,
-  { dryRun = false }: { dryRun?: boolean } = {},
+  {
+    dryRun = false,
+    site = "smws",
+  }: { dryRun?: boolean; site?: ExternalSiteKey } = {},
 ) {
   if (dryRun) {
     logInfo("Dry run bottle {bottleName}", {
@@ -235,11 +241,11 @@ export async function persistBottleObservation(
       await createStorePriceForBottleAsPeated({
         bottleId: resultBottle.id,
         createdBottle: isNew,
-        site: "smws",
+        site,
         price: sourcePrice,
       });
     } else {
-      await createStorePricesAsPeated({ site: "smws", prices: [sourcePrice] });
+      await createStorePricesAsPeated({ site, prices: [sourcePrice] });
     }
   }
 

@@ -16,6 +16,7 @@ import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import scrapePrices, {
   handleBottle,
+  persistBottleObservation,
   type ScrapePricesCallback,
   type StorePrice,
 } from "./scraper";
@@ -27,6 +28,9 @@ describe("handleBottle", () => {
     statedAge: 12,
     edition: "Batch 3",
     abv: 57.2,
+    releaseYear: 2024,
+    releaseMonth: 10,
+    releaseDay: 2,
     singleCask: true,
     category: "single_malt" as const,
   };
@@ -71,6 +75,9 @@ describe("handleBottle", () => {
       createdByActorId: systemActor.id,
       edition: bottleInput.edition,
       statedAge: bottleInput.statedAge,
+      releaseYear: bottleInput.releaseYear,
+      releaseMonth: bottleInput.releaseMonth,
+      releaseDay: bottleInput.releaseDay,
     });
     const price = await db.query.storePrices.findFirst({
       where: and(
@@ -84,6 +91,9 @@ describe("handleBottle", () => {
       sourceBottleIdentity: expect.objectContaining({
         expression: bottleInput.name,
         edition: bottleInput.edition,
+        release_year: bottleInput.releaseYear,
+        release_month: bottleInput.releaseMonth,
+        release_day: bottleInput.releaseDay,
       }),
     });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
@@ -105,6 +115,31 @@ describe("handleBottle", () => {
         matchingBasis: "source_bottle",
         resolutionSource: "trusted_scraper",
       },
+    });
+  });
+
+  it("saves a Bottle listing under its source site", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smwsa" });
+
+    await persistBottleObservation(
+      bottleInput,
+      {
+        ...priceInput,
+        currency: "usd",
+        volume: 750,
+      },
+      null,
+      { site: "smwsa" },
+    );
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject({
+      bottleId: expect.any(Number),
+      currency: "usd",
+      volume: 750,
     });
   });
 

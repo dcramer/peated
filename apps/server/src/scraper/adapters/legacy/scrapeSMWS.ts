@@ -249,6 +249,17 @@ function isSingleCask(
   );
 }
 
+function formatMaturation(
+  initialCask: string | null | undefined,
+  finalCask: string | null | undefined,
+): string | null {
+  const initial = initialCask?.trim() || null;
+  const final = finalCask?.trim() || null;
+  if (!initial || initial === final) return final ?? initial;
+  if (!final) return initial;
+  return `Initial cask: ${initial}; final cask: ${final}`;
+}
+
 type ArchiveBottle = {
   bottle: z.input<typeof BottleInputSchema>;
   imageUrl: string | null;
@@ -495,8 +506,10 @@ function mergeArchiveDetails(
       releaseYear: release?.releaseYear ?? null,
       releaseMonth: release?.releaseMonth ?? null,
       releaseDay: release?.releaseDay ?? null,
-      maturation:
-        archived.bottle.maturation ?? customFields.get("cask type") ?? null,
+      maturation: formatMaturation(
+        customFields.get("initial cask"),
+        archived.bottle.maturation ?? customFields.get("cask type"),
+      ),
       outturn: parsePositiveInteger(
         customFields.get("outturn") ??
           customFields.get("bottles produced") ??
@@ -633,6 +646,7 @@ const SMWSPayloadSchema = z.object({
       abv: z.union([z.string(), z.number()]).nullish(),
       cask_no: z.string().nullish(),
       cask_type: z.string().nullish(),
+      initial_cask: z.string().nullish(),
       region: z.string().nullish(),
       spirit_type: z.string().nullish(),
       distilleddate: z.string().nullish(),
@@ -708,6 +722,7 @@ export async function scrapeBottles(
           });
         }
 
+        const maturation = formatMaturation(item.initial_cask, item.cask_type);
         const bottle: z.input<typeof BottleInputSchema> = {
           name,
           vintageYear,
@@ -721,13 +736,9 @@ export async function scrapeBottles(
             name: "The Scotch Malt Whisky Society",
           },
           distillers: distiller ? [{ name: distiller }] : [],
-          maturation: item.cask_type?.trim() || null,
+          maturation,
           caskNumber,
-          singleCask: isSingleCask(
-            caskNumber,
-            category,
-            item.cask_type?.trim() || null,
-          ),
+          singleCask: isSingleCask(caskNumber, category, maturation),
           description: item.list_description?.trim() || null,
         };
         if (edition) bottle.edition = edition;

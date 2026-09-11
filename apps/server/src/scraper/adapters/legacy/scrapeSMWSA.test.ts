@@ -81,3 +81,55 @@ test("bottle list", async ({ axiosMock }) => {
     ]
   `);
 });
+
+test("parses the current product-card markup", async ({ axiosMock }) => {
+  const url = "https://newmake.smwsa.com/collections/all-products";
+  axiosMock.onGet(url).reply(
+    200,
+    `
+      <div data-product-tile>
+        <a href="/products/cask-no-41-176"
+          data-ecommerce-action="select-product"
+          data-product-name="Baristaliscious"
+          data-product-price="185.00"
+          data-product-product-id="7609520586823"
+          data-product-image="https://images.example/41.176.png">
+          <img src="https://images.example/41.176.png">
+        </a>
+        <div>
+          <h3>Cask No. 41.176</h3>
+          <h1>Baristaliscious</h1>
+          <ul>
+            <li><div>Age:</div><div>Vintage 1989</div></li>
+            <li><div>Region:</div><div>Speyside</div></li>
+            <li><div>Cask:</div><div>First-fill Chinkapin oak barrel</div></li>
+            <li><div>ABV:</div><div>58.8%</div></li>
+          </ul>
+        </div>
+      </div>
+    `,
+  );
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items).toEqual([
+    [
+      expect.objectContaining({
+        name: "41.176 Baristaliscious",
+        vintageYear: 1989,
+        statedAge: null,
+        abv: 58.8,
+        maturation: "First-fill Chinkapin oak barrel",
+      }),
+      expect.objectContaining({
+        externalProductId: "7609520586823",
+        price: 18_500,
+        url: "https://newmake.smwsa.com/products/cask-no-41-176",
+      }),
+      "https://images.example/41.176.png",
+    ],
+  ]);
+});

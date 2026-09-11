@@ -50,7 +50,7 @@ import {
   defineScrapeTarget,
 } from "./definitions";
 import { loadSingleCaskNationReleases } from "./singleCaskNationReleases";
-import { bottleObservationSink } from "./sinks/bottles";
+import { createBottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
 import { createStorePriceSink } from "./sinks/storePrices";
 
@@ -396,7 +396,7 @@ export const scraperRegistry = createScraperRegistry({
         cursorSchema: z.null(),
         observationSchema: LegacyBottleObservationSchema,
         adapter: createLegacyBottleAdapter(source.type, source.scrape),
-        sink: bottleObservationSink,
+        sink: createBottleObservationSink(source.type),
       }),
     ),
     // TODO(scraper-source-migration): Remove each remaining HTML review
