@@ -9,8 +9,14 @@ import {
   BottleAlreadyExistsError,
   createBottleAsPeated,
 } from "@peated/server/lib/createBottle";
-import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
-import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
+import {
+  createStorePriceForBottleAsPeated,
+  createStorePricesAsPeated,
+} from "@peated/server/lib/createStorePrices";
+import {
+  buildBottleCreateInput,
+  buildBottleSourceIdentity,
+} from "@peated/server/lib/flatBottleInput";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
@@ -220,7 +226,21 @@ export async function persistBottleObservation(
   }
 
   if (price) {
-    await createStorePricesAsPeated({ site: "smws", prices: [price] });
+    const sourcePrice = {
+      ...price,
+      sourceBottleIdentity:
+        price.sourceBottleIdentity ?? buildBottleSourceIdentity(bottle),
+    };
+    if (resultBottle) {
+      await createStorePriceForBottleAsPeated({
+        bottleId: resultBottle.id,
+        createdBottle: isNew,
+        site: "smws",
+        price: sourcePrice,
+      });
+    } else {
+      await createStorePricesAsPeated({ site: "smws", prices: [sourcePrice] });
+    }
   }
 
   return {

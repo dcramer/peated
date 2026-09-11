@@ -6,7 +6,10 @@ import { db, type AnyTransaction } from "@peated/server/db";
 import {
   externalSites,
   storePriceHistories,
+  storePriceMatchAttempts,
+  storePriceMatchProposals,
   storePrices,
+  type Actor,
   type StorePrice,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
@@ -19,7 +22,11 @@ import {
 } from "@peated/server/lib/bottleReferences";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
 import { normalizeGtin, type NormalizedGtin } from "@peated/server/lib/gtin";
-import { ActiveBottleSelectionError } from "@peated/server/lib/resolveActiveBottleIds";
+import { recordIncomingBottleDecisionInTransaction } from "@peated/server/lib/incomingBottleDecisionLog";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import {
   ExternalSiteKeySchema,
@@ -52,6 +59,113 @@ type StorePriceIdentity = {
   externalProductId?: string;
   externalSiteId: number;
   url: string;
+};
+
+type TrustedBottleMatch = {
+  bottleId: number;
+  candidate: null;
+  source: "trusted_source";
+  referenceMatch: null;
+};
+
+async function resolveTrustedBottleMatchInTransaction(
+  tx: AnyTransaction,
+  bottleId: number,
+): Promise<TrustedBottleMatch> {
+  await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+  return {
+    bottleId,
+    candidate: null,
+    source: "trusted_source",
+    referenceMatch: null,
+  };
+}
+
+async function finalizeTrustedSourceAssignmentInTransaction({
+  tx,
+  actor,
+  bottleId,
+  createdBottle,
+  externalSiteId,
+  name,
+  priceId,
+  url,
+}: {
+  tx: AnyTransaction;
+  actor: Pick<Actor, "id" | "type" | "userId">;
+  bottleId: number;
+  createdBottle: boolean;
+  externalSiteId: number;
+  name: string;
+  priceId: number;
+  url: string;
+}) {
+  const [proposal] = await tx
+    .update(storePriceMatchProposals)
+    .set({
+      status: "approved",
+      currentBottleId: bottleId,
+      suggestedBottleId: bottleId,
+      error: null,
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+      reviewedAt: sql`NOW()`,
+      reviewedById: null,
+      updatedAt: sql`NOW()`,
+    })
+    .where(
+      and(
+        eq(storePriceMatchProposals.priceId, priceId),
+        inArray(storePriceMatchProposals.status, ["pending_review", "errored"]),
+      ),
+    )
+    .returning({ id: storePriceMatchProposals.id });
+
+  if (proposal) {
+    await tx
+      .update(storePriceMatchAttempts)
+      .set({
+        finalStatus: "approved",
+        currentBottleId: bottleId,
+        suggestedBottleId: bottleId,
+        error: null,
+        reviewedAt: sql`NOW()`,
+        reviewedById: null,
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          eq(storePriceMatchAttempts.proposalId, proposal.id),
+          isNull(storePriceMatchAttempts.finalStatus),
+        ),
+      );
+  }
+
+  await recordIncomingBottleDecisionInTransaction(tx, {
+    sourceKind: "store_price",
+    sourceId: priceId,
+    proposalId: proposal?.id ?? null,
+    externalSiteId,
+    name,
+    url,
+    decision: createdBottle ? "create_bottle" : "match_existing",
+    actor,
+    bottleId,
+    createdBottle,
+    rationale:
+      "Trusted Bottle source assigned the listing to the Bottle it supplied.",
+    metadata: {
+      matchingBasis: "source_bottle",
+      resolutionSource: "trusted_scraper",
+    },
+  });
+}
+
+type TrustedBottleSource = {
+  actor: Pick<Actor, "id" | "type" | "userId">;
+  bottleId: number;
+  createdBottle: boolean;
 };
 
 function getSourceFingerprint({
@@ -353,9 +467,10 @@ async function persistStorePriceInTransaction({
 }
 
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
-export async function createStorePrices(
+async function createStorePricesInternal(
   rawInput: CreateStorePricesInput,
   actorId: number,
+  trustedBottleSource?: TrustedBottleSource,
 ) {
   const input = CreateStorePricesInputSchema.parse(rawInput);
   const site = await db.query.externalSites.findFirst({
@@ -382,15 +497,17 @@ export async function createStorePrices(
             const referenceKey = normalizeBottleReferenceKey(sp.name);
             let bottleMatch;
             try {
-              bottleMatch = await resolveStorePriceBottleMatchInTransaction(
-                tx,
-                {
-                  name: sp.name,
-                  normalizedBarcode,
-                  sourceBottleIdentity: sp.sourceBottleIdentity ?? null,
-                  volume: sp.volume,
-                },
-              );
+              bottleMatch = trustedBottleSource
+                ? await resolveTrustedBottleMatchInTransaction(
+                    tx,
+                    trustedBottleSource.bottleId,
+                  )
+                : await resolveStorePriceBottleMatchInTransaction(tx, {
+                    name: sp.name,
+                    normalizedBarcode,
+                    sourceBottleIdentity: sp.sourceBottleIdentity ?? null,
+                    volume: sp.volume,
+                  });
             } catch (error) {
               if (!(error instanceof ActiveBottleSelectionError)) {
                 throw error;
@@ -454,6 +571,28 @@ export async function createStorePrices(
               })
               .onConflictDoNothing();
 
+            const directMatchSource = persisted.sourceIdentityReused
+              ? "source"
+              : hasDirectMatch
+                ? bottleMatch.source
+                : null;
+            if (
+              trustedBottleSource &&
+              hasDirectMatch &&
+              directMatchSource === "trusted_source"
+            ) {
+              await finalizeTrustedSourceAssignmentInTransaction({
+                tx,
+                actor: trustedBottleSource.actor,
+                bottleId: trustedBottleSource.bottleId,
+                createdBottle: trustedBottleSource.createdBottle,
+                externalSiteId: site.id,
+                name: sp.name,
+                priceId,
+                url: sp.url,
+              });
+            }
+
             return {
               price: {
                 id: priceId,
@@ -461,11 +600,7 @@ export async function createStorePrices(
                 imageUrl: persisted.price.imageUrl,
                 identityChanged: persisted.identityChanged,
                 hasDirectMatch,
-                directMatchSource: persisted.sourceIdentityReused
-                  ? "source"
-                  : hasDirectMatch
-                    ? bottleMatch.source
-                    : null,
+                directMatchSource,
               },
               referenceAssignment,
             };
@@ -486,7 +621,10 @@ export async function createStorePrices(
         }
 
         // The old match was cleared. Do not reuse its completed job.
-        if (price.identityChanged) {
+        if (
+          price.identityChanged &&
+          price.directMatchSource !== "trusted_source"
+        ) {
           await pushJob("ResolveStorePriceBottle", {
             priceId: price.id,
             force: true,
@@ -510,8 +648,35 @@ export async function createStorePrices(
   return { newItemCount, existingItemCount };
 }
 
+export async function createStorePrices(
+  rawInput: CreateStorePricesInput,
+  actorId: number,
+) {
+  return await createStorePricesInternal(rawInput, actorId);
+}
+
 /** Trusted worker capability; callers cannot select an arbitrary actor. */
 export async function createStorePricesAsPeated(input: CreateStorePricesInput) {
   const actor = await getPeatedSystemActor();
-  return await createStorePrices(input, actor.id);
+  return await createStorePricesInternal(input, actor.id);
+}
+
+/** Trusted Bottle-source capability for one listing emitted with its Bottle. */
+export async function createStorePriceForBottleAsPeated({
+  bottleId,
+  createdBottle,
+  price,
+  site,
+}: {
+  bottleId: number;
+  createdBottle: boolean;
+  price: z.input<typeof StorePriceInputSchema>;
+  site: z.input<typeof ExternalSiteKeySchema>;
+}) {
+  const actor = await getPeatedSystemActor();
+  return await createStorePricesInternal({ site, prices: [price] }, actor.id, {
+    actor,
+    bottleId,
+    createdBottle,
+  });
 }
