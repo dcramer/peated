@@ -339,6 +339,18 @@ test("enriches archive cards from the batch storefront API", async ({
                         value: "2020-10-02 08:00:00",
                       },
                     },
+                    {
+                      node: {
+                        name: "Initial Cask",
+                        value: "1st fill ex-bourbon barrel",
+                      },
+                    },
+                    {
+                      node: {
+                        name: "Cask Type",
+                        value: "2nd fill oloroso hogshead",
+                      },
+                    },
                     { node: { name: "Outturn", value: "607" } },
                     {
                       node: {
@@ -380,6 +392,8 @@ test("enriches archive cards from the batch storefront API", async ({
         caskNumber: "1.243",
         description: "A bright & sunny Society description.",
         flavorProfile: "sweet_fruit_mellow",
+        maturation:
+          "Initial cask: 1st fill ex-bourbon barrel; final cask: 2nd fill oloroso hogshead",
         outturn: 607,
         releaseMonth: 10,
         releaseDay: 2,
@@ -541,6 +555,36 @@ test("continues when optional fields are absent and recovers code from SKU", asy
   expect(items[2][0]).not.toHaveProperty("releaseYear");
   expect(items[2][0]).not.toHaveProperty("releaseMonth");
   expect(items[2][0]).not.toHaveProperty("releaseDay");
+});
+
+test("keeps the initial and final casks from the live feed", async ({
+  axiosMock,
+}) => {
+  const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
+  const payload = z
+    .object({
+      items: z.array(z.record(z.string(), z.unknown())),
+    })
+    .passthrough()
+    .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
+  payload.items = [
+    {
+      ...payload.items[0],
+      initial_cask: "1st fill ex-bourbon barrel",
+      cask_type: "2nd fill oloroso hogshead",
+    },
+  ];
+  axiosMock.onGet(url).reply(200, payload);
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items[0]?.[0]).toMatchObject({
+    maturation:
+      "Initial cask: 1st fill ex-bourbon barrel; final cask: 2nd fill oloroso hogshead",
+  });
 });
 
 test("omits the release date when it conflicts with age and vintage", async ({

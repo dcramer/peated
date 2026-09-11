@@ -40,6 +40,10 @@ together. After the source successfully creates or resolves that exact Bottle,
 price ingestion assigns the listing to the returned Bottle ID and records the
 source decision without running the classifier. If Bottle resolution is
 ambiguous or conflicts, the listing stays unresolved and uses the normal queue.
+Only a registered source-specific Bottle sink may use this path. A generic
+configured price source cannot choose a Bottle ID. An SMWS extractor may change
+how it reads JSON or HTML, but it must keep the SMWS Bottle sink as the trusted
+create-and-assign boundary.
 
 A full run:
 
@@ -59,9 +63,9 @@ changes. Deterministic code can reject an unsafe result but cannot promote a
 semantic result that the classifier did not make.
 
 Generic SMWS reference parsing supplies an exact code as an identity anchor and
-still uses the classifier. The SMWS catalog importer instead uses the trusted
-Bottle-source path above because it already created or resolved the Bottle from
-the same structured source record.
+still uses the classifier. The SMWS catalog importers instead use the trusted
+Bottle-source path above because they already created or resolved the Bottle
+from the same structured source record.
 
 ## Proposal And Review
 
