@@ -35,6 +35,12 @@ different store or product ID never inherits the assignment.
 Price ingestion builds the Bottle Reference key and reuses an assigned exact
 reference when one exists. Otherwise it queues `ResolveStorePriceBottle`.
 
+A trusted Bottle source may emit one parsed Bottle and its retailer listing
+together. After the source successfully creates or resolves that exact Bottle,
+price ingestion assigns the listing to the returned Bottle ID and records the
+source decision without running the classifier. If Bottle resolution is
+ambiguous or conflicts, the listing stays unresolved and uses the normal queue.
+
 A full run:
 
 1. Extracts Bottle facts from the title or image.
@@ -52,8 +58,10 @@ catalog correction stays `no_match`; a separate Bottle audit owns catalog
 changes. Deterministic code can reject an unsafe result but cannot promote a
 semantic result that the classifier did not make.
 
-SMWS parsing supplies an exact code as an identity anchor. The classifier still
-makes the Bottle decision.
+Generic SMWS reference parsing supplies an exact code as an identity anchor and
+still uses the classifier. The SMWS catalog importer instead uses the trusted
+Bottle-source path above because it already created or resolved the Bottle from
+the same structured source record.
 
 ## Proposal And Review
 

@@ -3,10 +3,15 @@ import {
   bottleReferences,
   bottles,
   entities,
+  incomingBottleDecisionLogs,
+  storePriceMatchAttempts,
+  storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import scrapePrices, {
@@ -67,14 +72,40 @@ describe("handleBottle", () => {
       edition: bottleInput.edition,
       statedAge: bottleInput.statedAge,
     });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: and(
-          eq(storePrices.externalSiteId, site.id),
-          eq(storePrices.price, priceInput.price),
-        ),
+    const price = await db.query.storePrices.findFirst({
+      where: and(
+        eq(storePrices.externalSiteId, site.id),
+        eq(storePrices.price, priceInput.price),
+      ),
+    });
+    expect(price).toMatchObject({
+      bottleId: bottle!.id,
+      price: priceInput.price,
+      sourceBottleIdentity: expect.objectContaining({
+        expression: bottleInput.name,
+        edition: bottleInput.edition,
       }),
-    ).toMatchObject({ price: priceInput.price });
+    });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.sourceId, price!.id),
+      }),
+    ).toMatchObject({
+      sourceKind: "store_price",
+      sourceId: price!.id,
+      decision: "create_bottle",
+      actorId: systemActor.id,
+      bottleId: bottle!.id,
+      createdBottle: true,
+      metadata: {
+        matchingBasis: "source_bottle",
+        resolutionSource: "trusted_scraper",
+      },
+    });
   });
 
   it("updates the canonical Bottle when repeated ingestion conflicts", async () => {
@@ -197,7 +228,84 @@ describe("handleBottle", () => {
           eq(storePrices.price, priceInput.price),
         ),
       }),
-    ).toMatchObject({ price: priceInput.price });
+    ).toMatchObject({ bottleId: null, price: priceInput.price });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
+  });
+
+  it("closes an active classifier proposal after the trusted source assigns its Bottle", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    await createStorePricesAsPeated({ site: "smws", prices: [priceInput] });
+    const unresolvedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: unresolvedPrice!.id,
+        status: "errored",
+        proposalType: "no_match",
+        error: "Classifier unavailable",
+        processingToken: "stale-classifier-run",
+        processingQueuedAt: new Date(),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+    const [attempt] = await db
+      .insert(storePriceMatchAttempts)
+      .values({
+        priceId: unresolvedPrice!.id,
+        proposalId: proposal!.id,
+        proposalType: "no_match",
+        initialStatus: "errored",
+        error: "Classifier unavailable",
+      })
+      .returning();
+    vi.mocked(workerClient.pushJob).mockClear();
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+
+    await handleBottle(bottleInput, priceInput);
+
+    const [resolvedPrice, resolvedProposal, resolvedAttempt] =
+      await Promise.all([
+        db.query.storePrices.findFirst({
+          where: eq(storePrices.id, unresolvedPrice!.id),
+        }),
+        db.query.storePriceMatchProposals.findFirst({
+          where: eq(storePriceMatchProposals.id, proposal!.id),
+        }),
+        db.query.storePriceMatchAttempts.findFirst({
+          where: eq(storePriceMatchAttempts.id, attempt!.id),
+        }),
+      ]);
+    expect(resolvedPrice?.bottleId).not.toBeNull();
+    expect(resolvedProposal).toMatchObject({
+      status: "approved",
+      currentBottleId: resolvedPrice!.bottleId,
+      suggestedBottleId: resolvedPrice!.bottleId,
+      error: null,
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
+    expect(resolvedAttempt).toMatchObject({
+      finalStatus: "approved",
+      currentBottleId: resolvedPrice!.bottleId,
+      suggestedBottleId: resolvedPrice!.bottleId,
+      error: null,
+    });
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
   });
 
   it("rejects invalid flat Bottle input before persistence", async () => {
