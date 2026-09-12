@@ -218,18 +218,17 @@ export async function ensureRobotsAllowed({
         const missing = { status: "missing" } as const;
         await writeRobotsCache(url.origin, missing, now);
         state = CachedRobotsRulesSchema.safeParse(missing);
-      } else if (error instanceof ScraperRequestWaitError) {
-        throw error;
       } else if (
-        error instanceof ScraperRequestError &&
-        error.category === "invalid_request"
+        error instanceof ScraperHttpStatusError ||
+        (error instanceof ScraperRequestError &&
+          (error.category === "timeout" || error.category === "transport"))
       ) {
-        throw error;
-      } else {
         throw new ScraperRequestWaitError(
           "robots_unavailable",
           new Date(now.getTime() + ROBOTS_UNAVAILABLE_RETRY_MS),
         );
+      } else {
+        throw error;
       }
     }
   }

@@ -153,6 +153,8 @@ const legacyBottleSources = [
         origin: "https://newmake.smwsa.com",
         robots: { mode: "enforce" },
       },
+      // SMWS America redirects its original storefront and robots.txt here.
+      { origin: "https://smwsa.com", robots: { mode: "enforce" } },
     ],
     scrape: scrapeSMWSA,
   },

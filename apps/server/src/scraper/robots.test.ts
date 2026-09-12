@@ -262,6 +262,33 @@ test("does not report a disabled target as unavailable robots", async () => {
   expect(fetchImpl).not.toHaveBeenCalled();
 });
 
+test("reports an undeclared robots redirect instead of retrying it as unavailable", async () => {
+  const { registry, run } = await setupRobotsRuntime();
+  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+    new Response(null, {
+      status: 301,
+      headers: { location: "https://store.example.com/robots.txt" },
+    }),
+  );
+
+  await expect(
+    ensureRobotsAllowed({
+      runId: run.id,
+      sourceKey: "finedrams",
+      targetKey: "operator",
+      url: new URL("https://example.com/catalog"),
+      registry,
+      fetchImpl,
+      clock: fixedClock(),
+    }),
+  ).rejects.toThrow(
+    "Origin https://store.example.com is not declared for scraper target operator.",
+  );
+  expect(fetchImpl).toHaveBeenCalledTimes(1);
+  const [origin] = await db.select().from(scrapeOrigins);
+  expect(origin?.robotsState).toBeNull();
+});
+
 test("refreshes expired rules and persists parsed rules rather than content", async () => {
   const { registry, run } = await setupRobotsRuntime();
   await db
