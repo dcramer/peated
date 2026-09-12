@@ -83,6 +83,9 @@ test("registers each built-in scraper source with its target", () => {
     "content-type",
   ]);
   expectHourlyLimit("smws", 80);
+  expect(
+    scraperRegistry.targets.get("smwsa")?.origins.map(({ origin }) => origin),
+  ).toEqual(["https://newmake.smwsa.com", "https://smwsa.com"]);
   expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.initialRunEvery).toBe(1440);
   expectHourlyLimit("bourbonculture", 10);
   expect(scraperRegistry.targets.get("bruichladdich")).toBeDefined();

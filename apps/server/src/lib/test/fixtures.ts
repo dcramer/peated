@@ -353,7 +353,7 @@ export const Entity = async (
 ): Promise<dbSchema.Entity> => {
   const name =
     data.name ||
-    `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)}`;
+    `${faker.word.adjective().toLowerCase()} ${choose(distilleryNames)} ${faker.string.uuid()}`;
 
   return await db.transaction(async (tx) => {
     const createdByActorId =
