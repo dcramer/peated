@@ -263,6 +263,12 @@ supports the record. Re-fetch before reuse.
 | B57431 | Mars Dakekanba - Tokachi Wine Yamasachi Cask Finish Finished at Komagatake Distillery | <https://www.kokubu.co.jp/news/2025/detail/1203100000.html>                                                                                                  |
 | B57432 | Mars Dakekanba - Peated                                                               | <https://www.kokubu.co.jp/news/2026/detail/0716100000.html>                                                                                                  |
 
+## Created from a distributor listing with facts pending (1)
+
+| ID     | Full name               | Source                                                                  |
+| ------ | ----------------------- | ----------------------------------------------------------------------- |
+| B57433 | Mars The Y.A. - Inugami | <https://www.skurnik.com/sku/mars-y-a-bakemono-single-cask-12-inugami/> |
+
 ## Updated existing Bottles (46)
 
 Before is the name at the start of the day; After is the final stored name, including any later move to a distillery Brand.
