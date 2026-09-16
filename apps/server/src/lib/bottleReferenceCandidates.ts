@@ -33,7 +33,7 @@ import {
   isAIGatewayConfigured,
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
-import { webSearchQuery } from "@peated/server/lib/search";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { and, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
@@ -42,6 +42,7 @@ import { getOpenAIEmbedding } from "./openaiEmbeddings";
 const VECTOR_CANDIDATE_LIMIT = 20;
 const TEXT_CANDIDATE_LIMIT = 10;
 const BRAND_CANDIDATE_LIMIT = 5;
+const BRAND_COVERAGE_CANDIDATE_LIMIT = 10;
 
 type BottleReferenceIdentity = BottleExtractedDetails;
 export type BottleCandidateQueryRow = {
@@ -955,7 +956,7 @@ async function getTextCandidates(
   if (!queryText.trim()) {
     return [];
   }
-  const textQuery = webSearchQuery(queryText);
+  const textQuery = plainTextSearchQuery(queryText);
 
   const rows = await runQuery(sql`
     SELECT
@@ -1055,6 +1056,85 @@ async function getBrandCandidates(
   `);
 
   return rows.map((row) => buildBottleCandidate(row, "brand"));
+}
+
+function getExtractedBrandName(
+  extractedLabel: BottleReferenceIdentity | null,
+): string | null {
+  const brandName = (extractedLabel?.brand ?? extractedLabel?.bottler)?.trim();
+  return brandName || null;
+}
+
+/**
+ * Bottle candidate retrieval owns this rule: within a known Brand, rank Bottles
+ * by how many of the query's words they cover. A long scraped title cannot
+ * pass an all-words match, and a substring match misses an edition inserted
+ * between the words, so this is the retrieval that keeps a same-Brand release
+ * in front of the classifier. Coverage, not text rank, decides the order.
+ */
+async function getBrandCoverageCandidates(
+  queryText: string,
+  extractedLabel: BottleReferenceIdentity | null,
+  runQuery: BottleCandidateQueryRunner,
+): Promise<BottleCandidate[]> {
+  const brandName = getExtractedBrandName(extractedLabel);
+  if (!brandName || !queryText.trim()) {
+    return [];
+  }
+
+  const queryLexemes = sql`(
+    SELECT array_agg(DISTINCT lexeme)
+    FROM unnest(
+      tsvector_to_array(to_tsvector('english', unaccent(${queryText})))
+    ) AS lexeme
+  )`;
+  const anyLexemeQuery = sql`(
+    SELECT to_tsquery('english', string_agg(quote_literal(lexeme), ' | '))
+    FROM unnest(query_lexemes.lexemes) AS lexeme
+  )`;
+  const coverage = sql`(
+    SELECT COUNT(*)::float / GREATEST(array_length(query_lexemes.lexemes, 1), 1)
+    FROM unnest(tsvector_to_array(${bottles.searchVector})) AS lexeme
+    WHERE lexeme = ANY(query_lexemes.lexemes)
+  )`;
+
+  const rows = await runQuery(sql`
+    WITH query_lexemes AS (SELECT ${queryLexemes} AS lexemes)
+    SELECT
+      ${bottles.id} AS "bottleId",
+      ${bottles.fullName} AS "fullName",
+      ${entities.name} AS brand,
+      ${bottles.category} AS category,
+      ${bottles.statedAge} AS "statedAge",
+      ${bottles.edition} AS edition,
+      ${bottles.caskStrength} AS "caskStrength",
+      ${bottles.singleCask} AS "singleCask",
+      ${bottles.abv} AS abv,
+      ${bottles.vintageYear} AS "vintageYear",
+      ${bottles.bottlingYear} AS "bottlingYear",
+      ${bottles.releaseYear} AS "releaseYear",
+      ${bottles.maturation} AS "maturation",
+      ${bottles.caskNumber} AS "caskNumber",
+      ${bottles.outturn} AS "outturn",
+      ${coverage} AS score
+    FROM ${bottles}
+    INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
+    CROSS JOIN query_lexemes
+    WHERE (
+      LOWER(${entities.name}) = LOWER(${brandName})
+      OR LOWER(COALESCE(${entities.shortName}, '')) = LOWER(${brandName})
+    )
+      AND query_lexemes.lexemes IS NOT NULL
+      AND ${bottles.searchVector} @@ ${anyLexemeQuery}
+      AND NOT EXISTS(
+        SELECT FROM ${bottleTombstones}
+        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+      )
+    ORDER BY score DESC, ${bottles.fullName} ASC
+    LIMIT ${BRAND_COVERAGE_CANDIDATE_LIMIT}
+  `);
+
+  return rows.map((row) => buildBottleCandidate(row, "brand_coverage"));
 }
 
 async function getOrdinaryBottleCandidateById(
@@ -1330,6 +1410,7 @@ async function searchBottleCandidatesWithEmbedding(
     vectorCandidates,
     textCandidates,
     brandCandidates,
+    brandCoverageCandidates,
     exactCandidate,
   ] = await Promise.all([
     input.currentBottleId
@@ -1366,6 +1447,13 @@ async function searchBottleCandidatesWithEmbedding(
         await getBrandCandidates(normalizedName, extractedLabel, runQuery),
     ),
     runCandidateLookupSafely(
+      "brand_coverage",
+      searchName,
+      noCandidates,
+      async () =>
+        await getBrandCoverageCandidates(queryText, extractedLabel, runQuery),
+    ),
+    runCandidateLookupSafely(
       "exact",
       searchName,
       noExactCandidate,
@@ -1383,6 +1471,9 @@ async function searchBottleCandidatesWithEmbedding(
     mergeBottleCandidate(candidates, candidate);
   }
   for (const candidate of brandCandidates) {
+    mergeBottleCandidate(candidates, candidate);
+  }
+  for (const candidate of brandCoverageCandidates) {
     mergeBottleCandidate(candidates, candidate);
   }
   if (exactCandidate) {

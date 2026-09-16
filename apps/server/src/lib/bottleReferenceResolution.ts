@@ -6,7 +6,6 @@ import {
 import type {
   BottleClassificationDecision,
   BottleConfidenceBasis,
-  BottleExtractedDetails,
   BottleObservation,
 } from "@peated/bottle-classifier/internal/types";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
@@ -173,7 +172,6 @@ export async function applyClassifierCreateDecision({
 type ResolveBottleReferenceTargetInput = {
   reference: BottleReferenceInput;
   referenceLookupNames?: string[];
-  extractedIdentity?: Partial<BottleExtractedDetails> | null;
   createdByActorId: number;
 };
 
@@ -181,7 +179,6 @@ async function resolveBottleReferenceTargetWithClassifier(
   {
     reference,
     referenceLookupNames = [],
-    extractedIdentity = null,
     createdByActorId,
   }: ResolveBottleReferenceTargetInput,
   classify: typeof classifyBottleReference,
@@ -212,32 +209,9 @@ async function resolveBottleReferenceTargetWithClassifier(
 
   let classification: BottleClassificationResult;
   try {
-    classification = await classify({
-      reference,
-      extractedIdentity: extractedIdentity
-        ? {
-            brand: null,
-            bottler: null,
-            expression: null,
-            series: null,
-            distillery: null,
-            category: null,
-            stated_age: null,
-            abv: null,
-            release_year: null,
-            release_month: null,
-            release_day: null,
-            vintage_year: null,
-            maturation: null,
-            cask_number: null,
-            outturn: null,
-            cask_strength: null,
-            single_cask: null,
-            edition: null,
-            ...extractedIdentity,
-          }
-        : null,
-    });
+    // Source titles carry no structured facts. Supplying an extracted identity
+    // here, even an empty one, would make the classifier skip text extraction.
+    classification = await classify({ reference });
   } catch (error) {
     return {
       assignment: null,

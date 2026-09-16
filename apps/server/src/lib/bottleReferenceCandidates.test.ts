@@ -214,3 +214,70 @@ test("includes maturation and cask number in candidate search evidence", async (
   expect(queryText).toContain("Tawny port butt");
   expect(queryText).toContain("#1234");
 });
+
+test("ranks a same-Brand release by covered words when the scraped title cannot pass an all-words match", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await fixtures.Entity({ name: "Laphroaig", kind: "brand" });
+  const release = await fixtures.Bottle({
+    name: "Willem Dafoe - The Limited Edition",
+    brandId: brand.id,
+    edition: "The Limited Edition",
+    statedAge: 14,
+    abv: 53.7,
+    releaseYear: 2026,
+    maturation: "Finished in Oloroso sherry casks",
+  });
+  const sibling = await fixtures.Bottle({
+    name: "14-year-old Oloroso Sherry Finish",
+    brandId: brand.id,
+    statedAge: 14,
+  });
+  await fixtures.Bottle({
+    name: "10-year-old",
+    brandId: brand.id,
+    statedAge: 10,
+  });
+
+  const results = await searchBottleCandidates({
+    query:
+      "Laphroaig 14-year-old – Willem Dafoe Edition (53,7%, OB 2026, Oloroso sherry cask finish)",
+    brand: "Laphroaig",
+    expression: "Willem Dafoe Edition",
+    stated_age: 14,
+    abv: 53.7,
+    release_year: 2026,
+  });
+
+  expect(results[0]).toMatchObject({
+    bottleId: release.id,
+    source: expect.arrayContaining(["brand_coverage"]),
+  });
+  const siblingIndex = results.findIndex(
+    (candidate) => candidate.bottleId === sibling.id,
+  );
+  expect(siblingIndex).toBeGreaterThan(0);
+});
+
+test("does not read a dash in a scraped title as a word exclusion", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await fixtures.Entity({ name: "Laphroaig", kind: "brand" });
+  const release = await fixtures.Bottle({
+    name: "Willem Dafoe - The Limited Edition",
+    brandId: brand.id,
+  });
+
+  const results = await searchBottleCandidates({
+    query: "Laphroaig – Willem Dafoe",
+  });
+
+  expect(results).toContainEqual(
+    expect.objectContaining({
+      bottleId: release.id,
+      source: expect.arrayContaining(["text"]),
+    }),
+  );
+});

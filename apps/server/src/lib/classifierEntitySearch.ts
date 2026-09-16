@@ -1,7 +1,7 @@
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { entities, entityReferences } from "@peated/server/db/schema";
-import { webSearchQuery } from "@peated/server/lib/search";
+import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 
 const CONTAINED_MATCH_FETCH_MULTIPLIER = 4;
@@ -113,7 +113,7 @@ export async function searchClassifierEntities(
     });
   }
 
-  const textQuery = webSearchQuery(args.query);
+  const textQuery = plainTextSearchQuery(args.query);
   const textScore = sql<number>`ts_rank(${entities.searchVector}, ${textQuery})`;
   const textMatches = await db
     .select({
