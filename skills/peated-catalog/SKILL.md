@@ -69,8 +69,16 @@ the scoped research artifact.
 
 - One marketed release is one Bottle. Package size or packaging alone does not
   create another Bottle.
-- Use the producer's stable product name. Keep age, year, ABV, edition, cask
-  facts, and outturn in their fields.
+- Use the bottle's common name: the producer's title without the Brand,
+  keeping printed age, vintage, or cask wording. Also store age, year, ABV,
+  edition, cask facts, and outturn in their fields. Never add them from fields
+  to make a name unique, and do not fall back to a generic `Single Malt`.
+- When a producer presents a distillery name as its own line and the trade
+  sells it that way, that distillery Entity is the Brand with a short name,
+  as for Yamazaki, Chichibu, and Mars Komagatake. A house label stays the
+  Brand only for blends and ranges that mix distilleries.
+- Read the edit context before a shared rename; the change reaches every
+  Bottle in the group.
 - Use `null` for unknown or disputed facts. Keep an existing value unless a
   stronger source for the same Bottle proves it wrong.
 - A Bottler independently selects and releases whisky made by another producer.

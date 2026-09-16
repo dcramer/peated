@@ -51,8 +51,9 @@ Peated is a public record of whisky, freely accessible to everyone.
 - Before backfills, duplicate cleanup, or production Bottle edits, follow
   Catalog Maintenance and Whisky Identity Model: inventory, evidence, approval,
   and verification.
-- Use the producer's stable product name for Bottle `name`; do not build it from
-  age, year, strength, or other fields. Verify each Bottle after writing.
+- Bottle `name` is the bottle's common name as the producer prints it, keeping
+  any age, vintage, or cask wording from the title; do not invent those from
+  fields. Verify each Bottle after writing.
 
 ## Testing
 

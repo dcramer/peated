@@ -244,15 +244,21 @@ Entity.
   "release 4.2," store `4.2`. A printed batch or lot code is not an edition
   when the producer sells one ongoing product without batch-specific
   marketing.
-- Bottle names combine the stable expression with an explicit marketed
-  edition. Age, vintage year, bottling year, release year, ABV, cask strength,
-  cask number, and outturn remain structured facts. Do not generate name
-  suffixes from those fields to make a Bottle look unique. Wording already
-  marketed in the expression remains there.
+- Bottle names combine the common name of the bottle with an explicit marketed
+  edition. The common name is the expression as the producer's title, the
+  label, and the trade name it, without the Brand. It keeps printed age,
+  vintage, cask number, or strength wording, because that wording is how
+  people recognize the bottle: `22-year-old`, `Single Cask 2014 No.1841
+7-year-old`, `1986 30-year-old`. Age, vintage year, bottling year, release
+  year, ABV, cask strength, cask number, and outturn are always stored as
+  structured facts as well. Never generate a name suffix from those fields to
+  make a Bottle look unique, and do not use a generic category word such as
+  `Single Malt` as the name unless the marketed name is exactly that.
 - For a uniform multi-distillery label with no separate expression name, use
-  the featured distillery as the Bottle name. For example, use `Glenury Royal`
-  as the Rare Series Bottle name. Store its 55-year age, 1970 vintage, 2026
-  release year, and 62.4% ABV in their fields, not in the name.
+  the featured distillery as the Bottle name, keeping the age wording the label
+  prints: `Glenury Royal 55-year-old` for the Rare Series release. Store its
+  55-year age, 1970 vintage, 2026 release year, and 62.4% ABV in their fields
+  as well; do not add the vintage, release year, or ABV to the name.
 - `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
   was bottled. `releaseYear` is the known year the marketed release became
   available. Store `releaseMonth` and `releaseDay` only when the source gives
@@ -268,22 +274,28 @@ Entity.
   release evidence, and uncertain values remain unknown.
 - Do not infer `statedAge` from year fields unless the source states the age.
 
-When one uniform consumer label markets whiskies from multiple named
-distilleries, use that uniform label as the Brand when the distillery names
-identify provenance rather than separate consumer brands. Keep each producer
-in `distillers`. Do not assign the distillery as Brand only because a common
-product title puts the distillery name first. Display order does not change
-identity.
+The Brand is the name people buy the bottle under. A distillery Entity is the
+Brand of its own single malts when the producer presents the distillery name
+as a product line and the trade sells it that way; give the Entity a
+`shortName` for Bottle names. Yamazaki (owner Suntory), Chichibu (owner
+Venture Whisky), and Mars Komagatake and Mars Tsunuki (owner Hombo Shuzo,
+house label Mars) follow this rule. One Entity can be both Brand and
+distiller.
 
-For example, model Rare Malts Selection as Brand for its Brora release. Use
-Brora as the Bottle name and distiller. Do not model Rare Malts Selection as a
-series beneath the Brora Brand.
+A house or collection label is the Brand only when it is the name people buy
+under and the distillery names inside it identify provenance rather than
+separate consumer brands, as with Rare Malts Selection and its Brora release:
+Rare Malts Selection is the Brand, Brora is the Bottle name and distiller. A
+house label also stays the Brand for its blends and for ranges that mix
+distilleries, such as Mars Iwai or Mars The Y.A. Do not decide this from
+word order in a title, and do not keep a house label as Brand only because
+existing records use it; check how the producer and the trade name the line.
 
-BottleSeries belongs to one Brand. Do not use BottleSeries to demote an
-evidenced uniform Brand into several distillery Brands. A real marketing
-program that relates independently branded products needs a separately
-designed cross-brand collection concept; it is not a BottleSeries in the
-current model.
+BottleSeries belongs to one Brand and groups ranges inside that Brand. A
+distillery's own single malt line is a Brand, not a Series under the house
+label. A real marketing program that relates independently branded products
+needs a separately designed cross-brand collection concept; it is not a
+BottleSeries in the current model.
 
 Package volume, export carton, gift box, and miniature presentation are not
 Bottle editions by themselves. Variants that differ only by those package
