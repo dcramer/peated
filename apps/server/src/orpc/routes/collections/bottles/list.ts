@@ -16,7 +16,7 @@ import collectionBottleListContract from "@peated/server/orpc/contracts/collecti
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { isLibraryCollection } from "./collectionBottleHelpers";
 
@@ -91,13 +91,18 @@ export default implement(collectionBottleListContract).handler(async function ({
     eq(collectionBottles.collectionId, collection.id),
   ];
   if (input.query) {
+    // Wrap the alternatives with or() so the collection filter above still
+    // applies to both; a bare OR would leak matches from every collection.
     baseWhere.push(
-      sql`EXISTS(
+      or(
+        sql`EXISTS(
           SELECT FROM ${bottleReferences}
           WHERE ${bottleReferences.bottleId} = ${collectionBottles.bottleId}
             AND LOWER(${bottleReferences.name}) = ${input.query.toLowerCase()}
             AND ${bottleReferences.ignored} IS NOT TRUE
-        ) OR ${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
+        )`,
+        sql`${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
+      ),
     );
   }
   if (input.brand) {
