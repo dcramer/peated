@@ -40,7 +40,9 @@ Bottle identity can contain the following layers:
    BottleGroup, when the Bottle is grouped.
 4. **Release marker**: an exact human-facing designation such as a chapter,
    batch, act, scene, volume, edition, society code, or marketed barrel number.
-5. **Supporting facts**: stated age and ABV.
+5. **Supporting facts**: stated age and ABV as structured fields. When the
+   producer prints the age in the product name, that wording is part of the
+   expression, not a supporting fact.
 6. **Years**: distillation, bottling, and release years.
 7. **Verification facts**: category, single-cask and cask-strength flags, cask
    attributes, and other exact stored evidence.

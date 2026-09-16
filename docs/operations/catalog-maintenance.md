@@ -97,15 +97,28 @@ Then apply these rules:
   Bottler independently selects and releases whisky made by another producer.
   An official Brand or distillery release has no bottler. Do not infer one from
   an owner, importer, distributor, or physical packer.
-- Keep `name` to the stable release name used by the producer. Do not append
-  age, vintage
-  year, release year, ABV, cask strength, cask number, outturn, package size, or
-  package text to make it unique. Store those facts in their fields. Preserve
-  wording only when the producer markets it as part of the expression. Use
-  `edition` only for an explicit marketed release descriptor. Copy its wording
-  from the producer's product title or visible label. Narrative prose can prove
-  that a code identifies a release, but it cannot add generic words such as
-  `Release`, `Edition`, `Batch`, or `Volume` that the title and label omit.
+- `name` is the common name of the bottle: the expression as the producer's
+  product title, the label, and the trade name it, without the Brand. Keep any
+  age, vintage, cask number, or strength wording that the title or label
+  prints, because that wording is how people know the bottle. Also store those
+  facts in their fields. Do not add age, year, ABV, cask number, outturn, or
+  package text that the producer does not print, and never build a name from
+  fields to make it unique. A generic word such as `Single Malt` is a name
+  only when the marketed name is exactly that. Use `edition` for an explicit
+  marketed release descriptor such as `2022 Edition`, `Batch 24`, or a
+  numbered collection entry. Copy its wording from the producer's product
+  title or visible label. Narrative prose can prove that a code identifies a
+  release, but it cannot add generic words such as `Release`, `Edition`,
+  `Batch`, or `Volume` that the title and label omit.
+- The server normalizes `name` on create and update: age wording such as
+  `22 Years` or `Aged 7 Years` becomes `22-year-old` or `Aged 7-year-old`, so
+  write `7-year-old` rather than `Aged 7 Years`. See
+  [Bottle Reference Normalization](../architecture/bottle-reference-normalization.md)
+  before writing names with ages or batch codes.
+- Before changing a name, read the Bottle edit context. A name change is
+  shared and updates every Bottle in the group. When a group has more than one
+  member, give each member its own `edition` in the same pass so no sibling
+  is left with a bare shared name.
 - Store only known date parts. Use `releaseYear`, then `releaseMonth`, then
   `releaseDay`. A month needs a year, and a day needs a month. Do not invent the
   first day of a month. Do not copy a distillation or bottling date into release
@@ -115,6 +128,8 @@ Then apply these rules:
 - Merge records only when they describe the same marketed release. Package
   volume and market packaging alone do not create a new Bottle. Different
   vintage, age, ABV, edition, or cask facts usually require separate Bottles.
+- Unaged new-make or new-pot spirit is not whisky and is out of scope. Record
+  it in the research file as out of scope instead of creating a Bottle.
 
 Use `null` for unknown facts. Preserve a current value unless stronger evidence
 shows that it is wrong.
@@ -318,9 +333,8 @@ pnpm cli api delete /bottles/123/aliases/789
   identity changes, or changes that affect records outside the named scope.
 - Read every Bottle immediately before changing it. Stop if an ID, identifying
   fact, or current value differs from the work list.
-- Before changing a name, read the Bottle edit context. Confirm the shared
-  `name`, the release facts, and the number of Bottles that will change. A name
-  change is shared and can update every Bottle in the group.
+- Read the Bottle edit context before every shared rename. Confirm the shared
+  `name`, the release facts, and the number of Bottles that will change.
 - Use `--yes` only after the requested or separately approved authorization.
 - Update known IDs in small groups. Do not choose IDs from result order or an
   unchecked search result.
@@ -370,5 +384,11 @@ The operation is complete only when:
 
 ## Completed Audits
 
+Audits record what was true when they ran. Records written before the naming
+and Brand rules above were settled (September 16, 2026) may not follow them;
+Yamazaki still carries age-only names such as `12-year-old`. Do not copy an
+older catalog's shape as precedent without checking it against this guide.
+
 - [Whisky Auctioneer catalog audit, September 2026](catalog-audits/2026-09-02-whisky-auctioneer/README.md)
-- [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md)
+- [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md) (predates the current naming rules)
+- [Mars distilleries, September 16, 2026](../research/catalog/2026-09-16-mars.md) (follows the current naming and Brand rules)

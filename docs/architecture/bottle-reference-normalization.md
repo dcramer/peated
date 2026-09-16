@@ -52,6 +52,16 @@ Current classifier, validation, ingestion, and maintenance code uses the
 explicit `normalizeBottleInput` name for this wider behavior. Exact-reference
 keys still use `normalizeBottleReferenceKey`.
 
+Bottle create and update validation run `normalizeBottleInput` on the
+submitted `name`, so the stored name can differ from the request:
+
+- Age wording is rewritten: `22 Years` becomes `22-year-old`, and `Aged 7
+Years` becomes `Aged 7-year-old`. Write `7-year-old` directly.
+- `Batch 24` style wording is rewritten to a canonical `Batch` form. Cask
+  codes such as `#T333` or `No.1841` are left as written.
+
+Re-fetch every written Bottle and compare the stored name with the request.
+
 The old helper name is fully removed. Legacy scraper adapters now call
 `normalizeBottleInput`. This helper is still not safe for exact-reference keys;
 use `normalizeBottleReferenceKey` for those keys.

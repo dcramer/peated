@@ -50,6 +50,11 @@ edition, cask number, and Series when those facts are known.
 - Past releases, archive, history, news, and trade-support pages
 - Regional shops and local-language sites
 - Linked PDFs, bar menus, release books, and press pages
+- WordPress product sitemaps such as `product-sitemap.xml`, which list
+  discontinued product pages; fetch them one at a time, because security
+  plugins block parallel requests
+- Wayback captures of a producer's earlier product site and news pages when
+  its current news archive starts late
 
 Do not bypass access controls. Search snippets, thumbnails, copied images, and
 direct image links are leads only. Save the page that explains the item.
@@ -112,6 +117,11 @@ producer, auction, or retailer evidence.
   the exact label against an independent auction, producer, or retailer source
   before creating a Bottle; a plausible old date and name are not evidence.
 - An exact image may still lack permission for Peated to store it.
+- Creating an Entity with an address triggers geocoding that can replace the
+  address with a wrong street. Re-read the Entity and correct the address and
+  coordinates.
+- A shared Bottle rename fans out to every Bottle in its group. Read the edit
+  context first and give each member its own edition in the same pass.
 - A direct image URL does not record its source page or license. Count image
   identity, source-page provenance, and reuse status separately in the final
   audit.
