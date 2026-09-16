@@ -226,6 +226,41 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results).toHaveLength(0);
   });
 
+  test("only searches the requested Library", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Mars Search Brand" });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Mars Search Bottle",
+    });
+    const collection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    const otherUser = await fixtures.User();
+    const otherCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: otherUser.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values([
+      { collectionId: collection.id, bottleId: bottle.id },
+      { collectionId: otherCollection.id, bottleId: bottle.id },
+    ]);
+
+    const response = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", query: "mars" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results.map(({ bottle }) => bottle.id)).toEqual([
+      bottle.id,
+    ]);
+  });
+
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {
     const error = await waitError(() =>
       routerClient.collections.bottles.list(
