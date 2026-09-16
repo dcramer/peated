@@ -103,7 +103,6 @@ export async function createExternalReview(
       currentBottleId: null,
     },
     referenceLookupNames: [referenceKey, rawName],
-    extractedIdentity: { category: input.category },
     createdByActorId: systemActor.id,
   };
   const resolution =

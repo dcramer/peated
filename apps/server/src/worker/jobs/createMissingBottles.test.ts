@@ -328,11 +328,12 @@ describe("createMissingBottles", () => {
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        extractedIdentity: expect.objectContaining({
-          category: "single_malt",
-        }),
         reference: expect.objectContaining({ id: selected.id }),
       }),
+    );
+    // A supplied identity, even category-only, would skip text extraction.
+    expect(classifyBottleReferenceMock.mock.calls[0]?.[0]).not.toHaveProperty(
+      "extractedIdentity",
     );
     expect(
       await db.query.externalReviews.findFirst({

@@ -7,7 +7,11 @@ const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
 const SINGLE_CASK_SEARCH_TERMS = "single cask single barrel";
 
-/** Parse human search text as normalized words, never as search operators. */
+/**
+ * Parse search text as normalized words, never as search operators. Web
+ * search syntax would read a dash before a word, common in scraped titles and
+ * Bottle editions, as NOT that word.
+ */
 export function plainTextSearchQuery(query: string) {
   return sql`plainto_tsquery('english', unaccent(${query}))`;
 }
@@ -26,10 +30,6 @@ export function prefixTextSearchQuery(query: string) {
     ),
     ''::tsquery
   )`;
-}
-
-export function webSearchQuery(query: string) {
-  return sql`websearch_to_tsquery('english', unaccent(${query}))`;
 }
 
 function formatSearchAbv(abv: number | null | undefined) {

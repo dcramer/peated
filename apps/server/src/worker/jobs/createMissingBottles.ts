@@ -89,8 +89,6 @@ export async function createMissingBottles(
           // Normalized fallback aliases can collapse exact identity detail before
           // the classifier reviews the full reference title.
           referenceLookupNames: [referenceKey, review.name],
-          extractedIdentity:
-            review.category === null ? null : { category: review.category },
           createdByActorId: systemActor.id,
         },
         services?.classifyReference,

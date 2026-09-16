@@ -54,6 +54,27 @@ describe("searchClassifierEntities", () => {
     );
   });
 
+  test("does not read a dash in the query as a word exclusion", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Willem Dafoe Distillery",
+      kind: "distillery",
+    });
+
+    const results = await searchClassifierEntities({
+      query: "Willem – Dafoe Distillery",
+      limit: 10,
+    });
+
+    expect(results).toContainEqual(
+      expect.objectContaining({
+        entityId: entity.id,
+        source: expect.arrayContaining(["text"]),
+      }),
+    );
+  });
+
   test("filters Entity-classifier search by kind", async ({ fixtures }) => {
     const brand = await fixtures.Entity({
       name: "Kindfilter Brand",

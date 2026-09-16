@@ -421,7 +421,6 @@ describe("resolveBottleReferenceTarget", () => {
         imageUrl: null,
         currentBottleId: null,
       },
-      extractedIdentity: null,
     });
   });
 
