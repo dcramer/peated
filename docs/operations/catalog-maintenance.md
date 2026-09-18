@@ -93,10 +93,10 @@ but missing tasting notes do not block completion.
 
 Then apply these rules:
 
-- Set `brand`, `distillers`, `bottler`, and `series` from product evidence. A
-  Bottler independently selects and releases whisky made by another producer.
-  An official Brand or distillery release has no bottler. Do not infer one from
-  an owner, importer, distributor, or physical packer.
+- Set `brand`, `distillers`, `bottler`, and `series` with the six rules in
+  [Who Is The Brand, Series, And Bottler](../architecture/whisky-identity-model.md#who-is-the-brand-series-and-bottler).
+  An official Brand or distillery release has no bottler. Do not infer one
+  from an owner, importer, distributor, or physical packer.
 - `name` is the common name of the bottle: the expression as the producer's
   product title, the label, and the trade name it, without the Brand. Keep any
   age, vintage, cask number, or strength wording that the title or label
@@ -128,8 +128,12 @@ Then apply these rules:
 - Merge records only when they describe the same marketed release. Package
   volume and market packaging alone do not create a new Bottle. Different
   vintage, age, ABV, edition, or cask facts usually require separate Bottles.
-- Unaged new-make or new-pot spirit is not whisky and is out of scope. Record
-  it in the research file as out of scope instead of creating a Bottle.
+- Unaged new-make or new-pot spirit is not whisky and is out of scope. So is
+  anything that is not a marketed release under the identity model's
+  definition: visitor hand-fills, private casks never sold as labeled
+  bottles, non-sale set components, and whisky poured only by the glass.
+  Record each excluded item in the research file with the reason instead of
+  creating a Bottle.
 
 Use `null` for unknown facts. Preserve a current value unless stronger evidence
 shows that it is wrong.
@@ -138,8 +142,11 @@ shows that it is wrong.
 
 Review Series as catalog records, not only as a field on a Bottle:
 
-- Use a Series only for an evidenced stable range or family. A batch code,
-  release year, or one-off edition is not a Series.
+- Use a Series only for a named range the Brand markets for its own products
+  (identity model rules 1 to 4). A batch code, release year, or one-off
+  edition is not a Series. A retailer's or importer's program name is an
+  edition, not a Series. An owner's multi-distillery collection is a Brand,
+  not a per-distillery Series.
 - Inventory existing Series records for the Brand and look for missing or
   duplicate Series before creating one.
 - Review the Series Brand, name, and description. Keep the name to the marketed
@@ -150,7 +157,9 @@ Review Series as catalog records, not only as a field on a Bottle:
   membership, release count, and any redirects created by a merge.
 
 When the requested scope is an Entity such as a Brand, distillery, or bottler,
-also review the target Entity's catalog record. Fill supported names, kind,
+also review the target Entity's catalog record. Create a distillery Entity for
+a production site the producer names (identity model rule 6) before creating
+its Bottles. Fill supported names, kind,
 status, owner, description and source, establishment year, official website,
 and origin country, region, address, and location. For a Distillery, location is
 the production site. Do not use a later headquarters or office. Review aliases
@@ -311,6 +320,22 @@ that will remain, `222`:
 pnpm cli api post /bottles/111/merge --input /tmp/bottle-merge.json
 ```
 
+An Entity merge uses the same body and direction with
+`POST /entities/111/merge` (moderator only). Merge Entities only when the
+producer's own pages prove that two records describe one organization or one
+production site. Keep as survivor the Entity that Bottles already use as
+Brand, otherwise the older ID. The merge runs as a background job that
+repoints Bottle relationships, groups, aliases, references, images, and
+events to the survivor and leaves a redirect for the old ID. The survivor
+keeps its own name, address, and location. Afterwards:
+
+- fetch both IDs and confirm the old one resolves to the survivor;
+- fetch the survivor's Brand, distiller, and bottler Bottle lists and compare
+  the counts with the two lists from before the merge;
+- fetch aliases and references and confirm nothing was dropped;
+- patch the address and location if the retired record had the better ones,
+  then read the Entity again, because geocoding can rewrite an address.
+
 To add a verified public alias, send only the name:
 
 ```json
@@ -386,9 +411,12 @@ The operation is complete only when:
 
 Audits record what was true when they ran. Records written before the naming
 and Brand rules above were settled (September 16, 2026) may not follow them;
-Yamazaki still carries age-only names such as `12-year-old`. Do not copy an
-older catalog's shape as precedent without checking it against this guide.
+Yamazaki still carries age-only names such as `12-year-old`, some retailer
+exclusives still carry the retailer as bottler, and some owner collections
+still have per-distillery Series. Do not copy an older catalog's shape as
+precedent without checking it against this guide and the identity model.
 
 - [Whisky Auctioneer catalog audit, September 2026](catalog-audits/2026-09-02-whisky-auctioneer/README.md)
 - [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md) (predates the current naming rules)
 - [Mars distilleries, September 16, 2026](../research/catalog/2026-09-16-mars.md) (follows the current naming and Brand rules)
+- [Kanosuke, September 18, 2026](../research/catalog/2026-09-18-kanosuke/README.md) (first record written to the six Brand, Series, and bottler rules)

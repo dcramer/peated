@@ -1,103 +1,95 @@
 ---
 name: peated-catalog
-description: Catalogs or repairs Peated Bottle records directly for a named Bottle, brand, Series, distillery, bottler, or release set. Use for missing Bottles, wrong facts, Series membership, images, aliases, references, or duplicate review. Do not use for code changes or store-price queue moderation.
+description: Catalogs or repairs Peated Bottle records directly for a named Bottle, brand, Series, distillery, bottler, or release set. Use for missing Bottles, wrong facts, Brand or Series decisions, images, aliases, references, duplicate review, or a dry-run inventory of such a set. Do not use for code changes or store-price queue moderation.
 ---
 
 # Peated Catalog
 
 Finish the named catalog target in production unless the user names another
-environment or asks only for research or review. Follow any narrower target the
-user gives.
+environment or asks only for a dry run, research, or review. Follow any
+narrower target the user gives.
 
 ## Read what applies
 
-- Use `docs/operations/catalog-maintenance.md` for a full Bottle, brand, Series,
-  distillery, bottler, or release-set review.
-- Read `docs/architecture/whisky-identity-model.md` before deciding whether
-  Bottles are distinct, related, or duplicates.
-- Open only the linked guide needed for the current work.
-- Use `pnpm cli auth` and `pnpm cli api` for production data. Do not use legacy
-  database commands.
+| Read                                         | For                                                                                            |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `docs/operations/catalog-maintenance.md`     | The full workflow, every field to review, and the create, patch, merge, and image procedures   |
+| `docs/architecture/whisky-identity-model.md` | What counts as a release, the six Brand, Series, and bottler rules, and when Bottles are one   |
+| `docs/operations/catalog-research.md`        | Where releases hide and the traps earlier work hit; read before building the outside inventory |
+| `pnpm cli auth`, `pnpm cli api`              | Production data. Do not use legacy database commands.                                          |
 
 ## Work
 
-1. Name the target and environment. Resolve stored IDs with read-only API calls.
-2. Before deciding what to change, build a list of current and past releases
-   from sources outside Peated. Fetch every page of Peated results and compare
-   the lists. The producer's current range does not define the catalog. Search
-   every period and product family, including discontinued, one-off, and
-   country-specific releases. For a distillery scope, also search historical
-   owner and house brands; domestic blends and older releases may not use the
-   distillery as their Brand.
-3. Use specialist catalogs, collector lists, old sites, and auction archives to
-   find past releases. Verify each release and fact with producer pages,
-   announcements from the time, readable labels, or exact auction records. If a
-   search fails, try other names, languages, archives, and kinds of sources.
-4. Track every release and Peated record as `create`, `update`, `merge`,
-   `no change`, `unresolved`, or `out of scope`. Save the source for each change.
-   Check each existing Bottle and possible missing release. Do not mark old
-   records `unresolved` as a group because there are many or no current producer
-   page exists. For each unresolved item, record the unanswered question and
-   the sources or searches tried.
-5. Review all fields, Series, the target Entity, images, aliases, and import
-   references required by Catalog Maintenance.
-6. Before writing, state the target and action counts. A direct catalog request
-   allows supported creates and updates within that target. Ask before merges,
-   deletes, uncertain identity changes, or work outside it.
+1. Name the target and environment. Resolve stored IDs with read-only API
+   calls.
+2. Build the outside inventory before deciding anything: current and past
+   releases from producer archives, dated announcements, specialist catalogs,
+   collector lists, old sites, and auction records. The producer's current
+   range is not the catalog. Search every period and product family, including
+   discontinued, one-off, and country-specific releases. For a distillery
+   scope, also search former owner and house brands. If a search fails, try
+   other names, languages, archives, and kinds of sources.
+3. Fetch every page of Peated results by Brand, distiller, bottler, Series,
+   and name search. Compare both directions: every outside release needs a
+   Peated status and every Peated record needs an inventory status.
+4. Give each row one status: `create`, `update`, `merge`, `no change`,
+   `unresolved`, or `out of scope`. Save the source for each changed fact. Do
+   not mark old records `unresolved` as a group because there are many or no
+   producer page survives; for each one, record the open question and the
+   searches tried.
+5. Review every field, Series, the target Entity, images, aliases, and import
+   references that Catalog Maintenance lists.
+6. Before writing, state the target and the counts by status. A direct
+   catalog request allows evidence-backed creates and updates inside that
+   target. Ask before Bottle or Entity merges, deletes, Brand changes, or work
+   outside the target.
 7. Check the live OpenAPI schema. Re-fetch each record before changing it. Use
    exact IDs and send only supported fields. Stop if the record changed or the
    API returns a conflict or validation error.
-8. Re-fetch every changed record. Check shared edits, images, aliases,
-   references, and redirects when they apply.
-9. Before reporting completion, save durable results in a dated,
-   scope-specific artifact under `docs/research/catalog/`. Use
-   `YYYY-MM-DD-short-name.md`, or a directory with a `README.md` when the report
-   has supporting data. Do not append separate tasks to a shared or monthly
-   report.
+8. Re-fetch every changed record and check shared edits, images, aliases,
+   references, and redirects where they apply.
+9. Before reporting, save the durable results under `docs/research/catalog/`
+   as `YYYY-MM-DD-short-name.md`, or as a directory with a `README.md` when
+   there is supporting data. Do not append to a shared or monthly report.
+   Update `docs/operations/catalog-research.md` only for a reusable method,
+   access limit, or recurring trap.
 
-For the research record, keep exact links, what each source established, the
-years, markets, and release families covered, material conflicts or page errors,
-searches tried for unresolved gaps, and image source and reuse findings when
-they will help later work. Distinguish leads from evidence and do not claim that
-a source is complete unless it proves that. Do not keep raw API replies,
-downloaded images, tokens, request files, or other temporary working data.
-Update `docs/operations/catalog-research.md` only when the task finds a reusable
-research method, access limit, or recurring trap. Keep task-specific results in
-the scoped research artifact.
+## Research record
+
+| Keep                                                                   | Leave out                                                  |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Exact links and what each source established                           | Raw API replies, request files, tokens                     |
+| Years, markets, and release families covered, and where coverage stops | Downloaded images                                          |
+| Conflicts and page errors, and which value was used                    | Working notes with no later use                            |
+| Searches tried for each unresolved gap                                 | Claims that a source is complete when it does not prove it |
+| Image source pages and reuse terms                                     |                                                            |
+| Leads marked as leads, separate from evidence                          |                                                            |
 
 ## Rules
 
-- One marketed release is one Bottle. Package size or packaging alone does not
-  create another Bottle.
-- Use the bottle's common name: the producer's title without the Brand,
-  keeping printed age, vintage, or cask wording. Also store age, year, ABV,
-  edition, cask facts, and outturn in their fields. Never add them from fields
-  to make a name unique, and do not fall back to a generic `Single Malt`.
-- When a producer presents a distillery name as its own line and the trade
-  sells it that way, that distillery Entity is the Brand with a short name,
-  as for Yamazaki, Chichibu, and Mars Komagatake. A house label stays the
-  Brand only for blends and ranges that mix distilleries.
-- Read the edit context before a shared rename; the change reaches every
-  Bottle in the group.
-- Use `null` for unknown or disputed facts. Keep an existing value unless a
+- One marketed release is one Bottle. The same liquid in another size, box,
+  label, or market name is the same Bottle; add the name as a reference.
+- Set Brand, Series, and bottler with the six rules in the identity model.
+  In short: a distillery's own line and an owner's multi-distillery
+  collection are Brands; an independent bottler's label is Brand and bottler;
+  a retailer's, importer's, or festival's selection of an official bottling
+  keeps the producer Brand, has no bottler, and carries the program name in
+  `edition`. Do not clear an existing bottler only because a source omits it.
+- `name` is the producer's title without the Brand, keeping printed age,
+  vintage, or cask wording. Store age, years, ABV, edition, cask facts, and
+  outturn in their fields as well; never build a name from them, and do not
+  fall back to a generic `Single Malt`.
+- Read the edit context before a shared rename; it changes every Bottle in
+  the group.
+- Use `null` for an unknown or disputed fact. Keep an existing value unless a
   stronger source for the same Bottle proves it wrong.
-- A Bottler independently selects and releases whisky made by another producer.
-  A name on the label does not prove that role: do not infer it from an owner,
-  importer, distributor, physical packer, customer, retailer, bar, or private
-  barrel holder. Do not clear an existing Bottler only because a source omits
-  it; require stronger evidence that the assignment is wrong.
-- Use a Series only for an evidenced, named product range owned by one Brand.
-  Shared artwork, a client, a release year, or similar packaging does not prove
-  Series membership. Add an alias only for a proven public name. Assign an
-  import reference only when the full text identifies one Bottle.
-- Use only an image of the exact Bottle. Save the canonical page where it
-  appears and its reuse terms, then inspect the stored image. A populated image
-  URL, a direct asset URL, or a missing license does not by itself complete the
-  provenance check.
+- Add an alias only for a proven public name. Assign an import reference only
+  when its full text identifies one Bottle.
+- Use only an image of the exact Bottle. Record its source page and reuse
+  terms, then inspect the stored image; a direct image URL is not provenance.
 - Merge only proven copies of the same marketed release.
 
-Completing one family or the current range does not complete the catalog.
-Continue through every period and product family until each item has a final
-status. Report the environment, sources and years covered, counts by status,
-changed IDs, checks performed, research records changed, and unresolved
-questions.
+One family or the current range does not complete the catalog; continue until
+every item has a final status. Report the environment, sources and years
+covered, counts by status, changed IDs, checks performed, research records
+changed, and unresolved questions.
