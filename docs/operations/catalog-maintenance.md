@@ -407,16 +407,21 @@ The operation is complete only when:
   unresolved, and out-of-scope releases agree; and
 - unresolved facts and releases are listed explicitly for later work.
 
-## Completed Audits
+## Research Records
 
-Audits record what was true when they ran. Records written before the naming
-and Brand rules above were settled (September 16, 2026) may not follow them;
-Yamazaki still carries age-only names such as `12-year-old`, some retailer
-exclusives still carry the retailer as bottler, and some owner collections
-still have per-distillery Series. Do not copy an older catalog's shape as
-precedent without checking it against this guide and the identity model.
+Each pass leaves a dated research record under `docs/research/catalog/` that
+says where the information for that scope lives (see
+[Catalog Research](./catalog-research.md), "Write The Research Record").
+Older records below were written as change logs before that rule was settled;
+use them for their source links, not as a template. Records written before the
+naming and Brand rules above were settled (September 16, 2026) may not follow
+them: Yamazaki still carries age-only names such as `12-year-old`, some
+retailer exclusives still carry the retailer as bottler, and some owner
+collections still have per-distillery Series. Do not copy an older catalog's
+shape as precedent without checking it against this guide and the identity
+model.
 
 - [Whisky Auctioneer catalog audit, September 2026](catalog-audits/2026-09-02-whisky-auctioneer/README.md)
 - [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md) (predates the current naming rules)
 - [Mars distilleries, September 16, 2026](../research/catalog/2026-09-16-mars.md) (follows the current naming and Brand rules)
-- [Kanosuke, September 18, 2026](../research/catalog/2026-09-18-kanosuke.md) (first record written to the six Brand, Series, and bottler rules)
+- [Kanosuke, September 18, 2026](../research/catalog/2026-09-18-kanosuke.md) (source guide; the pass followed the six Brand, Series, and bottler rules)

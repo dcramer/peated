@@ -48,22 +48,26 @@ narrower target the user gives.
    API returns a conflict or validation error.
 8. Re-fetch every changed record and check shared edits, images, aliases,
    references, and redirects where they apply.
-9. Before reporting, save the durable results under `docs/research/catalog/`
-   as `YYYY-MM-DD-short-name.md`, or as a directory with a `README.md` when
-   there is supporting data. Do not append to a shared or monthly report.
-   Update `docs/operations/catalog-research.md` only for a reusable method,
-   access limit, or recurring trap.
+9. Before reporting, write the research record under
+   `docs/research/catalog/YYYY-MM-DD-short-name.md`: a guide to where the
+   information for this scope lives, for the next person who researches it.
+   Do not append to a shared or monthly report. Update
+   `docs/operations/catalog-research.md` only for a reusable method, access
+   limit, or recurring trap.
 
 ## Research record
 
-| Keep                                                                   | Leave out                                                  |
-| ---------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Exact links and what each source established                           | Raw API replies, request files, tokens                     |
-| Years, markets, and release families covered, and where coverage stops | Downloaded images                                          |
-| Conflicts and page errors, and which value was used                    | Working notes with no later use                            |
-| Searches tried for each unresolved gap                                 | Claims that a source is complete when it does not prove it |
-| Image source pages and reuse terms                                     |                                                            |
-| Leads marked as leads, separate from evidence                          |                                                            |
+| Keep                                                                       | Leave out                                                  |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Each source with its link, the families and years it covers, and its limit | Production IDs, counts, and per-Bottle field lists         |
+| Sites that block tools or need a browser, and pacing limits                | Raw API replies, request files, tokens, downloaded images  |
+| Conflicts between sources and which value was used                         | Working notes with no later use                            |
+| Searches and sites that found nothing                                      | Claims that a source is complete when it does not prove it |
+| Image reuse terms per site                                                 |                                                            |
+| Releases and facts still unknown, with the open question                   |                                                            |
+
+Peated's change history records the writes; the report to the user carries
+the counts and IDs.
 
 ## Rules
 
