@@ -311,7 +311,8 @@ when a waiting run starts again. The other request and result counts cover the
 full run. A null request-error count means the run finished before error
 tracking was added. Records without a saved type or new/seen result appear as
 not tracked in Admin. Preview and source suggestion runs do not appear in the
-Admin overview.
+Admin overview. The overview lists a site as failing only while its latest
+completed collection run failed; the next successful run clears it.
 
 Every network attempt, including robots refreshes and retries, counts toward
 the current worker's request limit. Response bodies are read only up to the

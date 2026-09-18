@@ -10,20 +10,24 @@ import { routerClient } from "@peated/server/orpc/router";
 import {
   createModerationAutomationProcedure,
   summarizeListingAutomation,
-  type ModerationQueueCountLoader,
+  type ModerationQueueLoader,
 } from "@peated/server/orpc/routes/admin/moderation/automation";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const getQueueCounts = vi.fn<ModerationQueueCountLoader>();
+const getQueueState = vi.fn<ModerationQueueLoader>();
+const failedJob = {
+  id: "OnBottleChange-abc123",
+  name: "OnBottleChange",
+  error: 'column "group_id" does not exist',
+  failedAt: new Date("2026-09-17T10:00:00.000Z"),
+};
 
 describe("admin moderation automation", () => {
   beforeEach(() => {
-    getQueueCounts.mockReset();
-    getQueueCounts.mockResolvedValue({
-      wait: 3,
-      active: 2,
-      completed: 20,
-      failed: 1,
+    getQueueState.mockReset();
+    getQueueState.mockResolvedValue({
+      counts: { wait: 3, active: 2, completed: 20, failed: 1 },
+      failedJobs: [failedJob],
     });
   });
 
@@ -78,7 +82,7 @@ describe("admin moderation automation", () => {
     );
 
     const automationClient = createRouterClient(
-      { automation: createModerationAutomationProcedure(getQueueCounts) },
+      { automation: createModerationAutomationProcedure(getQueueState) },
       { context: { user: admin } },
     );
     const result = await automationClient.automation();
@@ -100,9 +104,18 @@ describe("admin moderation automation", () => {
           status: "failed",
           title: `Price retry #${run!.id}`,
         }),
+        {
+          key: `job:${failedJob.id}`,
+          kind: "job",
+          title: "Job OnBottleChange",
+          status: "failed",
+          detail: failedJob.error,
+          href: null,
+          occurredAt: failedJob.failedAt.toISOString(),
+        },
       ]),
     );
-    expect(getQueueCounts).toHaveBeenCalledOnce();
+    expect(getQueueState).toHaveBeenCalledOnce();
   });
 
   test("omits catalog failures after their audit is closed", async ({
@@ -141,7 +154,7 @@ describe("admin moderation automation", () => {
       .returning();
 
     const automationClient = createRouterClient(
-      { automation: createModerationAutomationProcedure(getQueueCounts) },
+      { automation: createModerationAutomationProcedure(getQueueState) },
       { context: { user: admin } },
     );
     const result = await automationClient.automation();
@@ -157,14 +170,16 @@ describe("admin moderation automation", () => {
   }) => {
     const admin = await fixtures.User({ admin: true });
     const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const [failedRun] = await db
       .insert(storePriceMatchRetryRuns)
       .values({
         status: "failed",
         error: "Older retry failed.",
         createdById: admin.id,
-        createdAt: new Date("2020-01-01T00:00:00.000Z"),
-        updatedAt: new Date("2020-01-01T00:00:00.000Z"),
+        completedAt: yesterday,
+        createdAt: yesterday,
+        updatedAt: yesterday,
       })
       .returning();
     await db.insert(storePriceMatchRetryRuns).values({
@@ -185,7 +200,7 @@ describe("admin moderation automation", () => {
     );
 
     const automationClient = createRouterClient(
-      { automation: createModerationAutomationProcedure(getQueueCounts) },
+      { automation: createModerationAutomationProcedure(getQueueState) },
       { context: { user: admin } },
     );
     const result = await automationClient.automation();
@@ -201,6 +216,36 @@ describe("admin moderation automation", () => {
         key: `retry_run:${failedRun!.id}`,
         status: "failed",
       }),
+    );
+  });
+
+  test("ages out retry failures older than the failed job retention", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+    const [oldFailure] = await db
+      .insert(storePriceMatchRetryRuns)
+      .values({
+        status: "failed",
+        error: "Old retry failed.",
+        createdById: admin.id,
+        completedAt: fourDaysAgo,
+        createdAt: fourDaysAgo,
+        updatedAt: fourDaysAgo,
+      })
+      .returning();
+    getQueueState.mockResolvedValue({ counts: { failed: 0 }, failedJobs: [] });
+
+    const automationClient = createRouterClient(
+      { automation: createModerationAutomationProcedure(getQueueState) },
+      { context: { user: admin } },
+    );
+    const result = await automationClient.automation();
+
+    expect(result.counts.failed).toBe(0);
+    expect(result.needsAttention).not.toContainEqual(
+      expect.objectContaining({ key: `retry_run:${oldFailure!.id}` }),
     );
   });
 

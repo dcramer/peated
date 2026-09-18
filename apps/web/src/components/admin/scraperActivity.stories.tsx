@@ -84,7 +84,7 @@ const meta = {
           catalogListings: 2,
         },
       ],
-      recentFailures: [
+      failingSites: [
         {
           runId: 42,
           site: { key: "example", name: "Example source" },
@@ -120,7 +120,7 @@ export const NoActivity: Story = {
           catalogListings: 0,
         },
       ],
-      recentFailures: [],
+      failingSites: [],
     },
   },
 };

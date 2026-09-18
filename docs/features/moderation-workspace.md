@@ -34,5 +34,16 @@ or reason as unavailable.
 The admin overview shows open Inbox decisions separately from failed and active
 background work. It also shows recent price-matching results and the current
 Bottle resolution of review and price inputs added in the last 30 days.
-Background work shows retry runs and catalog changes that stopped. It is not a
-measure of decision accuracy and cannot approve a catalog change.
+Background work shows retry runs, queued jobs, and catalog changes that
+stopped. It is not a measure of decision accuracy and cannot approve a catalog
+change.
+
+Failed work is recent by definition. A failed queued job or price retry stays in
+the failed count and the stopped-work list for three days, then the worker
+removes the job and the count drops it. A stopped catalog change stays until its
+check is closed. The stopped-work list and the failed count read the same
+sources, so the list is never empty while the count is above zero.
+
+The scraper panel on the admin overview lists a source only while its latest
+completed collection run failed. One successful run clears it. A run that is
+still in progress does not clear it.

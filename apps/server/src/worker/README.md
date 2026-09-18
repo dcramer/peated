@@ -51,4 +51,7 @@ scheduledJob("0 3 * * *", "update-example", async () => {
 ```
 
 The registry adds Sentry spans, actor context, and success or failure logs.
+Failed jobs stay in Redis, and in Admin's Background work, for three days. The
+worker removes older failed jobs every hour (`removeOldFailedJobs` in
+`queue.ts`).
 Handlers should let unexpected errors throw so BullMQ can record and retry them.

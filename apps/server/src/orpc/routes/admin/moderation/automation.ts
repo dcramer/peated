@@ -9,7 +9,7 @@ import {
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { getQueue } from "@peated/server/worker/queue";
+import { FAILED_JOB_RETENTION_MS, getQueue } from "@peated/server/worker/queue";
 import {
   and,
   desc,
@@ -86,20 +86,44 @@ export function summarizeListingAutomation(
   };
 }
 
-export type ModerationQueueCountLoader = () => Promise<{
-  active?: number;
-  completed?: number;
-  failed?: number;
-  wait?: number;
+const FAILED_LIST_LIMIT = 25;
+
+export type FailedQueueJob = {
+  id: string;
+  name: string;
+  error: string | null;
+  failedAt: Date;
+};
+
+export type ModerationQueueLoader = () => Promise<{
+  counts: {
+    active?: number;
+    completed?: number;
+    failed?: number;
+    wait?: number;
+  };
+  failedJobs: FailedQueueJob[];
 }>;
 
-const loadQueueCounts: ModerationQueueCountLoader = async () => {
+const loadQueueState: ModerationQueueLoader = async () => {
   const queue = await getQueue("default");
-  return await queue.getJobCounts("wait", "active", "completed", "failed");
+  const [counts, failed] = await Promise.all([
+    queue.getJobCounts("wait", "active", "completed", "failed"),
+    queue.getFailed(0, FAILED_LIST_LIMIT - 1),
+  ]);
+  return {
+    counts,
+    failedJobs: failed.map((job) => ({
+      id: String(job.id),
+      name: job.name,
+      error: job.failedReason || null,
+      failedAt: new Date(job.finishedOn ?? job.timestamp),
+    })),
+  };
 };
 
 export function createModerationAutomationProcedure(
-  getQueueCounts: ModerationQueueCountLoader = loadQueueCounts,
+  getQueueState: ModerationQueueLoader = loadQueueState,
 ) {
   return procedure
     .use(requireAdmin)
@@ -113,9 +137,17 @@ export function createModerationAutomationProcedure(
     })
     .output(ModerationAutomationResponseSchema)
     .handler(async () => {
-      const queueCounts = await getQueueCounts();
+      const { counts: queueCounts, failedJobs } = await getQueueState();
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
+      // Background work rule (moderation): failed work stays visible for the
+      // failed job retention window, then it ages out of counts and lists.
+      const failedSince = new Date(Date.now() - FAILED_JOB_RETENTION_MS);
+      const retryFailedAt = sql`coalesce(${storePriceMatchRetryRuns.completedAt}, ${storePriceMatchRetryRuns.updatedAt})`;
+      const recentlyFailedRetry = and(
+        eq(storePriceMatchRetryRuns.status, "failed"),
+        gte(retryFailedAt, failedSince),
+      );
 
       // Health totals cover all durable work; limits apply only to rendered lists.
       // Moderation owns open audit failures; closed audit records remain in History.
@@ -162,7 +194,7 @@ export function createModerationAutomationProcedure(
         db
           .select({
             processing: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} IN ('pending', 'running'))::int`,
-            failed: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} = 'failed')::int`,
+            failed: sql<number>`count(*) filter (where ${recentlyFailedRetry})::int`,
             completedToday: sql<number>`count(*) filter (where ${storePriceMatchRetryRuns.status} = 'completed' AND ${storePriceMatchRetryRuns.completedAt} >= ${startOfToday})::int`,
           })
           .from(storePriceMatchRetryRuns),
@@ -174,9 +206,9 @@ export function createModerationAutomationProcedure(
         db
           .select()
           .from(storePriceMatchRetryRuns)
-          .where(eq(storePriceMatchRetryRuns.status, "failed"))
-          .orderBy(desc(storePriceMatchRetryRuns.updatedAt))
-          .limit(25),
+          .where(recentlyFailedRetry)
+          .orderBy(desc(retryFailedAt))
+          .limit(FAILED_LIST_LIMIT),
       ]);
 
       const failedOperations = await db
@@ -190,7 +222,7 @@ export function createModerationAutomationProcedure(
           ),
         )
         .orderBy(desc(bottleOperations.updatedAt))
-        .limit(25);
+        .limit(FAILED_LIST_LIMIT);
       return {
         generatedAt: new Date().toISOString(),
         counts: {
@@ -228,6 +260,15 @@ export function createModerationAutomationProcedure(
             detail: run.error,
             href: `/admin/moderation/automation?run=${run.id}`,
             occurredAt: (run.completedAt ?? run.updatedAt).toISOString(),
+          })),
+          ...failedJobs.map((job) => ({
+            key: `job:${job.id}`,
+            kind: "job" as const,
+            title: `Job ${job.name}`,
+            status: "failed",
+            detail: job.error,
+            href: null,
+            occurredAt: job.failedAt.toISOString(),
           })),
         ],
         recentRuns: recentRetryRuns.map((run) => ({

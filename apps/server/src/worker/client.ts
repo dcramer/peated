@@ -17,7 +17,7 @@ import {
   buildQueuedJobData,
   parseQueuedJobData,
 } from "./payload";
-import { getQueue } from "./queue";
+import { getQueue, removeOldFailedJobs } from "./queue";
 import { disconnectConnection, getConnection } from "./redis";
 import registry from "./registry";
 import { type JobArgs, type JobName, type QueuedJobInput } from "./types";
@@ -225,6 +225,17 @@ export async function runWorker() {
   }
 
   const runtime = await startWorkerRuntime();
+
+  if (config.ENV === "production") {
+    scheduledJob("41 * * * *", "remove-old-failed-jobs", async () => {
+      const removed = await removeOldFailedJobs(runtime.queues);
+      if (removed.length) {
+        logInfo("Removed {count} old failed jobs", {
+          extra: { count: removed.length },
+        });
+      }
+    });
+  }
 
   async function termProcess(signal: string) {
     logInfo("Received {signal}, closing worker", {
