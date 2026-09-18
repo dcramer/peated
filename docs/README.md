@@ -10,8 +10,9 @@ document as the source of truth and link to it from other places.
 - `development/` explains implementation, testing, and local development.
 - `operations/` contains production diagnosis and data-maintenance workflows.
 - `policies/` contains repository-wide engineering rules and defaults.
-- `research/` contains dated evidence and inventories. Research is not an
-  active product or runtime contract.
+- `research/` contains dated guides to where the evidence for a scope lives
+  and what is still unknown. Research is not an active product or runtime
+  contract.
 
 A document can describe a workflow without belonging in `operations/`. Put it
 under `features/` when it defines user-visible product behavior. Put it under
@@ -21,6 +22,10 @@ under `features/` when it defines user-visible product behavior. Put it under
 
 - Keep one bounded research task or scope in each dated file. Do not append
   unrelated work to a shared or monthly report.
+- Write a catalog research file for the next person who works on that scope:
+  which sources hold which facts, their limits and traps, the conflicts
+  settled, and the releases still unknown. It is not a log of the writes;
+  Peated's change history and the pull request hold those.
 - Group repeated work by topic, such as `research/catalog/`, and name files
   `YYYY-MM-DD-short-name.md`.
 - Use a directory with a `README.md` only when the report has supporting CSV,

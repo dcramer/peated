@@ -54,7 +54,10 @@ edition, cask number, and Series when those facts are known.
   discontinued product pages; fetch them one at a time, because security
   plugins block parallel requests
 - Wayback captures of a producer's earlier product site and news pages when
-  its current news archive starts late
+  its current news archive starts late. Fetch the archived spec and special
+  pages by path (Kanosuke kept full cask sheets at `/special/<slug>/` and
+  announcement text on `/news/<year>/`); the capture lookup API returns 429
+  when called in parallel, so pace requests one at a time
 
 Do not bypass access controls. Search snippets, thumbnails, copied images, and
 direct image links are leads only. Save the page that explains the item.
@@ -76,10 +79,15 @@ direct image links are leads only. Save the page that explains the item.
 | [Sotheby's whisky articles](https://www.sothebys.com/en/articles/whisky)    | Collector guides and old collections                            |
 | [TTB COLA](https://www.ttbonline.gov/colasonline/publicSearchColasBasic.do) | US label approvals                                              |
 | [Wikimedia Commons](https://commons.wikimedia.org/)                         | Licensed distillery photos                                      |
+| [Japanese Whisky Information Center](https://jwic.jp/)                      | Year-by-year release timelines for Japanese distilleries        |
+| [Kyodo PR Wire](https://kyodonewsprwire.jp/)                                | Japanese producer press releases with dates, ABV, and outturns  |
 
 Whiskybase was useful in many tasks, but Peated must not collect or copy it
 automatically. See the
 [source access audit](../research/external-review-source-audit-2026-08.md).
+Whisky Auctioneer, The Whisky Exchange, Whisky Hammer, K&L, Master of Malt,
+and Casa de Vinos block or rate-limit fetch tools (406, 403, 429); read them
+in a browser and treat search snippets of their pages as leads only.
 Spirit Radar was useful as a manually reviewed lead index for Yamazaki. Its
 brand page mixed proper releases, packaging variants, tasting samples, and
 misattributed Suntory bottles, so every exact identity required independent
@@ -125,17 +133,34 @@ producer, auction, or retailer evidence.
 - A direct image URL does not record its source page or license. Count image
   identity, source-page provenance, and reuse status separately in the final
   audit.
+- A geocoder can send a Japanese place name to the wrong prefecture (Kanosuke's
+  Kaminokawa in Hioki was pinned to Kaminokawa, Tochigi). Check Entity
+  coordinates against the producer's address after any address write.
+- An importer's "bottles for the US" count is an allocation, not the outturn.
+  A label photo on the importer's page can settle a cask-number conflict
+  between the importer's text and resellers.
 
-## Preserve Durable Research
+## Write The Research Record
 
-- Catalog and exact evidence links
-- Years, markets, ranges, and exclusions checked
-- Conflicts and page errors found
-- Searches tried for missing releases
-- Image source and stated license
-- A small Bottle-to-source list when it will be reused
+The dated file under `docs/research/catalog/` is a guide to where the
+information for that scope lives, written for the next person who researches
+it. It is not a log of the writes: Peated's change history records every
+create, patch, and merge, and the final report and pull request describe the
+pass.
 
-Do not keep raw API replies, downloaded images, tokens, or request files unless
-they have lasting value. The
-[Whisky Auctioneer audit](./catalog-audits/2026-09-02-whisky-auctioneer/README.md)
-shows how to keep useful links and decisions without raw downloads.
+Keep:
+
+- each source that held facts for the scope, with its link, the families and
+  years it covers, what it proves, and where it stops;
+- the sources that block tools or need a browser, and any pacing limit;
+- the conflicts found between sources and which value was used, so the next
+  pass does not settle them again;
+- the searches and sites that found nothing;
+- image reuse terms per site;
+- the releases and facts still unknown, with the question each leaves open.
+
+Leave out: production IDs and counts, per-Bottle field lists, raw API replies,
+downloaded images, tokens, and request files. Name a Bottle only when a fact
+about it needs its source to be found again (a Wayback capture URL, a label
+photo on an importer page). Put a reusable method, access limit, or recurring
+trap in this guide instead of the record.

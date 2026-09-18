@@ -50,7 +50,12 @@ with a later headquarters or office.
 ## Core Invariants
 
 - Every marketed release is a Bottle, including a dated, batched, annual,
-  vintage, or single-cask product.
+  vintage, or single-cask product. A release is marketed when the producer or
+  a bottler offered it to the public under a stable label, including by
+  lottery, at a festival, in one bar or hotel, or in one country. A bottle a
+  visitor fills, a private owner's cask that was never sold as labeled
+  bottles, a non-sale component of a set, and whisky poured only by the glass
+  are not releases.
 - Every Bottle is independently complete and belongs to exactly one
   BottleGroup.
 - `BottleGroup.name` stores the name shared by the group. `Bottle.name` stores
@@ -235,7 +240,9 @@ Entity.
   another producer. It may also be the Brand. An official Brand or distillery
   release has no bottler.
 - `distillery` identifies the actual producer or producers.
-- `series` is a stable range or family, not a batch code or release year.
+- `series` is a named range that the Brand markets for its own products, not
+  a batch code, a release year, or a customer's program name. See "Who Is
+  The Brand, Series, And Bottler" below.
 - `edition` is the exact human-facing release descriptor shown in the
   producer's product title or on the label, such as `Batch 24`, `2024 Release`,
   or `S2B13`. Preserve descriptor words that appear there. Narrative prose can
@@ -274,34 +281,77 @@ Entity.
   release evidence, and uncertain values remain unknown.
 - Do not infer `statedAge` from year fields unless the source states the age.
 
-The Brand is the name people buy the bottle under. A distillery Entity is the
-Brand of its own single malts when the producer presents the distillery name
-as a product line and the trade sells it that way; give the Entity a
-`shortName` for Bottle names. Yamazaki (owner Suntory), Chichibu (owner
-Venture Whisky), and Mars Komagatake and Mars Tsunuki (owner Hombo Shuzo,
-house label Mars) follow this rule. One Entity can be both Brand and
-distiller.
+### Who Is The Brand, Series, And Bottler
 
-A house or collection label is the Brand only when it is the name people buy
-under and the distillery names inside it identify provenance rather than
-separate consumer brands, as with Rare Malts Selection and its Brora release:
-Rare Malts Selection is the Brand, Brora is the Bottle name and distiller. A
-house label also stays the Brand for its blends and for ranges that mix
-distilleries, such as Mars Iwai or Mars The Y.A. Do not decide this from
-word order in a title, and do not keep a house label as Brand only because
-existing records use it; check how the producer and the trade name the line.
+The Brand is the name people buy the bottle under. Decide `brand`, `series`,
+and `bottler` together from the label and from how the producer and the trade
+sell the release. Do not decide from word order in a title, and do not keep an
+assignment only because existing records use it.
 
-BottleSeries belongs to one Brand and groups ranges inside that Brand. A
-distillery's own single malt line is a Brand, not a Series under the house
-label. A real marketing program that relates independently branded products
-needs a separately designed cross-brand collection concept; it is not a
+A distillery Entity's page lists every Bottle it distilled whatever the Brand,
+so choosing a collection or bottler label as Brand hides nothing from the
+distillery. Brand answers one question only: the name people buy under.
+
+1. **A distillery's own line.** When the producer presents the distillery
+   name as a product line and the trade sells it that way, the distillery
+   Entity is the Brand and the distiller; give it a `shortName` for Bottle
+   names. Its producer-named ranges are Series under it. No bottler.
+   Yamazaki (owner Suntory), Chichibu (owner Venture Whisky), Kanosuke
+   (owner Komasa Jyozo), and Mars Komagatake and Mars Tsunuki (owner Hombo
+   Shuzo, house label Mars) follow this rule.
+2. **A house label.** A house label is the Brand for its blends and for
+   ranges that mix distilleries, such as Mars Iwai or Mars The Y.A. A
+   distillery's own single malt line is a Brand, not a Series under the house
+   label. No bottler.
+3. **An owner's collection across its distilleries.** When one owner markets
+   a named collection whose releases come from more than one of its
+   distilleries, the collection is the Brand, the distillery is the Bottle
+   name and the distiller, the release descriptor is the `edition`, and there
+   is no bottler. This holds even when the distillery is also a consumer
+   brand on its own: Prima & Ultima Talisker 1988 has Brand Prima & Ultima,
+   name `Talisker 1988`, and distiller Talisker. Rare Malts Selection,
+   Special Releases, Prima & Ultima, The Managers' Choice, and Rare Series
+   follow this rule. Do not create a per-distillery Series for a collection
+   (no "Special Releases" Series under Talisker): the collection Brand
+   already groups them, and the distillery Entity still lists them as
+   distiller. A collection that only ever holds one distillery's whisky is a
+   Series under that distillery Brand instead.
+4. **An independent bottler's label.** When a business other than the
+   producer selects whisky and releases it under its own label, that label is
+   the Brand, the business is the `bottler`, the distillery is the Bottle
+   name and the distiller, and the bottler's number or code is the `edition`.
+   The bottler's own ranges are Series under that Brand. The Scotch Malt
+   Whisky Society, The Heart Cut, Gordon & MacPhail, Old Particular, and The
+   Ghost Series follow this rule. A bottler Entity may be owned by a company
+   Entity.
+5. **A selection of an official bottling.** When a retailer, importer,
+   distributor, festival, bar, hotel, or private buyer selects a cask or
+   batch that the producer bottles under the producer's label, the Brand
+   from rules 1 to 3 stays the Brand, there is no bottler, and the customer's
+   name or program name goes in `edition` (`for K&L Wine Merchants`,
+   `Brush Stroke`, `The Awakening Series`, `Chichibu Whisky Matsuri 2025`)
+   and in a Bottle reference. A program name that a retailer or importer
+   applies to several Brands' releases is never a Series or a Brand for any
+   of them. The test between rules 4 and 5: the label names the business as
+   the party that bottled or released the whisky, not as the party it was
+   selected for.
+6. **A named site of the same owner.** When the producer names a separate
+   production site for a release, that site is its own distillery Entity
+   with the same owner and is the distiller; the Brand does not change.
+   Kanosuke Hioki Pot Still has Brand Kanosuke and distiller Hioki
+   Distillery.
+
+A marketing program that relates independently branded products across
+Brands needs a separately designed cross-brand collection concept; it is not a
 BottleSeries in the current model.
 
-Package volume, export carton, gift box, and miniature presentation are not
-Bottle editions by themselves. Variants that differ only by those package
-facts identify the same Bottle. Store a market or package phrase in `edition`
-only when product evidence shows that the producer markets it as a distinct
-release descriptor.
+A different package does not make a different Bottle. Volume, carton, gift
+box, miniature presentation, a special label or box, and a market-specific
+name for the same liquid identify the same Bottle. Add the marketed name as a
+Bottle reference, and as an alias only when the producer uses it as the
+product's name. Create a separate Bottle only when a source shows that the
+liquid differs: a different vatting, cask, ABV, age, or a stated separate
+outturn.
 
 Brand identity is not a longest-prefix match. Distillery, bottler, owner,
 importer, and parent-company names may appear in source text without becoming
