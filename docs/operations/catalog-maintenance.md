@@ -425,3 +425,4 @@ model.
 - [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md) (predates the current naming rules)
 - [Mars distilleries, September 16, 2026](../research/catalog/2026-09-16-mars.md) (follows the current naming and Brand rules)
 - [Kanosuke, September 18, 2026](../research/catalog/2026-09-18-kanosuke.md) (source guide; the pass followed the six Brand, Series, and bottler rules)
+- [Highland Park, September 18, 2026](../research/catalog/2026-09-18-highland-park.md) (source guide; official releases, numbered casks, and Viking Soul casks)

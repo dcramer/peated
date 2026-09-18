@@ -139,6 +139,15 @@ producer, auction, or retailer evidence.
 - An importer's "bottles for the US" count is an allocation, not the outturn.
   A label photo on the importer's page can settle a cask-number conflict
   between the importer's text and resellers.
+- Some producer sites (highlandparkwhisky.com, edrington.com) block curl,
+  WebFetch, and agent-browser alike with Cloudflare. Read them from Wayback
+  captures found through the CDX index, and expect 2010-era captures behind an
+  age gate to hold only the splash page: they prove page names and grouping,
+  not specs.
+- For Scotch distilleries with many official market casks, the Whiskyfun
+  distillery index and the Malt Maniacs Whisky Monitor list are the backbone;
+  Spirit Radar adds breadth but a cask that appears only there stays
+  unresolved until a label, lot, or retailer page confirms it.
 
 ## Write The Research Record
 
