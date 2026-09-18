@@ -158,5 +158,6 @@ behavior; research cannot override them.
 - `docs/operations/catalog-research.md` — Find and assess catalog evidence.
 - `docs/operations/deployments.md` — Vercel, Render, and PlanetScale deploy checks.
 - `docs/operations/entity-images.md` — Add or replace production Entity images.
+- `docs/operations/events.md` — Add, fix, or retire whisky events.
 - `docs/operations/external-review-sources.md` — Add, publish, stop, or remove a review source.
 - `docs/operations/production-debugging.md` — Production diagnosis.
