@@ -29,7 +29,6 @@ export const metadata: Metadata = {
 export default function CatalogGuidePage() {
   return (
     <AboutPage
-      currentHref="/about/catalog"
       description="How Peated records each whisky release, connects it to the people and companies behind it, and keeps uncertain facts honest."
       rail={
         <>
