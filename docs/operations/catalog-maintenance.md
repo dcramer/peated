@@ -419,4 +419,4 @@ precedent without checking it against this guide and the identity model.
 - [Whisky Auctioneer catalog audit, September 2026](catalog-audits/2026-09-02-whisky-auctioneer/README.md)
 - [Yamazaki catalog audit, September 2026](catalog-audits/2026-09-07-yamazaki/README.md) (predates the current naming rules)
 - [Mars distilleries, September 16, 2026](../research/catalog/2026-09-16-mars.md) (follows the current naming and Brand rules)
-- [Kanosuke, September 18, 2026](../research/catalog/2026-09-18-kanosuke/README.md) (first record written to the six Brand, Series, and bottler rules)
+- [Kanosuke, September 18, 2026](../research/catalog/2026-09-18-kanosuke.md) (first record written to the six Brand, Series, and bottler rules)
