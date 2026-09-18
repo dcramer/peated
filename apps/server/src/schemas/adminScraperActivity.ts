@@ -35,7 +35,7 @@ export const AdminScraperActivitySchema = z.object({
       catalogListings: z.number().int().min(0),
     }),
   ),
-  recentFailures: z.array(
+  failingSites: z.array(
     z.object({
       runId: z.number().int().positive(),
       site: z.object({

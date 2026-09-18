@@ -327,7 +327,7 @@ function SavedTotal({
   );
 }
 
-/** Shows scraper output, request health, daily details, and recent problems. */
+/** Shows scraper output, request health, daily details, and sites failing now. */
 export default function ScraperActivity({ data }: ScraperActivityProps) {
   const activeDays = data.days.filter(
     (day) =>
@@ -350,21 +350,21 @@ export default function ScraperActivity({ data }: ScraperActivityProps) {
 
   return (
     <div {...stylex.props(styles.root)}>
-      {data.recentFailures.length ? (
+      {data.failingSites.length ? (
         <section
-          aria-labelledby="recent-problems-heading"
+          aria-labelledby="failing-sites-heading"
           {...stylex.props(styles.problemSection)}
         >
           <div {...stylex.props(styles.problemSectionHeader)}>
-            <SectionHeading id="recent-problems-heading">
-              Recent scraper problems
+            <SectionHeading id="failing-sites-heading">
+              Scrapers failing now
             </SectionHeading>
             <span {...stylex.props(styles.problemCount)}>
-              {formatCount(data.recentFailures.length)}
+              {formatCount(data.failingSites.length)}
             </span>
           </div>
           <ul {...stylex.props(styles.problemList)}>
-            {data.recentFailures.map((failure) => (
+            {data.failingSites.map((failure) => (
               <li key={failure.runId} {...stylex.props(styles.problem)}>
                 <div {...stylex.props(styles.problemHeader)}>
                   <TextLink href={`/admin/sites/${failure.site.key}/runs`}>

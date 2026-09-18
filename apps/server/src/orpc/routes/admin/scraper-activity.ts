@@ -86,6 +86,40 @@ function savedKindForRun(
   }
 }
 
+type SiteRunRow = {
+  run: typeof externalSiteRuns.$inferSelect;
+  site: typeof externalSites.$inferSelect;
+};
+
+/**
+ * Admin rule (moderation): a site is a problem only while its latest completed
+ * collection run failed. One successful run clears it from the list.
+ */
+export function findFailingSites(rows: SiteRunRow[]) {
+  const latestBySite = new Map<number, SiteRunRow>();
+  for (const row of rows) {
+    if (!row.run.completedAt) continue;
+    const latest = latestBySite.get(row.site.id);
+    if (
+      !latest ||
+      row.run.completedAt > latest.run.completedAt! ||
+      (row.run.completedAt.getTime() === latest.run.completedAt!.getTime() &&
+        row.run.id > latest.run.id)
+    ) {
+      latestBySite.set(row.site.id, row);
+    }
+  }
+  return [...latestBySite.values()]
+    .filter(({ run }) => run.status === "failed")
+    .sort((a, b) => b.run.completedAt!.getTime() - a.run.completedAt!.getTime())
+    .map(({ run, site }) => ({
+      runId: run.id,
+      site: { key: site.type, name: site.name },
+      error: run.error ?? "No error details were saved.",
+      completedAt: run.completedAt!.toISOString(),
+    }));
+}
+
 export default procedure
   .use(requireAdmin)
   .route({
@@ -93,7 +127,7 @@ export default procedure
     path: "/admin/scrapers/activity",
     summary: "Get scraper activity",
     description:
-      "Get daily scraper requests, saved source records, Bottle resolution, and recent failures for the admin homepage.",
+      "Get daily scraper requests, saved source records, Bottle resolution, and sites whose latest run failed for the admin homepage.",
     operationId: "getScraperActivity",
   })
   .output(AdminScraperActivitySchema)
@@ -217,16 +251,6 @@ export default procedure
       days: [...days.entries()]
         .reverse()
         .map(([date, counts]) => ({ date, ...counts })),
-      recentFailures: collectionRows
-        .filter(
-          ({ run }) => run.status === "failed" && run.completedAt !== null,
-        )
-        .slice(0, 5)
-        .map(({ run, site }) => ({
-          runId: run.id,
-          site: { key: site.type, name: site.name },
-          error: run.error ?? "No error details were saved.",
-          completedAt: run.completedAt!.toISOString(),
-        })),
+      failingSites: findFailingSites(collectionRows),
     };
   });

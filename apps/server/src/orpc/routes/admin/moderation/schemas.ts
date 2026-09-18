@@ -152,7 +152,7 @@ export const ModerationHistoryDetailsSchema = z
 const AutomationItemSchema = z
   .object({
     key: z.string(),
-    kind: z.enum(["listing", "operation", "retry_run"]),
+    kind: z.enum(["listing", "operation", "retry_run", "job"]),
     title: z.string(),
     status: z.string(),
     detail: z.string().nullable(),

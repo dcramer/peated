@@ -33,6 +33,7 @@ describe("GET /admin/scrapers/activity", () => {
     const today = utcStartOfToday();
     const startedAt = new Date(today.getTime() + 60 * 60_000);
     const completedAt = new Date(today.getTime() + 2 * 60 * 60_000);
+    const failedAt = new Date(completedAt.getTime() + 60_000);
     const olderThanWindow = new Date(today);
     olderThanWindow.setUTCDate(olderThanWindow.getUTCDate() - 30);
 
@@ -52,7 +53,7 @@ describe("GET /admin/scrapers/activity", () => {
         existingItemCount: 5,
         error: "The source returned error 503.",
         startedAt,
-        completedAt,
+        completedAt: failedAt,
         createdAt: startedAt,
       },
       {
@@ -242,12 +243,70 @@ describe("GET /admin/scrapers/activity", () => {
       created: 1,
       matched: 2,
     });
-    expect(result.recentFailures).toEqual([
+    expect(result.failingSites).toEqual([
       {
         runId: expect.any(Number),
         site: { key: reviewSite.type, name: reviewSite.name },
         error: "The source returned error 503.",
-        completedAt: completedAt.toISOString(),
+        completedAt: failedAt.toISOString(),
+      },
+    ]);
+  });
+
+  test("lists a site only while its latest completed run failed", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const failingSite = await fixtures.ExternalSite({
+      type: "activity-failing",
+      name: "Activity Failing",
+    });
+    const recoveredSite = await fixtures.ExternalSite({
+      type: "activity-recovered",
+      name: "Activity Recovered",
+    });
+    const now = new Date();
+    const hoursAgo = (hours: number) =>
+      new Date(now.getTime() - hours * 60 * 60_000);
+    const run = (
+      site: { id: number },
+      status: "failed" | "succeeded",
+      completedAt: Date,
+    ) => ({
+      externalSiteId: site.id,
+      status,
+      trigger: "scheduled" as const,
+      purpose: "collect" as const,
+      recordType: "price" as const,
+      requestCount: 4,
+      requestErrorCount: status === "failed" ? 4 : 0,
+      error: status === "failed" ? "The source returned error 500." : null,
+      createdAt: new Date(completedAt.getTime() - 60_000),
+      startedAt: new Date(completedAt.getTime() - 60_000),
+      completedAt,
+    });
+    await db
+      .insert(externalSiteRuns)
+      .values([
+        run(failingSite, "succeeded", hoursAgo(30)),
+        run(failingSite, "failed", hoursAgo(20)),
+        run(failingSite, "failed", hoursAgo(10)),
+        run(recoveredSite, "failed", hoursAgo(30)),
+        run(recoveredSite, "failed", hoursAgo(20)),
+        run(recoveredSite, "succeeded", hoursAgo(10)),
+        { ...run(recoveredSite, "failed", hoursAgo(1)), completedAt: null },
+      ]);
+
+    const result = await routerClient.admin.scraperActivity(undefined, {
+      context: { user: admin },
+    });
+
+    expect(result.failingSites).toEqual([
+      {
+        runId: expect.any(Number),
+        site: { key: failingSite.type, name: failingSite.name },
+        error: "The source returned error 500.",
+        completedAt: hoursAgo(10).toISOString(),
       },
     ]);
   });

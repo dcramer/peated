@@ -49,7 +49,7 @@ const data = {
       catalogListings: 3,
     },
   ],
-  recentFailures: [],
+  failingSites: [],
 };
 
 describe("ScraperActivity", () => {
@@ -91,7 +91,7 @@ describe("ScraperActivity", () => {
               catalogListings: 0,
             },
           ],
-          recentFailures: [],
+          failingSites: [],
         }}
       />,
     );
@@ -121,7 +121,7 @@ describe("ScraperActivity", () => {
               catalogListings: 0,
             },
           ],
-          recentFailures: [],
+          failingSites: [],
         }}
       />,
     );
