@@ -27,7 +27,6 @@ const bottleSearch =
 export default function ApiPage() {
   return (
     <AboutPage
-      currentHref="/about/api"
       description="Peated publishes its whisky catalog through a JSON API."
       rail={
         <RailSection heading="API resources">

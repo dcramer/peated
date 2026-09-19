@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 import {
   PageColumns,
   PageHeader,
-  TabbedPage,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import {
   TextLink,
@@ -17,40 +16,25 @@ import { colors, space } from "../../../styles/tokens.stylex";
 const MOBILE = "@media (max-width: 559px)";
 const STEPS_STACKED = "@media (max-width: 899px)";
 
-const aboutTabs = [
-  { href: "/about", label: "About" },
-  { href: "/about/catalog", label: "Catalog" },
-  { href: "/about/categories", label: "Whisky categories" },
-  { href: "/about/tasting-wheel", label: "Tasting wheel" },
-  { href: "/about/ratings", label: "Rating guide" },
-  { href: "/about/api", label: "API" },
-  { href: "/updates", label: "Recent changes" },
-] as const;
-
 export function AboutPage({
   children,
-  currentHref,
   description,
   rail,
   title,
 }: {
   children: ReactNode;
-  currentHref: string;
   description: ReactNode;
   rail?: ReactNode;
   title: ReactNode;
 }) {
   return (
-    <TabbedPage
-      currentHref={currentHref}
+    <PageColumns
       header={<PageHeader description={description} title={title} />}
-      tabs={aboutTabs}
-      tabsLabel="About Peated"
+      rail={rail}
+      railBehavior="stack"
     >
-      <PageColumns rail={rail} railBehavior="stack">
-        {children}
-      </PageColumns>
-    </TabbedPage>
+      {children}
+    </PageColumns>
   );
 }
 

@@ -20,7 +20,6 @@ export default function TastingWheelPage() {
   return (
     <TastingWheelProvider>
       <AboutPage
-        currentHref="/about/tasting-wheel"
         description="Know the taste, but can’t quite name it? The wheel gives you a few words to try."
         title="Tasting wheel"
       >

@@ -27,7 +27,6 @@ export default async function AboutRoute() {
 
   return (
     <AboutPage
-      currentHref="/about"
       description="A public record of whisky bottles, the people who make them, and what the people who drank them thought."
       rail={
         <>

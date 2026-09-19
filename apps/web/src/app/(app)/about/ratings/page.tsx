@@ -41,7 +41,6 @@ const bandColumns: DataTableColumn<(typeof RATING_BANDS)[number]>[] = [
 export default function RatingsPage() {
   return (
     <AboutPage
-      currentHref="/about/ratings"
       description="Tastings use five named ratings. Reviews keep their original scores. Older tastings used stars; those stars map to the five current ratings."
       rail={
         <RailSection heading="Where these appear">
