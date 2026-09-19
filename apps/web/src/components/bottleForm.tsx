@@ -1,16 +1,12 @@
 "use client";
 
-import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
+import { CATEGORY_LIST } from "@peated/server/constants";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
-import {
-  formatCategoryName,
-  formatFlavorProfile,
-} from "@peated/server/lib/format";
+import { formatCategoryName } from "@peated/server/lib/format";
 import type { Inputs } from "@peated/server/orpc/router";
 import {
   BottleInputFields,
   EntityChoiceSchema,
-  FlavorProfileEnum,
   ImageLicenseSchema,
   ImageSourceUrlSchema,
 } from "@peated/server/schemas";
@@ -185,7 +181,6 @@ const moreDetailFields = [
   "maturation",
   "caskNumber",
   "outturn",
-  "flavorProfile",
   "description",
 ] as const satisfies ReadonlyArray<BottleFormFieldName>;
 
@@ -515,7 +510,6 @@ export default function BottleForm({
     description,
     descriptionSrc,
     edition,
-    flavorProfile,
     maltPhenolPpm,
     maturation,
     name,
@@ -560,7 +554,6 @@ export default function BottleForm({
       outturn: finiteNumber(outturn),
       description: description || null,
       descriptionSrc: descriptionSrc ?? null,
-      flavorProfile: flavorProfile ?? null,
       tastingNotes: tastingNotes
         ? {
             nose: tastingNotes.nose ?? "",
@@ -582,7 +575,6 @@ export default function BottleForm({
       descriptionSrc,
       distillers,
       edition,
-      flavorProfile,
       maltPhenolPpm,
       maturation,
       name,
@@ -673,11 +665,6 @@ export default function BottleForm({
       setValue("description", result.description, { shouldDirty: true });
       setValue("descriptionSrc", "generated", { shouldDirty: true });
     }
-    if (result.flavorProfile && !current.flavorProfile) {
-      setValue("flavorProfile", FlavorProfileEnum.parse(result.flavorProfile), {
-        shouldDirty: true,
-      });
-    }
   }
 
   function scrollToFormTop() {
@@ -727,7 +714,7 @@ export default function BottleForm({
         "maltPhenolPpm",
       ],
       ["maturation", "caskNumber", "outturn"],
-      ["flavorProfile", "imageSourceUrl", "imageLicense", "description"],
+      ["imageSourceUrl", "imageLicense", "description"],
     ];
     if (!(await trigger([...stepFields[currentStep]]))) return;
     setCurrentStep((step) => Math.min(step + 1, createSteps.length - 1));
@@ -985,45 +972,50 @@ export default function BottleForm({
                     ) : null}
                     {!isCreate || currentStep === 2 ? (
                       <>
+                        {/* An age and "no age statement" contradict each
+                            other, so the form shows only one at a time. */}
                         <FormGrid>
-                          <Field
-                            error={errors.statedAge?.message}
-                            htmlFor="bottle-age"
-                            label="Age statement"
-                            optional
-                          >
-                            <UnitInput
-                              {...register("statedAge", {
-                                setValueAs: (value) => numberOrNull(value),
-                              })}
-                              disabled={noAgeStatement === true}
-                              id="bottle-age"
-                              invalid={Boolean(errors.statedAge)}
-                              min={0}
-                              placeholder="12"
-                              unit="years"
-                            />
-                          </Field>
-                          <Controller
-                            control={control}
-                            name="noAgeStatement"
-                            render={({ field }) => (
-                              <Switch
-                                checked={field.value === true}
-                                description="The label does not state an age."
-                                label="No age statement (NAS)"
-                                onCheckedChange={(checked) => {
-                                  field.onChange(checked ? true : null);
-                                  if (checked) {
-                                    setValue("statedAge", null, {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    });
-                                  }
-                                }}
+                          {noAgeStatement === true ? null : (
+                            <Field
+                              error={errors.statedAge?.message}
+                              htmlFor="bottle-age"
+                              label="Age statement"
+                              optional
+                            >
+                              <UnitInput
+                                {...register("statedAge", {
+                                  setValueAs: (value) => numberOrNull(value),
+                                })}
+                                id="bottle-age"
+                                invalid={Boolean(errors.statedAge)}
+                                min={0}
+                                placeholder="12"
+                                unit="years"
                               />
-                            )}
-                          />
+                            </Field>
+                          )}
+                          {finiteNumber(statedAge) === null ? (
+                            <Controller
+                              control={control}
+                              name="noAgeStatement"
+                              render={({ field }) => (
+                                <Switch
+                                  checked={field.value === true}
+                                  description="The label does not state an age."
+                                  label="No age statement (NAS)"
+                                  onCheckedChange={(checked) => {
+                                    field.onChange(checked ? true : null);
+                                    if (checked) {
+                                      setValue("statedAge", null, {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                      });
+                                    }
+                                  }}
+                                />
+                              )}
+                            />
+                          ) : null}
                         </FormGrid>
                         <Field
                           error={errors.abv?.message}
@@ -1419,27 +1411,6 @@ export default function BottleForm({
                     ) : null}
                     {!isCreate || currentStep === 6 ? (
                       <>
-                        <Field
-                          error={errors.flavorProfile?.message}
-                          htmlFor="bottle-flavor-profile"
-                          label="Flavor profile"
-                          optional
-                        >
-                          <Select
-                            {...register("flavorProfile", {
-                              setValueAs: (value) => value || null,
-                            })}
-                            id="bottle-flavor-profile"
-                            invalid={Boolean(errors.flavorProfile)}
-                          >
-                            <option value="">Not set</option>
-                            {FLAVOR_PROFILES.map((profile) => (
-                              <option key={profile} value={profile}>
-                                {formatFlavorProfile(profile)}
-                              </option>
-                            ))}
-                          </Select>
-                        </Field>
                         {user?.mod || user?.admin ? (
                           <FormActions>
                             <Button

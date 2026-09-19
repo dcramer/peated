@@ -21,9 +21,6 @@ export function buildBottlePatch(
   if (dirtyFields.has("brand")) patch.brand = value.brand;
   if (dirtyFields.has("distillers")) patch.distillers = value.distillers;
   if (dirtyFields.has("bottler")) patch.bottler = value.bottler;
-  if (dirtyFields.has("flavorProfile")) {
-    patch.flavorProfile = value.flavorProfile;
-  }
 
   if (dirtyFields.has("edition")) patch.edition = value.edition;
   if (dirtyFields.has("abv")) patch.abv = value.abv;
