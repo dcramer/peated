@@ -1,3 +1,5 @@
+import OpenAI from "openai";
+
 import { createWhiskyLabelExtractor } from "@peated/bottle-classifier";
 import {
   BottleExtractedDetailsSchema,
@@ -160,7 +162,13 @@ export async function extractPhotoBottleEvidence({
       model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
       callback: async (reportResponse) => {
         const extractor = createWhiskyLabelExtractor({
-          client: createOpenAIClient({ instrumentWithSentry: false }),
+          // Limit the photo form’s wait; let the user choose when to retry.
+          client: createOpenAIClient({
+            instrumentWithSentry: false,
+          }).withOptions({
+            timeout: 45_000,
+            maxRetries: 0,
+          }),
           model: config.OPENAI_MODEL,
           reasoningEffort: config.OPENAI_REASONING_EFFORT,
           imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,
@@ -207,4 +215,22 @@ export function buildPhotoReferenceName(
   ].filter(Boolean);
 
   return parts.length ? parts.join(" ") : "Bottle photo upload";
+}
+
+/** Check wrapped errors too: classification can fail because its provider is down. */
+export function isPhotoIdentificationUnavailable(error: Error | null): boolean {
+  let cause: unknown = error;
+  for (let depth = 0; depth < 5 && cause instanceof Error; depth++) {
+    if (cause instanceof OpenAI.APIConnectionError) return true;
+    if (
+      cause instanceof OpenAI.APIError &&
+      (cause.status === 408 ||
+        cause.status === 429 ||
+        (cause.status ?? 0) >= 500)
+    ) {
+      return true;
+    }
+    cause = cause.cause;
+  }
+  return false;
 }

@@ -87,6 +87,98 @@ test.describe("Add Bottle", () => {
     );
   });
 
+  test("recovers from a photo service outage through search", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-outage"),
+    });
+    await page.route("**/rpc/tastings/photoIdentification", (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        headers: {
+          "access-control-allow-origin": "*",
+          "x-sentry-trace-id": "88888888888888888888888888888888",
+        },
+        body: JSON.stringify({
+          json: {
+            defined: true,
+            code: "SERVICE_UNAVAILABLE",
+            status: 503,
+            message: "We can't check photos right now.",
+          },
+        }),
+      }),
+    );
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+    await expect(
+      page.getByText(
+        "We can't check photos right now. Search by name or try again later.",
+      ),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Search bottles", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/search/);
+  });
+
+  test("can replace a photo while identification is pending", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-cancel"),
+    });
+    let releaseRequest!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      releaseRequest = resolve;
+    });
+    await page.route("**/rpc/tastings/photoIdentification", () => pending);
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+    await page.getByRole("button", { name: "Use a different photo" }).click();
+    releaseRequest();
+    await page.unroute("**/rpc/tastings/photoIdentification");
+    await uploadLabel(page);
+    await expect(selectedBottle(page, existingBottle.group.name)).toBeVisible();
+  });
+
+  test("stops waiting for a stalled photo request", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-timeout"),
+    });
+    let releaseRequest!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      releaseRequest = resolve;
+    });
+    await page.route("**/rpc/tastings/photoIdentification", () => pending);
+    await page.goto("/addBottle");
+    await page.clock.install();
+    await uploadLabel(page);
+    await expect(
+      page.getByText("Reading the label and checking Peated for a match.", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.clock.fastForward(120_001);
+    await expect(
+      page.getByText(
+        "This is taking too long. Search by name or try again later.",
+      ),
+    ).toBeVisible();
+    releaseRequest();
+    await page
+      .getByRole("link", { name: "Search bottles", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/search/);
+  });
+
   test("sends an expired photo session back to sign in", async ({
     context,
     page,
