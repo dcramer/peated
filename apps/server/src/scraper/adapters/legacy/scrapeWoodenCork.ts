@@ -114,7 +114,7 @@ export default async function scrapeWoodenCork({
 }: { dryRun?: boolean } = {}) {
   return scrapePrices(
     SITE,
-    (page) => `https://woodencork.com/collections/whiskey?cursor=${page}`,
+    (page) => `https://woodencork.com/collections/whiskey?page=${page}`,
     scrapeProducts,
     { dryRun },
   );

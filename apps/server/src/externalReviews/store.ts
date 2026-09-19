@@ -8,6 +8,7 @@ import {
 import {
   ExternalReviewArticleObservationSchema,
   ExternalReviewObservationSchema,
+  reviewText,
 } from "@peated/server/externalReviews/observation";
 import { isExternalReviewPublicationApprovedInTransaction } from "@peated/server/externalReviews/publication";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
@@ -20,10 +21,10 @@ import { z } from "zod";
 
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
-  clip: z.string().trim().min(1).max(180).nullable().optional(),
+  clip: reviewText(180).nullable().optional(),
   version: z.number().int().nonnegative().optional(),
-  tags: z.array(z.string().min(1).max(64)).optional(),
-  body: z.string().trim().min(1).optional(),
+  tags: z.array(reviewText(64)).optional(),
+  body: reviewText().optional(),
 });
 
 export const ExternalReviewArticleInputSchema =
