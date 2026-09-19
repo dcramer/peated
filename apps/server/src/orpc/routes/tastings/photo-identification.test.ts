@@ -35,6 +35,7 @@ import {
 import { createPhotoIdentificationCreateProcedure } from "@peated/server/orpc/routes/tastings/photo-identification-create";
 import type { PhotoIdentificationInputSchema } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
+import OpenAI from "openai";
 import { afterEach, beforeEach, vi } from "vitest";
 import type { z } from "zod";
 
@@ -850,6 +851,63 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.suggestedNextStep).toBe("manual_search");
   });
 
+  test.for([
+    new OpenAI.APIConnectionError({ message: "Connection failed" }),
+    new OpenAI.APIConnectionTimeoutError(),
+    new OpenAI.APIError(429, {}, "Rate limited", new Headers()),
+    new OpenAI.APIError(503, {}, "Unavailable", new Headers()),
+  ])(
+    "returns a retryable error for provider failure %s",
+    async (failure, { fixtures, defaults }) => {
+      extractPhotoBottleEvidenceMock.mockRejectedValue(failure);
+      const error = await waitError(
+        routerClient.tastings.photoIdentification(
+          {
+            file: await fixtures.SampleSquareImage(),
+            idempotencyKey: "photo-provider-outage",
+          },
+          { context: { user: defaults.user } },
+        ),
+      );
+      expect(error).toMatchObject({ code: "SERVICE_UNAVAILABLE", status: 503 });
+      expect(error.message).not.toContain(failure.message);
+      expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+      const uploads = await db.select().from(pendingUploads);
+      expect(uploads).toHaveLength(1);
+    },
+  );
+
+  test("returns a retryable error when classification loses its provider", async ({
+    fixtures,
+    defaults,
+  }) => {
+    extractPhotoBottleEvidenceMock.mockImplementation(
+      async ({ pendingUpload }) => ({
+        extractedIdentity: null,
+        imageEvidence: buildImageEvidence(pendingUpload.id),
+      }),
+    );
+    runBottleReferenceMock.mockRejectedValue(
+      new Error("Classification failed", {
+        cause: new OpenAI.APIError(503, {}, "Unavailable", new Headers()),
+      }),
+    );
+    const error = await waitError(
+      routerClient.tastings.photoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-classification-outage",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(error).toMatchObject({ code: "SERVICE_UNAVAILABLE", status: 503 });
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.stage",
+      "classification",
+    );
+  });
+
   test("rejects when extraction fails", async ({ fixtures, defaults }) => {
     extractPhotoBottleEvidenceMock.mockRejectedValue(
       new Error("vision provider unavailable"),
@@ -867,6 +925,7 @@ describe("POST /tastings/photo-identification", () => {
       ),
     );
 
+    expect(err).toMatchObject({ code: "INTERNAL_SERVER_ERROR", status: 500 });
     expect(err).toMatchInlineSnapshot(
       `[Error: Unable to identify bottle from photo.]`,
     );

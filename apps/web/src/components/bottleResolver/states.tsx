@@ -81,7 +81,7 @@ export function PhotoReadFailureState({
     <>
       <PhotoFailurePanel
         previewUrl={previewUrl}
-        title="We couldn't read that photo"
+        title="We couldn't identify that bottle"
         description={photoError}
         searchHref={searchHref}
         searchLabel={searchLabel}

@@ -6,6 +6,13 @@ import {
 import { contract } from "../base";
 
 export default contract
+  .errors({
+    SERVICE_UNAVAILABLE: {
+      status: 503,
+      message:
+        "We can't check photos right now. Search by name or try again later.",
+    },
+  })
   .route({
     method: "POST",
     path: "/tastings/photo-identification",

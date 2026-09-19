@@ -11,11 +11,11 @@ import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleC
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
   buildPhotoReferenceName,
   extractPhotoBottleEvidence,
+  isPhotoIdentificationUnavailable,
 } from "@peated/server/lib/photoIdentification";
 import { signPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { humanizeBytes } from "@peated/server/lib/strings";
@@ -563,30 +563,17 @@ function logPhotoIdentificationFailure({
   err: unknown;
 }) {
   const error = err instanceof Error ? err : null;
-  const failureContext = {
-    userId: context.user.id,
-    pendingImageId: pendingImage.id,
-    pendingImageUrl: pendingImage.imageUrl,
-    idempotencyKey,
-    outcome: "failed",
-    fileSize: file.size,
-    fileType: file.type || "unknown",
-  };
-
   logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
-    "photo_identification.user_id": failureContext.userId,
-    "photo_identification.pending_image_id": failureContext.pendingImageId,
-    "photo_identification.idempotency_key": failureContext.idempotencyKey,
+    "photo_identification.user_id": context.user.id,
+    "photo_identification.pending_image_id": pendingImage.id,
+    "photo_identification.idempotency_key": idempotencyKey,
     "photo_identification.outcome": "failed",
-    "photo_identification.file_size": failureContext.fileSize,
-    "photo_identification.file_type": failureContext.fileType,
+    "photo_identification.file_size": file.size,
+    "photo_identification.file_type": file.type || "unknown",
     "photo_identification.error_name": error?.name ?? "NonErrorThrown",
-    "photo_identification.error_message":
-      error?.message ?? "Unknown photo identification failure.",
+    "photo_identification.retryable": isPhotoIdentificationUnavailable(error),
   });
-  logError(err, {
-    photoIdentification: failureContext,
-  });
+  // Global RPC middleware reports the error to Sentry.
 }
 
 /**
@@ -624,6 +611,7 @@ export async function identifyPendingImage(
       },
     },
     async (span) => {
+      span.setAttribute("photo_identification.stage", "extraction");
       const { extractedIdentity, imageEvidence } =
         await services.extractEvidence({
           pendingUpload: pendingImage,
@@ -640,6 +628,7 @@ export async function identifyPendingImage(
         extractedIdentity,
         imageEvidence,
       };
+      span.setAttribute("photo_identification.stage", "classification");
       const exactReferenceCandidate = await findExactReferenceBottleCandidate(
         classificationInput.reference.name,
       );
@@ -679,6 +668,7 @@ export async function identifyPendingImage(
       const suggestedNextStep = getSuggestedNextStep(classification);
 
       setSpanAttributes(span, {
+        "photo_identification.stage": "completed",
         "photo_identification.reference_name": referenceName,
         "photo_identification.extracted_identity_summary": referenceName,
         "photo_identification.image_evidence_summary":
@@ -776,6 +766,9 @@ export function createPhotoIdentificationProcedure(
           file,
           err,
         });
+        if (err instanceof Error && isPhotoIdentificationUnavailable(err)) {
+          throw errors.SERVICE_UNAVAILABLE({ cause: err });
+        }
         throw errors.INTERNAL_SERVER_ERROR({
           message: "Unable to identify bottle from photo.",
           cause: err,

@@ -181,3 +181,18 @@ Follow [Logs And Traces](../policies/logs-and-traces.md),
 [Sensitive Data](../policies/sensitive-data.md), and
 [Model Checks](../development/model-checks.md) when changing the model or tracing parts
 of this flow.
+
+## Errors and logs
+
+The form logs each attempt's start, result, duration, request key, file size and
+format, next step, and server trace ID. It never logs filenames or photo contents.
+Server traces show whether a failure happened while reading the label or looking
+up the bottle. The RPC layer reports errors to Sentry.
+
+Label reading stops after 45 seconds without automatic retries. Provider outages,
+connection failures, timeouts, and rate limits return `SERVICE_UNAVAILABLE`.
+Other failures remain server errors. Uploaded photos keep their normal expiry.
+
+The form stops waiting after two minutes and offers search or another upload.
+Starting over or leaving cancels the browser request and ignores late results;
+work already running on the server may continue.

@@ -1,5 +1,6 @@
 "use client";
 
+import { isORPCClientError } from "@peated/orpc/client/errors";
 import { Button } from "@peated/web/components/button.stylex";
 import {
   FormDetails,
@@ -7,7 +8,7 @@ import {
   FormStack,
 } from "@peated/web/components/formLayout.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
-import { logError } from "@peated/web/lib/log";
+import { logError, logInfo } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   createORPCResponseTraceContext,
@@ -73,6 +74,7 @@ export default function BottleResolver({
   searchActionLabel = "Search bottles",
 }: BottleResolverProps) {
   const orpc = useORPC();
+  const photoRequestRef = useRef<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef<string | null>(null);
   const transferredPreviewUrlRef = useRef<string | null>(null);
@@ -98,21 +100,21 @@ export default function BottleResolver({
   } | null>(null);
 
   const photoIdentificationMutation = useMutation({
-    mutationFn: async (
-      {
-        responseTraceContext,
-        ...input
-      }: {
-        file: File;
-        idempotencyKey: string;
-        responseTraceContext: ORPCResponseTraceContext;
-      },
-      mutationContext,
-    ) => {
-      const { mutationFn } = orpc.tastings.photoIdentification.mutationOptions({
+    retry: false,
+    mutationFn: async ({
+      responseTraceContext,
+      signal,
+      ...input
+    }: {
+      file: File;
+      idempotencyKey: string;
+      responseTraceContext: ORPCResponseTraceContext;
+      signal: AbortSignal;
+    }) => {
+      return orpc.tastings.photoIdentification.call(input, {
         context: { responseTraceContext },
+        signal,
       });
-      return mutationFn!(input, mutationContext);
     },
   });
   const photoIdentificationCreateMutation = useMutation(
@@ -126,6 +128,8 @@ export default function BottleResolver({
 
   useEffect(() => {
     return () => {
+      photoRequestRef.current?.abort();
+      photoRequestRef.current = null;
       const current = previewUrlRef.current;
       if (current && current !== transferredPreviewUrlRef.current) {
         URL.revokeObjectURL(current);
@@ -250,6 +254,19 @@ export default function BottleResolver({
   }
 
   async function identifyPhoto(file: File) {
+    photoRequestRef.current?.abort();
+    const controller = new AbortController();
+    photoRequestRef.current = controller;
+    const startedAt = performance.now();
+    let outcome = "failed";
+    let timedOut = false;
+    let errorCode: string | null = null;
+    let suggestedNextStep: string | null = null;
+    // Stop waiting after two minutes, including the upload and bottle lookup.
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 120_000);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
@@ -261,27 +278,49 @@ export default function BottleResolver({
     const idempotencyKey = createIdempotencyKey();
     const responseTraceContext = createORPCResponseTraceContext();
 
+    logInfo("Bottle photo submission started", {
+      extra: {
+        "photo_identification.idempotency_key": idempotencyKey,
+        "photo_identification.file_size": file.size,
+        "photo_identification.file_type": file.type || "unknown",
+      },
+    });
     try {
       const result = await photoIdentificationMutation.mutateAsync({
         file,
         idempotencyKey,
         responseTraceContext,
+        signal: controller.signal,
       });
+      if (photoRequestRef.current !== controller) {
+        outcome = "cancelled";
+        return;
+      }
+      outcome = "completed";
+      suggestedNextStep = result.suggestedNextStep;
       setPhotoResult(result);
       setPhotoIdentificationTraceId(responseTraceContext.sentryTraceId);
     } catch (err) {
-      if (isORPCUnauthorizedRedirectError(err)) return;
+      if (photoRequestRef.current !== controller) {
+        outcome = "cancelled";
+        return;
+      }
+      if (isORPCUnauthorizedRedirectError(err)) {
+        outcome = "unauthorized";
+        return;
+      }
 
-      logError(err, {
-        context: "add_bottle_photo_identification",
-        rpc: "tastings.photoIdentification",
-        file: {
-          size: file.size,
-          type: file.type || null,
-        },
-      });
+      // The RPC client already reports errors to Sentry.
+      errorCode = isORPCClientError(err) ? err.code : "NETWORK_ERROR";
+      outcome = timedOut ? "timeout" : "failed";
       setPhotoError(
-        "Search can still find the bottle, or you can try another photo.",
+        timedOut
+          ? "This is taking too long. Search by name or try again later."
+          : errorCode === "SERVICE_UNAVAILABLE"
+            ? "We can't check photos right now. Search by name or try again later."
+            : errorCode === "PAYLOAD_TOO_LARGE"
+              ? "That photo is too large. Choose a smaller photo or search by name."
+              : "Search by name, or try uploading your photo again.",
       );
       const sentryTraceId = responseTraceContext.sentryTraceId;
       if (sentryTraceId) {
@@ -299,6 +338,25 @@ export default function BottleResolver({
               : "Unable to identify bottle from photo.",
         });
       }
+    } finally {
+      clearTimeout(timeout);
+      if (photoRequestRef.current === controller)
+        photoRequestRef.current = null;
+      logInfo("Bottle photo submission finished", {
+        extra: {
+          "photo_identification.idempotency_key": idempotencyKey,
+          "photo_identification.outcome": outcome,
+          "photo_identification.duration_ms": Math.round(
+            performance.now() - startedAt,
+          ),
+          "photo_identification.error_code": errorCode,
+          "photo_identification.suggested_next_step": suggestedNextStep,
+          "photo_identification.server_trace_id":
+            responseTraceContext.sentryTraceId,
+          "photo_identification.file_size": file.size,
+          "photo_identification.file_type": file.type || "unknown",
+        },
+      });
     }
   }
 
@@ -310,6 +368,9 @@ export default function BottleResolver({
   }
 
   function startOver() {
+    photoRequestRef.current?.abort();
+    photoRequestRef.current = null;
+    photoIdentificationMutation.reset();
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
