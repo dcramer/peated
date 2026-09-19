@@ -224,7 +224,9 @@ Deterministic identifiers such as SMWS are input anchors, not bypasses.
 
 An audit returns untrusted Suggested Changes and findings. The agent cannot
 write to the catalog. Every proposed resource must have been inspected, and
-every change or finding must cite collected evidence.
+every change or finding must cite collected evidence. The propose tool rejects
+a Suggested Change without it. A finding without it is dropped from the result
+so the rest of the audit still saves.
 
 Supported Suggested Changes are:
 

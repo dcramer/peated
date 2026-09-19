@@ -39,10 +39,14 @@ const FirecrawlSearchResponseSchema = z
   })
   .passthrough();
 
+// Eight results per query give the model more than the top retailer hits
+// without a second query. Replay recordings key on the query, not this limit.
+const FIRECRAWL_SEARCH_RESULT_LIMIT = 8;
+
 function buildFirecrawlSearchBody(query: string) {
   return {
     query,
-    limit: 5,
+    limit: FIRECRAWL_SEARCH_RESULT_LIMIT,
     sources: ["web"],
   };
 }

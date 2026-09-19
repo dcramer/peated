@@ -602,26 +602,17 @@ export function createRunProposalCollector({
   });
 }
 
-export function assertFindingsUseCollectedEvidence(
+// Audit rule (docs/architecture/bottle-classifier.md, Audit Safety): a finding
+// must cite evidence this run collected and inspected. A finding that does not
+// is dropped so the rest of the audit still saves; Suggested Changes are
+// checked separately when the propose tool records them.
+export function keepFindingsWithCollectedEvidence(
   findings: readonly Finding[],
   proposalCollector: BottleProposalCollector,
-) {
-  for (const [findingIndex, finding] of findings.entries()) {
-    const missingEvidence = proposalCollector.getMissingEvidence(
-      finding.evidenceRefs,
-    );
-    if (missingEvidence) {
-      throw new Error(
-        `Finding ${findingIndex} cites evidence that was not collected: ${JSON.stringify(missingEvidence)}.`,
-      );
-    }
-    const uninspectedEvidence = proposalCollector.getUninspectedEvidence(
-      finding.evidenceRefs,
-    );
-    if (uninspectedEvidence) {
-      throw new Error(
-        `Finding ${findingIndex} cites Bottle or Entity evidence that was not inspected: ${JSON.stringify(uninspectedEvidence)}.`,
-      );
-    }
-  }
+): Finding[] {
+  return findings.filter(
+    (finding) =>
+      proposalCollector.getMissingEvidence(finding.evidenceRefs) === null &&
+      proposalCollector.getUninspectedEvidence(finding.evidenceRefs) === null,
+  );
 }

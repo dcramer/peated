@@ -29,6 +29,28 @@ describe("mergeBottleCandidate", () => {
     expect(z.json().safeParse(merged).success).toBe(true);
   });
 
+  test("keeps candidates JSON-safe when a duplicate result omits the bottling year", () => {
+    const first = BottleCandidateSchema.parse({
+      bottleId: 1,
+      fullName: "Example Small Batch",
+      source: ["exact"],
+      bottlingYear: null,
+    });
+    const second = BottleCandidateSchema.parse({
+      bottleId: 1,
+      fullName: "Example Small Batch",
+      source: ["search"],
+    });
+    const candidates = new Map<number, BottleCandidate>();
+
+    mergeBottleCandidate(candidates, first);
+    mergeBottleCandidate(candidates, second);
+
+    const merged = candidates.get(1);
+    expect(merged?.bottlingYear).toBeNull();
+    expect(z.json().safeParse(merged).success).toBe(true);
+  });
+
   test("keeps the accepted reference that produced an exact match", () => {
     const candidates = new Map<number, BottleCandidate>();
 
