@@ -392,10 +392,18 @@ test.describe("Add Bottle", () => {
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Continue" }).click();
     const age = page.getByRole("spinbutton", { name: "Age statement" });
+    const nas = page.getByText("No age statement (NAS)", { exact: true });
+    await expect(nas).toBeVisible();
     await age.fill("12");
-    await page.getByText("No age statement (NAS)", { exact: true }).click();
+    await expect(nas).toHaveCount(0);
 
-    await expect(age).toBeDisabled();
+    await age.fill("");
+    await expect(nas).toBeVisible();
+    await nas.click();
+    await expect(age).toHaveCount(0);
+
+    await nas.click();
+    await expect(age).toBeVisible();
     await expect(age).toHaveValue("");
   });
 });

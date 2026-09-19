@@ -25,8 +25,7 @@ type StableField =
   | "category"
   | "brand"
   | "distillers"
-  | "bottler"
-  | "flavorProfile";
+  | "bottler";
 
 function selectStableField<Field extends StableField>(
   field: Field,
@@ -137,10 +136,6 @@ export function buildBottleProposalDraft({
       proposedBottle,
     }),
     bottler: selectStableField("bottler", { sourceBottle, proposedBottle }),
-    flavorProfile: selectStableField("flavorProfile", {
-      sourceBottle,
-      proposedBottle,
-    }),
     ...exact,
     ...description,
   };

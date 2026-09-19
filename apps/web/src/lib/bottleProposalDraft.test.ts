@@ -53,7 +53,6 @@ describe("buildBottleProposalDraft", () => {
         brand: { id: 2, name: "Source Brand" },
         distillers: [{ id: 3, name: "Source Distillery" }],
         bottler: { id: 4, name: "Source Bottler" },
-        flavorProfile: "peated",
       },
       proposedBottle: {
         name: "Proposed Name",
@@ -74,7 +73,6 @@ describe("buildBottleProposalDraft", () => {
       brand: { id: 2, name: "Source Brand" },
       distillers: [],
       bottler: { id: 4, name: "Source Bottler" },
-      flavorProfile: "peated",
     });
   });
 
@@ -94,7 +92,6 @@ describe("buildBottleProposalDraft", () => {
       brand: { id: 2, name: "Example" },
       distillers: [{ id: 3, name: "Example Distillery" }],
       bottler: { id: 4, name: "Example Bottler" },
-      flavorProfile: "peated" as const,
       edition: "Batch 1",
       abv: 55.4,
       singleCask: true,
@@ -125,7 +122,6 @@ describe("buildBottleProposalDraft", () => {
       brand: { id: 2, name: "Example" },
       distillers: [{ id: 3, name: "Example Distillery" }],
       bottler: { id: 4, name: "Example Bottler" },
-      flavorProfile: "peated",
       edition: "Batch 1",
       abv: 55.4,
       singleCask: true,
