@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   externalReviewArticles,
+  externalReviewBodies,
   externalReviews,
 } from "@peated/server/db/schema";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
@@ -108,6 +109,45 @@ describe("storeExternalReviewArticle", () => {
         hidden: true,
       },
     ]);
+  });
+
+  test("drops NUL bytes from review text before storing it", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+    const input = inputFor(site.id);
+
+    const result = await storeExternalReviewArticle({
+      ...input,
+      title: "Three spring\u0000 releases reviewed",
+      externalReviews: [
+        {
+          ...input.externalReviews[0],
+          name: "Ardbeg\u0000 10-year-old",
+          body: "Smoke\u0000 and brine.",
+          clip: "Smoke and\u0000 brine.",
+        },
+      ],
+    });
+
+    expect(
+      await db.query.externalReviewArticles.findFirst({
+        where: eq(externalReviewArticles.id, result.articleId),
+      }),
+    ).toMatchObject({ title: "Three spring releases reviewed" });
+    const [review] = await db
+      .select()
+      .from(externalReviews)
+      .where(eq(externalReviews.articleId, result.articleId));
+    expect(review).toMatchObject({
+      name: "Ardbeg 10-year-old",
+      clip: "Smoke and brine.",
+    });
+    expect(
+      await db.query.externalReviewBodies.findFirst({
+        where: eq(externalReviewBodies.externalReviewId, review!.id),
+      }),
+    ).toMatchObject({ body: "Smoke and brine." });
   });
 
   test("publishes only resolved reviews for an approved source", async ({

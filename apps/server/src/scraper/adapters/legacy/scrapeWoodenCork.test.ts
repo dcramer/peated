@@ -2,7 +2,7 @@ import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { scrapeProducts } from "./scrapeWoodenCork";
 
 test("simple", async ({ axiosMock }) => {
-  const url = "https://woodencork.com/collections/whiskey?cursor=2";
+  const url = "https://woodencork.com/collections/whiskey?page=2";
   const result = await loadFixture("woodencork", "bottle-list.html");
 
   axiosMock.onGet(url).reply(200, result);
@@ -29,7 +29,7 @@ test("simple", async ({ axiosMock }) => {
 });
 
 test("supports the current collection card markup", async ({ axiosMock }) => {
-  const url = "https://woodencork.com/collections/whiskey?cursor=1";
+  const url = "https://woodencork.com/collections/whiskey?page=1";
   axiosMock.onGet(url).reply(
     200,
     `<div class="collection-grid">

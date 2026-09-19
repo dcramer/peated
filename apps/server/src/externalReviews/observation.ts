@@ -4,12 +4,22 @@ import { z } from "zod";
 const MAX_REVIEW_TEXT_LENGTH = 50_000;
 const ReviewSourceKeySchema = z.string().trim().min(1).max(255);
 
+// Storage rule (external reviews): Postgres text columns reject NUL bytes, so
+// publisher and model text drops them before validation.
+export function reviewText(max?: number) {
+  const text = z.string().trim().min(1);
+  return z
+    .string()
+    .transform((value) => value.replaceAll("\u0000", ""))
+    .pipe(max === undefined ? text : text.max(max));
+}
+
 export const ExternalReviewObservationSchema = z
   .object({
     sourceKey: ReviewSourceKeySchema,
-    name: z.string().trim().min(1).max(500),
+    name: reviewText(500),
     category: CategoryEnum.nullable().default(null),
-    reviewerName: z.string().trim().min(1).max(255).nullable().default(null),
+    reviewerName: reviewText(255).nullable().default(null),
     nativeScore: NativeScoreSchema.nullable().default(null),
   })
   .strict();
@@ -26,8 +36,8 @@ export const ExternalReviewArticleObservationSchema = z
         (value) => ["http:", "https:"].includes(new URL(value).protocol),
         { message: "Canonical URL must use HTTP or HTTPS." },
       ),
-    title: z.string().trim().min(1).max(1000),
-    issue: z.string().trim().min(1).max(255).nullable().default(null),
+    title: reviewText(1000),
+    issue: reviewText(255).nullable().default(null),
     publishedAt: z.date().nullable().default(null),
     contentHash: z.string().trim().min(1).max(128),
     externalReviews: z.array(ExternalReviewObservationSchema).min(1),

@@ -220,6 +220,49 @@ test("caches a missing robots document as allowed for the bounded period", async
   expect(runState?.requestCount).toBe(1);
 });
 
+test("treats a refused robots document as no rules", async () => {
+  const { registry, run } = await setupRobotsRuntime();
+  const fetchImpl = vi
+    .fn<typeof fetch>()
+    .mockResolvedValue(new Response("Forbidden", { status: 403 }));
+
+  await expect(
+    ensureRobotsAllowed({
+      runId: run.id,
+      sourceKey: "finedrams",
+      targetKey: "operator",
+      url: new URL("https://example.com/catalog"),
+      registry,
+      fetchImpl,
+      clock: fixedClock(),
+    }),
+  ).resolves.toBeUndefined();
+  const [origin] = await db
+    .select()
+    .from(scrapeOrigins)
+    .where(eq(scrapeOrigins.origin, "https://example.com"));
+  expect(origin?.robotsState).toEqual({ status: "missing" });
+});
+
+test("waits when robots returns a server error", async () => {
+  const { registry, run } = await setupRobotsRuntime();
+  await expect(
+    ensureRobotsAllowed({
+      runId: run.id,
+      sourceKey: "finedrams",
+      targetKey: "operator",
+      url: new URL("https://example.com/catalog"),
+      registry,
+      fetchImpl: vi
+        .fn<typeof fetch>()
+        .mockResolvedValue(new Response(null, { status: 500 })),
+      clock: fixedClock(),
+    }),
+  ).rejects.toMatchObject({ reason: "robots_unavailable" });
+  const [origin] = await db.select().from(scrapeOrigins);
+  expect(origin?.robotsState).toBeNull();
+});
+
 test("waits when robots is unavailable without a fresh decision", async () => {
   const { registry, run } = await setupRobotsRuntime();
   await expect(

@@ -214,7 +214,14 @@ export async function ensureRobotsAllowed({
       await writeRobotsCache(url.origin, parsed, now);
       state = CachedRobotsRulesSchema.safeParse(parsed);
     } catch (error) {
-      if (error instanceof ScraperHttpStatusError && error.status === 404) {
+      // Robots rule (RFC 9309 section 2.3.1.3): a 4xx robots.txt answer means
+      // the site publishes no rules, so the crawl may proceed. A 5xx answer or a
+      // network failure means the rules are unavailable, so the run waits.
+      if (
+        error instanceof ScraperHttpStatusError &&
+        error.status >= 400 &&
+        error.status < 500
+      ) {
         const missing = { status: "missing" } as const;
         await writeRobotsCache(url.origin, missing, now);
         state = CachedRobotsRulesSchema.safeParse(missing);
