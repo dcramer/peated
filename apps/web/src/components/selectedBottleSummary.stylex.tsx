@@ -7,6 +7,8 @@ import { Button } from "./button.stylex";
 
 export type SelectedBottleSummaryProps = {
   bottle: BottleIdentitySource & { imageUrl?: string | null };
+  /** Tints the bottle thumbnail, for example with the selected pour color. */
+  imageFillColor?: string | null;
   imageUrl?: string | null;
   /** Shows a change action when the owning workflow allows bottle selection. */
   onChange?: () => void;
@@ -15,6 +17,7 @@ export type SelectedBottleSummaryProps = {
 /** Keeps the selected bottle visible while a member completes a related form. */
 export function SelectedBottleSummary({
   bottle,
+  imageFillColor,
   imageUrl,
   onChange,
 }: SelectedBottleSummaryProps) {
@@ -29,6 +32,7 @@ export function SelectedBottleSummary({
             </Button>
           ) : undefined
         }
+        imageFillColor={imageFillColor}
         imageUrl={imageUrl ?? bottle.imageUrl}
         layout="cell"
       />

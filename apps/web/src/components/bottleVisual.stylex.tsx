@@ -18,6 +18,8 @@ export type BottleVisualFit = "contain" | "cover";
 
 export type BottleVisualProps = {
   expandable?: boolean;
+  /** Tints the frame behind the image or glyph, for example with the pour color a member selects. */
+  fillColor?: string | null;
   /** Cover is for personal-photo thumbnails; catalog bottle images stay contained. */
   fit?: BottleVisualFit;
   imageUrl?: string | null;
@@ -33,9 +35,12 @@ export type BottleVisualProps = {
  * text; expandable needs a label. Use cover only for personal-photo thumbnails.
  * Fixed-size frames cap both dimensions so source images cannot enlarge a row.
  * Row images load near the viewport; lg/xl detail images load immediately.
+ * fillColor washes the frame with a light mix of the color so the image or
+ * glyph stays readable in both color schemes.
  */
 export function BottleVisual({
   expandable = false,
+  fillColor = null,
   fit = "contain",
   imageUrl,
   label,
@@ -49,6 +54,13 @@ export function BottleVisual({
       aria-hidden={!label ? "true" : undefined}
       aria-label={label && !hasExpandableImage ? label : undefined}
       role={label && !hasExpandableImage ? "img" : undefined}
+      style={
+        fillColor
+          ? {
+              backgroundColor: `color-mix(in srgb, ${fillColor} 28%, transparent)`,
+            }
+          : undefined
+      }
       {...stylex.props(
         styles.visual,
         visualSizeStyles[size],
