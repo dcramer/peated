@@ -65,6 +65,7 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
   const bottle = await fixtures.Bottle({
     name: "Warehouse Selection",
     edition: "Batch 1",
+    bottlingYear: 2023,
     releaseYear: 2024,
     maturation: "Bourbon barrel",
     caskNumber: "#1234",
@@ -77,6 +78,7 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
   const sibling = await fixtures.BottleGroupMember({
     groupId: bottle.groupId,
     edition: "Batch 2",
+    bottlingYear: 2024,
     releaseYear: 2025,
     maturation: "Oloroso hogshead",
     caskNumber: "#9012",
@@ -97,6 +99,7 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
     bottleId: bottle.id,
     fullName: bottle.fullName,
     edition: "Batch 1",
+    bottlingYear: 2023,
     releaseYear: 2024,
     maturation: "Bourbon barrel",
     caskNumber: "#1234",
@@ -107,6 +110,7 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
           bottleId: sibling.id,
           fullName: sibling.fullName,
           edition: "Batch 2",
+          bottlingYear: 2024,
           releaseYear: 2025,
           traitFields: expect.not.arrayContaining([
             "maturation",

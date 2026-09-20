@@ -60,6 +60,7 @@ export type BottleCandidateQueryRow = {
   singleCask?: boolean | null;
   abv?: number | string | null;
   vintageYear?: number | string | null;
+  bottlingYear?: number | string | null;
   releaseYear?: number | string | null;
   releaseMonth?: number | string | null;
   releaseDay?: number | string | null;
@@ -328,6 +329,7 @@ function buildBottleCandidate(
     singleCask: row.singleCask ?? null,
     abv: normalizePotentialProofToAbv(parseNullableNumber(row.abv)),
     vintageYear: parseNullableNumber(row.vintageYear),
+    bottlingYear: parseNullableNumber(row.bottlingYear),
     releaseYear: parseNullableNumber(row.releaseYear),
     releaseMonth: parseNullableNumber(row.releaseMonth),
     releaseDay: parseNullableNumber(row.releaseDay),
@@ -597,6 +599,7 @@ type CandidateBottleMetadataRow = {
   singleCask: boolean | null;
   abv: number | null;
   vintageYear: number | null;
+  bottlingYear: number | null;
   releaseYear: number | null;
   releaseMonth: number | null;
   releaseDay: number | null;
@@ -615,6 +618,7 @@ type CandidateBottleSiblingRow = {
   singleCask: boolean | null;
   abv: number | null;
   vintageYear: number | null;
+  bottlingYear: number | null;
   releaseYear: number | null;
   releaseMonth: number | null;
   releaseDay: number | null;
@@ -695,6 +699,7 @@ function buildBottleSiblingContext(
           releaseMonth: sibling.releaseMonth,
           releaseDay: sibling.releaseDay,
           vintageYear: sibling.vintageYear,
+          bottlingYear: sibling.bottlingYear,
           abv: sibling.abv,
           singleCask: sibling.singleCask,
           caskStrength: sibling.caskStrength,
@@ -735,6 +740,7 @@ async function enrichBottleCandidates(
       singleCask: bottles.singleCask,
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
+      bottlingYear: bottles.bottlingYear,
       releaseYear: bottles.releaseYear,
       releaseMonth: bottles.releaseMonth,
       releaseDay: bottles.releaseDay,
@@ -772,6 +778,7 @@ async function enrichBottleCandidates(
             singleCask: bottles.singleCask,
             abv: bottles.abv,
             vintageYear: bottles.vintageYear,
+            bottlingYear: bottles.bottlingYear,
             releaseYear: bottles.releaseYear,
             releaseMonth: bottles.releaseMonth,
             releaseDay: bottles.releaseDay,
@@ -853,6 +860,7 @@ async function enrichBottleCandidates(
     candidate.singleCask ??= bottleMetadata.singleCask;
     candidate.abv ??= bottleMetadata.abv;
     candidate.vintageYear ??= bottleMetadata.vintageYear;
+    candidate.bottlingYear ??= bottleMetadata.bottlingYear;
     candidate.releaseYear ??= bottleMetadata.releaseYear;
     candidate.releaseMonth ??= bottleMetadata.releaseMonth;
     candidate.releaseDay ??= bottleMetadata.releaseDay;
@@ -1153,6 +1161,7 @@ async function getOrdinaryBottleCandidateById(
       singleCask: bottles.singleCask,
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
+      bottlingYear: bottles.bottlingYear,
       releaseYear: bottles.releaseYear,
       releaseMonth: bottles.releaseMonth,
       releaseDay: bottles.releaseDay,
@@ -1186,6 +1195,7 @@ async function getOrdinaryBottleCandidateById(
       singleCask: result.singleCask,
       abv: result.abv,
       vintageYear: result.vintageYear,
+      bottlingYear: result.bottlingYear,
       releaseYear: result.releaseYear,
       releaseMonth: result.releaseMonth,
       releaseDay: result.releaseDay,
@@ -1225,6 +1235,7 @@ async function getExactBottleCandidate(
       singleCask: bottles.singleCask,
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
+      bottlingYear: bottles.bottlingYear,
       releaseYear: bottles.releaseYear,
       maturation: bottles.maturation,
       caskNumber: bottles.caskNumber,
@@ -1257,6 +1268,7 @@ async function getExactBottleCandidate(
         singleCask: exactMatch.singleCask,
         abv: exactMatch.abv,
         vintageYear: exactMatch.vintageYear,
+        bottlingYear: exactMatch.bottlingYear,
         releaseYear: exactMatch.releaseYear,
         maturation: exactMatch.maturation,
         caskNumber: exactMatch.caskNumber,
@@ -1284,6 +1296,7 @@ async function getExactBottleCandidate(
       singleCask: bottles.singleCask,
       abv: bottles.abv,
       vintageYear: bottles.vintageYear,
+      bottlingYear: bottles.bottlingYear,
       releaseYear: bottles.releaseYear,
       maturation: bottles.maturation,
       caskNumber: bottles.caskNumber,
@@ -1320,6 +1333,7 @@ async function getExactBottleCandidate(
       singleCask: comparableMatch.singleCask,
       abv: comparableMatch.abv,
       vintageYear: comparableMatch.vintageYear,
+      bottlingYear: comparableMatch.bottlingYear,
       releaseYear: comparableMatch.releaseYear,
       maturation: comparableMatch.maturation,
       caskNumber: comparableMatch.caskNumber,

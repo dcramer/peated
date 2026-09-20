@@ -69,11 +69,11 @@ import {
   createBottleContextLoader,
 } from "./runtime/bottleCheckContext";
 import {
-  assertFindingsUseCollectedEvidence,
   buildAgentArtifacts,
   createBottleCheckTools,
   createRunProposalCollector,
   getAgentFinalOutput,
+  keepFindingsWithCollectedEvidence,
   mergeRunResultToolArtifacts,
   mergeSearchEvidence,
   observeRunnerTools,
@@ -111,9 +111,11 @@ export type {
   BottleClassifierToolEvent,
 } from "./runtime/bottleCheckRuntime";
 
-// A reference run can use 17 turns for research and one to return its decision.
+// A run can use 17 turns for research and one to return its decision. Audits
+// share the reference limit: new Bottles often need more inspections than an
+// 8-turn cap allowed.
 const REFERENCE_CLASSIFIER_MAX_TURNS = 18;
-const AUDIT_CLASSIFIER_MAX_TURNS = 8;
+const AUDIT_CLASSIFIER_MAX_TURNS = 18;
 // Tool calls run one at a time, so an audit keeps its last turn for the result.
 const CLASSIFIER_MAX_PROPOSED_OPERATIONS = AUDIT_CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
@@ -902,9 +904,12 @@ export function prepareBottleAuditAgentRun(
         throw new Error("Agent returned empty output");
       }
       const parsed = BottleAuditAgentOutputSchema.parse(finalOutput);
-      assertFindingsUseCollectedEvidence(parsed.findings, proposalCollector);
       return {
         ...parsed,
+        findings: keepFindingsWithCollectedEvidence(
+          parsed.findings,
+          proposalCollector,
+        ),
         proposedOperations: proposalCollector.getProposals(),
       };
     },

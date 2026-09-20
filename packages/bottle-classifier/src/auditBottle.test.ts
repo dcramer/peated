@@ -354,7 +354,7 @@ describe("auditBottle", () => {
     expect(extractFromImage).not.toHaveBeenCalled();
   });
 
-  test("preserves gathered artifacts when final finding validation fails", async () => {
+  test("drops a finding that cites uncollected evidence and keeps the audit", async () => {
     const currentBottle = {
       ...buildAuditedBottleContext(),
       imageSources: [],
@@ -414,26 +414,21 @@ describe("auditBottle", () => {
       },
     });
 
-    try {
-      await classifier.runBottleAudit({
-        bottleId: currentBottle.bottleId,
-        origin: "moderator",
-      });
-      throw new Error("Expected Bottle audit validation to fail.");
-    } catch (error) {
-      expect(error).toBeInstanceOf(BottleClassificationError);
-      expect(error).toMatchObject({
-        message: expect.stringContaining(
-          "Finding 0 cites evidence that was not collected",
-        ),
-        artifacts: {
-          bottleContexts: expect.arrayContaining([
-            expect.objectContaining({ bottleId: currentBottle.bottleId }),
-            expect.objectContaining({ bottleId: relatedBottle.bottleId }),
-          ]),
-        },
-      });
-    }
+    const { result } = await classifier.runBottleAudit({
+      bottleId: currentBottle.bottleId,
+      origin: "moderator",
+    });
+
+    expect(result.findings).toEqual([]);
+    expect(result.summary).toBe(
+      "The audit returned an unsupported finding citation.",
+    );
+    expect(result.artifacts.bottleContexts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ bottleId: currentBottle.bottleId }),
+        expect.objectContaining({ bottleId: relatedBottle.bottleId }),
+      ]),
+    );
   });
 
   test("accepts any supported audit proposal type", async () => {

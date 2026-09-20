@@ -124,7 +124,7 @@ describe("bottleClassifier web search tool", () => {
       );
       expect(searchBody).toEqual({
         query: "example distillery private cask",
-        limit: 5,
+        limit: 8,
         sources: ["web"],
       });
       expect("error" in evidence).toBe(false);

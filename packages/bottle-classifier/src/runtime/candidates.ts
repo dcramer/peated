@@ -96,7 +96,13 @@ export function mergeBottleCandidate(
 function fillMissingCandidateField<
   TField extends (typeof CANDIDATE_METADATA_FIELDS)[number],
 >(existing: BottleCandidate, candidate: BottleCandidate, field: TField): void {
-  if (existing[field] === null && candidate[field] !== null) {
+  // Candidates may omit an unknown year, so an undefined value must not replace
+  // null: the merged candidate is stored as JSON and undefined is not JSON.
+  if (
+    existing[field] === null &&
+    candidate[field] !== null &&
+    candidate[field] !== undefined
+  ) {
     existing[field] = candidate[field];
   }
 }

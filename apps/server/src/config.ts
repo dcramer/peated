@@ -82,7 +82,7 @@ export default {
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
       process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
-      "2",
+      "3",
   ),
   ENTITY_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.ENTITY_CLASSIFIER_MAX_SEARCH_QUERIES ||
