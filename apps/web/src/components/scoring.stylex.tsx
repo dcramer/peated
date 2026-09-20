@@ -119,6 +119,8 @@ export function ReviewScore({
 export type BottleRatingSummaryProps = {
   /** Critic review scores included in the bottle score. */
   externalScoreCount?: number;
+  /** Accessible name for the rating when it covers more than one bottle. */
+  label?: string;
   /** Member review scores included in the bottle score. */
   memberScoreCount?: number;
   /** Median of the included member and critic review scores. */
@@ -128,11 +130,13 @@ export type BottleRatingSummaryProps = {
 };
 
 /**
- * Shows one bottle rating as an exact review score or tasting range with its
- * matching name.
+ * Shows one rating as an exact review score or tasting range with its matching
+ * name. The accessible name alone carries the label; the visible summary shows
+ * the value first and the rating name under it.
  */
 export function BottleRatingSummary({
   externalScoreCount = 0,
+  label = "Bottle rating",
   memberScoreCount = 0,
   median = null,
   tastingCounts = {},
@@ -145,7 +149,7 @@ export function BottleRatingSummary({
   if (!rating) return null;
 
   return (
-    <section aria-label="Bottle rating">
+    <section aria-label={label}>
       <div {...stylex.props(styles.summaryHeadline)}>
         <span {...stylex.props(styles.summaryValueGroup)}>
           <strong {...stylex.props(styles.summaryValue)}>{rating.value}</strong>
