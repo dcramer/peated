@@ -39,6 +39,7 @@ import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
   buildTastingTagOptions,
+  pourColorToHex,
   TastingCreateFormFieldsSchema,
   TastingFormFieldsSchema,
   type TastingCreateFormSubmitData,
@@ -237,6 +238,10 @@ export default function TastingForm(
 
   const photoPreview = isReview ? effectiveReviewImagePreview : imagePreview;
 
+  const pourColorHex = pourColorToHex(
+    (isReview ? reviewValues : tastingValues).color,
+  );
+
   const submit: SubmitHandler<TastingFormFields> = async (fields) => {
     setSubmitError(undefined);
     try {
@@ -388,6 +393,7 @@ export default function TastingForm(
         <FormStack>
           <SelectedBottleSummary
             bottle={initialData.bottle}
+            imageFillColor={pourColorHex}
             imageUrl={photoPreview ?? initialData.bottle.imageUrl}
           />
           {submitError || errorMessage ? (

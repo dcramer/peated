@@ -53,3 +53,25 @@ export const Overview: Story = {
     </StoryStack>
   ),
 };
+
+export const PouredColor: Story = {
+  render: (args) => (
+    <StoryStack>
+      <SelectedBottleSummary
+        {...args}
+        imageFillColor="#f5db6d"
+        imageUrl={null}
+      />
+      <SelectedBottleSummary
+        {...args}
+        imageFillColor="#cf7831"
+        imageUrl={null}
+      />
+      <SelectedBottleSummary
+        {...args}
+        imageFillColor="#6a3022"
+        imageUrl={null}
+      />
+    </StoryStack>
+  ),
+};
