@@ -23,6 +23,7 @@ import { TextLink } from "@peated/web/components/textLink.stylex";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
+import { SeriesRatingSummary } from "./seriesRatingSummary.stylex";
 
 type Series = Outputs["bottleSeries"]["details"];
 
@@ -34,6 +35,8 @@ type SeriesPageFrameValue = {
 const SeriesPageFrameContext = createContext<SeriesPageFrameValue | null>(null);
 const DISTILLERY_PREVIEW_LIMIT = 5;
 const COMPACT = "@media (max-width: 639px)";
+const NARROW = "@media (max-width: 900px)";
+const PHONE = "@media (max-width: 480px)";
 const loadingRowCounts = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 export function SeriesPageFrame({
@@ -50,21 +53,28 @@ export function SeriesPageFrame({
       value={{ hasCurrentUser, series: initialSeries }}
     >
       <div {...stylex.props(styles.page)}>
-        <PageHeader
-          description={
-            initialSeries.description ? (
-              <Markdown content={initialSeries.description} />
-            ) : undefined
-          }
-          parent={
-            <TextLink href={getEntityUrl(initialSeries.brand)}>
-              {initialSeries.brand.name}
-            </TextLink>
-          }
-          title={
-            <span {...stylex.props(styles.title)}>{initialSeries.name}</span>
-          }
-        />
+        <div {...stylex.props(styles.header)}>
+          <PageHeader
+            description={
+              initialSeries.description ? (
+                <Markdown content={initialSeries.description} />
+              ) : undefined
+            }
+            parent={
+              <TextLink href={getEntityUrl(initialSeries.brand)}>
+                {initialSeries.brand.name}
+              </TextLink>
+            }
+            title={
+              <span {...stylex.props(styles.title)}>{initialSeries.name}</span>
+            }
+          />
+          {initialSeries.numReleases > 0 ? (
+            <div {...stylex.props(styles.rating)}>
+              <SeriesRatingSummary series={initialSeries.id} />
+            </div>
+          ) : null}
+        </div>
         <PageColumns
           rail={
             initialSeries.numReleases > 0 ? (
@@ -220,6 +230,28 @@ function SeriesDistilleries({
 const styles = stylex.create({
   page: {
     minWidth: 0,
+  },
+  header: {
+    boxSizing: "border-box",
+    display: "grid",
+    width: "100%",
+    minWidth: 0,
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr) 260px",
+      [NARROW]: "minmax(0, 1fr)",
+    },
+    columnGap: space.x6,
+  },
+  rating: {
+    boxSizing: "border-box",
+    display: "grid",
+    minWidth: 0,
+    gridColumn: { default: "2", [NARROW]: "1" },
+    gridRow: { default: "1", [NARROW]: "auto" },
+    gridTemplateColumns: "minmax(0, 1fr)",
+    justifyItems: { default: "stretch", [PHONE]: "center" },
+    paddingTop: { default: space.x4, [NARROW]: 0 },
+    paddingBottom: { default: space.x4, [NARROW]: 0 },
   },
   title: {
     display: "block",
