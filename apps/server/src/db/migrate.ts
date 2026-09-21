@@ -47,6 +47,9 @@ export const migrate = async function ({
     return;
   }
 
+  // Search migrations require TIN on PlanetScale, or Lead in local/CI images.
+  if (!fake) await db.execute(sql`CREATE EXTENSION IF NOT EXISTS tin`);
+
   console.log(
     `Migrating to ${migrationsToApply[migrationsToApply.length - 1].hash} (${
       migrationsToApply.length

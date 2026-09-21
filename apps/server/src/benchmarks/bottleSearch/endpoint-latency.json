@@ -1,0 +1,91 @@
+{
+  "baselineRevision": "923f1eca87c741839d1603081f464e4abeba847e",
+  "date": "2026-09-20",
+  "corpus": "1,001 synthetic Bottles; one producer; warm serial requests",
+  "boundary": "In-process route, validation, PostgreSQL, ranking and serialization; excludes HTTP and fixture setup",
+  "engine": "GIN",
+  "method": "Five warmups and 50 serial samples per case; rotating case order; baseline run followed by current run. Fixture setup excluded.",
+  "results": [
+    {
+      "case": "selective candidate search",
+      "before": {
+        "samples": 50,
+        "p50Ms": 4.0664900000010675,
+        "p95Ms": 4.872722000000067,
+        "maxMs": 5.130446999999549
+      },
+      "after": {
+        "samples": 50,
+        "p50Ms": 5.8793860000005225,
+        "p95Ms": 7.178710000000137,
+        "maxMs": 7.998020999999426
+      }
+    },
+    {
+      "case": "broad candidate search",
+      "before": {
+        "samples": 50,
+        "p50Ms": 8.640406999998959,
+        "p95Ms": 10.231638999999632,
+        "maxMs": 10.53364800000054
+      },
+      "after": {
+        "samples": 50,
+        "p50Ms": 7.122976000000563,
+        "p95Ms": 8.985053000000335,
+        "maxMs": 10.227283999996871
+      }
+    },
+    {
+      "case": "producer and release facts",
+      "before": {
+        "samples": 50,
+        "p50Ms": 9.00257999999667,
+        "p95Ms": 11.107939999999871,
+        "maxMs": 12.740789999999834
+      },
+      "after": {
+        "samples": 50,
+        "p50Ms": 9.61855099999957,
+        "p95Ms": 11.996187000000646,
+        "maxMs": 12.465047999998205
+      }
+    },
+    {
+      "case": "no candidate match",
+      "before": {
+        "samples": 50,
+        "p50Ms": 1.0613460000004125,
+        "p95Ms": 1.5700169999981881,
+        "maxMs": 1.814887999998973
+      },
+      "after": {
+        "samples": 50,
+        "p50Ms": 1.3980520000004617,
+        "p95Ms": 1.8621079999993526,
+        "maxMs": 2.0112220000009984
+      }
+    },
+    {
+      "case": "100-result Bottle list",
+      "before": {
+        "samples": 50,
+        "p50Ms": 12.693912000002456,
+        "p95Ms": 15.235556999999972,
+        "maxMs": 16.230075000003126
+      },
+      "after": {
+        "samples": 50,
+        "p50Ms": 11.673131000001376,
+        "p95Ms": 13.989631999998892,
+        "maxMs": 16.701200999999855
+      }
+    }
+  ],
+  "limitations": [
+    "Small synthetic catalog, one producer, warm cache, no concurrent traffic.",
+    "In-process route timings exclude HTTP, network, and production infrastructure.",
+    "Not a hosted TIN benchmark; local Lead timings are not used.",
+    "Single run per implementation; small differences may be measurement noise."
+  ]
+}

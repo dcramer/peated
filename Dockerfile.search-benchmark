@@ -16,34 +16,6 @@ RUN git init /lead && cd /lead && \
 WORKDIR /lead
 RUN cargo pgrx install --package tin --no-default-features --features pg17 --release
 
-
-# Use the PostGIS image as the base
-# https://github.com/postgis/docker-postgis/issues/216
-# FROM postgis/postgis:$PG_MAJOR-3.5
-FROM imresamu/postgis:17-3.5
-ARG PG_MAJOR=17
-ARG PG_VECTOR=0.8.0
-
-# Install necessary packages
-RUN apt-get update && \
-		apt-mark hold locales && \
-		apt-get install -y --no-install-recommends build-essential git postgresql-server-dev-$PG_MAJOR && \
-    git clone --depth 1 --branch v$PG_VECTOR https://github.com/pgvector/pgvector.git /tmp/pgvector && \
-		cd /tmp/pgvector && \
-		make clean && \
-		make OPTFLAGS="" && \
-		make install && \
-		mkdir /usr/share/doc/pgvector && \
-		cp LICENSE README.md /usr/share/doc/pgvector && \
-		rm -r /tmp/pgvector && \
-		apt-get remove -y build-essential postgresql-server-dev-$PG_MAJOR && \
-		apt-get autoremove -y && \
-		apt-mark unhold locales && \
-		rm -rf /var/lib/apt/lists/*
-
-# Copy initialization scripts
-# COPY ./docker-entrypoint-initdb.d/ /docker-entrypoint-initdb.d/
-
-# Use Lead to run the same search SQL in local development and CI.
+FROM postgres:17-bookworm
 COPY --from=build /usr/lib/postgresql/17/lib/tin.so /usr/lib/postgresql/17/lib/
 COPY --from=build /usr/share/postgresql/17/extension/tin* /usr/share/postgresql/17/extension/

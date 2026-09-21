@@ -1,6 +1,10 @@
 import { db } from "@peated/server/db";
 import { bottleReferences, bottles } from "@peated/server/db/schema";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
+import {
+  bottleTextPredicate,
+  bottleTextQuery,
+} from "@peated/server/lib/bottleTextSearch";
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
@@ -8,6 +12,7 @@ import indexBottleSearchVectors from "./indexBottleSearchVectors";
 async function searchVectorMatches(bottleId: number, query: string) {
   const [result] = await db
     .select({
+      tinMatches: bottleTextPredicate(bottleTextQuery(query)),
       matches: sql<boolean>`COALESCE(
         ${bottles.searchVector} @@ websearch_to_tsquery('english', ${query}),
         FALSE
@@ -17,6 +22,7 @@ async function searchVectorMatches(bottleId: number, query: string) {
     .where(eq(bottles.id, bottleId));
 
   if (!result) throw new Error(`Bottle fixture not found: ${bottleId}`);
+  expect(result.tinMatches).toBe(result.matches);
   return result.matches;
 }
 
@@ -79,7 +85,7 @@ describe("indexBottleSearchVectors", () => {
 
     await db
       .update(bottles)
-      .set({ searchVector: null })
+      .set({ searchVector: null, searchNames: "", searchTerms: "" })
       .where(eq(bottles.id, bottle.id));
     await indexBottleSearchVectors({ bottleId: bottle.id });
 

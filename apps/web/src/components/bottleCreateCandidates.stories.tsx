@@ -11,6 +11,7 @@ import { StoryCanvas, StoryStack } from "./storyFixtures.stylex";
 
 const match = {
   ...mockBottle,
+  comparison: { agreements: ["statedAge", "abv"], missing: [], conflicts: [] },
   id: 51689,
   peatedId: "B51689",
   fullName: "Yamazaki 18-year-old",

@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.postgres
     restart: on-failure
+    command: ["postgres", "-c", "shared_preload_libraries=tin"]
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

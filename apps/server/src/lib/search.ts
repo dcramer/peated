@@ -37,7 +37,7 @@ function formatSearchAbv(abv: number | null | undefined) {
     return null;
   }
 
-  return `${abv.toFixed(1)}% ABV`;
+  return `${Number.isInteger(abv) ? abv.toFixed(1) : abv}% ABV`;
 }
 
 export function buildEntitySearchVector(
@@ -92,6 +92,18 @@ export function buildBottleSearchVector(
     .forEach((a) => values.push(new TSVector(a.name, "A")));
   distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
   return values;
+}
+
+/** Keep text documents alongside GIN during the measured TIN rollout. */
+export function buildBottleSearchDocuments(vector: TSVector[]) {
+  return {
+    searchNames: [
+      ...new Set(
+        vector.filter((part) => part.weight === "A").map((part) => part.value),
+      ),
+    ].join("\n"),
+    searchTerms: [...new Set(vector.map((part) => part.value))].join("\n"),
+  };
 }
 
 export function buildBottleSeriesSearchVector(

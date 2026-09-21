@@ -19,6 +19,7 @@ export { mergeBottleCandidateFamilyContext } from "../candidateFamilyContext";
 export {
   BOTTLE_DECISION_TRAIT_FIELDS,
   BOTTLE_EXACT_TRAIT_FIELDS,
+  BottleCandidateComparisonSchema,
   BottleCandidateSchema,
   BottleCandidateSearchInputSchema,
   BottleClassificationDecisionSchema,

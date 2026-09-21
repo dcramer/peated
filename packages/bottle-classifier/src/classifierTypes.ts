@@ -140,6 +140,12 @@ export const BOTTLE_DECISION_TRAIT_FIELDS = [
   "caskNumber",
 ] as const satisfies ReadonlyArray<(typeof BOTTLE_EXACT_TRAIT_FIELDS)[number]>;
 
+export const BottleCandidateComparisonSchema = z.object({
+  agreements: z.array(z.string()),
+  missing: z.array(z.string()),
+  conflicts: z.array(z.string()),
+});
+
 const BottleExactTraitFieldEnum = z.enum(BOTTLE_EXACT_TRAIT_FIELDS);
 
 const BottleCandidateSiblingSchema = z
@@ -262,6 +268,7 @@ const BottleCandidateObjectSchema = z
     releaseDay: z.number().int().min(1).max(31).nullable().optional(),
     score: z.number().nullable().default(null),
     source: z.array(z.string()).default([]),
+    comparison: BottleCandidateComparisonSchema.optional(),
     familyContext: BottleCandidateFamilyContextSchema.nullable().optional(),
   })
   .strict();

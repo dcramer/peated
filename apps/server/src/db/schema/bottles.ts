@@ -208,6 +208,8 @@ export const bottles = pgTable(
     ),
 
     searchVector: tsvector("search_vector"),
+    searchNames: text("search_names").notNull().default(""),
+    searchTerms: text("search_terms").notNull().default(""),
 
     category: categoryEnum("category"),
     brandId: bigint("brand_id", { mode: "number" })
@@ -313,6 +315,8 @@ export const bottles = pgTable(
     unique("bottle_id_group_id_unq").on(table.id, table.groupId),
     index("bottle_group_idx").on(table.groupId),
     index("bottle_search_idx").using("gin", table.searchVector),
+    index("bottle_search_names_tin_idx").using("tin", table.searchNames),
+    index("bottle_search_terms_tin_idx").using("tin", table.searchTerms),
     index("bottle_brand_idx").on(table.brandId),
     index("bottle_bottler_idx").on(table.bottlerId),
     index("bottle_series_idx").on(table.seriesId),

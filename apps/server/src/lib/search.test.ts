@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildBottleSearchVector } from "./search";
+import { buildBottleSearchDocuments, buildBottleSearchVector } from "./search";
 
 describe("buildBottleSearchVector", () => {
   it("indexes a bottle's series as primary identity", () => {
@@ -32,4 +32,20 @@ describe("buildBottleSearchVector", () => {
       ]),
     );
   });
+});
+
+it("keeps decimal strength precision in search documents", () => {
+  const vector = buildBottleSearchVector(
+    {
+      name: "Single Cask",
+      fullName: "Test Single Cask",
+      brandId: 1,
+      createdByActorId: 1,
+      abv: 56.75,
+    },
+    { name: "Test", kind: "brand", createdByActorId: 1 },
+  );
+  const document = buildBottleSearchDocuments(vector);
+  expect(document.searchTerms).toContain("56.75% ABV");
+  expect(document.searchTerms).not.toContain("56.8% ABV");
 });

@@ -33,6 +33,7 @@ export default procedure
     z.object({
       bottles: z.object({
         total: z.number().int().nonnegative(),
+        withSearchDocuments: z.number().int().nonnegative(),
         withDescription: z.number().int().nonnegative(),
         withImage: z.number().int().nonnegative(),
         withReviews: z.number().int().nonnegative(),
@@ -53,6 +54,7 @@ export default procedure
       db
         .select({
           total: sql<number>`count(*)::int`,
+          withSearchDocuments: sql<number>`count(*) filter (where ${bottles.searchNames} <> '' AND ${bottles.searchTerms} <> '')::int`,
           withDescription: sql<number>`count(*) filter (where nullif(btrim(${bottles.description}), '') is not null)::int`,
           withImage: sql<number>`count(*) filter (where nullif(btrim(${bottles.imageUrl}), '') is not null)::int`,
         })

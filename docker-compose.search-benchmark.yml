@@ -1,0 +1,16 @@
+services:
+  search-benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile.search-benchmark
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: search_benchmark
+    ports:
+      - "127.0.0.1:15433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d search_benchmark"]
+      interval: 2s
+      timeout: 5s
+      retries: 30

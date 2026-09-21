@@ -8,7 +8,10 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
-import { buildBottleSearchVector } from "@peated/server/lib/search";
+import {
+  buildBottleSearchDocuments,
+  buildBottleSearchVector,
+} from "@peated/server/lib/search";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -92,6 +95,7 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
     .update(bottles)
     .set({
       searchVector,
+      ...buildBottleSearchDocuments(searchVector),
     })
     .where(eq(bottles.id, bottle.id));
 }
