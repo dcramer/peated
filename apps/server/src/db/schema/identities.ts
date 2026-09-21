@@ -12,6 +12,7 @@ import {
 import { users } from "./users";
 
 export const identityProviderEnum = pgEnum("identity_provider", [
+  "apple",
   "google",
   "passkey",
 ]);

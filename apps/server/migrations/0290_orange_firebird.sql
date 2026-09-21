@@ -1,0 +1,1 @@
+ALTER TYPE "public"."identity_provider" ADD VALUE 'apple' BEFORE 'google';

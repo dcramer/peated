@@ -1,7 +1,11 @@
 import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
-import { db } from "@peated/server/db";
-import { identities, users } from "@peated/server/db/schema";
+import { db, type AnyDatabase } from "@peated/server/db";
+import { identities, users, type User } from "@peated/server/db/schema";
+import {
+  AppleIdentityTokenError,
+  verifyAppleIdentityToken,
+} from "@peated/server/lib/apple";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { createAccessToken, createUser } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
@@ -10,59 +14,76 @@ import loginContract from "@peated/server/orpc/contracts/auth/login";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
+import slugify from "@sindresorhus/slugify";
 import { compareSync } from "bcrypt";
 import { and, eq, sql } from "drizzle-orm";
-import { OAuth2Client } from "google-auth-library";
+import { OAuth2Client, type TokenPayload } from "google-auth-library";
 
-export default implement(loginContract)
-  .use(authRateLimit)
-  .handler(async function ({ input, errors }) {
-    try {
-      const user =
-        "code" in input
-          ? await authGoogle(input.code, input.tosAccepted)
-          : "idToken" in input
-            ? await authGoogleIdToken(input.idToken, input.tosAccepted)
-            : await authBasic(input.email, input.password);
+export type LoginServices = {
+  verifyAppleIdentityToken: typeof verifyAppleIdentityToken;
+};
 
-      if (!user.active) {
+const defaultServices: LoginServices = {
+  verifyAppleIdentityToken,
+};
+
+export function createLoginProcedure(
+  services: LoginServices = defaultServices,
+) {
+  return implement(loginContract)
+    .use(authRateLimit)
+    .handler(async function ({ input, errors }) {
+      try {
+        const user =
+          "code" in input
+            ? await authGoogle(input.code, input.tosAccepted)
+            : "idToken" in input
+              ? await authGoogleIdToken(input.idToken, input.tosAccepted)
+              : "appleIdentityToken" in input
+                ? await authApple(services, input)
+                : await authBasic(input.email, input.password);
+
+        if (!user.active) {
+          auditLog({
+            event: AuditEvent.LOGIN_FAILED,
+            userId: user.id,
+            metadata: { reason: "inactive_account" },
+          });
+          throw errors.UNAUTHORIZED({
+            message: "Invalid credentials.",
+          });
+        }
+
         auditLog({
-          event: AuditEvent.LOGIN_FAILED,
+          event: AuditEvent.LOGIN_SUCCESS,
           userId: user.id,
-          metadata: { reason: "inactive_account" },
         });
-        throw errors.UNAUTHORIZED({
-          message: "Invalid credentials.",
+
+        return {
+          user: await serialize(UserSerializer, user, user),
+          accessToken: await createAccessToken(user),
+        };
+      } catch (error) {
+        // Re-throw ORPC errors as-is (they're already properly formatted)
+        if (error instanceof ORPCError) {
+          throw error;
+        }
+
+        // Log unexpected errors with minimal context
+        logError(error, {
+          extra: {
+            name: "auth/login",
+          },
+        });
+
+        throw errors.INTERNAL_SERVER_ERROR({
+          message: "An error occurred during authentication",
         });
       }
+    });
+}
 
-      auditLog({
-        event: AuditEvent.LOGIN_SUCCESS,
-        userId: user.id,
-      });
-
-      return {
-        user: await serialize(UserSerializer, user, user),
-        accessToken: await createAccessToken(user),
-      };
-    } catch (error) {
-      // Re-throw ORPC errors as-is (they're already properly formatted)
-      if (error instanceof ORPCError) {
-        throw error;
-      }
-
-      // Log unexpected errors with minimal context
-      logError(error, {
-        extra: {
-          name: "auth/login",
-        },
-      });
-
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "An error occurred during authentication",
-      });
-    }
-  });
+export default createLoginProcedure();
 
 async function authBasic(email: string, password: string) {
   const [user] = await db
@@ -113,7 +134,6 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
   );
 
   const { tokens } = await client.getToken(code);
-  // client.setCredentials(tokens);
 
   if (!tokens.id_token) {
     throw new ORPCError("UNAUTHORIZED", {
@@ -126,126 +146,7 @@ async function authGoogle(code: string, tosAccepted?: boolean) {
     audience: config.GOOGLE_CLIENT_ID,
   });
 
-  const payload = ticket.getPayload();
-  if (!payload || !payload.email) {
-    throw new ORPCError("UNAUTHORIZED", {
-      message: "Unable to validate credentials.",
-    });
-  }
-
-  const [result] = await db
-    .select({
-      user: users,
-    })
-    .from(users)
-    .innerJoin(identities, eq(users.id, identities.userId))
-    .where(
-      and(
-        eq(identities.provider, "google"),
-        eq(identities.externalId, payload.sub),
-      ),
-    );
-  let user = result?.user;
-  if (user) {
-    // If user exists but hasn't accepted ToS, accept if provided
-    if (!user.termsAcceptedAt && tosAccepted) {
-      const [updated] = await db
-        .update(users)
-        .set({ termsAcceptedAt: sql<Date>`NOW()` })
-        .where(
-          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
-        )
-        .returning();
-      // Handle race condition: if another request already accepted ToS, updated is undefined
-      return updated || user;
-    }
-    return user;
-  }
-
-  // try to associate w/ existing user
-  const [foundUser] = await db
-    .select()
-    .from(users)
-    .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
-  if (foundUser) {
-    // TODO: Only associate if account is verified to prevent attackers
-    // from claiming unverified accounts by using any email address
-    if (!foundUser.verified) {
-      throw new ORPCError("UNAUTHORIZED", {
-        message:
-          "Cannot link to unverified account. Please verify your email first.",
-      });
-    }
-    // Handle race condition where identity might already exist
-    try {
-      await db.insert(identities).values({
-        provider: "google",
-        externalId: payload.sub,
-        userId: foundUser.id,
-      });
-    } catch (err: any) {
-      // Ignore duplicate key error (23505) - identity already linked
-      if (err?.code !== "23505" || err?.constraint !== "identity_unq") {
-        throw err;
-      }
-    }
-    // mark ToS acceptance if provided (not required)
-    if (!foundUser.termsAcceptedAt && tosAccepted) {
-      const [updated] = await db
-        .update(users)
-        .set({ termsAcceptedAt: sql<Date>`NOW()` })
-        .where(
-          and(
-            eq(users.id, foundUser.id),
-            sql`${users.termsAcceptedAt} IS NULL`,
-          ),
-        )
-        .returning();
-      user = updated || foundUser;
-    } else {
-      user = foundUser;
-    }
-
-    // create new account
-  } else {
-    const userData = {
-      // displayName: payload.given_name,
-      // TODO: handle conflicts on username
-      username: payload.email.split("@", 1)[0].toLowerCase(),
-      email: payload.email,
-      verified: true, // emails are verified when coming from Google
-    };
-
-    user = await db.transaction(async (tx) => {
-      const newUser = await createUser(tx, userData);
-
-      await tx.insert(identities).values({
-        provider: "google",
-        externalId: payload.sub,
-        userId: newUser.id,
-      });
-
-      // Accept ToS if provided during signup
-      if (tosAccepted) {
-        const [updated] = await tx
-          .update(users)
-          .set({ termsAcceptedAt: sql<Date>`NOW()` })
-          .where(
-            and(
-              eq(users.id, newUser.id),
-              sql`${users.termsAcceptedAt} IS NULL`,
-            ),
-          )
-          .returning();
-        // Handle race condition: if another request already accepted ToS, updated is undefined
-        return updated || newUser;
-      }
-
-      return newUser;
-    });
-  }
-
-  return user;
+  return authExternalIdentity(googleIdentity(ticket.getPayload()), tosAccepted);
 }
 
 async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
@@ -276,14 +177,9 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
   }
 
   const payload = ticket?.getPayload();
-  if (!payload || !payload.email) {
-    throw new ORPCError("UNAUTHORIZED", {
-      message: "Unable to validate credentials.",
-    });
-  }
 
   // Validate issued-at time to prevent old token replay
-  if (!payload.iat) {
+  if (!payload?.iat) {
     throw new ORPCError("UNAUTHORIZED", {
       message: "Token missing issued-at claim.",
     });
@@ -307,6 +203,98 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
     });
   }
 
+  return authExternalIdentity(googleIdentity(payload), tosAccepted);
+}
+
+function googleIdentity(payload: TokenPayload | undefined): ExternalIdentity {
+  if (!payload || !payload.email) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Unable to validate credentials.",
+    });
+  }
+  return {
+    provider: "google",
+    externalId: payload.sub,
+    email: payload.email,
+    // Emails are verified when coming from Google.
+    emailVerified: true,
+    username: usernameFromEmail(payload.email),
+  };
+}
+
+async function authApple(
+  services: LoginServices,
+  input: {
+    appleIdentityToken: string;
+    fullName?: string;
+    tosAccepted?: boolean;
+  },
+) {
+  let identity;
+  try {
+    identity = await services.verifyAppleIdentityToken(
+      input.appleIdentityToken,
+    );
+  } catch (error) {
+    if (error instanceof AppleIdentityTokenError) {
+      throw new ORPCError("UNAUTHORIZED", {
+        message: "Invalid identity token.",
+      });
+    }
+    throw error;
+  }
+
+  if (!identity.email) {
+    throw new ORPCError("UNAUTHORIZED", {
+      message: "Unable to validate credentials.",
+    });
+  }
+
+  // Apple sends the name only on the first sign-in, and users who hide their
+  // email get a random relay address. The name makes a better username seed.
+  const username =
+    usernameFromName(input.fullName) ?? usernameFromEmail(identity.email);
+
+  return authExternalIdentity(
+    {
+      provider: "apple",
+      externalId: identity.sub,
+      email: identity.email,
+      emailVerified: identity.emailVerified,
+      username,
+    },
+    input.tosAccepted,
+  );
+}
+
+function usernameFromEmail(email: string) {
+  return email.split("@", 1)[0].toLowerCase();
+}
+
+function usernameFromName(name: string | undefined) {
+  if (!name) return undefined;
+  const username = slugify(name);
+  return username.length > 0 ? username : undefined;
+}
+
+type ExternalIdentity = {
+  provider: "google" | "apple";
+  /** The provider's stable user ID. */
+  externalId: string;
+  email: string;
+  emailVerified: boolean;
+  /** Username for a new account. `createUser` resolves conflicts. */
+  username: string;
+};
+
+/**
+ * Find the user linked to this identity. Otherwise link it to the verified
+ * account with the same email, or create a new account.
+ */
+async function authExternalIdentity(
+  identity: ExternalIdentity,
+  tosAccepted?: boolean,
+): Promise<User> {
   const [result] = await db
     .select({
       user: users,
@@ -315,109 +303,71 @@ async function authGoogleIdToken(idToken: string, tosAccepted?: boolean) {
     .innerJoin(identities, eq(users.id, identities.userId))
     .where(
       and(
-        eq(identities.provider, "google"),
-        eq(identities.externalId, payload.sub),
+        eq(identities.provider, identity.provider),
+        eq(identities.externalId, identity.externalId),
       ),
     );
-  let user = result?.user;
-  if (user) {
-    // If user exists but hasn't accepted ToS, accept if provided
-    if (!user.termsAcceptedAt && tosAccepted) {
-      const [updated] = await db
-        .update(users)
-        .set({ termsAcceptedAt: sql<Date>`NOW()` })
-        .where(
-          and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`),
-        )
-        .returning();
-      // Handle race condition: if another request already accepted ToS, updated is undefined
-      return updated || user;
-    }
-    return user;
+  if (result) {
+    return acceptTerms(result.user, tosAccepted);
   }
 
-  // try to associate w/ existing user
   const [foundUser] = await db
     .select()
     .from(users)
-    .where(eq(sql`LOWER(${users.email})`, payload.email.toLowerCase()));
+    .where(eq(sql`LOWER(${users.email})`, identity.email.toLowerCase()));
   if (foundUser) {
-    // TODO: Only associate if account is verified to prevent attackers
-    // from claiming unverified accounts by using any email address
-    if (!foundUser.verified) {
+    // Only link verified emails on both sides so nobody can claim an account
+    // by signing up elsewhere with someone else's address.
+    if (!foundUser.verified || !identity.emailVerified) {
       throw new ORPCError("UNAUTHORIZED", {
         message:
           "Cannot link to unverified account. Please verify your email first.",
       });
     }
-    // Handle race condition where identity might already exist
     try {
       await db.insert(identities).values({
-        provider: "google",
-        externalId: payload.sub,
+        provider: identity.provider,
+        externalId: identity.externalId,
         userId: foundUser.id,
       });
     } catch (err: any) {
-      // Ignore duplicate key error (23505) - identity already linked
+      // Another request already linked this identity.
       if (err?.code !== "23505" || err?.constraint !== "identity_unq") {
         throw err;
       }
     }
-    // mark ToS acceptance if provided (not required)
-    if (!foundUser.termsAcceptedAt && tosAccepted) {
-      const [updated] = await db
-        .update(users)
-        .set({ termsAcceptedAt: sql<Date>`NOW()` })
-        .where(
-          and(
-            eq(users.id, foundUser.id),
-            sql`${users.termsAcceptedAt} IS NULL`,
-          ),
-        )
-        .returning();
-      user = updated || foundUser;
-    } else {
-      user = foundUser;
-    }
-
-    // create new account
-  } else {
-    const userData = {
-      // displayName: payload.given_name,
-      // TODO: handle conflicts on username
-      username: payload.email.split("@", 1)[0].toLowerCase(),
-      email: payload.email,
-      verified: true, // emails are verified when coming from Google
-    };
-
-    user = await db.transaction(async (tx) => {
-      const newUser = await createUser(tx, userData);
-
-      await tx.insert(identities).values({
-        provider: "google",
-        externalId: payload.sub,
-        userId: newUser.id,
-      });
-
-      // Accept ToS if provided during signup
-      if (tosAccepted) {
-        const [updated] = await tx
-          .update(users)
-          .set({ termsAcceptedAt: sql<Date>`NOW()` })
-          .where(
-            and(
-              eq(users.id, newUser.id),
-              sql`${users.termsAcceptedAt} IS NULL`,
-            ),
-          )
-          .returning();
-        // Handle race condition: if another request already accepted ToS, updated is undefined
-        return updated || newUser;
-      }
-
-      return newUser;
-    });
+    return acceptTerms(foundUser, tosAccepted);
   }
 
-  return user;
+  return db.transaction(async (tx) => {
+    const newUser = await createUser(tx, {
+      username: identity.username,
+      email: identity.email,
+      verified: identity.emailVerified,
+    });
+
+    await tx.insert(identities).values({
+      provider: identity.provider,
+      externalId: identity.externalId,
+      userId: newUser.id,
+    });
+
+    return acceptTerms(newUser, tosAccepted, tx);
+  });
+}
+
+async function acceptTerms(
+  user: User,
+  tosAccepted: boolean | undefined,
+  tx: AnyDatabase = db,
+): Promise<User> {
+  if (user.termsAcceptedAt || !tosAccepted) return user;
+
+  const [updated] = await tx
+    .update(users)
+    .set({ termsAcceptedAt: sql<Date>`NOW()` })
+    .where(and(eq(users.id, user.id), sql`${users.termsAcceptedAt} IS NULL`))
+    .returning();
+  // Another request may have accepted the terms first.
+  return updated || user;
 }
