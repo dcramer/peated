@@ -377,6 +377,9 @@ JSDoc.
 - Prefer flat sections on the page ground.
 - Do not use filled cards as the default section treatment.
 - Use a complete frame only when it materially groups related content.
+- Frame an irreversible account action, such as deleting the account, with
+  the critical-toned form section. Use it once per page, keep the heading in
+  ink, and put the danger color only on the frame and the action.
 - Keep dividers between repeated rows. Do not add a divider after the last row.
 - Use the same visual foundations in the public product and admin.
 - Keep errors inside the section that failed when the rest of the page still

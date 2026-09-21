@@ -1,17 +1,10 @@
 "use client";
 
+import { formatDeletionDate } from "@peated/web/components/accountDeletionSection";
 import { ButtonLink } from "@peated/web/components/button.stylex";
 import { Notice } from "@peated/web/components/feedback.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { usePathname } from "next/navigation";
-
-/** Formats a deletion time in the member's locale. */
-export function formatDeletionDate(value: string) {
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
-}
 
 /** Reminds a member with a pending deletion that they can still keep the account. */
 export function AccountDeletionNotice() {
@@ -24,10 +17,12 @@ export function AccountDeletionNotice() {
   return (
     <Notice
       action={
-        <ButtonLink href="/settings/security" size="sm" variant="tonal">
+        <ButtonLink href="/settings/security" variant="accent">
           Keep my account
         </ButtonLink>
       }
+      heading="Deletion scheduled"
+      status="Pending"
       tone="warning"
     >
       Your account will be deleted on{" "}

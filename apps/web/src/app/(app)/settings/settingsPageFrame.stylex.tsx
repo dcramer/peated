@@ -83,6 +83,20 @@ export function SettingsContentLoading() {
             </div>
           )}
         </FormSection>
+        {security ? (
+          <FormSection
+            description="Deleting your account removes your profile, tastings, reviews, comments, and collections. Bottles and catalog edits you added stay, without your name. You'll have 24 hours to change your mind."
+            title="Delete account"
+            tone="danger"
+          >
+            <div {...stylex.props(styles.loadingActionRow)}>
+              <span
+                aria-hidden="true"
+                {...stylex.props(styles.loadingAction)}
+              />
+            </div>
+          </FormSection>
+        ) : null}
       </FormStack>
     </div>
   );
@@ -130,6 +144,10 @@ const styles = stylex.create({
     height: controlMetrics.controlHeightLarge,
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.surface,
+  },
+  loadingActionRow: {
+    display: "flex",
+    justifyContent: "flex-end",
   },
   loadingAction: {
     display: "block",
