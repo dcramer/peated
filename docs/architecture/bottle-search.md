@@ -68,9 +68,10 @@ support the engine choice; endpoint measurements still detect application overhe
 
 API tests cover both read paths, references before indexing, wrong relationships,
 rare releases, prefixes, accents, typos, pagination, and indexing. Comparator tests
-cover nearby casks, years, strengths, and unknown facts. The benchmark retains 100
-previously reviewed cases: 80 development and 20 held out. These measure retrieval
-recall, not automatic-assignment precision.
+cover nearby casks, years, strengths, and unknown facts. Recorded-request tests
+retain five moderation searches with their reviewed outcomes and public catalog
+snapshots. They cover existing candidates, ambiguous results, and retrieval
+before and after a missing Bottle is created, using the original query inputs.
+These sampled cases protect retrieval behavior, not automatic-assignment precision.
 
-See [benchmark instructions](../../apps/server/src/benchmarks/bottleSearch/README.md)
-and [Whisky Identity Model](whisky-identity-model.md).
+See [Whisky Identity Model](whisky-identity-model.md).

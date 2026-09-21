@@ -1,21 +1,24 @@
-import evidence from "@peated/server/benchmarks/bottleSearch/request-replays.json";
 import config from "@peated/server/config";
 import type * as FixtureTypes from "@peated/server/lib/test/fixtures";
 import { BottleListInputSchema } from "@peated/server/orpc/contracts/bottles/list";
 import { routerClient } from "@peated/server/orpc/router";
 import { EntitySchema } from "@peated/server/schemas";
+import evidence from "./fixtures/search-replays.json";
 
 type RecordedBottle = (typeof evidence.catalog)[number];
 
 // These are response snapshots, not a complete historical catalog. Preserve
 // recorded inputs; reviewed decisions are assertions, never extra query facts.
+// September 2026 Sentry traces confirm the saved request parameters, not an
+// exact response invocation. Rebuild indexes from public identity snapshots;
+// historical aliases and popularity are unavailable. Pagination is covered by
+// list.test.ts. These cases protect retrieval, not automatic match approval.
 async function seedCatalog(
   catalog: RecordedBottle[],
   fixtures: typeof FixtureTypes,
 ) {
   const entityIds = new Map<number, number>();
   const bottleIds = new Map<number, number>();
-  const seriesIds = new Map<number, number>();
   async function entity(record: NonNullable<RecordedBottle["brand"]>) {
     const existing = entityIds.get(record.id);
     if (existing !== undefined) return existing;
@@ -29,24 +32,11 @@ async function seedCatalog(
   }
   async function add(record: RecordedBottle) {
     const brandId = await entity(record.brand);
-    let seriesId: number | null = null;
-    if (record.series) {
-      seriesId = seriesIds.get(record.series.id) ?? null;
-      if (seriesId === null) {
-        const series = await fixtures.BottleSeries({
-          name: record.series.name,
-          brandId,
-        });
-        seriesId = series.id;
-        seriesIds.set(record.series.id, seriesId);
-      }
-    }
     const bottle = await fixtures.Bottle({
       name: record.name,
       brandId,
       bottlerId: record.bottler ? await entity(record.bottler) : null,
       distillerIds: await Promise.all(record.distillers.map(entity)),
-      seriesId,
       edition: record.edition,
       statedAge: record.statedAge,
       abv: record.abv,
@@ -121,12 +111,6 @@ describe.each([false, true])(
         if (replay.expectedBottleId !== null) {
           expect(replay.decision?.verified).toBe(true);
           expect(ids).toContain(bottleIds.get(replay.expectedBottleId));
-        }
-        if (replay.kind === "pagination") {
-          expect(pages.map((page) => page.results.length)).toEqual([100, 18]);
-          expect(pages[0].rel.nextCursor).toBe(2);
-          expect(pages[1].rel.nextCursor).toBeNull();
-          expect(pages[1].rel.prevCursor).toBe(1);
         }
       });
     }
