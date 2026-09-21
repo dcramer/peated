@@ -9,8 +9,8 @@ email verification. Middleware, route schemas, and tests define exact behavior.
 accepted the current required terms.
 
 - Email/password and new-passkey registration require explicit acceptance.
-- Google and magic-link authentication may establish a session for an existing
-  account that has not accepted the terms. Passkey authentication requires
+- Google, Apple, and magic-link authentication may establish a session for an
+  existing account that has not accepted the terms. Passkey authentication requires
   acceptance before it creates a session.
 - Such an account remains read-only until acceptance. Browsing and account
   recovery stay available, while user-authored writes are rejected.
@@ -27,6 +27,21 @@ allowed and rejected cases.
 Administrative or recovery operations may use a different boundary when their
 authority and purpose are explicit. Authentication alone never implies ToS
 acceptance.
+
+## Third-Party Sign-In
+
+Google and Apple sign-in link an external identity to a user by the provider's
+stable subject ID, stored in `identities`.
+
+- A token whose email matches an existing account links to that account only
+  when both the account and the provider email are verified.
+- Otherwise a new account is created. It is verified when the provider says
+  the email is. The username comes from the email's local part. Apple sends
+  the user's name only on the first sign-in, and hidden emails are random
+  relay addresses, so an Apple name is used first.
+- Apple identity tokens are verified against Apple's published keys. Accepted
+  audiences are the bundle and service IDs in `APPLE_CLIENT_IDS`. Tokens older
+  than five minutes are rejected.
 
 ## Email Verification
 
@@ -66,6 +81,7 @@ users must sign in again and request new emailed links.
 
 - user fields: `apps/server/src/db/schema/users.ts`
 - token signing and verification: `apps/server/src/lib/auth.ts`
+- Apple identity token verification: `apps/server/src/lib/apple.ts`
 - authentication middleware: `apps/server/src/orpc/middleware/auth.ts`
 - acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
 - registration and authentication: `apps/server/src/orpc/routes/auth/`

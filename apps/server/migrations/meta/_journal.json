@@ -2031,6 +2031,13 @@
       "when": 1789942812977,
       "tag": "0289_icy_thunderbolt",
       "breakpoints": false
+    },
+    {
+      "idx": 290,
+      "version": "7",
+      "when": 1790018281154,
+      "tag": "0290_orange_firebird",
+      "breakpoints": false
     }
   ]
 }
