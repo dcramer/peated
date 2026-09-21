@@ -8,8 +8,13 @@
       "ignoreBinaries": ["playwright"],
     },
     "apps/server": {
-      // The eval command loads this config through a shell conditional.
-      "entry": ["vitest.evals.config.mts"],
+      // Evals load their config through a shell conditional; search comparisons
+      // invoke the benchmark runner and baseline config directly.
+      "entry": [
+        "vitest.evals.config.mts",
+        "vitest.search-baseline.config.mts",
+        "src/benchmarks/bottleSearch/run.ts",
+      ],
       // The binary is nested in shell conditionals that Knip cannot parse.
       "ignoreDependencies": ["dotenv-cli"],
     },
