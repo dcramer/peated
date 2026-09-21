@@ -2,6 +2,8 @@ import { base } from "@peated/server/orpc";
 import activity from "./activity";
 import avatarUpdate from "./avatar-update";
 import badgeList from "./badge-list";
+import deleteUser from "./delete";
+import deletionCancel from "./deletion-cancel";
 import details from "./details";
 import flavorList from "./flavor-list";
 import libraryStats from "./library-stats";
@@ -13,6 +15,8 @@ import update from "./update";
 
 export default base.tag("users").router({
   activity,
+  delete: deleteUser,
+  deletionCancel,
   details,
   list,
   update,

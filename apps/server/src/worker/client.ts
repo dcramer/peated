@@ -215,6 +215,9 @@ export async function runWorker() {
     scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
       await runJob("CleanupPendingUploads");
     });
+    scheduledJob("7 * * * *", "process-account-deletions", async () => {
+      await runJob("ProcessAccountDeletions");
+    });
     scheduledJob("27 * * * *", "update-external-reviews", async () => {
       await pushUniqueJob(
         "UpdateExternalReviews",

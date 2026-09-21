@@ -77,11 +77,82 @@ after 10 minutes; access tokens expire after 7 days.
 Tokens without a purpose are rejected. When this check is first deployed,
 users must sign in again and request new emailed links.
 
+## Account Deletion
+
+Members delete their own accounts with `DELETE /users/me`. The route needs
+authentication only, so a member who has not accepted the current terms can
+still delete their account. Nobody can delete another member's account through
+it. App Store Review Guideline 5.1.1(v) requires this in-app path.
+
+### Grace period
+
+A request does not delete anything at once. It records
+`users.deletionRequestedAt`, emails the member a confirmation with the
+deletion time and how to cancel, and returns the member with
+`deletionScheduledAt` set 24 hours out. The account keeps working until then,
+and `deletionScheduledAt` is shown only to the member so clients can display
+a notice. `DELETE /users/me/deletion` cancels the request. Repeating the
+request or the cancellation changes nothing.
+
+The worker runs `ProcessAccountDeletions` hourly. It deletes every account
+whose request is at least 24 hours old, checking the request again under a
+row lock so a cancellation that lands in between wins.
+
+### What deletion does
+
+Deletion keeps the public record and removes the person. It happens in one
+transaction:
+
+- Catalog contributions stay. Bottles, Entities, and their change history keep
+  the member's actor row, with the display name replaced and the picture
+  removed.
+- The user row stays as a tombstone. `deletedAt` is set, `active` is false,
+  and the username, email, password, and picture are replaced so the old
+  values can be used again. Access tokens stop working because the account is
+  inactive. Deleted members do not appear in profile pages, member lists, or
+  search.
+- The member's tastings and member reviews stay as removed rows with the
+  reason `Account deleted`, the same way moderated content is hidden. Content
+  a moderator already removed keeps its original removal record. Their images
+  are removed.
+- Everything else the member owns is deleted: comments and toasts left on
+  tastings (with counters adjusted), collections, flights, follows, badge
+  awards, notifications, pending uploads, sign-in identities, passkeys, and
+  OAuth grants. Friend tags naming the member are cleared from other members'
+  tastings and reviews. Other members' tastings that used one of the member's
+  flights keep the tasting and lose the flight link.
+- Staff references without a database rule (Bottle observations, store-price
+  reviews and retry runs, and site scrape requests) are cleared.
+
+After the commit, uploaded images are removed from storage and Bottle
+summaries are recomputed in the background. A storage failure is reported and
+does not undo the deletion.
+
+### Sign in with Apple
+
+Apple requires revoking the member's Sign in with Apple grant when the account
+is deleted. The client sends a fresh `appleAuthorizationCode` from a new Sign
+in with Apple prompt with the deletion request. The code lives five minutes,
+so the server exchanges it for tokens and revokes them at request time, before
+anything is scheduled. A failure schedules nothing and the client retries with
+a new code. A member who cancels afterwards signs in with Apple again, which
+creates a new grant.
+
+Deletion never depends on Apple: without a code, or on a server without Apple
+credentials, the deletion is still scheduled and the grant remains until the
+member removes it in their Apple ID settings. Revocation needs
+`APPLE_TEAM_ID`, `APPLE_KEY_ID`, and `APPLE_PRIVATE_KEY`, and uses the first
+`APPLE_CLIENT_IDS` entry as the client ID.
+
 ## Ownership
 
 - user fields: `apps/server/src/db/schema/users.ts`
 - token signing and verification: `apps/server/src/lib/auth.ts`
-- Apple identity token verification: `apps/server/src/lib/apple.ts`
+- Apple identity token verification and revocation: `apps/server/src/lib/apple.ts`
+- account deletion: `apps/server/src/lib/accountDeletion.ts`,
+  `apps/server/src/orpc/routes/users/delete.ts`,
+  `apps/server/src/orpc/routes/users/deletion-cancel.ts`, and the
+  `ProcessAccountDeletions` worker job
 - authentication middleware: `apps/server/src/orpc/middleware/auth.ts`
 - acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
 - registration and authentication: `apps/server/src/orpc/routes/auth/`

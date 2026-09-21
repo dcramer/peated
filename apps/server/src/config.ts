@@ -50,6 +50,13 @@ export default {
     .split(",")
     .map((id) => id.trim())
     .filter((id) => id.length > 0),
+  // Sign in with Apple server credentials. Account deletion uses them to
+  // revoke the member's Apple grant. The private key is the `.p8` file's
+  // contents; escaped `\n` sequences are accepted.
+  APPLE_TEAM_ID: process.env.APPLE_TEAM_ID?.trim() || undefined,
+  APPLE_KEY_ID: process.env.APPLE_KEY_ID?.trim() || undefined,
+  APPLE_PRIVATE_KEY:
+    process.env.APPLE_PRIVATE_KEY?.replace(/\\n/g, "\n").trim() || undefined,
 
   UPLOAD_PATH: process.env.UPLOAD_PATH || tmpdir(),
 

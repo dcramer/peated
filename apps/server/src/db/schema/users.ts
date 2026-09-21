@@ -29,6 +29,13 @@ export const users = pgTable(
     termsAcceptedAt: timestamp("terms_accepted_at"),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    // Set when the member asks to delete their account. The deletion runs
+    // after a grace period unless the member cancels; see
+    // docs/architecture/account-access.md.
+    deletionRequestedAt: timestamp("deletion_requested_at"),
+    // Set when the account was deleted. The row stays as a tombstone with
+    // personal fields replaced.
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [
     uniqueIndex("user_email_unq").using("btree", sql`LOWER(${table.email})`),

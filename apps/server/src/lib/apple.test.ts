@@ -1,12 +1,19 @@
 import {
   APPLE_ISSUER,
+  APPLE_REVOKE_URL,
+  APPLE_TOKEN_URL,
   AppleIdentityTokenError,
+  AppleRevocationError,
+  revokeAppleAuthorization,
   verifyAppleIdentityToken,
 } from "@peated/server/lib/apple";
+import waitError from "@peated/server/lib/test/waitError";
 import {
   createLocalJWKSet,
   exportJWK,
+  exportPKCS8,
   generateKeyPair,
+  jwtVerify,
   SignJWT,
   type CryptoKey,
   type JWTVerifyGetKey,
@@ -159,5 +166,157 @@ describe("verifyAppleIdentityToken", () => {
     await expect(
       verifyAppleIdentityToken(token, { clientIds: [], getKey }),
     ).rejects.toThrow("No Apple client IDs configured.");
+  });
+});
+
+describe("revokeAppleAuthorization", () => {
+  const revocationConfig = {
+    clientId: CLIENT_ID,
+    teamId: "TEAM123456",
+    keyId: "KEY1234567",
+    privateKey: "",
+  };
+  let secretPublicKey: SigningKey;
+
+  beforeAll(async () => {
+    const pair = await generateKeyPair("ES256", { extractable: true });
+    revocationConfig.privateKey = await exportPKCS8(pair.privateKey);
+    secretPublicKey = pair.publicKey;
+  });
+
+  function appleServer(responses: Array<() => Response>) {
+    const requests: { url: string; form: Record<string, string> }[] = [];
+    const fetchImpl: typeof fetch = async (input, init) => {
+      requests.push({
+        url: input instanceof Request ? input.url : input.toString(),
+        form: Object.fromEntries(
+          init?.body instanceof URLSearchParams ? init.body : [],
+        ),
+      });
+      const respond = responses.shift();
+      if (!respond) throw new Error("Unexpected request to Apple.");
+      return respond();
+    };
+    return { fetchImpl, requests };
+  }
+
+  test("exchanges the code and revokes the refresh token", async () => {
+    const { fetchImpl, requests } = appleServer([
+      () =>
+        Response.json({ access_token: "access-1", refresh_token: "refresh-1" }),
+      () => new Response(null, { status: 200 }),
+    ]);
+
+    await revokeAppleAuthorization("code-1", {
+      config: revocationConfig,
+      fetch: fetchImpl,
+    });
+
+    expect(requests.map((request) => request.url)).toEqual([
+      APPLE_TOKEN_URL,
+      APPLE_REVOKE_URL,
+    ]);
+    expect(requests[0].form).toMatchObject({
+      client_id: CLIENT_ID,
+      code: "code-1",
+      grant_type: "authorization_code",
+    });
+    expect(requests[1].form).toMatchObject({
+      client_id: CLIENT_ID,
+      token: "refresh-1",
+      token_type_hint: "refresh_token",
+    });
+    expect(requests[1].form.client_secret).toEqual(
+      requests[0].form.client_secret,
+    );
+
+    const { payload, protectedHeader } = await jwtVerify(
+      requests[0].form.client_secret,
+      secretPublicKey,
+      { issuer: "TEAM123456", audience: APPLE_ISSUER, subject: CLIENT_ID },
+    );
+    expect(protectedHeader).toMatchObject({ alg: "ES256", kid: "KEY1234567" });
+    expect(payload.exp! - payload.iat!).toBe(5 * 60);
+  });
+
+  test("revokes the access token when no refresh token is returned", async () => {
+    const { fetchImpl, requests } = appleServer([
+      () => Response.json({ access_token: "access-1" }),
+      () => new Response(null, { status: 200 }),
+    ]);
+
+    await revokeAppleAuthorization("code-1", {
+      config: revocationConfig,
+      fetch: fetchImpl,
+    });
+
+    expect(requests[1].form).toMatchObject({
+      token: "access-1",
+      token_type_hint: "access_token",
+    });
+  });
+
+  test("reports a rejected code as not retryable", async () => {
+    const { fetchImpl } = appleServer([
+      () => Response.json({ error: "invalid_grant" }, { status: 400 }),
+    ]);
+
+    const err = await waitError(
+      () =>
+        revokeAppleAuthorization("code-1", {
+          config: revocationConfig,
+          fetch: fetchImpl,
+        }),
+      AppleRevocationError,
+    );
+    expect(err.retryable).toBe(false);
+    expect(err.message).toMatchInlineSnapshot(
+      `"Apple rejected the request: invalid_grant."`,
+    );
+  });
+
+  test("reports an Apple outage as retryable", async () => {
+    const { fetchImpl } = appleServer([
+      () => new Response(null, { status: 503 }),
+    ]);
+
+    const err = await waitError(
+      () =>
+        revokeAppleAuthorization("code-1", {
+          config: revocationConfig,
+          fetch: fetchImpl,
+        }),
+      AppleRevocationError,
+    );
+    expect(err.retryable).toBe(true);
+    expect(err.message).toMatchInlineSnapshot(
+      `"Apple rejected the request: HTTP 503."`,
+    );
+  });
+
+  test("reports a network failure as retryable", async () => {
+    const fetchImpl: typeof fetch = async () => {
+      throw new TypeError("fetch failed");
+    };
+
+    const err = await waitError(
+      () =>
+        revokeAppleAuthorization("code-1", {
+          config: revocationConfig,
+          fetch: fetchImpl,
+        }),
+      AppleRevocationError,
+    );
+    expect(err.retryable).toBe(true);
+    expect(err.cause).toBeInstanceOf(TypeError);
+  });
+
+  test("needs server credentials", async () => {
+    const err = await waitError(() =>
+      revokeAppleAuthorization("code-1", { config: null }),
+    );
+    expect(err.message).toMatchInlineSnapshot(
+      `"Sign in with Apple server credentials are not configured."`,
+    );
   });
 });

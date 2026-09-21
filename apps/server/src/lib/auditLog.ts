@@ -5,6 +5,9 @@ export enum AuditEvent {
   LOGIN_SUCCESS = "auth.login.success",
   LOGIN_FAILED = "auth.login.failed",
   LOGOUT = "auth.logout",
+  ACCOUNT_DELETION_REQUESTED = "account.deletion.requested",
+  ACCOUNT_DELETION_CANCELED = "account.deletion.canceled",
+  ACCOUNT_DELETED = "account.deleted",
 
   // Passkey events
   PASSKEY_REGISTERED = "passkey.registered",

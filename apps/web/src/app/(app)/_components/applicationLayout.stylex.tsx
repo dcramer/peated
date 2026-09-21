@@ -14,6 +14,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { logout } from "@peated/web/lib/auth.actions";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { publicHomeQueries } from "@peated/web/lib/orpc/homeQueries";
+import { AccountDeletionNotice } from "./accountDeletionNotice";
 import { ApplicationFooter } from "./applicationFooter.stylex";
 
 const databaseItems = [
@@ -121,6 +122,7 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
         />
       }
     >
+      <AccountDeletionNotice />
       {children}
     </PageFrame>
   );

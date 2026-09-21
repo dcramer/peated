@@ -6,7 +6,7 @@ import { UserSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const SORT_OPTIONS = ["name", "created", "-created", "-name"] as const;
@@ -54,7 +54,8 @@ export default procedure
 
     const offset = (cursor - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [];
+    // Deleted members keep a tombstone row that is not a profile.
+    const where: (SQL<unknown> | undefined)[] = [isNull(users.deletedAt)];
     if (query) {
       where.push(
         or(

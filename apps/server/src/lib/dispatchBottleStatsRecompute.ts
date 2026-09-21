@@ -3,6 +3,7 @@ import { pushJob } from "@peated/server/worker/dispatch";
 import type { UpdateBottleStatsJobArgs } from "@peated/server/worker/jobs/updateBottleStats";
 
 type BottleStatsSource =
+  | "accountDeletion"
   | "externalReview"
   | "memberReview"
   | "tasting"

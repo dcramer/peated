@@ -101,7 +101,8 @@ export default implement(userDetailsContract).handler(async function ({
 }) {
   const user = await getUserFromId(db, input.user, context.user);
 
-  if (!user) {
+  // A deleted member's tombstone row is not a profile.
+  if (!user || user.deletedAt) {
     if (input.user === "me") {
       throw errors.UNAUTHORIZED();
     }

@@ -51,6 +51,14 @@ export const UserSchema = z.object({
     .boolean()
     .optional()
     .describe("Whether to notify user of comments on their content"),
+  deletionScheduledAt: z
+    .string()
+    .datetime()
+    .optional()
+    .readonly()
+    .describe(
+      "When the account will be deleted, if the member requested deletion. Only shown to the member.",
+    ),
   friendStatus: FriendStatusEnum.optional()
     .readonly()
     .describe("Friendship status with the current user"),
@@ -61,6 +69,7 @@ export const UserInputSchema = UserSchema.omit({
   verified: true,
   createdAt: true,
   friendStatus: true,
+  deletionScheduledAt: true,
 }).extend({
   password: z
     .string()
@@ -73,6 +82,14 @@ export const UserInputSchema = UserSchema.omit({
     .boolean()
     .optional()
     .describe("Whether to notify user of comments on their content"),
+  deletionScheduledAt: z
+    .string()
+    .datetime()
+    .optional()
+    .readonly()
+    .describe(
+      "When the account will be deleted, if the member requested deletion. Only shown to the member.",
+    ),
 });
 
 export const AgeStatsSchema = z.object({
