@@ -17,6 +17,11 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
+import {
+  bottleTextPredicate,
+  bottleTextQuery,
+  bottleTextScore,
+} from "@peated/server/lib/bottleTextSearch";
 import { formatPeatedId, parsePeatedId } from "@peated/server/lib/peatedId";
 import {
   plainTextSearchQuery,
@@ -174,10 +179,7 @@ function activeBottleWhere() {
   // Search results and scope totals must use the same active Bottles.
   return and(
     isNotNull(bottles.groupId),
-    sql`NOT EXISTS(
-      SELECT FROM ${bottleTombstones}
-      WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-    )`,
+    sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
   );
 }
 
@@ -364,8 +366,12 @@ async function searchBottles(
   const where = and(
     activeBottleWhere(),
     or(
-      sql`${bottles.searchVector} @@ ${textQuery}`,
-      sql`${bottles.searchVector} @@ ${prefixQuery}`,
+      ...(config.BOTTLE_SEARCH_TIN
+        ? [bottleTextPredicate(bottleTextQuery(query, { prefix: true }))]
+        : [
+            sql`${bottles.searchVector} @@ ${textQuery}`,
+            sql`${bottles.searchVector} @@ ${prefixQuery}`,
+          ]),
       referenceMatch,
     ),
   );
@@ -385,7 +391,12 @@ async function searchBottles(
     .leftJoin(bottleGroups, eq(bottles.groupId, bottleGroups.id))
     .where(where)
     .limit(limit + 1)
-    .orderBy(rank, sql`${bottleRatingCount()} DESC`, asc(bottles.id));
+    .orderBy(
+      rank,
+      ...(config.BOTTLE_SEARCH_TIN ? [sql`${bottleTextScore} DESC`] : []),
+      sql`${bottleRatingCount()} DESC`,
+      asc(bottles.id),
+    );
   return {
     hasMore: rows.length > limit,
     results: rows.slice(0, limit).map(({ searchRank: _, ...result }) => result),

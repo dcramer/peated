@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -15,7 +16,14 @@ import indexBottleSeriesSearchVectors from "@peated/server/worker/jobs/indexBott
 import indexEntitySearchVectors from "@peated/server/worker/jobs/indexEntitySearchVectors";
 import { describe, expect, test } from "vitest";
 
-describe("GET /search", () => {
+describe.each([false, true])("GET /search (TIN=%s)", (tin) => {
+  const original = config.BOTTLE_SEARCH_TIN;
+  beforeEach(() => {
+    config.BOTTLE_SEARCH_TIN = tin;
+  });
+  afterEach(() => {
+    config.BOTTLE_SEARCH_TIN = original;
+  });
   test("finds a Bottle by a display alias without exact-match authority", async ({
     fixtures,
   }) => {

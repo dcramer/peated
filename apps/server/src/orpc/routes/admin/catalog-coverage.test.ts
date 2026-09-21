@@ -1,7 +1,8 @@
 import { db } from "@peated/server/db";
-import { bottleTombstones } from "@peated/server/db/schema";
+import { bottles, bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 describe("GET /admin/catalog/coverage", () => {
   test("reports active catalog and visible source-item coverage", async ({
@@ -12,10 +13,14 @@ describe("GET /admin/catalog/coverage", () => {
       description: "A useful description",
       imageUrl: "https://example.com/covered.jpg",
     });
-    await fixtures.Bottle({
+    const pendingSearchBottle = await fixtures.Bottle({
       description: "   ",
       imageUrl: "",
     });
+    await db
+      .update(bottles)
+      .set({ searchNames: "", searchTerms: "" })
+      .where(eq(bottles.id, pendingSearchBottle.id));
     const hiddenOnlyBottle = await fixtures.Bottle();
     await fixtures.LegacyBottle({
       description: "Legacy description",
@@ -81,6 +86,7 @@ describe("GET /admin/catalog/coverage", () => {
     expect(result).toEqual({
       bottles: {
         total: 3,
+        withSearchDocuments: 2,
         withDescription: 1,
         withImage: 1,
         withReviews: 1,

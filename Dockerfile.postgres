@@ -1,10 +1,27 @@
-ARG PG_MAJOR=17
+FROM postgres:17-bookworm AS build
+
+# Lead is the local compatibility implementation, not the production TIN index.
+ARG LEAD_REVISION=bd95c7e51b6afce81396790852ee2f2c169570ad
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential ca-certificates clang curl git libclang-dev libssl-dev \
+    pkg-config postgresql-server-dev-17
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+    sh -s -- -y --profile minimal --default-toolchain 1.96.0
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN cargo install cargo-pgrx --version 0.19.1 --locked
+RUN cargo pgrx init --pg17 /usr/lib/postgresql/17/bin/pg_config
+RUN git init /lead && cd /lead && \
+    git remote add origin https://github.com/planetscale/lead.git && \
+    git fetch --depth 1 origin ${LEAD_REVISION} && git checkout FETCH_HEAD
+WORKDIR /lead
+RUN cargo pgrx install --package tin --no-default-features --features pg17 --release
+
 
 # Use the PostGIS image as the base
 # https://github.com/postgis/docker-postgis/issues/216
 # FROM postgis/postgis:$PG_MAJOR-3.5
-FROM imresamu/postgis:$PG_MAJOR-3.5
-ARG PG_MAJOR
+FROM imresamu/postgis:17-3.5
+ARG PG_MAJOR=17
 ARG PG_VECTOR=0.8.0
 
 # Install necessary packages
@@ -26,3 +43,7 @@ RUN apt-get update && \
 
 # Copy initialization scripts
 # COPY ./docker-entrypoint-initdb.d/ /docker-entrypoint-initdb.d/
+
+# Use Lead to run the same search SQL in local development and CI.
+COPY --from=build /usr/lib/postgresql/17/lib/tin.so /usr/lib/postgresql/17/lib/
+COPY --from=build /usr/share/postgresql/17/extension/tin* /usr/share/postgresql/17/extension/

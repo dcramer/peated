@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -11,7 +12,14 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe("GET /bottles", () => {
+describe.each([false, true])("GET /bottles (TIN=%s)", (tin) => {
+  const original = config.BOTTLE_SEARCH_TIN;
+  beforeEach(() => {
+    config.BOTTLE_SEARCH_TIN = tin;
+  });
+  afterEach(() => {
+    config.BOTTLE_SEARCH_TIN = original;
+  });
   test("lists bottles", async ({ fixtures }) => {
     await fixtures.Bottle({ name: "Delicious Wood" });
     await fixtures.Bottle({ name: "Something Else" });
@@ -103,6 +111,7 @@ describe("GET /bottles", () => {
 
     const { results } = await routerClient.bottles.list({
       query: "Direct Bottle Alias",
+      sort: "rank",
     });
 
     expect(results.length).toBe(1);

@@ -14,6 +14,7 @@ import {
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
+import config from "@peated/server/config";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS,
@@ -37,6 +38,15 @@ import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { and, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
+import {
+  compareBottleCandidate,
+  orderBottleCandidateComparisons,
+} from "./bottleCandidateComparison";
+import {
+  bottleTextPredicate,
+  bottleTextQuery,
+  bottleTextScore,
+} from "./bottleTextSearch";
 import { getOpenAIEmbedding } from "./openaiEmbeddings";
 
 const VECTOR_CANDIDATE_LIMIT = 20;
@@ -453,137 +463,42 @@ function textsOverlap(
   );
 }
 
-function listMatchesExpectedValue(values: string[], expectedValues: string[]) {
-  if (!values.length || !expectedValues.length) {
-    return false;
-  }
-
-  return expectedValues.every((expectedValue) =>
-    values.some((value) => textsOverlap(value, expectedValue)),
+function compareReferenceCandidate(
+  candidate: BottleCandidate,
+  label: BottleReferenceIdentity | null,
+) {
+  const choice = (name: string | null | undefined) =>
+    name ? { name } : undefined;
+  return compareBottleCandidate(
+    {
+      name: label?.expression ?? "",
+      brand: choice(label?.brand),
+      bottler: choice(label?.bottler),
+      series: choice(label?.series),
+      distillers: (label?.distillery ?? []).map((name) => ({ name })),
+      category: label?.category,
+      statedAge: label?.stated_age,
+      edition: label?.edition,
+      abv: label?.abv,
+      vintageYear: label?.vintage_year,
+      bottlingYear: label?.bottling_year,
+      releaseYear: label?.release_year,
+      releaseMonth: label?.release_month,
+      releaseDay: label?.release_day,
+      caskNumber: label?.cask_number,
+      singleCask: label?.single_cask,
+      caskStrength: label?.cask_strength,
+    },
+    {
+      ...candidate,
+      id: candidate.bottleId,
+      name: candidate.fullName,
+      brand: { name: candidate.brand ?? "" },
+      bottler: choice(candidate.bottler),
+      series: choice(candidate.series),
+      distillers: candidate.distillery.map((name) => ({ name })),
+    },
   );
-}
-
-function getStructuredCandidateAdjustment(
-  candidate: BottleCandidate,
-  extractedLabel: BottleReferenceIdentity | null,
-) {
-  if (!extractedLabel) {
-    return 0;
-  }
-
-  let adjustment = 0;
-
-  if (extractedLabel.brand && candidate.brand) {
-    adjustment += textsOverlap(candidate.brand, extractedLabel.brand)
-      ? 0.06
-      : -0.1;
-  }
-
-  if (extractedLabel.bottler && candidate.bottler) {
-    adjustment += textsOverlap(candidate.bottler, extractedLabel.bottler)
-      ? 0.08
-      : -0.14;
-  }
-
-  if (extractedLabel.series && candidate.series) {
-    adjustment += textsOverlap(candidate.series, extractedLabel.series)
-      ? 0.08
-      : -0.14;
-  }
-
-  if (extractedLabel.distillery?.length && candidate.distillery.length) {
-    adjustment += listMatchesExpectedValue(
-      candidate.distillery,
-      extractedLabel.distillery,
-    )
-      ? 0.1
-      : -0.16;
-  }
-
-  if (extractedLabel.category && candidate.category) {
-    adjustment += candidate.category === extractedLabel.category ? 0.03 : -0.06;
-  }
-
-  if (extractedLabel.stated_age !== null && candidate.statedAge !== null) {
-    adjustment +=
-      candidate.statedAge === extractedLabel.stated_age ? 0.1 : -0.18;
-  }
-
-  if (extractedLabel.edition && candidate.edition) {
-    adjustment += textsOverlap(candidate.edition, extractedLabel.edition)
-      ? 0.12
-      : -0.2;
-  }
-
-  if (
-    extractedLabel.cask_strength !== null &&
-    candidate.caskStrength !== null
-  ) {
-    adjustment +=
-      candidate.caskStrength === extractedLabel.cask_strength ? 0.06 : -0.12;
-  }
-
-  if (extractedLabel.single_cask !== null && candidate.singleCask !== null) {
-    adjustment +=
-      candidate.singleCask === extractedLabel.single_cask ? 0.06 : -0.12;
-  }
-
-  if (extractedLabel.vintage_year !== null && candidate.vintageYear !== null) {
-    adjustment +=
-      candidate.vintageYear === extractedLabel.vintage_year ? 0.08 : -0.14;
-  }
-
-  if (extractedLabel.release_year !== null && candidate.releaseYear !== null) {
-    adjustment +=
-      candidate.releaseYear === extractedLabel.release_year ? 0.08 : -0.14;
-  }
-
-  if (extractedLabel.abv !== null && candidate.abv !== null) {
-    const difference = Math.abs(candidate.abv - extractedLabel.abv);
-    if (difference <= 0.3) {
-      adjustment += 0.05;
-    } else if (difference >= 1.0) {
-      adjustment -= 0.08;
-    }
-  }
-
-  return adjustment;
-}
-
-function getCandidateSortScore(
-  candidate: BottleCandidate,
-  extractedLabel: BottleReferenceIdentity | null,
-) {
-  return (
-    (candidate.score ?? 0) +
-    getStructuredCandidateAdjustment(candidate, extractedLabel) +
-    getExtractedBrandRankingAdjustment(candidate, extractedLabel)
-  );
-}
-
-function candidateMatchesKnownBrand(
-  candidate: BottleCandidate,
-  brandName: string,
-) {
-  const normalizedBrand = normalizeIdentityText(brandName);
-  if (!normalizedBrand) {
-    return false;
-  }
-
-  return [candidate.brand, candidate.fullName, candidate.reference].some(
-    (value) => normalizeIdentityText(value).includes(normalizedBrand),
-  );
-}
-
-function getExtractedBrandRankingAdjustment(
-  candidate: BottleCandidate,
-  extractedLabel: BottleReferenceIdentity | null,
-) {
-  if (!extractedLabel?.brand) {
-    return 0;
-  }
-
-  return candidateMatchesKnownBrand(candidate, extractedLabel.brand) ? 0.03 : 0;
 }
 
 type CandidateBottleMetadataRow = {
@@ -966,6 +881,7 @@ async function getTextCandidates(
   }
   const textQuery = plainTextSearchQuery(queryText);
 
+  const tinQuery = bottleTextQuery(queryText, { any: true });
   const rows = await runQuery(sql`
     SELECT
       ${bottles.id} AS "bottleId",
@@ -983,17 +899,13 @@ async function getTextCandidates(
       ${bottles.maturation} AS "maturation",
       ${bottles.caskNumber} AS "caskNumber",
       ${bottles.outturn} AS "outturn",
-      ts_rank(${bottles.searchVector}, ${textQuery}) AS score
+      ${config.BOTTLE_SEARCH_TIN ? bottleTextScore : sql`ts_rank(${bottles.searchVector}, ${textQuery})`} AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
-    WHERE ${bottles.searchVector} IS NOT NULL
-      AND ${bottles.searchVector} @@ ${textQuery}
-      AND NOT EXISTS(
-        SELECT FROM ${bottleTombstones}
-        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
+    WHERE ${config.BOTTLE_SEARCH_TIN ? bottleTextPredicate(tinQuery) : sql`${bottles.searchVector} @@ ${textQuery}`}
+      AND ${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})
     ORDER BY score DESC, ${bottles.fullName} ASC
-    LIMIT ${TEXT_CANDIDATE_LIMIT}
+    LIMIT ${config.BOTTLE_SEARCH_TIN ? 50 : TEXT_CANDIDATE_LIMIT}
   `);
 
   return rows.map((row) => buildBottleCandidate(row, "text"));
@@ -1498,10 +1410,13 @@ async function searchBottleCandidatesWithEmbedding(
   );
 
   return enrichedCandidates
+    .map((candidate) => ({
+      ...candidate,
+      comparison: compareReferenceCandidate(candidate, extractedLabel),
+    }))
     .sort(
       (a, b) =>
-        getCandidateSortScore(b, extractedLabel) -
-          getCandidateSortScore(a, extractedLabel) ||
+        orderBottleCandidateComparisons(a.comparison, b.comparison) ||
         (b.score ?? 0) - (a.score ?? 0),
     )
     .slice(0, input.limit);

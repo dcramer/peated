@@ -1,4 +1,9 @@
 import type { Bottle } from "@peated/server/types";
+import {
+  compareBottleCandidate,
+  orderBottleCandidateComparisons,
+  type BottleCandidateComparison,
+} from "./bottleCandidateComparison";
 
 type IdentityChoice = {
   id?: number | null;
@@ -45,6 +50,8 @@ export type BottleCreateCandidate = Pick<Bottle, "fullName" | "id" | "name"> &
     distillers: readonly IdentityChoice[];
     bottler?: IdentityChoice | null;
     series?: IdentityChoice | null;
+    textRelevance?: number;
+    exactReference?: boolean;
   };
 
 const GENERIC_NAME_WORDS = new Set([
@@ -206,28 +213,6 @@ function textSimilarity(left: readonly string[], right: readonly string[]) {
   return (2 * intersection) / (leftSet.size + rightSet.size);
 }
 
-function exactValueScore<T>(
-  input: T | null | undefined,
-  candidate: T | null | undefined,
-  matchScore: number,
-  mismatchScore: number,
-) {
-  if (input == null || candidate == null) return 0;
-  return input === candidate ? matchScore : mismatchScore;
-}
-
-function exactTextScore(
-  input: string | null | undefined,
-  candidate: string | null | undefined,
-  matchScore: number,
-  mismatchScore: number,
-) {
-  if (!input || !candidate) return 0;
-  return normalized(input) === normalized(candidate)
-    ? matchScore
-    : mismatchScore;
-}
-
 function candidateScore(
   input: BottleCreateCandidateInput,
   candidate: BottleCreateCandidate,
@@ -273,45 +258,20 @@ function candidateScore(
 
   // A generic age-only name needs a matching stored identity anchor.
   if (inputDistinctive.size === 0 && !identityMatch) return null;
-  if (similarity < 0.45 && distinctiveOverlap < 2) return null;
+  if (
+    similarity < 0.45 &&
+    distinctiveOverlap < 2 &&
+    candidate.textRelevance == null &&
+    !candidate.exactReference
+  )
+    return null;
 
   let score = similarity * 100;
+  if (candidate.exactReference) score += 200;
   if (brandMatch) score += 24;
   if (distillerMatch) score += 28;
   if (sameChoice(input.series, candidate.series)) score += 16;
   if (sameChoice(input.bottler, candidate.bottler)) score += 8;
-  score += exactValueScore(input.category, candidate.category, 2, -2);
-  score += exactValueScore(input.statedAge, candidate.statedAge, 8, -10);
-  score += exactValueScore(
-    input.noAgeStatement,
-    candidate.noAgeStatement,
-    8,
-    -10,
-  );
-  score += exactValueScore(input.vintageYear, candidate.vintageYear, 8, -12);
-  score += exactValueScore(input.bottlingYear, candidate.bottlingYear, 5, -8);
-  score += exactValueScore(input.releaseYear, candidate.releaseYear, 8, -12);
-  score += exactValueScore(input.releaseMonth, candidate.releaseMonth, 3, -4);
-  score += exactValueScore(input.releaseDay, candidate.releaseDay, 2, -3);
-  score += exactValueScore(input.singleCask, candidate.singleCask, 3, -3);
-  score += exactValueScore(input.caskStrength, candidate.caskStrength, 3, -3);
-  score += exactValueScore(input.naturalColor, candidate.naturalColor, 1, -1);
-  score += exactValueScore(
-    input.nonChillFiltered,
-    candidate.nonChillFiltered,
-    1,
-    -1,
-  );
-  score += exactTextScore(input.maturation, candidate.maturation, 4, -4);
-  score += exactTextScore(input.caskNumber, candidate.caskNumber, 16, -18);
-  score += exactValueScore(input.outturn, candidate.outturn, 3, -3);
-  if (input.abv != null && candidate.abv != null) {
-    score += Math.abs(input.abv - candidate.abv) <= 0.1 ? 8 : -10;
-  }
-  if (input.edition && candidate.edition) {
-    score +=
-      normalized(input.edition) === normalized(candidate.edition) ? 12 : -14;
-  }
   return score;
 }
 
@@ -323,19 +283,34 @@ export function rankBottleCreateCandidates<
   candidates: readonly Candidate[],
   limit: number,
 ): Candidate[] {
-  const bestById = new Map<number, { candidate: Candidate; score: number }>();
+  const bestById = new Map<
+    number,
+    {
+      candidate: Candidate;
+      score: number;
+      comparison: BottleCandidateComparison;
+    }
+  >();
   for (const candidate of candidates) {
     const score = candidateScore(input, candidate);
     if (score == null) continue;
     const current = bestById.get(candidate.id);
     if (!current || score > current.score) {
-      bestById.set(candidate.id, { candidate, score });
+      bestById.set(candidate.id, {
+        candidate,
+        score,
+        comparison: compareBottleCandidate(input, candidate),
+      });
     }
   }
   return [...bestById.values()]
     .sort(
       (left, right) =>
-        right.score - left.score || left.candidate.id - right.candidate.id,
+        orderBottleCandidateComparisons(left.comparison, right.comparison) ||
+        right.score - left.score ||
+        (right.candidate.textRelevance ?? 0) -
+          (left.candidate.textRelevance ?? 0) ||
+        left.candidate.id - right.candidate.id,
     )
     .slice(0, limit)
     .map(({ candidate }) => candidate);

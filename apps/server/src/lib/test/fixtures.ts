@@ -61,6 +61,7 @@ import {
 } from "../locationBottleCounts";
 import { choose, random, sample } from "../rand";
 import {
+  buildBottleSearchDocuments,
   buildBottleSearchVector,
   buildBottleSeriesSearchVector,
   buildEntitySearchVector,
@@ -706,6 +707,7 @@ async function createBottleFixture(
       .values({
         ...bottleData,
         searchVector,
+        ...buildBottleSearchDocuments(searchVector),
       })
       .returning();
 

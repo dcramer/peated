@@ -58,6 +58,7 @@ jobs:
               - "apps/server/**"
               - "apps/cli/**"
               - "Dockerfile"
+              - "Dockerfile.postgres"
               - "docker-compose.yml"
               - "packages/bottle-classifier/**"
               - "packages/catalog-verifier/**"

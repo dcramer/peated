@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import type { BOTTLE_AGE_BAND_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
@@ -15,6 +16,11 @@ import {
   regions,
 } from "@peated/server/db/schema";
 import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
+import {
+  bottleTextPredicate,
+  bottleTextQuery,
+  bottleTextScore,
+} from "@peated/server/lib/bottleTextSearch";
 import { companyBottleEntityIds } from "@peated/server/lib/companyPortfolio";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { bottleIdsForDistilleryView } from "@peated/server/lib/distilleryBottleView";
@@ -103,7 +109,7 @@ export default implement(bottleListContract).handler(async function ({
   let hasUnknownFlight = false;
   where.push(isNotNull(bottles.groupId));
   where.push(
-    sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+    sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
   );
 
   if (filter === "following") {
@@ -184,8 +190,12 @@ export default implement(bottleListContract).handler(async function ({
   if (query) {
     where.push(
       or(
-        sql`${bottles.searchVector} @@ ${textQuery}`,
-        sql`${bottles.searchVector} @@ ${prefixQuery}`,
+        ...(config.BOTTLE_SEARCH_TIN
+          ? [bottleTextPredicate(bottleTextQuery(query, { prefix: true }))]
+          : [
+              sql`${bottles.searchVector} @@ ${textQuery}`,
+              sql`${bottles.searchVector} @@ ${prefixQuery}`,
+            ]),
         exactReferenceBottleIds.length
           ? inArray(bottles.id, exactReferenceBottleIds)
           : undefined,
@@ -323,7 +333,9 @@ export default implement(bottleListContract).handler(async function ({
   switch (rest.sort) {
     case "rank":
       if (query) {
-        orderBy = sql`GREATEST(
+        orderBy = config.BOTTLE_SEARCH_TIN
+          ? desc(bottleTextScore)
+          : sql`GREATEST(
             ts_rank(${bottles.searchVector}, ${textQuery}),
             ts_rank(${bottles.searchVector}, ${prefixQuery}) * 0.5
           ) DESC`;

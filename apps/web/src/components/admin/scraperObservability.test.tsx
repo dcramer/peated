@@ -201,6 +201,7 @@ describe("scraper observability", () => {
         coverage={{
           bottles: {
             total: 100,
+            withSearchDocuments: 100,
             withDescription: 50,
             withImage: 75,
             withReviews: 25,
