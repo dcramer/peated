@@ -40,8 +40,8 @@ stable subject ID, stored in `identities`.
   the user's name only on the first sign-in, and hidden emails are random
   relay addresses, so an Apple name is used first.
 - Apple identity tokens are verified against Apple's published keys. Accepted
-  audiences are the bundle and service IDs in `APPLE_CLIENT_IDS`. Tokens older
-  than five minutes are rejected.
+  audiences default to the iOS bundle ID; `APPLE_CLIENT_IDS` overrides them.
+  Tokens older than five minutes are rejected.
 
 ## Email Verification
 

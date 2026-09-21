@@ -46,11 +46,10 @@ export default {
         .filter((id) => id.length > 0)
     : [],
   // Sign in with Apple audiences: the iOS bundle ID and any Services ID.
-  APPLE_CLIENT_IDS: process.env.APPLE_CLIENT_IDS
-    ? process.env.APPLE_CLIENT_IDS.split(",")
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0)
-    : [],
+  APPLE_CLIENT_IDS: (process.env.APPLE_CLIENT_IDS || "com.peated.Peated")
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => id.length > 0),
 
   UPLOAD_PATH: process.env.UPLOAD_PATH || tmpdir(),
 
