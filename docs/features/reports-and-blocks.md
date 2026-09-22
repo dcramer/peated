@@ -55,10 +55,13 @@ existing operations, then close it:
   open report about the same target with the same outcome.
 
 Reports also close on their own, as `resolved` with a note saying why, when
-the target goes away: a tasting or review is removed, a comment is deleted, a
-bottle, entity, series, or flight is deleted, the reported member is
-suspended, or the reported member deletes their account. The Inbox never
-holds a report about something moderators can no longer act on.
+the target goes away: a tasting or review is removed, a comment is deleted, or
+a bottle, entity, series, or flight is deleted. Suspending a member closes only
+the report about that member; reports about their content stay open because
+the content is still visible. Account deletion closes reports about the member
+and their removed content, but not about bottles, entities, or series they
+added, since those records live on. The Inbox never holds a report about
+something moderators can no longer act on.
 
 Closed reports appear in Moderation History with the outcome, the moderator,
 and the note. A report the system closed shows no moderator.

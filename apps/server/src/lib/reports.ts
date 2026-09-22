@@ -443,10 +443,16 @@ export async function closeOpenReportsForTarget(
     );
 }
 
-/** Resolve every open report that names a member, such as on suspension. */
+/**
+ * Resolve open reports that name a member, limited to the target types the
+ * action settled. Suspending a member settles only the report about them;
+ * their content stays visible. Deleting an account removes the member's
+ * content but not catalog records they added, so those reports stay open.
+ */
 export async function closeOpenReportsAboutMember(
   db: AnyDatabase,
   userId: number,
+  objectTypes: readonly ReportObjectType[],
   closure: ReportClosure,
 ): Promise<void> {
   await db
@@ -457,5 +463,20 @@ export async function closeOpenReportsAboutMember(
       closedAt: new Date(),
       closeNote: closure.note,
     })
-    .where(and(eq(reports.reportedUserId, userId), eq(reports.status, "open")));
+    .where(
+      and(
+        eq(reports.reportedUserId, userId),
+        inArray(reports.objectType, [...objectTypes]),
+        eq(reports.status, "open"),
+      ),
+    );
 }
+
+/** Report targets that account deletion removes along with the member. */
+export const MEMBER_CONTENT_REPORT_OBJECT_TYPES: readonly ReportObjectType[] = [
+  "user",
+  "tasting",
+  "member_review",
+  "comment",
+  "flight",
+];

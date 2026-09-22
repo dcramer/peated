@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTombstones, reports } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
@@ -306,6 +306,19 @@ describe("admin reports", () => {
     expect(closedComment.status).toBe("resolved");
     expect(closedComment.closeNote).toBe("Comment deleted by its author.");
 
+    // Suspension settles the report about the member. Their live tasting and
+    // the bottle they added still need a decision.
+    const actor = await getUserActor(author);
+    const liveTasting = await fixtures.Tasting({ createdById: author.id });
+    const bottle = await fixtures.Bottle({ createdByActorId: actor.id });
+    const liveTastingReport = await routerClient.reports.create(
+      { objectType: "tasting", objectId: liveTasting.id, reason: "spam" },
+      { context: { user: defaults.user } },
+    );
+    const bottleReport = await routerClient.reports.create(
+      { objectType: "bottle", objectId: bottle.id, reason: "inaccurate" },
+      { context: { user: defaults.user } },
+    );
     await routerClient.users.suspensionUpdate(
       { user: author.id, suspended: true, reason: "Repeat harassment." },
       { context: { user: moderator } },
@@ -321,7 +334,9 @@ describe("admin reports", () => {
       { category: "community" },
       { context: { user: moderator } },
     );
-    expect(inbox.results).toEqual([]);
+    expect(inbox.results.map((task) => task.key).sort()).toEqual(
+      [`report:${liveTastingReport.id}`, `report:${bottleReport.id}`].sort(),
+    );
   });
 
   test("follows a merged bottle and resolves reports when a bottle is deleted", async ({

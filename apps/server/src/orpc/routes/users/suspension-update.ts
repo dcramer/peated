@@ -84,7 +84,7 @@ export default procedure
       });
     }
     if (input.suspended) {
-      await closeOpenReportsAboutMember(db, user.id, {
+      await closeOpenReportsAboutMember(db, user.id, ["user"], {
         closedById: context.user.id,
         note: `Member suspended: ${input.reason}`,
       });
