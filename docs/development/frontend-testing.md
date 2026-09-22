@@ -128,7 +128,7 @@ lookup, and stopping a stalled request. The last test advances the browser clock
 - The Playwright command should finish in less than 5 minutes on a healthy CI
   runner. Its hard timeout is 7 minutes. The 15-minute GitHub job timeout also
   includes dependency and browser setup.
-- The suite can schedule at most 43 tests across all browser projects. The
+- The suite can schedule at most 44 tests across all browser projects. The
   `test:e2e` command checks this limit and the mobile tagging, timeout, retry,
   and failure policies before it starts a browser.
 - A test gets one CI retry. Do not increase retries or timeouts to hide an

@@ -33,6 +33,7 @@ import {
 } from "@peated/server/lib/locationBottleCounts";
 import { logInfo } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
+import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { asc, eq, inArray, or, sql, type SQL } from "drizzle-orm";
@@ -308,6 +309,11 @@ export default procedure
         .delete(bottleAliases)
         .where(eq(bottleAliases.bottleId, bottle.id));
       await tx.delete(bottles).where(eq(bottles.id, bottle.id));
+      await closeOpenReportsForTarget(
+        tx,
+        { objectType: "bottle", objectId: bottle.id },
+        { closedById: context.user.id, note: "Bottle deleted." },
+      );
 
       const entityLinksAfter = await getBottleEntityLinks(tx, [bottle.id]);
       await updateEntityBottleCounts(tx, entityLinksBefore, entityLinksAfter);

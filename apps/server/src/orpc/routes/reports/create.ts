@@ -1,6 +1,9 @@
 import { db } from "@peated/server/db";
 import { reports } from "@peated/server/db/schema";
-import { loadReportTarget } from "@peated/server/lib/reports";
+import {
+  loadReportTarget,
+  resolveReportObjectId,
+} from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import {
@@ -9,6 +12,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { ReportInputSchema, ReportSchema } from "@peated/server/schemas";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq } from "drizzle-orm";
 import type { z } from "zod";
 
@@ -46,14 +50,22 @@ export default procedure
     path: "/reports",
     summary: "Report content or a member",
     description:
-      "Report a tasting, member review, comment, or member to moderators. Repeating a report while the earlier one is still open returns that open report. Limited to 20 reports per hour.",
+      "Report a tasting, member review, comment, member, bottle, entity, series, or flight to moderators. Repeating a report while the earlier one is still open returns that open report. Limited to 20 reports per hour.",
     operationId: "createReport",
   })
   .input(ReportInputSchema)
   .output(ReportSchema)
   .handler(async ({ input, context, errors }) => {
-    const target = await loadReportTarget(db, input.objectType, input.objectId);
-    if (!target) {
+    const objectId = await resolveReportObjectId(
+      db,
+      input.objectType,
+      input.objectId,
+    );
+    const target =
+      objectId === null
+        ? null
+        : await loadReportTarget(db, input.objectType, objectId);
+    if (objectId === null || !target) {
       throw errors.NOT_FOUND({ message: "Content not found." });
     }
     if (target.reportedUserId === context.user.id) {
@@ -67,7 +79,7 @@ export default procedure
       .insert(reports)
       .values({
         objectType: input.objectType,
-        objectId: input.objectId,
+        objectId,
         reportedUserId: target.reportedUserId,
         reason: input.reason,
         comment: input.comment || null,
@@ -78,7 +90,11 @@ export default procedure
         where: eq(reports.status, "open"),
       })
       .returning();
-    if (report) return serializeReport(report);
+    if (report) {
+      // Moderators hear about each new report by email; repeats stay quiet.
+      await pushJob("NotifyReport", { reportId: report.id });
+      return serializeReport(report);
+    }
 
     // Already reported and still open: return that report unchanged.
     const [existing] = await db
@@ -88,7 +104,7 @@ export default procedure
         and(
           eq(reports.createdById, context.user.id),
           eq(reports.objectType, input.objectType),
-          eq(reports.objectId, input.objectId),
+          eq(reports.objectId, objectId),
           eq(reports.status, "open"),
         ),
       )

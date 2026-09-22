@@ -3,7 +3,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { ExpandableDescription } from "@peated/web/components/expandableDescription.stylex";
@@ -11,6 +11,7 @@ import { SectionError } from "@peated/web/components/feedback.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { PageTabs } from "@peated/web/components/pageTabs.stylex";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
+import { ReportContentDialog } from "@peated/web/components/reportContentDialog";
 import {
   RowMenu,
   type RowMenuItem,
@@ -77,6 +78,7 @@ function EntityActions({ entity }: { entity: Entity }) {
   const router = useRouter();
   const { flash } = useFlashMessages();
   const deleteMutation = useMutation(orpc.entities.delete.mutationOptions());
+  const [reporting, setReporting] = useState(false);
   const noun = getEntityPresentation(entity).label.toLocaleLowerCase();
   const entityUrl = getEntityUrl(entity);
   const groups: RowMenuItem[][] = [
@@ -105,6 +107,12 @@ function EntityActions({ entity }: { entity: Entity }) {
       { href: `${entityUrl}/aliases`, label: "View aliases" },
       { href: `${entityUrl}/edit`, label: `Edit ${noun}` },
       { href: `${entityUrl}/merge`, label: `Merge ${noun}` },
+    ]);
+  }
+
+  if (user) {
+    groups.push([
+      { label: `Report ${noun}`, onSelect: () => setReporting(true) },
     ]);
   }
 
@@ -140,7 +148,17 @@ function EntityActions({ entity }: { entity: Entity }) {
     ]);
   }
 
-  return <RowMenu groups={groups} label={entity.name} variant="page" />;
+  return (
+    <>
+      <RowMenu groups={groups} label={entity.name} variant="page" />
+      <ReportContentDialog
+        isOpen={reporting}
+        onClose={() => setReporting(false)}
+        subject={`this ${noun}`}
+        target={{ objectType: "entity", objectId: entity.id }}
+      />
+    </>
+  );
 }
 
 export function EntityPageFrameClient({

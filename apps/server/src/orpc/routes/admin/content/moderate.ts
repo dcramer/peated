@@ -7,6 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
+import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -78,6 +79,17 @@ export default procedure
               },
         )
         .where(eq(table.id, input.id));
+
+      if (input.removed && input.kind !== "external_review") {
+        await closeOpenReportsForTarget(
+          tx,
+          { objectType: input.kind, objectId: input.id },
+          {
+            closedById: context.user.id,
+            note: `Content removed: ${input.reason}`,
+          },
+        );
+      }
 
       return { bottleId: locked.bottleId, changed: true };
     });

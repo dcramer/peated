@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
+import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -36,6 +37,11 @@ export default procedure
 
     await db.transaction(async (tx) => {
       await tx.delete(flights).where(eq(flights.id, flight.id));
+      await closeOpenReportsForTarget(
+        tx,
+        { objectType: "flight", objectId: flight.id },
+        { closedById: context.user.id, note: "Flight deleted." },
+      );
     });
 
     return {};

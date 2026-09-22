@@ -18,6 +18,10 @@ export const REPORT_OBJECT_TYPES = [
   "member_review",
   "comment",
   "user",
+  "bottle",
+  "entity",
+  "bottle_series",
+  "flight",
 ] as const;
 
 export const REPORT_REASONS = [
@@ -26,6 +30,7 @@ export const REPORT_REASONS = [
   "hate",
   "sexual_content",
   "violence",
+  "inaccurate",
   "other",
 ] as const;
 
@@ -41,16 +46,18 @@ export const reportStatusEnum = pgEnum("report_status", REPORT_STATUSES);
 // A member's report of content or of another member. Moderators close a
 // report after acting on it or dismissing it. Reports never store the
 // reported content; the reported member is kept so a closed report still
-// says who it was about after the content is gone.
+// says who it was about after the content is gone. Catalog records (bottles,
+// entities, series) can come from scrapers or the system, so a report about
+// one names the creating member only when there is one.
 export const reports = pgTable(
   "report",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     objectType: reportObjectTypeEnum("object_type").notNull(),
     objectId: bigint("object_id", { mode: "number" }).notNull(),
-    reportedUserId: bigint("reported_user_id", { mode: "number" })
-      .references(() => users.id)
-      .notNull(),
+    reportedUserId: bigint("reported_user_id", { mode: "number" }).references(
+      () => users.id,
+    ),
     reason: reportReasonEnum("reason").notNull(),
     comment: text("comment"),
     status: reportStatusEnum("status").default("open").notNull(),

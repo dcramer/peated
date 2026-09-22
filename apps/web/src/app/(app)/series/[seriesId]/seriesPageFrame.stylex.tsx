@@ -19,8 +19,11 @@ import {
   PageHeader,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { RailListSection } from "@peated/web/components/pages/railListSection.stylex";
+import { ReportContentDialog } from "@peated/web/components/reportContentDialog";
+import { RowMenu } from "@peated/web/components/rowMenu.stylex";
 import { TextLink } from "@peated/web/components/textLink.stylex";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
+import useAuth from "@peated/web/hooks/useAuth";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
@@ -56,6 +59,7 @@ export function SeriesPageFrame({
               <Markdown content={initialSeries.description} />
             ) : undefined
           }
+          menu={<SeriesActions series={initialSeries} />}
           parent={
             <TextLink href={getEntityUrl(initialSeries.brand)}>
               {initialSeries.brand.name}
@@ -85,6 +89,32 @@ export function SeriesPageFrame({
         </PageColumns>
       </div>
     </SeriesPageFrameContext.Provider>
+  );
+}
+
+/** Lets a signed-in member report a series. */
+function SeriesActions({ series }: { series: Series }) {
+  const { user } = useAuth();
+  const [reporting, setReporting] = useState(false);
+
+  if (!user) return null;
+
+  return (
+    <>
+      <RowMenu
+        groups={[
+          [{ label: "Report series", onSelect: () => setReporting(true) }],
+        ]}
+        label={series.fullName}
+        variant="page"
+      />
+      <ReportContentDialog
+        isOpen={reporting}
+        onClose={() => setReporting(false)}
+        subject="this series"
+        target={{ objectType: "bottle_series", objectId: series.id }}
+      />
+    </>
   );
 }
 

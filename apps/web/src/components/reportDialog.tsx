@@ -48,12 +48,16 @@ function ReportDialogForm({
 }: Omit<ReportDialogProps, "isOpen">) {
   const reasonId = useId();
   const commentId = useId();
-  const [reason, setReason] = useState<ReportReason>("spam");
+  const [reason, setReason] = useState<ReportReason | "">("");
   const [comment, setComment] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string>();
+  // "Something else" means nothing to moderators without the details.
+  const needsDetails = reason === "other";
+  const ready = reason !== "" && (!needsDetails || comment.trim() !== "");
 
   async function submit() {
+    if (reason === "") return;
     setPending(true);
     setError(undefined);
     try {
@@ -76,6 +80,7 @@ function ReportDialogForm({
       onSubmit={() => void submit()}
       pending={pending}
       pendingLabel="Sending…"
+      submitDisabled={!ready}
       submitLabel="Send report"
       title="Report to moderators"
     >
@@ -84,10 +89,15 @@ function ReportDialogForm({
           disabled={pending}
           id={reasonId}
           onChange={(event) =>
-            setReason(ReportReasonEnum.parse(event.currentTarget.value))
+            setReason(
+              event.currentTarget.value === ""
+                ? ""
+                : ReportReasonEnum.parse(event.currentTarget.value),
+            )
           }
           value={reason}
         >
+          <option value="">Choose a reason</option>
           {ReportReasonEnum.options.map((value) => (
             <option key={value} value={value}>
               {REPORT_REASON_LABELS[value]}
@@ -95,13 +105,22 @@ function ReportDialogForm({
           ))}
         </Select>
       </Field>
-      <Field htmlFor={commentId} label="Details" optional>
+      <Field
+        htmlFor={commentId}
+        label="Details"
+        optional={!needsDetails}
+        required={needsDetails}
+      >
         <Textarea
           disabled={pending}
           id={commentId}
           maxLength={1000}
           onChange={(event) => setComment(event.currentTarget.value)}
-          placeholder="Anything that helps moderators understand the problem."
+          placeholder={
+            needsDetails
+              ? "Tell moderators what is wrong."
+              : "Anything that helps moderators understand the problem."
+          }
           rows={3}
           value={comment}
         />

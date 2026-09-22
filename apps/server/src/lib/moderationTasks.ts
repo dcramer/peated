@@ -15,7 +15,13 @@ import {
   listActionableBottleCheckSummaries,
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
-import { describeReportSubject } from "@peated/server/lib/reports";
+import {
+  CATALOG_REPORT_OBJECT_TYPES,
+  describeReportSubject,
+  loadReportTargets,
+  recordNameOf,
+  reportTargetKey,
+} from "@peated/server/lib/reports";
 import type { ModerationTaskSummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
 import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
 import { and, asc, eq, inArray, isNull, lte, or } from "drizzle-orm";
@@ -237,22 +243,27 @@ function catalogTasksForCheck(
 type ReportTaskRow = {
   report: Pick<
     typeof reports.$inferSelect,
-    "createdAt" | "id" | "objectType" | "reason"
+    "createdAt" | "id" | "objectId" | "objectType" | "reason"
   >;
-  reportedUser: Pick<typeof users.$inferSelect, "username">;
+  reportedUser: Pick<typeof users.$inferSelect, "username"> | null;
 };
 
-function reportTask({
-  report,
-  reportedUser,
-}: ReportTaskRow): ModerationTaskSummary {
+function reportTask(
+  { report, reportedUser }: ReportTaskRow,
+  recordName: string | null,
+): ModerationTaskSummary {
   return {
     key: `report:${report.id}`,
     kind: "report",
     category: "community",
     state: "ready",
     inconclusive: false,
-    title: describeReportSubject(report.objectType, reportedUser.username),
+    title: describeReportSubject({
+      objectType: report.objectType,
+      objectId: report.objectId,
+      reportedUsername: reportedUser?.username ?? null,
+      recordName,
+    }),
     sourceLabel: "Member report",
     question:
       report.objectType === "user"
@@ -272,13 +283,14 @@ async function reportTasks(
       report: {
         createdAt: reports.createdAt,
         id: reports.id,
+        objectId: reports.objectId,
         objectType: reports.objectType,
         reason: reports.reason,
       },
       reportedUser: { username: users.username },
     })
     .from(reports)
-    .innerJoin(users, eq(users.id, reports.reportedUserId))
+    .leftJoin(users, eq(users.id, reports.reportedUserId))
     .where(
       and(
         reportId === undefined ? undefined : eq(reports.id, reportId),
@@ -287,7 +299,22 @@ async function reportTasks(
     )
     .orderBy(asc(reports.createdAt), asc(reports.id))
     .limit(MAX_PROJECTED_SOURCE_ROWS);
-  return rows.map(reportTask);
+  // Catalog reports are titled by the record's current name, not a member.
+  const catalogTargets = await loadReportTargets(
+    db,
+    rows
+      .map(({ report }) => report)
+      .filter((report) => CATALOG_REPORT_OBJECT_TYPES.has(report.objectType)),
+  );
+  return rows.map((row) =>
+    reportTask(
+      row,
+      recordNameOf(
+        row.report.objectType,
+        catalogTargets.get(reportTargetKey(row.report))?.contentPreview ?? null,
+      ),
+    ),
+  );
 }
 
 async function catalogTasks(): Promise<ModerationTaskSummary[]> {

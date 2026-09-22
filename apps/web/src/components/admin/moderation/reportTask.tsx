@@ -28,7 +28,49 @@ const OBJECT_LABELS = {
   member_review: "review",
   comment: "comment",
   user: "member",
+  bottle: "bottle",
+  entity: "entity",
+  bottle_series: "series",
+  flight: "flight",
 } satisfies Record<Report["objectType"], string>;
+
+type CatalogPage = { path: string; label: string };
+
+// Catalog records are fixed with their own tools, and the member named on
+// the report only created the record; anyone may have edited it since. So a
+// catalog report links to those tools and never offers one-click suspension.
+function catalogPagesFor(objectType: Report["objectType"]): CatalogPage[] {
+  switch (objectType) {
+    case "bottle":
+      return [
+        { path: "edit", label: "Edit" },
+        { path: "merge", label: "Merge" },
+        { path: "audit", label: "History" },
+      ];
+    case "entity":
+      return [
+        { path: "edit", label: "Edit" },
+        { path: "merge", label: "Merge" },
+      ];
+    case "flight":
+      return [{ path: "edit", label: "Edit" }];
+    case "bottle_series":
+    case "comment":
+    case "member_review":
+    case "tasting":
+    case "user":
+      return [];
+  }
+}
+
+function isCatalogReport(objectType: Report["objectType"]) {
+  return (
+    objectType === "bottle" ||
+    objectType === "entity" ||
+    objectType === "bottle_series" ||
+    objectType === "flight"
+  );
+}
 
 /** One member report in the Inbox: who, what, why, and the follow-up actions. */
 export function ReportTask({
@@ -65,6 +107,8 @@ export function ReportTask({
   const contentUrl = report.contentUrl;
   const contentExists = contentUrl !== null;
   const objectLabel = OBJECT_LABELS[report.objectType];
+  const reportedUser = report.reportedUser;
+  const catalogReport = isCatalogReport(report.objectType);
 
   async function finish<TResult>(
     action: () => Promise<TResult>,
@@ -116,12 +160,20 @@ export function ReportTask({
           Reported by{" "}
           <TextLink href={`/users/${report.createdBy.username}`}>
             @{report.createdBy.username}
-          </TextLink>{" "}
-          about{" "}
-          <TextLink href={`/users/${report.reportedUser.username}`}>
-            @{report.reportedUser.username}
           </TextLink>
-          {report.reportedUser.suspended ? " (suspended)" : null}
+          {reportedUser ? (
+            <>
+              {catalogReport
+                ? " about a " + objectLabel + " added by "
+                : " about "}
+              <TextLink href={`/users/${reportedUser.username}`}>
+                @{reportedUser.username}
+              </TextLink>
+              {reportedUser.suspended ? " (suspended)" : null}
+            </>
+          ) : (
+            <> about a {objectLabel} that Peated added, not a member</>
+          )}
           {report.openReportCount > 0
             ? ` · ${report.openReportCount} other open ${
                 report.openReportCount === 1 ? "report" : "reports"
@@ -131,6 +183,14 @@ export function ReportTask({
         {contentUrl !== null ? (
           <p>
             <TextLink href={contentUrl}>View the {objectLabel}</TextLink>
+            {catalogPagesFor(report.objectType).map((page) => (
+              <span key={page.path}>
+                {" · "}
+                <TextLink href={`${contentUrl}/${page.path}`}>
+                  {page.label}
+                </TextLink>
+              </span>
+            ))}
             {report.contentPreview ? <> — {report.contentPreview}</> : null}
           </p>
         ) : (
@@ -190,14 +250,14 @@ export function ReportTask({
                 Delete comment and resolve
               </Button>
             ) : null}
-            {report.reportedUser.suspended ? null : (
+            {!reportedUser || reportedUser.suspended || catalogReport ? null : (
               <Button
                 disabled={busy}
                 loading={suspend.isPending}
                 onClick={() =>
                   void finish(async () => {
                     await suspend.mutateAsync({
-                      user: report.reportedUser.id,
+                      user: reportedUser.id,
                       suspended: true,
                       reason: note.trim() || reasonLabel,
                     });

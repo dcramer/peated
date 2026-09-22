@@ -200,6 +200,7 @@ const server = http.createServer(async (request, response) => {
   if (url.pathname.startsWith("/rpc")) {
     const handled = await handleRpcRequest({ request, response, url });
     if (!handled) {
+      console.error(`Unhandled mock RPC path: ${url.pathname}`);
       request.resume();
     }
     return;
@@ -1422,6 +1423,21 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, {
         imageUrl: "http://127.0.0.1:4999/uploads/tasting.webp",
+      });
+      return true;
+    case "reports/create":
+      if (input?.reason === "other" && !input?.comment) {
+        sendRpcError(response, "Tell moderators what is wrong.");
+        return true;
+      }
+      sendRpcResponse(response, {
+        id: 9901,
+        objectType: input?.objectType,
+        objectId: input?.objectId,
+        reason: input?.reason,
+        comment: input?.comment ?? null,
+        status: "open",
+        createdAt: "2026-06-07T12:00:00.000Z",
       });
       return true;
     case "tastings/details":

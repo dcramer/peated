@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const MAX_SCHEDULED_TESTS = 43;
+const MAX_SCHEDULED_TESTS = 44;
 const CI_GLOBAL_TIMEOUT_MS = 7 * 60_000;
 const CI_TEST_TIMEOUT_MS = 45_000;
 const CI_MAX_FAILURES = 2;

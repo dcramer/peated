@@ -3,6 +3,7 @@ import { Template as AccountDeletionEmailTemplate } from "@peated/email/template
 import { Template as AccountRecoveryEmailTemplate } from "@peated/email/templates/accountRecoveryEmail";
 import { Template as MagicLinkEmailTemplate } from "@peated/email/templates/magicLinkEmail";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
+import { Template as NewReportTemplate } from "@peated/email/templates/newReportEmail";
 import { Template as VerifyEmailTemplate } from "@peated/email/templates/verifyEmail";
 import config from "@peated/server/config";
 import { createHash } from "crypto";
@@ -350,6 +351,82 @@ export async function sendAccountDeletionEmail({
     text: `You asked us to delete your Peated account. It will be deleted on ${deletionDate}. To keep it, sign in and cancel the deletion: ${cancelUrl}`,
     html,
   });
+}
+
+export interface ReportEmail {
+  id: number;
+  /** What was reported, such as "Tasting by @jane.doe". */
+  subject: string;
+  reasonLabel: string;
+  comment: string | null;
+  reporterUsername: string;
+  contentPreview: string | null;
+  /** Path on the web app, or null when the content is gone. */
+  contentPath: string | null;
+}
+
+/** Tell moderators about a new report. One message per recipient. */
+export async function sendReportEmail({
+  report,
+  to,
+  transport = mailTransport,
+}: {
+  report: ReportEmail;
+  to: string[];
+  transport?: Transporter<SMTPTransport.SentMessageInfo>;
+}) {
+  if (!to.length || !hasEmailSupport()) return;
+
+  if (!transport) {
+    if (!mailTransport) mailTransport = createMailTransport();
+    transport = mailTransport;
+  }
+
+  const inboxUrl = `${config.URL_PREFIX}/admin/moderation/inbox/report/${report.id}`;
+  const contentUrl = report.contentPath
+    ? `${config.URL_PREFIX}${report.contentPath}`
+    : null;
+  const html = await render(
+    NewReportTemplate({
+      baseUrl: config.URL_PREFIX,
+      report: {
+        id: report.id,
+        subject: report.subject,
+        reasonLabel: report.reasonLabel,
+        comment: report.comment,
+        reporterUsername: report.reporterUsername,
+        contentPreview: report.contentPreview,
+        contentUrl,
+        inboxUrl,
+      },
+    }),
+  );
+  const text = [
+    `@${report.reporterUsername} reported ${report.subject} for ${report.reasonLabel}.`,
+    report.comment ? `"${report.comment}"` : null,
+    `Review it in Moderation: ${inboxUrl}`,
+    contentUrl ? `View the reported content: ${contentUrl}` : null,
+  ]
+    .filter((line) => line !== null)
+    .join("\n\n");
+
+  logInfo("Sending report email for report {reportId}", {
+    extra: { reportId: report.id, recipients: to.length },
+  });
+
+  for (const email of to) {
+    try {
+      await transport.sendMail({
+        ...getMailDefaults(),
+        to: email,
+        subject: `New report: ${report.subject}`,
+        text,
+        html,
+      });
+    } catch (err) {
+      logError(err);
+    }
+  }
 }
 
 function getMailDefaults() {
