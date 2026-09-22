@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { FriendStatusEnum } from "./shared";
 
+/** Usernames Peated keeps for itself: the `me` alias and deleted-member tombstones. */
+export function isReservedUsername(username: string) {
+  return username === "me" || username.startsWith("deleted-");
+}
+
 export const UserSchema = z.object({
   id: z.number().readonly().describe("Unique identifier for the user"),
   username: z
@@ -51,6 +56,14 @@ export const UserSchema = z.object({
     .boolean()
     .optional()
     .describe("Whether to notify user of comments on their content"),
+  deletionScheduledAt: z
+    .string()
+    .datetime()
+    .optional()
+    .readonly()
+    .describe(
+      "When the account will be deleted, if the member requested deletion. Only shown to the member.",
+    ),
   friendStatus: FriendStatusEnum.optional()
     .readonly()
     .describe("Friendship status with the current user"),
@@ -61,6 +74,7 @@ export const UserInputSchema = UserSchema.omit({
   verified: true,
   createdAt: true,
   friendStatus: true,
+  deletionScheduledAt: true,
 }).extend({
   password: z
     .string()

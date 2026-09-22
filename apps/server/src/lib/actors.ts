@@ -1,6 +1,6 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import { actors, users, type Actor, type User } from "@peated/server/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 /**
  * Actor resolution is the write-attribution boundary. Write paths should
@@ -56,11 +56,22 @@ export function getPeatedSystemActorForDatabase(targetDb: AnyDatabase) {
   return getSystemActorForDatabase(targetDb, PEATED_SYSTEM_ACTOR_KEY);
 }
 
-/** Resolve a durable user actor row, refreshing denormalized display fields. */
+/**
+ * Resolve a durable user actor row, refreshing denormalized display fields.
+ * A deleted member's actor keeps its anonymized fields.
+ */
 export async function getUserActorForDatabase(
   targetDb: AnyDatabase,
-  user: Pick<User, "id" | "username">,
+  user: Pick<User, "id" | "username"> & Partial<Pick<User, "deletedAt">>,
 ) {
+  if (user.deletedAt) {
+    const [existing] = await targetDb
+      .select()
+      .from(actors)
+      .where(and(eq(actors.type, "user"), eq(actors.key, String(user.id))));
+    if (existing) return existing;
+  }
+
   const [actor] = await targetDb
     .insert(actors)
     .values({

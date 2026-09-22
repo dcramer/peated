@@ -6,7 +6,12 @@ import { useEffect, useRef, type HTMLAttributes, type ReactNode } from "react";
 import { SectionHeading } from "./sectionHeading.stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
-import { colors, effects, space } from "../styles/tokens.stylex";
+import {
+  colors,
+  controlMetrics,
+  effects,
+  space,
+} from "../styles/tokens.stylex";
 
 export function FormStack({ children }: { children: ReactNode }) {
   return <div {...stylex.props(styles.stack)}>{children}</div>;
@@ -60,6 +65,8 @@ export function FormStep({
   );
 }
 
+export type FormSectionTone = "default" | "danger";
+
 export type FormSectionProps = Omit<
   HTMLAttributes<HTMLElement>,
   "className" | "style" | "title"
@@ -68,6 +75,8 @@ export type FormSectionProps = Omit<
   children: ReactNode;
   description?: ReactNode;
   title: ReactNode;
+  /** `danger` frames an irreversible account action. Use it once per page. */
+  tone?: FormSectionTone;
 };
 
 /** Groups one set of related fields without owning form state or submission. */
@@ -76,10 +85,17 @@ export function FormSection({
   children,
   description,
   title,
+  tone = "default",
   ...props
 }: FormSectionProps) {
   return (
-    <section {...props} {...stylex.props(styles.section)}>
+    <section
+      {...props}
+      {...stylex.props(
+        styles.section,
+        tone === "danger" && styles.dangerSection,
+      )}
+    >
       <div {...stylex.props(styles.header)}>
         <div {...stylex.props(styles.copy)}>
           <SectionHeading>{title}</SectionHeading>
@@ -295,6 +311,22 @@ const styles = stylex.create({
     paddingBottom: space.x8,
     paddingLeft: 0,
     backgroundColor: "transparent",
+  },
+  dangerSection: {
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.criticalQuiet,
+    borderRadius: controlMetrics.radius,
+    paddingTop: space.x6,
+    paddingRight: {
+      default: space.x6,
+      "@media (max-width: 559px)": space.x4,
+    },
+    paddingBottom: space.x6,
+    paddingLeft: {
+      default: space.x6,
+      "@media (max-width: 559px)": space.x4,
+    },
   },
   header: {
     display: "flex",

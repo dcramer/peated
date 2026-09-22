@@ -9,6 +9,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { UserInputSchema, UserSchema } from "@peated/server/schemas";
+import { isReservedUsername } from "@peated/server/schemas/users";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
@@ -50,7 +51,7 @@ export default procedure
 
     if (input.username !== undefined && input.username !== user.username) {
       data.username = input.username;
-      if (data.username === "me") {
+      if (isReservedUsername(data.username)) {
         throw errors.BAD_REQUEST({
           message: "Invalid username.",
         });

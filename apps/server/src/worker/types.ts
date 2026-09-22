@@ -19,6 +19,7 @@ export type JobName =
   | "OnBottleChange"
   | "OnBottleReferenceChange"
   | "OnEntityChange"
+  | "ProcessAccountDeletions"
   | "ProcessStorePriceMatchRetryRun"
   | "ProcessNotification"
   | "RepairBottleGroupBottleCounts"

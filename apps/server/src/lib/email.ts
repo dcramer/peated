@@ -1,4 +1,5 @@
 import cuid2 from "@paralleldrive/cuid2";
+import { Template as AccountDeletionEmailTemplate } from "@peated/email/templates/accountDeletionEmail";
 import { Template as AccountRecoveryEmailTemplate } from "@peated/email/templates/accountRecoveryEmail";
 import { Template as MagicLinkEmailTemplate } from "@peated/email/templates/magicLinkEmail";
 import { Template as NewCommentTemplate } from "@peated/email/templates/newCommentEmail";
@@ -307,6 +308,47 @@ export async function sendMagicLinkEmail({
     subject: "Magic Link for Peated",
     text: `Click the following link to log in to Peated: ${magicLink.url}`,
     html: html,
+  });
+}
+
+/** Confirms a deletion request and tells the member how to cancel it. */
+export async function sendAccountDeletionEmail({
+  user,
+  deletionScheduledAt,
+  transport = mailTransport,
+}: {
+  user: User;
+  deletionScheduledAt: Date;
+  transport?: Transporter<SMTPTransport.SentMessageInfo>;
+}) {
+  assertEmailSupport();
+
+  if (!transport) {
+    if (!mailTransport) mailTransport = createMailTransport();
+    transport = mailTransport;
+  }
+
+  const deletionDate = `${deletionScheduledAt.toLocaleString("en-US", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "UTC",
+  })} UTC`;
+  const cancelUrl = `${config.URL_PREFIX}/settings/security`;
+
+  const html = await render(
+    AccountDeletionEmailTemplate({
+      baseUrl: config.URL_PREFIX,
+      deletionDate,
+      cancelUrl,
+    }),
+  );
+
+  await transport.sendMail({
+    ...getMailDefaults(),
+    to: user.email,
+    subject: "Your Peated account will be deleted",
+    text: `You asked us to delete your Peated account. It will be deleted on ${deletionDate}. To keep it, sign in and cancel the deletion: ${cancelUrl}`,
+    html,
   });
 }
 

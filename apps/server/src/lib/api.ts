@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import type { AnyDatabase } from "../db";
 import type { User } from "../db/schema";
@@ -31,20 +31,17 @@ export async function getUserFromId(
   // TODO: this isnt ideal, but if we're only going to use this in the API
   // its ok. The rationale here is that numbers are passed as strings from
   // the query string, thus we have to coerce sometimes.
+  // A deleted member's tombstone row is not a member other routes can act on.
   const parsedUserId = z.coerce.number().finite().safeParse(userId);
-  if (parsedUserId.success) {
-    return (
-      (await db.query.users.findFirst({
-        where: eq(users.id, parsedUserId.data),
-      })) || null
-    );
-  }
-
-  return (
-    (await db.query.users.findFirst({
-      where: eq(users.username, z.string().parse(userId)),
-    })) || null
-  );
+  const user = await db.query.users.findFirst({
+    where: and(
+      parsedUserId.success
+        ? eq(users.id, parsedUserId.data)
+        : eq(users.username, z.string().parse(userId)),
+      isNull(users.deletedAt),
+    ),
+  });
+  return user || null;
 }
 
 export const profileVisible = async (

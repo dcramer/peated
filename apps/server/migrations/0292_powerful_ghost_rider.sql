@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "deletion_requested_at" timestamp;

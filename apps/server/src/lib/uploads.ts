@@ -31,10 +31,11 @@ function getGcsBucketName(): string {
   return config.GCS_BUCKET_NAME;
 }
 
-function filenameFromUploadUrl(imageUrl: string): string {
+/** Returns the stored filename for an upload URL, or null for other URLs. */
+function uploadFilename(imageUrl: string): string | null {
   const pathname = new URL(imageUrl, "https://peated.invalid").pathname;
   if (!pathname.startsWith("/uploads/")) {
-    throw new Error("Image URL is not an upload URL.");
+    return null;
   }
 
   const filename = decodeURIComponent(pathname.slice("/uploads/".length));
@@ -49,6 +50,28 @@ function filenameFromUploadUrl(imageUrl: string): string {
     throw new Error("Image URL has an invalid upload path.");
   }
   return filename;
+}
+
+function filenameFromUploadUrl(imageUrl: string): string {
+  const filename = uploadFilename(imageUrl);
+  if (filename === null) {
+    throw new Error("Image URL is not an upload URL.");
+  }
+  return filename;
+}
+
+/**
+ * Removes a stored upload by its `/uploads/...` URL. Returns false without
+ * touching storage when the URL points somewhere else, such as a provider
+ * avatar.
+ */
+export async function deleteUploadByUrl(imageUrl: string): Promise<boolean> {
+  const filename = uploadFilename(imageUrl);
+  if (filename === null) {
+    return false;
+  }
+  await deleteFile({ filename });
+  return true;
 }
 
 /** Reads one server-owned upload into the model image-input format. */

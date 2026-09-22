@@ -5,6 +5,7 @@ import config from "../config";
 import { db } from "../db";
 import type { User } from "../db/schema";
 import { follows } from "../db/schema";
+import { getDeletionScheduledAt } from "../lib/accountDeletion";
 import { absoluteUrl } from "../lib/urls";
 import { type UserSchema } from "../schemas";
 
@@ -63,6 +64,7 @@ export const UserSerializer = serializer({
       user.mod = item.admin || item.mod;
       user.notifyComments = item.notifyComments ?? false;
       user.termsAcceptedAt = item.termsAcceptedAt?.toISOString();
+      user.deletionScheduledAt = getDeletionScheduledAt(item)?.toISOString();
     }
     return user;
   },

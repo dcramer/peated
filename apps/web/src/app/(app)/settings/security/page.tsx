@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountDeletionSection } from "@peated/web/components/accountDeletionSection";
 import { Button } from "@peated/web/components/button.stylex";
 import { Field, TextInput } from "@peated/web/components/field.stylex";
 import {
@@ -9,13 +10,20 @@ import {
   FormStack,
 } from "@peated/web/components/formLayout.stylex";
 import PasskeyManager from "@peated/web/components/passkeyManager";
+import useAuth from "@peated/web/hooks/useAuth";
+import { updateSession } from "@peated/web/lib/auth.actions";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 
 export default function SecuritySettingsPage() {
   const orpc = useORPC();
+  const { user, setUser } = useAuth();
   const updateUser = useMutation(orpc.users.update.mutationOptions());
+  const deleteAccount = useMutation(orpc.users.delete.mutationOptions());
+  const cancelDeletion = useMutation(
+    orpc.users.deletionCancel.mutationOptions(),
+  );
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [message, setMessage] = useState<string>();
@@ -43,6 +51,16 @@ export default function SecuritySettingsPage() {
         caught instanceof Error ? caught.message : "Unable to update password.",
       );
     }
+  }
+
+  async function scheduleDeletion() {
+    setUser(await deleteAccount.mutateAsync({ user: "me" }));
+    await updateSession();
+  }
+
+  async function keepAccount() {
+    setUser(await cancelDeletion.mutateAsync({ user: "me" }));
+    await updateSession();
   }
 
   return (
@@ -98,6 +116,14 @@ export default function SecuritySettingsPage() {
       >
         <PasskeyManager />
       </FormSection>
+      {user ? (
+        <AccountDeletionSection
+          deletionScheduledAt={user.deletionScheduledAt}
+          onDelete={scheduleDeletion}
+          onKeep={keepAccount}
+          username={user.username}
+        />
+      ) : null}
     </FormStack>
   );
 }

@@ -6,7 +6,11 @@ import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import { notifyComment, sendMagicLinkEmail } from "./email";
+import {
+  notifyComment,
+  sendAccountDeletionEmail,
+  sendMagicLinkEmail,
+} from "./email";
 
 let transport: Transporter<SMTPTransport.SentMessageInfo>;
 let outbox: Mail.Options[];
@@ -195,5 +199,35 @@ describe("sendMagicLinkEmail", () => {
       config.SMTP_USER = originalUser;
       config.SMTP_PASS = originalPass;
     }
+  });
+});
+
+describe("sendAccountDeletionEmail", () => {
+  test("tells the member when deletion runs and how to cancel", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ email: "joe@example.com" });
+    const originalUrlPrefix = config.URL_PREFIX;
+    config.URL_PREFIX = "https://peated.example";
+
+    try {
+      await sendAccountDeletionEmail({
+        user,
+        deletionScheduledAt: new Date("2026-09-22T18:00:00Z"),
+        transport,
+      });
+    } finally {
+      config.URL_PREFIX = originalUrlPrefix;
+    }
+
+    expect(outbox).toHaveLength(1);
+    expect(outbox[0]).toMatchObject({
+      to: "joe@example.com",
+      subject: "Your Peated account will be deleted",
+    });
+    expect(outbox[0].text).toContain("September 22, 2026 at 6:00 PM UTC");
+    expect(outbox[0].text).toContain(
+      "https://peated.example/settings/security",
+    );
   });
 });
