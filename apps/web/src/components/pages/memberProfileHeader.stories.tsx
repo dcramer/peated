@@ -52,3 +52,18 @@ export const Private: Story = {
     privateProfile: true,
   },
 };
+
+/** Staff and the member see the suspension; other members do not. */
+export const Suspended: Story = {
+  args: {
+    actions: <Button variant="accent">Add friend</Button>,
+    suspended: true,
+  },
+};
+
+/** The viewer blocked this member, so the friend action is gone. */
+export const Blocked: Story = {
+  args: {
+    blocked: true,
+  },
+};

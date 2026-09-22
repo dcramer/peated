@@ -74,18 +74,34 @@ function AccountIntro() {
   );
 }
 
+function SuspendedIntro() {
+  return (
+    <AuthenticationIntro
+      points={[
+        "Your tastings, reviews, and comments stay on the record unless a moderator removes them.",
+        "You can delete your account from here at any time.",
+        "Sign out and come back once a moderator reinstates you.",
+      ]}
+      title="Your account is on hold."
+    />
+  );
+}
+
+const intros = {
+  account: AccountIntro,
+  database: DatabaseIntro,
+  suspended: SuspendedIntro,
+};
+
 export function AuthenticationPage({
   children,
   intro,
 }: {
   children: ReactNode;
-  intro: "account" | "database";
+  intro: keyof typeof intros;
 }) {
+  const Intro = intros[intro];
   return (
-    <AuthenticationLayout
-      intro={intro === "database" ? <DatabaseIntro /> : <AccountIntro />}
-    >
-      {children}
-    </AuthenticationLayout>
+    <AuthenticationLayout intro={<Intro />}>{children}</AuthenticationLayout>
   );
 }

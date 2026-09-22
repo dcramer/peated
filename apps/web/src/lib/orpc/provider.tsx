@@ -7,27 +7,29 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentProps } from "react";
 import { useEffect, useRef, useState } from "react";
 import { ORPCContext } from "./context";
-import { getLink } from "./link";
+import { getLink, type AccountStateErrorCode } from "./link";
 import { getQueryClient } from "./query";
 
 export default function ORPCProvider({
   accessToken,
   apiServer,
-  onUnauthorized,
+  onAccountStateError,
   ...props
 }: {
   accessToken?: string | null;
   apiServer: string;
-  onUnauthorized?: () => boolean | Promise<boolean>;
+  onAccountStateError?: (
+    code: AccountStateErrorCode,
+  ) => boolean | Promise<boolean>;
 } & Omit<ComponentProps<typeof ORPCContext.Provider>, "value">) {
   const queryClient = getQueryClient(false);
   const traceData = getTraceData();
   const accessTokenRef = useRef(accessToken);
   const previousAccessTokenRef = useRef(accessToken);
-  const onUnauthorizedRef = useRef(onUnauthorized);
+  const onAccountStateErrorRef = useRef(onAccountStateError);
 
   accessTokenRef.current = accessToken;
-  onUnauthorizedRef.current = onUnauthorized;
+  onAccountStateErrorRef.current = onAccountStateError;
 
   useEffect(() => {
     if (previousAccessTokenRef.current !== accessToken) {
@@ -42,7 +44,8 @@ export default function ORPCProvider({
         apiServer,
         getAccessToken: () => accessTokenRef.current,
         userAgent: "@peated/web (orpc/tanstack-query)",
-        onUnauthorized: () => onUnauthorizedRef.current?.() ?? false,
+        onAccountStateError: (code) =>
+          onAccountStateErrorRef.current?.(code) ?? false,
         traceContext: {
           sentryTrace: traceData["sentry-trace"],
           baggage: traceData.baggage,

@@ -8,7 +8,7 @@ export default async function Page({
 }) {
   const { kind, eventId } = await params;
   if (
-    !["incoming", "operation", "closure"].includes(kind) ||
+    !["incoming", "operation", "closure", "report"].includes(kind) ||
     !/^\d+$/.test(eventId)
   )
     notFound();

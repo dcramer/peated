@@ -21,6 +21,17 @@ export const errorDefinitions = {
     statusCode: 403,
     error: "Forbidden",
   },
+  // A suspended member's token; clients send the member to the suspension
+  // screen. See docs/architecture/account-access.md.
+  ACCOUNT_SUSPENDED: {
+    message:
+      "Your account is suspended. You can only delete your account or cancel a pending deletion.",
+    // Custom codes need an explicit status; oRPC only infers it for standard
+    // code names.
+    status: 403,
+    statusCode: 403,
+    error: "Account Suspended",
+  },
   INTERNAL_SERVER_ERROR: {
     message: "Internal server error.",
     statusCode: 500,

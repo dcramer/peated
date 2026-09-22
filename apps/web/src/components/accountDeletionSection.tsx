@@ -138,7 +138,7 @@ export function AccountDeletionSection({
         continueLabel="Delete my account"
         error={deleteError}
         isOpen={confirming}
-        message="We'll delete your account in 24 hours. You can cancel from Settings until then. After that, your profile, tastings, reviews, comments, and collections are gone for good."
+        message="We'll delete your account in 24 hours. You can keep your account until then. After that, your profile, tastings, reviews, comments, and collections are gone for good."
         onCancel={() => setConfirming(false)}
         onContinue={() => void confirmDelete()}
         pending={deleting}

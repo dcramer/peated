@@ -68,6 +68,13 @@ describe("selectedInboxTask", () => {
     });
   });
 
+  test("reads a selected report task", () => {
+    expect(selectedInboxTask("/admin/moderation/inbox/report/5")).toEqual({
+      kind: "report",
+      id: 5,
+    });
+  });
+
   test("leaves the inbox unselected on list and invalid routes", () => {
     expect(selectedInboxTask("/admin/moderation/inbox")).toBeUndefined();
     expect(

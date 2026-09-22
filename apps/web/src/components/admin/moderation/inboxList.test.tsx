@@ -19,6 +19,20 @@ const operationTask = {
   source: { kind: "operation", checkId: 9, operationId: 22 },
 } satisfies Task;
 
+const reportTask = {
+  key: "report:5",
+  kind: "report",
+  category: "community",
+  state: "ready",
+  inconclusive: false,
+  title: "Comment by @islaydrinker",
+  sourceLabel: "Member report",
+  question: "Does this content break the rules?",
+  statusLabel: "Harassment or bullying",
+  attentionAt: "2026-08-12T08:00:00.000Z",
+  source: { kind: "report", reportId: 5 },
+} satisfies Task;
+
 const listingTask = {
   key: "listing:7",
   kind: "listing",
@@ -38,11 +52,12 @@ describe("Moderation Inbox list", () => {
     const html = renderToStaticMarkup(
       <InboxListContent
         data={{
-          results: [listingTask, operationTask],
+          results: [listingTask, operationTask, reportTask],
           counts: {
-            all: 2,
+            all: 3,
             listing: 1,
             catalog: 1,
+            community: 1,
             blocked: 1,
             inconclusive: 0,
           },
@@ -56,8 +71,10 @@ describe("Moderation Inbox list", () => {
 
     expect(html).toContain("Apply these changes to the brand or producer?");
     expect(html).toContain("How should this listing be resolved?");
+    expect(html).toContain("Does this content break the rules?");
     expect(html).toContain("Listings 1");
     expect(html).toContain("Catalog 1");
+    expect(html).toContain("Community 1");
     expect(html).toContain('aria-current="true"');
   });
 
@@ -72,6 +89,12 @@ describe("Moderation Inbox list", () => {
     );
   });
 
+  test("links report tasks by report ID", () => {
+    expect(inboxTaskHref(reportTask, new URLSearchParams())).toBe(
+      "/admin/moderation/inbox/report/5",
+    );
+  });
+
   test("renders page links without keeping a selected task in the path", () => {
     const html = renderToStaticMarkup(
       <InboxListContent
@@ -81,6 +104,7 @@ describe("Moderation Inbox list", () => {
             all: 201,
             listing: 201,
             catalog: 0,
+            community: 0,
             blocked: 1,
             inconclusive: 0,
           },

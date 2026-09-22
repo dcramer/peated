@@ -3,20 +3,20 @@ import {
   projectModerationTasks,
 } from "@peated/server/lib/moderationTasks";
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import {
   ModerationTaskListInputSchema,
   ModerationTaskListResponseSchema,
 } from "./schemas";
 
 export default procedure
-  .use(requireAdmin)
+  .use(requireMod)
   .route({
     method: "GET",
     path: "/admin/moderation/tasks",
     summary: "List moderation tasks",
     description:
-      "List pending moderation decisions for imported listings and catalog changes. Requires administrator privileges.",
+      "List pending moderation decisions for imported listings, catalog changes, and member reports. Requires a moderator or administrator.",
     operationId: "listModerationTasks",
   })
   .input(ModerationTaskListInputSchema)
@@ -33,6 +33,8 @@ export default procedure
         listing: allTasks.filter(({ category }) => category === "listing")
           .length,
         catalog: allTasks.filter(({ category }) => category === "catalog")
+          .length,
+        community: allTasks.filter(({ category }) => category === "community")
           .length,
         blocked: allTasks.filter(({ state }) => state === "blocked").length,
         inconclusive: allTasks.filter(({ inconclusive }) => inconclusive)

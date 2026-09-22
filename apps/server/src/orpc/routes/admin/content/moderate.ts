@@ -8,7 +8,7 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import {
   AdminContentItemSchema,
   AdminContentModerationInputSchema,
@@ -18,13 +18,13 @@ import { dispatchTastingStatsRecompute } from "../../tastings/dispatchStatsRecom
 import { contentDisplayName, getAdminContent } from "./data";
 
 export default procedure
-  .use(requireAdmin)
+  .use(requireMod)
   .route({
     method: "PUT",
     path: "/admin/content/{kind}/{id}/moderation",
     summary: "Remove or restore review or tasting content",
     description:
-      "Remove content from Peated or restore it. Requires an administrator and a reason.",
+      "Remove content from Peated or restore it. Requires a moderator or administrator and a reason.",
     operationId: "moderateAdminContent",
   })
   .input(AdminContentModerationInputSchema)

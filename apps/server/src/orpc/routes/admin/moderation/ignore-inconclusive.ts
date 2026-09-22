@@ -1,17 +1,17 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import { ignoreInconclusiveStorePriceMatchProposals } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
 
 export default procedure
-  .use(requireAdmin)
+  .use(requireMod)
   .route({
     method: "POST",
     path: "/admin/moderation/listings/inconclusive/ignore",
     summary: "Ignore inconclusive listing proposals",
     description:
-      "Ignore every visible, actionable no-match listing proposal. Requires administrator privileges.",
+      "Ignore every visible, actionable no-match listing proposal. Requires a moderator or administrator.",
     operationId: "ignoreInconclusiveModerationListings",
   })
   .input(z.object({}).strict().default({}))

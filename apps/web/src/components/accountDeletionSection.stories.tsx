@@ -36,12 +36,10 @@ type Story = StoryObj<typeof meta>;
 /** Nothing scheduled. Delete account opens the typed confirmation. */
 export const Overview: Story = {};
 
-/** A deletion is pending; Keep my account cancels it. */
+/** A deletion is pending; Keep my account cancels it. Fixed date so screenshots stay stable. */
 export const Pending: Story = {
   args: {
-    deletionScheduledAt: new Date(
-      Date.now() + 24 * 60 * 60 * 1000,
-    ).toISOString(),
+    deletionScheduledAt: "2026-10-01T18:00:00.000Z",
   },
 };
 

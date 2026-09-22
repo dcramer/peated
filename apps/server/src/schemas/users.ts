@@ -64,9 +64,29 @@ export const UserSchema = z.object({
     .describe(
       "When the account will be deleted, if the member requested deletion. Only shown to the member.",
     ),
+  suspendedAt: z
+    .string()
+    .datetime()
+    .optional()
+    .readonly()
+    .describe(
+      "When a moderator suspended the account. Shown to the member and to staff.",
+    ),
+  suspensionReason: z
+    .string()
+    .optional()
+    .readonly()
+    .describe(
+      "Why the account is suspended. Shown to the member and to staff.",
+    ),
   friendStatus: FriendStatusEnum.optional()
     .readonly()
     .describe("Friendship status with the current user"),
+  blocked: z
+    .boolean()
+    .optional()
+    .readonly()
+    .describe("Whether the current user has blocked this member."),
 });
 
 export const UserInputSchema = UserSchema.omit({
@@ -75,6 +95,9 @@ export const UserInputSchema = UserSchema.omit({
   createdAt: true,
   friendStatus: true,
   deletionScheduledAt: true,
+  suspendedAt: true,
+  suspensionReason: true,
+  blocked: true,
 }).extend({
   password: z
     .string()

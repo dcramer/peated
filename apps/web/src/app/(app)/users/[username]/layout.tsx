@@ -89,6 +89,7 @@ export default async function ProfileLayout({
       <ProfileLayoutClient
         currentUserAdmin={Boolean(currentUser?.admin)}
         currentUserId={currentUser?.id}
+        currentUserStaff={Boolean(currentUser?.admin || currentUser?.mod)}
         initialUser={user}
         privateRecord={privateRecord}
       >

@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { follows, users } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
+import { hasBlockBetween } from "@peated/server/lib/userBlocks";
 import { implement } from "@peated/server/orpc";
 import friendCreateContract from "@peated/server/orpc/contracts/friends/create";
 import {
@@ -8,7 +9,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
 import type { FriendStatus } from "@peated/server/types";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 
 export default implement(friendCreateContract)
   .use(requireAuth)
@@ -22,11 +23,20 @@ export default implement(friendCreateContract)
       });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.id, userId), isNull(users.deletedAt)));
 
     if (!user) {
       throw errors.NOT_FOUND({
         message: "User not found.",
+      });
+    }
+
+    if (await hasBlockBetween(db, context.user.id, user.id)) {
+      throw errors.FORBIDDEN({
+        message: "You cannot send this member a friend request.",
       });
     }
 

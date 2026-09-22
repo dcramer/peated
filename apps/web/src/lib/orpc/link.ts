@@ -5,8 +5,23 @@ import sentryInterceptor from "@peated/orpc/client/interceptors";
 
 type ClientErrorCandidate = Parameters<typeof isORPCClientError>[0];
 
-class ORPCUnauthorizedRedirectError extends Error {
-  name = "ORPCUnauthorizedRedirectError";
+/** Thrown in place of the API error once the member has been sent elsewhere. */
+class ORPCAccountRedirectError extends Error {
+  name = "ORPCAccountRedirectError";
+}
+
+/** API errors that mean the member's account state changed under them. */
+export type AccountStateErrorCode = "UNAUTHORIZED" | "ACCOUNT_SUSPENDED";
+
+export function getAccountStateErrorCode(
+  error: ClientErrorCandidate,
+): AccountStateErrorCode | null {
+  if (!isORPCClientError(error)) return null;
+  if (error.code === "ACCOUNT_SUSPENDED") return "ACCOUNT_SUSPENDED";
+  if (error.status === 401 || error.code === "UNAUTHORIZED") {
+    return "UNAUTHORIZED";
+  }
+  return null;
 }
 
 export type ORPCResponseTraceContext = {
@@ -41,12 +56,12 @@ function parseSentryTraceId(traceId: string | null): string | null {
   return traceId && SENTRY_TRACE_ID_PATTERN.test(traceId) ? traceId : null;
 }
 
-export function isORPCUnauthorizedRedirectError(
+export function isORPCAccountRedirectError(
   error: ClientErrorCandidate,
-): error is ORPCUnauthorizedRedirectError {
+): error is ORPCAccountRedirectError {
   return (
-    error instanceof ORPCUnauthorizedRedirectError ||
-    (error instanceof Error && error.name === "ORPCUnauthorizedRedirectError")
+    error instanceof ORPCAccountRedirectError ||
+    (error instanceof Error && error.name === "ORPCAccountRedirectError")
   );
 }
 
@@ -54,7 +69,7 @@ export function getLink({
   apiServer,
   accessToken,
   getAccessToken,
-  onUnauthorized,
+  onAccountStateError,
   batch,
   userAgent,
   traceContext,
@@ -62,7 +77,14 @@ export function getLink({
   apiServer: string;
   accessToken?: string | null;
   getAccessToken?: () => string | null | undefined;
-  onUnauthorized?: () => boolean | Promise<boolean>;
+  /**
+   * Called when the API reports an account-state change. Return true after
+   * sending the member elsewhere; the request then fails with a redirect
+   * error instead of the API error.
+   */
+  onAccountStateError?: (
+    code: AccountStateErrorCode,
+  ) => boolean | Promise<boolean>;
   batch?: boolean;
   userAgent: string;
   traceContext?: {
@@ -102,13 +124,9 @@ export function getLink({
         try {
           return await next(options);
         } catch (err) {
-          if (
-            isORPCClientError(err) &&
-            (err.status === 401 || err.name === "UNAUTHORIZED")
-          ) {
-            if (await onUnauthorized?.()) {
-              throw new ORPCUnauthorizedRedirectError();
-            }
+          const code = getAccountStateErrorCode(err);
+          if (code && (await onAccountStateError?.(code))) {
+            throw new ORPCAccountRedirectError();
           }
           throw err;
         }

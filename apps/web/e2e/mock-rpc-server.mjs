@@ -720,6 +720,7 @@ async function handleRpcRequest({ request, response, url }) {
             all: tasks.length,
             listing: tasks.length,
             catalog: 0,
+            community: 0,
             blocked: 0,
             inconclusive: tasks.length,
           },
@@ -738,6 +739,7 @@ async function handleRpcRequest({ request, response, url }) {
           all: task ? 1 : 0,
           listing: task ? 1 : 0,
           catalog: 0,
+          community: 0,
           blocked: 0,
           inconclusive: 0,
         },
@@ -1429,6 +1431,20 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       sendRpcResponse(response, buildTasting());
+      return true;
+    case "auth/me":
+      if (getAccessToken(request).includes("photo-unauthorized-expired")) {
+        sendRpcUnauthorized(response);
+        return true;
+      }
+      sendRpcResponse(response, {
+        user: {
+          ...testUser,
+          mod:
+            userModeratorStateByToken.get(getAccessToken(request)) ??
+            testUser.mod,
+        },
+      });
       return true;
     case "users/details":
       if (getAccessToken(request).includes("photo-unauthorized-expired")) {

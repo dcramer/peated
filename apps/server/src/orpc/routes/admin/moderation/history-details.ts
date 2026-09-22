@@ -6,14 +6,19 @@ import {
   incomingBottleDecisionLogs,
   users,
 } from "@peated/server/db/schema";
+import { describeReportSubject } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
+import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { getAdminReport } from "../reports/data";
 import { ModerationHistoryDetailsSchema } from "./schemas";
 
 const InputSchema = z
-  .object({ key: z.string().regex(/^(incoming|operation|closure):\d+$/) })
+  .object({
+    key: z.string().regex(/^(incoming|operation|closure|report):\d+$/),
+  })
   .strict();
 
 function operationTitle(
@@ -47,13 +52,13 @@ function operationResourceUrl(
 }
 
 export default procedure
-  .use(requireAdmin)
+  .use(requireMod)
   .route({
     method: "GET",
     path: "/admin/moderation/history/{key}",
     summary: "Get moderation history details",
     description:
-      "Get the recorded evidence, status, and activity for a moderation event. Requires administrator privileges.",
+      "Get the recorded evidence, status, and activity for a moderation event. Requires a moderator or administrator.",
     operationId: "getModerationHistoryDetails",
   })
   .input(InputSchema)
@@ -101,6 +106,43 @@ export default procedure
             label: "Decision recorded",
             occurredAt: log.createdAt.toISOString(),
           },
+        ],
+      };
+    }
+
+    if (kind === "report") {
+      const report = await getAdminReport(id);
+      if (!report?.closedAt) {
+        throw errors.NOT_FOUND({ message: "History event not found." });
+      }
+      return {
+        event: {
+          key: input.key,
+          kind: "report",
+          category: "community",
+          title: describeReportSubject(
+            report.objectType,
+            report.reportedUser.username,
+          ),
+          outcome: report.status,
+          actor: report.closedBy?.username ?? null,
+          occurredAt: report.closedAt,
+        },
+        sourceUrl: null,
+        resourceUrl: report.contentUrl,
+        rationale: report.comment,
+        note: report.closeNote,
+        details: {
+          reportId: report.id,
+          objectType: report.objectType,
+          objectId: report.objectId,
+          reason: REPORT_REASON_LABELS[report.reason],
+          reportedBy: report.createdBy.username,
+          reportedUser: report.reportedUser.username,
+        },
+        activity: [
+          { label: "Report sent", occurredAt: report.createdAt },
+          { label: "Report closed", occurredAt: report.closedAt },
         ],
       };
     }

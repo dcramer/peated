@@ -2,7 +2,11 @@ import { createServer, type Server, type ServerResponse } from "node:http";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { createORPCResponseTraceContext, getLink } from "./link";
+import {
+  createORPCResponseTraceContext,
+  getLink,
+  isORPCAccountRedirectError,
+} from "./link";
 
 describe("oRPC response trace context", () => {
   let server: Server | null = null;
@@ -87,6 +91,85 @@ describe("oRPC response trace context", () => {
     expect(traceContext.sentryTraceId).toBeNull();
   });
 });
+
+describe("oRPC account-state errors", () => {
+  let server: Server | null = null;
+
+  afterEach(async () => {
+    if (!server) return;
+    await new Promise<void>((resolve, reject) => {
+      server?.close((err) => (err ? reject(err) : resolve()));
+    });
+    server = null;
+  });
+
+  it("hands suspension and sign-out errors to the handler and replaces them once handled", async () => {
+    const statuses = [403, 401];
+    server = createServer((_req, res) => {
+      const status = statuses.shift() ?? 401;
+      writeRpcError(
+        res,
+        status,
+        status === 403 ? "ACCOUNT_SUSPENDED" : "UNAUTHORIZED",
+      );
+    });
+    const apiServer = await listen(server);
+    const seen: string[] = [];
+    const link = getLink({
+      apiServer,
+      userAgent: "@peated/web (test)",
+      onAccountStateError: (code) => {
+        seen.push(code);
+        return code === "ACCOUNT_SUSPENDED";
+      },
+    });
+
+    const suspended = await failure(link.call(["first"], {}, { context: {} }));
+    expect(isORPCAccountRedirectError(suspended)).toBe(true);
+
+    const unauthorized = await failure(
+      link.call(["second"], {}, { context: {} }),
+    );
+    expect(isORPCAccountRedirectError(unauthorized)).toBe(false);
+    expect(unauthorized).toMatchObject({ code: "UNAUTHORIZED" });
+    expect(seen).toEqual(["ACCOUNT_SUSPENDED", "UNAUTHORIZED"]);
+  });
+
+  it("leaves other errors alone", async () => {
+    server = createServer((_req, res) => writeRpcError(res, 404, "NOT_FOUND"));
+    const apiServer = await listen(server);
+    const seen: string[] = [];
+    const link = getLink({
+      apiServer,
+      userAgent: "@peated/web (test)",
+      onAccountStateError: (code) => {
+        seen.push(code);
+        return true;
+      },
+    });
+
+    const error = await failure(link.call(["missing"], {}, { context: {} }));
+    expect(error).toMatchObject({ code: "NOT_FOUND" });
+    expect(seen).toEqual([]);
+  });
+});
+
+/** Resolves with the rejection, or null when the call succeeded. */
+function failure(call: Promise<unknown>): Promise<Error | null> {
+  return call.then(
+    () => null,
+    (error: Error) => error,
+  );
+}
+
+function writeRpcError(response: ServerResponse, status: number, code: string) {
+  response.writeHead(status, { "Content-Type": "application/json" });
+  response.end(
+    JSON.stringify({
+      json: { defined: true, code, status, message: `${code}.` },
+    }),
+  );
+}
 
 async function listen(server: Server) {
   await new Promise<void>((resolve, reject) => {

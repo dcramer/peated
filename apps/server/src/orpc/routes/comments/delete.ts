@@ -53,7 +53,11 @@ export default procedure
       });
     }
 
-    if (comment.createdById !== context.user.id && !context.user.admin) {
+    if (
+      comment.createdById !== context.user.id &&
+      !context.user.admin &&
+      !context.user.mod
+    ) {
       throw errors.FORBIDDEN({
         message: "Cannot delete another user's comment.",
       });

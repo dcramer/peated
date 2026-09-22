@@ -131,7 +131,11 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
     limit: 100,
   };
   if (query) input.query = query;
-  if (category === "listing" || category === "catalog")
+  if (
+    category === "listing" ||
+    category === "catalog" ||
+    category === "community"
+  )
     input.category = category;
   if (actor) input.actor = actor;
   if (outcome) input.outcome = outcome;
@@ -157,6 +161,7 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
               { value: "", label: "All work" },
               { value: "listing", label: "Listings" },
               { value: "catalog", label: "Catalog" },
+              { value: "community", label: "Community" },
             ]}
           />
           <AdminTextField

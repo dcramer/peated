@@ -44,6 +44,7 @@ const inboxCounts = {
   all: 23,
   listing: 18,
   catalog: 5,
+  community: 0,
   blocked: 2,
   inconclusive: 7,
 };

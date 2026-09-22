@@ -18,7 +18,11 @@ import {
 } from "@peated/web/components/field.stylex";
 import { ItemList, ItemRow } from "@peated/web/components/itemList.stylex";
 import { MemberAvatar } from "@peated/web/components/memberAvatar";
-import { RowMenu } from "@peated/web/components/rowMenu.stylex";
+import { ReportContentDialog } from "@peated/web/components/reportContentDialog";
+import {
+  RowMenu,
+  type RowMenuItem,
+} from "@peated/web/components/rowMenu.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -37,6 +41,7 @@ export function TastingComments({
   const { user } = useAuth();
   const [newComments, setNewComments] = useState<Comment[]>([]);
   const [deleted, setDeleted] = useState<number[]>([]);
+  const [reporting, setReporting] = useState<number | null>(null);
   const [comment, setComment] = useState("");
   const commentList = useQuery({
     ...orpc.comments.list.queryOptions({ input: { tasting: tastingId } }),
@@ -123,26 +128,35 @@ export function TastingComments({
       ) : comments.length ? (
         <ItemList ariaLabel="Tasting comments">
           {comments.map((item) => {
-            const canDelete = Boolean(
-              user?.admin || user?.id === item.createdBy.id,
-            );
+            const isOwner = user?.id === item.createdBy.id;
+            const canDelete = Boolean(user?.admin || user?.mod || isOwner);
+            const groups: RowMenuItem[][] = [];
+            if (canDelete) {
+              groups.push([
+                {
+                  disabled: deleteComment.isPending,
+                  label: "Delete comment",
+                  onSelect: () => {
+                    deleteComment.mutate({ comment: item.id });
+                    setDeleted((ids) => [...ids, item.id]);
+                  },
+                },
+              ]);
+            }
+            if (user && !isOwner) {
+              groups.push([
+                {
+                  label: "Report comment",
+                  onSelect: () => setReporting(item.id),
+                },
+              ]);
+            }
             return (
               <ItemRow
                 action={
-                  canDelete ? (
+                  groups.length ? (
                     <RowMenu
-                      groups={[
-                        [
-                          {
-                            disabled: deleteComment.isPending,
-                            label: "Delete comment",
-                            onSelect: () => {
-                              deleteComment.mutate({ comment: item.id });
-                              setDeleted((ids) => [...ids, item.id]);
-                            },
-                          },
-                        ],
-                      ]}
+                      groups={groups}
                       label={`${item.createdBy.username}'s comment`}
                     />
                   ) : undefined
@@ -162,6 +176,14 @@ export function TastingComments({
             );
           })}
         </ItemList>
+      ) : null}
+      {reporting !== null ? (
+        <ReportContentDialog
+          isOpen
+          onClose={() => setReporting(null)}
+          subject="this comment"
+          target={{ objectType: "comment", objectId: reporting }}
+        />
       ) : null}
     </div>
   );

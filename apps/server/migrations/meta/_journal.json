@@ -2052,6 +2052,13 @@
       "when": 1790031028451,
       "tag": "0292_powerful_ghost_rider",
       "breakpoints": false
+    },
+    {
+      "idx": 293,
+      "version": "7",
+      "when": 1790044255481,
+      "tag": "0293_next_night_nurse",
+      "breakpoints": false
     }
   ]
 }

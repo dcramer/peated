@@ -77,6 +77,35 @@ after 10 minutes; access tokens expire after 7 days.
 Tokens without a purpose are rejected. When this check is first deployed,
 users must sign in again and request new emailed links.
 
+## Suspension
+
+Moderators and administrators suspend a member with
+`PUT /users/{user}/suspension`. A suspension needs a reason. Administrators
+cannot be suspended, only an administrator can suspend a moderator, and nobody
+can suspend themselves. The same route lifts a suspension.
+
+`users.suspendedAt`, `users.suspendedById`, and `users.suspensionReason`
+record the suspension. A suspended member can do three things: read their own
+account (`GET /auth/me`), delete it (`DELETE /users/me`), and cancel a pending
+deletion (`DELETE /users/me/deletion`). Every other request made with their
+token, including reads, is rejected with the `ACCOUNT_SUSPENDED` error (HTTP
+403). Clients treat that code like an expired token: refresh the account and
+send the member to the suspension screen.
+Account recovery by email stays available. Their existing tastings, reviews,
+and comments stay visible unless a moderator removes them individually.
+
+The router applies this lockout to every route through one middleware with an
+allowlist, so individual routes do not repeat the check. The member and staff
+see `suspendedAt` and `suspensionReason` on the serialized user; other members
+do not. The web app sends a suspended member to `/auth/suspended`, which
+explains the suspension and offers deletion, cancellation, and sign-out. The
+web client's account-state handler reacts to `UNAUTHORIZED` and
+`ACCOUNT_SUSPENDED` responses the same way: it refreshes the session and
+routes on the result, so a member suspended or deleted mid-session is moved
+on their next request rather than at the next hourly refresh.
+
+See `docs/features/reports-and-blocks.md` for how reports lead to suspension.
+
 ## Account Deletion
 
 Members delete their own accounts with `DELETE /users/me`. The route needs
@@ -117,8 +146,8 @@ transaction:
   a moderator already removed keeps its original removal record. Their images
   are removed.
 - Everything else the member owns is deleted: comments and toasts left on
-  tastings (with counters adjusted), collections, flights, follows, badge
-  awards, notifications, pending uploads, sign-in identities, passkeys, and
+  tastings (with counters adjusted), collections, flights, follows, blocks,
+  badge awards, notifications, pending uploads, sign-in identities, passkeys, and
   OAuth grants. Friend tags naming the member are cleared from other members'
   tastings and reviews. Other members' tastings that used one of the member's
   flights keep the tasting and lose the flight link.
@@ -154,7 +183,11 @@ member removes it in their Apple ID settings. Revocation needs
   `apps/server/src/orpc/routes/users/delete.ts`,
   `apps/server/src/orpc/routes/users/deletion-cancel.ts`, and the
   `ProcessAccountDeletions` worker job
-- authentication middleware: `apps/server/src/orpc/middleware/auth.ts`
+- authentication and terms middleware: `apps/server/src/orpc/middleware/auth.ts`
+- suspension lockout: `apps/server/src/orpc/middleware/suspension.ts`, applied
+  in `apps/server/src/orpc/index.ts`
+- suspension route: `apps/server/src/orpc/routes/users/suspension-update.ts`
+- web interstitial: `apps/web/src/app/(layout-free)/auth/suspended/`
 - acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
 - registration and authentication: `apps/server/src/orpc/routes/auth/`
 - web acceptance prompts: `apps/web/src/components/pendingTosAlert.tsx` and the

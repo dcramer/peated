@@ -45,7 +45,9 @@ export function inboxTaskHref(
       ? task.source.proposalId
       : task.source.kind === "operation"
         ? task.source.operationId
-        : task.source.checkId;
+        : task.source.kind === "report"
+          ? task.source.reportId
+          : task.source.checkId;
   const href = `/admin/moderation/inbox/${task.kind}/${id}`;
   return query ? `${href}?${query}` : href;
 }
@@ -143,6 +145,11 @@ export function ModerationInboxContent({
       label: `Catalog ${data.counts.catalog}`,
       active: category === "catalog",
       href: filterHref({ category: "catalog", inconclusive: null }),
+    },
+    {
+      label: `Community ${data.counts.community}`,
+      active: category === "community",
+      href: filterHref({ category: "community", inconclusive: null }),
     },
     {
       label: `Inconclusive ${data.counts.inconclusive}`,

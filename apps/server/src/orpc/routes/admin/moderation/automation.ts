@@ -8,7 +8,7 @@ import {
   storePriceMatchRetryRuns,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import { FAILED_JOB_RETENTION_MS, getQueue } from "@peated/server/worker/queue";
 import {
   and,
@@ -126,13 +126,13 @@ export function createModerationAutomationProcedure(
   getQueueState: ModerationQueueLoader = loadQueueState,
 ) {
   return procedure
-    .use(requireAdmin)
+    .use(requireMod)
     .route({
       method: "GET",
       path: "/admin/moderation/automation",
       summary: "Get moderation automation overview",
       description:
-        "Read bounded processing, retry, and post-decision recovery state. Requires administrator privileges.",
+        "Read bounded processing, retry, and post-decision recovery state. Requires a moderator or administrator.",
       operationId: "getModerationAutomation",
     })
     .output(ModerationAutomationResponseSchema)

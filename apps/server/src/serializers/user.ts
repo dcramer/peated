@@ -4,7 +4,7 @@ import { serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { User } from "../db/schema";
-import { follows } from "../db/schema";
+import { follows, userBlocks } from "../db/schema";
 import { getDeletionScheduledAt } from "../lib/accountDeletion";
 import { absoluteUrl } from "../lib/urls";
 import { type UserSchema } from "../schemas";
@@ -31,12 +31,32 @@ export const UserSerializer = serializer({
         )
       : {};
 
+    const blockedIds = currentUser
+      ? new Set(
+          (
+            await db
+              .select({ blockedUserId: userBlocks.blockedUserId })
+              .from(userBlocks)
+              .where(
+                and(
+                  eq(userBlocks.userId, currentUser.id),
+                  inArray(
+                    userBlocks.blockedUserId,
+                    itemList.map((i) => i.id),
+                  ),
+                ),
+              )
+          ).map((b) => b.blockedUserId),
+        )
+      : new Set<number>();
+
     return Object.fromEntries(
       itemList.map((item) => {
         return [
           item.id,
           {
             friendStatus: followsByRef[item.id]?.status || "none",
+            blocked: blockedIds.has(item.id),
           },
         ];
       }),
@@ -53,6 +73,9 @@ export const UserSerializer = serializer({
         attrs.friendStatus === "following" ? "friends" : attrs.friendStatus,
       private: item.private,
     };
+    if (currentUser && currentUser.id !== item.id) {
+      user.blocked = attrs.blocked;
+    }
     if (
       currentUser &&
       (currentUser.admin || currentUser.mod || currentUser.id === item.id)
@@ -65,6 +88,8 @@ export const UserSerializer = serializer({
       user.notifyComments = item.notifyComments ?? false;
       user.termsAcceptedAt = item.termsAcceptedAt?.toISOString();
       user.deletionScheduledAt = getDeletionScheduledAt(item)?.toISOString();
+      user.suspendedAt = item.suspendedAt?.toISOString();
+      user.suspensionReason = item.suspensionReason ?? undefined;
     }
     return user;
   },

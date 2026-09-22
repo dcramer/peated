@@ -41,13 +41,20 @@ export function nextTaskAfterCompletion<Task extends { key: string }>(
 
 export function selectedInboxTask(
   pathname: string,
-): { kind: "listing" | "operation" | "finding"; id: number } | undefined {
+):
+  | { kind: "listing" | "operation" | "finding" | "report"; id: number }
+  | undefined {
   const match = pathname.match(
-    /^\/admin\/moderation\/inbox\/(listing|operation|finding)\/(\d+)\/?$/,
+    /^\/admin\/moderation\/inbox\/(listing|operation|finding|report)\/(\d+)\/?$/,
   );
   if (!match) return undefined;
   const kind = match[1];
-  if (kind !== "listing" && kind !== "operation" && kind !== "finding") {
+  if (
+    kind !== "listing" &&
+    kind !== "operation" &&
+    kind !== "finding" &&
+    kind !== "report"
+  ) {
     return undefined;
   }
 
@@ -89,7 +96,11 @@ export default function InboxPage() {
     limit: 100,
   };
   if (query) input.query = query;
-  if (category === "listing" || category === "catalog") {
+  if (
+    category === "listing" ||
+    category === "catalog" ||
+    category === "community"
+  ) {
     input.category = category;
   }
   if (searchParams.get("blocked") === "true") input.blocked = true;

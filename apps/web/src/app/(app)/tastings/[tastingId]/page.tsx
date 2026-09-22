@@ -54,13 +54,7 @@ export default async function TastingPage(props: {
           dangerouslySetInnerHTML={{ __html: structuredData }}
         />
       )}
-      <TastingDetail
-        canManage={
-          currentUser?.id === tasting.createdBy.id ||
-          Boolean(currentUser?.admin)
-        }
-        tasting={tasting}
-      />
+      <TastingDetail signedIn={Boolean(currentUser)} tasting={tasting} />
       <div id="comments">
         <PageSection heading="Comments">
           <TastingComments tastingId={tasting.id} />

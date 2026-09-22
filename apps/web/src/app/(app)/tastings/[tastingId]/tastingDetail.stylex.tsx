@@ -12,10 +12,10 @@ type MemberReviewList = Outputs["memberReviews"]["list"]["results"];
 type ExternalReviewList = Outputs["externalReviews"]["list"]["results"];
 
 export function TastingDetail({
-  canManage,
+  signedIn,
   tasting,
 }: {
-  canManage: boolean;
+  signedIn: boolean;
   tasting: Tasting;
 }) {
   return (
@@ -33,7 +33,7 @@ export function TastingDetail({
         />
       }
       friends={tasting.friends}
-      menu={canManage ? <TastingActions tasting={tasting} /> : undefined}
+      menu={signedIn ? <TastingActions tasting={tasting} /> : undefined}
       notes={tasting.notes}
       photoUrl={tasting.imageUrl}
       rating={{ kind: "tasting", ratingBand: tasting.ratingBand }}
