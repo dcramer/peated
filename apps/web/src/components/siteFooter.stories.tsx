@@ -40,7 +40,10 @@ const meta = {
     coverage:
       "47,402 bottles · 3,102 distilleries · 1,891 brands · 431 bottlers · 312,000 reviews",
     groups,
-    legalLinks: [{ href: "/terms", label: "Terms" }],
+    legalLinks: [
+      { href: "/terms", label: "Terms" },
+      { href: "/privacy", label: "Privacy" },
+    ],
     provenance: "Edited by members · corrections welcome",
     responsibility: "Drink responsibly",
     statement:

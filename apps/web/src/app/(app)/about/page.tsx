@@ -60,6 +60,7 @@ export default async function AboutRoute() {
               />
               <RailListItem href="/updates" title="Recent changes" />
               <RailListItem href="/terms" title="Terms" />
+              <RailListItem href="/privacy" title="Privacy" />
             </RailList>
           </RailSection>
         </>

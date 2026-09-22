@@ -2,7 +2,6 @@ import { describe, expect, test } from "vitest";
 import { GenerateBottleDetailsJobArgsSchema } from "./generateBottleDetails";
 import { IndexBottleReferenceJobArgsSchema } from "./indexBottleReference";
 import { IndexBottleSearchVectorsJobArgsSchema } from "./indexBottleSearchVectors";
-import { NotifyDiscordOnTastingJobArgsSchema } from "./notifyDiscordOnTasting";
 import { OnBottleReferenceChangeJobArgsSchema } from "./onBottleReferenceChange";
 import { VerifyBottleCreationJobArgsSchema } from "./verifyBottleCreation";
 
@@ -12,7 +11,6 @@ describe("Bottle job payloads", () => {
     [IndexBottleSearchVectorsJobArgsSchema, { bottleId: 1 }],
     [IndexBottleReferenceJobArgsSchema, { name: "Direct Bottle Alias" }],
     [OnBottleReferenceChangeJobArgsSchema, { name: "Direct Bottle Alias" }],
-    [NotifyDiscordOnTastingJobArgsSchema, { tastingId: 1 }],
     [
       VerifyBottleCreationJobArgsSchema,
       { bottleId: 1, creationSource: "manual_entry" },
@@ -26,7 +24,6 @@ describe("Bottle job payloads", () => {
     [IndexBottleSearchVectorsJobArgsSchema, { bottleId: 1, groupId: 2 }],
     [IndexBottleReferenceJobArgsSchema, { name: "" }],
     [OnBottleReferenceChangeJobArgsSchema, { targetId: 1 }],
-    [NotifyDiscordOnTastingJobArgsSchema, { tastingId: 0 }],
     [
       VerifyBottleCreationJobArgsSchema,
       { bottleId: 1, creationSource: "legacy_release" },

@@ -12,5 +12,4 @@ export * from "./mocks";
 export * from "./prices";
 export * from "./regions";
 export * from "./scrapers";
-export * from "./tastings";
 export * from "./users";
