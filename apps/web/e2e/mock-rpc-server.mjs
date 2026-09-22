@@ -1433,6 +1433,10 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, buildTasting());
       return true;
     case "auth/me":
+      if (getAccessToken(request).includes("photo-unauthorized-expired")) {
+        sendRpcUnauthorized(response);
+        return true;
+      }
       sendRpcResponse(response, {
         user: {
           ...testUser,
