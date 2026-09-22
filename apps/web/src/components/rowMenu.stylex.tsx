@@ -213,6 +213,9 @@ const styles = stylex.create({
     top: 0,
     right: 0,
     display: "inline-flex",
+    // Clip the small control's hit-area pseudo-element. Headless UI forces
+    // `overflow: auto` on anchored panels, so 2px past the edge shows a scrollbar.
+    overflow: "hidden",
     pointerEvents: "none",
   },
   header: {
