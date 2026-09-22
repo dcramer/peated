@@ -28,7 +28,6 @@ import { serialize } from "@peated/server/serializers";
 import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq, inArray } from "drizzle-orm";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
@@ -181,18 +180,6 @@ export default implement(tastingCreateContract)
           },
           pendingUpload: {
             id: input.pendingImageId,
-          },
-        });
-      }
-    }
-
-    if (!context.user.private) {
-      try {
-        await pushJob("NotifyDiscordOnTasting", { tastingId: tasting.id });
-      } catch (err) {
-        logError(err, {
-          tasting: {
-            id: tasting.id,
           },
         });
       }

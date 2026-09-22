@@ -116,5 +116,4 @@ export default {
   PRICE_MATCH_RETRY_RUN_DELAY_MS: Number(
     process.env.PRICE_MATCH_RETRY_RUN_DELAY_MS || "30000",
   ),
-  DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };
