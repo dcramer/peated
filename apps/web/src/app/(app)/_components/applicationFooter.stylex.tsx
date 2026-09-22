@@ -58,7 +58,10 @@ export function ApplicationFooter({ stats }: { stats?: Outputs["stats"] }) {
     <SiteFooter
       coverage={coverage}
       groups={groups}
-      legalLinks={[{ href: "/terms", label: "Terms" }]}
+      legalLinks={[
+        { href: "/terms", label: "Terms" },
+        { href: "/privacy", label: "Privacy" },
+      ]}
       provenance="Edited by members · corrections welcome"
       responsibility="Drink responsibly"
       statement="A public record of whisky bottles, critic scores, and tasting notes from the people who drank them."
