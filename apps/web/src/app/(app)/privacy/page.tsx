@@ -37,9 +37,9 @@ export default function PrivacyPage() {
             reviews, comments, collections, and photos you attach to tastings.
           </li>
           <li>
-            <strong>Location.</strong> The mobile app may ask for your precise
-            location to suggest nearby places when you log a tasting. We do not
-            store your coordinates.
+            <strong>Location.</strong> If you add a place to a tasting, the app
+            may ask for your precise location to find places near you. We keep
+            the place you choose, not your location history.
           </li>
           <li>
             <strong>Diagnostics.</strong> Crash reports and performance data,
