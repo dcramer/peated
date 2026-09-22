@@ -1,8 +1,12 @@
 # Classifier eval baselines
 
-The [current 105-case Luna high baseline](./baselines/2026-09-03-luna-high-current.json)
+The [current 105-case GPT-6 Luna high baseline](./baselines/2026-09-22-gpt-6-luna-high-current.json)
 pins the source commit, test-case hashes, run settings, aggregate results, and
-raw report hash. The findings from the first fourteen experiments are summarized
+raw report hash. The [model comparison](./experiments/model-gpt-6-luna-2026-09-22.md)
+records the same-day GPT 5.6 Luna control, the changed cases, and the focused
+safety repeat. The earlier
+[105-case GPT 5.6 Luna high baseline](./baselines/2026-09-03-luna-high-current.json)
+remains the reference for the September experiments. The findings from the first fourteen experiments are summarized
 in the dated
 [research record](../../../docs/research/bottle-classifier-evaluation-2026-09.md).
 The comparison below is the earlier six-model-setting snapshot.
@@ -95,10 +99,14 @@ and reported token/cache usage, including image extraction. They exclude cases
 with missing usage, no-model cases, Firecrawl charges, and provider adjustments.
 The prices used per million tokens were:
 
-| Model | Input | Cache read | Cache write | Output |
-| ----- | ----: | ---------: | ----------: | -----: |
-| Terra | $2.00 |      $0.20 |       $2.50 | $12.00 |
-| Luna  | $0.20 |      $0.02 |       $0.25 |  $1.20 |
+| Model      | Input | Cache read | Cache write | Output |
+| ---------- | ----: | ---------: | ----------: | -----: |
+| Terra      | $2.00 |      $0.20 |       $2.50 | $12.00 |
+| Luna       | $0.20 |      $0.02 |       $0.25 |  $1.20 |
+| GPT-6 Luna | $0.10 |      $0.01 |      $0.125 |  $0.50 |
+
+GPT-6 Luna was released on 2026-09-22 and is priced separately in the later
+comparison.
 
 Web runs started with separate empty replay directories per setting. New web
 requests were live; identical requests could replay, including in repeats.
@@ -109,8 +117,10 @@ One run per setting does not establish that high is more accurate than xhigh.
 
 ## Accuracy experiments
 
-Use **Luna high** for the next experiments and keep image extraction on Luna
-high. Luna high is also the production default after this comparison. The
+The September experiments used **GPT 5.6 Luna high** for classification and
+image extraction, which was the production default after this comparison.
+Since 2026-09-22 the production default is **GPT-6 Luna high**; use it for new
+experiments. The
 [failure analysis](./analysis-2026-09-03.md) identifies the first experiment and
 the scoring conflicts to resolve separately.
 
@@ -124,9 +134,9 @@ Run from the repository root, with model and Firecrawl credentials available in
 
 ```bash
 mkdir -p .cache/classifier-luna-experiment-01
-BOTTLE_CLASSIFIER_MODEL=gpt-5.6-luna \
+BOTTLE_CLASSIFIER_MODEL=gpt-6-luna \
 BOTTLE_CLASSIFIER_REASONING_EFFORT=high \
-OPENAI_IMAGE_EXTRACTION_MODEL=gpt-5.6-luna \
+OPENAI_IMAGE_EXTRACTION_MODEL=gpt-6-luna \
 OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT=high \
 BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES=2 \
 VITEST_EVALS_REPLAY_MODE=auto \

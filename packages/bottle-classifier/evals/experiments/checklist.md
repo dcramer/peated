@@ -4,8 +4,9 @@ This is the ordered list of work we believe is worth testing. A checkbox means
 the item was investigated and documented. It does not mean the change was kept.
 The linked result records whether it was accepted, rejected, or left uncertain.
 
-Each classifier experiment uses Luna high and compares one change with the
-unchanged Luna high classifier. We keep a change only when the accuracy benefit
+Each classifier experiment uses the production default model and compares one
+change with the unchanged classifier. That was GPT 5.6 Luna high through
+September 2026 and is GPT-6 Luna high since 2026-09-22. We keep a change only when the accuracy benefit
 is worth its cost, token use, and time. Score-rule fixes are reported separately;
 they cannot count as classifier accuracy gains.
 
@@ -372,7 +373,7 @@ measurement correction as classifier accuracy.
 For each classifier item:
 
 1. Record the exact change, cases, comparison cases, and success condition before running.
-2. Run the focused Luna high comparison three times per version.
+2. Run the focused comparison three times per version on the default model.
 3. Review every changed answer and report accuracy, incorrect matches, tokens,
    estimated model cost, web requests, and time.
 4. Mark the result **accepted**, **rejected**, or **uncertain** and link its full

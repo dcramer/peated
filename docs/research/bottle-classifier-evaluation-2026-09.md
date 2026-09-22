@@ -5,9 +5,23 @@ specific failures, and tested twenty-two classifier changes. The detailed run
 records live under
 [`packages/bottle-classifier/evals`](../../packages/bottle-classifier/evals/README.md).
 
-## Current measured baseline
+## GPT-6 Luna, 2026-09-22
 
-The classifier now uses `gpt-5.6-luna` with high reasoning effort. The
+OpenAI released GPT-6 Luna at half the GPT 5.6 Luna token price. A same-day
+full-suite comparison passed the same 79 of 105 checks on both models, with
+five cases gained and five lost. Model cost fell 30.8%, the median case became
+39.3% slower, and Firecrawl calls rose 23.7%. The one new unsafe automatic
+match, Canadian Club Reserve 9-year-old, was repeated three times per model:
+GPT-6 Luna passed 3/3 and GPT 5.6 Luna failed 1/3, so it is a pre-existing
+flaky case. GPT-6 Luna high is now the production default, and its
+[baseline](../../packages/bottle-classifier/evals/baselines/2026-09-22-gpt-6-luna-high-current.json)
+replaces the one below for future comparisons. The full
+[comparison record](../../packages/bottle-classifier/evals/experiments/model-gpt-6-luna-2026-09-22.md)
+lists the changed cases.
+
+## Measured baseline before GPT-6 Luna
+
+Through September the classifier used `gpt-5.6-luna` with high reasoning effort. The
 [recorded baseline](../../packages/bottle-classifier/evals/baselines/2026-09-03-luna-high-current.json)
 pins the source commit, test-case hashes, run settings, and raw report hash. The
 latest live web run checked 105 cases:

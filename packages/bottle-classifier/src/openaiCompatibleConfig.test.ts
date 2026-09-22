@@ -20,7 +20,7 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(resolveOpenAICompatibleConfig(env)).toMatchObject({
       apiKey: undefined,
       baseURL: "https://ai-gateway.vercel.sh/v1",
-      bottleClassifierModel: "openai/gpt-5.6-luna",
+      bottleClassifierModel: "openai/gpt-6-luna",
       embeddingModel: "openai/text-embedding-3-large",
       model: "openai/gpt-5.4",
     });
@@ -35,12 +35,12 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(config).toEqual({
       apiKey: "gateway-key",
       baseURL: "https://ai-gateway.vercel.sh/v1",
-      bottleClassifierModel: "openai/gpt-5.6-luna",
+      bottleClassifierModel: "openai/gpt-6-luna",
       bottleClassifierReasoningEffort: "high",
       embeddingModel: "openai/text-embedding-3-large",
       evalModel: "openai/gpt-5.6-luna",
       evalReasoningEffort: "medium",
-      imageExtractionModel: "openai/gpt-5.6-luna",
+      imageExtractionModel: "openai/gpt-6-luna",
       imageExtractionReasoningEffort: "high",
       model: "openai/gpt-5.4",
       reasoningEffort: undefined,
@@ -131,6 +131,21 @@ describe("resolveOpenAICompatibleConfig", () => {
       getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
     ).toEqual({ reasoning: { effort: "high" } });
     expect(config.reasoningEffort).toBe("low");
+  });
+
+  it("sends reasoning settings without temperature to GPT-6 models", () => {
+    const config = resolveOpenAICompatibleConfig({
+      BOTTLE_CLASSIFIER_MODEL: "gpt-6-luna",
+      BOTTLE_CLASSIFIER_REASONING_EFFORT: "high",
+    });
+
+    expect(config.bottleClassifierModel).toBe("openai/gpt-6-luna");
+    expect(
+      getStableOpenAISettings(
+        config.bottleClassifierModel,
+        config.bottleClassifierReasoningEffort,
+      ),
+    ).toEqual({ reasoning: { effort: "high" } });
   });
 
   it("does not send reasoning settings to custom non-GPT-5 models", () => {

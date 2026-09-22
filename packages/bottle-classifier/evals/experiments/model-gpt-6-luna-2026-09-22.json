@@ -1,0 +1,144 @@
+{
+  "item": "model-gpt-6-luna-2026-09-22",
+  "decision": "accepted",
+  "classifierChanged": false,
+  "layer": "model",
+  "date": "2026-09-22",
+  "sourceCommit": "d920eab79",
+  "control": {
+    "model": "gpt-5.6-luna",
+    "reasoningEffort": "high",
+    "imageExtractionModel": "gpt-5.6-luna",
+    "imageExtractionReasoningEffort": "high"
+  },
+  "treatment": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "high",
+    "imageExtractionModel": "gpt-6-luna",
+    "imageExtractionReasoningEffort": "high"
+  },
+  "sharedSettings": {
+    "judgeModel": "gpt-5.6-luna",
+    "judgeReasoningEffort": "medium",
+    "provider": "Vercel AI Gateway",
+    "webEnabled": true,
+    "maxSearchQueries": 2,
+    "maxAgentTurns": 8,
+    "configuredTimeoutMs": 300000,
+    "fixedEvidence": false,
+    "concurrentSuites": true
+  },
+  "pricingUsdPerMillion": {
+    "gpt-5.6-luna": {
+      "input": 0.2,
+      "cacheRead": 0.02,
+      "cacheWrite": 0.25,
+      "output": 1.2
+    },
+    "gpt-6-luna": {
+      "input": 0.1,
+      "cacheRead": 0.01,
+      "cacheWrite": 0.125,
+      "output": 0.5
+    }
+  },
+  "fullSuite": {
+    "checks": 105,
+    "control": {
+      "rawReportSha256": "b3e63c66a505efe3c4a44212f4953ac5eda10557918c9feabb89e8322fdd824c",
+      "passed": 79,
+      "failed": 26,
+      "timedOut": 0,
+      "incorrectExistingBottleMatches": 1,
+      "groups": {
+        "new bottles": "27/42",
+        "match existing": "32/38",
+        "corrections": "0/1",
+        "ignored / no match": "11/12",
+        "bottle audits": "9/12"
+      },
+      "measuredUsageChecks": 101,
+      "inputTokensMeasured": 2846825,
+      "cachedInputTokensMeasured": 2563311,
+      "cacheWriteTokensMeasured": 282347,
+      "outputTokensMeasured": 167381,
+      "reasoningTokensMeasured": 120863,
+      "totalTokensMeasured": 3014206,
+      "modelRequestsMeasured": 389,
+      "estimatedModelCostUsdMeasured": 0.322944,
+      "totalCaseTimeMs": 2648100,
+      "medianCaseTimeMs": 22530,
+      "p95NearestRankCaseTimeMs": 60540,
+      "firecrawlToolCalls": 156,
+      "otherToolCalls": 101
+    },
+    "treatment": {
+      "rawReportSha256": "f2012e49481a92072f0587776b864455b5dcc77752b7c1c226ef92ba782177c5",
+      "passed": 79,
+      "failed": 26,
+      "timedOut": 0,
+      "incorrectExistingBottleMatches": 2,
+      "groups": {
+        "new bottles": "25/42",
+        "match existing": "34/38",
+        "corrections": "1/1",
+        "ignored / no match": "11/12",
+        "bottle audits": "8/12"
+      },
+      "measuredUsageChecks": 101,
+      "inputTokensMeasured": 3685151,
+      "cachedInputTokensMeasured": 3303614,
+      "cacheWriteTokensMeasured": 380082,
+      "outputTokensMeasured": 285394,
+      "reasoningTokensMeasured": 226891,
+      "totalTokensMeasured": 3970545,
+      "modelRequestsMeasured": 485,
+      "estimatedModelCostUsdMeasured": 0.223389,
+      "totalCaseTimeMs": 3502000,
+      "medianCaseTimeMs": 31390,
+      "p95NearestRankCaseTimeMs": 72610,
+      "firecrawlToolCalls": 193,
+      "otherToolCalls": 160
+    },
+    "sameCaseComparison": {
+      "checksWithUsageInBoth": 99,
+      "controlEstimatedModelCostUsd": 0.317,
+      "treatmentEstimatedModelCostUsd": 0.2172,
+      "controlTotalTokens": 2967775,
+      "treatmentTotalTokens": 3870276
+    },
+    "changedOutcomes": {
+      "gainedByTreatment": [
+        "new bottles: The Whistler Bodega Cask requires review",
+        "match existing: image-backed Trestle Spirit of Eclipse",
+        "match existing: Laphroaig Càirdeas 2022 Warehouse 1",
+        "corrections: a bottle correction stays review-only",
+        "ignored / no match: age mismatch keeps product identity scope"
+      ],
+      "lostByTreatment": [
+        "new bottles: Four Roses Limited Edition Small Batch name and edition",
+        "new bottles: Glendalough Double Barrel category left null",
+        "new bottles: Black Label Islay Origin name shortened",
+        "ignored / no match: Canadian Club Reserve 9-year-old matched automatically",
+        "bottle audits: SMWS 10.258 update omitted the supported vintage"
+      ]
+    }
+  },
+  "focusedRepeat": {
+    "case": "store-listing-requires-review-for-canadian-club-reserve-9-year-old",
+    "attemptsPerVariant": 3,
+    "alternatingOrder": true,
+    "controlCorrectAttempts": 2,
+    "treatmentCorrectAttempts": 3,
+    "controlUnsafeAutomaticMatches": 1,
+    "treatmentUnsafeAutomaticMatches": 0,
+    "controlModelRequests": 18,
+    "treatmentModelRequests": 16,
+    "controlTotalTokens": 138743,
+    "treatmentTotalTokens": 122128,
+    "controlEstimatedModelCostUsd": 0.01474483,
+    "treatmentEstimatedModelCostUsd": 0.00754791,
+    "controlTotalCaseTimeMs": 129400,
+    "treatmentTotalCaseTimeMs": 112900
+  }
+}
