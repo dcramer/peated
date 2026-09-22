@@ -46,6 +46,38 @@ describe("ReportDialog", () => {
     });
   });
 
+  it("cannot be sent without a reason, or without details for Something else", async () => {
+    const onSubmit = vi.fn(async () => undefined);
+    dialog = mountDialog();
+    act(() =>
+      dialog?.root.render(
+        <ReportDialog
+          isOpen
+          onCancel={() => undefined}
+          onSubmit={onSubmit}
+          subject="this bottle"
+        />,
+      ),
+    );
+
+    expect(findButton("Send report").disabled).toBe(true);
+    act(() => findButton("Send report").click());
+    await flush();
+    expect(onSubmit).not.toHaveBeenCalled();
+
+    selectOption(findByLabel<HTMLSelectElement>("Reason"), "other");
+    expect(findButton("Send report").disabled).toBe(true);
+
+    typeInto(findByLabel<HTMLTextAreaElement>("Details"), "Fake bottle.");
+    expect(findButton("Send report").disabled).toBe(false);
+    act(() => findButton("Send report").click());
+    await flush();
+    expect(onSubmit).toHaveBeenCalledWith({
+      reason: "other",
+      comment: "Fake bottle.",
+    });
+  });
+
   it("omits empty details and keeps the dialog open on failure", async () => {
     const onSubmit = vi.fn(async () => {
       throw new Error("Too many requests. Please try again later.");
@@ -62,6 +94,7 @@ describe("ReportDialog", () => {
       ),
     );
 
+    selectOption(findByLabel<HTMLSelectElement>("Reason"), "spam");
     act(() => findButton("Send report").click());
     await flush();
 

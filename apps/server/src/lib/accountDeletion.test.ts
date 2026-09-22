@@ -12,6 +12,7 @@ import {
   memberReviews,
   notifications,
   passkeys,
+  reports,
   tastingBadgeAwards,
   tastings,
   toasts,
@@ -236,6 +237,54 @@ describe("deleteUserAccount", () => {
       { bottleId: bottle.id },
       expect.objectContaining({ delay: 5000 }),
     );
+  });
+
+  test("closes reports about the member and their content, not their catalog records", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const reporter = await fixtures.User();
+    const actor = await getUserActorForDatabase(db, user);
+    const tasting = await fixtures.Tasting({ createdById: user.id });
+    const bottle = await fixtures.Bottle({ createdByActorId: actor.id });
+    const [memberReport, tastingReport, bottleReport] = await Promise.all([
+      routerClient.reports.create(
+        { objectType: "user", objectId: user.id, reason: "spam" },
+        { context: { user: reporter } },
+      ),
+      routerClient.reports.create(
+        { objectType: "tasting", objectId: tasting.id, reason: "spam" },
+        { context: { user: reporter } },
+      ),
+      routerClient.reports.create(
+        { objectType: "bottle", objectId: bottle.id, reason: "inaccurate" },
+        { context: { user: reporter } },
+      ),
+    ]);
+
+    expect(await deleteUserAccount(user)).toBe(true);
+
+    const rows = await db
+      .select({
+        id: reports.id,
+        status: reports.status,
+        note: reports.closeNote,
+      })
+      .from(reports)
+      .where(
+        inArray(reports.id, [
+          memberReport.id,
+          tastingReport.id,
+          bottleReport.id,
+        ]),
+      );
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    expect(byId.get(memberReport.id)).toMatchObject({
+      status: "resolved",
+      note: "Member deleted their account.",
+    });
+    expect(byId.get(tastingReport.id)?.status).toBe("resolved");
+    expect(byId.get(bottleReport.id)?.status).toBe("open");
   });
 
   test("stops access tokens and hides the profile", async ({ fixtures }) => {

@@ -6,7 +6,10 @@ import {
   incomingBottleDecisionLogs,
   users,
 } from "@peated/server/db/schema";
-import { describeReportSubject } from "@peated/server/lib/reports";
+import {
+  describeReportSubject,
+  recordNameOf,
+} from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
@@ -120,10 +123,12 @@ export default procedure
           key: input.key,
           kind: "report",
           category: "community",
-          title: describeReportSubject(
-            report.objectType,
-            report.reportedUser.username,
-          ),
+          title: describeReportSubject({
+            objectType: report.objectType,
+            objectId: report.objectId,
+            reportedUsername: report.reportedUser?.username ?? null,
+            recordName: recordNameOf(report.objectType, report.contentPreview),
+          }),
           outcome: report.status,
           actor: report.closedBy?.username ?? null,
           occurredAt: report.closedAt,
@@ -138,7 +143,7 @@ export default procedure
           objectId: report.objectId,
           reason: REPORT_REASON_LABELS[report.reason],
           reportedBy: report.createdBy.username,
-          reportedUser: report.reportedUser.username,
+          reportedUser: report.reportedUser?.username ?? null,
         },
         activity: [
           { label: "Report sent", occurredAt: report.createdAt },

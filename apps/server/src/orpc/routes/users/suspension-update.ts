@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
+import { closeOpenReportsAboutMember } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { UserSchema } from "@peated/server/schemas";
@@ -80,6 +81,12 @@ export default procedure
     if (!updated) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to update suspension.",
+      });
+    }
+    if (input.suspended) {
+      await closeOpenReportsAboutMember(db, user.id, ["user"], {
+        closedById: context.user.id,
+        note: `Member suspended: ${input.reason}`,
       });
     }
 

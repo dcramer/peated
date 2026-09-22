@@ -10,6 +10,7 @@ import {
   notifyComment,
   sendAccountDeletionEmail,
   sendMagicLinkEmail,
+  sendReportEmail,
 } from "./email";
 
 let transport: Transporter<SMTPTransport.SentMessageInfo>;
@@ -229,5 +230,53 @@ describe("sendAccountDeletionEmail", () => {
     expect(outbox[0].text).toContain(
       "https://peated.example/settings/security",
     );
+  });
+});
+
+describe("sendReportEmail", () => {
+  test("sends one message per moderator with the Inbox link", async () => {
+    config.URL_PREFIX = "https://peated.test";
+    await sendReportEmail({
+      to: ["mod@example.com", "admin@example.com"],
+      report: {
+        id: 12,
+        subject: "Bottle: Fake Distillery 12-year-old",
+        reasonLabel: "Wrong or made-up information",
+        comment: "This distillery does not exist.",
+        reporterUsername: "islay.fan",
+        contentPreview: "Fake Distillery 12-year-old",
+        contentPath: "/bottles/99",
+      },
+      transport,
+    });
+
+    expect(outbox.map((mail) => mail.to)).toEqual([
+      "mod@example.com",
+      "admin@example.com",
+    ]);
+    const [msg] = outbox;
+    expect(msg.subject).toBe("New report: Bottle: Fake Distillery 12-year-old");
+    expect(msg.text).toContain(
+      "https://peated.test/admin/moderation/inbox/report/12",
+    );
+    expect(msg.text).toContain("https://peated.test/bottles/99");
+    expect(msg.html).toContain("This distillery does not exist.");
+  });
+
+  test("sends nothing without recipients", async () => {
+    await sendReportEmail({
+      to: [],
+      report: {
+        id: 1,
+        subject: "Member @x",
+        reasonLabel: "Spam or advertising",
+        comment: null,
+        reporterUsername: "y",
+        contentPreview: null,
+        contentPath: null,
+      },
+      transport,
+    });
+    expect(outbox).toHaveLength(0);
   });
 });

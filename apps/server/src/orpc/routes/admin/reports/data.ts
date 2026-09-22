@@ -17,7 +17,11 @@ const closer = alias(users, "closer");
 type AdminReportRow = {
   report: Report;
   createdBy: { id: number; username: string; suspendedAt: Date | null };
-  reportedUser: { id: number; username: string; suspendedAt: Date | null };
+  reportedUser: {
+    id: number;
+    username: string;
+    suspendedAt: Date | null;
+  } | null;
   closedBy: { id: number; username: string } | null;
 };
 
@@ -42,7 +46,7 @@ function selectReports() {
     })
     .from(reports)
     .innerJoin(reporter, eq(reporter.id, reports.createdById))
-    .innerJoin(reportedUser, eq(reportedUser.id, reports.reportedUserId))
+    .leftJoin(reportedUser, eq(reportedUser.id, reports.reportedUserId))
     .leftJoin(closer, eq(closer.id, reports.closedById));
 }
 
@@ -71,11 +75,13 @@ async function toAdminReports(rows: AdminReportRow[]): Promise<AdminReport[]> {
         username: createdBy.username,
         suspended: createdBy.suspendedAt !== null,
       },
-      reportedUser: {
-        id: reportedUser.id,
-        username: reportedUser.username,
-        suspended: reportedUser.suspendedAt !== null,
-      },
+      reportedUser: reportedUser
+        ? {
+            id: reportedUser.id,
+            username: reportedUser.username,
+            suspended: reportedUser.suspendedAt !== null,
+          }
+        : null,
       contentUrl: target?.contentPath ?? null,
       contentPreview: target?.contentPreview ?? null,
       openReportCount: Math.max(otherOpen, 0),

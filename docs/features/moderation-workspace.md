@@ -17,9 +17,13 @@ for review, unresolved findings, and open member reports. Work that is still
 running, failed, stale, or waiting to retry belongs in Background work until it
 needs a person to decide.
 
-A report task shows who sent the report, who it is about, the reason, and a
-link to the live content. Its actions remove the content, delete the comment,
-suspend the member, and close the report as resolved or dismissed. See
+A report task shows who sent the report, who it is about (when a member is
+named), the reason, and a link to the live content. Its actions remove the
+content, delete the comment, suspend the member, and close the report as
+resolved or dismissed. A report about a bottle, entity, series, or flight
+links to that record's edit, merge, and history pages instead, and offers no
+suspend action. Reports close on their own when their target is removed, so
+the Inbox never lists a report about content that is already gone. See
 `docs/features/reports-and-blocks.md`.
 
 Each selected item asks one question. Keep warnings, changed fields, impact, and

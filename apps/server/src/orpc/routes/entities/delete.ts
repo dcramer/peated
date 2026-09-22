@@ -9,6 +9,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { deleteOwnedEntityImage } from "@peated/server/lib/entityImages";
+import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -69,6 +70,11 @@ export default procedure
       ]);
 
       await tx.delete(entities).where(eq(entities.id, entity.id));
+      await closeOpenReportsForTarget(
+        tx,
+        { objectType: "entity", objectId: entity.id },
+        { closedById: context.user.id, note: "Entity deleted." },
+      );
     });
 
     await Promise.all(

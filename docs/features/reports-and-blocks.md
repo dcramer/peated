@@ -6,19 +6,37 @@ define exact behavior.
 
 ## Reports
 
-`POST /reports` records a report about a tasting, a member review, a comment,
-or a member. It needs a signed-in member who has accepted the terms, a reason
-from a short fixed list, and an optional note. Each member can send 20 reports
-per hour.
+`POST /reports` records a report about member content (a tasting, a member
+review, a comment, or a member) or a catalog record a member may have added
+(a bottle, an entity, a series, or a flight). It needs a signed-in member who
+has accepted the terms, a reason from a short fixed list, and an optional
+note. Each member can send 20 reports per hour.
 
-- A report always names the member responsible for the content, so a closed
-  report still says who it was about after the content is gone.
+- Reasons cover abuse (spam, harassment, hate, sexual content, violence),
+  wrong or made-up information, and "something else". A member must choose a
+  reason, and "something else" needs details.
+- A report about member content always names the member responsible, so a
+  closed report still says who it was about after the content is gone.
+- A report about a catalog record names the member who created it when there
+  is one. A record added by a scraper or by Peated names no member, and the
+  report is titled by the record's current name instead.
 - Reports never store the reported content. Moderators follow the link to the
-  live content instead.
+  live content instead. A report about a bottle, entity, or series that was
+  later merged follows the merge to the record that lives on.
+- Flights are reported by their public ID. Everything else uses its numeric ID.
+- Every new report emails each active, verified moderator and administrator,
+  except the member who sent it. The email links to the Inbox task. Repeat
+  reports about an open target send no email. Reporters are not told the
+  outcome.
 - A member cannot report their own content, or content that is missing or
   already removed.
 - One open report per member and target. Sending the same report again while
   the first is open returns the first one unchanged.
+
+On the web, "Report …" lives in the actions menu (the three-dot button) on
+tasting, review, bottle, entity, series, and flight pages, on each comment,
+and on a member's profile. It appears only for signed-in members viewing
+something they did not create.
 
 Open reports appear in the Moderation Inbox as `report` tasks in the
 `community` category, oldest first. Moderators act on a report through the
@@ -26,13 +44,27 @@ existing operations, then close it:
 
 - Remove a tasting or member review with the admin content moderation route.
 - Delete a comment with the comment delete route.
-- Suspend the member (see Account Access).
+- Fix, merge, or delete a bottle, entity, series, or flight with the catalog
+  tools. The report task links to the record's edit, merge, and history
+  pages. The member it names only created the record and may not have written
+  the reported text, so the task offers no one-click suspension for catalog
+  reports.
+- Suspend the member (see Account Access) when the report names one.
 - Close the report as `resolved` when action was taken or `dismissed` when no
   action was needed, with an optional note. Closing one report closes every
   open report about the same target with the same outcome.
 
+Reports also close on their own, as `resolved` with a note saying why, when
+the target goes away: a tasting or review is removed, a comment is deleted, or
+a bottle, entity, series, or flight is deleted. Suspending a member closes only
+the report about that member; reports about their content stay open because
+the content is still visible. Account deletion closes reports about the member
+and their removed content, but not about bottles, entities, or series they
+added, since those records live on. The Inbox never holds a report about
+something moderators can no longer act on.
+
 Closed reports appear in Moderation History with the outcome, the moderator,
-and the note.
+and the note. A report the system closed shows no moderator.
 
 App Store Review Guideline 1.2 requires reporting, blocking, and acting on
 reports. Reports should be handled within 24 hours.
@@ -70,10 +102,16 @@ of the admin area.
   `apps/server/src/db/schema/userBlocks.ts`
 - report routes: `apps/server/src/orpc/routes/reports/` and
   `apps/server/src/orpc/routes/admin/reports/`
+- report alert: the `NotifyReport` job in `apps/server/src/worker/jobs/` and
+  `sendReportEmail` in `apps/server/src/lib/email.ts`
+- auto-close: `closeOpenReportsForTarget` and `closeOpenReportsAboutMember`
+  in `apps/server/src/lib/reports.ts`, called by the removal, delete,
+  suspension, and account deletion paths
 - block routes: `apps/server/src/orpc/routes/users/block-*.ts`
 - block check: `apps/server/src/lib/userBlocks.ts`, used by the comment, toast,
   and friend request routes
 - inbox and history projection: `apps/server/src/lib/moderationTasks.ts` and
   `apps/server/src/lib/moderationHistory.ts`
-- web: the report dialog, profile actions, settings blocked-members page, and
-  the Inbox report task under `apps/web/src/components/`
+- web: the report dialog and Inbox report task under
+  `apps/web/src/components/`, the settings blocked-members page, and the
+  "Report …" menu items in each page's actions under `apps/web/src/app/`

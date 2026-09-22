@@ -7,6 +7,7 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -77,6 +78,11 @@ export default procedure
         type: "delete",
         data: series,
       });
+      await closeOpenReportsForTarget(
+        tx,
+        { objectType: "bottle_series", objectId: series.id },
+        { closedById: context.user.id, note: "Series deleted." },
+      );
 
       await tx.delete(bottleSeries).where(eq(bottleSeries.id, series.id));
     });

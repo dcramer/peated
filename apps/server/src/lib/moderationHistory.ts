@@ -3,6 +3,10 @@ import {
   actors,
   bottleChecks,
   bottleOperations,
+  bottles,
+  bottleSeries,
+  entities,
+  flights,
   incomingBottleDecisionLogs,
   reports,
   users,
@@ -129,18 +133,32 @@ export async function queryModerationHistory(
         'report:' || ${reports.id} AS key,
         'report'::text AS kind,
         'community'::text AS category,
+        -- Mirrors describeReportSubject in lib/reports.ts.
         CASE ${reports.objectType}::text
-          WHEN 'tasting' THEN 'Tasting by @' || reported_user.username
-          WHEN 'member_review' THEN 'Review by @' || reported_user.username
-          WHEN 'comment' THEN 'Comment by @' || reported_user.username
-          ELSE 'Member @' || reported_user.username
+          WHEN 'tasting' THEN 'Tasting ' || COALESCE('by @' || reported_user.username, '#' || ${reports.objectId})
+          WHEN 'member_review' THEN 'Review ' || COALESCE('by @' || reported_user.username, '#' || ${reports.objectId})
+          WHEN 'comment' THEN 'Comment ' || COALESCE('by @' || reported_user.username, '#' || ${reports.objectId})
+          WHEN 'user' THEN 'Member ' || COALESCE('@' || reported_user.username, '#' || ${reports.objectId})
+          WHEN 'bottle' THEN COALESCE('Bottle: ' || ${bottles.fullName}, 'Bottle #' || ${reports.objectId})
+          WHEN 'entity' THEN COALESCE('Entity: ' || ${entities.name}, 'Entity #' || ${reports.objectId})
+          WHEN 'bottle_series' THEN COALESCE('Series: ' || ${bottleSeries.fullName}, 'Series #' || ${reports.objectId})
+          WHEN 'flight' THEN COALESCE('Flight: ' || ${flights.name}, 'Flight #' || ${reports.objectId})
+          ELSE 'Report #' || ${reports.id}
         END AS title,
         ${reports.status}::text AS outcome,
         ${users.username} AS actor,
         ${reports.closedAt} AS "occurredAt"
       FROM ${reports}
-      INNER JOIN ${users} AS reported_user
+      LEFT JOIN ${users} AS reported_user
         ON reported_user.id = ${reports.reportedUserId}
+      LEFT JOIN ${bottles}
+        ON ${reports.objectType} = 'bottle' AND ${bottles.id} = ${reports.objectId}
+      LEFT JOIN ${entities}
+        ON ${reports.objectType} = 'entity' AND ${entities.id} = ${reports.objectId}
+      LEFT JOIN ${bottleSeries}
+        ON ${reports.objectType} = 'bottle_series' AND ${bottleSeries.id} = ${reports.objectId}
+      LEFT JOIN ${flights}
+        ON ${reports.objectType} = 'flight' AND ${flights.id} = ${reports.objectId}
       LEFT JOIN ${users} ON ${users.id} = ${reports.closedById}
       WHERE ${isNotNull(reports.closedAt)}
     ) AS history

@@ -5,6 +5,7 @@ import { Section, Text } from "./core";
 
 export enum Reason {
   comments = "You are being notified because you are subscribed to comments.",
+  moderation = "You are being notified because you moderate Peated.",
 }
 
 export default function ReasonFooter({

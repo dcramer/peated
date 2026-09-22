@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
 import { deleteNotification } from "@peated/server/lib/notifications";
+import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -78,6 +79,17 @@ export default procedure
       });
 
       await tx.delete(comments).where(eq(comments.id, comment.id));
+      await closeOpenReportsForTarget(
+        tx,
+        { objectType: "comment", objectId: comment.id },
+        {
+          closedById: context.user.id,
+          note:
+            comment.createdById === context.user.id
+              ? "Comment deleted by its author."
+              : "Comment deleted.",
+        },
+      );
     });
 
     return {};

@@ -15,20 +15,19 @@ export const REPORT_REASON_LABELS = {
   hate: "Hateful content",
   sexual_content: "Sexual content",
   violence: "Violence or threats",
+  inaccurate: "Wrong or made-up information",
   other: "Something else",
 } satisfies Record<z.infer<typeof ReportReasonEnum>, string>;
 
 export const ReportInputSchema = z
   .object({
     objectType: ReportObjectTypeEnum.describe(
-      "What is being reported: a tasting, a member review, a comment, or a member.",
+      "What is being reported: a tasting, a member review, a comment, a member, a bottle, an entity, a series, or a flight.",
     ),
-    objectId: z.coerce
-      .number()
-      .int()
-      .positive()
+    objectId: z
+      .union([z.number().int().positive(), z.string().trim().min(1).max(64)])
       .describe(
-        "ID of the reported tasting, member review, comment, or member.",
+        "ID of the reported item. Flights use their public ID; everything else uses its numeric ID.",
       ),
     reason: ReportReasonEnum.describe("Why the content is being reported."),
     comment: z
@@ -36,9 +35,28 @@ export const ReportInputSchema = z
       .trim()
       .max(1000)
       .optional()
-      .describe("Optional details for moderators."),
+      .describe("Details for moderators. Required when the reason is `other`."),
   })
-  .strict();
+  .strict()
+  .superRefine((input, ctx) => {
+    if (
+      input.objectType !== "flight" &&
+      !/^\d+$/.test(String(input.objectId))
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["objectId"],
+        message: "Only flights are reported by public ID.",
+      });
+    }
+    if (input.reason === "other" && !input.comment) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["comment"],
+        message: "Tell moderators what is wrong.",
+      });
+    }
+  });
 
 export const ReportSchema = z.object({
   id: z.number().readonly(),
@@ -66,7 +84,8 @@ export const AdminReportSchema = z
     status: ReportStatusEnum,
     createdAt: z.string().datetime(),
     createdBy: ReportMemberSchema,
-    reportedUser: ReportMemberSchema,
+    /** The member the report is about; null for a catalog record with no member creator. */
+    reportedUser: ReportMemberSchema.nullable(),
     /** Where the reported content lives; null when it no longer exists. */
     contentUrl: z.string().nullable(),
     /** A short preview of the reported content; null when it no longer exists. */

@@ -25,6 +25,7 @@ import {
   PageTabs,
   type PageTabItem,
 } from "@peated/web/components/pageTabs.stylex";
+import { ReportContentDialog } from "@peated/web/components/reportContentDialog";
 import {
   RowMenu,
   type RowMenuItem,
@@ -254,6 +255,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
   const router = useRouter();
   const { flash } = useFlashMessages();
   const deleteMutation = useMutation(orpc.bottles.delete.mutationOptions());
+  const [reporting, setReporting] = useState(false);
   const groups: RowMenuItem[][] = [
     [
       {
@@ -291,6 +293,12 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
     ]);
   }
 
+  if (user) {
+    groups.push([
+      { label: "Report bottle", onSelect: () => setReporting(true) },
+    ]);
+  }
+
   if (user?.admin) {
     groups.push([
       {
@@ -320,7 +328,17 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
     ]);
   }
 
-  return <RowMenu groups={groups} label="Bottle actions" variant="page" />;
+  return (
+    <>
+      <RowMenu groups={groups} label="Bottle actions" variant="page" />
+      <ReportContentDialog
+        isOpen={reporting}
+        onClose={() => setReporting(false)}
+        subject="this bottle"
+        target={{ objectType: "bottle", objectId: bottle.id }}
+      />
+    </>
+  );
 }
 
 export function BottlePageFrameClient({

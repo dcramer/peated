@@ -30,6 +30,10 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { dispatchBottleStatsRecomputes } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { logError } from "@peated/server/lib/log";
+import {
+  closeOpenReportsAboutMember,
+  MEMBER_CONTENT_REPORT_OBJECT_TYPES,
+} from "@peated/server/lib/reports";
 import { deleteUploadByUrl } from "@peated/server/lib/uploads";
 import { and, asc, eq, inArray, isNull, lte, or, sql } from "drizzle-orm";
 import { AuditEvent, auditLog } from "./auditLog";
@@ -344,6 +348,15 @@ export async function deleteUserAccount(
       .update(externalSiteRuns)
       .set({ requestedById: null })
       .where(eq(externalSiteRuns.requestedById, userId));
+
+    // Reports about the member and their removed content are moot now.
+    // Catalog records they added live on, so those reports stay open.
+    await closeOpenReportsAboutMember(
+      tx,
+      userId,
+      MEMBER_CONTENT_REPORT_OBJECT_TYPES,
+      { closedById: null, note: "Member deleted their account." },
+    );
 
     // Catalog history keeps the actor; only its personal fields change.
     await tx
