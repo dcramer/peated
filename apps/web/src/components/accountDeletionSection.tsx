@@ -9,14 +9,7 @@ import {
   FormActions,
   FormSection,
 } from "@peated/web/components/formLayout.stylex";
-
-/** Formats a scheduled deletion time in the member's locale. */
-export function formatDeletionDate(value: string) {
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
-}
+import { Timestamp } from "@peated/web/components/timestamp";
 
 export type AccountDeletionSectionProps = {
   /** When the pending deletion runs, or null when none is scheduled. */
@@ -108,8 +101,9 @@ export function AccountDeletionSection({
             tone="warning"
           >
             Your account will be deleted on{" "}
-            {formatDeletionDate(deletionScheduledAt)}. Until then everything
-            works as usual, and we've emailed you a confirmation.
+            <Timestamp date={deletionScheduledAt} format="dateTime" />. Until
+            then everything works as usual, and we've emailed you a
+            confirmation.
           </Notice>
         </>
       ) : (

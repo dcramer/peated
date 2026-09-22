@@ -52,40 +52,42 @@ export function getDeletionScheduledAt(
 /**
  * Deletes every account whose grace period has ended. Each account is checked
  * again under a row lock, so a cancellation that lands after this read wins.
- * Returns the number of accounts deleted.
+ * One account's failure is reported and does not stop the others. Returns
+ * the number of accounts deleted.
  */
 export async function processDueAccountDeletions({
   now = new Date(),
-  limit = 100,
-}: { now?: Date; limit?: number } = {}): Promise<number> {
+}: { now?: Date } = {}): Promise<number> {
   const cutoff = new Date(now.getTime() - ACCOUNT_DELETION_GRACE_MS);
   const due = await db
     .select()
     .from(users)
     .where(and(isNull(users.deletedAt), lte(users.deletionRequestedAt, cutoff)))
     .orderBy(asc(users.deletionRequestedAt))
-    .limit(limit);
+    .limit(100);
 
   let deleted = 0;
   for (const user of due) {
-    if (await deleteUserAccount(user, { requestedBefore: cutoff })) {
-      auditLog({ event: AuditEvent.ACCOUNT_DELETED, userId: user.id });
-      deleted += 1;
+    try {
+      if (await deleteUserAccount(user, { requestedBefore: cutoff })) {
+        auditLog({ event: AuditEvent.ACCOUNT_DELETED, userId: user.id });
+        deleted += 1;
+      }
+    } catch (error) {
+      logError(error, {
+        extra: { userId: user.id, operation: "accountDeletion.process" },
+      });
     }
   }
   return deleted;
 }
 
-export type DeleteUserAccountOptions = {
-  /** Only delete when the member's request is still open and at least this old. */
-  requestedBefore?: Date;
-};
-
 /**
  * Placeholder values for a deleted member's row. Username and email stay
- * unique so the member's old values are free to use again.
+ * unique so the member's old values are free to use again. The `deleted-`
+ * username prefix is reserved for this; see `isReservedUsername`.
  */
-export function deletedUserFields(userId: number, deletedAt: Date) {
+function deletedUserFields(userId: number, deletedAt: Date) {
   return {
     username: `deleted-${userId}`,
     email: `deleted-${userId}@peated.invalid`,
@@ -118,7 +120,12 @@ export function deletedUserFields(userId: number, deletedAt: Date) {
  */
 export async function deleteUserAccount(
   user: User,
-  { requestedBefore }: DeleteUserAccountOptions = {},
+  {
+    requestedBefore,
+  }: {
+    /** Only delete when the request is still open and at least this old. */
+    requestedBefore?: Date;
+  } = {},
 ): Promise<boolean> {
   const deletedAt = new Date();
 

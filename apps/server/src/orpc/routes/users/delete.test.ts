@@ -161,6 +161,23 @@ describe("DELETE /users/{user}", () => {
       expect(result.deletionScheduledAt).toBeDefined();
     });
 
+    test("revokes when a code arrives after an earlier request", async ({
+      fixtures,
+    }) => {
+      const user = await appleUser(fixtures);
+      const first = await client.delete({ user: "me" }, { context: { user } });
+      const current = await findUser(user.id);
+
+      const second = await client.delete(
+        { user: "me", appleAuthorizationCode: "code-2" },
+        { context: { user: current! } },
+      );
+
+      expect(revokeAppleAuthorization).toHaveBeenCalledWith("code-2");
+      expect(second.deletionScheduledAt).toEqual(first.deletionScheduledAt);
+      expect(sendAccountDeletionEmail).toHaveBeenCalledTimes(1);
+    });
+
     test("schedules without a code", async ({ fixtures }) => {
       const user = await appleUser(fixtures);
 

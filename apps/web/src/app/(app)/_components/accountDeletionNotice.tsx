@@ -1,8 +1,8 @@
 "use client";
 
-import { formatDeletionDate } from "@peated/web/components/accountDeletionSection";
 import { ButtonLink } from "@peated/web/components/button.stylex";
 import { Notice } from "@peated/web/components/feedback.stylex";
+import { Timestamp } from "@peated/web/components/timestamp";
 import useAuth from "@peated/web/hooks/useAuth";
 import { usePathname } from "next/navigation";
 
@@ -26,7 +26,8 @@ export function AccountDeletionNotice() {
       tone="warning"
     >
       Your account will be deleted on{" "}
-      {formatDeletionDate(user.deletionScheduledAt)}. You can cancel until then.
+      <Timestamp date={user.deletionScheduledAt} format="dateTime" />. You can
+      cancel until then.
     </Notice>
   );
 }

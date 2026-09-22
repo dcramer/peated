@@ -26,6 +26,18 @@ describe("PATCH /users/:user", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
+  test("rejects reserved usernames", async ({ fixtures }) => {
+    const user = await fixtures.User();
+
+    const err = await waitError(() =>
+      routerClient.users.update(
+        { user: "me", username: `deleted-${user.id}` },
+        { context: { user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(`[Error: Invalid username.]`);
+  });
+
   test("cannot update another user", async ({ fixtures }) => {
     const user = await fixtures.User();
     const otherUser = await fixtures.User();

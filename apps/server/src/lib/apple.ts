@@ -138,12 +138,14 @@ export function getAppleRevocationConfig(): AppleRevocationConfig | null {
  * the team, signed with the app's Sign in with Apple key.
  * https://developer.apple.com/documentation/accountorganizationaldatasharing/creating-a-client-secret
  */
-export async function createAppleClientSecret(
-  { clientId, teamId, keyId, privateKey }: AppleRevocationConfig,
-  now = new Date(),
-): Promise<string> {
+export async function createAppleClientSecret({
+  clientId,
+  teamId,
+  keyId,
+  privateKey,
+}: AppleRevocationConfig): Promise<string> {
   const key = await importPKCS8(privateKey, "ES256");
-  const issuedAt = Math.floor(now.getTime() / 1000);
+  const issuedAt = Math.floor(Date.now() / 1000);
   return new SignJWT({})
     .setProtectedHeader({ alg: "ES256", kid: keyId })
     .setIssuer(teamId)
@@ -175,9 +177,6 @@ const AppleTokenResponseSchema = z.object({
 });
 
 const AppleErrorResponseSchema = z.object({ error: z.string() });
-
-// Apple's revoke endpoint returns an empty body.
-const AppleEmptyResponseSchema = z.json();
 
 const JsonSchema = z.json();
 
@@ -236,7 +235,8 @@ export async function revokeAppleAuthorization(
       token,
       token_type_hint: tokens.refresh_token ? "refresh_token" : "access_token",
     },
-    AppleEmptyResponseSchema,
+    // The revoke endpoint returns an empty body.
+    JsonSchema,
   );
 }
 

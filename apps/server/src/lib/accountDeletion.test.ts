@@ -24,6 +24,7 @@ import {
   deleteUserAccount,
   processDueAccountDeletions,
 } from "@peated/server/lib/accountDeletion";
+import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
@@ -256,6 +257,21 @@ describe("deleteUserAccount", () => {
     expect(err).toMatchInlineSnapshot(`[Error: User not found]`);
   });
 
+  test("keeps the anonymized actor when it is resolved again", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    await deleteUserAccount(user);
+    const tombstone = (await findUser(user.id))!;
+
+    const actor = await getUserActorForDatabase(db, tombstone);
+
+    expect(actor).toMatchObject({
+      displayName: DELETED_MEMBER_NAME,
+      active: false,
+    });
+  });
+
   test("does nothing for an already deleted account", async ({ fixtures }) => {
     const user = await fixtures.User();
 
@@ -319,5 +335,25 @@ describe("processDueAccountDeletions", () => {
     });
 
     expect(await processDueAccountDeletions({ now })).toBe(0);
+  });
+
+  test("continues past an account that fails to delete", async ({
+    fixtures,
+  }) => {
+    const now = new Date();
+    const requestedAt = new Date(
+      now.getTime() - ACCOUNT_DELETION_GRACE_MS - HOUR_MS,
+    );
+    const blocked = await fixtures.User({ deletionRequestedAt: requestedAt });
+    // Someone already holds the tombstone username, so this row cannot change.
+    await fixtures.User({ username: `deleted-${blocked.id}` });
+    const due = await fixtures.User({
+      deletionRequestedAt: new Date(requestedAt.getTime() + 1000),
+    });
+
+    expect(await processDueAccountDeletions({ now })).toBe(1);
+
+    expect(await findUser(blocked.id)).toMatchObject({ active: true });
+    expect(await findUser(due.id)).toMatchObject({ active: false });
   });
 });

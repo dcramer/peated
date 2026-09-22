@@ -8,6 +8,7 @@ import { db } from "../db";
 import type { NewUser, User } from "../db/schema";
 import { users } from "../db/schema";
 import { random } from "../lib/rand";
+import { isReservedUsername } from "../schemas/users";
 import { serialize } from "../serializers";
 import { UserSerializer } from "../serializers/user";
 import { sendVerificationEmail } from "./email";
@@ -116,7 +117,7 @@ export async function createUser(
   let attempt = 0;
   const baseUsername = data.username.toLowerCase();
   let currentUsername = baseUsername;
-  if (currentUsername === "me")
+  if (isReservedUsername(currentUsername))
     currentUsername = `${baseUsername}-${random(10000, 99999)}`;
   const maxAttempts = 5;
   while (!user && attempt < maxAttempts) {

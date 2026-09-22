@@ -108,9 +108,10 @@ transaction:
   removed.
 - The user row stays as a tombstone. `deletedAt` is set, `active` is false,
   and the username, email, password, and picture are replaced so the old
-  values can be used again. Access tokens stop working because the account is
-  inactive. Deleted members do not appear in profile pages, member lists, or
-  search.
+  values can be used again. Usernames starting with `deleted-` are reserved
+  for this. Access tokens stop working because the account is inactive.
+  Member lookups by ID or username ignore tombstones, so deleted members do
+  not appear in profiles, member lists, search, or friend requests.
 - The member's tastings and member reviews stay as removed rows with the
   reason `Account deleted`, the same way moderated content is hidden. Content
   a moderator already removed keeps its original removal record. Their images

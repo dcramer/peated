@@ -15,7 +15,7 @@ import { requireAuth } from "@peated/server/orpc/middleware";
 import { UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export type DeleteUserServices = {
@@ -69,11 +69,6 @@ export function createDeleteUserProcedure(
         });
       }
 
-      // Repeating the request changes nothing.
-      if (user.deletionRequestedAt) {
-        return await serialize(UserSerializer, user, user);
-      }
-
       const [appleIdentity] = await db
         .select({ id: identities.id })
         .from(identities)
@@ -116,18 +111,18 @@ export function createDeleteUserProcedure(
         }
       }
 
+      // Repeating the request keeps the existing schedule.
+      if (user.deletionRequestedAt) {
+        return await serialize(UserSerializer, user, user);
+      }
+
       const [scheduled] = await db
         .update(users)
         .set({ deletionRequestedAt: sql<Date>`NOW()` })
-        .where(and(eq(users.id, user.id), isNull(users.deletionRequestedAt)))
+        .where(eq(users.id, user.id))
         .returning();
       if (!scheduled) {
-        // A concurrent request won; return its schedule.
-        const [current] = await db
-          .select()
-          .from(users)
-          .where(eq(users.id, user.id));
-        return await serialize(UserSerializer, current ?? user, user);
+        throw errors.NOT_FOUND({ message: "Account not found." });
       }
 
       auditLog({
