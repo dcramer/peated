@@ -5,7 +5,6 @@ import {
   ContentSection,
   ContentText,
 } from "@peated/web/components/pages/contentPage.stylex";
-import config from "@peated/web/config";
 import type { Metadata } from "next";
 
 export const dynamic = "force-static";
@@ -84,20 +83,17 @@ export default function PrivacyPage() {
       <ContentSection title="5. Retention">
         <ContentText>
           We keep your account and content for as long as your account exists.
-          Diagnostic data is deleted automatically after a short period. Public
-          contributions to the whisky record, such as corrections to bottle
-          details, may remain after your account is deleted, without your name
-          attached.
+          Diagnostic data is deleted automatically after a short period.
         </ContentText>
       </ContentSection>
       <ContentSection title="6. Deleting Your Account">
         <ContentText>
-          You can ask us to delete your account at any time. We will remove your
-          profile, email address, tastings, reviews, and photos. To request
-          deletion, contact us on{" "}
-          <ContentLink href={config.DISCORD_LINK}>Discord</ContentLink> or open
-          an issue on{" "}
-          <ContentLink href={config.GITHUB_REPO}>GitHub</ContentLink>.
+          You can delete your account at any time from{" "}
+          <ContentLink href="/settings/security">Settings</ContentLink>. You
+          have 24 hours to change your mind, and then we remove your profile,
+          email address, tastings, reviews, comments, photos, and collections.
+          Bottles and catalog edits you added stay in the public record, without
+          your name.
         </ContentText>
       </ContentSection>
       <ContentSection title="7. Children">
