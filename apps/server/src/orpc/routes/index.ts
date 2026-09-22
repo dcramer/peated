@@ -32,6 +32,7 @@ import oauth from "./oauth";
 import pendingUploads from "./pendingUploads";
 import prices from "./prices";
 import regions from "./regions";
+import reports from "./reports";
 import root from "./root";
 import search from "./search";
 import smws from "./smws";
@@ -75,6 +76,7 @@ export interface Router {
   pendingUploads: typeof pendingUploads;
   prices: typeof prices;
   regions: typeof regions;
+  reports: typeof reports;
   externalReviews: typeof externalReviews;
   root: typeof root;
   search: typeof search;
@@ -121,6 +123,7 @@ export default api.router({
   pendingUploads,
   prices,
   regions,
+  reports,
   externalReviews,
   root,
   search,

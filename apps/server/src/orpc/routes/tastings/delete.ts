@@ -39,7 +39,11 @@ export default procedure
       });
     }
 
-    if (tasting.createdById !== context.user.id && !context.user.admin) {
+    if (
+      tasting.createdById !== context.user.id &&
+      !context.user.admin &&
+      !context.user.mod
+    ) {
       throw errors.FORBIDDEN({
         message: "Cannot delete another user's tasting.",
       });

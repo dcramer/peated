@@ -23,6 +23,7 @@ import {
   tastingBadgeAwards,
   tastings,
   toasts,
+  userBlocks,
   users,
   type User,
 } from "@peated/server/db/schema";
@@ -111,9 +112,9 @@ function deletedUserFields(userId: number, deletedAt: Date) {
  * the member's actor row with the name and picture removed. The user row stays
  * as a tombstone with its personal fields replaced, and the member's tastings
  * and reviews stay as removed rows, like moderated content. Everything else the
- * member owns (comments, toasts, collections, flights, follows, badges,
- * notifications, uploads, sign-in identities, passkeys, and OAuth grants) is
- * deleted.
+ * member owns (comments, toasts, collections, flights, follows, blocks,
+ * badges, notifications, uploads, sign-in identities, passkeys, and OAuth
+ * grants) is deleted.
  *
  * Stored images are removed after the database commit. That step is
  * best-effort: a storage failure is reported and does not undo the deletion.
@@ -298,6 +299,11 @@ export async function deleteUserAccount(
       .delete(follows)
       .where(or(eq(follows.fromUserId, userId), eq(follows.toUserId, userId)));
     await tx.delete(entityFollows).where(eq(entityFollows.userId, userId));
+    await tx
+      .delete(userBlocks)
+      .where(
+        or(eq(userBlocks.userId, userId), eq(userBlocks.blockedUserId, userId)),
+      );
     await tx
       .delete(pendingUploads)
       .where(eq(pendingUploads.createdById, userId));

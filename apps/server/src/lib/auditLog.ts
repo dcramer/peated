@@ -8,6 +8,8 @@ export enum AuditEvent {
   ACCOUNT_DELETION_REQUESTED = "account.deletion.requested",
   ACCOUNT_DELETION_CANCELED = "account.deletion.canceled",
   ACCOUNT_DELETED = "account.deleted",
+  ACCOUNT_SUSPENDED = "account.suspended",
+  ACCOUNT_REINSTATED = "account.reinstated",
 
   // Passkey events
   PASSKEY_REGISTERED = "passkey.registered",

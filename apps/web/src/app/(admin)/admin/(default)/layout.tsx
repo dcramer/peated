@@ -2,7 +2,11 @@ import {
   AdminLayout,
   type AdminNavigationGroup,
 } from "@peated/web/components/admin/adminLayout.stylex";
+import { getSession } from "@peated/web/lib/session.server";
 import React from "react";
+
+// Groups moderators can use. Everything else needs an administrator.
+const MODERATOR_GROUPS = new Set(["Moderation", "Content"]);
 
 const navigationGroups = [
   {
@@ -54,5 +58,9 @@ export default async function AdminRouteLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <AdminLayout groups={navigationGroups}>{children}</AdminLayout>;
+  const session = await getSession();
+  const groups = session.user?.admin
+    ? navigationGroups
+    : navigationGroups.filter(({ label }) => MODERATOR_GROUPS.has(label));
+  return <AdminLayout groups={groups}>{children}</AdminLayout>;
 }

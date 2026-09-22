@@ -12,7 +12,7 @@ import { logError, logInfo } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   createORPCResponseTraceContext,
-  isORPCUnauthorizedRedirectError,
+  isORPCAccountRedirectError,
   type ORPCResponseTraceContext,
 } from "@peated/web/lib/orpc/link";
 import { useMutation } from "@tanstack/react-query";
@@ -242,7 +242,7 @@ export default function BottleResolver({
         action,
       );
     } catch (err) {
-      if (isORPCUnauthorizedRedirectError(err)) return;
+      if (isORPCAccountRedirectError(err)) return;
 
       logError(err);
       setError(
@@ -305,7 +305,7 @@ export default function BottleResolver({
         outcome = "cancelled";
         return;
       }
-      if (isORPCUnauthorizedRedirectError(err)) {
+      if (isORPCAccountRedirectError(err)) {
         outcome = "unauthorized";
         return;
       }

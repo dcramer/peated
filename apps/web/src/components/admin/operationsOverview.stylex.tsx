@@ -158,6 +158,7 @@ export default function OperationsOverview({
           <dl {...stylex.props(styles.statusList)}>
             <StatusRow label="Listings" value={inboxCounts.listing} />
             <StatusRow label="Catalog" value={inboxCounts.catalog} />
+            <StatusRow label="Community" value={inboxCounts.community} />
           </dl>
         </section>
 

@@ -21,6 +21,7 @@ import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
 const tabs = [
   { href: "/settings/profile", label: "Profile" },
   { href: "/settings/security", label: "Security" },
+  { href: "/settings/blocked", label: "Blocked members" },
 ] as const;
 
 export function SettingsPageFrame({ children }: { children: ReactNode }) {

@@ -4,13 +4,18 @@ export const ModerationTaskKindSchema = z.enum([
   "listing",
   "operation",
   "finding",
+  "report",
 ]);
-export const ModerationTaskCategorySchema = z.enum(["listing", "catalog"]);
+export const ModerationTaskCategorySchema = z.enum([
+  "listing",
+  "catalog",
+  "community",
+]);
 export const ModerationTaskStateSchema = z.enum(["ready", "blocked"]);
 
 export const ModerationTaskKeySchema = z
   .string()
-  .regex(/^(listing|operation|finding):\d+$/);
+  .regex(/^(listing|operation|finding|report):\d+$/);
 
 export const ModerationTaskSourceSchema = z.discriminatedUnion("kind", [
   z
@@ -30,6 +35,12 @@ export const ModerationTaskSourceSchema = z.discriminatedUnion("kind", [
     .object({
       kind: z.literal("finding"),
       checkId: z.number().int().positive(),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("report"),
+      reportId: z.number().int().positive(),
     })
     .strict(),
 ]);
@@ -70,6 +81,7 @@ export const ModerationTaskListResponseSchema = z
         all: z.number().int().min(0),
         listing: z.number().int().min(0),
         catalog: z.number().int().min(0),
+        community: z.number().int().min(0),
         blocked: z.number().int().min(0),
         inconclusive: z.number().int().min(0),
       })
@@ -95,11 +107,12 @@ export const ModerationHistoryKindSchema = z.enum([
   "incoming_decision",
   "operation",
   "audit_closure",
+  "report",
 ]);
 
 export const ModerationHistorySummarySchema = z
   .object({
-    key: z.string().regex(/^(incoming|operation|closure):\d+$/),
+    key: z.string().regex(/^(incoming|operation|closure|report):\d+$/),
     kind: ModerationHistoryKindSchema,
     category: ModerationTaskCategorySchema,
     title: z.string(),

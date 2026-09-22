@@ -4,6 +4,7 @@ import {
   bottleChecks,
   bottleOperations,
   incomingBottleDecisionLogs,
+  reports,
   users,
 } from "@peated/server/db/schema";
 import type { ModerationHistorySummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
@@ -11,7 +12,7 @@ import { and, isNotNull, sql, type SQL } from "drizzle-orm";
 
 type ModerationHistoryInput = {
   query?: string;
-  category?: "listing" | "catalog";
+  category?: "listing" | "catalog" | "community";
   outcome?: string;
   actor?: string;
   offset: number;
@@ -121,6 +122,27 @@ export async function queryModerationHistory(
       FROM ${bottleChecks}
       LEFT JOIN ${users} ON ${users.id} = ${bottleChecks.closedById}
       WHERE ${isNotNull(bottleChecks.closedAt)}
+
+      UNION ALL
+
+      SELECT
+        'report:' || ${reports.id} AS key,
+        'report'::text AS kind,
+        'community'::text AS category,
+        CASE ${reports.objectType}::text
+          WHEN 'tasting' THEN 'Tasting by @' || reported_user.username
+          WHEN 'member_review' THEN 'Review by @' || reported_user.username
+          WHEN 'comment' THEN 'Comment by @' || reported_user.username
+          ELSE 'Member @' || reported_user.username
+        END AS title,
+        ${reports.status}::text AS outcome,
+        ${users.username} AS actor,
+        ${reports.closedAt} AS "occurredAt"
+      FROM ${reports}
+      INNER JOIN ${users} AS reported_user
+        ON reported_user.id = ${reports.reportedUserId}
+      LEFT JOIN ${users} ON ${users.id} = ${reports.closedById}
+      WHERE ${isNotNull(reports.closedAt)}
     ) AS history
     WHERE ${where}
     ORDER BY history."occurredAt" DESC, history.key ASC

@@ -45,6 +45,7 @@ import {
   ModerationStack,
   ModerationTaskHeader,
 } from "./moderationDetail.stylex";
+import { ReportTask } from "./reportTask";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 type QueueItem = Outputs["prices"]["matchQueue"]["details"];
@@ -429,7 +430,8 @@ function AuditTask({
   onComplete: (message: string) => Promise<void>;
 }) {
   const source = task.source;
-  const checkId = source.kind === "listing" ? 0 : source.checkId;
+  const checkId =
+    source.kind === "listing" || source.kind === "report" ? 0 : source.checkId;
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data } = useSuspenseQuery(
@@ -627,5 +629,7 @@ export default function TaskDetail({
   const task = locator.data.task;
   if (task.source.kind === "listing")
     return <ListingTask onComplete={onComplete} task={task} />;
+  if (task.source.kind === "report")
+    return <ReportTask onComplete={onComplete} task={task} />;
   return <AuditTask onComplete={onComplete} task={task} />;
 }

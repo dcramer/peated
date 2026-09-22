@@ -4,8 +4,10 @@ import { db } from "@peated/server/db";
 import {
   bottleOperations,
   externalSites,
+  reports,
   storePriceMatchProposals,
   storePrices,
+  users,
 } from "@peated/server/db/schema";
 import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
@@ -13,7 +15,9 @@ import {
   listActionableBottleCheckSummaries,
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
+import { describeReportSubject } from "@peated/server/lib/reports";
 import type { ModerationTaskSummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
+import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
 import { and, asc, eq, inArray, isNull, lte, or } from "drizzle-orm";
 
 const MAX_PROJECTED_SOURCE_ROWS = 10_000;
@@ -230,6 +234,62 @@ function catalogTasksForCheck(
   return [];
 }
 
+type ReportTaskRow = {
+  report: Pick<
+    typeof reports.$inferSelect,
+    "createdAt" | "id" | "objectType" | "reason"
+  >;
+  reportedUser: Pick<typeof users.$inferSelect, "username">;
+};
+
+function reportTask({
+  report,
+  reportedUser,
+}: ReportTaskRow): ModerationTaskSummary {
+  return {
+    key: `report:${report.id}`,
+    kind: "report",
+    category: "community",
+    state: "ready",
+    inconclusive: false,
+    title: describeReportSubject(report.objectType, reportedUser.username),
+    sourceLabel: "Member report",
+    question:
+      report.objectType === "user"
+        ? "Does this member break the rules?"
+        : "Does this content break the rules?",
+    statusLabel: REPORT_REASON_LABELS[report.reason],
+    attentionAt: report.createdAt.toISOString(),
+    source: { kind: "report", reportId: report.id },
+  };
+}
+
+async function reportTasks(
+  reportId?: number,
+): Promise<ModerationTaskSummary[]> {
+  const rows = await db
+    .select({
+      report: {
+        createdAt: reports.createdAt,
+        id: reports.id,
+        objectType: reports.objectType,
+        reason: reports.reason,
+      },
+      reportedUser: { username: users.username },
+    })
+    .from(reports)
+    .innerJoin(users, eq(users.id, reports.reportedUserId))
+    .where(
+      and(
+        reportId === undefined ? undefined : eq(reports.id, reportId),
+        eq(reports.status, "open"),
+      ),
+    )
+    .orderBy(asc(reports.createdAt), asc(reports.id))
+    .limit(MAX_PROJECTED_SOURCE_ROWS);
+  return rows.map(reportTask);
+}
+
 async function catalogTasks(): Promise<ModerationTaskSummary[]> {
   const checks = await listActionableBottleCheckSummaries(
     MAX_PROJECTED_SOURCE_ROWS,
@@ -240,11 +300,12 @@ async function catalogTasks(): Promise<ModerationTaskSummary[]> {
 export async function projectModerationTasks(): Promise<
   ModerationTaskSummary[]
 > {
-  const [listings, catalog] = await Promise.all([
+  const [listings, catalog, reportList] = await Promise.all([
     listingTasks(),
     catalogTasks(),
+    reportTasks(),
   ]);
-  const tasks = [...listings, ...catalog];
+  const tasks = [...listings, ...catalog, ...reportList];
   return tasks.sort(
     (left, right) =>
       left.attentionAt.localeCompare(right.attentionAt) ||
@@ -258,6 +319,7 @@ export async function locateModerationTask(
   const [kind, rawId] = key.split(":");
   const id = Number(rawId);
   if (kind === "listing") return (await listingTasks(id)).at(0) ?? null;
+  if (kind === "report") return (await reportTasks(id)).at(0) ?? null;
 
   const checkId =
     kind === "finding"
@@ -282,7 +344,7 @@ export function filterModerationTasks(
   tasks: ModerationTaskSummary[],
   input: {
     query?: string;
-    category?: "listing" | "catalog";
+    category?: "listing" | "catalog" | "community";
     blocked?: boolean;
     inconclusive?: boolean;
   },

@@ -338,7 +338,7 @@ export async function updateSession(): Promise<SessionData> {
   const { client } = await createServerClient();
 
   try {
-    const user = await client.users.details({ user: "me" });
+    const { user } = await client.auth.me();
     await saveAuthSession(session, {
       user,
     });
@@ -456,6 +456,10 @@ function redirectAfterAuth(
   user: NonNullable<SessionData["user"]>,
   redirectTo: string,
 ): never {
+  if (user.suspendedAt) {
+    redirect("/auth/suspended");
+  }
+
   if (!user.termsAcceptedAt) {
     redirect(`/auth/tos-required?redirectTo=${encodeURIComponent(redirectTo)}`);
   }

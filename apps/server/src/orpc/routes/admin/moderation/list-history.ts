@@ -1,19 +1,19 @@
 import { queryModerationHistory } from "@peated/server/lib/moderationHistory";
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import {
   ModerationHistoryListInputSchema,
   ModerationHistoryListResponseSchema,
 } from "./schemas";
 
 export default procedure
-  .use(requireAdmin)
+  .use(requireMod)
   .route({
     method: "GET",
     path: "/admin/moderation/history",
     summary: "List moderation history",
     description:
-      "List recorded listing decisions, catalog change reviews, and audit closures. Requires administrator privileges.",
+      "List recorded listing decisions, catalog change reviews, and audit closures. Requires a moderator or administrator.",
     operationId: "listModerationHistory",
   })
   .input(ModerationHistoryListInputSchema)

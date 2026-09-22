@@ -12,7 +12,10 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("admin moderation tasks", () => {
-  test("requires administrator privileges", async ({ fixtures }) => {
+  test("requires a moderator or administrator", async ({
+    defaults,
+    fixtures,
+  }) => {
     const moderator = await fixtures.User({ mod: true });
     expect(
       await waitError(() => routerClient.admin.moderation.listTasks()),
@@ -20,10 +23,14 @@ describe("admin moderation tasks", () => {
     expect(
       await waitError(() =>
         routerClient.admin.moderation.listTasks(undefined, {
-          context: { user: moderator },
+          context: { user: defaults.user },
         }),
       ),
     ).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    const result = await routerClient.admin.moderation.listTasks(undefined, {
+      context: { user: moderator },
+    });
+    expect(result.results).toEqual([]);
   });
 
   test("projects one oldest-first task per human decision", async ({
@@ -150,6 +157,7 @@ describe("admin moderation tasks", () => {
   });
 
   test("filters and bulk-ignores only actionable inconclusive listings", async ({
+    defaults,
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
@@ -229,7 +237,7 @@ describe("admin moderation tasks", () => {
     await expect(
       routerClient.admin.moderation.ignoreInconclusive(
         {},
-        { context: { user: await fixtures.User({ mod: true }) } },
+        { context: { user: defaults.user } },
       ),
     ).rejects.toThrow("Unauthorized");
 

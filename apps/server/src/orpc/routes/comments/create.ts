@@ -7,6 +7,7 @@ import type {
 import { comments, tastings } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import { createNotification } from "@peated/server/lib/notifications";
+import { hasBlockBetween } from "@peated/server/lib/userBlocks";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -52,6 +53,15 @@ export default procedure
     if (!tasting) {
       throw errors.NOT_FOUND({
         message: "Tasting not found.",
+      });
+    }
+
+    if (
+      tasting.createdById !== context.user.id &&
+      (await hasBlockBetween(db, context.user.id, tasting.createdById))
+    ) {
+      throw errors.FORBIDDEN({
+        message: "You cannot comment on this member's tastings.",
       });
     }
 

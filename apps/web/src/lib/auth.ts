@@ -5,6 +5,7 @@ const AUTH_PATHS = [
   "/register",
   "/verify",
   "/auth/tos-required",
+  "/auth/suspended",
   "/auth/magic-link",
   "/recover-account",
   "/password-reset",
@@ -25,6 +26,23 @@ export function redirectToAuth({
   searchParams?: URLSearchParams;
 }) {
   return redirect(getAuthRedirect({ pathname, searchParams }));
+}
+
+/**
+ * Where a member goes after the API reports an account-state change, or null
+ * when the refreshed session is still usable. Suspended members go to the
+ * suspension screen; anyone without a working session goes to sign in.
+ */
+export function getAccountStateRedirect(
+  session: {
+    accessToken?: string | null;
+    user: { suspendedAt?: string } | null;
+  },
+  location: { pathname?: string; searchParams?: URLSearchParams },
+): string | null {
+  if (session.user?.suspendedAt) return "/auth/suspended";
+  if (session.user && session.accessToken) return null;
+  return getAuthRedirect(location);
 }
 
 export function getAuthRedirect({

@@ -1,5 +1,5 @@
 import { procedure } from "@peated/server/orpc";
-import { requireAdmin } from "@peated/server/orpc/middleware";
+import { requireMod } from "@peated/server/orpc/middleware";
 import {
   AdminContentKindSchema,
   AdminContentListItemSchema,
@@ -10,13 +10,13 @@ import { z } from "zod";
 import { listAdminContent } from "./data";
 
 export default procedure
-  .use(requireAdmin)
+  .use(requireMod)
   .route({
     method: "GET",
     path: "/admin/content",
     summary: "List reviews or tastings",
     description:
-      "List member reviews, critic reviews, or tastings for administrator review.",
+      "List member reviews, critic reviews, or tastings for moderator review.",
     operationId: "listAdminContent",
   })
   .input(

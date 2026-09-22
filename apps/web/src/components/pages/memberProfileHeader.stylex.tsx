@@ -14,25 +14,40 @@ const PHONE = "@media (max-width: 559px)";
 
 export type MemberProfileHeaderProps = {
   actions?: ReactNode;
+  /** The viewer has blocked this member. */
+  blocked?: boolean;
   pictureUrl?: string | null;
   privateProfile?: boolean;
+  /** Shown to the member and to staff only. */
+  suspended?: boolean;
   username: string;
 };
 
 /** Presents member identity, private status, and profile actions. */
 export function MemberProfileHeader({
   actions,
+  blocked = false,
   pictureUrl,
   privateProfile = false,
+  suspended = false,
   username,
 }: MemberProfileHeaderProps) {
+  const chips = [
+    privateProfile ? "Private profile" : null,
+    suspended ? "Suspended" : null,
+    blocked ? "Blocked" : null,
+  ].filter((chip) => chip !== null);
   return (
     <header {...stylex.props(styles.header)}>
       <ProfileAvatar pictureUrl={pictureUrl} username={username} />
       <div {...stylex.props(styles.copy)}>
-        {privateProfile ? (
+        {chips.length ? (
           <div {...stylex.props(styles.status)}>
-            <Chip variant="tinted">Private profile</Chip>
+            {chips.map((chip) => (
+              <Chip key={chip} variant="tinted">
+                {chip}
+              </Chip>
+            ))}
           </div>
         ) : null}
         <h1 {...stylex.props(foundationStyles.pageTitle, styles.title)}>

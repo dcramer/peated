@@ -4,7 +4,7 @@ import { FlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { default as config } from "@peated/web/config";
 import { AuthProvider } from "@peated/web/hooks/useAuth";
 import { OnlineStatusProvider } from "@peated/web/hooks/useOnlineStatus";
-import { getAuthRedirect } from "@peated/web/lib/auth";
+import { getAccountStateRedirect } from "@peated/web/lib/auth";
 import {
   ensureSessionSynced,
   updateSession,
@@ -25,7 +25,7 @@ export default function Providers({
   session: SessionData;
 }) {
   const [session, setSession] = useState<SessionData>(initialSession);
-  const unauthorizedHandlingRef = useRef<Promise<boolean> | null>(null);
+  const accountStateHandlingRef = useRef<Promise<boolean> | null>(null);
   const router = useRouter();
 
   // Sync from server props on navigation
@@ -43,38 +43,40 @@ export default function Providers({
     }
   }, 60000);
 
-  const handleUnauthorized = useCallback(async () => {
-    if (unauthorizedHandlingRef.current) return unauthorizedHandlingRef.current;
+  // The API said the account changed (token gone, account deleted, or
+  // suspended). Refresh the session once for all in-flight requests and
+  // route on what comes back.
+  const handleAccountStateError = useCallback(async () => {
+    if (accountStateHandlingRef.current) return accountStateHandlingRef.current;
 
     const handled = (async () => {
+      let updated: SessionData;
       try {
-        const updated = await updateSession();
-
-        if (updated.user && updated.accessToken) {
-          setSession(updated);
-          return false;
-        }
+        updated = await updateSession();
       } catch {
-        // Preserve the original 401 handling when session validation itself fails.
+        // Let the original API error surface when the refresh itself fails.
         return false;
       }
 
       const currentUrl = new URL(window.location.href);
-      router.push(
-        getAuthRedirect({
-          pathname: currentUrl.pathname,
-          searchParams: currentUrl.search ? currentUrl.searchParams : undefined,
-        }),
-      );
+      const destination = getAccountStateRedirect(updated, {
+        pathname: currentUrl.pathname,
+        searchParams: currentUrl.search ? currentUrl.searchParams : undefined,
+      });
+      if (!destination) {
+        setSession(updated);
+        return false;
+      }
+      router.push(destination);
       return true;
     })();
 
-    unauthorizedHandlingRef.current = handled;
+    accountStateHandlingRef.current = handled;
 
     try {
       return await handled;
     } finally {
-      unauthorizedHandlingRef.current = null;
+      accountStateHandlingRef.current = null;
     }
   }, [router]);
 
@@ -92,7 +94,7 @@ export default function Providers({
     <ORPCProvider
       apiServer={config.API_SERVER}
       accessToken={session.accessToken}
-      onUnauthorized={handleUnauthorized}
+      onAccountStateError={handleAccountStateError}
     >
       <ReactQueryStreamedHydration>
         <OnlineStatusProvider>

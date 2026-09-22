@@ -1,6 +1,6 @@
 # Moderation Workspace
 
-Only administrators can use Moderation. It has three sections:
+Moderators and administrators can use Moderation. It has three sections:
 
 - **Inbox** shows decisions waiting for a person.
 - **History** shows finished decisions.
@@ -13,9 +13,14 @@ those records into a second task system.
 ## Inbox
 
 The Inbox includes open store-price proposals, Bottle or Entity changes waiting
-for review, and unresolved findings. Work that is still running, failed, stale,
-or waiting to retry belongs in Background work until it needs a person to
-decide.
+for review, unresolved findings, and open member reports. Work that is still
+running, failed, stale, or waiting to retry belongs in Background work until it
+needs a person to decide.
+
+A report task shows who sent the report, who it is about, the reason, and a
+link to the live content. Its actions remove the content, delete the comment,
+suspend the member, and close the report as resolved or dismissed. See
+`docs/features/reports-and-blocks.md`.
 
 Each selected item asks one question. Keep warnings, changed fields, impact, and
 needed evidence visible. Put extra system details behind a disclosure. `Skip`
@@ -27,8 +32,8 @@ and detail views with a clear route back to the same filtered list.
 
 ## History And Background Work
 
-History combines completed listing decisions, reviewed catalog changes, and
-closed checks. Show only facts recorded by those sources. Label a missing actor
+History combines completed listing decisions, reviewed catalog changes,
+closed checks, and closed reports. Show only facts recorded by those sources. Label a missing actor
 or reason as unavailable.
 
 The admin overview shows open Inbox decisions separately from failed and active

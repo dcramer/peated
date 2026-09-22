@@ -114,6 +114,7 @@ behavior; research cannot override them.
 - `docs/features/external-reviews.md` — External review storage and publication.
 - `docs/features/moderation-workspace.md` — Moderation inbox, history, and automation.
 - `docs/features/photo-assisted-bottle-resolution.md` — Bottle lookup from a photo.
+- `docs/features/reports-and-blocks.md` — Member reports, blocks, and moderator follow-up.
 - `openspec/specs/entity-identity/spec.md` — Entity kinds, ownership, and API behavior.
 - `packages/bottle-classifier/README.md` — Classifier API and commands.
 

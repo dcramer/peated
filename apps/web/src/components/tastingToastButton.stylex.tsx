@@ -1,5 +1,6 @@
 "use client";
 
+import { isORPCClientError } from "@peated/orpc/client/errors";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -70,7 +71,9 @@ export function TastingToastSummary({
           aria-live="polite"
           {...stylex.props(foundationStyles.metadata, styles.error)}
         >
-          We couldn't save your toast. Try again.
+          {isORPCClientError(createToast.error)
+            ? createToast.error.message
+            : "We couldn't save your toast. Try again."}
         </span>
       ) : null}
     </div>

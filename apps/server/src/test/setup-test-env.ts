@@ -111,6 +111,7 @@ beforeEach(async (ctx) => {
         "auth:*",
         "auth-strict:*",
         "photo-identification:*",
+        "reports:*",
       ];
       for (const prefix of rateLimitPrefixes) {
         const keys = await redis.keys(prefix);

@@ -3,6 +3,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import { TastingReviewDetail } from "@peated/web/components/pages/tastingReviewDetail.stylex";
 import { TastingReviewRail } from "@peated/web/components/pages/tastingReviewRail.stylex";
 
+import { ReviewActions } from "./reviewActions";
+
 type Review = Outputs["memberReviews"]["details"];
 type TastingList = Outputs["tastings"]["list"]["results"];
 type MemberReviewList = Outputs["memberReviews"]["list"]["results"];
@@ -16,6 +18,7 @@ export function ReviewDetail({ review }: { review: Review }) {
       color={review.color}
       createdAt={review.createdAt}
       friends={review.friends}
+      menu={<ReviewActions review={review} />}
       notes={review.notes}
       photoUrl={review.imageUrl}
       rating={{ kind: "review", score: review.score }}

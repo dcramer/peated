@@ -3,6 +3,7 @@ import { implement as implementContract, os } from "@orpc/server";
 import sentryMiddleware from "@peated/orpc/server/middleware";
 import type { Context } from "./context";
 import { errorDefinitions } from "./contracts/base";
+import { suspensionLockout } from "./middleware/suspension";
 
 export const base = os
   .$context<Context>()
@@ -13,7 +14,7 @@ export const base = os
 
 // routes/index.ts must assemble the final router with api.router(...). This is
 // the production boundary that applies global middleware to every route.
-export const api = base.use(sentryMiddleware());
+export const api = base.use(sentryMiddleware()).use(suspensionLockout);
 export const procedure = api;
 
 export function implement<T extends AnyContractRouter>(contract: T) {

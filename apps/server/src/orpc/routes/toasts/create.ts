@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { tastings, toasts } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
+import { hasBlockBetween } from "@peated/server/lib/userBlocks";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -40,6 +41,12 @@ export default procedure
     if (context.user.id === targetTasting.createdById) {
       throw errors.BAD_REQUEST({
         message: "Cannot toast your own tasting.",
+      });
+    }
+
+    if (await hasBlockBetween(db, context.user.id, targetTasting.createdById)) {
+      throw errors.FORBIDDEN({
+        message: "You cannot toast this member's tastings.",
       });
     }
 
