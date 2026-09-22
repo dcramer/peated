@@ -103,7 +103,7 @@ describe("getBottleClassifierRunMetadata", () => {
         costCoverage: "cache_write_unreported_assumed_standard_input",
         estimatedAgentLoopCostUsd: 0.00248,
         pricingModel: "gpt-5.6-terra",
-        pricingEffectiveDate: "2026-08-01",
+        pricingEffectiveDate: "2026-09-22",
         pricingBasis: "standard_short_context",
       },
     });

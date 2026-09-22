@@ -1,12 +1,12 @@
 import type { ModelSettings } from "@openai/agents";
 import { z } from "zod";
 
-export const DEFAULT_BOTTLE_CLASSIFIER_MODEL = "gpt-5.6-luna";
+export const DEFAULT_BOTTLE_CLASSIFIER_MODEL = "gpt-6-luna";
 export const DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT = "high";
 export const DEFAULT_OPENAI_MODEL = "gpt-5.4";
 export const DEFAULT_OPENAI_EVAL_MODEL = "gpt-5.6-luna";
 export const DEFAULT_OPENAI_EVAL_REASONING_EFFORT = "medium";
-export const DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL = "gpt-5.6-luna";
+export const DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT = "high";
 
 type OpenAISdkReasoningEffort = NonNullable<
@@ -46,6 +46,14 @@ export interface StableOpenAISettings {
   reasoning?: { effort: OpenAIReasoningEffort };
 }
 
+/**
+ * GPT-5 and GPT-6 models accept a reasoning effort and ignore temperature.
+ * Other models get a fixed temperature and no reasoning setting.
+ */
+function isOpenAIReasoningModel(modelName: string): boolean {
+  return modelName.startsWith("gpt-5") || modelName.startsWith("gpt-6");
+}
+
 export function getStableOpenAISettings(
   model: string,
   reasoningEffort?: OpenAIReasoningEffort,
@@ -56,7 +64,7 @@ export function getStableOpenAISettings(
     reasoningEffort,
   );
   const settings: StableOpenAISettings = {};
-  if (!modelName.startsWith("gpt-5")) {
+  if (!isOpenAIReasoningModel(modelName)) {
     settings.temperature = 0;
   }
   if (resolvedReasoningEffort) {
@@ -70,5 +78,5 @@ export function resolveOpenAIReasoningEffort(
   reasoningEffort?: OpenAIReasoningEffort,
 ): OpenAIReasoningEffort | undefined {
   const modelName = model.toLowerCase().split("/").at(-1) ?? model;
-  return modelName.startsWith("gpt-5") ? reasoningEffort : undefined;
+  return isOpenAIReasoningModel(modelName) ? reasoningEffort : undefined;
 }

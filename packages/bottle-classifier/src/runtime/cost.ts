@@ -1,6 +1,6 @@
 import type { BottleClassifierRunMetadata } from "./runMetadata";
 
-const PRICING_EFFECTIVE_DATE = "2026-08-01";
+const PRICING_EFFECTIVE_DATE = "2026-09-22";
 const PRICING_SOURCE_URL = "https://developers.openai.com/api/docs/pricing";
 const TOKENS_PER_MILLION = 1_000_000;
 
@@ -41,6 +41,13 @@ const STANDARD_SHORT_CONTEXT_PRICING: TokenPricing[] = [
     cachedInputUsdPerMillion: 0.5,
     cacheWriteUsdPerMillion: 6.25,
     outputUsdPerMillion: 30,
+  },
+  {
+    model: "gpt-6-luna",
+    inputUsdPerMillion: 0.1,
+    cachedInputUsdPerMillion: 0.01,
+    cacheWriteUsdPerMillion: 0.125,
+    outputUsdPerMillion: 0.5,
   },
   {
     model: "gpt-5.4",

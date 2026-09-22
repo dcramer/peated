@@ -103,9 +103,9 @@ The server and eval runner read these settings:
 | Setting                                      | Purpose                                          | Default           |
 | -------------------------------------------- | ------------------------------------------------ | ----------------- |
 | `AI_GATEWAY_API_KEY`                         | Required hosted model access                     | none              |
-| `BOTTLE_CLASSIFIER_MODEL`                    | Reference and audit model                        | `gpt-5.6-luna`    |
+| `BOTTLE_CLASSIFIER_MODEL`                    | Reference and audit model                        | `gpt-6-luna`      |
 | `BOTTLE_CLASSIFIER_REASONING_EFFORT`         | Classifier reasoning effort                      | `high`            |
-| `OPENAI_IMAGE_EXTRACTION_MODEL`              | Label extraction model                           | `gpt-5.6-luna`    |
+| `OPENAI_IMAGE_EXTRACTION_MODEL`              | Label extraction model                           | `gpt-6-luna`      |
 | `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT`   | Label extraction reasoning effort                | `high`            |
 | `OPENAI_EVAL_MODEL`                          | Eval judge model                                 | `gpt-5.6-luna`    |
 | `OPENAI_EVAL_REASONING_EFFORT`               | Eval judge reasoning effort                      | `medium`          |
@@ -116,7 +116,9 @@ The server and eval runner read these settings:
 | `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` | Reviewed test case evidence for controlled evals | none              |
 | `BOTTLE_CLASSIFIER_EVAL_FIXTURE_IDS`         | Comma-separated exact test case IDs to run       | all               |
 
-Model calls use Vercel AI Gateway. Without Firecrawl, the classifier has no web
+Model calls use Vercel AI Gateway. GPT-5 and GPT-6 model names receive the
+reasoning effort; other names get a fixed temperature and no reasoning setting.
+Without Firecrawl, the classifier has no web
 tools. The eval config loads the repo-root `.env.local`; shell values take
 precedence.
 

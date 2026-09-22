@@ -130,6 +130,8 @@ describe("eval harness measurements", () => {
   test.each([
     ["gpt-5.4", 17.5, "gpt-5.4"],
     ["gpt-5.6", 35, "gpt-5.6-sol"],
+    ["gpt-6-luna", 0.6, "gpt-6-luna"],
+    ["openai/gpt-6-luna-2026-09-22", 0.6, "gpt-6-luna"],
   ])(
     "uses standard pricing for %s",
     (model, expectedCost, expectedPricingModel) => {
