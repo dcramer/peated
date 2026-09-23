@@ -28,7 +28,8 @@ export type AdminNavigationItem = {
 
 export type AdminNavigationGroup = {
   items: readonly AdminNavigationItem[];
-  label: string;
+  /** Omit for links that stand on their own above the labeled groups. */
+  label?: string;
 };
 
 export type AdminLayoutProps = {
@@ -55,10 +56,17 @@ function AdminNavigation({
   return (
     <nav aria-label="Admin navigation" {...stylex.props(styles.navigation)}>
       {groups.map((group) => (
-        <section key={group.label} {...stylex.props(styles.navigationGroup)}>
-          <h2 {...stylex.props(foundationStyles.fieldLabel, styles.groupLabel)}>
-            {group.label}
-          </h2>
+        <section
+          key={group.label ?? group.items[0]?.href}
+          {...stylex.props(styles.navigationGroup)}
+        >
+          {group.label ? (
+            <h2
+              {...stylex.props(foundationStyles.fieldLabel, styles.groupLabel)}
+            >
+              {group.label}
+            </h2>
+          ) : null}
           <ul {...stylex.props(styles.navigationList)}>
             {group.items.map((item) => {
               const current = isCurrentHref(currentHref, item);

@@ -3,7 +3,9 @@ import type { ReportStatus } from "@peated/server/db/schema";
 import { reports, users, type Report } from "@peated/server/db/schema";
 import {
   countOpenReportsByTarget,
+  describeReportSubject,
   loadReportTargets,
+  recordNameOf,
   reportTargetKey,
 } from "@peated/server/lib/reports";
 import type { AdminReport } from "@peated/server/schemas";
@@ -64,6 +66,15 @@ async function toAdminReports(rows: AdminReportRow[]): Promise<AdminReport[]> {
       (openCounts.get(key) ?? 0) - (report.status === "open" ? 1 : 0);
     return {
       id: report.id,
+      title: describeReportSubject({
+        objectType: report.objectType,
+        objectId: report.objectId,
+        reportedUsername: reportedUser?.username ?? null,
+        recordName: recordNameOf(
+          report.objectType,
+          target?.contentPreview ?? null,
+        ),
+      }),
       objectType: report.objectType,
       objectId: report.objectId,
       reason: report.reason,

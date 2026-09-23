@@ -139,14 +139,10 @@ export function AdminDetailPageLoading({
 
 export function AdminOverviewPageLoading() {
   return (
-    <div
-      aria-busy="true"
-      aria-label="Loading operations overview"
-      role="status"
-    >
+    <div aria-busy="true" aria-label="Loading overview" role="status">
       <AdminPage>
         <AdminPageHeader
-          title="Operations"
+          title="Overview"
           description="Review open decisions, check background work, and track incoming data."
           metadata={<LoadingPlaceholder preset="pageMetadata" />}
         />

@@ -36,6 +36,13 @@ const nextConfig = {
         destination: "/locations/scotland/regions/campbeltown",
         permanent: true,
       },
+      {
+        // Background work moved out of the Moderation group in the admin
+        // sidebar. Alerts and bookmarks still use the old path.
+        source: "/admin/moderation/automation",
+        destination: "/admin/background-work",
+        permanent: false,
+      },
     ];
   },
   turbopack: {

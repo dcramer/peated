@@ -66,7 +66,7 @@ describe("OperationsOverview", () => {
     expect(html).toContain("Open inbox");
     expect(html).toContain("Background work");
     expect(html).toContain("failed items");
-    expect(html).toContain('href="/admin/moderation/automation"');
+    expect(html).toContain('href="/admin/background-work"');
     expect(html).toContain("View background work");
     expect(html).not.toContain("Needs attention");
     expect(html).not.toContain("System status");

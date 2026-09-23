@@ -28,7 +28,7 @@ export default async function Layout({
     redirect("/auth/suspended");
   }
 
-  // Moderators reach the Moderation and Content sections; see
+  // Moderators reach the Moderation section; see
   // docs/features/moderation-workspace.md.
   if (!session.user?.admin && !session.user?.mod) {
     return <ForbiddenPage route="/admin" />;

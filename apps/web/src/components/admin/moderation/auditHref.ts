@@ -13,7 +13,7 @@ type ModerationAudit =
     };
 
 export function moderationHrefForAudit(audit: ModerationAudit): string {
-  if (!audit.schemaSupported) return "/admin/moderation/automation";
+  if (!audit.schemaSupported) return "/admin/background-work";
 
   const decision = audit.operations.find(({ status }) =>
     ["pending_review", "blocked"].includes(status),
@@ -35,7 +35,7 @@ export function moderationHrefForAudit(audit: ModerationAudit): string {
       ["applying", "stale", "failed"].includes(status),
     )
   ) {
-    return "/admin/moderation/automation";
+    return "/admin/background-work";
   }
 
   return "/admin/moderation/history?category=catalog";

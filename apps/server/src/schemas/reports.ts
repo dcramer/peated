@@ -77,6 +77,8 @@ const ReportMemberSchema = z.object({
 export const AdminReportSchema = z
   .object({
     id: z.number().int().positive(),
+    /** What the report is about, such as "Tasting by @name" or "Bottle: Name". Matches the Inbox and History titles. */
+    title: z.string(),
     objectType: ReportObjectTypeEnum,
     objectId: z.number().int().positive(),
     reason: ReportReasonEnum,

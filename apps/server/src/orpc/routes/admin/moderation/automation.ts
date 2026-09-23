@@ -129,7 +129,7 @@ export function createModerationAutomationProcedure(
     .use(requireMod)
     .route({
       method: "GET",
-      path: "/admin/moderation/automation",
+      path: "/admin/background-work",
       summary: "Get moderation automation overview",
       description:
         "Read bounded processing, retry, and post-decision recovery state. Requires a moderator or administrator.",
@@ -258,7 +258,7 @@ export function createModerationAutomationProcedure(
             title: `Price retry #${run.id}`,
             status: run.status,
             detail: run.error,
-            href: `/admin/moderation/automation?run=${run.id}`,
+            href: `/admin/background-work?run=${run.id}`,
             occurredAt: (run.completedAt ?? run.updatedAt).toISOString(),
           })),
           ...failedJobs.map((job) => ({
@@ -277,7 +277,7 @@ export function createModerationAutomationProcedure(
           title: run.query || "All matching listings",
           status: run.status,
           detail: `${run.processedCount} of ${run.matchedCount} checked`,
-          href: `/admin/moderation/automation?run=${run.id}`,
+          href: `/admin/background-work?run=${run.id}`,
           occurredAt: run.createdAt.toISOString(),
         })),
       };
