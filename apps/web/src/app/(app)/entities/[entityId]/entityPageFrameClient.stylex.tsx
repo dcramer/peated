@@ -102,17 +102,18 @@ function EntityActions({ entity }: { entity: Entity }) {
     ],
   ];
 
+  if (user) {
+    groups[0].push({
+      label: `Report ${noun}`,
+      onSelect: () => setReporting(true),
+    });
+  }
+
   if (user?.mod || user?.admin) {
     groups.push([
       { href: `${entityUrl}/aliases`, label: "View aliases" },
       { href: `${entityUrl}/edit`, label: `Edit ${noun}` },
       { href: `${entityUrl}/merge`, label: `Merge ${noun}` },
-    ]);
-  }
-
-  if (user) {
-    groups.push([
-      { label: `Report ${noun}`, onSelect: () => setReporting(true) },
     ]);
   }
 

@@ -65,12 +65,12 @@ export function TastingActions({ tasting }: { tasting: Tasting }) {
   }
 
   const groups: RowMenuItem[][] = [];
-  if (manage.length) groups.push(manage);
   if (!isOwner) {
     groups.push([
       { label: "Report tasting", onSelect: () => setReporting(true) },
     ]);
   }
+  if (manage.length) groups.push(manage);
 
   return (
     <>

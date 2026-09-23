@@ -101,57 +101,59 @@ export function RowMenu({
             </div>
             <div {...stylex.props(styles.separator)} />
             {normalizedGroups.map((group, groupIndex) => (
-              <div key={groupIndex} {...stylex.props(styles.group)}>
+              <Fragment key={groupIndex}>
                 {groupIndex > 0 ? (
                   <div {...stylex.props(styles.separator)} />
                 ) : null}
-                {group.label ? (
-                  <div
-                    {...stylex.props(
-                      foundationStyles.fieldLabel,
-                      styles.groupLabel,
-                    )}
-                  >
-                    {group.label}
-                  </div>
-                ) : null}
-                {group.items.map((item, itemIndex) => (
-                  <MenuItem
-                    as={Fragment}
-                    disabled={item.disabled}
-                    key={`${item.label}-${itemIndex}`}
-                  >
-                    {({ disabled, focus }) =>
-                      item.href ? (
-                        <AppLink
-                          href={item.href}
-                          {...stylex.props(
-                            foundationStyles.interactive,
-                            styles.item,
-                            focus && styles.focusedItem,
-                            disabled && styles.disabledItem,
-                          )}
-                        >
-                          {item.label}
-                        </AppLink>
-                      ) : (
-                        <button
-                          onClick={item.onSelect}
-                          type="button"
-                          {...stylex.props(
-                            foundationStyles.interactive,
-                            styles.item,
-                            focus && styles.focusedItem,
-                            disabled && styles.disabledItem,
-                          )}
-                        >
-                          {item.label}
-                        </button>
-                      )
-                    }
-                  </MenuItem>
-                ))}
-              </div>
+                <div {...stylex.props(styles.group)}>
+                  {group.label ? (
+                    <div
+                      {...stylex.props(
+                        foundationStyles.fieldLabel,
+                        styles.groupLabel,
+                      )}
+                    >
+                      {group.label}
+                    </div>
+                  ) : null}
+                  {group.items.map((item, itemIndex) => (
+                    <MenuItem
+                      as={Fragment}
+                      disabled={item.disabled}
+                      key={`${item.label}-${itemIndex}`}
+                    >
+                      {({ disabled, focus }) =>
+                        item.href ? (
+                          <AppLink
+                            href={item.href}
+                            {...stylex.props(
+                              foundationStyles.interactive,
+                              styles.item,
+                              focus && styles.focusedItem,
+                              disabled && styles.disabledItem,
+                            )}
+                          >
+                            {item.label}
+                          </AppLink>
+                        ) : (
+                          <button
+                            onClick={item.onSelect}
+                            type="button"
+                            {...stylex.props(
+                              foundationStyles.interactive,
+                              styles.item,
+                              focus && styles.focusedItem,
+                              disabled && styles.disabledItem,
+                            )}
+                          >
+                            {item.label}
+                          </button>
+                        )
+                      }
+                    </MenuItem>
+                  ))}
+                </div>
+              </Fragment>
             ))}
           </MenuItems>
         </div>
