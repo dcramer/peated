@@ -284,18 +284,19 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
     ],
   ];
 
+  if (user) {
+    groups[0].push({
+      label: "Report bottle",
+      onSelect: () => setReporting(true),
+    });
+  }
+
   if (user?.mod || user?.admin) {
     groups.push([
       { href: `/bottles/${bottle.id}/aliases`, label: "Manage other names" },
       { href: `/bottles/${bottle.id}/edit`, label: "Edit bottle" },
       { href: `/bottles/${bottle.id}/merge`, label: "Merge bottle" },
       { href: `/bottles/${bottle.id}/audit`, label: "Audit bottle" },
-    ]);
-  }
-
-  if (user) {
-    groups.push([
-      { label: "Report bottle", onSelect: () => setReporting(true) },
     ]);
   }
 

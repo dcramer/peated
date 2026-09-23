@@ -24,6 +24,11 @@ export function FlightActions({ flight }: { flight: Flight }) {
   const isOwner = user.id === flight.createdBy?.id;
 
   const groups: RowMenuItem[][] = [];
+  if (!isOwner) {
+    groups.push([
+      { label: "Report flight", onSelect: () => setReporting(true) },
+    ]);
+  }
   if (user.mod || isOwner) {
     groups.push([{ href: `/flights/${flight.id}/edit`, label: "Edit flight" }]);
   }
@@ -38,11 +43,6 @@ export function FlightActions({ flight }: { flight: Flight }) {
           router.push("/flights");
         },
       },
-    ]);
-  }
-  if (!isOwner) {
-    groups.push([
-      { label: "Report flight", onSelect: () => setReporting(true) },
     ]);
   }
 
