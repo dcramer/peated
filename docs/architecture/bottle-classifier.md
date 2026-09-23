@@ -54,8 +54,9 @@ not give a blend a component's age, year, or strength. Keep a production lot,
 bottle number, or retailer selector as an observation unless evidence shows
 that it identifies the marketed Bottle.
 
-`maturation` keeps the producer's wording. Do not split it into inferred cask
-type, size, or fill. `caskNumber` is a marketed cask or barrel identifier.
+`maturation` is the producer's cask statement as one short phrase, at most 120
+characters, following the [Whisky Identity Model](./whisky-identity-model.md).
+Do not split it into inferred cask type, size, or fill. `caskNumber` is a marketed cask or barrel identifier.
 `outturn` is the producer-stated bottle count. Maturation and outturn do not by
 themselves decide identity. A marketed cask identifier, `singleCask`, and
 `caskStrength` may be identity evidence.

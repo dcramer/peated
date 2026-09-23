@@ -424,7 +424,8 @@ The contract is applied at the presentation site that owns each branch:
 - Search-vector construction indexes series independently of whether a result
   surface has room to display it.
 - Additional Details remains the complete home for years, cask flags, and cask
-  details omitted from the usual Bottle display.
+  details omitted from the usual Bottle display. The cask statement shows at
+  most two lines; when it is cut off, the full text is available as a tooltip.
 
 Headers, plain-text labels, and verification facts follow the same naming
 contract. They do not introduce another renderer for bottle rows.

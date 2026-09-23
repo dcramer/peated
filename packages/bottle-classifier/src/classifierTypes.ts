@@ -34,11 +34,13 @@ export const ReferenceScopeEnum = z.enum(REFERENCE_SCOPES);
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+// Matches BOTTLE_MATURATION_MAX_LENGTH in the server Bottle schema. Owner: catalog.
+const MATURATION_MAX_LENGTH = 120;
 const MaturationSchema = z
   .string()
   .trim()
   .min(1)
-  .max(1000)
+  .max(MATURATION_MAX_LENGTH)
   .nullable()
   .default(null);
 const CaskNumberSchema = z
@@ -493,7 +495,7 @@ export const BottleCandidateSearchInputSchema = z
         "True only when the reference explicitly says single cask, single barrel, or a specific cask selection.",
       ),
     maturation: MaturationSchema.describe(
-      "Producer-stated cask or maturation details. Preserve the source wording and leave null when it is not stated.",
+      "Producer-stated casks in order of use, as one short phrase of at most 120 characters. Keep the producer's fill, wood, previous-contents, and size words; drop story wording, cask counts, dates, and percentages. Leave null when it is not stated.",
     ),
     cask_number: CaskNumberSchema.describe(
       "Marketed cask or barrel identifier. Preserve punctuation and leave null when it is not stated.",
