@@ -327,13 +327,13 @@ describe("Bottle creation", () => {
     });
   });
 
-  test("stores maturation wording longer than the legacy cask type limit", async ({
+  test("stores a cask statement at the 120-character limit", async ({
     defaults,
     fixtures,
   }) => {
-    const maturation = "Long producer-stated maturation detail. "
-      .repeat(8)
-      .trim();
+    const maturation = "Ex-bourbon barrels, then oloroso sherry butts, "
+      .repeat(3)
+      .slice(0, 120);
     const brand = await fixtures.Entity({ name: "Long Maturation Brand" });
 
     const result = await createBottle({
@@ -345,7 +345,7 @@ describe("Bottle creation", () => {
       },
     });
 
-    expect(maturation.length).toBeGreaterThan(255);
+    expect(maturation).toHaveLength(120);
     expect(result.bottle.maturation).toBe(maturation);
   });
 
