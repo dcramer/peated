@@ -46,6 +46,7 @@ describe("admin reports", () => {
     expect(results).toEqual([
       expect.objectContaining({
         id: report.id,
+        title: "Tasting by @reported-author",
         status: "open",
         reason: "spam",
         createdBy: expect.objectContaining({ id: defaults.user.id }),
@@ -210,6 +211,7 @@ describe("admin reports", () => {
     expect(results).toEqual([
       expect.objectContaining({
         id: report.id,
+        title: `Bottle: ${bottle.fullName}`,
         reportedUser: null,
         contentUrl: `/bottles/${bottle.id}`,
         contentPreview: bottle.fullName,

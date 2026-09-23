@@ -170,7 +170,7 @@ export default function OperationsOverview({
             <SectionHeading id="background-work-heading">
               Background work
             </SectionHeading>
-            <TextLink href="/admin/moderation/automation">
+            <TextLink href="/admin/background-work">
               View background work
             </TextLink>
           </div>

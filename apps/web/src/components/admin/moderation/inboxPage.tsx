@@ -210,7 +210,7 @@ export default function InboxPage() {
                     Start with the oldest
                   </Button>
                 ) : (
-                  <Button href="/admin/moderation/automation">
+                  <Button href="/admin/background-work">
                     Check background work
                   </Button>
                 )

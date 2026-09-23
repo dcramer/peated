@@ -31,7 +31,7 @@ export default function Page() {
   return (
     <AdminPage>
       <AdminPageHeader
-        title="Operations"
+        title="Overview"
         description="Review open decisions, check background work, and track incoming data."
         metadata={
           <>

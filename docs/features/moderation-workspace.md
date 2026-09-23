@@ -1,11 +1,20 @@
 # Moderation Workspace
 
-Moderators and administrators can use Moderation. It has three sections:
+Moderators and administrators can use Moderation. The admin sidebar groups
+these pages under Moderation:
 
 - **Inbox** shows decisions waiting for a person.
+- **Reports** lists every member report by status: open, resolved, or
+  dismissed. An open row opens its Inbox task; a closed row opens its History
+  entry. Decisions happen in the Inbox, not here.
 - **History** shows finished decisions.
-- **Background work** shows failures and retries. The admin overview shows its
-  live totals alongside scraper activity.
+- **Reviews** and **Tastings** list member content so a moderator can read it
+  and remove what should not appear on Peated.
+
+**Background work** (`/admin/background-work`) shows failures and retries. It
+sits under System in the sidebar because it is about the machinery, not about
+decisions, and only administrators see it. The admin overview shows its live
+totals alongside scraper activity.
 
 The workspace reads each item from the feature that owns it. It does not copy
 those records into a second task system.

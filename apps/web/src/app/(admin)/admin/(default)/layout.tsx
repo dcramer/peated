@@ -5,43 +5,39 @@ import {
 import { getSession } from "@peated/web/lib/session.server";
 import React from "react";
 
-// Groups moderators can use. Everything else needs an administrator.
-const MODERATOR_GROUPS = new Set(["Moderation", "Content"]);
+// Groups moderators can use. Everything else needs an administrator; see
+// docs/features/moderation-workspace.md.
+const MODERATOR_GROUPS = new Set(["Moderation"]);
 
 const navigationGroups = [
   {
-    label: "Operations",
-    items: [
-      { href: "/admin", label: "Overview", match: "exact" },
-      {
-        href: "/admin/moderation/automation",
-        label: "Background work",
-      },
-      { href: "/admin/sites", label: "Scrapers" },
-      { href: "/admin/maintenance", label: "Maintenance" },
-    ],
+    items: [{ href: "/admin", label: "Overview", match: "exact" }],
   },
   {
     label: "Moderation",
     items: [
       { href: "/admin/moderation/inbox", label: "Inbox" },
+      { href: "/admin/moderation/reports", label: "Reports" },
       { href: "/admin/moderation/history", label: "History" },
-    ],
-  },
-  {
-    label: "Content",
-    items: [
       { href: "/admin/reviews", label: "Reviews" },
       { href: "/admin/tastings", label: "Tastings" },
     ],
   },
   {
-    label: "Catalog",
+    label: "Reference",
     items: [
       { href: "/admin/badges", label: "Badges" },
       { href: "/admin/events", label: "Events" },
       { href: "/admin/locations", label: "Locations" },
       { href: "/admin/tags", label: "Tags" },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { href: "/admin/background-work", label: "Background work" },
+      { href: "/admin/sites", label: "Scrapers" },
+      { href: "/admin/maintenance", label: "Maintenance" },
     ],
   },
   {
@@ -61,6 +57,8 @@ export default async function AdminRouteLayout({
   const session = await getSession();
   const groups = session.user?.admin
     ? navigationGroups
-    : navigationGroups.filter(({ label }) => MODERATOR_GROUPS.has(label));
+    : navigationGroups.filter(
+        ({ label }) => label !== undefined && MODERATOR_GROUPS.has(label),
+      );
   return <AdminLayout groups={groups}>{children}</AdminLayout>;
 }

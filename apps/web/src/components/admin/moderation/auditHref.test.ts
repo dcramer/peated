@@ -37,7 +37,7 @@ describe("legacy audit routing", () => {
     };
 
     expect(moderationHrefForAudit(audit({ operations: [failed] }))).toBe(
-      "/admin/moderation/automation",
+      "/admin/background-work",
     );
     expect(
       moderationHrefForAudit(audit({ closedAt: "2026-08-13T00:00:00.000Z" })),

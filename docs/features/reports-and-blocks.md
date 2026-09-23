@@ -39,7 +39,9 @@ and on a member's profile. It appears only for signed-in members viewing
 something they did not create.
 
 Open reports appear in the Moderation Inbox as `report` tasks in the
-`community` category, oldest first. Moderators act on a report through the
+`community` category, oldest first. The Reports page
+(`/admin/moderation/reports`) lists every report by status and links each one
+to its Inbox task or History entry. Moderators act on a report through the
 existing operations, then close it:
 
 - Remove a tasting or member review with the admin content moderation route.
@@ -93,8 +95,8 @@ Account deletion removes the member's blocks in both directions.
 Moderators and administrators can read reports, close them, remove tastings
 and member reviews, delete comments, suspend members, and use the Moderation
 workspace. Administrators alone grant roles, suspend moderators, and cannot be
-suspended themselves. Moderators see only the Moderation and Content sections
-of the admin area.
+suspended themselves. Moderators see only the Moderation section of the admin
+area: Inbox, Reports, History, Reviews, and Tastings.
 
 ## Ownership
 
@@ -112,6 +114,6 @@ of the admin area.
   and friend request routes
 - inbox and history projection: `apps/server/src/lib/moderationTasks.ts` and
   `apps/server/src/lib/moderationHistory.ts`
-- web: the report dialog and Inbox report task under
+- web: the report dialog, the Inbox report task, and the Reports page under
   `apps/web/src/components/`, the settings blocked-members page, and the
   "Report …" menu items in each page's actions under `apps/web/src/app/`
