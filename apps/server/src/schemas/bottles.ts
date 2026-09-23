@@ -117,14 +117,18 @@ const BottleReleaseDaySchema = z
   .nullable()
   .default(null)
   .describe("Day of the month this release became available, when known");
+// The cask statement is one short phrase, not a description. Owner: catalog.
+export const BOTTLE_MATURATION_MAX_LENGTH = 120;
 const BottleMaturationSchema = z
   .string()
   .trim()
   .min(1)
-  .max(1000)
+  .max(BOTTLE_MATURATION_MAX_LENGTH)
   .nullable()
   .default(null)
-  .describe("Producer-stated cask or maturation details");
+  .describe(
+    "Producer-stated casks in order of use, as one short phrase of at most 120 characters",
+  );
 const BottleCaskNumberSchema = z
   .string()
   .trim()

@@ -5,6 +5,7 @@ import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Inputs } from "@peated/server/orpc/router";
 import {
+  BOTTLE_MATURATION_MAX_LENGTH,
   BottleInputFields,
   EntityChoiceSchema,
   ImageLicenseSchema,
@@ -1358,7 +1359,7 @@ export default function BottleForm({
                       <>
                         <Field
                           error={errors.maturation?.message}
-                          hint="Copy the producer's wording from the label."
+                          hint="The casks in order of use, in the producer's words. One short phrase, not a story."
                           htmlFor="bottle-maturation"
                           label="Cask details"
                           optional
@@ -1369,8 +1370,9 @@ export default function BottleForm({
                             })}
                             id="bottle-maturation"
                             invalid={Boolean(errors.maturation)}
-                            placeholder="2nd fill ex-bourbon hogshead"
-                            rows={3}
+                            maxLength={BOTTLE_MATURATION_MAX_LENGTH}
+                            placeholder="Ex-bourbon barrels, finished in oloroso sherry casks"
+                            rows={2}
                           />
                         </Field>
                         <FormGrid compactOnMobile={isCreate}>

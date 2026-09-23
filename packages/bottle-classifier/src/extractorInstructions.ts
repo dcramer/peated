@@ -606,7 +606,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "Use `release_year` only for the year the release became available, not a bottling year, founding date, or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `bottling_year` for the bottling year.",
       "If the source gives proof instead of ABV, convert proof to ABV by dividing by 2 and store only the ABV percentage.",
-      "Copy producer-stated cask or maturation wording into `maturation`. Use `cask_number` for a marketed cask or barrel identifier and `outturn` for the stated total bottle count. Do not infer missing values.",
+      "Put the producer-stated casks into `maturation` as one short phrase in order of use, at most 120 characters: keep the producer's fill, wood, previous-contents, and size words; drop story wording, cask counts, dates, and percentages. Example: `Ex-sherry European oak, finished in PX-seasoned new American oak hogsheads`. Use `cask_number` for a marketed cask or barrel identifier and `outturn` for the stated total bottle count. Do not infer missing values.",
       "Set `cask_strength` and `single_cask` only when the label states them explicitly. `Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all count as `cask_strength: true`.",
       "A specific `Cask No.` or `Barrel No.` on a single-bottle whisky label counts as `single_cask: true` when the label presents it as the source barrel/cask identity.",
       "When that exact cask or barrel marker is part of the marketed Bottle identity, preserve its full wording in `edition`; do not output only the number.",

@@ -168,9 +168,13 @@ A fact about one component of a blend does not become a field on the complete
 Bottle. Set the Bottle's age, year, ABV, or other exact trait only when evidence
 states that trait for the marketed blend itself.
 
-`maturation` is free text copied from the producer. Do not split it into a cask
-taxonomy. `caskNumber` and `outturn` hold the marketed identifier and stated
-bottle count. Do not infer any of these fields.
+`maturation` is the producer's cask statement as one short phrase of at most
+120 characters. It names the casks in order of use and keeps the producer's
+fill, wood, previous-contents, and size words, for example `Ex-sherry European
+oak, finished in PX-seasoned new American oak hogsheads`. Drop story wording,
+cask counts, dates, and percentages; those belong in the description. Do not
+split it into a cask taxonomy. `caskNumber` and `outturn` hold the marketed
+identifier and stated bottle count. Do not infer any of these fields.
 
 ## Shared And Exact Edits
 

@@ -113,7 +113,7 @@ describe("POST /bottles", () => {
     expect(await db.select().from(bottles)).toHaveLength(0);
   });
 
-  test("rejects invalid numeric fields at the route boundary", async ({
+  test("rejects invalid fields at the route boundary", async ({
     fixtures,
     defaults,
   }) => {
@@ -128,10 +128,11 @@ describe("POST /bottles", () => {
       ["nonpositive bottler id", { bottler: -1 }],
       ["nonpositive distiller id", { distillers: [0] }],
       ["nonpositive series id", { series: 0 }],
+      ["cask statement over 120 characters", { maturation: "x".repeat(121) }],
     ] as const;
 
     for (const [label, invalid] of cases) {
-      // SAFETY: This test sends invalid numeric fields to the runtime validator.
+      // SAFETY: This test sends invalid fields to the runtime validator.
       const input = {
         name: "Boundary Guard",
         brand: brand.id,

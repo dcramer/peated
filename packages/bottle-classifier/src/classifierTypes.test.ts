@@ -235,6 +235,11 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       cask_number: "#5678",
       outturn: 240,
     });
+    expect(() =>
+      BottleExtractedDetailsSchema.parse({
+        maturation: "x".repeat(121),
+      }),
+    ).toThrow();
     expect(
       BottleCandidateSchema.parse({
         bottleId: 1,

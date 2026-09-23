@@ -106,7 +106,14 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
             : null
           : `${bottle.statedAge} years`,
     },
-    { label: "Cask", value: bottle.maturation },
+    {
+      label: "Cask",
+      value: bottle.maturation ? (
+        <span title={bottle.maturation} {...stylex.props(styles.caskStatement)}>
+          {bottle.maturation}
+        </span>
+      ) : null,
+    },
     { label: "Cask number", value: bottle.caskNumber },
     {
       label: "Outturn",
@@ -588,6 +595,14 @@ const styles = stylex.create({
   },
   overview: {
     minWidth: 0,
+  },
+  // The cask statement shows at most two lines; the title holds the full text.
+  caskStatement: {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2,
+    overflow: "hidden",
+    overflowWrap: "anywhere",
   },
   partialError: {
     margin: 0,
