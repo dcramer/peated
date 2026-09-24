@@ -97,7 +97,9 @@ registry.add("UpdateBottleStats", updateBottleStats);
 registry.add("UpdateSiteReviewScores", updateSiteReviewScores);
 registry.add("UpdateCountryStats", updateCountryStats);
 registry.add("UpdateEntityStats", updateEntityStats);
-registry.add("UpdateExternalReviews", updateExternalReviews);
+registry.add("UpdateExternalReviews", updateExternalReviews, {
+  queueName: "models",
+});
 registry.add("UpdateRegionStats", updateRegionStats);
 registry.add("VerifyBottleCreation", verifyBottleCreation, {
   queueName: "models",

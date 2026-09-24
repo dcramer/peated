@@ -83,6 +83,7 @@ test("jobs that wait on a model do not share the default queue with indexing", a
     "ProcessStorePriceMatchRetryRun",
     "VerifyBottleCreation",
     "GenerateBottleDetails",
+    "UpdateExternalReviews",
   ]) {
     expect(registry.getQueueName(jobName)).toBe("models");
   }
