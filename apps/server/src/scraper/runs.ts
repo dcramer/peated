@@ -57,7 +57,9 @@ const REQUEST_LIMIT_WAIT_MS = 60_000;
 const MODEL_UNAVAILABLE_WAIT_MS = 60 * 60_000;
 const RUN_LIMIT_ERROR = "Scraper run exceeded its execution limits.";
 export const MODEL_UNAVAILABLE_ERROR =
-  "The AI service was unavailable. The run will try again until its time limit.";
+  "The AI service was unavailable. The run is waiting to try again.";
+export const MODEL_UNAVAILABLE_LIMIT_ERROR =
+  "The AI service stayed unavailable until the run's time limit. Request setup again.";
 
 // Run completion discards temporary setup evidence, but keeps repair history and cost counts.
 const finishedRunCursor = sql`CASE WHEN ${externalSiteRuns.purpose} = 'suggest'
@@ -157,8 +159,10 @@ async function claimScraperRun({
         .update(externalSiteRuns)
         .set({
           status: "failed",
-          // A waiting run keeps the reason it was waiting.
-          error: candidate.run.error ?? RUN_LIMIT_ERROR,
+          error:
+            candidate.run.error === MODEL_UNAVAILABLE_ERROR
+              ? MODEL_UNAVAILABLE_LIMIT_ERROR
+              : RUN_LIMIT_ERROR,
           cursor: finishedRunCursor,
           completedAt: now,
           nextAttemptAt: null,

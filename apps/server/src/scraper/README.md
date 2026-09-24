@@ -169,8 +169,8 @@ and repair history stay. Final rule errors are saved with the run and shown
 in Admin. When the AI service cannot take a call (budget exhausted, rate
 limited, an outage, or no connection), the run waits an hour and tries again.
 The rejected call is not counted, and the saved pages are reused, so waiting
-costs nothing. The run fails with that reason once it reaches the three-day run
-age limit. Other AI service, database, job runner, and network problems remain
+costs nothing. Admin shows that the run is waiting. Once the run reaches the
+three-day age limit it fails and asks for a new setup. Other AI service, database, job runner, and network problems remain
 system errors. The AI service does not store request content.
 
 A collection failure caused by broken rules marks the active version failed,

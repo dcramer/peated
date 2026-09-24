@@ -14,7 +14,11 @@ import { z } from "zod";
 import { createScraperRegistry } from "../definitions";
 import type { ScraperHttpClock } from "../http";
 import { createScraperLifecycle, type ScraperEnqueue } from "../lifecycle";
-import { executeScraperRun, MODEL_UNAVAILABLE_ERROR } from "../runs";
+import {
+  executeScraperRun,
+  MODEL_UNAVAILABLE_ERROR,
+  MODEL_UNAVAILABLE_LIMIT_ERROR,
+} from "../runs";
 import type { ScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
@@ -887,7 +891,7 @@ test("a waiting repair fails with its reason once the run is too old", async () 
       .select()
       .from(externalSiteRuns)
       .where(eq(externalSiteRuns.id, repairRunId)),
-  ).toMatchObject([{ status: "failed", error: MODEL_UNAVAILABLE_ERROR }]);
+  ).toMatchObject([{ status: "failed", error: MODEL_UNAVAILABLE_LIMIT_ERROR }]);
   await expectCollectionStopped(site.id);
 });
 
