@@ -45,10 +45,12 @@ export default procedure
       .limit(input.limit + 1);
     const page = rows.slice(0, input.limit);
     for (const bottle of page) {
+      // An operator repair runs ahead of routine queued work: with TIN reads
+      // on, every Bottle without documents is invisible until its job runs.
       await pushUniqueJob(
         "IndexBottleSearchVectors",
         { bottleId: bottle.id },
-        { delay: 0 },
+        { delay: 0, lifo: true },
       );
     }
     return {

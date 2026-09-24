@@ -27,6 +27,7 @@ test("pages search rebuilds by stable ID without skipping or duplicating Bottles
     { bottleId: first.id },
     { bottleId: second.id },
   ]);
+  expect(pushUniqueJob.mock.calls[0][2]).toEqual({ delay: 0, lifo: true });
 });
 
 test("queues only Bottles without search documents when repairing", async ({
