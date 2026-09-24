@@ -55,3 +55,7 @@ Failed jobs stay in Redis, and in Admin's Background work, for three days. The
 worker removes older failed jobs every hour (`removeOldFailedJobs` in
 `queue.ts`).
 Handlers should let unexpected errors throw so BullMQ can record and retry them.
+
+Waiting jobs live only in Redis. A Redis reset drops them without a failure
+record, so bulk work needs a repair path that finds what is still undone from
+the database, such as `missingOnly` on the Bottle search rebuild endpoint.
