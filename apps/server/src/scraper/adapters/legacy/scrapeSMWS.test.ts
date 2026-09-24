@@ -663,6 +663,31 @@ test("uses the SKU volume and positive sale price", async ({ axiosMock }) => {
   });
 });
 
+test("reads the volume from a SKU with another market code", async ({
+  axiosMock,
+}) => {
+  const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
+  const payload = z
+    .object({
+      items: z.array(z.object({ sku: z.string() }).passthrough()),
+    })
+    .passthrough()
+    .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
+
+  payload.items = [payload.items[0]];
+  payload.items[0].sku = "082048CN0700611";
+  axiosMock.onGet(url).reply(200, payload);
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items).toHaveLength(1);
+  expect(items[0][0]).toMatchObject({ caskNumber: "82.48" });
+  expect(items[0][1]).toMatchObject({ volume: 700 });
+});
+
 test("prefers a known cask code encoded in the official SKU", async ({
   axiosMock,
 }) => {

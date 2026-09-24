@@ -55,6 +55,14 @@ export const StorePriceSchema = z.object({
   ),
 });
 
+export const StorePriceVolumeSchema = z
+  .number()
+  .int()
+  .refine((val) => ALLOWED_VOLUMES.includes(val), {
+    message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
+  })
+  .describe("Listed volume in milliliters");
+
 export const StorePriceInputSchema = z.object({
   externalProductId: z
     .string()
@@ -87,13 +95,7 @@ export const StorePriceInputSchema = z.object({
       "Current listing price in the currency's smallest unit (for example, cents)",
     ),
   currency: CurrencyEnum.describe("Currency of the price"),
-  volume: z
-    .number()
-    .int()
-    .refine((val) => ALLOWED_VOLUMES.includes(val), {
-      message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
-    })
-    .describe("Listed volume in milliliters"),
+  volume: StorePriceVolumeSchema,
   url: z
     .string()
     .trim()

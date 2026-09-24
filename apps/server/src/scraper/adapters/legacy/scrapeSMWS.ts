@@ -97,8 +97,12 @@ function parseReleaseDate(value: string | null | undefined) {
 }
 
 function parseVolume(sku: string): number | null {
-  // SMWS UK SKUs encode the bottle size in centilitres after GB or GX.
-  const match = /(?:GB|GX)(?<centilitres>\d{3})/u.exec(sku);
+  // SMWS bottle SKUs put the size in centilitres after the six-character
+  // identity and a two-letter market code, such as 001243GB0700607 or
+  // 082048CN0700611. The market code varies, so accept any two letters.
+  const match = /^[A-Z0-9]{6}[A-Z]{2}(?<centilitres>\d{3})/u.exec(
+    sku.trim().toUpperCase(),
+  );
   if (!match?.groups) return null;
 
   const volume = Number(match.groups.centilitres) * 10;
