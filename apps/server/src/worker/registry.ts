@@ -5,7 +5,7 @@ import * as Sentry from "@sentry/node";
 import { applyJobActorContextToSentry } from "./context";
 import { type JobFunction } from "./types";
 
-export type JobQueueName = "default" | "scrapers";
+export type JobQueueName = "default" | "scrapers" | "models";
 
 /**
  * Keeps queue failure semantics and telemetry aligned: handler errors escape to

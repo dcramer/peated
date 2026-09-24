@@ -157,8 +157,8 @@ export async function gracefulShutdown(signal?: string, worker?: Worker) {
 }
 
 export type WorkerRuntime = {
-  queues: [Queue, Queue];
-  workers: [Worker, Worker];
+  queues: Queue[];
+  workers: Worker[];
   close: () => Promise<void>;
 };
 
@@ -170,6 +170,7 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
   const connection = await getConnection();
   const defaultQueue = await getQueue("default", connection);
   const scraperQueue = await getQueue("scrapers", connection);
+  const modelsQueue = await getQueue("models", connection);
   const processJob = async (job: { name: string; data: QueuedJobInput }) => {
     let jobFn;
     let queuedJob;
@@ -194,8 +195,16 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
     concurrency: 4,
     lockDuration: SCRAPER_JOB_LOCK_MS,
   });
+  // One model call at a time keeps spend predictable; the separate queue keeps
+  // those calls from starving the default queue.
+  const modelsWorker = new Worker(modelsQueue.name, processJob, {
+    connection,
+    autorun: false,
+  });
+  const queues = [defaultQueue, scraperQueue, modelsQueue];
+  const workers = [defaultWorker, scraperWorker, modelsWorker];
 
-  for (const worker of [defaultWorker, scraperWorker]) {
+  for (const worker of workers) {
     worker.on("failed", (job, error) => {
       // The instrumented job boundary already owns the Sentry issue.
       logTelemetryError(error, {
@@ -210,18 +219,17 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
     });
   }
 
-  void defaultWorker.run();
-  void scraperWorker.run();
+  for (const worker of workers) void worker.run();
   logInfo("Workers running", {
-    extra: { queues: [defaultQueue.name, scraperQueue.name] },
+    extra: { queues: queues.map((queue) => queue.name) },
   });
 
   return {
-    queues: [defaultQueue, scraperQueue],
-    workers: [defaultWorker, scraperWorker],
+    queues,
+    workers,
     async close() {
-      await Promise.all([defaultWorker.close(), scraperWorker.close()]);
-      await Promise.all([defaultQueue.close(), scraperQueue.close()]);
+      await Promise.all(workers.map((worker) => worker.close()));
+      await Promise.all(queues.map((queue) => queue.close()));
     },
   };
 }
