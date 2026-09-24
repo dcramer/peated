@@ -114,7 +114,8 @@ Fields on an article or product page are CSS selectors too. Code reads text by
 default. It reads `href` from links, `src` from images, `datetime` from dates,
 `content` from meta tags, and `value` from form fields. It also trims spaces,
 makes full URLs, and reads prices, scores, dates, volumes, strength, ages, and
-release years. A selector may match a short group of facts; code finds values
+release years. When the list page is an RSS or Atom feed, each item's date is
+used for an article page that shows no date of its own. A selector may match a short group of facts; code finds values
 beside familiar labels such as `70cl`, `46% ABV`, `10 Year Old`, and `91 points`.
 A price source can use a number of milliliters as a fixed volume. Rules do not
 contain general cleanup steps. Put unusual cleanup for one source in a small

@@ -33,7 +33,7 @@ import {
   type ScrapeSourceSetupFeedback,
 } from "./setupError";
 
-export const AI_INSTRUCTIONS_VERSION = "scrape-source-v28";
+export const AI_INSTRUCTIONS_VERSION = "scrape-source-v29";
 const MAX_AI_INPUT_CHARS = 200_000;
 export const MAX_EXAMPLE_PAGES = 3;
 export const MAX_RULE_TEST_ITEMS = 20;
@@ -196,6 +196,7 @@ const RULE_INSTRUCTIONS = [
   "<rules>",
   "Selectors return text by default. Code reads href from links, src from images, datetime from dates, content from meta tags, and value from form fields.",
   "Code trims spaces, makes full URLs, and reads prices, scores, dates, and volumes. Do not add cleanup instructions.",
+  "When the list page is an RSS or Atom feed, each item's date fills in an article page that shows no date. Prefer the feed as the list when article pages lack dates.",
   "Use only fields allowed by test_rules.",
   "The startPages are the main page and likely pages of article or product links from the same website.",
   "The examplePages are optional examples of article or product pages.",

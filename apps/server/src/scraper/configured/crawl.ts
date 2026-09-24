@@ -94,6 +94,8 @@ export const ConfiguredScrapeCursorSchema = z
   .object({
     listUrls: z.array(z.url()).max(SCRAPE_SOURCE_MAX_LIST_PAGES),
     detailUrls: z.array(z.url()).max(99),
+    // Feed item dates aligned with detailUrls; older cursors omit this.
+    detailDates: z.array(z.iso.datetime().nullable()).max(99).optional(),
     nextListUrl: z.url().nullable(),
     detailIndex: z.number().int().min(0).max(99),
     previewPages: z.array(ScrapeSourcePreviewPageSchema).max(99),
@@ -124,6 +126,7 @@ export function createScrapeSourceAdapter(
     let state: ConfiguredScrapeCursor = cursor ?? {
       listUrls: [],
       detailUrls: [],
+      detailDates: [],
       nextListUrl: new URL(input.listUrl).toString(),
       detailIndex: 0,
       previewPages: [],
@@ -131,6 +134,9 @@ export function createScrapeSourceAdapter(
     try {
       const listUrls = new Set(state.listUrls);
       const detailUrls = new Set(state.detailUrls);
+      const detailDates = state.detailUrls.map(
+        (_, index) => state.detailDates?.[index] ?? null,
+      );
       while (
         state.nextListUrl &&
         listUrls.size < SCRAPE_SOURCE_MAX_LIST_PAGES &&
@@ -170,13 +176,17 @@ export function createScrapeSourceAdapter(
           );
         }
         for (const link of listResult.links) {
-          detailUrls.add(link);
+          if (!detailUrls.has(link)) {
+            detailUrls.add(link);
+            detailDates.push(listResult.linkDates?.[link] ?? null);
+          }
           if (detailUrls.size >= input.rules.limit) break;
         }
         state = {
           ...state,
           listUrls: [...listUrls],
           detailUrls: [...detailUrls],
+          detailDates,
           nextListUrl: listResult.nextPageUrl,
         };
         await session.checkpoint(state);
@@ -201,7 +211,10 @@ export function createScrapeSourceAdapter(
           }
           throw error;
         }
-        const parsed = input.rules.parseDetail(response.body, response.url);
+        const listDate = state.detailDates?.[state.detailIndex];
+        const parsed = input.rules.parseDetail(response.body, response.url, {
+          listDate: listDate ? new Date(listDate) : undefined,
+        });
         if (parsed.issues.length > 0 || !parsed.value) {
           throw new ScrapeSourceParseError(
             response.url.toString(),

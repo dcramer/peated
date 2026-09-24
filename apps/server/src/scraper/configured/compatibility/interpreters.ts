@@ -5,6 +5,7 @@ import {
   parseEarlyScrapeList,
   parseSavedScrapeDetail,
   parseSavedScrapeList,
+  type ScrapeDetailContext,
   type ScrapeDetailResult,
   type ScrapeListResult,
 } from "../parser";
@@ -23,7 +24,11 @@ function contract<T extends StoredScrapeRules>(input: {
   listLinkField: string;
   nextPageField: string;
   parseList(html: string, pageUrl: URL): ScrapeListResult;
-  parseDetail(html: string, pageUrl: URL): ScrapeDetailResult;
+  parseDetail(
+    html: string,
+    pageUrl: URL,
+    context?: ScrapeDetailContext,
+  ): ScrapeDetailResult;
   withLimit(limit: number): ExecutableScrapeRules;
 }): ExecutableScrapeRules {
   return {
@@ -33,7 +38,8 @@ function contract<T extends StoredScrapeRules>(input: {
     listLinkField: input.listLinkField,
     nextPageField: input.nextPageField,
     parseList: (html, pageUrl) => input.parseList(html, pageUrl),
-    parseDetail: (html, pageUrl) => input.parseDetail(html, pageUrl),
+    parseDetail: (html, pageUrl, context) =>
+      input.parseDetail(html, pageUrl, context),
     withLimit: (limit) => input.withLimit(limit),
   };
 }
@@ -101,8 +107,8 @@ export function interpretDirectRules(
     listLinkField: "list.links",
     nextPageField: "list.nextPage",
     parseList: (html, pageUrl) => parseDirectScrapeList(rules, html, pageUrl),
-    parseDetail: (html, pageUrl) =>
-      parseDirectScrapeDetail(rules, html, pageUrl),
+    parseDetail: (html, pageUrl, context) =>
+      parseDirectScrapeDetail(rules, html, pageUrl, context),
     withLimit: (requestedLimit) =>
       decode({
         ...rules,
