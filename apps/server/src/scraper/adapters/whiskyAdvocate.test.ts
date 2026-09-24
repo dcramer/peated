@@ -1,6 +1,7 @@
 import { loadFixture } from "@peated/server/lib/test/fixtures";
 import { load as cheerio } from "cheerio";
 import { vi } from "vitest";
+import { ScraperHttpStatusError } from "../http";
 import type { ScraperObservation, ScraperSession } from "../types";
 import {
   type WhiskyAdvocateCursor,
@@ -210,6 +211,99 @@ test("fetches dates and checkpoints each review", async () => {
     issue: null,
     completedReviewUrls: [],
   });
+});
+
+test("skips a review whose page is gone and finishes the issue", async () => {
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    1,
+  );
+  const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
+  const missingUrl =
+    "https://whiskyadvocate.com/Angel-s-Envy-Cask-Strength-Sauternes-and-Toasted-Oak-Barrel-Finished-Batch-RC1-57-2";
+  const observations: ScraperObservation<WhiskyAdvocateObservation>[] = [];
+  const request = vi.fn(async ({ url }: { url: URL }) => {
+    if (url.href === missingUrl) {
+      throw new ScraperHttpStatusError(404, url, {});
+    }
+    return {
+      url,
+      status: 200,
+      headers: {},
+      body:
+        url.pathname !== "/ratings-reviews"
+          ? articleHtml
+          : url.search.includes("custom_rating_issue")
+            ? reviewHtml
+            : issueHtml,
+    };
+  });
+  const checkpoint = vi.fn();
+  const session: ScraperSession<
+    WhiskyAdvocateCursor,
+    WhiskyAdvocateObservation
+  > = {
+    request,
+    emit: async (observation) => {
+      observations.push(observation);
+    },
+    checkpoint,
+    remainingRequests: () => 200,
+  };
+
+  await whiskyAdvocateAdapter({ cursor: null, session });
+
+  expect(request).toHaveBeenCalledTimes(168);
+  expect(observations).toHaveLength(165);
+  expect(observations.map((item) => item.sourceKey)).not.toContain(missingUrl);
+  // The missing page is recorded as done so a resumed run does not request it again.
+  expect(checkpoint).toHaveBeenNthCalledWith(1, {
+    checksReviewDates: true,
+    completedIssues: [],
+    issue: "Winter 2023",
+    completedReviewUrls: [missingUrl],
+  });
+  expect(checkpoint).toHaveBeenLastCalledWith({
+    checksReviewDates: true,
+    completedIssues: ["Winter 2023"],
+    issue: null,
+    completedReviewUrls: [],
+  });
+});
+
+test("fails on a server error for a review page", async () => {
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    1,
+  );
+  const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const request = vi.fn(async ({ url }: { url: URL }) => {
+    if (url.pathname !== "/ratings-reviews") {
+      throw new ScraperHttpStatusError(503, url, {});
+    }
+    return {
+      url,
+      status: 200,
+      headers: {},
+      body: url.search.includes("custom_rating_issue") ? reviewHtml : issueHtml,
+    };
+  });
+  const emit = vi.fn();
+  const session: ScraperSession<
+    WhiskyAdvocateCursor,
+    WhiskyAdvocateObservation
+  > = {
+    request,
+    emit,
+    checkpoint: vi.fn(),
+    remainingRequests: () => 200,
+  };
+
+  await expect(
+    whiskyAdvocateAdapter({ cursor: null, session }),
+  ).rejects.toBeInstanceOf(ScraperHttpStatusError);
+  expect(emit).not.toHaveBeenCalled();
 });
 
 test("rechecks old saved reviews and resumes reviews checked for dates", async () => {
