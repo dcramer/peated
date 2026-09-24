@@ -54,7 +54,8 @@ The registry adds Sentry spans, actor context, and success or failure logs.
 Failed jobs stay in Redis, and in Admin's Background work, for three days. The
 worker removes older failed jobs every hour (`removeOldFailedJobs` in
 `queue.ts`). A unique job ID that still exists blocks a new add, so
-`pushUniqueJob` removes a failed job with the same ID before queueing again.
+`pushUniqueJob` removes a completed or failed job with the same ID before
+queueing again.
 Handlers should let unexpected errors throw so BullMQ can record and retry them.
 
 Waiting jobs live only in Redis. A Redis reset drops them without a failure

@@ -72,20 +72,28 @@ export function buildUniqueJobOptions(
 
 /**
  * Worker queue rule: BullMQ ignores an add whose job ID still exists in any
- * state. Failed jobs keep their ID for three days, so a failed unique job would
- * silently block the same work from queueing again. Remove it first.
+ * state. Failed jobs keep their ID for three days, and completed unique jobs
+ * queued before removeOnComplete was set are kept forever, so either would
+ * silently block the same work from queueing again. Remove a finished job
+ * first; leave waiting or active work alone.
  */
 type QueuedJobLookup = {
-  getJob(
-    jobId: string,
-  ): Promise<
-    { isFailed(): Promise<boolean>; remove(): Promise<void> } | undefined
+  getJob(jobId: string): Promise<
+    | {
+        isCompleted(): Promise<boolean>;
+        isFailed(): Promise<boolean>;
+        remove(): Promise<void>;
+      }
+    | undefined
   >;
 };
 
-export async function removeFailedJob(queue: QueuedJobLookup, jobId: string) {
+export async function removeFinishedJob(queue: QueuedJobLookup, jobId: string) {
   const existing = await queue.getJob(jobId);
-  if (existing && (await existing.isFailed())) await existing.remove();
+  if (!existing) return;
+  if ((await existing.isCompleted()) || (await existing.isFailed())) {
+    await existing.remove();
+  }
 }
 
 async function pushUniqueJobToQueue(
@@ -95,7 +103,7 @@ async function pushUniqueJobToQueue(
 ) {
   opts = buildUniqueJobOptions(jobName, args, opts);
   const queue = await getQueue(registry.getQueueName(jobName));
-  await removeFailedJob(queue, opts.jobId!);
+  await removeFinishedJob(queue, opts.jobId!);
 
   return await pushJobToQueue(jobName, args, opts);
 }
