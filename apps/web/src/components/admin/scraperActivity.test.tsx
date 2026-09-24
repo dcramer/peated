@@ -33,9 +33,9 @@ const data = {
       requestErrorsComplete: true,
       runs: 4,
       failedRuns: 1,
-      reviews: 12,
-      prices: 9,
-      catalogListings: 4,
+      reviews: 5,
+      prices: 4,
+      catalogListings: 1,
     },
     {
       date: "2026-09-04",
@@ -44,9 +44,9 @@ const data = {
       requestErrorsComplete: true,
       runs: 3,
       failedRuns: 0,
-      reviews: 8,
-      prices: 8,
-      catalogListings: 3,
+      reviews: 3,
+      prices: 2,
+      catalogListings: 1,
     },
   ],
   failingSites: [],
@@ -56,14 +56,16 @@ describe("ScraperActivity", () => {
   it("shows chronological charts with exact daily labels", () => {
     const html = renderToStaticMarkup(<ScraperActivity data={data} />);
     const savedChart = html.match(
-      /<ol aria-label="Saved items by day"[\s\S]*?<\/ol>/,
+      /<ol aria-label="New items by day"[\s\S]*?<\/ol>/,
     )?.[0];
 
     expect(savedChart).toBeDefined();
     expect(savedChart!.indexOf("September 4, 2026")).toBeLessThan(
       savedChart!.indexOf("September 5, 2026"),
     );
-    expect(savedChart).toContain("12 reviews, 9 prices, 4 catalog listings");
+    expect(savedChart).toContain(
+      "5 new reviews, 4 new prices, 1 new catalog listing",
+    );
     expect(html).toContain('aria-label="Requests by day"');
     expect(html).toContain("42 requests, 4 runs, 2 failed requests");
     expect(html).toContain("Daily details");
@@ -97,7 +99,7 @@ describe("ScraperActivity", () => {
     );
 
     expect(html).toContain("No scraper activity in the last 30 days.");
-    expect(html).not.toContain('aria-label="Saved items by day"');
+    expect(html).not.toContain('aria-label="New items by day"');
   });
 
   it("keeps an empty run summary compact", () => {
@@ -129,6 +131,6 @@ describe("ScraperActivity", () => {
     expect(html).toContain("1</dd><dd");
     expect(html).toContain("No reviews, prices or catalog listings saved.");
     expect(html).toContain("No scraper activity in the last 30 days.");
-    expect(html).not.toContain('aria-label="Saved items by day"');
+    expect(html).not.toContain('aria-label="New items by day"');
   });
 });
