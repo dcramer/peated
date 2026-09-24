@@ -37,8 +37,8 @@ not log the full argument object. Log only safe IDs, counts, and status values.
 Jobs run on three queues. `default` handles fast derived-data work such as
 search indexing, stats, and notifications. `scrapers` runs collection runs
 with its own lock timeout. `models` runs every job that waits on a hosted
-model, such as listing and review classification, catalog verification, and
-generated descriptions, one at a time. Register a job that calls a model with
+model, such as listing and review classification, review clips, catalog
+verification, and generated descriptions, one at a time. Register a job that calls a model with
 `{ queueName: "models" }` so a burst of classifier work cannot starve indexing.
 
 ## Queue Or Run A Job
