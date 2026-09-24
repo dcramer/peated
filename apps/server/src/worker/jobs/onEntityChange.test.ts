@@ -12,18 +12,17 @@ test("dispatches derived work for an existing Entity", async ({ fixtures }) => {
 
   await onEntityChange({ entityId: entity.id });
 
-  expect(workerClient.runJob).toHaveBeenNthCalledWith(
-    1,
+  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
     "GenerateEntityDetails",
     { entityId: entity.id },
   );
   expect(workerClient.runJob).toHaveBeenNthCalledWith(
-    2,
+    1,
     "IndexEntitySearchVectors",
     { entityId: entity.id },
   );
   expect(workerClient.runJob).toHaveBeenNthCalledWith(
-    3,
+    2,
     "GeocodeEntityLocation",
     { entityId: entity.id },
   );

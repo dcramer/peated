@@ -20,7 +20,8 @@ export default async (input: JobPayload) => {
   // this queued work is stale, so no derived entity state remains to update.
   if (!entity) return;
 
-  await runJob("GenerateEntityDetails", { entityId });
+  // Generated details wait on a model, so they run on the models queue.
+  await pushUniqueJob("GenerateEntityDetails", { entityId });
   await runJob("IndexEntitySearchVectors", { entityId });
   await runJob("GeocodeEntityLocation", { entityId });
   await pushUniqueJob("UpdateEntityStats", { entityId }, { delay: 5000 });

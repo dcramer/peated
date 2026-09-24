@@ -22,7 +22,7 @@ test("dispatches derived work for the supplied Bottle", async ({
 
   await onBottleChange({ bottleId: bottle.id });
 
-  expect(workerClient.runJob).not.toHaveBeenCalledWith(
+  expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
     "GenerateBottleDetails",
     expect.anything(),
   );
@@ -43,16 +43,13 @@ test("generates details only when explicitly requested", async ({
 
   await onBottleChange({ bottleId: bottle.id, generateDetails: true });
 
-  expect(workerClient.runJob).toHaveBeenNthCalledWith(
-    1,
+  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
     "GenerateBottleDetails",
     { bottleId: bottle.id },
   );
-  expect(workerClient.runJob).toHaveBeenNthCalledWith(
-    2,
-    "IndexBottleSearchVectors",
-    { bottleId: bottle.id },
-  );
+  expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearchVectors", {
+    bottleId: bottle.id,
+  });
 });
 
 test("skips stale work for a deleted Bottle", async () => {
