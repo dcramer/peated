@@ -40,6 +40,8 @@ with its own lock timeout. `models` runs every job that waits on a hosted
 model, such as listing and review classification, review clips, catalog
 verification, and generated descriptions, one at a time. Register a job that calls a model with
 `{ queueName: "models" }` so a burst of classifier work cannot starve indexing.
+A default-queue job that needs model work queues it instead of running it
+inline, and every outbound request on the default queue carries a timeout.
 
 ## Queue Or Run A Job
 

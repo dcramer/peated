@@ -171,6 +171,7 @@ export default async (input: JobPayload) => {
         headers: {
           "User-Agent": BOT_USER_AGENT,
         },
+        signal: AbortSignal.timeout(10_000),
       });
     } catch (err) {
       logTelemetryError(err, {

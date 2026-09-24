@@ -44,8 +44,10 @@ export default async (input: JobPayload) => {
   // this queued work is stale, so no derived Bottle state remains to update.
   if (!bottle) return;
 
+  // Generated details wait on a model, so they run on the models queue; the
+  // resulting patch queues another change, which re-indexes the Bottle.
   if (generateDetails) {
-    await runJob("GenerateBottleDetails", { bottleId });
+    await pushUniqueJob("GenerateBottleDetails", { bottleId });
   }
   await runJob("IndexBottleSearchVectors", { bottleId });
   const statsJob = buildBottleChangeStatsJob(bottleId);

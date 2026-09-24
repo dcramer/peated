@@ -54,6 +54,10 @@ describe("capturePriceImage", () => {
     });
 
     expect(storeImage).toHaveBeenCalled();
+    expect(fetchImage).toHaveBeenCalledWith(
+      "https://example.com/image.jpg",
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
     expect(updatedPrice?.imageUrl).toBe("/uploads/price-image.webp");
     expect(updatedBottle?.imageUrl).toBeNull();
     expect(queueResolution).toHaveBeenCalledWith("ResolveStorePriceBottle", {

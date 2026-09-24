@@ -41,8 +41,11 @@ async function fetchAndStoreImage(
       imageUrl,
     },
   });
+  // A retailer that never answers must not hold the queue: the job runs at
+  // concurrency 1 and BullMQ renews its lock for as long as it waits.
   const req = await services.fetchImage(imageUrl, {
     headers: defaultHeaders(imageUrl),
+    signal: AbortSignal.timeout(30_000),
   });
   if (!req.body) return null;
   const file = Readable.from(readResponseBody(req.body));
