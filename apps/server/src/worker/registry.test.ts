@@ -71,3 +71,19 @@ describe("worker registry", () => {
     expect(flush).toHaveBeenCalledWith(2000);
   });
 });
+
+test("jobs that wait on a model do not share the default queue with indexing", async () => {
+  await import("./jobs");
+  const registry = (await import("./registry")).default;
+  expect(registry.getQueueName("IndexBottleSearchVectors")).toBe("default");
+  expect(registry.getQueueName("UpdateBottleStats")).toBe("default");
+  for (const jobName of [
+    "CreateMissingBottles",
+    "ResolveStorePriceBottle",
+    "ProcessStorePriceMatchRetryRun",
+    "VerifyBottleCreation",
+    "GenerateBottleDetails",
+  ]) {
+    expect(registry.getQueueName(jobName)).toBe("models");
+  }
+});

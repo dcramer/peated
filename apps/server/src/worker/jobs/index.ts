@@ -39,12 +39,23 @@ import updateSiteReviewScores from "./updateSiteReviewScores";
 import verifyBottleCreation from "./verifyBottleCreation";
 import verifyEntityCreation from "./verifyEntityCreation";
 
+// Worker queue rule: jobs that wait on a hosted model run on the "models"
+// queue so fast derived-data work such as search indexing and stats never
+// waits behind a classifier call.
 registry.add("CapturePriceImage", capturePriceImage);
 registry.add("CleanupPendingUploads", cleanupPendingUploads);
-registry.add("GenerateBottleDetails", generateBottleDetails);
-registry.add("GenerateCountryDetails", generateCountryDetails);
-registry.add("GenerateEntityDetails", generateEntityDetails);
-registry.add("GenerateRegionDetails", generateRegionDetails);
+registry.add("GenerateBottleDetails", generateBottleDetails, {
+  queueName: "models",
+});
+registry.add("GenerateCountryDetails", generateCountryDetails, {
+  queueName: "models",
+});
+registry.add("GenerateEntityDetails", generateEntityDetails, {
+  queueName: "models",
+});
+registry.add("GenerateRegionDetails", generateRegionDetails, {
+  queueName: "models",
+});
 registry.add("GeocodeCountryLocation", geocodeCountryLocation);
 registry.add("GeocodeRegionLocation", geocodeRegionLocation);
 registry.add("GeocodeEntityLocation", geocodeEntityLocation);
@@ -59,7 +70,9 @@ registry.add("OnBottleChange", onBottleChange);
 registry.add("OnEntityChange", onEntityChange);
 registry.add("ProcessAccountDeletions", processAccountDeletions);
 registry.add("ProcessNotification", processNotification);
-registry.add("ProcessStorePriceMatchRetryRun", processStorePriceMatchRetryRun);
+registry.add("ProcessStorePriceMatchRetryRun", processStorePriceMatchRetryRun, {
+  queueName: "models",
+});
 registry.add("RepairBottleGroupBottleCounts", repairBottleGroupBottleCounts);
 registry.add("RepairBottleStats", repairBottleStats);
 registry.add(
@@ -73,14 +86,22 @@ registry.add(
   "ReconcileStorePriceMatchProposals",
   reconcileStorePriceMatchProposals,
 );
-registry.add("ResolveStorePriceBottle", resolveStorePriceBottle);
+registry.add("ResolveStorePriceBottle", resolveStorePriceBottle, {
+  queueName: "models",
+});
 registry.add("RunScraper", runScraper, { queueName: "scrapers" });
-registry.add("CreateMissingBottles", createMissingBottles);
+registry.add("CreateMissingBottles", createMissingBottles, {
+  queueName: "models",
+});
 registry.add("UpdateBottleStats", updateBottleStats);
 registry.add("UpdateSiteReviewScores", updateSiteReviewScores);
 registry.add("UpdateCountryStats", updateCountryStats);
 registry.add("UpdateEntityStats", updateEntityStats);
 registry.add("UpdateExternalReviews", updateExternalReviews);
 registry.add("UpdateRegionStats", updateRegionStats);
-registry.add("VerifyBottleCreation", verifyBottleCreation);
-registry.add("VerifyEntityCreation", verifyEntityCreation);
+registry.add("VerifyBottleCreation", verifyBottleCreation, {
+  queueName: "models",
+});
+registry.add("VerifyEntityCreation", verifyEntityCreation, {
+  queueName: "models",
+});

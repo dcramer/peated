@@ -106,11 +106,27 @@ export type ModerationQueueLoader = () => Promise<{
 }>;
 
 const loadQueueState: ModerationQueueLoader = async () => {
-  const queue = await getQueue("default");
-  const [counts, failed] = await Promise.all([
-    queue.getJobCounts("wait", "active", "completed", "failed"),
-    queue.getFailed(0, FAILED_LIST_LIMIT - 1),
-  ]);
+  // Moderation work spans the default and models queues; scrapers report
+  // through the scraper panel.
+  const queues = await Promise.all([getQueue("default"), getQueue("models")]);
+  const states = await Promise.all(
+    queues.map(async (queue) => ({
+      counts: await queue.getJobCounts("wait", "active", "completed", "failed"),
+      failed: await queue.getFailed(0, FAILED_LIST_LIMIT - 1),
+    })),
+  );
+  const counts: Record<string, number> = {};
+  for (const state of states) {
+    for (const [key, value] of Object.entries(state.counts)) {
+      counts[key] = (counts[key] ?? 0) + value;
+    }
+  }
+  const failed = states
+    .flatMap((state) => state.failed)
+    .sort(
+      (a, b) => (b.finishedOn ?? b.timestamp) - (a.finishedOn ?? a.timestamp),
+    )
+    .slice(0, FAILED_LIST_LIMIT);
   return {
     counts,
     failedJobs: failed.map((job) => ({
