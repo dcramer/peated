@@ -9,6 +9,7 @@ import { CategoryEnum } from "@peated/server/schemas";
 import { load as cheerio } from "cheerio";
 import { createHash } from "node:crypto";
 import { z } from "zod";
+import { ScraperHttpStatusError } from "../http";
 import type { ScraperAdapter } from "../types";
 import { parseDate } from "./dates";
 import { readReviewBody } from "./reviewBody";
@@ -211,10 +212,33 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
 
     for (const review of externalReviews) {
       if (completedReviewUrls.has(review.url)) continue;
-      const articleResponse = await session.request({
-        target: TARGET,
-        url: new URL(review.url),
-      });
+      let articleResponse;
+      try {
+        articleResponse = await session.request({
+          target: TARGET,
+          url: new URL(review.url),
+        });
+      } catch (error) {
+        // An issue can list a review whose page was removed. Skip it so the
+        // rest of the issue is still collected instead of failing every run.
+        if (
+          !(error instanceof ScraperHttpStatusError) ||
+          ![404, 410].includes(error.status)
+        ) {
+          throw error;
+        }
+        logWarn("[Whisky Advocate] Review page is missing for {name}", {
+          extra: { name: review.name, url: review.url, status: error.status },
+        });
+        completedReviewUrls.add(review.url);
+        await session.checkpoint({
+          checksReviewDates: true,
+          completedIssues: [...completedIssues],
+          issue,
+          completedReviewUrls: [...completedReviewUrls],
+        });
+        continue;
+      }
       const publishedAt = parseReviewPublishedAt(articleResponse.body);
       const body = parseReviewBody(articleResponse.body);
       const nativeScore = {
