@@ -82,8 +82,17 @@ export default implement(bottleDetailsContract).handler(async function ({
     aliases: aliasList.map(({ name }) => name),
     barcodes: barcodeList.map(({ value, volume }) => ({ value, volume })),
     people: Number(totalPeople),
+    // The response already carries this Bottle, so skip the nested copy.
     lastPrice: lastPrice
-      ? await serialize(StorePriceSerializer, lastPrice, context.user)
+      ? await serialize(
+          StorePriceSerializer,
+          lastPrice,
+          context.user,
+          ["bottle"],
+          {
+            includeBottle: false,
+          },
+        )
       : null,
   };
 });

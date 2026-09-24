@@ -16,7 +16,9 @@ const OutputSchema = z.intersection(
       .readonly()
       .describe("Product barcodes for this Bottle"),
     people: z.number(),
-    lastPrice: StorePriceSchema.nullable(),
+    lastPrice: StorePriceSchema.omit({ bottle: true })
+      .nullable()
+      .describe("Most recent visible store listing for this Bottle"),
   }),
 );
 
