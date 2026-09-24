@@ -45,6 +45,13 @@ configured price source cannot choose a Bottle ID. An SMWS extractor may change
 how it reads JSON or HTML, but it must keep the SMWS Bottle sink as the trusted
 create-and-assign boundary.
 
+A store price is one listing for one Bottle. Bundles, gift kits and sets,
+multipacks, and samplers are never recorded as prices: a scraper skips them
+using the source's own markers, such as a SKU prefix or tag, the run ignores
+any that still arrive, and a moderator hides any that were saved through the
+price update route. Hidden listings leave Bottle pages, price lists, and price
+history.
+
 A full run:
 
 1. Extracts Bottle facts from the title or image.

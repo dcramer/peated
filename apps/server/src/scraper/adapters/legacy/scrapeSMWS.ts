@@ -96,6 +96,12 @@ function parseReleaseDate(value: string | null | undefined) {
   return parseExactReleaseDate(date);
 }
 
+function isGiftKit(sku: string): boolean {
+  // A store price is one listing for one Bottle (store-price-matching.md).
+  // SMWS sells gift kits under KIT- SKUs, so they never get a listing.
+  return /^KIT-/iu.test(sku.trim());
+}
+
 function parseVolume(sku: string): number | null {
   // SMWS bottle SKUs put the size in centilitres after the six-character
   // identity and a two-letter market code, such as 001243GB0700607 or
@@ -681,6 +687,7 @@ export async function scrapeBottles(
           logScrapeWarning(SITE, "Cannot find cask name for product");
           return;
         }
+        if (isGiftKit(item.sku)) return;
         const societyCode =
           parseCaskNumberFromSku(item.sku) ?? item.cask_no?.trim() ?? null;
         if (!societyCode) {

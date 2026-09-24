@@ -117,8 +117,10 @@ makes full URLs, and reads prices, scores, dates, volumes, strength, ages, and
 release years. When the list page is an RSS or Atom feed, each item's date is
 used for an article page that shows no date of its own. A selector may match a short group of facts; code finds values
 beside familiar labels such as `70cl`, `46% ABV`, `10 Year Old`, and `91 points`.
-A price source can use a number of milliliters as a fixed volume. Rules do not
-contain general cleanup steps. Put unusual cleanup for one source in a small
+A price source can use a number of milliliters as a fixed volume. A price
+listing is one product for one Bottle: skip bundles, gift kits and sets,
+multipacks, and samplers, and keep the source's own marker for them, such as a
+SKU prefix or tag, in the adapter. Rules do not contain general cleanup steps. Put unusual cleanup for one source in a small
 named function.
 
 For reviews, `detail.reviews.area` selects the one area containing the review

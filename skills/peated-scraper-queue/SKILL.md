@@ -48,7 +48,7 @@ exceeded` error means stop and report. Never re-run the classifier on a
 | `create`      | Producer, label, or matching independent sources prove the release; a complete evidence-backed `independentBottle` can be supplied; and an exact duplicate search finds no Bottle. |
 | `repair`      | Sources for that exact Bottle prove the proposed fields.                                                                                                                           |
 | `retry`       | A failed run whose cause is fixed.                                                                                                                                                 |
-| `ignore`      | The listing is not a Bottle, or no safe Bottle match remains after review.                                                                                                         |
+| `ignore`      | The listing is not one Bottle (a bundle, gift kit or set, multipack, or sampler), or no safe Bottle match remains after review.                                                    |
 | `needs human` | Identity, evidence, permission, or catalog state is unclear.                                                                                                                       |
 
 Compare Brand, distillers, bottler, name, Series, edition, age, ABV, years,
