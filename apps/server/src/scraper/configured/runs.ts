@@ -82,6 +82,33 @@ export async function reserveScrapeSourceModelCall(
   });
 }
 
+/** Returns a reserved call when the AI service never took it. */
+export async function releaseScrapeSourceModelCall(
+  runId: number,
+  executionToken: string,
+) {
+  await db.transaction(async (tx) => {
+    const [run] = await tx
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, runId))
+      .for("update");
+    if (
+      !run ||
+      run.status !== "running" ||
+      run.executionToken !== executionToken
+    ) {
+      throw new ScraperRunTakenOverError();
+    }
+    const cursor = ScrapeSourceSuggestionCursorSchema.parse(run.cursor);
+    const count = cursor?.modelCallCount ?? 0;
+    await tx
+      .update(externalSiteRuns)
+      .set({ cursor: { ...cursor, modelCallCount: Math.max(0, count - 1) } })
+      .where(eq(externalSiteRuns.id, runId));
+  });
+}
+
 export async function saveScrapeSourceSetupState(
   runId: number,
   executionToken: string,

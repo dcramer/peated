@@ -8,12 +8,13 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
+import OpenAI from "openai";
 import { beforeEach, expect, test, vi } from "vitest";
 import { z } from "zod";
 import { createScraperRegistry } from "../definitions";
 import type { ScraperHttpClock } from "../http";
 import { createScraperLifecycle, type ScraperEnqueue } from "../lifecycle";
-import { executeScraperRun } from "../runs";
+import { executeScraperRun, MODEL_UNAVAILABLE_ERROR } from "../runs";
 import type { ScrapeRules } from "./rules";
 import {
   createPinnedScrapeSourceRun,
@@ -776,6 +777,155 @@ test("resumes a waiting rule test without spending another model call", async ()
       .where(eq(scrapeSourceRuns.purpose, "suggest")),
   ).toHaveLength(1);
   expect(blocked).toBe(true);
+});
+
+test("waits for the AI service without spending a model call or the repair", async () => {
+  const { revision, repairRunId } = await startRepair();
+  requestModel.mockRejectedValueOnce(
+    new OpenAI.APIError(
+      402,
+      { error: { message: "API key budget exceeded" } },
+      "402 API key budget exceeded",
+      new Headers(),
+    ),
+  );
+  const clock = testClock();
+  const registry = createScraperRegistry({ targets: [], sources: [] });
+  const fetchImpl = sitePages();
+
+  const result = await executeScraperRun(
+    { runId: repairRunId },
+    {
+      registry,
+      fetchImpl,
+      clock,
+      executionToken: "budget-exhausted",
+      requestModel,
+    },
+  );
+  if (result.status !== "waiting") throw new Error("The run did not wait.");
+  expect(result.nextAttemptAt.getTime() - clock.now().getTime()).toBe(
+    60 * 60_000,
+  );
+  const [waiting] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, repairRunId));
+  expect(waiting).toMatchObject({
+    status: "queued",
+    attemptCount: 0,
+    error: MODEL_UNAVAILABLE_ERROR,
+    cursor: { modelCallCount: 0, repair: { revisionId: revision.id } },
+  });
+  expect(waiting!.cursor).toHaveProperty("setup");
+  const pageReadsBeforeResume = fetchImpl.mock.calls.length;
+
+  clock.advanceTo(result.nextAttemptAt);
+  requestModel.mockImplementation(acceptTestedRules(repairedRules));
+  await runToCompletion({
+    runId: repairRunId,
+    fetchImpl,
+    clock,
+    executionToken: "budget-restored",
+  });
+  expect(requestModel).toHaveBeenCalledTimes(3);
+  expect(
+    await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, repairRunId)),
+  ).toMatchObject([
+    { status: "succeeded", error: null, cursor: { modelCallCount: 2 } },
+  ]);
+  expect(
+    await db
+      .select()
+      .from(scrapeSourceRevisions)
+      .where(eq(scrapeSourceRevisions.active, true)),
+  ).toMatchObject([{ author: "ai", rules: repairedRules }]);
+  // The rule test reads the site; the resumed setup itself does not read the pages again.
+  const resumedReads = fetchImpl.mock.calls
+    .slice(pageReadsBeforeResume)
+    .map(
+      (call) =>
+        new URL(call[0] instanceof Request ? call[0].url : call[0]).pathname,
+    );
+  expect(resumedReads).toEqual(["/archive", "/one", "/legacy"]);
+});
+
+test("a waiting repair fails with its reason once the run is too old", async () => {
+  const { site, repairRunId } = await startRepair();
+  requestModel.mockRejectedValue(new OpenAI.APIConnectionError({}));
+  const clock = testClock();
+  const registry = createScraperRegistry({ targets: [], sources: [] });
+  let result = await executeScraperRun(
+    { runId: repairRunId },
+    {
+      registry,
+      fetchImpl: sitePages(),
+      clock,
+      executionToken: "gateway-down",
+      requestModel,
+    },
+  );
+  expect(result.status).toBe("waiting");
+  clock.advanceTo(new Date("2026-09-13T12:00:00Z"));
+  result = await executeScraperRun(
+    { runId: repairRunId },
+    {
+      registry,
+      fetchImpl: sitePages(),
+      clock,
+      executionToken: "gateway-still-down",
+      requestModel,
+    },
+  );
+  expect(result).toEqual({ status: "completed" });
+  expect(requestModel).toHaveBeenCalledTimes(1);
+  expect(
+    await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, repairRunId)),
+  ).toMatchObject([{ status: "failed", error: MODEL_UNAVAILABLE_ERROR }]);
+  await expectCollectionStopped(site.id);
+});
+
+test("a rejected AI request still fails the repair", async () => {
+  const { site, repairRunId } = await startRepair();
+  requestModel.mockRejectedValue(
+    new OpenAI.APIError(
+      401,
+      { error: { message: "Invalid API key" } },
+      "401 Invalid API key",
+      new Headers(),
+    ),
+  );
+  await expect(
+    executeScraperRun(
+      { runId: repairRunId },
+      {
+        registry: createScraperRegistry({ targets: [], sources: [] }),
+        fetchImpl: sitePages(),
+        clock: testClock(),
+        executionToken: "bad-key",
+        requestModel,
+      },
+    ),
+  ).rejects.toBeInstanceOf(OpenAI.APIError);
+  expect(
+    await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, repairRunId)),
+  ).toMatchObject([
+    {
+      status: "failed",
+      error: "The scraper failed unexpectedly. See Sentry for details.",
+      cursor: { modelCallCount: 1 },
+    },
+  ]);
+  await expectCollectionStopped(site.id);
 });
 
 test("keeps the model budget across executions and does not restart an exhausted repair", async () => {

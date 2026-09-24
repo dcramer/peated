@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
 import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
+import { APIError } from "openai";
 import { z } from "zod";
 import { ScraperHttpStatusError } from "../http";
 import {
@@ -23,6 +24,7 @@ import {
   type ScrapeRules,
 } from "./rules";
 import {
+  releaseScrapeSourceModelCall,
   reserveScrapeSourceModelCall,
   saveScrapeSourceSetupState,
 } from "./runs";
@@ -37,7 +39,20 @@ import {
   type SetupAgentState,
   type WebsitePage,
 } from "./setupAgent";
-import { ScrapeSourceSetupError } from "./setupError";
+import {
+  ScrapeSourceModelUnavailableError,
+  ScrapeSourceSetupError,
+} from "./setupError";
+
+/** Budget, rate limit, outage, and connection failures are temporary; other rejections are bugs. */
+function isModelUnavailable(error: APIError) {
+  return (
+    error.status === undefined ||
+    error.status === 402 ||
+    error.status === 429 ||
+    error.status >= 500
+  );
+}
 
 function checkPreviousListPage(input: {
   listPage: WebsitePage & { firstPageLinks: string[] };
@@ -338,7 +353,19 @@ export async function suggestScrapeSourceRevision(
         input.externalSiteRunId,
         input.executionToken,
       );
-      return await requestModel(request);
+      try {
+        return await requestModel(request);
+      } catch (error) {
+        if (!(error instanceof APIError) || !isModelUnavailable(error)) {
+          throw error;
+        }
+        // The call never ran, so it must not count against the setup limit.
+        await releaseScrapeSourceModelCall(
+          input.externalSiteRunId,
+          input.executionToken,
+        );
+        throw new ScrapeSourceModelUnavailableError(error);
+      }
     },
     readPage: async (url) => {
       const page = await loadPage(url);

@@ -166,7 +166,11 @@ model count survive worker restarts. An HTTP wait resumes the pending test
 without another model call. When a run succeeds, fails, or reaches its execution
 limits, code discards its temporary setup conversation and crawl. Cost counts
 and repair history stay. Final rule errors are saved with the run and shown
-in Admin. Problems with the AI service, database, job runner, or network remain
+in Admin. When the AI service cannot take a call (budget exhausted, rate
+limited, an outage, or no connection), the run waits an hour and tries again.
+The rejected call is not counted, and the saved pages are reused, so waiting
+costs nothing. The run fails with that reason once it reaches the three-day run
+age limit. Other AI service, database, job runner, and network problems remain
 system errors. The AI service does not store request content.
 
 A collection failure caused by broken rules marks the active version failed,
@@ -180,6 +184,11 @@ If repair fails, or its replacement rules fail collection, collection stays
 stopped for admin review. Run history allows another automatic repair only after
 a complete successful collection—not after time passes, a preview passes, or a
 new version is saved. An admin can still request another suggestion.
+
+To recover a stopped source, open it in Admin → Scrapers and read the failed
+run's error. Then either request a new AI setup, or save corrected rules as a
+new version, preview it, and activate it. Automatic repair is available again
+after the next complete successful collection.
 
 Before shortening pages for AI, setup removes scripts and styles from its copy.
 This keeps links and article content from being cut off. Rule checks and
