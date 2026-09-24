@@ -130,13 +130,15 @@ async function insertRun(
     source.recordType === "review" &&
     (await hasReviewsWithoutSavedText(connection, site.id));
   if (source.resumeFromLastRun && !restartForMissingReviewText) {
+    // Every checkpoint is a safe place to continue, so a failed run's progress
+    // counts too.
     const [priorRun] = await connection
       .select({ cursor: externalSiteRuns.cursor })
       .from(externalSiteRuns)
       .where(
         and(
           eq(externalSiteRuns.externalSiteId, site.id),
-          eq(externalSiteRuns.status, "succeeded"),
+          inArray(externalSiteRuns.status, ["succeeded", "failed"]),
           isNotNull(externalSiteRuns.cursor),
         ),
       )

@@ -14,7 +14,7 @@ import {
   type ScrapeIssue,
   type ScrapeSourcePreviewPage,
 } from "./preview";
-import { SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
+import { SCRAPE_SOURCE_MAX_ITEMS, SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
 
 export class ScrapeSourceParseError extends Error {
   override name = "ScrapeSourceParseError";
@@ -99,12 +99,43 @@ export const ConfiguredScrapeCursorSchema = z
     nextListUrl: z.url().nullable(),
     detailIndex: z.number().int().min(0).max(99),
     previewPages: z.array(ScrapeSourcePreviewPageSchema).max(99),
+    // Article pages the run does not read again. Run creation decides which
+    // pages qualify. Holds the earlier list plus this run's finished pages.
+    completedDetailUrls: z
+      .array(z.url())
+      .max(2 * SCRAPE_SOURCE_MAX_ITEMS)
+      .optional(),
   })
   .strict();
 
 export type ConfiguredScrapeCursor = z.infer<
   typeof ConfiguredScrapeCursorSchema
 >;
+
+export function initialConfiguredScrapeCursor(
+  listUrl: string,
+  completedDetailUrls: string[] = [],
+): ConfiguredScrapeCursor {
+  return {
+    listUrls: [],
+    detailUrls: [],
+    detailDates: [],
+    nextListUrl: new URL(listUrl).toString(),
+    detailIndex: 0,
+    previewPages: [],
+    completedDetailUrls,
+  };
+}
+
+/** Article pages a finished run does not need to read again. */
+export function completedConfiguredDetailUrls(cursor: ConfiguredScrapeCursor) {
+  return [
+    ...new Set([
+      ...(cursor.completedDetailUrls ?? []),
+      ...cursor.detailUrls.slice(0, cursor.detailIndex),
+    ]),
+  ];
+}
 
 export function observationSchemaForRules(rules: ExecutableScrapeRules) {
   if (rules.kind === "review") return ExternalReviewArticleIngestionSchema;
@@ -123,14 +154,8 @@ export function createScrapeSourceAdapter(
   ),
 ): ScraperAdapter<ConfiguredScrapeCursor, unknown> {
   return async ({ cursor, session }) => {
-    let state: ConfiguredScrapeCursor = cursor ?? {
-      listUrls: [],
-      detailUrls: [],
-      detailDates: [],
-      nextListUrl: new URL(input.listUrl).toString(),
-      detailIndex: 0,
-      previewPages: [],
-    };
+    let state: ConfiguredScrapeCursor =
+      cursor ?? initialConfiguredScrapeCursor(input.listUrl);
     try {
       const listUrls = new Set(state.listUrls);
       const detailUrls = new Set(state.detailUrls);
@@ -192,9 +217,20 @@ export function createScrapeSourceAdapter(
         await session.checkpoint(state);
       }
 
+      // Only pages still listed can be skipped, which keeps the saved list small.
+      const completedDetailUrls = new Set(
+        (state.completedDetailUrls ?? []).filter((url) => detailUrls.has(url)),
+      );
+      state = { ...state, completedDetailUrls: [...completedDetailUrls] };
+
       while (state.detailIndex < state.detailUrls.length) {
         const link = state.detailUrls[state.detailIndex];
         if (!link) throw new Error("Configured scraper detail URL is missing.");
+        if (completedDetailUrls.has(link)) {
+          state = { ...state, detailIndex: state.detailIndex + 1 };
+          await session.checkpoint(state);
+          continue;
+        }
         let response;
         try {
           response = await session.request({

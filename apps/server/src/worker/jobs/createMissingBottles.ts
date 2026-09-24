@@ -22,7 +22,7 @@ import {
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
-import { and, asc, eq, gt, isNull } from "drizzle-orm";
+import { and, asc, eq, gt, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 
@@ -60,6 +60,7 @@ export async function createMissingBottles(
       .where(
         and(
           isNull(externalReviews.bottleId),
+          isNull(externalReviews.bottleNoMatchAt),
           gt(externalReviews.id, cursor),
           articleId === undefined
             ? undefined
@@ -117,6 +118,18 @@ export async function createMissingBottles(
               reviewId: review.id,
             },
           });
+        } else {
+          // Keep the classifier's answer so the next import does not ask the
+          // same question. A later accepted reference still matches the review.
+          await db
+            .update(externalReviews)
+            .set({ bottleNoMatchAt: sql`NOW()` })
+            .where(
+              and(
+                eq(externalReviews.id, review.id),
+                isNull(externalReviews.bottleId),
+              ),
+            );
         }
         continue;
       }

@@ -99,26 +99,33 @@ test("manual review runs do not require publication approval", async ({
   expect(enqueue).toHaveBeenCalledOnce();
 });
 
-test("opted-in source resumes the last successful run cursor", async ({
+test("opted-in source resumes the latest finished run cursor", async ({
   fixtures,
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const successfulCursor = { processedIssues: ["Summer 2026"] };
+  const latestCursor = { processedIssues: ["Fall 2026"] };
   await db.insert(externalSiteRuns).values([
     {
       externalSiteId: site.id,
       trigger: "scheduled",
       status: "succeeded",
-      cursor: successfulCursor,
+      cursor: { processedIssues: ["Summer 2026"] },
       completedAt: new Date("2026-08-20T00:00:00Z"),
     },
     {
       externalSiteId: site.id,
       trigger: "scheduled",
       status: "failed",
-      cursor: { processedIssues: ["Fall 2026"] },
+      cursor: latestCursor,
       completedAt: new Date("2026-08-21T00:00:00Z"),
+    },
+    {
+      externalSiteId: site.id,
+      trigger: "scheduled",
+      status: "failed",
+      cursor: null,
+      completedAt: new Date("2026-08-22T00:00:00Z"),
     },
   ]);
   const review = await fixtures.ExternalReview({ externalSiteId: site.id });
@@ -134,7 +141,7 @@ test("opted-in source resumes the last successful run cursor", async ({
     enqueue: async () => undefined,
   });
 
-  expect(run.cursor).toEqual(successfulCursor);
+  expect(run.cursor).toEqual(latestCursor);
 });
 
 test("manual review run restarts when reviews are missing saved text", async ({

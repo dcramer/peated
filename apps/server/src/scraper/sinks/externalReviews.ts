@@ -15,5 +15,6 @@ export const externalReviewSink: ScraperSink<
   return {
     newItemCount: result.newItemCount,
     existingItemCount: result.existingItemCount,
+    modelCallCount: result.modelCallCount,
   };
 };

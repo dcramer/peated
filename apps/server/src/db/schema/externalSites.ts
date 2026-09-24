@@ -92,6 +92,8 @@ export const externalSiteRuns = pgTable(
     emittedItemCount: integer("emitted_item_count").default(0).notNull(),
     newItemCount: integer("new_item_count").default(0).notNull(),
     existingItemCount: integer("existing_item_count").default(0).notNull(),
+    // Model requests made while saving results, such as review clips.
+    modelCallCount: integer("model_call_count").default(0).notNull(),
     cursor: jsonb("cursor"),
     nextAttemptAt: timestamp("next_attempt_at"),
     executionToken: text("execution_token"),
@@ -136,6 +138,7 @@ export const externalSiteRuns = pgTable(
         AND ${table.emittedItemCount} >= 0
         AND ${table.newItemCount} >= 0
         AND ${table.existingItemCount} >= 0
+        AND ${table.modelCallCount} >= 0
         AND ${table.newItemCount} + ${table.existingItemCount} <= ${table.emittedItemCount}`,
     ),
     check(

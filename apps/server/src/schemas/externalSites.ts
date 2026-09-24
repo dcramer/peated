@@ -47,6 +47,7 @@ export const ExternalSiteRunSchema = z.object({
   emittedItemCount: z.number().int().min(0),
   newItemCount: z.number().int().min(0),
   existingItemCount: z.number().int().min(0),
+  modelCallCount: z.number().int().min(0),
   untrackedItemCount: z.number().int().min(0),
   itemCount: z.number().int().min(0).nullable(),
   error: z.string().nullable(),

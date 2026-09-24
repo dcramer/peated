@@ -297,6 +297,68 @@ test("keeps an existing clip when later generation returns no clip", async ({
   });
 });
 
+test("reuses the saved clip when the review body is unchanged", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const input = {
+    externalSiteId: site.id,
+    fetchedAt: new Date("2026-04-13T12:00:00Z"),
+    article: {
+      canonicalUrl: "https://reviews.example/articles/unchanged",
+      title: "An unchanged review",
+      publishedAt: new Date("2026-04-12T00:00:00Z"),
+      contentHash: "sha256:unchanged",
+      externalReviews: [{ sourceKey: "same", name: "Clip Bottle" }],
+    },
+    externalReviewBodies: { same: "Nose: honey. Palate: smoke." },
+  };
+  createReviewClipMock.mockResolvedValueOnce("Honey and smoke.");
+  const first = await ingestExternalReviewArticle(input);
+  const second = await ingestExternalReviewArticle(input);
+
+  expect(first.modelCallCount).toBe(1);
+  expect(second.modelCallCount).toBe(0);
+  expect(createReviewClipMock).toHaveBeenCalledTimes(1);
+  expect(await db.query.externalReviews.findFirst()).toMatchObject({
+    clip: "Honey and smoke.",
+    version: CURRENT_REVIEW_VERSION,
+  });
+});
+
+test("asks for a new clip when the review body changed", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
+  const article = {
+    canonicalUrl: "https://reviews.example/articles/changed",
+    title: "A changed review",
+    publishedAt: new Date("2026-04-12T00:00:00Z"),
+    contentHash: "sha256:changed",
+    externalReviews: [{ sourceKey: "same", name: "Clip Bottle" }],
+  };
+  createReviewClipMock.mockResolvedValueOnce("The first clip.");
+  await ingestExternalReviewArticle({
+    externalSiteId: site.id,
+    fetchedAt: new Date("2026-04-13T12:00:00Z"),
+    article,
+    externalReviewBodies: { same: "A first draft." },
+  });
+  createReviewClipMock.mockResolvedValueOnce("The second clip.");
+  const result = await ingestExternalReviewArticle({
+    externalSiteId: site.id,
+    fetchedAt: new Date("2026-04-14T12:00:00Z"),
+    article,
+    externalReviewBodies: { same: "A revised review." },
+  });
+
+  expect(result.modelCallCount).toBe(1);
+  expect(createReviewClipMock).toHaveBeenCalledTimes(2);
+  expect(await db.query.externalReviews.findFirst()).toMatchObject({
+    clip: "The second clip.",
+  });
+});
+
 test.for<[string, string[]]>([
   [
     "Nose: VANILLA, ripe apples and cinnamon. Finish: vanilla.",

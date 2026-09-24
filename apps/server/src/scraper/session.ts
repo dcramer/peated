@@ -23,6 +23,7 @@ const ScraperSinkResultSchema = z
   .object({
     newItemCount: z.number().int().nonnegative(),
     existingItemCount: z.number().int().nonnegative(),
+    modelCallCount: z.number().int().nonnegative().default(0),
   })
   .strict();
 
@@ -124,7 +125,7 @@ export function createScraperSession<TCursor, TObservation>({
       });
       const counts = sinkResult
         ? ScraperSinkResultSchema.parse(sinkResult)
-        : { newItemCount: 0, existingItemCount: 0 };
+        : { newItemCount: 0, existingItemCount: 0, modelCallCount: 0 };
       if (
         counts.newItemCount + counts.existingItemCount >
         validated.itemCount
@@ -138,6 +139,7 @@ export function createScraperSession<TCursor, TObservation>({
           emittedItemCount: sql`${externalSiteRuns.emittedItemCount} + ${validated.itemCount}`,
           newItemCount: sql`${externalSiteRuns.newItemCount} + ${counts.newItemCount}`,
           existingItemCount: sql`${externalSiteRuns.existingItemCount} + ${counts.existingItemCount}`,
+          modelCallCount: sql`${externalSiteRuns.modelCallCount} + ${counts.modelCallCount}`,
           executionExpiresAt: new Date(now.getTime() + SCRAPER_RUN_TIMEOUT_MS),
         })
         .where(

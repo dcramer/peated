@@ -820,6 +820,70 @@ test("stores a safe preview issue when a request fails unexpectedly", async () =
   });
 });
 
+test("skips review pages finished by an earlier run of the same version", async () => {
+  const { revision, site, source, user } = await setupSource();
+  await markPreviewPassed(revision.id);
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+  });
+
+  async function collect(executionToken: string) {
+    const pinned = await createPinnedScrapeSourceRun(db, {
+      externalSiteId: site.id,
+      requestedById: user.id,
+      trigger: "scheduled",
+      purpose: "collect",
+    });
+    const fetchImpl = previewFetch();
+    await expect(
+      runToCompletion({ runId: pinned.run.id, fetchImpl, executionToken }),
+    ).resolves.toEqual({ status: "completed" });
+    const [run] = await db
+      .select()
+      .from(externalSiteRuns)
+      .where(eq(externalSiteRuns.id, pinned.run.id));
+    return {
+      run,
+      requestedPaths: fetchImpl.mock.calls.map(
+        ([input]) =>
+          new URL(input instanceof Request ? input.url : input).pathname,
+      ),
+    };
+  }
+
+  const first = await collect("first-collection");
+  expect(first.requestedPaths).toEqual(["/archive", "/one"]);
+  expect(first.run).toMatchObject({ emittedItemCount: 1, newItemCount: 1 });
+
+  const second = await collect("second-collection");
+  expect(second.requestedPaths).toEqual(["/archive"]);
+  expect(second.run).toMatchObject({ emittedItemCount: 0 });
+  expect(second.run?.cursor).toMatchObject({
+    completedDetailUrls: ["https://preview.example/one"],
+  });
+  expect(await db.select().from(externalReviews)).toHaveLength(1);
+
+  // A new version reads its whole window once.
+  const replacement = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    author: "person",
+    createdById: user.id,
+    rules: reviewRules(),
+  });
+  await markPreviewPassed(replacement.id);
+  await activateScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    revisionId: replacement.id,
+  });
+  const third = await collect("third-collection");
+  expect(third.requestedPaths).toEqual(["/archive", "/one"]);
+  expect(third.run).toMatchObject({
+    emittedItemCount: 1,
+    existingItemCount: 1,
+  });
+});
+
 test("a collection parse failure marks the rules broken and queues repair", async () => {
   const { revision, site, source, user } = await setupSource("h3.missing");
   await markPreviewPassed(revision.id);

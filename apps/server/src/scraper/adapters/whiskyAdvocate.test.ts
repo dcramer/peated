@@ -272,6 +272,62 @@ test("skips a review whose page is gone and finishes the issue", async () => {
   });
 });
 
+test("skips an issue whose review page is gone and continues", async () => {
+  const issueHtml = keepFirstIssues(
+    await loadFixture("whiskyadvocate", "empty-search.html"),
+    2,
+  );
+  const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
+  const issues = parseIssueList(issueHtml);
+  const missingIssue = issues[0];
+  const observations: ScraperObservation<WhiskyAdvocateObservation>[] = [];
+  const request = vi.fn(async ({ url }: { url: URL }) => {
+    if (url.searchParams.get("custom_rating_issue[0]") === missingIssue) {
+      throw new ScraperHttpStatusError(404, url, {});
+    }
+    return {
+      url,
+      status: 200,
+      headers: {},
+      body:
+        url.pathname !== "/ratings-reviews"
+          ? articleHtml
+          : url.search.includes("custom_rating_issue")
+            ? reviewHtml
+            : issueHtml,
+    };
+  });
+  const checkpoint = vi.fn();
+  const session: ScraperSession<
+    WhiskyAdvocateCursor,
+    WhiskyAdvocateObservation
+  > = {
+    request,
+    emit: async (observation) => {
+      observations.push(observation);
+    },
+    checkpoint,
+    remainingRequests: () => 400,
+  };
+
+  await whiskyAdvocateAdapter({ cursor: null, session });
+
+  expect(observations).toHaveLength(166);
+  expect(checkpoint).toHaveBeenNthCalledWith(1, {
+    checksReviewDates: true,
+    completedIssues: [missingIssue],
+    issue: null,
+    completedReviewUrls: [],
+  });
+  expect(checkpoint).toHaveBeenLastCalledWith({
+    checksReviewDates: true,
+    completedIssues: issues,
+    issue: null,
+    completedReviewUrls: [],
+  });
+});
+
 test("fails on a server error for a review page", async () => {
   const issueHtml = keepFirstIssues(
     await loadFixture("whiskyadvocate", "empty-search.html"),

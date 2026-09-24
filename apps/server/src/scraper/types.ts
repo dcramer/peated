@@ -56,6 +56,7 @@ export type ScraperSink<TObservation> = (input: {
 }) => Promise<{
   newItemCount: number;
   existingItemCount: number;
+  modelCallCount?: number;
 } | void>;
 
 export type ScraperSourceDefinition<TCursor = any, TObservation = any> = {

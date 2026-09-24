@@ -19,7 +19,7 @@ export default function ExternalSiteRunTelemetry({ run }: { run: Run }) {
       {run.untrackedItemCount
         ? ` · ${run.untrackedItemCount.toLocaleString("en-US")} not tracked`
         : ""}
-      )
+      ) · {run.modelCallCount.toLocaleString("en-US")} model calls
       {run.nextAttemptAt ? (
         <>
           {" "}

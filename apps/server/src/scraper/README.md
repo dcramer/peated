@@ -96,6 +96,10 @@ including relational selectors such as `:has()`. `list.links` finds article or
 product links. `list.nextPage` can find the next page of links. Links must
 stay on the source website. Code reads at most five list pages and stops at
 `list.limit`. It reads `href` from HTML links and text from XML links.
+A review source does not read an article page again once a run of the same
+rule version finished it; the list still counts it toward `list.limit`.
+Activating a new version reads the whole window once. Price and catalog
+sources read every listed page on every run because prices change.
 
 Each stored rule version has a decoder in `configured/compatibility/`. The
 decoder validates the saved JSON and returns the executable contract used by
@@ -318,11 +322,17 @@ to refresh them without keeping full articles.
   website stopped that run. Stored errors are brief; detailed unexpected
   failures belong in Sentry.
 
+A source that resumes from its last run continues from the latest finished
+run's saved place, whether that run succeeded or failed. Every checkpoint is a
+safe place to continue.
+
 `sliceRequestCount` counts requests in the current worker attempt and resets
 when a waiting run starts again. The other request and result counts cover the
 full run. A null request-error count means the run finished before error
-tracking was added. Records without a saved type or new/seen result appear as
-not tracked in Admin. Preview and source suggestion runs do not appear in the
+tracking was added. `modelCallCount` counts model requests made while saving
+results, such as review clips. Bottle classification runs later in its own job
+and is recorded with the Bottle check it creates. Records without a saved type
+or new/seen result appear as not tracked in Admin. Preview and source suggestion runs do not appear in the
 Admin overview. The overview lists a site as failing only while its latest
 completed collection run failed; the next successful run clears it.
 
