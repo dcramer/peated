@@ -91,6 +91,11 @@ function checkPreviousListPage(input: {
   );
 }
 
+export type PageLoadOptions = {
+  /** False makes request spacing sleep in place instead of requeueing the run. */
+  canResumeLater?: boolean;
+};
+
 /** Tests the collection crawler without calling its ingestion sink. */
 export async function testScrapeRules(input: {
   listPageUrl: string;
@@ -259,7 +264,7 @@ export async function suggestScrapeSourceRevision(
     failureUrl?: string;
     state?: SetupAgentState;
     allowedOrigins: string[];
-    loadPage: (url: URL) => Promise<WebsitePage>;
+    loadPage: (url: URL, options?: PageLoadOptions) => Promise<WebsitePage>;
   },
   requestModel: RequestScrapeSourceModel = requestAi,
 ) {
@@ -288,7 +293,7 @@ export async function suggestScrapeSourceRevision(
       ...(input.failure ? [input.failure] : []),
     ].map((page) => [new URL(page.url).toString(), page]),
   );
-  const loadPage = async (url: URL) => {
+  const loadPage = async (url: URL, options?: PageLoadOptions) => {
     if (
       !input.allowedOrigins.includes(url.origin) ||
       url.username ||
@@ -302,7 +307,7 @@ export async function suggestScrapeSourceRevision(
     if (cached) return cached;
     let page: WebsitePage;
     try {
-      page = await input.loadPage(url);
+      page = await input.loadPage(url, options);
     } catch (error) {
       if (
         error instanceof ScraperHttpStatusError &&
@@ -368,7 +373,9 @@ export async function suggestScrapeSourceRevision(
       }
     },
     readPage: async (url) => {
-      const page = await loadPage(url);
+      // A single page read has no saved place to resume from, so a redirect
+      // followed by a spacing wait must sleep here instead of restarting the read.
+      const page = await loadPage(url, { canResumeLater: false });
       return {
         ...page,
         document: inspectSyndicationFeed({

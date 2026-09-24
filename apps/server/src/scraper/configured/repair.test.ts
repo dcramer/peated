@@ -1026,6 +1026,57 @@ test("a page tool cannot fetch outside the source website", async () => {
   ).toMatchObject([{ active: true }]);
 });
 
+test("a page read that redirects finishes without restarting the read", async () => {
+  const { repairRunId } = await startRepair();
+  requestModel
+    .mockResolvedValueOnce({
+      model: "test-model",
+      output: [
+        {
+          type: "function_call",
+          call_id: "moved-page",
+          name: "read_page",
+          arguments: JSON.stringify({ url: "https://repair.example/moved" }),
+        },
+      ],
+    })
+    .mockImplementation(acceptTestedRules(repairedRules));
+  const pages = sitePages();
+  const fetchImpl = vi.fn<typeof fetch>(async (input, init) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/moved") {
+      return new Response(null, {
+        status: 301,
+        headers: { location: "https://repair.example/legacy" },
+      });
+    }
+    return pages(input, init);
+  });
+
+  await runToCompletion({
+    runId: repairRunId,
+    fetchImpl,
+    clock: testClock(),
+    executionToken: "redirected-page-read",
+  });
+
+  expect(requestModel).toHaveBeenCalledTimes(3);
+  expect(JSON.stringify(requestModel.mock.calls[1]?.[0].input)).toContain(
+    "Legacy reviews",
+  );
+  const movedReads = fetchImpl.mock.calls.filter(
+    ([url]) =>
+      new URL(url instanceof Request ? url.url : url).pathname === "/moved",
+  );
+  expect(movedReads).toHaveLength(1);
+  expect(
+    await db
+      .select()
+      .from(scrapeSourceRevisions)
+      .where(eq(scrapeSourceRevisions.author, "ai")),
+  ).toMatchObject([{ active: true }]);
+});
+
 test("duplicate delivery while the model is running cannot start another repair", async () => {
   const { repairRunId } = await startRepair();
   const enteredModel = Promise.withResolvers<void>();
