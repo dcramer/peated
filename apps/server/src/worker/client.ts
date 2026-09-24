@@ -70,12 +70,32 @@ export function buildUniqueJobOptions(
   };
 }
 
+/**
+ * Worker queue rule: BullMQ ignores an add whose job ID still exists in any
+ * state. Failed jobs keep their ID for three days, so a failed unique job would
+ * silently block the same work from queueing again. Remove it first.
+ */
+type QueuedJobLookup = {
+  getJob(
+    jobId: string,
+  ): Promise<
+    { isFailed(): Promise<boolean>; remove(): Promise<void> } | undefined
+  >;
+};
+
+export async function removeFailedJob(queue: QueuedJobLookup, jobId: string) {
+  const existing = await queue.getJob(jobId);
+  if (existing && (await existing.isFailed())) await existing.remove();
+}
+
 async function pushUniqueJobToQueue(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
 ) {
   opts = buildUniqueJobOptions(jobName, args, opts);
+  const queue = await getQueue(registry.getQueueName(jobName));
+  await removeFailedJob(queue, opts.jobId!);
 
   return await pushJobToQueue(jobName, args, opts);
 }
