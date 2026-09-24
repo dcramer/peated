@@ -326,6 +326,69 @@ test("runs preview through the normal request controls without product writes", 
   expect(run).toMatchObject({ status: "succeeded", emittedItemCount: 0 });
 });
 
+test("previews a feed-listed article that shows no date using the feed date", async () => {
+  const { site, source, user } = await setupSource();
+  const revision = await createScrapeSourceRevision({
+    scrapeSourceId: source.id,
+    author: "person",
+    createdById: user.id,
+    listUrl: "https://preview.example/feed/",
+    rules: {
+      ...reviewRules(),
+      list: { links: "item > link", nextPage: null, limit: 5 },
+      detail: { ...reviewRules().detail, date: null },
+    },
+  });
+  const pinned = await createPinnedScrapeSourceRun(db, {
+    externalSiteId: site.id,
+    scrapeSourceId: source.id,
+    revisionId: revision.id,
+    requestedById: user.id,
+    trigger: "manual",
+    purpose: "preview",
+  });
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/feed/") {
+      return new Response(
+        '<?xml version="1.0"?><rss><channel><item><link>https://preview.example/undated</link><pubDate>Sun, 20 Sep 2026 17:54:48 +0000</pubDate></item></channel></rss>',
+        { headers: { "content-type": "application/rss+xml" } },
+      );
+    }
+    if (url.pathname === "/undated") {
+      return new Response(
+        '<h1>Undated reviews</h1><article class="review"><h2>Example Whisky</h2><div class="body">No date on this page.</div></article>',
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  });
+
+  await expect(
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "feed-date-preview",
+    }),
+  ).resolves.toEqual({ status: "completed" });
+
+  const [storedRevision] = await db
+    .select()
+    .from(scrapeSourceRevisions)
+    .where(eq(scrapeSourceRevisions.id, revision.id));
+  expect(storedRevision).toMatchObject({
+    previewStatus: "passed",
+    previewResult: {
+      issues: [],
+      pages: [
+        {
+          url: "https://preview.example/undated",
+          publishedAt: "2026-09-20T17:54:48.000Z",
+        },
+      ],
+    },
+  });
+});
+
 test("previews an official catalog without writing listings", async () => {
   const { revision, site, source, user } = await setupCatalogSource();
   const pinned = await createPinnedScrapeSourceRun(db, {

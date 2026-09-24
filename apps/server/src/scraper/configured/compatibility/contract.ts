@@ -1,5 +1,9 @@
 import type { JsonValue } from "@peated/server/scraper/types";
-import type { ScrapeDetailResult, ScrapeListResult } from "../parser";
+import type {
+  ScrapeDetailContext,
+  ScrapeDetailResult,
+  ScrapeListResult,
+} from "../parser";
 import type { ScrapeSourceKind, StoredScrapeRules } from "../rules";
 
 export type ExecutableScrapeRules = {
@@ -9,7 +13,11 @@ export type ExecutableScrapeRules = {
   listLinkField: string;
   nextPageField: string;
   parseList(html: string, pageUrl: URL): ScrapeListResult;
-  parseDetail(html: string, pageUrl: URL): ScrapeDetailResult;
+  parseDetail(
+    html: string,
+    pageUrl: URL,
+    context?: ScrapeDetailContext,
+  ): ScrapeDetailResult;
   withLimit(limit: number): ExecutableScrapeRules;
 };
 

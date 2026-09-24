@@ -32,6 +32,13 @@ export type ScrapeListResult = {
   links: string[];
   nextPageUrl: string | null;
   issues: ScrapeIssue[];
+  /** Feed item dates by link, for pages that show no date of their own. */
+  linkDates?: Record<string, string>;
+};
+
+/** Facts the list page knows about a detail page. */
+export type ScrapeDetailContext = {
+  listDate?: Date;
 };
 
 export type ScrapeDetailResult =
@@ -308,6 +315,20 @@ function detailPageUrl(value: string, listUrl: URL) {
   ).toString();
 }
 
+/** RSS items and Atom entries date their links; article pages sometimes do not. */
+function readFeedItemDate(
+  $: ReturnType<typeof load>,
+  element: Parameters<ReturnType<typeof load>>[0],
+) {
+  const item = $(element).closest("item, entry");
+  if (item.length === 0) return null;
+  for (const name of ["pubDate", "published", "updated", "dc\\:date"]) {
+    const date = parseDate(readText(item.children(name).first()));
+    if (date) return date;
+  }
+  return null;
+}
+
 function parseSelectedLinks(
   rules: ScrapeRules,
   html: string,
@@ -320,6 +341,7 @@ function parseSelectedLinks(
   const $ = load(html, xml ? { xmlMode: true } : undefined);
   const issues: ScrapeIssue[] = [];
   const links = new Set<string>();
+  const linkDates: Record<string, string> = {};
 
   let linkElements;
   try {
@@ -335,7 +357,10 @@ function parseSelectedLinks(
     const raw = $(element).attr("href") ?? readText($(element));
     if (!raw) continue;
     try {
-      links.add(detailPageUrl(raw, pageUrl));
+      const link = detailPageUrl(raw, pageUrl);
+      links.add(link);
+      const itemDate = xml ? readFeedItemDate($, element) : null;
+      if (itemDate) linkDates[link] = itemDate.toISOString();
     } catch (error) {
       issues.push({
         field: "list.links",
@@ -365,7 +390,9 @@ function parseSelectedLinks(
     }
   }
 
-  return { links: [...links], nextPageUrl, issues };
+  const result: ScrapeListResult = { links: [...links], nextPageUrl, issues };
+  if (Object.keys(linkDates).length > 0) result.linkDates = linkDates;
+  return result;
 }
 
 export function parseScrapeList(
@@ -1552,8 +1579,6 @@ function dateFromPageUrl(pageUrl: URL) {
   return readCompatiblePublishedDate(pageUrl);
 }
 
-// TODO(scraper-platform): Carry RSS and Atom item dates into detail parsing
-// when an article omits its publication date.
 function readPublishedDate(
   $: ReturnType<typeof load>,
   selector: string | null,
@@ -1684,6 +1709,7 @@ function parseReviewPage(
   rules: Extract<ScrapeRules, { kind: "review" }>,
   html: string,
   pageUrl: URL,
+  context: ScrapeDetailContext,
 ): ScrapeDetailResult {
   const $ = load(html);
   const issues: ScrapeIssue[] = [];
@@ -1707,11 +1733,11 @@ function parseReviewPage(
     }
   }
   const title = readSelectedValue($, rules.detail.title);
-  const publishedAt = readPublishedDate(
-    $,
-    rules.detail.date,
-    new URL(canonicalUrl),
-  );
+  // A feed's item date is the publisher's date when the page itself shows none.
+  const publishedAt =
+    readPublishedDate($, rules.detail.date, new URL(canonicalUrl)) ??
+    context.listDate ??
+    null;
   if (!title) {
     issues.push({
       field: "detail.title",
@@ -2013,10 +2039,11 @@ export function parseDirectScrapeDetail(
   rules: ScrapeRules,
   html: string,
   pageUrl: URL,
+  context: ScrapeDetailContext = {},
 ) {
   return safelyParseScrapeDetail(rules, "detail", () =>
     rules.kind === "review"
-      ? parseReviewPage(rules, html, pageUrl)
+      ? parseReviewPage(rules, html, pageUrl, context)
       : parseProductPage(rules, html, pageUrl),
   );
 }
@@ -2062,6 +2089,7 @@ export function parseScrapeDetail(
   rules: ScrapeRules,
   html: string,
   pageUrl: URL,
+  context: ScrapeDetailContext = {},
 ): ScrapeDetailResult {
-  return parseDirectScrapeDetail(rules, html, pageUrl);
+  return parseDirectScrapeDetail(rules, html, pageUrl, context);
 }

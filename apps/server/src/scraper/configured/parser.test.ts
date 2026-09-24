@@ -1231,6 +1231,91 @@ const elementArticleRules = {
   },
 } as const satisfies StoredScrapeRules;
 
+const feedReviewRules = {
+  kind: "review",
+  list: { links: "item > link", nextPage: null, limit: 10 },
+  detail: {
+    url: null,
+    title: "h1",
+    date: null,
+    reviews: {
+      area: "main",
+      item: "article",
+      name: "h2",
+      reviewer: null,
+      tastingNotes: ".body",
+      score: null,
+    },
+  },
+} satisfies ScrapeRules;
+
+it("keeps feed item dates with their links", () => {
+  expect(
+    parseScrapeList(
+      feedReviewRules,
+      `<?xml version="1.0"?>
+        <rss><channel>
+          <item>
+            <title>Remus Repeal Reserve</title>
+            <link>https://reviews.test/2026/09/remus-repeal-reserve-review-2026/</link>
+            <pubDate>Sun, 20 Sep 2026 17:54:48 +0000</pubDate>
+          </item>
+          <item>
+            <title>No date here</title>
+            <link>https://reviews.test/2026/09/undated/</link>
+          </item>
+        </channel></rss>`,
+      new URL("https://reviews.test/feed/"),
+    ),
+  ).toEqual({
+    links: [
+      "https://reviews.test/2026/09/remus-repeal-reserve-review-2026/",
+      "https://reviews.test/2026/09/undated/",
+    ],
+    nextPageUrl: null,
+    issues: [],
+    linkDates: {
+      "https://reviews.test/2026/09/remus-repeal-reserve-review-2026/":
+        "2026-09-20T17:54:48.000Z",
+    },
+  });
+});
+
+it("uses the feed date only when the page shows no date", () => {
+  const html =
+    '<h1>Remus Repeal Reserve Review</h1><main><article><h2>Remus Repeal Reserve</h2><p class="body">Rye spice.</p></article></main>';
+  const pageUrl = new URL(
+    "https://reviews.test/2026/09/remus-repeal-reserve-review-2026/",
+  );
+  const listDate = new Date("2026-09-20T17:54:48.000Z");
+
+  expect(parseScrapeDetail(feedReviewRules, html, pageUrl)).toMatchObject({
+    value: null,
+    issues: [
+      {
+        field: "detail.date",
+        message: "Required date was not found or was not valid.",
+      },
+    ],
+  });
+  expect(
+    parseScrapeDetail(feedReviewRules, html, pageUrl, { listDate }),
+  ).toMatchObject({
+    issues: [],
+    value: { article: { publishedAt: listDate } },
+  });
+  expect(
+    parseScrapeDetail(
+      feedReviewRules,
+      `<h1>Dated Review</h1><time datetime="2026-09-18"></time>${html.slice(html.indexOf("<main>"))}`,
+      pageUrl,
+      { listDate },
+    ),
+  ).toMatchObject({
+    value: { article: { publishedAt: new Date("2026-09-18T00:00:00.000Z") } },
+  });
+});
+
 test("reads text links from an XML review index", () => {
   const rules = {
     ...currentReviewRules,
