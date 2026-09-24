@@ -69,6 +69,19 @@ export type ScrapeSourceSetupFeedback = {
   issues: ScrapeIssue[];
 };
 
+/**
+ * The AI service rejected or could not take a model call: budget exhausted,
+ * rate limited, an outage, or no connection. The run waits and tries again
+ * instead of failing, and the call is not counted or charged.
+ */
+export class ScrapeSourceModelUnavailableError extends Error {
+  override name = "ScrapeSourceModelUnavailableError";
+
+  constructor(cause: unknown) {
+    super("The AI service was unavailable.", { cause });
+  }
+}
+
 /** Expected page-rule failures are repair input, not system failures. */
 export class ScrapeSourceSetupError extends Error {
   override name = "ScrapeSourceSetupError";

@@ -298,6 +298,8 @@ async function runSetupTurns(
     readCount: 0,
     crawl: null,
   };
+  // Saving before the first call lets a waiting run resume without reading the pages again.
+  if (!input.state) await input.saveState(state);
   for (let turn = 0; turn < MAX_SETUP_MODEL_CALLS; turn++) {
     let last = state.conversation.at(-1);
     if (!last || !("type" in last) || last.type !== "function_call") {

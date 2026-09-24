@@ -5,6 +5,7 @@ import {
   scrapeSourceRuns,
   type ExternalSiteRun,
 } from "@peated/server/db/schema";
+import { logWarn } from "@peated/server/lib/log";
 import type { ExternalSiteKey } from "@peated/server/types";
 import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
@@ -21,7 +22,10 @@ import {
   SCRAPE_SOURCE_PAUSED_ERROR,
   ScrapeSourceChangedError,
 } from "./configured/service";
-import { ScrapeSourceSetupError } from "./configured/setupError";
+import {
+  ScrapeSourceModelUnavailableError,
+  ScrapeSourceSetupError,
+} from "./configured/setupError";
 import type { RequestScrapeSourceModel } from "./configured/suggestion";
 import { ScraperCoordinationError } from "./coordinator";
 import {
@@ -49,7 +53,13 @@ const MAX_RUN_EXECUTION_ATTEMPTS = 10;
 const MAX_RUN_AGE_MS = 3 * 24 * 60 * 60_000;
 const DEFAULT_WAIT_MS = 15 * 60_000;
 const REQUEST_LIMIT_WAIT_MS = 60_000;
+// An AI outage costs nothing while the run waits; the run age limit still ends it.
+const MODEL_UNAVAILABLE_WAIT_MS = 60 * 60_000;
 const RUN_LIMIT_ERROR = "Scraper run exceeded its execution limits.";
+export const MODEL_UNAVAILABLE_ERROR =
+  "The AI service was unavailable. The run is waiting to try again.";
+export const MODEL_UNAVAILABLE_LIMIT_ERROR =
+  "The AI service stayed unavailable until the run's time limit. Request setup again.";
 
 // Run completion discards temporary setup evidence, but keeps repair history and cost counts.
 const finishedRunCursor = sql`CASE WHEN ${externalSiteRuns.purpose} = 'suggest'
@@ -149,7 +159,10 @@ async function claimScraperRun({
         .update(externalSiteRuns)
         .set({
           status: "failed",
-          error: RUN_LIMIT_ERROR,
+          error:
+            candidate.run.error === MODEL_UNAVAILABLE_ERROR
+              ? MODEL_UNAVAILABLE_LIMIT_ERROR
+              : RUN_LIMIT_ERROR,
           cursor: finishedRunCursor,
           completedAt: now,
           nextAttemptAt: null,
@@ -328,10 +341,25 @@ async function activateRepair(runId: number, executionToken: string) {
 
 async function queueRunForLater(
   claim: ClaimedRun,
-  error: ScraperRequestWaitError | ScraperCoordinationError,
+  error:
+    | ScraperRequestWaitError
+    | ScraperCoordinationError
+    | ScrapeSourceModelUnavailableError,
   now: Date,
 ) {
   let nextAttemptAt = new Date(now.getTime() + DEFAULT_WAIT_MS);
+  const modelUnavailable = error instanceof ScrapeSourceModelUnavailableError;
+  if (modelUnavailable) {
+    nextAttemptAt = new Date(now.getTime() + MODEL_UNAVAILABLE_WAIT_MS);
+    logWarn("Scraper run is waiting for the AI service", {
+      extra: {
+        runId: claim.run.id,
+        site: claim.siteKey,
+        nextAttemptAt: nextAttemptAt.toISOString(),
+        cause: error.cause instanceof Error ? error.cause.message : undefined,
+      },
+    });
+  }
   if (error instanceof ScraperRequestWaitError) {
     nextAttemptAt =
       error.nextEligibleAt ??
@@ -347,14 +375,15 @@ async function queueRunForLater(
     .set({
       status: "queued",
       attemptCount:
-        error instanceof ScraperRequestWaitError &&
-        (error.reason === "target_spacing" || error.reason === "run_budget")
+        modelUnavailable ||
+        (error instanceof ScraperRequestWaitError &&
+          (error.reason === "target_spacing" || error.reason === "run_budget"))
           ? Math.max(0, claim.run.attemptCount - 1)
           : claim.run.attemptCount,
       nextAttemptAt,
       executionToken: null,
       executionExpiresAt: null,
-      error: null,
+      error: modelUnavailable ? MODEL_UNAVAILABLE_ERROR : null,
     })
     .where(
       and(
@@ -450,7 +479,8 @@ export async function executeScraperRun(
     }
     if (
       error instanceof ScraperRequestWaitError ||
-      error instanceof ScraperCoordinationError
+      error instanceof ScraperCoordinationError ||
+      error instanceof ScrapeSourceModelUnavailableError
     ) {
       const nextAttemptAt = await queueRunForLater(claimed, error, clock.now());
       return { status: "waiting", nextAttemptAt };
