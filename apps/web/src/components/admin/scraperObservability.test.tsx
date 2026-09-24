@@ -79,6 +79,7 @@ const run = {
   emittedItemCount: 15,
   newItemCount: 4,
   existingItemCount: 10,
+  modelCallCount: 6,
   untrackedItemCount: 1,
   itemCount: null,
   error: null,
@@ -188,6 +189,7 @@ describe("scraper observability", () => {
     expect(html).toContain("3 retries");
     expect(html).toContain("2 slow-downs");
     expect(html).toContain("15 records");
+    expect(html).toContain("6 model calls");
     expect(html).toContain("4 new");
     expect(html).toContain("10 seen before");
     expect(html).toContain("1 not tracked");

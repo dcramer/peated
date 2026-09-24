@@ -307,6 +307,51 @@ describe("createMissingBottles", () => {
     expect(unchangedReview?.bottleId).toBeNull();
   });
 
+  test("records a no-match answer and does not ask again", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const review = await fixtures.ExternalReview({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "Unknown Review Title",
+      url: "https://example.com/no-match-review",
+    });
+
+    await createMissingBottles();
+    await createMissingBottles();
+
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    const marked = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
+    });
+    expect(marked?.bottleId).toBeNull();
+    expect(marked?.bottleNoMatchAt).toBeInstanceOf(Date);
+  });
+
+  test("asks again after a classifier failure", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const review = await fixtures.ExternalReview({
+      externalSiteId: site.id,
+      bottleId: null,
+      name: "Unknown Review Title",
+      url: "https://example.com/failed-review",
+    });
+    classifyBottleReferenceMock.mockRejectedValueOnce(
+      new Error("The AI service is unavailable."),
+    );
+
+    await createMissingBottles();
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleNoMatchAt: null });
+
+    await createMissingBottles();
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(2);
+  });
+
   test("limits queued work to one review article", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const selected = await fixtures.ExternalReview({

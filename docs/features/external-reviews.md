@@ -25,6 +25,13 @@ Publishing a source makes its reviews public when they have an active Bottle
 match. Unresolved, retired, and individually hidden reviews stay hidden. Later
 matches from that source become public automatically.
 
+Bottle matching first looks for an accepted Bottle Reference with the review's
+name, then asks the Bottle classifier once. When the classifier finds no
+Bottle, the review records that answer and is not sent to the classifier
+again while its name stays the same. A later accepted reference for that name
+still matches the review on its next import. A classifier failure records
+nothing, so the review is tried again.
+
 Stopping publication hides its reviews without deleting them or stopping
 collection. Only a moderator can change publication. Peated records the change
 in the audit log.
@@ -53,6 +60,11 @@ traces.
 Missing text, disabled or missing model configuration, invalid output, and
 request failures produce no new clip and do not block ingestion. A failed
 refresh keeps the existing clip. Live clip checks run through `pnpm evals`.
+
+Sources read their recent articles on every run. A review whose saved body is
+unchanged keeps its clip without a model request. A changed body, or a review
+that has no clip yet, asks for one. Each run records its clip requests as
+`modelCallCount` in Admin → Scrapers.
 
 ## Extracted Tasting Tags
 

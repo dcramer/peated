@@ -191,6 +191,18 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
       : [],
   );
 
+  const finishIssue = async (finished: string) => {
+    completedIssues.add(finished);
+    await session.checkpoint({
+      checksReviewDates: true,
+      completedIssues: [...completedIssues],
+      issue: null,
+      completedReviewUrls: [],
+    });
+    issue = null;
+    completedReviewUrls.clear();
+  };
+
   while (true) {
     issue ??= issueList.find((value) => !completedIssues.has(value)) ?? null;
     if (!issue) return;
@@ -198,10 +210,28 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
     const reviewUrl = new URL("/ratings-reviews", ORIGIN);
     reviewUrl.searchParams.set("custom_rating_issue[0]", issue);
     reviewUrl.searchParams.set("order_by", "published_desc");
-    const reviewResponse = await session.request({
-      target: TARGET,
-      url: reviewUrl,
-    });
+    let reviewResponse;
+    try {
+      reviewResponse = await session.request({
+        target: TARGET,
+        url: reviewUrl,
+      });
+    } catch (error) {
+      // The issue list can name an issue whose review page was removed. Record
+      // it as done so the run reaches the remaining issues instead of failing
+      // at the same place every day.
+      if (
+        !(error instanceof ScraperHttpStatusError) ||
+        ![404, 410].includes(error.status)
+      ) {
+        throw error;
+      }
+      logWarn("[Whisky Advocate] Issue page is missing for {issue}", {
+        extra: { issue, url: reviewUrl.href, status: error.status },
+      });
+      await finishIssue(issue);
+      continue;
+    }
     const externalReviews = parseReviews(
       reviewResponse.body,
       reviewResponse.url.href,
@@ -287,14 +317,6 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
       });
     }
 
-    completedIssues.add(issue);
-    await session.checkpoint({
-      checksReviewDates: true,
-      completedIssues: [...completedIssues],
-      issue: null,
-      completedReviewUrls: [],
-    });
-    issue = null;
-    completedReviewUrls.clear();
+    await finishIssue(issue);
   }
 };

@@ -64,6 +64,7 @@ export function serializeExternalSiteRun(
     emittedItemCount: item.emittedItemCount,
     newItemCount: item.newItemCount,
     existingItemCount: item.existingItemCount,
+    modelCallCount: item.modelCallCount,
     untrackedItemCount: Math.max(
       0,
       item.emittedItemCount - item.newItemCount - item.existingItemCount,

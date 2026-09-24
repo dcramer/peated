@@ -196,6 +196,10 @@ export async function storeExternalReviewArticleInTransaction(
       nativeScoreDisplay: externalReview.nativeScore?.display ?? null,
       hidden,
     };
+    if (existing && existing.name !== externalReview.name) {
+      // A new name is a new question for Bottle resolution.
+      values.bottleNoMatchAt = null;
+    }
     if (origin === "source") {
       values.category = externalReview.category;
       values.reviewerName = externalReview.reviewerName;

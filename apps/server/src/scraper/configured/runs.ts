@@ -5,10 +5,15 @@ import {
   scrapeSourceRuns,
   scrapeSources,
 } from "@peated/server/db/schema";
-import { and, desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { ScraperRunTakenOverError } from "../session";
 import { loadExecutableScrapeRules } from "./compatibility";
+import {
+  completedConfiguredDetailUrls,
+  ConfiguredScrapeCursorSchema,
+  initialConfiguredScrapeCursor,
+} from "./crawl";
 import { ScrapeIssueSchema, type ScrapeIssue } from "./preview";
 import { SCRAPE_SOURCE_MAX_LIST_PAGES } from "./rules";
 import {
@@ -189,6 +194,13 @@ export async function createPinnedScrapeSourceRun(
     revision.rulesVersion,
     revision.rules,
   );
+  const cursor =
+    input.purpose === "collect" && rules.kind === "review"
+      ? initialConfiguredScrapeCursor(
+          revision.listUrl,
+          await loadCompletedDetailUrls(connection, revision.id),
+        )
+      : null;
   const [run] = await connection
     .insert(externalSiteRuns)
     .values({
@@ -199,6 +211,7 @@ export async function createPinnedScrapeSourceRun(
       requestLimit: rules.limit + SCRAPE_SOURCE_MAX_LIST_PAGES,
       requestErrorCount: 0,
       recordType: rules.kind,
+      cursor,
     })
     .returning();
   if (!run) throw new Error("Failed to create source run.");
@@ -209,6 +222,35 @@ export async function createPinnedScrapeSourceRun(
     purpose: input.purpose,
   });
   return { run, source, revision };
+}
+
+/**
+ * Review articles rarely change, so a run skips pages that an earlier run of
+ * the same version finished. Prices and catalogs are read every run.
+ */
+async function loadCompletedDetailUrls(
+  connection: AnyDatabase,
+  revisionId: number,
+) {
+  const [priorRun] = await connection
+    .select({ cursor: externalSiteRuns.cursor })
+    .from(externalSiteRuns)
+    .innerJoin(
+      scrapeSourceRuns,
+      eq(scrapeSourceRuns.externalSiteRunId, externalSiteRuns.id),
+    )
+    .where(
+      and(
+        eq(scrapeSourceRuns.revisionId, revisionId),
+        eq(scrapeSourceRuns.purpose, "collect"),
+        inArray(externalSiteRuns.status, ["succeeded", "failed"]),
+        isNotNull(externalSiteRuns.cursor),
+      ),
+    )
+    .orderBy(desc(externalSiteRuns.id))
+    .limit(1);
+  const cursor = ConfiguredScrapeCursorSchema.safeParse(priorRun?.cursor);
+  return cursor.success ? completedConfiguredDetailUrls(cursor.data) : [];
 }
 
 export async function createScrapeSourceSuggestionRun(input: {

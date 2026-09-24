@@ -67,6 +67,10 @@ export const externalReviews = pgTable(
     nativeScoreValue: doublePrecision("native_score_value"),
     nativeScoreScale: doublePrecision("native_score_scale"),
     nativeScoreDisplay: text("native_score_display"),
+    // Set when the Bottle classifier found no Bottle for this name. Missing
+    // Bottle resolution skips these reviews until the name changes, so the
+    // same unresolved name is not classified again on every import.
+    bottleNoMatchAt: timestamp("bottle_no_match_at"),
     clip: text("clip"),
     version: integer("version").default(0).notNull(),
     tags: varchar("tags", { length: 64 })
