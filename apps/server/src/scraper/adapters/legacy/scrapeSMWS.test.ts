@@ -688,6 +688,30 @@ test("reads the volume from a SKU with another market code", async ({
   expect(items[0][1]).toMatchObject({ volume: 700 });
 });
 
+test("skips gift kits sold under KIT- SKUs", async ({ axiosMock }) => {
+  const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
+  const payload = z
+    .object({
+      items: z.array(
+        z.object({ sku: z.string(), cask_no: z.string() }).passthrough(),
+      ),
+    })
+    .passthrough()
+    .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
+
+  payload.items = [payload.items[0]];
+  payload.items[0].sku = "KIT-076150GB0700632";
+  payload.items[0].cask_no = "76.150";
+  axiosMock.onGet(url).reply(200, payload);
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items).toHaveLength(0);
+});
+
 test("prefers a known cask code encoded in the official SKU", async ({
   axiosMock,
 }) => {
