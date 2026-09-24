@@ -436,11 +436,11 @@ export async function resolveScrapeSourceRunRegistry(
                         issues: repair.issues,
                       }
                     : undefined,
-                loadPage: async (url) => {
+                loadPage: async (url, options) => {
                   const response = await session.request({
                     target: target.key,
                     url,
-                    canResumeLater: true,
+                    canResumeLater: options?.canResumeLater ?? true,
                   });
                   return {
                     url: response.url.toString(),
