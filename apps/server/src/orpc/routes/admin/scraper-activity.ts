@@ -127,7 +127,7 @@ export default procedure
     path: "/admin/scrapers/activity",
     summary: "Get scraper activity",
     description:
-      "Get daily scraper requests, saved source records, Bottle resolution, and sites whose latest run failed for the admin homepage.",
+      "Get daily scraper requests, new source records, Bottle resolution, and sites whose latest run failed for the admin homepage.",
     operationId: "getScraperActivity",
   })
   .output(AdminScraperActivitySchema)
@@ -231,6 +231,8 @@ export default procedure
       });
     }
 
+    // Daily bars count only records Peated did not already have. Re-crawls
+    // update existing records and would otherwise inflate every day.
     for (const { run } of collectionRows) {
       const date = dayKey(run.startedAt ?? run.createdAt);
       const day = days.get(date);
@@ -240,7 +242,9 @@ export default procedure
       const savedKind = savedKindForRun(run.recordType);
       if (savedKind) {
         addSavedRun(saved[savedKind], run);
-        day[savedKind] += run.emittedItemCount;
+        // Daily bars count only records Peated did not already have. Re-crawls
+        // update existing records and would otherwise inflate every day.
+        day[savedKind] += run.newItemCount;
       }
     }
 

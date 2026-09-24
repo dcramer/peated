@@ -82,7 +82,7 @@ function savedTotal(day: ActivityDay) {
 }
 
 function savedDayLabel(day: ActivityDay) {
-  return `${formatFullDay(day.date)}: ${formatNamedCount(day.reviews, "review")}, ${formatNamedCount(day.prices, "price")}, ${formatNamedCount(day.catalogListings, "catalog listing")}`;
+  return `${formatFullDay(day.date)}: ${formatNamedCount(day.reviews, "new review")}, ${formatNamedCount(day.prices, "new price")}, ${formatNamedCount(day.catalogListings, "new catalog listing")}`;
 }
 
 function requestDayLabel(day: ActivityDay) {
@@ -141,22 +141,22 @@ function SavedActivityChart({ days }: { days: readonly ActivityDay[] }) {
     <figure {...stylex.props(styles.chart)}>
       <figcaption {...stylex.props(styles.chartHeader)}>
         <span {...stylex.props(foundationStyles.compactRowTitle)}>
-          Saved each day
+          New each day
         </span>
         <span {...stylex.props(foundationStyles.metadata, styles.chartScale)}>
           {largestTotal
-            ? `Up to ${formatNamedCount(largestTotal, "item")} a day`
-            : "No items saved"}
+            ? `Up to ${formatNamedCount(largestTotal, "new item")} a day`
+            : "No new items"}
         </span>
       </figcaption>
       <div {...stylex.props(styles.chartPlot)}>
         <span aria-hidden="true" {...stylex.props(styles.chartGuide)} />
         {!largestTotal ? (
           <span {...stylex.props(foundationStyles.metadata, styles.chartEmpty)}>
-            No reviews, prices or catalog listings were saved.
+            No new reviews, prices or catalog listings.
           </span>
         ) : null}
-        <ol aria-label="Saved items by day" {...stylex.props(styles.chartBars)}>
+        <ol aria-label="New items by day" {...stylex.props(styles.chartBars)}>
           {days.map((day) => {
             const total = savedTotal(day);
             const height = largestTotal ? (total / largestTotal) * 100 : 0;
@@ -512,12 +512,12 @@ export default function ScraperActivity({ data }: ScraperActivityProps) {
                       {formatDay(day.date)}
                     </time>
                     <div {...stylex.props(styles.dailyResults)}>
-                      <span>{formatNamedCount(day.reviews, "review")}</span>
-                      <span>{formatNamedCount(day.prices, "price")}</span>
+                      <span>{formatNamedCount(day.reviews, "new review")}</span>
+                      <span>{formatNamedCount(day.prices, "new price")}</span>
                       <span>
                         {formatNamedCount(
                           day.catalogListings,
-                          "catalog listing",
+                          "new catalog listing",
                         )}
                       </span>
                     </div>

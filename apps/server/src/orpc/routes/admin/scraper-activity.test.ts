@@ -229,9 +229,9 @@ describe("GET /admin/scrapers/activity", () => {
     expect(result.days[0]).toEqual({
       date: today.toISOString().slice(0, 10),
       ...result.totals,
-      reviews: 8,
-      prices: 5,
-      catalogListings: 5,
+      reviews: 3,
+      prices: 2,
+      catalogListings: 3,
     });
     expect(result.saved).toEqual({
       reviews: { total: 8, new: 3, existing: 5 },
