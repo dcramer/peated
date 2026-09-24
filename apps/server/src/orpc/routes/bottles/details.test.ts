@@ -125,7 +125,7 @@ describe("GET /bottles/:bottle", () => {
     const data = await routerClient.bottles.details({ bottle: bottle.id });
 
     expect(data.lastPrice?.id).toBe(directPrice.id);
-    expect(data.lastPrice?.bottle?.id).toBe(bottle.id);
+    expect(data.lastPrice).not.toHaveProperty("bottle");
     expect(data.lastPrice).not.toHaveProperty("target");
   });
 
@@ -141,7 +141,7 @@ describe("GET /bottles/:bottle", () => {
     const data = await routerClient.bottles.details({ bottle: bottle.id });
 
     expect(data.lastPrice?.id).toBe(directPrice.id);
-    expect(data.lastPrice?.bottle?.id).toBe(bottle.id);
+    expect(data.lastPrice).not.toHaveProperty("bottle");
   });
 
   test("does not expose hidden prices as lastPrice", async ({ fixtures }) => {

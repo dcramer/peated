@@ -27,10 +27,23 @@ type StorePriceAttrs = {
   bottle: z.infer<typeof BottleSchema> | null;
 };
 
+export type StorePriceSerializerContext = {
+  // Set false when the caller already has the Bottle and drops `bottle` with
+  // excludeFields, so the Bottle is not loaded and serialized again.
+  includeBottle?: boolean;
+};
+
 async function loadStorePriceBottleAttrs(
   itemList: StorePrice[],
   currentUser?: User,
+  context?: StorePriceSerializerContext,
 ): Promise<Record<number, StorePriceAttrs>> {
+  if (context?.includeBottle === false) {
+    return Object.fromEntries(
+      itemList.map((item) => [item.id, { bottle: null }]),
+    );
+  }
+
   const bottleIds = Array.from(
     new Set(
       itemList.flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
