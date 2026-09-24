@@ -57,6 +57,12 @@ code. See [PlanetScale query shapes](https://planetscale.com/docs/postgres/searc
 4. Set `BOTTLE_SEARCH_TIN=1`. Watch endpoint p95/p99, errors, query plans, and recall.
    Roll back reads by unsetting the flag; both document formats continue updating.
 
+Queued index jobs live in Redis and do not survive a Redis reset. If coverage
+stops short of `bottles.total` with no failed jobs, repeat step 2 with
+`{"afterId":0,"limit":100,"missingOnly":true}`; it queues only Bottles that
+still have no documents. Wait for the worker before enabling reads: with TIN on,
+a Bottle without documents is invisible to text search.
+
 The implementation does not execute the production migration, backfill, or switch.
 
 ## Verification

@@ -3,7 +3,7 @@ import { bottles } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
-import { asc, gt } from "drizzle-orm";
+import { and, asc, eq, gt, or } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -13,7 +13,7 @@ export default procedure
     path: "/admin/catalog/rebuild-bottle-search",
     summary: "Queue a page of Bottle search documents for rebuilding",
     description:
-      "Queue a bounded page of search-document rebuilds. Requires administrator privileges.",
+      "Queue a bounded page of search-document rebuilds, optionally only for Bottles that still have no documents. Requires administrator privileges.",
     operationId: "rebuildBottleSearch",
   })
   .input(
@@ -21,6 +21,7 @@ export default procedure
       .object({
         afterId: z.number().int().nonnegative().default(0),
         limit: z.number().int().min(1).max(100).default(100),
+        missingOnly: z.boolean().default(false),
       })
       .strict(),
   )
@@ -29,7 +30,17 @@ export default procedure
     const rows = await db
       .select({ id: bottles.id })
       .from(bottles)
-      .where(gt(bottles.id, input.afterId))
+      .where(
+        and(
+          gt(bottles.id, input.afterId),
+          // Repair path: queued index jobs are not durable across a Redis
+          // reset, so an operator can re-queue only Bottles still missing
+          // search documents instead of the whole catalog.
+          input.missingOnly
+            ? or(eq(bottles.searchNames, ""), eq(bottles.searchTerms, ""))
+            : undefined,
+        ),
+      )
       .orderBy(asc(bottles.id))
       .limit(input.limit + 1);
     const page = rows.slice(0, input.limit);
