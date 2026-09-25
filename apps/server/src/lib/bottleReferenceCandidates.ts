@@ -40,12 +40,12 @@ import {
   compareBottleCandidate,
   orderBottleCandidateComparisons,
 } from "./bottleCandidateComparison";
+import { getOpenAIEmbedding } from "./openaiEmbeddings";
 import {
   bottleTextPredicate,
-  bottleTextQuery,
   bottleTextScore,
-} from "./bottleTextSearch";
-import { getOpenAIEmbedding } from "./openaiEmbeddings";
+  textSearchQuery,
+} from "./textSearch";
 
 const VECTOR_CANDIDATE_LIMIT = 20;
 const TEXT_CANDIDATE_LIMIT = 50;
@@ -877,7 +877,7 @@ async function getTextCandidates(
   if (!queryText.trim()) {
     return [];
   }
-  const tinQuery = bottleTextQuery(queryText, { any: true });
+  const tinQuery = textSearchQuery(queryText, { any: true });
   // TIN rule (bottle-search.md): rank in the score-order-and-limit shape, then
   // join the Brand only for the rows that won.
   const rows = await runQuery(sql`

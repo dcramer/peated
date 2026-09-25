@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, entities } from "@peated/server/db/schema";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
+import {
+  bottleSeriesTextPredicate,
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { procedure } from "@peated/server/orpc";
 import {
   BottleSeriesListItemSchema,
@@ -72,7 +75,7 @@ export default procedure
 
     if (query) {
       where.push(
-        sql`${bottleSeries.searchVector} @@ ${plainTextSearchQuery(query)}`,
+        bottleSeriesTextPredicate(textSearchQuery(query, { prefix: true })),
       );
     }
 

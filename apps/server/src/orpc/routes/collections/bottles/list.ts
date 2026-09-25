@@ -7,13 +7,13 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import {
-  bottleTextPredicate,
-  bottleTextQuery,
-} from "@peated/server/lib/bottleTextSearch";
-import {
   getReservedCollection,
   isReservedCollectionSlug,
 } from "@peated/server/lib/db";
+import {
+  bottleTextPredicate,
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { implement } from "@peated/server/orpc";
 import collectionBottleListContract from "@peated/server/orpc/contracts/collections/bottles/list";
 import { serialize } from "@peated/server/serializers";
@@ -104,7 +104,7 @@ export default implement(collectionBottleListContract).handler(async function ({
             AND LOWER(${bottleReferences.name}) = ${input.query.toLowerCase()}
             AND ${bottleReferences.ignored} IS NOT TRUE
         )`,
-        bottleTextPredicate(bottleTextQuery(input.query, { prefix: true })),
+        bottleTextPredicate(textSearchQuery(input.query, { prefix: true })),
       ),
     );
   }

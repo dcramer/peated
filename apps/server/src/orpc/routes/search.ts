@@ -18,15 +18,18 @@ import {
   users,
 } from "@peated/server/db/schema";
 import {
-  bottleTextPredicate,
-  bottleTextQuery,
-  bottleTextScore,
-} from "@peated/server/lib/bottleTextSearch";
+  escapeLike,
+  nameRank,
+  normalizeText,
+} from "@peated/server/lib/nameRank";
 import { formatPeatedId, parsePeatedId } from "@peated/server/lib/peatedId";
 import {
-  plainTextSearchQuery,
-  prefixTextSearchQuery,
-} from "@peated/server/lib/search";
+  bottleSeriesTextPredicate,
+  bottleTextPredicate,
+  bottleTextScore,
+  entityTextPredicate,
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { implement } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
@@ -134,46 +137,6 @@ type SearchInput = {
   limit: number;
   suggestions: "exclude" | "include" | "only";
 };
-
-function normalizeText(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .trim();
-}
-
-function escapeLike(value: string) {
-  return value.replace(/[\\%_]/g, "\\$&");
-}
-
-function nameRank(
-  names: SQL<unknown>[],
-  query: string,
-  exactReferenceMatch?: SQL<unknown>,
-) {
-  // Use exact name, name prefix, word prefix, then other matches.
-  // Bottle and Entity queries use activity and ID to break ties.
-  const normalizedQuery = normalizeText(query);
-  const prefix = `${escapeLike(normalizedQuery)}%`;
-  const wordPrefix = `% ${escapeLike(normalizedQuery)}%`;
-  const normalizedNames = names.map(
-    (name) => sql`LOWER(unaccent(COALESCE(${name}, '')))`,
-  );
-  const wordNames = normalizedNames.map(
-    (name) => sql`REGEXP_REPLACE(${name}, '[^[:alnum:]]+', ' ', 'g')`,
-  );
-
-  return sql<number>`CASE
-    WHEN ${or(
-      ...normalizedNames.map((name) => eq(name, normalizedQuery)),
-      exactReferenceMatch,
-    )} THEN 0
-    WHEN ${or(...normalizedNames.map((name) => like(name, prefix)))} THEN 1
-    WHEN ${or(...wordNames.map((name) => like(name, wordPrefix)))} THEN 2
-    ELSE 3
-  END`;
-}
 
 function activeBottleWhere() {
   // Search results and scope totals must use the same active Bottles.
@@ -327,11 +290,8 @@ async function searchSeries(
   limit: number,
 ): Promise<{ hasMore: boolean; results: SeriesRow[]; exactMatch: boolean }> {
   if (!query) return { hasMore: false, results: [], exactMatch: false };
-  const textQuery = plainTextSearchQuery(query);
-  const prefixQuery = prefixTextSearchQuery(query);
-  const where = or(
-    sql`${bottleSeries.searchVector} @@ ${textQuery}`,
-    sql`${bottleSeries.searchVector} @@ ${prefixQuery}`,
+  const where = bottleSeriesTextPredicate(
+    textSearchQuery(query, { prefix: true }),
   );
   const rank = nameRank(
     [sql`${bottleSeries.fullName}`, sql`${bottleSeries.name}`],
@@ -364,7 +324,7 @@ async function searchBottles(
   const where = and(
     activeBottleWhere(),
     or(
-      bottleTextPredicate(bottleTextQuery(query, { prefix: true })),
+      bottleTextPredicate(textSearchQuery(query, { prefix: true })),
       referenceMatch,
     ),
   );
@@ -405,14 +365,11 @@ async function searchEntities(
   limit: number,
 ): Promise<{ hasMore: boolean; results: EntityRow[]; exactMatch: boolean }> {
   if (!query) return { hasMore: false, results: [], exactMatch: false };
-  const textQuery = plainTextSearchQuery(query);
-  const prefixQuery = prefixTextSearchQuery(query);
   const referenceMatch = exactEntityReferenceMatch(query);
   const where = and(
     entityScopeWhere(scope),
     or(
-      sql`${entities.searchVector} @@ ${textQuery}`,
-      sql`${entities.searchVector} @@ ${prefixQuery}`,
+      entityTextPredicate(textSearchQuery(query, { prefix: true })),
       referenceMatch,
     ),
   );

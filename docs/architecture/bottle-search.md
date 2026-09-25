@@ -37,10 +37,8 @@ documents contain the name, short name, references, and aliases. Series document
 contain the full name and the Brand names. The indexing jobs write these
 documents, and creation writes initial documents.
 
-The indexing jobs still write the older `search_vector` GIN columns. Bottle reads
-use TIN only. Entity and Series reads use GIN until their documents are backfilled
-in production. Switch those reads, then drop the three `search_vector` columns in
-a separate migration.
+Every text read uses TIN. The indexing jobs still write the older `search_vector`
+GIN columns, which nothing reads; drop them in a separate migration.
 
 User input is compiled into bounded literal TINQL. Catalog search supports
 alphabetic prefixes. Candidate discovery uses a broad word query and, on an empty

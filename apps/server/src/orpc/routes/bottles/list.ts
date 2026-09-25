@@ -15,11 +15,6 @@ import {
   regions,
 } from "@peated/server/db/schema";
 import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
-import {
-  bottleTextPredicate,
-  bottleTextQuery,
-  bottleTextScore,
-} from "@peated/server/lib/bottleTextSearch";
 import { companyBottleEntityIds } from "@peated/server/lib/companyPortfolio";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { bottleIdsForDistilleryView } from "@peated/server/lib/distilleryBottleView";
@@ -27,6 +22,11 @@ import {
   bottleIdsForEntities,
   bottleIdsForEntity,
 } from "@peated/server/lib/entityBottleIds";
+import {
+  bottleTextPredicate,
+  bottleTextScore,
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { implement } from "@peated/server/orpc";
 import bottleListContract from "@peated/server/orpc/contracts/bottles/list";
 import { serialize } from "@peated/server/serializers";
@@ -183,7 +183,7 @@ export default implement(bottleListContract).handler(async function ({
   if (query) {
     where.push(
       or(
-        bottleTextPredicate(bottleTextQuery(query, { prefix: true })),
+        bottleTextPredicate(textSearchQuery(query, { prefix: true })),
         exactReferenceBottleIds.length
           ? inArray(bottles.id, exactReferenceBottleIds)
           : undefined,
