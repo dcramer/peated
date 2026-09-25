@@ -410,8 +410,12 @@ export default implement(bottleListContract).handler(async function ({
     const rankedIds = [
       ...new Set([
         ...exactRows.map((row) => row.id),
+        // A row that matched only by exact reference id carries no text score.
         ...matches
-          .sort((a, b) => b.score - a.score || a.id - b.id)
+          .sort(
+            (a, b) =>
+              Number(b.score ?? 0) - Number(a.score ?? 0) || a.id - b.id,
+          )
           .map((row) => row.id),
       ]),
     ];
