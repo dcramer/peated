@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import { TSVector } from "../db/columns";
 import type { NewBottle, NewBottleSeries, NewEntity } from "../db/schema";
 import { formatCategoryName } from "./format";
@@ -6,31 +5,6 @@ import { formatCategoryName } from "./format";
 const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
 const SINGLE_CASK_SEARCH_TERMS = "single cask single barrel";
-
-/**
- * Parse search text as normalized words, never as search operators. Web
- * search syntax would read a dash before a word, common in scraped titles and
- * Bottle editions, as NOT that word.
- */
-export function plainTextSearchQuery(query: string) {
-  return sql`plainto_tsquery('english', unaccent(${query}))`;
-}
-
-/** Build prefix operators only from lexemes parsed by PostgreSQL. */
-export function prefixTextSearchQuery(query: string) {
-  return sql`COALESCE(
-    to_tsquery(
-      'english',
-      (
-        SELECT string_agg(quote_literal(token) || ':*', ' & ')
-        FROM unnest(
-          tsvector_to_array(to_tsvector('english', unaccent(${query})))
-        ) AS token
-      )
-    ),
-    ''::tsquery
-  )`;
-}
 
 function formatSearchAbv(abv: number | null | undefined) {
   if (abv === null || abv === undefined) {

@@ -8,15 +8,16 @@ import {
   type EntityKind,
   type User,
 } from "@peated/server/db/schema";
+import { nameRank } from "@peated/server/lib/nameRank";
 import {
-  plainTextSearchQuery,
-  prefixTextSearchQuery,
-} from "@peated/server/lib/search";
+  entityTextPredicate,
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import type { EntityKindListInputSchema } from "@peated/server/orpc/contracts/entityKinds/list";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 type Input = z.infer<typeof EntityKindListInputSchema>;
@@ -39,8 +40,6 @@ export async function listEntities({
 }: ListEntitiesOptions & { kind?: EntityKind }) {
   const { query, cursor, limit } = input;
   const offset = (cursor - 1) * limit;
-  const textQuery = plainTextSearchQuery(query);
-  const prefixQuery = prefixTextSearchQuery(query);
   const requestedKinds = kind ? [kind] : input.kinds;
   const where: (SQL<unknown> | undefined)[] = [
     requestedKinds?.length ? inArray(entities.kind, requestedKinds) : undefined,
@@ -66,12 +65,7 @@ export async function listEntities({
   }
 
   if (query) {
-    where.push(
-      or(
-        sql`${entities.searchVector} @@ ${textQuery}`,
-        sql`${entities.searchVector} @@ ${prefixQuery}`,
-      ),
-    );
+    where.push(entityTextPredicate(textSearchQuery(query, { prefix: true })));
   }
   if (input.name) {
     where.push(
@@ -133,10 +127,7 @@ export async function listEntities({
   switch (input.sort) {
     case "rank":
       orderBy = query
-        ? sql`GREATEST(
-              ts_rank(${entities.searchVector}, ${textQuery}),
-              ts_rank(${entities.searchVector}, ${prefixQuery}) * 0.5
-            ) DESC`
+        ? sql`${nameRank([sql`${entities.name}`, sql`${entities.shortName}`], query)}, ${entities.publicReviewAndTastingCount} DESC`
         : desc(entities.publicReviewAndTastingCount);
       break;
     case "name":

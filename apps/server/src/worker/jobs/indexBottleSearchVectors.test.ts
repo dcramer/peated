@@ -3,8 +3,8 @@ import { bottleReferences, bottles } from "@peated/server/db/schema";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import {
   bottleTextPredicate,
-  bottleTextQuery,
-} from "@peated/server/lib/bottleTextSearch";
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
@@ -12,7 +12,7 @@ import indexBottleSearchVectors from "./indexBottleSearchVectors";
 async function searchVectorMatches(bottleId: number, query: string) {
   const [result] = await db
     .select({
-      tinMatches: bottleTextPredicate(bottleTextQuery(query)),
+      tinMatches: bottleTextPredicate(textSearchQuery(query)),
       matches: sql<boolean>`COALESCE(
         ${bottles.searchVector} @@ websearch_to_tsquery('english', ${query}),
         FALSE

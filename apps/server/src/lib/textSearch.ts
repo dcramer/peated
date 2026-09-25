@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bottles } from "../db/schema";
+import { bottleSeries, bottles, entities } from "../db/schema";
 
 // Broad-query rule (bottle-search.md): words that describe almost every
 // whisky add nothing to an OR search, but an OR over them matches most of
@@ -42,7 +42,7 @@ const BROAD_QUERY_STOP_TOKENS = new Set([
 ]);
 
 /** Compile literal input to bounded TINQL; callers never supply TIN operators. */
-export function bottleTextQuery(
+export function textSearchQuery(
   input: string,
   { any = false, fuzzy = false, prefix = false } = {},
 ) {
@@ -79,3 +79,13 @@ export function bottleTextPredicate(query: string) {
 }
 
 export const bottleTextScore = sql<number>`tin.score(${bottles}.ctid)`;
+
+export function entityTextPredicate(query: string) {
+  if (!query) return sql`FALSE`;
+  return sql`${entities.searchNames} ==> ${query}`;
+}
+
+export function bottleSeriesTextPredicate(query: string) {
+  if (!query) return sql`FALSE`;
+  return sql`${bottleSeries.searchNames} ==> ${query}`;
+}

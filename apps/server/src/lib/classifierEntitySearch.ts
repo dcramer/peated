@@ -1,7 +1,10 @@
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { entities, entityReferences } from "@peated/server/db/schema";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
+import {
+  entityTextPredicate,
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 
 const CONTAINED_MATCH_FETCH_MULTIPLIER = 4;
@@ -109,25 +112,22 @@ export async function searchClassifierEntities(
     });
   }
 
-  const textQuery = plainTextSearchQuery(args.query);
-  const textScore = sql<number>`ts_rank(${entities.searchVector}, ${textQuery})`;
+  // Text matches rank below exact, prefix, and contained matches.
   const textMatches = await db
     .select({
       entityId: entities.id,
       name: entities.name,
       shortName: entities.shortName,
       kind: entities.kind,
-      score: textScore,
     })
     .from(entities)
     .where(
       and(
         args.kind ? eq(entities.kind, args.kind) : undefined,
-        sql`${entities.searchVector} IS NOT NULL`,
-        sql`${entities.searchVector} @@ ${textQuery}`,
+        entityTextPredicate(textSearchQuery(args.query)),
       ),
     )
-    .orderBy(sql`${textScore} DESC`, entities.name)
+    .orderBy(entities.name)
     .limit(args.limit);
 
   for (const row of textMatches) {
@@ -137,7 +137,7 @@ export async function searchClassifierEntities(
       shortName: row.shortName,
       kind: row.kind!,
       reference: null,
-      score: row.score === null ? null : Number(row.score),
+      score: 0.2,
       source: ["text"],
     });
   }

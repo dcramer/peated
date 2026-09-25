@@ -17,9 +17,9 @@ import {
 } from "@peated/server/lib/bottleCreateCandidates";
 import {
   bottleTextPredicate,
-  bottleTextQuery,
   bottleTextScore,
-} from "@peated/server/lib/bottleTextSearch";
+  textSearchQuery,
+} from "@peated/server/lib/textSearch";
 import { procedure } from "@peated/server/orpc";
 import {
   BottleInputFields,
@@ -132,7 +132,7 @@ export default procedure
       };
     }
 
-    const tinQuery = bottleTextQuery(input.name, { any: true });
+    const tinQuery = textSearchQuery(input.name, { any: true });
     const active = and(
       isNotNull(bottles.groupId),
       sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
@@ -202,7 +202,7 @@ export default procedure
         .limit(10),
     ]);
     if (!textRows.length && tinQuery) {
-      const fuzzy = bottleTextQuery(input.name, {
+      const fuzzy = textSearchQuery(input.name, {
         any: true,
         fuzzy: true,
       });

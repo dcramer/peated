@@ -171,6 +171,22 @@ describe("GET /bottle-series", () => {
     });
   });
 
+  it("matches a series by the start of a word", async function ({ fixtures }) {
+    const brand = await fixtures.Entity({ name: "Ardbeg" });
+    const series = await fixtures.BottleSeries({
+      name: "Supernova",
+      brandId: brand.id,
+    });
+    await fixtures.BottleSeries({ name: "Uigeadail", brandId: brand.id });
+
+    const { results } = await routerClient.bottleSeries.list({
+      brand: brand.id,
+      query: "supern",
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([series.id]);
+  });
+
   it("returns empty list for non-existent brand", async function () {
     const { results } = await routerClient.bottleSeries.list({
       brand: 12345,
