@@ -2,6 +2,7 @@ import {
   normalizeBottleInput,
   normalizeVolume,
 } from "@peated/bottle-classifier/normalize";
+import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { load as cheerio } from "cheerio";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
@@ -12,8 +13,9 @@ const SITE = "woodencork";
 const PRODUCT_CARD_SELECTOR =
   "#CollectionAjaxContent div.grid-item, .collection-grid .product-grid-item";
 
+// Titles end in "700ml", "1.75L", "750 ml", or "- 750 mL".
 function extractVolume(name: string) {
-  const match = name.match(/^(.+)\s([\d.]+(?:ml|l))$/i);
+  const match = name.match(/^(.+?)(?:\s-)?\s([\d.]+\s?(?:ml|l))$/i);
   if (!match) return [name];
   return match.slice(1, 3);
 }
@@ -59,7 +61,8 @@ export async function scrapeProducts(url: string, cb: ScrapePricesCallback) {
       return;
     }
 
-    if (volume < 500) {
+    // Sizes outside ALLOWED_VOLUMES fail the price schema and would fail the whole batch.
+    if (!ALLOWED_VOLUMES.includes(volume)) {
       logScrapeWarning(SITE, "Invalid product size", { volume });
       return;
     }

@@ -60,3 +60,38 @@ test("supports the current collection card markup", async ({ axiosMock }) => {
     },
   ]);
 });
+
+function card(title: string, handle: string) {
+  return `<div class="product-grid-item">
+    <div class="grid-product__title">${title}</div>
+    <a class="grid-item__link" href="products/${handle}"></a>
+    <span class="grid-product__price--current">
+      <span class="visually-hidden">$42.00</span>
+    </span>
+  </div>`;
+}
+
+test("reads spaced sizes and skips sizes outside the allowed list", async ({
+  axiosMock,
+}) => {
+  const url = "https://woodencork.com/collections/whiskey?page=1";
+  axiosMock.onGet(url).reply(
+    200,
+    `<div class="collection-grid">
+      ${card("Jack Daniel's Tennessee Whiskey 3L", "jack-daniels-3l")}
+      ${card("Laphroaig Quarter Cask 750 ml", "laphroaig-quarter-cask")}
+      ${card("Lagavulin 16 Year - 750 mL", "lagavulin-16")}
+      ${card("Knob Creek Old Fashioned 375 ml", "knob-creek-old-fashioned")}
+    </div>`,
+  );
+
+  const items: any[] = [];
+  await scrapeProducts(url, async (item) => {
+    items.push(item);
+  });
+
+  expect(items.map((item) => [item.name, item.volume])).toEqual([
+    ["Laphroaig Quarter Cask", 750],
+    ["Lagavulin 16-year-old", 750],
+  ]);
+});
