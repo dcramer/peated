@@ -261,6 +261,31 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     ]);
   });
 
+  test("matches a Library Bottle by the start of a word", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Springbank Local Barley" });
+    const collection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values({
+      collectionId: collection.id,
+      bottleId: bottle.id,
+    });
+
+    const response = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", query: "springb" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results.map(({ bottle }) => bottle.id)).toEqual([
+      bottle.id,
+    ]);
+  });
+
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {
     const error = await waitError(() =>
       routerClient.collections.bottles.list(

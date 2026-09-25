@@ -94,16 +94,21 @@ export function buildBottleSearchVector(
   return values;
 }
 
-/** Keep text documents alongside GIN during the measured TIN rollout. */
+function joinUniqueValues(parts: TSVector[]) {
+  return [...new Set(parts.map((part) => part.value))].join("\n");
+}
+
+/** Build the TIN text documents that Bottle text search reads. */
 export function buildBottleSearchDocuments(vector: TSVector[]) {
   return {
-    searchNames: [
-      ...new Set(
-        vector.filter((part) => part.weight === "A").map((part) => part.value),
-      ),
-    ].join("\n"),
-    searchTerms: [...new Set(vector.map((part) => part.value))].join("\n"),
+    searchNames: joinUniqueValues(vector.filter((part) => part.weight === "A")),
+    searchTerms: joinUniqueValues(vector),
   };
+}
+
+/** Entity and Series vectors hold only names, so one TIN document serves them. */
+export function buildNameSearchDocument(vector: TSVector[]) {
+  return { searchNames: joinUniqueValues(vector) };
 }
 
 export function buildBottleSeriesSearchVector(

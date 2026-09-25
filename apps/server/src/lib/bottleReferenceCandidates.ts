@@ -14,7 +14,6 @@ import {
   normalizeString,
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
-import config from "@peated/server/config";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   BOTTLE_REFERENCE_EMBEDDING_DIMENSIONS,
@@ -34,7 +33,6 @@ import {
   isAIGatewayConfigured,
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { and, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
@@ -50,7 +48,7 @@ import {
 import { getOpenAIEmbedding } from "./openaiEmbeddings";
 
 const VECTOR_CANDIDATE_LIMIT = 20;
-const TEXT_CANDIDATE_LIMIT = 10;
+const TEXT_CANDIDATE_LIMIT = 50;
 const BRAND_CANDIDATE_LIMIT = 5;
 const BRAND_COVERAGE_CANDIDATE_LIMIT = 10;
 
@@ -879,8 +877,6 @@ async function getTextCandidates(
   if (!queryText.trim()) {
     return [];
   }
-  const textQuery = plainTextSearchQuery(queryText);
-
   const tinQuery = bottleTextQuery(queryText, { any: true });
   const rows = await runQuery(sql`
     SELECT
@@ -899,13 +895,13 @@ async function getTextCandidates(
       ${bottles.maturation} AS "maturation",
       ${bottles.caskNumber} AS "caskNumber",
       ${bottles.outturn} AS "outturn",
-      ${config.BOTTLE_SEARCH_TIN ? bottleTextScore : sql`ts_rank(${bottles.searchVector}, ${textQuery})`} AS score
+      ${bottleTextScore} AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
-    WHERE ${config.BOTTLE_SEARCH_TIN ? bottleTextPredicate(tinQuery) : sql`${bottles.searchVector} @@ ${textQuery}`}
+    WHERE ${bottleTextPredicate(tinQuery)}
       AND ${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})
     ORDER BY score DESC, ${bottles.fullName} ASC
-    LIMIT ${config.BOTTLE_SEARCH_TIN ? 50 : TEXT_CANDIDATE_LIMIT}
+    LIMIT ${TEXT_CANDIDATE_LIMIT}
   `);
 
   return rows.map((row) => buildBottleCandidate(row, "text"));
@@ -985,12 +981,24 @@ function getExtractedBrandName(
   return brandName || null;
 }
 
+function coverageWords(queryText: string): string[] {
+  return [
+    ...new Set(
+      queryText
+        .normalize("NFKC")
+        .toLowerCase()
+        .match(/[\p{Letter}\p{Number}]{2,}/gu) ?? [],
+    ),
+  ];
+}
+
 /**
  * Bottle candidate retrieval owns this rule: within a known Brand, rank Bottles
- * by how many of the query's words they cover. A long scraped title cannot
- * pass an all-words match, and a substring match misses an edition inserted
- * between the words, so this is the retrieval that keeps a same-Brand release
- * in front of the classifier. Coverage, not text rank, decides the order.
+ * by how many of the query's words their search terms contain. A long scraped
+ * title cannot pass an all-words match, and a substring match misses an edition
+ * inserted between the words, so this is the retrieval that keeps a same-Brand
+ * release in front of the classifier. Coverage, not text rank, decides the
+ * order, so this reads the text document directly instead of an index.
  */
 async function getBrandCoverageCandidates(
   queryText: string,
@@ -998,28 +1006,20 @@ async function getBrandCoverageCandidates(
   runQuery: BottleCandidateQueryRunner,
 ): Promise<BottleCandidate[]> {
   const brandName = getExtractedBrandName(extractedLabel);
-  if (!brandName || !queryText.trim()) {
+  const words = coverageWords(queryText);
+  if (!brandName || !words.length) {
     return [];
   }
-
-  const queryLexemes = sql`(
-    SELECT array_agg(DISTINCT lexeme)
-    FROM unnest(
-      tsvector_to_array(to_tsvector('english', unaccent(${queryText})))
-    ) AS lexeme
-  )`;
-  const anyLexemeQuery = sql`(
-    SELECT to_tsquery('english', string_agg(quote_literal(lexeme), ' | '))
-    FROM unnest(query_lexemes.lexemes) AS lexeme
-  )`;
+  // Words are letters and digits only, so the array literal needs no quoting.
+  // A word counts when it starts a word in the document: "cask" covers "casks".
+  const wordList = `{${words.join(",")}}`;
   const coverage = sql`(
-    SELECT COUNT(*)::float / GREATEST(array_length(query_lexemes.lexemes, 1), 1)
-    FROM unnest(tsvector_to_array(${bottles.searchVector})) AS lexeme
-    WHERE lexeme = ANY(query_lexemes.lexemes)
+    SELECT COUNT(*)::float / ${words.length}
+    FROM unnest(${wordList}::text[]) AS word
+    WHERE unaccent(${bottles.searchTerms}) ~* ('\\m' || unaccent(word))
   )`;
 
   const rows = await runQuery(sql`
-    WITH query_lexemes AS (SELECT ${queryLexemes} AS lexemes)
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
@@ -1039,13 +1039,11 @@ async function getBrandCoverageCandidates(
       ${coverage} AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
-    CROSS JOIN query_lexemes
     WHERE (
       LOWER(${entities.name}) = LOWER(${brandName})
       OR LOWER(COALESCE(${entities.shortName}, '')) = LOWER(${brandName})
     )
-      AND query_lexemes.lexemes IS NOT NULL
-      AND ${bottles.searchVector} @@ ${anyLexemeQuery}
+      AND ${coverage} > 0
       AND NOT EXISTS(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}

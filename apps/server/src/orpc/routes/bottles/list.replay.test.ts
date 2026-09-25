@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import type * as FixtureTypes from "@peated/server/lib/test/fixtures";
 import { BottleListInputSchema } from "@peated/server/orpc/contracts/bottles/list";
 import { routerClient } from "@peated/server/orpc/router";
@@ -56,63 +55,50 @@ async function seedCatalog(
   return { bottleIds, add };
 }
 
-describe.each([false, true])(
-  "GET /bottles recorded requests (TIN=%s)",
-  (tin) => {
-    const original = config.BOTTLE_SEARCH_TIN;
-    beforeEach(() => {
-      config.BOTTLE_SEARCH_TIN = tin;
-    });
-    afterEach(() => {
-      config.BOTTLE_SEARCH_TIN = original;
-    });
-
-    for (const replay of evidence.cases) {
-      test(`replays ${replay.name}`, async ({ fixtures }) => {
-        const { bottleIds, add } = await seedCatalog(
-          evidence.catalog.filter((b) => replay.catalogIds.includes(b.id)),
-          fixtures,
-        );
-        const pages = [];
-        for (const request of replay.requests) {
-          const params = new URLSearchParams(request.path.split("?")[1]);
-          const input = BottleListInputSchema.parse(Object.fromEntries(params));
-          pages.push(await routerClient.bottles.list(input));
-        }
-        const ids = pages.flatMap((page) => page.results.map((b) => b.id));
-
-        if (replay.kind === "missing") {
-          expect(ids).toEqual([]);
-          expect(pages[0].total).toBe(0);
-          const later = replay.laterBottle!;
-          expect(bottleIds.has(later.id)).toBe(false);
-          expect(new Date(later.createdAt).getTime()).toBeGreaterThan(
-            new Date(replay.requests[0].traces[0].timestamp).getTime(),
-          );
-          const created = await add(later);
-          const input = BottleListInputSchema.parse(
-            Object.fromEntries(
-              new URLSearchParams(replay.requests[0].path.split("?")[1]),
-            ),
-          );
-          const after = await routerClient.bottles.list(input);
-          expect(after.results.map((b) => b.id)).toContain(created.id);
-          return;
-        }
-
-        // A broad search must retain alternatives, including the holiday release
-        // rejected during the Leopold review. Retrieval does not approve identity.
-        const expectedIds = replay.requests.flatMap((request) =>
-          request.observedBottleIds.map((id) => bottleIds.get(id)),
-        );
-        expect(new Set(ids)).toEqual(new Set(expectedIds));
-        expect(ids.length).toBe(expectedIds.length);
-        expect(pages[0].total).toBe(expectedIds.length);
-        if (replay.expectedBottleId !== null) {
-          expect(replay.decision?.verified).toBe(true);
-          expect(ids).toContain(bottleIds.get(replay.expectedBottleId));
-        }
-      });
+for (const replay of evidence.cases) {
+  test(`replays ${replay.name}`, async ({ fixtures }) => {
+    const { bottleIds, add } = await seedCatalog(
+      evidence.catalog.filter((b) => replay.catalogIds.includes(b.id)),
+      fixtures,
+    );
+    const pages = [];
+    for (const request of replay.requests) {
+      const params = new URLSearchParams(request.path.split("?")[1]);
+      const input = BottleListInputSchema.parse(Object.fromEntries(params));
+      pages.push(await routerClient.bottles.list(input));
     }
-  },
-);
+    const ids = pages.flatMap((page) => page.results.map((b) => b.id));
+
+    if (replay.kind === "missing") {
+      expect(ids).toEqual([]);
+      expect(pages[0].total).toBe(0);
+      const later = replay.laterBottle!;
+      expect(bottleIds.has(later.id)).toBe(false);
+      expect(new Date(later.createdAt).getTime()).toBeGreaterThan(
+        new Date(replay.requests[0].traces[0].timestamp).getTime(),
+      );
+      const created = await add(later);
+      const input = BottleListInputSchema.parse(
+        Object.fromEntries(
+          new URLSearchParams(replay.requests[0].path.split("?")[1]),
+        ),
+      );
+      const after = await routerClient.bottles.list(input);
+      expect(after.results.map((b) => b.id)).toContain(created.id);
+      return;
+    }
+
+    // A broad search must retain alternatives, including the holiday release
+    // rejected during the Leopold review. Retrieval does not approve identity.
+    const expectedIds = replay.requests.flatMap((request) =>
+      request.observedBottleIds.map((id) => bottleIds.get(id)),
+    );
+    expect(new Set(ids)).toEqual(new Set(expectedIds));
+    expect(ids.length).toBe(expectedIds.length);
+    expect(pages[0].total).toBe(expectedIds.length);
+    if (replay.expectedBottleId !== null) {
+      expect(replay.decision?.verified).toBe(true);
+      expect(ids).toContain(bottleIds.get(replay.expectedBottleId));
+    }
+  });
+}

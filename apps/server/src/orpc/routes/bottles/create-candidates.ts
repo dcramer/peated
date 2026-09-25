@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -21,7 +20,6 @@ import {
   bottleTextQuery,
   bottleTextScore,
 } from "@peated/server/lib/bottleTextSearch";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import {
   BottleInputFields,
@@ -30,7 +28,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const candidateColumns = {
@@ -120,9 +118,6 @@ export default procedure
     }
 
     const tinQuery = bottleTextQuery(input.name, { any: true });
-    const searchConditions = searchQueries.map(
-      (query) => sql`${bottles.searchVector} @@ ${plainTextSearchQuery(query)}`,
-    );
     const active = and(
       isNotNull(bottles.groupId),
       sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
@@ -159,20 +154,8 @@ export default procedure
       db
         .select(candidateColumns)
         .from(bottles)
-        .where(
-          and(
-            active,
-            config.BOTTLE_SEARCH_TIN
-              ? bottleTextPredicate(tinQuery)
-              : or(...searchConditions),
-          ),
-        )
-        .orderBy(
-          config.BOTTLE_SEARCH_TIN
-            ? desc(bottleTextScore)
-            : desc(bottles.totalTastings),
-          bottles.id,
-        )
+        .where(and(active, bottleTextPredicate(tinQuery)))
+        .orderBy(desc(bottleTextScore), bottles.id)
         .limit(50),
       identity
         ? db
@@ -208,7 +191,7 @@ export default procedure
         )
         .limit(10),
     ]);
-    if (config.BOTTLE_SEARCH_TIN && !textRows.length && tinQuery) {
+    if (!textRows.length && tinQuery) {
       const fuzzy = bottleTextQuery(input.name, {
         any: true,
         fuzzy: true,
@@ -287,10 +270,9 @@ export default procedure
         return {
           ...b,
           exactReference: referenceRows.some((row) => row.id === b.id),
-          textRelevance:
-            config.BOTTLE_SEARCH_TIN && textPositions.has(b.id)
-              ? 1 / textPositions.get(b.id)!
-              : undefined,
+          textRelevance: textPositions.has(b.id)
+            ? 1 / textPositions.get(b.id)!
+            : undefined,
           brand,
           distillers: distillersByBottle.get(b.id) ?? [],
           bottler: b.bottlerId ? entityById.get(b.bottlerId) : null,

@@ -712,8 +712,16 @@ describe("priceMatching", () => {
         source: expect.arrayContaining(["exact"]),
       }),
     ]);
-    expect(ignoredCandidates).toEqual([]);
-    expect(unresolvedCandidates).toEqual([]);
+    // Text similarity may still suggest the Bottle; the alias itself must not
+    // count as an exact match.
+    for (const candidates of [ignoredCandidates, unresolvedCandidates]) {
+      expect(
+        candidates.filter(
+          (candidate) =>
+            candidate.reference !== null || candidate.source.includes("exact"),
+        ),
+      ).toEqual([]);
+    }
   });
 
   test("excludes tombstoned Bottles from exact, text, and direct candidate lookup", async ({
@@ -732,12 +740,13 @@ describe("priceMatching", () => {
       newBottleId: replacement.id,
     });
 
-    await expect(
-      searchBottleCandidates({
-        query: retired.fullName,
-        limit: 15,
-      }),
-    ).resolves.toEqual([]);
+    const candidates = await searchBottleCandidates({
+      query: retired.fullName,
+      limit: 15,
+    });
+    expect(candidates.map((candidate) => candidate.bottleId)).not.toContain(
+      retired.id,
+    );
     await expect(getBottleCandidateById(retired.id)).resolves.toBeNull();
   });
 

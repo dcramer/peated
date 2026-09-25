@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
 import {
+  bottleSeries,
   bottleTombstones,
   bottles,
+  entities,
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -14,6 +16,11 @@ const itemCoverageSchema = z.object({
   total: z.number().int().nonnegative(),
   matched: z.number().int().nonnegative(),
   unmatched: z.number().int().nonnegative(),
+});
+
+const searchCoverageSchema = z.object({
+  total: z.number().int().nonnegative(),
+  withSearchDocuments: z.number().int().nonnegative(),
 });
 
 export default procedure
@@ -39,6 +46,8 @@ export default procedure
         withReviews: z.number().int().nonnegative(),
         withPriceListings: z.number().int().nonnegative(),
       }),
+      entities: searchCoverageSchema,
+      series: searchCoverageSchema,
       externalReviews: itemCoverageSchema,
       priceListings: itemCoverageSchema,
     }),
@@ -46,6 +55,8 @@ export default procedure
   .handler(async () => {
     const [
       [bottleContentCoverage],
+      [entitySearchCoverage],
+      [seriesSearchCoverage],
       [reviewBottleCoverage],
       [priceListingBottleCoverage],
       [reviewCoverage],
@@ -68,6 +79,18 @@ export default procedure
               )`,
           ),
         ),
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          withSearchDocuments: sql<number>`count(*) filter (where ${entities.searchNames} <> '')::int`,
+        })
+        .from(entities),
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          withSearchDocuments: sql<number>`count(*) filter (where ${bottleSeries.searchNames} <> '')::int`,
+        })
+        .from(bottleSeries),
       db
         .select({
           total: sql<number>`count(distinct ${externalReviews.bottleId})::int`,
@@ -130,6 +153,8 @@ export default procedure
         withReviews: reviewBottleCoverage!.total,
         withPriceListings: priceListingBottleCoverage!.total,
       },
+      entities: entitySearchCoverage!,
+      series: seriesSearchCoverage!,
       externalReviews: reviewCoverage!,
       priceListings: priceListingCoverage!,
     };

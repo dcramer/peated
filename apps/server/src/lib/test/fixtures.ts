@@ -65,6 +65,7 @@ import {
   buildBottleSearchVector,
   buildBottleSeriesSearchVector,
   buildEntitySearchVector,
+  buildNameSearchDocument,
 } from "../search";
 import { SMWS_DISTILLERY_CODES } from "../smws";
 import { toTitleCase } from "../strings";
@@ -376,7 +377,11 @@ export const Entity = async (
 
     const [entity] = await tx
       .insert(entities)
-      .values({ ...entityData, searchVector })
+      .values({
+        ...entityData,
+        searchVector,
+        ...buildNameSearchDocument(searchVector),
+      })
       .returning();
 
     if (!entity) throw new Error("Unable to create Entity fixture");
@@ -1415,11 +1420,13 @@ export async function BottleSeries(
       representativeBottleId: data.representativeBottleId ?? null,
     };
 
+    const searchVector = buildBottleSeriesSearchVector(values, brand);
     const result = await tx
       .insert(bottleSeries)
       .values({
         ...values,
-        searchVector: buildBottleSeriesSearchVector(values, brand),
+        searchVector,
+        ...buildNameSearchDocument(searchVector),
       })
       .returning();
 

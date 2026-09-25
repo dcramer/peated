@@ -209,6 +209,8 @@ describe("scraper observability", () => {
             withReviews: 25,
             withPriceListings: 80,
           },
+          entities: { total: 20, withSearchDocuments: 20 },
+          series: { total: 5, withSearchDocuments: 5 },
           externalReviews: { total: 40, matched: 30, unmatched: 10 },
           priceListings: { total: 200, matched: 180, unmatched: 20 },
         }}

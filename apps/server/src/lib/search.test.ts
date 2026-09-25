@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildBottleSearchDocuments, buildBottleSearchVector } from "./search";
+import {
+  buildBottleSearchDocuments,
+  buildBottleSearchVector,
+  buildEntitySearchVector,
+  buildNameSearchDocument,
+} from "./search";
 
 describe("buildBottleSearchVector", () => {
   it("indexes a bottle's series as primary identity", () => {
@@ -48,4 +53,19 @@ it("keeps decimal strength precision in search documents", () => {
   const document = buildBottleSearchDocuments(vector);
   expect(document.searchTerms).toContain("56.75% ABV");
   expect(document.searchTerms).not.toContain("56.8% ABV");
+});
+
+it("puts every Entity name and alias in one search document", () => {
+  const vector = buildEntitySearchVector(
+    {
+      name: "The Glenlivet Distillery",
+      shortName: "Glenlivet",
+      kind: "distillery",
+      createdByActorId: 1,
+    },
+    [{ name: "The Glenlivet Distillery" }, { name: "Glenlivet Distillers" }],
+  );
+  expect(buildNameSearchDocument(vector).searchNames).toBe(
+    "The Glenlivet Distillery\nGlenlivet\nGlenlivet Distillers",
+  );
 });
