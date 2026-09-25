@@ -250,3 +250,57 @@ name, 45992 Hearach brand vs entity 367043.
 
 New Keg N Bottle proposals kept arriving during the pass (35369 onward);
 they were not chased and stay for the next pass.
+
+## Master of Malt lane, September 25, 2026
+
+Environment: `https://api.peated.com` as @dcramer. Filter: the 637 Master
+of Malt (site 32) rows left open by the create and no_match lanes because
+the site returns 429 to every automated fetch. The pages were read with
+`agent-browser open` (a real browser session, paced at one page every few
+seconds), which the site allows; `agent-browser read` still gets 429. Total
+Wine and Astor Wines block the browser session as well (Total Wine returns
+an access-denied page, Astor a Cloudflare block), so those rows stay open.
+
+Each Master of Malt product page gives a spec line
+(`Style|size|ABV`), a details table (Distillery/Brand, Bottler, Age) and a
+description that usually names the vintage, cask, finish, outturn and
+bottling year. Those facts, with the saved packet, settled 595 of the 637
+rows: 419 creates (63438–63857 and two exact-duplicate creates that returned
+existing Bottles 62604 and 62229), 176 matches, 25 repairs, 42 open.
+
+Open reasons: page and record ABV disagree (Darkness Jura 7, Pursuit Triple
+Mash, Ballechin 18 Batch 2, Longmorn 25 SSC, Scapa 21, Kaiyo The Kuri,
+Hakushu 18 Limited Edition, G&M Mortlach 25, MoM Glen Garioch 17 CaskCade,
+MM Leapfrog 14, Bunnahabhain Spanish Oak Fèis Ìle 2018); annual or batched
+families with no batch named (Cragganmore and Dalwhinnie DE, Balvenie 40,
+Rock Island Sherry Edition, Double Eagle Very Rare, TBWC Slyrs and Macduff
+21, Wilderness Trail Family Reserve, Royal Lochnagar Selected Reserve);
+brands with no entity (Dublin's Own, Scilly Spirit, Distillerie de Paris,
+Thinkers, Defilement, Temris, Coperies, Smoky Scot, Many Hands, Pelter,
+Whisky 1901); title and description that disagree (Adelphi Speyside 10
+Linkwood vs Glen Elgin, Cooper's Choice Deanston 10 vintage, Campbeltown
+1972 Tesco); one 404.
+
+Conventions applied in this lane: Master of Malt's own series (Badly Drawn
+Dogs, Lost Bottlings, Masterpiece, CaskCade, single casks) use the Master of
+Malt entity 6075 as Brand and bottler; Diageo Manager's Dram bottlings use
+the distillery as Brand with the name `<age> The Manager's Dram` and the
+release year; Secret Speyside Collection bottlings use the distillery as
+Brand with the collection as edition; old label variants of a standard
+release (Glenlivet 12 "Pre 2004", Jura 10 "1990s", Highland Park 25
+pre-2013 and pre-2019, golf-course and clan presentation tins) match the
+base Bottle; a commemorative decanter series that the catalog already
+records per edition (Bell's, Johnnie Walker 2220 cities) gets one Bottle per
+edition.
+
+Catalog cleanup seen in this lane (not done, needs approval): 45985 /
+3488 (Glen Moray Elgin Classic Chardonnay); 58121 generic Evan Williams
+Single Barrel Vintage; 14207 Barrell Rye Batch 002 on brand 37; 1322 / 1323
+Ardnamurchan bottler self-reference; 2956 / 5381 / 17582 Royal Lochnagar
+Selected Reserve; 57582 Highland Park The Dolphins edition unknown; 45009 /
+45010 / 45008 Chichibu The Peated "Release" records (release year vs vintage;
+45010 and 45009 repaired from the page); 16802 / 4011 Chichibu Chibidaru;
+3254 Lagavulin Distillery Exclusive generic; 61328 vs 62524 G&M Longmorn
+1966; 1939 Arran Explorers Vol 3 had stated age 12 (repaired to 21); 3669
+Auchentoshan Blood Oak stated age 12 doubtful; 46290 Master of Malt Glen
+Garioch 17 2009 at 51.1% vs the CaskCade page at 50.5%.
