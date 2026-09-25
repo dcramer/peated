@@ -33,6 +33,7 @@ import type {
   ActivityEntry,
 } from "@peated/server/types";
 import { and, desc, eq, gte, inArray, lte, sql, type SQL } from "drizzle-orm";
+import { unionAll } from "drizzle-orm/pg-core";
 
 export {
   encodeActivityCursor,
@@ -733,73 +734,34 @@ export async function serializePrimaryActivityEntries(
   );
 }
 
-async function getCollectionHref(collection: Collection, user: User) {
-  const [favoritesCollection, libraryCollection] = await Promise.all([
-    getReservedCollection(db, user.id, "default"),
-    getReservedCollection(db, user.id, "library"),
-  ]);
-
-  if (favoritesCollection?.id === collection.id) {
-    return `/users/${user.username}/favorites`;
+async function loadCollectionHrefs(groups: CollectionAddGroup[]) {
+  const usersById = new Map(groups.map((group) => [group.user.id, group.user]));
+  const reservedByUser = await Promise.all(
+    [...usersById.values()].map(async (user) => {
+      const [favorites, library] = await Promise.all([
+        getReservedCollection(db, user.id, "default"),
+        getReservedCollection(db, user.id, "library"),
+      ]);
+      return { user, favorites, library };
+    }),
+  );
+  const hrefByCollectionId = new Map<number, string | null>();
+  for (const { user, favorites, library } of reservedByUser) {
+    if (favorites) {
+      hrefByCollectionId.set(favorites.id, `/users/${user.username}/favorites`);
+    }
+    if (library) {
+      hrefByCollectionId.set(library.id, `/users/${user.username}/library`);
+    }
   }
-  if (libraryCollection?.id === collection.id) {
-    return `/users/${user.username}/library`;
-  }
-  return null;
+  return hrefByCollectionId;
 }
 
-async function serializeCollectionForActivity({
-  collection,
-  user,
-  currentUser,
-}: {
-  collection: Collection;
-  user: User;
-  currentUser?: User | null;
-}) {
-  return {
-    ...(await serialize(CollectionSerializer, collection, currentUser)),
-    href: await getCollectionHref(collection, user),
-  };
-}
-
-/** Serializes grouped collection additions with actor, destination, and previews. */
-export async function serializeCollectionAddEntries({
-  groups,
-  currentUser,
-}: {
-  groups: CollectionAddGroup[];
-  currentUser?: User | null;
-}) {
-  const serializedUsersById = new Map<
-    number,
-    ActivityCollectionAddEntry["createdBy"]
-  >();
-  const serializedCollectionsById = new Map<
-    number,
-    Awaited<ReturnType<typeof serializeCollectionForActivity>>
-  >();
-
-  const entries: ActivityEntry[] = [];
-  for (const group of groups) {
-    let createdBy = serializedUsersById.get(group.user.id);
-    if (!createdBy) {
-      createdBy = await serialize(UserSerializer, group.user, currentUser);
-      serializedUsersById.set(group.user.id, createdBy);
-    }
-
-    let collection = serializedCollectionsById.get(group.collection.id);
-    if (!collection) {
-      collection = await serializeCollectionForActivity({
-        collection: group.collection,
-        user: group.user,
-        currentUser,
-      });
-      serializedCollectionsById.set(group.collection.id, collection);
-    }
-
-    // Activity previews must use exact database bounds; JS dates truncate microseconds.
-    const previewRows = await db
+/** Loads the newest additions inside each group's exact database window. */
+async function loadPreviewRows(groups: CollectionAddGroup[]) {
+  // Activity previews must use exact database bounds; JS dates truncate microseconds.
+  const selects = groups.map((group) =>
+    db
       .select()
       .from(collectionBottles)
       .where(
@@ -813,27 +775,90 @@ export async function serializeCollectionAddEntries({
         ),
       )
       .orderBy(desc(collectionBottles.createdAt))
-      .limit(COLLECTION_PREVIEW_LIMIT);
+      .limit(COLLECTION_PREVIEW_LIMIT),
+  );
+  const [first, second, ...rest] = selects;
+  if (first === undefined) return [];
+  if (second === undefined) return await first;
+  return await unionAll(first, second, ...rest);
+}
 
+/** Serializes grouped collection additions with actor, destination, and previews. */
+export async function serializeCollectionAddEntries({
+  groups,
+  currentUser,
+}: {
+  groups: CollectionAddGroup[];
+  currentUser?: User | null;
+}): Promise<ActivityEntry[]> {
+  if (!groups.length) return [];
+  const userList = [
+    ...new Map(groups.map((g) => [g.user.id, g.user])).values(),
+  ];
+  const collectionList = [
+    ...new Map(groups.map((g) => [g.collection.id, g.collection])).values(),
+  ];
+
+  // Every group on the page loads together: one user pass, one collection
+  // pass, one preview pass, instead of a query chain per group.
+  const [
+    serializedUsers,
+    serializedCollections,
+    hrefByCollectionId,
+    previewRows,
+  ] = await Promise.all([
+    serialize(UserSerializer, userList, currentUser),
+    serialize(CollectionSerializer, collectionList, currentUser),
+    loadCollectionHrefs(groups),
+    loadPreviewRows(groups),
+  ]);
+  const serializedPreviews = await serialize(
+    CollectionBottleSerializer,
+    previewRows,
+    currentUser,
+  );
+  const previewById = new Map(
+    previewRows.map((row, index) => [row.id, serializedPreviews[index]!]),
+  );
+  const userById = new Map(
+    userList.map((user, index) => [user.id, serializedUsers[index]!]),
+  );
+  const collectionById = new Map(
+    collectionList.map((collection, index) => [
+      collection.id,
+      serializedCollections[index]!,
+    ]),
+  );
+
+  return groups.map((group): ActivityEntry => {
     const windowStart = coerceActivityDate(group.windowStart);
     const windowEnd = coerceActivityDate(group.windowEnd);
-    entries.push({
+    const items = previewRows
+      .filter(
+        (row) =>
+          row.collectionId === group.collection.id &&
+          row.createdAt >= windowStart &&
+          row.createdAt <= windowEnd,
+      )
+      .sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id - a.id,
+      )
+      .slice(0, COLLECTION_PREVIEW_LIMIT)
+      .map((row) => previewById.get(row.id)!);
+    return {
       id: `collection_add:${group.user.id}:${group.collection.id}:${windowEnd.getTime()}`,
       type: "collection_add",
       priority: "secondary",
       createdAt: windowEnd.toISOString(),
       windowStart: windowStart.toISOString(),
       windowEnd: windowEnd.toISOString(),
-      createdBy,
-      collection,
-      items: await serialize(
-        CollectionBottleSerializer,
-        previewRows,
-        currentUser,
-      ),
+      createdBy: userById.get(group.user.id)!,
+      collection: {
+        ...collectionById.get(group.collection.id)!,
+        href: hrefByCollectionId.get(group.collection.id) ?? null,
+      },
+      items,
       totalItems: group.totalItems,
-    });
-  }
-
-  return entries;
+    };
+  });
 }
