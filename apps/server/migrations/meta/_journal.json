@@ -2101,6 +2101,13 @@
       "when": 1790343806138,
       "tag": "0299_drop_search_vectors",
       "breakpoints": false
+    },
+    {
+      "idx": 300,
+      "version": "7",
+      "when": 1790360393171,
+      "tag": "0300_drop_legacy_release_tables",
+      "breakpoints": false
     }
   ]
 }
