@@ -197,3 +197,56 @@ Catalog cleanup seen in this lane (not done, needs approval):
   under the same pick name; keep both until the shop clarifies.
 - The Rare Cask Reserves range now has a brand entity (367138); the William
   Grant & Sons company entity 5821 still has no Bottles.
+
+## Keg N Bottle lane (fresh proposals), September 25, 2026
+
+Environment: `https://api.peated.com` as @dcramer. Filter: the 568 Keg N
+Bottle (site 26889) proposals that arrived after the create lane
+(498 no_match, 49 match_existing, 21 create_new), decided from the saved
+packet plus the shop's Shopify product JSON, which was fetched for every row.
+
+Result: 314 matches, 145 ignores, 30 creates (63408–63437), 84 Bottle
+repairs, 79 left open. Two brand entities were added: Hinotori 367161 and
+Jackwagon 367162. Bottle repairs were ABV, category or stated-age fields
+that the shop page or the producer proved for the matched record (for
+example Blanton's and Benchmark Full Proof lose an invented age; Taketsuru
+21 becomes blended malt at 43%; Bladnoch Vinaya loses a 12-year age).
+
+Ignores were flavored whiskies, moonshine, liqueurs and bottled cocktails
+(111 found by title words, then each packet read; FEW x Smashing Pumpkins
+was pulled back out of that set), plus a few generic titles with no safe
+Bottle.
+
+Open rows, by reason: single-barrel or batch families where the page names
+no barrel or batch (Willett Family Estate, Old Fitzgerald 11, Kentucky Owl,
+EH Taylor Barrel Proof, Penelope Barrel Strength, Peerless, Old Forester
+Single Barrel Rye); page and record ABV or age disagree (Ohishi Sakura and
+Sherry, Hard Truth Sweet Mash Rye, Castle & Key Wheated, Jack Daniel's 14
+Batch 02); no ABV on the page (Crown Royal 32 Extra Rare, Leopold Bros
+Barrel 28, Rossville Union pick, Sazerac-owned picks); brands with no
+entity (Old Man Winter, Luckenbach Road, Hogsworth, Freedom Fighter); and
+commemorative packaging whose liquid is not identified (Jim Beam LA Dodgers
+60th).
+
+Conventions applied: a commemorative or artist packaging of a standard
+release matches the base Bottle (Johnnie Walker Blue Diwali and Year of the
+Goat, WhistlePig PiggyBank 10); a Diageo Special Release keeps the Special
+Releases Brand; the classifier's "bottler self-reference" on an official
+distillery release is not a conflict.
+
+Catalog cleanup seen in this lane (not done, needs approval): duplicates
+2936 / 1067 (Old Pulteney 12), 2308 / 16107 (Arran Bothy), 12946 / 17526
+(WhistlePig 10), 45643 / 55800 (Lot No. 40), 1154 / 701 (Bunnahabhain
+Toiteach), 3928 / 476 (Tomatin 12), 61976 / 46754 (Courage & Conviction),
+56003 / 54324 (Jack Daniel's Heritage Barrel), 781 / 41258 (Bunnahabhain
+Stiùireadair), 860 / 14 (Jim Beam white label), 58121 (generic Evan Williams
+Single Barrel Vintage next to vintage records); wrong fields: 14135 brand
+"Rieger's", 11943 Sagamore Spirit Rye stated age 7, 54208 Heaven Hill
+Chinquapin age 6 (page says 2018 fill, 2025 release), 45238 Bladnoch Vinaya
+43.4%, 55611 Starward Octave Barrel age 3, 14207 Barrell Rye Batch 002 on
+brand 37 instead of Barrell Craft Spirits 75635, 1322 / 1323 Ardnamurchan
+cask-strength bottler self-reference, 56831 FUK brand is the distillery
+name, 45992 Hearach brand vs entity 367043.
+
+New Keg N Bottle proposals kept arriving during the pass (35369 onward);
+they were not chased and stay for the next pass.
