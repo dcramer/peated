@@ -360,18 +360,11 @@ async function searchBottles(
   limit: number,
 ): Promise<{ hasMore: boolean; results: BottleRow[]; exactMatch: boolean }> {
   if (!query) return { hasMore: false, results: [], exactMatch: false };
-  const textQuery = plainTextSearchQuery(query);
-  const prefixQuery = prefixTextSearchQuery(query);
   const referenceMatch = exactBottleReferenceMatch(query);
   const where = and(
     activeBottleWhere(),
     or(
-      ...(config.BOTTLE_SEARCH_TIN
-        ? [bottleTextPredicate(bottleTextQuery(query, { prefix: true }))]
-        : [
-            sql`${bottles.searchVector} @@ ${textQuery}`,
-            sql`${bottles.searchVector} @@ ${prefixQuery}`,
-          ]),
+      bottleTextPredicate(bottleTextQuery(query, { prefix: true })),
       referenceMatch,
     ),
   );
@@ -393,7 +386,7 @@ async function searchBottles(
     .limit(limit + 1)
     .orderBy(
       rank,
-      ...(config.BOTTLE_SEARCH_TIN ? [sql`${bottleTextScore} DESC`] : []),
+      sql`${bottleTextScore} DESC`,
       sql`${bottleRatingCount()} DESC`,
       asc(bottles.id),
     );

@@ -125,6 +125,7 @@ export const bottleSeries = pgTable(
       .notNull(),
     description: text("description"),
     searchVector: tsvector("search_vector"),
+    searchNames: text("search_names").notNull().default(""),
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
       .notNull(),
@@ -147,6 +148,7 @@ export const bottleSeries = pgTable(
       sql`LOWER(${table.fullName})`,
     ),
     index("bottle_series_search_idx").using("gin", table.searchVector),
+    index("bottle_series_search_names_tin_idx").using("tin", table.searchNames),
     index("bottle_series_brand_idx").on(table.brandId),
     index("bottle_series_representative_bottle_idx").on(
       table.representativeBottleId,

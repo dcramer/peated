@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, bottles, entities } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
-import { buildBottleSeriesSearchVector } from "@peated/server/lib/search";
+import {
+  buildBottleSeriesSearchVector,
+  buildNameSearchDocument,
+} from "@peated/server/lib/search";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
@@ -27,7 +30,7 @@ export default async (input: JobPayload) => {
     .where(eq(entities.id, series.brandId));
   if (!brand) return;
 
-  const searchVector = buildBottleSeriesSearchVector(series, brand) || null;
+  const searchVector = buildBottleSeriesSearchVector(series, brand);
 
   logInfo("Updating search vector for series {seriesId}", {
     extra: {
@@ -39,6 +42,7 @@ export default async (input: JobPayload) => {
     .update(bottleSeries)
     .set({
       searchVector,
+      ...buildNameSearchDocument(searchVector),
     })
     .where(eq(bottleSeries.id, series.id));
 

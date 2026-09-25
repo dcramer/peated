@@ -15,7 +15,10 @@ import {
   upsertEntityReferences,
 } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
-import { buildEntitySearchVector } from "@peated/server/lib/search";
+import {
+  buildEntitySearchVector,
+  buildNameSearchDocument,
+} from "@peated/server/lib/search";
 import { implement } from "@peated/server/orpc";
 import contract from "@peated/server/orpc/contracts/entities/create";
 import {
@@ -73,11 +76,13 @@ export default implement(contract)
 
       const actorId = (await getUserActorForDatabase(tx, context.user)).id;
       const entityData: NewEntity = { ...data, createdByActorId: actorId };
+      const searchVector = buildEntitySearchVector(entityData);
       const [entity] = await tx
         .insert(entities)
         .values({
           ...entityData,
-          searchVector: buildEntitySearchVector(entityData),
+          searchVector,
+          ...buildNameSearchDocument(searchVector),
         })
         .onConflictDoNothing()
         .returning();

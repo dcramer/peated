@@ -5,7 +5,10 @@ import {
   entityReferences,
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
-import { buildEntitySearchVector } from "@peated/server/lib/search";
+import {
+  buildEntitySearchVector,
+  buildNameSearchDocument,
+} from "@peated/server/lib/search";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -50,6 +53,7 @@ export default async (input: JobPayload) => {
     .update(entities)
     .set({
       searchVector,
+      ...buildNameSearchDocument(searchVector),
     })
     .where(eq(entities.id, entity.id));
 };

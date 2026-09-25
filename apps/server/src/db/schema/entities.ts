@@ -45,6 +45,7 @@ export const entities = pgTable(
     ownerId: bigint("owner_id", { mode: "number" }),
 
     searchVector: tsvector("search_vector"),
+    searchNames: text("search_names").notNull().default(""),
 
     // These fields record where the Entity comes from, not a headquarters or
     // office. For a Distillery, they record the production site.
@@ -97,6 +98,7 @@ export const entities = pgTable(
   },
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
+    index("entity_search_names_tin_idx").using("tin", table.searchNames),
     index("entity_public_activity_count_idx").on(
       table.publicReviewAndTastingCount,
     ),

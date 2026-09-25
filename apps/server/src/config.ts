@@ -13,8 +13,6 @@ export default {
         ? "development"
         : "test",
   DEBUG: !!process.env.DEBUG,
-  // Enable after the existing search-index job has populated both documents.
-  BOTTLE_SEARCH_TIN: process.env.BOTTLE_SEARCH_TIN === "1",
   PORT: Number(process.env.PORT || "4300"),
   HOST: process.env.HOST || "localhost",
   CORS_HOST: process.env.CORS_HOST || "http://localhost:3200",

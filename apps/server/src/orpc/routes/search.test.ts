@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -16,548 +15,539 @@ import indexBottleSeriesSearchVectors from "@peated/server/worker/jobs/indexBott
 import indexEntitySearchVectors from "@peated/server/worker/jobs/indexEntitySearchVectors";
 import { describe, expect, test } from "vitest";
 
-describe.each([false, true])("GET /search (TIN=%s)", (tin) => {
-  const original = config.BOTTLE_SEARCH_TIN;
-  beforeEach(() => {
-    config.BOTTLE_SEARCH_TIN = tin;
+test("finds a Bottle by a display alias without exact-match authority", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle({ name: "Canonical Search Product" });
+  await fixtures.BottleAlias({
+    bottleId: bottle.id,
+    name: "Marketed Moonneedle",
   });
-  afterEach(() => {
-    config.BOTTLE_SEARCH_TIN = original;
-  });
-  test("finds a Bottle by a display alias without exact-match authority", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({ name: "Canonical Search Product" });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      name: "Marketed Moonneedle",
-    });
-    await indexBottleSearchVectors({ bottleId: bottle.id });
+  await indexBottleSearchVectors({ bottleId: bottle.id });
 
-    const data = await routerClient.search({
-      query: "marketed moonneedle",
-      scopes: ["bottles"],
-      limit: 5,
-    });
-
-    expect(data.groups[0]).toMatchObject({
-      type: "bottles",
-      results: [expect.objectContaining({ id: bottle.id })],
-    });
+  const data = await routerClient.search({
+    query: "marketed moonneedle",
+    scopes: ["bottles"],
+    limit: 5,
   });
 
-  test("returns independently capped groups and indicates more results", async ({
-    fixtures,
-  }) => {
-    const bottles = await Promise.all(
-      ["One", "Two", "Three", "Four"].map((suffix) =>
-        fixtures.Bottle({ name: `Contractneedle Bottle ${suffix}` }),
-      ),
-    );
-    const distiller = await fixtures.Entity({
-      name: "Contractneedle Distiller",
-      kind: "distillery",
-    });
-    const brand = await fixtures.Entity({
-      name: "Contractneedle Brand",
-      kind: "brand",
-    });
-    const bottler = await fixtures.Entity({
-      name: "Contractneedle Bottler",
-      kind: "bottler",
-    });
-    const company = await fixtures.Entity({
-      name: "Contractneedle Company",
-      type: [],
-      kind: "company",
-    });
-    const region = await fixtures.Region({
-      name: "Contractneedle Region",
-      totalBottles: 8,
-    });
+  expect(data.groups[0]).toMatchObject({
+    type: "bottles",
+    results: [expect.objectContaining({ id: bottle.id })],
+  });
+});
 
-    const data = await routerClient.search({
-      query: "contractneedle",
-      scopes: [
-        "regions",
-        "companies",
-        "brands",
-        "bottles",
-        "bottlers",
-        "distilleries",
-      ],
-      limit: 2,
-    });
+test("returns independently capped groups and indicates more results", async ({
+  fixtures,
+}) => {
+  const bottles = await Promise.all(
+    ["One", "Two", "Three", "Four"].map((suffix) =>
+      fixtures.Bottle({ name: `Contractneedle Bottle ${suffix}` }),
+    ),
+  );
+  const distiller = await fixtures.Entity({
+    name: "Contractneedle Distiller",
+    kind: "distillery",
+  });
+  const brand = await fixtures.Entity({
+    name: "Contractneedle Brand",
+    kind: "brand",
+  });
+  const bottler = await fixtures.Entity({
+    name: "Contractneedle Bottler",
+    kind: "bottler",
+  });
+  const company = await fixtures.Entity({
+    name: "Contractneedle Company",
+    type: [],
+    kind: "company",
+  });
+  const region = await fixtures.Region({
+    name: "Contractneedle Region",
+    totalBottles: 8,
+  });
 
-    expect(data.groups.map(({ type }) => type)).toEqual([
-      "bottles",
-      "distilleries",
-      "brands",
-      "bottlers",
-      "companies",
+  const data = await routerClient.search({
+    query: "contractneedle",
+    scopes: [
       "regions",
-    ]);
-    expect(data.groups).toMatchObject([
-      {
-        type: "bottles",
-        hasMore: true,
-        results: [{ id: bottles[0]!.id }, { id: bottles[1]!.id }],
-      },
-      {
-        type: "distilleries",
-        hasMore: false,
-        results: [{ id: distiller.id }],
-      },
-      { type: "brands", hasMore: false, results: [{ id: brand.id }] },
-      { type: "bottlers", hasMore: false, results: [{ id: bottler.id }] },
-      { type: "companies", hasMore: false, results: [{ id: company.id }] },
-      { type: "regions", hasMore: false, results: [{ id: region.id }] },
-    ]);
+      "companies",
+      "brands",
+      "bottles",
+      "bottlers",
+      "distilleries",
+    ],
+    limit: 2,
   });
 
-  test("finds Series with Brand context and indicates more results", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Dramfool" });
-    const first = await fixtures.BottleSeries({
-      name: "Jim McEwan Signature Collection",
-      brandId: brand.id,
-      numReleases: 12,
-    });
-    const second = await fixtures.BottleSeries({
-      name: "Jim McEwan Signature Archive",
-      brandId: brand.id,
-      numReleases: 4,
-    });
-    await Promise.all([
-      indexBottleSeriesSearchVectors({ seriesId: first.id }),
-      indexBottleSeriesSearchVectors({ seriesId: second.id }),
-    ]);
+  expect(data.groups.map(({ type }) => type)).toEqual([
+    "bottles",
+    "distilleries",
+    "brands",
+    "bottlers",
+    "companies",
+    "regions",
+  ]);
+  expect(data.groups).toMatchObject([
+    {
+      type: "bottles",
+      hasMore: true,
+      results: [{ id: bottles[0]!.id }, { id: bottles[1]!.id }],
+    },
+    {
+      type: "distilleries",
+      hasMore: false,
+      results: [{ id: distiller.id }],
+    },
+    { type: "brands", hasMore: false, results: [{ id: brand.id }] },
+    { type: "bottlers", hasMore: false, results: [{ id: bottler.id }] },
+    { type: "companies", hasMore: false, results: [{ id: company.id }] },
+    { type: "regions", hasMore: false, results: [{ id: region.id }] },
+  ]);
+});
 
-    const data = await routerClient.search({
-      query: "Jim McEwan Signature",
-      scopes: ["series"],
-      limit: 1,
-    });
+test("finds Series with Brand context and indicates more results", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({ name: "Dramfool" });
+  const first = await fixtures.BottleSeries({
+    name: "Jim McEwan Signature Collection",
+    brandId: brand.id,
+    numReleases: 12,
+  });
+  const second = await fixtures.BottleSeries({
+    name: "Jim McEwan Signature Archive",
+    brandId: brand.id,
+    numReleases: 4,
+  });
+  await Promise.all([
+    indexBottleSeriesSearchVectors({ seriesId: first.id }),
+    indexBottleSeriesSearchVectors({ seriesId: second.id }),
+  ]);
 
-    expect(data.groups).toMatchObject([
-      {
-        type: "series",
-        hasMore: true,
-        results: [
-          {
-            id: first.id,
-            peatedId: formatPeatedId("series", first.id),
-            brand: { id: brand.id, name: brand.name },
-          },
-        ],
-      },
-    ]);
+  const data = await routerClient.search({
+    query: "Jim McEwan Signature",
+    scopes: ["series"],
+    limit: 1,
   });
 
-  test("applies entity scopes before their result limits", async ({
-    fixtures,
-  }) => {
-    await Promise.all(
-      ["One", "Two", "Three"].map((suffix) =>
-        fixtures.Entity({
-          name: `Scopedneedle Brand ${suffix}`,
-          kind: "brand",
-        }),
-      ),
-    );
-    const distiller = await fixtures.Entity({
-      name: "Scopedneedle Distiller",
-      kind: "distillery",
-    });
-
-    const data = await routerClient.search({
-      query: "scopedneedle",
-      scopes: ["distilleries"],
-      limit: 1,
-    });
-
-    expect(data.groups).toMatchObject([
-      {
-        type: "distilleries",
-        hasMore: false,
-        results: [{ id: distiller.id }],
-      },
-    ]);
-  });
-
-  test("uses kind as the authority for every Entity search scope", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({
-      name: "Kindauthority Brand",
-      kind: "brand",
-    });
-    const company = await fixtures.Entity({
-      name: "Kindauthority Company",
-      kind: "company",
-    });
-
-    const data = await routerClient.search({
-      query: "kindauthority",
-      scopes: ["brands", "companies"],
-    });
-
-    expect(data.groups).toMatchObject([
-      { type: "brands", results: [{ id: brand.id }] },
-      { type: "companies", results: [{ id: company.id }] },
-    ]);
-  });
-
-  test("keeps member search authenticated and hides unsearchable profiles", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const publicMember = await fixtures.User({
-      username: "memberneedle-public",
-    });
-    const privateMember = await fixtures.User({
-      username: "memberneedle-private",
-      private: true,
-    });
-    await fixtures.Tasting({ createdById: publicMember.id });
-    await fixtures.Tasting({ createdById: publicMember.id });
-    await fixtures.Tasting({ createdById: privateMember.id });
-
-    const [anonymous, authenticated] = await Promise.all([
-      routerClient.search({ query: "memberneedle", scopes: ["members"] }),
-      routerClient.search(
-        { query: "memberneedle", scopes: ["members"] },
-        { context: { user: defaults.user } },
-      ),
-    ]);
-
-    expect(anonymous.groups).toEqual([]);
-    expect(authenticated.groups).toMatchObject([
-      {
-        type: "members",
-        hasMore: false,
-        results: [{ member: { id: publicMember.id }, totalTastings: 2 }],
-      },
-    ]);
-  });
-
-  test("includes followed private members without exposing their tasting count", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const privateMember = await fixtures.User({
-      username: "followedneedle-private",
-      private: true,
-    });
-    await fixtures.Follow({
-      fromUserId: defaults.user.id,
-      toUserId: privateMember.id,
-      status: "following",
-    });
-    await fixtures.Tasting({ createdById: privateMember.id });
-
-    const data = await routerClient.search(
-      { query: "followedneedle", scopes: ["members"] },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.groups).toMatchObject([
-      {
-        type: "members",
-        hasMore: false,
-        results: [{ member: { id: privateMember.id }, totalTastings: 0 }],
-      },
-    ]);
-  });
-
-  test("ranks exact, name-prefix, and any-word-prefix matches in order", async ({
-    fixtures,
-  }) => {
-    const word = await fixtures.Bottle({ name: "House Rankneedle" });
-    const prefix = await fixtures.Bottle({ name: "Rankneedle Extra" });
-    const exact = await fixtures.Bottle({ name: "Rankneedle" });
-
-    const data = await routerClient.search({
-      query: "rankneedle",
-      scopes: ["bottles"],
-      limit: 10,
-    });
-    const group = data.groups[0];
-
-    expect(group?.type).toBe("bottles");
-    if (group?.type !== "bottles") throw new Error("Expected Bottles group");
-    expect(group.results.map(({ id }) => id)).toEqual([
-      exact.id,
-      prefix.id,
-      word.id,
-    ]);
-  });
-
-  test("puts a case-insensitive exact Entity group before Bottle matches", async ({
-    fixtures,
-  }) => {
-    await fixtures.Bottle({ name: "Exactgroupneedle Bottle" });
-    const brand = await fixtures.Entity({
-      name: "Exactgroupneedle",
-      kind: "brand",
-    });
-
-    const data = await routerClient.search({
-      query: "EXACTGROUPNEEDLE",
-      scopes: ["bottles", "brands"],
-      limit: 10,
-    });
-
-    expect(data.groups).toMatchObject([
-      { type: "brands", results: [{ id: brand.id }] },
-      { type: "bottles" },
-    ]);
-  });
-
-  test("uses community rating count only to break equal text matches", async ({
-    fixtures,
-  }) => {
-    const lessRated = await fixtures.Bottle({
-      name: "Tienneedle Alpha",
-      memberScoreCount: 1,
-    });
-    const moreRated = await fixtures.Bottle({
-      name: "Tienneedle Beta",
-      memberScoreCount: 5,
-    });
-
-    const data = await routerClient.search({
-      query: "tienneedle",
-      scopes: ["bottles"],
-      limit: 10,
-    });
-    const group = data.groups[0];
-
-    if (group?.type !== "bottles") throw new Error("Expected Bottles group");
-    expect(group.results.map(({ id }) => id)).toEqual([
-      moreRated.id,
-      lessRated.id,
-    ]);
-  });
-
-  test("uses materialized Entity activity to break equal text matches", async ({
-    fixtures,
-  }) => {
-    const lessActive = await fixtures.Entity({
-      name: "Entitytieneedle Alpha",
-      kind: "brand",
-      publicReviewAndTastingCount: 1,
-    });
-    const moreActive = await fixtures.Entity({
-      name: "Entitytieneedle Beta",
-      kind: "brand",
-      publicReviewAndTastingCount: 5,
-    });
-
-    const data = await routerClient.search({
-      query: "entitytieneedle",
-      scopes: ["brands"],
-      limit: 10,
-    });
-    const group = data.groups[0];
-
-    if (group?.type !== "brands") throw new Error("Expected Brands group");
-    expect(group.results.map(({ id }) => id)).toEqual([
-      moreActive.id,
-      lessActive.id,
-    ]);
-  });
-
-  test("returns server-ranked nearest matches for a settled miss", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({ name: "Laphroaig" });
-
-    const data = await routerClient.search({
-      query: "Laphroaigg",
-      scopes: ["bottles"],
-    });
-
-    expect(data.groups).toMatchObject([
-      { type: "bottles", hasMore: false, results: [] },
-    ]);
-    expect(data.nearest).toMatchObject([
-      { type: "bottles", result: { id: bottle.id } },
-    ]);
-  });
-
-  test("can return an empty result without waiting for possible matches", async ({
-    fixtures,
-  }) => {
-    await fixtures.Bottle({ name: "Laphroaig" });
-
-    const data = await routerClient.search({
-      query: "Laphroaigg",
-      scopes: ["bottles"],
-      suggestions: "exclude",
-    });
-
-    expect(data.groups).toMatchObject([
-      { type: "bottles", hasMore: false, results: [] },
-    ]);
-    expect(data.nearest).toEqual([]);
-  });
-
-  test("can return only possible matches", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle({ name: "Laphroaig" });
-
-    const data = await routerClient.search({
-      query: "Laphroaigg",
-      scopes: ["bottles"],
-      suggestions: "only",
-    });
-
-    expect(data.exact).toBeNull();
-    expect(data.groups).toEqual([]);
-    expect(data.nearest).toMatchObject([
-      { type: "bottles", result: { id: bottle.id } },
-    ]);
-  });
-
-  test("resolves Bottle, Entity, and Series Peated ID tombstones directly", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const entity = await fixtures.Entity({ type: [], kind: "company" });
-    const brand = await fixtures.Entity({ name: "Redirect Brand" });
-    const series = await fixtures.BottleSeries({
-      name: "Redirect Destination",
-      brandId: brand.id,
-    });
-    await db.insert(bottleTombstones).values({
-      bottleId: 9001,
-      newBottleId: bottle.id,
-    });
-    await db.insert(entityTombstones).values({
-      entityId: 9002,
-      newEntityId: entity.id,
-    });
-    await db.insert(bottleSeriesTombstones).values({
-      seriesId: 9003,
-      newSeriesId: series.id,
-    });
-
-    const [bottleData, entityData, seriesData] = await Promise.all([
-      routerClient.search({
-        query: formatPeatedId("bottle", 9001),
-        scopes: ["bottles"],
-      }),
-      routerClient.search({
-        query: formatPeatedId("entity", 9002),
-        scopes: ["companies"],
-      }),
-      routerClient.search({
-        query: formatPeatedId("series", 9003),
-        scopes: ["series"],
-      }),
-    ]);
-
-    expect(bottleData.groups).toEqual([]);
-    expect(bottleData.exact).toMatchObject({
-      type: "bottle",
-      ref: { id: bottle.id },
-    });
-    expect(entityData.exact).toMatchObject({
-      type: "entity",
-      ref: { id: entity.id },
-    });
-    expect(seriesData.exact).toMatchObject({
+  expect(data.groups).toMatchObject([
+    {
       type: "series",
-      ref: { id: series.id, brand: { id: brand.id } },
-    });
-  });
+      hasMore: true,
+      results: [
+        {
+          id: first.id,
+          peatedId: formatPeatedId("series", first.id),
+          brand: { id: brand.id, name: brand.name },
+        },
+      ],
+    },
+  ]);
+});
 
-  test("searches active Bottles and directly assigned aliases", async ({
-    fixtures,
-  }) => {
-    const retainedBottle = await fixtures.Bottle({ name: "Retained Pair" });
-    await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
-    await db.insert(bottleReferences).values({
-      bottleId: retainedBottle.id,
-      name: "Authoritative Search Alias",
-      assignedByActorId: retainedBottle.createdByActorId,
-    });
-
-    const [aliasSearch, legacySearch] = await Promise.all([
-      routerClient.search({
-        query: "Authoritative Search Alias",
-        scopes: ["bottles"],
+test("applies entity scopes before their result limits", async ({
+  fixtures,
+}) => {
+  await Promise.all(
+    ["One", "Two", "Three"].map((suffix) =>
+      fixtures.Entity({
+        name: `Scopedneedle Brand ${suffix}`,
+        kind: "brand",
       }),
-      routerClient.search({
-        query: "Legacy Search Orphan",
-        scopes: ["bottles"],
-      }),
-    ]);
-
-    expect(aliasSearch.groups).toMatchObject([
-      {
-        type: "bottles",
-        hasMore: false,
-        results: [{ id: retainedBottle.id }],
-      },
-    ]);
-    expect(legacySearch.groups).toMatchObject([
-      { type: "bottles", hasMore: false, results: [] },
-    ]);
+    ),
+  );
+  const distiller = await fixtures.Entity({
+    name: "Scopedneedle Distiller",
+    kind: "distillery",
   });
 
-  test("searches directly assigned Entity references", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({
-      name: "Canonical Entity Name",
-      kind: "brand",
-    });
-    await db.insert(entityReferences).values({
-      entityId: entity.id,
-      name: "Immediate Entity Reference",
-    });
-
-    const data = await routerClient.search({
-      query: "Immediate Entity Reference",
-      scopes: ["brands"],
-    });
-
-    expect(data.groups).toMatchObject([
-      { type: "brands", hasMore: false, results: [{ id: entity.id }] },
-    ]);
+  const data = await routerClient.search({
+    query: "scopedneedle",
+    scopes: ["distilleries"],
+    limit: 1,
   });
 
-  test("finds an Entity by a display alias without exact-match authority", async ({
-    fixtures,
-  }) => {
-    const entity = await fixtures.Entity({
-      name: "Canonical Entity Name",
-      kind: "brand",
-    });
-    await fixtures.EntityAlias({
-      entityId: entity.id,
-      name: "Marketed Entity Name",
-    });
-    await indexEntitySearchVectors({ entityId: entity.id });
+  expect(data.groups).toMatchObject([
+    {
+      type: "distilleries",
+      hasMore: false,
+      results: [{ id: distiller.id }],
+    },
+  ]);
+});
 
-    const data = await routerClient.search({
-      query: "Marketed Entity Name",
-      scopes: ["brands"],
-    });
-
-    expect(data.groups).toMatchObject([
-      { type: "brands", hasMore: false, results: [{ id: entity.id }] },
-    ]);
+test("uses kind as the authority for every Entity search scope", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({
+    name: "Kindauthority Brand",
+    kind: "brand",
+  });
+  const company = await fixtures.Entity({
+    name: "Kindauthority Company",
+    kind: "company",
   });
 
-  test("rejects unknown scopes", async () => {
-    const error = await waitError(() =>
-      routerClient.search({
-        query: "test",
-        // SAFETY: This test sends an invalid scope to the runtime validator.
-        scopes: ["unknown" as any],
-      }),
-    );
-    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  const data = await routerClient.search({
+    query: "kindauthority",
+    scopes: ["brands", "companies"],
   });
+
+  expect(data.groups).toMatchObject([
+    { type: "brands", results: [{ id: brand.id }] },
+    { type: "companies", results: [{ id: company.id }] },
+  ]);
+});
+
+test("keeps member search authenticated and hides unsearchable profiles", async ({
+  defaults,
+  fixtures,
+}) => {
+  const publicMember = await fixtures.User({
+    username: "memberneedle-public",
+  });
+  const privateMember = await fixtures.User({
+    username: "memberneedle-private",
+    private: true,
+  });
+  await fixtures.Tasting({ createdById: publicMember.id });
+  await fixtures.Tasting({ createdById: publicMember.id });
+  await fixtures.Tasting({ createdById: privateMember.id });
+
+  const [anonymous, authenticated] = await Promise.all([
+    routerClient.search({ query: "memberneedle", scopes: ["members"] }),
+    routerClient.search(
+      { query: "memberneedle", scopes: ["members"] },
+      { context: { user: defaults.user } },
+    ),
+  ]);
+
+  expect(anonymous.groups).toEqual([]);
+  expect(authenticated.groups).toMatchObject([
+    {
+      type: "members",
+      hasMore: false,
+      results: [{ member: { id: publicMember.id }, totalTastings: 2 }],
+    },
+  ]);
+});
+
+test("includes followed private members without exposing their tasting count", async ({
+  defaults,
+  fixtures,
+}) => {
+  const privateMember = await fixtures.User({
+    username: "followedneedle-private",
+    private: true,
+  });
+  await fixtures.Follow({
+    fromUserId: defaults.user.id,
+    toUserId: privateMember.id,
+    status: "following",
+  });
+  await fixtures.Tasting({ createdById: privateMember.id });
+
+  const data = await routerClient.search(
+    { query: "followedneedle", scopes: ["members"] },
+    { context: { user: defaults.user } },
+  );
+
+  expect(data.groups).toMatchObject([
+    {
+      type: "members",
+      hasMore: false,
+      results: [{ member: { id: privateMember.id }, totalTastings: 0 }],
+    },
+  ]);
+});
+
+test("ranks exact, name-prefix, and any-word-prefix matches in order", async ({
+  fixtures,
+}) => {
+  const word = await fixtures.Bottle({ name: "House Rankneedle" });
+  const prefix = await fixtures.Bottle({ name: "Rankneedle Extra" });
+  const exact = await fixtures.Bottle({ name: "Rankneedle" });
+
+  const data = await routerClient.search({
+    query: "rankneedle",
+    scopes: ["bottles"],
+    limit: 10,
+  });
+  const group = data.groups[0];
+
+  expect(group?.type).toBe("bottles");
+  if (group?.type !== "bottles") throw new Error("Expected Bottles group");
+  expect(group.results.map(({ id }) => id)).toEqual([
+    exact.id,
+    prefix.id,
+    word.id,
+  ]);
+});
+
+test("puts a case-insensitive exact Entity group before Bottle matches", async ({
+  fixtures,
+}) => {
+  await fixtures.Bottle({ name: "Exactgroupneedle Bottle" });
+  const brand = await fixtures.Entity({
+    name: "Exactgroupneedle",
+    kind: "brand",
+  });
+
+  const data = await routerClient.search({
+    query: "EXACTGROUPNEEDLE",
+    scopes: ["bottles", "brands"],
+    limit: 10,
+  });
+
+  expect(data.groups).toMatchObject([
+    { type: "brands", results: [{ id: brand.id }] },
+    { type: "bottles" },
+  ]);
+});
+
+test("uses community rating count only to break equal text matches", async ({
+  fixtures,
+}) => {
+  const lessRated = await fixtures.Bottle({
+    name: "Tienneedle Alpha",
+    memberScoreCount: 1,
+  });
+  const moreRated = await fixtures.Bottle({
+    name: "Tienneedle Beta",
+    memberScoreCount: 5,
+  });
+
+  const data = await routerClient.search({
+    query: "tienneedle",
+    scopes: ["bottles"],
+    limit: 10,
+  });
+  const group = data.groups[0];
+
+  if (group?.type !== "bottles") throw new Error("Expected Bottles group");
+  expect(group.results.map(({ id }) => id)).toEqual([
+    moreRated.id,
+    lessRated.id,
+  ]);
+});
+
+test("uses materialized Entity activity to break equal text matches", async ({
+  fixtures,
+}) => {
+  const lessActive = await fixtures.Entity({
+    name: "Entitytieneedle Alpha",
+    kind: "brand",
+    publicReviewAndTastingCount: 1,
+  });
+  const moreActive = await fixtures.Entity({
+    name: "Entitytieneedle Beta",
+    kind: "brand",
+    publicReviewAndTastingCount: 5,
+  });
+
+  const data = await routerClient.search({
+    query: "entitytieneedle",
+    scopes: ["brands"],
+    limit: 10,
+  });
+  const group = data.groups[0];
+
+  if (group?.type !== "brands") throw new Error("Expected Brands group");
+  expect(group.results.map(({ id }) => id)).toEqual([
+    moreActive.id,
+    lessActive.id,
+  ]);
+});
+
+test("returns server-ranked nearest matches for a settled miss", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle({ name: "Laphroaig" });
+
+  const data = await routerClient.search({
+    query: "Laphroaigg",
+    scopes: ["bottles"],
+  });
+
+  expect(data.groups).toMatchObject([
+    { type: "bottles", hasMore: false, results: [] },
+  ]);
+  expect(data.nearest).toMatchObject([
+    { type: "bottles", result: { id: bottle.id } },
+  ]);
+});
+
+test("can return an empty result without waiting for possible matches", async ({
+  fixtures,
+}) => {
+  await fixtures.Bottle({ name: "Laphroaig" });
+
+  const data = await routerClient.search({
+    query: "Laphroaigg",
+    scopes: ["bottles"],
+    suggestions: "exclude",
+  });
+
+  expect(data.groups).toMatchObject([
+    { type: "bottles", hasMore: false, results: [] },
+  ]);
+  expect(data.nearest).toEqual([]);
+});
+
+test("can return only possible matches", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle({ name: "Laphroaig" });
+
+  const data = await routerClient.search({
+    query: "Laphroaigg",
+    scopes: ["bottles"],
+    suggestions: "only",
+  });
+
+  expect(data.exact).toBeNull();
+  expect(data.groups).toEqual([]);
+  expect(data.nearest).toMatchObject([
+    { type: "bottles", result: { id: bottle.id } },
+  ]);
+});
+
+test("resolves Bottle, Entity, and Series Peated ID tombstones directly", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+  const entity = await fixtures.Entity({ type: [], kind: "company" });
+  const brand = await fixtures.Entity({ name: "Redirect Brand" });
+  const series = await fixtures.BottleSeries({
+    name: "Redirect Destination",
+    brandId: brand.id,
+  });
+  await db.insert(bottleTombstones).values({
+    bottleId: 9001,
+    newBottleId: bottle.id,
+  });
+  await db.insert(entityTombstones).values({
+    entityId: 9002,
+    newEntityId: entity.id,
+  });
+  await db.insert(bottleSeriesTombstones).values({
+    seriesId: 9003,
+    newSeriesId: series.id,
+  });
+
+  const [bottleData, entityData, seriesData] = await Promise.all([
+    routerClient.search({
+      query: formatPeatedId("bottle", 9001),
+      scopes: ["bottles"],
+    }),
+    routerClient.search({
+      query: formatPeatedId("entity", 9002),
+      scopes: ["companies"],
+    }),
+    routerClient.search({
+      query: formatPeatedId("series", 9003),
+      scopes: ["series"],
+    }),
+  ]);
+
+  expect(bottleData.groups).toEqual([]);
+  expect(bottleData.exact).toMatchObject({
+    type: "bottle",
+    ref: { id: bottle.id },
+  });
+  expect(entityData.exact).toMatchObject({
+    type: "entity",
+    ref: { id: entity.id },
+  });
+  expect(seriesData.exact).toMatchObject({
+    type: "series",
+    ref: { id: series.id, brand: { id: brand.id } },
+  });
+});
+
+test("searches active Bottles and directly assigned aliases", async ({
+  fixtures,
+}) => {
+  const retainedBottle = await fixtures.Bottle({ name: "Retained Pair" });
+  await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
+  await db.insert(bottleReferences).values({
+    bottleId: retainedBottle.id,
+    name: "Authoritative Search Alias",
+    assignedByActorId: retainedBottle.createdByActorId,
+  });
+
+  const [aliasSearch, legacySearch] = await Promise.all([
+    routerClient.search({
+      query: "Authoritative Search Alias",
+      scopes: ["bottles"],
+    }),
+    routerClient.search({
+      query: "Legacy Search Orphan",
+      scopes: ["bottles"],
+    }),
+  ]);
+
+  expect(aliasSearch.groups).toMatchObject([
+    {
+      type: "bottles",
+      hasMore: false,
+      results: [{ id: retainedBottle.id }],
+    },
+  ]);
+  expect(legacySearch.groups).toMatchObject([
+    { type: "bottles", hasMore: false, results: [] },
+  ]);
+});
+
+test("searches directly assigned Entity references", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({
+    name: "Canonical Entity Name",
+    kind: "brand",
+  });
+  await db.insert(entityReferences).values({
+    entityId: entity.id,
+    name: "Immediate Entity Reference",
+  });
+
+  const data = await routerClient.search({
+    query: "Immediate Entity Reference",
+    scopes: ["brands"],
+  });
+
+  expect(data.groups).toMatchObject([
+    { type: "brands", hasMore: false, results: [{ id: entity.id }] },
+  ]);
+});
+
+test("finds an Entity by a display alias without exact-match authority", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({
+    name: "Canonical Entity Name",
+    kind: "brand",
+  });
+  await fixtures.EntityAlias({
+    entityId: entity.id,
+    name: "Marketed Entity Name",
+  });
+  await indexEntitySearchVectors({ entityId: entity.id });
+
+  const data = await routerClient.search({
+    query: "Marketed Entity Name",
+    scopes: ["brands"],
+  });
+
+  expect(data.groups).toMatchObject([
+    { type: "brands", hasMore: false, results: [{ id: entity.id }] },
+  ]);
+});
+
+test("rejects unknown scopes", async () => {
+  const error = await waitError(() =>
+    routerClient.search({
+      query: "test",
+      // SAFETY: This test sends an invalid scope to the runtime validator.
+      scopes: ["unknown" as any],
+    }),
+  );
+  expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
 });

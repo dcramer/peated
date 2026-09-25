@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -12,1471 +11,1452 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
-describe.each([false, true])("GET /bottles (TIN=%s)", (tin) => {
-  const original = config.BOTTLE_SEARCH_TIN;
-  beforeEach(() => {
-    config.BOTTLE_SEARCH_TIN = tin;
-  });
-  afterEach(() => {
-    config.BOTTLE_SEARCH_TIN = original;
-  });
-  test("lists bottles", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Delicious Wood" });
-    await fixtures.Bottle({ name: "Something Else" });
+test("lists bottles", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Delicious Wood" });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    const { results } = await routerClient.bottles.list({});
+  const { results } = await routerClient.bottles.list({});
 
-    expect(results.length).toBe(2);
-    expect(results.every((result) => result.group?.id)).toBe(true);
-  });
+  expect(results.length).toBe(2);
+  expect(results.every((result) => result.group?.id)).toBe(true);
+});
 
-  test("lists bottles with query", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Delicious Wood" });
-    await fixtures.Bottle({ name: "Something Else" });
+test("lists bottles with query", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({ name: "Delicious Wood" });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    const { results } = await routerClient.bottles.list({
-      query: "wood",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    query: "wood",
   });
 
-  test("matches prefixes while the user is typing", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Macallan" });
-    const bottle = await fixtures.Bottle({
-      name: "Discovery",
-      brandId: brand.id,
-    });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      query: "Mac Disc",
-      sort: "rank",
-    });
-
-    expect(results.map(({ id }) => id)).toEqual([bottle.id]);
+test("matches prefixes while the user is typing", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Macallan" });
+  const bottle = await fixtures.Bottle({
+    name: "Discovery",
+    brandId: brand.id,
   });
 
-  test("treats accented and unaccented search text as equivalent", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Pōkeno" });
-    const bottle = await fixtures.Bottle({
-      name: "Discovery",
-      brandId: brand.id,
-    });
-
-    const searches = await Promise.all(
-      ["Pokeno Discovery", "Pōkeno Discovery"].map((query) =>
-        routerClient.bottles.list({ query }),
-      ),
-    );
-
-    expect(searches.map(({ results }) => results.map(({ id }) => id))).toEqual([
-      [bottle.id],
-      [bottle.id],
-    ]);
+  const { results } = await routerClient.bottles.list({
+    query: "Mac Disc",
+    sort: "rank",
   });
 
-  test("treats search text as words, not operators", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Search Test Brand" });
-    const bottle = await fixtures.Bottle({
-      name: "Triple Distilled",
-      brandId: brand.id,
-    });
-    await fixtures.Bottle({ name: "Triple Reserve", brandId: brand.id });
+  expect(results.map(({ id }) => id)).toEqual([bottle.id]);
+});
 
-    const searches = await Promise.all(
-      ["Triple - Distilled", "Triple OR Distilled"].map((query) =>
-        routerClient.bottles.list({ query, sort: "rank" }),
-      ),
-    );
-
-    expect(searches.map(({ results }) => results.map(({ id }) => id))).toEqual([
-      [bottle.id],
-      [bottle.id],
-    ]);
+test("treats accented and unaccented search text as equivalent", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({ name: "Pōkeno" });
+  const bottle = await fixtures.Bottle({
+    name: "Discovery",
+    brandId: brand.id,
   });
 
-  test("resolves aliases through direct Bottle ownership", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({ name: "Private Selection" });
+  const searches = await Promise.all(
+    ["Pokeno Discovery", "Pōkeno Discovery"].map((query) =>
+      routerClient.bottles.list({ query }),
+    ),
+  );
 
-    await db.insert(bottleReferences).values({
+  expect(searches.map(({ results }) => results.map(({ id }) => id))).toEqual([
+    [bottle.id],
+    [bottle.id],
+  ]);
+});
+
+test("treats search text as words, not operators", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Search Test Brand" });
+  const bottle = await fixtures.Bottle({
+    name: "Triple Distilled",
+    brandId: brand.id,
+  });
+  await fixtures.Bottle({ name: "Triple Reserve", brandId: brand.id });
+
+  const searches = await Promise.all(
+    ["Triple - Distilled", "Triple OR Distilled"].map((query) =>
+      routerClient.bottles.list({ query, sort: "rank" }),
+    ),
+  );
+
+  expect(searches.map(({ results }) => results.map(({ id }) => id))).toEqual([
+    [bottle.id],
+    [bottle.id],
+  ]);
+});
+
+test("resolves aliases through direct Bottle ownership", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle({ name: "Private Selection" });
+
+  await db.insert(bottleReferences).values({
+    bottleId: bottle.id,
+    name: "Direct Bottle Alias",
+    assignedByActorId: bottle.createdByActorId,
+  });
+
+  const { results } = await routerClient.bottles.list({
+    query: "Direct Bottle Alias",
+    sort: "rank",
+  });
+
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle.id);
+  expect(results[0].group?.id).toBe(bottle.groupId);
+});
+
+test("resolves assigned aliases and excludes ignored or unresolved aliases", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle({ name: "Alias Boundary" });
+  await db.insert(bottleReferences).values([
+    {
       bottleId: bottle.id,
-      name: "Direct Bottle Alias",
+      name: "Assigned General Alias",
       assignedByActorId: bottle.createdByActorId,
-    });
+    },
+    {
+      bottleId: bottle.id,
+      name: "Ignored Exact Reference",
+      ignored: true,
+      assignedByActorId: bottle.createdByActorId,
+    },
+    {
+      bottleId: null,
+      name: "Unresolved Retained Alias",
+      assignedByActorId: bottle.createdByActorId,
+    },
+  ]);
 
-    const { results } = await routerClient.bottles.list({
-      query: "Direct Bottle Alias",
-      sort: "rank",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle.id);
-    expect(results[0].group?.id).toBe(bottle.groupId);
-  });
-
-  test("resolves assigned aliases and excludes ignored or unresolved aliases", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({ name: "Alias Boundary" });
-    await db.insert(bottleReferences).values([
-      {
-        bottleId: bottle.id,
-        name: "Assigned General Alias",
-        assignedByActorId: bottle.createdByActorId,
-      },
-      {
-        bottleId: bottle.id,
-        name: "Ignored Exact Reference",
-        ignored: true,
-        assignedByActorId: bottle.createdByActorId,
-      },
-      {
-        bottleId: null,
-        name: "Unresolved Retained Alias",
-        assignedByActorId: bottle.createdByActorId,
-      },
+  const [assignedResults, ignoredResults, unresolvedResults] =
+    await Promise.all([
+      routerClient.bottles.list({ query: "Assigned General Alias" }),
+      routerClient.bottles.list({ query: "Ignored Exact Reference" }),
+      routerClient.bottles.list({ query: "Unresolved Retained Alias" }),
     ]);
 
-    const [assignedResults, ignoredResults, unresolvedResults] =
-      await Promise.all([
-        routerClient.bottles.list({ query: "Assigned General Alias" }),
-        routerClient.bottles.list({ query: "Ignored Exact Reference" }),
-        routerClient.bottles.list({ query: "Unresolved Retained Alias" }),
-      ]);
+  expect(assignedResults.results.map(({ id }) => id)).toEqual([bottle.id]);
+  expect(ignoredResults.results).toHaveLength(0);
+  expect(unresolvedResults.results).toHaveLength(0);
+});
 
-    expect(assignedResults.results.map(({ id }) => id)).toEqual([bottle.id]);
-    expect(ignoredResults.results).toHaveLength(0);
-    expect(unresolvedResults.results).toHaveLength(0);
+test("excludes a retired Bottle", async ({ fixtures }) => {
+  const retired = await fixtures.Bottle({ name: "Retired Bottle" });
+  const replacement = await fixtures.Bottle({ name: "Replacement Bottle" });
+  await db.insert(bottleTombstones).values({
+    bottleId: retired.id,
+    newBottleId: replacement.id,
   });
 
-  test("excludes a retired Bottle", async ({ fixtures }) => {
-    const retired = await fixtures.Bottle({ name: "Retired Bottle" });
-    const replacement = await fixtures.Bottle({ name: "Replacement Bottle" });
-    await db.insert(bottleTombstones).values({
-      bottleId: retired.id,
-      newBottleId: replacement.id,
-    });
+  const { results } = await routerClient.bottles.list({ sort: "name" });
 
-    const { results } = await routerClient.bottles.list({ sort: "name" });
+  expect(results.map((result) => result.id)).toEqual([replacement.id]);
+});
 
-    expect(results.map((result) => result.id)).toEqual([replacement.id]);
+test("keeps exact sibling Bottles distinct in list results", async ({
+  fixtures,
+}) => {
+  const first = await fixtures.Bottle({ name: "Sibling Batch" });
+  const second = await fixtures.BottleGroupMember({
+    groupId: first.groupId,
+    edition: "Batch Two",
+    releaseYear: 2026,
   });
 
-  test("keeps exact sibling Bottles distinct in list results", async ({
-    fixtures,
-  }) => {
-    const first = await fixtures.Bottle({ name: "Sibling Batch" });
-    const second = await fixtures.BottleGroupMember({
-      groupId: first.groupId,
-      edition: "Batch Two",
-      releaseYear: 2026,
-    });
-
-    const { results } = await routerClient.bottles.list({
-      brand: first.brandId,
-      sort: "name",
-    });
-
-    expect(results.map((result) => result.id).sort((a, b) => a - b)).toEqual(
-      [first.id, second.id].sort((a, b) => a - b),
-    );
+  const { results } = await routerClient.bottles.list({
+    brand: first.brandId,
+    sort: "name",
   });
 
-  test("lists bottles with 'The' prefix", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "The Macallan" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      brandId: brand.id,
-    });
+  expect(results.map((result) => result.id).sort((a, b) => a - b)).toEqual(
+    [first.id, second.id].sort((a, b) => a - b),
+  );
+});
 
-    const { results } = await routerClient.bottles.list({
-      query: "Macallan",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+test("lists bottles with 'The' prefix", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "The Macallan" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    brandId: brand.id,
   });
 
-  test("lists bottles with distiller", async ({ fixtures }) => {
-    const distiller1 = await fixtures.Entity();
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      distillerIds: [distiller1.id],
-    });
-    await fixtures.Bottle({ name: "Something Else" });
-
-    const { results } = await routerClient.bottles.list({
-      distiller: distiller1.id,
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    query: "Macallan",
   });
 
-  test("lists bottles with brand", async ({ fixtures }) => {
-    const brand1 = await fixtures.Entity();
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      brandId: brand1.id,
-    });
-    await fixtures.Bottle({ name: "Something Else" });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      brand: brand1.id,
-    });
+test("lists bottles with distiller", async ({ fixtures }) => {
+  const distiller1 = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    distillerIds: [distiller1.id],
+  });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    distiller: distiller1.id,
   });
 
-  test("lists bottles with bottler", async ({ fixtures }) => {
-    const bottler = await fixtures.Entity({
-      kind: "bottler",
-    });
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      bottlerId: bottler.id,
-    });
-    await fixtures.Bottle({ name: "Something Else" });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      bottler: bottler.id,
-    });
+test("lists bottles with brand", async ({ fixtures }) => {
+  const brand1 = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    brandId: brand1.id,
+  });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    brand: brand1.id,
   });
 
-  test("lists bottles with entity filter (brand)", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      brandId: entity.id,
-    });
-    await fixtures.Bottle({ name: "Something Else" });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      entity: entity.id,
-    });
+test("lists bottles with bottler", async ({ fixtures }) => {
+  const bottler = await fixtures.Entity({
+    kind: "bottler",
+  });
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    bottlerId: bottler.id,
+  });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    bottler: bottler.id,
   });
 
-  test("lists bottles with entity filter (bottler)", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      bottlerId: entity.id,
-    });
-    await fixtures.Bottle({ name: "Something Else" });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      entity: entity.id,
-    });
+test("lists bottles with entity filter (brand)", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    brandId: entity.id,
+  });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    entity: entity.id,
   });
 
-  test("lists bottles with entity filter (distiller)", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      distillerIds: [entity.id],
-    });
-    await fixtures.Bottle({ name: "Something Else" });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      entity: entity.id,
-    });
+test("lists bottles with entity filter (bottler)", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    bottlerId: entity.id,
+  });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    entity: entity.id,
   });
 
-  test("lists each active Bottle once through a complete Company portfolio", async ({
-    fixtures,
-  }) => {
-    const company = await fixtures.Entity({
-      kind: "company",
-      name: "Complete Portfolio Company",
-    });
-    const group = await fixtures.Entity({
-      kind: "company",
-      name: "Nested Portfolio Company",
-      ownerId: company.id,
-    });
-    const brand = await fixtures.Entity({
-      kind: "brand",
-      name: "Nested Portfolio Brand",
-      ownerId: group.id,
-    });
-    const distillery = await fixtures.Entity({
-      kind: "distillery",
-      name: "Nested Portfolio Distillery",
-      ownerId: brand.id,
-    });
-    const bottler = await fixtures.Entity({
-      kind: "bottler",
-      name: "Nested Portfolio Bottler",
-      ownerId: group.id,
-    });
-    const outsideBrand = await fixtures.Entity({
-      kind: "brand",
-      name: "Outside Portfolio Brand",
-    });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const brandBottle = await fixtures.Bottle({
-      name: "Brand Match",
-      brandId: brand.id,
-    });
-    const distilleryBottle = await fixtures.Bottle({
-      name: "Distillery Match",
-      brandId: outsideBrand.id,
-      distillerIds: [distillery.id],
-    });
-    const bottlerBottle = await fixtures.Bottle({
-      name: "Bottler Match",
-      brandId: outsideBrand.id,
-      bottlerId: bottler.id,
-    });
-    const severalMatches = await fixtures.Bottle({
-      name: "Several Matches",
-      brandId: brand.id,
-      bottlerId: bottler.id,
-      distillerIds: [distillery.id],
-    });
-    const nestedCompanyBottle = await fixtures.Bottle({
-      name: "Nested Company Match",
-      brandId: group.id,
-    });
-    const directCompanyBottle = await fixtures.Bottle({
-      name: "Direct Company Match",
-      brandId: company.id,
-    });
-    const retiredBottle = await fixtures.Bottle({
-      name: "Retired Match",
-      brandId: brand.id,
-    });
-    const replacement = await fixtures.Bottle({
-      name: "Unrelated Replacement",
-      brandId: outsideBrand.id,
-    });
-    await db.insert(bottleTombstones).values({
-      bottleId: retiredBottle.id,
-      newBottleId: replacement.id,
-    });
+test("lists bottles with entity filter (distiller)", async ({ fixtures }) => {
+  const entity = await fixtures.Entity();
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    distillerIds: [entity.id],
+  });
+  await fixtures.Bottle({ name: "Something Else" });
 
-    const result = await routerClient.bottles.list({
-      company: company.id,
-      sort: "-tastings",
-      limit: 2,
-    });
-    const secondPage = await routerClient.bottles.list({
-      company: company.id,
-      sort: "-tastings",
-      cursor: 2,
-      limit: 2,
-    });
-    const thirdPage = await routerClient.bottles.list({
-      company: company.id,
-      sort: "-tastings",
-      cursor: 3,
-      limit: 2,
-    });
+  const { results } = await routerClient.bottles.list({
+    entity: entity.id,
+  });
 
-    expect(result.total).toBe(6);
-    expect(result.results.map(({ id }) => id)).toEqual([
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
+
+test("lists each active Bottle once through a complete Company portfolio", async ({
+  fixtures,
+}) => {
+  const company = await fixtures.Entity({
+    kind: "company",
+    name: "Complete Portfolio Company",
+  });
+  const group = await fixtures.Entity({
+    kind: "company",
+    name: "Nested Portfolio Company",
+    ownerId: company.id,
+  });
+  const brand = await fixtures.Entity({
+    kind: "brand",
+    name: "Nested Portfolio Brand",
+    ownerId: group.id,
+  });
+  const distillery = await fixtures.Entity({
+    kind: "distillery",
+    name: "Nested Portfolio Distillery",
+    ownerId: brand.id,
+  });
+  const bottler = await fixtures.Entity({
+    kind: "bottler",
+    name: "Nested Portfolio Bottler",
+    ownerId: group.id,
+  });
+  const outsideBrand = await fixtures.Entity({
+    kind: "brand",
+    name: "Outside Portfolio Brand",
+  });
+
+  const brandBottle = await fixtures.Bottle({
+    name: "Brand Match",
+    brandId: brand.id,
+  });
+  const distilleryBottle = await fixtures.Bottle({
+    name: "Distillery Match",
+    brandId: outsideBrand.id,
+    distillerIds: [distillery.id],
+  });
+  const bottlerBottle = await fixtures.Bottle({
+    name: "Bottler Match",
+    brandId: outsideBrand.id,
+    bottlerId: bottler.id,
+  });
+  const severalMatches = await fixtures.Bottle({
+    name: "Several Matches",
+    brandId: brand.id,
+    bottlerId: bottler.id,
+    distillerIds: [distillery.id],
+  });
+  const nestedCompanyBottle = await fixtures.Bottle({
+    name: "Nested Company Match",
+    brandId: group.id,
+  });
+  const directCompanyBottle = await fixtures.Bottle({
+    name: "Direct Company Match",
+    brandId: company.id,
+  });
+  const retiredBottle = await fixtures.Bottle({
+    name: "Retired Match",
+    brandId: brand.id,
+  });
+  const replacement = await fixtures.Bottle({
+    name: "Unrelated Replacement",
+    brandId: outsideBrand.id,
+  });
+  await db.insert(bottleTombstones).values({
+    bottleId: retiredBottle.id,
+    newBottleId: replacement.id,
+  });
+
+  const result = await routerClient.bottles.list({
+    company: company.id,
+    sort: "-tastings",
+    limit: 2,
+  });
+  const secondPage = await routerClient.bottles.list({
+    company: company.id,
+    sort: "-tastings",
+    cursor: 2,
+    limit: 2,
+  });
+  const thirdPage = await routerClient.bottles.list({
+    company: company.id,
+    sort: "-tastings",
+    cursor: 3,
+    limit: 2,
+  });
+
+  expect(result.total).toBe(6);
+  expect(result.results.map(({ id }) => id)).toEqual([
+    brandBottle.id,
+    distilleryBottle.id,
+  ]);
+  expect(result.rel.nextCursor).toBe(2);
+  expect(secondPage.results.map(({ id }) => id)).toEqual([
+    bottlerBottle.id,
+    severalMatches.id,
+  ]);
+  expect(thirdPage.results.map(({ id }) => id)).toEqual([
+    nestedCompanyBottle.id,
+    directCompanyBottle.id,
+  ]);
+  expect(
+    new Set(
+      [...result.results, ...secondPage.results, ...thirdPage.results].map(
+        ({ id }) => id,
+      ),
+    ),
+  ).toEqual(
+    new Set([
       brandBottle.id,
       distilleryBottle.id,
-    ]);
-    expect(result.rel.nextCursor).toBe(2);
-    expect(secondPage.results.map(({ id }) => id)).toEqual([
       bottlerBottle.id,
       severalMatches.id,
-    ]);
-    expect(thirdPage.results.map(({ id }) => id)).toEqual([
       nestedCompanyBottle.id,
       directCompanyBottle.id,
-    ]);
-    expect(
-      new Set(
-        [...result.results, ...secondPage.results, ...thirdPage.results].map(
-          ({ id }) => id,
-        ),
-      ),
-    ).toEqual(
-      new Set([
-        brandBottle.id,
-        distilleryBottle.id,
-        bottlerBottle.id,
-        severalMatches.id,
-        nestedCompanyBottle.id,
-        directCompanyBottle.id,
-      ]),
-    );
+    ]),
+  );
+});
+
+test("requires the Company filter to identify a Company", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({ kind: "brand" });
+
+  await expect(
+    routerClient.bottles.list({ company: brand.id }),
+  ).rejects.toMatchObject({
+    code: "BAD_REQUEST",
+    message: "Choose a Company.",
+  });
+});
+
+test("separates distillery releases from other bottlings", async ({
+  fixtures,
+}) => {
+  const distillery = await fixtures.Entity({
+    name: "Bottle View Distillery",
+    kind: "distillery",
+  });
+  const ownedBrand = await fixtures.Entity({
+    name: "Owned Distillery Brand",
+    kind: "brand",
+    ownerId: distillery.id,
+  });
+  const ownedBottler = await fixtures.Entity({
+    name: "Owned Release Imprint",
+    kind: "bottler",
+    ownerId: distillery.id,
+  });
+  const outsideBrand = await fixtures.Entity({
+    name: "Outside Distillery Brand",
+    kind: "brand",
+  });
+  const outsideBottler = await fixtures.Entity({
+    name: "Outside Distillery Bottler",
+    kind: "bottler",
+  });
+  const otherDistillery = await fixtures.Entity({
+    name: "Second Bottle View Distillery",
+    kind: "distillery",
   });
 
-  test("requires the Company filter to identify a Company", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ kind: "brand" });
-
-    await expect(
-      routerClient.bottles.list({ company: brand.id }),
-    ).rejects.toMatchObject({
-      code: "BAD_REQUEST",
-      message: "Choose a Company.",
-    });
+  const directRelease = await fixtures.Bottle({
+    name: "Direct Release",
+    brandId: distillery.id,
+    bottlerId: null,
+    distillerIds: [],
+  });
+  const ownedBrandRelease = await fixtures.Bottle({
+    name: "Owned Brand Release",
+    brandId: ownedBrand.id,
+    bottlerId: ownedBottler.id,
+    distillerIds: [distillery.id],
+  });
+  const outsideBottling = await fixtures.Bottle({
+    name: "Outside Bottling",
+    brandId: outsideBrand.id,
+    bottlerId: outsideBottler.id,
+    distillerIds: [distillery.id],
+  });
+  const outsideBottlerOnOfficialBrand = await fixtures.Bottle({
+    name: "Outside Bottler Official Brand",
+    brandId: distillery.id,
+    bottlerId: outsideBottler.id,
+    distillerIds: [],
+  });
+  await fixtures.Bottle({
+    name: "Bottler Role Only",
+    brandId: outsideBrand.id,
+    bottlerId: distillery.id,
+    distillerIds: [otherDistillery.id],
   });
 
-  test("separates distillery releases from other bottlings", async ({
-    fixtures,
-  }) => {
-    const distillery = await fixtures.Entity({
-      name: "Bottle View Distillery",
-      kind: "distillery",
-    });
-    const ownedBrand = await fixtures.Entity({
-      name: "Owned Distillery Brand",
-      kind: "brand",
-      ownerId: distillery.id,
-    });
-    const ownedBottler = await fixtures.Entity({
-      name: "Owned Release Imprint",
-      kind: "bottler",
-      ownerId: distillery.id,
-    });
-    const outsideBrand = await fixtures.Entity({
-      name: "Outside Distillery Brand",
-      kind: "brand",
-    });
-    const outsideBottler = await fixtures.Entity({
-      name: "Outside Distillery Bottler",
-      kind: "bottler",
-    });
-    const otherDistillery = await fixtures.Entity({
-      name: "Second Bottle View Distillery",
-      kind: "distillery",
-    });
-
-    const directRelease = await fixtures.Bottle({
-      name: "Direct Release",
-      brandId: distillery.id,
-      bottlerId: null,
-      distillerIds: [],
-    });
-    const ownedBrandRelease = await fixtures.Bottle({
-      name: "Owned Brand Release",
-      brandId: ownedBrand.id,
-      bottlerId: ownedBottler.id,
-      distillerIds: [distillery.id],
-    });
-    const outsideBottling = await fixtures.Bottle({
-      name: "Outside Bottling",
-      brandId: outsideBrand.id,
-      bottlerId: outsideBottler.id,
-      distillerIds: [distillery.id],
-    });
-    const outsideBottlerOnOfficialBrand = await fixtures.Bottle({
-      name: "Outside Bottler Official Brand",
-      brandId: distillery.id,
-      bottlerId: outsideBottler.id,
-      distillerIds: [],
-    });
-    await fixtures.Bottle({
-      name: "Bottler Role Only",
-      brandId: outsideBrand.id,
-      bottlerId: distillery.id,
-      distillerIds: [otherDistillery.id],
-    });
-
-    const [releases, other] = await Promise.all([
-      routerClient.bottles.list({
-        entity: distillery.id,
-        distilleryView: "releases",
-        sort: "name",
-      }),
-      routerClient.bottles.list({
-        entity: distillery.id,
-        distilleryView: "other",
-        sort: "name",
-      }),
-    ]);
-
-    expect(new Set(releases.results.map(({ id }) => id))).toEqual(
-      new Set([directRelease.id, ownedBrandRelease.id]),
-    );
-    expect(releases.total).toBe(2);
-    expect(new Set(other.results.map(({ id }) => id))).toEqual(
-      new Set([outsideBottling.id, outsideBottlerOnOfficialBrand.id]),
-    );
-    expect(other.total).toBe(2);
-  });
-
-  test("rejects a distillery view without a distillery", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ kind: "brand" });
-
-    await expect(
-      routerClient.bottles.list({ distilleryView: "releases" }),
-    ).rejects.toThrow("Choose a distillery for this view.");
-    await expect(
-      routerClient.bottles.list({
-        entity: brand.id,
-        distilleryView: "releases",
-      }),
-    ).rejects.toThrow("Choose a distillery for this view.");
-  });
-
-  test("lists bottles with flavor profile filter", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Peated Whisky",
-      flavorProfile: "peated",
-    });
-    await fixtures.Bottle({
-      name: "Light Whisky",
-      flavorProfile: "light_delicate",
-    });
-    await fixtures.Bottle({ name: "No Profile" });
-
-    const { results } = await routerClient.bottles.list({
-      flavorProfile: "peated",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("lists bottles with category filter", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Single Malt",
-      category: "single_malt",
-    });
-    await fixtures.Bottle({
-      name: "Bourbon",
-      category: "bourbon",
-    });
-    await fixtures.Bottle({ name: "No Category" });
-
-    const { results } = await routerClient.bottles.list({
-      category: "single_malt",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("lists bottles with age filter", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "12 Year Old",
-      statedAge: 12,
-    });
-    await fixtures.Bottle({
-      name: "18 Year Old",
-      statedAge: 18,
-    });
-    await fixtures.Bottle({ name: "No Age Statement" });
-
-    const { results } = await routerClient.bottles.list({
-      age: 12,
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("filters tags by direct Bottle identity", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
-    const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
-    await Promise.all(
-      ["smoky", "peated", "retained-only"].map((name) =>
-        fixtures.TagOrExisting({ name, tagCategory: "smoke" }),
-      ),
-    );
-    await fixtures.Tasting({
-      bottleId: bottle2.id,
-      tags: ["smoky", "peated"],
-    });
-    await fixtures.Tasting({
-      bottleId: bottle1.id,
-      tags: ["retained-only"],
-    });
-    await recomputeBottleStats(bottle1.id);
-    await recomputeBottleStats(bottle2.id);
-
-    const [targetMatch, retainedMatch] = await Promise.all([
-      routerClient.bottles.list({ tag: "smoky" }),
-      routerClient.bottles.list({ tag: "retained-only" }),
-    ]);
-
-    expect(targetMatch.results.map((result) => result.id)).toEqual([
-      bottle2.id,
-    ]);
-    expect(retainedMatch.results.map((result) => result.id)).toEqual([
-      bottle1.id,
-    ]);
-  });
-
-  test("filters flights by direct Bottle identity", async ({ fixtures }) => {
-    const flight = await fixtures.Flight({ name: "Exact target flight" });
-    const retainedBottle = await fixtures.Bottle({
-      name: "Flight member",
-    });
-    await fixtures.Bottle({
-      name: "Unrelated Bottle",
-    });
-    await db.insert(flightBottles).values({
-      flightId: flight.id,
-      bottleId: retainedBottle.id,
-    });
-
-    const { results } = await routerClient.bottles.list({
-      flight: flight.publicId,
+  const [releases, other] = await Promise.all([
+    routerClient.bottles.list({
+      entity: distillery.id,
+      distilleryView: "releases",
       sort: "name",
-    });
-
-    expect(results.map((result) => result.id)).toEqual([retainedBottle.id]);
-  });
-
-  test("returns empty results for an unknown flight", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Some Bottle" });
-
-    const result = await routerClient.bottles.list({
-      flight: "unknown-flight",
-      cursor: 2,
-    });
-
-    expect(result).toEqual({
-      results: [],
-      total: 0,
-      followedEntityCount: null,
-      rel: {
-        nextCursor: null,
-        prevCursor: null,
-      },
-    });
-  });
-
-  test("paginates exact flight members using Bottle list ordering", async ({
-    fixtures,
-  }) => {
-    const members = await Promise.all(
-      Array.from({ length: 5 }, (_, index) =>
-        fixtures.Bottle({
-          name: `Flight Bottle ${index + 1}`,
-          publicReviewAndTastingCount: index + 1,
-        }),
-      ),
-    );
-    await fixtures.Bottle({
-      name: "Outside flight",
-      publicReviewAndTastingCount: 100,
-    });
-    const flight = await fixtures.Flight({
-      name: "Paginated flight",
-      bottles: members.map((bottle) => bottle.id),
-    });
-
-    const page1 = await routerClient.bottles.list({
-      flight: flight.publicId,
-      limit: 2,
-      cursor: 1,
-      sort: "-tastings",
-    });
-    const page2 = await routerClient.bottles.list({
-      flight: flight.publicId,
-      limit: 2,
-      cursor: 2,
-      sort: "-tastings",
-    });
-    const page3 = await routerClient.bottles.list({
-      flight: flight.publicId,
-      limit: 2,
-      cursor: 3,
-      sort: "-tastings",
-    });
-
-    expect(page1.results.map((result) => result.id)).toEqual([
-      members[4]!.id,
-      members[3]!.id,
-    ]);
-    expect(page1.rel).toEqual({ nextCursor: 2, prevCursor: null });
-    expect(page2.results.map((result) => result.id)).toEqual([
-      members[2]!.id,
-      members[1]!.id,
-    ]);
-    expect(page2.rel).toEqual({ nextCursor: 3, prevCursor: 1 });
-    expect(page3.results.map((result) => result.id)).toEqual([members[0]!.id]);
-    expect(page3.rel).toEqual({ nextCursor: null, prevCursor: 2 });
-  });
-
-  test("lists bottles with query matching brand and name", async ({
-    fixtures,
-  }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood 10-year-old",
-    });
-    await fixtures.Bottle({ name: "Something Else" });
-
-    const { results } = await routerClient.bottles.list({
-      query: "wood 10",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("lists bottles with series", async ({ fixtures }) => {
-    const series = await fixtures.BottleSeries({ name: "Limited Edition" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Delicious Wood",
-      seriesId: series.id,
-    });
-    await fixtures.Bottle({ name: "Something Else" });
-
-    const { results } = await routerClient.bottles.list({
-      series: series.id,
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("filters a Series by the signed-in user's Library", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const series = await fixtures.BottleSeries({ name: "Library Series" });
-    const inLibrary = await fixtures.Bottle({
-      name: "In Library",
-      seriesId: series.id,
-    });
-    const outsideLibrary = await fixtures.Bottle({
-      name: "Outside Library",
-      seriesId: series.id,
-    });
-    const libraryCollection = await fixtures.Collection({
-      name: "Library",
-      createdById: defaults.user.id,
-      totalBottles: 1,
-    });
-    await db.insert(collectionBottles).values({
-      bottleId: inLibrary.id,
-      collectionId: libraryCollection.id,
-    });
-
-    const [included, excluded] = await Promise.all([
-      routerClient.bottles.list(
-        { library: "in", series: series.id },
-        { context: { user: defaults.user } },
-      ),
-      routerClient.bottles.list(
-        { library: "out", series: series.id },
-        { context: { user: defaults.user } },
-      ),
-    ]);
-
-    expect(included.total).toBe(1);
-    expect(included.results.map(({ id }) => id)).toEqual([inLibrary.id]);
-    expect(excluded.total).toBe(1);
-    expect(excluded.results.map(({ id }) => id)).toEqual([outsideLibrary.id]);
-  });
-
-  test("requires authentication for Library filtering", async () => {
-    const err = await waitError(() =>
-      routerClient.bottles.list({ library: "in" }),
-    );
-
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-  });
-
-  // Sorting tests
-  test("sorts bottles by name ascending", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Singleton" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Zebra Whisky",
-      brandId: brand.id,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Alpha Whisky",
-      brandId: brand.id,
-    });
-
-    const { results } = await routerClient.bottles.list({
+    }),
+    routerClient.bottles.list({
+      entity: distillery.id,
+      distilleryView: "other",
       sort: "name",
-    });
+    }),
+  ]);
 
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id);
-    expect(results[1].id).toBe(bottle1.id);
+  expect(new Set(releases.results.map(({ id }) => id))).toEqual(
+    new Set([directRelease.id, ownedBrandRelease.id]),
+  );
+  expect(releases.total).toBe(2);
+  expect(new Set(other.results.map(({ id }) => id))).toEqual(
+    new Set([outsideBottling.id, outsideBottlerOnOfficialBrand.id]),
+  );
+  expect(other.total).toBe(2);
+});
+
+test("rejects a distillery view without a distillery", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ kind: "brand" });
+
+  await expect(
+    routerClient.bottles.list({ distilleryView: "releases" }),
+  ).rejects.toThrow("Choose a distillery for this view.");
+  await expect(
+    routerClient.bottles.list({
+      entity: brand.id,
+      distilleryView: "releases",
+    }),
+  ).rejects.toThrow("Choose a distillery for this view.");
+});
+
+test("lists bottles with flavor profile filter", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Peated Whisky",
+    flavorProfile: "peated",
+  });
+  await fixtures.Bottle({
+    name: "Light Whisky",
+    flavorProfile: "light_delicate",
+  });
+  await fixtures.Bottle({ name: "No Profile" });
+
+  const { results } = await routerClient.bottles.list({
+    flavorProfile: "peated",
   });
 
-  test("sorts bottles by name descending", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Singleton" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Alpha Whisky",
-      brandId: brand.id,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Zebra Whisky",
-      brandId: brand.id,
-    });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      sort: "-name",
-    });
+test("lists bottles with category filter", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Single Malt",
+    category: "single_malt",
+  });
+  await fixtures.Bottle({
+    name: "Bourbon",
+    category: "bourbon",
+  });
+  await fixtures.Bottle({ name: "No Category" });
 
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id);
-    expect(results[1].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    category: "single_malt",
   });
 
-  test("sorts bottles by age ascending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Old Whisky",
-      statedAge: 18,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Young Whisky",
-      statedAge: 12,
-    });
-    const bottle3 = await fixtures.Bottle({ name: "No Age" }); // null age
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      sort: "age",
-    });
+test("lists bottles with age filter", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "12 Year Old",
+    statedAge: 12,
+  });
+  await fixtures.Bottle({
+    name: "18 Year Old",
+    statedAge: 18,
+  });
+  await fixtures.Bottle({ name: "No Age Statement" });
 
-    expect(results.length).toBe(3);
-    expect(results[0].id).toBe(bottle3.id); // null first
-    expect(results[1].id).toBe(bottle2.id); // 12
-    expect(results[2].id).toBe(bottle1.id); // 18
+  const { results } = await routerClient.bottles.list({
+    age: 12,
   });
 
-  test("sorts bottles by age descending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Old Whisky",
-      statedAge: 18,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Young Whisky",
-      statedAge: 12,
-    });
-    const bottle3 = await fixtures.Bottle({ name: "No Age" }); // null age
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      sort: "-age",
-    });
+test("filters tags by direct Bottle identity", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
+  const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
+  await Promise.all(
+    ["smoky", "peated", "retained-only"].map((name) =>
+      fixtures.TagOrExisting({ name, tagCategory: "smoke" }),
+    ),
+  );
+  await fixtures.Tasting({
+    bottleId: bottle2.id,
+    tags: ["smoky", "peated"],
+  });
+  await fixtures.Tasting({
+    bottleId: bottle1.id,
+    tags: ["retained-only"],
+  });
+  await recomputeBottleStats(bottle1.id);
+  await recomputeBottleStats(bottle2.id);
 
-    expect(results.length).toBe(3);
-    expect(results[0].id).toBe(bottle1.id); // 18 first
-    expect(results[1].id).toBe(bottle2.id); // 12
-    expect(results[2].id).toBe(bottle3.id); // null last
+  const [targetMatch, retainedMatch] = await Promise.all([
+    routerClient.bottles.list({ tag: "smoky" }),
+    routerClient.bottles.list({ tag: "retained-only" }),
+  ]);
+
+  expect(targetMatch.results.map((result) => result.id)).toEqual([bottle2.id]);
+  expect(retainedMatch.results.map((result) => result.id)).toEqual([
+    bottle1.id,
+  ]);
+});
+
+test("filters flights by direct Bottle identity", async ({ fixtures }) => {
+  const flight = await fixtures.Flight({ name: "Exact target flight" });
+  const retainedBottle = await fixtures.Bottle({
+    name: "Flight member",
+  });
+  await fixtures.Bottle({
+    name: "Unrelated Bottle",
+  });
+  await db.insert(flightBottles).values({
+    flightId: flight.id,
+    bottleId: retainedBottle.id,
   });
 
-  test("sorts bottles by created date ascending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "First Bottle" });
-    // Small delay to ensure different timestamps
-    await new Promise((resolve) => setTimeout(resolve, 10));
-    const bottle2 = await fixtures.Bottle({ name: "Second Bottle" });
-
-    const { results } = await routerClient.bottles.list({
-      sort: "created",
-    });
-
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle1.id); // Created first
-    expect(results[1].id).toBe(bottle2.id);
+  const { results } = await routerClient.bottles.list({
+    flight: flight.publicId,
+    sort: "name",
   });
 
-  test("sorts bottles by created date descending", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "First Bottle" });
-    // Small delay to ensure different timestamps
-    await new Promise((resolve) => setTimeout(resolve, 10));
-    const bottle2 = await fixtures.Bottle({ name: "Second Bottle" });
+  expect(results.map((result) => result.id)).toEqual([retainedBottle.id]);
+});
 
-    const { results } = await routerClient.bottles.list({
-      sort: "-created",
-    });
+test("returns empty results for an unknown flight", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Some Bottle" });
 
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id); // Created last, shown first
-    expect(results[1].id).toBe(bottle1.id);
+  const result = await routerClient.bottles.list({
+    flight: "unknown-flight",
+    cursor: 2,
   });
 
-  test("sorts known releases first and undated bottles last", async ({
-    fixtures,
-  }) => {
-    const earlierAddition = await fixtures.Bottle({
-      name: "Earlier Addition",
-      releaseYear: 2026,
-      createdAt: new Date("2026-01-01T00:00:00.000Z"),
-    });
-    const laterAddition = await fixtures.Bottle({
-      name: "Later Addition",
-      releaseYear: 2026,
-      createdAt: new Date("2026-06-01T00:00:00.000Z"),
-    });
-    const undated = await fixtures.Bottle({
-      name: "Recently Added",
-      createdAt: new Date("2027-01-01T00:00:00.000Z"),
-    });
+  expect(result).toEqual({
+    results: [],
+    total: 0,
+    followedEntityCount: null,
+    rel: {
+      nextCursor: null,
+      prevCursor: null,
+    },
+  });
+});
 
-    const { results, total } = await routerClient.bottles.list({
-      sort: "-release",
-    });
-
-    expect(results.map(({ id }) => id)).toEqual([
-      laterAddition.id,
-      earlierAddition.id,
-      undated.id,
-    ]);
-    expect(total).toBe(3);
+test("paginates exact flight members using Bottle list ordering", async ({
+  fixtures,
+}) => {
+  const members = await Promise.all(
+    Array.from({ length: 5 }, (_, index) =>
+      fixtures.Bottle({
+        name: `Flight Bottle ${index + 1}`,
+        publicReviewAndTastingCount: index + 1,
+      }),
+    ),
+  );
+  await fixtures.Bottle({
+    name: "Outside flight",
+    publicReviewAndTastingCount: 100,
+  });
+  const flight = await fixtures.Flight({
+    name: "Paginated flight",
+    bottles: members.map((bottle) => bottle.id),
   });
 
-  test("requires authentication for followed entity releases", async () => {
-    const err = await waitError(() =>
-      routerClient.bottles.list({ filter: "following" }),
-    );
-
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  const page1 = await routerClient.bottles.list({
+    flight: flight.publicId,
+    limit: 2,
+    cursor: 1,
+    sort: "-tastings",
+  });
+  const page2 = await routerClient.bottles.list({
+    flight: flight.publicId,
+    limit: 2,
+    cursor: 2,
+    sort: "-tastings",
+  });
+  const page3 = await routerClient.bottles.list({
+    flight: flight.publicId,
+    limit: 2,
+    cursor: 3,
+    sort: "-tastings",
   });
 
-  test("returns an empty followed-entity feed", async ({ defaults }) => {
-    const response = await routerClient.bottles.list(
-      { filter: "following", sort: "-release" },
+  expect(page1.results.map((result) => result.id)).toEqual([
+    members[4]!.id,
+    members[3]!.id,
+  ]);
+  expect(page1.rel).toEqual({ nextCursor: 2, prevCursor: null });
+  expect(page2.results.map((result) => result.id)).toEqual([
+    members[2]!.id,
+    members[1]!.id,
+  ]);
+  expect(page2.rel).toEqual({ nextCursor: 3, prevCursor: 1 });
+  expect(page3.results.map((result) => result.id)).toEqual([members[0]!.id]);
+  expect(page3.rel).toEqual({ nextCursor: null, prevCursor: 2 });
+});
+
+test("lists bottles with query matching brand and name", async ({
+  fixtures,
+}) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood 10-year-old",
+  });
+  await fixtures.Bottle({ name: "Something Else" });
+
+  const { results } = await routerClient.bottles.list({
+    query: "wood 10",
+  });
+
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
+
+test("lists bottles with series", async ({ fixtures }) => {
+  const series = await fixtures.BottleSeries({ name: "Limited Edition" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Delicious Wood",
+    seriesId: series.id,
+  });
+  await fixtures.Bottle({ name: "Something Else" });
+
+  const { results } = await routerClient.bottles.list({
+    series: series.id,
+  });
+
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
+
+test("filters a Series by the signed-in user's Library", async ({
+  defaults,
+  fixtures,
+}) => {
+  const series = await fixtures.BottleSeries({ name: "Library Series" });
+  const inLibrary = await fixtures.Bottle({
+    name: "In Library",
+    seriesId: series.id,
+  });
+  const outsideLibrary = await fixtures.Bottle({
+    name: "Outside Library",
+    seriesId: series.id,
+  });
+  const libraryCollection = await fixtures.Collection({
+    name: "Library",
+    createdById: defaults.user.id,
+    totalBottles: 1,
+  });
+  await db.insert(collectionBottles).values({
+    bottleId: inLibrary.id,
+    collectionId: libraryCollection.id,
+  });
+
+  const [included, excluded] = await Promise.all([
+    routerClient.bottles.list(
+      { library: "in", series: series.id },
       { context: { user: defaults.user } },
-    );
+    ),
+    routerClient.bottles.list(
+      { library: "out", series: series.id },
+      { context: { user: defaults.user } },
+    ),
+  ]);
 
-    expect(response.results).toEqual([]);
-    expect(response.followedEntityCount).toBe(0);
+  expect(included.total).toBe(1);
+  expect(included.results.map(({ id }) => id)).toEqual([inLibrary.id]);
+  expect(excluded.total).toBe(1);
+  expect(excluded.results.map(({ id }) => id)).toEqual([outsideLibrary.id]);
+});
+
+test("requires authentication for Library filtering", async () => {
+  const err = await waitError(() =>
+    routerClient.bottles.list({ library: "in" }),
+  );
+
+  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+});
+
+// Sorting tests
+test("sorts bottles by name ascending", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Singleton" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Zebra Whisky",
+    brandId: brand.id,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Alpha Whisky",
+    brandId: brand.id,
   });
 
-  test("lists bottles from followed distillers, brands, and bottlers", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const distiller = await fixtures.Entity({ kind: "distillery" });
-    const bottler = await fixtures.Entity({ kind: "bottler" });
-    const followedBrand = await fixtures.Entity({ kind: "brand" });
-    await db.insert(entityFollows).values([
-      {
-        userId: defaults.user.id,
-        entityId: distiller.id,
-      },
-      {
-        userId: defaults.user.id,
-        entityId: bottler.id,
-      },
-      {
-        userId: defaults.user.id,
-        entityId: followedBrand.id,
-      },
-    ]);
-    const followedBottlerRelease = await fixtures.Bottle({
-      name: "Followed Bottler Release",
-      bottlerId: bottler.id,
-      releaseYear: 2026,
-      releaseMonth: 9,
-      releaseDay: 1,
-    });
-    const exactLaterThisYear = await fixtures.Bottle({
-      name: "Exact Later This Year",
-      distillerIds: [distiller.id],
-      releaseYear: 2026,
-      releaseMonth: 8,
-      releaseDay: 1,
-      createdAt: new Date("2025-01-01T00:00:00.000Z"),
-    });
-    const exactEarlierThisYear = await fixtures.Bottle({
-      name: "Exact Earlier This Year",
-      distillerIds: [distiller.id],
-      releaseYear: 2026,
-      releaseMonth: 2,
-      releaseDay: 1,
-      createdAt: new Date("2026-08-15T00:00:00.000Z"),
-    });
-    const yearOnlyThisYear = await fixtures.Bottle({
-      name: "Year Only This Year",
-      distillerIds: [distiller.id],
-      releaseYear: 2026,
-      createdAt: new Date("2026-07-01T00:00:00.000Z"),
-    });
-    const addedThisYear = await fixtures.Bottle({
-      name: "Added This Year",
-      distillerIds: [distiller.id],
-      createdAt: new Date("2026-09-01T00:00:00.000Z"),
-    });
-    const knownLastYear = await fixtures.Bottle({
-      name: "Known Last Year",
-      distillerIds: [distiller.id],
-      releaseYear: 2025,
-      createdAt: new Date("2026-08-15T00:00:00.000Z"),
-    });
-    const addedLastYear = await fixtures.Bottle({
-      name: "Added Last Year",
-      distillerIds: [distiller.id],
-      createdAt: new Date("2025-12-01T00:00:00.000Z"),
-    });
-    const followedBrandRelease = await fixtures.Bottle({
-      name: "Followed Brand Release",
-      brandId: followedBrand.id,
-      releaseYear: 2026,
-      releaseMonth: 6,
-      releaseDay: 1,
-    });
-    await fixtures.Bottle({ name: "Unrelated Release", releaseYear: 2026 });
-
-    const { followedEntityCount, results } = await routerClient.bottles.list(
-      {
-        filter: "following",
-        limit: 10,
-        sort: "-release",
-      },
-      {
-        context: { user: defaults.user },
-      },
-    );
-
-    expect(results.map(({ id }) => id)).toEqual([
-      followedBottlerRelease.id,
-      exactLaterThisYear.id,
-      followedBrandRelease.id,
-      exactEarlierThisYear.id,
-      yearOnlyThisYear.id,
-      knownLastYear.id,
-      addedThisYear.id,
-      addedLastYear.id,
-    ]);
-    expect(followedEntityCount).toBe(3);
+  const { results } = await routerClient.bottles.list({
+    sort: "name",
   });
 
-  test("sorts bottles by public reviews and tastings ascending", async ({
-    fixtures,
-  }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Popular Bottle",
-      publicReviewAndTastingCount: 10,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Less Popular",
-      publicReviewAndTastingCount: 5,
-    });
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id);
+  expect(results[1].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      sort: "tastings",
-    });
-
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id);
-    expect(results[1].id).toBe(bottle1.id);
+test("sorts bottles by name descending", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Singleton" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Alpha Whisky",
+    brandId: brand.id,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Zebra Whisky",
+    brandId: brand.id,
   });
 
-  test("sorts bottles by public reviews and tastings descending", async ({
-    fixtures,
-  }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Less Popular",
-      publicReviewAndTastingCount: 5,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Popular Bottle",
-      publicReviewAndTastingCount: 10,
-    });
-
-    const { results } = await routerClient.bottles.list({
-      sort: "-tastings",
-    });
-
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id);
-    expect(results[1].id).toBe(bottle1.id);
+  const { results } = await routerClient.bottles.list({
+    sort: "-name",
   });
 
-  test("sorts bottles by median score with nulls last", async ({
-    fixtures,
-  }) => {
-    const high = await fixtures.Bottle({ name: "High", medianScore: 92 });
-    const low = await fixtures.Bottle({ name: "Low", medianScore: 82 });
-    const unscored = await fixtures.Bottle({ name: "Unscored" });
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id);
+  expect(results[1].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({ sort: "-score" });
+test("sorts bottles by age ascending", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Old Whisky",
+    statedAge: 18,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Young Whisky",
+    statedAge: 12,
+  });
+  const bottle3 = await fixtures.Bottle({ name: "No Age" }); // null age
 
-    expect(results.map((bottle) => bottle.id)).toEqual([
-      high.id,
-      low.id,
-      unscored.id,
-    ]);
+  const { results } = await routerClient.bottles.list({
+    sort: "age",
   });
 
-  test("filters bottles by minimum median score", async ({ fixtures }) => {
-    const included = await fixtures.Bottle({ medianScore: 88 });
-    await fixtures.Bottle({ medianScore: 84 });
-    await fixtures.Bottle();
+  expect(results.length).toBe(3);
+  expect(results[0].id).toBe(bottle3.id); // null first
+  expect(results[1].id).toBe(bottle2.id); // 12
+  expect(results[2].id).toBe(bottle1.id); // 18
+});
 
-    const { results } = await routerClient.bottles.list({ minScore: 85 });
+test("sorts bottles by age descending", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Old Whisky",
+    statedAge: 18,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Young Whisky",
+    statedAge: 12,
+  });
+  const bottle3 = await fixtures.Bottle({ name: "No Age" }); // null age
 
-    expect(results.map((bottle) => bottle.id)).toEqual([included.id]);
+  const { results } = await routerClient.bottles.list({
+    sort: "-age",
   });
 
-  test("sorts bottles by rank with query", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Ranking Fixture Brand" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Wood Whisky",
-      brandId: brand.id,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Wooden Cask Whisky",
-      brandId: brand.id,
-    });
+  expect(results.length).toBe(3);
+  expect(results[0].id).toBe(bottle1.id); // 18 first
+  expect(results[1].id).toBe(bottle2.id); // 12
+  expect(results[2].id).toBe(bottle3.id); // null last
+});
 
-    const { results } = await routerClient.bottles.list({
-      query: "wood",
-      sort: "rank",
-    });
+test("sorts bottles by created date ascending", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({ name: "First Bottle" });
+  // Small delay to ensure different timestamps
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const bottle2 = await fixtures.Bottle({ name: "Second Bottle" });
 
-    expect(results.map(({ id }) => id)).toEqual([bottle1.id, bottle2.id]);
+  const { results } = await routerClient.bottles.list({
+    sort: "created",
   });
 
-  test("uses Bottle id as the stable rank tie breaker", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Paging Fixture Brand" });
-    const created = await Promise.all(
-      ["Alpha", "Bravo", "Charlie"].map((suffix) =>
-        fixtures.Bottle({
-          name: `Common ${suffix}`,
-          brandId: brand.id,
-        }),
-      ),
-    );
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle1.id); // Created first
+  expect(results[1].id).toBe(bottle2.id);
+});
 
-    const pages = await Promise.all(
-      [1, 2, 3].map((cursor) =>
-        routerClient.bottles.list({
-          query: "common",
-          sort: "rank",
-          cursor,
-          limit: 1,
-        }),
-      ),
-    );
+test("sorts bottles by created date descending", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({ name: "First Bottle" });
+  // Small delay to ensure different timestamps
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  const bottle2 = await fixtures.Bottle({ name: "Second Bottle" });
 
-    expect(pages.flatMap(({ results }) => results.map(({ id }) => id))).toEqual(
-      created.map(({ id }) => id),
-    );
+  const { results } = await routerClient.bottles.list({
+    sort: "-created",
   });
 
-  test("sorts bottles by rank without query (falls back to public reviews and tastings)", async ({
-    fixtures,
-  }) => {
-    const bottle1 = await fixtures.Bottle({
-      name: "Less Popular",
-      publicReviewAndTastingCount: 5,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Popular Bottle",
-      publicReviewAndTastingCount: 10,
-    });
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id); // Created last, shown first
+  expect(results[1].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      sort: "rank",
-    });
-
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id);
-    expect(results[1].id).toBe(bottle1.id);
+test("sorts known releases first and undated bottles last", async ({
+  fixtures,
+}) => {
+  const earlierAddition = await fixtures.Bottle({
+    name: "Earlier Addition",
+    releaseYear: 2026,
+    createdAt: new Date("2026-01-01T00:00:00.000Z"),
+  });
+  const laterAddition = await fixtures.Bottle({
+    name: "Later Addition",
+    releaseYear: 2026,
+    createdAt: new Date("2026-06-01T00:00:00.000Z"),
+  });
+  const undated = await fixtures.Bottle({
+    name: "Recently Added",
+    createdAt: new Date("2027-01-01T00:00:00.000Z"),
   });
 
-  test("sorts bottles by brand with entity filter", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ name: "Test Distillery" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Zebra Expression",
-      brandId: entity.id,
-    });
-    const bottle2 = await fixtures.Bottle({
-      name: "Alpha Expression",
-      brandId: entity.id,
-    });
+  const { results, total } = await routerClient.bottles.list({
+    sort: "-release",
+  });
 
-    const { results } = await routerClient.bottles.list({
-      entity: entity.id,
+  expect(results.map(({ id }) => id)).toEqual([
+    laterAddition.id,
+    earlierAddition.id,
+    undated.id,
+  ]);
+  expect(total).toBe(3);
+});
+
+test("requires authentication for followed entity releases", async () => {
+  const err = await waitError(() =>
+    routerClient.bottles.list({ filter: "following" }),
+  );
+
+  expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+});
+
+test("returns an empty followed-entity feed", async ({ defaults }) => {
+  const response = await routerClient.bottles.list(
+    { filter: "following", sort: "-release" },
+    { context: { user: defaults.user } },
+  );
+
+  expect(response.results).toEqual([]);
+  expect(response.followedEntityCount).toBe(0);
+});
+
+test("lists bottles from followed distillers, brands, and bottlers", async ({
+  defaults,
+  fixtures,
+}) => {
+  const distiller = await fixtures.Entity({ kind: "distillery" });
+  const bottler = await fixtures.Entity({ kind: "bottler" });
+  const followedBrand = await fixtures.Entity({ kind: "brand" });
+  await db.insert(entityFollows).values([
+    {
+      userId: defaults.user.id,
+      entityId: distiller.id,
+    },
+    {
+      userId: defaults.user.id,
+      entityId: bottler.id,
+    },
+    {
+      userId: defaults.user.id,
+      entityId: followedBrand.id,
+    },
+  ]);
+  const followedBottlerRelease = await fixtures.Bottle({
+    name: "Followed Bottler Release",
+    bottlerId: bottler.id,
+    releaseYear: 2026,
+    releaseMonth: 9,
+    releaseDay: 1,
+  });
+  const exactLaterThisYear = await fixtures.Bottle({
+    name: "Exact Later This Year",
+    distillerIds: [distiller.id],
+    releaseYear: 2026,
+    releaseMonth: 8,
+    releaseDay: 1,
+    createdAt: new Date("2025-01-01T00:00:00.000Z"),
+  });
+  const exactEarlierThisYear = await fixtures.Bottle({
+    name: "Exact Earlier This Year",
+    distillerIds: [distiller.id],
+    releaseYear: 2026,
+    releaseMonth: 2,
+    releaseDay: 1,
+    createdAt: new Date("2026-08-15T00:00:00.000Z"),
+  });
+  const yearOnlyThisYear = await fixtures.Bottle({
+    name: "Year Only This Year",
+    distillerIds: [distiller.id],
+    releaseYear: 2026,
+    createdAt: new Date("2026-07-01T00:00:00.000Z"),
+  });
+  const addedThisYear = await fixtures.Bottle({
+    name: "Added This Year",
+    distillerIds: [distiller.id],
+    createdAt: new Date("2026-09-01T00:00:00.000Z"),
+  });
+  const knownLastYear = await fixtures.Bottle({
+    name: "Known Last Year",
+    distillerIds: [distiller.id],
+    releaseYear: 2025,
+    createdAt: new Date("2026-08-15T00:00:00.000Z"),
+  });
+  const addedLastYear = await fixtures.Bottle({
+    name: "Added Last Year",
+    distillerIds: [distiller.id],
+    createdAt: new Date("2025-12-01T00:00:00.000Z"),
+  });
+  const followedBrandRelease = await fixtures.Bottle({
+    name: "Followed Brand Release",
+    brandId: followedBrand.id,
+    releaseYear: 2026,
+    releaseMonth: 6,
+    releaseDay: 1,
+  });
+  await fixtures.Bottle({ name: "Unrelated Release", releaseYear: 2026 });
+
+  const { followedEntityCount, results } = await routerClient.bottles.list(
+    {
+      filter: "following",
+      limit: 10,
+      sort: "-release",
+    },
+    {
+      context: { user: defaults.user },
+    },
+  );
+
+  expect(results.map(({ id }) => id)).toEqual([
+    followedBottlerRelease.id,
+    exactLaterThisYear.id,
+    followedBrandRelease.id,
+    exactEarlierThisYear.id,
+    yearOnlyThisYear.id,
+    knownLastYear.id,
+    addedThisYear.id,
+    addedLastYear.id,
+  ]);
+  expect(followedEntityCount).toBe(3);
+});
+
+test("sorts bottles by public reviews and tastings ascending", async ({
+  fixtures,
+}) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Popular Bottle",
+    publicReviewAndTastingCount: 10,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Less Popular",
+    publicReviewAndTastingCount: 5,
+  });
+
+  const { results } = await routerClient.bottles.list({
+    sort: "tastings",
+  });
+
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id);
+  expect(results[1].id).toBe(bottle1.id);
+});
+
+test("sorts bottles by public reviews and tastings descending", async ({
+  fixtures,
+}) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Less Popular",
+    publicReviewAndTastingCount: 5,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Popular Bottle",
+    publicReviewAndTastingCount: 10,
+  });
+
+  const { results } = await routerClient.bottles.list({
+    sort: "-tastings",
+  });
+
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id);
+  expect(results[1].id).toBe(bottle1.id);
+});
+
+test("sorts bottles by median score with nulls last", async ({ fixtures }) => {
+  const high = await fixtures.Bottle({ name: "High", medianScore: 92 });
+  const low = await fixtures.Bottle({ name: "Low", medianScore: 82 });
+  const unscored = await fixtures.Bottle({ name: "Unscored" });
+
+  const { results } = await routerClient.bottles.list({ sort: "-score" });
+
+  expect(results.map((bottle) => bottle.id)).toEqual([
+    high.id,
+    low.id,
+    unscored.id,
+  ]);
+});
+
+test("filters bottles by minimum median score", async ({ fixtures }) => {
+  const included = await fixtures.Bottle({ medianScore: 88 });
+  await fixtures.Bottle({ medianScore: 84 });
+  await fixtures.Bottle();
+
+  const { results } = await routerClient.bottles.list({ minScore: 85 });
+
+  expect(results.map((bottle) => bottle.id)).toEqual([included.id]);
+});
+
+test("sorts bottles by rank with query", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Ranking Fixture Brand" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Wood Whisky",
+    brandId: brand.id,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Wooden Cask Whisky",
+    brandId: brand.id,
+  });
+
+  const { results } = await routerClient.bottles.list({
+    query: "wood",
+    sort: "rank",
+  });
+
+  expect(results.map(({ id }) => id)).toEqual([bottle1.id, bottle2.id]);
+});
+
+test("uses Bottle id as the stable rank tie breaker", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Paging Fixture Brand" });
+  const created = await Promise.all(
+    ["Alpha", "Bravo", "Charlie"].map((suffix) =>
+      fixtures.Bottle({
+        name: `Common ${suffix}`,
+        brandId: brand.id,
+      }),
+    ),
+  );
+
+  const pages = await Promise.all(
+    [1, 2, 3].map((cursor) =>
+      routerClient.bottles.list({
+        query: "common",
+        sort: "rank",
+        cursor,
+        limit: 1,
+      }),
+    ),
+  );
+
+  expect(pages.flatMap(({ results }) => results.map(({ id }) => id))).toEqual(
+    created.map(({ id }) => id),
+  );
+});
+
+test("sorts bottles by rank without query (falls back to public reviews and tastings)", async ({
+  fixtures,
+}) => {
+  const bottle1 = await fixtures.Bottle({
+    name: "Less Popular",
+    publicReviewAndTastingCount: 5,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Popular Bottle",
+    publicReviewAndTastingCount: 10,
+  });
+
+  const { results } = await routerClient.bottles.list({
+    sort: "rank",
+  });
+
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id);
+  expect(results[1].id).toBe(bottle1.id);
+});
+
+test("sorts bottles by brand with entity filter", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({ name: "Test Distillery" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Zebra Expression",
+    brandId: entity.id,
+  });
+  const bottle2 = await fixtures.Bottle({
+    name: "Alpha Expression",
+    brandId: entity.id,
+  });
+
+  const { results } = await routerClient.bottles.list({
+    entity: entity.id,
+    sort: "brand",
+  });
+
+  expect(results.length).toBe(2);
+  expect(results[0].id).toBe(bottle2.id); // Alpha comes first
+  expect(results[1].id).toBe(bottle1.id);
+});
+
+test("rejects brand sort without entity filter", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Test Bottle" });
+
+  const err = await waitError(
+    routerClient.bottles.list({
       sort: "brand",
-    });
+    }),
+  );
 
-    expect(results.length).toBe(2);
-    expect(results[0].id).toBe(bottle2.id); // Alpha comes first
-    expect(results[1].id).toBe(bottle1.id);
-  });
+  expect(err).toMatchInlineSnapshot(
+    `[Error: Cannot sort by brand without entity filter.]`,
+  );
+});
 
-  test("rejects brand sort without entity filter", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Test Bottle" });
-
-    const err = await waitError(
-      routerClient.bottles.list({
-        sort: "brand",
+// Pagination tests
+test("handles pagination with cursor and limit", async ({ fixtures }) => {
+  // Create 5 bottles
+  const bottles = [];
+  for (let i = 1; i <= 5; i++) {
+    bottles.push(
+      await fixtures.Bottle({
+        name: `Bottle ${i}`,
+        publicReviewAndTastingCount: i,
       }),
     );
+  }
 
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Cannot sort by brand without entity filter.]`,
-    );
+  // First page
+  const page1 = await routerClient.bottles.list({
+    limit: 2,
+    cursor: 1,
+    sort: "-tastings",
   });
 
-  // Pagination tests
-  test("handles pagination with cursor and limit", async ({ fixtures }) => {
-    // Create 5 bottles
-    const bottles = [];
-    for (let i = 1; i <= 5; i++) {
-      bottles.push(
-        await fixtures.Bottle({
-          name: `Bottle ${i}`,
-          publicReviewAndTastingCount: i,
-        }),
-      );
-    }
+  expect(page1.results.length).toBe(2);
+  expect(page1.rel.nextCursor).toBe(2);
+  expect(page1.rel.prevCursor).toBe(null);
 
-    // First page
-    const page1 = await routerClient.bottles.list({
-      limit: 2,
-      cursor: 1,
-      sort: "-tastings",
-    });
-
-    expect(page1.results.length).toBe(2);
-    expect(page1.rel.nextCursor).toBe(2);
-    expect(page1.rel.prevCursor).toBe(null);
-
-    // Second page
-    const page2 = await routerClient.bottles.list({
-      limit: 2,
-      cursor: 2,
-      sort: "-tastings",
-    });
-
-    expect(page2.results.length).toBe(2);
-    expect(page2.rel.nextCursor).toBe(3);
-    expect(page2.rel.prevCursor).toBe(1);
-
-    // Last page
-    const page3 = await routerClient.bottles.list({
-      limit: 2,
-      cursor: 3,
-      sort: "-tastings",
-    });
-
-    expect(page3.results.length).toBe(1); // Only 1 bottle left
-    expect(page3.rel.nextCursor).toBe(null);
-    expect(page3.rel.prevCursor).toBe(2);
+  // Second page
+  const page2 = await routerClient.bottles.list({
+    limit: 2,
+    cursor: 2,
+    sort: "-tastings",
   });
 
-  test("handles empty results", async () => {
-    const { results, rel } = await routerClient.bottles.list({});
+  expect(page2.results.length).toBe(2);
+  expect(page2.rel.nextCursor).toBe(3);
+  expect(page2.rel.prevCursor).toBe(1);
 
-    expect(results.length).toBe(0);
-    expect(rel.nextCursor).toBe(null);
-    expect(rel.prevCursor).toBe(null);
+  // Last page
+  const page3 = await routerClient.bottles.list({
+    limit: 2,
+    cursor: 3,
+    sort: "-tastings",
   });
 
-  test("handles large limit values", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Test Bottle" });
+  expect(page3.results.length).toBe(1); // Only 1 bottle left
+  expect(page3.rel.nextCursor).toBe(null);
+  expect(page3.rel.prevCursor).toBe(2);
+});
 
-    const { results } = await routerClient.bottles.list({
-      limit: 100, // Max allowed
-    });
+test("handles empty results", async () => {
+  const { results, rel } = await routerClient.bottles.list({});
 
-    expect(results.length).toBe(1);
+  expect(results.length).toBe(0);
+  expect(rel.nextCursor).toBe(null);
+  expect(rel.prevCursor).toBe(null);
+});
+
+test("handles large limit values", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Test Bottle" });
+
+  const { results } = await routerClient.bottles.list({
+    limit: 100, // Max allowed
   });
 
-  // Complex filter combinations
-  test("combines multiple filters", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Test Brand" });
-    const distiller = await fixtures.Entity({ name: "Test Distiller" });
+  expect(results.length).toBe(1);
+});
 
-    const bottle1 = await fixtures.Bottle({
-      name: "Perfect Match",
-      brandId: brand.id,
-      distillerIds: [distiller.id],
-      category: "single_malt",
-      statedAge: 12,
-      flavorProfile: "peated",
-    });
+// Complex filter combinations
+test("combines multiple filters", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Test Brand" });
+  const distiller = await fixtures.Entity({ name: "Test Distiller" });
 
-    // Create bottles that don't match all criteria
-    await fixtures.Bottle({
-      name: "Wrong Brand",
-      category: "single_malt",
-      statedAge: 12,
-      flavorProfile: "peated",
-    });
-
-    await fixtures.Bottle({
-      name: "Wrong Category",
-      brandId: brand.id,
-      distillerIds: [distiller.id],
-      category: "bourbon",
-      statedAge: 12,
-      flavorProfile: "peated",
-    });
-
-    const { results } = await routerClient.bottles.list({
-      brand: brand.id,
-      distiller: distiller.id,
-      category: "single_malt",
-      age: 12,
-      flavorProfile: "peated",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  const bottle1 = await fixtures.Bottle({
+    name: "Perfect Match",
+    brandId: brand.id,
+    distillerIds: [distiller.id],
+    category: "single_malt",
+    statedAge: 12,
+    flavorProfile: "peated",
   });
 
-  test("handles query with filters", async ({ fixtures }) => {
-    const brand = await fixtures.Entity({ name: "Highland Distillery" });
-    const bottle1 = await fixtures.Bottle({
-      name: "Highland Single Malt",
-      brandId: brand.id,
-      category: "single_malt",
-    });
-
-    await fixtures.Bottle({
-      name: "Highland Blend", // Matches query but wrong category
-      brandId: brand.id,
-      category: "blend",
-    });
-
-    const { results } = await routerClient.bottles.list({
-      query: "highland",
-      category: "single_malt",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  // Create bottles that don't match all criteria
+  await fixtures.Bottle({
+    name: "Wrong Brand",
+    category: "single_malt",
+    statedAge: 12,
+    flavorProfile: "peated",
   });
 
-  // Edge cases
-  test("handles special characters in query", async ({ fixtures }) => {
-    const bottle1 = await fixtures.Bottle({ name: "Whisky & Co." });
-
-    const { results } = await routerClient.bottles.list({
-      query: "whisky &",
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+  await fixtures.Bottle({
+    name: "Wrong Category",
+    brandId: brand.id,
+    distillerIds: [distiller.id],
+    category: "bourbon",
+    statedAge: 12,
+    flavorProfile: "peated",
   });
 
-  test("handles empty query string", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Test Bottle" });
-
-    const { results } = await routerClient.bottles.list({
-      query: "",
-    });
-
-    expect(results.length).toBe(1);
+  const { results } = await routerClient.bottles.list({
+    brand: brand.id,
+    distiller: distiller.id,
+    category: "single_malt",
+    age: 12,
+    flavorProfile: "peated",
   });
 
-  test("handles non-existent entity filters", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Test Bottle" });
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
 
-    const { results } = await routerClient.bottles.list({
-      brand: 999999,
-    });
-
-    expect(results.length).toBe(0);
+test("handles query with filters", async ({ fixtures }) => {
+  const brand = await fixtures.Entity({ name: "Highland Distillery" });
+  const bottle1 = await fixtures.Bottle({
+    name: "Highland Single Malt",
+    brandId: brand.id,
+    category: "single_malt",
   });
 
-  test("filters production location through distilleries", async ({
-    fixtures,
-  }) => {
-    const country = await fixtures.Country({ slug: "scotland" });
-    const otherCountry = await fixtures.Country({ slug: "japan" });
-    const region = await fixtures.Region({
-      countryId: country.id,
-      slug: "islay",
-    });
-    const otherRegion = await fixtures.Region({
-      countryId: otherCountry.id,
-      slug: "islay",
-    });
-    const brand = await fixtures.Entity({ countryId: country.id });
-    const distiller = await fixtures.Entity({
-      countryId: country.id,
-      regionId: region.id,
-      kind: "distillery",
-    });
-    const otherDistiller = await fixtures.Entity({
-      countryId: otherCountry.id,
-      regionId: otherRegion.id,
-      kind: "distillery",
-    });
-    const localBottle = await fixtures.Bottle({
-      name: "Local bottle",
-      distillerIds: [distiller.id],
-    });
-    await fixtures.Bottle({
-      name: "Local brand only",
-      brandId: brand.id,
-      distillerIds: [otherDistiller.id],
-    });
+  await fixtures.Bottle({
+    name: "Highland Blend", // Matches query but wrong category
+    brandId: brand.id,
+    category: "blend",
+  });
 
-    const countryResults = await routerClient.bottles.list({
+  const { results } = await routerClient.bottles.list({
+    query: "highland",
+    category: "single_malt",
+  });
+
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
+
+// Edge cases
+test("handles special characters in query", async ({ fixtures }) => {
+  const bottle1 = await fixtures.Bottle({ name: "Whisky & Co." });
+
+  const { results } = await routerClient.bottles.list({
+    query: "whisky &",
+  });
+
+  expect(results.length).toBe(1);
+  expect(results[0].id).toBe(bottle1.id);
+});
+
+test("handles empty query string", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Test Bottle" });
+
+  const { results } = await routerClient.bottles.list({
+    query: "",
+  });
+
+  expect(results.length).toBe(1);
+});
+
+test("handles non-existent entity filters", async ({ fixtures }) => {
+  await fixtures.Bottle({ name: "Test Bottle" });
+
+  const { results } = await routerClient.bottles.list({
+    brand: 999999,
+  });
+
+  expect(results.length).toBe(0);
+});
+
+test("filters production location through distilleries", async ({
+  fixtures,
+}) => {
+  const country = await fixtures.Country({ slug: "scotland" });
+  const otherCountry = await fixtures.Country({ slug: "japan" });
+  const region = await fixtures.Region({
+    countryId: country.id,
+    slug: "islay",
+  });
+  const otherRegion = await fixtures.Region({
+    countryId: otherCountry.id,
+    slug: "islay",
+  });
+  const brand = await fixtures.Entity({ countryId: country.id });
+  const distiller = await fixtures.Entity({
+    countryId: country.id,
+    regionId: region.id,
+    kind: "distillery",
+  });
+  const otherDistiller = await fixtures.Entity({
+    countryId: otherCountry.id,
+    regionId: otherRegion.id,
+    kind: "distillery",
+  });
+  const localBottle = await fixtures.Bottle({
+    name: "Local bottle",
+    distillerIds: [distiller.id],
+  });
+  await fixtures.Bottle({
+    name: "Local brand only",
+    brandId: brand.id,
+    distillerIds: [otherDistiller.id],
+  });
+
+  const countryResults = await routerClient.bottles.list({
+    country: country.slug,
+  });
+  const regionResults = await routerClient.bottles.list({
+    country: country.slug,
+    region: region.slug,
+  });
+
+  expect(countryResults.results.map(({ id }) => id)).toEqual([localBottle.id]);
+  expect(regionResults.results.map(({ id }) => id)).toEqual([localBottle.id]);
+});
+
+test("requires and validates a region country", async ({ fixtures }) => {
+  const country = await fixtures.Country({ slug: "scotland" });
+  const otherCountry = await fixtures.Country({ slug: "japan" });
+  const region = await fixtures.Region({
+    countryId: otherCountry.id,
+    slug: "islay",
+  });
+
+  await expect(
+    routerClient.bottles.list({ region: region.slug }),
+  ).rejects.toThrow("Region requires country.");
+  await expect(
+    routerClient.bottles.list({
       country: country.slug,
-    });
-    const regionResults = await routerClient.bottles.list({
-      country: country.slug,
-      region: region.slug,
-    });
+      region: region.id.toString(),
+    }),
+  ).rejects.toThrow("Invalid region.");
+});
 
-    expect(countryResults.results.map(({ id }) => id)).toEqual([
-      localBottle.id,
-    ]);
-    expect(regionResults.results.map(({ id }) => id)).toEqual([localBottle.id]);
-  });
+test("validates input parameters", async () => {
+  const err = await waitError(
+    routerClient.bottles.list({
+      limit: 101, // Above max
+    }),
+  );
 
-  test("requires and validates a region country", async ({ fixtures }) => {
-    const country = await fixtures.Country({ slug: "scotland" });
-    const otherCountry = await fixtures.Country({ slug: "japan" });
-    const region = await fixtures.Region({
-      countryId: otherCountry.id,
-      slug: "islay",
-    });
+  expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+});
 
-    await expect(
-      routerClient.bottles.list({ region: region.slug }),
-    ).rejects.toThrow("Region requires country.");
-    await expect(
-      routerClient.bottles.list({
-        country: country.slug,
-        region: region.id.toString(),
-      }),
-    ).rejects.toThrow("Invalid region.");
-  });
+test("validates cursor parameter", async () => {
+  const err = await waitError(
+    routerClient.bottles.list({
+      cursor: 0, // Below min
+    }),
+  );
 
-  test("validates input parameters", async () => {
-    const err = await waitError(
-      routerClient.bottles.list({
-        limit: 101, // Above max
-      }),
-    );
-
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
-  });
-
-  test("validates cursor parameter", async () => {
-    const err = await waitError(
-      routerClient.bottles.list({
-        cursor: 0, // Below min
-      }),
-    );
-
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
-  });
+  expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
 });

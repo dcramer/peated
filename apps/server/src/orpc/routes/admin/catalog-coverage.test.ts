@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleTombstones } from "@peated/server/db/schema";
+import {
+  bottles,
+  bottleSeries,
+  bottleTombstones,
+  entities,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -92,6 +97,11 @@ describe("GET /admin/catalog/coverage", () => {
         withReviews: 1,
         withPriceListings: 1,
       },
+      entities: {
+        total: expect.any(Number),
+        withSearchDocuments: expect.any(Number),
+      },
+      series: { total: 0, withSearchDocuments: 0 },
       externalReviews: {
         total: 4,
         matched: 3,
@@ -103,6 +113,33 @@ describe("GET /admin/catalog/coverage", () => {
         unmatched: 1,
       },
     });
+    expect(result.entities.withSearchDocuments).toBe(result.entities.total);
+  });
+
+  test("counts Entities and Series that still have no search documents", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const pendingEntity = await fixtures.Entity();
+    await fixtures.Entity();
+    await db
+      .update(entities)
+      .set({ searchNames: "" })
+      .where(eq(entities.id, pendingEntity.id));
+    const pendingSeries = await fixtures.BottleSeries();
+    await fixtures.BottleSeries();
+    await db
+      .update(bottleSeries)
+      .set({ searchNames: "" })
+      .where(eq(bottleSeries.id, pendingSeries.id));
+
+    const result = await routerClient.admin.catalogCoverage(undefined, {
+      context: { user: admin },
+    });
+
+    expect(result.entities.total).toBeGreaterThanOrEqual(2);
+    expect(result.entities.withSearchDocuments).toBe(result.entities.total - 1);
+    expect(result.series).toEqual({ total: 2, withSearchDocuments: 1 });
   });
 
   test("requires an administrator", async ({ defaults }) => {
