@@ -1,5 +1,3 @@
-import { SCRAPER_PRICE_BATCH_SIZE } from "@peated/server/constants";
-import { StorePriceInputSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import {
   runLegacyPriceAdapter,
@@ -14,11 +12,6 @@ export const LegacyPriceCursorSchema = z
     page: z.number().int().positive(),
   })
   .strict();
-
-export const StorePriceBatchSchema = z
-  .array(StorePriceInputSchema.strict())
-  .min(1)
-  .max(SCRAPER_PRICE_BATCH_SIZE);
 
 export function createLegacyPriceAdapter(
   targetKey: string,

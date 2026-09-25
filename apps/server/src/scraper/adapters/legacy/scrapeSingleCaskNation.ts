@@ -5,14 +5,14 @@ import { load as cheerio } from "cheerio";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices, { getUrl } from "../../legacy/scraper";
+import type { JsonValue } from "../../types";
 import {
   getShopifyStorePriceIdentity,
   parseShopifyPrice,
   ShopifyCatalogSchema,
   ShopifyImageSchema,
   ShopifyProductSchema,
-} from "../../legacy/shopify";
-import type { JsonValue } from "../../types";
+} from "../shopify";
 import { logScrapedProduct } from "./scrapeLogging";
 
 const SITE = "singlecasknation";

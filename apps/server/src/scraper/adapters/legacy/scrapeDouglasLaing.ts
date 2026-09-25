@@ -10,15 +10,15 @@ import { absoluteUrl } from "@peated/server/lib/urls";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
+import { scrapeShopifyProducts } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import {
   getShopifyStorePriceIdentity,
   parseShopifyPrice,
-  scrapeShopifyProducts,
   ShopifyCatalogSchema,
   ShopifyImageSchema,
   ShopifyProductSchema,
-} from "../../legacy/shopify";
-import type { JsonValue } from "../../types";
+} from "../shopify";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "douglaslaing";

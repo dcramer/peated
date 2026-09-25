@@ -284,6 +284,20 @@ the complete rules still need a full local check before they are used in
 production. If request limits pause a run, the command prints when it can
 continue and resumes from its saved page automatically.
 
+A built-in source (one registered in `registry.ts`) runs through the same
+runtime with its real sink, so its results are saved to the local database:
+
+```bash
+pnpm cli scrapers run --site kegnbottle
+```
+
+The command uses `.env.local`. It waits and resumes when request pacing
+pauses the run, and it prints the finished run record. It refuses to start
+while the site has a queued or running run. Follow-up jobs such as image
+capture and Bottle matching go to the local queue and run only when a worker
+is running. Do not run it with `NODE_ENV=test`: test mode limits the
+database pool to one connection, and saving a price batch needs more.
+
 ## Checks for every source
 
 Every new or changed source must pass these checks. Test shared request rules

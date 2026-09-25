@@ -1,0 +1,529 @@
+{
+  "products": [
+    {
+      "id": 101,
+      "title": "Eagle Rare Kentucky Straight Bourbon (750 ml)",
+      "handle": "eagle-rare-bourbon-750-ml",
+      "product_type": "Whiskey",
+      "vendor": "Buffalo Trace",
+      "tags": [
+        "Liquor: Bourbon",
+        "style_Bourbon"
+      ],
+      "images": [
+        {
+          "src": "https://kegnbottle.com/cdn/shop/products/eagle-rare.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1001,
+          "title": "Default Title",
+          "available": true,
+          "price": "69.99"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "title": "Buffalo Trace Bourbon Whiskey",
+      "handle": "buffalo-trace",
+      "product_type": "Whiskey",
+      "vendor": "Buffalo Trace",
+      "tags": [
+        "Liquor: Bourbon"
+      ],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/buffalo-trace.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1021,
+          "title": "375 mL",
+          "available": false,
+          "price": "21.99"
+        },
+        {
+          "id": 1022,
+          "title": "750 mL",
+          "available": true,
+          "price": "25.99"
+        },
+        {
+          "id": 1023,
+          "title": "1 L",
+          "available": true,
+          "price": "34.99"
+        },
+        {
+          "id": 1024,
+          "title": "1.75 L",
+          "available": true,
+          "price": "69.99"
+        },
+        {
+          "id": 1025,
+          "title": "Case (12x750 mL)",
+          "available": true,
+          "price": "299.99"
+        }
+      ]
+    },
+    {
+      "id": 103,
+      "title": "Blanton's Gold Label Bourbon (750mL)",
+      "handle": "blantons-gold-label",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/blantons-gold.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1031,
+          "title": "Default Title",
+          "available": false,
+          "price": "199.99"
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "title": "Blanton's, E.H. Taylor, Eagle Rare, Buffalo Trace, & W.L. Weller Special Reserve Premium Collection Bundle (5pack)",
+      "handle": "premium-collection-bundle",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/bundle.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1041,
+          "title": "Default Title",
+          "available": true,
+          "price": "999.99"
+        }
+      ]
+    },
+    {
+      "id": 105,
+      "title": "Whiskey Mystery Box $99 in Value (Pappy Old Rip Van Winkle 10 Year $1,900 in Value)",
+      "handle": "whiskey-mystery-box-99",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/mystery.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1051,
+          "title": "Default Title",
+          "available": true,
+          "price": "99.00"
+        }
+      ]
+    },
+    {
+      "id": 106,
+      "title": "St-Remy VSOP Brandy (750 ml)",
+      "handle": "st-remy-vsop-brandy",
+      "product_type": "Brandy",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/st-remy.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1061,
+          "title": "Default Title",
+          "available": true,
+          "price": "24.99"
+        }
+      ]
+    },
+    {
+      "id": 107,
+      "title": "High West American Prairie Bourbon Brandy Finished Barrel Pick",
+      "handle": "high-west-american-prairie-barrel-pick",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/high-west.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1071,
+          "title": "Default Title",
+          "available": true,
+          "price": "49.99"
+        }
+      ]
+    },
+    {
+      "id": 108,
+      "title": "Old Forester 1920 Prohibition Style Bourbon (750 ml)",
+      "handle": "old-forester-1920",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/old-forester.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1081,
+          "title": "1 L",
+          "available": true,
+          "price": "64.99"
+        }
+      ]
+    },
+    {
+      "id": 109,
+      "title": "Kura The Whisky Rum Cask Finish (700ml)",
+      "handle": "kura-the-whisky-rum-cask-finish",
+      "product_type": "Whisky",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://images.example.com/kura.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1091,
+          "title": "Default Title",
+          "available": true,
+          "price": "79.99"
+        }
+      ]
+    },
+    {
+      "id": 110,
+      "title": "Jack Daniel's Old No. 7 Tennessee Whiskey (375 ml)",
+      "handle": "jack-daniels-old-no-7-375-ml",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/jack-daniels.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1101,
+          "title": "Default Title",
+          "available": true,
+          "price": "14.99"
+        }
+      ]
+    },
+    {
+      "id": 111,
+      "title": "W.L. Weller Special Reserve Bourbon (750 ml)",
+      "handle": "weller-special-reserve",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/weller.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1111,
+          "title": "Default Title",
+          "available": true,
+          "price": ""
+        }
+      ]
+    },
+    {
+      "title": "Missing Handle Whiskey (750 ml)",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [],
+      "variants": [
+        {
+          "id": 1121,
+          "title": "Default Title",
+          "available": true,
+          "price": "29.99"
+        }
+      ]
+    },
+    {
+      "id": 113,
+      "title": "Four Roses Single Barrel Kentucky Straight Bourbon (750 ml)",
+      "handle": "four-roses-single-barrel",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/four-roses.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1131,
+          "title": "Default Title",
+          "available": true,
+          "price": "54.99"
+        }
+      ]
+    },
+    {
+      "id": 114,
+      "title": "Blanton's, Eagle Rare, & W.L. Weller Special Reserve Bourbon Collection (750 ml Each)",
+      "handle": "bourbon-collection-750-ml-each",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/bourbon-collection-750-ml-each.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1141,
+          "title": "Default Title",
+          "available": true,
+          "price": "399.99"
+        }
+      ]
+    },
+    {
+      "id": 115,
+      "title": "Balcones Texas Pot Still Bourbon with Rocks Glasses (750 ml)",
+      "handle": "balcones-with-rocks-glasses",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/balcones-with-rocks-glasses.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1151,
+          "title": "Default Title",
+          "available": true,
+          "price": "49.99"
+        }
+      ]
+    },
+    {
+      "id": 116,
+      "title": "Ardbeg 10-year-old Islay Scotch Whisky Gift Box (750 ml)",
+      "handle": "ardbeg-10-gift-box",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/ardbeg-10-gift-box.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1161,
+          "title": "Default Title",
+          "available": true,
+          "price": "59.99"
+        }
+      ]
+    },
+    {
+      "id": 117,
+      "title": "Doc Holliday 10-year-old Bourbon Limited Edition Set (750ml)",
+      "handle": "doc-holliday-10-year-set",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/doc-holliday-10-year-set.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1171,
+          "title": "Default Title",
+          "available": true,
+          "price": "149.99"
+        }
+      ]
+    },
+    {
+      "id": 118,
+      "title": "Woodinville Bourbon Join Zoom tasting session with Woodinville and Keg N Bottle Barrel Pick Teams (750 ml)",
+      "handle": "woodinville-zoom-tasting",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/woodinville-zoom-tasting.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1181,
+          "title": "Default Title",
+          "available": true,
+          "price": "44.99"
+        }
+      ]
+    },
+    {
+      "id": 119,
+      "title": "America First Straight Bourbon Whiskey with 1 Vest included (750 ml)",
+      "handle": "america-first-with-vest",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/america-first-with-vest.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1191,
+          "title": "Default Title",
+          "available": true,
+          "price": "39.99"
+        }
+      ]
+    },
+    {
+      "id": 120,
+      "title": "Whistlepig Hogidays Whiskey Advent Calendar (12x50mL)",
+      "handle": "whistlepig-advent-calendar",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/whistlepig-advent-calendar.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1201,
+          "title": "Default Title",
+          "available": true,
+          "price": "199.99"
+        }
+      ]
+    },
+    {
+      "id": 121,
+      "title": "Sagamore Spirit Rye Whiskey 750 (mL)",
+      "handle": "sagamore-spirit-rye-whiskey",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/sagamore-spirit-rye-whiskey.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1211,
+          "title": "Default Title",
+          "available": true,
+          "price": "39.99"
+        }
+      ]
+    },
+    {
+      "id": 122,
+      "title": "Buffalo Trace Antique Collection - George T. Stagg - (750 ml)",
+      "handle": "btac-george-t-stagg",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/btac-george-t-stagg.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1221,
+          "title": "Default Title",
+          "available": true,
+          "price": "1299.99"
+        }
+      ]
+    },
+    {
+      "id": 123,
+      "title": "Ardbeg Vintage_Y2K 23 Year Single Malt Scotch Whisky (750 ml)",
+      "handle": "ardbeg-vintage_y2k-23-year",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/ardbeg-vintage_y2k-23-year.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1231,
+          "title": "Default Title",
+          "available": true,
+          "price": "899.99"
+        }
+      ]
+    },
+    {
+      "id": 124,
+      "title": "WhistlePig The Boss Hog 六 Samurai Scientist Katana Edition Rye Whiskey (750 ml)",
+      "handle": "whistlepig-the-boss-hog-六-samurai-scientist",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/whistlepig-the-boss-hog-六-samurai-scientist.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1241,
+          "title": "Default Title",
+          "available": true,
+          "price": "699.99"
+        }
+      ]
+    },
+    {
+      "id": 125,
+      "title": "Blood Oath Trilogy 3rd Edition Straight Bourbon 3-Pack (750 ml)",
+      "handle": "blood-oath-trilogy-3-pack",
+      "product_type": "Whiskey",
+      "tags": [],
+      "images": [
+        {
+          "src": "https://cdn.shopify.com/s/files/blood-oath.png"
+        }
+      ],
+      "variants": [
+        {
+          "id": 1251,
+          "title": "Default Title",
+          "available": true,
+          "price": "599.99"
+        }
+      ]
+    }
+  ]
+}
