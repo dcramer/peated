@@ -5,14 +5,14 @@ import config from "../config";
 import { db } from "../db";
 import {
   bottles,
-  type CollectionBottle,
   tastings,
+  type CollectionBottle,
   type User,
 } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
 import { type CollectionBottleSchema } from "../schemas";
 import type { BottleSchema } from "../schemas/bottles";
-import { BottleSerializer } from "./bottle";
+import { BottleSerializer, bottleRowColumns } from "./bottle";
 
 type CollectionBottleAttrs = {
   bottle: z.infer<typeof BottleSchema>;
@@ -27,7 +27,7 @@ export const CollectionBottleSerializer = serializer({
   ): Promise<Record<number, CollectionBottleAttrs>> => {
     const bottleIds = [...new Set(itemList.map(({ bottleId }) => bottleId))];
     const bottleRows = await db
-      .select()
+      .select(bottleRowColumns)
       .from(bottles)
       .where(inArray(bottles.id, bottleIds));
     const [groupedBottles, legacyBottles] = await Promise.all([

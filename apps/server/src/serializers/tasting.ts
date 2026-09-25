@@ -3,14 +3,14 @@ import { z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import type { Bottle, Tasting, User } from "../db/schema";
+import type { Tasting, User } from "../db/schema";
 import { bottles, tastingBadgeAwards, toasts, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type TastingSchema } from "../schemas";
 import type { TagCategory } from "../types";
 import { BadgeAwardSerializer } from "./badgeAward";
-import { BottleSerializer } from "./bottle";
+import { BottleSerializer, bottleRowColumns, type BottleRow } from "./bottle";
 import { categoriesForTags, loadTagCategories } from "./tagCategories";
 import { UserSerializer } from "./user";
 
@@ -23,6 +23,95 @@ type TastingAttrs = {
   tagCategories: Record<string, TagCategory>;
 };
 
+async function loadSerializedBottles(bottleIds: number[], currentUser?: User) {
+  const bottleList = bottleIds.length
+    ? await db
+        .select(bottleRowColumns)
+        .from(bottles)
+        .where(inArray(bottles.id, bottleIds))
+    : [];
+  const bottlesById = new Map<number, BottleRow>(
+    bottleList.map((bottle) => [bottle.id, bottle]),
+  );
+  for (const bottleId of bottleIds) {
+    if (!bottlesById.has(bottleId)) {
+      throw new Error(`Tasting references missing Bottle ${bottleId}.`);
+    }
+  }
+  const serializedBottles = await serialize(
+    BottleSerializer,
+    bottleList,
+    currentUser,
+    [],
+    { includeGroupSummary: true },
+  );
+  return new Map(
+    bottleList.map((bottle, index) => [bottle.id, serializedBottles[index]!]),
+  );
+}
+
+async function loadToastedTastingIds(
+  tastingIds: number[],
+  currentUser?: User,
+): Promise<number[]> {
+  if (!currentUser) return [];
+  const rows = await db
+    .select({ tastingId: toasts.tastingId })
+    .from(toasts)
+    .where(
+      and(
+        inArray(toasts.tastingId, tastingIds),
+        eq(toasts.createdById, currentUser.id),
+      ),
+    );
+  return rows.map((t) => t.tastingId);
+}
+
+async function loadSerializedUsers(userIds: number[], currentUser?: User) {
+  if (!userIds.length)
+    return new Map<number, ReturnType<(typeof UserSerializer)["item"]>>();
+  const userList = await db
+    .select()
+    .from(users)
+    .where(inArray(users.id, userIds));
+  const serialized = await serialize(UserSerializer, userList, currentUser);
+  return new Map(userList.map((user, index) => [user.id, serialized[index]!]));
+}
+
+async function loadAwardsByTasting(tastingIds: number[], currentUser?: User) {
+  const tastingAwardList = await db.query.tastingBadgeAwards.findMany({
+    where: inArray(tastingBadgeAwards.tastingId, tastingIds),
+    with: {
+      award: {
+        with: {
+          badge: true,
+        },
+      },
+    },
+  });
+  const awardsByRef = Object.fromEntries(
+    (
+      await serialize(
+        BadgeAwardSerializer,
+        tastingAwardList.map((t) => t.award),
+        currentUser,
+      )
+    ).map((data, index) => [tastingAwardList[index].award.id, data]),
+  );
+  const awardsByTasting: Record<
+    string,
+    ReturnType<(typeof BadgeAwardSerializer)["item"]>[]
+  > = {};
+  for (const tastingAward of tastingAwardList) {
+    if (!awardsByTasting[tastingAward.tastingId])
+      awardsByTasting[tastingAward.tastingId] = [];
+    awardsByTasting[tastingAward.tastingId].push(
+      awardsByRef[tastingAward.award.id],
+    );
+  }
+  return awardsByTasting;
+}
+
 export const TastingSerializer = serializer({
   name: "tasting",
   attrs: async (
@@ -30,105 +119,30 @@ export const TastingSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
-    const categoriesByTag = await loadTagCategories(
-      itemList.flatMap((item) => item.tags ?? []),
-    );
     const bottleIds = [...new Set(itemList.map(({ bottleId }) => bottleId))];
-    const bottleList = bottleIds.length
-      ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
-      : [];
-    const bottlesById = new Map<number, Bottle>(
-      bottleList.map((bottle) => [bottle.id, bottle]),
-    );
-    for (const bottleId of bottleIds) {
-      if (!bottlesById.has(bottleId)) {
-        throw new Error(`Tasting references missing Bottle ${bottleId}.`);
-      }
-    }
-    const serializedBottles = await serialize(
-      BottleSerializer,
-      bottleList,
-      currentUser,
-      [],
-      { includeGroupSummary: true },
-    );
-    const serializedBottleById = new Map(
-      bottleList.map((bottle, index) => [bottle.id, serializedBottles[index]!]),
-    );
-
-    const userToastsList: number[] = currentUser
-      ? (
-          await db
-            .select({ tastingId: toasts.tastingId })
-            .from(toasts)
-            .where(
-              and(
-                inArray(toasts.tastingId, itemIds),
-                eq(toasts.createdById, currentUser.id),
-              ),
-            )
-        ).map((t) => t.tastingId)
-      : [];
-
-    // TODO: combine friends + createdBy
     const creatorIds = [...new Set(itemList.map((item) => item.createdById))];
-    const creatorList = creatorIds.length
-      ? await db.select().from(users).where(inArray(users.id, creatorIds))
-      : [];
-    const creatorsById = Object.fromEntries(
-      (await serialize(UserSerializer, creatorList, currentUser)).map(
-        (data, index) => [creatorList[index].id, data],
-      ),
-    );
-
     const friendIds = Array.from(
       new Set<number>(itemList.map((r) => r.friends).flat()),
     );
-    const usersById = friendIds.length
-      ? Object.fromEntries(
-          (
-            await serialize(
-              UserSerializer,
-              await db.select().from(users).where(inArray(users.id, friendIds)),
-              currentUser,
-            )
-          ).map((data) => [data.id, data]),
-        )
-      : {};
 
-    // this is extremely inefficient, especially without response compression
-    const tastingAwardList = await db.query.tastingBadgeAwards.findMany({
-      where: inArray(tastingBadgeAwards.tastingId, itemIds),
-      with: {
-        award: {
-          with: {
-            badge: true,
-          },
-        },
-      },
-    });
-
-    const awardsByRef = Object.fromEntries(
-      (
-        await serialize(
-          BadgeAwardSerializer,
-          tastingAwardList.map((t) => t.award),
-          currentUser,
-        )
-      ).map((data, index) => [tastingAwardList[index].award.id, data]),
-    );
-
-    const awardsByTasting: Record<
-      string,
-      ReturnType<(typeof BadgeAwardSerializer)["item"]>[]
-    > = {};
-    for (const tastingAward of tastingAwardList) {
-      if (!awardsByTasting[tastingAward.tastingId])
-        awardsByTasting[tastingAward.tastingId] = [];
-      awardsByTasting[tastingAward.tastingId].push(
-        awardsByRef[tastingAward.award.id],
-      );
-    }
+    // Each load below depends only on the tastings, so they run together
+    // instead of paying one database round trip after another.
+    const [
+      categoriesByTag,
+      serializedBottleById,
+      userToastsList,
+      usersById,
+      awardsByTasting,
+    ] = await Promise.all([
+      loadTagCategories(itemList.flatMap((item) => item.tags ?? [])),
+      loadSerializedBottles(bottleIds, currentUser),
+      loadToastedTastingIds(itemIds, currentUser),
+      loadSerializedUsers(
+        [...new Set([...creatorIds, ...friendIds])],
+        currentUser,
+      ),
+      loadAwardsByTasting(itemIds, currentUser),
+    ]);
 
     return Object.fromEntries(
       itemList.map((item) => {
@@ -142,9 +156,9 @@ export const TastingSerializer = serializer({
           item.id,
           {
             hasToasted: userToastsList.includes(item.id),
-            createdBy: creatorsById[item.createdById],
+            createdBy: usersById.get(item.createdById)!,
             bottle,
-            friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
+            friends: item.friends.map((f) => usersById.get(f)).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
             tagCategories: categoriesForTags(item.tags ?? [], categoriesByTag),
           },

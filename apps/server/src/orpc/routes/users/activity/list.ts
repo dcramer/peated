@@ -74,14 +74,13 @@ export default implement(userActivityListContract).handler(async function ({
     }),
   ]);
 
-  const primaryEntries = await serializePrimaryActivityEntries(
-    primaryRows,
-    context.user,
-  );
-  const secondaryEntries = await serializeCollectionAddEntries({
-    groups: collectionGroupRows,
-    currentUser: context.user,
-  });
+  const [primaryEntries, secondaryEntries] = await Promise.all([
+    serializePrimaryActivityEntries(primaryRows, context.user),
+    serializeCollectionAddEntries({
+      groups: collectionGroupRows,
+      currentUser: context.user,
+    }),
+  ]);
 
   const activity = composeActivity({
     primary: primaryEntries,

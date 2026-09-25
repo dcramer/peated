@@ -19,7 +19,7 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
-import { getReservedCollection } from "@peated/server/lib/db";
+import { getReservedCollectionsByUser, mapRows } from "@peated/server/lib/db";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
@@ -33,6 +33,7 @@ import type {
   ActivityEntry,
 } from "@peated/server/types";
 import { and, desc, eq, gte, inArray, lte, sql, type SQL } from "drizzle-orm";
+import { unionAll } from "drizzle-orm/pg-core";
 
 export {
   encodeActivityCursor,
@@ -330,6 +331,8 @@ type CollectionAddGroupRow = {
   window_start: string;
   window_end: string;
   total_items: string;
+  collection: object;
+  user: object;
 };
 
 /** Pages collection additions without splitting a six-hour activity session. */
@@ -346,54 +349,40 @@ export async function getCollectionAddGroups({
 }): Promise<CollectionAddGroup[]> {
   if (!limit) return [];
 
-  return await db.transaction(
-    async (tx) => {
-      const result = await tx.execute<CollectionAddGroupRow>(sql`
-        SELECT
-          numbered_additions.collection_id,
-          MIN(numbered_additions.created_at)::text AS window_start,
-          MAX(numbered_additions.created_at)::text AS window_end,
-          COUNT(numbered_additions.id) AS total_items
-        FROM (
-          ${numberedCollectionAdditionsSql({ userCondition, snapshotAt })}
-        ) numbered_additions
-        GROUP BY
-          numbered_additions.collection_id,
-          numbered_additions.session_number
-        ORDER BY window_end DESC, numbered_additions.collection_id DESC
-        OFFSET ${offset}
-        LIMIT ${limit}
-      `);
+  // One statement returns each group with its collection and owner, so the
+  // page needs no transaction or second round trip and reads one snapshot.
+  const result = await db.execute<CollectionAddGroupRow>(sql`
+    SELECT
+      numbered_additions.collection_id,
+      MIN(numbered_additions.created_at)::text AS window_start,
+      MAX(numbered_additions.created_at)::text AS window_end,
+      COUNT(numbered_additions.id) AS total_items,
+      to_jsonb(${collections}) AS collection,
+      to_jsonb(${users}) AS "user"
+    FROM (
+      ${numberedCollectionAdditionsSql({ userCondition, snapshotAt })}
+    ) numbered_additions
+    INNER JOIN ${collections}
+      ON ${collections.id} = numbered_additions.collection_id
+    INNER JOIN ${users} ON ${users.id} = ${collections.createdById}
+    GROUP BY
+      numbered_additions.collection_id,
+      numbered_additions.session_number,
+      ${collections.id},
+      ${users.id}
+    ORDER BY window_end DESC, numbered_additions.collection_id DESC
+    OFFSET ${offset}
+    LIMIT ${limit}
+  `);
 
-      const collectionIds = result.rows.map((row) => Number(row.collection_id));
-      if (!collectionIds.length) return [];
-
-      const collectionRows = await tx
-        .select({ collection: collections, user: users })
-        .from(collections)
-        .innerJoin(users, eq(users.id, collections.createdById))
-        .where(inArray(collections.id, collectionIds));
-      const collectionById = new Map(
-        collectionRows.map((row) => [row.collection.id, row]),
-      );
-
-      return result.rows.map((row): CollectionAddGroup => {
-        const target = collectionById.get(Number(row.collection_id));
-        if (!target) {
-          throw new Error(
-            `Activity references missing Collection ${row.collection_id}.`,
-          );
-        }
-        return {
-          collection: target.collection,
-          user: target.user,
-          windowStart: row.window_start,
-          windowEnd: row.window_end,
-          totalItems: Number(row.total_items),
-        };
-      });
-    },
-    { accessMode: "read only", isolationLevel: "repeatable read" },
+  return result.rows.map(
+    (row): CollectionAddGroup => ({
+      collection: mapRows([row.collection], collections)[0]!,
+      user: mapRows([row.user], users)[0]!,
+      windowStart: row.window_start,
+      windowEnd: row.window_end,
+      totalItems: Number(row.total_items),
+    }),
   );
 }
 
@@ -441,7 +430,7 @@ type PrimaryActivityRow = {
   created_by_id: string | null;
   started_at: Date | string;
   last_activity_at: Date | string;
-  tasting_ids: (number | string)[];
+  payload: object | object[] | null;
 };
 
 type PrimaryActivity =
@@ -465,158 +454,147 @@ export async function getPrimaryActivity({
 }): Promise<PrimaryActivity[]> {
   if (!limit) return [];
 
-  // Session membership and hydration must share one MVCC snapshot so a
-  // concurrent deletion cannot leave an aggregate referencing a missing row.
-  return await db.transaction(
-    async (tx) => {
-      const result = await tx.execute<PrimaryActivityRow>(sql`
-        WITH marked_tastings AS (
-          ${markedTastingsSql({ userCondition, snapshotAt })}
-        ),
-        numbered_tastings AS (
-          SELECT
-            marked_tastings.*,
-            SUM(marked_tastings.is_session_start) OVER (
-              PARTITION BY marked_tastings.created_by_id
-              ORDER BY marked_tastings.created_at, marked_tastings.id
-              ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-            ) AS session_number
-          FROM marked_tastings
-        ),
-        tasting_sessions AS (
-          SELECT
-            MIN(numbered_tastings.id) AS session_id,
-            numbered_tastings.created_by_id,
-            MIN(numbered_tastings.created_at) AS started_at,
-            MAX(numbered_tastings.created_at) AS last_activity_at,
-            ARRAY_AGG(
-              numbered_tastings.id
-              ORDER BY numbered_tastings.created_at DESC, numbered_tastings.id DESC
-            ) AS tasting_ids
-          FROM numbered_tastings
-          GROUP BY
-            numbered_tastings.created_by_id,
-            numbered_tastings.session_number
+  // One statement returns each entry with the rows it references, so session
+  // membership and hydration share one snapshot and one round trip.
+  const result = await db.execute<PrimaryActivityRow>(sql`
+    WITH marked_tastings AS (
+      ${markedTastingsSql({ userCondition, snapshotAt })}
+    ),
+    numbered_tastings AS (
+      SELECT
+        marked_tastings.*,
+        SUM(marked_tastings.is_session_start) OVER (
+          PARTITION BY marked_tastings.created_by_id
+          ORDER BY marked_tastings.created_at, marked_tastings.id
+          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS session_number
+      FROM marked_tastings
+    ),
+    tasting_sessions AS (
+      SELECT
+        MIN(numbered_tastings.id) AS session_id,
+        numbered_tastings.created_by_id,
+        MIN(numbered_tastings.created_at) AS started_at,
+        MAX(numbered_tastings.created_at) AS last_activity_at,
+        ARRAY_AGG(
+          numbered_tastings.id
+          ORDER BY numbered_tastings.created_at DESC, numbered_tastings.id DESC
+        ) AS tasting_ids
+      FROM numbered_tastings
+      GROUP BY
+        numbered_tastings.created_by_id,
+        numbered_tastings.session_number
+    )
+    SELECT
+      primary_activity.type,
+      primary_activity.id,
+      primary_activity.created_by_id,
+      primary_activity.started_at,
+      primary_activity.last_activity_at,
+      CASE primary_activity.type
+        WHEN 'tasting_session' THEN (
+          SELECT jsonb_agg(to_jsonb(${tastings}) ORDER BY ${tastings.createdAt} DESC, ${tastings.id} DESC)
+          FROM ${tastings}
+          WHERE ${tastings.id} = ANY(primary_activity.tasting_ids)
         )
-        SELECT * FROM (
-          SELECT 'tasting_session' AS type, session_id AS id, created_by_id,
-            started_at, last_activity_at, tasting_ids
-          FROM tasting_sessions
-          UNION ALL
-          SELECT 'member_review' AS type, ${memberReviews.id} AS id,
-            ${memberReviews.createdById} AS created_by_id,
-            ${memberReviews.createdAt} AS started_at,
-            ${memberReviews.createdAt} AS last_activity_at,
-            ARRAY[]::bigint[] AS tasting_ids
+        WHEN 'member_review' THEN (
+          SELECT jsonb_build_object(
+            'review', to_jsonb(${memberReviews}),
+            'bottle', to_jsonb(${bottles})
+          )
           FROM ${memberReviews}
-          INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
-          WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
-            AND ${memberReviews.removedAt} IS NULL
-          ${
-            includeCriticReviews
-              ? sql`
-                UNION ALL
-                SELECT 'critic_review' AS type, ${externalReviews.id} AS id,
-                  NULL::bigint AS created_by_id,
-                  ${externalReviewArticles.publishedAt} AS started_at,
-                  ${externalReviewArticles.publishedAt} AS last_activity_at,
-                  ARRAY[]::bigint[] AS tasting_ids
-                FROM ${externalReviews}
-                INNER JOIN ${externalReviewArticles}
-                  ON ${externalReviewArticles.id} = ${externalReviews.articleId}
-                LEFT JOIN ${externalReviewPublications}
-                  ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
-                WHERE ${visibleExternalReviewWhere()}
-                  AND ${externalReviews.bottleId} IS NOT NULL
-                  AND ${externalReviews.createdAt} <= ${snapshotAt}
-                  AND ${externalReviewArticles.publishedAt} IS NOT NULL
-                  AND ${externalReviewArticles.publishedAt} <= ${snapshotAt}
-              `
-              : sql``
-          }
-        ) primary_activity
-        ORDER BY last_activity_at DESC, id DESC, type
-        OFFSET ${offset}
-        LIMIT ${limit}
-      `);
+          INNER JOIN ${bottles} ON ${bottles.id} = ${memberReviews.bottleId}
+          WHERE ${memberReviews.id} = primary_activity.id
+        )
+        ELSE (
+          SELECT to_jsonb(${externalReviews})
+          FROM ${externalReviews}
+          WHERE ${externalReviews.id} = primary_activity.id
+        )
+      END AS payload
+    FROM (
+      SELECT 'tasting_session' AS type, session_id AS id, created_by_id,
+        started_at, last_activity_at, tasting_ids
+      FROM tasting_sessions
+      UNION ALL
+      SELECT 'member_review' AS type, ${memberReviews.id} AS id,
+        ${memberReviews.createdById} AS created_by_id,
+        ${memberReviews.createdAt} AS started_at,
+        ${memberReviews.createdAt} AS last_activity_at,
+        ARRAY[]::bigint[] AS tasting_ids
+      FROM ${memberReviews}
+      INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
+      WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+        AND ${memberReviews.removedAt} IS NULL
+      ${
+        includeCriticReviews
+          ? sql`
+            UNION ALL
+            SELECT 'critic_review' AS type, ${externalReviews.id} AS id,
+              NULL::bigint AS created_by_id,
+              ${externalReviewArticles.publishedAt} AS started_at,
+              ${externalReviewArticles.publishedAt} AS last_activity_at,
+              ARRAY[]::bigint[] AS tasting_ids
+            FROM ${externalReviews}
+            INNER JOIN ${externalReviewArticles}
+              ON ${externalReviewArticles.id} = ${externalReviews.articleId}
+            LEFT JOIN ${externalReviewPublications}
+              ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
+            WHERE ${visibleExternalReviewWhere()}
+              AND ${externalReviews.bottleId} IS NOT NULL
+              AND ${externalReviews.createdAt} <= ${snapshotAt}
+              AND ${externalReviewArticles.publishedAt} IS NOT NULL
+              AND ${externalReviewArticles.publishedAt} <= ${snapshotAt}
+          `
+          : sql``
+      }
+    ) primary_activity
+    ORDER BY last_activity_at DESC, id DESC, type
+    OFFSET ${offset}
+    LIMIT ${limit}
+  `);
 
-      const tastingIds = result.rows.flatMap((row) =>
-        row.tasting_ids.map(Number),
-      );
-      const tastingRows = tastingIds.length
-        ? await tx
-            .select()
-            .from(tastings)
-            .where(inArray(tastings.id, tastingIds))
-        : [];
-      const tastingsById = new Map(
-        tastingRows.map((tasting) => [tasting.id, tasting]),
-      );
-
-      const reviewIds = result.rows
-        .filter((row) => row.type === "member_review")
-        .map((row) => Number(row.id));
-      const reviewRows = reviewIds.length
-        ? await tx
-            .select({ review: memberReviews, bottle: bottles })
-            .from(memberReviews)
-            .innerJoin(bottles, eq(bottles.id, memberReviews.bottleId))
-            .where(inArray(memberReviews.id, reviewIds))
-        : [];
-      const reviewsById = new Map(
-        reviewRows.map((row) => [row.review.id, row]),
-      );
-
-      const criticReviewIds = result.rows
-        .filter((row) => row.type === "critic_review")
-        .map((row) => Number(row.id));
-      const criticReviewRows = criticReviewIds.length
-        ? await tx
-            .select()
-            .from(externalReviews)
-            .where(inArray(externalReviews.id, criticReviewIds))
-        : [];
-      const criticReviewsById = new Map(
-        criticReviewRows.map((review) => [review.id, review]),
-      );
-
-      return result.rows.map((row): PrimaryActivity => {
-        if (row.type === "critic_review") {
-          const review = criticReviewsById.get(Number(row.id));
-          if (!review) {
-            throw new Error(
-              `Activity references missing external review ${row.id}.`,
-            );
-          }
-          return { type: "critic_review", review };
-        }
-        if (row.type === "member_review") {
-          const review = reviewsById.get(Number(row.id));
-          if (!review)
-            throw new Error(
-              `Activity references missing member review ${row.id}.`,
-            );
-          return { type: "member_review", ...review };
-        }
-        return {
-          type: "tasting_session",
-          id: Number(row.id),
-          createdById: Number(row.created_by_id!),
-          startedAt: coerceActivityDate(row.started_at),
-          lastActivityAt: coerceActivityDate(row.last_activity_at),
-          tastings: row.tasting_ids.map((id) => {
-            const tasting = tastingsById.get(Number(id));
-            if (!tasting)
-              throw new Error(
-                `Activity session references missing Tasting ${id}.`,
-              );
-            return tasting;
-          }),
-        };
-      });
-    },
-    { accessMode: "read only", isolationLevel: "repeatable read" },
-  );
+  return result.rows.map((row): PrimaryActivity => {
+    if (row.type === "critic_review") {
+      if (!row.payload) {
+        throw new Error(
+          `Activity references missing external review ${row.id}.`,
+        );
+      }
+      return {
+        type: "critic_review",
+        review: mapRows([row.payload], externalReviews)[0]!,
+      };
+    }
+    if (row.type === "member_review") {
+      // SAFETY: the member_review branch above builds payload as
+      // jsonb_build_object('review', ..., 'bottle', ...).
+      const payload = row.payload as { review: object; bottle: object } | null;
+      if (!payload) {
+        throw new Error(`Activity references missing member review ${row.id}.`);
+      }
+      return {
+        type: "member_review",
+        review: mapRows([payload.review], memberReviews)[0]!,
+        bottle: mapRows([payload.bottle], bottles)[0]!,
+      };
+    }
+    const tastingRows = mapRows(
+      Array.isArray(row.payload) ? row.payload : [],
+      tastings,
+    );
+    if (!tastingRows.length) {
+      throw new Error(`Activity session ${row.id} has no tastings.`);
+    }
+    return {
+      type: "tasting_session",
+      id: Number(row.id),
+      createdById: Number(row.created_by_id!),
+      startedAt: coerceActivityDate(row.started_at),
+      lastActivityAt: coerceActivityDate(row.last_activity_at),
+      tastings: tastingRows,
+    };
+  });
 }
 
 /** Serializes logical tasting sessions into the shared activity contract. */
@@ -733,73 +711,35 @@ export async function serializePrimaryActivityEntries(
   );
 }
 
-async function getCollectionHref(collection: Collection, user: User) {
-  const [favoritesCollection, libraryCollection] = await Promise.all([
-    getReservedCollection(db, user.id, "default"),
-    getReservedCollection(db, user.id, "library"),
+async function loadCollectionHrefs(groups: CollectionAddGroup[]) {
+  const usersById = new Map(groups.map((group) => [group.user.id, group.user]));
+  const reservedByUser = await getReservedCollectionsByUser(db, [
+    ...usersById.keys(),
   ]);
-
-  if (favoritesCollection?.id === collection.id) {
-    return `/users/${user.username}/favorites`;
+  const hrefByCollectionId = new Map<number, string | null>();
+  for (const user of usersById.values()) {
+    const reserved = reservedByUser.get(user.id);
+    if (reserved?.default) {
+      hrefByCollectionId.set(
+        reserved.default.id,
+        `/users/${user.username}/favorites`,
+      );
+    }
+    if (reserved?.library) {
+      hrefByCollectionId.set(
+        reserved.library.id,
+        `/users/${user.username}/library`,
+      );
+    }
   }
-  if (libraryCollection?.id === collection.id) {
-    return `/users/${user.username}/library`;
-  }
-  return null;
+  return hrefByCollectionId;
 }
 
-async function serializeCollectionForActivity({
-  collection,
-  user,
-  currentUser,
-}: {
-  collection: Collection;
-  user: User;
-  currentUser?: User | null;
-}) {
-  return {
-    ...(await serialize(CollectionSerializer, collection, currentUser)),
-    href: await getCollectionHref(collection, user),
-  };
-}
-
-/** Serializes grouped collection additions with actor, destination, and previews. */
-export async function serializeCollectionAddEntries({
-  groups,
-  currentUser,
-}: {
-  groups: CollectionAddGroup[];
-  currentUser?: User | null;
-}) {
-  const serializedUsersById = new Map<
-    number,
-    ActivityCollectionAddEntry["createdBy"]
-  >();
-  const serializedCollectionsById = new Map<
-    number,
-    Awaited<ReturnType<typeof serializeCollectionForActivity>>
-  >();
-
-  const entries: ActivityEntry[] = [];
-  for (const group of groups) {
-    let createdBy = serializedUsersById.get(group.user.id);
-    if (!createdBy) {
-      createdBy = await serialize(UserSerializer, group.user, currentUser);
-      serializedUsersById.set(group.user.id, createdBy);
-    }
-
-    let collection = serializedCollectionsById.get(group.collection.id);
-    if (!collection) {
-      collection = await serializeCollectionForActivity({
-        collection: group.collection,
-        user: group.user,
-        currentUser,
-      });
-      serializedCollectionsById.set(group.collection.id, collection);
-    }
-
-    // Activity previews must use exact database bounds; JS dates truncate microseconds.
-    const previewRows = await db
+/** Loads the newest additions inside each group's exact database window. */
+async function loadPreviewRows(groups: CollectionAddGroup[]) {
+  // Activity previews must use exact database bounds; JS dates truncate microseconds.
+  const selects = groups.map((group) =>
+    db
       .select()
       .from(collectionBottles)
       .where(
@@ -813,27 +753,90 @@ export async function serializeCollectionAddEntries({
         ),
       )
       .orderBy(desc(collectionBottles.createdAt))
-      .limit(COLLECTION_PREVIEW_LIMIT);
+      .limit(COLLECTION_PREVIEW_LIMIT),
+  );
+  const [first, second, ...rest] = selects;
+  if (first === undefined) return [];
+  if (second === undefined) return await first;
+  return await unionAll(first, second, ...rest);
+}
 
+/** Serializes grouped collection additions with actor, destination, and previews. */
+export async function serializeCollectionAddEntries({
+  groups,
+  currentUser,
+}: {
+  groups: CollectionAddGroup[];
+  currentUser?: User | null;
+}): Promise<ActivityEntry[]> {
+  if (!groups.length) return [];
+  const userList = [
+    ...new Map(groups.map((g) => [g.user.id, g.user])).values(),
+  ];
+  const collectionList = [
+    ...new Map(groups.map((g) => [g.collection.id, g.collection])).values(),
+  ];
+
+  // Every group on the page loads together: one user pass, one collection
+  // pass, one preview pass, instead of a query chain per group.
+  const [
+    serializedUsers,
+    serializedCollections,
+    hrefByCollectionId,
+    previewRows,
+  ] = await Promise.all([
+    serialize(UserSerializer, userList, currentUser),
+    serialize(CollectionSerializer, collectionList, currentUser),
+    loadCollectionHrefs(groups),
+    loadPreviewRows(groups),
+  ]);
+  const serializedPreviews = await serialize(
+    CollectionBottleSerializer,
+    previewRows,
+    currentUser,
+  );
+  const previewById = new Map(
+    previewRows.map((row, index) => [row.id, serializedPreviews[index]!]),
+  );
+  const userById = new Map(
+    userList.map((user, index) => [user.id, serializedUsers[index]!]),
+  );
+  const collectionById = new Map(
+    collectionList.map((collection, index) => [
+      collection.id,
+      serializedCollections[index]!,
+    ]),
+  );
+
+  return groups.map((group): ActivityEntry => {
     const windowStart = coerceActivityDate(group.windowStart);
     const windowEnd = coerceActivityDate(group.windowEnd);
-    entries.push({
+    const items = previewRows
+      .filter(
+        (row) =>
+          row.collectionId === group.collection.id &&
+          row.createdAt >= windowStart &&
+          row.createdAt <= windowEnd,
+      )
+      .sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime() || b.id - a.id,
+      )
+      .slice(0, COLLECTION_PREVIEW_LIMIT)
+      .map((row) => previewById.get(row.id)!);
+    return {
       id: `collection_add:${group.user.id}:${group.collection.id}:${windowEnd.getTime()}`,
       type: "collection_add",
       priority: "secondary",
       createdAt: windowEnd.toISOString(),
       windowStart: windowStart.toISOString(),
       windowEnd: windowEnd.toISOString(),
-      createdBy,
-      collection,
-      items: await serialize(
-        CollectionBottleSerializer,
-        previewRows,
-        currentUser,
-      ),
+      createdBy: userById.get(group.user.id)!,
+      collection: {
+        ...collectionById.get(group.collection.id)!,
+        href: hrefByCollectionId.get(group.collection.id) ?? null,
+      },
+      items,
       totalItems: group.totalItems,
-    });
-  }
-
-  return entries;
+    };
+  });
 }
