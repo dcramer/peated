@@ -1742,7 +1742,7 @@ export async function finalizeBottleUpdate(
   }
   for (const seriesId of result.affectedSeriesIds) {
     try {
-      await pushUniqueJob("IndexBottleSeriesSearchVectors", { seriesId });
+      await pushUniqueJob("IndexBottleSeriesSearch", { seriesId });
     } catch (error) {
       logError(error, { series: { id: seriesId } });
     }

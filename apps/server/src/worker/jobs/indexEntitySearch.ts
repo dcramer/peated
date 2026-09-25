@@ -10,14 +10,14 @@ import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-export const IndexEntitySearchVectorsJobArgsSchema = z
+export const IndexEntitySearchJobArgsSchema = z
   .object({
     entityId: z.number().int().positive(),
   })
   .strict();
 
 export default async (input: JobPayload) => {
-  const { entityId } = IndexEntitySearchVectorsJobArgsSchema.parse(input);
+  const { entityId } = IndexEntitySearchJobArgsSchema.parse(input);
 
   const entity = await db.query.entities.findFirst({
     where: (entities, { eq }) => eq(entities.id, entityId),

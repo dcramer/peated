@@ -180,7 +180,7 @@ describe("fixBadExternalReviewEntities", () => {
     });
     expect(siblingPrice?.bottleId).toEqual(correctBottle.id);
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       {
         bottleId: correctBottle.id,
       },

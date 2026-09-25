@@ -22,7 +22,7 @@ export default async (input: JobPayload) => {
 
   // Generated details wait on a model, so they run on the models queue.
   await pushUniqueJob("GenerateEntityDetails", { entityId });
-  await runJob("IndexEntitySearchVectors", { entityId });
+  await runJob("IndexEntitySearch", { entityId });
   await runJob("GeocodeEntityLocation", { entityId });
   await pushUniqueJob("UpdateEntityStats", { entityId }, { delay: 5000 });
 };

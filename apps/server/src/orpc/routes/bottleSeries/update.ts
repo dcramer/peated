@@ -126,9 +126,8 @@ export default procedure
       return updatedSeries;
     });
 
-    // Queue search vector indexing
     await pushUniqueJob(
-      "IndexBottleSeriesSearchVectors",
+      "IndexBottleSeriesSearch",
       {
         seriesId: updatedSeries.id,
       },

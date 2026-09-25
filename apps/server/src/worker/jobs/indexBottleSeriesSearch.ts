@@ -7,14 +7,14 @@ import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-export const IndexBottleSeriesSearchVectorsJobArgsSchema = z
+export const IndexBottleSeriesSearchJobArgsSchema = z
   .object({
     seriesId: z.number().int().positive(),
   })
   .strict();
 
 export default async (input: JobPayload) => {
-  const { seriesId } = IndexBottleSeriesSearchVectorsJobArgsSchema.parse(input);
+  const { seriesId } = IndexBottleSeriesSearchJobArgsSchema.parse(input);
 
   const series = await db.query.bottleSeries.findFirst({
     where: (bottleSeries, { eq }) => eq(bottleSeries.id, seriesId),
@@ -44,7 +44,7 @@ export default async (input: JobPayload) => {
     .where(eq(bottles.seriesId, series.id));
   await Promise.all(
     relatedBottles.map(({ id }) =>
-      pushUniqueJob("IndexBottleSearchVectors", { bottleId: id }),
+      pushUniqueJob("IndexBottleSearch", { bottleId: id }),
     ),
   );
 };

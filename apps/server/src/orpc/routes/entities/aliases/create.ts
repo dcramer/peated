@@ -40,7 +40,7 @@ export default procedure
         name: input.name,
         createdByActorId: actor.id,
       });
-      await pushUniqueJob("IndexEntitySearchVectors", {
+      await pushUniqueJob("IndexEntitySearch", {
         entityId: alias.entityId,
       });
       return {

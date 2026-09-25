@@ -109,7 +109,7 @@ describe("PUT /bottle-references", () => {
       name: reference!.name,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       { bottleId: bottle.id },
     );
   });

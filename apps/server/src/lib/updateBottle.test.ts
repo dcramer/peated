@@ -2198,7 +2198,7 @@ describe("Bottle updates", () => {
     ).toEqual({ [oldSeries.id]: 0, [newSeries.id]: 2 });
     for (const seriesId of [oldSeries.id, newSeries.id]) {
       expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-        "IndexBottleSeriesSearchVectors",
+        "IndexBottleSeriesSearch",
         { seriesId },
       );
     }
@@ -2282,7 +2282,7 @@ describe("Bottle updates", () => {
       "OnBottleReferenceChange",
       "OnEntityChange",
       "VerifyEntityCreation",
-      "IndexBottleSeriesSearchVectors",
+      "IndexBottleSeriesSearch",
     ]) {
       const payloads = payloadsFor(jobName);
       expect(new Set(payloads).size).toBe(payloads.length);
@@ -2302,7 +2302,7 @@ describe("Bottle updates", () => {
     expect(payloadsFor("VerifyEntityCreation").sort()).toEqual(
       verificationPayloads,
     );
-    expect(payloadsFor("IndexBottleSeriesSearchVectors")).toEqual([
+    expect(payloadsFor("IndexBottleSeriesSearch")).toEqual([
       JSON.stringify({ seriesId: createdSeries.id }),
     ]);
   });

@@ -28,7 +28,7 @@ export default procedure
     if (!deleted) {
       throw errors.NOT_FOUND({ message: "Entity alias not found." });
     }
-    await pushUniqueJob("IndexEntitySearchVectors", {
+    await pushUniqueJob("IndexEntitySearch", {
       entityId: input.entity,
     });
     return {};

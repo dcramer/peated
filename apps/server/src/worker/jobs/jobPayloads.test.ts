@@ -6,8 +6,8 @@ import { GenerateRegionDetailsJobArgsSchema } from "./generateRegionDetails";
 import { GeocodeCountryLocationJobArgsSchema } from "./geocodeCountryLocation";
 import { GeocodeEntityLocationJobArgsSchema } from "./geocodeEntityLocation";
 import { GeocodeRegionLocationJobArgsSchema } from "./geocodeRegionLocation";
-import { IndexBottleSeriesSearchVectorsJobArgsSchema } from "./indexBottleSeriesSearchVectors";
-import { IndexEntitySearchVectorsJobArgsSchema } from "./indexEntitySearchVectors";
+import { IndexBottleSeriesSearchJobArgsSchema } from "./indexBottleSeriesSearch";
+import { IndexEntitySearchJobArgsSchema } from "./indexEntitySearch";
 import { OnEntityChangeJobArgsSchema } from "./onEntityChange";
 import { ProcessNotificationJobArgsSchema } from "./processNotification";
 import { ProcessStorePriceMatchRetryRunJobArgsSchema } from "./processStorePriceMatchRetryRun";
@@ -25,8 +25,8 @@ const jobPayloads = [
   [GeocodeCountryLocationJobArgsSchema, { countryId: 1 }],
   [GeocodeEntityLocationJobArgsSchema, { entityId: 1 }],
   [GeocodeRegionLocationJobArgsSchema, { regionId: 1 }],
-  [IndexBottleSeriesSearchVectorsJobArgsSchema, { seriesId: 1 }],
-  [IndexEntitySearchVectorsJobArgsSchema, { entityId: 1 }],
+  [IndexBottleSeriesSearchJobArgsSchema, { seriesId: 1 }],
+  [IndexEntitySearchJobArgsSchema, { entityId: 1 }],
   [OnEntityChangeJobArgsSchema, { entityId: 1 }],
   [ProcessNotificationJobArgsSchema, { notificationId: 1 }],
   [ProcessStorePriceMatchRetryRunJobArgsSchema, { runId: 1 }],

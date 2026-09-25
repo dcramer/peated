@@ -681,7 +681,7 @@ describe("finalizeBottleReferenceAssignment", () => {
       name: result.reference.name,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       { bottleId: bottle.id },
     );
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(

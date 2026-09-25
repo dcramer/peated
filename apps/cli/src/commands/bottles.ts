@@ -196,8 +196,8 @@ subcommand
       hasResults = false;
       const query = await bottleQuery.offset(offset).limit(step);
       for (const { id } of query) {
-        console.log(`Indexing search vectors for Bottle ${id}.`);
-        await runJob("IndexBottleSearchVectors", { bottleId: id });
+        console.log(`Indexing search documents for Bottle ${id}.`);
+        await runJob("IndexBottleSearch", { bottleId: id });
         hasResults = true;
       }
       offset += step;

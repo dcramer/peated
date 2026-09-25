@@ -126,8 +126,8 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
-        console.log(`Indexing search vectors for Entity ${id}.`);
-        await runJob("IndexEntitySearchVectors", { entityId: id });
+        console.log(`Indexing search documents for Entity ${id}.`);
+        await runJob("IndexEntitySearch", { entityId: id });
         hasResults = true;
       }
       offset += step;

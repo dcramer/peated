@@ -49,7 +49,7 @@ export default async (input: JobPayload) => {
   if (generateDetails) {
     await pushUniqueJob("GenerateBottleDetails", { bottleId });
   }
-  await runJob("IndexBottleSearchVectors", { bottleId });
+  await runJob("IndexBottleSearch", { bottleId });
   const statsJob = buildBottleChangeStatsJob(bottleId);
   await pushUniqueJob(statsJob.name, statsJob.args, statsJob.opts);
 };

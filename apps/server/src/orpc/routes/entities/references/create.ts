@@ -115,7 +115,7 @@ export default procedure
       return nextReference;
     });
 
-    await pushUniqueJob("IndexEntitySearchVectors", {
+    await pushUniqueJob("IndexEntitySearch", {
       entityId: entity.id,
     });
 

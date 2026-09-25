@@ -27,7 +27,7 @@ test("an Entity name change reindexes every related Bottle", async ({
 
   const indexedBottleIds = vi
     .mocked(workerClient.pushUniqueJob)
-    .mock.calls.filter(([job]) => job === "IndexBottleSearchVectors")
+    .mock.calls.filter(([job]) => job === "IndexBottleSearch")
     .flatMap(([, input]) =>
       input !== undefined && "bottleId" in input ? [input.bottleId] : [],
     );

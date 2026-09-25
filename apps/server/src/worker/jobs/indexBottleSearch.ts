@@ -13,14 +13,14 @@ import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 
-export const IndexBottleSearchVectorsJobArgsSchema = z
+export const IndexBottleSearchJobArgsSchema = z
   .object({
     bottleId: z.number().int().positive(),
   })
   .strict();
 
-export default async function indexBottleSearchVectors(input: JobPayload) {
-  const { bottleId } = IndexBottleSearchVectorsJobArgsSchema.parse(input);
+export default async function indexBottleSearch(input: JobPayload) {
+  const { bottleId } = IndexBottleSearchJobArgsSchema.parse(input);
 
   const bottle = await db.query.bottles.findFirst({
     where: (bottles, { eq }) => eq(bottles.id, bottleId),

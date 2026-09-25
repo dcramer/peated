@@ -1087,7 +1087,7 @@ describe("POST /bottles", () => {
     expect(change.type).toEqual("add");
     expect(change.displayName).toEqual(`${brand.name} Limited Edition`);
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSeriesSearchVectors",
+      "IndexBottleSeriesSearch",
       { seriesId: newSeries.id },
     );
   });

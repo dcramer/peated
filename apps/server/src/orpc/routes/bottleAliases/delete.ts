@@ -29,7 +29,7 @@ export default procedure
     try {
       await deleteBottleAlias({ bottleId: input.bottle, aliasId: input.alias });
       try {
-        await pushUniqueJob("IndexBottleSearchVectors", {
+        await pushUniqueJob("IndexBottleSearch", {
           bottleId: input.bottle,
         });
       } catch (error) {

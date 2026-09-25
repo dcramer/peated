@@ -38,7 +38,7 @@ export default procedure
         createdByActorId: actor.id,
       });
       try {
-        await pushUniqueJob("IndexBottleSearchVectors", {
+        await pushUniqueJob("IndexBottleSearch", {
           bottleId: alias.bottleId,
         });
       } catch (error) {
