@@ -11,7 +11,6 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-import type { TSVector } from "../columns/tsvector";
 import { actors } from "./actors";
 import { objectTypeEnum } from "./enums";
 
@@ -24,7 +23,6 @@ type ChangeDataValue =
   | null
   | undefined
   | Date
-  | TSVector
   | ChangeDataValue[]
   | ChangeData;
 

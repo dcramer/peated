@@ -32,7 +32,6 @@ import {
   type ReviewScoreBandCounts,
   type TastingBandCounts,
 } from "../../constants";
-import { tsvector } from "../columns";
 import { vector } from "../columns/vector";
 import { actors } from "./actors";
 import { entities } from "./entities";
@@ -124,7 +123,6 @@ export const bottleSeries = pgTable(
       .references(() => entities.id)
       .notNull(),
     description: text("description"),
-    searchVector: tsvector("search_vector"),
     searchNames: text("search_names").notNull().default(""),
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
@@ -147,7 +145,6 @@ export const bottleSeries = pgTable(
       "btree",
       sql`LOWER(${table.fullName})`,
     ),
-    index("bottle_series_search_idx").using("gin", table.searchVector),
     index("bottle_series_search_names_tin_idx").using("tin", table.searchNames),
     index("bottle_series_brand_idx").on(table.brandId),
     index("bottle_series_representative_bottle_idx").on(
@@ -209,7 +206,6 @@ export const bottles = pgTable(
       () => bottleSeries.id,
     ),
 
-    searchVector: tsvector("search_vector"),
     searchNames: text("search_names").notNull().default(""),
     searchTerms: text("search_terms").notNull().default(""),
 
@@ -317,7 +313,6 @@ export const bottles = pgTable(
   (table) => [
     unique("bottle_id_group_id_unq").on(table.id, table.groupId),
     index("bottle_group_idx").on(table.groupId),
-    index("bottle_search_idx").using("gin", table.searchVector),
     index("bottle_search_names_tin_idx").using("tin", table.searchNames),
     index("bottle_search_terms_tin_idx").using("tin", table.searchTerms),
     index("bottle_brand_idx").on(table.brandId),

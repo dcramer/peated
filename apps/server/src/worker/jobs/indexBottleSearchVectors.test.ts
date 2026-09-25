@@ -5,24 +5,17 @@ import {
   bottleTextPredicate,
   textSearchQuery,
 } from "@peated/server/lib/textSearch";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
 
 async function searchVectorMatches(bottleId: number, query: string) {
   const [result] = await db
-    .select({
-      tinMatches: bottleTextPredicate(textSearchQuery(query)),
-      matches: sql<boolean>`COALESCE(
-        ${bottles.searchVector} @@ websearch_to_tsquery('english', ${query}),
-        FALSE
-      )`,
-    })
+    .select({ matches: bottleTextPredicate(textSearchQuery(query)) })
     .from(bottles)
     .where(eq(bottles.id, bottleId));
 
   if (!result) throw new Error(`Bottle fixture not found: ${bottleId}`);
-  expect(result.tinMatches).toBe(result.matches);
   return result.matches;
 }
 
@@ -85,7 +78,7 @@ describe("indexBottleSearchVectors", () => {
 
     await db
       .update(bottles)
-      .set({ searchVector: null, searchNames: "", searchTerms: "" })
+      .set({ searchNames: "", searchTerms: "" })
       .where(eq(bottles.id, bottle.id));
     await indexBottleSearchVectors({ bottleId: bottle.id });
 

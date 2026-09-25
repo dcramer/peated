@@ -29,7 +29,7 @@ test("writes a Series search document that TIN can query", async ({
   });
   await db
     .update(bottleSeries)
-    .set({ searchVector: null, searchNames: "" })
+    .set({ searchNames: "" })
     .where(eq(bottleSeries.id, series.id));
 
   await indexBottleSeriesSearchVectors({ seriesId: series.id });

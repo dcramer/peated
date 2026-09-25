@@ -16,7 +16,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { bottles, bottlesToDistillers, countries } from ".";
-import { tsvector } from "../columns";
 import { geometry_point } from "../columns/geometry";
 import { actors } from "./actors";
 import { entityEvents } from "./entityEvents";
@@ -52,7 +51,6 @@ export const entities = pgTable(
 
     ownerId: bigint("owner_id", { mode: "number" }),
 
-    searchVector: tsvector("search_vector"),
     searchNames: text("search_names").notNull().default(""),
 
     // These fields record where the Entity comes from, not a headquarters or
@@ -130,7 +128,6 @@ export const entities = pgTable(
         OR (${table.kind} IN ('bottler', 'company') AND ${table.status} = 'closed')`,
     ),
     index("entity_owner_idx").on(table.ownerId),
-    index("entity_search_idx").using("gin", table.searchVector),
     index("entity_country_by_idx").on(table.countryId),
     index("entity_region_idx").on(table.regionId),
     index("entity_created_by_actor_idx").on(table.createdByActorId),

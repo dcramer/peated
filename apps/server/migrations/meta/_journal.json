@@ -2094,6 +2094,13 @@
       "when": 1790302669753,
       "tag": "0298_entity_normalized_names",
       "breakpoints": false
+    },
+    {
+      "idx": 299,
+      "version": "7",
+      "when": 1790343806138,
+      "tag": "0299_drop_search_vectors",
+      "breakpoints": false
     }
   ]
 }

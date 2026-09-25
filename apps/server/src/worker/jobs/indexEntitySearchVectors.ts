@@ -5,10 +5,7 @@ import {
   entityReferences,
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
-import {
-  buildEntitySearchVector,
-  buildNameSearchDocument,
-} from "@peated/server/lib/search";
+import { buildEntitySearchDocument } from "@peated/server/lib/search";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -38,12 +35,7 @@ export default async (input: JobPayload) => {
       .where(eq(entityAliases.entityId, entity.id)),
   ]);
 
-  const searchVector = buildEntitySearchVector(entity, [
-    ...references,
-    ...aliases,
-  ]);
-
-  logInfo("Updating search vector for entity {entityId}", {
+  logInfo("Updating search document for entity {entityId}", {
     extra: {
       entityId: entity.id,
     },
@@ -51,9 +43,6 @@ export default async (input: JobPayload) => {
 
   await db
     .update(entities)
-    .set({
-      searchVector,
-      ...buildNameSearchDocument(searchVector),
-    })
+    .set(buildEntitySearchDocument(entity, [...references, ...aliases]))
     .where(eq(entities.id, entity.id));
 };

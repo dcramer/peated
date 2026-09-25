@@ -1,4 +1,3 @@
-import { TSVector } from "../db/columns";
 import type { NewBottle, NewBottleSeries, NewEntity } from "../db/schema";
 import { formatCategoryName } from "./format";
 
@@ -14,86 +13,68 @@ function formatSearchAbv(abv: number | null | undefined) {
   return `${Number.isInteger(abv) ? abv.toFixed(1) : abv}% ABV`;
 }
 
-export function buildEntitySearchVector(
-  entity: NewEntity,
-  alternateNames?: { name: string }[],
-): TSVector[] {
-  const values: TSVector[] = [
-    new TSVector(entity.name, "A"),
-    ...(entity.shortName ? [new TSVector(entity.shortName, "A")] : []),
-  ];
-  alternateNames
-    ?.filter(({ name }) => name !== entity.name)
-    .forEach(({ name }) => values.push(new TSVector(name, "B")));
-  return values;
+function joinUniqueValues(values: string[]) {
+  return [...new Set(values)].join("\n");
 }
 
-export function buildBottleSearchVector(
+/** Entity documents hold the name, short name, references, and aliases. */
+export function buildEntitySearchDocument(
+  entity: NewEntity,
+  alternateNames?: { name: string }[],
+) {
+  const names = [
+    entity.name,
+    ...(entity.shortName ? [entity.shortName] : []),
+    ...(alternateNames ?? [])
+      .filter(({ name }) => name !== entity.name)
+      .map(({ name }) => name),
+  ];
+  return { searchNames: joinUniqueValues(names) };
+}
+
+/**
+ * `searchNames` holds what identifies the Bottle: names, edition, cask code,
+ * Series, and accepted aliases. `searchTerms` adds producers and release facts.
+ */
+export function buildBottleSearchDocuments(
   bottle: NewBottle,
   brand: NewEntity,
   nameList?: { name: string }[],
   bottler?: NewEntity,
   distillerList?: NewEntity[],
   series?: NewBottleSeries,
-): TSVector[] {
-  const values: TSVector[] = [
-    new TSVector(bottle.fullName, "A"),
-    new TSVector(brand.name, "B"),
-  ];
-  if (brand.shortName)
-    values.push(new TSVector(`${brand.shortName} ${bottle.name}`, "B"));
-
-  if (bottle.category)
-    values.push(new TSVector(formatCategoryName(bottle.category), "C"));
-  if (bottle.edition) values.push(new TSVector(bottle.edition, "A"));
-  if (bottle.statedAge)
-    values.push(new TSVector(`${bottle.statedAge}-year-old`, "B"));
-  if (bottle.maturation) values.push(new TSVector(bottle.maturation, "B"));
-  if (bottle.caskNumber) values.push(new TSVector(bottle.caskNumber, "A"));
-  if (bottle.caskStrength)
-    values.push(new TSVector(CASK_STRENGTH_SEARCH_TERMS, "B"));
-  if (bottle.singleCask)
-    values.push(new TSVector(SINGLE_CASK_SEARCH_TERMS, "B"));
-  if (bottle.vintageYear)
-    values.push(new TSVector(`${bottle.vintageYear} vintage`, "B"));
-  if (bottle.releaseYear)
-    values.push(new TSVector(`${bottle.releaseYear} release`, "B"));
-  if (bottle.abv) values.push(new TSVector(formatSearchAbv(bottle.abv)!, "B"));
-  if (bottler) values.push(new TSVector(bottler.name, "C"));
-  if (series) values.push(new TSVector(series.name, "A"));
+) {
+  const names = [bottle.fullName];
+  const terms = [brand.name];
+  if (brand.shortName) terms.push(`${brand.shortName} ${bottle.name}`);
+  if (bottle.category) terms.push(formatCategoryName(bottle.category));
+  if (bottle.edition) names.push(bottle.edition);
+  if (bottle.statedAge) terms.push(`${bottle.statedAge}-year-old`);
+  if (bottle.maturation) terms.push(bottle.maturation);
+  if (bottle.caskNumber) names.push(bottle.caskNumber);
+  if (bottle.caskStrength) terms.push(CASK_STRENGTH_SEARCH_TERMS);
+  if (bottle.singleCask) terms.push(SINGLE_CASK_SEARCH_TERMS);
+  if (bottle.vintageYear) terms.push(`${bottle.vintageYear} vintage`);
+  if (bottle.releaseYear) terms.push(`${bottle.releaseYear} release`);
+  if (bottle.abv) terms.push(formatSearchAbv(bottle.abv)!);
+  if (bottler) terms.push(bottler.name);
+  if (series) names.push(series.name);
   nameList
     ?.filter((a) => a.name !== bottle.fullName)
-    .forEach((a) => values.push(new TSVector(a.name, "A")));
-  distillerList?.forEach((a) => values.push(new TSVector(a.name, "B")));
-  return values;
-}
-
-function joinUniqueValues(parts: TSVector[]) {
-  return [...new Set(parts.map((part) => part.value))].join("\n");
-}
-
-/** Build the TIN text documents that Bottle text search reads. */
-export function buildBottleSearchDocuments(vector: TSVector[]) {
+    .forEach((a) => names.push(a.name));
+  distillerList?.forEach((a) => terms.push(a.name));
   return {
-    searchNames: joinUniqueValues(vector.filter((part) => part.weight === "A")),
-    searchTerms: joinUniqueValues(vector),
+    searchNames: joinUniqueValues(names),
+    searchTerms: joinUniqueValues([...names, ...terms]),
   };
 }
 
-/** Entity and Series vectors hold only names, so one TIN document serves them. */
-export function buildNameSearchDocument(vector: TSVector[]) {
-  return { searchNames: joinUniqueValues(vector) };
-}
-
-export function buildBottleSeriesSearchVector(
+/** Series documents hold the full name and the Brand names. */
+export function buildBottleSeriesSearchDocument(
   series: NewBottleSeries,
   brand: NewEntity,
-): TSVector[] {
-  const values: TSVector[] = [
-    new TSVector(series.fullName, "A"),
-    new TSVector(brand.name, "C"),
-  ];
-  if (brand.shortName)
-    values.push(new TSVector(`${brand.shortName} ${series.name}`, "B"));
-  return values;
+) {
+  const names = [series.fullName, brand.name];
+  if (brand.shortName) names.push(`${brand.shortName} ${series.name}`);
+  return { searchNames: joinUniqueValues(names) };
 }

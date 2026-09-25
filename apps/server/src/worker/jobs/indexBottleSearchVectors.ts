@@ -8,10 +8,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
-import {
-  buildBottleSearchDocuments,
-  buildBottleSearchVector,
-} from "@peated/server/lib/search";
+import { buildBottleSearchDocuments } from "@peated/server/lib/search";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -75,17 +72,7 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
         .where(eq(bottleSeries.id, bottle.seriesId))
     : [];
 
-  const searchVector =
-    buildBottleSearchVector(
-      bottle,
-      brand,
-      [...referenceList, ...aliasList],
-      bottler,
-      distillerList,
-      series,
-    ) || null;
-
-  logInfo("Updating search vector for bottle {bottleId}", {
+  logInfo("Updating search documents for bottle {bottleId}", {
     extra: {
       bottleId: bottle.id,
     },
@@ -93,9 +80,15 @@ export default async function indexBottleSearchVectors(input: JobPayload) {
 
   await db
     .update(bottles)
-    .set({
-      searchVector,
-      ...buildBottleSearchDocuments(searchVector),
-    })
+    .set(
+      buildBottleSearchDocuments(
+        bottle,
+        brand,
+        [...referenceList, ...aliasList],
+        bottler,
+        distillerList,
+        series,
+      ),
+    )
     .where(eq(bottles.id, bottle.id));
 }
