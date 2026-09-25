@@ -29,3 +29,29 @@ test("prefixes alphabetic tokens without expanding numeric identifiers", () => {
     'speyside* AND "199"',
   );
 });
+
+test("drops words shared by most whiskies from a broad OR search", () => {
+  expect(
+    bottleTextQuery("Arran 14-year-old Single Malt Scotch Whisky", {
+      any: true,
+    }),
+  ).toBe('"arran" OR "14-year-old"');
+  expect(
+    bottleTextQuery("Arran 14-year-old Single Malt Scotch Whisky", {
+      any: true,
+      fuzzy: true,
+    }),
+  ).toBe('arran~1 OR "14-year-old"');
+});
+
+test("keeps every word when a broad search has only shared words", () => {
+  expect(bottleTextQuery("Single Malt Scotch Whisky", { any: true })).toBe(
+    '"single" OR "malt" OR "scotch" OR "whisky"',
+  );
+});
+
+test("keeps shared words in an AND search", () => {
+  expect(bottleTextQuery("Old Pulteney 12", { prefix: true })).toBe(
+    'old* AND pulteney* AND "12"',
+  );
+});

@@ -84,10 +84,13 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(omit(entity, "name", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "name", "searchVector", "updatedAt"),
+    expect(
+      omit(entity, "name", "normalizedName", "searchVector", "updatedAt"),
+    ).toEqual(
+      omit(newEntity, "name", "normalizedName", "searchVector", "updatedAt"),
     );
     expect(newEntity.name).toBe("Delicious Wood");
+    expect(newEntity.normalizedName).toBe("deliciouswood");
 
     const [change] = await db
       .select()
@@ -623,9 +626,24 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(
-      omit(entityBeforeUpdate, "shortName", "searchVector", "updatedAt"),
-    ).toEqual(omit(newEntity, "shortName", "searchVector", "updatedAt"));
+      omit(
+        entityBeforeUpdate,
+        "shortName",
+        "normalizedShortName",
+        "searchVector",
+        "updatedAt",
+      ),
+    ).toEqual(
+      omit(
+        newEntity,
+        "shortName",
+        "normalizedShortName",
+        "searchVector",
+        "updatedAt",
+      ),
+    );
     expect(newEntity.shortName).toBe("F");
+    expect(newEntity.normalizedShortName).toBe("f");
 
     const [newBottle] = await db
       .select()

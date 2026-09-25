@@ -374,31 +374,96 @@ export default implement(bottleListContract).handler(async function ({
       orderBy = desc(bottles.publicReviewAndTastingCount);
   }
 
-  const [results, [totalRow]] = await Promise.all([
-    db
+  const exactFirst = exactReferenceBottleIds.length
+    ? [
+        sql`CASE WHEN ${bottles.id} IN (${sql.join(
+          exactReferenceBottleIds.map((bottleId) => sql`${bottleId}`),
+          sql`, `,
+        )}) THEN 0 ELSE 1 END`,
+      ]
+    : [];
+
+  let results: (typeof bottles.$inferSelect)[];
+  let total: number;
+  if (query && rest.sort === "rank") {
+    // TIN rule (bottle-search.md): keep ranked text retrieval in the
+    // score-order-and-limit shape. Rank enough matches for this page, then load
+    // and order the page from those ids. Exact reference matches always lead.
+    const wanted = offset + limit + 1;
+    const [matches, exactRows] = await Promise.all([
+      db
+        .select({ id: bottles.id, score: bottleTextScore })
+        .from(bottles)
+        .where(and(...resultWhere))
+        .orderBy(desc(bottleTextScore))
+        .limit(wanted),
+      exactReferenceBottleIds.length
+        ? db
+            .select({ id: bottles.id })
+            .from(bottles)
+            .where(
+              and(...resultWhere, inArray(bottles.id, exactReferenceBottleIds)),
+            )
+            .orderBy(asc(bottles.id))
+        : Promise.resolve([]),
+    ]);
+    const rankedIds = [
+      ...new Set([
+        ...exactRows.map((row) => row.id),
+        // A row that matched only by exact reference id carries no text score.
+        ...matches
+          .sort(
+            (a, b) =>
+              Number(b.score ?? 0) - Number(a.score ?? 0) || a.id - b.id,
+          )
+          .map((row) => row.id),
+      ]),
+    ];
+    const pageIds = rankedIds.slice(offset, offset + limit + 1);
+    const pageRows = pageIds.length
+      ? await db
+          .select({ ...getTableColumns(bottles) })
+          .from(bottles)
+          .where(inArray(bottles.id, pageIds))
+      : [];
+    const rowsById = new Map(pageRows.map((row) => [row.id, row]));
+    results = pageIds.flatMap((id) => {
+      const row = rowsById.get(id);
+      return row ? [row] : [];
+    });
+    total =
+      matches.length < wanted
+        ? rankedIds.length
+        : await db
+            .select({ count: sql<string>`COUNT(*)` })
+            .from(bottles)
+            .where(and(...resultWhere))
+            .then(([row]) => Number(row?.count ?? 0));
+  } else {
+    const page = db
       .select({ ...getTableColumns(bottles) })
       .from(bottles)
-      .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(and(...resultWhere))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(
-        ...(exactReferenceBottleIds.length
-          ? [
-              sql`CASE WHEN ${bottles.id} IN (${sql.join(
-                exactReferenceBottleIds.map((bottleId) => sql`${bottleId}`),
-                sql`, `,
-              )}) THEN 0 ELSE 1 END`,
-              orderBy,
-              asc(bottles.id),
-            ]
-          : [orderBy, asc(bottles.id)]),
-      ),
-    db
-      .select({ count: sql<string>`COUNT(*)` })
-      .from(bottles)
-      .where(and(...resultWhere)),
-  ]);
+      .orderBy(...exactFirst, orderBy, asc(bottles.id));
+    // Only the brand sort reads the Brand; every other sort keeps the scan on
+    // bottle alone.
+    results =
+      rest.sort === "brand"
+        ? await page.innerJoin(entities, eq(entities.id, bottles.brandId))
+        : await page;
+    // A short page proves the total unless it is an empty page past the first;
+    // count only when the page cannot.
+    total =
+      results.length <= limit && (results.length > 0 || offset === 0)
+        ? offset + results.length
+        : await db
+            .select({ count: sql<string>`COUNT(*)` })
+            .from(bottles)
+            .where(and(...resultWhere))
+            .then(([row]) => Number(row?.count ?? 0));
+  }
 
   return {
     results: await serialize(
@@ -408,7 +473,7 @@ export default implement(bottleListContract).handler(async function ({
       ["description", "tastingNotes"],
       { includeGroupSummary: true },
     ),
-    total: Number(totalRow?.count ?? 0),
+    total,
     followedEntityCount: followedEntityIds?.length ?? null,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,

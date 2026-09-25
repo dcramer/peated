@@ -28,6 +28,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
+import type { SQL } from "drizzle-orm";
 import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -52,6 +53,20 @@ const candidateColumns = {
   singleCask: bottles.singleCask,
   caskStrength: bottles.caskStrength,
 };
+
+// TIN rule (bottle-search.md): keep text retrieval in the score-order-and-limit
+// shape. Break score ties in memory instead of in the ORDER BY.
+async function rankedTextCandidates(where: SQL | undefined) {
+  const rows = await db
+    .select({ ...candidateColumns, score: bottleTextScore })
+    .from(bottles)
+    .where(where)
+    .orderBy(desc(bottleTextScore))
+    .limit(50);
+  return rows
+    .sort((a, b) => b.score - a.score || a.id - b.id)
+    .map(({ score: _score, ...row }) => row);
+}
 
 const IdentityChoiceSchema = z.object({
   id: z.number().int().positive().nullish(),
@@ -151,12 +166,7 @@ export default procedure
     // relationships before the global text limit can crowd out a rare release.
     // Keep text discovery independent because draft relationships can be wrong.
     const [textRows, identityRows, referenceRows] = await Promise.all([
-      db
-        .select(candidateColumns)
-        .from(bottles)
-        .where(and(active, bottleTextPredicate(tinQuery)))
-        .orderBy(desc(bottleTextScore), bottles.id)
-        .limit(50),
+      rankedTextCandidates(and(active, bottleTextPredicate(tinQuery))),
       identity
         ? db
             .select(candidateColumns)
@@ -198,12 +208,9 @@ export default procedure
       });
       if (fuzzy !== tinQuery)
         textRows.push(
-          ...(await db
-            .select(candidateColumns)
-            .from(bottles)
-            .where(and(active, bottleTextPredicate(fuzzy)))
-            .orderBy(desc(bottleTextScore))
-            .limit(50)),
+          ...(await rankedTextCandidates(
+            and(active, bottleTextPredicate(fuzzy)),
+          )),
         );
     }
     const candidateRows = [

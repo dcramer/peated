@@ -12,6 +12,7 @@ import {
   getQueueBaseWhere,
   getQueueIsProcessingSql,
   getQueueStateFilter,
+  getQueueWhere,
   QueueListInputSchema,
 } from "./filters";
 import { serializeQueueItems } from "./utils";
@@ -21,19 +22,8 @@ type QueueStats = {
   processingCount: number;
 };
 
-function queueStatsSelection() {
-  return {
-    actionableCount:
-      sql<number>`count(*) filter (where ${getQueueStateFilter("actionable")}) over()::int`.as(
-        "actionable_count",
-      ),
-    processingCount:
-      sql<number>`count(*) filter (where ${getQueueStateFilter("processing")}) over()::int`.as(
-        "processing_count",
-      ),
-  };
-}
-
+// Queue list rule: the page and the counts read the same filtered queue, so the
+// counts stay true for the page. Count once instead of on every row.
 async function queryQueueStats(baseWhere: SQL): Promise<QueueStats> {
   const [stats] = await db
     .select({
@@ -68,79 +58,50 @@ export default procedure
   .output(StorePriceMatchQueueListResponse)
   .handler(async function ({ input, context, errors }) {
     const offset = (input.cursor - 1) * input.limit;
-    const baseWhere = getQueueBaseWhere(input);
-    const queueMatches = db
-      .select({
-        proposalId: storePriceMatchProposals.id,
-        createdAt: storePriceMatchProposals.createdAt,
-        updatedAt: storePriceMatchProposals.updatedAt,
-        processingQueuedAt: storePriceMatchProposals.processingQueuedAt,
-        isProcessing: getQueueIsProcessingSql().as("is_processing"),
-        ...queueStatsSelection(),
-      })
-      .from(storePriceMatchProposals)
-      .innerJoin(
-        storePrices,
-        eq(storePrices.id, storePriceMatchProposals.priceId),
-      )
-      .innerJoin(
-        externalSites,
-        eq(externalSites.id, storePrices.externalSiteId),
-      )
-      .where(baseWhere)
-      .as("queue_matches");
-
-    const queueStateWhere = eq(
-      queueMatches.isProcessing,
-      input.state === "processing",
-    );
     const orderBy =
       input.sort === "created"
-        ? [asc(queueMatches.createdAt), asc(queueMatches.proposalId)]
+        ? [
+            asc(storePriceMatchProposals.createdAt),
+            asc(storePriceMatchProposals.id),
+          ]
         : input.sort === "-created"
-          ? [desc(queueMatches.createdAt), desc(queueMatches.proposalId)]
+          ? [
+              desc(storePriceMatchProposals.createdAt),
+              desc(storePriceMatchProposals.id),
+            ]
           : input.state === "processing"
             ? [
-                desc(queueMatches.processingQueuedAt),
-                desc(queueMatches.proposalId),
+                desc(storePriceMatchProposals.processingQueuedAt),
+                desc(storePriceMatchProposals.id),
               ]
-            : [desc(queueMatches.updatedAt), desc(queueMatches.proposalId)];
+            : [
+                desc(storePriceMatchProposals.updatedAt),
+                desc(storePriceMatchProposals.id),
+              ];
 
-    const rows = await db
-      .select({
-        isProcessing: queueMatches.isProcessing,
-        actionableCount: queueMatches.actionableCount,
-        processingCount: queueMatches.processingCount,
-        proposal: storePriceMatchProposals,
-        price: storePrices,
-        site: externalSites,
-      })
-      .from(queueMatches)
-      .innerJoin(
-        storePriceMatchProposals,
-        eq(storePriceMatchProposals.id, queueMatches.proposalId),
-      )
-      .innerJoin(
-        storePrices,
-        eq(storePrices.id, storePriceMatchProposals.priceId),
-      )
-      .innerJoin(
-        externalSites,
-        eq(externalSites.id, storePrices.externalSiteId),
-      )
-      .where(queueStateWhere)
-      .orderBy(...orderBy)
-      .limit(input.limit + 1)
-      .offset(offset);
-
-    // Queue list rule: count both states from the same filtered scan as the
-    // page. Only run the separate count when the requested page has no rows.
-    const stats = rows[0]
-      ? {
-          actionableCount: rows[0].actionableCount,
-          processingCount: rows[0].processingCount,
-        }
-      : await queryQueueStats(baseWhere);
+    const [rows, stats] = await Promise.all([
+      db
+        .select({
+          isProcessing: getQueueIsProcessingSql(),
+          proposal: storePriceMatchProposals,
+          price: storePrices,
+          site: externalSites,
+        })
+        .from(storePriceMatchProposals)
+        .innerJoin(
+          storePrices,
+          eq(storePrices.id, storePriceMatchProposals.priceId),
+        )
+        .innerJoin(
+          externalSites,
+          eq(externalSites.id, storePrices.externalSiteId),
+        )
+        .where(getQueueWhere(input))
+        .orderBy(...orderBy)
+        .limit(input.limit + 1)
+        .offset(offset),
+      queryQueueStats(getQueueBaseWhere(input)),
+    ]);
 
     const hasNextPage = rows.length > input.limit;
     const queueRows = rows.slice(0, input.limit).map((row) => ({

@@ -41,6 +41,14 @@ export const entities = pgTable(
 
     name: text("name").notNull(),
     shortName: text("short_name"),
+    // Classifier lookup rule (classifierEntitySearch): compare names by their
+    // stored letters and digits so lookups never normalize every row per query.
+    normalizedName: text("normalized_name").generatedAlwaysAs(
+      sql`regexp_replace(lower(coalesce(name, '')), '[^a-z0-9]+', '', 'g')`,
+    ),
+    normalizedShortName: text("normalized_short_name").generatedAlwaysAs(
+      sql`regexp_replace(lower(coalesce(short_name, '')), '[^a-z0-9]+', '', 'g')`,
+    ),
 
     ownerId: bigint("owner_id", { mode: "number" }),
 
@@ -98,6 +106,8 @@ export const entities = pgTable(
   },
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
+    index("entity_normalized_name_idx").on(table.normalizedName),
+    index("entity_normalized_short_name_idx").on(table.normalizedShortName),
     index("entity_search_names_tin_idx").using("tin", table.searchNames),
     index("entity_public_activity_count_idx").on(
       table.publicReviewAndTastingCount,
@@ -211,6 +221,9 @@ export const entityReferences = pgTable(
       () => entities.id,
     ),
     name: varchar("name", { length: 255 }).notNull(),
+    normalizedName: text("normalized_name").generatedAlwaysAs(
+      sql`regexp_replace(lower(coalesce(name, '')), '[^a-z0-9]+', '', 'g')`,
+    ),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -219,6 +232,7 @@ export const entityReferences = pgTable(
       "btree",
       sql`LOWER(${table.name})`,
     ),
+    index("entity_reference_normalized_name_idx").on(table.normalizedName),
   ],
 );
 

@@ -47,9 +47,18 @@ alphabetic prefixes. Candidate discovery uses a broad word query and, on an empt
 text result, one spelling fallback with edit distance one. Numeric and mixed
 letter/number identifiers never receive fuzzy or prefix expansion.
 
-Keep text retrieval in the supported score-order-and-limit shape. Compare identity
-facts after bounded retrieval, rather than sorting the whole catalog in application
-code. See [PlanetScale query shapes](https://planetscale.com/docs/postgres/search/reference/sql-shapes).
+Broad word queries drop words that describe almost every whisky, such as
+"single", "malt", "scotch", and "year", when any other word remains. An OR over
+those words matches most of the catalog and scores every match for nothing. AND
+and phrase queries keep every word.
+
+Keep ranked text retrieval in the supported score-order-and-limit shape: filter on
+`bottle` columns, order by `tin.score` alone, and limit. Break ties, join the
+Brand, and page in memory or in an outer query over the winning ids. Compare
+identity facts after bounded retrieval, rather than sorting the whole catalog in
+application code. A page shorter than its limit already proves the total, so run
+the count query only when more rows exist. See
+[PlanetScale query shapes](https://planetscale.com/docs/postgres/search/reference/sql-shapes).
 
 ## Rebuilding documents
 
