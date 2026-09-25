@@ -1,12 +1,52 @@
 import { sql } from "drizzle-orm";
 import { bottles } from "../db/schema";
 
+// Broad-query rule (bottle-search.md): words that describe almost every
+// whisky add nothing to an OR search, but an OR over them matches most of
+// the catalog and TIN must score every match. Drop them when a query keeps
+// at least one other word. AND and phrase searches keep every word.
+const BROAD_QUERY_STOP_TOKENS = new Set([
+  "a",
+  "aged",
+  "blend",
+  "blended",
+  "bottle",
+  "bottled",
+  "bottling",
+  "bourbon",
+  "cask",
+  "casks",
+  "distillery",
+  "edition",
+  "finish",
+  "finished",
+  "in",
+  "irish",
+  "limited",
+  "malt",
+  "malts",
+  "of",
+  "old",
+  "proof",
+  "release",
+  "rye",
+  "scotch",
+  "single",
+  "strength",
+  "the",
+  "whiskey",
+  "whisky",
+  "with",
+  "year",
+  "years",
+]);
+
 /** Compile literal input to bounded TINQL; callers never supply TIN operators. */
 export function bottleTextQuery(
   input: string,
   { any = false, fuzzy = false, prefix = false } = {},
 ) {
-  const tokens = [
+  const allTokens = [
     ...new Set(
       input
         .normalize("NFKC")
@@ -15,9 +55,13 @@ export function bottleTextQuery(
           /[\p{Letter}\p{Number}]+(?:[.'’/-][\p{Letter}\p{Number}]+)*/gu,
         ) ?? [],
     ),
-  ]
-    .filter((token) => !["and", "or", "not"].includes(token))
-    .slice(0, 32);
+  ].filter((token) => !["and", "or", "not"].includes(token));
+  const distinctiveTokens = any
+    ? allTokens.filter((token) => !BROAD_QUERY_STOP_TOKENS.has(token))
+    : allTokens;
+  const tokens = (
+    distinctiveTokens.length ? distinctiveTokens : allTokens
+  ).slice(0, 32);
   return tokens
     .map((token) => {
       const literal = `"${token}"`;

@@ -28,10 +28,6 @@ function normalizeEntityLookupText(value: string) {
     .trim();
 }
 
-function normalizedSql(value: any) {
-  return sql`regexp_replace(lower(coalesce(${value}, '')), '[^a-z0-9]+', '', 'g')`;
-}
-
 function mergeResult(
   results: Map<number, ClassifierEntityResolution>,
   candidate: ClassifierEntityResolution,
@@ -88,13 +84,13 @@ export async function searchClassifierEntities(
             args.query.toLowerCase(),
           ),
           normalizedQuery
-            ? eq(normalizedSql(entities.name), normalizedQuery)
+            ? eq(entities.normalizedName, normalizedQuery)
             : undefined,
           normalizedQuery
-            ? eq(normalizedSql(entities.shortName), normalizedQuery)
+            ? eq(entities.normalizedShortName, normalizedQuery)
             : undefined,
           normalizedQuery
-            ? eq(normalizedSql(entityReferences.name), normalizedQuery)
+            ? eq(entityReferences.normalizedName, normalizedQuery)
             : undefined,
         ),
       ),
@@ -184,28 +180,28 @@ export async function searchClassifierEntities(
   const matchingReference = sql<string | null>`(
     array_agg(
       ${entityReferences.name}
-      ORDER BY length(${normalizedSql(entityReferences.name)}) DESC, ${entityReferences.name}
+      ORDER BY length(${entityReferences.normalizedName}) DESC, ${entityReferences.name}
     ) FILTER (
-      WHERE length(${normalizedSql(entityReferences.name)}) >= 4
-        AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityReferences.name)} || '%'
+      WHERE length(${entityReferences.normalizedName}) >= 4
+        AND ${normalizedQuery} LIKE '%' || ${entityReferences.normalizedName} || '%'
     )
   )[1]`;
   const matchingNameLength = sql<number>`CASE
-    WHEN length(${normalizedSql(entities.name)}) >= 4
-      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.name)} || '%'
-    THEN length(${normalizedSql(entities.name)})
+    WHEN length(${entities.normalizedName}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${entities.normalizedName} || '%'
+    THEN length(${entities.normalizedName})
     ELSE 0
   END`;
   const matchingShortNameLength = sql<number>`CASE
-    WHEN length(${normalizedSql(entities.shortName)}) >= 4
-      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.shortName)} || '%'
-    THEN length(${normalizedSql(entities.shortName)})
+    WHEN length(${entities.normalizedShortName}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${entities.normalizedShortName} || '%'
+    THEN length(${entities.normalizedShortName})
     ELSE 0
   END`;
   const matchingReferenceLength = sql<number>`coalesce(max(CASE
-    WHEN length(${normalizedSql(entityReferences.name)}) >= 4
-      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityReferences.name)} || '%'
-    THEN length(${normalizedSql(entityReferences.name)})
+    WHEN length(${entityReferences.normalizedName}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${entityReferences.normalizedName} || '%'
+    THEN length(${entityReferences.normalizedName})
     ELSE 0
   END), 0)`;
   const containedSpecificity = sql<number>`GREATEST(
@@ -229,9 +225,9 @@ export async function searchClassifierEntities(
           and(
             args.kind ? eq(entities.kind, args.kind) : undefined,
             or(
-              sql`length(${normalizedSql(entities.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.name)} || '%'`,
-              sql`length(${normalizedSql(entities.shortName)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.shortName)} || '%'`,
-              sql`length(${normalizedSql(entityReferences.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityReferences.name)} || '%'`,
+              sql`length(${entities.normalizedName}) >= 4 AND ${normalizedQuery} LIKE '%' || ${entities.normalizedName} || '%'`,
+              sql`length(${entities.normalizedShortName}) >= 4 AND ${normalizedQuery} LIKE '%' || ${entities.normalizedShortName} || '%'`,
+              sql`length(${entityReferences.normalizedName}) >= 4 AND ${normalizedQuery} LIKE '%' || ${entityReferences.normalizedName} || '%'`,
             ),
           ),
         )

@@ -2087,6 +2087,13 @@
       "when": 1790300674293,
       "tag": "0297_entity_series_search_documents",
       "breakpoints": false
+    },
+    {
+      "idx": 298,
+      "version": "7",
+      "when": 1790302669753,
+      "tag": "0298_entity_normalized_names",
+      "breakpoints": false
     }
   ]
 }

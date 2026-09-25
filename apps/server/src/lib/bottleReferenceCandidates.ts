@@ -878,7 +878,17 @@ async function getTextCandidates(
     return [];
   }
   const tinQuery = bottleTextQuery(queryText, { any: true });
+  // TIN rule (bottle-search.md): rank in the score-order-and-limit shape, then
+  // join the Brand only for the rows that won.
   const rows = await runQuery(sql`
+    WITH matches AS (
+      SELECT ${bottles.id} AS id, ${bottleTextScore} AS score
+      FROM ${bottles}
+      WHERE ${bottleTextPredicate(tinQuery)}
+        AND ${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})
+      ORDER BY score DESC
+      LIMIT ${TEXT_CANDIDATE_LIMIT}
+    )
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
@@ -895,13 +905,11 @@ async function getTextCandidates(
       ${bottles.maturation} AS "maturation",
       ${bottles.caskNumber} AS "caskNumber",
       ${bottles.outturn} AS "outturn",
-      ${bottleTextScore} AS score
-    FROM ${bottles}
+      matches.score AS score
+    FROM matches
+    INNER JOIN ${bottles} ON ${bottles.id} = matches.id
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
-    WHERE ${bottleTextPredicate(tinQuery)}
-      AND ${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})
-    ORDER BY score DESC, ${bottles.fullName} ASC
-    LIMIT ${TEXT_CANDIDATE_LIMIT}
+    ORDER BY matches.score DESC, ${bottles.fullName} ASC
   `);
 
   return rows.map((row) => buildBottleCandidate(row, "text"));
