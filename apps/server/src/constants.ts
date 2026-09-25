@@ -82,6 +82,7 @@ export const EXTERNAL_SITE_DEFINITIONS = {
   glenallachie: { name: "The GlenAllachie", initialRunEvery: 10080 },
   gordonmacphail: { name: "Gordon Macphail", initialRunEvery: 10080 },
   healthyspirits: { name: "Healthy Spirits", initialRunEvery: 10080 },
+  kegnbottle: { name: "Keg N Bottle", initialRunEvery: 10080 },
   kilchoman: { name: "Kilchoman", initialRunEvery: 10080 },
   masterofmalt: { name: "Master of Malt", initialRunEvery: 10080 },
   missionliquor: { name: "Mission Liquor", initialRunEvery: 10080 },

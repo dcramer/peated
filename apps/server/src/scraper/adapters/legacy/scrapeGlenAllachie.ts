@@ -2,17 +2,17 @@ import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
+import { scrapeShopifyProducts } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import {
   getShopifyImageUrl,
   getShopifyProductTitle,
   getShopifyStorePriceIdentity,
   parseShopifyPrice,
-  scrapeShopifyProducts,
   ShopifyCatalogSchema,
   ShopifyProductSchema,
   ShopifyVariantSchema,
-} from "../../legacy/shopify";
-import type { JsonValue } from "../../types";
+} from "../shopify";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "glenallachie";

@@ -14,6 +14,7 @@ const registeredSources = [
   "fredminnick",
   "glenallachie",
   "healthyspirits",
+  "kegnbottle",
   "masterofmalt",
   "missionliquor",
   "reservebar",

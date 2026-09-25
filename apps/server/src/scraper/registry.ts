@@ -9,6 +9,11 @@ import {
   FredMinnickCursorSchema,
   FredMinnickObservationSchema,
 } from "./adapters/fredMinnick";
+import {
+  kegnbottleAdapter,
+  KegnbottleCursorSchema,
+  KegnbottleObservationSchema,
+} from "./adapters/kegnbottle";
 import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeDouglasLaing from "./adapters/legacy/scrapeDouglasLaing";
@@ -32,7 +37,6 @@ import {
 import {
   createLegacyPriceAdapter,
   LegacyPriceCursorSchema,
-  StorePriceBatchSchema,
 } from "./adapters/legacyPrice";
 import {
   whiskyAdvocateAdapter,
@@ -52,7 +56,10 @@ import {
 import { loadSingleCaskNationReleases } from "./singleCaskNationReleases";
 import { createBottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
-import { createStorePriceSink } from "./sinks/storePrices";
+import {
+  createStorePriceSink,
+  StorePriceBatchSchema,
+} from "./sinks/storePrices";
 
 // TODO(scraper-source-migration): Delete these HTML adapters after every site
 // uses saved parsing rules. New HTML sources must use those rules.
@@ -271,6 +278,15 @@ export const scraperRegistry = createScraperRegistry({
       ],
     }),
     defineScrapeTarget({
+      key: "kegnbottle",
+      origins: [
+        {
+          origin: "https://kegnbottle.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
       key: "kilchoman",
       origins: [
         {
@@ -401,6 +417,16 @@ export const scraperRegistry = createScraperRegistry({
         sink: createBottleObservationSink(source.type),
       }),
     ),
+    defineScraperSource({
+      key: "kegnbottle",
+      externalSiteKey: "kegnbottle",
+      recordType: "price",
+      targetKeys: ["kegnbottle"],
+      cursorSchema: KegnbottleCursorSchema,
+      observationSchema: KegnbottleObservationSchema,
+      adapter: kegnbottleAdapter,
+      sink: createStorePriceSink("kegnbottle"),
+    }),
     // TODO(scraper-source-migration): Remove each remaining HTML review
     // definition after its publisher turns on saved parsing rules.
     defineScraperSource({

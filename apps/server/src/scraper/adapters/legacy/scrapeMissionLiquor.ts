@@ -3,17 +3,17 @@ import { ALLOWED_VOLUMES } from "@peated/server/constants";
 import { z } from "zod";
 import type { ScrapePricesCallback, StorePrice } from "../../legacy/scraper";
 import scrapePrices from "../../legacy/scraper";
+import { scrapeShopifyProducts } from "../../legacy/shopify";
+import type { JsonValue } from "../../types";
 import {
   getShopifyImageUrl,
   getShopifyProductTitle,
   getShopifyStorePriceIdentity,
   parseShopifyPrice,
-  scrapeShopifyProducts,
   ShopifyCatalogSchema,
   ShopifyProductSchema,
   ShopifyVariantSchema,
-} from "../../legacy/shopify";
-import type { JsonValue } from "../../types";
+} from "../shopify";
 import { logScrapedProduct, logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "missionliquor";

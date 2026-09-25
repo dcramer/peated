@@ -1,5 +1,7 @@
 import program from "@peated/cli/program";
 import { runLocalScrapeSourcePreview } from "@peated/server/scraper/localPreview";
+import { runLocalScraperSource } from "@peated/server/scraper/localRun";
+import { disconnectConnection } from "@peated/server/worker/redis";
 import { readFile } from "node:fs/promises";
 import { z } from "zod";
 
@@ -36,7 +38,9 @@ async function readPreviewFile(path: string) {
 
 const subcommand = program
   .command("scrapers")
-  .description("Test scraper parsing rules through the local runtime");
+  .description(
+    "Run scraper sources and parsing rules through the local runtime",
+  );
 
 subcommand
   .command("preview")
@@ -65,4 +69,31 @@ subcommand
       },
     );
     console.log(JSON.stringify(result, null, 2));
+  });
+
+subcommand
+  .command("run")
+  .description(
+    "Run a built-in source and save its results to the local database",
+  )
+  .requiredOption("--site <key>", "Site key of a built-in source")
+  .action(async (options) => {
+    try {
+      const run = await runLocalScraperSource(
+        { site: options.site },
+        {
+          onWaiting: (nextAttemptAt) => {
+            console.error(
+              `Waiting until ${nextAttemptAt.toISOString()} before continuing the run.`,
+            );
+          },
+        },
+      );
+      const { executionToken: _token, ...summary } = run;
+      console.log(JSON.stringify(summary, null, 2));
+    } finally {
+      // Saved results queue follow-up jobs; their Redis connection would
+      // otherwise keep the command from exiting.
+      disconnectConnection();
+    }
   });
