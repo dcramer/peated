@@ -810,7 +810,7 @@ export async function finalizeBottleReferenceAssignment(
   }
 
   try {
-    await pushUniqueJob("IndexBottleSearchVectors", { bottleId });
+    await pushUniqueJob("IndexBottleSearch", { bottleId });
   } catch (err) {
     logError(err, contexts);
   }
@@ -1112,7 +1112,7 @@ export async function correctBottleReference(
       ),
     )) {
       try {
-        await pushUniqueJob("IndexBottleSearchVectors", {
+        await pushUniqueJob("IndexBottleSearch", {
           bottleId: changedBottleId,
         });
       } catch (err) {

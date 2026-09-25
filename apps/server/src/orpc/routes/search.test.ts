@@ -10,9 +10,9 @@ import {
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import indexBottleSearchVectors from "@peated/server/worker/jobs/indexBottleSearchVectors";
-import indexBottleSeriesSearchVectors from "@peated/server/worker/jobs/indexBottleSeriesSearchVectors";
-import indexEntitySearchVectors from "@peated/server/worker/jobs/indexEntitySearchVectors";
+import indexBottleSearch from "@peated/server/worker/jobs/indexBottleSearch";
+import indexBottleSeriesSearch from "@peated/server/worker/jobs/indexBottleSeriesSearch";
+import indexEntitySearch from "@peated/server/worker/jobs/indexEntitySearch";
 import { describe, expect, test } from "vitest";
 
 test("finds a Bottle by a display alias without exact-match authority", async ({
@@ -23,7 +23,7 @@ test("finds a Bottle by a display alias without exact-match authority", async ({
     bottleId: bottle.id,
     name: "Marketed Moonneedle",
   });
-  await indexBottleSearchVectors({ bottleId: bottle.id });
+  await indexBottleSearch({ bottleId: bottle.id });
 
   const data = await routerClient.search({
     query: "marketed moonneedle",
@@ -121,8 +121,8 @@ test("finds Series with Brand context and indicates more results", async ({
     numReleases: 4,
   });
   await Promise.all([
-    indexBottleSeriesSearchVectors({ seriesId: first.id }),
-    indexBottleSeriesSearchVectors({ seriesId: second.id }),
+    indexBottleSeriesSearch({ seriesId: first.id }),
+    indexBottleSeriesSearch({ seriesId: second.id }),
   ]);
 
   const data = await routerClient.search({
@@ -529,7 +529,7 @@ test("finds an Entity by a display alias without exact-match authority", async (
     entityId: entity.id,
     name: "Marketed Entity Name",
   });
-  await indexEntitySearchVectors({ entityId: entity.id });
+  await indexEntitySearch({ entityId: entity.id });
 
   const data = await routerClient.search({
     query: "Marketed Entity Name",

@@ -3,7 +3,7 @@ import { bottleSeries } from "@peated/server/db/schema";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
-import indexBottleSeriesSearchVectors from "./indexBottleSeriesSearchVectors";
+import indexBottleSeriesSearch from "./indexBottleSeriesSearch";
 
 beforeEach(() => {
   vi.mocked(workerClient.pushUniqueJob).mockClear();
@@ -11,7 +11,7 @@ beforeEach(() => {
 
 test("skips stale work for a deleted BottleSeries", async () => {
   await expect(
-    indexBottleSeriesSearchVectors({ seriesId: 2_147_483_647 }),
+    indexBottleSeriesSearch({ seriesId: 2_147_483_647 }),
   ).resolves.toBeUndefined();
   expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 });
@@ -32,7 +32,7 @@ test("writes a Series search document that TIN can query", async ({
     .set({ searchNames: "" })
     .where(eq(bottleSeries.id, series.id));
 
-  await indexBottleSeriesSearchVectors({ seriesId: series.id });
+  await indexBottleSeriesSearch({ seriesId: series.id });
 
   const [row] = await db
     .select({ searchNames: bottleSeries.searchNames })

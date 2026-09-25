@@ -531,7 +531,7 @@ export async function finalizeEntityUpdate(
       );
     for (const { id: bottleId } of relatedBottles) {
       try {
-        await pushUniqueJob("IndexBottleSearchVectors", { bottleId });
+        await pushUniqueJob("IndexBottleSearch", { bottleId });
       } catch (error) {
         logError(error, { extra: { bottleId }, entity: result.entity });
       }

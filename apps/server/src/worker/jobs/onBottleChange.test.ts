@@ -26,7 +26,7 @@ test("dispatches derived work for the supplied Bottle", async ({
     "GenerateBottleDetails",
     expect.anything(),
   );
-  expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearchVectors", {
+  expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearch", {
     bottleId: bottle.id,
   });
   expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
@@ -47,7 +47,7 @@ test("generates details only when explicitly requested", async ({
     "GenerateBottleDetails",
     { bottleId: bottle.id },
   );
-  expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearchVectors", {
+  expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearch", {
     bottleId: bottle.id,
   });
 });

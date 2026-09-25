@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import generateEntityDetails from "./generateEntityDetails";
 import geocodeEntityLocation from "./geocodeEntityLocation";
-import indexEntitySearchVectors from "./indexEntitySearchVectors";
+import indexEntitySearch from "./indexEntitySearch";
 
 const originalAiGatewayApiKey = config.AI_GATEWAY_API_KEY;
 const originalGoogleMapsApiKey = config.GOOGLE_MAPS_API_KEY;
@@ -21,6 +21,6 @@ test("skips stale derived work for a deleted Entity", async () => {
   const entityId = 2_147_483_647;
 
   await expect(generateEntityDetails({ entityId })).resolves.toBeUndefined();
-  await expect(indexEntitySearchVectors({ entityId })).resolves.toBeUndefined();
+  await expect(indexEntitySearch({ entityId })).resolves.toBeUndefined();
   await expect(geocodeEntityLocation({ entityId })).resolves.toBeUndefined();
 });

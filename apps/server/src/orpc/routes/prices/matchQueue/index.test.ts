@@ -2201,7 +2201,7 @@ describe("price match queue", () => {
       expect.anything(),
     );
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       expect.anything(),
     );
   });

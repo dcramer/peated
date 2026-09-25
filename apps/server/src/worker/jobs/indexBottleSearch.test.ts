@@ -7,9 +7,9 @@ import {
 } from "@peated/server/lib/textSearch";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-import indexBottleSearchVectors from "./indexBottleSearchVectors";
+import indexBottleSearch from "./indexBottleSearch";
 
-async function searchVectorMatches(bottleId: number, query: string) {
+async function searchMatches(bottleId: number, query: string) {
   const [result] = await db
     .select({ matches: bottleTextPredicate(textSearchQuery(query)) })
     .from(bottles)
@@ -19,7 +19,7 @@ async function searchVectorMatches(bottleId: number, query: string) {
   return result.matches;
 }
 
-describe("indexBottleSearchVectors", () => {
+describe("indexBottleSearch", () => {
   test("indexes durable Bottle identity and directly owned accepted aliases", async ({
     fixtures,
   }) => {
@@ -80,39 +80,27 @@ describe("indexBottleSearchVectors", () => {
       .update(bottles)
       .set({ searchNames: "", searchTerms: "" })
       .where(eq(bottles.id, bottle.id));
-    await indexBottleSearchVectors({ bottleId: bottle.id });
+    await indexBottleSearch({ bottleId: bottle.id });
 
-    expect(
-      await searchVectorMatches(bottle.id, "Promoted Batch Solstice"),
-    ).toBe(true);
-    expect(await searchVectorMatches(bottle.id, "1998 vintage")).toBe(true);
-    expect(await searchVectorMatches(bottle.id, "Independent Bottler")).toBe(
+    expect(await searchMatches(bottle.id, "Promoted Batch Solstice")).toBe(
       true,
     );
-    expect(await searchVectorMatches(bottle.id, "Vector Distillery")).toBe(
+    expect(await searchMatches(bottle.id, "1998 vintage")).toBe(true);
+    expect(await searchMatches(bottle.id, "Independent Bottler")).toBe(true);
+    expect(await searchMatches(bottle.id, "Vector Distillery")).toBe(true);
+    expect(await searchMatches(bottle.id, "Searchable Series Zenith")).toBe(
       true,
     );
-    expect(
-      await searchVectorMatches(bottle.id, "Searchable Series Zenith"),
-    ).toBe(true);
-    expect(
-      await searchVectorMatches(bottle.id, "Authoritative Alias Aurora"),
-    ).toBe(true);
-    expect(await searchVectorMatches(bottle.id, "Direct Alias Quasar")).toBe(
+    expect(await searchMatches(bottle.id, "Authoritative Alias Aurora")).toBe(
       true,
     );
-    expect(await searchVectorMatches(bottle.id, "Displayed Market Comet")).toBe(
-      true,
-    );
+    expect(await searchMatches(bottle.id, "Direct Alias Quasar")).toBe(true);
+    expect(await searchMatches(bottle.id, "Displayed Market Comet")).toBe(true);
     await expect(
       findBottleReferenceAssignment("Displayed Market Comet"),
     ).resolves.toBeNull();
-    expect(await searchVectorMatches(bottle.id, "Ignored Exact Nebula")).toBe(
-      false,
-    );
-    expect(await searchVectorMatches(bottle.id, "Foreign Direct Pulsar")).toBe(
-      false,
-    );
+    expect(await searchMatches(bottle.id, "Ignored Exact Nebula")).toBe(false);
+    expect(await searchMatches(bottle.id, "Foreign Direct Pulsar")).toBe(false);
     expect(
       await db
         .select({ name: bottleReferences.name })
@@ -129,7 +117,7 @@ describe("indexBottleSearchVectors", () => {
 
   test("skips stale work for a deleted Bottle", async () => {
     await expect(
-      indexBottleSearchVectors({ bottleId: 2_147_483_647 }),
+      indexBottleSearch({ bottleId: 2_147_483_647 }),
     ).resolves.toBeUndefined();
   });
 });

@@ -58,7 +58,7 @@ export default procedure
       );
 
     if (reference.entity) {
-      await pushUniqueJob("IndexEntitySearchVectors", {
+      await pushUniqueJob("IndexEntitySearch", {
         entityId: reference.entity.id,
       });
     }

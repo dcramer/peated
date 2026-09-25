@@ -15,25 +15,21 @@ const SEARCH_SCOPES = {
       eq(bottles.searchTerms, ""),
     ),
     queue: (bottleId: number) =>
-      pushUniqueJob("IndexBottleSearchVectors", { bottleId }, { delay: 0 }),
+      pushUniqueJob("IndexBottleSearch", { bottleId }, { delay: 0 }),
   },
   entities: {
     id: entities.id,
     table: entities,
     missingDocuments: eq(entities.searchNames, ""),
     queue: (entityId: number) =>
-      pushUniqueJob("IndexEntitySearchVectors", { entityId }, { delay: 0 }),
+      pushUniqueJob("IndexEntitySearch", { entityId }, { delay: 0 }),
   },
   series: {
     id: bottleSeries.id,
     table: bottleSeries,
     missingDocuments: eq(bottleSeries.searchNames, ""),
     queue: (seriesId: number) =>
-      pushUniqueJob(
-        "IndexBottleSeriesSearchVectors",
-        { seriesId },
-        { delay: 0 },
-      ),
+      pushUniqueJob("IndexBottleSeriesSearch", { seriesId }, { delay: 0 }),
   },
 };
 

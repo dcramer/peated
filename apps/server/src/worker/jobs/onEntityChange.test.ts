@@ -16,11 +16,9 @@ test("dispatches derived work for an existing Entity", async ({ fixtures }) => {
     "GenerateEntityDetails",
     { entityId: entity.id },
   );
-  expect(workerClient.runJob).toHaveBeenNthCalledWith(
-    1,
-    "IndexEntitySearchVectors",
-    { entityId: entity.id },
-  );
+  expect(workerClient.runJob).toHaveBeenNthCalledWith(1, "IndexEntitySearch", {
+    entityId: entity.id,
+  });
   expect(workerClient.runJob).toHaveBeenNthCalledWith(
     2,
     "GeocodeEntityLocation",

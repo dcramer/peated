@@ -33,7 +33,7 @@ describe("Bottle aliases", () => {
       }),
     ).resolves.toBeUndefined();
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       { bottleId: bottle.id },
     );
   });

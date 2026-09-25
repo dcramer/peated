@@ -32,7 +32,7 @@ test("removes a finished job with the same unique ID so the work can queue again
     const remove = vi.fn();
     const queue = { getJob: async () => ({ ...finished, remove }) };
 
-    await removeFinishedJob(queue, "IndexBottleSearchVectors-1");
+    await removeFinishedJob(queue, "IndexBottleSearch-1");
 
     expect(remove).toHaveBeenCalledOnce();
   }
@@ -48,7 +48,7 @@ test("keeps an unfinished job with the same unique ID", async () => {
     }),
   };
 
-  await removeFinishedJob(queue, "IndexBottleSearchVectors-1");
+  await removeFinishedJob(queue, "IndexBottleSearch-1");
 
   expect(remove).not.toHaveBeenCalled();
 });

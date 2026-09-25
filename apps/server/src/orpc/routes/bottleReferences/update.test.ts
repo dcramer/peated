@@ -135,11 +135,11 @@ describe("PATCH /bottle-references/:reference", () => {
       name,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       { bottleId: source.id },
     );
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       { bottleId: target.id },
     );
     for (const bottle of [source, target]) {

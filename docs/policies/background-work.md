@@ -9,7 +9,7 @@ has completed.
 ## Policy
 
 - Persist the durable product change before dispatching post-save work.
-- Keep AI review, catalog verification, indexing, email, search-vector refresh,
+- Keep AI review, catalog verification, indexing, email, search document refresh,
   and other slow side effects out of the blocking request path when a queued or
   follow-up path can preserve correctness.
 - Persist work state before execution when the job must resume after queue state

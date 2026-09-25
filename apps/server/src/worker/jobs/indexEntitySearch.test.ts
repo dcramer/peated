@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { expect, test } from "vitest";
-import indexEntitySearchVectors from "./indexEntitySearchVectors";
+import indexEntitySearch from "./indexEntitySearch";
 
 test("writes an Entity search document that TIN can query", async ({
   fixtures,
@@ -20,7 +20,7 @@ test("writes an Entity search document that TIN can query", async ({
     .set({ searchNames: "" })
     .where(eq(entities.id, entity.id));
 
-  await indexEntitySearchVectors({ entityId: entity.id });
+  await indexEntitySearch({ entityId: entity.id });
 
   const [row] = await db
     .select({ searchNames: entities.searchNames })
@@ -40,6 +40,6 @@ test("writes an Entity search document that TIN can query", async ({
 
 test("skips stale work for a deleted Entity", async () => {
   await expect(
-    indexEntitySearchVectors({ entityId: 2_147_483_647 }),
+    indexEntitySearch({ entityId: 2_147_483_647 }),
   ).resolves.toBeUndefined();
 });

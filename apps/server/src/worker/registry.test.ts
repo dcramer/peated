@@ -75,7 +75,7 @@ describe("worker registry", () => {
 test("jobs that wait on a model do not share the default queue with indexing", async () => {
   await import("./jobs");
   const registry = (await import("./registry")).default;
-  expect(registry.getQueueName("IndexBottleSearchVectors")).toBe("default");
+  expect(registry.getQueueName("IndexBottleSearch")).toBe("default");
   expect(registry.getQueueName("UpdateBottleStats")).toBe("default");
   for (const jobName of [
     "CreateMissingBottles",

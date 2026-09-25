@@ -1098,7 +1098,7 @@ export async function finalizeBottleMerge(
         | "OnBottleChange"
         | "OnBottleReferenceChange"
         | "OnEntityChange"
-        | "IndexBottleSeriesSearchVectors"
+        | "IndexBottleSeriesSearch"
       ),
       Record<string, number | string>,
     ]
@@ -1111,7 +1111,7 @@ export async function finalizeBottleMerge(
       (entityId) => ["OnEntityChange", { entityId }] as const,
     ),
     ...manifest.seriesIds.map(
-      (seriesId) => ["IndexBottleSeriesSearchVectors", { seriesId }] as const,
+      (seriesId) => ["IndexBottleSeriesSearch", { seriesId }] as const,
     ),
   ];
   for (const [job, payload] of jobs) {

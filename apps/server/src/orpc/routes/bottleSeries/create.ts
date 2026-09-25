@@ -89,8 +89,7 @@ export default procedure
       return series;
     });
 
-    // Queue search vector indexing
-    await pushJob("IndexBottleSeriesSearchVectors", {
+    await pushJob("IndexBottleSeriesSearch", {
       seriesId: series.id,
     });
 

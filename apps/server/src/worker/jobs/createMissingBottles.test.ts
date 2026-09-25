@@ -188,7 +188,7 @@ describe("createMissingBottles", () => {
     });
 
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       {
         bottleId: updatedReview?.bottleId,
       },

@@ -69,7 +69,7 @@ test("queues Entity index jobs for the Entity scope", async ({ fixtures }) => {
   );
   expect(page).toEqual({ queued: 1, nextAfterId: null });
   expect(pushUniqueJob.mock.calls).toEqual([
-    ["IndexEntitySearchVectors", { entityId: missing.id }, { delay: 0 }],
+    ["IndexEntitySearch", { entityId: missing.id }, { delay: 0 }],
   ]);
 });
 
@@ -87,7 +87,7 @@ test("queues Series index jobs for the Series scope", async ({ fixtures }) => {
   );
   expect(page).toEqual({ queued: 1, nextAfterId: null });
   expect(pushUniqueJob.mock.calls).toEqual([
-    ["IndexBottleSeriesSearchVectors", { seriesId: series.id }, { delay: 0 }],
+    ["IndexBottleSeriesSearch", { seriesId: series.id }, { delay: 0 }],
   ]);
 });
 

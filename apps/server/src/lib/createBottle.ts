@@ -770,7 +770,7 @@ export async function finalizeCreatedBottle(
 
   if (bottle.seriesId && seriesCreated) {
     try {
-      await pushUniqueJob("IndexBottleSeriesSearchVectors", {
+      await pushUniqueJob("IndexBottleSeriesSearch", {
         seriesId: bottle.seriesId,
       });
     } catch (err) {

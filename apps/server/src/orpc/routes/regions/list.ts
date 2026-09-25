@@ -16,7 +16,6 @@ export default implement(regionListContract).handler(async function ({
 
   const offset = (cursor - 1) * limit;
 
-  // TODO: switch to tsvector to improve upon unicode
   if (query) {
     where.push(ilike(regions.name, `%${query}%`));
   }

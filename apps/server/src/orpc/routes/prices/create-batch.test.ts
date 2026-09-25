@@ -141,7 +141,7 @@ describe("POST /external-sites/:site/prices", () => {
       imageUrl,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
+      "IndexBottleSearch",
       { bottleId: bottle.id },
     );
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
@@ -933,7 +933,7 @@ describe("POST /external-sites/:site/prices", () => {
         { priceId: price!.id },
       );
       expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
-        "IndexBottleSearchVectors",
+        "IndexBottleSearch",
         { bottleId: incomingBottle.id },
       );
       expect(
