@@ -5006,10 +5006,10 @@ describe("priceMatching", () => {
       releaseYear: 2023,
     });
 
-    // Blank the text-search vectors so this test exercises the local
-    // brand/parent candidate path rather than Postgres full-text matching.
+    // Blank the search documents so this test exercises the local
+    // brand/parent candidate path rather than text matching.
     await db.execute(
-      sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} = ${bottle.id}`,
+      sql`UPDATE ${bottles} SET search_names = '', search_terms = '' WHERE ${bottles.id} = ${bottle.id}`,
     );
     const candidates = await searchBottleCandidates({
       query:
@@ -5068,7 +5068,7 @@ describe("priceMatching", () => {
     });
 
     await db.execute(
-      sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} IN (${springBottle.id}, ${autumnBottle.id})`,
+      sql`UPDATE ${bottles} SET search_names = '', search_terms = '' WHERE ${bottles.id} IN (${springBottle.id}, ${autumnBottle.id})`,
     );
 
     const candidates = await searchBottleCandidates({

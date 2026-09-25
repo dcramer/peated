@@ -84,10 +84,8 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(
-      omit(entity, "name", "normalizedName", "searchVector", "updatedAt"),
-    ).toEqual(
-      omit(newEntity, "name", "normalizedName", "searchVector", "updatedAt"),
+    expect(omit(entity, "name", "normalizedName", "updatedAt")).toEqual(
+      omit(newEntity, "name", "normalizedName", "updatedAt"),
     );
     expect(newEntity.name).toBe("Delicious Wood");
     expect(newEntity.normalizedName).toBe("deliciouswood");
@@ -122,8 +120,8 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(omit(entity, "countryId", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "countryId", "searchVector", "updatedAt"),
+    expect(omit(entity, "countryId", "updatedAt")).toEqual(
+      omit(newEntity, "countryId", "updatedAt"),
     );
     expect(newEntity.countryId).toBe(country.id);
   });
@@ -176,10 +174,8 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(
-      omit(entity, "countryId", "regionId", "searchVector", "updatedAt"),
-    ).toEqual(
-      omit(newEntity, "countryId", "regionId", "searchVector", "updatedAt"),
+    expect(omit(entity, "countryId", "regionId", "updatedAt")).toEqual(
+      omit(newEntity, "countryId", "regionId", "updatedAt"),
     );
     expect(newEntity.regionId).toBe(region.id);
   });
@@ -324,8 +320,8 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(omit(entity, "kind", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "kind", "searchVector", "updatedAt"),
+    expect(omit(entity, "kind", "updatedAt")).toEqual(
+      omit(newEntity, "kind", "updatedAt"),
     );
     expect(newEntity.kind).toEqual("distillery");
   });
@@ -626,22 +622,8 @@ describe("PATCH /entities/:entity", () => {
       .where(eq(entities.id, data.id));
 
     expect(
-      omit(
-        entityBeforeUpdate,
-        "shortName",
-        "normalizedShortName",
-        "searchVector",
-        "updatedAt",
-      ),
-    ).toEqual(
-      omit(
-        newEntity,
-        "shortName",
-        "normalizedShortName",
-        "searchVector",
-        "updatedAt",
-      ),
-    );
+      omit(entityBeforeUpdate, "shortName", "normalizedShortName", "updatedAt"),
+    ).toEqual(omit(newEntity, "shortName", "normalizedShortName", "updatedAt"));
     expect(newEntity.shortName).toBe("F");
     expect(newEntity.normalizedShortName).toBe("f");
 
@@ -933,22 +915,8 @@ describe("PATCH /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, data.id));
 
-    expect(
-      omit(
-        entity,
-        "description",
-        "descriptionSrc",
-        "searchVector",
-        "updatedAt",
-      ),
-    ).toEqual(
-      omit(
-        newEntity,
-        "description",
-        "descriptionSrc",
-        "searchVector",
-        "updatedAt",
-      ),
+    expect(omit(entity, "description", "descriptionSrc", "updatedAt")).toEqual(
+      omit(newEntity, "description", "descriptionSrc", "updatedAt"),
     );
     expect(newEntity.description).toBe("Delicious Wood");
     expect(newEntity.descriptionSrc).toEqual("user");

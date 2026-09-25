@@ -17,7 +17,7 @@ test("writes an Entity search document that TIN can query", async ({
   });
   await db
     .update(entities)
-    .set({ searchVector: null, searchNames: "" })
+    .set({ searchNames: "" })
     .where(eq(entities.id, entity.id));
 
   await indexEntitySearchVectors({ entityId: entity.id });

@@ -49,10 +49,7 @@ import {
 } from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
-import {
-  buildBottleSearchDocuments,
-  buildBottleSearchVector,
-} from "@peated/server/lib/search";
+import { buildBottleSearchDocuments } from "@peated/server/lib/search";
 import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
@@ -372,14 +369,9 @@ async function prepareBottleCreateInTransaction(
     createdByActorId: actorId,
     fullName,
   };
-  bottleInsertData.searchVector = buildBottleSearchVector(
-    bottleInsertData,
-    brand,
-  );
-
   Object.assign(
     bottleInsertData,
-    buildBottleSearchDocuments(bottleInsertData.searchVector),
+    buildBottleSearchDocuments(bottleInsertData, brand),
   );
 
   return {

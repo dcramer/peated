@@ -62,10 +62,8 @@ import {
 import { choose, random, sample } from "../rand";
 import {
   buildBottleSearchDocuments,
-  buildBottleSearchVector,
-  buildBottleSeriesSearchVector,
-  buildEntitySearchVector,
-  buildNameSearchDocument,
+  buildBottleSeriesSearchDocument,
+  buildEntitySearchDocument,
 } from "../search";
 import { SMWS_DISTILLERY_CODES } from "../smws";
 import { toTitleCase } from "../strings";
@@ -373,14 +371,11 @@ export const Entity = async (
       createdByActorId,
     };
 
-    const searchVector = buildEntitySearchVector(entityData);
-
     const [entity] = await tx
       .insert(entities)
       .values({
         ...entityData,
-        searchVector,
-        ...buildNameSearchDocument(searchVector),
+        ...buildEntitySearchDocument(entityData),
       })
       .returning();
 
@@ -698,21 +693,18 @@ async function createBottleFixture(
         })
       : undefined;
 
-    const searchVector = buildBottleSearchVector(
-      bottleData,
-      brand,
-      [],
-      bottler,
-      distillerList,
-      series,
-    );
-
     const [bottle] = await tx
       .insert(bottles)
       .values({
         ...bottleData,
-        searchVector,
-        ...buildBottleSearchDocuments(searchVector),
+        ...buildBottleSearchDocuments(
+          bottleData,
+          brand,
+          [],
+          bottler,
+          distillerList,
+          series,
+        ),
       })
       .returning();
 
@@ -1420,13 +1412,11 @@ export async function BottleSeries(
       representativeBottleId: data.representativeBottleId ?? null,
     };
 
-    const searchVector = buildBottleSeriesSearchVector(values, brand);
     const result = await tx
       .insert(bottleSeries)
       .values({
         ...values,
-        searchVector,
-        ...buildNameSearchDocument(searchVector),
+        ...buildBottleSeriesSearchDocument(values, brand),
       })
       .returning();
 
