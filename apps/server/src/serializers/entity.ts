@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
@@ -23,9 +23,16 @@ interface EntityAttrs {
   region: z.infer<typeof EntitySchema>["region"];
 }
 
+// Serializers read Entity rows without their search documents; those
+// columns only serve text search and can be large.
+const { searchNames: _entitySearchNames, ...entityRowColumns } =
+  getTableColumns(entities);
+export { entityRowColumns };
+export type EntityRow = Omit<Entity, "searchNames">;
+
 export const EntitySerializer = serializer({
   name: "entity",
-  attrs: async (itemList: Entity[], currentUser?: User) => {
+  attrs: async (itemList: EntityRow[], currentUser?: User) => {
     const itemIds = [...new Set(itemList.map((item) => item.id))];
     const countryIds = [
       ...new Set(itemList.map((item) => item.countryId).filter(notEmpty)),
@@ -116,7 +123,7 @@ export const EntitySerializer = serializer({
       }),
     );
   },
-  item: (item: Entity, attrs: EntityAttrs): z.infer<typeof EntitySchema> => {
+  item: (item: EntityRow, attrs: EntityAttrs): z.infer<typeof EntitySchema> => {
     if (!item.kind) {
       throw new Error(`Entity ${item.id} has no kind.`);
     }

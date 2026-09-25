@@ -1,21 +1,21 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray, isNull } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
-import type { ReservedCollectionSlug } from "../constants";
 import { db } from "../db";
 import type { Bottle, User } from "../db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
   bottleImages,
+  bottles,
   bottleSeries,
   bottlesToDistillers,
   collectionBottles,
   entities,
   tastings,
 } from "../db/schema";
-import { getReservedCollection } from "../lib/db";
+import { getReservedCollectionsByUser } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { formatPeatedId } from "../lib/peatedId";
 import { absoluteUrl } from "../lib/urls";
@@ -23,7 +23,17 @@ import { type BottleSchema } from "../schemas";
 import type { BottleGroupV1 } from "../schemas/catalogIdentity";
 import { BottleSeriesSerializer } from "./bottleSeries";
 import { BottleGroupSummarySerializer } from "./catalogIdentity";
-import { EntitySerializer } from "./entity";
+import { entityRowColumns, EntitySerializer } from "./entity";
+
+// Serializers read Bottle rows without their search documents; those
+// columns only serve text search and can be large.
+const {
+  searchNames: _bottleSearchNames,
+  searchTerms: _bottleSearchTerms,
+  ...bottleRowColumns
+} = getTableColumns(bottles);
+export { bottleRowColumns };
+export type BottleRow = Omit<Bottle, "searchNames" | "searchTerms">;
 
 type Attrs = {
   isFavorite: boolean;
@@ -41,7 +51,7 @@ export type BottleSerializerContext = {
   includeGroupSummary?: boolean;
 };
 
-async function loadGroupSummaries(itemList: Bottle[]) {
+async function loadGroupSummaries(itemList: BottleRow[]) {
   const groupByBottleId = new Map<number, BottleGroupV1>();
   const groupIds = Array.from(
     new Set(itemList.map(({ groupId }) => groupId).filter(notEmpty)),
@@ -94,7 +104,7 @@ async function loadGroupSummaries(itemList: Bottle[]) {
   return groupByBottleId;
 }
 
-async function loadProducers(itemList: Bottle[], currentUser?: User) {
+async function loadProducers(itemList: BottleRow[], currentUser?: User) {
   const itemIds = itemList.map((t) => t.id);
   const [distillerList, primaryImageList] = await Promise.all([
     db
@@ -130,7 +140,7 @@ async function loadProducers(itemList: Bottle[], currentUser?: User) {
   );
 
   const entityList = await db
-    .select()
+    .select(entityRowColumns)
     .from(entities)
     .where(inArray(entities.id, entityIds));
   const entitiesById = Object.fromEntries(
@@ -153,7 +163,7 @@ async function loadProducers(itemList: Bottle[], currentUser?: User) {
   return { entitiesById, distillersByBottleId, primaryImageByBottleId };
 }
 
-async function loadSeries(itemList: Bottle[], currentUser?: User) {
+async function loadSeries(itemList: BottleRow[], currentUser?: User) {
   const seriesIds = Array.from(
     new Set(itemList.map((i) => i.seriesId).filter(notEmpty)),
   );
@@ -178,45 +188,19 @@ async function loadViewerMarks(itemIds: number[], currentUser?: User) {
       tastedSet: new Set<number>(),
     };
   }
-  const viewer = currentUser;
 
-  const getReservedCollectionBottleSet = async (
-    collectionSlug: ReservedCollectionSlug,
-  ) => {
-    const collection = await getReservedCollection(
-      db,
-      viewer.id,
-      collectionSlug,
-    );
-    if (!collection) {
-      return new Set<number>();
-    }
-
-    return new Set(
-      (
-        await db
-          .selectDistinct({ bottleId: collectionBottles.bottleId })
-          .from(collectionBottles)
-          .where(
-            and(
-              inArray(collectionBottles.bottleId, itemIds),
-              eq(collectionBottles.collectionId, collection.id),
-            ),
-          )
-      ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
-    );
-  };
-
-  const [favoriteSet, librarySet, tastedSet] = await Promise.all([
-    getReservedCollectionBottleSet("default"),
-    getReservedCollectionBottleSet("library"),
+  const [reserved, tastedSet] = await Promise.all([
+    getReservedCollectionsByUser(db, [currentUser.id]).then(
+      (byUser) =>
+        byUser.get(currentUser.id) ?? { default: null, library: null },
+    ),
     db
       .selectDistinct({ bottleId: tastings.bottleId })
       .from(tastings)
       .where(
         and(
           inArray(tastings.bottleId, itemIds),
-          eq(tastings.createdById, viewer.id),
+          eq(tastings.createdById, currentUser.id),
           isNull(tastings.removedAt),
         ),
       )
@@ -229,13 +213,40 @@ async function loadViewerMarks(itemIds: number[], currentUser?: User) {
           ),
       ),
   ]);
-  return { favoriteSet, librarySet, tastedSet };
+  const collectionIds = [reserved.default?.id, reserved.library?.id].filter(
+    notEmpty,
+  );
+  const memberships = collectionIds.length
+    ? await db
+        .selectDistinct({
+          collectionId: collectionBottles.collectionId,
+          bottleId: collectionBottles.bottleId,
+        })
+        .from(collectionBottles)
+        .where(
+          and(
+            inArray(collectionBottles.bottleId, itemIds),
+            inArray(collectionBottles.collectionId, collectionIds),
+          ),
+        )
+    : [];
+  const bottleIdsIn = (collectionId: number | undefined) =>
+    new Set(
+      memberships.flatMap(({ collectionId: id, bottleId }) =>
+        id === collectionId && bottleId !== null ? [bottleId] : [],
+      ),
+    );
+  return {
+    favoriteSet: bottleIdsIn(reserved.default?.id),
+    librarySet: bottleIdsIn(reserved.library?.id),
+    tastedSet,
+  };
 }
 
 export const BottleSerializer = serializer({
   name: "bottle",
   attrs: async (
-    itemList: Bottle[],
+    itemList: BottleRow[],
     currentUser?: User,
     context?: BottleSerializerContext,
   ): Promise<Record<number, Attrs>> => {
@@ -277,7 +288,7 @@ export const BottleSerializer = serializer({
     );
   },
 
-  item: (item: Bottle, attrs: Attrs): z.infer<typeof BottleSchema> => {
+  item: (item: BottleRow, attrs: Attrs): z.infer<typeof BottleSchema> => {
     const bottle: z.infer<typeof BottleSchema> = {
       id: item.id,
       peatedId: formatPeatedId("bottle", item.id),

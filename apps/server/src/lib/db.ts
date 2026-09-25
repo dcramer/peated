@@ -1,7 +1,16 @@
 import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import type { InferSelectModel, Table } from "drizzle-orm";
-import { and, eq, getTableColumns, inArray, ne, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  getTableColumns,
+  inArray,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import type { ReservedCollectionSlug } from "../constants";
@@ -448,6 +457,47 @@ export const getReservedCollection = async (
     null
   );
 };
+
+/**
+ * Reads every user's reserved collections in one query, following the same
+ * lookup and legacy `default` fallback rules as `getReservedCollection`.
+ */
+export async function getReservedCollectionsByUser(
+  db: AnyDatabase,
+  userIds: number[],
+): Promise<
+  Map<number, Record<ReservedCollectionSlug, ReservedCollection | null>>
+> {
+  const byUser = new Map<
+    number,
+    Record<ReservedCollectionSlug, ReservedCollection | null>
+  >();
+  if (!userIds.length) return byUser;
+  const rows = await db
+    .select({
+      id: collections.id,
+      createdById: collections.createdById,
+      name: collections.name,
+    })
+    .from(collections)
+    .where(inArray(collections.createdById, userIds))
+    .orderBy(asc(collections.id));
+  const libraryName = RESERVED_COLLECTIONS.library.name.toLowerCase();
+  const defaultName = RESERVED_COLLECTIONS.default.name.toLowerCase();
+  for (const userId of userIds) {
+    const owned = rows.filter((row) => row.createdById === userId);
+    const named = (name: string) =>
+      owned.find((row) => row.name.toLowerCase() === name) ?? null;
+    byUser.set(userId, {
+      library: named(libraryName),
+      default:
+        named(defaultName) ??
+        owned.find((row) => row.name.toLowerCase() !== libraryName) ??
+        null,
+    });
+  }
+  return byUser;
+}
 
 export const getDefaultCollection = async (
   db: AnyDatabase,
