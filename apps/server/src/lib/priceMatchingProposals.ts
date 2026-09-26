@@ -63,7 +63,11 @@ import {
   refreshStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
 } from "@peated/server/lib/priceMatchingProcessingLease";
-import { REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES } from "@peated/server/lib/priceMatchingStatus";
+import {
+  REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
+  toCurrentProposalStatus,
+  toCurrentProposalType,
+} from "@peated/server/lib/priceMatchingStatus";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
@@ -1404,6 +1408,9 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
   if (!row) {
     throw new UnknownStorePriceMatchProposalError(proposalId);
   }
+  // A row written by the previous release during a deploy may use old names.
+  row.proposal.status = toCurrentProposalStatus(row.proposal.status);
+  row.proposal.proposalType = toCurrentProposalType(row.proposal.proposalType);
 
   if (!allowedStatuses.includes(row.proposal.status)) {
     throw new StorePriceMatchProposalNotReviewableError(

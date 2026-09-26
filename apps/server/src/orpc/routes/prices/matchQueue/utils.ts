@@ -14,7 +14,10 @@ import {
 } from "@peated/server/db/schema";
 import { logWarn } from "@peated/server/lib/log";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
-import { toCurrentProposalType } from "@peated/server/lib/priceMatchingStatus";
+import {
+  toCurrentProposalStatus,
+  toCurrentProposalType,
+} from "@peated/server/lib/priceMatchingStatus";
 import { type Context } from "@peated/server/orpc/context";
 import {
   ExtractedBottleDetailsSchema,
@@ -300,7 +303,7 @@ export function serializeProposal(
       : automationAssessment.automationBlockers;
   const serializedProposal = StorePriceMatchProposalSchema.parse({
     id: proposal.id,
-    status: proposal.status,
+    status: toCurrentProposalStatus(proposal.status),
     proposalType: toCurrentProposalType(proposal.proposalType),
     automationEligible: automationAssessment.automationEligible,
     automationBlockers: Array.from(new Set(automationBlockers)),

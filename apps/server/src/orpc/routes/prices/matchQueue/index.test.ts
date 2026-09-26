@@ -2636,6 +2636,52 @@ describe("price match queue", () => {
     });
   });
 
+  // TODO(prices): Remove with the old enum values in the follow-up deploy.
+  test("reads and reviews a proposal the previous release wrote mid-deploy", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Legacy Row Brand" });
+    const price = await fixtures.StorePrice({ name: "Legacy Row Release" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "verified",
+        proposalType: "create_new",
+      })
+      .returning();
+
+    const details = await routerClient.prices.matchQueue.details(
+      { proposal: proposal.id },
+      { context: { user } },
+    );
+    expect(details).toMatchObject({
+      status: "pending_review",
+      proposalType: "create_bottle",
+    });
+
+    const createdBottle = await routerClient.prices.matchQueue.createBottle(
+      {
+        proposal: proposal.id,
+        independentBottle: {
+          name: "Legacy Row Release",
+          brand: brand.id,
+          category: "single_malt",
+        },
+      },
+      { context: { user } },
+    );
+    expect(
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+    ).toMatchObject({
+      status: "approved",
+      suggestedBottleId: createdBottle.id,
+    });
+  });
+
   test("creates a reviewed Bottle from an errored no_match proposal", async ({
     fixtures,
   }) => {

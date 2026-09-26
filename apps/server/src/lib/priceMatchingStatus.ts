@@ -32,3 +32,14 @@ export function toCurrentProposalType(type: StoredProposalType): ProposalType {
   if (type === "create_new") return "create_bottle";
   return type;
 }
+
+/**
+ * The previous release briefly marks an eligible match `verified` before it
+ * applies it. A person treats such a row like any other pending proposal.
+ * TODO(prices): Remove with the old enum values in the follow-up deploy.
+ */
+export function toCurrentProposalStatus(
+  status: StorePriceMatchProposal["status"],
+): Exclude<StorePriceMatchProposal["status"], "verified"> {
+  return status === "verified" ? "pending_review" : status;
+}
