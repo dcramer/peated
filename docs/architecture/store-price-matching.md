@@ -122,15 +122,19 @@ site, listing name, and volume.
 
 ## Automatic Changes
 
-Code derives automation eligibility. It never uses a model-written confidence
+The classifier decides identity. Code decides only whether that decision may
+apply without a moderator, using the same `deriveAutomationTier` rule as photo
+creation (`assessStorePriceMatch`). It never uses a model-written confidence
 number.
 
 - Every unresolved risk forces review.
-- A match must identify an active Bottle and must not replace a different saved
-  assignment.
-- A create must provide one complete, valid Bottle with enough independent or
-  primary label evidence for its distinguishing facts.
-- Source retailer text alone cannot prove a distinguishing fact.
+- A match must name a reviewed candidate and must not replace a different saved
+  assignment. It needs supportive web evidence, the classifier's judgment that
+  no research was needed, or facts read from the listing's own label image.
+- A create needs supportive web evidence, facts read from the listing's label
+  image, an exact-cask anchor such as an SMWS code, or complete structured
+  scraper facts.
+- A Bottle that contradicts the scraper's structured facts goes to review.
 - Duplicate Bottle, reference, and current-state checks can only make an
   automatic result stricter.
 

@@ -167,10 +167,12 @@ forces review. Code derives `auto` or `review` from action risk, structured
 evidence, and verified anchors; model-supplied confidence cannot raise that
 tier.
 
-An ABV conflict from image extraction alone adds a conflict risk and forces
-review; it does not erase the agent's match. A known text or structured-source
-ABV conflict, conflicting web evidence, or an extraction of unknown origin is a
-hard conflict.
+When a matched candidate's populated typed field contradicts the extracted
+facts, code adds a conflict risk and the Match goes to review
+(`getBottleFieldConflicts`). The typed fields are category, age, ABV, vintage
+year, release year, the cask-strength and single-cask flags, and edition. Code
+never turns that Match into No Match, and it never compares Brands, names, or
+other free text; the agent owns those judgments.
 
 ### Exact Stored References
 

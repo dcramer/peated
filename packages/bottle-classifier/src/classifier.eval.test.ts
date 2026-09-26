@@ -14,6 +14,11 @@ import { executeWithReplay } from "vitest-evals/replay";
 import { z } from "zod";
 import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
+  agentActionRiskClass,
+  deriveAutomationTier,
+  type AutomationTier,
+} from "./automationTier";
+import {
   scoreBottleCheckGrounding,
   scoreBottleCheckSemanticOutput,
   selectBottleCheckExpectedOperations,
@@ -78,11 +83,6 @@ import {
 import { withEvalModelCallCapture } from "./evalTelemetry";
 import { createLocalCatalogDataSource } from "./localCatalog";
 import { exactBottleIdentityMatches } from "./normalizationEvalScoring";
-import {
-  agentActionRiskClass,
-  deriveAutomationTier,
-  type AutomationTier,
-} from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
 
 // Classifier evals: historical per-fixture outcomes and experiment guidance live
@@ -188,7 +188,6 @@ function getDerivedAutomationTier(
     reaffirmsCurrentAssignment,
     replacesCurrentAssignment:
       currentBottleId != null && !reaffirmsCurrentAssignment,
-    hasExactReferenceAnchor: false,
     hasDeterministicAnchor: decision.identityScope === "exact_cask",
     // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
     // `reference.imageUrl` and rely on live extraction; both mean the run has

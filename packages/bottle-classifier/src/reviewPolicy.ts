@@ -1,9 +1,4 @@
 import { normalizePotentialProofLikeDecision } from "./abv";
-import {
-  exactEditionMarkersMatch,
-  extractedIdentityLooksLikePlainAgeStatementReference,
-  getExistingMatchIdentityConflicts,
-} from "./bottleClassificationEvidence";
 import { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 import {
   BottleClassificationDecisionSchema,
@@ -27,11 +22,13 @@ import {
   getExactCaskCodeAnchor,
   getMarketedCaskCodeAnchor,
 } from "./exactCask";
-import { listMatchesExpectedValue } from "./identityEvidenceCore";
+import {
+  exactEditionMarkersMatch,
+  getBottleFieldConflicts,
+} from "./fieldConflicts";
 import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
 import {
-  candidateLooksSmws,
   getSmwsCodeAnchor,
   maybeResolveSmwsExactCaskCodeDecision,
   normalizeSmwsExactCaskProposedBottleDraft,
@@ -476,23 +473,18 @@ function createNoMatchDecision({
   });
 }
 
-const IMAGE_ABV_CONFLICT_RISK_NOTE =
-  "Image-extracted ABV conflicts with the matched Bottle and needs review.";
-
-function addImageAbvConflictRisk(
+/**
+ * A conflict with extracted facts needs review, but it cannot erase the Match:
+ * the facts come from the same listing the classifier already judged.
+ */
+function addFieldConflictRisk(
   decision: BottleClassificationDecision,
+  conflicts: string[],
 ): BottleClassificationDecision {
   const confidenceBasis = decision.confidenceBasis ?? {
     unresolvedRisks: [],
     webEvidence: "not_used" as const,
   };
-  if (
-    confidenceBasis.unresolvedRisks.some(
-      ({ note }) => note === IMAGE_ABV_CONFLICT_RISK_NOTE,
-    )
-  ) {
-    return decision;
-  }
 
   return {
     ...decision,
@@ -502,7 +494,7 @@ function addImageAbvConflictRisk(
         ...confidenceBasis.unresolvedRisks,
         {
           category: "trait_conflict",
-          note: IMAGE_ABV_CONFLICT_RISK_NOTE,
+          note: `Extracted ${conflicts.join(", ")} conflicts with the matched Bottle.`,
         },
       ],
     },
@@ -586,49 +578,13 @@ function rejectInvalidExistingMatch({
     });
   }
 
-  const identityConflicts = getExistingMatchIdentityConflicts({
-    referenceName: reference.name,
-    targetCandidate: target,
-    extractedLabel: artifacts.extractedIdentity,
-  });
-  const hasImageAbvConflict =
-    artifacts.extractedIdentitySource === "image" &&
-    identityConflicts.includes("abv");
-  // One image read cannot erase a Match. The conflict still needs review until
-  // the runtime carries independent evidence for this exact field and value.
-  const imageAbvNeedsReview =
-    hasImageAbvConflict &&
-    decision.confidenceBasis?.webEvidence !== "conflicting";
-  const hardIdentityConflicts =
-    hasImageAbvConflict &&
-    decision.confidenceBasis?.webEvidence !== "conflicting"
-      ? identityConflicts.filter((field) => field !== "abv")
-      : identityConflicts;
-
-  const materialIdentityConflicts =
-    smwsCode &&
-    candidateLooksSmws(target) &&
-    candidateHasExactCaskCodeAnchor(target, smwsCode)
-      ? hardIdentityConflicts.filter((field) => field !== "brand")
-      : hardIdentityConflicts;
-
-  if (!materialIdentityConflicts.length) {
-    return imageAbvNeedsReview ? addImageAbvConflictRisk(decision) : decision;
-  }
-
-  const downgradedRationale = appendRationale(
-    decision.rationale,
-    `Server downgraded the existing-match recommendation because the candidate conflicts with extracted reference details (${materialIdentityConflicts.join(
-      "; ",
-    )}).`,
+  const conflicts = getBottleFieldConflicts(
+    artifacts.extractedIdentity,
+    target,
   );
-  return createNoMatchDecision({
-    decision,
-    candidateBottleIds: decision.candidateBottleIds,
-    observation: decision.observation,
-    identityScope: decision.identityScope,
-    rationale: downgradedRationale,
-  });
+  return conflicts.length
+    ? addFieldConflictRisk(decision, conflicts)
+    : decision;
 }
 
 interface ResolvedEntityChoice {

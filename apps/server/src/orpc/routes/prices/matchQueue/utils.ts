@@ -14,7 +14,6 @@ import {
 } from "@peated/server/db/schema";
 import { logWarn } from "@peated/server/lib/log";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
-import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
 import { type Context } from "@peated/server/orpc/context";
 import {
   ExtractedBottleDetailsSchema,
@@ -126,19 +125,14 @@ function normalizeStoredProposedBottle(
   );
 }
 
+// Older proposals saved more assessment fields; only these two are still read.
 function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
-  if (!proposal.automationAssessment) {
-    return null;
-  }
-  if (!("plainAgeBottleAutoVerifyEligible" in proposal.automationAssessment)) {
-    return null;
-  }
-
-  const parsedAssessment = StorePriceMatchAutomationAssessmentSchema.safeParse(
-    proposal.automationAssessment,
+  const parsed = StorePriceMatchAutomationAssessmentSchema.safeParse(
+    proposal.automationAssessment ?? {},
   );
-
-  return parsedAssessment.success ? parsedAssessment.data : null;
+  return parsed.success
+    ? parsed.data
+    : { automationEligible: false, automationBlockers: [] };
 }
 
 function humanizeAutomationIssuePath(
@@ -295,33 +289,7 @@ export function serializeProposal(
   const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
     proposal.searchEvidence,
   );
-  const classifierCandidates =
-    ClassifierBottleCandidateSchema.array().safeParse(candidateBottles);
-  const classifierExtractedLabel =
-    ClassifierBottleExtractedDetailsSchema.nullable().safeParse(extractedLabel);
-  const automationAssessment =
-    getPersistedAutomationAssessment(proposal) ??
-    (price && classifierCandidates.success && classifierExtractedLabel.success
-      ? getStorePriceMatchAutomationAssessment({
-          action: proposal.proposalType,
-          modelConfidence: proposal.confidence,
-          price,
-          suggestedBottleId: proposal.suggestedBottleId,
-          candidateBottles: classifierCandidates.data,
-          extractedLabel: classifierExtractedLabel.data,
-          proposedBottle: normalizedProposedBottle,
-          searchEvidence,
-        })
-      : {
-          modelConfidence: proposal.confidence,
-          automationScore: null,
-          automationEligible: false,
-          automationBlockers: [],
-          decisiveMatchAttributes: [],
-          plainAgeBottleAutoVerifyEligible: false,
-          differentiatingAttributes: [],
-          webEvidenceChecks: [],
-        });
+  const automationAssessment = getPersistedAutomationAssessment(proposal);
   const automationBlockers =
     proposal.status === "errored" && proposal.error
       ? [
@@ -333,16 +301,8 @@ export function serializeProposal(
     id: proposal.id,
     status: proposal.status,
     proposalType: proposal.proposalType,
-    confidence: proposal.confidence,
-    modelConfidence: automationAssessment.modelConfidence,
-    automationScore: automationAssessment.automationScore,
     automationEligible: automationAssessment.automationEligible,
     automationBlockers: Array.from(new Set(automationBlockers)),
-    decisiveMatchAttributes: automationAssessment.decisiveMatchAttributes,
-    plainAgeBottleAutoVerifyEligible:
-      automationAssessment.plainAgeBottleAutoVerifyEligible,
-    differentiatingAttributes: automationAssessment.differentiatingAttributes,
-    webEvidenceChecks: automationAssessment.webEvidenceChecks,
     candidateBottles,
     extractedLabel,
     proposedBottle: normalizedProposedBottle,
