@@ -13,7 +13,7 @@ import type { StorePriceMatchAutomationAssessment } from "@peated/server/schemas
 
 export type { StorePriceMatchAutomationAssessment };
 
-type MatchAction = "match_existing" | "correction" | "create_new" | "no_match";
+type MatchAction = "match" | "create_bottle" | "no_match";
 
 /**
  * Store-price automation rule (owner: store-price matching). The classifier
@@ -50,7 +50,7 @@ export function assessStorePriceMatch({
     return { automationEligible: false, automationBlockers: [] };
   }
 
-  const isCreate = action === "create_new";
+  const isCreate = action === "create_bottle";
   const target = isCreate
     ? proposedBottle
     : (candidates.find(({ bottleId }) => bottleId === suggestedBottleId) ??

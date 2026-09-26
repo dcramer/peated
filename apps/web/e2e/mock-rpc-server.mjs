@@ -2326,16 +2326,9 @@ function buildDirectBottleProposal() {
   return {
     id: 9901,
     status: "pending_review",
-    proposalType: "create_new",
-    confidence: null,
-    modelConfidence: 90,
-    automationScore: 90,
+    proposalType: "create_bottle",
     automationEligible: false,
     automationBlockers: [],
-    decisiveMatchAttributes: [],
-    plainAgeBottleAutoVerifyEligible: false,
-    differentiatingAttributes: [],
-    webEvidenceChecks: [],
     candidateBottles: [],
     extractedLabel: null,
     proposedBottle: {

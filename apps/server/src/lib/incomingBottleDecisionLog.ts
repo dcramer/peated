@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export type IncomingBottleDecisionType = Extract<
   IncomingBottleDecisionLog["decision"],
-  "match_existing" | "create_bottle"
+  "match" | "create_bottle"
 >;
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
@@ -36,9 +36,9 @@ export function getIncomingBottleDecisionFromResolutionSource(
 ): IncomingBottleDecisionType | null {
   switch (source) {
     case "classifier_match":
-      return "match_existing";
+      return "match";
     case "classifier_create_bottle":
-      return createdBottle === false ? "match_existing" : "create_bottle";
+      return createdBottle === false ? "match" : "create_bottle";
     default:
       return null;
   }

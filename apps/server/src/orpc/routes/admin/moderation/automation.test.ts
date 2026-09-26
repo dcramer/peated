@@ -258,25 +258,25 @@ describe("admin moderation automation", () => {
         automationEligible: false,
       },
       {
-        proposalType: "match_existing" as const,
-        initialStatus: "verified" as const,
-        finalStatus: "approved" as const,
-        automationEligible: false,
-      },
-      {
-        proposalType: "match_existing" as const,
+        proposalType: "match" as const,
         initialStatus: "pending_review" as const,
         finalStatus: "approved" as const,
         automationEligible: true,
       },
       {
-        proposalType: "create_new" as const,
+        proposalType: "match" as const,
+        initialStatus: "pending_review" as const,
+        finalStatus: "approved" as const,
+        automationEligible: true,
+      },
+      {
+        proposalType: "create_bottle" as const,
         initialStatus: "pending_review" as const,
         finalStatus: "approved" as const,
         automationEligible: false,
       },
       {
-        proposalType: "create_new" as const,
+        proposalType: "create_bottle" as const,
         initialStatus: "errored" as const,
         finalStatus: "errored" as const,
         automationEligible: false,
@@ -291,7 +291,7 @@ describe("admin moderation automation", () => {
       rate: 60,
       byProposalType: [
         {
-          proposalType: "match_existing",
+          proposalType: "match",
           sampleSize: 2,
           automatic: 2,
           manual: 0,
@@ -299,7 +299,7 @@ describe("admin moderation automation", () => {
           rate: 100,
         },
         {
-          proposalType: "create_new",
+          proposalType: "create_bottle",
           sampleSize: 2,
           automatic: 0,
           manual: 1,

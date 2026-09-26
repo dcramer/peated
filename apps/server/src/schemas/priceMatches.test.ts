@@ -98,36 +98,25 @@ describe("StorePriceMatchDecisionSchema", () => {
     expect(parsed.provider).toBe("openai");
   });
 
-  test("accepts the four direct-Bottle decisions", () => {
+  test("accepts the three classifier decisions", () => {
     expect(
       StorePriceMatchDecisionSchema.parse({
-        action: "match_existing",
+        action: "match",
         suggestedBottleId: 123,
         referenceScope: "global_alias",
       }),
     ).toMatchObject({
-      action: "match_existing",
+      action: "match",
       suggestedBottleId: 123,
       proposedBottle: null,
     });
     expect(
       StorePriceMatchDecisionSchema.parse({
-        action: "correction",
-        suggestedBottleId: 123,
+        action: "create_bottle",
         proposedBottle: baseProposedBottle,
       }),
     ).toMatchObject({
-      action: "correction",
-      suggestedBottleId: 123,
-      proposedBottle: baseProposedBottle,
-    });
-    expect(
-      StorePriceMatchDecisionSchema.parse({
-        action: "create_new",
-        proposedBottle: baseProposedBottle,
-      }),
-    ).toMatchObject({
-      action: "create_new",
+      action: "create_bottle",
       suggestedBottleId: null,
       proposedBottle: baseProposedBottle,
     });
@@ -174,12 +163,12 @@ describe("StorePriceMatchDecisionSchema", () => {
   test("requires a Bottle id for existing matches and corrections", () => {
     expect(
       StorePriceMatchDecisionSchema.safeParse({
-        action: "match_existing",
+        action: "match",
       }).success,
     ).toBe(false);
     expect(
       StorePriceMatchDecisionSchema.safeParse({
-        action: "correction",
+        action: "match",
         proposedBottle: null,
       }).success,
     ).toBe(false);
@@ -188,34 +177,21 @@ describe("StorePriceMatchDecisionSchema", () => {
   test("requires one complete Bottle draft for creation", () => {
     expect(
       StorePriceMatchDecisionSchema.safeParse({
-        action: "create_new",
+        action: "create_bottle",
         proposedBottle: null,
       }).success,
     ).toBe(false);
     expect(
       StorePriceMatchDecisionSchema.safeParse({
-        action: "create_new",
+        action: "create_bottle",
         proposedBottle: baseProposedBottle,
       }).success,
     ).toBe(true);
   });
 
-  test("parses correction age as a direct Bottle field", () => {
-    const repair = StorePriceMatchDecisionSchema.parse({
-      action: "correction",
-      suggestedBottleId: 1,
-      proposedBottle: {
-        ...baseProposedBottle,
-        statedAge: 12,
-      },
-    });
-
-    expect(repair.proposedBottle).toMatchObject({ statedAge: 12 });
-  });
-
   test("rejects fractional entity ids in Bottle drafts", () => {
     const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "create_new",
+      action: "create_bottle",
       proposedBottle: {
         ...baseProposedBottle,
         series: {

@@ -39,10 +39,7 @@ import {
   finalizeBottleReferenceAssignment,
 } from "@peated/server/lib/bottleReferences";
 import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
-import {
-  buildBottleInputFromProposedBottle,
-  buildClassifierBottleInput,
-} from "@peated/server/lib/classifierDecisionCreateInputs";
+import { buildClassifierBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
@@ -66,20 +63,18 @@ import {
   refreshStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
 } from "@peated/server/lib/priceMatchingProcessingLease";
-import { REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES } from "@peated/server/lib/priceMatchingStatus";
+import {
+  REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES,
+  toCurrentProposalStatus,
+  toCurrentProposalType,
+} from "@peated/server/lib/priceMatchingStatus";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
-import {
-  finalizeBottleUpdate,
-  updateBottleInTransaction,
-  type BottlePatch,
-} from "@peated/server/lib/updateBottle";
 import type { PriceMatchSearchEvidenceSchema } from "@peated/server/schemas";
 import {
   ProposedBottleSchema,
-  StorePriceBottleRepairDraftSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
@@ -91,9 +86,6 @@ type ExtractedBottleDetails = BottleExtractedDetails;
 type PriceMatchCandidate = BottleCandidate;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
-type StorePriceBottleRepairDraft = z.infer<
-  typeof StorePriceBottleRepairDraftSchema
->;
 type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
@@ -198,56 +190,6 @@ export class StorePriceMatchProposalIdentityChangedError extends Error {
 }
 
 /**
- * Maps sparse persisted repair drafts to the canonical flat Bottle patch.
- * Unknown null fields or empty distiller lists are omitted rather than cleared.
- */
-function buildBottleRepairInput(
-  proposedBottle: StorePriceBottleRepairDraft,
-): BottlePatch {
-  const proposedInput = buildBottleInputFromProposedBottle(proposedBottle);
-  const patch: BottlePatch = {
-    name: proposedInput.name,
-    brand: proposedInput.brand,
-  };
-
-  if (proposedBottle.series !== null) patch.series = proposedInput.series!;
-  if (proposedBottle.category !== null) {
-    patch.category = proposedBottle.category;
-  }
-  if (proposedBottle.statedAge !== null) {
-    patch.statedAge = proposedBottle.statedAge;
-  }
-  if (proposedBottle.distillers.length > 0) {
-    patch.distillers = proposedInput.distillers;
-  }
-  if (proposedBottle.bottler !== null) {
-    patch.bottler = proposedInput.bottler!;
-  }
-
-  if (proposedBottle.edition !== null) patch.edition = proposedBottle.edition;
-  if (proposedBottle.abv !== null) patch.abv = proposedBottle.abv;
-  if (proposedBottle.singleCask !== null) {
-    patch.singleCask = proposedBottle.singleCask;
-  }
-  if (proposedBottle.caskStrength !== null) {
-    patch.caskStrength = proposedBottle.caskStrength;
-  }
-  if (proposedBottle.vintageYear !== null) {
-    patch.vintageYear = proposedBottle.vintageYear;
-  }
-  if (proposedBottle.releaseYear !== null) {
-    patch.releaseYear = proposedBottle.releaseYear;
-  }
-  if (proposedBottle.maturation !== null)
-    patch.maturation = proposedBottle.maturation;
-  if (proposedBottle.caskNumber !== null)
-    patch.caskNumber = proposedBottle.caskNumber;
-  if (proposedBottle.outturn !== null) patch.outturn = proposedBottle.outturn;
-
-  return patch;
-}
-
-/**
  * Converts classifier decisions into store-price match decisions while carrying
  * review metadata needed by later proposal handling.
  */
@@ -259,14 +201,8 @@ export function toStorePriceMatchDecision({
   decision: BottleClassificationDecision;
 }): StorePriceMatchDecision {
   if (decision.action === "match") {
-    const action =
-      price.bottleId !== null && price.bottleId !== decision.matchedBottleId
-        ? "correction"
-        : "match_existing";
-
     return {
-      action,
-      confidence: null,
+      action: "match",
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -278,8 +214,7 @@ export function toStorePriceMatchDecision({
 
   if (decision.action === "create_bottle") {
     return {
-      action: "create_new",
-      confidence: null,
+      action: "create_bottle",
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -291,7 +226,6 @@ export function toStorePriceMatchDecision({
 
   return {
     action: "no_match",
-    confidence: null,
     rationale: decision.rationale,
     candidateBottleIds: decision.candidateBottleIds,
     identityScope: decision.identityScope,
@@ -322,57 +256,20 @@ export class InvalidStorePriceMatchProposalTypeError extends Error {
   }
 }
 
-export class StorePriceBottleRepairBadRequestError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "StorePriceBottleRepairBadRequestError";
-  }
-}
-
-function getProposalType(
-  price: StorePrice,
-  decision: StorePriceMatchDecision,
-): StorePriceMatchProposal["proposalType"] {
-  if (decision.action === "create_new") {
-    return "create_new";
-  }
-
-  if (price.bottleId) {
-    if (
-      decision.action === "match_existing" &&
-      decision.suggestedBottleId === price.bottleId
-    ) {
-      return "match_existing";
-    }
-    return "correction";
-  }
-  return decision.action;
-}
-
-function getProposalStatus(
-  decision: StorePriceMatchDecision,
-  automationAssessment: StorePriceMatchAutomationAssessment | null,
-): StorePriceMatchProposal["status"] {
-  // An eligible match is verified here; an eligible create is applied later.
-  return decision.action === "match_existing" &&
-    automationAssessment?.automationEligible
-    ? "verified"
-    : "pending_review";
-}
-
 function shouldTrackStorePriceQueueEntry(
   status: StorePriceMatchProposal["status"],
+  automationEligible: boolean,
 ) {
-  return status === "pending_review" || status === "errored";
+  // An eligible decision is applied right away and never waits for a person.
+  return (
+    (status === "pending_review" && !automationEligible) || status === "errored"
+  );
 }
 
 function getInitialAttemptFinalStatus(
   status: StorePriceMatchProposal["status"],
 ): StorePriceMatchProposal["status"] | null {
-  if (status === "pending_review" || status === "verified") {
-    return null;
-  }
-  return status;
+  return status === "pending_review" ? null : status;
 }
 
 async function recordStorePriceMatchAttempt({
@@ -537,8 +434,9 @@ async function markOwnedStorePriceMatchAttemptFinalInTransaction(
 
 function getStorePriceQueueEntryUpdateValue(
   status: StorePriceMatchProposal["status"],
+  automationEligible: boolean,
 ) {
-  if (!shouldTrackStorePriceQueueEntry(status)) {
+  if (!shouldTrackStorePriceQueueEntry(status, automationEligible)) {
     return storePriceMatchProposals.enteredQueueAt;
   }
 
@@ -557,7 +455,7 @@ function shouldAutoCreateStorePriceMatchProposal({
   automationAssessment: StorePriceMatchAutomationAssessment | null;
 }) {
   return (
-    decision.action === "create_new" &&
+    decision.action === "create_bottle" &&
     decision.proposedBottle !== null &&
     automationAssessment?.automationEligible === true
   );
@@ -629,38 +527,13 @@ async function canContinueStorePriceMatchProcessing(
 function buildStorePriceMatchBottleInput(
   decision: StorePriceMatchDecision,
 ): BottleCreateInput {
-  if (decision.action !== "create_new" || decision.proposedBottle === null) {
+  if (decision.action !== "create_bottle" || decision.proposedBottle === null) {
     throw new Error(
       "Price match decision does not contain one Bottle creation input.",
     );
   }
 
   return buildClassifierBottleInput(decision.proposedBottle);
-}
-
-function getStorePriceBottleRepairDraft(
-  proposal: StorePriceMatchProposalForReview,
-): StorePriceBottleRepairDraft {
-  if (
-    proposal.currentBottleId === null ||
-    proposal.suggestedBottleId === null ||
-    proposal.currentBottleId !== proposal.suggestedBottleId
-  ) {
-    throw new StorePriceBottleRepairBadRequestError(
-      "Price match proposal is not an existing-bottle repair.",
-    );
-  }
-
-  const parsedBottle = StorePriceBottleRepairDraftSchema.safeParse(
-    proposal.proposedBottle,
-  );
-  if (!parsedBottle.success) {
-    throw new StorePriceBottleRepairBadRequestError(
-      "Price match proposal does not contain a valid bottle repair draft.",
-    );
-  }
-
-  return parsedBottle.data;
 }
 
 function buildStorePriceObservationFacts(
@@ -753,21 +626,19 @@ export async function upsertStorePriceMatchProposal({
   const parsedDecision = decision
     ? StorePriceMatchDecisionSchema.parse(decision)
     : null;
-  const proposalType = parsedDecision
-    ? getProposalType(price, parsedDecision)
-    : "no_match";
+  const proposalType = parsedDecision?.action ?? "no_match";
   const status =
-    statusOverride ??
-    (parsedDecision
-      ? getProposalStatus(parsedDecision, automationAssessment ?? null)
-      : "errored");
-  const enteredQueueAt = shouldTrackStorePriceQueueEntry(status)
+    statusOverride ?? (parsedDecision ? "pending_review" : "errored");
+  const automationEligible = automationAssessment?.automationEligible ?? false;
+  const enteredQueueAt = shouldTrackStorePriceQueueEntry(
+    status,
+    automationEligible,
+  )
     ? sql`NOW()`
     : null;
   const proposalRuntimeValues = {
     status,
     proposalType,
-    confidence: parsedDecision?.confidence ?? null,
     currentBottleId: price.bottleId,
     suggestedBottleId: parsedDecision?.suggestedBottleId ?? null,
     referenceScope: parsedDecision?.referenceScope ?? null,
@@ -806,14 +677,20 @@ export async function upsertStorePriceMatchProposal({
           model: model === undefined ? config.BOTTLE_CLASSIFIER_MODEL : model,
           error: error || null,
           lastEvaluatedAt: sql`NOW()`,
-          enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
+          enteredQueueAt: getStorePriceQueueEntryUpdateValue(
+            status,
+            automationEligible,
+          ),
           reviewedById: null,
           reviewedAt: null,
           updatedAt: sql`NOW()`,
         }
       : {
           ...proposalRuntimeValues,
-          enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
+          enteredQueueAt: getStorePriceQueueEntryUpdateValue(
+            status,
+            automationEligible,
+          ),
         };
   const [proposal] = await tx
     .insert(storePriceMatchProposals)
@@ -896,7 +773,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
 
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
-    expectedProposalTypes: ["create_new", "match_existing", "no_match"],
+    expectedProposalTypes: ["create_bottle", "match", "no_match"],
     allowedStatuses: ["pending_review", "errored"],
     expectedProcessingToken,
   });
@@ -914,7 +791,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     allowSystemActor: creationSource === "price_match_automation",
     decisionLog: {
       actor: writeActor,
-      decision: createResult ? "create_bottle" : "match_existing",
+      decision: createResult ? "create_bottle" : "match",
       createdBottle: !!createResult,
       metadata: {
         creationSource,
@@ -1049,8 +926,7 @@ async function resolveApprovedBarcodeStorePriceMatch({
     }
 
     const decision: StorePriceMatchDecision = {
-      action: "match_existing",
-      confidence: null,
+      action: "match",
       rationale: `Matched approved barcode ${normalizedBarcode.value}. Bottle size and known bottle details agree.`,
       candidateBottleIds: [match.bottleId],
       identityScope: "product",
@@ -1065,7 +941,10 @@ async function resolveApprovedBarcodeStorePriceMatch({
       candidates: [match.candidate],
       decision,
       searchEvidence: [],
-      statusOverride: "verified",
+      automationAssessment: {
+        automationEligible: true,
+        automationBlockers: [],
+      },
       expectedProcessingToken: processingToken,
       model: null,
       tx,
@@ -1082,7 +961,7 @@ async function resolveApprovedBarcodeStorePriceMatch({
     const proposalForReview =
       await getStorePriceMatchProposalForReviewInTransaction(tx, {
         proposalId: proposal.id,
-        allowedStatuses: ["verified"],
+        allowedStatuses: ["pending_review"],
         expectedProcessingToken: processingToken,
       });
     const actor = await getPriceMatchWriteActorForDatabase(tx, systemActor, {
@@ -1095,7 +974,7 @@ async function resolveApprovedBarcodeStorePriceMatch({
       bottleId: match.bottleId,
       decisionLog: {
         actor,
-        decision: "match_existing",
+        decision: "match",
         metadata: {
           matchingBasis: "canonical_gtin",
           gtin14: normalizedBarcode.gtin14,
@@ -1354,7 +1233,9 @@ export function createStorePriceMatchResolver({
         automationAssessment,
       });
 
-      if (proposal.status !== "verified" && !shouldAutoCreate) {
+      const shouldAutoApprove =
+        decision.action === "match" && automationAssessment.automationEligible;
+      if (!shouldAutoApprove && !shouldAutoCreate) {
         return proposal;
       }
 
@@ -1373,10 +1254,10 @@ export function createStorePriceMatchResolver({
           return await reloadStorePriceMatchProposal(proposal.id);
         }
 
-        if (proposal.status === "verified") {
+        if (shouldAutoApprove) {
           if (!proposal.suggestedBottleId) {
             throw new Error(
-              `Unable to auto-approve verified price match proposal without a suggested Bottle (${proposal.id}).`,
+              `Unable to auto-approve a price match proposal without a suggested Bottle (${proposal.id}).`,
             );
           }
 
@@ -1421,7 +1302,7 @@ export function createStorePriceMatchResolver({
         const error =
           err instanceof Error
             ? err.message
-            : proposal.status === "verified"
+            : shouldAutoApprove
               ? "Unknown auto-approval error"
               : "Unknown auto-create error";
         const erroredProposal = await db.transaction(async (tx) => {
@@ -1527,6 +1408,9 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
   if (!row) {
     throw new UnknownStorePriceMatchProposalError(proposalId);
   }
+  // A row written by the previous release during a deploy may use old names.
+  row.proposal.status = toCurrentProposalStatus(row.proposal.status);
+  row.proposal.proposalType = toCurrentProposalType(row.proposal.proposalType);
 
   if (!allowedStatuses.includes(row.proposal.status)) {
     throw new StorePriceMatchProposalNotReviewableError(
@@ -1737,7 +1621,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
   // suggested Bottle. The exact StorePrice assignment below is independent.
   const shouldAssignReference =
     proposal.referenceScope === "global_alias" &&
-    (proposal.proposalType === "create_new" ||
+    (proposal.proposalType === "create_bottle" ||
       proposal.suggestedBottleId === bottleId);
   const referenceResult = shouldAssignReference
     ? await assignBottleReferenceInTransaction(tx, {
@@ -1826,7 +1710,7 @@ export async function applyApprovedStorePriceMatchInTransaction(
       bottleId,
       decisionLog: {
         actor,
-        decision: "match_existing",
+        decision: "match",
       },
     }),
     bottleId,
@@ -1866,88 +1750,6 @@ export async function applyApprovedStorePriceMatch({
  * Commits the canonical Bottle update and proposal approval atomically, then
  * runs both retained finalizers only after that transaction commits.
  */
-export async function applyStorePriceBottleRepairFromProposal({
-  proposalId,
-  user,
-  actor,
-  expectedProcessingToken,
-}: {
-  proposalId: number;
-  user: User;
-  actor: IncomingBottleDecisionActor;
-  expectedProcessingToken?: string;
-}) {
-  const { updateManifest, approval } = await db.transaction(async (tx) => {
-    const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
-    if (
-      preflight.proposalType !== "correction" ||
-      preflight.currentBottleId === null
-    ) {
-      throw new StorePriceBottleRepairBadRequestError(
-        "Price match proposal is not an existing-bottle repair.",
-      );
-    }
-    const repairBottleId = preflight.currentBottleId;
-    if (preflight.suggestedBottleId !== repairBottleId) {
-      throw new StorePriceBottleRepairBadRequestError(
-        "Price match repair must select the current Bottle.",
-      );
-    }
-
-    const proposedBottle = getStorePriceBottleRepairDraft(preflight);
-    const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
-      userId: user.id,
-    });
-    // The Bottle writer acquires and validates the active Bottle graph
-    // before the proposal and its consumers are locked below.
-    const updateManifest = await updateBottleInTransaction(tx, {
-      bottleId: repairBottleId,
-      input: buildBottleRepairInput(proposedBottle),
-      actorId: writeActor.id,
-      creationSource: "price_match_review",
-    });
-
-    const proposal = await getStorePriceMatchProposalForReviewInTransaction(
-      tx,
-      {
-        proposalId,
-        expectedProposalTypes: ["correction"],
-        expectedProcessingToken,
-      },
-    );
-    if (
-      proposal.proposalType !== preflight.proposalType ||
-      proposal.currentBottleId !== preflight.currentBottleId ||
-      proposal.suggestedBottleId !== preflight.suggestedBottleId ||
-      proposal.price.bottleId !== preflight.price.bottleId
-    ) {
-      throw new StorePriceMatchProposalIdentityChangedError(proposalId);
-    }
-    const approval = await applyApprovedStorePriceMatchProposalInTransaction(
-      tx,
-      {
-        proposal,
-        reviewedById: user.id,
-        bottleId: updateManifest.bottle.id,
-        decisionLog: {
-          actor,
-          decision: "match_existing",
-        },
-      },
-    );
-
-    return {
-      updateManifest,
-      approval,
-    };
-  });
-
-  await finalizeStorePriceApproval(approval, updateManifest.bottle.id);
-  await finalizeBottleUpdate(updateManifest);
-
-  return updateManifest.bottle;
-}
-
 export async function ignoreStorePriceMatchProposal({
   proposalId,
   reviewedById,

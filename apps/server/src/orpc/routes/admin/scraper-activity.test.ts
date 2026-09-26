@@ -208,7 +208,7 @@ describe("GET /admin/scrapers/activity", () => {
         sourceId: matchedPrice.id,
         externalSiteId: priceSite.id,
         name: matchedPrice.name,
-        decision: "match_existing",
+        decision: "match",
         actorId: systemActor.id,
         bottleId: bottle.id,
         createdAt: startedAt,

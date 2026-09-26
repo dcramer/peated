@@ -105,7 +105,7 @@ describe("PATCH /external-reviews/:externalReview", () => {
         ),
       }),
     ).toMatchObject({
-      decision: "match_existing",
+      decision: "match",
       bottleId: nextBottle.id,
     });
   });

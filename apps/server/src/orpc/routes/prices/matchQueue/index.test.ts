@@ -64,14 +64,6 @@ describe("price match queue", () => {
     );
     expect(resolveError).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
 
-    const applyError = await waitError(
-      routerClient.prices.matchQueue.applyBottleRepair(
-        { proposal: 1 },
-        { context: { user } },
-      ),
-    );
-    expect(applyError).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-
     const beforeCreate = await Promise.all([
       db
         .select({ id: storePriceMatchProposals.id })
@@ -133,7 +125,7 @@ describe("price match queue", () => {
       .values({
         priceId: visiblePrice.id,
         status: "pending_review",
-        proposalType: "correction",
+        proposalType: "match",
         confidence: 62,
         currentBottleId: currentBottle.id,
         suggestedBottleId: suggestedBottle.id,
@@ -185,7 +177,7 @@ describe("price match queue", () => {
       (item) => item.id === pendingProposal.id,
     );
     expect(queueItem).toMatchObject({
-      proposalType: "correction",
+      proposalType: "match",
       price: {
         id: visiblePrice.id,
         name: "Queue Candidate",
@@ -231,7 +223,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "correction",
+        proposalType: "match",
         currentBottleId: bottle.id,
       })
       .returning();
@@ -270,7 +262,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
       })
       .returning();
     await db.insert(bottleChecks).values({
@@ -320,7 +312,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "approved",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: destinationBottle.id,
       })
       .returning();
@@ -396,7 +388,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "approved",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: destinationBottle.id,
       })
       .returning();
@@ -490,7 +482,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -514,7 +506,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         candidateBottles: [
           {
             kind: "bottle",
@@ -613,7 +605,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: candidate.id,
         candidateBottles: [
           {
@@ -689,7 +681,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         currentBottleId: parent.id,
       })
       .returning();
@@ -720,7 +712,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         currentBottleId: bottle.id,
       })
       .returning();
@@ -763,7 +755,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "correction",
+        proposalType: "match",
         confidence: 62,
         currentBottleId: currentBottle.id,
         suggestedBottleId: suggestedBottle.id,
@@ -802,660 +794,6 @@ describe("price match queue", () => {
     });
   });
 
-  test("serializes same-bottle correction proposals with repair drafts", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const brand = await fixtures.Entity({
-      name: "The Whistler",
-      kind: "bottler",
-    });
-    const currentBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Bodega Cask",
-      category: "blend",
-      edition: "Port Pipe",
-      abv: 46,
-      caskStrength: true,
-      releaseYear: 2020,
-      distillerIds: [],
-    });
-    const price = await fixtures.StorePrice({
-      externalSiteId: site.id,
-      name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
-      bottleId: currentBottle.id,
-    });
-
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-        confidence: 92,
-        currentBottleId: currentBottle.id,
-        suggestedBottleId: currentBottle.id,
-        candidateBottles: [
-          {
-            bottleId: currentBottle.id,
-            fullName: currentBottle.fullName,
-            reference: currentBottle.fullName,
-            brand: "The Whistler",
-            bottler: null,
-            series: null,
-            distillery: [],
-            category: "blend",
-            statedAge: null,
-            edition: null,
-            caskStrength: null,
-            singleCask: null,
-            abv: null,
-            vintageYear: null,
-            releaseYear: null,
-            maturation: null,
-            caskNumber: null,
-            outturn: null,
-            score: 0.99,
-            source: ["exact"],
-          },
-        ],
-        extractedLabel: {
-          brand: "The Whistler",
-          bottler: null,
-          expression: "Bodega Cask",
-          series: null,
-          distillery: ["Boann Distillery"],
-          category: "single_malt",
-          stated_age: null,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          maturation: null,
-          cask_number: null,
-          outturn: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-        proposedBottle: {
-          name: "Bodega Cask",
-          series: null,
-          category: "single_malt",
-          edition: null,
-          statedAge: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          maturation: "Bourbon barrel",
-          caskNumber: "#1234",
-          outturn: 240,
-          brand: {
-            id: brand.id,
-            name: "The Whistler",
-          },
-          distillers: [
-            {
-              id: null,
-              name: "Boann Distillery",
-            },
-          ],
-          bottler: null,
-        },
-        searchEvidence: [
-          {
-            provider: "openai",
-            query: '"The Whistler Bodega Cask" single malt',
-            summary:
-              "Official and critic sources describe The Whistler Bodega Cask as a single malt from Boann Distillery.",
-            results: [
-              {
-                title:
-                  "Whiskey Review: The Whistler Bodega Cask Irish Single Malt",
-                url: "https://thewhiskeywash.com/reviews/whiskey-review-the-whistler-bodega-cask-irish-single-malt/",
-                domain: "thewhiskeywash.com",
-                description:
-                  "Reviewing The Whistler Bodega Cask Irish Single Malt.",
-                extraSnippets: [],
-              },
-            ],
-          },
-        ],
-        rationale:
-          "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits.",
-      })
-      .returning();
-
-    const result = await routerClient.prices.matchQueue.list(
-      {},
-      { context: { user } },
-    );
-    const queueItem = result.results.find((item) => item.id === proposal.id);
-
-    expect(queueItem).toMatchObject({
-      proposalType: "correction",
-      currentBottle: {
-        id: currentBottle.id,
-      },
-      suggestedBottle: {
-        id: currentBottle.id,
-      },
-      proposedBottle: {
-        name: "Bodega Cask",
-        category: "single_malt",
-        maturation: "Bourbon barrel",
-        caskNumber: "#1234",
-        outturn: 240,
-        distillers: [
-          {
-            name: "Boann Distillery",
-          },
-        ],
-      },
-    });
-  });
-
-  test("applies same-bottle repair drafts and approves the listing", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const brand = await fixtures.Entity({
-      name: "The Whistler",
-      kind: "bottler",
-    });
-    const distillery = await fixtures.Entity({
-      name: "Boann Distillery",
-      kind: "distillery",
-    });
-    const sourceSeries = await fixtures.BottleSeries({
-      brandId: brand.id,
-      name: "Legacy",
-    });
-    const targetSeries = await fixtures.BottleSeries({
-      brandId: brand.id,
-      name: "Bodega",
-    });
-    const currentBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Bodega Cask",
-      seriesId: sourceSeries.id,
-      category: "blend",
-      statedAge: 12,
-      bottlerId: brand.id,
-      edition: "Port Pipe",
-      abv: 46,
-      caskStrength: true,
-      releaseYear: 2020,
-      distillerIds: [distillery.id],
-    });
-    const sibling = await fixtures.BottleGroupMember({
-      groupId: currentBottle.groupId!,
-      edition: "Batch 2",
-      statedAge: 14,
-      abv: 50,
-      caskStrength: true,
-      releaseYear: 2021,
-    });
-    const siblingId = sibling.id;
-    await db
-      .update(bottleSeries)
-      .set({ numReleases: 2 })
-      .where(eq(bottleSeries.id, sourceSeries.id));
-    const price = await fixtures.StorePrice({
-      externalSiteId: site.id,
-      name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
-      bottleId: currentBottle.id,
-    });
-
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-        confidence: 92,
-        currentBottleId: currentBottle.id,
-        suggestedBottleId: currentBottle.id,
-        referenceScope: "global_alias",
-        candidateBottles: [
-          {
-            bottleId: currentBottle.id,
-            fullName: currentBottle.fullName,
-            reference: currentBottle.fullName,
-            brand: "The Whistler",
-            bottler: null,
-            series: null,
-            distillery: [],
-            category: "blend",
-            statedAge: null,
-            edition: null,
-            caskStrength: null,
-            singleCask: null,
-            abv: null,
-            vintageYear: null,
-            releaseYear: null,
-            maturation: null,
-            caskNumber: null,
-            outturn: null,
-            score: 0.99,
-            source: ["exact"],
-          },
-        ],
-        extractedLabel: {
-          brand: "The Whistler",
-          bottler: null,
-          expression: "Bodega Cask",
-          series: null,
-          distillery: ["Boann Distillery"],
-          category: "single_malt",
-          stated_age: null,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          maturation: null,
-          cask_number: null,
-          outturn: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: "Bodega Review",
-        },
-        proposedBottle: {
-          name: "Bodega Cask",
-          series: {
-            id: targetSeries.id,
-            name: targetSeries.name,
-          },
-          category: "single_malt",
-          edition: "Bodega Review",
-          statedAge: null,
-          caskStrength: false,
-          singleCask: null,
-          abv: 0,
-          vintageYear: null,
-          releaseYear: null,
-          maturation: null,
-          caskNumber: null,
-          outturn: null,
-          brand: {
-            id: brand.id,
-            name: "The Whistler",
-          },
-          distillers: [],
-          bottler: null,
-        },
-        rationale:
-          "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits.",
-      })
-      .returning();
-
-    const result = await routerClient.prices.matchQueue.applyBottleRepair(
-      { proposal: proposal.id },
-      { context: { user } },
-    );
-
-    expect(result).toMatchObject({
-      id: currentBottle.id,
-      category: "single_malt",
-      edition: "Bodega Review",
-      abv: 0,
-      caskStrength: false,
-      distillers: [
-        {
-          id: distillery.id,
-          name: "Boann Distillery",
-        },
-      ],
-    });
-
-    const [
-      updatedGroup,
-      updatedBottle,
-      updatedSibling,
-      updatedPrice,
-      updatedProposal,
-      memberDistillerRows,
-      groupDistillerRows,
-      updatedSourceSeries,
-      updatedTargetSeries,
-      repairChanges,
-    ] = await Promise.all([
-      db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, currentBottle.groupId!),
-      }),
-      db.query.bottles.findFirst({
-        where: eq(bottles.id, currentBottle.id),
-      }),
-      db.query.bottles.findFirst({
-        where: eq(bottles.id, siblingId),
-      }),
-      db.query.storePrices.findFirst({
-        where: eq(storePrices.id, price.id),
-      }),
-      db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, proposal.id),
-      }),
-      db
-        .select()
-        .from(bottlesToDistillers)
-        .where(
-          inArray(bottlesToDistillers.bottleId, [currentBottle.id, siblingId]),
-        )
-        .orderBy(
-          asc(bottlesToDistillers.bottleId),
-          asc(bottlesToDistillers.distillerId),
-        ),
-      db.query.bottleGroupDistillers.findMany({
-        where: eq(bottleGroupDistillers.groupId, currentBottle.groupId!),
-      }),
-      db.query.bottleSeries.findFirst({
-        where: eq(bottleSeries.id, sourceSeries.id),
-      }),
-      db.query.bottleSeries.findFirst({
-        where: eq(bottleSeries.id, targetSeries.id),
-      }),
-      db
-        .select()
-        .from(changes)
-        .where(
-          and(
-            eq(changes.objectType, "bottle"),
-            eq(changes.type, "update"),
-            inArray(changes.objectId, [currentBottle.id, siblingId]),
-          ),
-        )
-        .orderBy(asc(changes.objectId)),
-    ]);
-
-    expect(updatedGroup).toMatchObject({
-      id: currentBottle.groupId,
-      name: "Bodega Cask",
-      seriesId: targetSeries.id,
-      category: "single_malt",
-      statedAge: 12,
-      bottlerId: brand.id,
-    });
-    expect(updatedBottle).toMatchObject({
-      id: currentBottle.id,
-      groupId: currentBottle.groupId,
-      seriesId: targetSeries.id,
-      category: "single_malt",
-      statedAge: 12,
-      bottlerId: brand.id,
-      edition: "Bodega Review",
-      abv: 0,
-      caskStrength: false,
-      releaseYear: 2020,
-    });
-    expect(updatedSibling).toMatchObject({
-      id: siblingId,
-      groupId: currentBottle.groupId,
-      seriesId: targetSeries.id,
-      category: "single_malt",
-      statedAge: 14,
-      bottlerId: brand.id,
-      edition: "Batch 2",
-      abv: 50,
-      caskStrength: true,
-      releaseYear: 2021,
-    });
-    expect(updatedPrice).toMatchObject({
-      bottleId: currentBottle.id,
-    });
-    expect(updatedProposal).toMatchObject({
-      status: "approved",
-      proposalType: "correction",
-      currentBottleId: currentBottle.id,
-      suggestedBottleId: currentBottle.id,
-      reviewedById: user.id,
-    });
-    expect(memberDistillerRows).toEqual([
-      expect.objectContaining({
-        bottleId: currentBottle.id,
-        distillerId: distillery.id,
-      }),
-      expect.objectContaining({
-        bottleId: siblingId,
-        distillerId: distillery.id,
-      }),
-    ]);
-    expect(groupDistillerRows.map((row) => row.distillerId)).toEqual([
-      distillery.id,
-    ]);
-    expect(updatedSourceSeries?.numReleases).toEqual(0);
-    expect(updatedTargetSeries?.numReleases).toEqual(2);
-    const actorId = (await getUserActor(user)).id;
-    expect(repairChanges).toHaveLength(2);
-    expect(repairChanges).toEqual([
-      expect.objectContaining({
-        objectId: currentBottle.id,
-        actorId,
-        data: expect.objectContaining({
-          creationSource: "price_match_review",
-          updateScope: "mixed",
-          groupId: currentBottle.groupId,
-          requestedBottleId: currentBottle.id,
-        }),
-      }),
-      expect.objectContaining({
-        objectId: siblingId,
-        actorId,
-        data: expect.objectContaining({
-          creationSource: "price_match_review",
-          updateScope: "shared",
-          groupId: currentBottle.groupId,
-          requestedBottleId: currentBottle.id,
-        }),
-      }),
-    ]);
-
-    const observation = await db.query.bottleObservations.findFirst({
-      where: (bottleObservations, { eq }) =>
-        eq(bottleObservations.sourceKey, `store_price:${price.id}`),
-    });
-    const listingAlias = await db.query.bottleReferences.findFirst({
-      where: eq(bottleReferences.name, normalizeBottleReferenceKey(price.name)),
-    });
-    expect(observation).toMatchObject({
-      bottleId: currentBottle.id,
-      facts: expect.objectContaining({
-        proposalType: "correction",
-        proposedBottle: expect.objectContaining({
-          category: "single_malt",
-        }),
-      }),
-    });
-    expect(listingAlias).toMatchObject({
-      bottleId: currentBottle.id,
-    });
-  });
-
-  test("rejects repair approval when the suggested Bottle changed", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const selected = await fixtures.Bottle({ name: "Repair Target Owner" });
-    const other = await fixtures.Bottle({ name: "Repair Target Drift" });
-    const cases = [
-      { name: "Bottle suggestion drift", suggestedBottleId: other.id },
-    ];
-
-    for (const testCase of cases) {
-      const price = await fixtures.StorePrice({
-        bottleId: selected.id,
-        name: `Repair ${testCase.name}`,
-      });
-      const [proposal] = await db
-        .insert(storePriceMatchProposals)
-        .values({
-          priceId: price.id,
-          status: "pending_review",
-          proposalType: "correction",
-          currentBottleId: selected.id,
-          suggestedBottleId: testCase.suggestedBottleId,
-          proposedBottle: {
-            name: selected.name,
-            brand: {
-              id: selected.brandId,
-              name: "Repair Target Brand",
-            },
-          },
-        })
-        .returning();
-
-      const error = await waitError(
-        routerClient.prices.matchQueue.applyBottleRepair(
-          { proposal: proposal.id },
-          { context: { user } },
-        ),
-      );
-
-      expect(error, testCase.name).toMatchObject({ status: 400 });
-      expect(
-        await db.query.storePriceMatchProposals.findFirst({
-          where: eq(storePriceMatchProposals.id, proposal.id),
-        }),
-        testCase.name,
-      ).toMatchObject({ status: "pending_review" });
-    }
-  });
-
-  test("repairs shared names without overwriting an accepted alias", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const brand = await fixtures.Entity({
-      name: "Repair Collision Brand",
-      kind: "brand",
-    });
-    const selected = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Repair Collision Source",
-      category: "blend",
-    });
-    const sibling = await fixtures.BottleGroupMember({
-      groupId: selected.groupId!,
-      edition: "Batch 2",
-      abv: 50,
-    });
-    const conflicting = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "External Conflict Owner",
-    });
-    await fixtures.BottleReference({
-      bottleId: conflicting.id,
-      name: sibling.fullName.replace(
-        "Repair Collision Source",
-        "Repair Collision Target",
-      ),
-    });
-    const price = await fixtures.StorePrice({
-      externalSiteId: site.id,
-      name: "Repair Collision Listing",
-      bottleId: selected.id,
-    });
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-        currentBottleId: selected.id,
-        suggestedBottleId: selected.id,
-        proposedBottle: {
-          name: "Repair Collision Target",
-          series: null,
-          category: "single_malt",
-          edition: null,
-          statedAge: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          maturation: null,
-          caskNumber: null,
-          outturn: null,
-          brand: { id: brand.id, name: brand.name },
-          distillers: [],
-          bottler: null,
-        },
-      })
-      .returning();
-
-    const memberIds = [selected.id, sibling.id];
-    const aliasesBefore = await db
-      .select()
-      .from(bottleReferences)
-      .orderBy(asc(bottleReferences.name));
-
-    await routerClient.prices.matchQueue.applyBottleRepair(
-      { proposal: proposal.id },
-      { context: { user } },
-    );
-
-    const [
-      groupAfter,
-      membersAfter,
-      aliasesAfter,
-      proposalAfter,
-      priceAfter,
-      observation,
-      repairChanges,
-    ] = await Promise.all([
-      db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, selected.groupId!),
-      }),
-      db
-        .select()
-        .from(bottles)
-        .where(inArray(bottles.id, memberIds))
-        .orderBy(asc(bottles.id)),
-      db.select().from(bottleReferences).orderBy(asc(bottleReferences.name)),
-      db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, proposal.id),
-      }),
-      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
-      db.query.bottleObservations.findFirst({
-        where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
-      }),
-      db
-        .select()
-        .from(changes)
-        .where(
-          and(
-            eq(changes.objectType, "bottle"),
-            eq(changes.type, "update"),
-            inArray(changes.objectId, memberIds),
-          ),
-        ),
-    ]);
-
-    expect(groupAfter).toMatchObject({
-      name: "Repair Collision Target",
-      category: "single_malt",
-    });
-    expect(membersAfter).toHaveLength(2);
-    expect(
-      membersAfter.every(({ fullName }) =>
-        fullName.includes("Repair Collision Target"),
-      ),
-    ).toBe(true);
-    expect(aliasesAfter).toEqual(aliasesBefore);
-    expect(proposalAfter).toMatchObject({
-      status: "approved",
-      reviewedById: user.id,
-    });
-    expect(priceAfter).toMatchObject({
-      bottleId: selected.id,
-    });
-    expect(observation).toMatchObject({ bottleId: selected.id });
-    expect(repairChanges).toHaveLength(2);
-  });
-
   test("filters queue items by kind and orders ties by newest id", async ({
     fixtures,
   }) => {
@@ -1489,7 +827,7 @@ describe("price match queue", () => {
       .values({
         priceId: firstCreatePrice.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         updatedAt: sharedUpdatedAt,
       })
       .returning();
@@ -1499,7 +837,7 @@ describe("price match queue", () => {
       .values({
         priceId: secondCreatePrice.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         updatedAt: sharedUpdatedAt,
       })
       .returning();
@@ -1509,7 +847,7 @@ describe("price match queue", () => {
       .values({
         priceId: correctionPrice.id,
         status: "pending_review",
-        proposalType: "correction",
+        proposalType: "match",
         currentBottleId: currentBottle.id,
         updatedAt: new Date("2026-03-08T11:00:00.000Z"),
       })
@@ -1530,7 +868,7 @@ describe("price match queue", () => {
       { context: { user } },
     );
     const createResults = await routerClient.prices.matchQueue.list(
-      { kind: "create_new" },
+      { kind: "create_bottle" },
       { context: { user } },
     );
     const erroredResults = await routerClient.prices.matchQueue.list(
@@ -1618,7 +956,7 @@ describe("price match queue", () => {
       .values({
         priceId: oldestPrice.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         createdAt: new Date("2026-03-08T08:00:00.000Z"),
         updatedAt: new Date("2026-03-08T11:00:00.000Z"),
       })
@@ -1629,7 +967,7 @@ describe("price match queue", () => {
       .values({
         priceId: middlePrice.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         createdAt: new Date("2026-03-08T09:00:00.000Z"),
         updatedAt: new Date("2026-03-08T10:00:00.000Z"),
       })
@@ -1640,7 +978,7 @@ describe("price match queue", () => {
       .values({
         priceId: newestPrice.id,
         status: "pending_review",
-        proposalType: "correction",
+        proposalType: "match",
         createdAt: new Date("2026-03-08T10:00:00.000Z"),
         updatedAt: new Date("2026-03-08T09:00:00.000Z"),
       })
@@ -1726,7 +1064,7 @@ describe("price match queue", () => {
       .values({
         priceId: actionablePrice.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         updatedAt: new Date("2026-03-08T10:00:00.000Z"),
       })
       .returning();
@@ -1736,7 +1074,7 @@ describe("price match queue", () => {
       .values({
         priceId: processingPrice.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         processingToken: "processing-token",
         processingQueuedAt: new Date(now - 60_000),
         processingExpiresAt: new Date(now + 15 * 60_000),
@@ -1806,7 +1144,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         confidence: 88,
         extractedLabel: {
           brand: "Independent Brand",
@@ -1853,7 +1191,7 @@ describe("price match queue", () => {
 
     expect(result).toMatchObject({
       id: proposal.id,
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       price: {
         id: price.id,
         name: "Unknown Dram",
@@ -1920,7 +1258,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -1929,7 +1267,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         proposalId: proposal.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "pending_review",
       })
       .returning();
@@ -2000,7 +1338,7 @@ describe("price match queue", () => {
     expect(alias).toBeUndefined();
     expect(decisionLog).toMatchObject({
       actorId: userActor.id,
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
     });
     expect(updatedPrice).toMatchObject({
@@ -2082,7 +1420,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "none",
         suggestedBottleId: exactBottle.id,
       })
@@ -2151,7 +1489,7 @@ describe("price match queue", () => {
     expect(decisionLog).toMatchObject({
       proposalId: proposal.id,
       bottleId: exactBottle.id,
-      decision: "match_existing",
+      decision: "match",
       metadata: expect.objectContaining({ referenceScope: "none" }),
     });
   });
@@ -2179,7 +1517,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -2241,7 +1579,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         currentBottleId: bottle.id,
         suggestedBottleId: bottle.id,
       })
@@ -2266,7 +1604,7 @@ describe("price match queue", () => {
     expect(decisionLog).toMatchObject({
       proposalId: proposal.id,
       actorId: (await getUserActor(user)).id,
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
     });
@@ -2294,7 +1632,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: sourceBottle.id,
       })
       .returning();
@@ -2303,7 +1641,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         proposalId: proposal.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "pending_review",
       })
       .returning();
@@ -2361,7 +1699,7 @@ describe("price match queue", () => {
       suggestedBottleId: sourceBottle.id,
     });
     expect(decisionLog).toMatchObject({
-      decision: "match_existing",
+      decision: "match",
       bottleId: sourceBottle.id,
     });
     expect(decisionLog?.bottleId).toBe(sourceBottle.id);
@@ -2382,7 +1720,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: suggestedBottle.id,
       })
@@ -2428,7 +1766,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         referenceScope: "global_alias",
         proposedBottle: completeProposedBottle({
           name: "Single Cask",
@@ -2445,7 +1783,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         proposalId: proposal.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "pending_review",
         finalStatus: "ignored",
         currentBottleId: priorBottle.id,
@@ -2459,7 +1797,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         proposalId: proposal.id,
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         initialStatus: "pending_review",
       })
       .returning();
@@ -2562,7 +1900,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         proposedBottle: completeProposedBottle({
           name: "Private Selection",
           brand: { id: brand.id, name: brand.name },
@@ -2628,7 +1966,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         referenceScope: "global_alias",
         currentBottleId: previousBottle.id,
         proposedBottle: completeProposedBottle({
@@ -2642,7 +1980,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         proposalId: proposal.id,
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         initialStatus: "pending_review",
         currentBottleId: previousBottle.id,
       })
@@ -2656,7 +1994,7 @@ describe("price match queue", () => {
         proposalId: proposal.id,
         externalSiteId: price.externalSiteId,
         name: price.name,
-        decision: "match_existing",
+        decision: "match",
         actorId: actor.id,
         bottleId: previousBottle.id,
         createdBottle: false,
@@ -2787,7 +2125,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         proposedBottle: completeProposedBottle({
           name: "Trusted Expression",
           brand: { id: durableBrand.id, name: durableBrand.name },
@@ -2919,7 +2257,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
       })
       .returning();
     const [bottlesBefore, groupsBefore] = await Promise.all([
@@ -2985,7 +2323,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         proposedBottle: completeProposedBottle({
           name: "Retry Expression",
           brand: { id: brand.id, name: brand.name },
@@ -3089,7 +2427,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         proposedBottle: completeProposedBottle({
           name: "Cross Group Expression",
           brand: { id: brand.id, name: brand.name },
@@ -3137,7 +2475,7 @@ describe("price match queue", () => {
       currentBottleId: existing.id,
     });
     expect(decisionLog).toMatchObject({
-      decision: "match_existing",
+      decision: "match",
       bottleId: existing.id,
       createdBottle: false,
       createdRelease: false,
@@ -3191,7 +2529,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
       })
       .returning();
     const [bottlesBefore, groupsBefore] = await Promise.all([
@@ -3248,7 +2586,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: suggestedBottle.id,
       })
       .returning();
@@ -3295,6 +2633,52 @@ describe("price match queue", () => {
       bottleId: createdBottle.id,
       decision: "create_bottle",
       createdBottle: true,
+    });
+  });
+
+  // TODO(prices): Remove with the old enum values in the follow-up deploy.
+  test("reads and reviews a proposal the previous release wrote mid-deploy", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Legacy Row Brand" });
+    const price = await fixtures.StorePrice({ name: "Legacy Row Release" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "verified",
+        proposalType: "create_new",
+      })
+      .returning();
+
+    const details = await routerClient.prices.matchQueue.details(
+      { proposal: proposal.id },
+      { context: { user } },
+    );
+    expect(details).toMatchObject({
+      status: "pending_review",
+      proposalType: "create_bottle",
+    });
+
+    const createdBottle = await routerClient.prices.matchQueue.createBottle(
+      {
+        proposal: proposal.id,
+        independentBottle: {
+          name: "Legacy Row Release",
+          brand: brand.id,
+          category: "single_malt",
+        },
+      },
+      { context: { user } },
+    );
+    expect(
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+    ).toMatchObject({
+      status: "approved",
+      suggestedBottleId: createdBottle.id,
     });
   });
 
@@ -3407,104 +2791,6 @@ describe("price match queue", () => {
     expect(createdBottle).toBeUndefined();
   });
 
-  test("rejects Bottle creation from a verified proposal", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const brand = await fixtures.Entity({ name: "Verified Review Brand" });
-    const suggestedBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Verified Match",
-    });
-    const price = await fixtures.StorePrice({
-      name: "Verified Review Release",
-      bottleId: null,
-    });
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "verified",
-        proposalType: "match_existing",
-        suggestedBottleId: suggestedBottle.id,
-      })
-      .returning();
-
-    const err = await waitError(
-      routerClient.prices.matchQueue.createBottle(
-        {
-          proposal: proposal.id,
-          independentBottle: {
-            name: "Verified Review Release",
-            brand: brand.id,
-          },
-        },
-        { context: { user } },
-      ),
-    );
-
-    const [updatedProposal, updatedPrice, createdBottle] = await Promise.all([
-      db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, proposal.id),
-      }),
-      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
-      db.query.bottles.findFirst({
-        where: eq(
-          bottles.fullName,
-          "Verified Review Brand Verified Review Release",
-        ),
-      }),
-    ]);
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Price match proposal is not reviewable (${proposal.id}, verified).]`,
-    );
-    expect(updatedProposal).toMatchObject({
-      status: "verified",
-      suggestedBottleId: suggestedBottle.id,
-      reviewedById: null,
-    });
-    expect(updatedPrice).toMatchObject({ bottleId: null });
-    expect(createdBottle).toBeUndefined();
-  });
-
-  test("rejects proposal-backed bottle creation for correction proposals", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const brand = await fixtures.Entity({ name: "Mismatch Brand" });
-    const price = await fixtures.StorePrice({ name: "Correction Candidate" });
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-      })
-      .returning();
-
-    const err = await waitError(
-      routerClient.prices.matchQueue.createBottle(
-        {
-          proposal: proposal.id,
-          independentBottle: {
-            name: "Should Not Exist",
-            brand: brand.id,
-          },
-        },
-        { context: { user } },
-      ),
-    );
-
-    const createdBottle = await db.query.bottles.findFirst({
-      where: eq(bottles.fullName, "Mismatch Brand Should Not Exist"),
-    });
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Price match proposal has invalid type (${proposal.id}, expected create_new or match_existing or no_match, got correction).]`,
-    );
-    expect(createdBottle).toBeUndefined();
-  });
-
   test("rejects proposal-backed bottle creation for closed proposals", async ({
     fixtures,
   }) => {
@@ -3519,7 +2805,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "approved",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         proposedBottle: completeProposedBottle({
           name: "Already Reviewed",
           brand: { id: brand.id, name: brand.name },
@@ -3570,7 +2856,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: targetBottle.id,
       })
@@ -3616,7 +2902,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         referenceScope: "global_alias",
         proposedBottle: completeProposedBottle({
           name: "Fresh Release",
@@ -3694,7 +2980,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "ignored",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -3728,7 +3014,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: bottle.id,
         processingToken: "active-token",
         processingQueuedAt: new Date(Date.now() - 60_000),
@@ -3798,7 +3084,7 @@ describe("price match queue", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         processingToken: "active-token",
         processingQueuedAt: new Date(Date.now() - 60_000),
         processingExpiresAt: new Date(Date.now() + 10 * 60_000),
@@ -3850,7 +3136,7 @@ describe("price match queue", () => {
         {
           priceId: secondPrice.id,
           status: "pending_review",
-          proposalType: "create_new",
+          proposalType: "create_bottle",
         },
       ])
       .returning();
@@ -3858,7 +3144,7 @@ describe("price match queue", () => {
     await db.insert(storePriceMatchProposals).values({
       priceId: ignoredPrice.id,
       status: "pending_review",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
     });
 
     const result = await routerClient.prices.matchQueue.retryAll(

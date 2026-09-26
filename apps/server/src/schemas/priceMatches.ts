@@ -69,17 +69,16 @@ export type StorePriceMatchAutomationAssessment = z.infer<
 >;
 
 export const StorePriceMatchProposalStatusEnum = z.enum([
-  "verified",
   "pending_review",
   "approved",
   "ignored",
   "errored",
 ]);
 
+/** The Bottle classifier's action names; see the classifier glossary. */
 export const StorePriceMatchProposalTypeEnum = z.enum([
-  "match_existing",
-  "create_new",
-  "correction",
+  "match",
+  "create_bottle",
   "no_match",
 ]);
 export const BottleIdentityScopeEnum = z.enum(["product", "exact_cask"]);
@@ -139,13 +138,8 @@ export const ProposedBottleSchema = z.object({
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 });
 
-export const StorePriceBottleRepairDraftSchema = ProposedBottleSchema;
-
 const StorePriceMatchDecisionBaseSchema = z
   .object({
-    // Numeric confidence was removed from the classifier agent contract; this
-    // field is retained as nullable telemetry and is written null.
-    confidence: z.number().min(0).max(100).nullable().default(null),
     rationale: z.string().nullable().default(null),
     candidateBottleIds: z.array(z.number().int()).default([]),
     identityScope: BottleIdentityScopeEnum.default("product"),
@@ -155,17 +149,12 @@ const StorePriceMatchDecisionBaseSchema = z
 
 export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
   StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("match_existing"),
+    action: z.literal("match"),
     suggestedBottleId: z.number().int(),
     proposedBottle: z.null().default(null),
   }),
   StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("correction"),
-    suggestedBottleId: z.number().int(),
-    proposedBottle: StorePriceBottleRepairDraftSchema.nullable().default(null),
-  }),
-  StorePriceMatchDecisionBaseSchema.extend({
-    action: z.literal("create_new"),
+    action: z.literal("create_bottle"),
     suggestedBottleId: z.null().default(null),
     proposedBottle: ProposedBottleSchema,
   }),

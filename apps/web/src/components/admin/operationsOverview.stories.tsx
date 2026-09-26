@@ -52,7 +52,7 @@ const meta = {
         rate: 73,
         byProposalType: [
           {
-            proposalType: "match_existing",
+            proposalType: "match",
             sampleSize: 72,
             automatic: 65,
             manual: 6,
@@ -60,7 +60,7 @@ const meta = {
             rate: 90,
           },
           {
-            proposalType: "create_new",
+            proposalType: "create_bottle",
             sampleSize: 28,
             automatic: 8,
             manual: 18,

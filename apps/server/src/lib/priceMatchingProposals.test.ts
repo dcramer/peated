@@ -21,7 +21,7 @@ describe("toStorePriceMatchDecision", () => {
     });
 
     expect(decision).toMatchObject({
-      action: "match_existing",
+      action: "match",
       suggestedBottleId: 123,
       referenceScope: "none",
     });
@@ -60,6 +60,6 @@ test("does not change create_bottle into a correction", () => {
     },
   });
 
-  expect(decision.action).toBe("create_new");
+  expect(decision.action).toBe("create_bottle");
   expect(decision.suggestedBottleId).toBeNull();
 });

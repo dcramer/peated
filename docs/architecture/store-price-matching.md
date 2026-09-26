@@ -84,22 +84,24 @@ from the same structured source record.
 
 ## Proposal And Review
 
-Proposal types are `match_existing`, `correction`, `create_new`, and
-`no_match`. Status values are `verified`, `pending_review`, `approved`,
-`ignored`, and `errored`.
+Proposal types use the classifier's action names: `match`, `create_bottle`,
+and `no_match`. A `match` whose `currentBottleId` differs from its suggested
+Bottle would replace the listing's current Bottle. Status values are
+`pending_review`, `approved`, `ignored`, and `errored`. A decision that may
+apply automatically is applied as soon as it is saved; it stays
+`pending_review` only if applying fails.
 
 Moderators can:
 
 - approve an existing Bottle match;
-- apply a correction to that same Bottle;
 - approve one complete new Bottle;
 - choose a different existing Bottle; or
 - ignore the proposal.
 
 A moderator may atomically create a complete, independently reviewed Bottle
-from a reviewable `create_new`, `match_existing`, or `no_match` proposal,
-including an `errored` proposal. An active processing lease still blocks the
-write, and `correction` proposals continue through the correction action.
+from any reviewable proposal, including an `errored` one. An active
+processing lease still blocks the write. A Bottle that needs a catalog fix
+goes through a Bottle audit, not the listing queue.
 
 The review queue lists only listings the store still shows: a price last seen
 more than 7 days ago (`STORE_PRICE_VALIDITY_DAYS`) leaves the queue, its counts,

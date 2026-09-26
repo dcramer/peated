@@ -14,7 +14,7 @@ pnpm cli api get '/bottles?query=Port%20Charlotte%2018&limit=12'
 pnpm cli api get '/admin/moderation/history?category=listing&limit=100&cursor=1'
 ```
 
-Queue filters: `kind=create_new|match_existing|correction|errored`,
+Queue filters: `kind=create_bottle|match|errored`,
 `state=actionable|processing`, `sort=priority|created|-created`, `query`,
 `site`, `cursor`, `limit` (maximum 100). `no_match` proposals appear only
 without `kind`. `stats` on the list response carries the filtered counts.
@@ -66,17 +66,11 @@ pnpm cli api post /prices/match-queue/123 --input /tmp/peated-request.json --yes
 ```
 
 Create body: `{ "proposal": 123, "independentBottle": ... }`. It works for a
-reviewable `create_new`, `match_existing`, or `no_match` proposal, including
+reviewable `create_bottle`, `match`, or `no_match` proposal, including
 `errored`; active processing still blocks the write.
 
 ```bash
 pnpm cli api post /prices/match-queue/123/create-bottle --input /tmp/peated-request.json --yes
-```
-
-Repair body: `{ "proposal": 123 }`.
-
-```bash
-pnpm cli api post /prices/match-queue/123/apply-bottle-repair --input /tmp/peated-request.json --yes
 ```
 
 Stop on `409`. Verify proposal status, the assigned or created Bottle, and

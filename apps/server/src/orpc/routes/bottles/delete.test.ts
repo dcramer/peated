@@ -430,7 +430,7 @@ describe("DELETE /bottles/:bottle", () => {
       .values({
         priceId: price.id,
         status: "approved",
-        proposalType: "match_existing",
+        proposalType: "match",
         currentBottleId: bottle.id,
         suggestedBottleId: bottle.id,
         legacyParentBottleId: bottle.id,

@@ -283,7 +283,7 @@ describe("Bottle check persistence", () => {
       .insert(storePriceMatchProposals)
       .values({
         priceId: price.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         status: "pending_review",
         suggestedBottleId: primary.id,
       })
@@ -293,7 +293,7 @@ describe("Bottle check persistence", () => {
       .values({
         priceId: price.id,
         proposalId: proposal!.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "pending_review",
         suggestedBottleId: primary.id,
       })

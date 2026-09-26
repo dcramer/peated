@@ -9,7 +9,7 @@ import { and, eq, ilike, inArray, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
 export const QueueKindSchema = z
-  .enum(["create_new", "match_existing", "correction", "errored"])
+  .enum(["create_bottle", "match", "errored"])
   .nullable()
   .default(null);
 
