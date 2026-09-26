@@ -33,7 +33,15 @@ different store or product ID never inherits the assignment.
 ## Resolution
 
 Price ingestion builds the Bottle Reference key and reuses an assigned exact
-reference when one exists. Otherwise it queues `ResolveStorePriceBottle`.
+reference when one exists. Otherwise it queues `ResolveStorePriceBottle` once:
+a listing that already has a saved proposal is not queued again by later
+scrapes. A changed source fingerprint or a new barcode assignment queues a
+fresh classification.
+
+When the AI service is unavailable, classification saves nothing and the job
+waits for the service, as the
+[worker README](../../apps/server/src/worker/README.md) describes. A spent
+budget or an outage never marks a listing `errored`.
 
 A trusted Bottle source may emit one parsed Bottle and its retailer listing
 together. After the source successfully creates or resolves that exact Bottle,

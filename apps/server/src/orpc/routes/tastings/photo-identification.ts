@@ -11,11 +11,11 @@ import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleC
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import { isModelServiceUnavailable } from "@peated/server/lib/openaiClient";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
   buildPhotoReferenceName,
   extractPhotoBottleEvidence,
-  isPhotoIdentificationUnavailable,
 } from "@peated/server/lib/photoIdentification";
 import { signPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { humanizeBytes } from "@peated/server/lib/strings";
@@ -571,7 +571,8 @@ function logPhotoIdentificationFailure({
     "photo_identification.file_size": file.size,
     "photo_identification.file_type": file.type || "unknown",
     "photo_identification.error_name": error?.name ?? "NonErrorThrown",
-    "photo_identification.retryable": isPhotoIdentificationUnavailable(error),
+    "photo_identification.retryable":
+      error !== null && isModelServiceUnavailable(error),
   });
   // Global RPC middleware reports the error to Sentry.
 }
@@ -766,7 +767,7 @@ export function createPhotoIdentificationProcedure(
           file,
           err,
         });
-        if (err instanceof Error && isPhotoIdentificationUnavailable(err)) {
+        if (err instanceof Error && isModelServiceUnavailable(err)) {
           throw errors.SERVICE_UNAVAILABLE({ cause: err });
         }
         throw errors.INTERNAL_SERVER_ERROR({

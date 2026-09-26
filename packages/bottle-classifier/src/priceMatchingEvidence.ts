@@ -87,9 +87,7 @@ const TITLE_IGNORABLE_NAME_TOKENS = new Set([
 // derive whether a classifier decision may act automatically from the action's
 // risk class and the structured evidence the agent asserts, instead of reading
 // the numeric `confidence` score. See
-// `docs/architecture/bottle-classifier.md` (Determinism) and
-// `openspec/changes/define-bottle-classifier-agent-contract/design.md`
-// ("Remove numeric confidence; consumers derive gating from evidence"). User
+// `docs/architecture/bottle-classifier.md` (Deterministic Code). User
 // driven flows (Add Bottle) need no tier because the user confirms the outcome.
 export type AutomationTier = "auto" | "review";
 

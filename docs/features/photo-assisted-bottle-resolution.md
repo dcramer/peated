@@ -190,7 +190,8 @@ Server traces show whether a failure happened while reading the label or looking
 up the bottle. The RPC layer reports errors to Sentry.
 
 Label reading stops after 45 seconds without automatic retries. Provider outages,
-connection failures, timeouts, and rate limits return `SERVICE_UNAVAILABLE`.
+a spent AI budget, connection failures, timeouts, and rate limits return
+`SERVICE_UNAVAILABLE`.
 Other failures remain server errors. Uploaded photos keep their normal expiry.
 
 The form stops waiting after two minutes and offers search or another upload.
