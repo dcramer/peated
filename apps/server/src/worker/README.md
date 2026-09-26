@@ -38,10 +38,16 @@ Jobs run on three queues. `default` handles fast derived-data work such as
 search indexing, stats, and notifications. `scrapers` runs collection runs
 with its own lock timeout. `models` runs every job that waits on a hosted
 model, such as listing and review classification, review clips, catalog
-verification, and generated descriptions, one at a time. Register a job that calls a model with
-`{ queueName: "models" }` so a burst of classifier work cannot starve indexing.
-A default-queue job that needs model work queues it instead of running it
-inline, and every outbound request on the default queue carries a timeout.
+verification, and generated descriptions, four at a time. Register a job that
+calls a model with `{ queueName: "models" }` so a burst of classifier work
+cannot starve indexing. A default-queue job that needs model work queues it
+instead of running it inline, and every outbound request on the default queue
+carries a timeout.
+
+When the AI service is out of budget, rate limited, down, or unreachable
+(`isModelServiceUnavailable`), the models queue pauses for 15 minutes and puts
+the job back without using an attempt. A model job must let that error throw
+before it saves a partial result.
 
 ## Queue Or Run A Job
 

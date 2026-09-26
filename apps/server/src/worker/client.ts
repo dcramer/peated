@@ -6,6 +6,7 @@ import { createHash } from "node:crypto";
 import config from "../config";
 import { syncExternalSites } from "../lib/externalSites";
 import { logError, logInfo, logTelemetryError } from "../lib/log";
+import { isModelServiceUnavailable } from "../lib/openaiClient";
 import { initializeScraperRuntime } from "../scraper";
 import { SCRAPER_JOB_LOCK_MS } from "../scraper/runTimeout";
 import { pushUniqueJob, runJob, type WorkerDispatch } from "./dispatch";
@@ -151,6 +152,8 @@ export const queueWorkerDispatch: WorkerDispatch = {
   pushUniqueJob: pushUniqueJobToQueue,
   runJob: runRegisteredJob,
 };
+const MODEL_SERVICE_PAUSE_MS = 15 * 60 * 1000;
+
 export async function gracefulShutdown(signal?: string, worker?: Worker) {
   scheduler.stop();
   disconnectConnection();
@@ -171,7 +174,8 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
   const defaultQueue = await getQueue("default", connection);
   const scraperQueue = await getQueue("scrapers", connection);
   const modelsQueue = await getQueue("models", connection);
-  const processJob = async (job: { name: string; data: QueuedJobInput }) => {
+  type QueueJob = { name: string; data: QueuedJobInput };
+  const processJob = async (job: QueueJob) => {
     let jobFn;
     let queuedJob;
     try {
@@ -185,6 +189,19 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
     const { args, context } = queuedJob;
     return await jobFn(args, context);
   };
+  const processModelJob = async (job: QueueJob) => {
+    try {
+      return await processJob(job);
+    } catch (error) {
+      if (!(error instanceof Error) || !isModelServiceUnavailable(error)) {
+        throw error;
+      }
+      // Worker queue rule: an unavailable AI service pauses every model job and
+      // puts this one back without using an attempt.
+      await modelsWorker.rateLimit(MODEL_SERVICE_PAUSE_MS);
+      throw Worker.RateLimitError();
+    }
+  };
   const defaultWorker = new Worker(defaultQueue.name, processJob, {
     connection,
     autorun: false,
@@ -195,11 +212,14 @@ export async function startWorkerRuntime(): Promise<WorkerRuntime> {
     concurrency: 4,
     lockDuration: SCRAPER_JOB_LOCK_MS,
   });
-  // One model call at a time keeps spend predictable; the separate queue keeps
-  // those calls from starving the default queue.
-  const modelsWorker = new Worker(modelsQueue.name, processJob, {
+  // The separate queue keeps slow model calls from starving the default queue.
+  const modelsWorker = new Worker(modelsQueue.name, processModelJob, {
     connection,
     autorun: false,
+    concurrency: 4,
+    // BullMQ honors a manual pause only when a limiter is set; this one is
+    // never reached.
+    limiter: { max: 1000, duration: 1000 },
   });
   const queues = [defaultQueue, scraperQueue, modelsQueue];
   const workers = [defaultWorker, scraperWorker, modelsWorker];

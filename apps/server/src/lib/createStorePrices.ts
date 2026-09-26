@@ -32,7 +32,7 @@ import {
   ExternalSiteKeySchema,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { z } from "zod";
@@ -381,6 +381,7 @@ async function persistStorePriceInTransaction({
       return {
         price: created,
         isNew: true,
+        bottleChanged: bottleId !== null,
         identityChanged: false,
         sourceIdentityReused: false,
       };
@@ -461,9 +462,27 @@ async function persistStorePriceInTransaction({
   return {
     price: updated,
     isNew: false,
+    bottleChanged: updated.bottleId !== existing.bottleId,
     identityChanged,
     sourceIdentityReused,
   };
+}
+
+/** Queue classification only for unmatched listings without a saved proposal. */
+async function queueUnclassifiedPrices(priceIds: number[]) {
+  if (priceIds.length === 0) return;
+  const classified = new Set(
+    (
+      await db
+        .select({ priceId: storePriceMatchProposals.priceId })
+        .from(storePriceMatchProposals)
+        .where(inArray(storePriceMatchProposals.priceId, priceIds))
+    ).map((row) => row.priceId),
+  );
+  for (const priceId of priceIds) {
+    if (classified.has(priceId)) continue;
+    await pushUniqueJob("ResolveStorePriceBottle", { priceId });
+  }
 }
 
 /** Persists one scraper batch with attribution chosen by the owning boundary. */
@@ -598,6 +617,7 @@ async function createStorePricesInternal(
                 id: priceId,
                 isNew: persisted.isNew,
                 imageUrl: persisted.price.imageUrl,
+                bottleChanged: persisted.bottleChanged,
                 identityChanged: persisted.identityChanged,
                 hasDirectMatch,
                 directMatchSource,
@@ -614,36 +634,35 @@ async function createStorePricesInternal(
         }
 
         if (!price.imageUrl && sp.imageUrl) {
-          await pushJob("CapturePriceImage", {
+          await pushUniqueJob("CapturePriceImage", {
             priceId: price.id,
             imageUrl: sp.imageUrl,
           });
         }
 
-        // The old match was cleared. Do not reuse its completed job.
+        // Classify again when the old match was cleared or a barcode changed it.
         if (
-          price.identityChanged &&
-          price.directMatchSource !== "trusted_source"
+          (price.identityChanged &&
+            price.directMatchSource !== "trusted_source") ||
+          (price.directMatchSource === "barcode" && price.bottleChanged)
         ) {
-          await pushJob("ResolveStorePriceBottle", {
-            priceId: price.id,
-            force: true,
-          });
-        } else if (price.directMatchSource === "barcode") {
           await pushUniqueJob("ResolveStorePriceBottle", {
             priceId: price.id,
             force: true,
-          });
-        } else if (!price.hasDirectMatch) {
-          await pushUniqueJob("ResolveStorePriceBottle", {
-            priceId: price.id,
           });
         }
-        return price.isNew;
+        return {
+          id: price.id,
+          isNew: price.isNew,
+          unmatched: !price.identityChanged && !price.hasDirectMatch,
+        };
       }),
     );
-    newItemCount += results.filter(Boolean).length;
-    existingItemCount += results.filter((isNew) => !isNew).length;
+    await queueUnclassifiedPrices(
+      results.filter((result) => result.unmatched).map((result) => result.id),
+    );
+    newItemCount += results.filter((result) => result.isNew).length;
+    existingItemCount += results.filter((result) => !result.isNew).length;
   }
   return { newItemCount, existingItemCount };
 }

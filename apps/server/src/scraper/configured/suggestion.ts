@@ -1,9 +1,11 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
-import { createOpenAIAgentClient } from "@peated/server/lib/openaiClient";
+import {
+  createOpenAIAgentClient,
+  isModelServiceUnavailable,
+} from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
-import { APIError } from "openai";
 import { z } from "zod";
 import { ScraperHttpStatusError } from "../http";
 import {
@@ -43,16 +45,6 @@ import {
   ScrapeSourceModelUnavailableError,
   ScrapeSourceSetupError,
 } from "./setupError";
-
-/** Budget, rate limit, outage, and connection failures are temporary; other rejections are bugs. */
-function isModelUnavailable(error: APIError) {
-  return (
-    error.status === undefined ||
-    error.status === 402 ||
-    error.status === 429 ||
-    error.status >= 500
-  );
-}
 
 function checkPreviousListPage(input: {
   listPage: WebsitePage & { firstPageLinks: string[] };
@@ -361,7 +353,7 @@ export async function suggestScrapeSourceRevision(
       try {
         return await requestModel(request);
       } catch (error) {
-        if (!(error instanceof APIError) || !isModelUnavailable(error)) {
+        if (!(error instanceof Error) || !isModelServiceUnavailable(error)) {
           throw error;
         }
         // The call never ran, so it must not count against the setup limit.

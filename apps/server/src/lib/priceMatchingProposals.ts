@@ -57,6 +57,7 @@ import {
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
+import { isModelServiceUnavailable } from "@peated/server/lib/openaiClient";
 import {
   getStorePriceMatchAutomationAssessment,
   shouldVerifyStorePriceMatch,
@@ -1500,6 +1501,10 @@ export function createStorePriceMatchResolver({
         return erroredProposal;
       }
     } catch (err) {
+      // Nothing was saved yet, so the job retries once the AI service is
+      // back. Saving an errored proposal here would block automatic retries.
+      if (err instanceof Error && isModelServiceUnavailable(err)) throw err;
+
       logError(err, {
         price: {
           id: price.id,

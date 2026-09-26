@@ -6,6 +6,7 @@ import {
   bottleTombstones,
   externalReviews,
   storePriceHistories,
+  storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
@@ -136,10 +137,10 @@ describe("POST /external-sites/:site/prices", () => {
       price: 7_999,
     });
     expect(await db.select().from(storePriceHistories)).toHaveLength(2);
-    expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
-      priceId: matched!.id,
-      imageUrl,
-    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "CapturePriceImage",
+      { priceId: matched!.id, imageUrl },
+    );
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "IndexBottleSearch",
       { bottleId: bottle.id },
@@ -480,13 +481,13 @@ describe("POST /external-sites/:site/prices", () => {
       externalProductId: listing.externalProductId,
     });
     expect(updated!.sourceFingerprint).not.toBe(initial!.sourceFingerprint);
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: initial!.id, force: true },
     );
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      expect.anything(),
+      { priceId: initial!.id },
     );
   });
 
@@ -741,6 +742,81 @@ describe("POST /external-sites/:site/prices", () => {
         ),
       }),
     ).toBeUndefined();
+  });
+
+  test("a repeat scrape of a barcode match queues no new classification", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "Repeat Barcode Bottle" });
+    const systemActor = await getPeatedSystemActor();
+    await db.insert(bottleBarcodes).values({
+      bottleId: bottle.id,
+      value: "036602301986",
+      gtin14: "00036602301986",
+      volume: 750,
+      createdByActorId: systemActor.id,
+    });
+    const listing = {
+      externalProductId: "repeat-barcode",
+      barcode: "036602301986",
+      name: "Repeat Barcode Listing",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+      url: "https://example.com/products/repeat-barcode",
+    };
+
+    await createStorePricesAsPeated({ site: site.type, prices: [listing] });
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [{ ...listing, price: 6_900 }],
+    });
+
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
+  });
+
+  test("a repeat scrape of a classified listing queues no new classification", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const listing = {
+      externalProductId: "classified-listing",
+      name: "Classified Unmatched Listing",
+      price: 7_200,
+      currency: "usd" as const,
+      volume: 750,
+      url: "https://example.com/products/classified-listing",
+    };
+
+    await createStorePricesAsPeated({ site: site.type, prices: [listing] });
+    const price = await db.query.storePrices.findFirst({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: price!.id },
+    );
+    await db.insert(storePriceMatchProposals).values({
+      priceId: price!.id,
+      status: "pending_review",
+      proposalType: "no_match",
+    });
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [{ ...listing, price: 6_900 }],
+    });
+
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
   });
 
   test("uses an identity-preserving alias key as an exact match", async ({
@@ -1153,7 +1229,7 @@ describe("POST /external-sites/:site/prices", () => {
         where: (bottles, { eq }) => eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "CapturePriceImage",
       expect.anything(),
     );

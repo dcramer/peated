@@ -1,9 +1,11 @@
 import config from "@peated/server/config";
 import * as Sentry from "@sentry/node";
+import OpenAI from "openai";
 import { afterEach, describe, expect, test } from "vitest";
 import {
   createOpenAIClient,
   isAIGatewayConfigured,
+  isModelServiceUnavailable,
   withSentryConversation,
 } from "./openaiClient";
 
@@ -66,5 +68,39 @@ describe("withSentryConversation", () => {
         );
       });
     });
+  });
+});
+
+describe("isModelServiceUnavailable", () => {
+  function apiError(status: number) {
+    return new OpenAI.APIError(status, undefined, "rejected", new Headers());
+  }
+
+  test.each([402, 408, 429, 500, 503])(
+    "treats a %i response as temporary",
+    (status) => {
+      expect(isModelServiceUnavailable(apiError(status))).toBe(true);
+    },
+  );
+
+  test.each([400, 401, 404, 422])("treats a %i response as a bug", (status) => {
+    expect(isModelServiceUnavailable(apiError(status))).toBe(false);
+  });
+
+  test("treats a lost connection as temporary", () => {
+    expect(isModelServiceUnavailable(new OpenAI.APIConnectionError({}))).toBe(
+      true,
+    );
+  });
+
+  test("finds a temporary failure wrapped by another error", () => {
+    const wrapped = new Error("Classification failed", {
+      cause: apiError(402),
+    });
+    expect(isModelServiceUnavailable(wrapped)).toBe(true);
+  });
+
+  test("ignores errors from other sources", () => {
+    expect(isModelServiceUnavailable(new Error("Database down"))).toBe(false);
   });
 });

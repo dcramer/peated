@@ -53,6 +53,7 @@ import {
 import type * as Fixtures from "@peated/server/lib/test/fixtures";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, sql } from "drizzle-orm";
+import OpenAI from "openai";
 import pg from "pg";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { z } from "zod";
@@ -4761,6 +4762,36 @@ describe("priceMatching", () => {
         error: "Team budget exceeded",
       }),
     ]);
+  });
+
+  test("saves nothing and throws when the AI service is unavailable", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({
+      name: "Budget Outage Candidate",
+      imageUrl: null,
+    });
+    const outage = new BottleClassificationError(
+      "Classification failed",
+      {},
+      {
+        cause: new OpenAI.APIError(
+          402,
+          undefined,
+          "API key budget exceeded",
+          new Headers(),
+        ),
+      },
+    );
+    classifyBottleReference.mockRejectedValue(outage);
+
+    await expect(resolveStorePriceMatchProposal(price.id)).rejects.toBe(outage);
+
+    expect(
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.priceId, price.id),
+      }),
+    ).toBeUndefined();
   });
 
   test("includes decision-relevant structured bottle fields in candidate search text", async () => {
