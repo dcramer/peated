@@ -10,12 +10,31 @@ import {
   type BottleCandidate,
   type BottleExtractedDetails,
 } from "../classifierTypes";
-import { createWhiskyLabelExtractor } from "../extractor";
+import {
+  createWhiskyLabelExtractor,
+  getImageLabelExtractionVersion,
+} from "../extractor";
 import type { OpenAIReasoningEffort } from "../openaiModelSettings";
+
+export type ImageLabelReading = {
+  extractedIdentity: BottleExtractedDetails | null;
+  rawLabelText: string | null;
+};
+
+/**
+ * Returns the saved reading for this image and extractor version, or runs
+ * `read` and saves its result. A failed read must not be saved.
+ */
+export type ReadImageLabel = (input: {
+  imageUrl: string;
+  version: string;
+  read: () => Promise<ImageLabelReading>;
+}) => Promise<ImageLabelReading>;
 
 type BottleContextLoaderDataSource = {
   getBottleContext?: (bottleId: number) => Promise<BottleContextSource | null>;
   getBottleContextImageInput?: (imageUrl: string) => Promise<string>;
+  readImageLabel?: ReadImageLabel;
 };
 
 type BottleContextLoaderOptions = {
@@ -78,19 +97,39 @@ export function createBottleContextLoader({
     imageModel: options.imageExtractionModel,
     imageReasoningEffort: options.imageExtractionReasoningEffort,
   });
-  const extractLabelEvidence = async (imageUrl: string) => {
+  const extractLabelEvidence = async (
+    imageUrl: string,
+  ): Promise<ImageLabelReading> => {
+    const imageInput = dataSource.getBottleContextImageInput
+      ? await dataSource.getBottleContextImageInput(imageUrl)
+      : imageUrl;
     if (options.overrides?.extractFromImage) {
       return {
-        extractedIdentity: await options.overrides.extractFromImage(imageUrl),
+        extractedIdentity: await options.overrides.extractFromImage(imageInput),
         rawLabelText: null,
       };
     }
-    const extraction = await extractor.extractFromImageWithMetadata(imageUrl);
+    const extraction = await extractor.extractFromImageWithMetadata(imageInput);
     return {
       extractedIdentity: extraction.result,
       rawLabelText: extraction.rawLabelText,
     };
   };
+  // A label reading only depends on the image and the extractor, so the same
+  // candidate image is read once, not once per listing or review that sees it.
+  const imageLabelVersion = getImageLabelExtractionVersion({
+    model: options.imageExtractionModel ?? options.model,
+    reasoningEffort:
+      options.imageExtractionReasoningEffort ?? options.reasoningEffort,
+  });
+  const readImageLabel = async (imageUrl: string) =>
+    dataSource.readImageLabel && !options.overrides?.extractFromImage
+      ? await dataSource.readImageLabel({
+          imageUrl,
+          version: imageLabelVersion,
+          read: () => extractLabelEvidence(imageUrl),
+        })
+      : await extractLabelEvidence(imageUrl);
 
   return async (bottleId: number): Promise<BottleContext | null> => {
     const rawContext = await getBottleContext(bottleId);
@@ -104,11 +143,9 @@ export function createBottleContextLoader({
         let extractedIdentity: BottleExtractedDetails | null = null;
         let rawLabelText: string | null = null;
         try {
-          const imageInput = dataSource.getBottleContextImageInput
-            ? await dataSource.getBottleContextImageInput(imageSource.url)
-            : imageSource.url;
-          ({ extractedIdentity, rawLabelText } =
-            await extractLabelEvidence(imageInput));
+          ({ extractedIdentity, rawLabelText } = await readImageLabel(
+            imageSource.url,
+          ));
         } catch {
           extractedIdentity = null;
           rawLabelText = null;

@@ -119,6 +119,13 @@ conflict-free identity.
 Image extraction must read the whole visible label, including subtitles, neck
 tags, and smaller bands. It should omit unreadable facts instead of guessing.
 
+When the agent inspects a candidate Bottle, each of its public images is read
+once per extractor version and saved (`image_label_extraction`). Each upload
+gets a new file name, so an image URL always shows the same image and later
+inspections reuse the saved reading. A change to the
+image model, reasoning effort, prompt, or response schema is a new version and
+reads the label again. A failed read is not saved.
+
 During an audit:
 
 - Do not remove a populated bottler because another source omits it or the same
