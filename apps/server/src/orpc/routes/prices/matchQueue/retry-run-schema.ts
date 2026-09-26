@@ -8,9 +8,7 @@ export const PriceMatchRetryRunSchema = z.object({
   erroredCount: z.number().int().min(0),
   failedCount: z.number().int().min(0),
   id: z.number().int(),
-  kind: z
-    .enum(["create_new", "match_existing", "correction", "errored"])
-    .nullable(),
+  kind: z.enum(["create_bottle", "match", "errored"]).nullable(),
   matchedCount: z.number().int().min(0),
   mode: z.enum(["no_web", "full"]),
   pendingCount: z.number().int().min(0),

@@ -2108,6 +2108,20 @@
       "when": 1790360393171,
       "tag": "0300_drop_legacy_release_tables",
       "breakpoints": false
+    },
+    {
+      "idx": 301,
+      "version": "7",
+      "when": 1790443797716,
+      "tag": "0301_price_match_terms",
+      "breakpoints": false
+    },
+    {
+      "idx": 302,
+      "version": "7",
+      "when": 1790443804444,
+      "tag": "0302_rewrite_price_match_terms",
+      "breakpoints": false
     }
   ]
 }

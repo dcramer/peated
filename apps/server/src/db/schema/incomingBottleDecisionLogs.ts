@@ -40,6 +40,8 @@ export const incomingBottleDecisionTypeEnum = pgEnum(
     "create_bottle",
     "create_release",
     "create_bottle_and_release",
+    // TODO(prices): Drop match_existing once migration 0302 has rewritten it.
+    "match",
   ],
 );
 export const incomingBottleDecisionLogs = pgTable(

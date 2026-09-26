@@ -608,7 +608,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       .insert(storePriceMatchProposals)
       .values({
         priceId: price.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         status: "approved",
         suggestedBottleId: originalTarget.id,
       })
@@ -618,7 +618,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       .values({
         priceId: price.id,
         proposalId: sharedProposal!.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "pending_review",
         finalStatus: "approved",
         suggestedBottleId: originalTarget.id,
@@ -658,7 +658,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
     await db.insert(storePriceMatchAttempts).values({
       priceId: price.id,
       proposalId: sharedProposal!.id,
-      proposalType: "match_existing",
+      proposalType: "match",
       initialStatus: "pending_review",
       finalStatus: "approved",
       suggestedBottleId: duplicate.id,

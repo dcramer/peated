@@ -65,7 +65,7 @@ describe("reconcileStorePriceMatchProposals", () => {
 
     await db.insert(storePriceMatchProposals).values({
       priceId: price.id,
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       status: "pending_review",
     });
 

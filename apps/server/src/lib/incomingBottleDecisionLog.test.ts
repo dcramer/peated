@@ -21,7 +21,7 @@ describe("getIncomingBottleDecisionFromResolutionSource", () => {
         "classifier_create_bottle",
         { createdBottle: false },
       ),
-    ).toBe("match_existing");
+    ).toBe("match");
 
     for (const obsoleteSource of [
       "classifier_create_release",

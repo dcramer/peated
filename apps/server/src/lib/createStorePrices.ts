@@ -149,7 +149,7 @@ async function finalizeTrustedSourceAssignmentInTransaction({
     externalSiteId,
     name,
     url,
-    decision: createdBottle ? "create_bottle" : "match_existing",
+    decision: createdBottle ? "create_bottle" : "match",
     actor,
     bottleId,
     createdBottle,

@@ -7,6 +7,7 @@ import {
   storePriceMatchProposals,
   storePriceMatchRetryRuns,
 } from "@peated/server/db/schema";
+import { toCurrentProposalType } from "@peated/server/lib/priceMatchingStatus";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { FAILED_JOB_RETENTION_MS, getQueue } from "@peated/server/worker/queue";
@@ -42,9 +43,7 @@ function summarizeListingOutcomes(attempts: CompletedListingAttempt[]) {
     if (
       (attempt.finalStatus === "approved" ||
         attempt.finalStatus === "ignored") &&
-      (attempt.initialStatus === "verified" ||
-        attempt.initialStatus === "ignored" ||
-        attempt.automationEligible)
+      (attempt.initialStatus === "ignored" || attempt.automationEligible)
     ) {
       automatic += 1;
     }
@@ -63,12 +62,7 @@ function summarizeListingOutcomes(attempts: CompletedListingAttempt[]) {
   };
 }
 
-const listingProposalTypes = [
-  "match_existing",
-  "create_new",
-  "correction",
-  "no_match",
-] as const;
+const listingProposalTypes = ["match", "create_bottle", "no_match"] as const;
 
 export function summarizeListingAutomation(
   attempts: CompletedListingAttempt[],
@@ -257,7 +251,12 @@ export function createModerationAutomationProcedure(
             (operationCounts[0]?.clearedToday ?? 0) +
             (retryCounts[0]?.completedToday ?? 0),
         },
-        listingAutomation: summarizeListingAutomation(recentListingAttempts),
+        listingAutomation: summarizeListingAutomation(
+          recentListingAttempts.map((attempt) => ({
+            ...attempt,
+            proposalType: toCurrentProposalType(attempt.proposalType),
+          })),
+        ),
         needsAttention: [
           ...failedOperations.map(({ operation }) => ({
             key: `operation:${operation.id}`,

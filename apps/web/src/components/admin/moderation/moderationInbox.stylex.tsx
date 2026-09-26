@@ -250,7 +250,7 @@ export function ModerationInboxContent({
       <ConfirmationDialog
         continueLabel={`Ignore ${data.counts.inconclusive} listings`}
         isOpen={confirmingIgnore}
-        message="Every actionable inconclusive listing will leave the moderation inbox without a bottle assignment. Listings with a match, proposed bottle, correction, error, or active classification will not be changed."
+        message="Every actionable inconclusive listing will leave the moderation inbox without a bottle assignment. Listings with a match, proposed bottle, error, or active classification will not be changed."
         onCancel={() => setConfirmingIgnore(false)}
         onContinue={() => {
           setConfirmingIgnore(false);

@@ -23,9 +23,8 @@ type OperationsOverviewProps = {
 };
 
 const proposalTypeLabels = {
-  match_existing: "Existing matches",
-  create_new: "New Bottles",
-  correction: "Corrections",
+  match: "Existing matches",
+  create_bottle: "New Bottles",
   no_match: "No match",
 } satisfies Record<
   OperationsData["listingAutomation"]["byProposalType"][number]["proposalType"],

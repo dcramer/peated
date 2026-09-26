@@ -19,7 +19,7 @@ overrides before writes.
 
 ```bash
 pnpm cli api get /bottles/123
-pnpm cli api get '/prices/match-queue?kind=create_new&limit=25'
+pnpm cli api get '/prices/match-queue?kind=create_bottle&limit=25'
 pnpm cli api post /path --input /tmp/peated-request.json
 pnpm cli api patch /path --input /tmp/peated-request.json
 pnpm cli api delete /path

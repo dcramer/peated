@@ -270,7 +270,7 @@ describe("createMissingBottles", () => {
       bottleId: bottle.id,
     });
     expect(decisionLog).toMatchObject({
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
       createdRelease: false,
@@ -440,7 +440,7 @@ describe("createMissingBottles", () => {
         ),
       }),
     ).toMatchObject({
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
     });
   });

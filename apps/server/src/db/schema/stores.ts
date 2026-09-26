@@ -45,7 +45,16 @@ export const storePriceMatchProposalStatusEnum = pgEnum(
 );
 export const storePriceMatchProposalTypeEnum = pgEnum(
   "store_price_match_proposal_type",
-  ["match_existing", "create_new", "correction", "no_match"],
+  // TODO(prices): Drop match_existing, create_new, and correction in the
+  // follow-up deploy once migration 0302 has rewritten every row.
+  [
+    "match_existing",
+    "create_new",
+    "correction",
+    "no_match",
+    "match",
+    "create_bottle",
+  ],
 );
 export const legacyStorePriceMatchCreationTargetEnum = pgEnum(
   "store_price_match_creation_target",
@@ -53,7 +62,16 @@ export const legacyStorePriceMatchCreationTargetEnum = pgEnum(
 );
 export const storePriceMatchRetryRunKindEnum = pgEnum(
   "store_price_match_retry_run_kind",
-  ["create_new", "match_existing", "correction", "errored"],
+  // TODO(prices): Drop create_new, match_existing, and correction with the
+  // proposal type values above.
+  [
+    "create_new",
+    "match_existing",
+    "correction",
+    "errored",
+    "match",
+    "create_bottle",
+  ],
 );
 export const storePriceMatchRetryRunModeEnum = pgEnum(
   "store_price_match_retry_run_mode",

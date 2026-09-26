@@ -47,7 +47,7 @@ describe("admin moderation tasks", () => {
       .insert(storePriceMatchProposals)
       .values({
         priceId: price.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         status: "pending_review",
         enteredQueueAt: new Date("2026-01-01T00:00:00.000Z"),
       })
@@ -199,7 +199,7 @@ describe("admin moderation tasks", () => {
         },
         {
           priceId: matchedPrice.id,
-          proposalType: "match_existing",
+          proposalType: "match",
           status: "pending_review",
         },
         {

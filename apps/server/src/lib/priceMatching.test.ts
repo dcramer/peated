@@ -40,7 +40,6 @@ import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
-  applyStorePriceBottleRepairFromProposal,
   canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
   createStorePriceMatchResolver,
@@ -145,13 +144,7 @@ type ProposedBottleFixture = Partial<
   >;
 
 type MockBottleClassifierDecision = {
-  action:
-    | "correction"
-    | "create_bottle"
-    | "create_new"
-    | "match"
-    | "match_existing"
-    | "no_match";
+  action: "match" | "create_bottle" | "no_match";
   referenceScope?: BottleClassificationDecision["referenceScope"];
   candidateBottleIds?: number[];
   confidence?: number | null;
@@ -247,12 +240,7 @@ async function countBottles() {
 function normalizeMockBottleClassifierDecision(
   decision: MockBottleClassifierDecision,
 ) {
-  const action =
-    decision.action === "match_existing" || decision.action === "correction"
-      ? "match"
-      : decision.action === "create_new"
-        ? "create_bottle"
-        : decision.action;
+  const action = decision.action;
   const commonDecision = {
     rationale: decision.rationale ?? null,
     candidateBottleIds: decision.candidateBottleIds ?? [],
@@ -340,7 +328,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       referenceScope: "none",
@@ -585,7 +573,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           rationale: "Structured scraper facts identify a distinct Bottle.",
           confidenceBasis: {
             unresolvedRisks: [],
@@ -628,7 +616,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       automationAssessment: expect.objectContaining({
         automationEligible: true,
         automationBlockers: [],
@@ -1100,7 +1088,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         referenceScope: "global_alias",
         extractedLabel: {
           brand: "SMWS",
@@ -1218,7 +1206,7 @@ describe("priceMatching", () => {
       sourceKind: "store_price",
       sourceId: price.id,
       proposalId: proposal.id,
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
       createdRelease: false,
@@ -1248,12 +1236,12 @@ describe("priceMatching", () => {
         {
           priceId: firstPrice.id,
           status: "pending_review",
-          proposalType: "create_new",
+          proposalType: "create_bottle",
         },
         {
           priceId: secondPrice.id,
           status: "pending_review",
-          proposalType: "create_new",
+          proposalType: "create_bottle",
         },
       ])
       .returning();
@@ -1445,7 +1433,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 95,
           rationale:
             "The listing supports the generic 12-year-old bottle, not a cask-strength sibling.",
@@ -1534,7 +1522,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "pending_review",
-      proposalType: "match_existing",
+      proposalType: "match",
       suggestedBottleId: generic12Bottle.id,
       proposedBottle: null,
     });
@@ -1591,7 +1579,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 80,
           rationale: "The current bottle identity already matches cleanly.",
           referenceScope: "global_alias",
@@ -1645,7 +1633,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       reviewedById: expect.any(Number),
@@ -1680,7 +1668,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 97,
           rationale: "The listing exactly matches a canonical reference.",
           confidenceBasis: autoVerificationConfidenceBasis,
@@ -1724,7 +1712,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       reviewedById: expect.any(Number),
@@ -1742,7 +1730,7 @@ describe("priceMatching", () => {
       sourceId: price.id,
       proposalId: proposal.id,
       actorId: (await getPeatedSystemActor()).id,
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
       createdRelease: false,
@@ -1777,7 +1765,7 @@ describe("priceMatching", () => {
       buildMockBottleReferenceClassification({
         extractedLabel: null,
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 98,
           rationale:
             "The raw title directly reaffirms the existing Jameson Cold Brew bottle.",
@@ -1822,7 +1810,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       reviewedById: expect.any(Number),
@@ -1947,7 +1935,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 84,
           rationale:
             "Reliable web evidence confirms Rare Breed Rye is the barrel-proof Wild Turkey release.",
@@ -2012,7 +2000,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("match_existing");
+    expect(proposal.proposalType).toBe("match");
     expect(proposal.enteredQueueAt).not.toBeNull();
     expect(proposal.suggestedBottleId).toBe(bottle.id);
     expect(proposal.rationale).not.toContain(
@@ -2068,7 +2056,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 96,
           rationale:
             "Official Glenlivet sources confirm Caribbean Reserve as the rum-cask-finished single malt release.",
@@ -2132,7 +2120,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       enteredQueueAt: null,
@@ -2242,7 +2230,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       enteredQueueAt: null,
@@ -2278,7 +2266,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 84,
           rationale: "The bottle identity matches cleanly.",
           suggestedBottleId: bottle.id,
@@ -2317,7 +2305,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("match_existing");
+    expect(proposal.proposalType).toBe("match");
     expect(proposal.suggestedBottleId).toBe(bottle.id);
   });
 
@@ -2335,7 +2323,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 95,
           rationale: "Looks like a distinct bottle from local evidence.",
           suggestedBottleId: null,
@@ -2376,7 +2364,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.proposalType).toBe("create_bottle");
     expect(proposal.confidence).toBeNull();
   });
 
@@ -2510,7 +2498,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.proposalType).toBe("create_bottle");
     expect(proposal.currentBottleId).toBe(currentBottle.id);
     expect(proposal.suggestedBottleId).toBeNull();
     expect(proposal.proposedBottle).toMatchObject({
@@ -2636,7 +2624,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("correction");
+    expect(proposal.proposalType).toBe("no_match");
     expect(proposal.currentBottleId).toBe(currentBottle.id);
     expect(proposal.suggestedBottleId).toBeNull();
     expect(proposal.proposedBottle).toBeNull();
@@ -2648,237 +2636,6 @@ describe("priceMatching", () => {
       decision: { action: "no_match", matchedBottleId: null },
     });
     expect(check?.operations).toEqual([]);
-  });
-
-  test("rolls back a repair when its suggested Bottle changes behind the Bottle lock", async ({
-    fixtures,
-  }) => {
-    const reviewer = await fixtures.User();
-    const brand = await fixtures.Entity({
-      kind: "brand",
-      name: "Repair Drift Brand",
-    });
-    const bottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Repair Drift",
-      category: "single_malt",
-      edition: "Original Edition",
-      distillerIds: [],
-    });
-    const replacement = await fixtures.Bottle({
-      name: "Concurrent Repair Suggestion",
-    });
-    const price = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      name: "Repair Identity Drift Listing",
-    });
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-        currentBottleId: bottle.id,
-        suggestedBottleId: bottle.id,
-        proposedBottle: {
-          name: bottle.name,
-          series: null,
-          category: "single_malt",
-          edition: "Changed Edition",
-          statedAge: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          maturation: null,
-          caskNumber: null,
-          outturn: null,
-          brand: { id: brand.id, name: brand.name },
-          distillers: [],
-          bottler: null,
-        },
-      })
-      .returning();
-
-    const blocker = new Client(getPostgresConnectionConfig());
-    const mutator = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let approval: ReturnType<
-      typeof applyStorePriceBottleRepairFromProposal
-    > | null = null;
-    let blockerReleased = false;
-    let mutatorCommitted = false;
-
-    await blocker.connect();
-    await mutator.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load repair blocker pid.");
-      await blocker.query("SELECT id FROM bottle WHERE id = $1 FOR UPDATE", [
-        bottle.id,
-      ]);
-
-      approval = applyStorePriceBottleRepairFromProposal({
-        proposalId: proposal.id,
-        user: reviewer,
-        actor: await getUserActor(reviewer),
-      });
-      void approval.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await mutator.query("BEGIN");
-      await mutator.query(
-        `UPDATE store_price_match_proposal
-         SET suggested_bottle_id = $2
-         WHERE id = $1`,
-        [proposal.id, replacement.id],
-      );
-      await mutator.query("COMMIT");
-      mutatorCommitted = true;
-
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-
-      await expect(approval).rejects.toBeInstanceOf(
-        StorePriceMatchProposalIdentityChangedError,
-      );
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      if (!mutatorCommitted) {
-        await mutator.query("ROLLBACK").catch(() => undefined);
-      }
-      if (approval) await approval.catch(() => undefined);
-      await blocker.end();
-      await mutator.end();
-      await observer.end();
-    }
-
-    const [
-      updatedBottle,
-      updatedPrice,
-      updatedProposal,
-      reference,
-      observation,
-    ] = await Promise.all([
-      db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
-      db.query.storePrices.findFirst({
-        where: eq(storePrices.id, price.id),
-      }),
-      db.query.storePriceMatchProposals.findFirst({
-        where: eq(storePriceMatchProposals.id, proposal.id),
-      }),
-      db.query.bottleReferences.findFirst({
-        where: eq(
-          bottleReferences.name,
-          normalizeBottleReferenceKey(price.name),
-        ),
-      }),
-      db.query.bottleObservations.findFirst({
-        where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
-      }),
-    ]);
-
-    expect(updatedBottle).toMatchObject({
-      id: bottle.id,
-      name: bottle.name,
-      fullName: bottle.fullName,
-      edition: "Original Edition",
-      brandId: brand.id,
-    });
-    expect(updatedPrice).toMatchObject({
-      id: price.id,
-      bottleId: bottle.id,
-    });
-    expect(updatedProposal).toMatchObject({
-      status: "pending_review",
-      currentBottleId: bottle.id,
-      suggestedBottleId: replacement.id,
-      reviewedById: null,
-      reviewedAt: null,
-    });
-    expect(reference).toBeUndefined();
-    expect(observation).toBeUndefined();
-  });
-
-  test("gives unmarked historical repair ages the exact Bottle owner", async ({
-    fixtures,
-  }) => {
-    const reviewer = await fixtures.User();
-    const brand = await fixtures.Entity({
-      kind: "brand",
-      name: "Historical Repair Brand",
-    });
-    const selectedBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Historical Age",
-      category: "single_malt",
-      statedAge: 10,
-    });
-    const sibling = await fixtures.BottleGroupMember({
-      groupId: requireGroupId(selectedBottle.groupId),
-      edition: "Sibling Edition",
-    });
-    const price = await fixtures.StorePrice({
-      bottleId: selectedBottle.id,
-      name: "Historical Age Repair Listing",
-    });
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-        currentBottleId: selectedBottle.id,
-        suggestedBottleId: selectedBottle.id,
-        proposedBottle: {
-          name: "Historical Age",
-          series: null,
-          category: "single_malt",
-          edition: null,
-          statedAge: 14,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          maturation: null,
-          caskNumber: null,
-          outturn: null,
-          brand: { id: brand.id, name: brand.name },
-          distillers: [],
-          bottler: null,
-        },
-      })
-      .returning();
-
-    expect(proposal.proposedBottle).not.toHaveProperty("statedAgeScope");
-    await applyStorePriceBottleRepairFromProposal({
-      proposalId: proposal.id,
-      user: reviewer,
-      actor: await getUserActor(reviewer),
-    });
-
-    const [updatedBottle, updatedSibling, updatedGroup] = await Promise.all([
-      db.query.bottles.findFirst({
-        where: eq(bottles.id, selectedBottle.id),
-      }),
-      db.query.bottles.findFirst({
-        where: eq(bottles.id, sibling.id),
-      }),
-      db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, selectedBottle.groupId!),
-      }),
-    ]);
-    expect(updatedBottle?.statedAge).toBe(14);
-    expect(updatedSibling?.statedAge).toBe(10);
-    expect(updatedGroup?.statedAge).toBe(10);
   });
 
   test("persists normalized proposed bottle drafts from the classifier", async ({
@@ -2895,7 +2652,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 85,
           rationale: "The listing looks like a distinct release.",
           suggestedBottleId: null,
@@ -2981,7 +2738,7 @@ describe("priceMatching", () => {
           edition: "Batch 1",
         },
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 96,
           rationale: "Web evidence suggests this is a real release.",
           suggestedBottleId: null,
@@ -3067,7 +2824,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 95,
           rationale: "A web search was attempted but found nothing useful.",
           suggestedBottleId: null,
@@ -3117,7 +2874,7 @@ describe("priceMatching", () => {
     });
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.proposalType).toBe("create_bottle");
     expect(proposal.confidence).toBeNull();
     expect(updatedPrice?.bottleId).toBeNull();
   });
@@ -3240,7 +2997,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
@@ -3288,7 +3045,7 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       reviewedById: expect.any(Number),
@@ -3355,7 +3112,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
@@ -3403,7 +3160,7 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       reviewedById: expect.any(Number),
@@ -3462,7 +3219,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           identityScope: "exact_cask",
           confidence: 95,
           rationale: "Classifier created the SMWS exact-cask bottle.",
@@ -3542,7 +3299,7 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       currentBottleId: expect.any(Number),
       suggestedBottleId: expect.any(Number),
       reviewedById: expect.any(Number),
@@ -3641,7 +3398,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
           identityScope: "exact_cask",
@@ -3691,13 +3448,13 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
     });
     expect(updatedProposal).toMatchObject({
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       currentBottleId: bottle.id,
       suggestedBottleId: bottle.id,
       processingToken: null,
@@ -3770,7 +3527,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 100,
           rationale: "Classifier matched the exact SMWS cask code.",
           identityScope: "exact_cask",
@@ -3825,8 +3582,8 @@ describe("priceMatching", () => {
           .values({
             priceId: price.id,
             proposalId: existingProposal.id,
-            proposalType: "match_existing",
-            initialStatus: "verified",
+            proposalType: "match",
+            initialStatus: "pending_review",
             suggestedBottleId: bottle.id,
             automationEligible: true,
           })
@@ -3845,7 +3602,7 @@ describe("priceMatching", () => {
     expect(replacementAttemptId).not.toBeNull();
     expect(resolvedProposal).toMatchObject({
       id: existingProposal.id,
-      status: "verified",
+      status: "pending_review",
       processingToken: "replacement-owner",
     });
 
@@ -3863,7 +3620,7 @@ describe("priceMatching", () => {
     ]);
 
     expect(updatedProposal).toMatchObject({
-      status: "verified",
+      status: "pending_review",
       processingToken: "replacement-owner",
       error: null,
     });
@@ -3939,7 +3696,7 @@ describe("priceMatching", () => {
           edition: null,
         },
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           identityScope: "exact_cask",
           confidence: 95,
           rationale:
@@ -4031,7 +3788,7 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       suggestedBottleId: expect.any(Number),
     });
     expect(proposal.suggestedBottleId).not.toBe(mismatchedBottle.id);
@@ -4063,7 +3820,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 92,
           rationale: "Web evidence confirms a distinct release.",
           referenceScope: "global_alias",
@@ -4144,7 +3901,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       reviewedById: expect.any(Number),
       currentBottleId: expect.any(Number),
       suggestedBottleId: expect.any(Number),
@@ -4172,7 +3929,7 @@ describe("priceMatching", () => {
       automationEligible: true,
       finalStatus: "approved",
       initialStatus: "pending_review",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
     });
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -4230,7 +3987,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 92,
           rationale: "Web evidence confirms a distinct release.",
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
@@ -4300,12 +4057,12 @@ describe("priceMatching", () => {
     });
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       suggestedBottleId: expect.any(Number),
     });
     expect(updatedProposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       suggestedBottleId: proposal.suggestedBottleId,
       processingToken: null,
       processingQueuedAt: null,
@@ -4361,7 +4118,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 95,
           rationale: "Official evidence looks like a distinct bottle.",
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
@@ -4423,7 +4180,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       currentBottleId: expect.any(Number),
       suggestedBottleId: expect.any(Number),
       error: null,
@@ -4455,7 +4212,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 92,
           rationale: "Web evidence confirms this is a distinct bottling.",
           confidenceBasis: supportiveWebEvidenceConfidenceBasis,
@@ -4543,7 +4300,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "approved",
-      proposalType: "create_new",
+      proposalType: "create_bottle",
       reviewedById: expect.any(Number),
       currentBottleId: expect.any(Number),
       suggestedBottleId: expect.any(Number),
@@ -4656,7 +4413,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         confidence: 91,
         suggestedBottleId: bottle.id,
         extractedLabel: { brand: "Retained Brand" },
@@ -4679,7 +4436,7 @@ describe("priceMatching", () => {
     expect(proposal).toMatchObject({
       id: existingProposal.id,
       status: "errored",
-      proposalType: "match_existing",
+      proposalType: "match",
       confidence: 91,
       suggestedBottleId: bottle.id,
       extractedLabel: { brand: "Retained Brand" },
@@ -4694,7 +4451,7 @@ describe("priceMatching", () => {
     });
     expect(attempts).toEqual([
       expect.objectContaining({
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "errored",
         finalStatus: "errored",
         suggestedBottleId: bottle.id,
@@ -5405,7 +5162,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 84,
           rationale: "Local evidence supports this bottle.",
           suggestedBottleId: suggestedBottle.id,
@@ -5448,7 +5205,7 @@ describe("priceMatching", () => {
     expect(attempt).toMatchObject({
       priceId: price.id,
       proposalId: proposal.id,
-      proposalType: "correction",
+      proposalType: "match",
       initialStatus: "pending_review",
       finalStatus: null,
       confidence: null,
@@ -5522,7 +5279,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "approved",
-        proposalType: "match_existing",
+        proposalType: "match",
         reviewedById: reviewer.id,
         reviewedAt: new Date("2026-03-10T12:00:00.000Z"),
       })
@@ -5539,7 +5296,7 @@ describe("priceMatching", () => {
   test("does not reevaluate reviewable proposals during automatic resolution", async ({
     fixtures,
   }) => {
-    for (const status of ["verified", "pending_review", "errored"] as const) {
+    for (const status of ["pending_review", "errored"] as const) {
       const price = await fixtures.StorePrice({
         name: `Already Classified ${status}`,
       });
@@ -5586,7 +5343,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 82,
           rationale: "Local reference evidence is now sufficient.",
           suggestedBottleId: bottle.id,
@@ -5660,7 +5417,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 88,
           rationale: "This listing looks like a new bottle.",
           suggestedBottleId: null,
@@ -5707,7 +5464,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.proposalType).toBe("create_bottle");
     expect(proposal.proposedBottle).toMatchObject({
       name: "Reserve",
       series: {
@@ -5776,7 +5533,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
+          action: "create_bottle",
           confidence: 88,
           rationale: "This listing looks like a new bottle.",
           suggestedBottleId: null,
@@ -5851,7 +5608,7 @@ describe("priceMatching", () => {
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("create_new");
+    expect(proposal.proposalType).toBe("create_bottle");
     expect(proposal.proposedBottle).toMatchObject({
       name: "Reserve",
       series: {
@@ -5889,7 +5646,7 @@ describe("priceMatching", () => {
     classifyBottleReference.mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "match_existing",
+          action: "match",
           confidence: 80,
           rationale: "Looks like an existing bottle.",
           suggestedBottleId: 999999,
@@ -6008,7 +5765,7 @@ describe("priceMatching", () => {
     await db.insert(storePriceMatchProposals).values({
       priceId: price.id,
       status: "approved",
-      proposalType: "match_existing",
+      proposalType: "match",
       enteredQueueAt: priorQueueEntryAt,
       reviewedById: reviewer.id,
       reviewedAt: new Date("2026-03-01T00:30:00.000Z"),
@@ -6684,12 +6441,12 @@ describe("priceMatching", () => {
         {
           priceId: firstPrice.id,
           status: "pending_review",
-          proposalType: "match_existing",
+          proposalType: "match",
         },
         {
           priceId: secondPrice.id,
           status: "pending_review",
-          proposalType: "match_existing",
+          proposalType: "match",
         },
       ])
       .returning();
@@ -6754,7 +6511,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         extractedLabel: {
           brand: "Observation Brand",
           bottler: null,
@@ -6828,7 +6585,7 @@ describe("priceMatching", () => {
         cask_strength: true,
       }),
       facts: expect.objectContaining({
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         proposedBottle: expect.objectContaining({
           edition: "Batch 7",
           statedAge: 12,
@@ -6856,7 +6613,7 @@ describe("priceMatching", () => {
       sourceKind: "store_price",
       sourceId: price.id,
       proposalId: proposal.id,
-      decision: "match_existing",
+      decision: "match",
       bottleId: promotedBottle.id,
       createdBottle: false,
       createdRelease: false,
@@ -6888,7 +6645,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         currentBottleId: legacyBottle.id,
         suggestedBottleId: legacyBottle.id,
       })
@@ -6898,7 +6655,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         proposalId: staleProposal.id,
-        proposalType: "create_new",
+        proposalType: "create_bottle",
         initialStatus: "pending_review",
         currentBottleId: legacyBottle.id,
         suggestedBottleId: legacyBottle.id,
@@ -6910,8 +6667,7 @@ describe("priceMatching", () => {
       extractedLabel: null,
       candidates: [],
       decision: {
-        action: "match_existing",
-        confidence: null,
+        action: "match",
         rationale: "The direct Bottle is the reviewed match.",
         candidateBottleIds: [directBottle.id],
         identityScope: "product",
@@ -6955,7 +6711,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: parent.id,
       })
@@ -7022,7 +6778,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: suggestedParent.id,
       })
@@ -7136,7 +6892,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: suggestedParent.id,
       })
       .returning();
@@ -7182,7 +6938,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
       })
       .returning();
     await db.insert(bottleObservations).values({
@@ -7227,7 +6983,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: bottle.id,
       })
@@ -7276,7 +7032,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "none",
       })
       .returning();
@@ -7313,7 +7069,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: null,
       })
@@ -7358,7 +7114,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
       })
       .returning();
 
@@ -7398,7 +7154,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "none",
       })
       .returning();
@@ -7439,7 +7195,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "none",
       })
       .returning();
@@ -7488,7 +7244,7 @@ describe("priceMatching", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
         referenceScope: "global_alias",
         suggestedBottleId: bottle.id,
       })
@@ -7540,7 +7296,7 @@ describe("priceMatching", () => {
 
     expect(proposal).toMatchObject({
       status: "pending_review",
-      proposalType: "match_existing",
+      proposalType: "match",
       suggestedBottleId: bottle.id,
     });
     expect(await db.select().from(storePriceMatchAttempts)).toHaveLength(1);
@@ -7622,7 +7378,7 @@ describe("priceMatching", () => {
     expect(secondProposal).toMatchObject({
       id: firstProposal.id,
       status: "pending_review",
-      proposalType: "match_existing",
+      proposalType: "match",
       suggestedBottleId: destinationBottle.id,
     });
     expect(

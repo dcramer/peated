@@ -19,7 +19,7 @@ const operations = {
     rate: 73,
     byProposalType: [
       {
-        proposalType: "match_existing" as const,
+        proposalType: "match" as const,
         sampleSize: 72,
         automatic: 65,
         manual: 6,
@@ -27,7 +27,7 @@ const operations = {
         rate: 90,
       },
       {
-        proposalType: "create_new" as const,
+        proposalType: "create_bottle" as const,
         sampleSize: 28,
         automatic: 8,
         manual: 18,

@@ -8,7 +8,6 @@ export {
 } from "@peated/server/lib/priceMatchingProcessingLease";
 export {
   InvalidStorePriceMatchProposalTypeError,
-  StorePriceBottleRepairBadRequestError,
   StorePriceMatchProposalAlreadyProcessingError,
   StorePriceMatchProposalIdentityChangedError,
   StorePriceMatchProposalNotReviewableError,
@@ -16,7 +15,6 @@ export {
   applyApprovedStorePriceMatch,
   applyApprovedStorePriceMatchInTransaction,
   applyApprovedStorePriceMatchProposalInTransaction,
-  applyStorePriceBottleRepairFromProposal,
   canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
   createStorePriceMatchResolver,

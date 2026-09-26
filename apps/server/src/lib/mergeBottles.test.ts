@@ -156,7 +156,7 @@ describe("exact Bottle merges", () => {
       .insert(storePriceMatchProposals)
       .values({
         priceId: price!.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         currentBottleId: source.id,
         suggestedBottleId: source.id,
         legacyParentBottleId: source.id,
@@ -167,7 +167,7 @@ describe("exact Bottle merges", () => {
       .values({
         priceId: price!.id,
         proposalId: proposal!.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         initialStatus: "pending_review",
         currentBottleId: source.id,
         suggestedBottleId: source.id,
@@ -183,7 +183,7 @@ describe("exact Bottle merges", () => {
         externalSiteId: externalSite.id,
         name: price!.name,
         url: price!.url,
-        decision: "match_existing",
+        decision: "match",
         actorId: actor.id,
         bottleId: source.id,
       })

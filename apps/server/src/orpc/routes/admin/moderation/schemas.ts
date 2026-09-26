@@ -196,12 +196,7 @@ export const ModerationAutomationResponseSchema = z
           .array(
             z
               .object({
-                proposalType: z.enum([
-                  "match_existing",
-                  "create_new",
-                  "correction",
-                  "no_match",
-                ]),
+                proposalType: z.enum(["match", "create_bottle", "no_match"]),
                 sampleSize: z.number().int().min(1).max(100),
                 automatic: z.number().int().min(0),
                 manual: z.number().int().min(0),

@@ -27,12 +27,12 @@ describe("store price match retry runs", () => {
         {
           priceId: firstPrice.id,
           status: "pending_review",
-          proposalType: "match_existing",
+          proposalType: "match",
         },
         {
           priceId: secondPrice.id,
           status: "pending_review",
-          proposalType: "match_existing",
+          proposalType: "match",
         },
       ])
       .returning();
@@ -128,12 +128,12 @@ describe("store price match retry runs", () => {
         {
           priceId: price.id,
           status: "pending_review",
-          proposalType: "match_existing",
+          proposalType: "match",
         },
         {
           priceId: exhaustedPrice.id,
           status: "pending_review",
-          proposalType: "match_existing",
+          proposalType: "match",
         },
       ])
       .returning();
@@ -214,7 +214,7 @@ describe("store price match retry runs", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
       })
       .returning();
     const [run] = await db
@@ -278,7 +278,7 @@ describe("store price match retry runs", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
       })
       .returning();
     const [run] = await db
@@ -324,7 +324,7 @@ describe("store price match retry runs", () => {
       .values({
         priceId: price.id,
         status: "pending_review",
-        proposalType: "match_existing",
+        proposalType: "match",
       })
       .returning();
     const [run] = await db

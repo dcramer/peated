@@ -493,7 +493,7 @@ describe("POST /external-reviews", () => {
         ),
       }),
     ).toMatchObject({
-      decision: "match_existing",
+      decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
     });

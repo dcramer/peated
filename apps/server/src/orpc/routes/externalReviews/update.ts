@@ -120,7 +120,7 @@ export default procedure
           shouldRecordIncomingBottleDecision({
             previousBottleId: lockedExternalReview.bottleId,
             bottleId: nextBottleId,
-            decision: "match_existing",
+            decision: "match",
           })
         ) {
           const actor = await getUserActorForDatabase(tx, context.user);
@@ -130,7 +130,7 @@ export default procedure
             externalSiteId: article.externalSiteId,
             name: externalReview.name,
             url: article.canonicalUrl,
-            decision: "match_existing",
+            decision: "match",
             actor,
             bottleId: nextBottleId,
           });

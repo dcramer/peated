@@ -30,6 +30,13 @@ import {
   type SQL,
 } from "drizzle-orm";
 
+// TODO(prices): Remove with the old enum values in the follow-up deploy.
+function toCurrentRetryRunKind(kind: StorePriceMatchRetryRun["kind"]) {
+  if (kind === "match_existing" || kind === "correction") return "match";
+  if (kind === "create_new") return "create_bottle";
+  return kind;
+}
+
 const RETRY_RUN_JOB_ATTEMPTS = 3;
 const RETRY_RUN_ITEM_MAX_ATTEMPTS = 3;
 const RETRY_RUN_ITEM_TIMEOUT_MS =
@@ -52,7 +59,7 @@ export type SerializedStorePriceMatchRetryRun = {
   erroredCount: number;
   failedCount: number;
   id: number;
-  kind: StorePriceMatchRetryRun["kind"];
+  kind: ReturnType<typeof toCurrentRetryRunKind>;
   matchedCount: number;
   mode: StorePriceMatchRetryRun["mode"];
   pendingCount: number;
@@ -125,7 +132,7 @@ export function serializeStorePriceMatchRetryRun(
     erroredCount: run.erroredCount,
     failedCount: run.failedCount,
     id: run.id,
-    kind: run.kind,
+    kind: toCurrentRetryRunKind(run.kind),
     matchedCount: run.matchedCount,
     mode: run.mode,
     pendingCount,

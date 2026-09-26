@@ -29,7 +29,7 @@ describe("admin moderation history", () => {
       .insert(storePriceMatchProposals)
       .values({
         priceId: price.id,
-        proposalType: "match_existing",
+        proposalType: "match",
         suggestedBottleId: bottle.id,
       })
       .returning();
@@ -42,7 +42,7 @@ describe("admin moderation history", () => {
         externalSiteId: site.id,
         name: price.name,
         url: price.url,
-        decision: "match_existing",
+        decision: "match",
         actorId: actor.id,
         bottleId: bottle.id,
         rationale: "The durable identity matched.",

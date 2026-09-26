@@ -902,11 +902,7 @@ function actionableBottleCheckWhere(
               storePriceMatchProposals.id,
               bottleChecks.storePriceMatchProposalId,
             ),
-            inArray(storePriceMatchProposals.status, [
-              "approved",
-              "ignored",
-              "verified",
-            ]),
+            inArray(storePriceMatchProposals.status, ["approved", "ignored"]),
           ),
         ),
     ),

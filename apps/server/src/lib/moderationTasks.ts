@@ -15,6 +15,7 @@ import {
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
 import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
+import { toCurrentProposalType } from "@peated/server/lib/priceMatchingStatus";
 import {
   CATALOG_REPORT_OBJECT_TYPES,
   describeReportSubject,
@@ -32,12 +33,10 @@ const OPERATIONAL_STATUSES = new Set(["applying", "stale", "failed"]);
 
 function listingQuestion(proposalType: string): string {
   switch (proposalType) {
-    case "match_existing":
+    case "match":
       return "Which bottle should this listing use?";
-    case "create_new":
+    case "create_bottle":
       return "Should this bottle be added to the catalog?";
-    case "correction":
-      return "Should this bottle be corrected?";
     case "no_match":
       return "No bottle match was found. Should this listing be ignored?";
     default:
@@ -120,13 +119,13 @@ function listingTask({
       proposal.proposalType === "no_match",
     title: price.name,
     sourceLabel: site.name,
-    question: listingQuestion(proposal.proposalType),
+    question: listingQuestion(toCurrentProposalType(proposal.proposalType)),
     statusLabel:
       proposal.status === "errored"
         ? "Needs recovery"
         : proposal.proposalType === "no_match"
           ? "Inconclusive"
-          : proposal.proposalType.replaceAll("_", " "),
+          : toCurrentProposalType(proposal.proposalType).replaceAll("_", " "),
     attentionAt: (proposal.enteredQueueAt ?? proposal.createdAt).toISOString(),
     source: { kind: "listing", proposalId: proposal.id },
   };

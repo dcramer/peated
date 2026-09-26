@@ -82,7 +82,7 @@ function buildProposedBottle(
 
 function assess(overrides: Partial<AssessmentInput> = {}) {
   return assessStorePriceMatch({
-    action: "create_new",
+    action: "create_bottle",
     price: { bottleId: null },
     suggestedBottleId: null,
     candidates: [],
@@ -158,7 +158,7 @@ describe("assessStorePriceMatch", () => {
   test("verifies a match the classifier judged needs no web research", () => {
     expect(
       assess({
-        action: "match_existing",
+        action: "match",
         suggestedBottleId: 1,
         candidates: [buildCandidate()],
         proposedBottle: null,
@@ -170,7 +170,7 @@ describe("assessStorePriceMatch", () => {
   test("reviews a match that replaces the listing's current Bottle", () => {
     expect(
       assess({
-        action: "correction",
+        action: "match",
         price: { bottleId: 2 },
         suggestedBottleId: 1,
         candidates: [buildCandidate()],
@@ -185,7 +185,7 @@ describe("assessStorePriceMatch", () => {
   test("reviews a match whose Bottle was not a reviewed candidate", () => {
     expect(
       assess({
-        action: "match_existing",
+        action: "match",
         suggestedBottleId: 99,
         candidates: [buildCandidate()],
         proposedBottle: null,

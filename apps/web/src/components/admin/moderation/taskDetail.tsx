@@ -112,20 +112,13 @@ function ListingTask({
   const createBottle = useMutation(
     orpc.prices.matchQueue.createBottle.mutationOptions(),
   );
-  const repair = useMutation(
-    orpc.prices.matchQueue.applyBottleRepair.mutationOptions(),
-  );
   const retry = useMutation(orpc.prices.matchQueue.retry.mutationOptions());
   const [selecting, setSelecting] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copying" | "copied">(
     "idle",
   );
   const [error, setError] = useState<string | null>(null);
-  const busy =
-    resolve.isPending ||
-    createBottle.isPending ||
-    repair.isPending ||
-    retry.isPending;
+  const busy = resolve.isPending || createBottle.isPending || retry.isPending;
 
   async function finish<TResult>(
     action: () => Promise<TResult>,
@@ -200,7 +193,7 @@ function ListingTask({
         </Button>
       );
     }
-    if (item.proposalType === "match_existing" && item.suggestedBottle) {
+    if (item.proposalType === "match" && item.suggestedBottle) {
       return (
         <Button
           variant="accent"
@@ -222,7 +215,7 @@ function ListingTask({
         </Button>
       );
     }
-    if (item.proposalType === "create_new" && item.proposedBottle) {
+    if (item.proposalType === "create_bottle" && item.proposedBottle) {
       return (
         <Button
           variant="accent"
@@ -242,23 +235,6 @@ function ListingTask({
           }
         >
           Create Bottle
-        </Button>
-      );
-    }
-    if (item.proposalType === "correction" && item.proposedBottle) {
-      return (
-        <Button
-          variant="accent"
-          disabled={busy}
-          loading={repair.isPending}
-          onClick={() =>
-            void finish(
-              () => repair.mutateAsync({ proposal: item.id }),
-              "Bottle correction applied.",
-            )
-          }
-        >
-          Apply correction
         </Button>
       );
     }
@@ -364,7 +340,7 @@ function ListingTask({
         >
           {copyStatus === "copied" ? "Copied details" : "Copy details"}
         </Button>
-        {item.proposalType === "create_new" && item.proposedBottle ? (
+        {item.proposalType === "create_bottle" && item.proposedBottle ? (
           <Button href={`/bottles/new?proposal=${item.id}`}>
             Edit before creation
           </Button>
