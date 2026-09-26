@@ -142,6 +142,54 @@ describe("Audit review action routes", () => {
     expect(closed.closedAt).not.toBeNull();
   });
 
+  test("reviews a check whose saved artifacts use retired classifier fields", async ({
+    fixtures,
+  }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const created = await createEntityUpdateCheck(fixtures, "Older Entity");
+    const [saved] = await db
+      .select({ artifacts: bottleChecks.artifacts })
+      .from(bottleChecks)
+      .where(eq(bottleChecks.id, created.check.id));
+    // Shapes written before the cask, alias, category, and maturation changes.
+    const retiredCandidate = {
+      bottleId: 1,
+      fullName: "Older Bottle",
+      category: "retired_category",
+      maturation: "x".repeat(200),
+      alias: "Older Bottle Alias",
+      caskFill: "1st_fill",
+      caskSize: "barrel",
+      caskType: "bourbon",
+      familyContext: {
+        siblingBottles: [{ bottleId: 2, caskType: "sherry" }],
+      },
+    };
+    await db
+      .update(bottleChecks)
+      .set({
+        // SAFETY: This test stores a retired artifact shape to exercise saved-check reads.
+        artifacts: {
+          ...saved!.artifacts,
+          extractedIdentity: { brand: "Older", cask_fill: "1st_fill" },
+          candidates: [retiredCandidate],
+        } as never,
+      })
+      .where(eq(bottleChecks.id, created.check.id));
+
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
+      { context: { user: moderator } },
+    );
+
+    expect(details.reviewOperations).toMatchObject([
+      {
+        operationId: created.operation.id,
+        review: { status: "pending_review" },
+      },
+    ]);
+  });
+
   test("reject-selected preserves its structured reason and note", async ({
     fixtures,
   }) => {

@@ -1,11 +1,8 @@
-import {
-  BottleClassificationArtifactsSchema,
-  type EvidenceRef,
-  type ProposedOperation,
-} from "@peated/bottle-classifier";
+import type { EvidenceRef, ProposedOperation } from "@peated/bottle-classifier";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { countries, entities, regions } from "@peated/server/db/schema";
+import { SavedBottleCheckArtifactsSchema } from "@peated/server/lib/bottleCheckEvidence";
 import type { BottlePatch } from "@peated/server/lib/bottleSchemas";
 import { findEntityByExactNameOrReference } from "@peated/server/lib/db";
 import type {
@@ -28,7 +25,6 @@ import type {
   PreparedEntityUpdateDataSchema,
 } from "../bottleOperationReviewSchemas";
 
-type ParsedArtifacts = z.infer<typeof BottleClassificationArtifactsSchema>;
 export type BottleOperationRow = {
   id: number;
   proposal: unknown;
@@ -86,7 +82,6 @@ export type PreparedOperationExecution =
     };
 
 export type ParsedPreparationContext = {
-  artifacts: ParsedArtifacts;
   sourceFields: ReadonlySet<string>;
   protectedBottleIds: ReadonlySet<number>;
   database: AnyDatabase;
@@ -144,8 +139,8 @@ export function relationshipDigest(value: JsonStringifyInput): string {
 export function parseContext(
   context: BottleOperationPreparationContext,
 ): ParsedPreparationContext {
-  const artifacts = BottleClassificationArtifactsSchema.parse(
-    context.artifacts,
+  const artifacts = SavedBottleCheckArtifactsSchema.parse(
+    context.artifacts ?? {},
   );
   const collectedBottleIds = new Set<number>();
   const collectedEntityIds = new Set<number>();
@@ -183,7 +178,6 @@ export function parseContext(
   }
 
   return {
-    artifacts,
     sourceFields: new Set(context.sourceFields ?? []),
     protectedBottleIds: new Set(context.protectedBottleIds ?? []),
     database: context.database ?? db,

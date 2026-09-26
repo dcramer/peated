@@ -3,6 +3,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { ExternalSiteKeySchema } from "@peated/server/schemas";
 import { and, eq, ilike, inArray, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
@@ -91,6 +92,10 @@ export function getQueueBaseWhere(input: {
 }): SQL {
   const filter = and(
     eq(storePrices.hidden, false),
+    // Store price matching owns this rule: a listing the store has not shown
+    // within the price validity window leaves the work list until a scrape
+    // sees it again.
+    currentStorePriceCondition(),
     getQueueKindFilter(input.kind),
     input.site ? eq(externalSites.type, input.site) : undefined,
     input.query ? ilike(storePrices.name, `%${input.query}%`) : undefined,

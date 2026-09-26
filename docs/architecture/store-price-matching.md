@@ -93,6 +93,15 @@ from a reviewable `create_new`, `match_existing`, or `no_match` proposal,
 including an `errored` proposal. An active processing lease still blocks the
 write, and `correction` proposals continue through the correction action.
 
+The review queue lists only listings the store still shows: a price last seen
+more than 7 days ago (`STORE_PRICE_VALIDITY_DAYS`) leaves the queue, its counts,
+and bulk actions until a scrape sees it again. A direct link to its proposal
+still opens it.
+
+A retry run in `no_web` mode skips web search and reuses the proposal's saved
+extracted facts. When no facts were saved, it extracts them again rather than
+classify with none.
+
 Approval locks and rechecks current state. It submits one Bottle ID. It never
 selects a BottleGroup representative or a legacy release. Failed work can retry
 only after reconciliation; stale work needs a new check or manual correction.

@@ -237,11 +237,17 @@ const BOTTLE_REFERENCE_EVIDENCE_FIELDS = [
   "currentBottleId",
 ] as const satisfies readonly (keyof BottleReferenceInput)[];
 
+// Only the fields read below, so saved checks from older schemas still qualify.
+type BottleCheckEvidenceArtifacts = {
+  extractedIdentity?: object | null;
+  imageEvidence?: { fieldCandidates?: object } | null;
+};
+
 type BottleCheckEvidenceSource =
   | {
       intent: "audit_bottle";
       input: AuditBottleInput;
-      artifacts: BottleClassificationArtifacts;
+      artifacts: BottleCheckEvidenceArtifacts;
     }
   | {
       intent: "resolve_reference";
@@ -255,7 +261,7 @@ type BottleCheckEvidenceSource =
           currentBottleId?: unknown;
         };
       };
-      artifacts: BottleClassificationArtifacts;
+      artifacts: BottleCheckEvidenceArtifacts;
     };
 
 export function getBottleCheckSourceEvidencePaths(
