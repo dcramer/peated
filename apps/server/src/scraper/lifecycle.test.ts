@@ -104,13 +104,20 @@ test("opted-in source resumes the latest finished run cursor", async ({
 }) => {
   const requestedBy = await fixtures.User({ admin: true });
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
-  const latestCursor = { processedIssues: ["Fall 2026"] };
+  const savedCursor = (issue: string) => ({
+    checksReviewDates: true,
+    completedIssues: [issue],
+    issue: null,
+    completedReviewUrls: [],
+    newestIssue: null,
+  });
+  const latestCursor = savedCursor("Fall 2026");
   await db.insert(externalSiteRuns).values([
     {
       externalSiteId: site.id,
       trigger: "scheduled",
       status: "succeeded",
-      cursor: { processedIssues: ["Summer 2026"] },
+      cursor: savedCursor("Summer 2026"),
       completedAt: new Date("2026-08-20T00:00:00Z"),
     },
     {
