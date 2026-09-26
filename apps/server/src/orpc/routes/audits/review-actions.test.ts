@@ -190,6 +190,62 @@ describe("Audit review action routes", () => {
     ]);
   });
 
+  test("shows a check with a retired proposal field as unsupported and closable", async ({
+    fixtures,
+  }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const created = await createEntityUpdateCheck(fixtures, "Retired Field");
+    await db
+      .update(bottleOperations)
+      .set({
+        // SAFETY: This test stores a proposal field that was later removed.
+        proposal: {
+          ...(created.operation.proposal as object),
+          input: {
+            entityId: created.entity.id,
+            patch: { roles: ["distiller"] },
+          },
+        } as never,
+      })
+      .where(eq(bottleOperations.id, created.operation.id));
+
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
+      { context: { user: moderator } },
+    );
+
+    expect(details.audit).toMatchObject({
+      id: created.check.id,
+      schemaSupported: false,
+      schemaVersion: created.check.schemaVersion,
+      canClose: true,
+      operationCount: 1,
+      operations: [],
+    });
+    expect(details.reviewOperations).toEqual([]);
+
+    const listed = await routerClient.audits.list(
+      {},
+      { context: { user: moderator } },
+    );
+    expect(listed.results).toContainEqual(
+      expect.objectContaining({
+        id: created.check.id,
+        schemaSupported: false,
+      }),
+    );
+
+    const closed = await routerClient.audits.close(
+      {
+        audit: created.check.id,
+        reason: "dismissed",
+        note: "The proposal uses a field that no longer exists.",
+      },
+      { context: { user: moderator } },
+    );
+    expect(closed.closedAt).not.toBeNull();
+  });
+
   test("reject-selected preserves its structured reason and note", async ({
     fixtures,
   }) => {

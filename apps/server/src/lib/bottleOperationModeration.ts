@@ -30,7 +30,7 @@ import {
 } from "@peated/server/lib/bottleCheckPrimaryDecision";
 import {
   assertSupportedBottleCheckSchemaVersion,
-  isSupportedBottleCheckSchemaVersion,
+  isSupportedBottleCheck,
   UnsupportedBottleCheckSchemaVersionError,
 } from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
@@ -432,7 +432,7 @@ export async function prepareBottleCheckReviewOperations(
     approvalReady: boolean;
   }>
 > {
-  if (!isSupportedBottleCheckSchemaVersion(check)) {
+  if (!isSupportedBottleCheck(check)) {
     return [];
   }
   const preparationContext = await reviewPreparationContextForCheck(

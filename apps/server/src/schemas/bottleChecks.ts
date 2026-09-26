@@ -110,10 +110,7 @@ const UnsupportedBottleCheckResponseSchema = z
     sourceId: z.string().nullable(),
     bottleId: z.number().nullable(),
     schemaSupported: z.literal(false),
-    schemaVersion: z
-      .number()
-      .int()
-      .refine((value) => value !== BOTTLE_CHECK_SCHEMA_VERSION),
+    schemaVersion: z.number().int(),
     canClose: z.boolean(),
     operationCount: z.number().int().nonnegative(),
     operations: z.tuple([]),

@@ -36,8 +36,8 @@ export default function CheckResult({
           <SectionHeading>{title}</SectionHeading>
         </div>
         <p {...stylex.props(foundationStyles.body, styles.copy)}>
-          This audit uses schema version {check.schemaVersion}. Its historical
-          proposals cannot be reviewed safely
+          This audit was saved in an older format. Its proposals cannot be
+          reviewed safely
           {check.canClose
             ? ", but the audit can be closed."
             : ". It cannot be closed while an operation is applying."}
