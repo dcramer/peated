@@ -17,34 +17,22 @@ import { readReviewBody } from "./reviewBody";
 const ORIGIN = "https://whiskyadvocate.com";
 const TARGET = "whiskyadvocate";
 
-const LegacyWhiskyAdvocateCursorSchema = z
-  .object({ processedIssues: z.array(z.string().min(1)) })
-  .strict();
-
-const CurrentWhiskyAdvocateCursorSchema = z
-  .object({
-    issue: z.string().min(1),
-    processedReviewUrls: z.array(z.url()).max(500),
-  })
-  .strict();
-
-const DatedWhiskyAdvocateCursorSchema = z
+export const WhiskyAdvocateCursorSchema = z
   .object({
     checksReviewDates: z.literal(true),
     completedIssues: z.array(z.string().min(1)).max(500),
     issue: z.string().min(1).nullable(),
     completedReviewUrls: z.array(z.url()).max(500),
+    // Reviews already saved from the newest issue, which every run checks again.
+    newestIssue: z
+      .object({
+        issue: z.string().min(1),
+        reviewUrls: z.array(z.url()).max(500),
+      })
+      .nullable()
+      .default(null),
   })
   .strict();
-
-// Runs can span deploys.
-// TODO(scraper): Remove the two old cursor shapes after this change has been
-// live for three days, when no older run can still be active.
-export const WhiskyAdvocateCursorSchema = z.union([
-  DatedWhiskyAdvocateCursorSchema,
-  LegacyWhiskyAdvocateCursorSchema,
-  CurrentWhiskyAdvocateCursorSchema,
-]);
 
 export type WhiskyAdvocateCursor = z.infer<typeof WhiskyAdvocateCursorSchema>;
 
@@ -180,27 +168,41 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
   if (issueList.length === 0) {
     throw new Error("Whisky Advocate issue list is empty.");
   }
-  // Old saved progress skipped dates, so start again from the newest issue.
-  const completedIssues = new Set(
-    cursor && "checksReviewDates" in cursor ? cursor.completedIssues : [],
-  );
-  let issue = cursor && "issue" in cursor ? cursor.issue : null;
-  const completedReviewUrls = new Set(
-    issue && cursor && "completedReviewUrls" in cursor
-      ? cursor.completedReviewUrls
+  const completedIssues = new Set(cursor?.completedIssues ?? []);
+  let issue = cursor?.issue ?? null;
+  const completedReviewUrls = new Set(issue ? cursor?.completedReviewUrls : []);
+  // Whisky Advocate can add reviews to its current issue after a run finished
+  // it. Every run checks the newest issue again and reads only unsaved reviews.
+  const newestIssue = issueList[0]!;
+  completedIssues.delete(newestIssue);
+  const newestIssueReviewUrls = new Set(
+    cursor?.newestIssue?.issue === newestIssue
+      ? cursor.newestIssue.reviewUrls
       : [],
   );
 
-  const finishIssue = async (finished: string) => {
-    completedIssues.add(finished);
+  const saveProgress = async () => {
     await session.checkpoint({
       checksReviewDates: true,
       completedIssues: [...completedIssues],
-      issue: null,
-      completedReviewUrls: [],
+      issue,
+      completedReviewUrls: [...completedReviewUrls],
+      newestIssue: {
+        issue: newestIssue,
+        reviewUrls: [...newestIssueReviewUrls],
+      },
     });
+  };
+  const finishReview = async (url: string) => {
+    completedReviewUrls.add(url);
+    if (issue === newestIssue) newestIssueReviewUrls.add(url);
+    await saveProgress();
+  };
+  const finishIssue = async (finished: string) => {
+    completedIssues.add(finished);
     issue = null;
     completedReviewUrls.clear();
+    await saveProgress();
   };
 
   while (true) {
@@ -241,7 +243,12 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
     }
 
     for (const review of externalReviews) {
-      if (completedReviewUrls.has(review.url)) continue;
+      if (
+        completedReviewUrls.has(review.url) ||
+        (issue === newestIssue && newestIssueReviewUrls.has(review.url))
+      ) {
+        continue;
+      }
       let articleResponse;
       try {
         articleResponse = await session.request({
@@ -260,13 +267,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
         logWarn("[Whisky Advocate] Review page is missing for {name}", {
           extra: { name: review.name, url: review.url, status: error.status },
         });
-        completedReviewUrls.add(review.url);
-        await session.checkpoint({
-          checksReviewDates: true,
-          completedIssues: [...completedIssues],
-          issue,
-          completedReviewUrls: [...completedReviewUrls],
-        });
+        await finishReview(review.url);
         continue;
       }
       const publishedAt = parseReviewPublishedAt(articleResponse.body);
@@ -308,13 +309,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
         externalReviewBodies: { [review.url]: body },
       });
       await session.emit({ sourceKey: review.url, value });
-      completedReviewUrls.add(review.url);
-      await session.checkpoint({
-        checksReviewDates: true,
-        completedIssues: [...completedIssues],
-        issue,
-        completedReviewUrls: [...completedReviewUrls],
-      });
+      await finishReview(review.url);
     }
 
     await finishIssue(issue);

@@ -28,22 +28,18 @@ function keepFirstIssues(data: string, count: number) {
   return $.html();
 }
 
-test("accepts a cursor stored by the previous adapter", () => {
-  expect(
-    WhiskyAdvocateCursorSchema.parse({ processedIssues: ["Winter 2023"] }),
-  ).toEqual({ processedIssues: ["Winter 2023"] });
+test("reads progress saved before the newest-issue check", () => {
   expect(
     WhiskyAdvocateCursorSchema.parse({
-      issue: "Winter 2023",
-      processedReviewUrls: ["https://whiskyadvocate.com/example-review"],
+      checksReviewDates: true,
+      completedIssues: ["Winter 2023"],
+      issue: null,
+      completedReviewUrls: [],
     }),
-  ).toEqual({
-    issue: "Winter 2023",
-    processedReviewUrls: ["https://whiskyadvocate.com/example-review"],
-  });
+  ).toMatchObject({ completedIssues: ["Winter 2023"], newestIssue: null });
 });
 
-test("starts old saved progress again and finishes remaining issues", async () => {
+test("checks the newest issue again and reads only its unsaved reviews", async () => {
   const issueHtml = keepFirstIssues(
     await loadFixture("whiskyadvocate", "empty-search.html"),
     2,
@@ -52,57 +48,53 @@ test("starts old saved progress again and finishes remaining issues", async () =
   const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
   const issueNames = parseIssueList(issueHtml);
   const $ = cheerio(reviewHtml);
-  $("#directoryResults .postsItem").slice(1).remove();
-  const oneReviewHtml = $.html();
-
-  const run = async (cursor: WhiskyAdvocateCursor) => {
-    const checkpoint = vi.fn();
-    const request = vi.fn(async ({ url }: { url: URL }) => ({
-      url,
-      status: 200,
-      headers: {},
-      body:
-        url.pathname !== "/ratings-reviews"
-          ? articleHtml
-          : url.search.includes("custom_rating_issue")
-            ? oneReviewHtml
-            : issueHtml,
-    }));
-    await whiskyAdvocateAdapter({
-      cursor,
-      session: {
-        request,
-        emit: vi.fn(),
-        checkpoint,
-        remainingRequests: () => 30,
-      },
-    });
-    return { checkpoint, request };
-  };
-
-  const oldRun = await run({ processedIssues: [issueNames[0]!] });
-  expect(
-    oldRun.request.mock.calls[1]?.[0].url.searchParams.get(
-      "custom_rating_issue[0]",
-    ),
-  ).toBe(issueNames[0]);
-  expect(oldRun.checkpoint).toHaveBeenLastCalledWith(
-    expect.objectContaining({ completedIssues: issueNames }),
+  $("#directoryResults .postsItem").slice(2).remove();
+  const twoReviewHtml = $.html();
+  const [savedReview, addedReview] = parseReviews(
+    twoReviewHtml,
+    "https://whiskyadvocate.com/ratings-reviews",
   );
 
-  const nextRun = await run({
-    checksReviewDates: true,
-    completedIssues: [issueNames[0]!],
-    issue: null,
-    completedReviewUrls: [],
+  const emit = vi.fn();
+  const checkpoint = vi.fn();
+  const request = vi.fn(async ({ url }: { url: URL }) => ({
+    url,
+    status: 200,
+    headers: {},
+    body:
+      url.pathname !== "/ratings-reviews"
+        ? articleHtml
+        : url.search.includes("custom_rating_issue")
+          ? twoReviewHtml
+          : issueHtml,
+  }));
+  await whiskyAdvocateAdapter({
+    cursor: {
+      checksReviewDates: true,
+      completedIssues: issueNames,
+      issue: null,
+      completedReviewUrls: [],
+      newestIssue: { issue: issueNames[0]!, reviewUrls: [savedReview!.url] },
+    },
+    session: { request, emit, checkpoint, remainingRequests: () => 30 },
   });
-  expect(
-    nextRun.request.mock.calls[1]?.[0].url.searchParams.get(
-      "custom_rating_issue[0]",
-    ),
-  ).toBe(issueNames[1]);
-  expect(nextRun.checkpoint).toHaveBeenLastCalledWith(
-    expect.objectContaining({ completedIssues: issueNames }),
+
+  // The issue list, the newest issue, and only the review it had not saved.
+  const requestedUrls = request.mock.calls.map(([{ url }]) => url);
+  expect(requestedUrls).toHaveLength(3);
+  expect(requestedUrls[1]!.searchParams.get("custom_rating_issue[0]")).toBe(
+    issueNames[0],
+  );
+  expect(requestedUrls[2]!.href).toBe(addedReview!.url);
+  expect(emit).toHaveBeenCalledOnce();
+  expect(checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      completedIssues: expect.arrayContaining(issueNames),
+      newestIssue: {
+        issue: issueNames[0],
+        reviewUrls: [savedReview!.url, addedReview!.url],
+      },
+    }),
   );
 });
 
@@ -205,12 +197,14 @@ test("fetches dates and checkpoints each review", async () => {
     },
   });
   expect(checkpoint).toHaveBeenCalledTimes(167);
-  expect(checkpoint).toHaveBeenLastCalledWith({
-    checksReviewDates: true,
-    completedIssues: ["Winter 2023"],
-    issue: null,
-    completedReviewUrls: [],
-  });
+  expect(checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: ["Winter 2023"],
+      issue: null,
+      completedReviewUrls: [],
+    }),
+  );
 });
 
 test("skips a review whose page is gone and finishes the issue", async () => {
@@ -258,18 +252,23 @@ test("skips a review whose page is gone and finishes the issue", async () => {
   expect(observations).toHaveLength(165);
   expect(observations.map((item) => item.sourceKey)).not.toContain(missingUrl);
   // The missing page is recorded as done so a resumed run does not request it again.
-  expect(checkpoint).toHaveBeenNthCalledWith(1, {
-    checksReviewDates: true,
-    completedIssues: [],
-    issue: "Winter 2023",
-    completedReviewUrls: [missingUrl],
-  });
-  expect(checkpoint).toHaveBeenLastCalledWith({
-    checksReviewDates: true,
-    completedIssues: ["Winter 2023"],
-    issue: null,
-    completedReviewUrls: [],
-  });
+  expect(checkpoint).toHaveBeenNthCalledWith(
+    1,
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: [],
+      issue: "Winter 2023",
+      completedReviewUrls: [missingUrl],
+    }),
+  );
+  expect(checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: ["Winter 2023"],
+      issue: null,
+      completedReviewUrls: [],
+    }),
+  );
 });
 
 test("skips an issue whose review page is gone and continues", async () => {
@@ -314,18 +313,23 @@ test("skips an issue whose review page is gone and continues", async () => {
   await whiskyAdvocateAdapter({ cursor: null, session });
 
   expect(observations).toHaveLength(166);
-  expect(checkpoint).toHaveBeenNthCalledWith(1, {
-    checksReviewDates: true,
-    completedIssues: [missingIssue],
-    issue: null,
-    completedReviewUrls: [],
-  });
-  expect(checkpoint).toHaveBeenLastCalledWith({
-    checksReviewDates: true,
-    completedIssues: issues,
-    issue: null,
-    completedReviewUrls: [],
-  });
+  expect(checkpoint).toHaveBeenNthCalledWith(
+    1,
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: [missingIssue],
+      issue: null,
+      completedReviewUrls: [],
+    }),
+  );
+  expect(checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: issues,
+      issue: null,
+      completedReviewUrls: [],
+    }),
+  );
 });
 
 test("fails on a server error for a review page", async () => {
@@ -362,7 +366,7 @@ test("fails on a server error for a review page", async () => {
   expect(emit).not.toHaveBeenCalled();
 });
 
-test("rechecks old saved reviews and resumes reviews checked for dates", async () => {
+test("resumes an issue from its saved reviews", async () => {
   const issueHtml = keepFirstIssues(
     await loadFixture("whiskyadvocate", "empty-search.html"),
     1,
@@ -405,36 +409,34 @@ test("rechecks old saved reviews and resumes reviews checked for dates", async (
     return { checkpoint, emit, request };
   };
 
-  const oldRun = await run({
-    issue: "Winter 2023",
-    processedReviewUrls: [firstReviewUrl],
-  });
-  expect(oldRun.request).toHaveBeenCalledTimes(4);
-  expect(oldRun.emit).toHaveBeenCalledTimes(2);
-
   const datedRun = await run({
     checksReviewDates: true,
     completedIssues: [],
     issue: "Winter 2023",
     completedReviewUrls: [firstReviewUrl],
+    newestIssue: null,
   });
   expect(datedRun.request).toHaveBeenCalledTimes(3);
   expect(datedRun.emit).toHaveBeenCalledOnce();
   expect(datedRun.emit).toHaveBeenCalledWith(
     expect.objectContaining({ sourceKey: externalReviews.at(-1)?.url }),
   );
-  expect(datedRun.checkpoint).toHaveBeenCalledWith({
-    checksReviewDates: true,
-    completedIssues: [],
-    issue: "Winter 2023",
-    completedReviewUrls: externalReviews.map((review) => review.url),
-  });
-  expect(datedRun.checkpoint).toHaveBeenLastCalledWith({
-    checksReviewDates: true,
-    completedIssues: ["Winter 2023"],
-    issue: null,
-    completedReviewUrls: [],
-  });
+  expect(datedRun.checkpoint).toHaveBeenCalledWith(
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: [],
+      issue: "Winter 2023",
+      completedReviewUrls: externalReviews.map((review) => review.url),
+    }),
+  );
+  expect(datedRun.checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      checksReviewDates: true,
+      completedIssues: ["Winter 2023"],
+      issue: null,
+      completedReviewUrls: [],
+    }),
+  );
 });
 
 test("fails when the newest issue has no review results", async () => {
