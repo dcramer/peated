@@ -26,6 +26,7 @@ import {
 } from "@peated/server/db/schema";
 import {
   BOTTLE_CHECK_SCHEMA_VERSION,
+  isSupportedBottleCheck,
   isSupportedBottleCheckSchemaVersion,
 } from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
@@ -1085,7 +1086,7 @@ export async function closeBottleCheck(
       .from(bottleOperations)
       .where(eq(bottleOperations.checkId, check.id))
       .orderBy(bottleOperations.id);
-    const schemaSupported = isSupportedBottleCheckSchemaVersion(check);
+    const schemaSupported = isSupportedBottleCheck({ ...check, operations });
     if (
       operations.some(
         ({ status }) =>

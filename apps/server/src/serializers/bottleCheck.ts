@@ -1,5 +1,5 @@
 import type { BottleCheckWithOperations } from "@peated/server/lib/bottleChecks";
-import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
+import { isSupportedBottleCheck } from "@peated/server/lib/bottleCheckSchemaVersion";
 import type { ReviewOperation } from "@peated/server/lib/bottleOperationReviewSchemas";
 import {
   BottleCheckResponseSchema,
@@ -64,7 +64,7 @@ export function serializeBottleCheck(check: BottleCheckWithOperations) {
     closedAt: serializeDate(check.closedAt),
   };
 
-  if (!isSupportedBottleCheckSchemaVersion(check)) {
+  if (!isSupportedBottleCheck(check)) {
     return BottleCheckResponseSchema.parse({
       ...common,
       schemaSupported: false,
