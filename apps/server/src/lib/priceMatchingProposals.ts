@@ -70,6 +70,7 @@ import {
 import { REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES } from "@peated/server/lib/priceMatchingStatus";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
+import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
   finalizeBottleUpdate,
@@ -1273,8 +1274,12 @@ export function createStorePriceMatchResolver({
           BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity);
         classificationInput.extractedIdentitySource = "structured";
       } else if (reuseExistingExtraction) {
-        classificationInput.extractedIdentity =
-          parseStoredExtractedLabel(existingProposal);
+        // A reuse retry skips extraction only when saved facts exist. Passing
+        // null would run the classifier with no facts at all.
+        const storedIdentity = parseStoredExtractedLabel(existingProposal);
+        if (storedIdentity) {
+          classificationInput.extractedIdentity = storedIdentity;
+        }
       }
 
       const classificationRun = signal
@@ -2066,6 +2071,7 @@ export async function ignoreInconclusiveStorePriceMatchProposals({
             FROM ${storePrices}
             WHERE ${storePrices.id} = ${storePriceMatchProposals.priceId}
               AND ${storePrices.hidden} = false
+              AND ${currentStorePriceCondition()}
           )`,
         ),
       )

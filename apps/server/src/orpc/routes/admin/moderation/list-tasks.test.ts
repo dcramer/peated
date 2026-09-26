@@ -156,7 +156,7 @@ describe("admin moderation tasks", () => {
     );
   });
 
-  test("filters and bulk-ignores only actionable inconclusive listings", async ({
+  test("filters and bulk-ignores only actionable, current inconclusive listings", async ({
     defaults,
     fixtures,
   }) => {
@@ -183,7 +183,13 @@ describe("admin moderation tasks", () => {
       hidden: true,
       name: "Hidden unresolved listing",
     });
-    const [inconclusive, matched, processing, hidden] = await db
+    const unlistedPrice = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Listing the store stopped showing",
+      updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+    });
+    const [inconclusive, matched, processing, hidden, unlisted] = await db
       .insert(storePriceMatchProposals)
       .values([
         {
@@ -205,6 +211,11 @@ describe("admin moderation tasks", () => {
         },
         {
           priceId: hiddenPrice.id,
+          proposalType: "no_match",
+          status: "pending_review",
+        },
+        {
+          priceId: unlistedPrice.id,
           proposalType: "no_match",
           status: "pending_review",
         },
@@ -233,6 +244,14 @@ describe("admin moderation tasks", () => {
       }),
     ]);
     expect(filtered.counts.inconclusive).toBe(1);
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `listing:${unlisted!.id}` },
+        { context: { user: admin } },
+      ),
+    ).resolves.toEqual({
+      task: expect.objectContaining({ key: `listing:${unlisted!.id}` }),
+    });
 
     await expect(
       routerClient.admin.moderation.ignoreInconclusive(
@@ -256,6 +275,7 @@ describe("admin moderation tasks", () => {
       [matched!.id]: "pending_review",
       [processing!.id]: "pending_review",
       [hidden!.id]: "pending_review",
+      [unlisted!.id]: "pending_review",
     });
     await expect(
       db.query.storePriceMatchAttempts.findFirst({

@@ -515,6 +515,38 @@ describe("priceMatching", () => {
     expect(retryInput).not.toHaveProperty("extractedIdentitySource");
   });
 
+  test("extracts again when a reuse retry finds no saved extraction", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Example Single Malt",
+    });
+    classifyBottleReference.mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "no_match",
+          rationale: "No safe local match.",
+          candidateBottleIds: [],
+          matchedBottleId: null,
+          proposedBottle: null,
+        },
+        extractedLabel: null,
+      }),
+    );
+
+    await resolveStorePriceMatchProposal(price.id);
+    runScrapedBottleReference.mockClear();
+    await resolveStorePriceMatchProposal(price.id, {
+      force: true,
+      reuseExistingExtraction: true,
+    });
+
+    const retryInput = runScrapedBottleReference.mock.calls[0]?.[0];
+    expect(retryInput).toBeDefined();
+    expect(retryInput).not.toHaveProperty("extractedIdentity");
+  });
+
   test("auto creates a Bottle from complete structured scraper facts without web evidence", async ({
     fixtures,
   }) => {

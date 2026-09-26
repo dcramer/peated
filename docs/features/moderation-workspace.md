@@ -24,7 +24,13 @@ those records into a second task system.
 The Inbox includes open store-price proposals, Bottle or Entity changes waiting
 for review, unresolved findings, and open member reports. Work that is still
 running, failed, stale, or waiting to retry belongs in Background work until it
-needs a person to decide.
+needs a person to decide. A store-price proposal appears only while the store
+still shows the listing; see `docs/architecture/store-price-matching.md`.
+
+A catalog task reads its saved Bottle check through
+`apps/server/src/lib/bottleCheckEvidence.ts`, which keeps only the IDs, links,
+and field names that review needs. A check saved before a classifier schema
+change still opens and can be reviewed.
 
 A report task shows who sent the report, who it is about (when a member is
 named), the reason, and a link to the live content. Its actions remove the

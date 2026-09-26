@@ -9,12 +9,12 @@ import {
   storePrices,
   users,
 } from "@peated/server/db/schema";
-import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
   getActionableBottleCheckSummary,
   listActionableBottleCheckSummaries,
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
+import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
   CATALOG_REPORT_OBJECT_TYPES,
   describeReportSubject,
@@ -22,6 +22,7 @@ import {
   recordNameOf,
   reportTargetKey,
 } from "@peated/server/lib/reports";
+import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import type { ModerationTaskSummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
 import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
 import { and, asc, eq, inArray, isNull, lte, or } from "drizzle-orm";
@@ -158,6 +159,9 @@ async function listingTasks(
           ? undefined
           : eq(storePriceMatchProposals.id, proposalId),
         eq(storePrices.hidden, false),
+        // Store price matching owns this rule: the Inbox lists only listings
+        // the store still shows. A direct link to one task still opens it.
+        proposalId === undefined ? currentStorePriceCondition() : undefined,
         inArray(storePriceMatchProposals.status, ["pending_review", "errored"]),
         or(
           isNull(storePriceMatchProposals.processingExpiresAt),
