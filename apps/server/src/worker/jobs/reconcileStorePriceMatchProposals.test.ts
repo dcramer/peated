@@ -3,6 +3,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import "@peated/server/worker/jobs";
 import {
   reconcileStorePriceMatchProposals as reconcileStorePriceMatchProposalsWithServices,
@@ -163,6 +164,27 @@ describe("reconcileStorePriceMatchProposals", () => {
     expect(enqueuePriceResolution).toHaveBeenCalledTimes(2);
     expect(enqueuePriceResolution).toHaveBeenNthCalledWith(1, newerPrice.id);
     expect(enqueuePriceResolution).toHaveBeenNthCalledWith(2, olderPrice.id);
+  });
+
+  test("does not queue a listing again while its job is still waiting", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Waiting Store Listing",
+    });
+    await agePrice(price.id, 60);
+
+    await reconcileStorePriceMatchProposalsWithServices();
+
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: price.id },
+    );
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
   });
 
   test("is registered as a worker job", () => {

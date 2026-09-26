@@ -4,7 +4,7 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { logError, logInfo } from "@peated/server/lib/log";
-import { pushJob } from "@peated/server/worker/dispatch";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { desc, eq, sql } from "drizzle-orm";
 
 type ReconcileStorePriceMatchProposalsArgs = {
@@ -18,7 +18,11 @@ export type ReconcileStorePriceMatchProposalsServices = {
 
 const defaultServices: ReconcileStorePriceMatchProposalsServices = {
   enqueuePriceResolution: async (priceId) => {
-    await pushJob("ResolveStorePriceBottle", { priceId });
+    // Worker queue rule: use the scraper's unique job ID so a listing that is
+    // still waiting is not queued again. Otherwise every hourly run re-adds
+    // the same listings while the models queue is behind, and the backlog
+    // feeds itself. A finished job with this ID is removed before re-adding.
+    await pushUniqueJob("ResolveStorePriceBottle", { priceId });
   },
 };
 
@@ -63,8 +67,6 @@ export async function reconcileStorePriceMatchProposals(
   let queuedCount = 0;
 
   for (const price of prices) {
-    // Bypass unique enqueue here: stale unique BullMQ ids are one reason these
-    // targetless rows can be missing proposals in the first place.
     try {
       await services.enqueuePriceResolution(price.id);
       queuedCount += 1;
