@@ -37,7 +37,7 @@ export async function requestLegacyUrl(
     });
     return response.body;
   } catch (error) {
-    if (error instanceof ScraperHttpStatusError && error.status === 404) {
+    if (error instanceof ScraperHttpStatusError && error.isMissingPage) {
       const notFound = new Error(url);
       notFound.name = "PageNotFound";
       throw notFound;

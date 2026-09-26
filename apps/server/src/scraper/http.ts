@@ -60,6 +60,11 @@ export class ScraperHttpStatusError extends Error {
   ) {
     super(`Scraper request returned HTTP ${status}.`);
   }
+
+  /** The page is gone (404 or 410), so a crawl skips it instead of failing. */
+  get isMissingPage() {
+    return this.status === 404 || this.status === 410;
+  }
 }
 
 export type ScraperRequestErrorCategory =

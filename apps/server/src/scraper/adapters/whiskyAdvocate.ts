@@ -220,10 +220,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
       // The issue list can name an issue whose review page was removed. Record
       // it as done so the run reaches the remaining issues instead of failing
       // at the same place every day.
-      if (
-        !(error instanceof ScraperHttpStatusError) ||
-        ![404, 410].includes(error.status)
-      ) {
+      if (!(error instanceof ScraperHttpStatusError) || !error.isMissingPage) {
         throw error;
       }
       logWarn("[Whisky Advocate] Issue page is missing for {issue}", {
@@ -253,7 +250,7 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
         // rest of the issue is still collected instead of failing every run.
         if (
           !(error instanceof ScraperHttpStatusError) ||
-          ![404, 410].includes(error.status)
+          !error.isMissingPage
         ) {
           throw error;
         }

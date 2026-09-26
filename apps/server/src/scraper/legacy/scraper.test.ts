@@ -623,6 +623,41 @@ describe("scrapePrices", () => {
     ).toHaveLength(2);
   });
 
+  it("skips an invalid listing and keeps the rest of the batch", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const scrapeProducts = async (url: string, cb: ScrapePricesCallback) => {
+      if (!url.endsWith("/1")) return;
+      await cb({
+        name: "Valid Listing",
+        price: 1800,
+        currency: "usd",
+        url: "https://test.com/valid",
+        volume: 750,
+      });
+      await cb({
+        name: "Free Listing",
+        price: 0,
+        currency: "usd",
+        url: "https://test.com/free",
+        volume: 750,
+      });
+    };
+
+    await scrapePrices(
+      site.type,
+      (page) => `https://test.com/page/${page}`,
+      scrapeProducts,
+    );
+
+    expect(
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toEqual([expect.objectContaining({ name: "Valid Listing" })]);
+  });
+
   it("throws when no products are found", async () => {
     const error = await waitError(() =>
       scrapePrices(

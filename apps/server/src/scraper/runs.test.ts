@@ -556,6 +556,55 @@ test("fails a waiting run after its maximum lifetime", async () => {
   });
 });
 
+test("keeps the waiting problem when a run gives up", async () => {
+  const adapter: ScraperAdapter<
+    FixtureCursor,
+    FixtureObservation
+  > = async () => {
+    throw new ScraperRequestWaitError(
+      "robots_unavailable",
+      new Date("2026-08-18T12:15:00Z"),
+    );
+  };
+  const { registry, run } = await setupRun({ adapter });
+
+  await executeScraperRun(
+    { runId: run.id },
+    { registry, clock: fixedClock(), executionToken: "owner" },
+  );
+  const [waiting] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(waiting).toMatchObject({
+    status: "queued",
+    error:
+      "The source's robots.txt could not be read. The run is waiting to try again.",
+  });
+
+  await db
+    .update(externalSiteRuns)
+    .set({ attemptCount: 10 })
+    .where(eq(externalSiteRuns.id, run.id));
+  await executeScraperRun(
+    { runId: run.id },
+    {
+      registry,
+      clock: fixedClock("2026-08-18T12:15:00Z"),
+      executionToken: "next-owner",
+    },
+  );
+  const [stored] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(stored).toMatchObject({
+    status: "failed",
+    error:
+      "Scraper run exceeded its execution limits. Last problem: The source's robots.txt could not be read.",
+  });
+});
+
 test("replay-safe sink prevents duplicate records after a lost checkpoint", async () => {
   let attempt = 0;
   const adapter: ScraperAdapter<FixtureCursor, FixtureObservation> = async ({

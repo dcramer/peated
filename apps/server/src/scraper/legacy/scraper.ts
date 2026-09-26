@@ -31,6 +31,7 @@ import type {
 import type { ExternalSiteKey } from "@peated/server/types";
 import axios from "axios";
 import { z } from "zod";
+import { keepValidStorePrices } from "../sinks/storePrices";
 import { emitLegacyBottleObservation } from "./bottleContext";
 import {
   beginLegacyPricePagination,
@@ -282,7 +283,9 @@ export default async function scrapePrices(
   if (pagination?.skip) return 0;
   const workQueue = new BatchQueue<StorePrice>(
     SCRAPER_PRICE_BATCH_SIZE,
-    async (prices) => {
+    async (batch) => {
+      const prices = keepValidStorePrices(site, batch);
+      if (prices.length === 0) return;
       logInfo(dryRun ? "Dry run price batch" : "Persisting price batch", {
         extra: {
           site,
@@ -324,7 +327,9 @@ export default async function scrapePrices(
       page += 1;
     }
 
-    if (uniqueProducts.size === 0) {
+    // A resumed run can start on an empty last page; only a fresh run that
+    // finds nothing means the store's pages changed.
+    if (uniqueProducts.size === 0 && (pagination?.startPage ?? 1) === 1) {
       throw new Error("Failed to scrape any products.");
     }
   } finally {

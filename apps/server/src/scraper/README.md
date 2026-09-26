@@ -312,7 +312,7 @@ once in the runtime instead of repeating them in every source test.
 | The saved place points to the next safe item. Results are saved before progress, and repeating work is safe.            | The source's resume and repeat-work tests.                                                             |
 | Each result has a stable source key that is unique where it is stored.                                                  | Parser tests for stable keys and known collisions.                                                     |
 | Parsed output passes the source's strict schema and is saved by its registered save function.                           | Registry and saving tests.                                                                             |
-| A planned wait keeps the run active. Bad markup, invalid data, and failed saves fail the run.                           | Runtime and source tests.                                                                              |
+| A planned wait keeps the run active. Bad markup and failed saves fail the run.                                          | Runtime and source tests.                                                                              |
 | A source change passes fixture tests and one local run against the public website.                                      | Inspect its saved progress, request count, and parsed results. Use the CI label for live model checks. |
 | The first production run is checked in Admin → Scrapers and Sentry.                                                     | Confirm its status, counts, saved progress, robots state, and any final error.                         |
 
@@ -331,7 +331,8 @@ to refresh them without keeping full articles.
 - `succeeded` means the source finished after its valid results and latest
   progress were saved.
 - `queued` with `nextAttemptAt` means the same run is saved and waiting for its
-  next request time. It is not a failure.
+  next request time. It is not a failure. When the wait has a cause, such as an
+  unreadable robots.txt, the run's error names it.
 - `failed` means invalid data, robots rules, settings, saving, or the remote
   website stopped that run. Stored errors are brief; detailed unexpected
   failures belong in Sentry.
@@ -356,7 +357,11 @@ configured size and are never stored by the runtime.
 
 Planned waits do not count as failed attempts. Other restarts do. A run may last
 up to three days. This gives a historical review import time to finish while
-still stopping work that cannot make progress.
+still stopping work that cannot make progress. A run that runs out of attempts
+keeps the last problem it waited on in its error.
+
+A listed page that returns 404 or 410 is skipped with a warning, and a listing
+that fails the price schema is skipped the same way. Neither fails the run.
 
 ## Bot identity
 

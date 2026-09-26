@@ -492,6 +492,41 @@ test("resumes a detail page from its redirect", async () => {
   });
 });
 
+test("skips a listed page that was removed and collects the rest", async () => {
+  const { pinned } = await setupCatalogCollection();
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.pathname === "/whisky") {
+      return new Response(
+        '<article class="product"><a href="/whisky/gone">Gone</a></article><article class="product"><a href="/whisky/release">Release</a></article>',
+      );
+    }
+    if (url.pathname === "/whisky/gone") {
+      return new Response("Not found", { status: 404 });
+    }
+    if (url.pathname === "/whisky/release") {
+      return new Response(
+        '<main data-product-id="official-1"><h1>Official Release</h1><span class="volume">70 cl</span></main>',
+      );
+    }
+    throw new Error(`Unexpected URL: ${url.toString()}`);
+  });
+
+  await expect(
+    runToCompletion({
+      runId: pinned.run.id,
+      fetchImpl,
+      executionToken: "missing-page-collection",
+    }),
+  ).resolves.toEqual({ status: "completed" });
+
+  const [run] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, pinned.run.id));
+  expect(run).toMatchObject({ status: "succeeded", emittedItemCount: 1 });
+});
+
 test("fails a configured source before requesting a reserved destination", async () => {
   const { revision, site, source, user } = await setupCatalogSource(
     "http://127.0.0.1/catalog",
