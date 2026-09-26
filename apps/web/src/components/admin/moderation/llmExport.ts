@@ -78,26 +78,19 @@ function serializeBottleFields(value: BottleLike | ProposedBottleLike) {
 export function formatPriceMatchQueueLlmExport(item: QueueItem) {
   return JSON.stringify(
     {
-      schemaVersion: 4,
+      schemaVersion: 5,
       source: "peated.admin.match_queue",
       proposal: {
         id: item.id,
         status: item.status,
         proposalType: item.proposalType,
-        confidence: item.confidence,
-        modelConfidence: item.modelConfidence,
         model: item.model,
         rationale: item.rationale,
         error: item.error,
         isProcessing: item.isProcessing,
         automation: {
-          score: item.automationScore,
           eligible: item.automationEligible,
           blockers: item.automationBlockers,
-          decisiveMatchAttributes: item.decisiveMatchAttributes,
-          plainAgeBottleAutoVerifyEligible:
-            item.plainAgeBottleAutoVerifyEligible,
-          differentiatingAttributes: item.differentiatingAttributes,
         },
         timestamps: {
           createdAt: item.createdAt,
@@ -152,15 +145,6 @@ export function formatPriceMatchQueueLlmExport(item: QueueItem) {
           outturn: candidate.outturn,
           score: candidate.score,
           source: candidate.source,
-        })),
-        webEvidenceChecks: item.webEvidenceChecks.map((check) => ({
-          attribute: check.attribute,
-          expectedValue: check.expectedValue,
-          required: check.required,
-          validated: check.validated,
-          weaklySupported: check.weaklySupported,
-          matchedSourceTiers: check.matchedSourceTiers,
-          matchedSourceUrls: check.matchedSourceUrls,
         })),
         searchEvidence: item.searchEvidence.map((evidence) => ({
           provider: evidence.provider,

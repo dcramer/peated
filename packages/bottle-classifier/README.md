@@ -67,13 +67,13 @@ See
 
 Other supported subpaths include:
 
+- `automationTier`
 - `bottleCreationDrafts`
 - `bottleIdentity`
 - `bottleSchemaGuidance`
-- `identityEvidenceCore`
+- `fieldConflicts`
 - `imageEvidence`
 - `openaiCompatibleConfig`
-- `priceMatchingEvidence`
 - `smws`
 
 Server integrations may use only the explicit `internal/*` exports. These are not
@@ -90,7 +90,8 @@ general package API.
 - [`src/normalize.ts`](./src/normalize.ts) — normalization helpers
 - [`src/bottleIdentity.ts`](./src/bottleIdentity.ts) — stable Bottle identity
 - [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts) — creation draft cleanup
-- [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts) — evidence checks and `deriveAutomationTier`
+- [`src/automationTier.ts`](./src/automationTier.ts) — `deriveAutomationTier`
+- [`src/fieldConflicts.ts`](./src/fieldConflicts.ts) — typed field conflicts
 - [`src/smws.ts`](./src/smws.ts) — SMWS code handling
 - [`src/eval-fixtures/`](./src/eval-fixtures) — file-backed eval cases
 - [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts) — live eval runner

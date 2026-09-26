@@ -10,7 +10,6 @@ import {
   type BottleCandidate,
   type BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
-import type { WebEvidenceJudgment } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import {
   BottleClassificationError,
@@ -59,8 +58,7 @@ import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { isModelServiceUnavailable } from "@peated/server/lib/openaiClient";
 import {
-  getStorePriceMatchAutomationAssessment,
-  shouldVerifyStorePriceMatch,
+  assessStorePriceMatch,
   type StorePriceMatchAutomationAssessment,
 } from "@peated/server/lib/priceMatchingAutomation";
 import {
@@ -197,24 +195,6 @@ export class StorePriceMatchProposalIdentityChangedError extends Error {
     );
     this.name = "StorePriceMatchProposalIdentityChangedError";
   }
-}
-
-function normalizeClassifierDecisionForPriceMatching(
-  decision: BottleClassificationDecision,
-  candidates: PriceMatchCandidate[],
-): BottleClassificationDecision {
-  if (
-    decision.action === "match" &&
-    !candidates.some(
-      (candidate) => candidate.bottleId === decision.matchedBottleId,
-    )
-  ) {
-    throw new Error(
-      `Classifier returned unknown suggested bottle id (${decision.matchedBottleId}).`,
-    );
-  }
-
-  return decision;
 }
 
 /**
@@ -369,37 +349,15 @@ function getProposalType(
   return decision.action;
 }
 
-// Structured evidence the code-derived automation tier reads. Carried
-// alongside the translated price-match decision because the derived tier no
-// longer reads the numeric `confidence` score.
-type StorePriceMatchDecisionEvidence = {
-  hasUnresolvedRisks: boolean;
-  webEvidence: WebEvidenceJudgment;
-};
-
 function getProposalStatus(
-  price: StorePrice,
   decision: StorePriceMatchDecision,
   automationAssessment: StorePriceMatchAutomationAssessment | null,
-  decisionEvidence: StorePriceMatchDecisionEvidence | null,
 ): StorePriceMatchProposal["status"] {
-  if (
-    automationAssessment &&
-    shouldVerifyStorePriceMatch({
-      action: decision.action,
-      currentBottleId: price.bottleId,
-      identityScope: decision.identityScope,
-      suggestedBottleId: decision.suggestedBottleId,
-      hasUnresolvedRisks: decisionEvidence?.hasUnresolvedRisks ?? false,
-      webEvidence: decisionEvidence?.webEvidence ?? null,
-      automationBlockers: automationAssessment.automationBlockers,
-      plainAgeBottleAutoVerifyEligible:
-        automationAssessment.plainAgeBottleAutoVerifyEligible,
-    })
-  ) {
-    return "verified";
-  }
-  return "pending_review";
+  // An eligible match is verified here; an eligible create is applied later.
+  return decision.action === "match_existing" &&
+    automationAssessment?.automationEligible
+    ? "verified"
+    : "pending_review";
 }
 
 function shouldTrackStorePriceQueueEntry(
@@ -438,7 +396,6 @@ async function recordStorePriceMatchAttempt({
       currentBottleId: proposal.currentBottleId,
       suggestedBottleId: proposal.suggestedBottleId,
       automationEligible: automationAssessment?.automationEligible ?? false,
-      automationScore: automationAssessment?.automationScore ?? null,
       model: proposal.model,
       error: proposal.error,
       reviewedById: proposal.reviewedById,
@@ -771,7 +728,6 @@ export async function upsertStorePriceMatchProposal({
   extractedLabel,
   candidates,
   decision,
-  decisionEvidence,
   automationAssessment,
   searchEvidence,
   error,
@@ -785,7 +741,6 @@ export async function upsertStorePriceMatchProposal({
   extractedLabel: ExtractedBottleDetails | null;
   candidates: PriceMatchCandidate[];
   decision?: StorePriceMatchDecision | null;
-  decisionEvidence?: StorePriceMatchDecisionEvidence | null;
   automationAssessment?: StorePriceMatchAutomationAssessment | null;
   searchEvidence?: SearchEvidence[];
   error?: string | null;
@@ -804,12 +759,7 @@ export async function upsertStorePriceMatchProposal({
   const status =
     statusOverride ??
     (parsedDecision
-      ? getProposalStatus(
-          price,
-          parsedDecision,
-          automationAssessment ?? null,
-          decisionEvidence ?? null,
-        )
+      ? getProposalStatus(parsedDecision, automationAssessment ?? null)
       : "errored");
   const enteredQueueAt = shouldTrackStorePriceQueueEntry(status)
     ? sql`NOW()`
@@ -1339,31 +1289,37 @@ export function createStorePriceMatchResolver({
         return ignoredProposal;
       }
 
-      const classifierDecision = normalizeClassifierDecisionForPriceMatching(
-        classification.decision,
-        candidates,
-      );
+      // Check the classifier boundary: a Match must name a reviewed candidate.
+      if (
+        classification.decision.action === "match" &&
+        !candidates.some(
+          ({ bottleId }) =>
+            bottleId === classification.decision.matchedBottleId,
+        )
+      ) {
+        throw new Error(
+          `Classifier returned unknown suggested bottle id (${classification.decision.matchedBottleId}).`,
+        );
+      }
       const decision = toStorePriceMatchDecision({
         price,
-        decision: classifierDecision,
+        decision: classification.decision,
       });
-      const automationAssessment = getStorePriceMatchAutomationAssessment({
+      const confidenceBasis = classification.decision.confidenceBasis;
+      const automationAssessment = assessStorePriceMatch({
         action: decision.action,
-        modelConfidence: decision.confidence,
         price,
         suggestedBottleId: decision.suggestedBottleId,
-        candidateBottles: candidates,
-        extractedLabel,
+        candidates,
         proposedBottle: decision.proposedBottle,
-        searchEvidence,
+        identityScope: decision.identityScope,
         sourceBottleIdentity: price.sourceBottleIdentity
           ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
           : null,
-        hasUnresolvedRisks:
-          (classification.decision.confidenceBasis?.unresolvedRisks.length ??
-            0) > 0,
-        webEvidenceJudgment:
-          classification.decision.confidenceBasis?.webEvidence ?? null,
+        hasUnresolvedRisks: (confidenceBasis?.unresolvedRisks.length ?? 0) > 0,
+        webEvidence: confidenceBasis?.webEvidence ?? null,
+        readListingImage:
+          classification.artifacts.extractedIdentitySource === "image",
       });
       const { proposal, attempt } = await db.transaction(async (tx) => {
         const proposal = await upsertStorePriceMatchProposal({
@@ -1371,13 +1327,6 @@ export function createStorePriceMatchResolver({
           extractedLabel,
           candidates,
           decision,
-          decisionEvidence: {
-            hasUnresolvedRisks:
-              (classification.decision.confidenceBasis?.unresolvedRisks
-                .length ?? 0) > 0,
-            webEvidence:
-              classification.decision.confidenceBasis?.webEvidence ?? null,
-          },
           automationAssessment,
           searchEvidence,
           expectedProcessingToken: processingToken,

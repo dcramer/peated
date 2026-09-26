@@ -1,11 +1,11 @@
 // This route owns the photo lookup boundary for add-tasting. It may create or
 // reuse a pending upload, but it must not create tastings, bottles, or durable
 // classifier trace rows.
-import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
 import {
   agentActionRiskClass,
   deriveAutomationTier,
-} from "@peated/bottle-classifier/priceMatchingEvidence";
+} from "@peated/bottle-classifier/automationTier";
+import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
 import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
 import config from "@peated/server/config";
@@ -115,7 +115,6 @@ function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
       decision.action === "match" && decision.matchedBottleId !== null,
     reaffirmsCurrentAssignment: false,
     replacesCurrentAssignment: false,
-    hasExactReferenceAnchor: false,
     hasDeterministicAnchor: decision.identityScope === "exact_cask",
     hasPrimaryLabelOrImageEvidence: true,
   });

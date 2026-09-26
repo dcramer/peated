@@ -55,58 +55,9 @@ export const PriceMatchSearchEvidenceSchema = z.object({
 });
 export const BottleSearchEvidenceSchema = PriceMatchSearchEvidenceSchema;
 
-export const PriceMatchAttributeEnum = z.enum([
-  "brand",
-  "bottler",
-  "name",
-  "series",
-  "distillery",
-  "category",
-  "statedAge",
-  "edition",
-  "maturation",
-  "caskNumber",
-  "outturn",
-  "caskStrength",
-  "singleCask",
-  "abv",
-  "vintageYear",
-  "releaseYear",
-]);
-
-// Legacy checks may contain official, critic, retailer, or unknown. Current
-// code only writes external or origin_retailer.
-export const PriceMatchEvidenceSourceTierEnum = z.enum([
-  "official",
-  "critic",
-  "retailer",
-  "external",
-  "origin_retailer",
-  "unknown",
-]);
-export const BottleEvidenceSourceTierEnum = PriceMatchEvidenceSourceTierEnum;
-
-export const PriceMatchEvidenceCheckSchema = z.object({
-  attribute: PriceMatchAttributeEnum,
-  expectedValue: z.string(),
-  required: z.boolean().default(false),
-  validated: z.boolean().default(false),
-  weaklySupported: z.boolean().default(false),
-  matchedSourceTiers: z.array(PriceMatchEvidenceSourceTierEnum).default([]),
-  matchedSourceUrls: z.array(z.string().url()).default([]),
-});
-export const BottleEvidenceCheckSchema = PriceMatchEvidenceCheckSchema;
-
 export const StorePriceMatchAutomationAssessmentFields = {
-  modelConfidence: z.number().nullable(),
-  automationScore: z.number().nullable(),
   automationEligible: z.boolean().default(false),
   automationBlockers: z.array(z.string()).default([]),
-  decisiveMatchAttributes: z.array(PriceMatchAttributeEnum).default([]),
-  structuredMatchRequiresStatedAge: z.boolean().default(false),
-  plainAgeBottleAutoVerifyEligible: z.boolean().default(false),
-  differentiatingAttributes: z.array(PriceMatchAttributeEnum).default([]),
-  webEvidenceChecks: z.array(PriceMatchEvidenceCheckSchema).default([]),
 } as const;
 
 export const StorePriceMatchAutomationAssessmentSchema = z.object(
@@ -229,21 +180,10 @@ export const StorePriceMatchProposalSchema = z.object({
   id: z.number(),
   status: StorePriceMatchProposalStatusEnum,
   proposalType: StorePriceMatchProposalTypeEnum,
-  confidence: z.number().nullable(),
-  modelConfidence: StorePriceMatchAutomationAssessmentFields.modelConfidence,
-  automationScore: StorePriceMatchAutomationAssessmentFields.automationScore,
   automationEligible:
     StorePriceMatchAutomationAssessmentFields.automationEligible,
   automationBlockers:
     StorePriceMatchAutomationAssessmentFields.automationBlockers,
-  decisiveMatchAttributes:
-    StorePriceMatchAutomationAssessmentFields.decisiveMatchAttributes,
-  plainAgeBottleAutoVerifyEligible:
-    StorePriceMatchAutomationAssessmentFields.plainAgeBottleAutoVerifyEligible,
-  differentiatingAttributes:
-    StorePriceMatchAutomationAssessmentFields.differentiatingAttributes,
-  webEvidenceChecks:
-    StorePriceMatchAutomationAssessmentFields.webEvidenceChecks,
   candidateBottles: z.array(PriceMatchCandidateSchema),
   extractedLabel: ExtractedBottleDetailsSchema.nullable(),
   proposedBottle: ProposedBottleSchema.nullable(),

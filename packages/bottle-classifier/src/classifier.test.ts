@@ -3714,7 +3714,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("downgrades a dirty parent age match instead of redirecting it to a child release", async () => {
+  test("keeps a conflicting parent age match for review instead of redirecting it to a child release", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Glenglassaugh",
       bottler: null,
@@ -3781,13 +3781,14 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "no_match",
+      action: "match",
       identityScope: "product",
-      matchedBottleId: null,
+      matchedBottleId: 2457,
     });
-    expect(result.decision.rationale).toContain(
-      "Server downgraded the existing-match recommendation",
-    );
+    expect(result.decision.confidenceBasis?.unresolvedRisks).toContainEqual({
+      category: "trait_conflict",
+      note: "Extracted statedAge conflicts with the matched Bottle.",
+    });
   });
 
   test("keeps non-SMWS year-marked creation on one complete Bottle", async () => {

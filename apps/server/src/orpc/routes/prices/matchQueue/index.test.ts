@@ -186,7 +186,6 @@ describe("price match queue", () => {
     );
     expect(queueItem).toMatchObject({
       proposalType: "correction",
-      confidence: 62,
       price: {
         id: visiblePrice.id,
         name: "Queue Candidate",
@@ -798,158 +797,9 @@ describe("price match queue", () => {
     const queueItem = result.results.find((item) => item.id === proposal.id);
 
     expect(queueItem).toMatchObject({
-      automationScore: 17,
-      automationBlockers: expect.arrayContaining(["persisted blocker"]),
-      differentiatingAttributes: expect.arrayContaining(["distillery"]),
-      webEvidenceChecks: expect.arrayContaining([
-        expect.objectContaining({
-          attribute: "distillery",
-          expectedValue: "Persisted Distillery",
-        }),
-      ]),
+      automationEligible: false,
+      automationBlockers: ["persisted blocker"],
     });
-  });
-
-  test("computes legacy automation assessments without mutating on queue reads", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const brand = await fixtures.Entity({
-      name: "The Whistler",
-      kind: "bottler",
-    });
-    const currentBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Bodega Cask",
-      category: "blend",
-      distillerIds: [],
-    });
-    const price = await fixtures.StorePrice({
-      externalSiteId: site.id,
-      name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
-      bottleId: currentBottle.id,
-      url: "https://www.totalwine.com/example",
-    });
-
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "correction",
-        confidence: 92,
-        currentBottleId: currentBottle.id,
-        suggestedBottleId: currentBottle.id,
-        candidateBottles: [
-          {
-            bottleId: currentBottle.id,
-            fullName: currentBottle.fullName,
-            reference: "The Whistler Bodega Cask",
-            brand: "The Whistler",
-            bottler: "The Whistler",
-            distillery: [],
-            category: "blend",
-            statedAge: null,
-            edition: null,
-            caskStrength: null,
-            singleCask: null,
-            abv: null,
-            vintageYear: null,
-            releaseYear: null,
-            maturation: null,
-            caskNumber: null,
-            outturn: null,
-            score: 0.94,
-            source: ["current", "exact"],
-          },
-        ],
-        extractedLabel: {
-          brand: "The Whistler",
-          bottler: null,
-          expression: "Bodega Cask",
-          series: null,
-          distillery: ["Boann Distillery"],
-          category: "single_malt",
-          stated_age: null,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          maturation: null,
-          cask_number: null,
-          outturn: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-        proposedBottle: {
-          name: "Bodega Cask",
-          brand: {
-            id: brand.id,
-            name: "The Whistler",
-          },
-          bottler: {
-            id: brand.id,
-            name: "The Whistler",
-          },
-          distillers: [
-            {
-              id: null,
-              name: "Boann Distillery",
-            },
-          ],
-          series: null,
-          category: "single_malt",
-          statedAge: null,
-          edition: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          maturation: null,
-          caskNumber: null,
-          outturn: null,
-        },
-        searchEvidence: [
-          {
-            query: "Whistler Bodega Cask distillery",
-            summary: "Boann Distillery produces The Whistler range.",
-            results: [
-              {
-                title: "The Whistler Distillery Collection",
-                url: "https://www.example.com/whistler-bodega-cask",
-                domain: "example.com",
-                description: "Distilled at Boann Distillery.",
-                extraSnippets: [],
-              },
-            ],
-          },
-        ],
-        updatedAt: new Date("2026-03-08T10:00:00.000Z"),
-      })
-      .returning();
-
-    expect(proposal.automationAssessment).toBeNull();
-
-    const result = await routerClient.prices.matchQueue.list(
-      {},
-      { context: { user } },
-    );
-
-    const persistedProposal = await db.query.storePriceMatchProposals.findFirst(
-      {
-        where: eq(storePriceMatchProposals.id, proposal.id),
-      },
-    );
-
-    expect(
-      result.results.find((item) => item.id === proposal.id),
-    ).toMatchObject({
-      modelConfidence: 92,
-      differentiatingAttributes: expect.arrayContaining(["distillery"]),
-    });
-    expect(persistedProposal?.automationAssessment).toBeNull();
   });
 
   test("serializes same-bottle correction proposals with repair drafts", async ({
@@ -1104,13 +954,6 @@ describe("price match queue", () => {
           },
         ],
       },
-      differentiatingAttributes: expect.arrayContaining(["distillery"]),
-      webEvidenceChecks: expect.arrayContaining([
-        expect.objectContaining({
-          attribute: "distillery",
-          expectedValue: "Boann Distillery",
-        }),
-      ]),
     });
   });
 

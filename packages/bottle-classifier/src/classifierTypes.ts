@@ -301,46 +301,6 @@ export const BottleSearchEvidenceSchema = z.object({
   results: z.array(BottleSearchResultSchema).default([]),
 });
 
-// Legacy checks may contain official, critic, retailer, or unknown. Current
-// code only writes external or origin_retailer.
-export const BottleEvidenceSourceTierEnum = z.enum([
-  "official",
-  "critic",
-  "retailer",
-  "external",
-  "origin_retailer",
-  "unknown",
-]);
-
-export const BottleEvidenceCheckSchema = z
-  .object({
-    attribute: z.enum([
-      "brand",
-      "bottler",
-      "name",
-      "series",
-      "distillery",
-      "category",
-      "statedAge",
-      "edition",
-      "caskStrength",
-      "singleCask",
-      "maturation",
-      "caskNumber",
-      "outturn",
-      "abv",
-      "vintageYear",
-      "releaseYear",
-    ]),
-    expectedValue: z.string(),
-    required: z.boolean().default(false),
-    validated: z.boolean().default(false),
-    weaklySupported: z.boolean().default(false),
-    matchedSourceTiers: z.array(BottleEvidenceSourceTierEnum).default([]),
-    matchedSourceUrls: z.array(z.string().url()).default([]),
-  })
-  .strict();
-
 export const ProposedEntityChoiceSchema = z
   .object({
     id: z.number().int().nullable().default(null),
@@ -724,10 +684,6 @@ export type BottleConfidenceBasis = z.infer<typeof BottleConfidenceBasisSchema>;
 export type UnresolvedRisk = z.infer<typeof UnresolvedRiskSchema>;
 export type UnresolvedRiskCategory = z.infer<typeof UnresolvedRiskCategoryEnum>;
 export type ReferenceScope = z.infer<typeof ReferenceScopeEnum>;
-export type BottleEvidenceSourceTier = z.infer<
-  typeof BottleEvidenceSourceTierEnum
->;
-export type BottleEvidenceCheck = z.infer<typeof BottleEvidenceCheckSchema>;
 export type Category = z.infer<typeof CategoryEnum>;
 export type BottleCandidate = z.infer<typeof BottleCandidateSchema>;
 export type BottleSearchEvidence = z.infer<typeof BottleSearchEvidenceSchema>;

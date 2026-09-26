@@ -1,9 +1,9 @@
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import type {
   BottleCandidate,
   BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
 import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
-import { getExistingMatchIdentityConflicts } from "@peated/bottle-classifier/priceMatchingEvidence";
 import type { AnyTransaction } from "@peated/server/db";
 import { bottleBarcodes } from "@peated/server/db/schema";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
@@ -75,10 +75,7 @@ export async function resolveStorePriceBottleMatchInTransaction(
     getBottleCandidateById(barcodeBeforeLock.bottleId, tx),
   ]);
   const conflicts = candidate
-    ? getExistingMatchIdentityConflicts({
-        target: candidate,
-        extractedLabel: sourceBottleIdentity,
-      })
+    ? getBottleFieldConflicts(sourceBottleIdentity, candidate)
     : ["barcode target is not an active Bottle"];
   const bottleId =
     barcodeAfterLock?.bottleId === barcodeBeforeLock.bottleId &&

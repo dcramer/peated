@@ -27,13 +27,13 @@
       "types": "./src/bottleCreationDrafts.ts",
       "default": "./src/bottleCreationDrafts.ts"
     },
-    "./priceMatchingEvidence": {
-      "types": "./src/priceMatchingEvidence.ts",
-      "default": "./src/priceMatchingEvidence.ts"
+    "./automationTier": {
+      "types": "./src/automationTier.ts",
+      "default": "./src/automationTier.ts"
     },
-    "./identityEvidenceCore": {
-      "types": "./src/identityEvidenceCore.ts",
-      "default": "./src/identityEvidenceCore.ts"
+    "./fieldConflicts": {
+      "types": "./src/fieldConflicts.ts",
+      "default": "./src/fieldConflicts.ts"
     },
     "./error": {
       "types": "./src/error.ts",

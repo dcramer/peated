@@ -631,7 +631,6 @@ describe("priceMatching", () => {
       proposalType: "create_new",
       automationAssessment: expect.objectContaining({
         automationEligible: true,
-        automationScore: 100,
         automationBlockers: [],
       }),
     });
@@ -1404,68 +1403,6 @@ describe("priceMatching", () => {
         reference: "Synthetic Candidate",
       }),
     ]);
-  });
-
-  test("normalizes fractional classifier confidence before persisting proposals", async ({
-    fixtures,
-  }) => {
-    config.AI_GATEWAY_API_KEY = undefined;
-
-    const bottle = await fixtures.Bottle();
-    const price = await fixtures.StorePrice({
-      bottleId: null,
-      name: "Fractional Confidence Candidate",
-      imageUrl: null,
-    });
-
-    classifyBottleReference.mockResolvedValue(
-      buildMockBottleReferenceClassification({
-        decision: {
-          action: "match_existing",
-          confidence: 0.88,
-          rationale: "Reference and listing details strongly match.",
-          suggestedBottleId: bottle.id,
-          candidateBottleIds: [bottle.id],
-          proposedBottle: null,
-        },
-        searchEvidence: [],
-        candidateBottles: [
-          {
-            bottleId: bottle.id,
-            reference: "Fractional Confidence Candidate",
-            fullName: bottle.fullName,
-            brand: null,
-            bottler: null,
-            series: null,
-            distillery: [],
-            category: null,
-            statedAge: null,
-            edition: null,
-            caskStrength: null,
-            singleCask: null,
-            abv: null,
-            vintageYear: null,
-            releaseYear: null,
-            maturation: null,
-            caskNumber: null,
-            outturn: null,
-            score: 0.95,
-            source: ["exact"],
-          },
-        ],
-        resolvedEntities: [],
-      }),
-    );
-    const proposal = await resolveStorePriceMatchProposal(price.id);
-
-    expect(proposal.status).toBe("pending_review");
-    expect(proposal.proposalType).toBe("match_existing");
-    expect(proposal.confidence).toBeNull();
-    expect(proposal.automationAssessment).toMatchObject({
-      modelConfidence: null,
-      automationEligible: false,
-      automationScore: null,
-    });
   });
 
   test("keeps a plain age-statement match instead of drifting into a cask-strength release proposal", async ({
@@ -3526,6 +3463,7 @@ describe("priceMatching", () => {
         },
         decision: {
           action: "create_new",
+          identityScope: "exact_cask",
           confidence: 95,
           rationale: "Classifier created the SMWS exact-cask bottle.",
           referenceScope: "global_alias",
@@ -4002,6 +3940,7 @@ describe("priceMatching", () => {
         },
         decision: {
           action: "create_new",
+          identityScope: "exact_cask",
           confidence: 95,
           rationale:
             "Classifier preserved the SMWS code as the identity anchor.",

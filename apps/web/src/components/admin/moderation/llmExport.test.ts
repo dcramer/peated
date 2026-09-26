@@ -123,18 +123,12 @@ function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
     id: 99,
     status: "pending_review",
     proposalType: "no_match",
-    confidence: 0.98,
-    modelConfidence: 0.98,
     model: "test-model",
     rationale: "The available evidence was inconclusive.",
     error: null,
     isProcessing: false,
-    automationScore: 0.95,
     automationEligible: false,
     automationBlockers: [],
-    decisiveMatchAttributes: [],
-    plainAgeBottleAutoVerifyEligible: false,
-    differentiatingAttributes: [],
     createdAt: timestamp,
     updatedAt: timestamp,
     lastEvaluatedAt: null,
@@ -169,7 +163,6 @@ function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
     suggestedBottle,
     proposedBottle: null,
     candidateBottles: [localCandidate],
-    webEvidenceChecks: [],
     searchEvidence: [],
     ...overrides,
   } satisfies QueueItem;
@@ -180,7 +173,7 @@ describe("formatPriceMatchQueueLlmExport", () => {
     const payload = JSON.parse(formatPriceMatchQueueLlmExport(queueItem()));
 
     expect(payload).toMatchObject({
-      schemaVersion: 4,
+      schemaVersion: 5,
       source: "peated.admin.match_queue",
       proposal: {
         id: 99,
