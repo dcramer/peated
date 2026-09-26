@@ -301,10 +301,7 @@ export async function suggestScrapeSourceRevision(
     try {
       page = await input.loadPage(url, options);
     } catch (error) {
-      if (
-        error instanceof ScraperHttpStatusError &&
-        [404, 410].includes(error.status)
-      ) {
+      if (error instanceof ScraperHttpStatusError && error.isMissingPage) {
         throw new ScrapeSourceSetupError(
           "That page is no longer available. Choose another link from the website.",
         );

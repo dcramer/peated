@@ -6,6 +6,7 @@ import {
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import {
+  keepValidStorePrices,
   StorePriceBatchSchema,
   type StorePriceBatch,
 } from "../sinks/storePrices";
@@ -208,7 +209,10 @@ export const kegnbottleAdapter: ScraperAdapter<
     const catalog = ShopifyCatalogSchema.parse(JSON.parse(response.body));
     if (catalog.products.length === 0) break;
 
-    const listings = parseKegnbottleProducts(catalog);
+    const listings = keepValidStorePrices(
+      SITE,
+      parseKegnbottleProducts(catalog),
+    );
     for (let at = 0; at < listings.length; at += SCRAPER_PRICE_BATCH_SIZE) {
       const batch = listings.slice(at, at + SCRAPER_PRICE_BATCH_SIZE);
       await session.emit({

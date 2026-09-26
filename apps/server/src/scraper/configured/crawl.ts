@@ -1,11 +1,12 @@
 import { ExternalReviewArticleIngestionSchema } from "@peated/server/externalReviews/observation";
+import { logWarn } from "@peated/server/lib/log";
 import {
   CatalogListingInputSchema,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
 import { z } from "zod";
 import { ScraperCoordinationError } from "../coordinator";
-import { ScraperRequestWaitError } from "../http";
+import { ScraperHttpStatusError, ScraperRequestWaitError } from "../http";
 import { ScraperRunTakenOverError } from "../session";
 import type { ScraperAdapter, ScraperObservation } from "../types";
 import type { ExecutableScrapeRules } from "./compatibility";
@@ -244,6 +245,16 @@ export function createScrapeSourceAdapter(
             detailUrls[state.detailIndex] = error.resumeUrl.toString();
             state = { ...state, detailUrls };
             await session.checkpoint(state);
+          }
+          // A listed page can be removed before we read it. Skip it so the
+          // rest of the list is still collected.
+          if (error instanceof ScraperHttpStatusError && error.isMissingPage) {
+            logWarn("Skipped a missing page from a saved-rules source", {
+              extra: { url: link, status: error.status },
+            });
+            state = { ...state, detailIndex: state.detailIndex + 1 };
+            await session.checkpoint(state);
+            continue;
           }
           throw error;
         }

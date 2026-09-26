@@ -60,6 +60,7 @@ export const MODEL_UNAVAILABLE_ERROR =
   "The AI service was unavailable. The run is waiting to try again.";
 export const MODEL_UNAVAILABLE_LIMIT_ERROR =
   "The AI service stayed unavailable until the run's time limit. Request setup again.";
+const WAITING_SUFFIX = " The run is waiting to try again.";
 
 // Run completion discards temporary setup evidence, but keeps repair history and cost counts.
 const finishedRunCursor = sql`CASE WHEN ${externalSiteRuns.purpose} = 'suggest'
@@ -159,10 +160,7 @@ async function claimScraperRun({
         .update(externalSiteRuns)
         .set({
           status: "failed",
-          error:
-            candidate.run.error === MODEL_UNAVAILABLE_ERROR
-              ? MODEL_UNAVAILABLE_LIMIT_ERROR
-              : RUN_LIMIT_ERROR,
+          error: getRunLimitError(candidate.run.error),
           cursor: finishedRunCursor,
           completedAt: now,
           nextAttemptAt: null,
@@ -339,6 +337,34 @@ async function activateRepair(runId: number, executionToken: string) {
   }
 }
 
+/**
+ * Admin rule (owner: scraper runtime): a run that gives up keeps the problem
+ * that made it wait, so an operator sees "robots.txt could not be read"
+ * instead of only a generic limit message.
+ */
+function getRunLimitError(waitingError: string | null) {
+  if (waitingError === MODEL_UNAVAILABLE_ERROR) {
+    return MODEL_UNAVAILABLE_LIMIT_ERROR;
+  }
+  if (waitingError?.endsWith(WAITING_SUFFIX)) {
+    return `${RUN_LIMIT_ERROR} Last problem: ${waitingError.slice(0, -WAITING_SUFFIX.length)}`;
+  }
+  return RUN_LIMIT_ERROR;
+}
+
+function getWaitingError(
+  error: ScraperRequestWaitError | ScraperCoordinationError,
+) {
+  if (!(error instanceof ScraperRequestWaitError)) return null;
+  if (error.reason === "robots_unavailable") {
+    return `The source's robots.txt could not be read.${WAITING_SUFFIX}`;
+  }
+  if (error.reason === "rate_limited") {
+    return `The source asked us to slow down.${WAITING_SUFFIX}`;
+  }
+  return null;
+}
+
 async function queueRunForLater(
   claim: ClaimedRun,
   error:
@@ -383,7 +409,9 @@ async function queueRunForLater(
       nextAttemptAt,
       executionToken: null,
       executionExpiresAt: null,
-      error: modelUnavailable ? MODEL_UNAVAILABLE_ERROR : null,
+      error: modelUnavailable
+        ? MODEL_UNAVAILABLE_ERROR
+        : getWaitingError(error),
     })
     .where(
       and(

@@ -363,7 +363,7 @@ export async function resolveScrapeSourceRunRegistry(
                 } catch (error) {
                   if (
                     error instanceof ScraperHttpStatusError &&
-                    [404, 410].includes(error.status)
+                    error.isMissingPage
                   ) {
                     continue;
                   }
@@ -408,7 +408,7 @@ export async function resolveScrapeSourceRunRegistry(
                 } catch (error) {
                   if (
                     error instanceof ScraperHttpStatusError &&
-                    [404, 410].includes(error.status)
+                    error.isMissingPage
                   ) {
                     continue;
                   }
